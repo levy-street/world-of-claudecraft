@@ -35,6 +35,7 @@ import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
+import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
@@ -90,7 +91,12 @@ import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_poli
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
-import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
+import {
+  animatesEveryFrame,
+  animCadenceFrames,
+  characterLodBands,
+  showsStaticFarMesh,
+} from './crowd_lod';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
@@ -1014,6 +1020,11 @@ export class Renderer {
   private entityViewCreateRangeSq = ENTITY_VIEW_CREATE_RANGE_SQ;
   private entityViewDestroyRangeSq = ENTITY_VIEW_DESTROY_RANGE_SQ;
   private renderBudgetGovernor!: RenderBudgetGovernor;
+  // Last frame-budget pressure (render_budget.ts), fed to the character LOD plan
+  // so the animated far band is the first extra cost surrendered on a machine
+  // already at its budget. Cosmetic only: the fairness floor for an actionable
+  // pose lives in crowd_lod.ts and never reads this.
+  private lastBudgetPressure = 0;
   // Composer tiers only (packet 0 R1): with info.autoReset off, this turns the
   // monotonic WebGL counters into per-frame deltas; null on every other profile
   // (low/medium, native-iOS high/ultra, advanced with effects shed), which keep
@@ -1992,6 +2003,7 @@ export class Renderer {
       this.renderBudgetMaxScale(),
       Math.max(this.renderBudgetMinScale(), state.levels.resolution),
     );
+    this.lastBudgetPressure = state.pressure;
     this.foliage.setGrassQuality(state.levels.grass);
     this.foliage.setModelQuality(state.levels.foliage);
     this.vfx.setQuality(state.levels.vfx);
@@ -5248,10 +5260,16 @@ export class Renderer {
 
     // Crowd-adaptive LOD/shadow distances, derived from last frame's visible-rig
     // count (the one-frame lag is imperceptible); recount as we go this frame.
-    const crowdScaleSq = crowdLodScaleSq(this.lastVisibleRigCount);
-    const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdScaleSq;
-    const shadowRangeSq = ENTITY_SHADOW_RANGE_SQ * crowdScaleSq;
-    const midAnimCadenceFrames = midAnimCadence(this.lastVisibleRigCount);
+    // The plan also carries the animated far band (articulated rig at a low
+    // cadence between `lodRangeSq` and `staticRangeSq`) and its cadences.
+    const lodBands = characterLodBands(
+      this.lastVisibleRigCount,
+      ENTITY_SHADOW_RANGE_SQ,
+      ENTITY_LOD_RANGE_SQ,
+      GFX.farCharacterAnimScale,
+      this.lastBudgetPressure,
+    );
+    const shadowRangeSq = lodBands.shadowRangeSq;
     let visibleRigCount = 0;
 
     for (const [id, v] of this.views) {
@@ -5309,6 +5327,11 @@ export class Renderer {
         cdz = e.pos.z - p.pos.z;
       const d2 = cdx * cdx + cdz * cdz;
       const isSelf = id === p.id;
+      // Pose carries information the player acts on (own feedback, the read on
+      // the current target, a cast windup telegraph) rather than mere cosmetic
+      // smoothness: such an entity is exempt from BOTH the cadence throttle and
+      // the crowd-pulled frozen-mesh swap below.
+      const actionablePose = animatesEveryFrame(id, p.id, p.targetId, e.castingAbility);
       if (isSelf) {
         v.group.visible = true;
         v.isFar = false;
@@ -5346,7 +5369,7 @@ export class Renderer {
         if (v.visual) {
           visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
           v.visual.setShadow(wantShadow);
-          v.isFar = d2 > lodRangeSq;
+          v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
@@ -5764,19 +5787,21 @@ export class Renderer {
       updateWaterContact(v, waterContactFrame, this.waterView, this.vfx, this.waterContactPlan);
       v.wasAirborne = airborne;
       v.wasSwimming = swimming;
-      // Distance-tiered mixer updates: near = every frame, mid = every Nth,
-      // far (static LOD mesh visible) = every 6th; edges latch regardless.
-      // Both the near band and the mid cadence follow the same crowd-adaptive
-      // LOD the shadow bands use, because sampling clips + rebuilding bone
-      // matrices is the per-rig cost that actually scales with the crowd.
+      // Distance-tiered mixer updates: near = every frame, mid = every Nth, the
+      // animated far band = every 4th to 6th (the rig is still articulated, so
+      // this is visible motion, just at a lower pose rate), and the frozen band
+      // = every 6th to keep the pose warm for re-entry. Edges latch regardless.
+      // Every band follows the same crowd-adaptive plan the shadow bands use,
+      // because sampling clips + rebuilding bone matrices is the per-rig cost
+      // that actually scales with the crowd.
       //
       // Animation smoothness is cosmetic, but a cast windup is a telegraph the
       // player reacts to, so the local player, the current target, and anything
       // mid-cast always animate every frame no matter how dense the crowd.
       let animate = true;
-      if (!animatesEveryFrame(id, p.id, p.targetId, e.castingAbility)) {
-        if (v.isFar) animate = (this.frameIdx + e.id) % 6 === 0;
-        else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
+      if (!actionablePose) {
+        const cadence = animCadenceFrames(d2, lodBands);
+        animate = cadence <= 1 || (this.frameIdx + e.id) % cadence === 0;
       }
       active.update(dt, st, animate);
       // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
@@ -6763,7 +6788,10 @@ export class Renderer {
 
   // Hang a speech bubble over an entity's head; it follows the entity and
   // fades out after a few seconds (longer for longer messages).
-  showChatBubble(entityId: number, text: string, yell: boolean): void {
+  showChatBubble(entityId: number, text: string, style?: boolean | ChatBubbleStyle): void {
+    // Back-compat: the older 3-arg call passes a bare `yell` boolean; the chat
+    // gate passes a full descriptor (the party channel tint).
+    const s: ChatBubbleStyle = typeof style === 'boolean' ? { yell: style } : (style ?? {});
     let b = this.chatBubbles.get(entityId);
     if (!b) {
       const el = document.createElement('div');
@@ -6773,7 +6801,12 @@ export class Renderer {
       this.chatBubbles.set(entityId, b);
     }
     b.el.textContent = text; // textContent: chat is player input, never HTML
-    b.el.classList.toggle('yell', yell);
+    b.el.classList.toggle('yell', s.yell === true);
+    // Channel bubbles (party/guild/officer) tint the BORDER only; the near-white
+    // background and dark text stay for legibility. Clearing to '' restores the
+    // stylesheet default (and the `.yell` border) when a reused bubble switches
+    // channel, so say/yell/emote stay byte-identical.
+    b.el.style.borderColor = s.border ?? '';
     // wall-clock ttl: sim/render time can run slower than real time under
     // frame-delta clamping, which would keep bubbles up too long
     b.until = performance.now() + 1000 * Math.min(10, 3.5 + text.length * 0.045);
@@ -6786,9 +6819,13 @@ export class Renderer {
     for (const [id, b] of this.chatBubbles) {
       const e = this.sim.entities.get(id);
       const v = e ? this.views.get(id) : undefined;
-      if (!e || !v || now >= b.until) {
+      if (now >= b.until) {
         b.el.remove();
         this.chatBubbles.delete(id);
+        continue;
+      }
+      if (!e || !v) {
+        b.el.style.display = 'none';
         continue;
       }
       // culled rigs (beyond ENTITY_DRAW_RANGE) stop updating group.position,

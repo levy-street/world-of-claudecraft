@@ -346,12 +346,18 @@ Fiesta) and every world/spatial sound ignore the toggle.
 | `ui_card_play`, `ui_card_reveal` | Card Duel minigame (`src/sim/social/card_duel.ts`): a card played, and every round's simultaneous reveal. High-frequency (once per round each), multi-take. |
 | `ui_card_round_push` | Card Duel: layers on top of the reveal cue when a round ties (nobody scores), never a replacement for it |
 | `ui_card_shuffle` | Card Duel: the initial deal at match start AND a mid-match reshuffle (discard pile shuffled back into the deck once it empties), same cue for both moments |
-| `ui_gather_cast` | PLACEHOLDER (deterministic synth, issue #2208): the gather cast starting (Professions 2.0 Phase 12b), a soft tool wind-up |
-| `ui_gather_strike` | PLACEHOLDER (deterministic synth, issue #2208): the completed gather strike landing with the harvest |
-| `ui_gather_rare` | PLACEHOLDER (deterministic synth, issue #2208): rare-strike variant of `ui_gather_strike`, keyed off `gatherResult` rarity rare+ or a rare event |
-| `ui_fish_cast` | PLACEHOLDER (deterministic synth, issue #2208): the fishing line cast whoosh and plop |
-| `ui_fish_bite` | PLACEHOLDER (deterministic synth, issue #2208): the bite signal opening the reel window; the one gameplay-timing cue of this family, so it ignores the Interface & Feedback Sounds toggle (rides `play()`, never `playFeedback()`) |
-| `ui_fish_reel` | PLACEHOLDER (deterministic synth, issue #2208): the landed reel crank and splash |
+| `ui_gather_cast` | the gather cast starting (Professions 2.0 Phase 12b), a soft tool wind-up; PLACEHOLDER (deterministic synth, issue #2208) ONLY as the flat fallback for when `gatherCast()` is called with no node type known. In practice `ui_gather_cast_<nodeType>` below always takes over: `harvestNode` is the sole gather `castStart` emit site and always sets the type |
+| `ui_gather_cast_ore`, `ui_gather_cast_wood`, `ui_gather_cast_herb` | the real, per-node-type "pulling the tool out" recordings that supersede `ui_gather_cast` above, via `audio.gatherCast(nodeType)` |
+| `ui_fish_cast` | the fishing line cast whoosh and plop |
+| `ui_fish_bite` | the bite signal opening the reel window; the one gameplay-timing cue of this family, so it ignores the Interface & Feedback Sounds toggle (rides `play()`, never `playFeedback()`) |
+| `ui_fish_reel` | the landed reel crank and splash |
+| `ui_gather_ore`, `ui_gather_wood`, `ui_gather_herb` | gathering-node harvest, keyed by `GatherNodeType` (`src/sim/types.ts`) off the `gatherResult` sim event via `audio.gather(nodeType)`; replaces the old flat `ui_gather_strike`/`ui_gather_rare` placeholders |
+| `ui_gather_rare`, `ui_gather_epic`, `ui_gather_legendary` | rare-or-better gather stinger, layered ALONGSIDE the `ui_gather_<nodeType>` cue above via `audio.gatherRareTier(tier)`, never a replacement for it; tier tracks `gatherResult.rarity` 1:1, with a rare-event roll forcing at least the epic tier regardless of the rolled material rarity |
+| `ui_craft_engineering`, `ui_craft_alchemy`, `ui_craft_cooking`, `ui_craft_leatherworking`, `ui_craft_tailoring`, `ui_craft_inscription`, `ui_craft_enchanting`, `ui_craft_jewelcrafting`, `ui_craft_weaponcrafting`, `ui_craft_armorcrafting` | crafting completion, one per `CRAFT_RING` family (`src/sim/content/professions.ts`), resolved from the `craftResult` event's `recipeId` via `audio.craftSuccess(professionId)`; an unrecognized family falls back to `ui_loot_item`. `ui_craft_enchanting` never actually fires: the enchanting profession has no craftable recipes in `recipes.ts`, so `craftResult` can never resolve to it |
+| `ui_masterwork` | masterwork proc: plays via `audio.masterwork()` layered ALONGSIDE the `ui_craft_<family>` cue above on the same `craftResult`, never a replacement for it |
+| `ui_craft_disenchant` | the enchanting profession's disenchant action (`src/sim/professions/enchanting.ts` `disenchantItem`), wired to `audio.disenchant()` on a successful `disenchantResult` |
+| `ui_craft_salvage` | the enchanting profession's salvage action (`src/sim/professions/salvage.ts`), wired to `audio.salvage()` on a successful `salvageResult` |
+| `ui_craft_enchanting` (via `audio.enchant()`) | the enchanting profession's ONE recording, reused for its real action: applying an enchant to a held item (`src/sim/professions/enchanting.ts` `applyEnchant`), wired on a successful `enchantResult`. The same file also sits in `craftByFamily.enchanting` above, harmlessly, since that path never fires |
 
 ---
 

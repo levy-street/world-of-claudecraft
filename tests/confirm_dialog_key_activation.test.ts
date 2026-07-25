@@ -101,6 +101,45 @@ describe('bindDialogKeyActivation (confirm-dialog family keyboard repair)', () =
     h.done();
   });
 
+  // The held-key hazard. The picker row that OPENS a confirm is itself
+  // activated on keydown (hud.ts bindContextMenuActions), and confirmDialog
+  // auto-focuses OK, so without a repeat guard an Enter held past the OS
+  // repeat delay walks straight through the row onto the accept button. On the
+  // #2415 replace confirm that destroys an enchant with no refund before the
+  // body can be read.
+  it('ignores OS key repeat, so a held Enter cannot activate the freshly focused button', () => {
+    const h = harness();
+    h.ok.focus();
+    // The repeat that arrives while the key is still down.
+    const ev = h.press(h.ok, { key: 'Enter', code: 'Enter', repeat: true });
+    expect(h.counts().okClicks).toBe(0);
+    // Left entirely alone: not consumed, not prevented, still the game
+    // layer's to handle (movement keys repeat legitimately).
+    expect(ev.defaultPrevented).toBe(false);
+    expect(h.counts().windowSaw).toBe(1);
+    // A fresh press still works, so the guard is repeat-only.
+    h.press(h.ok, { key: 'Enter', code: 'Enter' });
+    expect(h.counts().okClicks).toBe(1);
+    h.done();
+  });
+
+  it('ignores repeated Space too, not just Enter', () => {
+    const h = harness();
+    h.ok.focus();
+    h.press(h.ok, { key: ' ', code: 'Space', repeat: true });
+    expect(h.counts().okClicks).toBe(0);
+    h.done();
+  });
+
+  it('the confirm dialog associates its BODY as the accessible description', () => {
+    // A destroy confirm's body is what dies, what is refunded, and what it
+    // costs. Focus lands on OK, so without aria-describedby a screen reader
+    // announces the name and the button and never the warning.
+    const hud = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain(`el.setAttribute('aria-describedby', 'confirm-dialog-body')`);
+    expect(hud).toContain('<div class="cd-body" id="confirm-dialog-body">');
+  });
+
   it('non-activation keys are left for the game layer even on a focused button', () => {
     const h = harness();
     h.ok.focus();

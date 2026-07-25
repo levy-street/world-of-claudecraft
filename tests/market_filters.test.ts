@@ -1,15 +1,27 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import { type MarketQuery, marketItemMatches, sanitizeMarketQuery } from '../src/sim/market_query';
 import {
+  MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
+  MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
   MARKET_WEAPON_TYPE_FILTERS,
 } from '../src/ui/market_filters';
 
 // A full browse query with sensible defaults; a case varies only what it cares about.
 function q(over: Partial<MarketQuery> = {}): MarketQuery {
-  return { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0, ...over };
+  return {
+    search: '',
+    itemType: 'all',
+    subtype: 'all',
+    armorClass: 'all',
+    primaryStat: 'all',
+    rarity: 'all',
+    page: 0,
+    ...over,
+  };
 }
 
 // Filter a list of item ids through the shared predicate the SERVER filters with
@@ -63,6 +75,8 @@ describe('World Market filters', () => {
       'axe',
       'other',
     ]);
+    expect(MARKET_ARMOR_CLASS_FILTERS).toEqual(['all', 'cloth', 'leather', 'mail']);
+    expect(MARKET_PRIMARY_STAT_FILTERS).toEqual(['all', 'str', 'agi', 'int']);
     expect(MARKET_RARITY_FILTERS).toEqual([
       'all',
       'poor',
@@ -146,6 +160,113 @@ describe('World Market filters', () => {
     expect(filterIds(armor, { itemType: 'armor', subtype: 'chest' })).toEqual(['recruit_tunic']);
   });
 
+  it('narrows armor by cloth, leather, or mail independently of its slot', () => {
+    const armor = ['woven_robe', 'shadow_jerkin', 'boundstone_helm', 'valefire_lantern'];
+    expect(filterIds(armor, { itemType: 'armor', armorClass: 'cloth' })).toEqual(['woven_robe']);
+    expect(filterIds(armor, { itemType: 'armor', armorClass: 'leather' })).toEqual([
+      'shadow_jerkin',
+    ]);
+    expect(filterIds(armor, { itemType: 'armor', armorClass: 'mail' })).toEqual([
+      'boundstone_helm',
+    ]);
+  });
+
+  it('keeps the armor-class filter meaningful for every armor record', () => {
+    // The 'armor' item type deliberately admits held offhands (orbs, lanterns), which the
+    // class predicate then rejects via its `kind === 'armor'` clause. That clause is only
+    // inert while no held offhand carries an armorType, so pin the content assumption: the
+    // day one does, this reddens and someone revisits itemMatchesArmorClass.
+    const offhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
+    expect(offhands.length).toBeGreaterThan(0);
+    expect(offhands.every((item) => item.armorType === undefined)).toBe(true);
+    // And every armorType in the catalog is an option the browse can actually select, so a
+    // new armor class can never be silently unfilterable.
+    const classes = new Set(
+      Object.values(ITEMS)
+        .map((item) => item.armorType)
+        .filter((armorType): armorType is NonNullable<typeof armorType> => armorType !== undefined),
+    );
+    expect([...classes].sort()).toEqual(['cloth', 'leather', 'mail']);
+    for (const armorClass of classes) {
+      expect(MARKET_ARMOR_CLASS_FILTERS).toContain(armorClass);
+    }
+  });
+
+  it('combines armor class, slot, and dominant primary stat filters', () => {
+    const armor = [
+      'eastbrook_warded_leggings',
+      'sootscale_mantle',
+      'drowned_prayer_leggings',
+      'ironlink_legguards',
+    ];
+    expect(
+      filterIds(armor, {
+        itemType: 'armor',
+        subtype: 'legs',
+        armorClass: 'mail',
+        primaryStat: 'int',
+      }),
+    ).toEqual(['eastbrook_warded_leggings']);
+  });
+
+  it('matches only a positive dominant Strength, Agility, or Intellect value', () => {
+    const gear = [
+      'boundstone_helm',
+      'shadow_jerkin',
+      'woven_robe',
+      'recruit_tunic',
+      'kingsbane_last_oath',
+    ];
+    expect(filterIds(gear, { itemType: 'armor', primaryStat: 'str' })).toEqual(['boundstone_helm']);
+    expect(filterIds(gear, { itemType: 'armor', primaryStat: 'agi' })).toEqual(['shadow_jerkin']);
+    expect(filterIds(gear, { itemType: 'armor', primaryStat: 'int' })).toEqual(['woven_robe']);
+    expect(filterIds(gear, { itemType: 'weapon', primaryStat: 'str' })).toEqual([
+      'kingsbane_last_oath',
+    ]);
+    expect(filterIds(gear, { itemType: 'weapon', primaryStat: 'agi' })).toEqual([
+      'kingsbane_last_oath',
+    ]);
+  });
+
+  it('narrows WEAPONS by dominant primary stat too, not only armor', () => {
+    // The armor cases above cannot prove the weapon half of the itemType guard: the only
+    // weapon in that fixture is the one tied str/agi piece, so it matches whether or not
+    // the filter runs. These weapons each have a DIFFERENT dominant stat, so making the
+    // primary-stat filter a no-op for weapons reddens all three lines.
+    const weapons = [
+      'bonewrought_greatsword', // str 14
+      'direfang_greatblade', // agi 14
+      'drownedmoon_scepter', // int 10
+      'worn_sword', // no stats at all
+    ];
+    expect(filterIds(weapons, { itemType: 'weapon', primaryStat: 'str' })).toEqual([
+      'bonewrought_greatsword',
+    ]);
+    expect(filterIds(weapons, { itemType: 'weapon', primaryStat: 'agi' })).toEqual([
+      'direfang_greatblade',
+    ]);
+    expect(filterIds(weapons, { itemType: 'weapon', primaryStat: 'int' })).toEqual([
+      'drownedmoon_scepter',
+    ]);
+    // Dominance, not mere presence: the greatstaff carries agi 4 under str 5, so it is a
+    // Strength weapon only.
+    expect(filterIds(['cragthorn_greatstaff'], { itemType: 'weapon', primaryStat: 'str' })).toEqual(
+      ['cragthorn_greatstaff'],
+    );
+    expect(filterIds(['cragthorn_greatstaff'], { itemType: 'weapon', primaryStat: 'agi' })).toEqual(
+      [],
+    );
+  });
+
+  it('ignores advanced filters outside their matching item type', () => {
+    expect(filterIds(['worn_sword'], { itemType: 'weapon', armorClass: 'mail' })).toEqual([
+      'worn_sword',
+    ]);
+    expect(filterIds(['minor_healing_potion'], { itemType: 'all', primaryStat: 'str' })).toEqual([
+      'minor_healing_potion',
+    ]);
+  });
+
   it('narrows armor filters to the jewelry slots (neck and ring)', () => {
     // Jewelry is kind 'armor' with slot 'ring'/'neck' (heroic vendor exemplars), so the
     // shared slot predicate must sub-filter it like any other wearable slot.
@@ -177,6 +298,16 @@ describe('World Market filters', () => {
     expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'ring' }).subtype).toBe('ring');
     expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'neck' }).subtype).toBe('neck');
     expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'bogus' }).subtype).toBe('all');
+  });
+
+  it('sanitizes armor class and primary stat wire filters', () => {
+    const valid = sanitizeMarketQuery({ armorClass: 'leather', primaryStat: 'int' });
+    expect(valid.armorClass).toBe('leather');
+    expect(valid.primaryStat).toBe('int');
+
+    const invalid = sanitizeMarketQuery({ armorClass: 'plate', primaryStat: 'stamina' });
+    expect(invalid.armorClass).toBe('all');
+    expect(invalid.primaryStat).toBe('all');
   });
 
   it('narrows weapon filters by weapon family', () => {

@@ -38,6 +38,14 @@ export const ko_KR: EnTranslations = {
     "filterLabel": "명령어 필터",
     "filterPlaceholder": "이 범주 검색",
     "noMatches": "일치하는 명령어가 없습니다.",
+    "itemSearchPlaceholder": "이름 또는 ID로 검색",
+    "itemResultsAria": "일치하는 아이템",
+    "itemNoMatches": "일치하는 아이템이 없습니다.",
+    "itemMore": "{total}개 중 {shown}개 표시 중입니다. 계속 입력해 범위를 좁히세요.",
+    "itemChosen": "선택됨: {name}",
+    "itemUnknown": "해당 ID를 가진 아이템이 없습니다.",
+    "itemHeroicTag": "영웅",
+    "kitCurrentSpec": "현재 전문화",
     "serverRequirement": "서버 치트 기능에는 여전히 ALLOW_DEV_COMMANDS=1이 필요합니다.",
     "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
     "sent": "전송됨: {command}",
@@ -55,7 +63,8 @@ export const ko_KR: EnTranslations = {
       "z": "Z",
       "dungeon": "던전",
       "difficulty": "난이도",
-      "name": "이름"
+      "name": "이름",
+      "spec": "전문화"
     },
     "difficulty": {
       "normal": "일반",
@@ -113,6 +122,10 @@ export const ko_KR: EnTranslations = {
       "give": {
         "label": "아이템 지급",
         "description": "플레이어 소지품에 아이템을 추가합니다."
+      },
+      "kit": {
+        "label": "20레벨 초기 장비 세트 착용",
+        "description": "특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다."
       },
       "gold": {
         "label": "골드 추가",
@@ -1049,6 +1062,7 @@ export const ko_KR: EnTranslations = {
       "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
       "mouseoverCast": "파티 창에서 마우스오버 시전",
+      "stickyTarget": "지면 클릭 시 대상 유지",
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
@@ -1461,7 +1475,7 @@ export const ko_KR: EnTranslations = {
         "claw": "발톱",
         "horn": "뿔",
         "tusk": "엄니",
-        "meat": "Meat",
+        "meat": "고기",
         "cloth": "천"
       }
     },
@@ -1529,6 +1543,8 @@ export const ko_KR: EnTranslations = {
       "dragDestroyHint": "세계로 끌어내어 파괴",
       "reorderNeedsRecent": "가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요",
       "itemAriaInstanced": "{item}, 수량 {count}, 제작자 표식이 있는 사본",
+      "itemAriaEnchanted": "{item}, 수량 {count}, 마법부여된 사본",
+      "itemAriaBound": "{item}, 수량 {count}, 귀속된 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
@@ -1753,7 +1769,19 @@ export const ko_KR: EnTranslations = {
       "label": "프레임 위치 초기화"
     },
     "itemTooltip": {
-      "requiresLevel": "필요 레벨 {level}"
+      "requiresLevel": "필요 레벨 {level}",
+      "statEnchanted": "+{value} {stat} (마법부여)",
+      "enchantedFallback": "마법부여됨"
+    },
+    "materialHint": {
+      "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
+      "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
+      "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
+      "resonantThread": "마법부여 재료. 희귀 이상 천 방어구의 마력을 추출해 얻습니다.",
+      "resonantHide": "마법부여 재료. 희귀 이상 가죽 방어구의 마력을 추출해 얻습니다.",
+      "resonantLinks": "마법부여 재료. 희귀 이상 사슬 방어구의 마력을 추출해 얻습니다.",
+      "resonantSteel": "마법부여 재료. 희귀 이상 근접 무기의 마력을 추출해 얻습니다.",
+      "resonantTimber": "마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다."
     },
     "discord": {
       "title": "Discord",
@@ -1994,6 +2022,10 @@ export const ko_KR: EnTranslations = {
         "takeParcelsFirst": "편지를 버리기 전에 소포를 먼저 꺼내세요."
       }
     },
+    "marketIndicator": {
+      "aria": "세계 시장 수령 대기",
+      "tip": "골드나 아이템이 상인에게서 수령을 기다리고 있습니다."
+    },
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다."
     },
@@ -2113,7 +2145,19 @@ export const ko_KR: EnTranslations = {
       "onlineHeader": "온라인 ({n})",
       "offlineHeader": "오프라인 ({n})",
       "hideOffline": "오프라인 숨기기",
-      "hideOfflineTitle": "오프라인 길드원 숨기기"
+      "hideOfflineTitle": "오프라인 길드원 숨기기",
+      "billboard": {
+        "label": "길드 게시판",
+        "empty": "게시판에 아직 아무 내용도 없습니다.",
+        "setBy": "{name} 설정",
+        "save": "저장",
+        "placeholder": "길드에 전할 메시지를 작성하세요",
+        "inputLabel": "길드 게시판 메시지",
+        "result": {
+          "set": "길드 게시판이 업데이트되었습니다.",
+          "notOfficer": "게시판은 임원과 길드 마스터만 수정할 수 있습니다."
+        }
+      }
     },
     "gathering": {
       "title": "채집",
@@ -2383,7 +2427,6 @@ export const ko_KR: EnTranslations = {
       "makersMark": "제작자: {name}",
       "gatheredBy": "채집자: {name}",
       "masterworkSeal": "걸작",
-      "enchantedLine": "마법부여됨",
       "commissionToggle": "주문 제작품으로 제작",
       "commissionToggleHint": "거래로 처음 받는 캐릭터에게 귀속됩니다.",
       "commissionUnbound": "주문 제작품: 첫 수령인에게 귀속됩니다",
@@ -2421,7 +2464,26 @@ export const ko_KR: EnTranslations = {
       "pickerTitle": "마법부여 적용",
       "targetTitle": "마법부여할 아이템을 선택하세요",
       "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
-      "noTargets": "마법부여할 수 있는 아이템이 없습니다."
+      "noTargets": "마법부여할 수 있는 아이템이 없습니다.",
+      "wornTag": "착용 중 ({slot})",
+      "tier": {
+        "base": "기본 마법부여",
+        "runed": "룬 마법부여",
+        "greater": "상급 마법부여"
+      },
+      "yieldHeader": "예상 재료:",
+      "yieldLineExact": "{item} {count}개",
+      "yieldLineRange": "{item} {min}~{max}개",
+      "alreadyEnchanted": "해당 아이템에는 이미 마법부여가 되어 있습니다.",
+      "sameEnchant": "해당 아이템에는 이미 같은 마법부여가 되어 있습니다.",
+      "replaceTag": "{enchant} 대체",
+      "sameEnchantTag": "이미 적용됨",
+      "replaceConfirmTitle": "{item}의 마법부여를 대체하시겠습니까?",
+      "replaceConfirmBody": "{item}의 {old}을(를) {new}(으)로 대체합니다.",
+      "replaceConfirmNoRefund": "기존 마법부여는 파괴되며 재료는 환불되지 않습니다. 되돌릴 수 없습니다.",
+      "replaceConfirmCost": "비용: {cost}",
+      "replaceConfirmCostItem": "{name} {count}개",
+      "replaceConfirmAccept": "대체"
     },
     "training": {
       "title": "훈련: {name}",
@@ -3819,7 +3881,7 @@ export const ko_KR: EnTranslations = {
           "levelingHeading": "마법부여 올리는 법",
           "levelingBody": "기술을 움직이는 행동은 둘이다. 분해와 마법부여 시전. 성공마다 최대 1점이고, 일의 무게로 환산된다. 일반 분해와 가루만 드는 마법부여는 일반 일, 고급 분해와 정수 마법부여는 고급, 희귀 분해와 모든 Runed나 Greater 마법부여는 희귀, 영웅과 전설 분해는 그보다 높다. 익숙한 숙달 감쇠가 25점 단위로 걸려 일반 일은 기술 75에, 고급 일은 100에, 희귀 일은 정확히 상한 125에 회색이 된다. 마법부여만의 자비도 하나 있다. 천장을 넘는 입력은 0이 아니라 천장으로 내림되니, 맹세 전의 영웅 분해는 아무것도 못 배우는 대신 희귀로 계산된다. 마법부여가 다른 정체성 뒤에서 휴면하면 모든 것이 일반 일로 계산되어 오름세가 75에 멎고, 취미로 두면 희귀 일이 여전히 값을 하되 75 이후 느려질 뿐이다.",
           "marketHeading": "부여된 사본, 출처, 시장",
-          "marketBody": "마법부여는 가방 속 장착하지 않은 사본 하나와 재료를 소모하고, 별개의 부여된 사본을 돌려준다. 입으면 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본은 다시 부여할 수도 분해할 수도 없고, 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 세계 시장은 무표식 일반품만 다루므로 부여품과 서명품은 거래 창에서 직접 오간다. 시장에 올릴 수 있는 절반은 재료 쪽이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다."
+          "marketBody": "마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 세계 시장은 무표식 일반품만 다루므로 부여품과 서명품은 거래 창에서 직접 오간다. 시장에 올릴 수 있는 절반은 재료 쪽이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다."
         }
       },
       "howHeading": "제작 방법",
@@ -3858,9 +3920,9 @@ export const ko_KR: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "채광은 세 지역의 광맥에서 광석을 캐어 대장간 계열 전문직에 공급하며, 상한은 100이다.",
-        "logging": "벌목은 세 지역의 숲에서 목재를 베어 무기 자루와 도구에 공급하며, 상한은 100이다.",
-        "herbalism": "약초학은 세 지역에서 약초를 캐어 연금술과 요리에 공급하며, 상한은 100이다.",
+        "mining": "채광은 세상의 바위에서 광석을 곧바로 캐낸다. 이스트브룩 골짜기의 구리, 마이어펜 습지의 철, 쏜피크 고지의 오스뮴이 대장간 계열 전문직에 공급된다. 레벨 1부터 누구나 할 수 있고, 필요한 것은 가방 속 채광 곡괭이 하나뿐이다. 어느 거점 마을에서나 20동이면 산다. 자체 수치로 기록되며 상한은 100이다.",
+        "logging": "벌목은 세 지역의 나무숲에서 목재를 베어 낸다. 이스트브룩 골짜기의 무쇠껍질나무, 마이어펜 습지의 물푸레나무, 쏜피크 고지의 고산소나무가 무기 자루와 지팡이, 그리고 기술자의 작업대에 들어가는 원자재다. 레벨 1부터 누구나 할 수 있고, 가방에 벌목 도끼(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.",
+        "herbalism": "약초학은 야생에서 자라는 것을 캔다. 이스트브룩 골짜기의 윤기잎, 마이어펜 습지의 금빛잎, 쏜피크 고지의 태양꽃잎, 연금술 계열 전문직의 조제를 이어 주는 잎과 줄기다. 레벨 1부터 누구나 할 수 있고, 가방에 약초 낫(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.",
         "fishing": "낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다."
       },
       "rhythmHeading": "채집의 리듬",
@@ -3869,7 +3931,7 @@ export const ko_KR: EnTranslations = {
       "nodesHeading": "지역별 채집물",
       "nodesNote": "채집물의 위치, 티어, 필요한 도구, 산출물. 각 채집물은 내가 채집한 뒤 {respawn}초가 지나야 나에게 다시 생겨난다.",
       "toolsHeading": "도구",
-      "toolsNote": "정확한 상인 가격이 담긴 도구 사다리. 4티어와 5티어 도구는 제작으로만 얻고 팔지 않는다.",
+      "toolsNote": "모든 채집지에는 그 전문직의 도구가 가방에 있어야 하며, 1티어도 예외가 아니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없다. 상인 사다리는 1티어부터 3티어까지를 다루며 모든 거점 마을에 재고가 있다. 도구는 가방에 들어 있기만 하면 되고, 장착 칸도 내구도도 없어서 한 번만 사면 된다. 조건을 가르는 것은 티어뿐이며, 도구의 희귀도 색은 겉모습일 뿐이다.\n\n상인 사다리 위에는 제작 도구 두 가지, 4티어와 5티어가 있다. 기술자가 도구 공방에서 만들며 어떤 NPC도 팔지 않는다. 현재 3티어를 넘는 채집지는 없으므로 지금 이들의 가치는 속도다. 최상급 도구는 낮은 등급 채집지에서 시전 시간을 최소치로 고정하며, 더 높은 티어의 땅이 열리면 그때의 입장권이 된다.",
       "toolCrafted": "제작({craft})",
       "toolVendor": "{name}({hub})",
       "toolUnavailable": "판매 없음",
@@ -6181,6 +6243,7 @@ export const ko_KR: EnTranslations = {
       "arenaJoin": "잿빛 원형경기장 대기열에 들어갔습니다. 훌륭한 상대를 기다리세요...",
       "arenaLeave": "잿빛 원형경기장 대기열에서 나왔습니다.",
       "arenaSands": "잿빛 원형경기장의 모래 위에 섰습니다.",
+      "arenaSandsDrowned": "수몰된 궁정의 물에 잠긴 돌바닥에 들어섰습니다.",
       "tradeRequestSent": "{name}님에게 거래를 요청했습니다.",
       "tradeOpened": "거래 창이 열렸습니다.",
       "tradeComplete": "거래 완료.",
@@ -6349,6 +6412,11 @@ export const ko_KR: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level}레벨 {className}",
       "noChallengers": "아직 순위에 오른 도전자가 없습니다 - 첫 번째가 되세요.",
       "matchInProgress": "{name}님과 경기 진행 중.",
+      "mapName": "맵: {name}",
+      "map": {
+        "coliseum": "잿빛 원형경기장",
+        "drownedCourt": "수몰된 궁정"
+      },
       "leaveQueue": "대기열 나가기",
       "searching": "상대 찾는 중... (대기열 {count}명)",
       "enterQueue": "대기열 참가",
@@ -6641,6 +6709,7 @@ export const ko_KR: EnTranslations = {
       "pageNextAria": "다음 시장 페이지",
       "pageStatus": "{total}쪽 중 {current}쪽",
       "filters": "시장 필터",
+      "filterValueAria": "{label}: {value}",
       "filterType": "유형",
       "filterTypeAll": "모든 유형",
       "filterTypeWeapon": "무기",
@@ -6651,8 +6720,15 @@ export const ko_KR: EnTranslations = {
       "filterTypeOther": "기타",
       "filterArmorType": "방어구 유형",
       "filterArmorAll": "모든 방어구",
+      "filterArmorSlot": "방어구 부위",
+      "filterArmorClassAll": "모든 방어구 유형",
+      "armorCloth": "천 방어구",
+      "armorLeather": "가죽 방어구",
+      "armorMail": "사슬 방어구",
       "filterWeaponType": "무기 유형",
       "filterWeaponAll": "모든 무기",
+      "filterPrimaryStat": "주 능력치",
+      "filterPrimaryStatAll": "모든 주 능력치",
       "filterRarity": "희귀도",
       "filterRarityAll": "모든 희귀도",
       "weaponSword": "검",

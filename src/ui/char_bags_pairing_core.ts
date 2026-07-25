@@ -5,9 +5,10 @@
 // When both are open we therefore split the viewport 50/50, exactly as the bank and
 // the vendor already do with their bags companion (body.bank-open).
 //
-// The bank/vendor clusters OWN the bags companion when they are up (their own pairing
-// docks it), so this one stands down there rather than fighting them for the layout.
-// Desktop never pairs: its windows are free-floating and already show both at once.
+// The bank/vendor/market clusters OWN the bags companion when they are up (their own
+// pairing docks it), so this one stands down there rather than fighting them for the
+// layout. Desktop never pairs: its windows are free-floating and already show both at
+// once.
 //
 // DOM-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
@@ -20,10 +21,12 @@ export interface CharBagsPairingState {
   bankOpen: boolean;
   /** A vendor is up: same, its cluster owns the bags companion. */
   vendorOpen: boolean;
+  /** The World Market is up: same, its cluster owns the bags companion. */
+  marketOpen: boolean;
 }
 
 /** True when the character sheet and the bags should dock as one 50/50 cluster. */
 export function charBagsPaired(s: CharBagsPairingState): boolean {
   if (!s.touch || !s.charOpen || !s.bagsShown) return false;
-  return !s.bankOpen && !s.vendorOpen;
+  return !s.bankOpen && !s.vendorOpen && !s.marketOpen;
 }

@@ -175,6 +175,7 @@ import * as runsMod from './delves/runs';
 import { CASCADE_SCENARIO } from './dev/cascade_playtest';
 import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
+import { arenaMapForSlot } from './dungeon_layout';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -2710,6 +2711,7 @@ export class Sim {
         hpPer2s: 0,
         manaPer2s: 0,
         remaining: 1_000_000,
+        ticksElapsed: 0,
       };
     }
     mage.cascadeDevStats = {
@@ -2807,6 +2809,7 @@ export class Sim {
         hpPer2s: 0,
         manaPer2s: 0,
         remaining: 1_000_000,
+        ticksElapsed: 0,
       };
     }
     this.devSandboxIds = [dummy.id, ...botIds];
@@ -4135,9 +4138,12 @@ export class Sim {
       // reach-ins delegate to delves/runs via their Sim method body.
       partyMembersForKey: (key) => sim.partyMembersForKey(key),
       grantXp: (amount, meta, opts) => sim.grantXp(amount, meta, opts),
-      addItem: (itemId, count, pid) => sim.addItem(itemId, count, pid),
-      addItemInstance: (itemId, instance, pid, count) =>
-        sim.addItemInstance(itemId, instance, pid, count),
+      addItem: (itemId, count, pid, opts) => sim.addItem(itemId, count, pid, opts),
+      equipBag: (itemId, socket, pid) => sim.equipBag(itemId, socket, pid),
+      equipItem: (itemId, pid) => sim.equipItem(itemId, pid),
+      unequipItem: (slot, pid) => sim.unequipItem(slot, pid),
+      addItemInstance: (itemId, instance, pid, count, opts) =>
+        sim.addItemInstance(itemId, instance, pid, count, opts),
       // L2's World Market escrow (marketList) also consumes removeItem; it is bound once
       // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
       spawnBossAdds: (boss, mobId, count) => sim.spawnBossAdds(boss, mobId, count),
@@ -5367,13 +5373,39 @@ export class Sim {
     )
       return;
     for (const existing of replacementConflicts) {
-      this.applyNonPlayerStatAura(target, target.auras[existing], -1);
+      const displaced = target.auras[existing];
+      this.applyNonPlayerStatAura(target, displaced, -1);
       target.auras.splice(existing, 1);
+      // A same-id replacement that swaps in a DIFFERENT display name (a
+      // same-stat elixir overwriting another brand) would otherwise vanish
+      // from the buff bar with no combat-log trace: emit the fade the client
+      // cannot infer. Same-name refreshes stay silent, exactly as before.
+      if (displaced.name !== aura.name)
+        this.emit({ type: 'aura', targetId: target.id, name: displaced.name, gained: false });
     }
     target.auras.push(aura);
     if (aura.kind === 'stealth') target.stealthed = true; // keep the cache live without waiting for updateAuras
     this.applyNonPlayerStatAura(target, aura, 1);
     this.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: true });
+    if (aura.kind === 'hot') {
+      // A HoT's periodic ticks (combat/auras.ts) no longer carry the sound: the
+      // client plays a single heal_impact right here, at the moment it lands,
+      // instead of once per tick for the whole duration. amount:0 keeps this
+      // sound-only (FCT/combat log/heal meters/heal-glow VFX all gate on
+      // amount > 0 or crit, so this never double-counts real ticks). Confirmed
+      // in-game on Priest and Druid, Frenzied Regeneration included (see the
+      // hud.ts heal2 case for the one exception this feeds into).
+      this.emit({
+        type: 'heal2',
+        sourceId: aura.sourceId,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        ability: aura.name,
+        abilityId: aura.id,
+        cueOnly: true,
+      });
+    }
     const source = this.entities.get(aura.sourceId);
     this.refreshMobLeashFromAction(source ?? null, target);
     if (target.kind === 'player') {
@@ -6755,7 +6787,14 @@ export class Sim {
   // this hub always lands, so an async award (loot roll, master loot, delve
   // rewards) can't destroy items. Capacity is enforced by canAddItem pre-checks
   // at the command boundaries instead.
-  addItem(itemId: string, count: number, pid?: number): void {
+  // opts.silent suppresses only the client's default loot audio cue for this
+  // grant (the "You receive:" text line still prints); a caller with its own
+  // dedicated cue for the same grant (gathering/crafting/enchanting) sets
+  // this so the generic ding doesn't stack on top of it. Professions 2.0's
+  // later phases add new grant sites here (Phase 4 rare-event jackpot yields,
+  // Phase 13's disenchant UI wiring): pass { silent: true } from those too,
+  // or the new grants will double-ding the same way the original ones did.
+  addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
@@ -6769,6 +6808,11 @@ export class Sim {
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
+      // Conditional, not `silent: opts?.silent`: writing the key even as
+      // `undefined` on every grant moved every loot event's parity digest
+      // (the canonicalizer keeps `undefined` keys, tests/parity/trace.ts),
+      // dragging goldens with no professions content into every regen.
+      ...(opts?.silent ? { silent: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
     if (
@@ -6788,7 +6832,14 @@ export class Sim {
   // grant (a rare-event windfall) emits ONE loot line with the xN suffix
   // instead of one line and cue per unit; discovery and quest hooks fire once
   // per grant, matching addItem's per-call semantics.
-  addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number, count = 1): void {
+  // opts.silent: see addItem's matching param above, same contract.
+  addItemInstance(
+    itemId: string,
+    instance: ItemInstancePayload,
+    pid?: number,
+    count = 1,
+    opts?: { silent?: boolean },
+  ): void {
     const r = this.resolve(pid);
     if (!r) return;
     if (count < 1) return;
@@ -6820,6 +6871,8 @@ export class Sim {
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
+      // Conditional, see the matching comment in addItem above.
+      ...(opts?.silent ? { silent: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
   }
@@ -7248,8 +7301,20 @@ export class Sim {
     return this.players.get(pid)?.lastDisenchantResult ?? null;
   }
 
-  applyEnchant(itemId: string, enchantId: string, pid?: number): void {
-    const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid);
+  // `slot`, when present, targets the copy WORN in that equipment slot (the
+  // in-place enchant arm), and `confirmReplace` (#2415) is the explicit
+  // consent to replace an existing enchant; both precede `pid` here because
+  // the IWorldProfessions signature is applyEnchant(itemId, enchantId, slot?,
+  // confirmReplace?) and the trailing pid is the offline/server-side extra
+  // (the craftItem (recipeId, commission?, pid?) precedent).
+  applyEnchant(
+    itemId: string,
+    enchantId: string,
+    slot?: EquipSlot,
+    confirmReplace?: boolean,
+    pid?: number,
+  ): void {
+    const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
     this.emit({
@@ -7915,6 +7980,7 @@ export class Sim {
   guildDisband(): void {}
   guildEventCreate(_day: string, _hour: number | null, _title: string, _note: string): void {}
   guildEventRemove(_eventId: number): void {}
+  guildSetMotd(_text: string): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
   }
@@ -8200,6 +8266,10 @@ export class Sim {
   // -------------------------------------------------------------------------
 
   fiestaBotPids: number[] = [];
+  // Per-bot stuck-recovery steering state (fiesta_bots.ts advanceBotSteer):
+  // session-only, never serialized, cleared by stopFiestaPractice and on any
+  // tick a bot is not actively fighting.
+  fiestaBotSteer = new Map<number, fiestaBotsMod.BotSteer>();
 
   fiestaPracticeActive(): boolean {
     return fiestaBotsMod.fiestaPracticeActive(this);
@@ -8382,6 +8452,10 @@ export class Sim {
           matchInfo = {
             format: match.format,
             state: match.state,
+            // Yumi bouts hold a MAZE slot (a different pool whose numbers
+            // collide with pit slots), so parity would be meaningless there:
+            // they report the documented default instead.
+            map: match.yumi ? 'coliseum' : arenaMapForSlot(match.slot).id,
             oppName: enemies.map((e) => e.name).join(' & '),
             oppClass: primary.cls,
             oppLevel: primary.level,
@@ -8551,6 +8625,12 @@ export class Sim {
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
     return this.market.marketInfoFor(pid);
+  }
+
+  // The always-streamed collect-indicator bit (the mailUnreadFor pattern):
+  // server/game.ts ships it on every snapshot as `mktU`.
+  marketCollectPendingFor(pid: number): boolean {
+    return this.market.collectPendingFor(pid);
   }
 
   serializeMarket(): MarketSave {
@@ -8841,6 +8921,10 @@ export class Sim {
 
   get marketInfo(): import('../world_api').MarketInfo | null {
     return this.primaryId === -1 ? null : this.marketInfoFor(this.primaryId);
+  }
+
+  get marketCollectPending(): boolean {
+    return this.primaryId === -1 ? false : this.marketCollectPendingFor(this.primaryId);
   }
 
   get mailInfo(): import('../world_api').MailInfo | null {

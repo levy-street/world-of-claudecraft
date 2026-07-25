@@ -153,6 +153,7 @@ describe('activePvpOpponentIds', () => {
         ladder: [],
         ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
+          map: 'coliseum' as const,
           oppPid: 3,
           oppName: 'Arena Rival',
           oppClass: 'warrior',
@@ -199,6 +200,7 @@ describe('activePvpOpponentIds', () => {
       ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
     };
     const matchBase = {
+      map: 'coliseum' as const,
       oppPid: 3,
       oppName: 'Rivals',
       oppClass: 'warrior' as const,
@@ -262,6 +264,7 @@ describe('activePvpOpponentIds', () => {
         ladder: [],
         ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
+          map: 'coliseum' as const,
           oppPid: 3,
           oppName: 'Arena Rival',
           oppClass: 'warrior',

@@ -38,6 +38,14 @@ export const pt_BR: EnTranslations = {
     "filterLabel": "Filtrar comandos",
     "filterPlaceholder": "Pesquisar nesta categoria",
     "noMatches": "Nenhum comando correspondente.",
+    "itemSearchPlaceholder": "Pesquisar por nome ou id",
+    "itemResultsAria": "Itens correspondentes",
+    "itemNoMatches": "Nenhum item correspondente.",
+    "itemMore": "Mostrando {shown} de {total}. Continue digitando para refinar.",
+    "itemChosen": "Selecionado: {name}",
+    "itemUnknown": "Nenhum item tem esse id.",
+    "itemHeroicTag": "Heroico",
+    "kitCurrentSpec": "Especialização atual",
     "serverRequirement": "Os comandos de trapaça do servidor ainda exigem ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Escolha valores válidos antes de executar este comando.",
     "sent": "Enviado: {command}",
@@ -55,7 +63,8 @@ export const pt_BR: EnTranslations = {
       "z": "Z",
       "dungeon": "Masmorra",
       "difficulty": "Dificuldade",
-      "name": "Nome"
+      "name": "Nome",
+      "spec": "Especialização"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const pt_BR: EnTranslations = {
       "give": {
         "label": "Dar item",
         "description": "Adiciona um item ao inventário do jogador."
+      },
+      "kit": {
+        "label": "Equipar kit de nível 20",
+        "description": "Veste o predefinido de nível 20 pré-Santuário de uma especialização, começando pelas bolsas. Somente equipamento."
       },
       "gold": {
         "label": "Adicionar ouro",
@@ -1049,6 +1062,7 @@ export const pt_BR: EnTranslations = {
       "walkByAutoloot": "Saque Automático ao Passar",
       "groundReticle": "Retícula de mira no chão",
       "mouseoverCast": "Conjuração ao Apontar nos Quadros do Grupo",
+      "stickyTarget": "Manter alvo ao clicar no chão",
       "showItemLevel": "Mostrar nível do item",
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
@@ -1461,8 +1475,8 @@ export const pt_BR: EnTranslations = {
         "claw": "Garra",
         "horn": "Chifre",
         "tusk": "Presa",
-        "meat": "Meat",
-        "cloth": "Cloth"
+        "meat": "Carne",
+        "cloth": "Pano"
       }
     },
     "townFocus": {
@@ -1529,6 +1543,8 @@ export const pt_BR: EnTranslations = {
       "dragDestroyHint": "Arraste para fora do inventário para destruir",
       "reorderNeedsRecent": "Limpe o filtro e ordene por Recentes para reorganizar suas bolsas",
       "itemAriaInstanced": "{item}, quantidade {count}, cópia marcada pelo criador",
+      "itemAriaEnchanted": "{item}, quantidade {count}, cópia encantada",
+      "itemAriaBound": "{item}, quantidade {count}, cópia vinculada",
       "itemAriaMasterwork": "{item}, quantidade {count}, obra-prima",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
@@ -1753,7 +1769,19 @@ export const pt_BR: EnTranslations = {
       "label": "Redefinir Posições dos Quadros"
     },
     "itemTooltip": {
-      "requiresLevel": "Requer Nível {level}"
+      "requiresLevel": "Requer Nível {level}",
+      "statEnchanted": "+{value} {stat} (Encantado)",
+      "enchantedFallback": "Encantado"
+    },
+    "materialHint": {
+      "arcaneDust": "Reagente de encantamento. Desencantado de equipamento comum e incomum.",
+      "arcaneEssence": "Reagente de encantamento. Desencantado de equipamento raro.",
+      "arcaneShard": "Reagente de encantamento. Desencantado de equipamento épico e lendário.",
+      "resonantThread": "Reagente de encantamento. Desencantado de armadura de pano rara ou melhor.",
+      "resonantHide": "Reagente de encantamento. Desencantado de armadura de couro rara ou melhor.",
+      "resonantLinks": "Reagente de encantamento. Desencantado de armadura de malha rara ou melhor.",
+      "resonantSteel": "Reagente de encantamento. Desencantado de armas corpo a corpo raras ou melhores.",
+      "resonantTimber": "Reagente de encantamento. Desencantado de cajados, varinhas, arcos e bestas raros ou melhores."
     },
     "discord": {
       "title": "Discord",
@@ -1994,8 +2022,12 @@ export const pt_BR: EnTranslations = {
         "takeParcelsFirst": "Retire as encomendas antes de descartar a carta."
       }
     },
+    "marketIndicator": {
+      "aria": "Coleta do Mercado Mundial pendente",
+      "tip": "Há ouro ou itens esperando por você com o Mercador."
+    },
     "noticeboard": {
-      "empty": "Nothing seems posted."
+      "empty": "Parece que não há nada afixado."
     },
     "bank": {
       "title": "Banco",
@@ -2113,7 +2145,19 @@ export const pt_BR: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Ocultar offline",
-      "hideOfflineTitle": "Ocultar membros da guilda offline"
+      "hideOfflineTitle": "Ocultar membros da guilda offline",
+      "billboard": {
+        "label": "Mural da Guilda",
+        "empty": "Ainda não há nada no mural.",
+        "setBy": "Definido por {name}",
+        "save": "Salvar",
+        "placeholder": "Escreva uma mensagem para a guilda",
+        "inputLabel": "Mensagem do mural da guilda",
+        "result": {
+          "set": "O mural da guilda foi atualizado.",
+          "notOfficer": "Apenas oficiais e o Mestre da Guilda podem editar o mural."
+        }
+      }
     },
     "gathering": {
       "title": "Coleta",
@@ -2138,9 +2182,9 @@ export const pt_BR: EnTranslations = {
         "herbalism": "Requer uma foice de herborismo de nível {tier}"
       },
       "requiresTool": {
-        "mining": "Requires a mining pick",
-        "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle"
+        "mining": "Requer uma picareta de mineração",
+        "logging": "Requer um machado de lenharia",
+        "herbalism": "Requer uma foice de herborismo"
       },
       "toolTierUnmet": {
         "mining": "Você precisa de uma picareta de mineração de nível {tier} para extrair este veio.",
@@ -2148,39 +2192,39 @@ export const pt_BR: EnTranslations = {
         "herbalism": "Você precisa de uma foice de herborismo de nível {tier} para colher este canteiro."
       },
       "toolRequired": {
-        "mining": "You need a mining pick to harvest this vein.",
-        "logging": "You need a logging axe to fell this stand.",
-        "herbalism": "You need a herbalism sickle to gather this patch.",
-        "fishing": "You need a fishing pole to cast a line."
+        "mining": "Você precisa de uma picareta de mineração para extrair este veio.",
+        "logging": "Você precisa de um machado de lenharia para derrubar este arvoredo.",
+        "herbalism": "Você precisa de uma foice de herborismo para colher este canteiro.",
+        "fishing": "Você precisa de uma vara de pesca para lançar a linha."
       },
       "noNodeNearby": {
-        "mining": "There is no ore vein within reach.",
-        "logging": "There is no timber stand within reach.",
-        "herbalism": "There is no herb patch within reach."
+        "mining": "Não há nenhum veio de minério ao alcance.",
+        "logging": "Não há nenhum arvoredo ao alcance.",
+        "herbalism": "Não há nenhum canteiro de ervas ao alcance."
       },
       "toolTierUnmetCorpse": "Você precisa de uma ferramenta de coleta de nível {tier} para recuperar os melhores materiais.",
       "toolTooltip": {
         "kind": {
-          "mining": "Mining tool (tier {tier})",
-          "logging": "Logging tool (tier {tier})",
-          "herbalism": "Herbalism tool (tier {tier})",
-          "fishing": "Fishing rod (tier {tier})"
+          "mining": "Ferramenta de mineração (nível {tier})",
+          "logging": "Ferramenta de lenharia (nível {tier})",
+          "herbalism": "Ferramenta de herborismo (nível {tier})",
+          "fishing": "Vara de pesca (nível {tier})"
         },
         "unlocks": {
-          "mining": "Required to mine ore veins up to tier {tier}.",
-          "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "mining": "Necessária para extrair veios de minério até o nível {tier}.",
+          "logging": "Necessário para derrubar arvoredos até o nível {tier}.",
+          "herbalism": "Necessária para colher canteiros de ervas até o nível {tier}."
         },
         "use": {
-          "mining": "Use: Mine a nearby ore vein.",
-          "logging": "Use: Fell a nearby timber stand.",
-          "herbalism": "Use: Gather from a nearby herb patch."
+          "mining": "Uso: extrai um veio de minério próximo.",
+          "logging": "Uso: derruba um arvoredo próximo.",
+          "herbalism": "Uso: coleta de um canteiro de ervas próximo."
         },
-        "speed": "Gathers faster at nodes below tier {tier}.",
-        "rodRequired": "Required to fish.",
-        "rodBite": "Fish bite up to {seconds}s sooner.",
-        "rodReel": "Extends the reel window by {seconds}s.",
-        "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
+        "speed": "Coleta mais rápido em nós abaixo do nível {tier}.",
+        "rodRequired": "Necessária para pescar.",
+        "rodBite": "Os peixes mordem a isca até {seconds}s mais cedo.",
+        "rodReel": "Estende a janela de puxada em {seconds}s.",
+        "rodBand": "Libera tabelas de captura mais ricas a partir de {skill} de proficiência em Pesca."
       },
       "downgradeMark": "Bolsas cheias: a descoberta foi armazenada sem a marca do coletor.",
       "downgradeFind": "Bolsas cheias: uma descoberta imaculada escapou.",
@@ -2357,7 +2401,7 @@ export const pt_BR: EnTranslations = {
       },
       "throttled": "Você está criando rápido demais. Espere um momento e tente de novo.",
       "recipeNotLearned": "Você ainda não aprendeu essa receita.",
-      "noBagSpace": "You do not have room for the crafted item.",
+      "noBagSpace": "Você não tem espaço para o item criado.",
       "skillReqLine": "Requer {craft} {skill}",
       "difficultyFull": "Ganho total de habilidade",
       "difficultyReduced": "Ganho de habilidade reduzido",
@@ -2383,7 +2427,6 @@ export const pt_BR: EnTranslations = {
       "makersMark": "Feito por {name}",
       "gatheredBy": "Coletado por {name}",
       "masterworkSeal": "Obra-prima",
-      "enchantedLine": "Encantado",
       "commissionToggle": "Peça por encomenda",
       "commissionToggleHint": "Vincula ao primeiro personagem que a receber em uma negociação.",
       "commissionUnbound": "Peça por encomenda: vincula ao primeiro destinatário",
@@ -2409,9 +2452,9 @@ export const pt_BR: EnTranslations = {
       "enchantWrongSlot": "Esse encantamento não pode ser aplicado a esse item.",
       "enchantUnknown": "Esse encantamento não existe.",
       "enchantInsufficient": "Você não tem os materiais para esse encantamento.",
-      "disenchantNoSpace": "You do not have room for the arcane materials.",
-      "salvageNoSpace": "You do not have room for the salvaged materials.",
-      "enchantNoSpace": "You do not have room for the enchanted item.",
+      "disenchantNoSpace": "Você não tem espaço para os materiais arcanos.",
+      "salvageNoSpace": "Você não tem espaço para os materiais recuperados.",
+      "enchantNoSpace": "Você não tem espaço para o item encantado.",
       "disenchantConfirmTitle": "Desencantar {item}?",
       "disenchantConfirmBody": "Isso destrói {item} e produz materiais arcanos. Não pode ser desfeito.",
       "disenchantConfirmBodySpecial": "Isso destrói uma cópia especial de {item} (assinada, obra-prima ou encantada) e produz materiais arcanos. Não pode ser desfeito.",
@@ -2421,7 +2464,26 @@ export const pt_BR: EnTranslations = {
       "pickerTitle": "Aplicar Encantamento",
       "targetTitle": "Escolha um item para encantar",
       "noEnchants": "Nenhum encantamento usa esse reagente.",
-      "noTargets": "Nenhum item elegível para encantar."
+      "noTargets": "Nenhum item elegível para encantar.",
+      "wornTag": "Equipado ({slot})",
+      "tier": {
+        "base": "Encantamentos Base",
+        "runed": "Encantamentos Rúnicos",
+        "greater": "Encantamentos Superiores"
+      },
+      "yieldHeader": "Materiais esperados:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} a {max} {item}",
+      "alreadyEnchanted": "Esse item já está encantado.",
+      "sameEnchant": "Esse item já tem esse encantamento.",
+      "replaceTag": "Substitui {enchant}",
+      "sameEnchantTag": "Já aplicado",
+      "replaceConfirmTitle": "Substituir o encantamento de {item}?",
+      "replaceConfirmBody": "Isso substitui {old} em {item} por {new}.",
+      "replaceConfirmNoRefund": "O encantamento antigo é destruído. Os materiais dele não são reembolsados. Não pode ser desfeito.",
+      "replaceConfirmCost": "Custo: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Substituir"
     },
     "training": {
       "title": "Treinamento: {name}",
@@ -2431,10 +2493,10 @@ export const pt_BR: EnTranslations = {
       "stateKnown": "Conhecido",
       "stateTeachable": "Disponível",
       "stateLocked": "Bloqueado",
-      "statePending": "Learning",
+      "statePending": "Aprendendo",
       "requirement": "Ensinado em {craft} {skill}",
       "trainAria": "Aprenda {name} para {fee}",
-      "pendingAria": "Learning {name}",
+      "pendingAria": "Aprendendo {name}",
       "dialogOption": "Treinamento",
       "dialogOptionAria": "Procure o treinamento de {name}",
       "learned": "Receita aprendida: {recipe}",
@@ -2462,7 +2524,7 @@ export const pt_BR: EnTranslations = {
       "notBound": "Esse item não está vinculado.",
       "cannotAfford": "Você não pode pagar a taxa de desvincular.",
       "outOfRange": "Você deve estar em uma bancada de artesanato para desvincular.",
-      "noSpace": "You do not have room for the unbound copy."
+      "noSpace": "Você não tem espaço para a cópia desvinculada."
     },
     "finder": {
       "title": "Localizador de Masmorras",
@@ -3819,7 +3881,7 @@ export const pt_BR: EnTranslations = {
           "levelingHeading": "Como o encantamento sobe de nível",
           "levelingBody": "Duas ações movem a habilidade: desencantear uma peça e aplicar um encantamento. Cada sucesso vale até um ponto, escalado pela seriedade do trabalho: a raridade da peça que você quebra, ou o nível de reagente do encantamento que você aplica. Desencantar comuns e encantamentos só com pó pontuam como trabalho comum; desencantar incomuns e encantamentos com essência como incomum; desencantar raros e todo encantamento Rúnico ou Superior como raro; desencantar épicos e lendários ainda mais alto.\n\nO desvanecer de maestria familiar se aplica em faixas de 25 pontos, então trabalho de nível comum fica cinza na habilidade 75, trabalho incomum em 100, e trabalho de nível raro exatamente no limite de 125. O Encantamento também tem uma gentileza própria: insumos acima do teto do seu arquétipo são arredondados para esse teto em vez de zerarem, então antes de se sintonizar, um desencantar épico simplesmente pontua como raro em vez de não ensinar nada. Se o Encantamento acabar inativo por trás de outra identidade, tudo pontua como trabalho comum e a escalada estagna em 75; mantenha-o como passatempo e o trabalho de nível raro ainda paga, só mais devagar após o 75.",
           "marketHeading": "Cópias encantadas, proveniência e o mercado",
-          "marketBody": "Aplicar um encantamento consome uma cópia ensacada e desequipada do item mais os reagentes, e entrega de volta uma cópia encantada distinta; equipe-a e o bônus segue a peça para sempre, através de desequipamentos, viagens ao banco e trocas. Um encantamento por peça: uma cópia encantada nunca pode ser encantada novamente ou desencantada, e vender, descartar e desencantar preferem sempre cópias simples primeiro, então sua peça finalizada não é consumida por acidente. Cópias idênticas encantadas até se empilham juntas nas suas bolsas.\n\nEquipamento com obra-prima e encantamento são amigos: uma peça de obra-prima permanece totalmente encantável, e o encantamento se soma ao bônus da obra-prima sem perturbá-lo nem a assinatura do criador. Somando todas as fontes, uma obra-prima assinada com um encantamento Superior é o melhor que uma peça artesanal pode ter, e ainda fica abaixo do saque de incursão por design.\n\nNo mercado, o Mercado Mundial negocia apenas estoque simples e não modificado, então peças encantadas e assinadas mudam de mãos cara a cara pela janela de troca. Os materiais são a metade comercializável do ofício: Pó, Essência e Fragmentos são listados livremente, listar não custa nada, e o Mercador fica com 5% de uma venda concluída apenas. Isso faz com que as duas fontes clássicas de renda de um encantador sejam vender materiais no mercado e pegar a peça de um cliente na troca, encantá-la e devolvê-la."
+          "marketBody": "Aplicar um encantamento consome os reagentes e marca uma cópia específica do item. Aponte para uma cópia na bolsa e você recebe de volta uma cópia encantada distinta; aponte para uma peça que você já veste e ela é encantada no lugar, sem desequipar e reequipar. De qualquer forma o bônus segue a peça para sempre, através de desequipamentos, viagens ao banco e trocas. Um encantamento por peça: aplicar um encantamento diferente a uma cópia encantada pede confirmação primeiro e então substitui o encantamento antigo de vez, destruindo-o sem reembolso dos materiais. Vender, descartar e desencantar preferem sempre cópias simples primeiro, então sua peça finalizada não é consumida por acidente. Cópias idênticas encantadas até se empilham juntas nas suas bolsas.\n\nEquipamento com obra-prima e encantamento são amigos: uma peça de obra-prima permanece totalmente encantável, e o encantamento se soma ao bônus da obra-prima sem perturbá-lo nem a assinatura do criador. Somando todas as fontes, uma obra-prima assinada com um encantamento Superior é o melhor que uma peça artesanal pode ter, e ainda fica abaixo do saque de incursão por design.\n\nNo mercado, o Mercado Mundial negocia apenas estoque simples e não modificado, então peças encantadas e assinadas mudam de mãos cara a cara pela janela de troca. Os materiais são a metade comercializável do ofício: Pó, Essência e Fragmentos são listados livremente, listar não custa nada, e o Mercador fica com 5% de uma venda concluída apenas. Isso faz com que as duas fontes clássicas de renda de um encantador sejam vender materiais no mercado e pegar a peça de um cliente na troca, encantá-la e devolvê-la."
         }
       },
       "howHeading": "Como funciona a criação",
@@ -3858,9 +3920,9 @@ export const pt_BR: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "A Mineração extrai minério direto da rocha do mundo: cobre no Vale de Eastbrook, ferro no Brejo de Mirefen e ósmio em Thornpeak Heights, alimentando os ofícios de forja. Aberta a todos desde o nível 1, sem nenhum requisito, rastreada em seu próprio contador até um limite de 100.",
-        "logging": "A Lenharia derruba madeira de árvores em todas as três zonas: casca-de-ferro no Vale de Eastbrook, madeira-de-cinza no Brejo de Mirefen e pinheiro alto em Thornpeak Heights, a matéria-prima para cabos, cajados e a bancada do engenheiro. Aberto a todos desde o nível 1, rastreado em seu próprio contador até um limite de 100.",
-        "herbalism": "O Herborismo coleta o que cresce selvagem: folha reluzente no Vale de Eastbrook, folha-dourada no Brejo de Mirefen e pétala-solar em Thornpeak Heights, a folha e o caule que mantêm os ofícios de boticário em atividade. Aberto a todos desde o nível 1, rastreado em seu próprio contador até um limite de 100.",
+        "mining": "A Mineração extrai minério direto da rocha do mundo: cobre no Vale de Eastbrook, ferro no Pântano de Mirefen e ósmio nas Alturas de Thornpeak, alimentando os ofícios de forja. Aberta a todos desde o nível 1: basta ter uma picareta de mineração nas bolsas, 20 cobre em qualquer cidade principal. Rastreada em seu próprio contador até um limite de 100.",
+        "logging": "A Lenharia derruba madeira de árvores em todas as três zonas: casca-de-ferro no Vale de Eastbrook, madeira-de-cinza no Pântano de Mirefen e pinheiro alto nas Alturas de Thornpeak, a matéria-prima para cabos, cajados e a bancada do engenheiro. Aberta a todos desde o nível 1 com um machado de lenharia nas bolsas (20 cobre em qualquer cidade principal), rastreada em seu próprio contador até um limite de 100.",
+        "herbalism": "O Herborismo coleta o que cresce selvagem: folha reluzente no Vale de Eastbrook, folha-dourada no Pântano de Mirefen e pétala-solar nas Alturas de Thornpeak, a folha e o caule que mantêm os ofícios de boticário em atividade. Aberto a todos desde o nível 1 com uma foice de herborismo nas bolsas (20 cobre em qualquer cidade principal), rastreado em seu próprio contador até um limite de 100.",
         "fishing": "A Pesca é a mais diferente entre os ofícios de coleta, e também a mais profunda: um minijogo real de fisgar e puxar, com suas próprias tabelas de captura em cada zona, e um limite de proficiência de 200, o dobro dos outros. Compre uma vara, enfrente água aberta e lance."
       },
       "rhythmHeading": "O ritmo da coleta",
@@ -3869,7 +3931,7 @@ export const pt_BR: EnTranslations = {
       "nodesHeading": "Nós por zona",
       "nodesNote": "Onde estão os nós, seu nível, a ferramenta que exigem e o que rendem. Cada nó se regenera para você {respawn} segundos após sua própria coleta, e esse temporizador é só seu: outro coletor trabalhando o mesmo nó nunca atrasa o seu, então não há corrida nem campismo por nó. Cada zona acima na escala traz um material melhor de um terreno mais resistente.",
       "toolsHeading": "Ferramentas",
-      "toolsNote": "Mãos nuas equivalem a uma ferramenta de nível 1, então todo nó de nível 1 no jogo não precisa de ferramenta alguma. A escada de vendedores cobre os níveis 1 a 3; uma ferramenta só precisa estar na sua mochila, não há espaço de equipamento nem durabilidade, então cada uma é uma compra única. Apenas o nível importa para o requisito de acesso: a cor de raridade de uma ferramenta é cosmética.\n\nAcima da escada de vendedores ficam duas ferramentas criadas, de nível 4 e nível 5, feitas na oficina de ferramentas por engenheiros e nunca vendidas por nenhum NPC. Nenhum nó hoje exige mais que o nível 3, então seu valor agora é velocidade: uma ferramenta de topo fixa o lançamento em seu mínimo nos nós inferiores, e será o ingresso de entrada quando terrenos de nível mais alto chegarem.",
+      "toolsNote": "Cada nó exige a ferramenta do ofício correspondente nas bolsas, incluindo os de nível 1: sem picareta, sem minério; sem vara, sem peixe. A escada de vendedores cobre os níveis 1 a 3, com estoque em toda cidade principal; uma ferramenta só precisa estar nas suas bolsas, não há espaço de equipamento nem durabilidade, então cada uma é uma compra única. Apenas o nível importa para o requisito de acesso: a cor de raridade de uma ferramenta é cosmética.\n\nAcima da escada de vendedores ficam duas ferramentas criadas, de nível 4 e nível 5, feitas na oficina de ferramentas por engenheiros e nunca vendidas por nenhum NPC. Nenhum nó hoje exige mais que o nível 3, então seu valor agora é velocidade: uma ferramenta de topo fixa o lançamento em seu mínimo nos nós inferiores, e será o ingresso de entrada quando terrenos de nível mais alto chegarem.",
       "toolCrafted": "Criada ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Não vendido",
@@ -5574,10 +5636,10 @@ export const pt_BR: EnTranslations = {
     "reconnectingNow": "Conexão perdida. Reconectando agora... (tentativa {attempt}/{maxAttempts})",
     "slowConnection": "Isso está demorando mais que o normal. Verifique sua conexão com a Internet.",
     "connectionRejected": "O servidor encerrou a conexão.",
-    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
+    "incompatibleWorldVersion": "As versões do jogo e do servidor são incompatíveis. Recarregue ou atualize e tente novamente.",
     "realmFull": "Este mundo está lotado no momento. Tente novamente em alguns minutos.",
     "tooManyConnections": "Há conexões em excesso a este mundo vindas da sua rede. Feche janelas extras do jogo ou tente novamente em alguns minutos.",
-    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
+    "messageRateExceeded": "Você foi desconectado por enviar ações rápido demais. Aguarde um momento e entre novamente.",
     "tips": {
       "classes": "Dica: cada uma das 9 classes tem um estilo diferente. Experimente algumas antes de escolher uma.",
       "talents": "Dica: você pode redefinir seus talentos sempre que estiver fora de combate, então uma escolha inicial nunca é definitiva.",
@@ -5648,10 +5710,10 @@ export const pt_BR: EnTranslations = {
     "dismiss": "Dispensar"
   },
   "perfNudge": {
-    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
-    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
-    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
-    "dismiss": "Dismiss"
+    "integratedGpu": "O jogo está funcionando na GPU integrada (de economia de energia). Se este computador também tiver uma placa de vídeo dedicada para jogos, defina o navegador como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos no Windows e reinicie o navegador. O aplicativo para desktop escolhe a placa dedicada automaticamente.",
+    "hardwareAccelerationDesktop": "O jogo está funcionando sem aceleração de GPU, o que o deixa muito lento. Atualize os drivers de placa de vídeo e reinicie o jogo. No Windows, defina também o jogo como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos.",
+    "hardwareAccelerationWeb": "O jogo está funcionando sem aceleração de GPU, o que o deixa muito lento. Ative a aceleração de hardware nas configurações do navegador, atualize os drivers de placa de vídeo e reinicie o navegador.",
+    "dismiss": "Dispensar"
   },
   "realm": {
     "noRealms": "Nenhum mundo disponível.",
@@ -6078,7 +6140,7 @@ export const pt_BR: EnTranslations = {
       "auraGain": "Você ganha {name}.",
       "auraFade": "{name} se dissipa de você.",
       "auraAfflicted": "{target} é afligido por {name}.",
-      "auraGainOther": "{target} gains {name}."
+      "auraGainOther": "{target} ganha {name}."
     },
     "system": {
       "playerDeath": "Você morreu.",
@@ -6181,6 +6243,7 @@ export const pt_BR: EnTranslations = {
       "arenaJoin": "Você entra na fila do Coliseu Cinzento. Aguarde um oponente digno...",
       "arenaLeave": "Você sai da fila do Coliseu Cinzento.",
       "arenaSands": "Você pisa nas areias do Coliseu Cinzento.",
+      "arenaSandsDrowned": "Você pisa nas pedras inundadas da Corte Afogada.",
       "tradeRequestSent": "Você solicitou uma troca com {name}.",
       "tradeOpened": "Janela de troca aberta.",
       "tradeComplete": "Troca concluída.",
@@ -6349,6 +6412,11 @@ export const pt_BR: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nv {level} {className}",
       "noChallengers": "Nenhum desafiante ranqueado ainda - seja o primeiro.",
       "matchInProgress": "Partida em andamento contra {name}.",
+      "mapName": "Mapa: {name}",
+      "map": {
+        "coliseum": "Coliseu Cinzento",
+        "drownedCourt": "A Corte Afogada"
+      },
       "leaveQueue": "Sair da fila",
       "searching": "Procurando oponente... ({count} na fila)",
       "enterQueue": "Entrar na fila",
@@ -6641,6 +6709,7 @@ export const pt_BR: EnTranslations = {
       "pageNextAria": "Próxima página do mercado",
       "pageStatus": "Página {current} de {total}",
       "filters": "Filtros do mercado",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Tipo",
       "filterTypeAll": "Todos os tipos",
       "filterTypeWeapon": "Armas",
@@ -6651,8 +6720,15 @@ export const pt_BR: EnTranslations = {
       "filterTypeOther": "Outros",
       "filterArmorType": "Tipo de armadura",
       "filterArmorAll": "Toda armadura",
+      "filterArmorSlot": "Encaixe de armadura",
+      "filterArmorClassAll": "Todos os tipos de armadura",
+      "armorCloth": "Pano",
+      "armorLeather": "Couro",
+      "armorMail": "Malha",
       "filterWeaponType": "Tipo de arma",
       "filterWeaponAll": "Todas as armas",
+      "filterPrimaryStat": "Atributo primário",
+      "filterPrimaryStatAll": "Qualquer atributo primário",
       "filterRarity": "Raridade",
       "filterRarityAll": "Todas as raridades",
       "weaponSword": "Espadas",
@@ -6914,39 +6990,39 @@ export const pt_BR: EnTranslations = {
         "description": "Evoca um Elemental da Água para lutar ao seu lado, lançar Setas d'Água no seu alvo e canalizar Jato d'Água. (Gelo)"
       },
       "ice_lance": {
-        "name": "Ice Lance",
+        "name": "Lança de Gelo",
         "description": "Arremessa um fragmento de gelo causando {damage} de dano de Gelo, triplicado contra alvos congelados. Gasta Fingers of Frost ou uma carga de Frio de Inverno para tratar o alvo como congelado. (Gelo)"
       },
       "flurry": {
-        "name": "Winterlash",
+        "name": "Açoite Invernal",
         "description": "Solte três raios de gelo, causando {damage} dano de Gelo cada um e aplique Winter's Chill ao alvo: seus próximos 2 feitiços compatíveis recebidos o tratam como congelado. Brain Freeze torna Winterlash instantâneo e pula seu tempo de espera. (Geada)"
       },
       "frozen_orb": {
-        "name": "Frozen Orb",
+        "name": "Orbe Congelado",
         "description": "Libera um orbe de gelo rodopiante que avança por 8 s, causando {damage} dano de Gelo a cada segundo aos inimigos próximos e reduzindo-os em 30%. Cada pulso impressionante gera um Sincelo. (Geada)"
       },
       "blizzard": {
-        "name": "Blizzard",
+        "name": "Nevasca",
         "description": "Invoca uma tempestade de gelo sobre a área alvo por 6 s, causando {damage} de dano de Gelo por segundo e desacelerando os inimigos em 40%. Cada inimigo atingido reduz em 0,5 s o tempo restante do Orbe Congelado, até no máximo 3 s por lançamento. (Gelo)"
       },
       "glacial_spike": {
-        "name": "Glacial Spike",
+        "name": "Estaca Glacial",
         "description": "Conjura um enorme pico de gelo, consumindo 5 Icicles para causar {damage} de dano de Gelo e congelar o alvo no lugar por 4 s. (Gelo)"
       },
       "glacial_front": {
-        "name": "Glacial Front",
+        "name": "Frente Glacial",
         "description": "Mantenha pressionado para acumular uma frente de gelo cada vez mais ampla, depois solte em cone. Cargas mais longas alcançam mais longe e causam mais dano. Todos os inimigos atingidos são desacelerados em 50% por 4 s; a carga máxima também os prende por 1 s. (Gelo)"
       },
       "dragons_breath": {
-        "name": "Dragon's Breath",
+        "name": "Sopro do Dragão",
         "description": "Mantenha pressionado para acumular um sopro de chamas cada vez mais amplo, depois solte em cone. Cargas mais longas alcançam mais longe e causam mais dano. Os inimigos atingidos ficam desorientados e o dano quebra o efeito; a carga máxima sempre causa acerto crítico e conta uma vez para o Embalo Ardente. (Fogo)"
       },
       "fingers_of_frost": {
-        "name": "Fingers of Frost",
+        "name": "Dedos de Gelo",
         "description": "A Lança de Geada tem 15% de chance de conceder Fingers of Frost, até 2 cargas: sua próxima Ice Lance trata o alvo como congelado. (Gelo)"
       },
       "brain_freeze": {
-        "name": "Brain Freeze",
+        "name": "Congelamento Mental",
         "description": "Lança de Geada tem 20% de chance de tornar seu próximo Winterlash instantâneo e livre de recarga. (Geada)"
       },
       "shatter": {
@@ -7030,7 +7106,7 @@ export const pt_BR: EnTranslations = {
         "description": "Embosca o alvo com 250% do dano de arma mais {damage}. Você precisa estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo."
       },
       "stealth": {
-        "name": "Duskveil",
+        "name": "Véu Crepuscular",
         "description": "Esconde você nas sombras: inimigos mal percebem você, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra Duskveil. Lance de novo para sair."
       },
       "adrenaline_rush": {
@@ -7090,7 +7166,7 @@ export const pt_BR: EnTranslations = {
         "description": "Aumenta sua armadura em {buff} por 30 min."
       },
       "judgement": {
-        "name": "Verdict",
+        "name": "Veredito",
         "description": "Libera seu Selo ativo sobre o inimigo, consumindo-o para causar seu dano Sagrado armazenado."
       },
       "blessing_of_might": {
@@ -7262,7 +7338,7 @@ export const pt_BR: EnTranslations = {
         "description": "Imbui sua arma com gelo cortante: cada golpe causa {damage} de dano adicional por 5 min."
       },
       "ghost_wolf": {
-        "name": "Shadewolf",
+        "name": "Lobo Sombrio",
         "description": "Transforma você em Shadewolf, aumentando a velocidade de movimento em 40% por 10 min."
       },
       "stormstrike": {
@@ -7318,7 +7394,7 @@ export const pt_BR: EnTranslations = {
         "description": "Cura um alvo aliado em {damage}."
       },
       "mark_of_the_wild": {
-        "name": "Wildward",
+        "name": "Guarda Selvagem",
         "description": "Coloca o Wildward em um alvo aliado, aumentando a armadura em {buff} por 30 min."
       },
       "moonfire": {
@@ -11786,6 +11862,6 @@ export const pt_BR: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuário do Junco: Pressione F para tocá-lo",
     "delveRiteShrineSkullInteract": "Santuário da Caveira: Pressione F para tocá-lo",
     "mailboxName": "Caixa de correio",
-    "noticeboardName": "Notice Board"
+    "noticeboardName": "Quadro de Avisos"
   }
 };

@@ -249,10 +249,12 @@
       </div>
       <div class="uf-buffs" id="tf-debuffs"></div>
       <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
-           who the current target is targeting. A #target-frame child so it inherits the
-           target's children-zoom and hides with the whole frame when there is no target;
-           its own unit_frame painter toggles it flex/none when the target-of-target is
-           known/unknown. Portrait + name + hp bar only (no resource/cast/debuffs). -->
+           who the current target is targeting. A #target-frame child that hides with the
+           whole frame when there is no target; hud.css anchors it BESIDE the frame's
+           right edge (the below-frame band belongs to the #tf-debuffs strip) and
+           compounds the target frame scale into its own mini zoom. Its own unit_frame
+           painter toggles it flex/none when the target-of-target is known/unknown.
+           Portrait + name + hp bar only (no resource/cast/debuffs). -->
       <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark">
         <div class="portrait-wrap">
           <div class="portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
@@ -289,6 +291,10 @@
         <!-- Ravenpost envelope: visible while unread letters wait; opens the mailbox
              window, which explains when the player is too far from a mailbox. -->
         <button id="mail-indicator" type="button" hidden data-icon="mail" aria-live="polite"><span class="mail-indicator-count">0</span></button>
+        <!-- World Market coin: visible while sale proceeds or returned items wait at
+             the Merchant; opens the market window when standing at the Merchant, and
+             is informational only (the tooltip) anywhere else. -->
+        <button id="market-indicator" type="button" hidden data-icon="market" aria-live="polite" data-i18n-title="hudChrome.marketIndicator.tip" data-i18n-aria="hudChrome.marketIndicator.aria" title="Gold or items are waiting for you at the Merchant." aria-label="World Market collection waiting"></button>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" role="status" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
@@ -445,7 +451,7 @@
         <button type="button" class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
         <button type="button" class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
         <button type="button" class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
-        <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="target"><span class="keybind">s-p</span></button>
+        <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="keybind">s-p</span></button>
         <button type="button" class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
         <button type="button" class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
         <button type="button" class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
@@ -1185,19 +1191,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.29.1-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.30.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.29.1-win.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.30.0-win.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.29.1-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.30.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1406,7 +1412,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.29.1</div>
+      <div id="game-version">v0.30.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>
@@ -1526,7 +1532,7 @@
           <button type="button" class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
           <button type="button" class="mobile-btn" id="mobile-daily-rewards" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.dailyRewards">Store</span></button>
           <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
-          <button type="button" class="mobile-btn" id="mobile-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="target"><span class="mobile-label" data-i18n="hudChrome.mobile.professions">Professions</span></button>
+          <button type="button" class="mobile-btn" id="mobile-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="mobile-label" data-i18n="hudChrome.mobile.professions">Professions</span></button>
           <button type="button" class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>
           <button type="button" class="mobile-btn" id="mobile-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Toggle music" data-icon="music"><span class="mobile-label" data-i18n="hud.options.music">Music</span></button>
           <button type="button" class="mobile-btn" id="mobile-haptics" data-i18n-title="hudChrome.mobile.toggleHaptics" data-i18n-aria="hudChrome.mobile.toggleHaptics" title="Toggle haptic feedback" aria-label="Toggle haptic feedback" aria-pressed="true" data-icon="vibrate"><span class="mobile-label" data-i18n="hudChrome.mobile.haptics">Haptics</span></button>

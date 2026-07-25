@@ -17,6 +17,7 @@ import {
   classifyGatherNode,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
+  gatherRareTierFor,
   gatherToolNoNodeKey,
   isNodeToolLockedFor,
   viewerOwnedToolTier,
@@ -269,5 +270,28 @@ describe('buildGatheringProficiencyRows', () => {
     expect(rows.find((r) => r.professionId === 'mining')?.value).toBe(0);
     expect(rows.find((r) => r.professionId === 'logging')?.value).toBe(0);
     expect(rows.find((r) => r.professionId === 'herbalism')?.value).toBe(0);
+  });
+});
+
+describe('gatherRareTierFor', () => {
+  it('tracks the rolled material rarity 1:1 for rare/epic/legendary', () => {
+    expect(gatherRareTierFor('rare', null)).toBe('rare');
+    expect(gatherRareTierFor('epic', null)).toBe('epic');
+    expect(gatherRareTierFor('legendary', null)).toBe('legendary');
+  });
+
+  it('plays no stinger for common or uncommon rolls with no rare event', () => {
+    expect(gatherRareTierFor('common', null)).toBeNull();
+    expect(gatherRareTierFor('uncommon', null)).toBeNull();
+  });
+
+  it('a rare event forces at least the epic stinger, overriding a lower rarity roll', () => {
+    expect(gatherRareTierFor('common', 'pristine_vein')).toBe('epic');
+    expect(gatherRareTierFor('uncommon', 'ancient_heartwood')).toBe('epic');
+    expect(gatherRareTierFor('rare', 'moonlit_bloom')).toBe('epic');
+  });
+
+  it('never downgrades a legendary roll just because a rare event also fired', () => {
+    expect(gatherRareTierFor('legendary', 'pristine_vein')).toBe('legendary');
   });
 });

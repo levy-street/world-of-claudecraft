@@ -310,6 +310,20 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
   composites its procedural recipe). Convert with `npm run assets:deeds`
   (`scripts/convert_deed_icons_webp.mjs`); `tests/deed_icons.test.ts` gates the id list
   against the committed webp files in both directions.
+- **The same exception for HUD CHROME, scoped to primary destinations:** `ui_icons.ts` stays
+  the monochrome `currentColor` registry, but the names in `CHROME_ART_IDS`
+  (`chrome_icon_art.ts`) also ship painted art under `public/ui/chrome/<name>.webp`, and
+  `hydrateIcons()` serves that art for their `[data-icon]` placeholders (the side rail, the
+  mobile bar, the More tray) as an `<img class="ui-icon ui-icon-art">`. This is the role split
+  of `DESIGN.md` section 6: painted art for primary destinations, thin-line glyphs for
+  secondary controls. Direct `svgIcon()` calls are UNCHANGED and still return the glyph, which
+  is what the small inline uses beside text need (they tint with the surrounding color). Add
+  art by dropping a raster into `public/ui/chrome/` (authored on a flat `#FF00FF` key: the
+  converter keys it to alpha, despills, trims, centers, and encodes), running
+  `npm run assets:chrome`, then listing the name in `CHROME_ART_IDS` and
+  `public/ui/chrome/mapping.json`. `tests/chrome_icons.test.ts` gates the bijection, the alpha,
+  the 128px square, launcher reachability from BOTH entry documents, and the role split
+  (secondary controls and brand marks may never gain art).
 - **The same exception for ITEMS:** `ITEM_IMAGE_IDS` ships painted art for items, and
   `itemImageUrl(id)` returns `/ui/items/<id>.webp`, served for `kind:'item'` (bags, tooltips,
   loot, vendor, the `/wiki` guide). Weapons are the one carve-out: they keep their rendered-model

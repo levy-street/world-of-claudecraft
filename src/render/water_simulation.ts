@@ -494,7 +494,6 @@ export class WaterSimulation {
   }
 
   private prewarmPool(): void {
-    this.renderer.compile(this.scene, this.camera);
     if (this.states.length === 0) return;
     const poolSize = Math.min(this.maxResidentBodies, this.states.length);
     for (let i = 0; i < poolSize; i++) {
@@ -505,8 +504,10 @@ export class WaterSimulation {
     this.renderer.getClearColor(previousColor);
     const previousAlpha = this.renderer.getClearAlpha();
     this.renderer.setClearColor(0x000000, 0);
-    for (const targets of this.freeTargets) {
+    for (let i = 0; i < this.freeTargets.length; i++) {
+      const targets = this.freeTargets[i];
       this.renderer.setRenderTarget(targets.read);
+      if (i === 0) this.renderer.compile(this.scene, this.camera);
       this.renderer.clear();
       this.renderer.setRenderTarget(targets.write);
       this.renderer.clear();

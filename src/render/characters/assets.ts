@@ -965,6 +965,11 @@ export function applyMaterials(
     // and restores. Tinting either (or re-deriving them from the shared cache
     // on a body-skin change) corrupts live handles, so both stay untouched.
     if (mesh.userData.weaponVfxMesh || mesh.userData.weaponSkinIsolated) return;
+    // The class halo's shared additive material must never be re-mapped or
+    // tinted (visual.ts adds it after the constructor's applyMaterials for the
+    // same reason); a skin or weapon swap re-running this sweep used to wash
+    // the golden ring toward the body tint until relog.
+    if (mesh.name === 'class_halo') return;
     // Always derive a skin/material variant from the assembled model's source
     // material. Reusing the last applied variant would retain its alternate map
     // when skin 0 asks to restore the embedded default texture.

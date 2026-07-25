@@ -1351,6 +1351,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'fire',
     requiresTarget: false,
+    requiresOutOfCombat: true,
+    requiresOutsideInstance: true,
     effects: [{ type: 'selfBuff', kind: 'form_fireball', value: 1.4, duration: 3600 }],
     description:
       'Transform into a blazing ember, increasing movement speed by $b%. You cannot attack or cast spells while transformed. Recast to return to your normal form.',
@@ -1802,7 +1804,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 5,
     cost: 40,
     castTime: 0,
-    cooldown: 8,
+    // Balance 2026-07-25 (live raid parses + class designer round): the full
+    // three-charge bank STAYS (dumping it inside Phoenix Trance for the free
+    // Pyrelance chain is the fire fantasy, designer call), but each charge
+    // recharges in 30s (was 8s, playtest 2026-07-13). The burst window keeps
+    // its whole payoff; the slow refill is what makes fire fall off after the
+    // window and come back for the next Trance (~110s), so FIGHT-LONG damage
+    // lands at parity: with the Ignite fold fix this measures 1.03x-1.17x the
+    // talented frost comparator at 60s/120s/300s (was 2.2x-2.9x live). Pinned
+    // by tests/fire_short_fight_tuning.test.ts.
+    cooldown: 30,
     range: 20,
     school: 'fire',
     requiresTarget: true,
@@ -1811,7 +1822,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner rule (round five): fully off the GCD, like Phoenix Trance: castable
     // during one and it never arms one for the other abilities.
     offGcd: true,
-    // Owner playtest 2026-07-13: three stored charges (was two), back to back if banked.
+    // Owner playtest 2026-07-13: three stored charges, back to back if banked.
     maxCharges: 3,
     // Owner playtest round four: no bolt, the embers bite the moment you press.
     projectile: false,
@@ -1935,7 +1946,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner rule 2026-07-11: a real cast, EXCEPT under Hot Streak, whose
     // next_cast_instant makes it instant and free (the spender machinery).
     castTime: 2,
-    cooldown: 12,
+    // Owner release rule 2026-07-19: cast time and the GCD pace it, no cooldown.
+    cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: false,
@@ -5479,7 +5491,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // same day: the Phoenix Trance window is meant to chain free Pyroblasts).
     effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
     description:
-      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other. (Fire signature)',
+      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)',
   },
   cone_of_cold: {
     id: 'cone_of_cold',
@@ -6393,6 +6405,30 @@ function scaleEffect(
       return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
     case 'gainResource':
       return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
+    case 'groundAoE':
+      // Rune of Power's pulse is an ally damage-done buff, not a damage roll
+      // (its authored min/max are 0/0): leave it untouched so a flat talent
+      // mod can never turn a buff zone into a damage zone.
+      return eff.allyBuffPct
+        ? eff
+        : {
+            ...eff,
+            min: Math.round(eff.min * dmgMult + flat),
+            max: Math.round(eff.max * dmgMult + flat),
+          };
+    case 'repositionToAim':
+      // Heroic Leap's landing hit is a groundAoE-shaped rider on the
+      // reposition; scale it the same way a groundAoE pulse scales.
+      return eff.landingAoe
+        ? {
+            ...eff,
+            landingAoe: {
+              ...eff.landingAoe,
+              min: Math.round(eff.landingAoe.min * dmgMult + flat),
+              max: Math.round(eff.landingAoe.max * dmgMult + flat),
+            },
+          }
+        : eff;
     default:
       return eff;
   }

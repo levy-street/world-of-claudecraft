@@ -33,6 +33,19 @@ describe('Settings', () => {
     expect(s.get('graphicsPreset')).toBe(2);
   });
 
+  it('remembers the camera zoom distance across sessions, clamped to the zoom range (issue 1657)', () => {
+    // Range mirrors Input.zoomBy's clamp so a persisted value is always applicable; def 12 is the
+    // shipped starting distance.
+    expect(SETTING_RANGES.cameraZoom).toEqual({ min: 3, max: 22, def: 12 });
+    const s = new Settings();
+    expect(s.get('cameraZoom')).toBe(12);
+    expect(s.set('cameraZoom', 100)).toBe(22); // clamped to max
+    expect(s.set('cameraZoom', 1)).toBe(3); // clamped to min
+    expect(s.set('cameraZoom', 8)).toBe(8);
+    // Persisted like every other setting: a fresh Settings (next session) reads the saved value.
+    expect(new Settings().get('cameraZoom')).toBe(8);
+  });
+
   it('keeps graphicsDefaultApplied false through an unrelated save and clears it on reset', () => {
     const s = new Settings();
     expect(s.get('graphicsDefaultApplied')).toBe(false);

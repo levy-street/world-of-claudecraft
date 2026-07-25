@@ -188,6 +188,26 @@ export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null 
   return isAuraDebuff(aura) ? 'debuff_apply' : 'buff_apply';
 }
 
+type HealEvent = Extract<SimEvent, { type: 'heal' }>;
+
+// A potion, eat, or drink heal (items.ts / combat/auras.ts) plays its own
+// dedicated cue instead of the generic heal_impact every other heal source
+// falls through to. A potion is always a one-shot (fires every time); eat/drink
+// only fires on its designated sfxTick (see consume_sfx.ts), independent of
+// whether hp/mana actually landed that tick.
+export function consumeHealCue(event: HealEvent): SfxId | null {
+  switch (event.source) {
+    case 'potion':
+      return 'player_drink_potion';
+    case 'food':
+      return event.sfxTick ? 'player_eat_food' : null;
+    case 'drink':
+      return event.sfxTick ? 'player_drink_water' : null;
+    default:
+      return null;
+  }
+}
+
 export function weaponSwingCue(entity: Entity): SfxId {
   if (entity.auras.some((aura) => aura.kind === 'form_bear' || aura.kind === 'form_cat')) {
     return 'melee_unarmed';

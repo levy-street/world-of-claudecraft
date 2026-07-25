@@ -27,7 +27,11 @@ import type { ActionBarState } from './action_bar_view';
 // painter references no bare DOM string literal.
 const ARIA_LABEL_ATTR = 'aria-label';
 const BACKGROUND_IMAGE_PROP = 'background-image';
-const COOLDOWN_HEIGHT_PROP = 'height';
+const HEIGHT_PROP = 'height';
+// Drives the radial cooldown sweep: a CSS custom property the `.cd-overlay`
+// conic-gradient reads (0% = ready, 100% = full cooldown remaining). Replaces the
+// old bottom-up `height` fill so remaining cooldown reads as a classic clock wipe.
+const COOLDOWN_FILL_PROP = '--cd-fill';
 const CLASS_EMPTY = 'empty';
 const CLASS_UNUSABLE = 'unusable';
 const CLASS_OUT_OF_RANGE = 'oor';
@@ -92,8 +96,8 @@ export class ActionBarPainter {
 
       this.writers.setText(el.countEl, s.count);
       this.writers.toggleClass(el.countEl, CLASS_CHARGE_COUNT, s.isCharges);
-      this.writers.setStyleProp(el.cdOverlay, COOLDOWN_HEIGHT_PROP, `${s.cooldownPercent}%`);
-      this.writers.setStyleProp(el.rechargeOverlay, COOLDOWN_HEIGHT_PROP, `${s.rechargePercent}%`);
+      this.writers.setStyleProp(el.cdOverlay, COOLDOWN_FILL_PROP, `${s.cooldownPercent}%`);
+      this.writers.setStyleProp(el.rechargeOverlay, HEIGHT_PROP, `${s.rechargePercent}%`);
       this.writers.setText(el.cdText, s.cdText);
 
       this.writers.toggleClass(el.btn, CLASS_EMPTY, s.kind === 'empty');

@@ -558,33 +558,36 @@ export function resolveCraftForRecipe(
   // commissioned sub-rare output forces the instance path a plain grant
   // would skip. Commission never adds signer: the #1149 signing rule is
   // untouched (the bond composes with the maker's mark, it does not extend
-  // it).
+  // it). silent on every grant below: the craftResult event fires its own
+  // per-family cue (audio.craftSuccess, plus audio.masterwork layered on top
+  // for a proc) in src/game/audio.ts; the generic loot ding would otherwise
+  // stack on top of it for every single craft.
   if (meta && masterwork && bonusStats) {
     const payload: ItemInstancePayload = {
       signer: meta.name,
       rolled: { masterwork: true, stats: bonusStats },
     };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid);
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, { silent: true });
     if (recipe.resultCount > 1) {
       if (commissioned) {
         for (let i = 1; i < recipe.resultCount; i++) {
-          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid);
+          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, { silent: true });
         }
       } else {
-        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid);
+        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, { silent: true });
       }
     }
   } else if (meta && recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
     const payload: ItemInstancePayload = { signer: meta.name };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid);
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, { silent: true });
   } else if (commissioned) {
     for (let i = 0; i < recipe.resultCount; i++) {
-      ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid);
+      ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, { silent: true });
     }
   } else {
-    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid);
+    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid, { silent: true });
   }
   if (meta) {
     // The #1129/#1148 gain doctrine (archetype ceiling alone zeroes, ordinary

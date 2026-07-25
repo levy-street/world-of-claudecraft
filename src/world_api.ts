@@ -192,6 +192,7 @@ export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/pa
 export type {
   CraftingIdentityView,
   CraftResultView,
+  DisenchantResultView,
   PlayerProfessionsView,
   RecipeDef,
 } from './world_api/professions';
@@ -466,6 +467,9 @@ export const COMMAND_NAMES = [
   // tier-scaled gold fee (Sim.unbindItem via src/sim/professions/
   // commission.ts).
   'unbind_item',
+  // Guild billboard: set (or clear, with '') the officer-editable message
+  // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
+  'guild_set_motd',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -656,6 +660,7 @@ export const COMMAND_FACETS = {
   guild_disband: 'IWorldSocialGraph',
   guild_event_create: 'IWorldSocialGraph',
   guild_event_remove: 'IWorldSocialGraph',
+  guild_set_motd: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',

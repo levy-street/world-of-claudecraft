@@ -145,6 +145,19 @@ describe('optimized water geometry, scheduling, and stability', () => {
     state.accumulator = 0;
     expect(advanceWaterSchedule(state, true, 16, 0.01)).toBe(WATER_SCHEDULE_SLEEP);
   });
+
+  it('primes a newly woken solver step at a realistic frame cadence', () => {
+    const stepSeconds = 1 / 24;
+    const state = {
+      active: false,
+      pendingCount: 1,
+      accumulator: 0,
+      awakeUntil: 0,
+      stepSeconds,
+    };
+    expect(advanceWaterSchedule(state, true, 10, 1 / 60)).toBe(WATER_SCHEDULE_WAKE);
+    expect(state.accumulator).toBeGreaterThanOrEqual(stepSeconds);
+  });
 });
 
 describe('terrain/feature-aware water (#1518)', () => {

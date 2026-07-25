@@ -38,6 +38,14 @@ export const fr_CA: EnTranslations = {
     "filterLabel": "Filtrer les commandes",
     "filterPlaceholder": "Rechercher dans cette catégorie",
     "noMatches": "Aucune commande correspondante.",
+    "itemSearchPlaceholder": "Rechercher par nom ou id",
+    "itemResultsAria": "Objets correspondants",
+    "itemNoMatches": "Aucun objet correspondant.",
+    "itemMore": "Affichage de {shown} sur {total}. Continuez à taper pour affiner.",
+    "itemChosen": "Sélectionné : {name}",
+    "itemUnknown": "Aucun objet ne correspond à cet id.",
+    "itemHeroicTag": "Héroïque",
+    "kitCurrentSpec": "Spécialisation actuelle",
     "serverRequirement": "Les commandes de triche du serveur exigent toujours ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Choisissez des valeurs valides avant d’exécuter cette commande.",
     "sent": "Envoyé : {command}",
@@ -55,7 +63,8 @@ export const fr_CA: EnTranslations = {
       "z": "Z",
       "dungeon": "Donjon",
       "difficulty": "Difficulté",
-      "name": "Nom"
+      "name": "Nom",
+      "spec": "Spécialisation"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const fr_CA: EnTranslations = {
       "give": {
         "label": "Donner un objet",
         "description": "Ajoute un objet à l’inventaire du joueur."
+      },
+      "kit": {
+        "label": "Équiper un kit de niveau 20 fraîchement atteint",
+        "description": "Enfile le kit de spécialisation niveau 20 pré-Sanctuaire, sacs d'abord. Équipement seul."
       },
       "gold": {
         "label": "Ajouter de l’or",
@@ -1049,6 +1062,7 @@ export const fr_CA: EnTranslations = {
       "walkByAutoloot": "Ramassage auto au passage",
       "groundReticle": "Réticule de ciblage au sol",
       "mouseoverCast": "Lancement au survol sur les cadres de groupe",
+      "stickyTarget": "Conserver la cible au clic au sol",
       "showItemLevel": "Afficher le niveau d'objet",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
@@ -1461,8 +1475,8 @@ export const fr_CA: EnTranslations = {
         "claw": "Griffe",
         "horn": "Corne",
         "tusk": "Défense",
-        "meat": "Meat",
-        "cloth": "Cloth"
+        "meat": "Viande",
+        "cloth": "Tissu"
       }
     },
     "townFocus": {
@@ -1529,6 +1543,8 @@ export const fr_CA: EnTranslations = {
       "dragDestroyHint": "Faites glisser dans le monde pour détruire",
       "reorderNeedsRecent": "Effacez le filtre et triez par Récents pour réorganiser vos sacs",
       "itemAriaInstanced": "{item}, quantité {count}, copie marquée par le fabricant",
+      "itemAriaEnchanted": "{item}, quantité {count}, copie enchantée",
+      "itemAriaBound": "{item}, quantité {count}, copie liée",
       "itemAriaMasterwork": "{item}, quantité {count}, chef-d'oeuvre",
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
@@ -1753,7 +1769,19 @@ export const fr_CA: EnTranslations = {
       "label": "Réinitialiser la position des cadres"
     },
     "itemTooltip": {
-      "requiresLevel": "Niveau requis : {level}"
+      "requiresLevel": "Niveau requis : {level}",
+      "statEnchanted": "+{value} {stat} (Enchanté)",
+      "enchantedFallback": "Enchanté"
+    },
+    "materialHint": {
+      "arcaneDust": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
+      "arcaneEssence": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement rare.",
+      "arcaneShard": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement épique et légendaire.",
+      "resonantThread": "Réactif d'enchantement. Obtenu en désenchantant de l'armure en tissu rare ou mieux.",
+      "resonantHide": "Réactif d'enchantement. Obtenu en désenchantant de l'armure en cuir rare ou mieux.",
+      "resonantLinks": "Réactif d'enchantement. Obtenu en désenchantant de l'armure de mailles rare ou mieux.",
+      "resonantSteel": "Réactif d'enchantement. Obtenu en désenchantant des armes de mêlée rares ou mieux.",
+      "resonantTimber": "Réactif d'enchantement obtenu de bâtons, baguettes, arcs et arbalètes rares ou mieux."
     },
     "discord": {
       "title": "Discord",
@@ -1994,8 +2022,12 @@ export const fr_CA: EnTranslations = {
         "takeParcelsFirst": "Retirez les colis avant de jeter la lettre."
       }
     },
+    "marketIndicator": {
+      "aria": "Collecte du Marché mondial en attente",
+      "tip": "De l'or ou des objets vous attendent chez le Marchand."
+    },
     "noticeboard": {
-      "empty": "Nothing seems posted."
+      "empty": "Rien ne semble affiché."
     },
     "bank": {
       "title": "Banque",
@@ -2113,7 +2145,19 @@ export const fr_CA: EnTranslations = {
       "onlineHeader": "En ligne ({n})",
       "offlineHeader": "Hors ligne ({n})",
       "hideOffline": "Masquer les hors ligne",
-      "hideOfflineTitle": "Masquer les membres de guilde hors ligne"
+      "hideOfflineTitle": "Masquer les membres de guilde hors ligne",
+      "billboard": {
+        "label": "Tableau d'affichage de la guilde",
+        "empty": "Rien sur le tableau d'affichage pour le moment.",
+        "setBy": "Défini par {name}",
+        "save": "Enregistrer",
+        "placeholder": "Écrivez un message pour la guilde",
+        "inputLabel": "Message du tableau d'affichage de la guilde",
+        "result": {
+          "set": "Le tableau d'affichage de la guilde a été mis à jour.",
+          "notOfficer": "Seuls les officiers et le maître de guilde peuvent modifier le tableau d'affichage."
+        }
+      }
     },
     "gathering": {
       "title": "Récolte",
@@ -2138,9 +2182,9 @@ export const fr_CA: EnTranslations = {
         "herbalism": "Requiert une serpe d'herboristerie de palier {tier}"
       },
       "requiresTool": {
-        "mining": "Requires a mining pick",
-        "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle"
+        "mining": "Nécessite un pic de mineur",
+        "logging": "Nécessite une hache de bûcheron",
+        "herbalism": "Nécessite une serpe d'herboristerie"
       },
       "toolTierUnmet": {
         "mining": "Vous avez besoin d'un pic de mineur de palier {tier} pour exploiter ce filon.",
@@ -2148,39 +2192,39 @@ export const fr_CA: EnTranslations = {
         "herbalism": "Vous avez besoin d'une serpe d'herboristerie de palier {tier} pour collecter cette parcelle."
       },
       "toolRequired": {
-        "mining": "You need a mining pick to harvest this vein.",
-        "logging": "You need a logging axe to fell this stand.",
-        "herbalism": "You need a herbalism sickle to gather this patch.",
-        "fishing": "You need a fishing pole to cast a line."
+        "mining": "Vous avez besoin d'un pic de mineur pour exploiter ce filon.",
+        "logging": "Vous avez besoin d'une hache de bûcheron pour abattre ce bosquet.",
+        "herbalism": "Vous avez besoin d'une serpe d'herboristerie pour collecter cette parcelle.",
+        "fishing": "Vous avez besoin d'une canne à pêche pour lancer votre ligne."
       },
       "noNodeNearby": {
-        "mining": "There is no ore vein within reach.",
-        "logging": "There is no timber stand within reach.",
-        "herbalism": "There is no herb patch within reach."
+        "mining": "Aucun filon de minerai à portée.",
+        "logging": "Aucun bosquet de bois à portée.",
+        "herbalism": "Aucune parcelle de plantes à portée."
       },
       "toolTierUnmetCorpse": "Vous avez besoin d'un outil de collecte de palier {tier} pour récupérer les meilleurs matériaux.",
       "toolTooltip": {
         "kind": {
-          "mining": "Mining tool (tier {tier})",
-          "logging": "Logging tool (tier {tier})",
-          "herbalism": "Herbalism tool (tier {tier})",
-          "fishing": "Fishing rod (tier {tier})"
+          "mining": "Outil de minage (palier {tier})",
+          "logging": "Outil de bûcheronnage (palier {tier})",
+          "herbalism": "Outil d'herboristerie (palier {tier})",
+          "fishing": "Canne à pêche (palier {tier})"
         },
         "unlocks": {
-          "mining": "Required to mine ore veins up to tier {tier}.",
-          "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "mining": "Nécessaire pour exploiter les filons de minerai jusqu'au palier {tier}.",
+          "logging": "Nécessaire pour abattre les bosquets de bois jusqu'au palier {tier}.",
+          "herbalism": "Nécessaire pour collecter les parcelles de plantes jusqu'au palier {tier}."
         },
         "use": {
-          "mining": "Use: Mine a nearby ore vein.",
-          "logging": "Use: Fell a nearby timber stand.",
-          "herbalism": "Use: Gather from a nearby herb patch."
+          "mining": "Utilisation : exploiter un filon de minerai à proximité.",
+          "logging": "Utilisation : abattre un bosquet de bois à proximité.",
+          "herbalism": "Utilisation : collecter une parcelle de plantes à proximité."
         },
-        "speed": "Gathers faster at nodes below tier {tier}.",
-        "rodRequired": "Required to fish.",
-        "rodBite": "Fish bite up to {seconds}s sooner.",
-        "rodReel": "Extends the reel window by {seconds}s.",
-        "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
+        "speed": "Collecte plus vite sur les nœuds de palier inférieur à {tier}.",
+        "rodRequired": "Nécessaire pour pêcher.",
+        "rodBite": "Le poisson mord jusqu'à {seconds}s plus tôt.",
+        "rodReel": "Prolonge la fenêtre de remontée de {seconds}s.",
+        "rodBand": "Débloque des tables de prises plus riches à partir de {skill} en compétence de pêche."
       },
       "downgradeMark": "Sacs pleins : la trouvaille a été rangée sans la marque du collecteur.",
       "downgradeFind": "Sacs pleins : une trouvaille de qualité supérieure vous a échappé.",
@@ -2357,7 +2401,7 @@ export const fr_CA: EnTranslations = {
       },
       "throttled": "Vous fabriquez trop vite. Patientez un instant et réessayez.",
       "recipeNotLearned": "Vous n'avez pas encore appris cette recette.",
-      "noBagSpace": "You do not have room for the crafted item.",
+      "noBagSpace": "Vous n'avez pas de place pour l'objet fabriqué.",
       "skillReqLine": "Nécessite {craft} {skill}",
       "difficultyFull": "Gain de compétence complet",
       "difficultyReduced": "Gain de compétences réduit",
@@ -2383,7 +2427,6 @@ export const fr_CA: EnTranslations = {
       "makersMark": "Fabriqué par {name}",
       "gatheredBy": "Collecté par {name}",
       "masterworkSeal": "Chef-d'œuvre",
-      "enchantedLine": "Enchanté",
       "commissionToggle": "Pièce de commande",
       "commissionToggleHint": "Se lie au premier personnage qui la reçoit lors d'un échange.",
       "commissionUnbound": "Pièce de commande : se lie au premier destinataire",
@@ -2409,9 +2452,9 @@ export const fr_CA: EnTranslations = {
       "enchantWrongSlot": "Cet enchantement ne peut pas être appliqué à cet objet.",
       "enchantUnknown": "Cet enchantement n'existe pas.",
       "enchantInsufficient": "Vous n'avez pas les matériaux pour cet enchantement.",
-      "disenchantNoSpace": "You do not have room for the arcane materials.",
-      "salvageNoSpace": "You do not have room for the salvaged materials.",
-      "enchantNoSpace": "You do not have room for the enchanted item.",
+      "disenchantNoSpace": "Vous n'avez pas de place pour les matériaux arcaniques.",
+      "salvageNoSpace": "Vous n'avez pas de place pour les matériaux récupérés.",
+      "enchantNoSpace": "Vous n'avez pas de place pour l'objet enchanté.",
       "disenchantConfirmTitle": "Désenchanter {item} ?",
       "disenchantConfirmBody": "Cela détruit {item} et donne des matériaux arcaniques. Cette action est irréversible.",
       "disenchantConfirmBodySpecial": "Cela détruit une copie spéciale de {item} (signée, de maître ou enchantée) et donne des matériaux arcaniques. Cette action est irréversible.",
@@ -2421,7 +2464,26 @@ export const fr_CA: EnTranslations = {
       "pickerTitle": "Appliquer un enchantement",
       "targetTitle": "Choisissez un objet à enchanter",
       "noEnchants": "Aucun enchantement n'utilise ce réactif.",
-      "noTargets": "Aucun objet éligible à enchanter."
+      "noTargets": "Aucun objet éligible à enchanter.",
+      "wornTag": "Équipé ({slot})",
+      "tier": {
+        "base": "Enchantements de base",
+        "runed": "Enchantements Runiques",
+        "greater": "Enchantements Supérieurs"
+      },
+      "yieldHeader": "Matériaux attendus :",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} à {max} {item}",
+      "alreadyEnchanted": "Cet objet est déjà enchanté.",
+      "sameEnchant": "Cet objet a déjà cet enchantement.",
+      "replaceTag": "Remplace {enchant}",
+      "sameEnchantTag": "Déjà appliqué",
+      "replaceConfirmTitle": "Remplacer l'enchantement sur {item} ?",
+      "replaceConfirmBody": "Cela remplace {old} sur {item} par {new}.",
+      "replaceConfirmNoRefund": "L'ancien enchantement est détruit sans remboursement. Cette action est irréversible.",
+      "replaceConfirmCost": "Coût : {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Remplacer"
     },
     "training": {
       "title": "Formation : {name}",
@@ -2431,10 +2493,10 @@ export const fr_CA: EnTranslations = {
       "stateKnown": "Connu",
       "stateTeachable": "Disponible",
       "stateLocked": "Verrouillé",
-      "statePending": "Learning",
+      "statePending": "En apprentissage",
       "requirement": "Enseigné à {craft} {skill}",
       "trainAria": "Apprenez {name} pour {fee}",
-      "pendingAria": "Learning {name}",
+      "pendingAria": "Apprentissage de {name}",
       "dialogOption": "Formation",
       "dialogOptionAria": "Parcourir la formation de {name}",
       "learned": "Recette apprise : {recipe}",
@@ -2462,7 +2524,7 @@ export const fr_CA: EnTranslations = {
       "notBound": "Cet objet n'est pas lié.",
       "cannotAfford": "Vous n'avez pas les moyens de payer les frais de déliage.",
       "outOfRange": "Vous devez être à un établi pour délier.",
-      "noSpace": "You do not have room for the unbound copy."
+      "noSpace": "Vous n'avez pas de place pour l'exemplaire délié."
     },
     "finder": {
       "title": "Chercheur de donjons",
@@ -3819,7 +3881,7 @@ export const fr_CA: EnTranslations = {
           "levelingHeading": "Comment l'Enchantement progresse",
           "levelingBody": "Deux actions font progresser la compétence : désenchanter une pièce, et appliquer un enchantement. Chaque succès vaut jusqu'à un point, mis à l'échelle selon l'importance du travail : la rareté de la pièce que vous démantèlez, ou le palier de réactif de l'enchantement que vous appliquez. Les désenchantements communs et les enchantements à base de poussière uniquement valent un travail commun ; les désenchantements inhabituels et les enchantements à base d'essence, un travail inhabituel ; les désenchantements rares et tous les enchantements Runique ou Supérieur, un travail rare ; les désenchantements épiques et légendaires, un niveau encore supérieur.\n\nL'estompement de maîtrise habituel s'applique par tranches de 25 points, de sorte que le travail de qualité commune devient gris à la compétence 75, le travail inhabituel à 100, et le travail de palier rare exactement au plafond de 125. L'Enchantement a aussi une gentillesse particulière : le gain au-delà du plafond de votre archétype est arrondi à ce plafond plutôt qu'annulé, si bien qu'avant l'harmonisation, un désenchantement épique vaut simplement un travail rare plutôt que d'enseigner quoi que ce soit. Si l'Enchantement finit en sommeil derrière une autre identité, tout vaut un travail commun et la progression stagne à 75 ; gardez-le comme passe-temps et le travail de palier rare rapporte quand même, juste plus lentement après 75.",
           "marketHeading": "Les copies enchantées, la provenance et le marché",
-          "marketBody": "Appliquer un enchantement consomme une copie en sacoche, non équipée de l'objet plus les réactifs, et restitue une copie enchantée distincte ; équipez-la et le bonus suit la pièce indéfiniment, après déséquipement, séjours en banque et échanges. Un seul enchantement par pièce : une copie enchantée ne peut jamais être enchantée à nouveau ni désenchantée, et vendre, jeter et désenchanter préfèrent toujours les copies normales en premier, votre pièce finie ne se fait donc pas dévorer par accident. Des copies identiquement enchantées s'empilent même dans vos sacs.\n\nL'équipement de chef-d'oeuvre et l'Enchantement s'entendent bien : une pièce de chef-d'oeuvre reste entièrement enchantable, et l'enchantement s'ajoute par-dessus le bonus du chef-d'oeuvre sans le perturber ni effacer la signature du créateur. En cumulant toutes les sources, une pièce signée de chef-d'oeuvre portant un enchantement Supérieur est le meilleur qu'une pièce artisanale puisse atteindre, et elle reste en dessous du butin de raid par conception.\n\nSur le marché, le Marché mondial ne négocie que des stocks ordinaires, non modifiés ; les pièces enchantées et signées changent donc de mains en face à face via la fenêtre d'échange. Les matériaux sont la moitié commercialisable du métier : la Poussière, l'Essence et les Éclats se mettent en vente librement, sans frais de mise en vente, et le Marchand prélève seulement 5 % d'une vente conclue. Cela donne deux revenus classiques d'enchanteur : vendre des matériaux sur le marché, et prendre la pièce d'un client en échange, l'enchanter, et la lui rendre."
+          "marketBody": "Appliquer un enchantement consomme les réactifs et marque une copie précise de l'objet. Visez une copie en sacoche et vous recevez une copie enchantée distincte ; visez une pièce déjà équipée et elle est enchantée sur place, sans déséquiper ni rééquiper. Dans les deux cas le bonus suit la pièce indéfiniment, après déséquipement, séjours en banque et échanges. Un seul enchantement par pièce : appliquer un enchantement différent à une copie enchantée demande d'abord confirmation, puis remplace l'ancien enchantement purement et simplement ; il est détruit sans remboursement de ses matériaux. Vendre, jeter et désenchanter préfèrent toujours les copies normales en premier, votre pièce finie ne se fait donc pas dévorer par accident. Des copies identiquement enchantées s'empilent même dans vos sacs.\n\nL'équipement de chef-d'oeuvre et l'Enchantement s'entendent bien : une pièce de chef-d'oeuvre reste entièrement enchantable, et l'enchantement s'ajoute par-dessus le bonus du chef-d'oeuvre sans le perturber ni effacer la signature du créateur. En cumulant toutes les sources, une pièce signée de chef-d'oeuvre portant un enchantement Supérieur est le meilleur qu'une pièce artisanale puisse atteindre, et elle reste en dessous du butin de raid par conception.\n\nSur le marché, le Marché mondial ne négocie que des stocks ordinaires, non modifiés ; les pièces enchantées et signées changent donc de mains en face à face via la fenêtre d'échange. Les matériaux sont la moitié commercialisable du métier : la Poussière, l'Essence et les Éclats se mettent en vente librement, sans frais de mise en vente, et le Marchand prélève seulement 5 % d'une vente conclue. Cela donne deux revenus classiques d'enchanteur : vendre des matériaux sur le marché, et prendre la pièce d'un client en échange, l'enchanter, et la lui rendre."
         }
       },
       "howHeading": "Comment fonctionne l'artisanat",
@@ -3858,9 +3920,9 @@ export const fr_CA: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Le Minage extrait le minerai directement de la roche du monde : le cuivre dans le Val d'Eastbrook, le fer dans le Marais de Mirefen, et l'osmium dans les Hauteurs de Thornpeak, pour alimenter les métiers de forge. Accessible à tous dès le niveau 1, sans aucune condition, suivi sur son propre compteur jusqu'à un plafond de 100.",
-        "logging": "Le Bûcheronnage abat du bois dans les bosquets des trois zones : l'écorceferme dans le Val d'Eastbrook, le bois de frêne dans le Marais de Mirefen, et le pin des cimes dans les Hauteurs de Thornpeak, le stock brut pour les manches, les bâtons et le banc d'ingénieur. Accessible à tous dès le niveau 1, suivi sur son propre compteur jusqu'à un plafond de 100.",
-        "herbalism": "L'Herboristerie cueille ce qui pousse à l'état sauvage : la feuilleclat dans le Val d'Eastbrook, la feuille-d'or dans le Marais de Mirefen, et le pétale-de-soleil dans les Hauteurs de Thornpeak, la feuille et la tige qui alimentent les métiers apothicaires. Accessible à tous dès le niveau 1, suivie sur son propre compteur jusqu'à un plafond de 100.",
+        "mining": "Le Minage extrait le minerai directement de la roche du monde : le cuivre dans le Val d'Eastbrook, le fer dans le Marais de Mirefen, et l'osmium dans les Hauteurs de Thornpeak, pour alimenter les métiers de forge. Accessible à tous dès le niveau 1 : il suffit d'avoir un pic de mineur dans vos sacs, 20 pièces de cuivre dans la ville principale de n'importe quelle zone. Suivi sur son propre compteur jusqu'à un plafond de 100.",
+        "logging": "Le Bûcheronnage abat du bois dans les bosquets des trois zones : l'écorceferme dans le Val d'Eastbrook, le bois de frêne dans le Marais de Mirefen, et le pin des cimes dans les Hauteurs de Thornpeak, le stock brut pour les manches, les bâtons et le banc d'ingénieur. Accessible à tous dès le niveau 1 avec une hache de bûcheron dans vos sacs (20 pièces de cuivre dans la ville principale de n'importe quelle zone), suivi sur son propre compteur jusqu'à un plafond de 100.",
+        "herbalism": "L'Herboristerie cueille ce qui pousse à l'état sauvage : la feuilleclat dans le Val d'Eastbrook, la feuille-d'or dans le Marais de Mirefen, et le pétale-de-soleil dans les Hauteurs de Thornpeak, la feuille et la tige qui alimentent les métiers apothicaires. Accessible à tous dès le niveau 1 avec une serpe d'herboristerie dans vos sacs (20 pièces de cuivre dans la ville principale de n'importe quelle zone), suivie sur son propre compteur jusqu'à un plafond de 100.",
         "fishing": "La Pêche est le métier à part parmi les métiers de récolte, et le plus profond : un vrai mini-jeu de touche et de moulinage, ses propres tables de prises dans chaque zone, et un plafond de maîtrise de 200, soit le double des autres. Achetez une canne, faites face à une eau libre, et lancez."
       },
       "rhythmHeading": "Le rythme de la récolte",
@@ -3869,7 +3931,7 @@ export const fr_CA: EnTranslations = {
       "nodesHeading": "Noeuds par zone",
       "nodesNote": "Où se trouvent les noeuds, leur palier, l'outil dont ils ont besoin et ce qu'ils rapportent. Chaque noeud réapparaît pour vous {respawn} secondes après votre propre récolte, et ce minuteur vous appartient exclusivement : un autre récolteur travaillant le même noeud ne retarde jamais le vôtre, donc il n'y a pas de course aux noeuds ni de camping. Chaque zone plus haut dans la progression fournit un matériau supérieur extrait d'un terrain plus difficile.",
       "toolsHeading": "Outils",
-      "toolsNote": "Les mains nues comptent comme un outil de palier 1, donc chaque noeud de palier 1 du jeu ne nécessite aucun outil. L'échelle des marchands couvre les paliers 1 à 3 ; un outil doit simplement se trouver dans vos sacs, il n'y a pas d'emplacement d'équipement ni de durabilité, donc chacun est un achat unique. Seul le palier importe pour la condition : la couleur de rareté d'un outil est purement cosmétique.\n\nAu-dessus de l'échelle des marchands se trouvent deux outils artisanaux, de palier 4 et de palier 5, fabriqués à l'outillage par les ingénieurs et jamais vendus par aucun PNJ. Aucun noeud aujourd'hui n'a besoin de plus du palier 3, donc leur valeur actuelle est la vitesse : un outil du sommet fixe le lancer à son plancher sur les noeuds inférieurs, et il sera le ticket d'entrée quand des terrains de palier supérieur arriveront.",
+      "toolsNote": "Chaque nœud exige l'outil de son métier dans vos sacs, palier 1 compris : pas de pic, pas de minerai ; pas de canne, pas de poisson. L'échelle des marchands couvre les paliers 1 à 3, en stock dans la ville principale de chaque zone ; un outil doit simplement se trouver dans vos sacs, il n'y a pas d'emplacement d'équipement ni de durabilité, donc chacun est un achat unique. Seul le palier importe pour la condition : la couleur de rareté d'un outil est purement cosmétique.\n\nAu-dessus de l'échelle des marchands se trouvent deux outils artisanaux, de palier 4 et de palier 5, fabriqués à l'outillage par les ingénieurs et jamais vendus par aucun PNJ. Aucun nœud aujourd'hui n'a besoin de plus du palier 3, donc leur valeur actuelle est la vitesse : un outil du sommet fixe le lancer à son plancher sur les nœuds inférieurs, et il sera le ticket d'entrée quand des terrains de palier supérieur arriveront.",
       "toolCrafted": "Fabriqué ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Non vendu",
@@ -5574,10 +5636,10 @@ export const fr_CA: EnTranslations = {
     "reconnectingNow": "Connexion perdue. Reconnexion maintenant... (tentative {attempt}/{maxAttempts})",
     "slowConnection": "Cela prend plus de temps que d'habitude. Vérifiez votre connexion Internet.",
     "connectionRejected": "Le serveur a fermé la connexion.",
-    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
+    "incompatibleWorldVersion": "Les versions du jeu et du serveur sont incompatibles. Rechargez ou mettez à jour, puis réessayez.",
     "realmFull": "Ce monde est complet en ce moment. Veuillez réessayer dans quelques minutes.",
     "tooManyConnections": "Trop de connexions à ce monde proviennent de votre réseau. Veuillez fermer les fenêtres de jeu superflues ou réessayer dans quelques minutes.",
-    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
+    "messageRateExceeded": "Vous avez été déconnecté pour avoir envoyé des actions trop rapidement. Patientez un instant, puis reconnectez-vous.",
     "tips": {
       "classes": "Conseil : chacune des 9 classes se joue différemment. Essayez-en plusieurs avant de faire votre choix.",
       "talents": "Conseil : vous pouvez réinitialiser vos talents dès que vous êtes hors combat, un premier choix ne vous enferme donc jamais.",
@@ -5648,10 +5710,10 @@ export const fr_CA: EnTranslations = {
     "dismiss": "Ignorer"
   },
   "perfNudge": {
-    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
-    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
-    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
-    "dismiss": "Dismiss"
+    "integratedGpu": "Le jeu fonctionne sur le GPU intégré (économie d'énergie). Si cet ordinateur possède aussi un GPU de jeu, définissez votre navigateur sur Performances élevées dans Paramètres > Système > Affichage > Graphiques sous Windows, puis redémarrez le navigateur. L'application de bureau choisit automatiquement le GPU de jeu.",
+    "hardwareAccelerationDesktop": "Le jeu fonctionne sans accélération GPU, ce qui le rend très lent. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres > Système > Affichage > Graphiques.",
+    "hardwareAccelerationWeb": "Le jeu fonctionne sans accélération GPU, ce qui le rend très lent. Activez l'accélération matérielle dans les paramètres de votre navigateur, mettez à jour vos pilotes graphiques, puis redémarrez votre navigateur.",
+    "dismiss": "Ignorer"
   },
   "realm": {
     "noRealms": "Aucun monde disponible.",
@@ -6078,7 +6140,7 @@ export const fr_CA: EnTranslations = {
       "auraGain": "Vous gagnez {name}.",
       "auraFade": "{name} se dissipe de vous.",
       "auraAfflicted": "{target} est affecté par {name}.",
-      "auraGainOther": "{target} gains {name}."
+      "auraGainOther": "{target} gagne {name}."
     },
     "system": {
       "playerDeath": "Vous êtes mort.",
@@ -6181,6 +6243,7 @@ export const fr_CA: EnTranslations = {
       "arenaJoin": "Vous rejoignez la file du Colisée cendré. Attendez un adversaire digne...",
       "arenaLeave": "Vous quittez la file du Colisée cendré.",
       "arenaSands": "Vous foulez le sable du Colisée cendré.",
+      "arenaSandsDrowned": "Vous foulez les pierres inondées de la Cour noyée.",
       "tradeRequestSent": "Vous avez demandé un échange avec {name}.",
       "tradeOpened": "Fenêtre d'échange ouverte.",
       "tradeComplete": "Échange terminé.",
@@ -6349,6 +6412,11 @@ export const fr_CA: EnTranslations = {
       "playerLevelClassTitle": "{name} - Niv. {level} {className}",
       "noChallengers": "Aucun prétendant classé pour l'instant - soyez le premier.",
       "matchInProgress": "Match en cours contre {name}.",
+      "mapName": "Carte : {name}",
+      "map": {
+        "coliseum": "Colisée cendré",
+        "drownedCourt": "La Cour noyée"
+      },
       "leaveQueue": "Quitter la file",
       "searching": "Recherche d'un adversaire... ({count} en file)",
       "enterQueue": "Entrer en file",
@@ -6641,6 +6709,7 @@ export const fr_CA: EnTranslations = {
       "pageNextAria": "Page suivante du marché",
       "pageStatus": "Page {current} sur {total}",
       "filters": "Filtres du marché",
+      "filterValueAria": "{label} : {value}",
       "filterType": "Type",
       "filterTypeAll": "Tous les types",
       "filterTypeWeapon": "Armes",
@@ -6651,8 +6720,15 @@ export const fr_CA: EnTranslations = {
       "filterTypeOther": "Autres",
       "filterArmorType": "Type d'armure",
       "filterArmorAll": "Toute l'armure",
+      "filterArmorSlot": "Emplacement d'armure",
+      "filterArmorClassAll": "Tous les types d'armure",
+      "armorCloth": "Tissu",
+      "armorLeather": "Cuir",
+      "armorMail": "Mailles",
       "filterWeaponType": "Type d'arme",
       "filterWeaponAll": "Toutes les armes",
+      "filterPrimaryStat": "Caractéristique principale",
+      "filterPrimaryStatAll": "Toute caractéristique principale",
       "filterRarity": "Rareté",
       "filterRarityAll": "Toutes les raretés",
       "weaponSword": "Épées",
@@ -6798,7 +6874,7 @@ export const fr_CA: EnTranslations = {
         "description": "Un cri qui augmente de {buff}% la puissance d'attaque de tous les membres du groupe pendant 30 min."
       },
       "demoralizing_shout": {
-        "name": "Direhowl",
+        "name": "Hurlement sinistre",
         "description": "Pousse un cri terrifiant qui réduit de {buff}% les dégâts infligés par tous les ennemis proches pendant 20 s."
       },
       "charge": {
@@ -6818,7 +6894,7 @@ export const fr_CA: EnTranslations = {
         "description": "Génère 10 rage au prix de vos points de vie."
       },
       "overpower": {
-        "name": "Redhand",
+        "name": "Main rouge",
         "description": "Attaque instantanée infligeant les dégâts de l'arme plus {damage}. Utilisable seulement après une esquive de la cible. Ne peut pas être esquivée."
       },
       "execute": {
@@ -6846,7 +6922,7 @@ export const fr_CA: EnTranslations = {
         "description": "Provoque la cible: votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s."
       },
       "fireball": {
-        "name": "Cinderbolt",
+        "name": "Trait de braises",
         "description": "Lance une boule enflammée qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée."
       },
       "fireball_form": {
@@ -6862,7 +6938,7 @@ export const fr_CA: EnTranslations = {
         "description": "Augmente l'Intelligence de {buff} pendant 30 min."
       },
       "frostbolt": {
-        "name": "Rimelance",
+        "name": "Lance de givre",
         "description": "Lance un éclair de givre, inflige {damage} points de dégâts de Givre et ralentit le déplacement de 40%."
       },
       "blazing_barrier": {
@@ -6914,55 +6990,55 @@ export const fr_CA: EnTranslations = {
         "description": "Invoque un élémentaire d'eau qui se bat à tes côtés, lance des Éclairs d'eau sur ta cible et canalise Jet d'eau. (Givre)"
       },
       "ice_lance": {
-        "name": "Ice Lance",
+        "name": "Lance de glace",
         "description": "Lancez un éclat de glace infligeant {damage} points de dégâts de Givre, triplés contre une cible gelée. Dépense Fingers of Frost ou une charge de Morsure de l'hiver pour traiter la cible comme gelée. (Givre)"
       },
       "flurry": {
-        "name": "Winterlash",
+        "name": "Fouet de l'hiver",
         "description": "Lâchez trois éclairs glacés pour {damage} dégâts de Givre chacun et appliquez Winter's Chill à la cible : ses 2 prochains sorts compatibles entrants la traitent comme gelée. Brain Freeze rend Winterlash instantané et ignore son temps de recharge. (Gel)"
       },
       "frozen_orb": {
-        "name": "Frozen Orb",
+        "name": "Orbe gelé",
         "description": "Libère un orbe de givre tourbillonnant qui dérive vers l'avant pendant 8 s, infligeant {damage} des dégâts de Givre chaque seconde aux ennemis proches et les ralentissant de 30%. Chaque impulsion frappante génère un glaçon. (Givre)"
       },
       "blizzard": {
-        "name": "Blizzard",
+        "name": "Tempête de neige",
         "description": "Déchaîne une tempête de glace sur la zone ciblée pendant 6 s, infligeant {damage} points de dégâts de Givre par seconde et ralentissant les ennemis de 40 %. Chaque ennemi touché réduit le temps de recharge de Frozen Orb de 0,5 s, jusqu'à 3 s par incantation. (Givre)"
       },
       "glacial_spike": {
-        "name": "Glacial Spike",
+        "name": "Pointe glaciale",
         "description": "Conjurez un pic de glace massif en consumant 5 glaçons pour infliger {damage} points de dégâts de Givre et geler la cible sur place pendant 4 s. (Givre)"
       },
       "glacial_front": {
-        "name": "Glacial Front",
+        "name": "Front glaciaire",
         "description": "Maintenez pour accumuler un front de givre de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Tous les ennemis touchés sont ralentis de 50 % pendant 4 s ; une charge maximale les immobilise également pendant 1 s. (Givre)"
       },
       "dragons_breath": {
-        "name": "Dragon's Breath",
+        "name": "Souffle du dragon",
         "description": "Maintenez pour accumuler un souffle de flammes de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Les ennemis touchés sont désorientés et les dégâts brisent l'effet ; une charge maximale critique toujours et compte une fois pour Bonne série. (Feu)"
       },
       "fingers_of_frost": {
-        "name": "Fingers of Frost",
+        "name": "Doigts de givre",
         "description": "Rimelance a 15 % de chances d'accorder Fingers of Frost, jusqu'à 2 charges : votre prochain Ice Lance traite sa cible comme gelée. (Givre)"
       },
       "brain_freeze": {
-        "name": "Brain Freeze",
+        "name": "Gel cérébral",
         "description": "Rimelance a 20 % de chances de rendre votre prochain Winterlash instantané et sans son temps de recharge. (Givre)"
       },
       "shatter": {
-        "name": "Brittle Ruin",
+        "name": "Ruine fragile",
         "description": "Vos sorts bénéficient de 50 % de chances de coup critique contre les cibles gelées. Fingers of Frost et Winter's Chill sont considérés comme gelés. (Givre)"
       },
       "conjure_water": {
-        "name": "Waterbind",
+        "name": "Lien d'eau",
         "description": "Invoque 2 bouteilles d'eau qui restaurent du mana une fois bues. Les rangs supérieurs invoquent une eau plus pure."
       },
       "conjure_food": {
-        "name": "Breadbind",
+        "name": "Lien de pain",
         "description": "Invoque 2 portions de pain qui restaurent de la vie une fois mangées. Les rangs supérieurs invoquent une nourriture plus consistante."
       },
       "fire_blast": {
-        "name": "Cinderfall",
+        "name": "Pluie de braises",
         "description": "Frappe l'ennemi pour {damage} points de dégâts de Feu. Instantané."
       },
       "arcane_missiles": {
@@ -6974,11 +7050,11 @@ export const fr_CA: EnTranslations = {
         "description": "Transforme l'ennemi en crapaud pendant un maximum de {duration} s. Le crapaud erre et récupère rapidement. Tout dégât interrompt l'effet. Bêtes et humanoïdes uniquement."
       },
       "frost_nova": {
-        "name": "Icebind",
+        "name": "Entrave de glace",
         "description": "Gèle tous les ennemis proches sur place pendant un maximum de 8 s et inflige {damage} points de dégâts de Givre. L’immobilisation prend fin après avoir subi un total de dégâts égal à 15 % des points de vie maximum de la cible, avec un minimum de 20 et un maximum de 60 points de dégâts."
       },
       "arcane_explosion": {
-        "name": "Aetherburst",
+        "name": "Explosion d'Aether",
         "description": "Une explosion d'énergie des Arcanes touche tous les ennemis proches pour {damage} points de dégâts des Arcanes."
       },
       "scorch": {
@@ -6986,7 +7062,7 @@ export const fr_CA: EnTranslations = {
         "description": "Brûle l'ennemi pour {damage} points de dégâts de Feu. Incantation rapide."
       },
       "pyroblast": {
-        "name": "Pyrelance",
+        "name": "Lance de flammes",
         "description": "Projette un immense rocher enflammé qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée."
       },
       "ice_barrier": {
@@ -7010,7 +7086,7 @@ export const fr_CA: EnTranslations = {
         "description": "Frappe la cible pour {damage} points de dégâts et l'incapacite pendant 4 s. Tout dégât interrompt l'effet. Confère 1 point de combo."
       },
       "evasion": {
-        "name": "Ghostfoot",
+        "name": "Pied spectral",
         "description": "Augmente vos chances d'esquiver de 50% pendant 15 s."
       },
       "slice_and_dice": {
@@ -7030,7 +7106,7 @@ export const fr_CA: EnTranslations = {
         "description": "Prend la cible en embuscade pour 250% des dégâts de l'arme plus {damage}. Vous devez être camouflé et derrière la cible. Requiert une dague. Confère 1 point de combo."
       },
       "stealth": {
-        "name": "Duskveil",
+        "name": "Voile du crépuscule",
         "description": "Vous dissimule dans les ombres : les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Duskveil. Relancez pour sortir."
       },
       "adrenaline_rush": {
@@ -7062,7 +7138,7 @@ export const fr_CA: EnTranslations = {
         "description": "Coup de grâce qui blesse la cible, la faisant saigner de {damage} pendant 16 s."
       },
       "vanish": {
-        "name": "Smokestep",
+        "name": "Pas de fumée",
         "description": "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
       },
       "instant_poison": {
@@ -7078,7 +7154,7 @@ export const fr_CA: EnTranslations = {
         "description": "Aveugle la cible, la faisant errer désorientée pendant 8 s. Le moindre dégât rompt l'effet."
       },
       "seal_of_righteousness": {
-        "name": "Oathbrand",
+        "name": "Marque du serment",
         "description": "Vous remplit de puissance Sacrée pendant 30 s, faisant infliger {damage} points de dégâts Sacrés supplémentaires à chacune de vos frappes de mêlée. Libérez-le avec Verdict."
       },
       "holy_light": {
@@ -7114,7 +7190,7 @@ export const fr_CA: EnTranslations = {
         "description": "Provoque la cible : votre menace rejoint celle de l’ennemi qu’elle déteste le plus et elle est contrainte de vous attaquer pendant 3 s."
       },
       "flash_of_light": {
-        "name": "Lightmend",
+        "name": "Soin de lumière",
         "description": "Un éclat de Lumière rapide et efficace qui rend {damage} points de vie à une cible alliée."
       },
       "exorcism": {
@@ -7134,7 +7210,7 @@ export const fr_CA: EnTranslations = {
         "description": "Vous entoure d'énergie sacrée pendant 30 min, infligeant 5 points de dégâts Sacrés à tout ennemi qui vous frappe en mêlée."
       },
       "tame_beast": {
-        "name": "Wildbond",
+        "name": "Lien sauvage",
         "description": "Commence à apprivoiser une bête pour en faire votre compagnon. Elle doit être de votre niveau ou moins et ne pas être élite. Votre familier vous suit, attaque vos ennemis et génère sa propre menace. Vous ne pouvez avoir qu'un familier à la fois."
       },
       "dismiss_pet": {
@@ -7162,7 +7238,7 @@ export const fr_CA: EnTranslations = {
         "description": "Hébète la cible pour {damage} points de dégâts et ralentit son déplacement de 50% pendant 4 s."
       },
       "mongoose_bite": {
-        "name": "Counterfang",
+        "name": "Contre-croc",
         "description": "Contre-attaque après une esquive de la cible, infligeant les dégâts de l'arme plus {damage}. Ne peut pas être esquivée."
       },
       "wing_clip": {
@@ -7210,7 +7286,7 @@ export const fr_CA: EnTranslations = {
         "description": "Rend {damage} points de vie à la cible en 15 s."
       },
       "mind_blast": {
-        "name": "Mindfracture",
+        "name": "Fracture mentale",
         "description": "Frappe l'esprit de la cible pour {damage} points de dégâts d'Ombre."
       },
       "heal": {
@@ -7262,7 +7338,7 @@ export const fr_CA: EnTranslations = {
         "description": "Imprègne votre arme d'un givre mordant: chaque frappe inflige {damage} points de dégâts supplémentaires pendant 5 min."
       },
       "ghost_wolf": {
-        "name": "Shadewolf",
+        "name": "Loup d'ombre",
         "description": "Vous transforme en Shadewolf et augmente votre vitesse de déplacement de 40% pendant 10 min."
       },
       "stormstrike": {
@@ -7274,7 +7350,7 @@ export const fr_CA: EnTranslations = {
         "description": "Envoie un trait ténébreux sur l'ennemi pour {damage} points de dégâts d'Ombre."
       },
       "demon_skin": {
-        "name": "Fiendhide",
+        "name": "Peau de démon",
         "description": "Une peau démoniaque augmente votre armure de {buff} pendant 30 min."
       },
       "immolate": {
@@ -7282,7 +7358,7 @@ export const fr_CA: EnTranslations = {
         "description": "Brûle l'ennemi pour {damage} points de dégâts de Feu et {overTime} points supplémentaires en 15 s."
       },
       "corruption": {
-        "name": "Blackrot",
+        "name": "Pourriture noire",
         "description": "Corrompt la cible et inflige {damage} points de dégâts d'Ombre en 18 s."
       },
       "life_tap": {
@@ -7310,15 +7386,15 @@ export const fr_CA: EnTranslations = {
         "description": "Frappe instantanément la cible d'une ombre brûlante pour {damage} points de dégâts d'Ombre."
       },
       "wrath": {
-        "name": "Wildbolt",
+        "name": "Trait sauvage",
         "description": "Lance un trait d'énergie naturelle qui inflige {damage} points de dégâts de Nature."
       },
       "healing_touch": {
-        "name": "Wildmend",
+        "name": "Soin sauvage",
         "description": "Rend {damage} points de vie à une cible alliée."
       },
       "mark_of_the_wild": {
-        "name": "Wildward",
+        "name": "Garde sauvage",
         "description": "Place le Wildward sur une cible alliée et augmente son armure de {buff} pendant 30 min."
       },
       "moonfire": {
@@ -7326,11 +7402,11 @@ export const fr_CA: EnTranslations = {
         "description": "Brûle l'ennemi par un feu lunaire pour {damage} points de dégâts des Arcanes plus des dégâts sur la durée."
       },
       "rejuvenation": {
-        "name": "Wildbloom",
+        "name": "Floraison sauvage",
         "description": "Rend {damage} points de vie à la cible en 12 s."
       },
       "thorns": {
-        "name": "Briarguard",
+        "name": "Garde de ronces",
         "description": "Des épines jaillissent de la cible: les assaillants en mêlée subissent {buff} points de dégâts de Nature."
       },
       "entangling_roots": {
@@ -7342,11 +7418,11 @@ export const fr_CA: EnTranslations = {
         "description": "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
       },
       "maul": {
-        "name": "Bonecrush",
+        "name": "Brise-os",
         "description": "Attaque dévastatrice qui augmente les dégâts de mêlée de {damage} et génère beaucoup de menace. S'active lors de votre prochaine frappe. Forme de Bruin uniquement."
       },
       "growl": {
-        "name": "Menace",
+        "name": "Menacer",
         "description": "Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement."
       },
       "cat_form": {
@@ -7358,7 +7434,7 @@ export const fr_CA: EnTranslations = {
         "description": "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de loup uniquement."
       },
       "ferocious_bite": {
-        "name": "Gorebite",
+        "name": "Morsure sanglante",
         "description": "Coup de grâce qui inflige {damage}. Forme de loup uniquement."
       },
       "swipe": {
@@ -7382,7 +7458,7 @@ export const fr_CA: EnTranslations = {
         "description": "Vos instincts s'aiguisent, augmentant votre chance d'esquiver de 50 % pendant 6 sec."
       },
       "starfire": {
-        "name": "Skyfall",
+        "name": "Chute céleste",
         "description": "Fait tomber un trait de feu stellaire qui inflige {damage} points de dégâts des Arcanes."
       },
       "travel_form": {
@@ -7398,7 +7474,7 @@ export const fr_CA: EnTranslations = {
         "description": "Étourdit la cible pendant 2 s. Forme de Bruin uniquement."
       },
       "faerie_fire": {
-        "name": "Witchlight",
+        "name": "Lumière de sorcière",
         "description": "Diminue l'armure de la cible de {damage}% pendant 40 s. Ne se cumule pas avec Cisaillement d'armure."
       },
       "hibernate": {
@@ -7410,7 +7486,7 @@ export const fr_CA: EnTranslations = {
         "description": "Bondit en avant, augmentant la vitesse de déplacement de 50% pendant 15 s. Forme de loup uniquement."
       },
       "pounce": {
-        "name": "Slinkstrike",
+        "name": "Frappe furtive",
         "description": "Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo. Forme de loup uniquement."
       },
       "insect_swarm": {
@@ -7418,7 +7494,7 @@ export const fr_CA: EnTranslations = {
         "description": "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s."
       },
       "tigers_fury": {
-        "name": "Wolfsblood",
+        "name": "Sang de loup",
         "description": "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement."
       },
       "rip": {
@@ -7434,7 +7510,7 @@ export const fr_CA: EnTranslations = {
         "description": "Attaque instantanément dans une frénésie sanguinaire pour 60% des dégâts de l'arme plus {damage}. (signature Fureur)"
       },
       "shield_slam": {
-        "name": "Shieldcrack",
+        "name": "Brise-bouclier",
         "description": "Heurte la cible avec votre bouclier pour 50% des dégâts de l'arme plus {damage} et génère une menace énorme. (signature Protection)"
       },
       "whirlwind": {
@@ -7690,7 +7766,7 @@ export const fr_CA: EnTranslations = {
         "description": "Insuffle une force sauvage aux alliés à moins de 30 m, augmentant leur puissance d'attaque de 45 et leur vitesse d'attaque de 5 % pendant 5 min. (talent de Chasseur)"
       },
       "avatar": {
-        "name": "Avatar",
+        "name": "Incarnation",
         "description": "Vous vous transformez en colosse pendant 20 s, ce qui dissipe tous les effets de contrôle vous affectant et augmente de 20% les dégâts que vous infligez."
       },
       "avenging_wrath": {
@@ -7866,7 +7942,7 @@ export const fr_CA: EnTranslations = {
         "description": "Saisissez votre moment parfait : gagnez instantanément 4 Charges d'arcane, et pendant 10 s Traits d'Aether ne les consomme pas. (Chromancie)"
       },
       "arcane_surge": {
-        "name": "Aether Surge",
+        "name": "Déferlante d'Aether",
         "description": "Envoie une déferlante d'éther brut à travers l'ennemi pour {damage} points de dégâts. Chaque incantation laisse une Charge d'arcane qui augmente les dégâts et la vitesse d'incantation de votre prochain Aether Surge (5 % plus rapide chacune) mais en relève fortement le coût en mana, cumulant jusqu'à 4 fois ; Traits d'Aether dépense les charges. Chaque incantation peut également armer l'Élan d'Aether, rendant votre prochain Aether Surge gratuit et deux fois plus rapide à lancer."
       },
       "mind_sear": {
@@ -11786,6 +11862,6 @@ export const fr_CA: EnTranslations = {
     "delveRiteShrineReedInteract": "Autel du roseau : appuyez sur F pour le toucher",
     "delveRiteShrineSkullInteract": "Autel du crâne : appuyez sur F pour le toucher",
     "mailboxName": "Boîte aux lettres",
-    "noticeboardName": "Notice Board"
+    "noticeboardName": "Panneau d'affichage"
   }
 };

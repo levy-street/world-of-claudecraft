@@ -42,6 +42,11 @@ const CANCELABLE_CLASS = 'cancelable';
 // stylesheet renders it larger so your dots/hots read at a glance among other
 // casters'. Toggled per frame so a recycled node never keeps stale prominence.
 const OWN_CLASS = 'own';
+// Marks an aura in its final seconds (auras_view isAuraExpiring): the stylesheet
+// blinks the icon so an expiring DoT/buff reads at a glance, with a steady
+// brightness fallback under prefers-reduced-motion. Toggled per frame so a
+// recycled node never keeps a stale blink.
+const EXPIRING_CLASS = 'expiring';
 // Carries the debuff's magic school so the stylesheet tints the border per school
 // (WoW-style poison/magic/curse reads); '' on a buff, so no school selector matches.
 const SCHOOL_ATTR = 'data-school';
@@ -214,6 +219,7 @@ export class AurasPainter {
       this.writers.setAttr(rec.el, SCHOOL_ATTR, s.school);
       this.writers.toggleClass(rec.el, CANCELABLE_CLASS, rec.cancelable);
       this.writers.toggleClass(rec.el, OWN_CLASS, s.own);
+      this.writers.toggleClass(rec.el, EXPIRING_CLASS, s.expiring);
       this.writers.setText(rec.dur, s.durationText);
       const hasStacks = s.stacksText !== '';
       this.writers.setDisplay(rec.stacks, hasStacks ? STACKS_SHOWN : STACKS_HIDDEN);

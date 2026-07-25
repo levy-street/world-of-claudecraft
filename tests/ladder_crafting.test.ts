@@ -160,7 +160,7 @@ describe('crafted elixir defs and the live use path', () => {
       sim.addItem(id, 1, pid);
       sim.useItem(id, pid);
       const p = (sim as any).entities.get(pid);
-      const aura = p.auras.find((a: { id: string }) => a.id === `elixir_${id}`);
+      const aura = p.auras.find((a: { id: string }) => a.id === 'elixir_buff_sta');
       expect(aura, `${id} aura applied`).toBeTruthy();
       expect(aura.kind).toBe('buff_sta');
       expect(aura.value).toBe(expected.value);

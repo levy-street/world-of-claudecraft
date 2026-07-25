@@ -198,7 +198,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Dovednost posouvají dvě akce: rozzačarování kusu a aplikace okouzlení. Každý úspěch má hodnotu až jednoho bodu, škálovaného podle závažnosti práce: vzácnost kusu, který rozbíješ, nebo úroveň reagentu okouzlení, které aplikuješ. Běžná rozzačarování a okouzlení pouze prachem se hodnotí jako běžná práce; neobvyklá rozzačarování a okouzlení s esencí jako neobvyklá; vzácná rozzačarování a každé Runové nebo Velké okouzlení jako vzácná; epická a legendární rozzačarování ještě výše.\n\nZnámé blednutí mistrovství se uplatňuje po 25bodových úrovních, takže běžná práce šedne na dovednosti 75, neobvyklá na 100 a práce vzácné úrovně přesně na stropu 125. Okouzlování má také jednu vlastní laskavost: vstup nad tvůj strop archetypu je zaokrouhlen dolů na tento strop místo vymazání, takže před laděním epické rozzačarování jednoduše skóruje jako vzácné místo toho, aby nic nenaučilo. Pokud Okouzlování skončí nečinné za jinou identitou, vše se hodnotí jako běžná práce a výstup se zastaví na 75; ponech ho jako koníček a práce vzácné úrovně stále přináší výsledky, jen pomaleji za 75.',
   'guide.profPages.craftProse.enchanting.marketHeading': 'Okouzlené kopie, původ a tržiště',
   'guide.profPages.craftProse.enchanting.marketBody':
-    'Aplikace okouzlení spotřebuje sáčkovou, nevybavenou kopii předmětu a reagenty a vrátí odlišnou okouzlenou kopii; vybavy ji a bonus následuje kus navždy, přes odepnutí, bankovní výlety i obchody. Jedno okouzlení na kus: okouzlená kopie již nikdy nemůže být znovu okouzlena nebo rozzačarována, a prodej, vyhazování a rozzačarování dávají přednost prostým kopiím, takže tvůj hotový kus nebude omylem sežrán. Identicky okouzlené kopie se dokonce skládají dohromady v brašnách.\n\nMistrovská výbava a okouzlování jsou přátelé: mistrovský kus zůstává plně okouzlitelný a okouzlení se přidá na vrchol bonusu mistrovského díla, aniž by ho nebo výrobcův podpis narušilo. Při kombinaci všech zdrojů je podepsaný mistrovský kus nesoucí Velké okouzlení nejlepší, co řemeslný kus může získat, a přesto záměrně zaostává za lootovou výbavou z raidu.\n\nNa tržišti World Market zprostředkovává pouze prostý, nemodifikovaný zásobník, takže okouzlené a podepsané kusy mění majitele tváří v tvář přes obchodní okno. Materiály jsou obchodovatelnou polovinou řemesla: Prach, Esence a Střepy jsou volně vypisovatelné, výpis nic nestojí a Obchodník bere 5 procent pouze z dokončeného prodeje. To dělá ze dvou klasických příjmů okouzlovače prodej materiálů na tržišti a převzetí zákazníkova kusu v obchodě, jeho okouzlení a vrácení zpět.',
+    'Aplikace okouzlení spotřebuje reagenty a označí jednu konkrétní kopii předmětu. Namíříš-li ji na kopii v brašně, dostaneš zpět odlišnou okouzlenou kopii; namíříš-li ji na kus, který už máš nasazený, je okouzlen na místě, bez sundávání a opětovného nasazování. Tak či tak bonus následuje kus navždy, přes odepnutí, bankovní výlety i obchody. Jedno okouzlení na kus: použití jiného okouzlení na okouzlenou kopii si nejprve vyžádá potvrzení a pak staré okouzlení rovnou nahradí; staré okouzlení je zničeno bez náhrady materiálů. Prodej, vyhazování a rozzačarování dávají přednost prostým kopiím, takže tvůj hotový kus nebude omylem sežrán. Identicky okouzlené kopie se dokonce skládají dohromady v brašnách.\n\nMistrovská výbava a okouzlování jsou přátelé: mistrovský kus zůstává plně okouzlitelný a okouzlení se přidá na vrchol bonusu mistrovského díla, aniž by ho nebo výrobcův podpis narušilo. Při kombinaci všech zdrojů je podepsaný mistrovský kus nesoucí Velké okouzlení nejlepší, co řemeslný kus může získat, a přesto záměrně zaostává za lootovou výbavou z raidu.\n\nNa tržišti World Market zprostředkovává pouze prostý, nemodifikovaný zásobník, takže okouzlené a podepsané kusy mění majitele tváří v tvář přes obchodní okno. Materiály jsou obchodovatelnou polovinou řemesla: Prach, Esence a Střepy jsou volně vypisovatelné, výpis nic nestojí a Obchodník bere 5 procent pouze z dokončeného prodeje. To dělá ze dvou klasických příjmů okouzlovače prodej materiálů na tržišti a převzetí zákazníkova kusu v obchodě, jeho okouzlení a vrácení zpět.',
   'guide.profPages.howHeading': 'Jak výroba funguje',
   'guide.profPages.howBody':
     'Otevři okno výroby (výchozí klávesa T) a každý recept, který znáš, je uveden s tím, co potřebuje, a co máš po ruce. Recepty vázané na stanici tě žádají stát do 20 yardů od správné stanice ve městě, terénní recepty vyrábíš kdekoli a Okouzlování nikdy stanici nepotřebuje. Neexistuje hod na selhání: výroba s materiály po ruce vždy uspěje.\n\nDva malé třecí prvky udržují ekonomiku poctivou. Každá úspěšná výroba platí poplatek 2 měděné za bod hodnoty statistik předmětu a akce typu výroba sdílejí jedno tempo: nejvýše 10 výrob, rozzačarování, okouzlení nebo rozebrání za libovolných 60 sekund. Ani jedno normální sezení nezatíží; obojí zastaví vyšperkovaného specialistu v zaplavení trhu.',
@@ -241,11 +241,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Rozebrání je lidový bratranec rozzačarování: stejné zbraně a zbroje, žádná dovednost nevyžadována ani nezískaná, vracející běžný řemeslný odpad podle kvality místo čehokoli arkanového. Může to dělat kdokoli, okouzlovatel i laik. Když držíš kus vhodný k rozebrání, volba je jednoduchá: od vzácné výše je rozzačarování striktně lepší obchod, zatímco u běžné kvality se výnosy prodají prodejci přibližně za stejnou cenu, takže rozeber to, co ze suroviny skutečně potřebuješ.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Těžba vytahuje rudu přímo ze světového kamene: měď v Eastbrookském údolí, železo v Mirefenském močálu a osmium nahoře v Thornpeakských výšinách, zásobující kovářské živnosti. Přístupné všem od úrovně 1, bez jakékoli podmínky, sledované na vlastním počítadle s limitem 100.',
+    'Těžba vytahuje rudu přímo ze světového kamene: měď v Eastbrookském údolí, železo v Mirefenském močálu a osmium nahoře v Thornpeakských výšinách, zásobující kovářské živnosti. Přístupné všem od úrovně 1: stačí mít v brašnách hornický krumpáč, k mání za 20 mědi v centru kterékoli zóny. Sledované na vlastním počítadle s limitem 100.',
   'guide.profPages.gatherIntro.logging':
-    'Dřevorubectví kácí dřevo ze skupin stromů ve všech třech zónách: železová kůra v Eastbrookském údolí, jasanové dřevo v Mirefenském močálu a vysokoborové dřevo v Thornpeakských výšinách, hrubý materiál pro topůrka, hole a inženýrský stůl. Přístupné všem od úrovně 1, sledované na vlastním počítadle s limitem 100.',
+    'Dřevorubectví kácí dřevo ze skupin stromů ve všech třech zónách: železová kůra v Eastbrookském údolí, jasanové dřevo v Mirefenském močálu a vysokoborové dřevo v Thornpeakských výšinách, hrubý materiál pro topůrka, hole a inženýrský stůl. Přístupné všem od úrovně 1, pokud máš v brašnách dřevorubeckou sekeru (20 mědi v centru kterékoli zóny), sledované na vlastním počítadle s limitem 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Bylinkářství sbírá, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu a sluncokvět v Thornpeakských výšinách, list a stonek, které zásobují lékárenské živnosti. Přístupné všem od úrovně 1, sledované na vlastním počítadle s limitem 100.',
+    'Bylinkářství sbírá, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu a sluncokvět v Thornpeakských výšinách, list a stonek, které zásobují lékárenské živnosti. Přístupné všem od úrovně 1, pokud máš v brašnách bylinkářský srp (20 mědi v centru kterékoli zóny), sledované na vlastním počítadle s limitem 100.',
   'guide.profPages.gatherIntro.fishing':
     'Rybaření je výjimkou mezi sběratelskými živnostmi a zároveň tou nejhlubší: skutečná minihra s pokusem o záběr a navíjením, vlastní tabulky úlovků v každé zóně a limit dovednosti 200, dvojnásobek ostatních. Kup prut, obraťte se k otevřené vodě a zahoď.',
   'guide.profPages.rhythmHeading': 'Rytmus sběru',
@@ -258,7 +258,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Kde naleziště jsou, jejich úroveň, jaký nástroj potřebují a co přinášejí. Každé naleziště se ti obnoví {respawn} sekund po tvé vlastní sklizni a ten časovač je jen tvůj: jiný sběrač pracující na stejném nalezišti tvůj nikdy nezdržuje, takže neexistují závody o naleziště ani jejich číhání. Každá zóna výše na žebříčku přináší lepší materiál z náročnějšího terénu.',
   'guide.profPages.toolsHeading': 'Nástroje',
   'guide.profPages.toolsNote':
-    'Holé ruce se počítají jako nástroj 1. úrovně, takže každé naleziště 1. úrovně ve hře nepotřebuje žádný nástroj. Prodejní žebříček pokrývá úrovně 1 až 3; nástroj stačí mít v brašně, žádný slot na vybavení ani trvanlivost neexistuje, takže každý je jednorázovým nákupem. Důležitá je jen úroveň: vzácnostní barva nástroje je kosmetická.\n\nNad prodejním žebříčkem stojí dva vyráběné nástroje, 4. a 5. úrovně, vyrobené v dílně inženýry a žádným NPC neprodávané. Žádné dnešní naleziště nepotřebuje víc než 3. úroveň, takže jejich hodnota nyní spočívá v rychlosti: špičkový nástroj udrží sesílání na spodním limitu u nižších nalezišť a bude vstupní vstupenkou, až přijde terén vyšší úrovně.',
+    'Každé naleziště vyžaduje nástroj svého řemesla v brašnách, včetně 1. úrovně: bez krumpáče není ruda a bez prutu nejsou ryby. Prodejní žebříček pokrývá úrovně 1 až 3 a najdeš ho v centru každé zóny; nástroj stačí mít v brašně, žádný slot na vybavení ani trvanlivost neexistuje, takže každý je jednorázovým nákupem. Důležitá je jen úroveň: vzácnostní barva nástroje je kosmetická.\n\nNad prodejním žebříčkem stojí dva vyráběné nástroje, 4. a 5. úrovně, vyrobené v dílně inženýry a žádným NPC neprodávané. Žádné dnešní naleziště nepotřebuje víc než 3. úroveň, takže jejich hodnota nyní spočívá v rychlosti: špičkový nástroj udrží sesílání na spodním limitu u nižších nalezišť a bude vstupenkou, až přijde terén vyšší úrovně.',
   'guide.profPages.toolCrafted': 'Vyrobený ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Neprodáváno',
@@ -414,18 +414,18 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.name': 'Příval éteru',
   'entities.abilities.blizzard.description':
     'Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Vánice',
+  'entities.abilities.brain_freeze.name': 'Zmrazení mozku',
   'entities.abilities.dragons_breath.description':
     'Podrž pro nabití rozšiřujícího se ohnivého dechu, pak ho pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Zasažení nepřátelé jsou dezorientováni; poškození efekt přeruší. Maximální nabití vždy kriticky zasáhne a počítá se jednou pro Žhavou sérii. (Oheň)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Dračí dech',
   'entities.abilities.fingers_of_frost.description':
     'Kopí jinovatky má 15% šanci udělit Zmrzlé prsty, až 2 nabití: tvoje příští Ice Lance považuje cíl za zmrazený. (Mráz)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Mrazivé prsty',
   'entities.abilities.fireball_form.description':
     'Přeměníš se v planoucí žar a zvýšíš rychlost pohybu o {buff} %. V přeměněné podobě nemůžeš útočit ani sesílat kouzla. Seslej znovu pro návrat do normální podoby.',
   'entities.abilities.fireball_form.name': 'Žárová podoba',
-  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.flurry.name': 'Zimní bič',
   'entities.abilities.frozen_orb.name': 'Zmrzlá sféra',
   'entities.abilities.glacial_front.description':
     'Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)',
@@ -435,7 +435,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.glacial_spike.name': 'Ledový hrot',
   'entities.abilities.ice_lance.description':
     'Vrhneš střep ledu, způsobíš {damage} mrazivého poškození, trojnásobný proti zmrazenému cíli. Spotřebuje Zmrzlé prsty nebo nabití Zimního chladu, aby byl cíl považován za zmrazený. (Mráz)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Ledové kopí',
   'entities.abilities.perfect_moment.description':
     'Popadneš svůj dokonalý okamžik: okamžitě získáš 4 Éterické náboje a po dobu 10 s Éterické šipky je nespotřebovávají. (Chronomagie)',
   'entities.abilities.perfect_moment.name': 'Dokonalý okamžik',
@@ -5564,7 +5564,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': 'Brašna z vlčí kůže',
   'entities.abilities.aspect_of_the_wild.description':
     'Povzbudí spojence do 30 m divokou silou a na 5 min. jim zvýší útočnou sílu o 45 a rychlost útoku o 5 %. (lovecký talent)',
-  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.name': 'Avatár',
   'entities.abilities.avatar.description':
     'Na 20 s se proměníš v kolosa, zrušíš všechny ovládací efekty a zvýšíš své způsobené poškození o 20 %.',
   'entities.abilities.avenging_wrath.description':
@@ -8913,7 +8913,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Plný zisk dovedností',
   'hudChrome.crafting.difficultyNone': 'Žádný zisk dovedností',
   'hudChrome.crafting.difficultyReduced': 'Snížený zisk dovedností',
-  'hudChrome.crafting.enchantedLine': 'Okouzlený',
   'hudChrome.crafting.makersMark': 'Vytvořil {name}',
   'hudChrome.crafting.masterworkSeal': 'Mistrovské dílo',
   'hudChrome.crafting.masterworkToast': 'Mistrovské dílo! {name}',
@@ -9085,4 +9084,132 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.tierUnmet': 'K naučení tohoto receptu potřebuješ {craft} {skill}.',
   'hudChrome.training.title': 'Školení: {name}',
   'hudChrome.training.trainAria': 'Naučit se {name} za {fee}',
+  'hud.combat.auraGainOther': '{target} získává {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Látka',
+  'hudChrome.corpseHarvest.components.meat': 'Maso',
+  'hudChrome.crafting.noBagSpace': 'Nemáš místo pro vyrobený předmět.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Nemáš místo pro arkánní materiály.',
+  'hudChrome.enchanting.enchantNoSpace': 'Nemáš místo pro okouzlený předmět.',
+  'hudChrome.enchanting.salvageNoSpace': 'Nemáš místo pro materiály z rozebrání.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'V dosahu není žádný porost bylin.',
+  'hudChrome.gathering.noNodeNearby.logging': 'V dosahu není žádná skupina stromů.',
+  'hudChrome.gathering.noNodeNearby.mining': 'V dosahu není žádná rudná žíla.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Vyžaduje bylinkářský srp',
+  'hudChrome.gathering.requiresTool.logging': 'Vyžaduje dřevorubeckou sekeru',
+  'hudChrome.gathering.requiresTool.mining': 'Vyžaduje hornický krumpáč',
+  'hudChrome.gathering.toolRequired.fishing': 'K nahození udice potřebuješ rybářský prut.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Ke sběru tohoto porostu bylin potřebuješ bylinkářský srp.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Ke skácení této skupiny stromů potřebuješ dřevorubeckou sekeru.',
+  'hudChrome.gathering.toolRequired.mining': 'K vytěžení této žíly potřebuješ hornický krumpáč.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Rybářský prut ({tier}. úroveň)',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Bylinkářský nástroj ({tier}. úroveň)',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Dřevorubecký nástroj ({tier}. úroveň)',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Hornický nástroj ({tier}. úroveň)',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Od rybářské dovednosti {skill} výše odemyká bohatší úlovky.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Ryby zabírají až o {seconds} s dříve.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Prodlužuje čas na navíjení o {seconds} s.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Nutný k rybaření.',
+  'hudChrome.gathering.toolTooltip.speed': 'Rychleji sbírá na nalezištích pod {tier}. úrovní.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Nutný ke sběru porostů bylin až do {tier}. úrovně.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Nutná ke kácení skupin stromů až do {tier}. úrovně.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Nutný k těžbě rudných žil až do {tier}. úrovně.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': 'Použití: Sesbírá blízký porost bylin.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Použití: Pokácí blízkou skupinu stromů.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Použití: Vytěží blízkou rudnou žílu.',
+  'hudChrome.noticeboard.empty': 'Zdá se, že tu nic nevisí.',
+  'hudChrome.training.pendingAria': 'Učí se {name}',
+  'hudChrome.training.statePending': 'Učí se',
+  'hudChrome.unbind.noSpace': 'Nemáš místo pro odpoutaný předmět.',
+  'loading.incompatibleWorldVersion':
+    'Verze hry a serveru nejsou kompatibilní. Obnov stránku nebo aktualizuj hru a zkus to znovu.',
+  'loading.messageRateExceeded':
+    'Spojení bylo přerušeno kvůli příliš rychlému odesílání akcí. Chvíli počkej a přihlas se znovu.',
+  'perfNudge.dismiss': 'Zavřít',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Hra běží bez akcelerace GPU, a proto je velmi pomalá. Aktualizuj ovladače grafické karty a restartuj hru. Ve Windows navíc nastav hru na „Vysoký výkon“ v Nastavení > Systém > Obrazovka > Grafika.',
+  'perfNudge.hardwareAccelerationWeb':
+    'Hra běží bez akcelerace GPU, a proto je velmi pomalá. Zapni v nastavení prohlížeče hardwarovou akceleraci, aktualizuj ovladače grafické karty a restartuj prohlížeč.',
+  'perfNudge.integratedGpu':
+    'Hra běží na integrované (úsporné) grafické kartě. Pokud má tento počítač i herní grafickou kartu, nastav ve Windows prohlížeč na „Vysoký výkon“ v Nastavení > Systém > Obrazovka > Grafika a prohlížeč restartuj. Desktopová aplikace si herní grafickou kartu vybere automaticky.',
+  'worldContent.noticeboardName': 'Vývěska',
+  'hud.arena.map.coliseum': 'Popelavé koloseum',
+  'hud.arena.map.drownedCourt': 'Utopený dvůr',
+  'hud.arena.mapName': 'Mapa: {name}',
+  'hud.logs.arenaSandsDrowned': 'Vstupuješ na zatopené kameny Utopeného dvora.',
+  'itemUi.market.armorCloth': 'Látka',
+  'itemUi.market.armorLeather': 'Kůže',
+  'itemUi.market.armorMail': 'Kroužková zbroj',
+  'itemUi.market.filterArmorClassAll': 'Všechny typy brnění',
+  'itemUi.market.filterArmorSlot': 'Slot brnění',
+  'itemUi.market.filterPrimaryStat': 'Hlavní atribut',
+  'itemUi.market.filterPrimaryStatAll': 'Libovolný hlavní atribut',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Obleč přednastavenou sadu na 20. úroveň před Svatyní pro danou specializaci, nejprve batohy. Pouze výbava.',
+  'devCommand.actions.kit.label': 'Vybavit sadu na 20. úroveň',
+  'devCommand.fields.spec': 'Specializace',
+  'devCommand.itemChosen': 'Vybráno: {name}',
+  'devCommand.itemHeroicTag': 'Hrdinské',
+  'devCommand.itemMore': 'Zobrazeno {shown} z {total}. Pokračuj v psaní pro zúžení výběru.',
+  'devCommand.itemNoMatches': 'Žádné odpovídající předměty.',
+  'devCommand.itemResultsAria': 'Odpovídající předměty',
+  'devCommand.itemSearchPlaceholder': 'Hledat podle jména nebo id',
+  'devCommand.itemUnknown': 'Žádný předmět nemá toto id.',
+  'devCommand.kitCurrentSpec': 'Aktuální specializace',
+  'hudChrome.bags.itemAriaBound': '{item}, množství {count}, vázaná kopie',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, množství {count}, okouzlená kopie',
+  'hudChrome.enchanting.tier.base': 'Základní okouzlení',
+  'hudChrome.enchanting.tier.greater': 'Velké okouzlení',
+  'hudChrome.enchanting.tier.runed': 'Runové okouzlení',
+  'hudChrome.enchanting.wornTag': 'Vybaveno ({slot})',
+  'hudChrome.enchanting.yieldHeader': 'Očekávané materiály:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} až {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Okouzlený',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (okouzleno)',
+  'hudChrome.marketIndicator.aria': 'Čeká vyzvednutí ze Světového trhu',
+  'hudChrome.marketIndicator.tip': 'U Obchodníka na tebe čekají zlato nebo předměty.',
+  'hudChrome.materialHint.arcaneDust':
+    'Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.',
+  'hudChrome.materialHint.arcaneShard':
+    'Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.',
+  'hudChrome.materialHint.resonantHide':
+    'Reagencie k okouzlení. Získává se rozzačarováním koženého brnění vzácné kvality a lepšího.',
+  'hudChrome.materialHint.resonantLinks':
+    'Reagencie k okouzlení. Získává se rozzačarováním kroužkového brnění vzácné kvality a lepšího.',
+  'hudChrome.materialHint.resonantSteel':
+    'Reagencie k okouzlení. Získává se rozzačarováním zbraní na blízko vzácné kvality a lepších.',
+  'hudChrome.materialHint.resonantThread':
+    'Reagencie k okouzlení. Získává se rozzačarováním látkového brnění vzácné kvality a lepšího.',
+  'hudChrome.materialHint.resonantTimber':
+    'Reagencie k okouzlení. Získává se rozzačarováním holí, hůlek, luků a kuší vzácné kvality a lepších.',
+  'hudChrome.options.stickyTarget': 'Zachovat cíl při kliknutí na zem',
+  'hudChrome.social.billboard.empty': 'Na nástěnce zatím nic není.',
+  'hudChrome.social.billboard.inputLabel': 'Zpráva na cechovní nástěnku',
+  'hudChrome.social.billboard.label': 'Cechovní nástěnka',
+  'hudChrome.social.billboard.placeholder': 'Napiš zprávu pro cech',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Nástěnku mohou upravovat pouze důstojníci a mistr cechu.',
+  'hudChrome.social.billboard.result.set': 'Cechovní nástěnka byla aktualizována.',
+  'hudChrome.social.billboard.save': 'Uložit',
+  'hudChrome.social.billboard.setBy': 'Nastaveno {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'Tento předmět je již okouzlený.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Nahradit',
+  'hudChrome.enchanting.replaceConfirmBody': 'Tímto nahradíš {old} na {item} za {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Cena: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'Staré okouzlení bude zničeno. Materiály se nevrací. Tuto akci nelze vrátit.',
+  'hudChrome.enchanting.replaceConfirmTitle': 'Nahradit okouzlení na {item}?',
+  'hudChrome.enchanting.replaceTag': 'Nahradí {enchant}',
+  'hudChrome.enchanting.sameEnchant': 'Tento předmět už má toto okouzlení.',
+  'hudChrome.enchanting.sameEnchantTag': 'Již aplikováno',
 };

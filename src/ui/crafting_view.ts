@@ -259,6 +259,51 @@ export function buildCraftingView(
   return { recipes: rows };
 }
 
+// Every item id any recipe consumes, derived ONCE from static content. Both
+// hosts serve ALL_RECIPES verbatim as IWorld#recipeList (src/sim/sim.ts,
+// src/net/online.ts), and reagent ids are authored literals, so this set can
+// never miss a reagent the window might row.
+const REAGENT_ITEM_IDS: ReadonlySet<string> = new Set(
+  ALL_RECIPES.flatMap((recipe) => recipe.reagents.map((reagent) => reagent.itemId)),
+);
+
+/**
+ * Compact signature of every bag fact buildCraftingView above reads, so an
+ * OPEN crafting window can converge on an inventory change without repainting
+ * per frame (issue #2375: buying, looting, or trading for the last reagent
+ * left the Craft button disabled until the window was closed and reopened).
+ *
+ * The window is a cold painter, so the HUD diffs this the same way it diffs
+ * stationTypesSignature for the station-range edge. Two properties earn their
+ * keep here:
+ *  - COMPLETE. Per reagent id it carries the summed stack count (the only
+ *    input to countInInventory, and therefore to `have`, `satisfied`, and the
+ *    Craft gate) plus whether the VIEWER signed any stack of it, the one
+ *    instance fact the #1145 self-signed quantity reduction asks about
+ *    (holdsSelfSignedInstance). Those two are the whole of what the view reads
+ *    off the bag: money and free bag slots are server-side deny reasons, not
+ *    terms in `craftable`. If either ever enters the gate, it belongs here too.
+ *  - QUIET. Non-reagent items are skipped and ids are emitted sorted, so
+ *    looting a grey, rearranging the bags, or a stranger-signed stack changing
+ *    hands never repaints the window under the player.
+ */
+export function craftingReagentSig(
+  inventory: readonly InvSlot[],
+  playerName: string | null,
+): string {
+  const totals = new Map<string, number>();
+  const selfSigned = new Set<string>();
+  for (const slot of inventory) {
+    if (!REAGENT_ITEM_IDS.has(slot.itemId)) continue;
+    totals.set(slot.itemId, (totals.get(slot.itemId) ?? 0) + slot.count);
+    if (playerName !== null && slot.instance?.signer === playerName) selfSigned.add(slot.itemId);
+  }
+  let sig = '';
+  for (const itemId of [...totals.keys()].sort())
+    sig += `${itemId}:${totals.get(itemId)}:${selfSigned.has(itemId) ? 1 : 0}|`;
+  return sig;
+}
+
 // ---------------------------------------------------------------------------
 // Craft tabs: the window shows one craft at a time behind a tab strip, so a
 // ten-craft recipe book stays scannable. The tab list and the selection

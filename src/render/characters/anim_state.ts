@@ -37,7 +37,7 @@ const DEFAULT_RUN_REF = 7;
 export const SWIM_ENTER_FEET_DEPTH = 0.5;
 export const SWIM_EXIT_FEET_DEPTH = 0.25;
 const SWIM_ENTER_FLOOR_DEPTH = 0.8;
-const SWIM_EXIT_FLOOR_DEPTH = 0.6;
+const SWIM_EXIT_FLOOR_DEPTH = 0.8;
 
 /** Stable waterline latch. Separate enter/exit depths prevent pose flicker. */
 export function isSwimmingAtDepth(

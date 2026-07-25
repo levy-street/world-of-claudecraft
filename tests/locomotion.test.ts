@@ -152,10 +152,14 @@ describe('gait hysteresis (run vs walk)', () => {
 
 describe('swim animation stability', () => {
   it('uses separate enter and exit depths so waterline noise cannot flap the pose', () => {
-    expect(isSwimmingAtDepth(false, false, SWIM_ENTER_FEET_DEPTH - 0.01, 2)).toBe(false);
-    expect(isSwimmingAtDepth(false, false, SWIM_ENTER_FEET_DEPTH, 0.8)).toBe(true);
-    expect(isSwimmingAtDepth(true, false, SWIM_EXIT_FEET_DEPTH + 0.01, 0.61)).toBe(true);
-    expect(isSwimmingAtDepth(true, false, SWIM_EXIT_FEET_DEPTH - 0.01, 2)).toBe(false);
+    expect(SWIM_ENTER_FEET_DEPTH).toBe(0.5);
+    expect(SWIM_EXIT_FEET_DEPTH).toBe(0.25);
+    expect(SWIM_EXIT_FEET_DEPTH).toBeLessThan(SWIM_ENTER_FEET_DEPTH);
+    expect(isSwimmingAtDepth(false, false, 0.49, 2)).toBe(false);
+    expect(isSwimmingAtDepth(false, false, 0.5, 0.8)).toBe(true);
+    expect(isSwimmingAtDepth(true, false, 0.26, 0.8)).toBe(true);
+    expect(isSwimmingAtDepth(true, false, 2, 0.79)).toBe(false);
+    expect(isSwimmingAtDepth(true, false, 0.24, 2)).toBe(false);
     expect(isSwimmingAtDepth(true, true, 2, 2)).toBe(false);
   });
 

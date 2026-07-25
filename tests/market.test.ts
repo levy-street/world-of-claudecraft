@@ -10,7 +10,16 @@ function makeWorld() {
 
 // A full browse query with sensible defaults; tests vary only what they care about.
 function q(search = '', extra: Partial<MarketQuery> = {}): MarketQuery {
-  return { search, itemType: 'all', subtype: 'all', rarity: 'all', page: 0, ...extra };
+  return {
+    search,
+    itemType: 'all',
+    subtype: 'all',
+    armorClass: 'all',
+    primaryStat: 'all',
+    rarity: 'all',
+    page: 0,
+    ...extra,
+  };
 }
 
 function merchant(sim: Sim): Entity {
@@ -93,6 +102,45 @@ describe('the World Market — the Merchant', () => {
     // Clearing the filter restores the full, unfiltered view.
     sim.marketSearch(q(''), seller);
     expect(sim.marketInfoFor(seller)!.totalCount).toBe(all.totalCount);
+  });
+
+  it('applies armor class and dominant primary stat to the authoritative browse result', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    for (const [id, itemId] of [
+      [1, 'eastbrook_warded_leggings'],
+      [2, 'sootscale_mantle'],
+      [3, 'drowned_prayer_leggings'],
+      [4, 'ironlink_legguards'],
+    ] as const) {
+      book.push({
+        id,
+        sellerKey: 'house',
+        sellerName: 'Merchant',
+        itemId,
+        count: 1,
+        price: 100,
+        expiresAt: Number.POSITIVE_INFINITY,
+        house: true,
+      });
+    }
+
+    sim.marketSearch(
+      q('', {
+        itemType: 'armor',
+        subtype: 'legs',
+        armorClass: 'mail',
+        primaryStat: 'int',
+      }),
+      viewer,
+    );
+
+    expect(sim.marketInfoFor(viewer)?.listings.map((listing) => listing.itemId)).toEqual([
+      'eastbrook_warded_leggings',
+    ]);
   });
 
   it('paginates other sellers server-side, keeping the viewer own listings on every page', () => {
@@ -598,5 +646,66 @@ describe('World Market: a now-soulbound listing is returned to the seller', () =
     ).marketCollections;
     const coll = collections.get(sellerKey);
     expect(coll?.items.some((s) => s.itemId === 'heroic_mark' && s.count === 3)).toBe(true);
+  });
+});
+
+// The always-streamed HUD indicator bit (the mailUnread pattern): true while
+// ANY collection (sale gold or returned items) waits at the Merchant, with no
+// proximity gate, so the minimap badge can light anywhere in the world.
+describe('marketCollectPendingFor - the collect-indicator bit', () => {
+  it('flips true when a sale credits the collection and false after collecting', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.players.get(buyer)!.copper = 500;
+    expect(sim.marketCollectPendingFor(seller)).toBe(false); // fresh seller: nothing waits
+
+    sim.marketList('wolf_fang', 1, 200, seller);
+    expect(sim.marketCollectPendingFor(seller)).toBe(false); // listed but unsold: still nothing
+
+    sim.marketBuy(
+      sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!.id,
+      buyer,
+    );
+    expect(sim.marketCollectPendingFor(seller)).toBe(true);
+
+    // no proximity gate: the bit stays readable far from the Merchant
+    teleport(sim, seller, 200, 200);
+    expect(sim.marketCollectPendingFor(seller)).toBe(true);
+
+    standAtMerchant(sim, seller);
+    sim.marketCollect(seller);
+    expect(sim.marketCollectPendingFor(seller)).toBe(false);
+  });
+
+  it('an item-only collection (expired listing returned) also reads pending', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 100, seller);
+    expect(sim.marketCollectPendingFor(seller)).toBe(false);
+    const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
+    listing.expiresAt = sim.time - 1; // force it past due
+    for (let i = 0; i < 20; i++) sim.tick(); // updateMarket runs once a second
+
+    expect(sim.marketInfoFor(seller)!.collectionCopper).toBe(0);
+    expect(sim.marketCollectPendingFor(seller)).toBe(true);
+  });
+
+  it('the marketCollectPending getter mirrors the primary player', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    expect(sim.marketCollectPending).toBe(false);
+    const internals = sim.market as unknown as {
+      marketCollections: Map<
+        string,
+        { copper: number; items: { itemId: string; count: number }[] }
+      >;
+    };
+    internals.marketCollections.set(String(sim.playerId), { copper: 95, items: [] });
+    expect(sim.marketCollectPending).toBe(true);
   });
 });

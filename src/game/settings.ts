@@ -38,6 +38,11 @@ export const SETTING_RANGES = {
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
   cameraFov: { min: 55, max: 100, def: 60 },
+  // Camera zoom distance (Input.camDist), remembered across sessions like the other
+  // camera settings. Range mirrors Input.zoomBy's clamp; def 12 is the shipped starting
+  // distance. Set by the wheel/pinch zoom (persisted debounced from main.ts), applied back
+  // to Input on boot via the startup apply-all loop and on Reset (issue 1657).
+  cameraZoom: { min: 3, max: 22, def: 12 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn
@@ -267,6 +272,12 @@ export const BOOL_SETTINGS = {
   // red when the click lands on a hostile. Purely a local presentation cue; it
   // never touches sim state. Off removes the marker entirely.
   clickFeedback: { def: true },
+  // off by default (the classic behavior: a left-click on empty ground clears
+  // your target). When on, a ground left-click keeps the current target, so
+  // click-to-move players can reposition without deselecting; the target still
+  // drops by targeting something else, target death, or range/stealth as normal.
+  // Read by the pick handler via shouldClearTargetOnGroundClick (target_click.ts).
+  stickyTarget: { def: false },
   // off by default: swap the looping landing-page trailer for a static, dimmed,
   // high-contrast backdrop so the start-screen text stays legible (and the
   // 5.7 MB video is never fetched). Forced on regardless for phones / Save-Data /

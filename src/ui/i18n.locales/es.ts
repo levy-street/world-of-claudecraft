@@ -209,7 +209,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Copias encantadas, procedencia y el mercado',
   'guide.profPages.craftProse.enchanting.marketBody':
-    'Aplicar un encantamiento consume una copia embolsada y sin equipar del objeto más los reactivos, y devuelve una copia encantada diferente; equípala y la bonificación acompaña a la pieza para siempre, a través de desequipamientos, viajes al banco y comercios. Un encantamiento por pieza: una copia encantada nunca puede encantarse de nuevo ni desencantarse, y vender, descartar y desencantar prefieren las copias simples primero, para que tu pieza terminada no se consuma por accidente. Las copias encantadas idénticamente incluso se apilan en tus bolsas.\n\nEl equipo de obra maestra y el encantamiento son amigos: una pieza de obra maestra sigue siendo completamente encantable, y el encantamiento se suma a la bonificación de obra maestra sin alterarla ni la firma del fabricante. Sumando todas las fuentes, una obra maestra firmada con un encantamiento Mayor es lo mejor que puede lograr una pieza artesanal, y aún así sigue por debajo del botín de banda por diseño.\n\nEn el mercado, el Mercado Mundial solo comercia con existencias simples y sin modificar, por lo que las piezas encantadas y firmadas cambian de manos cara a cara a través de la ventana de comercio. Los materiales son la mitad comerciable del oficio: el Polvo, la Esencia y los Fragmentos se listan libremente, publicar no cuesta nada y el Mercader toma solo el 5 por ciento de una venta completada. Eso hace que los dos ingresos clásicos del encantador sean vender materiales en el mercado y tomar la pieza de un cliente en comercio, encantarla y devolvérsela.',
+    'Aplicar un encantamiento consume los reactivos y marca una copia concreta del objeto. Si lo aplicas a una copia embolsada, recibes una copia encantada diferente; si lo aplicas a una pieza que ya llevas puesta, se encanta en el sitio, sin desequipar y volver a equipar. En cualquier caso la bonificación acompaña a la pieza para siempre, a través de desequipamientos, viajes al banco y comercios. Un encantamiento por pieza: aplicar un encantamiento distinto a una copia encantada pide confirmación primero y luego reemplaza el encantamiento antiguo directamente, destruyéndolo sin reembolsar sus materiales. Vender, descartar y desencantar prefieren las copias simples primero, para que tu pieza terminada no se consuma por accidente. Las copias encantadas idénticamente incluso se apilan en tus bolsas.\n\nEl equipo de obra maestra y el encantamiento son amigos: una pieza de obra maestra sigue siendo completamente encantable, y el encantamiento se suma a la bonificación de obra maestra sin alterarla ni la firma del fabricante. Sumando todas las fuentes, una obra maestra firmada con un encantamiento Mayor es lo mejor que puede lograr una pieza artesanal, y aún así sigue por debajo del botín de banda por diseño.\n\nEn el mercado, el Mercado Mundial solo comercia con existencias simples y sin modificar, por lo que las piezas encantadas y firmadas cambian de manos cara a cara a través de la ventana de comercio. Los materiales son la mitad comerciable del oficio: el Polvo, la Esencia y los Fragmentos se listan libremente, publicar no cuesta nada y el Mercader toma solo el 5 por ciento de una venta completada. Eso hace que los dos ingresos clásicos del encantador sean vender materiales en el mercado y tomar la pieza de un cliente en comercio, encantarla y devolvérsela.',
   'guide.profPages.howHeading': 'Cómo funciona la artesanía',
   'guide.profPages.howBody':
     'Abre la ventana de artesanía (tecla T por defecto) y cada receta que conoces aparece con lo que necesita y lo que tienes a mano. Las recetas de estación te piden estar a menos de 20 metros de la estación correcta en el pueblo, las recetas de campo se elaboran en cualquier lugar, y la Encantación nunca necesita estación. No hay dado de fallo: una elaboración con los materiales en mano siempre tiene éxito.\n\nDos pequeñas fricciones mantienen la economía honesta. Cada elaboración exitosa paga una tarifa de 2 cobres por punto del presupuesto de estadísticas del objeto, y las acciones de tipo artesanía comparten un ritmo: como máximo 10 elaboraciones, desencantamientos, encantamientos o salvamentos en cualquier periodo de 60 segundos. Ninguno de los dos molestará en una sesión normal; ambos evitan que un especialista al tope inunde el mercado.',
@@ -252,11 +252,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'El desguace es el primo para todos del desencantamiento: las mismas armas y armaduras, sin habilidad requerida ni ganada, devolviendo chatarra de artesanía corriente por calidad en lugar de nada arcano. Cualquiera puede hacerlo, encantador o no. Cuando tienes una pieza que vale la pena desmontar, la elección es simple: a partir de raro, el desencantamiento es estrictamente el mejor trato, mientras que en común los dos rendimientos se venden al vendedor por más o menos lo mismo, así que desguaza según el material que realmente necesites.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'La Minería extrae mineral directamente de la roca del mundo: cobre en el Valle de Eastbrook, hierro en el Pantano de Mirefen y osmio en las Alturas de Thornpeak, que alimenta los oficios de la forja. Disponible para todos desde el nivel 1, sin ningún requisito, con su propio contador hasta un tope de 100.',
+    'La Minería extrae mineral directamente de la roca del mundo: cobre en el Valle de Eastbrook, hierro en el Pantano de Mirefen y osmio en las Alturas de Thornpeak, que alimenta los oficios de la forja. Disponible para todos desde el nivel 1: solo hace falta un pico de minero en la mochila, 20 de cobre en cualquier pueblo principal. Se registra en su propio contador hasta un tope de 100.',
   'guide.profPages.gatherIntro.logging':
-    'La Tala derriba madera de arboledas en las tres zonas: corteza de hierro en el Valle de Eastbrook, madera de ceniza en el Pantano de Mirefen y pino cumbre en las Alturas de Thornpeak, el material bruto para mangos, bastones y el banco del ingeniero. Disponible para todos desde el nivel 1, con su propio contador hasta un tope de 100.',
+    'La Tala derriba madera de arboledas en las tres zonas: corteza de hierro en el Valle de Eastbrook, madera de ceniza en el Pantano de Mirefen y pino cumbre en las Alturas de Thornpeak, el material bruto para mangos, bastones y el banco del ingeniero. Disponible para todos desde el nivel 1 con un hacha de leñador en la mochila (20 de cobre en cualquier pueblo principal), con su propio contador hasta un tope de 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'La Herboristería recoge lo que crece silvestre: hoja de brillo en el Valle de Eastbrook, hoja dorada en el Pantano de Mirefen y pétalo de sol en las Alturas de Thornpeak, la hoja y el tallo que mantienen activos los oficios del boticario. Disponible para todos desde el nivel 1, con su propio contador hasta un tope de 100.',
+    'La Herboristería recoge lo que crece silvestre: hoja de brillo en el Valle de Eastbrook, hoja dorada en el Pantano de Mirefen y pétalo de sol en las Alturas de Thornpeak, la hoja y el tallo que mantienen activos los oficios del boticario. Disponible para todos desde el nivel 1 con una hoz de herborista en la mochila (20 de cobre en cualquier pueblo principal), con su propio contador hasta un tope de 100.',
   'guide.profPages.gatherIntro.fishing':
     'La Pesca es la diferente entre los oficios de recolección, y la más profunda: un minijuego real de picar y cobrar, con sus propias tablas de captura en cada zona y un tope de pericia de 200, el doble que los demás. Compra una caña, mira hacia aguas abiertas y lanza.',
   'guide.profPages.rhythmHeading': 'El ritmo de recolección',
@@ -269,7 +269,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Dónde están los nodos, su nivel, la herramienta que necesitan y qué producen. Cada nodo reaparece para ti {respawn} segundos después de tu propia cosecha, y ese temporizador es solo tuyo: otro recolector trabajando el mismo nodo nunca retrasa el tuyo, así que no hay carreras por nodos ni campamentos. Cada zona que subes en la escalera trae un material mejor de un terreno más exigente.',
   'guide.profPages.toolsHeading': 'Herramientas',
   'guide.profPages.toolsNote':
-    'Las manos vacías cuentan como herramienta de nivel 1, así que todos los nodos de nivel 1 del juego no necesitan herramienta alguna. La escalera de vendedores cubre los niveles 1 a 3; la herramienta solo tiene que estar en tu mochila, no hay ranura de equipamiento ni durabilidad, así que cada una es una compra de una sola vez. Solo importa el nivel para el acceso: el color de rareza de una herramienta es cosmético.\n\nPor encima de la escalera de vendedores hay dos herramientas elaboradas, de nivel 4 y nivel 5, fabricadas en el taller de herramientas por ingenieros y que ningún NPC vende. Ningún nodo actual necesita más de nivel 3, así que su valor ahora mismo es la velocidad: una herramienta de primer nivel reduce el lanzamiento a su piso en los nodos inferiores, y será el boleto de entrada cuando lleguen terrenos de nivel más alto.',
+    'Cada nodo necesita la herramienta de su oficio en tu mochila, incluido el nivel 1: sin pico no hay mineral, y sin caña no hay peces. La escalera de vendedores cubre los niveles 1 a 3, a la venta en todos los pueblos principales; la herramienta solo tiene que estar en tu mochila, no hay ranura de equipamiento ni durabilidad, así que cada una es una compra de una sola vez. Solo importa el nivel para el acceso: el color de rareza de una herramienta es cosmético.\n\nPor encima de la escalera de vendedores hay dos herramientas elaboradas, de nivel 4 y nivel 5, fabricadas en el taller de herramientas por ingenieros y que ningún NPC vende. Ningún nodo actual necesita más de nivel 3, así que su valor ahora mismo es la velocidad: una herramienta del nivel más alto fija el tiempo de lanzamiento en su mínimo en los nodos inferiores, y será el boleto de entrada cuando lleguen terrenos de nivel más alto.',
   'guide.profPages.toolCrafted': 'Elaborada ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'No se vende',
@@ -428,19 +428,19 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.name': 'Impulso de Éter',
   'entities.abilities.blizzard.description':
     'Desata una tormenta de hielo sobre el área objetivo durante 6 s, causando {damage} de daño de Escarcha por segundo y ralentizando a los enemigos un 40%. Cada enemigo golpeado reduce en 0,5 s el tiempo restante del Orbe Helado, hasta un máximo de 3 s por lanzamiento. (Escarcha)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Ventisca',
+  'entities.abilities.brain_freeze.name': 'Congelación Mental',
   'entities.abilities.dragons_breath.description':
     'Mantén pulsado para concentrar un aliento de llamas cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Los enemigos golpeados quedan desorientados y el daño rompe el efecto; la concentración máxima siempre es un golpe crítico y cuenta una vez hacia Buena Racha. (Fuego)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Aliento de Dragón',
   'entities.abilities.fingers_of_frost.description':
     'Lanza de Escarcha tiene un 15% de probabilidad de otorgar Fingers of Frost, hasta 2 cargas: tu siguiente Lanza de Hielo trata al objetivo como si estuviera congelado. (Escarcha)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Dedos de Escarcha',
   'entities.abilities.fireball_form.description':
     'Te transformas en una brasa ardiente, aumentando la velocidad de movimiento un {buff}%. No puedes atacar ni lanzar hechizos mientras estás transformado. Vuelve a lanzar la habilidad para recuperar tu forma normal.',
   'entities.abilities.fireball_form.name': 'Forma de Brasa',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.flurry.name': 'Látigo Invernal',
+  'entities.abilities.frozen_orb.name': 'Orbe Congelado',
   'entities.abilities.glacial_front.description':
     'Mantén pulsado para concentrar un frente de escarcha cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Cada enemigo golpeado queda ralentizado un 50% durante 4 s; la concentración máxima también los inmoviliza durante 1 s. (Escarcha)',
   'entities.abilities.glacial_front.name': 'Frente Glacial',
@@ -449,7 +449,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.glacial_spike.name': 'Espiga Glacial',
   'entities.abilities.ice_lance.description':
     'Lanza un fragmento de hielo que causa {damage} de daño de Escarcha, triplicado contra un objetivo congelado. Gasta Fingers of Frost o una carga de Frío Invernal para tratar al objetivo como congelado. (Escarcha)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Lanza de Hielo',
   'entities.abilities.shatter.name': 'Ruina Quebradiza',
   'entities.abilities.temporal_acceleration.description':
     'Acelera el flujo del tiempo para tu grupo o banda, aumentando la velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados recientemente por Aceleración Temporal o Tambores de Guerra están demasiado agotados para beneficiarse. (Cronomancia)',
@@ -462,7 +462,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_reversal.name': 'Inversión Temporal',
   'entities.abilities.temporal_rewind.description':
     'Envía una onda arcana por tu grupo o banda, rebobinando el tiempo para restaurar el 30% del daño que cada aliado en un radio de 40 yardas sufrió durante los últimos 5 segundos (hasta el 35% de su salud máxima). No puede ser un efecto crítico. (Cronomancia)',
-  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.abilities.temporal_rewind.name': 'Rebobinar',
   'entities.items.sootscale_mantle.name': 'Manto de Escama de Horno',
   'entities.items.arcane_dust.name': 'Polvo de Carillón',
   'entities.items.arcane_essence.name': 'Esencia de Carillón',
@@ -3884,7 +3884,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.name': 'Golpe del Acechador',
   'entities.abilities.ambush.description':
     'Embosca al objetivo por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Velo Crepuscular',
   'entities.abilities.stealth.description':
     'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Duskveil. Lánzalo de nuevo para salir.',
   'entities.abilities.adrenaline_rush.name': 'Sangre Acelerada',
@@ -3927,7 +3927,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_light.description': 'Sana a un objetivo amistoso por {damage}.',
   'entities.abilities.devotion_aura.name': 'Aura Inquebrantable',
   'entities.abilities.devotion_aura.description': 'Aumenta tu armadura en {buff} durante 30 min.',
-  'entities.abilities.judgement.name': 'Verdict',
+  'entities.abilities.judgement.name': 'Veredicto',
   'entities.abilities.judgement.description':
     'Desata tu Sello activo sobre el enemigo, lo consume y causa su daño Sagrado acumulado.',
   'entities.abilities.blessing_of_might.name': 'Juramento de Hierro',
@@ -4047,7 +4047,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.name': 'Arma Escarchada',
   'entities.abilities.frostbrand_weapon.description':
     'Imbuye tu arma con escarcha mordiente: cada golpe inflige {damage} de daño adicional durante 5 min.',
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': 'Lobo Sombrío',
   'entities.abilities.ghost_wolf.description':
     'Te transforma en Shadewolf y aumenta tu velocidad de movimiento un 40% durante 10 min.',
   'entities.abilities.stormstrike.name': 'Golpe Ancestral',
@@ -4087,7 +4087,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Lanza una descarga de energía natural que inflige {damage} de daño de Naturaleza.',
   'entities.abilities.healing_touch.name': 'Cura Silvestre',
   'entities.abilities.healing_touch.description': 'Sana a un objetivo amistoso por {damage}.',
-  'entities.abilities.mark_of_the_wild.name': 'Wildward',
+  'entities.abilities.mark_of_the_wild.name': 'Resguardo Silvestre',
   'entities.abilities.mark_of_the_wild.description':
     'Coloca la Wildward sobre un objetivo amistoso y aumenta su armadura en {buff} durante 30 min.',
   'entities.abilities.moonfire.name': 'Tempestad Lunar',
@@ -8534,7 +8534,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspira a los aliados en un radio de 30 m con fuerza salvaje, aumentando su poder de ataque en 45 y su velocidad de ataque un 5% durante 5 min. (talento de Cazador)',
-  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.name': 'Avatar de Guerra',
   'entities.abilities.avatar.description':
     'Te transforma en un coloso durante 20 s, elimina todos los efectos de control sobre ti y aumenta un 20% el daño que infliges.',
   'entities.abilities.avenging_wrath.description':
@@ -9071,7 +9071,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Ganancia total de habilidad',
   'hudChrome.crafting.difficultyNone': 'Sin ganancia de habilidad',
   'hudChrome.crafting.difficultyReduced': 'Ganancia de habilidad reducida',
-  'hudChrome.crafting.enchantedLine': 'encantada',
   'hudChrome.crafting.makersMark': 'Elaborado por {name}',
   'hudChrome.crafting.masterworkSeal': 'obra maestra',
   'hudChrome.crafting.masterworkToast': '¡Obra maestra! {name}',
@@ -9321,4 +9320,133 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': 'Desvincular {name} por {fee}',
   'hudChrome.unbind.unbound':
     'Desvinculado {name} por {fee}. Se volverá a vincular en su próximo intercambio.',
+  'hud.combat.auraGainOther': '{target} gana {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Tela',
+  'hudChrome.corpseHarvest.components.meat': 'Carne',
+  'hudChrome.crafting.noBagSpace': 'No tienes espacio para el objeto elaborado.',
+  'hudChrome.enchanting.disenchantNoSpace': 'No tienes espacio para los materiales arcanos.',
+  'hudChrome.enchanting.enchantNoSpace': 'No tienes espacio para el objeto encantado.',
+  'hudChrome.enchanting.salvageNoSpace': 'No tienes espacio para los materiales del desguace.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'No hay ninguna mata de hierbas a tu alcance.',
+  'hudChrome.gathering.noNodeNearby.logging': 'No hay ninguna arboleda a tu alcance.',
+  'hudChrome.gathering.noNodeNearby.mining': 'No hay ninguna veta de mineral a tu alcance.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Requiere una hoz de herborista',
+  'hudChrome.gathering.requiresTool.logging': 'Requiere un hacha de leñador',
+  'hudChrome.gathering.requiresTool.mining': 'Requiere un pico de minero',
+  'hudChrome.gathering.toolRequired.fishing': 'Necesitas una caña de pescar para lanzar el sedal.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Necesitas una hoz de herborista para recoger esta mata.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Necesitas un hacha de leñador para talar esta arboleda.',
+  'hudChrome.gathering.toolRequired.mining': 'Necesitas un pico de minero para explotar esta veta.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Caña de pescar (nivel {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Herramienta de herboristería (nivel {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Herramienta de tala (nivel {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Herramienta de minería (nivel {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Desbloquea capturas más ricas con habilidad de pesca {skill} o superior.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Los peces pican hasta {seconds} s antes.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Amplía la ventana de recogida en {seconds} s.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Necesaria para pescar.',
+  'hudChrome.gathering.toolTooltip.speed':
+    'Recolecta más rápido en nodos por debajo del nivel {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Necesaria para recoger matas de hierbas hasta el nivel {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Necesaria para talar arboledas hasta el nivel {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Necesaria para extraer vetas de mineral hasta el nivel {tier}.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': 'Uso: recoger de una mata de hierbas cercana.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Uso: talar una arboleda cercana.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Uso: extraer una veta de mineral cercana.',
+  'hudChrome.noticeboard.empty': 'Parece que no hay nada publicado.',
+  'hudChrome.training.pendingAria': 'Aprendiendo {name}',
+  'hudChrome.training.statePending': 'Aprendiendo',
+  'hudChrome.unbind.noSpace': 'No tienes espacio para la copia desvinculada.',
+  'loading.incompatibleWorldVersion':
+    'Las versiones del juego y del servidor no son compatibles. Recarga o actualiza y vuelve a intentarlo.',
+  'loading.messageRateExceeded':
+    'Se te desconectó por enviar acciones demasiado rápido. Espera un momento y vuelve a iniciar sesión.',
+  'perfNudge.dismiss': 'Descartar',
+  'perfNudge.hardwareAccelerationDesktop':
+    'El juego se está ejecutando sin aceleración por GPU, lo que lo vuelve muy lento. Actualiza los controladores de tu tarjeta gráfica y reinicia el juego. En Windows, además configura el juego como «Alto rendimiento» en Configuración > Sistema > Pantalla > Gráficos.',
+  'perfNudge.hardwareAccelerationWeb':
+    'El juego se está ejecutando sin aceleración por GPU, lo que lo vuelve muy lento. Activa la aceleración por hardware en la configuración de tu navegador, actualiza los controladores de tu tarjeta gráfica y reinicia el navegador.',
+  'perfNudge.integratedGpu':
+    'El juego se está ejecutando en la GPU integrada (de ahorro de energía). Si esta computadora también tiene una GPU para juegos, en Windows configura tu navegador como «Alto rendimiento» en Configuración > Sistema > Pantalla > Gráficos y luego reinicia el navegador. La aplicación de escritorio elige la GPU para juegos automáticamente.',
+  'worldContent.noticeboardName': 'Tablón de anuncios',
+  'hud.arena.map.coliseum': 'Coliseo Cinéreo',
+  'hud.arena.map.drownedCourt': 'La Corte Ahogada',
+  'hud.arena.mapName': 'Mapa: {name}',
+  'hud.logs.arenaSandsDrowned': 'Pisas las piedras anegadas de la Corte Ahogada.',
+  'itemUi.market.armorCloth': 'Tela',
+  'itemUi.market.armorLeather': 'Cuero',
+  'itemUi.market.armorMail': 'Malla',
+  'itemUi.market.filterArmorClassAll': 'Todos los tipos de armadura',
+  'itemUi.market.filterArmorSlot': 'Ranura de armadura',
+  'itemUi.market.filterPrimaryStat': 'Estadística principal',
+  'itemUi.market.filterPrimaryStatAll': 'Cualquier estadística principal',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Equipa el kit preestablecido de nivel 20 previo al Santuario para una especialización, primero las bolsas. Solo equipo.',
+  'devCommand.actions.kit.label': 'Equipar kit de nivel 20 nuevo',
+  'devCommand.fields.spec': 'Especialización',
+  'devCommand.itemChosen': 'Seleccionado: {name}',
+  'devCommand.itemHeroicTag': 'Heroico',
+  'devCommand.itemMore': 'Mostrando {shown} de {total}. Sigue escribiendo para acotar.',
+  'devCommand.itemNoMatches': 'No hay objetos coincidentes.',
+  'devCommand.itemResultsAria': 'Objetos coincidentes',
+  'devCommand.itemSearchPlaceholder': 'Buscar por nombre o id',
+  'devCommand.itemUnknown': 'Ningún objeto tiene ese id.',
+  'devCommand.kitCurrentSpec': 'Especialización actual',
+  'hudChrome.bags.itemAriaBound': '{item}, cantidad {count}, copia vinculada',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, cantidad {count}, copia encantada',
+  'hudChrome.enchanting.tier.base': 'Encantamientos base',
+  'hudChrome.enchanting.tier.greater': 'Encantamientos Mayores',
+  'hudChrome.enchanting.tier.runed': 'Encantamientos Rúnicos',
+  'hudChrome.enchanting.wornTag': 'Equipado ({slot})',
+  'hudChrome.enchanting.yieldHeader': 'Materiales esperados:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} a {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Encantado',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Encantado)',
+  'hudChrome.marketIndicator.aria': 'Recogida pendiente en el Mercado Mundial',
+  'hudChrome.marketIndicator.tip': 'Oro u objetos te esperan en el Mercader.',
+  'hudChrome.materialHint.arcaneDust':
+    'Reactivo de encantamiento. Se obtiene desencantando equipo común y poco común.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Reactivo de encantamiento. Se obtiene desencantando equipo raro.',
+  'hudChrome.materialHint.arcaneShard':
+    'Reactivo de encantamiento. Se obtiene desencantando equipo épico y legendario.',
+  'hudChrome.materialHint.resonantHide':
+    'Reactivo de encantamiento. Se obtiene desencantando armadura de cuero rara o mejor.',
+  'hudChrome.materialHint.resonantLinks':
+    'Reactivo de encantamiento. Se obtiene desencantando armadura de malla rara o mejor.',
+  'hudChrome.materialHint.resonantSteel':
+    'Reactivo de encantamiento. Se obtiene desencantando armas de cuerpo a cuerpo raras o mejores.',
+  'hudChrome.materialHint.resonantThread':
+    'Reactivo de encantamiento. Se obtiene desencantando armadura de tela rara o mejor.',
+  'hudChrome.materialHint.resonantTimber':
+    'Reactivo de encantamiento. Se obtiene desencantando bastones, varitas, arcos y ballestas raros o mejores.',
+  'hudChrome.options.stickyTarget': 'Mantener objetivo al hacer clic en el suelo',
+  'hudChrome.social.billboard.empty': 'Aún no hay nada publicado en el tablón.',
+  'hudChrome.social.billboard.inputLabel': 'Mensaje del tablón de la hermandad',
+  'hudChrome.social.billboard.label': 'Tablón de la Hermandad',
+  'hudChrome.social.billboard.placeholder': 'Escribe un mensaje para la hermandad',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Solo los oficiales y el maestro de hermandad pueden editar el tablón.',
+  'hudChrome.social.billboard.result.set': 'Tablón de la hermandad actualizado.',
+  'hudChrome.social.billboard.save': 'Guardar',
+  'hudChrome.social.billboard.setBy': 'Fijado por {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'Ese objeto ya está encantado.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Reemplazar',
+  'hudChrome.enchanting.replaceConfirmBody': 'Esto reemplaza {old} en {item} por {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Coste: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'El encantamiento antiguo se destruye. Sus materiales no se reembolsan. No se puede deshacer.',
+  'hudChrome.enchanting.replaceConfirmTitle': '¿Reemplazar el encantamiento de {item}?',
+  'hudChrome.enchanting.replaceTag': 'Reemplaza {enchant}',
+  'hudChrome.enchanting.sameEnchant': 'Ese objeto ya tiene ese encantamiento.',
+  'hudChrome.enchanting.sameEnchantTag': 'Ya aplicado',
 };

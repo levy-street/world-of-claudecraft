@@ -465,6 +465,24 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(JSON.parse(newCap.body as string).steam).toEqual({ enabled: true });
   });
 
+  it('the /api/status dev_commands advert AGREES on both arms under ALLOW_DEV_COMMANDS=1', async () => {
+    // Unlike steam.enabled directly above, dev_commands must NOT diverge: the dev_*
+    // cheats ride the WEBSOCKET dispatcher, which both ladders serve identically, so
+    // there is no arm on which advertising true would strand a client. /api/status is
+    // a known-deviation route (the name-list trim), so the corpus filter masks the
+    // whole path and only this explicit case can catch the two arms drifting apart.
+    // The corpus runs with the env OFF, so this covers the ON state, where a
+    // one-armed edit would show up as a tester whose /dev GUI appears or vanishes
+    // depending on which dispatch the realm happens to be running.
+    const { oldCap, newCap } = await captureWithEnv({ ALLOW_DEV_COMMANDS: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/status' }),
+    );
+    expect(oldCap.status).toBe(200);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(oldCap.body as string).dev_commands).toBe(true);
+    expect(JSON.parse(newCap.body as string).dev_commands).toBe(true);
+  });
+
   it('the /api/status players_cap AGREES on both arms and clamps a negative cap to 0', async () => {
     // players_cap is served by BOTH arms through the same canonicalPlayersCap
     // (the legacy handleApi twin inline, the migrated statusHandler via the

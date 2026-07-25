@@ -588,6 +588,20 @@
     height: 18px;
     vertical-align: middle;
   }
+  /* Painted launcher art (chrome_icon_art.ts, served by hydrateIcons as an <img> that also
+     carries .ui-icon, so it inherits every sizing rule above). It renders LARGER than the
+     18px monochrome glyph it replaces: a painted silhouette needs the extra pixels to read,
+     while a single-color glyph does not. The button box is unchanged, so nothing reflows. */
+  .ui-icon-art {
+    object-fit: contain;
+    /* Grounds warm art against the dark chrome; the glyphs get the same lift from being
+       flat currentColor on a gradient, which art does not have. */
+    filter: drop-shadow(0 1px 1px #000000a6);
+  }
+  .micro-btn .ui-icon-art {
+    width: 24px;
+    height: 24px;
+  }
   .pfm-crest {
     width: 16px;
     height: 16px;
@@ -694,6 +708,16 @@
     #tf-castbar .fill,
     .np-castfill {
       background: Highlight !important;
+    }
+    /* Painted launcher art is an <img>, which the forced palette leaves untouched, but the
+       button UNDER it collapses to Canvas: warm gold art on a forced-light Canvas is the
+       one place this set loses contrast. Give the art its own dark chip (opted out of the
+       forced palette) so the silhouette keeps reading. The glyph icons need no equivalent:
+       they are currentColor and follow CanvasText automatically. */
+    .ui-icon-art {
+      forced-color-adjust: none;
+      background: #15151f;
+      border-radius: 3px;
     }
   }
 
