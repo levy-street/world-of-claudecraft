@@ -57,8 +57,8 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
   it('ships exactly 223 deeds worth 2750 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(223);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2750);
+    expect(DEED_ORDER.length).toBe(226);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2830);
   });
 
   it('ships the audited per-category counts', () => {
@@ -67,7 +67,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 50,
       combat: 10,
-      dungeon: 31,
+      dungeon: 34,
       delve: 13,
       chronicle: 24,
       collection: 28,
@@ -124,6 +124,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_orkadia_heroic',
       'dgn_wildheart_basin',
       'dgn_wildheart_basin_heroic',
+      // The Demon Tower.
+      'dgn_demon_tower_initiate',
+      'dgn_demon_tower_ascendant',
+      'dgn_demon_tower_unbound',
     ]);
     expect(DEEDS.dgn_orkadia.renown).toBe(10);
     expect(DEEDS.dgn_orkadia_heroic.renown).toBe(10);
@@ -295,11 +299,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
   it('ships exactly 30 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(30);
+    expect(titles.length).toBe(31);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(30);
+    expect(new Set(titleTexts).size).toBe(31);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -338,7 +342,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
   // Orkadia and Wildheart Basin dungeon deed pairs (4 new deeds); no shipped
   // trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '225ebed7ddee51df2910226f9b4f5ffb0ac689151369d8c681502c917d7f90a5';
+  const FROZEN_CATALOG_SHA256 = '50f2e0970e07b4f71b4a2c064a6741308ac789255efaaf5962d6286401f026c7';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -480,7 +484,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_wildheart_basin_heroic');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_demon_tower_unbound');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

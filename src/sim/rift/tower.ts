@@ -29,6 +29,7 @@
 
 import { DEMON_TOWER_SEED, DEMON_TOWER_THEME_NAME } from '../content/rift/demon_tower';
 import { MOBS, riftInstanceOrigin } from '../data';
+import { bumpDeedStat } from '../deeds';
 import { createGroundObject, createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import { RIFT_RANK_BASE_LEVEL, riftHeroicTemplate } from './ranks';
@@ -234,6 +235,16 @@ export function updateDemonTower(
   if (isDemonTowerBossFloor(inst.floorIndex) && inst.towerBossId === null) return;
   inst.puzzleSolved = true;
   const summit = inst.floorIndex === DEMON_TOWER_FLOOR_COUNT - 1;
+  // Book of Deeds credit. Floors and full clears are separate counters on
+  // purpose: a lifetime floor tally can be farmed on floor 1, so finishing the
+  // tower has to be its own reading. Credited to everyone who was standing in
+  // the instance when it fell, not just the killer.
+  for (const pid of playerIds) {
+    const meta = ctx.players.get(pid);
+    if (!meta) continue;
+    bumpDeedStat(ctx, meta, 'demonTowerFloorsCleared', 1);
+    if (summit) bumpDeedStat(ctx, meta, 'demonTowerClears', 1);
+  }
   for (const pid of playerIds) {
     if (summit) {
       ctx.emit({

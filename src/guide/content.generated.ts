@@ -4690,6 +4690,28 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_demon_tower_initiate",
+    "name": "Tower Initiate",
+    "category": "dungeon",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "dgn_demon_tower_ascendant",
+    "name": "Tower Ascendant",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "dgn_demon_tower_unbound",
+    "name": "The Tower Unbound",
+    "category": "dungeon",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "the Tower Unbound"
   }
 ];
 

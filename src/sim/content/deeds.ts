@@ -2257,6 +2257,35 @@ export const DEEDS: Record<string, DeedDef> = {
       count: 1,
     },
   },
+  // The Demon Tower (rift/tower.ts). Cosmetic only, like every deed: a title and
+  // Renown, never power. Floors and full clears are separate counters, because
+  // "climbed a lot" and "finished it" are different achievements and a lifetime
+  // floor tally can be farmed on floor 1.
+  dgn_demon_tower_initiate: {
+    id: 'dgn_demon_tower_initiate',
+    name: 'Tower Initiate',
+    desc: 'Clear a floor of the Demon Tower.',
+    category: 'dungeon',
+    renown: 5,
+    trigger: { kind: 'stat', stat: 'demonTowerFloorsCleared', count: 1 },
+  },
+  dgn_demon_tower_ascendant: {
+    id: 'dgn_demon_tower_ascendant',
+    name: 'Tower Ascendant',
+    desc: 'Clear fifty floors of the Demon Tower.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'stat', stat: 'demonTowerFloorsCleared', count: 50 },
+  },
+  dgn_demon_tower_unbound: {
+    id: 'dgn_demon_tower_unbound',
+    name: 'The Tower Unbound',
+    desc: 'Climb all ten floors of the Demon Tower and put down Malgrath at its summit.',
+    category: 'dungeon',
+    renown: 50,
+    trigger: { kind: 'stat', stat: 'demonTowerClears', count: 1 },
+    reward: { kind: 'title', text: 'the Tower Unbound' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {
