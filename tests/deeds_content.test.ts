@@ -8,10 +8,33 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
+import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { FISHING_TABLES } from '../src/sim/content/items';
-import { CRAFT_RING, GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
-import { DELVES, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
-import { MILESTONE_DEED_TO_LEGACY, VISITED_MARK_NAMESPACES } from '../src/sim/deeds';
+import { MAGE_PET_MOBS } from '../src/sim/content/mage_pets';
+import {
+  CRAFT_RING,
+  GATHERING_PROFESSION_IDS,
+  GATHERING_PROFESSIONS,
+} from '../src/sim/content/professions';
+import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
+import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
+import {
+  DELVES,
+  DUNGEONS,
+  GROUND_OBJECTS,
+  ITEMS,
+  MOBS,
+  NPCS,
+  QUESTS,
+  ZONES,
+} from '../src/sim/data';
+import {
+  GROUND_PICKUP_PROVING_QUESTS,
+  MAX_CREDITABLE_MOB_LEVEL,
+  MILESTONE_DEED_TO_LEGACY,
+  VISITED_MARK_NAMESPACES,
+} from '../src/sim/deeds';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
@@ -31,23 +54,23 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 195 deeds worth 2405 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(195);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2405);
+  it('ships exactly 221 deeds worth 2745 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(221);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2745);
   });
 
   it('ships the audited per-category counts', () => {
     const byCategory: Record<string, number> = {};
     for (const d of ALL) byCategory[d.category] = (byCategory[d.category] ?? 0) + 1;
     expect(byCategory).toEqual({
-      progression: 30,
+      progression: 50,
       combat: 10,
       dungeon: 27,
       delve: 13,
       chronicle: 24,
-      collection: 24,
+      collection: 28,
       pvp: 30,
-      social: 16,
+      social: 18,
       exploration: 9,
       feat: 3,
       hidden: 9,
@@ -68,6 +91,33 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'pvp_frostreach_warden',
       'chr_marsh_first_cast',
       'pvp_card_duel_first_win',
+      // Professions 2.0 tail (order-pinned like the block above).
+      'prog_guildsworn',
+      'prog_masterwright',
+      'prog_fishing_100',
+      'prog_master_angler',
+      'prog_engineering_50',
+      'prog_alchemy_50',
+      'prog_cooking_50',
+      'prog_leatherworking_50',
+      'prog_tailoring_50',
+      'prog_enchanting_50',
+      'prog_weaponcrafting_50',
+      'prog_armorcrafting_50',
+      'prog_grandmaster_engineering',
+      'prog_grandmaster_alchemy',
+      'prog_grandmaster_cooking',
+      'prog_grandmaster_leatherworking',
+      'prog_grandmaster_tailoring',
+      'prog_grandmaster_enchanting',
+      'prog_grandmaster_weaponcrafting',
+      'prog_grandmaster_armorcrafting',
+      'col_pristine_vein',
+      'col_ancient_heartwood',
+      'col_moonlit_bloom',
+      'col_perfect_specimen',
+      'soc_first_salvage',
+      'soc_salvage_50',
     ]);
     expect(DEEDS.prog_crown_below.renown).toBe(25);
     expect(DEEDS.prog_mere_at_rest.renown).toBe(25);
@@ -118,14 +168,120 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 19 titles and 3 borders', () => {
+  it('pins the professions additions: renown and trigger literals', () => {
+    // The Craftsworn/Masterwright pair (marquee: renown 25 plus a title each).
+    expect(DEEDS.prog_guildsworn.renown).toBe(25);
+    expect(DEEDS.prog_guildsworn.trigger).toEqual({
+      kind: 'stat',
+      stat: 'attunementsCompleted',
+      count: 1,
+    });
+    expect(DEEDS.prog_guildsworn.reward).toEqual({ kind: 'title', text: 'Craftsworn' });
+    expect(DEEDS.prog_masterwright.renown).toBe(25);
+    expect(DEEDS.prog_masterwright.trigger).toEqual({
+      kind: 'stat',
+      stat: 'masterworksCrafted',
+      count: 1,
+    });
+    expect(DEEDS.prog_masterwright.reward).toEqual({ kind: 'title', text: 'Masterwright' });
+    // Fishing milestones: 100 parallels the other gathering 100s (renown 10),
+    // 200 is fishing's resolved cap (content/professions.ts maxSkill).
+    expect(DEEDS.prog_fishing_100.renown).toBe(10);
+    expect(DEEDS.prog_fishing_100.trigger).toEqual({
+      kind: 'gathering',
+      professionId: 'fishing',
+      amount: 100,
+    });
+    expect(DEEDS.prog_master_angler.renown).toBe(25);
+    expect(DEEDS.prog_master_angler.trigger).toEqual({
+      kind: 'gathering',
+      professionId: 'fishing',
+      amount: 200,
+    });
+    expect(DEEDS.prog_master_angler.reward).toEqual({ kind: 'title', text: 'Master Angler' });
+    // Per-craft milestones for every craft with a live skill-gain path (the
+    // seven recipe-homed crafts plus enchanting; jewelcrafting and inscription
+    // stay deferred with prog_ringwright): rare-teach tier 50 at renown 5,
+    // the resolved cap 125 at renown 25 with a Grandmaster title. EVERY craft
+    // threshold in the catalog equals a resolved cap or sits below it, and no
+    // deed references the classic 300 scale anywhere.
+    const earnableCrafts = [
+      'engineering',
+      'alchemy',
+      'cooking',
+      'leatherworking',
+      'tailoring',
+      'enchanting',
+      'weaponcrafting',
+      'armorcrafting',
+    ];
+    for (const craftId of earnableCrafts) {
+      const cap = CRAFT_RING.find((c) => c.id === craftId)?.maxSkill;
+      expect(cap, craftId).toBe(125);
+      const mid = DEEDS[`prog_${craftId}_50`];
+      expect(mid.renown, mid.id).toBe(5);
+      expect(mid.trigger).toEqual({ kind: 'craftSkill', craftId, level: 50 });
+      const grand = DEEDS[`prog_grandmaster_${craftId}`];
+      expect(grand.renown, grand.id).toBe(25);
+      expect(grand.trigger).toEqual({ kind: 'craftSkill', craftId, level: 125 });
+      const name = CRAFT_RING.find((c) => c.id === craftId)?.name as string;
+      expect(grand.reward).toEqual({ kind: 'title', text: `Grandmaster ${name}` });
+    }
+    for (const def of ALL) {
+      const t = def.trigger;
+      if (t.kind === 'craftSkill') {
+        const cap =
+          t.craftId !== undefined
+            ? (CRAFT_RING.find((c) => c.id === t.craftId)?.maxSkill ?? 0)
+            : Math.max(...CRAFT_RING.map((c) => c.maxSkill));
+        expect(t.level, def.id).toBeLessThanOrEqual(cap);
+      }
+      if (t.kind === 'gathering') {
+        const cap =
+          t.professionId !== undefined
+            ? GATHERING_PROFESSIONS[t.professionId].maxSkill
+            : Math.max(...GATHERING_PROFESSION_IDS.map((p) => GATHERING_PROFESSIONS[p].maxSkill));
+        expect(t.amount, def.id).toBeLessThanOrEqual(cap);
+      }
+    }
+    // The rare-find quartet: luck-based, so renown 0 and NO title (rule 2),
+    // visible like col_glimmerfin (not a hid_ spoiler delight).
+    for (const id of [
+      'col_pristine_vein',
+      'col_ancient_heartwood',
+      'col_moonlit_bloom',
+      'col_perfect_specimen',
+    ]) {
+      expect(DEEDS[id].renown, id).toBe(0);
+      expect(DEEDS[id].reward, id).toBeUndefined();
+      expect(DEEDS[id].hidden ?? false, id).toBe(false);
+      expect(DEEDS[id].trigger.kind, id).toBe('visit');
+    }
+    // The formerly deferred salvage pair, now that salvage is wired on
+    // every host; prog_ringwright stays deferred (see docs/design/deeds.md).
+    expect(DEEDS.soc_first_salvage.renown).toBe(5);
+    expect(DEEDS.soc_first_salvage.trigger).toEqual({
+      kind: 'stat',
+      stat: 'salvagesPerformed',
+      count: 1,
+    });
+    expect(DEEDS.soc_salvage_50.renown).toBe(10);
+    expect(DEEDS.soc_salvage_50.trigger).toEqual({
+      kind: 'stat',
+      stat: 'salvagesPerformed',
+      count: 50,
+    });
+    expect(DEEDS.prog_ringwright).toBeUndefined();
+  });
+
+  it('ships exactly 30 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(20);
+    expect(titles.length).toBe(31);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(20);
+    expect(new Set(titleTexts).size).toBe(31);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -151,7 +307,20 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Regenerate after a DELIBERATE catalog change, then paste the printed hex
   // into FROZEN_CATALOG_SHA256 below (run from the repo root):
   //   npx tsx -e "import {DEED_ORDER,DEEDS} from './src/sim/content/deeds'; import {createHash} from 'node:crypto'; console.log(createHash('sha256').update(JSON.stringify(DEED_ORDER.map((id)=>[id,DEEDS[id].trigger,DEEDS[id].renown])),'utf8').digest('hex'))"
-  const FROZEN_CATALOG_SHA256 = 'a5391eff4fe5bdefbdc6a505c61f6818a5c808e2f3cd7e03919251ba1b9d26fc';
+  // v0.26 replaces the point tree before release, so prog_full_build's unreachable
+  // eleven-point threshold is deliberately migrated once to the canonical six rows.
+  // This new digest freezes that release contract; it is not permission for later edits.
+  // Re-baselined once more at the release/v0.27.0 base merge: the catalog now also
+  // carries the appended pvp_card_duel_first_win deed (Card Duel).
+  // Re-baselined for Professions 2.0: 26 appended professions deeds
+  // (Craftsworn, Masterwright, the fishing pair, the per-craft 50/125
+  // milestones, the rare-find quartet, and the salvage pair). No shipped
+  // trigger or renown changed; prog_master_gatherer had only its English desc
+  // reworded, which this digest deliberately does not cover.
+  // Re-baselined at the release/v0.30.0 merge into the Frostreach Frontier
+  // branch: the catalog now also carries the appended Frontier deeds
+  // (first blood, the rare-kill pair, and the Frontier title).
+  const FROZEN_CATALOG_SHA256 = '00a58362ffbcd1b49c88af0353c092d1762b4738dfef6f5b0225f4baea2c5a5f';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -168,16 +337,125 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   });
 });
 
+describe('retro fallback proof sets stay anchored to the real tables', () => {
+  it('the ground-pickup proving quests are exactly the single-source collect quests', () => {
+    // A quest proves a sparkle pickup only when its collect objective's item
+    // can come from nowhere but the ground pickup path: any mob-loot or
+    // vendor source would break the inference, and interact objectives never
+    // bump the counter at all. Re-derive that set from the live tables and
+    // hold the pin to it, so a new ground object, loot entry, or vendor row
+    // forces a conscious re-decision here.
+    const groundItemIds = new Set(GROUND_OBJECTS.map((g) => g.itemId));
+    const lootItemIds = new Set(
+      Object.values(MOBS).flatMap((m) => (m.loot ?? []).map((l) => l.itemId)),
+    );
+    const vendorItemIds = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
+    const derived: string[] = [];
+    for (const [questId, quest] of Object.entries(QUESTS)) {
+      const proves = quest.objectives.some(
+        (obj) =>
+          obj.type === 'collect' &&
+          groundItemIds.has(obj.itemId) &&
+          !lootItemIds.has(obj.itemId) &&
+          !vendorItemIds.has(obj.itemId),
+      );
+      if (proves) derived.push(questId);
+    }
+    expect([...GROUND_PICKUP_PROVING_QUESTS].sort()).toEqual(derived.sort());
+    // The pickup gate itself requires the item def to carry the quest id, so
+    // every proving quest's evidence chain resolves end to end.
+    for (const questId of GROUND_PICKUP_PROVING_QUESTS) {
+      const quest = QUESTS[questId];
+      expect(quest, questId).toBeDefined();
+      const collect = quest.objectives.find(
+        (o) => o.type === 'collect' && groundItemIds.has(o.itemId),
+      );
+      expect(collect, questId).toBeDefined();
+      const item = ITEMS[(collect as { itemId: string }).itemId];
+      // kind 'quest' is also the non-transferability guarantee: trade
+      // (social/trade.ts), mail (mail/post_office.ts), and the market
+      // (market.ts) all hard-block that kind, so questsDone proves THIS
+      // character performed the pickup, not a trading partner.
+      expect(item?.kind, questId).toBe('quest');
+      expect(item?.questId, questId).toBe(questId);
+      // A repeatable proving quest would weaken nothing, but none exists; a
+      // future one should be reconsidered here rather than slip in.
+      expect(quest.repeatable ?? false, questId).toBe(false);
+    }
+  });
+
+  it('the Craftsworn proof (attunedPairs) is written only by the archetype module', () => {
+    // The prog_guildsworn retro arm infers a pre-counter attunement from a
+    // non-empty ArchetypeState.attunedPairs. That inference holds only while
+    // every attunedPairs WRITE lives in professions/archetype.ts (the
+    // quest-validated attunement path and the save-restore of that same
+    // history); a writer anywhere else in the sim would let the history grow
+    // without an attunement and must re-decide this proof. Same fs-scan
+    // idiom as the producer-site test below.
+    const simRoot = path.join(__dirname, '..', 'src', 'sim');
+    const writers: string[] = [];
+    const walk = (dir: string): void => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const p = path.join(dir, entry.name);
+        if (entry.isDirectory()) walk(p);
+        else if (entry.name.endsWith('.ts')) {
+          const src = fs.readFileSync(p, 'utf8');
+          if (/attunedPairs(\.push\(|\s*=[^=])/.test(src)) writers.push(path.basename(p));
+        }
+      }
+    };
+    walk(simRoot);
+    expect(writers.sort()).toEqual(['archetype.ts']);
+    // And the retro arm itself exists: deeds.ts grants prog_guildsworn off
+    // that history at world join.
+    const deedsSrc = fs.readFileSync(path.join(simRoot, 'deeds.ts'), 'utf8');
+    const retroArm = deedsSrc.slice(deedsSrc.indexOf('export function retroFallbackGrants'));
+    expect(retroArm).toContain('attunedPairs');
+    expect(retroArm).toContain("'prog_guildsworn'");
+  });
+
+  it('the creditable mob-level ceiling is the heroic pin', () => {
+    // Giantslayer's stranded heal keys on the highest level a creditable mob
+    // can ever spawn at. Heroic instances pin every mob to one shared level;
+    // outside heroic no spawnable template exceeds the player cap. The only
+    // templates authored above the ceiling can never be credited: warlock
+    // and mage pets sync to their owner's level and die outside kill credit
+    // (combat/damage.ts owned-pet early return), and the Yumi cat's damage
+    // is intercepted before the death path (social/yumi.ts).
+    const heroicLevels = Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.level);
+    expect(Math.max(...heroicLevels)).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    const neverCreditable = new Set([
+      ...Object.keys(WARLOCK_PET_MOBS),
+      ...Object.keys(MAGE_PET_MOBS),
+      YUMI_TEMPLATE_ID,
+    ]);
+    for (const [id, m] of Object.entries(MOBS)) {
+      if (m.dummy || m.worldBoss || neverCreditable.has(id)) continue;
+      expect(m.maxLevel, id).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    }
+    // Delve spawns bypass maxLevel: the live level is minLevel plus the
+    // tier's enemyLevelBonus (delves/runs.ts). Guard the whole delve mob
+    // table against the highest bonus any delve ships, so a future tier or
+    // higher-level delve mob cannot silently pass the ceiling.
+    const maxDelveBonus = Math.max(
+      ...Object.values(DELVES).flatMap((d) => d.tiers.map((t) => t.enemyLevelBonus)),
+    );
+    for (const [id, m] of Object.entries(DELVE_MOBS)) {
+      expect(m.minLevel + maxDelveBonus, id).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    }
+  });
+});
+
 describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and chr_marsh_first_cast
-    // closes the refresh tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and soc_salvage_50
+    // closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('pvp_card_duel_first_win');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('soc_salvage_50');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -321,6 +599,14 @@ describe('trigger references resolve against the real content tables', () => {
         expect(powerupIds.has(mark.slice(7)), `${deedId}: ${mark}`).toBe(true);
       } else if (ns === 'dungeon') {
         expect(DUNGEONS[mark.slice(8)], `${deedId}: ${mark}`).toBeDefined();
+      } else if (ns === 'gather_event') {
+        // The three node-flavor marks written by announceGatherRareEvent
+        // (professions/gather_events.ts gatherRareEventFlavor) plus the
+        // corpse-harvest perfect_specimen jackpot (interaction.ts).
+        expect(
+          ['pristine_vein', 'ancient_heartwood', 'moonlit_bloom', 'perfect_specimen'],
+          `${deedId}: ${mark}`,
+        ).toContain(mark.slice('gather_event:'.length));
       }
     };
     for (const def of ALL) {

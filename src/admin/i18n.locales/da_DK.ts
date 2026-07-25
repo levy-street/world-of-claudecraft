@@ -103,6 +103,7 @@ export const da_DK: Record<string, string> = {
   'stats.onlineAccounts': 'online konti',
   'stats.siteUsersNow': 'sidebrugere nu',
   'stats.peakOnline': 'spidsbelastning online',
+  'stats.playersCap': 'spillergrænse',
   'stats.peakOnlineToday': 'spidsbelastning online 24t',
   'stats.peakOnlineAllTime': 'spidsbelastning online nogensinde',
   'stats.accounts': 'konti',

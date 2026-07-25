@@ -74,6 +74,7 @@ describe('describeFct: color token by kind + flags', () => {
     'damage-done-ability': { self: 'damage-done-ability', other: 'damage-done-ability' },
     'damage-done-auto': { self: 'damage-done-auto', other: 'damage-done-auto' },
     'damage-taken': { self: 'damage-taken', other: 'damage-taken' },
+    absorb: { self: 'absorb', other: 'absorb' },
     heal: { self: 'heal', other: 'heal' },
     xp: { self: 'xp', other: 'xp' },
     'rested-xp': { self: 'rested-xp', other: 'rested-xp' },
@@ -124,6 +125,7 @@ describe('describeFct: ttl is a pure function of kind (constant across kinds, ex
       'damage-done-ability',
       'damage-done-auto',
       'damage-taken',
+      'absorb',
       'heal',
       'honor',
       'self-note',
@@ -222,7 +224,17 @@ describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)
   it('treats informational / avoidance floaters as NON-damage (kept on low)', () => {
     // These are the low-volume floaters the low-tier drop must NOT shed: progression,
     // the self-note UX hint, heals, and avoidance words.
-    const nonDamage: FctKind[] = ['miss', 'dodge', 'heal', 'xp', 'rested-xp', 'honor', 'self-note'];
+    const nonDamage: FctKind[] = [
+      'miss',
+      'dodge',
+      'resist',
+      'absorb',
+      'heal',
+      'xp',
+      'rested-xp',
+      'honor',
+      'self-note',
+    ];
     for (const kind of nonDamage) expect(isDamageFctKind(kind)).toBe(false);
   });
 });

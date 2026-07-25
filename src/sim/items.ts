@@ -19,28 +19,75 @@
 import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
-import { canEquipItem, resolveEquipSlot, slotAcceptsItem } from './equipment_rules';
+import {
+  canDualWield,
+  canDualWieldTwoHand,
+  canEquipItem,
+  canEquipItemInSlot,
+  resolveEquipSlot,
+  slotAcceptsItem,
+  weaponHand,
+} from './equipment_rules';
 import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
+import { useGatherToolItem } from './professions/gathering';
 import { spendHeroPoints } from './pvp';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
   CONSUME_DURATION,
   CONSUME_TICKS,
+  cloneItemInstancePayload,
   dist2d,
   type Entity,
   type EquipSlot,
-  FISHING_CAST_ID,
   INTERACT_RANGE,
+  type ItemDef,
   type ItemInstancePayload,
+  isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
+  const def = ITEMS[itemId];
+  if (!def?.slot) return null;
+  if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
+
+  const spec = meta.talents.spec;
+  const hand = weaponHand(def);
+  if (hand === 'mainhand') return 'mainhand';
+  if (hand === 'twohand') {
+    if (!canDualWieldTwoHand(meta.cls, spec)) return 'mainhand';
+    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    if (
+      mainhand?.kind === 'weapon' &&
+      weaponHand(mainhand) === 'twohand' &&
+      !meta.equipment.offhand
+    ) {
+      return 'offhand';
+    }
+    return 'mainhand';
+  }
+
+  if (!meta.equipment.mainhand) return 'mainhand';
+  if (!canDualWield(meta.cls, spec)) return 'mainhand';
+  if (!canEquipItemInSlot(meta.cls, def, 'offhand', spec)) return 'mainhand';
+
+  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  if (
+    !canDualWieldTwoHand(meta.cls, spec) &&
+    mainhand?.kind === 'weapon' &&
+    weaponHand(mainhand) === 'twohand'
+  ) {
+    return 'mainhand';
+  }
+  return 'offhand';
+}
 
 // Fungible-preferring removal: consumes plain (non-instanced) copies first and
 // only reaches for an instanced copy (an enchanted or otherwise signed/rolled
@@ -50,18 +97,50 @@ const VENDOR_BUYBACK_LIMIT = 12;
 // ctx.removeItem there would eat the enchanted copy first when both exist.
 // sellItem/discardItem below and trade.ts's drop arm route through this instead
 // so "sell/discard/trade one" prefers the plain copy a player almost always means.
+// The optional `skip` predicate (Professions 2.0) spares any instanced
+// copy it matches from removal: the trade swap passes it to never consume a
+// trade-locked (boundTo-set) copy. Absent, the function is byte-identical to
+// before: fungible first, then ctx.removeItem for the remainder. Only the
+// skip-aware path walks the inventory itself (removeItem cannot skip), and it
+// mirrors removeItem's highest-index-first order and clone-on-survival return
+// contract exactly, so a caller mutating a returned payload (the trade
+// bind-on-trade stamp) never aliases a surviving stack's shared payload.
 export function removePreferFungible(
   ctx: SimContext,
   itemId: string,
   count: number,
   pid?: number,
+  skip?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
   const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
   const fungibleTake = Math.min(fungibleAvailable, count);
   if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
   const remaining = count - fungibleTake;
   if (remaining <= 0) return [];
-  return ctx.removeItem(itemId, remaining, pid);
+  if (!skip) return ctx.removeItem(itemId, remaining, pid);
+  const r = ctx.resolve(pid);
+  if (!r) return [];
+  const { meta } = r;
+  const consumed: ItemInstancePayload[] = [];
+  let left = remaining;
+  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+    const s = meta.inventory[i];
+    if (s.itemId !== itemId || !s.instance || skip(s.instance)) continue;
+    const take = Math.min(s.count, left);
+    for (let unit = 0; unit < take; unit++) {
+      const finalUnitOfSlot = take >= s.count && unit === take - 1;
+      consumed.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+    }
+    s.count -= take;
+    left -= take;
+    if (s.count <= 0) meta.inventory.splice(i, 1);
+  }
+  // Same post-removal hook the inventory hub's removeItem fires. Optional-called
+  // so a decoupled test ctx that models inventory but omits the hook (its own
+  // removeItem does the same) is not forced to stub it; the live SimContext
+  // always provides it.
+  ctx.onInventoryChangedForQuests?.(meta);
+  return consumed;
 }
 
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
@@ -114,7 +193,8 @@ export function equipItem(
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
+  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor' && def.kind !== 'held_offhand'))
+    return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
   if (targetSlot && !slotAcceptsItem(def, targetSlot)) {
     ctx.error(meta.entityId, 'That does not go in that slot.');
@@ -131,10 +211,44 @@ export function equipItem(
   // Rings declare slot 'ring'; with no aimed slot the resolver picks ring1/ring2
   // (empty-first). An aimed slot is honored verbatim once validated above, so
   // dropping a ring on the ring2 socket fills ring2 even while ring1 is free.
-  const slot = targetSlot ?? resolveEquipSlot(def, meta.equipment);
+  // Warrior weapons additionally route between hands from the committed v0.26
+  // specialization (desiredEquipSlot), and the chosen slot, aimed or resolved,
+  // is re-validated against the spec-aware rules.
+  const spec = meta.talents.spec;
+  const slot = targetSlot ?? desiredEquipSlot(meta, itemId);
   if (!slot) return;
+  if (!canEquipItemInSlot(meta.cls, def, slot, spec)) {
+    ctx.error(meta.entityId, 'You cannot equip that.');
+    return;
+  }
   const old = meta.equipment[slot];
   const oldInstance = meta.equipmentInstance?.[slot];
+  // A two-hander and a shield cannot coexist. Fury's Titan Grip exemption is
+  // weapon-only: a valid Fury weapon pair may contain one or two two-handers.
+  let displacedSlot: EquipSlot | null = null;
+  if (slot === 'offhand') {
+    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const titanPair = def.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
+    if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand' && !titanPair) {
+      displacedSlot = 'mainhand';
+    }
+  } else if (slot === 'mainhand' && def.kind === 'weapon' && weaponHand(def) === 'twohand') {
+    const offhand = meta.equipment.offhand ? ITEMS[meta.equipment.offhand] : undefined;
+    const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
+    if (meta.equipment.offhand && !titanPair) displacedSlot = 'offhand';
+  }
+  const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;
+  const displacedInstance = displacedSlot ? meta.equipmentInstance?.[displacedSlot] : undefined;
+  if (displacedSlot && displacedId) {
+    // Removing the incoming item frees one bag slot. If this equip also returns
+    // the replaced item, the displaced other hand needs one additional slot.
+    if (old && !ctx.canAddItem(displacedId, 1, meta.entityId)) {
+      bagsFullError(ctx, meta.entityId);
+      return;
+    }
+    delete meta.equipment[displacedSlot];
+    if (meta.equipmentInstance) delete meta.equipmentInstance[displacedSlot];
+  }
   // removeItem scans from the highest inventory index down (sim.ts), so a
   // freshly-enchanted copy (pushed onto the end by addItemInstance,
   // src/sim/professions/enchanting.ts applyEnchant) is what this picks up first
@@ -146,10 +260,19 @@ export function equipItem(
   const consumed = ctx.removeItem(itemId, 1, meta.entityId);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
-    // its own instanced slot (never merge it into a plain stack, which would
-    // silently drop the enchant), same non-merge rule addItemInstance follows.
+    // its own instanced slot (never merged into a plain stack, which would
+    // silently drop the enchant; worn kinds are 1-per-slot, so the
+    // identical-payload merge arm of addItemInstance could
+    // never apply here anyway).
     if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
     else addItemSilent(old, 1, meta);
+  }
+  if (displacedId) {
+    if (displacedInstance) {
+      meta.inventory.push({ itemId: displacedId, count: 1, instance: displacedInstance });
+    } else {
+      addItemSilent(displacedId, 1, meta);
+    }
   }
   meta.equipment[slot] = itemId;
   if (consumed[0]) {
@@ -162,6 +285,34 @@ export function equipItem(
   ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
+}
+
+// A committed spec is the only state transition that can make an already worn
+// offhand illegal. Bench it into bags without a capacity gate so a respec can
+// never destroy gear, and keep any per-instance enchant payload attached.
+export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  const offhandId = meta.equipment.offhand;
+  if (!offhandId) return;
+  const def = ITEMS[offhandId];
+  if (!def) return;
+  if (canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
+
+  const instance = meta.equipmentInstance?.offhand;
+  delete meta.equipment.offhand;
+  if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
+  if (instance) meta.inventory.push({ itemId: offhandId, count: 1, instance });
+  else addItemSilent(offhandId, 1, meta);
+  ctx.markDeedsDirty(meta.entityId);
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  ctx.emit({
+    type: 'log',
+    text: `Unequipped ${def.name}.`,
+    color: '#8f8',
+    pid: meta.entityId,
+  });
 }
 
 // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike
@@ -214,6 +365,20 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.startFishing(p, meta);
     return;
   }
+  // The tiered fishing rods are gatherTool items (their tier caps
+  // the catch band, professions/fishing.ts) but must still CAST like the
+  // simple pole, so a fishing-profession gatherTool use routes to the same
+  // startFishing (which owns the dead/combat/busy/water gates, exactly as the
+  // arm above). Every OTHER gatherTool use (picks, axes, sickles) starts
+  // gathering the nearest matching node in range (#2343): useGatherToolItem
+  // routes through harvestNode, which owns the dead/busy/range/respawn/tool/
+  // capacity gates, and a click with nothing in reach gets the text-free
+  // gatherToolNoNode event, never a silent no-op.
+  if (def.use?.type === 'gatherTool') {
+    if (def.use.professionId === 'fishing') ctx.startFishing(p, meta);
+    else useGatherToolItem(ctx, def.use.professionId, meta.entityId);
+    return;
+  }
   if (def.use?.type === 'mechChroma') {
     return ctx.unlockMechChromaFromItem(meta, itemId, def.use.chromaId);
   }
@@ -221,7 +386,10 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
     return;
   }
-  if (p.castingAbility === FISHING_CAST_ID) {
+  // A running non-spell cast (fishing/gather) blocks other item use. The
+  // Demon Heal channel is deliberately NOT folded in: items stay usable
+  // during it, as today.
+  if (isNonSpellCast(p.castingAbility)) {
     ctx.error(meta.entityId, 'You are busy.');
     return;
   }
@@ -245,7 +413,14 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       hpPer2s: def.foodHp ? Math.round(def.foodHp / CONSUME_TICKS) : 0,
       manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
       remaining: CONSUME_DURATION,
+      ticksElapsed: 0,
     };
+    // A one-shot bite/gulp the instant you sit down, on top of the regular
+    // every-3rd-tick cadence (updateRegen, combat/auras.ts): otherwise the
+    // first sound doesn't land until ~6s in and using the item reads silent.
+    // amount:0 + sfxTick:true is sound-only (see consumeHealCue), same
+    // convention as the regen tick's own sfx-only ticks.
+    ctx.emit({ type: 'heal', targetId: p.id, amount: 0, source: def.kind, sfxTick: true });
     ctx.emit({
       type: 'log',
       text: def.kind === 'food' ? 'You sit down to eat.' : 'You sit down to drink.',
@@ -294,23 +469,36 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     }
     p.potionCooldownUntil = ctx.time + POTION_COOLDOWN;
     p.potionCdRemaining = POTION_COOLDOWN; // materialized remaining for the action-bar swipe
+    let potionHeal = 0;
     if (restoresHp) {
-      const heal = Math.min(Math.round(def.potionHp! * ctx.healingTakenMult(p)), p.maxHp - p.hp);
-      p.hp += heal;
-      ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
+      potionHeal = Math.min(Math.round(def.potionHp! * ctx.healingTakenMult(p)), p.maxHp - p.hp);
+      p.hp += potionHeal;
     }
     if (restoresMana) {
       p.resource = Math.min(p.maxResource, p.resource + def.potionMana!);
     }
+    // Always emit, even a pure-mana potion (potionHeal 0): this is what plays
+    // the dedicated quaff sound (hud.ts), distinct from a real heal's
+    // heal_impact. amount:0 keeps a mana-only potion from spawning a bogus
+    // "+0" floating heal number (the FCT/log arms both gate on amount > 0).
+    ctx.emit({ type: 'heal', targetId: p.id, amount: potionHeal, source: 'potion' });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
   } else if (def.kind === 'elixir') {
     // Battle elixir: grant a temporary stat-buff aura. Usable in combat (classic),
     // no shared potion cooldown; re-quaffing refreshes the buff via applyAura.
+    // The aura id is keyed on the elixir's EFFECT kind, not the item, so every
+    // elixir of one stat shares one id and the same-id replacement in applyAura
+    // makes same-stat elixirs exclusive: last drunk wins (classic overwrite,
+    // weaker included). Different-kind elixirs coexist; class buffs
+    // (buff_sta_pct) and negative buff_sta debuffs ride their own ids. This
+    // assumes one stat kind equals one exclusivity slot: if a guardian elixir
+    // family that should stack with battle elixirs ever lands, the id needs a
+    // family component (elixir_battle_...), not just the kind.
     const elx = def.elixir;
     if (!elx) return;
     ctx.removeItem(itemId, 1, meta.entityId);
     ctx.applyAura(p, {
-      id: `elixir_${itemId}`,
+      id: `elixir_${elx.kind}`,
       name: elx.aura,
       kind: elx.kind,
       remaining: elx.duration,
@@ -320,7 +508,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       school: 'nature',
     });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-  } else if (def.kind === 'weapon' || def.kind === 'armor') {
+  } else if (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') {
     equipItem(ctx, itemId, meta.entityId);
   } else if (def.kind === 'bag') {
     equipBagCmd(ctx, itemId, undefined, meta.entityId);
@@ -341,6 +529,9 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'That item is not sold here.');
     return;
   }
+  // Dev free-epic vendor: on a dev-command realm this vendor sells its whole
+  // epic stock for free, bypassing the price requirement below.
+  const freeVendor = ctx.devCommands && npc.devVendor === true;
   const copperUnitPrice =
     def?.buyValue !== undefined && Number.isFinite(def.buyValue) && def.buyValue > 0
       ? def.buyValue
@@ -356,7 +547,7 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   const hasCopperPrice = copperUnitPrice > 0;
   const hasHonorPrice = honorPrice > 0;
   const hasHeroPrice = heroPrice > 0;
-  if (!def || (!hasCopperPrice && !hasHonorPrice && !hasHeroPrice)) {
+  if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice && !hasHeroPrice)) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -374,9 +565,9 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
   const qty = vendorStackSize(def);
-  const copperCost = copperUnitPrice * qty;
-  const honorCost = honorPrice;
-  const heroCost = heroPrice;
+  const copperCost = freeVendor ? 0 : copperUnitPrice * qty;
+  const honorCost = freeVendor ? 0 : honorPrice;
+  const heroCost = freeVendor ? 0 : heroPrice;
   if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
@@ -449,17 +640,81 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     ctx.error(meta.entityId, 'You cannot sell quest items.');
     return;
   }
-  removePreferFungible(ctx, itemId, sellCount, meta.entityId);
-  recordVendorBuyback(meta, itemId, sellCount);
-  const payout = def.sellValue * sellCount;
+  // Vendor-sell bind guard: a bound copy
+  // (instance payload carrying boundTo, the Maker's Bond trade lock) is never
+  // vendor-sellable. Selling one recorded a PLAIN buyback row, so sell + buyback
+  // laundered the piece into an unbound copy for a 0 copper spread, bypassing
+  // the unbind fee ladder (professions/commission.ts) and permanently stripping
+  // bindOnTrade. Mirror the trade gate (social/trade.ts offerableCount): clamp
+  // the request to the unbound copies and refuse only when none covers it.
+  // `?? []`: same contract as social/trade.ts boundCount, a decoupled test ctx
+  // may model counts elsewhere and carry no inventory array; its bound count
+  // is simply zero and every copy stays sellable.
+  let boundHeld = 0;
+  for (const s of meta.inventory ?? []) {
+    if (s.itemId === itemId && s.instance?.boundTo !== undefined) boundHeld += s.count;
+  }
+  const sellableCount = Math.min(sellCount, available - boundHeld);
+  if (sellableCount <= 0) {
+    ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
+    return;
+  }
+  // The skip predicate is defence in depth (same as the trade swap): the clamp
+  // above already guarantees enough unbound copies, but removePreferFungible's
+  // highest-index-first instanced walk must still spare a bound copy sitting
+  // above an unbound instanced one.
+  removePreferFungible(
+    ctx,
+    itemId,
+    sellableCount,
+    meta.entityId,
+    (instance) => instance.boundTo !== undefined,
+  );
+  recordVendorBuyback(meta, itemId, sellableCount);
+  const payout = def.sellValue * sellableCount;
   meta.copper += payout;
   ctx.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
   ctx.emit({
     type: 'loot',
     // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
-    text: `Sold ${def.name}${sellCount > 1 ? ' x' + sellCount : ''} for ${formatMoney(payout)}.`,
+    text: `Sold ${def.name}${sellableCount > 1 ? ' x' + sellableCount : ''} for ${formatMoney(payout)}.`,
     pid: meta.entityId,
   });
+  // A mixed stack sold fewer copies than asked because the clamp above spared
+  // bound ones: say so in one info line instead of a silent partial (the
+  // maintainer-ruled replacement). keptCount counts only bound copies the
+  // player actually asked to sell, since sellCount is pre-clamped to
+  // `available`; a clean unbound sell emits nothing here.
+  const keptCount = sellCount - sellableCount;
+  if (keptCount > 0) {
+    ctx.emit({
+      type: 'loot',
+      text: `Kept ${keptCount} bound ${keptCount === 1 ? 'copy' : 'copies'}.`,
+      pid: meta.entityId,
+    });
+  }
+}
+
+// The junk-sweep eligibility rule for ONE bag slot, shared by the sim sweep
+// (sellAllJunk below) and the HUD vendor preview (hud.ts renderVendor) so the
+// two surfaces can never drift: gray quality, a sellable kind, and never a
+// soulbound def or a bound copy (instance payload carrying boundTo, the same
+// Maker's Bond gate sellItem applies). No poor-quality def binds or is
+// soulbound in shipped content; the instance arm closes the recorded future
+// hole before content can reopen the buyback wash.
+export function junkSellableSlot(
+  def: ItemDef | undefined,
+  slot: { count: number; instance?: ItemInstancePayload },
+): boolean {
+  return (
+    !!def &&
+    def.quality === 'poor' &&
+    def.kind !== 'quest' &&
+    !def.noVendorSell &&
+    !def.soulbound &&
+    slot.instance?.boundTo === undefined &&
+    slot.count > 0
+  );
 }
 
 // Bulk-sell every gray (poor-quality) item in the bags in one action, applying the
@@ -479,24 +734,22 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     return;
   }
   const junk = meta.inventory
-    .filter((s) => {
-      const def = ITEMS[s.itemId];
-      return (
-        !!def &&
-        def.quality === 'poor' &&
-        def.kind !== 'quest' &&
-        !def.noVendorSell &&
-        !def.soulbound &&
-        s.count > 0
-      );
-    })
+    .filter((s) => junkSellableSlot(ITEMS[s.itemId], s))
     .map((s) => ({ itemId: s.itemId, count: s.count }));
   if (junk.length === 0) return; // nothing gray to sell; the vendor UI keeps the button disabled here
   let total = 0;
   let soldCount = 0;
   for (const { itemId, count } of junk) {
     const def = ITEMS[itemId]!;
-    ctx.removeItem(itemId, count, meta.entityId);
+    // Skip-aware removal: a spared bound slot sharing this itemId must never
+    // be the slot the removal walk consumes (plain removeItem cannot skip).
+    removePreferFungible(
+      ctx,
+      itemId,
+      count,
+      meta.entityId,
+      (instance) => instance.boundTo !== undefined,
+    );
     recordVendorBuyback(meta, itemId, count);
     total += def.sellValue * count;
     soldCount += count;

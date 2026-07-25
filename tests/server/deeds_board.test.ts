@@ -3,8 +3,8 @@
 // keys (score desc, completionTime asc, accountId asc), display-character
 // selection, the self rank + topPercent + renown read, and unknown-deed
 // tolerance. Plain fixtures, no db import: the module is host-agnostic by
-// design. deedCount is a deprecated wire-compat output (issue #2044): still
-// asserted populated here until its removal, never displayed by clients.
+// design. The board SCORES the renown-bearing scoring set; it carries no
+// deed count (the completion count lives in the Book of Deeds header).
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -65,20 +65,18 @@ function ranked(rows: DeedsBoardSourceRow[]): RankedDeedsAccount[] {
 }
 
 describe('computeDeedsBoard scoring', () => {
-  it('sums renown over the distinct counted set and reports deedCount', () => {
+  it('sums renown over the distinct scoring set', () => {
     const board = ranked([row(1, 11, 'd25a', T1), row(1, 11, 'd10a', T2), row(1, 12, 'd25b', T3)]);
     expect(board).toHaveLength(1);
     expect(board[0].accountId).toBe(1);
     expect(board[0].renown).toBe(60);
-    expect(board[0].deedCount).toBe(3);
   });
 
-  it('counts a deed once per account even when two characters both earned it', () => {
+  it('scores a deed once per account even when two characters both earned it', () => {
     const board = ranked([row(1, 11, 'd50', T1), row(1, 12, 'd50', T3), row(1, 11, 'd25a', T2)]);
     expect(board).toHaveLength(1);
     // 50 + 25, never 50 + 50 + 25: the roll-up dedupes per account by deed id.
     expect(board[0].renown).toBe(75);
-    expect(board[0].deedCount).toBe(2);
     // The duplicate's later earn does not move completionTime either: the deed
     // first contributed renown at its EARLIEST earn (T1), so the score was
     // reached at max(T1, T2) = T2.
@@ -93,7 +91,7 @@ describe('computeDeedsBoard scoring', () => {
 });
 
 describe('zero-renown deeds sit outside the scoring set', () => {
-  it('never score, and never enter the deprecated deedCount output', () => {
+  it('never add to the account score', () => {
     const board = ranked([
       row(1, 11, 'd50', T1),
       row(1, 11, 'feat0', T2),
@@ -102,7 +100,6 @@ describe('zero-renown deeds sit outside the scoring set', () => {
     ]);
     expect(board).toHaveLength(1);
     expect(board[0].renown).toBe(75);
-    expect(board[0].deedCount).toBe(2);
   });
 
   it('a zero-renown FEAT does not shift the tie-break', () => {
@@ -245,7 +242,6 @@ describe('buildDeedsBoardEntries', () => {
         cls: 'warrior',
         level: 20,
         renown: 75,
-        deedCount: 2,
         title: 'd50',
       },
       {
@@ -255,7 +251,6 @@ describe('buildDeedsBoardEntries', () => {
         cls: 'warrior',
         level: 20,
         renown: 50,
-        deedCount: 1,
         title: null,
       },
     ]);

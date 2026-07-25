@@ -13,7 +13,10 @@ const components = readFileSync(new URL('../src/styles/components.css', import.m
 
 describe('bags_window: no magic values', () => {
   it('carries no literal hex color in TS (quality color comes from QUALITY_COLOR + a token)', () => {
-    const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
+    // Issue references in comments (#2343) match the hex shape, so the scan
+    // runs on comment-stripped source: a hex COLOR only matters in live code.
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const hex = code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
     expect(hex, `hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
   });
 
@@ -240,6 +243,11 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     expect(body).toMatch(/case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId\);/);
     expect(body).toMatch(/case 'bankDeposit': \{/);
     expect(body).toMatch(/case 'petFeed':\s*this\.deps\.world\(\)\.feedPet\(s\.itemId\);/);
+    // The 'use' case tries the gathering-tool routing first (#2343) and only
+    // falls back to the plain useItem command when the hook declines.
+    expect(body).toMatch(
+      /case 'use': \{[\s\S]{0,400}?if \(!item \|\| !this\.deps\.useGatherTool\(item\)\) this\.deps\.world\(\)\.useItem\(s\.itemId\);/,
+    );
   });
 });
 
@@ -297,5 +305,16 @@ describe('bags_window: styles for the drag affordances', () => {
 
   it('an accepting paperdoll socket lights up as a drop target', () => {
     expect(components).toContain('.equip-slot.drop-target {');
+  });
+});
+
+describe('bags_window: per-copy instance tooltip forwarding (Professions 2.0)', () => {
+  it("forwards the slot's instance payload into the widened itemTooltip dep", () => {
+    // The bank arm has a model-level pin (bank_view.test.ts BankSlotModel
+    // .instance passthrough); the bags arm is a direct painter call, so the
+    // call site itself is the load-bearing surface: dropping `s.instance`
+    // reverts every bag tooltip to def-only while all pure-core suites stay
+    // green (the exact regression class the widened dep was added for).
+    expect(painter).toContain('this.deps.itemTooltip(item, s.instance)');
   });
 });

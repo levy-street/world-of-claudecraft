@@ -114,11 +114,13 @@ export interface MarketViewInput {
   sellHave: number;
 }
 
-/** True when any of the type/subtype/rarity dropdowns is narrowing the browse. */
+/** True when any dropdown is narrowing the browse. */
 function filtersActive(filters: MarketFilters): boolean {
   return (
     filters.itemType !== 'all' ||
     (filters.subtype !== undefined && filters.subtype !== 'all') ||
+    (filters.armorClass !== undefined && filters.armorClass !== 'all') ||
+    (filters.primaryStat !== undefined && filters.primaryStat !== 'all') ||
     filters.rarity !== 'all'
   );
 }
@@ -169,8 +171,16 @@ export function buildMarketSell(sellItemId: string | null, sellHave: number): Ma
   if (!sellItemId || !item || sellHave <= 0) return { state: 'pick-empty' };
   if (item.kind === 'quest' || item.noMarketList || item.soulbound)
     return { state: 'cannot-market' };
-  // A gentle starting ask: a few times vendor value, never below 1c.
-  const suggested = Math.max(1, item.buyValue ?? Math.max(1, item.sellValue) * 4);
+  // A gentle starting ask: the vendor shop price when the item has one, but
+  // never more than 10x its vendor sell value (the recipe-economy rework re-priced
+  // four commons' sellValues while deliberately keeping their historical shop
+  // buyValues, so a raw buyValue read would suggest a 20x-29x ask); items with
+  // no shop price suggest a few times sell value. Never below 1c.
+  const vendorFloor = Math.max(1, item.sellValue);
+  const suggested = Math.max(
+    1,
+    item.buyValue != null ? Math.min(item.buyValue, vendorFloor * 10) : vendorFloor * 4,
+  );
   const gold = Math.floor(suggested / COPPER_PER_GOLD);
   const silver = Math.floor((suggested % COPPER_PER_GOLD) / COPPER_PER_SILVER);
   const copper = suggested % COPPER_PER_SILVER;
@@ -224,4 +234,18 @@ export function buildMarketView(input: MarketViewInput): MarketView {
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
   return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
+}
+
+/** The minimap-corner collect indicator (the mailIndicatorView pattern). */
+export interface MarketCollectIndicatorView {
+  visible: boolean;
+}
+
+/**
+ * Driven by the always-streamed IWorld.marketCollectPending bit, NOT by
+ * marketInfo (null away from the Merchant), so the badge lights anywhere in
+ * the world while sale proceeds or returned items wait.
+ */
+export function marketCollectIndicatorView(pending: boolean): MarketCollectIndicatorView {
+  return { visible: pending === true };
 }

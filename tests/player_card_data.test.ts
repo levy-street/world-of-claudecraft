@@ -54,6 +54,7 @@ describe('buildPlayerCardData', () => {
     });
     expect(data.gear.map((entry) => entry.slot)).toEqual([
       'slot:mainhand',
+      'slot:offhand',
       'slot:chest',
       'slot:legs',
       'slot:feet',

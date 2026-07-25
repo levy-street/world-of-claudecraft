@@ -21,6 +21,7 @@ import {
   zoneAt,
   zoneWelcomeText,
 } from '../src/sim/data';
+import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
 import { ACTIONS, encodeObs } from '../src/sim/obs';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
@@ -137,13 +138,19 @@ describe('collision & terrain', () => {
   it('players cannot walk through town buildings', () => {
     const sim = makeSim();
     const p = sim.player;
-    // approach the house at (10,12) from the south and hold forward
-    teleportTo(sim, 10, 6);
-    p.facing = 0; // +z, straight at the building
+    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
+    const approach = localToWorld(
+      bank.position,
+      bank.rotation,
+      0,
+      bank.nativeDimensions.depth / 2 + 3,
+    );
+    teleportTo(sim, approach.x, approach.z);
+    p.facing = bank.rotation + Math.PI;
     sim.moveInput.forward = true;
     for (let i = 0; i < 120; i++) sim.tick();
     // blocked at the wall: never reaches the interior
-    expect(dist2d(p.pos, { x: 10, y: 0, z: 12 })).toBeGreaterThan(2.2);
+    expect(dist2d(p.pos, { ...bank.position, y: 0 })).toBeGreaterThan(2.2);
   });
 
   it('steep rims are walls, not ramps', () => {
@@ -179,8 +186,9 @@ describe('collision & terrain', () => {
   });
 
   it('resolvePosition pushes points out of colliders', () => {
-    const inside = resolvePosition(SEED, 10, 12, 0.5); // house centre
-    expect(Math.abs(inside.x - 10) + Math.abs(inside.z - 12)).toBeGreaterThan(0.5);
+    const center = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position;
+    const inside = resolvePosition(SEED, center.x, center.z, 0.5);
+    expect(Math.abs(inside.x - center.x) + Math.abs(inside.z - center.z)).toBeGreaterThan(0.5);
     const open = resolvePosition(SEED, 0, -40, 0.5); // open road
     expect(open.x).toBe(0);
     expect(open.z).toBe(-40);
@@ -191,35 +199,69 @@ describe('collision & terrain', () => {
   });
 
   it('camera ghosts through village buildings (hidden instead of pulling in)', () => {
-    const groundY = groundHeight(10, 4, SEED);
+    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
+    const front = localToWorld(
+      bank.position,
+      bank.rotation,
+      0,
+      bank.nativeDimensions.depth / 2 + 4,
+    );
+    const rear = localToWorld(
+      bank.position,
+      bank.rotation,
+      0,
+      -bank.nativeDimensions.depth / 2 - 4,
+    );
+    const groundY = groundHeight(front.x, front.z, SEED);
     const eyeY = groundY + 2;
 
-    // ray sweeps straight through the house at (10,12): buildings are camGhost,
+    // The ray sweeps through the replacement bank: buildings are camGhost,
     // so the chase cam no longer pulls in for them — the renderer hides them.
-    const through = cameraOcclusion(SEED, 10, eyeY, 4, 10, eyeY + 1.5, 20, 0.35);
+    const through = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 1.5, rear.z, 0.35);
     expect(through).toBe(1);
-    // but movement still collides with that same house (camGhost is camera-only)
-    const blocked = resolvePosition(SEED, 10, 12, 0.5);
-    expect(Math.abs(blocked.x - 10) + Math.abs(blocked.z - 12)).toBeGreaterThan(0.5);
+    // but movement still collides with that same bank (camGhost is camera-only)
+    const blocked = resolvePosition(SEED, bank.position.x, bank.position.z, 0.5);
+    expect(
+      Math.abs(blocked.x - bank.position.x) + Math.abs(blocked.z - bank.position.z),
+    ).toBeGreaterThan(0.5);
 
     const clear = cameraOcclusion(SEED, 0, eyeY, -40, 0, eyeY + 1.5, -48, 0.35);
     expect(clear).toBe(1);
 
-    const overhead = cameraOcclusion(SEED, 10, eyeY, 4, 10, eyeY + 24, 20, 0.35);
+    const overhead = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 24, rear.z, 0.35);
     expect(overhead).toBe(1);
   });
 
   it('camera ghosts through campfires while movement still collides', () => {
-    const groundY = groundHeight(3, -4, SEED);
+    const [cx, cz] = PROPS.campfires[0];
+    const groundY = groundHeight(cx, cz, SEED);
 
-    const eyeHeightRay = cameraOcclusion(SEED, 3, groundY + 2.0, -12, 3, groundY + 2.2, 4, 0.35);
+    const eyeHeightRay = cameraOcclusion(
+      SEED,
+      cx,
+      groundY + 2.0,
+      cz - 8,
+      cx,
+      groundY + 2.2,
+      cz + 8,
+      0.35,
+    );
     expect(eyeHeightRay).toBe(1);
 
-    const lowRay = cameraOcclusion(SEED, 3, groundY + 0.8, -12, 3, groundY + 0.9, 4, 0.35);
+    const lowRay = cameraOcclusion(
+      SEED,
+      cx,
+      groundY + 0.8,
+      cz - 8,
+      cx,
+      groundY + 0.9,
+      cz + 8,
+      0.35,
+    );
     expect(lowRay).toBe(1);
 
-    const blocked = resolvePosition(SEED, 3, -4, 0.5);
-    expect(Math.abs(blocked.x - 3) + Math.abs(blocked.z + 4)).toBeGreaterThan(0.5);
+    const blocked = resolvePosition(SEED, cx, cz, 0.5);
+    expect(Math.abs(blocked.x - cx) + Math.abs(blocked.z - cz)).toBeGreaterThan(0.5);
   });
 
   it('camera ghosts through trees while movement still collides', () => {
@@ -295,6 +337,69 @@ describe('terrain wall standoff', () => {
       }
     }
     expect(closest).toBeLessThan(2.0);
+  });
+
+  it('keeps the Abandoned Crypt door clear of the mine-mound collider (door trigger 2.0yd)', () => {
+    // The crypt entrance reuses the "mine entrance" prop (rock mound + timber
+    // portal) for its visual, sharing the door's exact (x, z). The mound's
+    // collider circle must not swallow the door tile itself: a ghost can only
+    // ever re-enter through the walk-in proximity trigger (interact() refuses
+    // it while dead), so if the full collider stack (not just terrain) pushes
+    // every approach outside the 2.0yd trigger, no released spirit can ever
+    // get back in.
+    const door = { x: -152, z: 610 };
+    expect(isBlocked(SEED, door.x, door.z, PLAYER_BODY_RADIUS)).toBe(false);
+    let closest = Infinity;
+    for (let x = -156; x <= -148; x += 0.25) {
+      for (let z = 606; z <= 614; z += 0.25) {
+        if (isBlocked(SEED, x, z, PLAYER_BODY_RADIUS)) continue;
+        const s = resolvePosition(SEED, x, z, PLAYER_BODY_RADIUS);
+        if (isBlocked(SEED, s.x, s.z, PLAYER_BODY_RADIUS)) continue;
+        closest = Math.min(closest, Math.hypot(s.x - door.x, s.z - door.z));
+      }
+    }
+    expect(closest).toBeLessThan(2.0);
+    // Upper bound: the door-clear fix must not become an excuse to push the
+    // mound arbitrarily far back. The forward rock anchors nearest the portal
+    // (src/render/props.ts abandonedCrypt mound, local (1.75, -1.2) r 1.1 and
+    // (-1.7, -1.25) r 1.15) must stay solid, so a future offset bump can't
+    // silently turn the visible rubble into walk-through air.
+    expect(isBlocked(SEED, -153.2, 608.25, PLAYER_BODY_RADIUS)).toBe(true);
+    expect(isBlocked(SEED, -153.25, 611.7, PLAYER_BODY_RADIUS)).toBe(true);
+  });
+
+  it('keeps the OTHER mine mounds on the generic 3.4/5 default (moundOffset/moundRadius fallback)', () => {
+    // Only the Abandoned Crypt entry overrides moundOffset/moundRadius; this
+    // pins the `?? 3.4` / `?? 5` fallback arm of src/sim/colliders.ts so an
+    // edit to either default (or to the mound's rotY math) regresses these
+    // two entries silently while the crypt-only assertions above stay green.
+    const mineMoundFar = (x: number, z: number, rot: number) => ({
+      x: x - 15 * Math.sin(rot),
+      z: z - 15 * Math.cos(rot),
+    });
+    // Deeprock Burrows (88, 612, rot -2.0):
+    expect(isBlocked(SEED, 91.09, 613.41, PLAYER_BODY_RADIUS)).toBe(true); // mound center
+    const deeprockFar = mineMoundFar(88, 612, -2.0);
+    expect(isBlocked(SEED, deeprockFar.x, deeprockFar.z, PLAYER_BODY_RADIUS)).toBe(false); // far past the 5yd mound radius
+    // zone1 mine (-88, -68, rot 0.8):
+    expect(isBlocked(SEED, -90.44, -70.37, PLAYER_BODY_RADIUS)).toBe(true); // mound center
+    const zone1Far = mineMoundFar(-88, -68, 0.8);
+    expect(isBlocked(SEED, zone1Far.x, zone1Far.z, PLAYER_BODY_RADIUS)).toBe(false); // far past the 5yd mound radius
+  });
+
+  it('keeps the Abandoned Crypt mound collider matched to its visible rock pile', () => {
+    // Follow-up to the door-clear fix above: the mound circle must clear the
+    // door trigger WITHOUT drifting so far back that it disagrees with the
+    // rendered pile (src/render/props.ts), which would open a collision gap
+    // under the flanking boulders and wall off open ground behind them that
+    // no player ever needed to cross.
+    const door = { x: -152, z: 610 };
+    // A point inside the rendered flanking boulder (local (2.65, -2.3), r 1.75;
+    // world (-154.5, 607.5), rot PI/2) stays blocked under the tightened mound.
+    expect(isBlocked(SEED, -154.5, 607.5, PLAYER_BODY_RADIUS)).toBe(true);
+    // Open ground well behind the pile's rendered extent (local z < -8, past
+    // the farthest rock at z -4.15, r 2.35) is not swallowed by the collider.
+    expect(isBlocked(SEED, door.x - 9, door.z, PLAYER_BODY_RADIUS)).toBe(false);
   });
 
   it('eases a player parked at a rim wall foot off it, end to end through the Sim', () => {
@@ -1075,7 +1180,9 @@ describe('boss loot and encounter resets', () => {
     sim.lootCorpse(mob.id, b);
     expect(sim.countItem('boar_hide', b)).toBe(1);
     expect(mob.loot).toBeNull();
-    expect(mob.lootable).toBe(false);
+    // The emptied boar corpse stays lootable through its
+    // unclaimed-harvest grace window instead of collapsing immediately.
+    expect(mob.lootable).toBe(true);
   });
 
   it('personal loot remains claimable after party rights are gone without granting shared loot', () => {
@@ -1653,6 +1760,54 @@ describe('warrior charge', () => {
     sim.tick();
     expect(p.chargeTargetId).toBe(null);
   });
+
+  it('does not bill or arm charge through unbreakable encounter control', () => {
+    const { sim, p, wolf } = chargeSetup();
+    const rageBefore = p.resource;
+    p.auras.push({
+      id: 'scripted_root',
+      name: 'Scripted Root',
+      kind: 'root',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 9000,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    sim.castAbility('charge');
+
+    expect(p.chargeTargetId).toBe(null);
+    expect(p.resource).toBe(rageBefore);
+    expect(p.cooldowns.has('charge')).toBe(false);
+    expect(wolf.auras.some((a) => a.kind === 'stun')).toBe(false);
+  });
+
+  it('stops an in-flight charge when unbreakable encounter control lands', () => {
+    const { sim, p } = chargeSetup();
+    sim.castAbility('charge');
+    sim.tick();
+    expect(p.chargeTargetId).not.toBe(null);
+    const heldAt = { ...p.pos };
+    p.auras.push({
+      id: 'scripted_stun',
+      name: 'Scripted Stun',
+      kind: 'stun',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 9000,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    sim.tick();
+
+    expect(p.chargeTargetId).toBe(null);
+    expect(p.pos.x).toBeCloseTo(heldAt.x, 5);
+    expect(p.pos.z).toBeCloseTo(heldAt.z, 5);
+  });
 });
 
 describe('mob tap rights', () => {
@@ -1730,7 +1885,10 @@ describe('aoe damage vs armor', () => {
   // other spell in the game.
   function aoeSetup(ability: string) {
     const sim = makeSim('mage');
-    (sim as any).grantXp(99999); // level up far past Arcane Explosion (lvl 14)
+    (sim as any).grantXp(99999); // level up far past Aetherburst (lvl 7)
+    // The mage rework spec-gated Aetherburst (arcane_explosion) to the arcane
+    // spec; a no-spec mage drops it from the known list, so commit first.
+    expect(sim.setSpec('arcane')).toBe(true);
     const p = sim.player;
     const wolf = [...sim.entities.values()].find(
       (e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead,

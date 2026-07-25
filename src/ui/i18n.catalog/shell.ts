@@ -30,6 +30,11 @@ export const shellStrings = {
       discordCommunity: 'Join the World of ClaudeCraft Discord community',
       donateProject: 'Donate to support World of ClaudeCraft',
     },
+    entryGuard: {
+      title: 'Graphics lowered',
+      body: 'The game closed unexpectedly while entering the world, so graphics are now set to {preset}. You can change this in the graphics selector below or in the in-game Options.',
+      dismiss: 'Dismiss',
+    },
     loading: {
       world: 'Loading world...',
       worldProgress: 'Loading world... {done}/{total}',
@@ -39,11 +44,18 @@ export const shellStrings = {
       rendererFailed: 'Could not start the renderer: try reloading. {error}',
       enterTimeout: 'Could not enter world. The connection timed out. Is the game server running?',
       connectionLost: 'Connection to the server was lost.',
-      reconnecting: 'Connection lost. Reconnecting...',
+      reconnectingAttempt:
+        'Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)',
+      reconnectingNow: 'Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})',
+      slowConnection: 'This is taking longer than usual. Check your internet connection.',
       connectionRejected: 'The server closed the connection.',
+      incompatibleWorldVersion:
+        'Game and server versions are incompatible. Reload or update, then try again.',
       realmFull: 'This world is full right now. Please try again in a few minutes.',
       tooManyConnections:
         'Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.',
+      messageRateExceeded:
+        'You were disconnected for sending actions too quickly. Please wait a moment and log back in.',
       tips: {
         classes:
           'Tip: each of the 9 classes plays differently. Try a few before committing to one.',
@@ -129,6 +141,21 @@ export const shellStrings = {
         'The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
       bodyWeb:
         'The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
+      dismiss: 'Dismiss',
+    },
+    // Performance nudge (src/ui/perf_nudge_toast.ts): the gpuNotice sibling
+    // shown once mid-session when the client perf-doctor finds a machine-local
+    // cause (packet 0 rulings R14-R16). The integrated-GPU copy is deliberately
+    // conditional: the adapter string cannot prove a discrete GPU exists, only
+    // that the session is not on one (ruling R15). The hardware-acceleration
+    // variants mirror the gpuNotice desktop/web split for the same reason.
+    perfNudge: {
+      integratedGpu:
+        'The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.',
+      hardwareAccelerationDesktop:
+        'The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
+      hardwareAccelerationWeb:
+        'The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
       dismiss: 'Dismiss',
     },
     realm: {
@@ -288,29 +315,6 @@ export const shellStrings = {
       heading: 'The world is temporarily unavailable.',
       body: 'We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.',
       status: 'Back soon',
-    },
-    welcome: {
-      back: 'Welcome back, {name}',
-      level: 'Level {level}',
-      lastPlayed: 'Last played {when}',
-      continue: 'Enter World',
-      continueHint: 'Enter to continue, Esc to skip',
-      continueHintTouch: 'Tap to continue',
-      discord: {
-        title: 'The community lives on Discord',
-        sub: 'Patch previews, events, dev chat, and 2 bonus bank slots for linking.',
-        join: 'Join our Discord',
-      },
-      chest: {
-        ready: 'Daily chest ready',
-      },
-      armory: {
-        cta: 'Enter and browse the Armory',
-      },
-      news: {
-        new: 'New',
-        viewAll: 'View all updates on GitHub',
-      },
     },
   },
   es: {

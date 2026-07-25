@@ -95,6 +95,10 @@ export function renderVendorWindow(
     el.appendChild(heroBalance);
   }
 
+  // Landscape layout: goods tile up in a multi-column grid instead of one
+  // full-width row per item (see .vendor-goods-grid in components.css).
+  const goodsGrid = document.createElement('div');
+  goodsGrid.className = 'vendor-goods-grid';
   for (const goods of view.goods) {
     const { itemId, item, quantity } = goods;
     const row = document.createElement('button');
@@ -118,8 +122,9 @@ export function renderVendorWindow(
       () =>
         `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
     );
-    el.appendChild(row);
+    goodsGrid.appendChild(row);
   }
+  if (view.goods.length > 0) el.appendChild(goodsGrid);
 
   const sellJunk = document.createElement('button');
   sellJunk.type = 'button';
@@ -152,6 +157,8 @@ export function renderVendorWindow(
     empty.textContent = t('itemUi.vendor.buybackEmpty');
     el.appendChild(empty);
   }
+  const buybackGrid = document.createElement('div');
+  buybackGrid.className = 'vendor-goods-grid';
   for (const { itemId, item, count, price: priceCopper } of view.buyback) {
     const row = document.createElement('button');
     row.type = 'button';
@@ -166,8 +173,9 @@ export function renderVendorWindow(
       () =>
         `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuyback'))}</div>`,
     );
-    el.appendChild(row);
+    buybackGrid.appendChild(row);
   }
+  if (view.buyback.length > 0) el.appendChild(buybackGrid);
 
   const hint = document.createElement('div');
   hint.className = 'vendor-hint';

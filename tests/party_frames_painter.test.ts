@@ -397,8 +397,10 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
           auras: [
             { id: 'weapon_imbue', kind: 'imbue' },
             { id: 'well_fed', kind: 'buff_sta' },
+            { id: 'arcane_intellect', kind: 'buff_int_pct' },
+            { id: 'temporal_exhaustion', kind: 'sated' },
             { id: 'power_word_shield', kind: 'absorb' },
-            { id: 'rend', kind: 'dot' },
+            { id: 'deep_wounds', kind: 'dot' },
           ],
         }),
       ],
@@ -416,7 +418,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // actionable healer effects in the compact frame.
     expect(icons()).toHaveLength(2);
     // the shield wears off: the strip's keyed pool detaches its node
-    painter.sync([member({ pid: 2, auras: [{ id: 'rend', kind: 'dot' }] })], 1, false);
+    painter.sync([member({ pid: 2, auras: [{ id: 'deep_wounds', kind: 'dot' }] })], 1, false);
     expect(icons()).toHaveLength(1);
     // a member with no auras (or an older server omitting the field) paints an empty strip
     painter.sync([member({ pid: 2 })], 1, false);

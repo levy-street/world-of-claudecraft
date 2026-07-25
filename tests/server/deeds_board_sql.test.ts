@@ -112,18 +112,16 @@ describe('deedsBoardRanked SQL shape (mocked pool)', () => {
     // with the exact unnest element types.
     expect(agg).toContain('unnest($1::text[], $2::int[])');
     // Zero-renown deeds never enter the SCORING set: they never score and
-    // never move the tie-break or the entry floor. (deed_count, the scoring
-    // set's size, is a deprecated wire-compat output; issue #2044.)
+    // never move the tie-break or the entry floor.
     expect(agg).toContain('WHERE u.renown > 0');
     // Per-deed earliest earn (a re-earn on a second character cannot move it).
     expect(agg).toContain('per_deed AS (');
     expect(agg).toContain('min(cd.earned_at) AS first_earned');
     expect(agg).toContain('GROUP BY cd.account_id, cd.deed_id');
-    // Account score = sum over the counted set; deedCount = size; completionTime =
-    // max of the per-deed earliest earns; floor applied server-side, inclusive.
+    // Account score = sum over the scoring set; completionTime = max of the
+    // per-deed earliest earns; floor applied server-side, inclusive.
     expect(agg).toContain('account_agg AS (');
     expect(agg).toContain('sum(r.renown)::int AS renown');
-    expect(agg).toContain('count(*)::int AS deed_count');
     expect(agg).toContain('max(pd.first_earned) AS completion_time');
     expect(agg).toContain('HAVING sum(r.renown) >= $3');
     // Display character = highest per-character Renown, ties to lowest id.
@@ -135,8 +133,8 @@ describe('deedsBoardRanked SQL shape (mocked pool)', () => {
     expect(agg).toContain('ORDER BY aa.renown DESC, aa.completion_time ASC, aa.account_id ASC');
 
     // The eligibility fragment is embedded VERBATIM at BOTH roll-up sites (per-deed
-    // and per-character), so a banned/suspended account is delisted from the score,
-    // the count, AND the display pick.
+    // and per-character), so a banned/suspended account is delisted from the score
+    // AND the display pick.
     expect(agg.split(ELIGIBLE_ACCOUNT_SQL).length - 1).toBe(2);
     expect(agg).toContain('JOIN accounts a ON a.id = cd.account_id');
     // Belt over the ON DELETE CASCADE: only rows whose character still exists.
@@ -164,14 +162,12 @@ describe('deedsBoardRanked SQL shape (mocked pool)', () => {
           {
             account_id: 1,
             renown: 75,
-            deed_count: 2,
             completion_time: new Date(T2),
             display_character_id: 11,
           },
           {
             account_id: 2,
             renown: 50,
-            deed_count: 1,
             completion_time: new Date(T2),
             display_character_id: 21,
           },
@@ -185,7 +181,6 @@ describe('deedsBoardRanked SQL shape (mocked pool)', () => {
     expect(out.ranked[0]).toEqual({
       accountId: 1,
       renown: 75,
-      deedCount: 2,
       completionTime: Date.parse(T2),
       displayCharacterId: 11,
     });
@@ -199,7 +194,6 @@ describe('deedsBoardRanked SQL shape (mocked pool)', () => {
           {
             account_id: 9,
             renown: 50,
-            deed_count: 1,
             completion_time: T1,
             display_character_id: 90,
           },
@@ -385,7 +379,6 @@ describe.skipIf(!PG_ON)('deedsBoardRanked differential vs computeDeedsBoard (pg-
     ]);
     expect(sql[0]).toMatchObject({
       renown: 75,
-      deedCount: 2,
       completionTime: Date.parse(T2),
       displayCharacterId: 99110111,
     });
@@ -398,9 +391,8 @@ describe.skipIf(!PG_ON)('deedsBoardRanked differential vs computeDeedsBoard (pg-
   it('flags the unknown deed id and excludes it (and the zero-renown feat) from every score', async () => {
     const full = await deedsBoardRanked(DEED_IDS, RENOWNS, DEEDS_BOARD_ENTRY_FLOOR);
     expect(full.unknownDeedIds).toContain('sql_gone');
-    // score75's counted set is {d50, d25a} = 75, never inflated by sql_feat0 or sql_gone.
+    // score75's scoring set is {d50, d25a} = 75, never inflated by sql_feat0 or sql_gone.
     const top = full.ranked.find((a) => a.accountId === ACCT.score75);
     expect(top?.renown).toBe(75);
-    expect(top?.deedCount).toBe(2);
   });
 });

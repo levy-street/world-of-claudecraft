@@ -29,6 +29,13 @@ import type { TranslationKey } from './i18n.catalog';
 /** How a slider's readout is formatted; the painter maps this to a formatter. */
 export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal';
 
+/** Which Interface-panel tab a control belongs to. The Interface panel is split
+ *  into four tabs (the interface list grew to ~40 rows in one scroll); every
+ *  declarative interface control carries exactly one category so the painter can
+ *  filter the list per tab. Non-interface panels (graphics/audio/controller)
+ *  leave `category` unset. */
+export type InterfaceTab = 'general' | 'frames' | 'chat' | 'combat';
+
 export interface SliderControl {
   control: 'slider';
   /** A NumericSettingKey (the painter narrows it to the live settings store). */
@@ -45,6 +52,8 @@ export interface SliderControl {
    *  mid-drag (issue 1558); dragging updates only the readout, not the setting.
    *  Other sliders keep their intended live preview (volume, fov, frame scale). */
   commitOnChange?: boolean;
+  /** Interface-panel tab this control lives in (unset on other panels). */
+  category?: InterfaceTab;
 }
 
 export interface ToggleControl {
@@ -53,6 +62,8 @@ export interface ToggleControl {
   key: string;
   labelKey: TranslationKey;
   on: boolean;
+  /** Interface-panel tab this control lives in (unset on other panels). */
+  category?: InterfaceTab;
 }
 
 export interface BoolToggleControl {
@@ -61,6 +72,12 @@ export interface BoolToggleControl {
   key: string;
   labelKey: TranslationKey;
   on: boolean;
+  /** Disabled controls remain visible but cannot dispatch until their dependency is met. */
+  disabled?: boolean;
+  /** Rebuild the panel after dispatch so dependent controls refresh immediately. */
+  rerender?: boolean;
+  /** Interface-panel tab this control lives in (unset on other panels). */
+  category?: InterfaceTab;
 }
 
 export interface ChoiceOption {
@@ -77,12 +94,16 @@ export interface ChoiceControl {
   options: ChoiceOption[];
   /** True when selecting an option re-renders the panel (preset + interfaceMode). */
   rerender: boolean;
+  /** Interface-panel tab this control lives in (unset on other panels). */
+  category?: InterfaceTab;
 }
 
 /** A standalone explanatory line rendered between controls (class set-note). */
 export interface NoteControl {
   control: 'note';
   textKey: TranslationKey;
+  /** Interface-panel tab this control lives in (unset on other panels). */
+  category?: InterfaceTab;
 }
 
 /** Position marker for the bespoke music on/off toggle inside the audio panel.
@@ -91,6 +112,8 @@ export interface NoteControl {
 export interface MusicToggleControl {
   control: 'musicToggle';
   labelKey: TranslationKey;
+  /** Interface-panel tab this control lives in (unset on other panels). */
+  category?: InterfaceTab;
 }
 
 export type OptionsControl =
@@ -169,7 +192,8 @@ const boolToggle = (
   s: OptionsSettingsSource,
   key: string,
   labelKey: TranslationKey,
-): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, on: s.bool(key) });
+  opts: Pick<BoolToggleControl, 'disabled' | 'rerender'> = {},
+): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, on: s.bool(key), ...opts });
 
 const choice = (
   s: OptionsSettingsSource,
@@ -356,69 +380,141 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
 }
 
 // ---------------------------------------------------------------------------
-// Interface & Comfort panel (cluster 5) -- the slider/boolToggle block that
-// follows the bespoke language picker + theme controls. The chat-timestamp and
-// chat-window-reset rows below it are bespoke and live in the painter.
+// Interface & Comfort panel (cluster 5) -- split into four tabs (the interface
+// list grew to ~40 rows in one scroll). The declarative controls below carry a
+// `category` each; the painter renders one tab strip and filters the list per
+// tab via interfaceControlsForTab(). The bespoke rows painted alongside them
+// (language + theme in General, the chat-timestamp / chat-window-reset / deed-
+// broadcast rows in Chat, the unit-frames-reset row in Frames) live in the
+// painter and are placed by the same taxonomy. See INTERFACE_TAB_ORDER.
 // ---------------------------------------------------------------------------
+
+/** The four Interface-panel tabs, in strip order. Also the canonical set the
+ *  completeness test partitions the control list against, so a control added
+ *  without a category (or added to two tabs) fails the guard. */
+export const INTERFACE_TAB_ORDER: readonly InterfaceTab[] = ['general', 'frames', 'chat', 'combat'];
+
+/** The tab-strip label key per tab (short single words; rendered via t()). */
+export const INTERFACE_TAB_LABEL_KEY: Record<InterfaceTab, TranslationKey> = {
+  general: 'hudChrome.interfaceTabs.general',
+  frames: 'hudChrome.interfaceTabs.frames',
+  chat: 'hudChrome.interfaceTabs.chat',
+  combat: 'hudChrome.interfaceTabs.combat',
+};
+
+// Stamp a category onto each control in a per-tab sub-list. Kept pure (a plain
+// map) so the tagged list round-trips through the same determinism guard.
+const tag = (category: InterfaceTab, controls: OptionsControl[]): OptionsControl[] =>
+  controls.map((c): OptionsControl => ({ ...c, category }));
 
 export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
-    // uiScale commits on release: applying it live rescales the whole UI (the
-    // options window included), which shoves the slider under the cursor and makes
-    // the value hard to land (issue 1558).
-    { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
-    slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
-    slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),
-    note('hudChrome.partyFrames.section'),
-    choice(s, 'partyFrameStyle', 'hudChrome.partyFrames.style', [
-      { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
-      { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
-      { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
+    ...tag('general', [
+      // uiScale commits on release: applying it live rescales the whole UI (the
+      // options window included), which shoves the slider under the cursor and
+      // makes the value hard to land (issue 1558).
+      { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
+      slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
+      slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
+      boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
+      boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
+      boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
+      // Camera comfort (mouse-look direction), so it sits with the comfort
+      // toggles rather than the Combat tab's attack/action-bar cluster.
+      boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
+      boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
+      boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
+      boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
+      boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
+      boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
+      boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
+      boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
+      boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
     ]),
-    slider(s, 'partyFrameScale', 'hudChrome.partyFrames.scale'),
-    slider(s, 'partyFrameWidth', 'hudChrome.partyFrames.width', 'oneDecimal', 5),
-    slider(s, 'partyFrameHeight', 'hudChrome.partyFrames.height', 'oneDecimal', 2),
-    slider(s, 'partyFrameSpacing', 'hudChrome.partyFrames.spacing', 'oneDecimal', 1),
-    slider(s, 'partyFrameColumns', 'hudChrome.partyFrames.columns', 'oneDecimal', 1),
-    choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', [
-      { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
-      { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
-      { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
-      { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
+    ...tag('frames', [
+      slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
+      slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),
+      choice(s, 'partyFrameStyle', 'hudChrome.partyFrames.style', [
+        { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
+        { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
+        { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
+      ]),
+      slider(s, 'partyFrameScale', 'hudChrome.partyFrames.scale'),
+      slider(s, 'partyFrameWidth', 'hudChrome.partyFrames.width', 'oneDecimal', 5),
+      slider(s, 'partyFrameHeight', 'hudChrome.partyFrames.height', 'oneDecimal', 2),
+      slider(s, 'partyFrameSpacing', 'hudChrome.partyFrames.spacing', 'oneDecimal', 1),
+      slider(s, 'partyFrameColumns', 'hudChrome.partyFrames.columns', 'oneDecimal', 1),
+      choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', [
+        { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
+        { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
+        { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
+        { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
+      ]),
+      choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
+        { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
+        { value: 1, labelKey: 'hudChrome.partyFrames.sortRole' },
+        { value: 2, labelKey: 'hudChrome.partyFrames.sortName' },
+      ]),
+      boolToggle(s, 'partyFrameShowResource', 'hudChrome.partyFrames.showResource'),
+      boolToggle(s, 'partyFrameShowAbsorbs', 'hudChrome.partyFrames.showAbsorbs'),
+      boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
+      boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
+      boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
+      boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
     ]),
-    choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
-      { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
-      { value: 1, labelKey: 'hudChrome.partyFrames.sortRole' },
-      { value: 2, labelKey: 'hudChrome.partyFrames.sortName' },
+    ...tag('chat', [
+      slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
+      slider(s, 'chatOpacity', 'hud.options.chatOpacity'),
+      boolToggle(s, 'compactChat', 'hud.options.compactChat'),
     ]),
-    boolToggle(s, 'partyFrameShowResource', 'hudChrome.partyFrames.showResource'),
-    boolToggle(s, 'partyFrameShowAbsorbs', 'hudChrome.partyFrames.showAbsorbs'),
-    boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
-    boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
-    slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
-    slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
-    slider(s, 'fctScale', 'hud.options.fctScale'),
-    slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
-    slider(s, 'chatOpacity', 'hud.options.chatOpacity'),
-    boolToggle(s, 'compactChat', 'hud.options.compactChat'),
-    boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
-    boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
-    boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
-    boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
-    boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
-    boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
-    boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
-    boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
-    boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
-    boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
-    boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
-    boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
-    boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
-    boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
-    boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
-    boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar'),
-    boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
+    ...tag('combat', [
+      boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
+      boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
+      boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
+      boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
+      boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
+      boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
+      slider(s, 'fctScale', 'hud.options.fctScale'),
+      boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar', {
+        rerender: true,
+      }),
+      boolToggle(s, 'showThirdActionBar', 'hudChrome.options.showThirdActionBar', {
+        disabled: !s.bool('showSecondaryActionBar'),
+      }),
+    ]),
   ];
+}
+
+/** Keys of the controls in `controls` that write a GameSettings value: sliders,
+ *  toggles, boolToggles and choices all carry a `key`. NoteControl (a display-only
+ *  line) and MusicToggleControl (reads the live MusicDirector, not a stored
+ *  setting) carry no key and are skipped. Used to scope a sub-view's "Reset to
+ *  Defaults" button to only the settings that view actually renders, instead of
+ *  resetting the whole GameSettings object (issue 2341). */
+export function optionsControlKeys(controls: OptionsControl[]): string[] {
+  const keys = new Set<string>();
+  for (const c of controls) {
+    if (c.control === 'note' || c.control === 'musicToggle') continue;
+    keys.add(c.key);
+  }
+  return [...keys];
+}
+
+/** The interface controls that belong to `tab`, in declaration order. The
+ *  painter calls this per tab; the completeness test partitions the full list
+ *  through it (union across INTERFACE_TAB_ORDER equals the full list, no dupes). */
+export function interfaceControlsForTab(
+  controls: OptionsControl[],
+  tab: InterfaceTab,
+): OptionsControl[] {
+  const seen = new Set<string>();
+  return controls.filter((c) => {
+    if (c.category !== tab) return false;
+    if (c.control === 'note' || c.control === 'musicToggle') return true;
+    if (seen.has(c.key)) return false;
+    seen.add(c.key);
+    return true;
+  });
 }
 
 // ---------------------------------------------------------------------------

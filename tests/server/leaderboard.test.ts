@@ -100,7 +100,6 @@ function deedsRow(rank: number): DeedsLeaderboardEntry {
     cls: 'warrior' as DeedsLeaderboardEntry['cls'],
     level: 20,
     renown: 500 - rank,
-    deedCount: 40 - rank,
     title: rank === 1 ? 'prog_veteran' : null,
   };
 }
@@ -134,6 +133,9 @@ function fakeRuntime(overrides: Partial<LeaderboardRuntime> = {}): LeaderboardRu
     getDevLeaderboard: async () => [],
     getDeedsLeaderboard: async () => [],
     deedsSelfRank: async () => null,
+    getArenaLeaderboard: async () => [],
+    getAccountsCreatedCount: async () => 0,
+    getCharactersCreatedCount: async () => 0,
     getReleases: async () => [],
     githubRepo: 'levy-street/world-of-claudecraft',
     releasesMaxLimit: 20,
@@ -292,11 +294,18 @@ describe('response builders (convention B deferred: leaders key preserved)', () 
     const first = (body.leaders as Record<string, unknown>[])[0];
     expect(first.name).toBe('Chronicler1');
     expect(first.renown).toBe(499);
-    // deedCount stays POPULATED on the wire this release (deprecated
-    // wire-compat for stale clients, issue #2044); current clients never
-    // display it.
-    expect(first.deedCount).toBe(39);
     expect(first.title).toBe('prog_veteran');
+    // The exact wire key set: Renown is the one ranked number the entry
+    // carries (the ranked-surface rule; the retired count output is gone).
+    expect(Object.keys(first).sort()).toEqual([
+      'cls',
+      'level',
+      'name',
+      'rank',
+      'realm',
+      'renown',
+      'title',
+    ]);
     expect('accountId' in first).toBe(false);
   });
 
@@ -372,9 +381,18 @@ describe('readRealms (FakeCharactersDb)', () => {
 });
 
 describe('readProjectStats', () => {
-  it('reports accounts_created from the db, players_online from the arg, and the realm', async () => {
-    const out = await readProjectStats({ getAccountsCount: async () => 123 }, 7, REALM_NAME);
-    expect(out).toEqual({ accounts_created: 123, players_online: 7, realm: REALM_NAME });
+  it('reports accounts_created and characters_created from the db, players_online from the arg, and the realm', async () => {
+    const out = await readProjectStats(
+      { getAccountsCount: async () => 123, getCharactersCount: async () => 456 },
+      7,
+      REALM_NAME,
+    );
+    expect(out).toEqual({
+      accounts_created: 123,
+      characters_created: 456,
+      players_online: 7,
+      realm: REALM_NAME,
+    });
   });
 });
 
@@ -525,7 +543,7 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online, players_cap, steam } with NO names list', async () => {
+  it('returns counts only: { ok, realm, players_online, players_cap, steam, dev_commands } with NO names list', async () => {
     configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
@@ -538,8 +556,41 @@ describe('status handler (name-list trim deviation)', () => {
       // The configured realm cap, advertised so the client realm list can show Full.
       players_cap: 250,
       steam: { enabled: false },
+      // The /dev GUI capability advert. False here because the suite runs without
+      // ALLOW_DEV_COMMANDS, which is also the production posture.
+      dev_commands: false,
     });
     expect('names' in (body as object)).toBe(false);
+  });
+
+  // The advert must track the env, not a boot-time snapshot: the /api/perf gate
+  // beside it reads live per request, and a status body that lied either way would
+  // strand a tester (dark window on a dev realm) or tease one (lit window on a
+  // realm that refuses every command).
+  it('advertises dev_commands true only while ALLOW_DEV_COMMANDS=1, read live per request', async () => {
+    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 1, playersCap: () => 10 }));
+    const previous = process.env.ALLOW_DEV_COMMANDS;
+    try {
+      process.env.ALLOW_DEV_COMMANDS = '1';
+      const on = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(on);
+      expect((captured(on.res).body as { dev_commands: boolean }).dev_commands).toBe(true);
+
+      // Same process, no re-boot: flipping the env must flip the next answer.
+      process.env.ALLOW_DEV_COMMANDS = '0';
+      const off = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(off);
+      expect((captured(off.res).body as { dev_commands: boolean }).dev_commands).toBe(false);
+
+      // Only the exact string '1' arms it, matching every other ALLOW_DEV_COMMANDS gate.
+      process.env.ALLOW_DEV_COMMANDS = 'true';
+      const truthy = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(truthy);
+      expect((captured(truthy.res).body as { dev_commands: boolean }).dev_commands).toBe(false);
+    } finally {
+      if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = previous;
+    }
   });
 
   it('advertises players_cap 0 when the cap is disabled', async () => {
@@ -769,11 +820,11 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
   });
 });
 
-describe('arena leaderboard handler (through the injected db reads)', () => {
-  it('decodes ?format and serves { format, leaders } from the db read', async () => {
-    setLeaderboardDbForTests({
-      topArenaRatings: async (_limit, format) => [arenaRow(`Champ-${format}`)],
-    });
+describe('arena leaderboard handler (through the injected cache-fronted runtime)', () => {
+  it('decodes ?format and serves { format, leaders } from the runtime getter', async () => {
+    configureLeaderboardRuntime(
+      fakeRuntime({ getArenaLeaderboard: async (format) => [arenaRow(`Champ-${format}`)] }),
+    );
     const ctx = fakeCtx({
       method: 'GET',
       url: '/api/arena/leaderboard',
@@ -788,15 +839,45 @@ describe('arena leaderboard handler (through the injected db reads)', () => {
   });
 });
 
-describe('project-stats handler (through the injected db reads)', () => {
-  it('serves accounts_created from the db, players_online from the runtime, and the realm', async () => {
-    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 9 }));
-    setLeaderboardDbForTests({ getAccountsCount: async () => 123 });
+describe('project-stats handler (through the injected cache-fronted runtime)', () => {
+  it('serves characters_created from the runtime count, players_online live, and the realm', async () => {
+    configureLeaderboardRuntime(
+      fakeRuntime({
+        playersOnline: () => 9,
+        getAccountsCreatedCount: async () => 123,
+        getCharactersCreatedCount: async () => 456,
+      }),
+    );
     const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
     await handlerFor('/api/project-stats')(ctx);
     const { status, body } = captured(ctx.res);
     expect(status).toBe(200);
-    expect(body).toEqual({ accounts_created: 123, players_online: 9, realm: REALM_NAME });
+    expect(body).toEqual({
+      accounts_created: 123,
+      characters_created: 456,
+      players_online: 9,
+      realm: REALM_NAME,
+    });
+  });
+});
+
+describe('search handler (funnels a non-empty query through the dbReads bundle)', () => {
+  it('serves the searchCharacters results capped at SEARCH_RESULT_LIMIT', async () => {
+    // Arena and project-stats moved onto the cache-fronted runtime; search / realms
+    // / sheet still read the db through the dbReads bundle, so this keeps that seam
+    // (setLeaderboardDbForTests) covered at the handler level with a fake read.
+    configureLeaderboardRuntime(fakeRuntime());
+    setLeaderboardDbForTests({
+      searchCharacters: async (prefix, limit) => [
+        { name: `Match-${prefix}-${limit}`, cls: 'mage', level: 60 },
+      ],
+    });
+    const ctx = fakeCtx({ method: 'GET', url: '/api/search', query: { q: 'ar' } });
+    await handlerFor('/api/search')(ctx);
+    const { status, body } = captured(ctx.res);
+    expect(status).toBe(200);
+    const b = body as { results: { name: string }[] };
+    expect(b.results.map((r) => r.name)).toEqual([`Match-ar-${SEARCH_RESULT_LIMIT}`]);
   });
 });
 
@@ -869,6 +950,97 @@ describe('public sheet handler (rate-limited before any DB read)', () => {
     });
     await handlerFor('/api/public/characters/:name/sheet')(ctx);
     expect(captured(ctx.res)).toEqual({ status: 429, body: { error: 'rate limited' } });
+  });
+});
+
+describe('arena leaderboard handler (anonymous DB read is rate-limited)', () => {
+  it('serves 200 under the per-IP public-read budget, then 429 { error } once exhausted, and resets', async () => {
+    resetPublicReadRateLimits();
+    configureLeaderboardRuntime(fakeRuntime());
+    const arena = handlerFor('/api/arena/leaderboard');
+    let firstStatus = 0;
+    let saw429 = false;
+    // Same 127.0.0.1 bucket makeReq shares; a tight loop past the budget exhausts it.
+    for (let i = 0; i < PUBLIC_READ_MAX_PER_MINUTE + 5; i++) {
+      const ctx = fakeCtx({ method: 'GET', url: '/api/arena/leaderboard' });
+      await arena(ctx);
+      const { status, body } = captured(ctx.res);
+      if (i === 0) firstStatus = status;
+      if (status === 429) {
+        saw429 = true;
+        expect(body).toEqual({ error: 'rate limited' });
+        break;
+      }
+    }
+    expect(firstStatus).toBe(200);
+    expect(saw429).toBe(true);
+    resetPublicReadRateLimits();
+    const ctx = fakeCtx({ method: 'GET', url: '/api/arena/leaderboard' });
+    await arena(ctx);
+    expect(captured(ctx.res).status).toBe(200);
+  });
+
+  it('does not spend a cached getter call on a rate-limited request', async () => {
+    // Mirrors the public sheet handler's "before any DB read" ordering: the limiter
+    // must short-circuit BEFORE the cached read, so a 429 never reaches the getter.
+    // The fake runtime absorbs the read silently, so a status-only assertion cannot
+    // prove the ordering; a spy getter with not.toHaveBeenCalled can.
+    resetPublicReadRateLimits();
+    const getArena = vi.fn(async () => [] as ArenaLeaderRow[]);
+    configureLeaderboardRuntime(fakeRuntime({ getArenaLeaderboard: getArena }));
+    // Exhaust the per-IP bucket externally so the very next handler call is a 429.
+    for (let i = 0; i < PUBLIC_READ_MAX_PER_MINUTE + 1; i++) {
+      publicReadRateLimited(makeReq({ method: 'GET', url: '/api/arena/leaderboard' }));
+    }
+    const ctx = fakeCtx({ method: 'GET', url: '/api/arena/leaderboard' });
+    await handlerFor('/api/arena/leaderboard')(ctx);
+    expect(captured(ctx.res)).toEqual({ status: 429, body: { error: 'rate limited' } });
+    expect(getArena).not.toHaveBeenCalled();
+  });
+});
+
+describe('project-stats handler (anonymous DB read is rate-limited)', () => {
+  it('serves 200 under the per-IP public-read budget, then 429 { error } once exhausted, and resets', async () => {
+    resetPublicReadRateLimits();
+    configureLeaderboardRuntime(fakeRuntime());
+    const projectStats = handlerFor('/api/project-stats');
+    let firstStatus = 0;
+    let saw429 = false;
+    for (let i = 0; i < PUBLIC_READ_MAX_PER_MINUTE + 5; i++) {
+      const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
+      await projectStats(ctx);
+      const { status, body } = captured(ctx.res);
+      if (i === 0) firstStatus = status;
+      if (status === 429) {
+        saw429 = true;
+        expect(body).toEqual({ error: 'rate limited' });
+        break;
+      }
+    }
+    expect(firstStatus).toBe(200);
+    expect(saw429).toBe(true);
+    resetPublicReadRateLimits();
+    const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
+    await projectStats(ctx);
+    expect(captured(ctx.res).status).toBe(200);
+  });
+
+  it('does not spend a cached getter call on a rate-limited request', async () => {
+    // Mirrors the public sheet handler's "before any DB read" ordering: the limiter
+    // must short-circuit BEFORE the cached read, so a 429 never reaches the getter.
+    // The fake runtime absorbs the read silently, so a status-only assertion cannot
+    // prove the ordering; a spy getter with not.toHaveBeenCalled can.
+    resetPublicReadRateLimits();
+    const getCount = vi.fn(async () => 0);
+    configureLeaderboardRuntime(fakeRuntime({ getAccountsCreatedCount: getCount }));
+    // Exhaust the per-IP bucket externally so the very next handler call is a 429.
+    for (let i = 0; i < PUBLIC_READ_MAX_PER_MINUTE + 1; i++) {
+      publicReadRateLimited(makeReq({ method: 'GET', url: '/api/project-stats' }));
+    }
+    const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
+    await handlerFor('/api/project-stats')(ctx);
+    expect(captured(ctx.res)).toEqual({ status: 429, body: { error: 'rate limited' } });
+    expect(getCount).not.toHaveBeenCalled();
   });
 });
 

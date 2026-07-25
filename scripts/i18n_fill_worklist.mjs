@@ -42,13 +42,13 @@
 //   node scripts/i18n_fill_worklist.mjs            all 13 non-en locales
 //   node scripts/i18n_fill_worklist.mjs --lang de_DE,fr_FR   a subset
 
-import * as esbuild from 'esbuild';
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createHash } from 'node:crypto';
+import * as esbuild from 'esbuild';
 import { flatten } from './i18n_flatten.mjs';
-import { placeholdersOf, contentHash } from './i18n_hash.mjs';
+import { contentHash, placeholdersOf } from './i18n_hash.mjs';
 
 const root = process.cwd();
 const REGISTRY_PATH = path.join(root, 'src/ui/i18n.status.json');
@@ -80,10 +80,31 @@ const PROSE_MAIN_PREFIXES = [
 // MECHANICAL UI CHROME (a bot may auto-fill): short functional labels/messages.
 // `classDetails.` is chrome EXCEPT `classDetails.lore.` (caught as prose first).
 const CHROME_MAIN_PREFIXES = [
-  'a11y.', 'abilityUi.', 'auth.', 'character.', 'classDetails.', 'controls.',
-  'deleteCharacter.', 'download.', 'errors.', 'footer.', 'game.', 'highscores.',
-  'hud.', 'itemUi.', 'loading.', 'meta.', 'mobilePreflight.', 'mode.', 'nav.',
-  'questUi.', 'realm.', 'realmTypes.', 'serverUnavailable.', 'stats.',
+  'a11y.',
+  'abilityUi.',
+  'auth.',
+  'character.',
+  'classDetails.',
+  'controls.',
+  'deleteCharacter.',
+  'download.',
+  'entryGuard.',
+  'errors.',
+  'footer.',
+  'game.',
+  'highscores.',
+  'hud.',
+  'itemUi.',
+  'loading.',
+  'meta.',
+  'mobilePreflight.',
+  'mode.',
+  'nav.',
+  'questUi.',
+  'realm.',
+  'realmTypes.',
+  'serverUnavailable.',
+  'stats.',
 ];
 // DICT scopes (sim/server/admin) are system / operator UI chrome. The admin
 // dashboard is in scope (operators are users); the cognate backstops there are
@@ -105,12 +126,16 @@ function isChrome(scope, key) {
 // anything unrecognised defaults to human-required (blocked-by-default).
 export function classify(scope, key) {
   if (isProse(scope, key)) {
-    return { fillable: false, reason: 'prose: human-required (content proper noun / narrative; never auto-filled)' };
+    return {
+      fillable: false,
+      reason: 'prose: human-required (content proper noun / narrative; never auto-filled)',
+    };
   }
   if (isChrome(scope, key)) return { fillable: true, reason: null };
   return {
     fillable: false,
-    reason: 'unclassified: human-required (blocked-by-default; add the namespace to CHROME_*_PREFIXES once confirmed mechanical chrome)',
+    reason:
+      'unclassified: human-required (blocked-by-default; add the namespace to CHROME_*_PREFIXES once confirmed mechanical chrome)',
   };
 }
 
@@ -143,9 +168,12 @@ export function siblingKeys(key, scopeKeysSorted, max = MAX_SIBLINGS) {
     if (family.length <= 1) continue;
     const idx = family.indexOf(key);
     let start = Math.max(0, idx - Math.floor(max / 2));
-    let end = Math.min(family.length, start + max + 1);
+    const end = Math.min(family.length, start + max + 1);
     start = Math.max(0, end - (max + 1));
-    return family.slice(start, end).filter((k) => k !== key).slice(0, max);
+    return family
+      .slice(start, end)
+      .filter((k) => k !== key)
+      .slice(0, max);
   }
   return [];
 }
@@ -192,7 +220,9 @@ function sortEntries(a, b) {
 export function assertAutoFillableHasNoProse(autoFillable) {
   for (const e of autoFillable) {
     if (isProse(e.scope, e.key)) {
-      throw new Error(`i18n:worklist: prose key leaked into autoFillable (${e.scope}:${e.key}); classification is unsound`);
+      throw new Error(
+        `i18n:worklist: prose key leaked into autoFillable (${e.scope}:${e.key}); classification is unsound`,
+      );
     }
   }
 }
@@ -204,7 +234,15 @@ export function assertAutoFillableHasNoProse(autoFillable) {
 // deterministic (same inputs -> identical fileEntries + inputHash; a changed
 // English value moves the hash) and (2) a pending prose key routes to humanRequired
 // and never to autoFillable - without running the CLI or esbuild.
-export function buildWorklistOutputs({ registry, enFlat, dictEn, overlays, glossarySrc, targetLocales, scope }) {
+export function buildWorklistOutputs({
+  registry,
+  enFlat,
+  dictEn,
+  overlays,
+  glossarySrc,
+  targetLocales,
+  scope,
+}) {
   // English source for a registry composite, by scope (mirrors main()).
   const englishOf = (s, key) => (s === 'main' ? enFlat[key] : dictEn[s] && dictEn[s][key]);
   // Sorted key universe per scope, for sibling lookup (mirrors main()).
@@ -239,7 +277,10 @@ export function buildWorklistOutputs({ registry, enFlat, dictEn, overlays, gloss
         const placeholders = placeholdersOf(english);
         const { fillable, reason } = classify(s, key);
         if (fillable) {
-          const siblings = siblingKeys(key, scopeKeysSorted[s]).map((sk) => ({ key: sk, english: englishOf(s, sk) }));
+          const siblings = siblingKeys(key, scopeKeysSorted[s]).map((sk) => ({
+            key: sk,
+            english: englishOf(s, sk),
+          }));
           autoFillable.push({ scope: s, key, english, placeholders, siblings });
         } else {
           humanRequired.push({ scope: s, key, english, placeholders, reason });
@@ -319,7 +360,16 @@ export function buildWorklistOutputs({ registry, enFlat, dictEn, overlays, gloss
   const inputHash = createHash('sha256').update(canonical, 'utf8').digest('hex').slice(0, 16);
   const manifest = { ...manifestBase, inputHash };
 
-  return { fileEntries, manifest, inputHash, totalAuto, totalHuman, perLanguage, langsWithWork, batchObjs };
+  return {
+    fileEntries,
+    manifest,
+    inputHash,
+    totalAuto,
+    totalHuman,
+    perLanguage,
+    langsWithWork,
+    batchObjs,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -339,7 +389,12 @@ async function loadSources(nonEn) {
   // dense runtime/resolved table - the worklist only needs the English source.
   lines.push("export { en as adminEn } from './src/admin/i18n.en';");
   const build = await esbuild.build({
-    stdin: { contents: lines.join('\n'), resolveDir: root, sourcefile: 'i18n-worklist-entry.ts', loader: 'ts' },
+    stdin: {
+      contents: lines.join('\n'),
+      resolveDir: root,
+      sourcefile: 'i18n-worklist-entry.ts',
+      loader: 'ts',
+    },
     bundle: true,
     platform: 'node',
     format: 'esm',
@@ -350,7 +405,13 @@ async function loadSources(nonEn) {
   const mod = await import(dataUrl);
   const overlays = {};
   for (const lang of nonEn) overlays[lang] = mod[lang];
-  return { en: mod.en, overlays, serverDICT: mod.serverDICT, simDICT: mod.simDICT, adminEn: mod.adminEn };
+  return {
+    en: mod.en,
+    overlays,
+    serverDICT: mod.serverDICT,
+    simDICT: mod.simDICT,
+    adminEn: mod.adminEn,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -358,10 +419,14 @@ async function loadSources(nonEn) {
 // ---------------------------------------------------------------------------
 function writeOutputs(outputs) {
   const existing = existsSync(OUT_DIR)
-    ? readdirSync(OUT_DIR).filter((f) => f.endsWith('.json')).map((f) => path.join(OUT_DIR, f))
+    ? readdirSync(OUT_DIR)
+        .filter((f) => f.endsWith('.json'))
+        .map((f) => path.join(OUT_DIR, f))
     : [];
   const targets = new Set(outputs.keys());
-  const allPresentAndEqual = [...outputs].every(([p, c]) => existsSync(p) && readFileSync(p, 'utf8') === c);
+  const allPresentAndEqual = [...outputs].every(
+    ([p, c]) => existsSync(p) && readFileSync(p, 'utf8') === c,
+  );
   const noStale = existing.every((p) => targets.has(p));
   if (allPresentAndEqual && noStale) return { wrote: 0, deleted: 0, hit: true };
 
@@ -389,7 +454,14 @@ function parseArgs(argv) {
     if (argv[i] === '--lang') langFilter = argv[++i];
     else if (argv[i].startsWith('--lang=')) langFilter = argv[i].slice('--lang='.length);
   }
-  return { langFilter: langFilter ? langFilter.split(',').map((s) => s.trim()).filter(Boolean) : null };
+  return {
+    langFilter: langFilter
+      ? langFilter
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : null,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -403,7 +475,9 @@ async function main() {
   if (langFilter) {
     const unknown = langFilter.filter((l) => !allLocales.includes(l));
     if (unknown.length) {
-      console.error(`i18n:worklist: unknown locale(s): ${unknown.join(', ')}. Known: ${allLocales.join(', ')}`);
+      console.error(
+        `i18n:worklist: unknown locale(s): ${unknown.join(', ')}. Known: ${allLocales.join(', ')}`,
+      );
       process.exit(1);
     }
   }
@@ -414,7 +488,8 @@ async function main() {
   const dictEn = { sim: simDICT.en, server: serverDICT.en, admin: adminEn };
 
   // English source for a registry composite, by scope (used by the staleness guard).
-  const englishOf = (scope, key) => (scope === 'main' ? enFlat[key] : dictEn[scope] && dictEn[scope][key]);
+  const englishOf = (scope, key) =>
+    scope === 'main' ? enFlat[key] : dictEn[scope] && dictEn[scope][key];
 
   // Staleness guard: the worklist must reflect a FRESH registry. Verify every
   // registry key still resolves to source with the recorded enHash, and that no
@@ -432,15 +507,21 @@ async function main() {
       stale.push(`${composite} (enHash drifted; English changed since the last scan)`);
     }
   }
-  for (const k of Object.keys(enFlat)) if (!registry.keys[`main:${k}`]) stale.push(`main:${k} (in en, absent from registry)`);
+  for (const k of Object.keys(enFlat))
+    if (!registry.keys[`main:${k}`]) stale.push(`main:${k} (in en, absent from registry)`);
   for (const scope of ['sim', 'server', 'admin']) {
-    for (const k of Object.keys(dictEn[scope])) if (!registry.keys[`${scope}:${k}`]) stale.push(`${scope}:${k} (in DICT, absent from registry)`);
+    for (const k of Object.keys(dictEn[scope]))
+      if (!registry.keys[`${scope}:${k}`])
+        stale.push(`${scope}:${k} (in DICT, absent from registry)`);
   }
   if (stale.length) {
     console.error(
       `i18n:worklist: the registry (src/ui/i18n.status.json) is STALE relative to source ` +
         `(${stale.length} drift(s)). Run \`npm run i18n:scan\` first, then re-run the worklist.\n` +
-        stale.slice(0, 10).map((s) => `  - ${s}`).join('\n') +
+        stale
+          .slice(0, 10)
+          .map((s) => `  - ${s}`)
+          .join('\n') +
         (stale.length > 10 ? `\n  ... and ${stale.length - 10} more` : ''),
     );
     process.exit(1);
@@ -448,19 +529,21 @@ async function main() {
 
   // Assemble every batch + manifest + inputHash from the loaded data (pure; no I/O).
   const scope = langFilter ? { lang: targetLocales } : 'all-locales';
-  const { fileEntries, manifest, inputHash, totalAuto, totalHuman, langsWithWork } = buildWorklistOutputs({
-    registry,
-    enFlat,
-    dictEn,
-    overlays,
-    glossarySrc,
-    targetLocales,
-    scope,
-  });
+  const { fileEntries, manifest, inputHash, totalAuto, totalHuman, langsWithWork } =
+    buildWorklistOutputs({
+      registry,
+      enFlat,
+      dictEn,
+      overlays,
+      glossarySrc,
+      targetLocales,
+      scope,
+    });
 
   const outputs = new Map();
   outputs.set(path.join(OUT_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
-  for (const [name, obj] of fileEntries) outputs.set(path.join(OUT_DIR, name), JSON.stringify(obj, null, 2) + '\n');
+  for (const [name, obj] of fileEntries)
+    outputs.set(path.join(OUT_DIR, name), JSON.stringify(obj, null, 2) + '\n');
 
   const { wrote, deleted, hit } = writeOutputs(outputs);
   const rel = path.relative(root, OUT_DIR);
@@ -470,7 +553,9 @@ async function main() {
         `pending=${totalAuto + totalHuman} (auto=${totalAuto} human=${totalHuman}) across ${targetLocales.length} locale(s).`,
     );
   } else if (totalAuto + totalHuman === 0) {
-    console.log(`i18n:worklist: 0 pending translations across ${targetLocales.length} locale(s); ${rel}/manifest.json written (no batches). [${inputHash}]`);
+    console.log(
+      `i18n:worklist: 0 pending translations across ${targetLocales.length} locale(s); ${rel}/manifest.json written (no batches). [${inputHash}]`,
+    );
   } else {
     console.log(
       `i18n:worklist: ${totalAuto + totalHuman} pending (auto=${totalAuto} human=${totalHuman}) ` +

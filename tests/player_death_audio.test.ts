@@ -22,9 +22,10 @@ describe('playerDeath audio wiring', () => {
   });
 
   it('leaves every minigame/PvP loss chime on the shared generic cue', () => {
-    // fiesta, Yumi match, arena rating, and Vale Cup losses are NOT a
-    // character death and must keep using the shared stinger.
+    // fiesta and Vale Cup losses are NOT a character death and must keep
+    // using the shared stinger. Arena rating loss moved to its own dedicated
+    // audio.arenaLoss() cue (ui_arena_loss), so it no longer counts here.
     const matches = hud.match(/audio\.death\(\);/g) ?? [];
-    expect(matches.length).toBe(4);
+    expect(matches.length).toBe(3);
   });
 });

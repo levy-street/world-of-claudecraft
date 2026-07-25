@@ -182,8 +182,16 @@ describe('hud wiring', () => {
   });
 
   it('renders the inspected player title from the entity wire field', () => {
-    expect(hud).toMatch(/e\.title && deedTitleText\(e\.title\) !== ''/);
-    expect(hud).toContain('class="inspect-title"');
+    // The showcase redesign extracted inspect out of hud.ts into the inspect_window
+    // painter (deed-title resolution) over the inspect_view pure core (the empty vs
+    // present gate). The rendered subtitle keeps its class.
+    const inspectWindow = read('../src/ui/inspect_window.ts');
+    const inspectView = read('../src/ui/inspect_view.ts');
+    expect(inspectWindow).toContain("e.title ? deedTitleText(e.title) : ''");
+    expect(inspectView).toContain(
+      "deedTitle: input.deedTitleText !== '' ? input.deedTitleText : null",
+    );
+    expect(inspectWindow).toContain('class="inspect-title"');
   });
 
   it('persists the tracker collapse as its own settings row', () => {

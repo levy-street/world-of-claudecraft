@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   activePvpOpponentIds,
   HOVER_REPICK_MS,
@@ -7,8 +7,9 @@ import {
   hoverCursorKind,
   isAttackableEntity,
   isAttackHoverTarget,
+  shouldApproachPickedEntity,
 } from '../src/game/interactions';
-import type { Entity } from '../src/sim/types';
+import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
 function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -152,6 +153,7 @@ describe('activePvpOpponentIds', () => {
         ladder: [],
         ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
+          map: 'coliseum' as const,
           oppPid: 3,
           oppName: 'Arena Rival',
           oppClass: 'warrior',
@@ -198,6 +200,7 @@ describe('activePvpOpponentIds', () => {
       ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
     };
     const matchBase = {
+      map: 'coliseum' as const,
       oppPid: 3,
       oppName: 'Rivals',
       oppClass: 'warrior' as const,
@@ -261,6 +264,7 @@ describe('activePvpOpponentIds', () => {
         ladder: [],
         ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
+          map: 'coliseum' as const,
           oppPid: 3,
           oppName: 'Arena Rival',
           oppClass: 'warrior',
@@ -278,6 +282,232 @@ describe('activePvpOpponentIds', () => {
 });
 
 describe('handlePickedEntity', () => {
+  it('reports a nearby NPC dialogue as an interaction but plain targeting as no interaction', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const npc = stubEntity({ id: 2, kind: 'npc', pos: { x: 1, y: 0, z: 0 } });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, npc],
+      ]),
+      targetEntity: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      openQuestDialog: vi.fn(),
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(true);
+    expect(hud.openQuestDialog).toHaveBeenCalledWith(2);
+
+    npc.pos = { x: 99, y: 0, z: 0 };
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(false);
+  });
+
+  it.each([0, 2])('reports opening nearby corpse loot with button %i', (button) => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const corpse = stubEntity({
+      id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, corpse],
+      ]),
+      targetEntity: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      openLoot: vi.fn(),
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(true);
+    expect(hud.openLoot).toHaveBeenCalledWith(2, 10, 20);
+  });
+
+  it.each([0, 2])('preserves movement when button %i finds no visible corpse loot', (button) => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const corpse = stubEntity({
+      id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 0, items: [{ itemId: 'wolf_fang', count: 1, personalFor: [99] }] },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, corpse],
+      ]),
+      targetEntity: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      openLoot: vi.fn(),
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(false);
+    expect(hud.openLoot).not.toHaveBeenCalled();
+  });
+
+  it.each([0, 2])(
+    'preserves movement for button %i when an online host only appears to have harvestable remains',
+    (button) => {
+      const player = stubEntity({ id: 1, kind: 'player' });
+      const corpse = stubEntity({
+        id: 2,
+        kind: 'mob',
+        templateId: 'forest_wolf',
+        dead: true,
+        lootable: true,
+        loot: null,
+        harvestClaimedBy: null,
+        pos: { x: 1, y: 0, z: 0 },
+      });
+      const world = {
+        playerId: 1,
+        player,
+        entities: new Map([
+          [1, player],
+          [2, corpse],
+        ]),
+        targetEntity: () => {},
+      } as unknown as Parameters<typeof handlePickedEntity>[0];
+      const hud = {
+        openLoot: vi.fn(),
+        closeContextMenu: () => {},
+      } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+      expect(handlePickedEntity(world, hud, 2, button, 10, 20, false)).toBe(false);
+      expect(hud.openLoot).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ['door', 0, { templateId: 'dungeon_door', dungeonId: 'crypt' }, 'enterDungeon'],
+    ['door', 2, { templateId: 'dungeon_door', dungeonId: 'crypt' }, 'enterDungeon'],
+    ['exit', 0, { templateId: 'dungeon_exit' }, 'leaveDungeon'],
+    ['exit', 2, { templateId: 'dungeon_exit' }, 'leaveDungeon'],
+    ['mailbox', 0, { templateId: 'mailbox' }, 'openMailbox'],
+    ['mailbox', 2, { templateId: 'mailbox' }, 'openMailbox'],
+    ['pickup', 0, {}, 'pickUpObject'],
+    ['pickup', 2, {}, 'pickUpObject'],
+  ])('reports a successful %s interaction with button %i', (_name, button, fields, expected) => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const object = stubEntity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+      ...(fields as Partial<Entity>),
+    });
+    const calls: string[] = [];
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, object],
+      ]),
+      targetEntity: () => {},
+      enterDungeon: () => {
+        calls.push('enterDungeon');
+        return true;
+      },
+      leaveDungeon: () => {
+        calls.push('leaveDungeon');
+        return true;
+      },
+      pickUpObject: () => {
+        calls.push('pickUpObject');
+        return true;
+      },
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      openMailbox: () => calls.push('openMailbox'),
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    expect(handlePickedEntity(world, hud, 2, button as number, 10, 20)).toBe(true);
+    expect(calls).toEqual([expected]);
+  });
+
+  it.each([
+    [0, 'inside', 3.99, true, 1],
+    [0, 'exactly at', 4, true, 1],
+    [0, 'outside', 4.01, false, 0],
+    [2, 'inside', 3.99, true, 1],
+    [2, 'exactly at', 4, true, 1],
+    [2, 'outside', 4.01, false, 0],
+  ] as const)(
+    'uses the authored noticeboard boundary for button %i when %s the radius',
+    (button, _position, distance, expectedOutcome, expectedPickups) => {
+      const player = stubEntity({ id: 1, kind: 'player' });
+      const board = stubEntity({
+        id: 2,
+        kind: 'object',
+        templateId: 'noticeboard_eastbrook',
+        lootable: true,
+        pos: { x: distance, y: 0, z: 0 },
+      });
+      const world = {
+        playerId: 1,
+        player,
+        entities: new Map([
+          [1, player],
+          [2, board],
+        ]),
+        targetEntity: vi.fn(),
+        pickUpObject: vi.fn(() => true),
+      } as unknown as Parameters<typeof handlePickedEntity>[0];
+      const hud = {
+        closeContextMenu: vi.fn(),
+        showError: vi.fn(),
+      } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+      expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(expectedOutcome);
+      expect(world.pickUpObject).toHaveBeenCalledTimes(expectedPickups);
+    },
+  );
+
+  it('returns a rejected authoritative pickup result', async () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const object = stubEntity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, object],
+      ]),
+      targetEntity: () => {},
+      pickUpObject: vi.fn(async () => false),
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    await expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).resolves.toBe(false);
+    expect(world.pickUpObject).toHaveBeenCalledWith(2);
+  });
+
   it('targets and starts auto-attack on a hostile mob on right-click', () => {
     // Right-clicking an enemy targets AND begins auto-attack, the classic-MMO
     // convention the attack ability tooltip documents ("Right-clicking an enemy
@@ -314,9 +544,10 @@ describe('handlePickedEntity', () => {
       openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},
+      requestSpiritHealerResurrect: () => {},
     };
 
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
 
     expect(targetId).toBe(2);
     expect(attacks).toBe(1);
@@ -353,6 +584,7 @@ describe('handlePickedEntity', () => {
       openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},
+      requestSpiritHealerResurrect: () => {},
     };
 
     handlePickedEntity(world, hud, 2, 2, 10, 20);
@@ -377,11 +609,20 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       duelInfo: null,
       arenaInfo: null,
       targetEntity: () => {},
-      enterDungeon: () => calls.push('enterDungeon'),
-      leaveDungeon: () => {},
-      pickUpObject: () => calls.push('pickUpObject'),
+      enterDungeon: () => {
+        calls.push('enterDungeon');
+        return true;
+      },
+      leaveDungeon: () => true,
+      pickUpObject: () => {
+        calls.push('pickUpObject');
+        return true;
+      },
       startAutoAttack: () => {},
-      resurrectAtSpiritHealer: () => calls.push('resurrectAtSpiritHealer'),
+      resurrectAtSpiritHealer: () => {
+        calls.push('resurrectAtSpiritHealer');
+        return true;
+      },
     };
     const hud = {
       openLoot: () => calls.push('openLoot'),
@@ -390,6 +631,7 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       openMailbox: () => calls.push('openMailbox'),
       showError: () => calls.push('showError'),
       closeContextMenu: () => {},
+      requestSpiritHealerResurrect: () => calls.push('requestSpiritHealerResurrect'),
     };
     return { world, hud, calls };
   }
@@ -399,7 +641,7 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
 
   it('a ghost right-clicking a quest NPC does not open the quest dialog', () => {
     const { world, hud, calls } = rig({ dead: true, ghost: true }, questNpc());
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
     expect(calls).not.toContain('openQuestDialog');
     expect(calls).not.toContain('openDelveBoard');
     expect(calls).toContain('showError');
@@ -407,18 +649,46 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
 
   it('a ghost left-clicking a quest NPC does not open the quest dialog', () => {
     const { world, hud, calls } = rig({ dead: true, ghost: true }, questNpc());
-    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(false);
     expect(calls).not.toContain('openQuestDialog');
     expect(calls).not.toContain('openDelveBoard');
   });
 
   it('a dead-unreleased player clicking a quest NPC does not open the quest dialog', () => {
     const { world, hud, calls } = rig({ dead: true, ghost: false }, questNpc());
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
     expect(calls).not.toContain('openQuestDialog');
   });
 
-  it('a ghost right-clicking the Spirit Healer still takes the healer res', () => {
+  it('a ghost clicking a dungeon door does not dispatch a no-op interaction', () => {
+    const door = stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: 'crypt',
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const { world, hud, calls } = rig({ dead: true, ghost: true }, door);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
+    expect(calls).not.toContain('enterDungeon');
+    expect(calls).toContain('showError');
+  });
+
+  it('a dead player clicking visible corpse loot does not open it', () => {
+    const corpse = stubEntity({
+      id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const { world, hud, calls } = rig({ dead: true, ghost: false }, corpse);
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(false);
+    expect(calls).not.toContain('openLoot');
+  });
+
+  it('a ghost right-clicking the Spirit Healer routes through the confirm gate', () => {
     const healer = stubEntity({
       id: 2,
       kind: 'npc',
@@ -426,8 +696,11 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       pos: { x: 3, y: 0, z: 0 },
     });
     const { world, hud, calls } = rig({ dead: true, ghost: true }, healer);
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
-    expect(calls).toContain('resurrectAtSpiritHealer');
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(true);
+    // The click opens the HUD confirm (which owns sending the command on OK);
+    // it must never send the resurrect command directly.
+    expect(calls).toContain('requestSpiritHealerResurrect');
+    expect(calls).not.toContain('resurrectAtSpiritHealer');
     expect(calls).not.toContain('openQuestDialog');
   });
 
@@ -440,16 +713,136 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       pos: { x: 3, y: 0, z: 0 },
     });
     const { world, hud, calls } = rig({ dead: true, ghost: true }, mailbox);
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
     expect(calls).not.toContain('openMailbox');
-    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(false);
     expect(calls).not.toContain('openMailbox');
   });
 
   it('an alive player clicking a quest NPC still opens the quest dialog', () => {
     const { world, hud, calls } = rig({}, questNpc());
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(true);
     expect(calls).toContain('openQuestDialog');
+  });
+});
+
+describe('shouldApproachPickedEntity', () => {
+  const player = stubEntity({ id: 1, kind: 'player' });
+
+  it('does not replace autorun for successful or locally impossible interactions', () => {
+    const nearbyHealer = stubEntity({
+      id: 2,
+      kind: 'npc',
+      templateId: 'spirit_healer',
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const unavailableCorpse = stubEntity({
+      id: 3,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+
+    expect(shouldApproachPickedEntity(player, nearbyHealer, false)).toBe(false);
+    expect(shouldApproachPickedEntity(player, unavailableCorpse, false)).toBe(false);
+    expect(shouldApproachPickedEntity(player, nearbyHealer, true)).toBe(false);
+  });
+
+  it('allows movement toward distant interactables and living targets', () => {
+    const distantNpc = stubEntity({ id: 2, kind: 'npc', pos: { x: 99, y: 0, z: 0 } });
+    const hostile = stubEntity({
+      id: 3,
+      kind: 'mob',
+      hostile: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const distantCorpse = stubEntity({
+      id: 4,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 99, y: 0, z: 0 },
+    });
+
+    expect(shouldApproachPickedEntity(player, distantNpc, false)).toBe(true);
+    expect(shouldApproachPickedEntity(player, hostile, false)).toBe(true);
+    expect(shouldApproachPickedEntity(player, distantCorpse, false)).toBe(true);
+  });
+
+  it('approaches an object outside the authoritative interaction range while confirmation is pending', () => {
+    const object = stubEntity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: INTERACT_RANGE + 0.5, y: 0, z: 0 },
+    });
+
+    expect(shouldApproachPickedEntity(player, object, false)).toBe(true);
+  });
+
+  it('turns an out-of-range noticeboard tap into approach movement', () => {
+    const board = stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'noticeboard_eastbrook',
+      lootable: true,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, board],
+      ]),
+      targetEntity: vi.fn(),
+      pickUpObject: vi.fn(() => true),
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      closeContextMenu: vi.fn(),
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    const didInteract = handlePickedEntity(world, hud, board.id, 0, 10, 20);
+
+    expect(didInteract).toBe(false);
+    expect(world.pickUpObject).not.toHaveBeenCalled();
+    expect(shouldApproachPickedEntity(player, board, didInteract === true)).toBe(true);
+  });
+
+  it('keeps a generic object at the same distance immediately interactable', () => {
+    const object = stubEntity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+
+    expect(shouldApproachPickedEntity(player, object, false)).toBe(false);
+  });
+
+  it('approaches distant harvest remains only when the host mirrors claim state', () => {
+    const harvestOnlyCorpse = stubEntity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'forest_wolf',
+      dead: true,
+      lootable: true,
+      loot: null,
+      harvestClaimedBy: null,
+      pos: { x: 99, y: 0, z: 0 },
+    });
+
+    expect(shouldApproachPickedEntity(player, harvestOnlyCorpse, false, true)).toBe(true);
+    expect(shouldApproachPickedEntity(player, harvestOnlyCorpse, false, false)).toBe(false);
+  });
+
+  it('does not start entity click-move while the player is dead', () => {
+    const ghost = stubEntity({ id: 1, kind: 'player', dead: true, ghost: true });
+    const distantNpc = stubEntity({ id: 2, kind: 'npc', pos: { x: 99, y: 0, z: 0 } });
+
+    expect(shouldApproachPickedEntity(ghost, distantNpc, false)).toBe(false);
   });
 });
 

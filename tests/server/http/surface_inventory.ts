@@ -647,6 +647,46 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.mainApi,
     method: 'POST',
+    path: '/api/desktop-wallet/create',
+    handler: 'handleApi arm: /api/desktop-wallet/create',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'walletLinkRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/desktop-wallet/claim',
+    handler: 'handleApi arm: /api/desktop-wallet/claim',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/desktop-wallet/complete',
+    handler: 'handleApi arm: /api/desktop-wallet/complete',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/desktop-wallet/result',
+    handler: 'handleApi arm: /api/desktop-wallet/result',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
     path: '/api/wallet/link/challenge',
     handler: 'handleApi arm: /api/wallet/link/challenge',
     contentType: PROBLEM_JSON,
@@ -837,20 +877,6 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.public,
     limiter: 'wocBalanceRateLimited',
-    requireOwnedExpected: null,
-  },
-  // Welcome Screen server flags (server/welcome.ts): the Season 1 Armory promo
-  // gate. Registry-only RouteDef born after the migration (new-route rule,
-  // server/http/CLAUDE.md): no legacy ladder arm. Bearer-only (read or full
-  // token), no per-route rate limiter.
-  {
-    dispatcher: DISPATCH.mainApi,
-    method: 'GET',
-    path: '/api/welcome/flags',
-    handler: 'server/welcome.ts welcomeHandler (registry-only RouteDef)',
-    contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.bearer,
-    limiter: null,
     requireOwnedExpected: null,
   },
   // Daily-rewards player family (v0.19.0, server/daily_rewards.ts): served by
@@ -2124,6 +2150,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   // the composite delegate kept as the rollback arm. The whole `/internal/daily-rewards/` prefix
   // is secret-gated BEFORE path/method resolution, fail-closed (see AUTH_SCOPE),
   // and answers in the admin { success, data, error } envelope on every branch.
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
+    path: '/internal/daily-rewards/finalize',
+    handler: 'handleDailyRewardInternalApi arm: /internal/daily-rewards/finalize',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDailyReward,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   {
     dispatcher: DISPATCH.internal,
     method: 'POST',

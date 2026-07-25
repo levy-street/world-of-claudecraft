@@ -14,6 +14,7 @@ import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarPaintDescriptor } from './action_bar_painter';
 import { ActionBarPainter } from './action_bar_painter';
 import type { ActionBarState } from './action_bar_view';
+import { mobileButtonHasSourceSlot } from './mobile_action_page_view';
 
 const ARIA_LABEL_ATTR = 'aria-label';
 const PAGE_INDICATOR_KEY: TranslationKey = 'hudChrome.mobile.actionPageIndicator';
@@ -52,6 +53,12 @@ export class MobileActionRingPainter {
   paint(state: ActionBarState, page: number, pageCount: number, showAttackButton = true): void {
     this.writers.setDisplay(this.descriptor.bar.slots[0].btn, showAttackButton ? '' : 'none');
     this.barPainter.paint(state);
+    for (let buttonIndex = 0; buttonIndex < 5; buttonIndex++) {
+      this.writers.setDisplay(
+        this.descriptor.bar.slots[buttonIndex + 1].btn,
+        mobileButtonHasSourceSlot(page, buttonIndex) ? '' : 'none',
+      );
+    }
 
     if (this.lastPage !== page || this.lastPageCount !== pageCount) {
       this.lastPage = page;

@@ -14,6 +14,8 @@ import type { CorpseHarvestViewModel } from './corpse_harvest_view';
 export interface CorpseHarvestPainterDeps {
   /** Called with the checked component tags (may be empty = spread across all). */
   onHarvest(chosen: string[]): void;
+  /** The Hud's shared tooltip idiom: hover, mobile long-press, keyboard focus. */
+  attachTooltip(element: HTMLElement, html: () => string): void;
 }
 
 const COMPONENT_LABEL_KEYS: Record<string, string> = {
@@ -25,9 +27,13 @@ const COMPONENT_LABEL_KEYS: Record<string, string> = {
   claw: 'hudChrome.corpseHarvest.components.claw',
   horn: 'hudChrome.corpseHarvest.components.horn',
   tusk: 'hudChrome.corpseHarvest.components.tusk',
+  meat: 'hudChrome.corpseHarvest.components.meat',
+  cloth: 'hudChrome.corpseHarvest.components.cloth',
 };
 
-function componentLabel(tag: string): string {
+/** Exported for tests only, so the label map can be pinned against the real set of
+ *  componentTags used across mob content (see tests/town_focus_i18n.test.ts). */
+export function componentLabel(tag: string): string {
   const key = COMPONENT_LABEL_KEYS[tag];
   return key ? t(key as TranslationKey) : tag;
 }
@@ -69,7 +75,7 @@ export function renderCorpseHarvestPicker(
   btn.type = 'button';
   btn.className = 'btn corpse-harvest-btn';
   btn.textContent = t('hudChrome.corpseHarvest.harvestButton');
-  btn.title = t('hudChrome.corpseHarvest.harvestButtonTooltip');
+  deps.attachTooltip(btn, () => esc(t('hudChrome.corpseHarvest.harvestTooltip')));
   btn.disabled = view.harvestDisabled;
   btn.addEventListener('click', () => {
     const chosen = [...list.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')]

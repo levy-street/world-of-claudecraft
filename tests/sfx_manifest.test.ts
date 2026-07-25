@@ -162,10 +162,10 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog and all 27 UI cues in one 171-key inventory', () => {
+  it('keeps the release catalog and all 62 UI cues in one 210-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(171);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(27);
+    expect(keys.size).toBe(210);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
@@ -180,6 +180,9 @@ describe('buildManifest', () => {
       'wand_arcane',
       'wand_holy',
       'wand_shadow',
+      'player_eat_food',
+      'player_drink_water',
+      'player_drink_potion',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
@@ -192,7 +195,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(171);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(210);
   });
 });
 

@@ -1,15 +1,29 @@
 import { DELVES, ITEMS, NPCS, QUESTS, questRewardItem } from '../../../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
-import { dist2d, type Entity, type ItemDef, isQuestTurnInNpc } from '../../../sim/types';
+import { craftsForPairTarget } from '../../../sim/professions/archetype';
+import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
+import {
+  dist2d,
+  type Entity,
+  type ItemDef,
+  isQuestTurnInNpc,
+  questObjectiveRequired,
+} from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
+import { archetypeTitleText, craftNameText } from '../../char_window';
+import { decorativeArtImg } from '../../decorative_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
 import { t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
+import { archetypeImageUrl } from '../../profession_art';
+import { buildAttunementPreview } from '../../profession_identity_view';
 import { svgIcon } from '../../ui_icons';
+import { isStationMasterNpc } from '../vendor/train_view';
 import { gossipMenuIsEmpty } from './gossip_menu';
+import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
 
 export interface QuestDialogTextPort {
   npcName(templateId: string): string;
@@ -41,10 +55,13 @@ export interface QuestDialogControllerDeps {
   openChronicles(): void;
   openVendor(npcId: number): void;
   openHeroicVendor(npcId: number): void;
+  openTrain(npcId: number): void;
+  openUnbind(npcId: number): void;
   openMarket(): void;
   openDelveBoard(npcId: number): void;
   openValeCup(): void;
   openCardDuel(): void;
+  onOpenChange(open: boolean): void;
   voice: {
     play(key: string): void;
     isPlaying(): boolean;
@@ -52,15 +69,29 @@ export interface QuestDialogControllerDeps {
   };
 }
 
+interface ProfessionPreviewContent {
+  text: string;
+  crestUrl: string | null;
+}
+
 /** Owns gossip, quest details, shared quest links, focus, and dialogue voice state. */
 export class QuestDialogController {
   private npcId: number | null = null;
   private detailQuestId: string | null = null;
+  // The profession-intro hint visibility as of the last gossip render (null =
+  // no gossip list currently painted): the one identity-driven row in this
+  // dialog, so it is the whole staleness signature refreshIfChanged watches.
+  private lastIntroHintVisible: boolean | null = null;
   private trap: FocusTrapHandle | null = null;
   private openedAt = 0;
   private voiceNpcId: number | null = null;
+  private openState = false;
 
   constructor(private readonly deps: QuestDialogControllerDeps) {}
+
+  get isOpen(): boolean {
+    return this.openState;
+  }
 
   open(npcId: number): void {
     const world = this.deps.world();
@@ -77,6 +108,7 @@ export class QuestDialogController {
       this.deps.openChronicles();
       return;
     }
+    this.beginOpen();
     this.openedAt = this.deps.now();
     this.ensureFocusTrap();
     this.deps.closeTransient();
@@ -88,6 +120,7 @@ export class QuestDialogController {
   openLinked(questId: string, fromPid?: number): void {
     const quest = QUESTS[questId];
     if (!quest) return;
+    this.beginOpen();
     this.npcId = null;
     this.ensureFocusTrap();
     this.deps.closeTransient();
@@ -140,9 +173,14 @@ export class QuestDialogController {
     this.deps.element.style.display = 'none';
     this.npcId = null;
     this.detailQuestId = null;
+    this.lastIntroHintVisible = null;
     this.deps.hideTooltip();
     this.trap?.release(restoreFocus);
     this.trap = null;
+    if (this.openState) {
+      this.openState = false;
+      this.deps.onOpenChange(false);
+    }
   }
 
   refresh(): void {
@@ -150,6 +188,21 @@ export class QuestDialogController {
     const npc = this.deps.world().entities.get(this.npcId);
     if (npc) this.renderGossip(npc);
     else this.close();
+  }
+
+  /** Repaint the open gossip list only when the profession-intro hint's
+   *  visibility flipped under it: online, the cprof identity mirror can land
+   *  AFTER the dialog opened (attunement retires the hint), and no quest
+   *  event fires for that edge. The quest-detail view never shows the hint
+   *  and is left alone; everything else in the gossip list repaints through
+   *  the quest event arms, so an unchanged signature never rebuilds the DOM
+   *  (the dialog holds focus-trapped buttons). */
+  refreshIfChanged(): void {
+    if (this.npcId === null || this.deps.element.style.display !== 'block') return;
+    if (this.detailQuestId !== null || this.lastIntroHintVisible === null) return;
+    const npc = this.deps.world().entities.get(this.npcId);
+    if (!npc) return;
+    if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible) this.refresh();
   }
 
   relocalize(): void {
@@ -194,6 +247,24 @@ export class QuestDialogController {
     }
   }
 
+  private beginOpen(): void {
+    if (this.openState) return;
+    this.openState = true;
+    this.deps.onOpenChange(true);
+  }
+
+  /** The one rule for the intro hint row, shared by the gossip render and the
+   *  staleness probe so the two can never drift. */
+  private introHintVisibleFor(npc: Entity): boolean {
+    const world = this.deps.world();
+    return professionIntroHintVisible(
+      npc.templateId,
+      world.questState(PROF_INTRO_QUEST_ID),
+      world.craftingIdentity.attunedPairs.length > 0,
+      world.stationPlacements,
+    );
+  }
+
   private renderGossip(npc: Entity, closeIfEmpty = false): void {
     const world = this.deps.world();
     const definition = NPCS[npc.templateId];
@@ -211,11 +282,15 @@ export class QuestDialogController {
           (objective, objectiveIndex) =>
             objective.type === 'interact' &&
             objective.targetNpcId === npc.templateId &&
-            progress.counts[objectiveIndex] < objective.count,
+            progress.counts[objectiveIndex] <
+              questObjectiveRequired(QUESTS[progress.questId], progress, objectiveIndex),
         ),
       )
       .map((progress) => progress.questId);
     const hasVendor = npc.vendorItems.length > 0;
+    // Station master (Professions 2.0): the resident master of a
+    // crafting station (stations content masterNpcId) offers recipe training.
+    const hasTraining = isStationMasterNpc(npc.templateId, world.stationPlacements);
     const hasMarket = !!definition?.market;
     const hasHeroicVendor = !!definition?.heroicVendor;
     const hasDelveBoard = Object.values(DELVES).some(
@@ -234,6 +309,7 @@ export class QuestDialogController {
         hasDelveBoard,
         hasVcup: hasValeCup,
         hasCardMaster,
+        hasTraining,
       })
     ) {
       this.close();
@@ -248,6 +324,21 @@ export class QuestDialogController {
     const npcTitle = definition ? this.deps.text.npcTitle(definition.id) : '';
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(npcName)}<span class="quest-muted"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="qd-text">"${esc(definition ? this.deps.text.npcGreeting(definition.id, world.cfg.playerClass, world.player.name) : t('questUi.dialog.greetingFallback'))}"</div>`;
+    // Locked-quest hint row: a profession master's
+    // dialog points a pre-q_prof_intro viewer at the intro quest's giver, so
+    // the Guild trend letter never lands on a greeting-plus-vendor dead end.
+    // Non-interactive, the qd-req hint family; both names arrive through the
+    // text port so they localize like every other dialog line.
+    const introHintVisible = this.introHintVisibleFor(npc);
+    this.lastIntroHintVisible = introHintVisible;
+    if (introHintVisible) {
+      html += `<div class="qd-req" data-prof-intro-hint="1">${esc(
+        t('questUi.dialog.profIntroHint', {
+          name: this.deps.text.npcName(QUESTS[PROF_INTRO_QUEST_ID].giverNpcId),
+          quest: this.deps.text.questTitle(PROF_INTRO_QUEST_ID),
+        }),
+      )}</div>`;
+    }
     for (const questId of interesting) {
       const state = world.questState(questId);
       const icon =
@@ -265,6 +356,13 @@ export class QuestDialogController {
     }
     if (hasVendor) {
       html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+    }
+    if (hasTraining) {
+      html += `<button type="button" class="qd-list-item" data-train="1" aria-label="${esc(t('hudChrome.training.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.training.dialogOption'))}</button>`;
+      // Maker's Bond unbind service (Professions 2.0): every
+      // station master offers it beside training (the same isStationMasterNpc
+      // gate, so the empty-menu check needs no new arm).
+      html += `<button type="button" class="qd-list-item" data-unbind="1" aria-label="${esc(t('hudChrome.unbind.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.unbind.dialogOption'))}</button>`;
     }
     if (hasMarket) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
@@ -297,6 +395,8 @@ export class QuestDialogController {
     });
     this.bindRoute('[data-vendor]', () => this.deps.openVendor(npc.id));
     this.bindRoute('[data-heroic-shop]', () => this.deps.openHeroicVendor(npc.id));
+    this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
+    this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-vcup]', this.deps.openValeCup);
@@ -329,20 +429,111 @@ export class QuestDialogController {
       const progress = world.questLog.get(questId);
       html += `<div class="qd-sub">${esc(t('questUi.detail.objectives'))}</div>`;
       html += quest.objectives
-        .map(
-          (objective, index) =>
-            `<div class="qd-obj">${esc(this.deps.text.progress(this.deps.text.objectiveLabel(questId, index), progress ? Math.min(progress.counts[index], objective.count) : 0, objective.count))}</div>`,
-        )
+        .map((objective, index) => {
+          const required = progress
+            ? questObjectiveRequired(quest, progress, index)
+            : quest.resolvedObjectiveCounts === 'archetypeAmends'
+              ? world.craftingIdentity.amendsRequired
+              : objective.count;
+          return `<div class="qd-obj">${esc(this.deps.text.progress(this.deps.text.objectiveLabel(questId, index), progress ? Math.min(progress.counts[index], required) : 0, required))}</div>`;
+        })
         .join('');
+    }
+    let professionTargets: string[] = [];
+    let professionPreviewContent: ((target: string) => ProfessionPreviewContent) | null = null;
+    let initialProfessionPreview: ProfessionPreviewContent | null = null;
+    if (state === 'available' && quest.completionEffect) {
+      const identity = world.craftingIdentity;
+      professionTargets = professionQuestSelectionTargets(quest, {
+        activeArchetype: identity.activeArchetype,
+        pairedMajor: identity.pairedMajor,
+        hobbyCraft: identity.hobbyCraft,
+        attunedPairs: [...identity.attunedPairs],
+        switchCount: identity.switchCount,
+        amendsProgress: identity.amendsProgress,
+      });
+      const options = professionTargets
+        .map((target) => {
+          const pair = craftsForPairTarget(target);
+          // A pair target leads with its archetype name and keeps both craft
+          // names visible so the choice stays informative, e.g.
+          // "Smith (Weaponcrafting + Armorcrafting)"; a single-craft target
+          // (the hobby-switch quest) is just the craft name.
+          const label = pair
+            ? t('hudChrome.crafting.pairOptionLabel', {
+                pair: archetypeTitleText(target),
+                craftA: craftNameText(pair[0]),
+                craftB: craftNameText(pair[1]),
+              })
+            : craftNameText(target);
+          return `<option value="${esc(target)}">${esc(label)}</option>`;
+        })
+        .join('');
+      professionPreviewContent = (target) => {
+        if (quest.completionEffect?.type === 'switchHobby') {
+          return {
+            text: t('hudChrome.crafting.hobbyPreview', { hobby: craftNameText(target) }),
+            crestUrl: null,
+          };
+        }
+        const preview = buildAttunementPreview(target, identity.craftSkills, identity.switchCount);
+        if (!preview) return { text: '', crestUrl: null };
+        // The pre-commit picture: majors, hobby, and retained-but-dormant
+        // knowledge, PLUS the escalating make-amends return cost (closing the
+        // 2039 gap). Two complete localized sentences joined, the
+        // combo line + status precedent (crafting_window.ts).
+        const base = t('hudChrome.crafting.attunementPreview', {
+          title: archetypeTitleText(preview.target),
+          majorA: craftNameText(preview.majors[0]),
+          majorB: craftNameText(preview.majors[1]),
+          hobby: craftNameText(preview.hobbyCraft),
+        });
+        const returnCost = t('hudChrome.crafting.attunementReturnCost', {
+          cost: this.deps.text.number(preview.returnCost),
+        });
+        return {
+          text: `${base} ${returnCost}`,
+          crestUrl: archetypeImageUrl(preview.target),
+        };
+      };
+      initialProfessionPreview = professionTargets[0]
+        ? professionPreviewContent(professionTargets[0])
+        : { text: t('hudChrome.crafting.noProfessionChoice'), crestUrl: null };
+      html += `<label class="qd-profession-choice">${esc(t('hudChrome.crafting.professionChoice'))}<select data-profession-selection aria-label="${esc(t('hudChrome.crafting.professionChoice'))}">${options}</select></label><div class="qd-profession-preview" data-profession-preview></div>`;
     }
     html += this.rewardsHtml(questId);
     this.deps.element.innerHTML = html;
+    const professionSelect = this.deps.element.querySelector<HTMLSelectElement>(
+      '[data-profession-selection]',
+    );
+    const professionPreview = this.deps.element.querySelector<HTMLElement>(
+      '[data-profession-preview]',
+    );
+    if (professionPreview && initialProfessionPreview) {
+      this.paintProfessionPreview(professionPreview, initialProfessionPreview);
+      // The initial preview is already visible when the dialog opens. Enable
+      // announcements only after that first paint so it does not talk over the
+      // dialog title; subsequent select changes replace this region once.
+      professionPreview.setAttribute('aria-live', 'polite');
+      professionPreview.setAttribute('aria-atomic', 'true');
+    }
+    if (professionSelect && professionPreviewContent && professionPreview) {
+      professionSelect.addEventListener('change', () => {
+        const content = professionPreviewContent?.(professionSelect.value);
+        if (content) this.paintProfessionPreview(professionPreview, content);
+      });
+    }
     this.attachRewardTooltip(questId);
     if (state === 'available') {
       const button = this.makeButton(t('questUi.dialog.accept'));
+      if (quest.completionEffect && professionTargets.length === 0) button.disabled = true;
       button.addEventListener('click', () => {
         const liveWorld = this.deps.world();
-        liveWorld.acceptQuest(questId);
+        const selection = this.deps.element.querySelector<HTMLSelectElement>(
+          '[data-profession-selection]',
+        )?.value;
+        if (selection === undefined) liveWorld.acceptQuest(questId);
+        else liveWorld.acceptQuest(questId, selection);
         liveWorld.reportTelemetry('quest_accept', {
           timeMs: this.deps.now() - this.openedAt,
         });
@@ -395,6 +586,20 @@ export class QuestDialogController {
     button.type = 'button';
     button.textContent = label;
     return button;
+  }
+
+  private paintProfessionPreview(element: HTMLElement, content: ProfessionPreviewContent): void {
+    const copy = this.deps.document.createElement('span');
+    copy.className = 'qd-profession-preview-copy';
+    copy.textContent = content.text;
+    if (!content.crestUrl) {
+      element.replaceChildren(copy);
+      return;
+    }
+    element.replaceChildren(
+      decorativeArtImg(this.deps.document, 'qd-profession-crest', content.crestUrl),
+      copy,
+    );
   }
 
   private bindRoute(selector: string, open: () => void): void {

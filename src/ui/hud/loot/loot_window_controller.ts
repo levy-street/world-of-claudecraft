@@ -1,4 +1,5 @@
-import { ITEMS, MOBS } from '../../../sim/data';
+import type { corpseLootAvailability } from '../../../game/corpse_loot_availability';
+import { ITEMS } from '../../../sim/data';
 import { dist2d, type Entity, type ItemDef } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
@@ -17,6 +18,7 @@ export interface LootWindowControllerDeps {
   element: HTMLElement;
   document: Document;
   world(): IWorld;
+  corpseAvailability(entity: Entity): ReturnType<typeof corpseLootAvailability>;
   closeTransient(): void;
   hideTooltip(): void;
   entityName(entity: Entity): string;
@@ -52,41 +54,52 @@ export class LootWindowController {
     const world = this.deps.world();
     const mob = world.entities.get(mobId);
     if (!mob) return;
-    const componentTags = MOBS[mob.templateId]?.componentTags;
-    const harvestable = !!componentTags?.length && mob.harvestClaimedBy === null;
-    const visibleItems = mob.loot
-      ? mob.loot.items.filter(
-          (stack) => !stack.personalFor || stack.personalFor.includes(world.playerId),
-        )
-      : [];
-    const hasLoot = !!mob.loot && (mob.loot.copper > 0 || visibleItems.length > 0);
-    if (!hasLoot && !harvestable) return;
+    const { componentTags, harvestable, visibleItems, visibleCopper, hasLoot, canOpen } =
+      this.deps.corpseAvailability(mob);
+    if (!canOpen) return;
 
     this.deps.closeTransient();
     this.mobId = mobId;
     this.chestId = null;
     let html = this.titleHtml(this.deps.entityName(mob));
-    if (mob.loot && mob.loot.copper > 0) {
-      html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(mob.loot.copper)}</span></div>`;
+    // visibleCopper, not mob.loot.copper: coin is shared (tap-owned) loot, so
+    // the popup must not advertise a stranger's copper the take would deny.
+    if (visibleCopper > 0) {
+      html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(visibleCopper)}</span></div>`;
     }
     html += visibleItems.map((stack) => this.itemRowHtml(stack)).join('');
     this.deps.element.innerHTML = html;
     this.attachItemTooltips();
 
     if (hasLoot) {
-      this.appendTakeAll(() => {
-        this.deps.world().lootCorpse(mobId);
-        this.close();
-      }, t('hudChrome.loot.takeAllTooltip'));
+      // "Take Loot", not "Take All": the old label promised the harvest too.
+      // The delve-chest arm keeps Take All.
+      this.appendTakeButton(
+        t('hudChrome.loot.takeLootButton'),
+        () => {
+          this.deps.world().lootCorpse(mobId);
+          this.close();
+        },
+        () => esc(t('hudChrome.loot.takeLootTooltip')),
+      );
     }
     if (harvestable && componentTags) {
-      renderCorpseHarvestPicker(this.deps.element, corpseHarvestView(componentTags, new Set()), {
+      // Pre-check the caller's town focus: the same subset an omitted-components
+      // harvest resolves server-side. Deselecting every box still
+      // submits an explicit empty pick, which spreads.
+      const focused = new Set(componentTags.filter((tag) => (world.townFocus[tag] ?? 0) > 0));
+      renderCorpseHarvestPicker(this.deps.element, corpseHarvestView(componentTags, focused), {
         onHarvest: (chosen) => {
           this.deps.world().harvestCorpse(mobId, chosen);
           this.close();
         },
+        attachTooltip: (element, html) => this.deps.attachTooltip(element, html),
       });
     }
+    const hint = this.deps.document.createElement('div');
+    hint.className = 'town-focus-hint';
+    hint.textContent = t('hudChrome.loot.unifiedPressHint');
+    this.deps.element.appendChild(hint);
     this.bindClose();
     this.deps.element.style.display = 'block';
     if (this.deps.document.body.classList.contains('mobile-touch')) {
@@ -107,7 +120,7 @@ export class LootWindowController {
       this.titleHtml(chest ? this.deps.entityName(chest) : t('hudChrome.loot.chestTitle')) +
       items.map((stack) => this.itemRowHtml(stack)).join('');
     this.attachItemTooltips();
-    this.appendTakeAll(() => {
+    this.appendTakeButton(t('itemUi.loot.takeAll'), () => {
       this.deps.world().collectDelveChestLoot(chestId);
       this.close();
     });
@@ -159,12 +172,14 @@ export class LootWindowController {
     });
   }
 
-  private appendTakeAll(onTakeAll: () => void, title?: string): void {
+  private appendTakeButton(label: string, onClick: () => void, tooltip?: () => string): void {
     const button = this.deps.document.createElement('button');
     button.className = 'btn';
-    button.textContent = t('itemUi.loot.takeAll');
-    if (title) button.title = title;
-    button.addEventListener('click', onTakeAll);
+    button.textContent = label;
+    // The shared attachTooltip idiom (hover, mobile long-press, and keyboard
+    // focus), not a native title attribute, so touch players see it too.
+    if (tooltip) this.deps.attachTooltip(button, tooltip);
+    button.addEventListener('click', onClick);
     this.deps.element.appendChild(button);
   }
 

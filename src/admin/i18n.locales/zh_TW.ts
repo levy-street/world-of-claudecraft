@@ -158,6 +158,7 @@ export const zh_TW: Record<string, string> = {
   'stats.uptime': '運作時間',
   'stats.avgTick': '平均tick',
   'stats.serverRss': '伺服器RSS',
+  'stats.playersCap': '玩家上限',
   'online.title': '在線玩家',
   'online.refreshHint': '每5秒重新整理',
   'online.empty': '目前無人在線',

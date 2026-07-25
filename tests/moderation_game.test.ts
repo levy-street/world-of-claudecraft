@@ -60,6 +60,7 @@ type TestFrame = {
     nm: string;
     ack: number;
     party: { members: { pid: number; x: number; z: number }[] };
+    tal?: { alloc: { spec: string | null; rows: Record<number, string> } };
   };
 };
 
@@ -783,5 +784,46 @@ describe('moderator spectate integration', () => {
 
     command(server, moderator, '/unspectate');
     expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
+  });
+
+  // Regression for the /spectate talent-reset bug: the heavy self block
+  // (tal/inv/equip/...) is gated on meta.wireRev vs session.lastWireRev, a
+  // comparison keyed to whichever entity's meta is currently being wired.
+  // Neither talent allocation bumps wireRev here (both start at the sim
+  // default, 0), so without forcing selfHeavyDirty on enter/exit, the
+  // moderator's own 'tal' field silently fails to resend after /unspectate
+  // and the client stays mirrored on the spectated target's talents.
+  it('resends the moderator own talents (not the spectated target) after /unspectate', () => {
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const suspect = joined(server.join(fakeWs(), 2, 102, 'Suspect', 'mage', null));
+    const moderatorMeta = server.sim.meta(moderator.pid);
+    const suspectMeta = server.sim.meta(suspect.pid);
+    if (!moderatorMeta || !suspectMeta) throw new Error('meta missing');
+    moderatorMeta.talents = { spec: 'arcane', rows: { 5: 'arc_r5_arcane_focus' } };
+    suspectMeta.talents = { spec: 'fire', rows: { 5: 'fir_r5_imp_fireball' } };
+
+    // first snapshot as self establishes session.lastWireRev at the
+    // moderator's own (unbumped) wireRev.
+    internals(server).broadcastSnapshots();
+
+    command(server, moderator, '/spectate Suspect');
+    moderatorWs.send.mockClear();
+    internals(server).broadcastSnapshots();
+    const spectateSnap = frames(moderatorWs).find((frame) => frame.t === 'snap');
+    expect(spectateSnap?.self?.tal?.alloc).toEqual(suspectMeta.talents);
+
+    command(server, moderator, '/unspectate');
+    moderatorWs.send.mockClear();
+    internals(server).broadcastSnapshots();
+    const restoredSnap = frames(moderatorWs).find((frame) => frame.t === 'snap');
+    if (!restoredSnap?.self) throw new Error('restored snapshot missing');
+    expect(restoredSnap.self.tal?.alloc).toEqual(moderatorMeta.talents);
   });
 });

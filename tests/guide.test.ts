@@ -13,6 +13,16 @@ import {
   GUIDE_DUNGEONS,
   GUIDE_FAMILIES,
   GUIDE_MODELS,
+  GUIDE_PROF_ARCHETYPES,
+  GUIDE_PROF_CRAFTS,
+  GUIDE_PROF_CURVE,
+  GUIDE_PROF_ECONOMY,
+  GUIDE_PROF_ENCHANTING,
+  GUIDE_PROF_GATHERING,
+  GUIDE_PROF_MASTERWORK,
+  GUIDE_PROF_PAGES,
+  GUIDE_PROF_RING,
+  GUIDE_PROF_STATIONS,
   GUIDE_WARLOCK_PETS,
   GUIDE_ZONES,
 } from '../src/guide/content.generated';
@@ -20,6 +30,7 @@ import { pageFor } from '../src/guide/pages';
 import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
+import { professions as professionsPage } from '../src/guide/pages/professions';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
   GUIDE_BASE,
@@ -32,7 +43,59 @@ import {
 } from '../src/guide/routes';
 import { buildIndex, rank } from '../src/guide/search';
 import { DEEDS } from '../src/sim/content/deeds';
-import { CAMPS, MOBS } from '../src/sim/data';
+import { ENCHANTS } from '../src/sim/content/enchants';
+import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import {
+  CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
+  CRAFT_RING,
+  CRAFT_THROTTLE_MAX_PER_WINDOW,
+  CRAFT_THROTTLE_WINDOW_SECONDS,
+  GATHERING_PROFESSION_IDS,
+  GATHERING_PROFESSIONS,
+  PERK_THRESHOLDS,
+  STATION_TYPE_BY_CRAFT,
+  STATIONS,
+} from '../src/sim/content/professions';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
+import {
+  WORK_ORDER_CADENCE_TICKS,
+  WORK_ORDER_PAYOUT_FRACTION,
+} from '../src/sim/professions/cadence';
+import { UNBIND_FEE_BY_QUALITY_TIER } from '../src/sim/professions/commission';
+import {
+  ARMOR_SECONDARY_BY_TYPE,
+  TIMBER_WEAPON_TYPES,
+} from '../src/sim/professions/disenchant_reagents';
+import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/enchanting';
+import { FISHING_GAIN_SCHEDULE } from '../src/sim/professions/fishing';
+import {
+  GATHER_RARE_EVENT_CHANCE,
+  GATHER_RARE_EVENT_YIELD_MULT,
+} from '../src/sim/professions/gather_events';
+import {
+  GATHER_CAST_BAND_REDUCTION_SEC,
+  GATHER_CAST_BASE_SEC,
+  GATHER_CAST_FLOOR_SEC,
+  GATHER_CAST_TOOL_TIER_REDUCTION_SEC,
+  GATHER_GAIN_TIER_STEP,
+} from '../src/sim/professions/gathering';
+import {
+  MASTERWORK_BASE_CHANCE,
+  MASTERWORK_CHANCE_CAP,
+  MASTERWORK_PER_TIER_ABOVE_CHANCE,
+  MASTERWORK_SIGNED_CHANCE,
+  MASTERWORK_SPECIALIZATION_CHANCE,
+} from '../src/sim/professions/masterwork';
+import { SALVAGE_MATERIAL_BY_QUALITY } from '../src/sim/professions/salvage';
+import { TRAINING_FEE_BY_TIER, trainingFeeFor } from '../src/sim/professions/training';
+import {
+  TIER_SKILL_STEP,
+  tierForSkill,
+  tierProgressMultiplier,
+} from '../src/sim/professions/wheel';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
@@ -1048,5 +1111,637 @@ describe('Guide corrected-prose pins', () => {
   it('keeps the delve death exception on the combat death rules', () => {
     setLanguage('en');
     expect(t('guide.combat.deathBody' as never)).toContain('Delves are the exception');
+  });
+});
+
+// ============================================================================
+// Professions reference accuracy (Professions 2.0 wiki arm).
+//
+// NUMERIC-TRANSPARENCY CARVE-OUT (a maintainer ruling):
+// the professions sections of the wiki publish EXACT numbers, skill
+// requirements, gain-state boundaries, band thresholds, caps, fees,
+// rare-event odds, and vendor prices, because a crafting reference that hides
+// its numbers is useless. This carve-out is scoped to the GUIDE_PROF_*
+// sections ONLY: the delve/bestiary no-digit spoiler guards above stay
+// untouched and keep applying to their own sections, and narrative content
+// remains spoiler-light everywhere. Every published number below maps back to
+// the live sim def, so the wiki can never drift from the game.
+// ============================================================================
+describe('Guide professions generated content accuracy', () => {
+  const EARNABLE_CRAFT_IDS = [
+    'engineering',
+    'alchemy',
+    'cooking',
+    'leatherworking',
+    'tailoring',
+    'enchanting',
+    'weaponcrafting',
+    'armorcrafting',
+  ];
+
+  it('covers the full ring, honest about the two wave-one content-empty crafts', () => {
+    expect(GUIDE_PROF_RING.map((c) => c.id)).toEqual(CRAFT_RING.map((c) => c.id));
+    for (const c of GUIDE_PROF_RING) {
+      const def = CRAFT_RING.find((r) => r.id === c.id);
+      expect(c.name).toBe(def?.name);
+      expect(c.pole).toBe(def?.pole);
+      expect(c.maxSkill).toBe(def?.maxSkill);
+      expect(c.maxSkill).toBe(125); // every wave-one craft caps at 125
+    }
+    expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual([
+      'inscription',
+      'jewelcrafting',
+    ]);
+    expect(GUIDE_PROF_CRAFTS.map((c) => c.id)).toEqual(EARNABLE_CRAFT_IDS);
+  });
+
+  it('emits only allowlisted fields on every craft and recipe row (the GUIDE_DEEDS pattern)', () => {
+    const craftFields = new Set([
+      'id',
+      'name',
+      'pole',
+      'maxSkill',
+      'station',
+      'masters',
+      'specialization',
+      'recipes',
+    ]);
+    const recipeFields = new Set([
+      'id',
+      'name',
+      'skillReq',
+      'tier',
+      'station',
+      'acquisition',
+      'feeCopper',
+      'materials',
+      'output',
+      'combo',
+      'gain',
+    ]);
+    for (const c of GUIDE_PROF_CRAFTS) {
+      for (const k of Object.keys(c)) {
+        expect(craftFields.has(k), `craft "${c.id}" emitted unexpected field "${k}"`).toBe(true);
+      }
+      for (const r of c.recipes) {
+        for (const k of Object.keys(r)) {
+          expect(recipeFields.has(k), `recipe "${r.id}" emitted unexpected field "${k}"`).toBe(
+            true,
+          );
+        }
+        for (const m of r.materials) expect(Object.keys(m).sort()).toEqual(['count', 'name']);
+        expect(Object.keys(r.output).sort()).toEqual(['count', 'name', 'quality']);
+        if (r.combo) expect(Object.keys(r.combo).sort()).toEqual(['crafts', 'minTier']);
+        expect(Object.keys(r.gain).sort()).toEqual(['minimalAt', 'reducedAt', 'zeroAt']);
+      }
+    }
+  });
+
+  it('maps every recipe row back to the sim def with matching numbers', () => {
+    for (const c of GUIDE_PROF_CRAFTS) {
+      const simIds = ALL_RECIPES.filter((r) => r.professionId === c.id)
+        .map((r) => r.id)
+        .sort();
+      expect(c.recipes.map((r) => r.id).sort()).toEqual(simIds);
+      for (const row of c.recipes) {
+        const def = ALL_RECIPES.find((r) => r.id === row.id);
+        expect(def, `recipe row "${row.id}" has no sim def`).toBeDefined();
+        if (!def) continue;
+        expect(row.skillReq).toBe(def.skillReq);
+        expect(row.tier).toBe(tierForSkill(def.skillReq));
+        expect(row.station).toBe(def.stationType ?? null);
+        expect(row.acquisition).toBe(def.acquisition?.includes('trainer') ? 'trainer' : 'known');
+        expect(row.feeCopper).toBe(def.acquisition?.includes('trainer') ? trainingFeeFor(def) : 0);
+        expect(row.materials).toEqual(
+          def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
+        );
+        expect(row.output.name).toBe(ITEMS[def.resultItemId].name);
+        expect(row.output.count).toBe(def.resultCount);
+        expect(row.output.quality).toBe(ITEMS[def.resultItemId].quality ?? 'common');
+        if (def.comboRequirement) {
+          expect(row.combo).toEqual({
+            crafts: [def.comboRequirement.craftA, def.comboRequirement.craftB],
+            minTier: def.comboRequirement.minTier,
+          });
+        } else {
+          expect(row.combo).toBeNull();
+        }
+        // The gain boundaries are DECISIVE against the real curve: one skill
+        // point below each boundary still pays the higher rate, and the
+        // boundary itself drops to exactly 0.5 / 0.25 / 0.
+        const rTier = tierForSkill(def.skillReq);
+        expect(tierProgressMultiplier(tierForSkill(row.gain.reducedAt - 1), rTier)).toBe(1);
+        expect(tierProgressMultiplier(tierForSkill(row.gain.reducedAt), rTier)).toBe(0.5);
+        expect(tierProgressMultiplier(tierForSkill(row.gain.minimalAt), rTier)).toBe(0.25);
+        expect(tierProgressMultiplier(tierForSkill(row.gain.zeroAt), rTier)).toBe(0);
+      }
+    }
+  });
+
+  it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {
+    // The rare-tier warblade: trainer-taught at the forge, 1 gold to learn,
+    // gain fading at 75 / 100 / 125 (tier 2 recipe, TIER_SKILL_STEP 25).
+    const wc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting');
+    const warblade = wc?.recipes.find((r) => r.id === 'recipe_thorium_warblade');
+    expect(warblade?.name).toBe('Osmium Warblade');
+    expect(warblade?.skillReq).toBe(50);
+    expect(warblade?.station).toBe('forge');
+    expect(warblade?.acquisition).toBe('trainer');
+    expect(warblade?.feeCopper).toBe(10000);
+    expect(warblade?.gain).toEqual({ reducedAt: 75, minimalAt: 100, zeroAt: 125 });
+    expect(TIER_SKILL_STEP).toBe(25);
+    // A grandfathered tool recipe: known to everyone, no fee, tier 3.
+    const eng = GUIDE_PROF_CRAFTS.find((c) => c.id === 'engineering');
+    const pick = eng?.recipes.find((r) => r.id === 'recipe_thorium_mining_pick');
+    expect(pick?.acquisition).toBe('known');
+    expect(pick?.feeCopper).toBe(0);
+    expect(pick?.gain).toEqual({ reducedAt: 100, minimalAt: 125, zeroAt: 150 });
+    // Specialization: skill 75, 20 percent material discount, from content.
+    for (const c of GUIDE_PROF_CRAFTS) {
+      expect(c.specialization.at).toBe(PERK_THRESHOLDS[c.id].specializedSkillThreshold);
+      expect(c.specialization.at).toBe(75);
+      expect(c.specialization.materialDiscountPct).toBe(
+        PERK_THRESHOLDS[c.id].materialDiscountPct * 100,
+      );
+      expect(c.specialization.materialDiscountPct).toBe(20);
+    }
+  });
+
+  it('grounds each craft station and its resident masters in the sim tables', () => {
+    for (const c of GUIDE_PROF_CRAFTS) {
+      expect(c.station).toBe(STATION_TYPE_BY_CRAFT[c.id] ?? null);
+      const simMasters = STATIONS.filter((s) => s.type === c.station);
+      expect(c.masters.length).toBe(c.station ? simMasters.length : 0);
+      for (const m of c.masters) {
+        const npc = Object.values(NPCS).find((n) => n.name === m.name);
+        expect(npc, `master "${m.name}" is not a real NPC`).toBeDefined();
+      }
+    }
+    // Enchanting has no station and no station masters (content fact).
+    const ench = GUIDE_PROF_CRAFTS.find((c) => c.id === 'enchanting');
+    expect(ench?.station).toBeNull();
+    expect(ench?.masters).toEqual([]);
+    // The stations block mirrors the sim table (six stations, radius 20).
+    expect(GUIDE_PROF_STATIONS.radius).toBe(20);
+    expect(GUIDE_PROF_STATIONS.stations.map((s) => s.id)).toEqual(STATIONS.map((s) => s.id));
+    for (const s of GUIDE_PROF_STATIONS.stations) {
+      const def = STATIONS.find((d) => d.id === s.id);
+      expect(s.type).toBe(def?.type);
+      const master = def ? NPCS[def.masterNpcId] : undefined;
+      expect(s.master?.name).toBe(master?.name);
+    }
+  });
+
+  it('lists the ten archetype pairs with ring-true craft ids', () => {
+    expect(GUIDE_PROF_ARCHETYPES).toHaveLength(10);
+    const ringIds = new Set(CRAFT_RING.map((c) => c.id));
+    for (const a of GUIDE_PROF_ARCHETYPES) {
+      expect(a.pairId).toBe(`${a.crafts[0]}+${a.crafts[1]}`);
+      for (const id of a.crafts) expect(ringIds.has(id), `pair craft "${id}" off-ring`).toBe(true);
+      // Every pair title resolves as a real localized key.
+      expect(t(`hudChrome.archetypePair.${a.pairId}` as never).length).toBeGreaterThan(0);
+    }
+    expect(GUIDE_PROF_ARCHETYPES.some((a) => a.pairId === 'weaponcrafting+armorcrafting')).toBe(
+      true,
+    );
+  });
+});
+
+describe('Guide professions gathering accuracy', () => {
+  it('covers the four gathering professions with grounded caps and bands', () => {
+    expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([...GATHERING_PROFESSION_IDS]);
+    for (const g of GUIDE_PROF_GATHERING) {
+      expect(g.maxSkill).toBe(
+        GATHERING_PROFESSIONS[g.id as keyof typeof GATHERING_PROFESSIONS].maxSkill,
+      );
+      expect(g.bands).toEqual([0, 100, 200]);
+    }
+    expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.maxSkill).toBe(100);
+    expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.maxSkill).toBe(200);
+  });
+
+  it('aggregates every world node into its zone row (tool tier = node tier)', () => {
+    const typeFor: Record<string, string> = { mining: 'ore', logging: 'wood', herbalism: 'herb' };
+    for (const g of GUIDE_PROF_GATHERING) {
+      if (g.id === 'fishing') continue;
+      const simNodes = GATHER_NODES.filter((n) => n.type === typeFor[g.id]);
+      const total = (g.nodes ?? []).reduce((sum, row) => sum + row.count, 0);
+      expect(total, `${g.id} node count drifted`).toBe(simNodes.length);
+      for (const row of g.nodes ?? []) {
+        expect(row.toolTier).toBe(row.tier);
+        const zone = ZONES.find((z) => z.name === row.zone);
+        expect(zone, `node row zone "${row.zone}" is not a real zone`).toBeDefined();
+        const simCount = simNodes.filter(
+          (n) => n.zoneId === zone?.id && n.tier === row.tier,
+        ).length;
+        expect(row.count).toBe(simCount);
+      }
+      expect(g.respawnSeconds).toBe(120);
+    }
+    // Spot pin: Thornpeak ships one tier-3 node per gathering type.
+    const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
+    const t3 = mining?.nodes?.find((n) => n.tier === 3);
+    expect(t3).toEqual({
+      zone: 'Thornpeak Heights',
+      tier: 3,
+      toolTier: 3,
+      count: 1,
+      material: 'Osmium Ore',
+    });
+  });
+
+  it('mirrors the tool and rod ladders with live vendor prices', () => {
+    // Every gatherTool ItemDef appears exactly once, in its own profession's
+    // ladder, with the def's tier/quality/buyValue.
+    for (const [itemId, def] of Object.entries(ITEMS)) {
+      const use = def.use;
+      if (use?.type !== 'gatherTool') continue;
+      const ladder = GUIDE_PROF_GATHERING.find((g) => g.id === use.professionId);
+      const rows = (ladder?.tools ?? []).filter((tool) => tool.name === def.name);
+      expect(rows, `tool "${itemId}" missing from its ladder`).toHaveLength(1);
+      expect(rows[0].tier).toBe(use.tier);
+      expect(rows[0].quality).toBe(def.quality ?? 'common');
+      expect(rows[0].priceCopper).toBe(def.buyValue ?? null);
+      if (def.buyValue != null) {
+        const stocked = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId));
+        expect(stocked, `vendor tool "${itemId}" is stocked by no NPC`).toBe(true);
+        expect(rows[0].vendors.length).toBeGreaterThan(0);
+      } else {
+        expect(rows[0].craftedBy).toBe(
+          ALL_RECIPES.find((r) => r.resultItemId === itemId)?.professionId,
+        );
+      }
+    }
+    // The rod ladder: simple pole tier 1, Ironreel t2 at 60c, Silverstream t3
+    // at 150c, all at Trader Wilkes.
+    const fishing = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing');
+    expect(fishing?.tools.map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
+      ['Simple Fishing Pole', 1, 20],
+      ['Ironreel Fishing Rod', 2, 60],
+      ['Silverstream Fishing Rod', 3, 150],
+    ]);
+    for (const rod of fishing?.tools ?? []) {
+      expect(
+        rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
+      ).toBe(true);
+    }
+  });
+
+  it('publishes the exact fishing rhythm, gain schedule, and per-band tables', () => {
+    const f = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.fishing;
+    expect(f).toBeDefined();
+    if (!f) return;
+    expect(f.biteMinSec).toBe(3);
+    expect(f.biteMaxSec).toBe(8);
+    expect(f.rodBiteReductionSec).toBe(1.5);
+    expect(f.reelWindowSec).toBe(3);
+    expect(f.reelRodBonusSec).toBe(0.75);
+    expect(f.sessionCapSec).toBe(15);
+    expect(f.schedule).toEqual(
+      FISHING_GAIN_SCHEDULE.map((row) => ({ below: row.belowProficiency, gain: row.gain })),
+    );
+    expect(f.schedule).toEqual([
+      { below: 50, gain: 1 },
+      { below: 100, gain: 0.5 },
+      { below: 150, gain: 0.1 },
+      { below: 200, gain: 0.02 },
+    ]);
+    expect(f.junkCutoff).toBe(100);
+    expect(f.rareCatch).toBe('Sunglint Koi');
+    // Band tables mirror the sim tables row for row; weights sum to exactly
+    // 100 per table, so the published pct IS the real probability; band b
+    // needs rod tier b + 1.
+    expect(f.bandTables).toHaveLength(FISHING_TABLES_BY_BAND.length);
+    for (const [band, byZone] of FISHING_TABLES_BY_BAND.entries()) {
+      const pub = f.bandTables[band];
+      expect(pub.rodTierRequired).toBe(band + 1);
+      expect(pub.minProficiency).toBe([0, 100, 200][band]);
+      for (const [zoneId, rows] of Object.entries(byZone)) {
+        const zoneName = ZONES.find((z) => z.id === zoneId)?.name ?? zoneId;
+        const pubZone = pub.zones.find((z) => z.zone === zoneName);
+        expect(pubZone, `band ${band} missing zone ${zoneId}`).toBeDefined();
+        expect(pubZone?.rows).toEqual(
+          rows.map((r) => ({
+            name: r.itemId ? ITEMS[r.itemId].name : null,
+            pct: r.weight,
+            quality: r.itemId ? (ITEMS[r.itemId].quality ?? 'common') : null,
+          })),
+        );
+        expect(pubZone?.rows.reduce((sum, r) => sum + r.pct, 0)).toBe(100);
+      }
+    }
+    // The koi odds stay flat across bands: 3 percent in the Vale and marsh,
+    // 4 in Thornpeak (its odds never scale with skill).
+    for (const band of f.bandTables) {
+      for (const zone of band.zones) {
+        const koi = zone.rows.find((r) => r.name === 'Sunglint Koi');
+        expect(koi?.pct).toBe(zone.zone === 'Thornpeak Heights' ? 4 : 3);
+      }
+    }
+  });
+
+  it('publishes the exact shared curve, cast, and rare-event numbers', () => {
+    const c = GUIDE_PROF_CURVE;
+    expect(c.tierStep).toBe(TIER_SKILL_STEP);
+    expect(c.multipliers).toEqual({ full: 1, reduced: 0.5, minimal: 0.25, none: 0 });
+    expect(c.gatherTierStep).toBe(GATHER_GAIN_TIER_STEP);
+    expect(c.cast).toEqual({
+      baseSec: GATHER_CAST_BASE_SEC,
+      floorSec: GATHER_CAST_FLOOR_SEC,
+      toolTierReductionSec: GATHER_CAST_TOOL_TIER_REDUCTION_SEC,
+      bandReductionSec: GATHER_CAST_BAND_REDUCTION_SEC,
+    });
+    expect(c.cast).toEqual({
+      baseSec: 2.5,
+      floorSec: 1.5,
+      toolTierReductionSec: 0.4,
+      bandReductionSec: 0.15,
+    });
+    expect(c.rareEvent.oneIn).toBe(Math.round(1 / GATHER_RARE_EVENT_CHANCE));
+    expect(c.rareEvent.oneIn).toBe(90);
+    expect(c.rareEvent.yieldMult).toBe(GATHER_RARE_EVENT_YIELD_MULT);
+    expect(c.rareEvent.yieldMult).toBe(5);
+    expect(c.rareEvent.flavors).toEqual({
+      ore: 'pristine_vein',
+      wood: 'ancient_heartwood',
+      herb: 'moonlit_bloom',
+    });
+    // The corpse specimen chance: the rare+ share of the corpse rarity roll
+    // at its fixed baseline (40 * 0.4 / 100 = 16 percent).
+    expect(c.specimenChancePct).toBe(16);
+  });
+});
+
+describe('Guide professions enchanting and economy accuracy', () => {
+  it('mirrors the enchant table, tiered structurally from the reagents', () => {
+    const e = GUIDE_PROF_ENCHANTING;
+    expect(e.enchants.map((row) => row.id).sort()).toEqual(Object.keys(ENCHANTS).sort());
+    for (const row of e.enchants) {
+      const def = ENCHANTS[row.id];
+      expect(row.name).toBe(def.name);
+      expect(row.slot).toBe(def.itemSlot);
+      expect(row.reagents).toEqual(
+        def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
+      );
+      expect(row.bonus).toEqual(
+        Object.entries(def.statBonus).map(([stat, value]) => ({ stat, value })),
+      );
+      // Tier is structural: shard = Greater, typed secondary = Runed.
+      const hasShard = def.reagents.some((g) => g.itemId === 'arcane_shard');
+      expect(row.tier === 'greater').toBe(hasShard);
+    }
+    // The five Runed consumer enchants (the only typed-secondary sink).
+    expect(
+      e.enchants
+        .filter((row) => row.tier === 'runed')
+        .map((row) => row.id)
+        .sort(),
+    ).toEqual([
+      'enchant_chest_runeweave',
+      'enchant_helmet_runed_links',
+      'enchant_legs_runed_hide',
+      'enchant_weapon_runed_edge',
+      'enchant_weapon_runed_focus',
+    ]);
+    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(6);
+  });
+
+  it('mirrors the disenchant, typed-secondary, and salvage yield maps', () => {
+    const e = GUIDE_PROF_ENCHANTING;
+    expect(e.disenchantByQuality).toEqual(
+      Object.entries(DISENCHANT_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
+        quality,
+        material: ITEMS[m].name,
+      })),
+    );
+    expect(e.disenchantByQuality).toEqual([
+      { quality: 'common', material: 'Chime Dust' },
+      { quality: 'uncommon', material: 'Chime Dust' },
+      { quality: 'rare', material: 'Chime Essence' },
+      { quality: 'epic', material: 'Chime Shard' },
+      { quality: 'legendary', material: 'Chime Shard' },
+    ]);
+    expect(e.typedSecondaries.armor).toEqual(
+      Object.entries(ARMOR_SECONDARY_BY_TYPE).map(([armorType, m]) => ({
+        armorType,
+        material: ITEMS[m].name,
+      })),
+    );
+    expect(e.typedSecondaries.meleeWeapons).toBe(ITEMS.resonant_steel.name);
+    expect(e.typedSecondaries.timberWeapons.material).toBe(ITEMS.resonant_timber.name);
+    expect(e.typedSecondaries.timberWeapons.families).toEqual([...TIMBER_WEAPON_TYPES].sort());
+    expect(e.typedSecondaries.counts).toEqual({ rare: 1, epicMin: 1, epicMax: 2 });
+    expect(e.salvageByQuality).toEqual(
+      Object.entries(SALVAGE_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
+        quality,
+        material: ITEMS[m].name,
+      })),
+    );
+  });
+
+  it('publishes the exact fees, throttle, masterwork odds, and market cut', () => {
+    const e = GUIDE_PROF_ECONOMY;
+    expect(e.craftFeeCopperPerBudgetPoint).toBe(CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
+    expect(e.craftFeeCopperPerBudgetPoint).toBe(2);
+    expect(e.actionThrottle).toEqual({
+      windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
+      maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
+    });
+    expect(e.actionThrottle).toEqual({ windowSeconds: 60, maxActions: 10 });
+    expect(e.marketCutPct).toBe(Math.round(MARKET_CUT * 100));
+    expect(e.marketCutPct).toBe(5);
+    expect(e.listingDepositCopper).toBe(MARKET_LISTING_DEPOSIT_COPPER);
+    expect(e.listingDepositCopper).toBe(0);
+    expect(e.trainingFeeCopperByTier).toEqual([...TRAINING_FEE_BY_TIER]);
+    expect(e.trainingFeeCopperByTier).toEqual([0, 2500, 10000, 40000, 160000]);
+    expect(e.unbindFeeCopper).toEqual({
+      uncommon: UNBIND_FEE_BY_QUALITY_TIER[0],
+      rare: UNBIND_FEE_BY_QUALITY_TIER[1],
+      epic: UNBIND_FEE_BY_QUALITY_TIER[2],
+    });
+    expect(e.unbindFeeCopper).toEqual({ uncommon: 2500, rare: 10000, epic: 40000 });
+    const mw = GUIDE_PROF_MASTERWORK;
+    expect(mw.basePct).toBe(Math.round(MASTERWORK_BASE_CHANCE * 100));
+    expect(mw.perTierAbovePct).toBe(Math.round(MASTERWORK_PER_TIER_ABOVE_CHANCE * 100));
+    expect(mw.signedReagentPct).toBe(Math.round(MASTERWORK_SIGNED_CHANCE * 100));
+    expect(mw.specializedPct).toBe(Math.round(MASTERWORK_SPECIALIZATION_CHANCE * 100));
+    expect(mw.capPct).toBe(Math.round(MASTERWORK_CHANCE_CAP * 100));
+    expect(mw).toEqual({
+      basePct: 3,
+      perTierAbovePct: 1,
+      signedReagentPct: 2,
+      specializedPct: 3,
+      capPct: 15,
+    });
+  });
+
+  it('lists every work order on the shared cadence, coin matching the payout formula', () => {
+    const wo = GUIDE_PROF_ECONOMY.workOrders;
+    expect(wo.cadenceMinutes).toBe(WORK_ORDER_CADENCE_TICKS / 20 / 60);
+    expect(wo.cadenceMinutes).toBe(30);
+    // Literal arm first so the constant-derived checks below are never
+    // self-referential: the fraction itself is the pinned contract.
+    expect(WORK_ORDER_PAYOUT_FRACTION).toBe(0.5);
+    expect(wo.payoutPctOfVendorValue).toBe(WORK_ORDER_PAYOUT_FRACTION * 100);
+    expect(wo.payoutPctOfVendorValue).toBe(50);
+    const simOrders = Object.values(QUESTS).filter(
+      (q) =>
+        q.repeatCadenceTicks === WORK_ORDER_CADENCE_TICKS &&
+        (q.objectives ?? []).length > 0 &&
+        q.objectives.every((o) => o.type === 'collect'),
+    );
+    expect(simOrders.length).toBeGreaterThanOrEqual(6);
+    expect(wo.orders.map((o) => o.id).sort()).toEqual(simOrders.map((q) => q.id).sort());
+    for (const order of wo.orders) {
+      const quest = QUESTS[order.id];
+      const obj = quest.objectives[0];
+      expect(obj.type).toBe('collect');
+      if (obj.type !== 'collect') continue;
+      expect(order.name).toBe(quest.name);
+      expect(order.master).toBe(NPCS[quest.giverNpcId]?.name ?? '');
+      expect(order.count).toBe(obj.count);
+      expect(order.material).toBe(ITEMS[obj.itemId].name);
+      // The payout formula, from the sim's own constant
+      // (its 0.5 value is literal-pinned above).
+      const vendorValue = (ITEMS[obj.itemId].sellValue ?? 0) * obj.count;
+      expect(order.coinCopper, `work order "${order.id}" coin off-formula`).toBe(
+        Math.floor(WORK_ORDER_PAYOUT_FRACTION * vendorValue),
+      );
+      expect(order.coinCopper).toBe(quest.copperReward ?? 0);
+    }
+  });
+});
+
+describe('Guide professions pages and routes', () => {
+  const ctx = (params: string[]) => ({
+    params,
+    sub: 'professions',
+    titleKey: 'guide.nav.professions' as const,
+  });
+
+  it('derives the detail-page list from the generated data', () => {
+    expect(GUIDE_PROF_PAGES).toEqual([
+      ...GUIDE_PROF_CRAFTS.map((c) => c.id),
+      ...GUIDE_PROF_GATHERING.map((g) => g.id),
+      'economy',
+      'faq',
+    ]);
+  });
+
+  it('renders every detail page with exactly one h1 and real generated tables', () => {
+    setLanguage('en');
+    for (const id of GUIDE_PROF_PAGES) {
+      const html = professionsPage.render(ctx([id]));
+      expect((html.match(/<h1>/g) ?? []).length, `page "${id}" h1 count`).toBe(1);
+      expect(html).not.toContain('guide-notfound');
+    }
+    // The craft page really renders its recipe rows.
+    const weapon = professionsPage.render(ctx(['weaponcrafting']));
+    expect(weapon).toContain('Osmium Warblade');
+    expect((weapon.match(/class="guide-prof-recipe/g) ?? []).length).toBe(
+      GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting')?.recipes.length,
+    );
+    // The enchanting route rides the craft module with its own sections.
+    const ench = professionsPage.render(ctx(['enchanting']));
+    expect(ench).toContain('Enchant Weapon - Runed Edge');
+    expect(ench).toContain('Chime Shard');
+    expect(ench).toContain('id="prof-disenchant"');
+    // The fishing page renders all three band tables and the koi.
+    const fishing = professionsPage.render(ctx(['fishing']));
+    expect(fishing).toContain('Sunglint Koi');
+    expect(fishing).toContain('id="fish-band-2"');
+    // The economy page renders the work orders.
+    const econ = professionsPage.render(ctx(['economy']));
+    expect(econ).toContain('Forge Work Order');
+    // An unknown id renders the inline not-found, never a blank page.
+    expect(professionsPage.render(ctx(['nonsense']))).toContain('guide-notfound');
+  });
+
+  it('rewrites the overview into the hub: ring cards, links, and honesty about empty crafts', () => {
+    setLanguage('en');
+    const html = professionsPage.render(ctx([]));
+    expect((html.match(/<h1>/g) ?? []).length).toBe(1);
+    for (const id of GUIDE_PROF_PAGES) {
+      expect(html, `overview missing link to "${id}"`).toContain(
+        `href="${hrefFor(`professions/${id}`)}"`,
+      );
+    }
+    // The two content-empty crafts appear but do NOT link anywhere.
+    expect(html).not.toContain(`href="${hrefFor('professions/jewelcrafting')}"`);
+    expect(html).not.toContain(`href="${hrefFor('professions/inscription')}"`);
+    expect(html).toContain(t('guide.professions.comingSoon'));
+    // All ten archetype pair titles render.
+    for (const a of GUIDE_PROF_ARCHETYPES) {
+      expect(html).toContain(t(`hudChrome.archetypePair.${a.pairId}` as never));
+    }
+  });
+
+  it('lists every professions detail page in the sitemap', () => {
+    const origin = 'https://worldofclaudecraft.com';
+    for (const id of GUIDE_PROF_PAGES) {
+      const loc = `${origin}${hrefFor(`professions/${id}`)}`;
+      expect(sitemapXml, `sitemap missing professions page "${id}"`).toContain(`<loc>${loc}</loc>`);
+    }
+  });
+
+  it('indexes the professions detail pages in site search', () => {
+    setLanguage('en');
+    const index = buildIndex();
+    expect(index.some((e) => e.href === hrefFor('professions/weaponcrafting'))).toBe(true);
+    expect(index.some((e) => e.href === hrefFor('professions/fishing'))).toBe(true);
+    const hits = rank(index, 'weaponcrafting');
+    expect(hits.some((e) => e.href === hrefFor('professions/weaponcrafting'))).toBe(true);
+  });
+
+  it('resolves the new professions keys in English', () => {
+    setLanguage('en');
+    for (const k of [
+      'guide.professions.ringHeading',
+      'guide.professions.ringWaveNote',
+      'guide.professions.gatherHubHeading',
+      'guide.professions.archetypesHeading',
+      'guide.professions.curveHeading',
+      'guide.professions.provenanceHeading',
+      'guide.professions.stationsHeading',
+      'guide.profPages.back',
+      'guide.profPages.recipesHeading',
+      'guide.profPages.masteryHeading',
+      'guide.profPages.masterworkHeading',
+      'guide.profPages.trainingHeading',
+      'guide.profPages.specializationHeading',
+      'guide.profPages.ench.disenchantHeading',
+      'guide.profPages.ench.enchantsHeading',
+      'guide.profPages.ench.salvageHeading',
+      'guide.profPages.rhythmHeading',
+      'guide.profPages.nodesHeading',
+      'guide.profPages.toolsHeading',
+      'guide.profPages.bandsHeading',
+      'guide.profPages.rareHeading',
+      'guide.profPages.fish.biteHeading',
+      'guide.profPages.fish.tablesHeading',
+      'guide.profPages.econ.title',
+      'guide.profPages.econ.feesHeading',
+      'guide.profPages.econ.workOrdersHeading',
+      'guide.profPages.faq.title',
+    ]) {
+      expect(t(k as never).length, k).toBeGreaterThan(0);
+    }
+    for (const c of GUIDE_PROF_CRAFTS) {
+      expect(t(`guide.profPages.craftIntro.${c.id}` as never).length).toBeGreaterThan(0);
+    }
+    for (const g of GUIDE_PROF_GATHERING) {
+      expect(t(`guide.profPages.gatherIntro.${g.id}` as never).length).toBeGreaterThan(0);
+    }
+    for (let n = 1; n <= 8; n += 1) {
+      expect(t(`guide.profPages.faq.q${n}` as never).length).toBeGreaterThan(0);
+      expect(t(`guide.profPages.faq.a${n}` as never).length).toBeGreaterThan(0);
+    }
+    // Format keys stay translator-controlled, pinned as literals.
+    expect(t('guide.profPages.matFmt' as never, { name: 'Copper Ore', count: '4' })).toBe(
+      'Copper Ore x4',
+    );
+    expect(
+      t('guide.profPages.gainFmt' as never, { reduced: '75', minimal: '100', zero: '125' }),
+    ).toBe('75 / 100 / 125');
   });
 });

@@ -5,6 +5,7 @@ import type { GroundAoE } from '../src/sim/entity_roster';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { OPEN_FIELD, placePlayerInOpenField } from './helpers/open_field';
 
 // Ground-targeted casting primitive (docs/design/arpg-spell-mechanics.md), exercised
 // through Flamestrike (mage, targetMode 'position', range 30). The deterministic sim
@@ -21,15 +22,20 @@ function place(sim: Sim, id: number, x: number, z: number): void {
 function makeMage(): { sim: Sim; pid: number } {
   const sim = new Sim({ seed: 7, playerClass: 'mage', noPlayer: true });
   const pid = sim.addPlayer('mage', 'Mag');
-  sim.setPlayerLevel(20, pid); // learns Flamestrike (learnLevel 20)
+  placePlayerInOpenField(sim, pid);
+  sim.setPlayerLevel(20, pid); // plenty of level for Flamestrike
+  // The mage unify spec-gated Flamestrike into the fire kit (specs: ['fire']).
+  if (!sim.setSpec('fire', pid)) throw new Error('no fire spec');
   const me = sim.entities.get(pid);
   if (!me) throw new Error('no mage');
   me.resource = 9999; // plenty of mana for the cast
   return { sim, pid };
 }
 
-// Flamestrike is an instant aimed BURST (aoeDamage at the clamped point plus a
+// Flamestrike is an aimed BURST (aoeDamage at the clamped point plus a
 // radius-carrying spellfxAt for the impact ring), not a lingering ground zone.
+// Since the mage unify it is a real 2 s cast (owner rule 2026-07-11), so the
+// burst lands at cast RESOLVE, not at the castAbility call.
 function spawnWolfAt(sim: Sim, x: number, z: number): ReturnType<typeof createMob> {
   const s = sim as unknown as { nextId: number; addEntity(e: ReturnType<typeof createMob>): void };
   const mob = createMob(s.nextId++, MOBS.forest_wolf, 1, {
@@ -52,6 +58,19 @@ function aimedFx(sim: Sim): { x: number; z: number; radius?: number } | undefine
   return undefined;
 }
 
+// Tick the in-flight cast through to its resolve, returning the aimed impact
+// event (spellfxAt) it emits, if any. Bounded well past the 2 s cast: melee
+// pushback from an adjacent mob can stretch it.
+function resolveAimedCast(sim: Sim, pid: number): ReturnType<typeof aimedFx> {
+  const me = sim.entities.get(pid);
+  if (!me) throw new Error(`no caster ${pid}`);
+  let fx: ReturnType<typeof aimedFx>;
+  for (let i = 0; i < 200 && me.castingAbility && !fx; i++) {
+    fx = sim.tick().find((e) => e.type === 'spellfxAt');
+  }
+  return fx;
+}
+
 describe('ground-targeted casting (Flamestrike)', () => {
   it('detonates at the aimed point (ring event + damage there), not on the caster', () => {
     const { sim, pid } = makeMage();
@@ -62,7 +81,7 @@ describe('ground-targeted casting (Flamestrike)', () => {
 
     sim.castAbility('flamestrike', pid, { x: 18, z: 0 }); // within range 30
 
-    const fx = aimedFx(sim);
+    const fx = resolveAimedCast(sim, pid);
     expect(fx).toBeDefined();
     expect(fx?.x).toBeCloseTo(18, 1);
     expect(fx?.radius).toBe(7); // the AoE ring size rides the event
@@ -72,14 +91,14 @@ describe('ground-targeted casting (Flamestrike)', () => {
 
   it('clamps the aimed point to the ability range from the caster', () => {
     const { sim, pid } = makeMage();
-    place(sim, pid, 0, 0);
-    const atClamp = spawnWolfAt(sim, 30, 0);
+    place(sim, pid, OPEN_FIELD.x, OPEN_FIELD.z);
+    const atClamp = spawnWolfAt(sim, OPEN_FIELD.x + 30, OPEN_FIELD.z);
     sim.drainEvents();
 
-    sim.castAbility('flamestrike', pid, { x: 100, z: 0 }); // far beyond range 30
+    sim.castAbility('flamestrike', pid, { x: OPEN_FIELD.x + 100, z: OPEN_FIELD.z });
 
-    const fx = aimedFx(sim);
-    expect(fx?.x).toBeCloseTo(30, 0); // clamped onto the 30 yd range
+    const fx = resolveAimedCast(sim, pid);
+    expect(fx?.x).toBeCloseTo(OPEN_FIELD.x + 30, 0);
     expect(atClamp.hp).toBeLessThan(5000);
   });
 
@@ -90,6 +109,7 @@ describe('ground-targeted casting (Flamestrike)', () => {
     sim.drainEvents();
 
     sim.castAbility('flamestrike', pid); // no aim (e.g. a keybind cast)
+    resolveAimedCast(sim, pid); // no aim means no spellfxAt; just ride out the cast
 
     expect(nearCaster.hp).toBeLessThan(5000);
   });
@@ -98,6 +118,7 @@ describe('ground-targeted casting (Flamestrike)', () => {
     const { sim, pid } = makeMage();
     place(sim, pid, 0, 0);
     sim.castAbility('flamestrike', pid, { x: 18, z: 0 });
+    expect(resolveAimedCast(sim, pid)).toBeDefined(); // the burst actually landed
     const zones = (sim as unknown as { groundAoEs: GroundAoE[] }).groundAoEs;
     expect(zones.some((z) => z.ability === 'Flamestrike')).toBe(false);
   });

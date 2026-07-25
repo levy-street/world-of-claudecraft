@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { SpatialGrid } from '../src/sim/spatial';
-import { Entity, dist2d } from '../src/sim/types';
+import { dist2d, type Entity } from '../src/sim/types';
 
 function bruteForceInRadius(sim: Sim, x: number, z: number, radius: number): Set<number> {
   const out = new Set<number>();
@@ -55,6 +55,24 @@ describe('spatial grid', () => {
     expect(gridInRadius(grid, 0, 0, 2).has(1)).toBe(false);
   });
 
+  it('reclaims an emptied cell instead of leaking it forever', () => {
+    // remove() used to leave a stale empty array behind in `cells` whenever
+    // the last occupant of a cell moved out, so a long-lived process
+    // accumulated one dead Map entry per distinct cell any entity ever
+    // vacated. Simulate an entity wandering through many distinct cells (as
+    // happens over hours of real movement) and assert the tracked cell count
+    // stays at the true occupied count (1) instead of growing with the
+    // number of moves.
+    const grid = new SpatialGrid();
+    const e = { id: 1, pos: { x: 0, y: 0, z: 0 } } as Entity;
+    grid.insert(e);
+    for (let i = 1; i <= 500; i++) {
+      e.pos.x = i * 40; // 40 > cellSize (32), so every step crosses a cell boundary
+      grid.update(e);
+    }
+    expect(grid.cellCount()).toBe(1);
+  });
+
   it('player combat flag matches per-player scan semantics', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
     const p = sim.entities.get(sim.primaryId)!;
@@ -65,7 +83,12 @@ describe('spatial grid', () => {
       meta.moveInput.forward = true;
       sim.tick();
       for (const e of sim.entities.values()) {
-        if (e.kind === 'mob' && !e.dead && (e.aiState === 'chase' || e.aiState === 'attack') && e.aggroTargetId === p.id) {
+        if (
+          e.kind === 'mob' &&
+          !e.dead &&
+          (e.aiState === 'chase' || e.aiState === 'attack') &&
+          e.aggroTargetId === p.id
+        ) {
           aggroed = true;
         }
       }

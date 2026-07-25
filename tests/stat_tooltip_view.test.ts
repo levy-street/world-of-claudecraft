@@ -354,6 +354,20 @@ describe('statCellHtml', () => {
     expect(html).not.toContain('A&B:');
   });
 
+  it('drops the colon with colon:false while keeping data-stat, tabindex, and the aria breakdown', () => {
+    const m = model({ stat: 'agi', statValue: 22, effects: [{ kind: 'armor', value: 44 }] });
+    const html = statCellHtml(m, deps, { colon: false });
+    // The label is no longer joined to the value by a literal colon-space.
+    expect(html).not.toContain('itemUi.stats.agi: <b>');
+    expect(html).toContain('itemUi.stats.agi <b>22</b>');
+    // The a11y + tooltip plumbing is byte-identical to the default layout.
+    expect(html).toContain(
+      'class="stat-cell" data-stat="agi" tabindex="0" aria-describedby="statdesc-agi"',
+    );
+    expect(html).toContain('<span id="statdesc-agi" class="visually-hidden">');
+    expect(html).toContain(statTooltipAria(m, deps));
+  });
+
   it('uses one Warfare name and describes both live PvP effects in accessible output', () => {
     const m = model({
       stat: 'warfare',

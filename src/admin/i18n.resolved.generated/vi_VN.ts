@@ -46,6 +46,7 @@ export const vi_VN: AdminTranslations = {
   "stats.peakOnline": "đỉnh trực tuyến",
   "stats.peakOnlineToday": "đỉnh trực tuyến 24h",
   "stats.peakOnlineAllTime": "đỉnh trực tuyến mọi thời điểm",
+  "stats.playersCap": "giới hạn người chơi",
   "stats.accounts": "tài khoản",
   "stats.characters": "nhân vật",
   "stats.newAccounts24h": "tài khoản mới 24 giờ",

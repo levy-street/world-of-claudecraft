@@ -64,6 +64,11 @@
     --color-bg-dark: #08080d;
     --color-bg-input: #0a0a0f;
     --color-border-default: #4e3d1d;
+    /* The showcase hairline: the gold-brown 1px keyline the char-window stat
+       panels established and the inset-card family repeats (section cards,
+       recipe cards, pill chips, panel dividers). One token for every site so
+       the family cannot drift shade by shade. */
+    --color-border-showcase: #463a1c;
     --color-border-focus: #c8a838;
     --color-border-invalid: #ff8f85;
     --color-border-valid: #48e060;
@@ -85,6 +90,33 @@
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */
     --color-quality-default: #fff;
+
+    /* Crafting skill-gain difficulty tints (consumer: components.css
+       .crafting-difficulty[data-difficulty], painted by crafting_window.ts as
+       a data attribute, never an inline color). The classic four-color recipe
+       intuition (Professions 2.0): full/minimal/none reuse the item-quality
+       palette literals (icons.ts QUALITY_COLOR legendary/uncommon/poor, a
+       classic-fidelity anchor), reduced is the house gold. The tint is always
+       a redundant hint beside the text label (fairness). */
+    --color-craft-full: #ff8000;
+    --color-craft-reduced: var(--gold);
+    --color-craft-minimal: #1eff00;
+    --color-craft-none: #9d9d9d;
+
+    /* The bonus-stat green the item tooltip's own gain lines speak in
+       (icons.ts QUALITY_COLOR.uncommon, the same value #tooltip .tt-green
+       carries): one token for the surfaces that must agree with those lines,
+       today the Apply Enchant picker's effect line and the enchanted bag glyph. */
+    --color-stat-bonus: #1eff00;
+    /* Bag-grid per-copy corner glyphs (components.css .bag-item .bi-glyph-*,
+       painted by bags_window.ts as a class, never an inline color). Enchanted
+       borrows the bonus-stat green above (the enchant color language); signed
+       rides the house gold like the maker's mark; bound takes a cool steel-blue
+       so the three read apart at 12px even before the shapes resolve. The shape
+       is the primary signal, the tint a redundant one (fairness). */
+    --color-bag-glyph-enchanted: var(--color-stat-bonus);
+    --color-bag-glyph-signed: var(--color-accent);
+    --color-bag-glyph-bound: #7fb0e6;
 
     /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
        no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.
@@ -123,6 +155,7 @@
     --color-map-tree: #2f6b34;
     --color-map-oak: #4f8c3a;
     --color-map-building-outline: #1a140a;
+    --color-map-building-armoury: #315fa8;
     --color-map-building-chapel: #9b9080;
     --color-map-building-inn: #8a6233;
     --color-map-building-house: #7a5630;
@@ -152,6 +185,11 @@
     --color-minimap-outline: #000;
     --color-minimap-gather-ready: #3ef07a;
     --color-minimap-gather-cooldown: #5a5f57;
+    --color-minimap-station: #d98e4a;
+    /* Tool-tier locked gather node (Professions 2.0): a dark rust
+       clearly apart from the ready green, the cooldown olive-gray, and the
+       bright mob red, so the lock reads at minimap marker size. */
+    --color-minimap-node-locked: #8a4a3a;
 
     /* Talents window: tree arrows + tooltip accents (talents_window.ts references
        these via var() so the painter carries no raw hex). Exact pre-existing values. */
@@ -180,6 +218,12 @@
     --scrollbar-border: #7c6233;
     --app-vw: 100vw;
     --app-vh: 100vh;
+    /* #bags' own reservation half-width + gap (components.css), hoisted here so
+       any OTHER centred window that must not slide under the bottom-right bags
+       column (the vendor Goods window's width cap is the first consumer) reads
+       the SAME numbers instead of re-deriving a copy that can drift out of sync. */
+    --bags-bar-half: 306px;
+    --bags-gap: 12px;
     /* effects tier (wired by src/ui/ui_effects_applier.ts from the pure
        src/game/ui_effects_profile.ts resolver): data-fx-level (low | medium | high
        | ultra) is stamped on the document root, and these three tokens are written
@@ -194,6 +238,12 @@
     --fx-shadow: 1;
     --fx-ambient-anim: running;
     --motion-scale: 1;
+    /* Shared painted-art shadows. The color is theme-addressable and the blur
+       follows the graphics shadow tier so small decorative raster art stays
+       legible without forcing full-cost shadows on the low preset. */
+    --color-art-shadow: rgb(0 0 0 / 75%);
+    --art-shadow-sm: 0 1px calc(2px * var(--fx-shadow, 1)) var(--color-art-shadow);
+    --art-shadow-lg: 0 2px calc(5px * var(--fx-shadow, 1)) var(--color-art-shadow);
     /* Shared with src/game/cursors.ts, keep hotspots in sync.
        --cursor-arrow = default; --cursor-point = interactive/hover (gauntlet finger). */
     --cursor-arrow: url("/ui/cursors/arrow.png") 7 2, default;
@@ -203,6 +253,55 @@
     --cursor-hand: var(--cursor-arrow);
     --cursor-sword: var(--cursor-point);
     --cursor-shield: var(--cursor-point);
+
+    /* Badge halo (the static "stand out" glow), shared by the holder and
+       contributor ladders. The hue is supplied per tier by the nameplate/inspect
+       painter via --holder-glow / --dev-glow; these two tunables set the blur
+       strength only, frozen from in-game nameplate screenshots: subtle for the
+       ordinary rungs, moderately stronger for the apex rungs (holder band IV
+       regalia; the significant-contributor dev tiers). Cosmetic and static (no
+       per-frame cost). */
+    --holder-halo: 2.5px;
+    --holder-halo-strong: 4px;
+
+    /* DESIGN.md section 4.3's gold ramp (adopted 2026-07-15), the exact classic-
+       preset hex values. Purely additive: no existing --gold/--border consumer is
+       retuned. Two readers today: the #options-menu.perf-wide gilded ornament
+       (below, and src/ui/perf_ornament_svg.ts) and the minimap disc's gilded
+       ring (src/ui/minimap_gilded_ornament.ts); a future repo-wide DESIGN.md
+       Phase 1 token pass can reuse these names verbatim. */
+    --color-gold-900: #4a2f10;
+    --color-gold-800: #6b4517;
+    --color-gold-700: #926321;
+    --color-gold-600: #bc8732;
+    --color-gold-500: #d8a645;
+    --color-gold-400: #f0c86d;
+    --color-gold-300: #ffe5a3;
+
+    /* Performance Overlay gilded-ornament shape defaults. perf_ornament_svg.ts
+       overwrites these with the real generated mask-image/gradient values once at
+       boot (applyPerfOrnamentVars, called next to hydrateIcons() in main.ts); an
+       unset custom property makes mask-image compute to `none`, which would show
+       the pseudo-element's `background` as an opaque rectangle over the title/edge
+       instead of just doing nothing, so every one of these needs a real (if inert)
+       fallback rather than being left undefined. */
+    --perf-ornament-corner: linear-gradient(transparent, transparent);
+    --perf-ornament-mid-edge: linear-gradient(transparent, transparent);
+    --perf-ornament-edge-top: linear-gradient(transparent, transparent);
+    --perf-ornament-edge-bottom: linear-gradient(transparent, transparent);
+    --perf-ornament-edge-left: linear-gradient(transparent, transparent);
+    --perf-ornament-edge-right: linear-gradient(transparent, transparent);
+    --perf-ornament-gilt: var(--color-gold-700);
+    /* Minimap disc's gilded ring (hud.css "minimap" section /
+       minimap_gilded_ornament.ts). Same fallback contract as
+       --perf-ornament-gilt above: consumed as a whole `background`, so it
+       needs a real paintable value before applyMinimapOrnamentVars() runs
+       at boot. */
+    --minimap-gilt: var(--color-gold-700);
+    /* The speckle field is a `background-image`, so an unset value must
+       compute to `none` (no image), not an invalid/empty string, the same
+       reasoning as the --perf-ornament-* mask fallbacks above. */
+    --minimap-speckle: none;
   }
 
   /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal
@@ -217,5 +316,29 @@
   :root[data-fx-level="low"] *::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+  }
+
+  /* Performance Overlay's gilded ornament is purely cosmetic (a mask-image
+     finish, never actionable information), so it is shed at the low effect tier
+     the same way glass is dropped above: one rule resets every --perf-ornament-*
+     custom property back to its no-op fallback, with no per-selector override
+     needed. --perf-ornament-gilt keeps a flat-color fallback (it is consumed as a
+     whole `background`, not a mask, so it must resolve to something paintable).
+     !important: applyPerfOrnamentVars() (perf_ornament_svg.ts) writes these same
+     properties as a plain (non-important) INLINE style on documentElement, which
+     otherwise always beats a normal-priority stylesheet rule regardless of
+     selector specificity; only an important author declaration outranks it. */
+  :root[data-fx-level="low"] {
+    --perf-ornament-corner: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-mid-edge: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-edge-top: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-edge-bottom: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-edge-left: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-edge-right: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-gilt: var(--color-gold-700) !important;
+    /* The minimap ring is purely cosmetic too (never actionable information),
+       so it is shed at the low effect tier the same way. */
+    --minimap-gilt: var(--color-gold-700) !important;
+    --minimap-speckle: none !important;
   }
 }

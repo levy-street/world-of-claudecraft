@@ -5,11 +5,15 @@ import {
   actionForAttackSlot,
   applyLoadoutBar,
   assignAttackSlotAction,
+  attackDragDisposition,
   attackSlotStorageKey,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
+  dragCarriesAttack,
   encodeStoredHotbarAction,
+  HOTBAR_ACTION_MIME,
+  HOTBAR_ATTACK_MIME,
   handleMobileAttackTap,
   hotbarActionsEqual,
   loadAttackSlotAction,
@@ -145,6 +149,39 @@ describe('mobile attack tap', () => {
     );
 
     expect(calls).toEqual(['toggle']);
+  });
+});
+
+describe('attack drag marker', () => {
+  it('uses a MIME distinct from the normal action MIME', () => {
+    expect(HOTBAR_ATTACK_MIME).not.toBe(HOTBAR_ACTION_MIME);
+  });
+
+  it('detects the attack marker among the dragged types', () => {
+    expect(dragCarriesAttack([HOTBAR_ATTACK_MIME])).toBe(true);
+    expect(dragCarriesAttack(['text/plain', HOTBAR_ATTACK_MIME])).toBe(true);
+  });
+
+  it('does not treat a normal action drag as an attack drag', () => {
+    expect(dragCarriesAttack([HOTBAR_ACTION_MIME, 'text/plain'])).toBe(false);
+    expect(dragCarriesAttack([])).toBe(false);
+    expect(dragCarriesAttack(undefined)).toBe(false);
+  });
+
+  it('accepts the drag only over its slot-0 destination', () => {
+    expect(attackDragDisposition([HOTBAR_ATTACK_MIME], 0, 'over')).toBe('highlight');
+    expect(attackDragDisposition([HOTBAR_ATTACK_MIME], 1, 'over')).toBe('ignore');
+    expect(attackDragDisposition([HOTBAR_ATTACK_MIME], 11, 'over')).toBe('ignore');
+  });
+
+  it('restores Attack only when dropped on slot 0', () => {
+    expect(attackDragDisposition([HOTBAR_ATTACK_MIME], 0, 'drop')).toBe('restore');
+    expect(attackDragDisposition([HOTBAR_ATTACK_MIME], 7, 'drop')).toBe('ignore');
+  });
+
+  it('ignores non-Attack drags in both phases', () => {
+    expect(attackDragDisposition([HOTBAR_ACTION_MIME], 0, 'over')).toBe('ignore');
+    expect(attackDragDisposition(undefined, 0, 'drop')).toBe('ignore');
   });
 });
 
@@ -464,6 +501,26 @@ describe('hotbar slot sync', () => {
       { type: 'ability', id: 'blink' },
     ]);
   });
+
+  it('sweeps a passive left on the bar by an older build, and never re-places it', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'ability' as const, id: 'measured_fury' }, // passive saved by an older build
+      { type: 'ability' as const, id: 'blink' },
+    ];
+    const known = ['fireball', 'measured_fury', 'blink'];
+    const isPassive = (id: string) => id === 'measured_fury';
+
+    // measured_fury is known but passive: its slot is cleared, and it is NOT
+    // re-added even if the auto-place set (defensively) contains it.
+    const synced = syncHotbarActions(slots, known, new Set(['measured_fury']), isPassive);
+    expect(synced.actions).toEqual([
+      { type: 'ability', id: 'fireball' },
+      null,
+      { type: 'ability', id: 'blink' },
+    ]);
+    expect(synced.changed).toBe(true);
+  });
 });
 
 describe('applying a saved talent loadout bar', () => {
@@ -504,6 +561,28 @@ describe('applying a saved talent loadout bar', () => {
 
     expect(applyLoadoutBar(current, ['no_such_ability'], 1, abilityExists)).toEqual([null]);
   });
+
+  it('restores an ability in the last slot of the third row', () => {
+    const current = Array(33).fill(null);
+    const saved = Array<string | null>(33).fill(null);
+    saved[32] = 'polymorph';
+
+    expect(applyLoadoutBar(current, saved, 33, abilityExists)[32]).toEqual({
+      type: 'ability',
+      id: 'polymorph',
+    });
+  });
+
+  it('preserves third-row actions missing from a legacy two-row loadout', () => {
+    const current = Array<ReturnType<typeof applyLoadoutBar>[number]>(33).fill(null);
+    current[32] = { type: 'ability', id: 'polymorph' };
+    const legacyBar = Array<string | null>(22).fill(null);
+
+    expect(applyLoadoutBar(current, legacyBar, 33, abilityExists)[32]).toEqual({
+      type: 'ability',
+      id: 'polymorph',
+    });
+  });
 });
 
 describe('loadoutKnownAbilityIds', () => {
@@ -529,6 +608,16 @@ describe('loadoutKnownAbilityIds', () => {
   it('still includes base class-kit abilities regardless of spec', () => {
     const known = loadoutKnownAbilityIds('shaman', { ...emptyAllocation(), spec: 'elemental' }, 20);
     expect(known.has('lightning_bolt')).toBe(true);
+  });
+
+  it('excludes passive traits from saved loadout action-bar eligibility', () => {
+    const armsKnown = loadoutKnownAbilityIds('warrior', { ...emptyAllocation(), spec: 'arms' }, 20);
+
+    expect(armsKnown.has('measured_fury')).toBe(false);
+    expect(armsKnown.has('seasoned_soldier')).toBe(false);
+    expect(armsKnown.has('sudden_death')).toBe(false);
+    expect(armsKnown.has('deep_wounds')).toBe(false);
+    expect(armsKnown.has('battle_shout')).toBe(true);
   });
 
   // Pins the actual applyLoadoutBar call site wiring, not just the predicate in

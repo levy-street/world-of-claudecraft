@@ -10,7 +10,7 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { QUESTS } from '../src/sim/data';
+import { QUESTS, STATIONS } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
@@ -105,6 +105,7 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     delveRun: null,
     cfg: { seed: 42, playerClass: 'warrior' },
     playerId: 1,
+    stationPlacements: STATIONS,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
   } as unknown as IWorld;
 }
@@ -261,6 +262,121 @@ describe('allocation budget (the reused-reference proxy, wrapper floor)', () => 
   });
 });
 
+describe('station markers (Professions 2.0)', () => {
+  // A viewer in the Eastbrook square: the four zone-1 stations (forge,
+  // kitchens, loom, toolworks) sit inside the rim at this scale, while the
+  // Fenbridge tannery (z 314) and Highwatch apothecary (z 660) sit far
+  // beyond it. Station markers are STATIC content positions: no per-viewer
+  // state, so both host shapes and any social/profession stub state must
+  // produce byte-identical markers (the graphics-fairness doctrine).
+  const VIEW_POS = { x: 0, z: 10 };
+
+  function makeStationWorld(shape: 'sim' | 'client', over: Record<string, unknown> = {}): IWorld {
+    const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
+    const player = {
+      id: 1,
+      kind: 'player',
+      name: 'Me',
+      pos: { ...VIEW_POS },
+      facing: 0,
+      dead: false,
+      lootable: false,
+      aggroTargetId: null,
+      questIds: [],
+      templateId: '',
+      ...junk,
+    };
+    return {
+      player,
+      entities: new Map([[1, player]]),
+      partyInfo: null,
+      socialInfo: { friends: [], blocks: [], guild: null },
+      delveRun: null,
+      cfg: { seed: 42, playerClass: 'warrior' },
+      playerId: 1,
+      stationPlacements: STATIONS,
+      questState: () => 'unavailable',
+      nodeHarvestableByMe: () => true,
+      ...over,
+    } as unknown as IWorld;
+  }
+
+  function stationMarkers(world: IWorld): MinimapMarker[] {
+    return buildMarkers(world).filter((m) => m.kind === 'station');
+  }
+
+  it('projects one marker per in-range station at the exact canvas px (both shapes)', () => {
+    for (const shape of ['sim', 'client'] as const) {
+      const markers = stationMarkers(makeStationWorld(shape));
+      // The four Eastbrook stations; the two other-zone stations are culled.
+      expect(markers, shape).toHaveLength(4);
+      // The forge (STATIONS[0], x 7, z 16.5) lands at the projected px:
+      // mx = half - dx * pxPerYard, my = half - dz * pxPerYard.
+      const half = S / 2;
+      const forge = STATIONS[0];
+      expect(forge.id).toBe('station_eastbrook_forge');
+      const projected = markers.find(
+        (m) =>
+          Math.abs(m.mx - (half - (forge.pos.x - VIEW_POS.x) * PPY)) < 1e-9 &&
+          Math.abs(m.my - (half - (forge.pos.z - VIEW_POS.z) * PPY)) < 1e-9,
+      );
+      expect(projected, `${shape}: forge marker at the projected px`).toBeDefined();
+    }
+  });
+
+  it('culls stations beyond the rim: a field viewer far from every town sees none', () => {
+    const world = makeStationWorld('sim');
+    (world.player as unknown as { pos: { x: number; z: number } }).pos = { x: 0, z: 150 };
+    expect(stationMarkers(world)).toHaveLength(0);
+  });
+
+  it('reads the active IWorld station surface, so a custom world leaks no built-in markers', () => {
+    expect(stationMarkers(makeStationWorld('sim', { stationPlacements: [] }))).toEqual([]);
+    const custom = [
+      {
+        id: 'custom_station',
+        type: 'forge',
+        zoneId: 'custom',
+        pos: { x: 2, z: 12 },
+        masterNpcId: 'custom_master',
+      },
+    ] as const;
+    const markers = stationMarkers(makeStationWorld('sim', { stationPlacements: custom }));
+    expect(markers).toEqual([
+      {
+        kind: 'station',
+        mx: S / 2 - (2 - VIEW_POS.x) * PPY,
+        my: S / 2 - (12 - VIEW_POS.z) * PPY,
+      },
+    ]);
+  });
+
+  it('is host- and viewer-invariant: shapes and unrelated stub state never change the set', () => {
+    const base = stationMarkers(makeStationWorld('sim'));
+    expect(stationMarkers(makeStationWorld('client'))).toEqual(base);
+    // Differing quest/social/profession state (another viewer, effectively):
+    // the station layer must not read ANY of it.
+    const busy = makeStationWorld('client', {
+      questState: () => 'available',
+      nodeHarvestableByMe: () => false,
+      socialInfo: {
+        friends: [{ id: 20, name: 'Friend', online: true }],
+        blocks: [],
+        guild: { id: 1, name: 'G', rank: 'member', members: [] },
+      },
+    });
+    expect(stationMarkers(busy)).toEqual(base);
+  });
+
+  it('draws stations before the player arrow (draw order: the arrow stays on top)', () => {
+    const markers = buildMarkers(makeStationWorld('sim'));
+    expect(markers[markers.length - 1].kind).toBe('player');
+    const lastStation = markers.map((m) => m.kind).lastIndexOf('station');
+    expect(lastStation).toBeGreaterThanOrEqual(0);
+    expect(lastStation).toBeLessThan(markers.length - 1);
+  });
+});
+
 describe('minimap corpse marker (ghost run)', () => {
   it('marks the body with a corpse skull only while the player is a ghost', () => {
     const world = makeWorld('sim');
@@ -274,5 +390,85 @@ describe('minimap corpse marker (ghost run)', () => {
       z: PZ,
     };
     expect(buildMarkers(world).some((m) => m.kind === 'corpse')).toBe(true);
+  });
+});
+
+// The gather-node marker's locked dimension. The viewer stands ON
+// the new tier-2 mirefen vein (ore_mirefen_t2), where the rim covers exactly
+// five nodes in GATHER_NODES order: ore_mirefen_1, ore_mirefen_3,
+// herb_mirefen_1, herb_mirefen_3 (all tier 1) and the tier-2 vein itself at
+// the map centre. Actionable info on every preset: locked resolves from the
+// bags, never a graphics knob.
+describe('gather-node markers: the locked dimension', () => {
+  const T2 = { x: 48, z: 352 }; // ore_mirefen_t2, pinned literally
+
+  function makeGatherWorld(
+    shape: 'sim' | 'client',
+    opts: {
+      inventory?: { itemId: string; count: number }[];
+      harvestable?: (id: string) => boolean;
+    } = {},
+  ): IWorld {
+    const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
+    const player = {
+      id: 1,
+      kind: 'player',
+      name: 'Me',
+      pos: { x: T2.x, z: T2.z },
+      facing: 0,
+      dead: false,
+      lootable: false,
+      aggroTargetId: null,
+      questIds: [],
+      templateId: '',
+      ...junk,
+    };
+    return {
+      player,
+      entities: new Map([[1, player]]),
+      partyInfo: null,
+      socialInfo: null,
+      delveRun: null,
+      cfg: { seed: 42, playerClass: 'warrior' },
+      playerId: 1,
+      stationPlacements: STATIONS,
+      inventory: opts.inventory ?? [],
+      nodeHarvestableByMe: opts.harvestable ?? (() => true),
+      questState: () => 'unavailable',
+    } as unknown as IWorld;
+  }
+
+  function gatherMarkers(world: IWorld) {
+    return buildMarkers(world).filter((m) => m.kind === 'gather-node') as Extract<
+      MinimapMarker,
+      { kind: 'gather-node' }
+    >[];
+  }
+
+  it('a toolless viewer sees EVERY node locked (#2343: bare hands never gather)', () => {
+    const markers = gatherMarkers(makeGatherWorld('sim'));
+    expect(markers.map((m) => m.locked)).toEqual([true, true, true, true, true]);
+    // The centre marker is the tier-2 vein under the viewer, still ready:
+    // locked is the tool dimension, never the respawn one.
+    const centre = markers.find((m) => m.mx === S / 2 && m.my === S / 2);
+    expect(centre).toMatchObject({ locked: true, ready: true });
+  });
+
+  it('the tier-2 pick unlocks only the ore nodes; herb stays locked without a sickle', () => {
+    const tooled = gatherMarkers(
+      makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
+    );
+    // GATHER_NODES rim order: ore t1, ore t1, herb t1, herb t1, ore t2 (centre).
+    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    // Locked composes WITH the respawn dimension, never replaces it: a
+    // cooling locked vein keeps ready=false (the silhouette the painter keeps
+    // readable under the locked tint).
+    const cooling = gatherMarkers(makeGatherWorld('sim', { harvestable: () => false }));
+    const centre = cooling.find((m) => m.mx === S / 2 && m.my === S / 2);
+    expect(centre).toMatchObject({ locked: true, ready: false });
+  });
+
+  it('both IWorld shapes produce identical gather markers (decision-15 parity)', () => {
+    expect(gatherMarkers(makeGatherWorld('sim'))).toEqual(gatherMarkers(makeGatherWorld('client')));
   });
 });

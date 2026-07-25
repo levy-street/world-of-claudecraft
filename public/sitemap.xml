@@ -126,6 +126,76 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/engineering</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/alchemy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/cooking</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/leatherworking</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/tailoring</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/enchanting</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/weaponcrafting</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/armorcrafting</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/mining</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/logging</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/herbalism</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/fishing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/economy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
     <loc>https://worldofclaudecraft.com/wiki/economy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

@@ -57,8 +57,10 @@ export const GOAL_DEPTH = 2.5; // net pocket depth behind the goal line
 export const GOAL_Z_MIN = PITCH_CENTER.z - GOAL_HALF_W;
 export const GOAL_Z_MAX = PITCH_CENTER.z + GOAL_HALF_W;
 // Crossbar height (matches the rendered goal frame, vale_cup_stadium.ts goalPostH):
-// a ball crossing the line ABOVE this sails over and does not score, which is the
-// accuracy cost of an over-powered charged shot.
+// a ball crossing the line ABOVE this does not score, which is the accuracy cost
+// of an over-powered charged shot. The crossbar and the frame above it are SOLID,
+// so an over-the-bar shot banks back into play off the frame rather than escaping
+// through the open mouth (see reflectOffGoalFrame in vale_cup_ball.ts).
 export const GOAL_HEIGHT = 2.5;
 
 // Goal lines (the scoring planes): west goal belongs to team A, east to team B.
@@ -80,9 +82,11 @@ export interface VcWallSegment {
 }
 
 // Every board line the ball banks off, in world coordinates. The goal mouths
-// are open (no segment) so shots roll into the net pockets; the pockets' own
-// back/side walls stop the ball dead (the module treats pocket hits as goal
-// settle, not a bank).
+// are open BELOW the crossbar (no segment) so shots roll into the net pockets;
+// the pockets' own back/side walls stop the ball dead (the module treats pocket
+// hits as goal settle, not a bank). ABOVE the crossbar the goal frame is solid:
+// an over-the-bar shot banks back into play off it (reflectOffGoalFrame in
+// vale_cup_ball.ts), so a ballooned shot never escapes the arena.
 export const PITCH_WALLS: VcWallSegment[] = [
   // north board (inward normal points south, -z)
   { x1: PITCH.xMin, z1: PITCH.zMax, x2: PITCH.xMax, z2: PITCH.zMax, nx: 0, nz: -1 },
@@ -177,7 +181,7 @@ export function isAtSowfield(x: number, z: number): boolean {
  * Inside the full stadium footprint including the flatten's falloff apron. This
  * is the same rectangle that keeps procedural trees/rocks off the shell
  * (world.ts generateDecorations), reused to keep wild grass tufts, ground
- * plants, and ambient critters off the pitch and its immediate surrounds so the
+ * plants and other ambient dressing off the pitch and its immediate surrounds so the
  * Sowfield reads as a proper mown football ground.
  */
 export function isInSowfieldShell(x: number, z: number): boolean {

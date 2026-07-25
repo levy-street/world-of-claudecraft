@@ -190,9 +190,14 @@ if (GFX.standardMaterials) {
         .then((tex) => {
           tex.wrapS = THREE.RepeatWrapping;
           tex.wrapT = THREE.ClampToEdgeWrapping;
-          tex.minFilter = THREE.LinearMipmapLinearFilter;
+          // Memory-ceiling profile (phone WebKit): a mip chain adds a third on top of each
+          // decoded 4K backdrop, and three biomes are resident at once; the dome is mostly
+          // magnified at phone resolutions, so trading mips for slight distant-sky shimmer
+          // keeps ~44MB of GPU memory out of the world-entry allocation spike.
+          const mips = !GFX.constrainedMemory;
+          tex.minFilter = mips ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
           tex.magFilter = THREE.LinearFilter;
-          tex.generateMipmaps = true;
+          tex.generateMipmaps = mips;
           backdropStore[biome] = tex;
           return tex;
         })

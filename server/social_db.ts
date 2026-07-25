@@ -108,6 +108,10 @@ CREATE TABLE IF NOT EXISTS guilds (
 -- guild names are likewise unique per realm
 ALTER TABLE guilds DROP CONSTRAINT IF EXISTS guilds_name_key;
 CREATE UNIQUE INDEX IF NOT EXISTS guilds_realm_name ON guilds(realm, name);
+-- Guild billboard: a short officer-set message pinned atop the Guild tab.
+-- motd_set_by keeps the setter's display name for attribution ('' when unset).
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS motd TEXT NOT NULL DEFAULT '';
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS motd_set_by TEXT NOT NULL DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS guild_members (
   character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
@@ -379,6 +383,23 @@ export class PgSocialDb implements SocialDb {
       charId,
       rank,
     ]);
+  }
+
+  async setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void> {
+    await this.pool.query('UPDATE guilds SET motd = $2, motd_set_by = $3 WHERE id = $1', [
+      guildId,
+      motd,
+      setBy,
+    ]);
+  }
+
+  async guildMotd(guildId: number): Promise<{ motd: string; motdSetBy: string }> {
+    const res = await this.pool.query(
+      'SELECT motd, motd_set_by AS "motdSetBy" FROM guilds WHERE id = $1',
+      [guildId],
+    );
+    const row = res.rows[0];
+    return { motd: row?.motd ?? '', motdSetBy: row?.motdSetBy ?? '' };
   }
 
   async guildMembers(

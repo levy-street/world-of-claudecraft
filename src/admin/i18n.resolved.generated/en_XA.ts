@@ -46,6 +46,7 @@ export const en_XA: AdminTranslations = {
   "stats.peakOnline": "[þéáķ óñļíñé]",
   "stats.peakOnlineToday": "[þéáķ óñļíñé 24ĥ]",
   "stats.peakOnlineAllTime": "[þéáķ óñļíñé áļļ ţíɱé]",
+  "stats.playersCap": "[þļáýéŕ çáþ]",
   "stats.accounts": "[áççóúñţš]",
   "stats.characters": "[çĥáŕáçţéŕš]",
   "stats.newAccounts24h": "[ñéŵ áççóúñţš 24ĥ]",

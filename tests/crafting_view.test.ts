@@ -1,6 +1,26 @@
 import { describe, expect, it } from 'vitest';
+import { STATIONS } from '../src/sim/content/professions';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { archetypeCeilingFor } from '../src/sim/professions/archetype';
+import { requiredReagentCount } from '../src/sim/professions/crafting';
+import type { StationType } from '../src/sim/professions/stations';
+import { stationTypeForCraft } from '../src/sim/professions/stations';
+import {
+  MINIMAL_TIER_MULTIPLIER,
+  REDUCED_TIER_MULTIPLIER,
+  tierCapability,
+  tierForSkill,
+  tierProgressMultiplier,
+} from '../src/sim/professions/wheel';
+import type { PlayerMeta } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
-import { buildCraftingView, type RecipeDefLike } from '../src/ui/crafting_view';
+import {
+  buildCraftingView,
+  type CraftDifficulty,
+  type CraftingIdentityLike,
+  craftLearnHints,
+  type RecipeDefLike,
+} from '../src/ui/crafting_view';
 
 function item(id: string): ItemDef {
   return {
@@ -89,6 +109,207 @@ describe('buildCraftingView', () => {
   });
 });
 
+// The reagent line shows and gates on the DISCOUNTED requirement the sim
+// actually charges (requiredReagentCount: the #1145 self-signed reduction
+// composed with the #1134 specialization discount), never the raw listed
+// count, so the window can neither overstate the cost nor block a craft the
+// server would accept.
+describe('buildCraftingView discounted reagent requirements (#1134/#1145)', () => {
+  const PLAYER = 'Testchar';
+  // PERK_THRESHOLDS: specialization at skill 75, materialDiscountPct 0.2.
+  const specializedSkills = { cooking: 75 };
+  const noIdentity: CraftingIdentityLike = {
+    synced: true,
+    activeArchetype: null,
+    pairedMajor: null,
+    hobbyCraft: null,
+  };
+
+  function reagentRow(
+    listed: number,
+    inventory: InvSlot[],
+    craftSkills: Record<string, number>,
+    playerName?: string,
+  ) {
+    const items = table(item('bone_fragments'), item('recipe_disc_result'));
+    const view = buildCraftingView(
+      [recipe('recipe_disc', [{ itemId: 'bone_fragments', count: listed }])],
+      inventory,
+      items,
+      craftSkills,
+      noIdentity,
+      new Set<StationType>(),
+      playerName,
+    );
+    return { row: view.recipes[0], reagent: view.recipes[0].reagents[0] };
+  }
+
+  it('a specialized crafter sees the discounted requirement and the row gates on it (listed 4 shows 3)', () => {
+    // Holding exactly the discounted amount: the raw-count view says short
+    // (3 < 4) and disables Craft; the sim charges 3 and would accept. This is
+    // the red case the fix exists for.
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 3 }];
+    const { row, reagent } = reagentRow(4, inventory, specializedSkills, PLAYER);
+    expect(reagent).toMatchObject({ required: 3, have: 3, satisfied: true });
+    expect(row.craftable).toBe(true);
+  });
+
+  it('the specialization discount applies even when no player name is passed', () => {
+    // No name only disables the SELF-SIGNED check; the #1134 discount reads
+    // craftSkills alone and must still show.
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 3 }];
+    const { row, reagent } = reagentRow(4, inventory, specializedSkills);
+    expect(reagent).toMatchObject({ required: 3, satisfied: true });
+    expect(row.craftable).toBe(true);
+  });
+
+  it('a listed count of 1 floors at required 1 under every discount', () => {
+    const signed: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 1, instance: { signer: PLAYER } },
+    ];
+    expect(reagentRow(1, signed, specializedSkills, PLAYER).reagent.required).toBe(1);
+    expect(reagentRow(1, signed, {}, PLAYER).reagent.required).toBe(1);
+    expect(
+      reagentRow(1, [{ itemId: 'bone_fragments', count: 1 }], specializedSkills, PLAYER).reagent
+        .required,
+    ).toBe(1);
+  });
+
+  it('a self-signed instance of the reagent reduces required by 1; another name does not', () => {
+    const selfSigned: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 4, instance: { signer: PLAYER } },
+    ];
+    expect(reagentRow(4, selfSigned, {}, PLAYER).reagent.required).toBe(3);
+    // Someone ELSE's signed material behaves like a plain unsigned one.
+    const otherSigned: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 4, instance: { signer: 'Someoneelse' } },
+    ];
+    expect(reagentRow(4, otherSigned, {}, PLAYER).reagent.required).toBe(4);
+  });
+
+  it('both discounts compose: listed 4, self-signed to 3, times 0.8 floors to 2', () => {
+    const selfSigned: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 2, instance: { signer: PLAYER } },
+    ];
+    const { row, reagent } = reagentRow(4, selfSigned, specializedSkills, PLAYER);
+    expect(reagent).toMatchObject({ required: 2, have: 2, satisfied: true });
+    expect(row.craftable).toBe(true);
+  });
+
+  it('non-specialized with no self-signed material: required equals the listed count', () => {
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 3 }];
+    const { row, reagent } = reagentRow(4, inventory, { cooking: 74 }, PLAYER);
+    expect(reagent).toMatchObject({ required: 4, have: 3, satisfied: false });
+    expect(row.craftable).toBe(false);
+  });
+
+  it('divergence guard: the view required equals the sim requiredReagentCount for identical inputs', () => {
+    const cases: { listed: number; inventory: InvSlot[]; skills: Record<string, number> }[] = [
+      { listed: 4, inventory: [{ itemId: 'bone_fragments', count: 3 }], skills: specializedSkills },
+      {
+        listed: 4,
+        inventory: [{ itemId: 'bone_fragments', count: 4, instance: { signer: PLAYER } }],
+        skills: {},
+      },
+      {
+        listed: 4,
+        inventory: [{ itemId: 'bone_fragments', count: 2, instance: { signer: PLAYER } }],
+        skills: specializedSkills,
+      },
+      { listed: 1, inventory: [{ itemId: 'bone_fragments', count: 1 }], skills: specializedSkills },
+      { listed: 5, inventory: [], skills: {} },
+    ];
+    for (const c of cases) {
+      const meta = { name: PLAYER, inventory: c.inventory } as unknown as PlayerMeta;
+      const simRequired = requiredReagentCount(
+        meta,
+        { itemId: 'bone_fragments', count: c.listed },
+        c.skills,
+        'cooking',
+      ).count;
+      const { reagent } = reagentRow(c.listed, c.inventory, c.skills, PLAYER);
+      expect(reagent.required, `listed ${c.listed} skills ${JSON.stringify(c.skills)}`).toBe(
+        simRequired,
+      );
+    }
+  });
+
+  it('a shared reagent keeps per-recipe required counts (memoized facts are per item, not per row)', () => {
+    // Two recipes in ONE build pull the same reagent, so the inventory probes
+    // (have, self-signed) resolve once for the pair, but required must still
+    // differ per recipe: it also depends on the recipe's professionId, and
+    // only cooking is specialized here. A memo that cached the required
+    // count per itemId would collapse these to one value and fail.
+    const items = table(
+      item('bone_fragments'),
+      item('recipe_disc_a_result'),
+      item('recipe_disc_b_result'),
+    );
+    const inventory: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 4, instance: { signer: PLAYER } },
+    ];
+    const view = buildCraftingView(
+      [
+        recipe('recipe_disc_a', [{ itemId: 'bone_fragments', count: 4 }]),
+        {
+          ...recipe('recipe_disc_b', [{ itemId: 'bone_fragments', count: 4 }]),
+          professionId: 'weaponcrafting',
+        },
+      ],
+      inventory,
+      items,
+      specializedSkills,
+      noIdentity,
+      new Set<StationType>(),
+      PLAYER,
+    );
+    const [cookingRow, weaponRow] = view.recipes;
+    // Cooking is specialized AND self-signed: 4 to 3, then floor(3 * 0.8) = 2.
+    expect(cookingRow.reagents[0]).toMatchObject({ required: 2, have: 4, satisfied: true });
+    // Weaponcrafting is not specialized: the self-signed reduction alone, 4 to 3.
+    expect(weaponRow.reagents[0]).toMatchObject({ required: 3, have: 4, satisfied: true });
+    expect(cookingRow.craftable).toBe(true);
+    expect(weaponRow.craftable).toBe(true);
+  });
+
+  it('cache-hit rows stay consistent: same profession shares identical facts, other reagents stay independent', () => {
+    // Three recipes in one build: two same-profession rows sharing a reagent
+    // must render identical have/required, and a third recipe's different
+    // reagent must keep its own facts (the memo keys by itemId only).
+    const items = table(
+      item('bone_fragments'),
+      item('linen_scrap'),
+      item('recipe_disc_c_result'),
+      item('recipe_disc_d_result'),
+      item('recipe_disc_e_result'),
+    );
+    const inventory: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 3 },
+      { itemId: 'linen_scrap', count: 1 },
+    ];
+    const view = buildCraftingView(
+      [
+        recipe('recipe_disc_c', [{ itemId: 'bone_fragments', count: 4 }]),
+        recipe('recipe_disc_d', [{ itemId: 'bone_fragments', count: 4 }]),
+        recipe('recipe_disc_e', [{ itemId: 'linen_scrap', count: 3 }]),
+      ],
+      inventory,
+      items,
+      specializedSkills,
+      noIdentity,
+      new Set<StationType>(),
+      PLAYER,
+    );
+    const [first, second, third] = view.recipes;
+    // Same profession, same unsigned reagent: identical rows, floor(4 * 0.8) = 3.
+    expect(first.reagents[0]).toMatchObject({ required: 3, have: 3, satisfied: true });
+    expect(second.reagents[0]).toMatchObject({ required: 3, have: 3, satisfied: true });
+    // A different reagent keeps independent facts: floor(3 * 0.8) = 2 against have 1.
+    expect(third.reagents[0]).toMatchObject({ required: 2, have: 1, satisfied: false });
+    expect(third.craftable).toBe(false);
+  });
+});
+
 describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
   function comboRecipe(id: string): RecipeDefLike {
     return {
@@ -108,11 +329,23 @@ describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
 
   it('marks a combo recipe craftable once the player meets tier capability in both named crafts', () => {
     const items = table(item('recipe_combo_result'));
-    const view = buildCraftingView([comboRecipe('recipe_combo')], [], items, {
-      armorcrafting: 25,
-      weaponcrafting: 25,
-    });
+    const view = buildCraftingView(
+      [comboRecipe('recipe_combo')],
+      [],
+      items,
+      {
+        armorcrafting: 25,
+        weaponcrafting: 25,
+      },
+      {
+        synced: true,
+        activeArchetype: 'armorcrafting',
+        pairedMajor: 'weaponcrafting',
+        hobbyCraft: 'leatherworking',
+      },
+    );
     expect(view.recipes[0].craftable).toBe(true);
+    expect(view.recipes[0].comboRequirement).toMatchObject({ met: true, reason: null });
   });
 
   it('an unrelated craft, however high, never substitutes for a required craft', () => {
@@ -134,5 +367,437 @@ describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
       {},
     );
     expect(view.recipes[0].craftable).toBe(true);
+  });
+
+  it('high raw skills do not unlock a combo without the exact active pair', () => {
+    const items = table(item('recipe_combo_result'));
+    const view = buildCraftingView(
+      [comboRecipe('recipe_combo')],
+      [],
+      items,
+      { armorcrafting: 100, weaponcrafting: 100 },
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+    );
+    expect(view.recipes[0].craftable).toBe(false);
+    expect(view.recipes[0].comboRequirement).toMatchObject({
+      met: false,
+      reason: 'not_attuned',
+    });
+  });
+
+  it('keeps the action available while the online crafting identity is still syncing', () => {
+    const items = table(item('recipe_combo_result'));
+    const view = buildCraftingView(
+      [comboRecipe('recipe_combo')],
+      [],
+      items,
+      {},
+      { synced: false, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+    );
+    expect(view.recipes[0].craftable).toBe(true);
+    expect(view.recipes[0].comboRequirement).toMatchObject({ met: null, reason: 'syncing' });
+  });
+});
+
+// #2037: skill-req line, skill-gain difficulty, and the station
+// gate (per-type) on the rows model.
+describe('buildCraftingView difficulty and skillReq', () => {
+  // Identity where the recipe's craft (cooking) is a MAJOR: the archetype
+  // ceiling is Infinity, isolating the ordinary tier curve.
+  const majorIdentity: CraftingIdentityLike = {
+    synced: true,
+    activeArchetype: 'cooking',
+    pairedMajor: 'alchemy',
+    hobbyCraft: null,
+  };
+
+  function difficultyFor(
+    skillReq: number,
+    craftSkills: Record<string, number>,
+    identity: CraftingIdentityLike = majorIdentity,
+  ): CraftDifficulty {
+    const items = table(item('recipe_diff_result'));
+    const view = buildCraftingView(
+      [{ ...recipe('recipe_diff', []), skillReq }],
+      [],
+      items,
+      craftSkills,
+      identity,
+    );
+    return view.recipes[0].difficulty;
+  }
+
+  it('surfaces the recipe skillReq on the row', () => {
+    const items = table(item('recipe_sr_result'));
+    const view = buildCraftingView([{ ...recipe('recipe_sr', []), skillReq: 75 }], [], items);
+    expect(view.recipes[0].skillReq).toBe(75);
+  });
+
+  it('full at or above raw capability (this is how capability advances)', () => {
+    // At capability: skill 100 (tier 4) vs skillReq 100 (tier 4).
+    expect(difficultyFor(100, { cooking: 100 })).toBe('full');
+    // Above capability: skill 50 (tier 2) vs skillReq 100 (tier 4).
+    expect(difficultyFor(100, { cooking: 50 })).toBe('full');
+  });
+
+  it('reduced one tier below, minimal two below, none three or more below', () => {
+    expect(difficultyFor(75, { cooking: 100 })).toBe('reduced');
+    // Two below is the green minimal state (MINIMAL_TIER_MULTIPLIER), its own
+    // four-state label since the Stage 5 split (was bucketed into 'reduced').
+    expect(difficultyFor(50, { cooking: 100 })).toBe('minimal');
+    expect(difficultyFor(25, { cooking: 100 })).toBe('none');
+  });
+
+  it('the tier-0 free floor is retired: common recipes ride the curve', () => {
+    expect(difficultyFor(0, { cooking: 0 })).toBe('full');
+    expect(difficultyFor(0, { cooking: 25 })).toBe('reduced');
+    expect(difficultyFor(0, { cooking: 50 })).toBe('minimal');
+    expect(difficultyFor(0, { cooking: 300 })).toBe('none'); // was 'full' pre-12c
+    expect(difficultyFor(24, { cooking: 300 })).toBe('none');
+  });
+
+  it('at the craft content cap the label is none regardless of band (the learning-XP arm)', () => {
+    // The four-state curve alone can never reach gray for skillReq 75+
+    // (that needs capability past the 125 cap), so without the cap arm a
+    // maxed craft would read minimal, or even full for a tier-6 recipe,
+    // forever while the applied gain and the character-XP grant are zero.
+    expect(difficultyFor(75, { cooking: 125 })).toBe('none'); // was 'minimal'
+    expect(difficultyFor(150, { cooking: 125 })).toBe('none'); // was 'full'
+    // Just under the cap the recipe still teaches, so the band still shows
+    // (124.5 is tier 4: tier 5 begins exactly at the 125 cap, which is why
+    // a tier-3 recipe's minimal state only ever existed at the cap itself).
+    expect(difficultyFor(150, { cooking: 124.5 })).toBe('full');
+    expect(difficultyFor(75, { cooking: 124.5 })).toBe('reduced');
+    // Online pre-sync the skills mirror is EMPTY, and empty must never read
+    // as capped: with the majors identity the label rides the ordinary curve
+    // (full at capability 0) until the first cprof snapshot lands, the same
+    // pre-existing transient every difficulty state has. (With a NULL
+    // pre-sync identity the rare-ceiling arm reads 'none' for skillReq 75+
+    // on its own, so the majors identity is what isolates the cap arm here.)
+    expect(
+      difficultyFor(
+        75,
+        {},
+        {
+          synced: false,
+          activeArchetype: 'cooking',
+          pairedMajor: 'alchemy',
+          hobbyCraft: null,
+        },
+      ),
+    ).toBe('full');
+  });
+
+  it('pins the multiplier constants and their four-state difficulty mapping', () => {
+    // Constant identity: the view compares against the SAME exported wheel.ts
+    // constants the sim gain site consumes, so a curve retune moves the label
+    // and the grant together, never one without the other.
+    expect(REDUCED_TIER_MULTIPLIER).toBe(0.5);
+    expect(MINIMAL_TIER_MULTIPLIER).toBe(0.25);
+    expect(tierProgressMultiplier(5, 4)).toBe(REDUCED_TIER_MULTIPLIER);
+    expect(tierProgressMultiplier(5, 3)).toBe(MINIMAL_TIER_MULTIPLIER);
+    // Each multiplier value drives its own state through a real skills/recipe
+    // fixture: cooking 100 is tier-4 capability against recipe tiers 4/3/2/1,
+    // multipliers 1 / 0.5 / 0.25 / 0.
+    expect(difficultyFor(100, { cooking: 100 })).toBe('full');
+    expect(difficultyFor(75, { cooking: 100 })).toBe('reduced');
+    expect(difficultyFor(50, { cooking: 100 })).toBe('minimal');
+    expect(difficultyFor(25, { cooking: 100 })).toBe('none');
+  });
+
+  it('a recipe tier above the ARCHETYPE ceiling is none even when the curve says full', () => {
+    // cooking is neither major nor hobby: common (tier 0) ceiling. skillReq 25
+    // (tier 1) at exactly tier-1 capability would be full on the curve alone.
+    const otherIdentity: CraftingIdentityLike = {
+      synced: true,
+      activeArchetype: 'alchemy',
+      pairedMajor: 'engineering',
+      hobbyCraft: 'smelting',
+    };
+    expect(difficultyFor(25, { cooking: 25 }, otherIdentity)).toBe('none');
+    // Hobby craft: rare (tier 2) ceiling. Tier 2 at capability passes, tier 3
+    // at capability clamps to none.
+    const hobbyIdentity: CraftingIdentityLike = {
+      synced: true,
+      activeArchetype: 'alchemy',
+      pairedMajor: 'engineering',
+      hobbyCraft: 'cooking',
+    };
+    expect(difficultyFor(50, { cooking: 50 }, hobbyIdentity)).toBe('full');
+    expect(difficultyFor(75, { cooking: 75 }, hobbyIdentity)).toBe('none');
+    // No archetype chosen at all: every craft is capped at rare (tier 2).
+    const unchosenIdentity: CraftingIdentityLike = {
+      synced: true,
+      activeArchetype: null,
+      pairedMajor: null,
+      hobbyCraft: null,
+    };
+    expect(difficultyFor(75, { cooking: 75 }, unchosenIdentity)).toBe('none');
+  });
+
+  it('difficulty never gates craftable: a none recipe with reagents stays craftable', () => {
+    // There is NO skillReq admission gate on crafting (crafting.ts documents
+    // that resolveCraft does not read skillReq); difficulty is informational.
+    // skillReq 25 (tier 1) at cooking 100 (tier-4 capability) is three tiers
+    // below: gray on the curve, so the row reads 'none'.
+    const items = table(item('bone_fragments'), item('recipe_none_result'));
+    const view = buildCraftingView(
+      [{ ...recipe('recipe_none', [{ itemId: 'bone_fragments', count: 1 }]), skillReq: 25 }],
+      [{ itemId: 'bone_fragments', count: 1 }],
+      items,
+      { cooking: 100 },
+      majorIdentity,
+    );
+    expect(view.recipes[0].difficulty).toBe('none');
+    expect(view.recipes[0].craftable).toBe(true);
+  });
+
+  it('pins equality with the sim skill-gain derivation across the boundary sweep', () => {
+    // The view's difficulty must be the EXACT mapping of the multiplier the
+    // sim computes at the gainCraftSkill call site (crafting.ts): archetype
+    // ceiling alone zeroes, else tierProgressMultiplier off raw capability.
+    // Each case also pins the ABSOLUTE bucket so a shared regression in both
+    // derivations cannot pass as vacuous equality.
+    const otherIdentity: CraftingIdentityLike = {
+      synced: true,
+      activeArchetype: 'alchemy',
+      pairedMajor: 'engineering',
+      hobbyCraft: 'smelting',
+    };
+    const cases: {
+      skillReq: number;
+      skills: Record<string, number>;
+      identity: CraftingIdentityLike;
+      expected: CraftDifficulty;
+    }[] = [
+      // At capability.
+      { skillReq: 100, skills: { cooking: 100 }, identity: majorIdentity, expected: 'full' },
+      // One below capability.
+      { skillReq: 75, skills: { cooking: 100 }, identity: majorIdentity, expected: 'reduced' },
+      // Two below capability: the green minimal state
+      // (MINIMAL_TIER_MULTIPLIER), its own label since the Stage 5 split.
+      { skillReq: 50, skills: { cooking: 100 }, identity: majorIdentity, expected: 'minimal' },
+      // Recipe above raw capability: the ordinary climb, full.
+      { skillReq: 100, skills: { cooking: 25 }, identity: majorIdentity, expected: 'full' },
+      // Recipe tier 0 at a towering capability: the free floor is retired
+      // so this is gray (was 'full' before the retire).
+      { skillReq: 0, skills: { cooking: 300 }, identity: majorIdentity, expected: 'none' },
+      // Ceiling-clamped: curve alone would say full, common ceiling zeroes it.
+      { skillReq: 25, skills: { cooking: 25 }, identity: otherIdentity, expected: 'none' },
+      // A tier-0 recipe at tier-0 capability stays full under any ceiling
+      // (tier 0 is never above tier 0, and zero tiers below is orange).
+      { skillReq: 0, skills: {}, identity: otherIdentity, expected: 'full' },
+    ];
+    for (const c of cases) {
+      // The sim derivation, computed with the SAME imported pure functions.
+      const ceilingTier = archetypeCeilingFor(
+        c.identity.activeArchetype,
+        c.identity.pairedMajor,
+        'cooking',
+        c.identity.hobbyCraft,
+      );
+      const recipeTier = tierForSkill(c.skillReq);
+      const multiplier =
+        recipeTier > ceilingTier
+          ? 0
+          : tierProgressMultiplier(tierCapability(c.skills, 'cooking'), recipeTier);
+      const simDerived: CraftDifficulty =
+        multiplier === 0
+          ? 'none'
+          : multiplier === REDUCED_TIER_MULTIPLIER
+            ? 'reduced'
+            : multiplier === MINIMAL_TIER_MULTIPLIER
+              ? 'minimal'
+              : 'full';
+      const viewDerived = difficultyFor(c.skillReq, c.skills, c.identity);
+      expect(viewDerived, `skillReq ${c.skillReq} skills ${JSON.stringify(c.skills)}`).toBe(
+        simDerived,
+      );
+      expect(viewDerived, `skillReq ${c.skillReq} skills ${JSON.stringify(c.skills)}`).toBe(
+        c.expected,
+      );
+    }
+  });
+
+  it('while syncing, difficulty computes normally from the empty pre-cprof skills', () => {
+    // Chosen behavior, documented here: pre-cprof the same payload carries the
+    // skills, so they are empty; difficulty computes normally over them (a
+    // tier-0 recipe reads full, a tier-3 recipe reads none under the
+    // no-archetype rare ceiling) and stays presentation-neutral, while the
+    // LOCKED optimistic craftable behavior is untouched.
+    const syncing: CraftingIdentityLike = {
+      synced: false,
+      activeArchetype: null,
+      pairedMajor: null,
+      hobbyCraft: null,
+    };
+    expect(difficultyFor(0, {}, syncing)).toBe('full');
+    // Curve still runs over the empty skills: tier 1 at zero capability is the
+    // ordinary above-capability climb, full, within the no-archetype ceiling.
+    expect(difficultyFor(25, {}, syncing)).toBe('full');
+    // Tier 3 sits above the no-archetype rare (tier 2) ceiling: none.
+    expect(difficultyFor(75, {}, syncing)).toBe('none');
+    const items = table(item('recipe_sync_result'));
+    const view = buildCraftingView(
+      [{ ...recipe('recipe_sync', []), skillReq: 75 }],
+      [],
+      items,
+      {},
+      syncing,
+    );
+    expect(view.recipes[0].craftable).toBe(true);
+  });
+});
+
+describe('buildCraftingView station gate (formerly the #1297 hub boolean)', () => {
+  function stationRecipe(id: string, reagents: { itemId: string; count: number }[]): RecipeDefLike {
+    // The base recipe helper is professionId 'cooking': kitchens is its craft's
+    // own station type (STATION_TYPE_BY_CRAFT).
+    return { ...recipe(id, reagents), stationType: 'kitchens' };
+  }
+
+  it('a station recipe whose type is in the in-range set stays craftable', () => {
+    const items = table(item('bone_fragments'), item('recipe_st_result'));
+    const view = buildCraftingView(
+      [stationRecipe('recipe_st', [{ itemId: 'bone_fragments', count: 1 }])],
+      [{ itemId: 'bone_fragments', count: 1 }],
+      items,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set<StationType>(['kitchens']),
+    );
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: true });
+    expect(view.recipes[0].craftable).toBe(true);
+  });
+
+  it('a station recipe out of range is not craftable even with every reagent', () => {
+    const items = table(item('bone_fragments'), item('recipe_st_result'));
+    const view = buildCraftingView(
+      [stationRecipe('recipe_st', [{ itemId: 'bone_fragments', count: 1 }])],
+      [{ itemId: 'bone_fragments', count: 1 }],
+      items,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set<StationType>(),
+    );
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: false });
+    expect(view.recipes[0].craftable).toBe(false);
+  });
+
+  it('the in-range set discriminates per type: a different station in range does not satisfy', () => {
+    const items = table(item('bone_fragments'), item('recipe_st_result'));
+    const view = buildCraftingView(
+      [stationRecipe('recipe_st', [{ itemId: 'bone_fragments', count: 1 }])],
+      [{ itemId: 'bone_fragments', count: 1 }],
+      items,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set<StationType>(['forge', 'loom']),
+    );
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: false });
+    expect(view.recipes[0].craftable).toBe(false);
+  });
+
+  it('station range and reagents gate independently: in range with short reagents stays blocked', () => {
+    const items = table(item('bone_fragments'), item('recipe_st_result'));
+    const view = buildCraftingView(
+      [stationRecipe('recipe_st', [{ itemId: 'bone_fragments', count: 2 }])],
+      [{ itemId: 'bone_fragments', count: 1 }],
+      items,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set<StationType>(['kitchens']),
+    );
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: true });
+    expect(view.recipes[0].craftable).toBe(false);
+  });
+
+  it('a recipe without stationType gets a null station and ignores the in-range set', () => {
+    const items = table(item('bone_fragments'), item('recipe_free_result'));
+    const view = buildCraftingView(
+      [recipe('recipe_free', [{ itemId: 'bone_fragments', count: 1 }])],
+      [{ itemId: 'bone_fragments', count: 1 }],
+      items,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set<StationType>(),
+    );
+    expect(view.recipes[0].station).toBeNull();
+    expect(view.recipes[0].craftable).toBe(true);
+  });
+
+  it('the in-range set defaults to EMPTY (out of range) when omitted', () => {
+    // Re-pin: the old boolean defaulted to true; the set default is
+    // deliberately conservative, so a caller that forgets to pass it renders
+    // a disabled station row rather than a falsely-enabled one.
+    const items = table(item('recipe_st_result'));
+    const view = buildCraftingView([stationRecipe('recipe_st', [])], [], items);
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: false });
+    expect(view.recipes[0].craftable).toBe(false);
+  });
+
+  it('never mutates any input across the new difficulty and station paths', () => {
+    const items = table(item('bone_fragments'), item('recipe_mut_result'));
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 5 }];
+    const recipes = [
+      { ...stationRecipe('recipe_mut', [{ itemId: 'bone_fragments', count: 2 }]), skillReq: 75 },
+    ];
+    const craftSkills = { cooking: 100 };
+    const identity: CraftingIdentityLike = {
+      synced: true,
+      activeArchetype: 'cooking',
+      pairedMajor: 'alchemy',
+      hobbyCraft: null,
+    };
+    const snapshots = [inventory, recipes, items, craftSkills, identity].map((v) =>
+      JSON.stringify(v),
+    );
+    buildCraftingView(
+      recipes,
+      inventory,
+      items,
+      craftSkills,
+      identity,
+      new Set<StationType>(['kitchens']),
+    );
+    const after = [inventory, recipes, items, craftSkills, identity].map((v) => JSON.stringify(v));
+    expect(after).toEqual(snapshots);
+  });
+});
+
+describe('craftLearnHints (discoverability)', () => {
+  const trainerRecipeIdsFor = (craft: string): string[] =>
+    ALL_RECIPES.filter((r) => r.professionId === craft && r.acquisition?.includes('trainer')).map(
+      (r) => r.id,
+    );
+
+  it('hints a craft with unlearned trainer recipes at its station and master (positive)', () => {
+    // Nothing learned: every stationed craft with a trainer recipe is hinted,
+    // naming its station type and resident master.
+    const hints = craftLearnHints([], STATIONS);
+    expect(trainerRecipeIdsFor('weaponcrafting').length).toBeGreaterThan(0);
+    expect(hints.get('weaponcrafting')).toEqual({
+      stationType: 'forge',
+      masterNpcId: 'forgemistress_darva',
+    });
+  });
+
+  it('drops the hint once every trainer recipe of the craft is known (fully-trained negative)', () => {
+    const known = trainerRecipeIdsFor('weaponcrafting');
+    expect(known.length).toBeGreaterThan(0);
+    expect(craftLearnHints(known, STATIONS).has('weaponcrafting')).toBe(false);
+  });
+
+  it('never hints a craft with no physical station, and stays safe for unknown crafts', () => {
+    const hints = craftLearnHints([], []);
+    // Every hinted craft resolves to the station type it was paired with.
+    for (const [craft, hint] of hints) {
+      expect(stationTypeForCraft(craft)).toBe(hint.stationType);
+      expect(hint.masterNpcId).toBeTruthy();
+    }
+    // jewelcrafting has no station master, so it is never hinted even unlearned;
+    // a bogus craft id is simply absent (no crash, no entry).
+    expect(hints.has('jewelcrafting')).toBe(false);
+    expect(hints.has('not-a-craft')).toBe(false);
   });
 });

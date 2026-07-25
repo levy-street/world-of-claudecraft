@@ -1,0 +1,116 @@
+{
+  "validatedOn": "2026-07-24",
+  "skill": "img2threejs 1.3.0",
+  "referenceAdmission": {
+    "mailbox": {
+      "primaryViews": 7,
+      "admitted": 7,
+      "rejected": 0,
+      "supplementaryRejectedAsDuplicate": 1
+    },
+    "noticeboard": { "primaryViews": 7, "admitted": 7, "rejected": 0 },
+    "command": "forge/stage1_intake/check_reference_admission.py <view> --viewpoint <id> --against <prior-primary-phashes> --json"
+  },
+  "specValidation": [
+    {
+      "assetId": "ravenpost-mailbox",
+      "spec": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/object-sculpt-spec.json",
+      "normal": { "ok": true, "errors": 0, "warnings": 0, "components": 12, "materials": 2 },
+      "strictQuality": { "ok": true, "errors": 0, "warnings": 0, "components": 12, "materials": 2 },
+      "pipeline": {
+        "currentPass": "complete",
+        "completedPasses": [
+          "blockout",
+          "structural-pass",
+          "form-refinement",
+          "material-pass",
+          "lighting-pass",
+          "interaction-pass",
+          "optimization-pass"
+        ]
+      },
+      "reviewAcceptance": {
+        "reviews": 7,
+        "minimumGlobalScore": 0.74,
+        "minimumLayerScore": 0.7,
+        "minimumVisibleFeatureScore": 0.75
+      },
+      "shippingOutput": {
+        "triangles": 1640,
+        "primitives": 2,
+        "materials": 2,
+        "compressedBytes": 32884,
+        "bounds": [1.65, 2.9, 1.05],
+        "embeddedTextures": 0,
+        "animations": 0,
+        "skins": 0,
+        "cameras": 0,
+        "extensions": ["EXT_meshopt_compression", "KHR_mesh_quantization"],
+        "sha256": "8750b9de2a2f5b29937e580696971ac50677c6ea997722ca06262951a8825acb",
+        "sourceFingerprint": "488d484fbdbb15a4953754fbf08dc59880496ff97acec2e63036cde93ae883db"
+      }
+    },
+    {
+      "assetId": "eastbrook-civic-noticeboard",
+      "spec": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/object-sculpt-spec.json",
+      "normal": { "ok": true, "errors": 0, "warnings": 0, "components": 12, "materials": 2 },
+      "strictQuality": { "ok": true, "errors": 0, "warnings": 0, "components": 12, "materials": 2 },
+      "pipeline": {
+        "currentPass": "complete",
+        "completedPasses": [
+          "blockout",
+          "structural-pass",
+          "form-refinement",
+          "material-pass",
+          "lighting-pass",
+          "interaction-pass",
+          "optimization-pass"
+        ]
+      },
+      "reviewAcceptance": {
+        "reviews": 7,
+        "minimumGlobalScore": 0.73,
+        "minimumLayerScore": 0.7,
+        "minimumVisibleFeatureScore": 0.74
+      },
+      "shippingOutput": {
+        "triangles": 1184,
+        "primitives": 2,
+        "materials": 2,
+        "compressedBytes": 24684,
+        "bounds": [2.4, 2.6, 0.6],
+        "embeddedTextures": 0,
+        "animations": 0,
+        "skins": 0,
+        "cameras": 0,
+        "extensions": ["EXT_meshopt_compression", "KHR_mesh_quantization"],
+        "sha256": "2743458c5d551093c0ccc0d3104bdece26f06c210a7f3f74eaa2fe1510b9c8d7",
+        "sourceFingerprint": "2a591ad70045e7988f38f9890383ffd35d9fefe6dd598436d92ea2b568d3fb17"
+      }
+    }
+  ],
+  "commands": {
+    "normal": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --json",
+    "strictQuality": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --strict-quality --json",
+    "pipelineStatus": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage3_build/orchestrate_passes.py status <spec>",
+    "intakeCorrectness": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage1_intake/check_intake_correctness.py <spec> --json"
+  },
+  "intakeCorrectness": {
+    "mailbox": {
+      "action": "proceed",
+      "confirmed": false,
+      "deferredCheck": "OSIM or Divine-Eye review"
+    },
+    "noticeboard": {
+      "action": "proceed",
+      "confirmed": false,
+      "deferredCheck": "OSIM or Divine-Eye review"
+    },
+    "note": "The declared class and material assumptions are explicit and falsifiable. No external objectness verdict was available at pre-spec time."
+  },
+  "gateThresholds": {
+    "globalVisualAcceptance": 0.7,
+    "criticalFeatureMinimum": 0.7,
+    "importantFeatureAverage": 0.7
+  }
+}

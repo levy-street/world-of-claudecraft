@@ -1,4 +1,5 @@
 import { QUESTS } from '../../../sim/data';
+import { questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
@@ -34,10 +35,10 @@ export class QuestTrackerController {
         number: quests.length + 1,
         title: this.deps.questTitle(progress.questId),
         complete: progress.state === 'ready',
-        objectives: quest.objectives.map((objective, objectiveIndex) => ({
+        objectives: quest.objectives.map((_objective, objectiveIndex) => ({
           label: this.deps.objectiveLabel(progress.questId, objectiveIndex),
           current: progress.counts[objectiveIndex],
-          total: objective.count,
+          total: questObjectiveRequired(quest, progress, objectiveIndex),
         })),
       });
     }

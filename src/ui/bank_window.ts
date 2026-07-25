@@ -431,7 +431,7 @@ export class BankWindow {
         const partial = slot.showCount
           ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
           : '';
-        return `${this.deps.itemTooltip(item)}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
+        return `${this.deps.itemTooltip(item, slot.instance)}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
       });
       grid.appendChild(cell);
     }

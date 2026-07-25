@@ -1,0 +1,1193 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-24T00:57:15.705Z",
+  "gameUrl": "http://127.0.0.1:5184",
+  "shotPrefix": "after",
+  "expectedArmoury": true,
+  "profile": "desktop-ultra",
+  "view": "close",
+  "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+  "sample": {
+    "warmupMs": 800,
+    "sampleMs": 2400,
+    "repeats": 2
+  },
+  "world": {
+    "seed": 20061,
+    "lot": {
+      "kind": "inn",
+      "landmark": "eastbrook_grand_armoury",
+      "x": 17.5,
+      "z": -5.5,
+      "w": 13,
+      "d": 9,
+      "rot": -1.5707963267948966
+    },
+    "player": {
+      "x": 8,
+      "y": 1.5,
+      "z": 2,
+      "facing": 1.5707963267948966
+    },
+    "camera": {
+      "x": 2.2,
+      "y": 7.8,
+      "z": -5.5
+    },
+    "target": {
+      "x": 7,
+      "y": 6.32,
+      "z": -5.5
+    }
+  },
+  "gl": {
+    "vendor": "Google Inc. (Apple)",
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Max, Unspecified Version)"
+  },
+  "settings": {
+    "cameraSpeed": 0.7,
+    "sfxVolume": 0.8,
+    "musicVolume": 0.8,
+    "voiceVolume": 0.9,
+    "brightness": 1,
+    "graphicsPreset": 4,
+    "browserEffects": 0,
+    "terrainDetail": 1,
+    "foliageDensity": 1,
+    "effectsQuality": 1,
+    "shadowQuality": 1,
+    "cameraFov": 60,
+    "renderScale": 1,
+    "fullscreen": 1,
+    "showOverflowXp": 1,
+    "clickToMove": 0,
+    "clickToMoveButton": 0,
+    "interfaceMode": 0,
+    "touchLookSpeed": 1,
+    "touchOpacity": 1,
+    "weather": 1,
+    "joystickScale": 1,
+    "actionButtonScale": 1,
+    "joystickDeadzone": 0.22,
+    "gamepadStickDeadzone": 0.18,
+    "gamepadCameraSpeed": 2.4,
+    "gamepadVibration": 1,
+    "tooltipScale": 1,
+    "chatFontScale": 1,
+    "chatOpacity": 1,
+    "fctScale": 1,
+    "hudOpacity": 1,
+    "uiScale": 1,
+    "playerFrameScale": 1,
+    "targetFrameScale": 1,
+    "partyFrameStyle": 0,
+    "partyFrameScale": 1,
+    "partyFrameWidth": 170,
+    "partyFrameHeight": 42,
+    "partyFrameSpacing": 4,
+    "partyFrameColumns": 1,
+    "partyFrameHealthText": 1,
+    "partyFrameSort": 0,
+    "mouseCamera": false,
+    "lockCursorOnRotate": true,
+    "gamepadEnabled": true,
+    "gamepadInvertY": false,
+    "leftHandedTouch": false,
+    "mobileCameraJoystick": false,
+    "filterProfanity": true,
+    "attackMove": false,
+    "touchInvertLook": false,
+    "startAttackOnAbilityUse": true,
+    "showAttackButton": true,
+    "walkByAutoloot": false,
+    "groundReticle": true,
+    "aurasOnPlayerFrame": false,
+    "mouseoverCast": true,
+    "partyFrameShowResource": true,
+    "partyFrameShowAbsorbs": true,
+    "partyFrameShowAuras": true,
+    "partyFrameShowSelf": false,
+    "reduceMotion": true,
+    "highContrastText": false,
+    "frostedPanels": false,
+    "compactChat": false,
+    "showFps": false,
+    "showWalletOnCharacterScreen": true,
+    "showWalletOnPlayerCard": true,
+    "showDevBadges": true,
+    "showOwnNameplate": true,
+    "showPlayerNameplates": true,
+    "invertLookY": false,
+    "voiceEnabled": true,
+    "footstepSfx": false,
+    "interfaceSfx": true,
+    "clickFeedback": true,
+    "landingHighContrast": false,
+    "questTrackerCollapsed": false,
+    "deedTrackerCollapsed": false,
+    "showItemLevel": false,
+    "showSecondaryActionBar": false,
+    "showThirdActionBar": false,
+    "showTargetOfTarget": false,
+    "showDailyRewardsChest": true,
+    "graphicsDefaultApplied": true
+  },
+  "initialResources": {
+    "calls": 1,
+    "triangles": 1,
+    "geometries": 290,
+    "textures": 161,
+    "programs": 63
+  },
+  "sequence": [
+    {
+      "label": "visible-shadow-on-1",
+      "armouryChildMeshes": 6,
+      "requested": {
+        "meshVisible": true,
+        "shadowEnabled": true
+      },
+      "observed": {
+        "wrapperVisible": true,
+        "visibleMeshes": 6,
+        "shadowMapEnabled": true,
+        "sunCastShadow": true
+      },
+      "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+      "renderMedian": {
+        "calls": 534,
+        "triangles": 2103040,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 6.1
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 64
+      },
+      "rafFrameIntervalStats": {
+        "frames": 229,
+        "seconds": 2.4,
+        "fpsMean": 95.2,
+        "fpsMedian": 100,
+        "fpsLow1": 16.4,
+        "fpsLow01": 6.8,
+        "meanMs": 10.5,
+        "p50Ms": 10,
+        "p95Ms": 16,
+        "p99Ms": 17.3,
+        "p999Ms": 148.1,
+        "maxMs": 148.1,
+        "stdevMs": 9.64,
+        "jankPct": 0.44,
+        "long50": 1,
+        "stutter100": 1
+      },
+      "perfReportSummary": {
+        "fps": 95.2,
+        "fps10s": 95.7,
+        "frameP95": 16,
+        "frameP99": 17.3,
+        "frameMax": 148.1,
+        "long50": 1,
+        "tier": "ultra",
+        "renderScale": 1,
+        "calls": 534,
+        "triangles": 2103040,
+        "programs": 64,
+        "textures": 162,
+        "views": 55,
+        "entities": null,
+        "grassTufts": 5231,
+        "foliageDraws": 166,
+        "foliageTris": 2181874,
+        "phaseEntitiesMs": 0.43,
+        "phaseWorldMs": 0.2,
+        "phaseSubmitMs": 10.13,
+        "phaseTotalMs": 10.91,
+        "mainSimMs": 0,
+        "mainRendererMs": 0,
+        "mainHudMs": 0,
+        "longTaskCount": 1,
+        "longTaskP95": 153,
+        "longTaskMax": 153,
+        "heapUsedMb": 441.6,
+        "heapLimitMb": 4192,
+        "budgetMode": "disabled",
+        "budgetReason": "disabled",
+        "budgetPressure": 0,
+        "autoGovernor": false
+      }
+    },
+    {
+      "label": "hidden-shadow-on-1",
+      "armouryChildMeshes": 6,
+      "requested": {
+        "meshVisible": false,
+        "shadowEnabled": true
+      },
+      "observed": {
+        "wrapperVisible": true,
+        "visibleMeshes": 0,
+        "shadowMapEnabled": true,
+        "sunCastShadow": true
+      },
+      "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+      "renderMedian": {
+        "calls": 524,
+        "triangles": 2087196,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 6.6
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 64
+      },
+      "rafFrameIntervalStats": {
+        "frames": 218,
+        "seconds": 2.41,
+        "fpsMean": 90.6,
+        "fpsMedian": 93.5,
+        "fpsLow1": 35.4,
+        "fpsLow01": 30,
+        "meanMs": 11.04,
+        "p50Ms": 10.7,
+        "p95Ms": 16.6,
+        "p99Ms": 18.3,
+        "p999Ms": 33.3,
+        "maxMs": 33.3,
+        "stdevMs": 3.94,
+        "jankPct": 0.92,
+        "long50": 0,
+        "stutter100": 0
+      },
+      "perfReportSummary": {
+        "fps": 90.6,
+        "fps10s": 90.9,
+        "frameP95": 16.6,
+        "frameP99": 18.3,
+        "frameMax": 33.3,
+        "long50": 0,
+        "tier": "ultra",
+        "renderScale": 1,
+        "calls": 526,
+        "triangles": 2090336,
+        "programs": 64,
+        "textures": 162,
+        "views": 55,
+        "entities": null,
+        "grassTufts": 5231,
+        "foliageDraws": 166,
+        "foliageTris": 2181874,
+        "phaseEntitiesMs": 0.42,
+        "phaseWorldMs": 0.18,
+        "phaseSubmitMs": 7.84,
+        "phaseTotalMs": 8.57,
+        "mainSimMs": 0,
+        "mainRendererMs": 0,
+        "mainHudMs": 0,
+        "longTaskCount": 0,
+        "longTaskP95": 0,
+        "longTaskMax": 0,
+        "heapUsedMb": 463.4,
+        "heapLimitMb": 4192,
+        "budgetMode": "disabled",
+        "budgetReason": "disabled",
+        "budgetPressure": 0,
+        "autoGovernor": false
+      }
+    },
+    {
+      "label": "hidden-shadow-on-2",
+      "armouryChildMeshes": 6,
+      "requested": {
+        "meshVisible": false,
+        "shadowEnabled": true
+      },
+      "observed": {
+        "wrapperVisible": true,
+        "visibleMeshes": 0,
+        "shadowMapEnabled": true,
+        "sunCastShadow": true
+      },
+      "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+      "renderMedian": {
+        "calls": 528,
+        "triangles": 2093476,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 5.1
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 64
+      },
+      "rafFrameIntervalStats": {
+        "frames": 220,
+        "seconds": 2.4,
+        "fpsMean": 91.6,
+        "fpsMedian": 96.2,
+        "fpsLow1": 20.9,
+        "fpsLow01": 10.6,
+        "meanMs": 10.91,
+        "p50Ms": 10.4,
+        "p95Ms": 16.2,
+        "p99Ms": 18.7,
+        "p999Ms": 94.1,
+        "maxMs": 94.1,
+        "stdevMs": 6.49,
+        "jankPct": 0.91,
+        "long50": 1,
+        "stutter100": 0
+      },
+      "perfReportSummary": {
+        "fps": 91.6,
+        "fps10s": 92,
+        "frameP95": 16.2,
+        "frameP99": 18.7,
+        "frameMax": 94.1,
+        "long50": 1,
+        "tier": "ultra",
+        "renderScale": 1,
+        "calls": 528,
+        "triangles": 2093476,
+        "programs": 64,
+        "textures": 162,
+        "views": 55,
+        "entities": null,
+        "grassTufts": 5231,
+        "foliageDraws": 166,
+        "foliageTris": 2181874,
+        "phaseEntitiesMs": 0.51,
+        "phaseWorldMs": 0.22,
+        "phaseSubmitMs": 6.79,
+        "phaseTotalMs": 7.67,
+        "mainSimMs": 0,
+        "mainRendererMs": 0,
+        "mainHudMs": 0,
+        "longTaskCount": 1,
+        "longTaskP95": 91,
+        "longTaskMax": 91,
+        "heapUsedMb": 446.5,
+        "heapLimitMb": 4192,
+        "budgetMode": "disabled",
+        "budgetReason": "disabled",
+        "budgetPressure": 0,
+        "autoGovernor": false
+      }
+    },
+    {
+      "label": "visible-shadow-on-2",
+      "armouryChildMeshes": 6,
+      "requested": {
+        "meshVisible": true,
+        "shadowEnabled": true
+      },
+      "observed": {
+        "wrapperVisible": true,
+        "visibleMeshes": 6,
+        "shadowMapEnabled": true,
+        "sunCastShadow": true
+      },
+      "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+      "renderMedian": {
+        "calls": 538,
+        "triangles": 2109320,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 4.7
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 64
+      },
+      "rafFrameIntervalStats": {
+        "frames": 189,
+        "seconds": 2.43,
+        "fpsMean": 77.9,
+        "fpsMedian": 87,
+        "fpsLow1": 28.1,
+        "fpsLow01": 28,
+        "meanMs": 12.84,
+        "p50Ms": 11.5,
+        "p95Ms": 30.5,
+        "p99Ms": 35.5,
+        "p999Ms": 35.7,
+        "maxMs": 35.7,
+        "stdevMs": 6.18,
+        "jankPct": 6.35,
+        "long50": 0,
+        "stutter100": 0
+      },
+      "perfReportSummary": {
+        "fps": 78.3,
+        "fps10s": 78.6,
+        "frameP95": 30.5,
+        "frameP99": 35.5,
+        "frameMax": 35.7,
+        "long50": 0,
+        "tier": "ultra",
+        "renderScale": 1,
+        "calls": 538,
+        "triangles": 2109320,
+        "programs": 64,
+        "textures": 162,
+        "views": 55,
+        "entities": null,
+        "grassTufts": 5231,
+        "foliageDraws": 166,
+        "foliageTris": 2181874,
+        "phaseEntitiesMs": 0.62,
+        "phaseWorldMs": 0.26,
+        "phaseSubmitMs": 5.93,
+        "phaseTotalMs": 7,
+        "mainSimMs": 0,
+        "mainRendererMs": 0,
+        "mainHudMs": 0,
+        "longTaskCount": 0,
+        "longTaskP95": 0,
+        "longTaskMax": 0,
+        "heapUsedMb": 456.9,
+        "heapLimitMb": 4192,
+        "budgetMode": "disabled",
+        "budgetReason": "disabled",
+        "budgetPressure": 0,
+        "autoGovernor": false
+      }
+    },
+    {
+      "label": "visible-shadow-off-1",
+      "armouryChildMeshes": 6,
+      "requested": {
+        "meshVisible": true,
+        "shadowEnabled": false
+      },
+      "observed": {
+        "wrapperVisible": true,
+        "visibleMeshes": 6,
+        "shadowMapEnabled": false,
+        "sunCastShadow": false
+      },
+      "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+      "renderMedian": {
+        "calls": 218,
+        "triangles": 1264109,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 3.4
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 87
+      },
+      "rafFrameIntervalStats": {
+        "frames": 241,
+        "seconds": 2.41,
+        "fpsMean": 99.9,
+        "fpsMedian": 104.2,
+        "fpsLow1": 30.1,
+        "fpsLow01": 25.4,
+        "meanMs": 10.01,
+        "p50Ms": 9.6,
+        "p95Ms": 17.8,
+        "p99Ms": 29.7,
+        "p999Ms": 39.3,
+        "maxMs": 39.3,
+        "stdevMs": 5.12,
+        "jankPct": 1.66,
+        "long50": 0,
+        "stutter100": 0
+      },
+      "perfReportSummary": {
+        "fps": 99.4,
+        "fps10s": 99.9,
+        "frameP95": 17.8,
+        "frameP99": 29.7,
+        "frameMax": 39.3,
+        "long50": 0,
+        "tier": "ultra",
+        "renderScale": 1,
+        "calls": 218,
+        "triangles": 1264109,
+        "programs": 87,
+        "textures": 162,
+        "views": 55,
+        "entities": null,
+        "grassTufts": 5231,
+        "foliageDraws": 166,
+        "foliageTris": 2181874,
+        "phaseEntitiesMs": 0.66,
+        "phaseWorldMs": 0.27,
+        "phaseSubmitMs": 5,
+        "phaseTotalMs": 6.14,
+        "mainSimMs": 0,
+        "mainRendererMs": 0,
+        "mainHudMs": 0,
+        "longTaskCount": 0,
+        "longTaskP95": 0,
+        "longTaskMax": 0,
+        "heapUsedMb": 459.2,
+        "heapLimitMb": 4192,
+        "budgetMode": "disabled",
+        "budgetReason": "disabled",
+        "budgetPressure": 0,
+        "autoGovernor": false
+      }
+    },
+    {
+      "label": "hidden-shadow-off-1",
+      "armouryChildMeshes": 6,
+      "requested": {
+        "meshVisible": false,
+        "shadowEnabled": false
+      },
+      "observed": {
+        "wrapperVisible": true,
+        "visibleMeshes": 0,
+        "shadowMapEnabled": false,
+        "sunCastShadow": false
+      },
+      "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+      "renderMedian": {
+        "calls": 212,
+        "triangles": 1255883,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 3.2
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 93
+      },
+      "rafFrameIntervalStats": {
+        "frames": 226,
+        "seconds": 2.4,
+        "fpsMean": 94.1,
+        "fpsMedian": 98,
+        "fpsLow1": 44.3,
+        "fpsLow01": 35.8,
+        "meanMs": 10.63,
+        "p50Ms": 10.2,
+        "p95Ms": 15.5,
+        "p99Ms": 18.6,
+        "p999Ms": 27.9,
+        "maxMs": 27.9,
+        "stdevMs": 2.7,
+        "jankPct": 0.44,
+        "long50": 0,
+        "stutter100": 0
+      },
+      "perfReportSummary": {
+        "fps": 94.3,
+        "fps10s": 94.5,
+        "frameP95": 15.5,
+        "frameP99": 18.6,
+        "frameMax": 27.9,
+        "long50": 0,
+        "tier": "ultra",
+        "renderScale": 1,
+        "calls": 213,
+        "triangles": 1258741,
+        "programs": 94,
+        "textures": 162,
+        "views": 55,
+        "entities": null,
+        "grassTufts": 5231,
+        "foliageDraws": 166,
+        "foliageTris": 2181874,
+        "phaseEntitiesMs": 0.65,
+        "phaseWorldMs": 0.26,
+        "phaseSubmitMs": 4.35,
+        "phaseTotalMs": 5.47,
+        "mainSimMs": 0,
+        "mainRendererMs": 0,
+        "mainHudMs": 0,
+        "longTaskCount": 0,
+        "longTaskP95": 0,
+        "longTaskMax": 0,
+        "heapUsedMb": 462,
+        "heapLimitMb": 4192,
+        "budgetMode": "disabled",
+        "budgetReason": "disabled",
+        "budgetPressure": 0,
+        "autoGovernor": false
+      }
+    },
+    {
+      "label": "hidden-shadow-off-2",
+      "armouryChildMeshes": 6,
+      "requested": {
+        "meshVisible": false,
+        "shadowEnabled": false
+      },
+      "observed": {
+        "wrapperVisible": true,
+        "visibleMeshes": 0,
+        "shadowMapEnabled": false,
+        "sunCastShadow": false
+      },
+      "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+      "renderMedian": {
+        "calls": 213,
+        "triangles": 1258741,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 3.3
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 94
+      },
+      "rafFrameIntervalStats": {
+        "frames": 234,
+        "seconds": 2.41,
+        "fpsMean": 97,
+        "fpsMedian": 103.1,
+        "fpsLow1": 27.3,
+        "fpsLow01": 20.5,
+        "meanMs": 10.31,
+        "p50Ms": 9.7,
+        "p95Ms": 17.7,
+        "p99Ms": 30.1,
+        "p999Ms": 48.7,
+        "maxMs": 48.7,
+        "stdevMs": 4.85,
+        "jankPct": 1.71,
+        "long50": 0,
+        "stutter100": 0
+      },
+      "perfReportSummary": {
+        "fps": 97.1,
+        "fps10s": 97.6,
+        "frameP95": 17.7,
+        "frameP99": 30.1,
+        "frameMax": 48.7,
+        "long50": 0,
+        "tier": "ultra",
+        "renderScale": 1,
+        "calls": 213,
+        "triangles": 1258741,
+        "programs": 94,
+        "textures": 162,
+        "views": 55,
+        "entities": null,
+        "grassTufts": 5231,
+        "foliageDraws": 166,
+        "foliageTris": 2181874,
+        "phaseEntitiesMs": 0.68,
+        "phaseWorldMs": 0.26,
+        "phaseSubmitMs": 3.82,
+        "phaseTotalMs": 4.98,
+        "mainSimMs": 0,
+        "mainRendererMs": 0,
+        "mainHudMs": 0,
+        "longTaskCount": 0,
+        "longTaskP95": 0,
+        "longTaskMax": 0,
+        "heapUsedMb": 445.3,
+        "heapLimitMb": 4192,
+        "budgetMode": "disabled",
+        "budgetReason": "disabled",
+        "budgetPressure": 0,
+        "autoGovernor": false
+      }
+    },
+    {
+      "label": "visible-shadow-off-2",
+      "armouryChildMeshes": 6,
+      "requested": {
+        "meshVisible": true,
+        "shadowEnabled": false
+      },
+      "observed": {
+        "wrapperVisible": true,
+        "visibleMeshes": 6,
+        "shadowMapEnabled": false,
+        "sunCastShadow": false
+      },
+      "timingBasis": "uncapped requestAnimationFrame throughput and game CPU submit phase, not GPU timing",
+      "renderMedian": {
+        "calls": 218,
+        "triangles": 1265397,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 3.2
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 94
+      },
+      "rafFrameIntervalStats": {
+        "frames": 272,
+        "seconds": 2.4,
+        "fpsMean": 113.1,
+        "fpsMedian": 116.3,
+        "fpsLow1": 52.5,
+        "fpsLow01": 51.8,
+        "meanMs": 8.84,
+        "p50Ms": 8.6,
+        "p95Ms": 14,
+        "p99Ms": 18.9,
+        "p999Ms": 19.3,
+        "maxMs": 19.3,
+        "stdevMs": 3.09,
+        "jankPct": 0,
+        "long50": 0,
+        "stutter100": 0
+      },
+      "perfReportSummary": {
+        "fps": 113,
+        "fps10s": 113.6,
+        "frameP95": 14,
+        "frameP99": 18.9,
+        "frameMax": 19.3,
+        "long50": 0,
+        "tier": "ultra",
+        "renderScale": 1,
+        "calls": 218,
+        "triangles": 1265397,
+        "programs": 94,
+        "textures": 162,
+        "views": 55,
+        "entities": null,
+        "grassTufts": 5231,
+        "foliageDraws": 166,
+        "foliageTris": 2181874,
+        "phaseEntitiesMs": 0.69,
+        "phaseWorldMs": 0.26,
+        "phaseSubmitMs": 3.78,
+        "phaseTotalMs": 4.93,
+        "mainSimMs": 0,
+        "mainRendererMs": 0,
+        "mainHudMs": 0,
+        "longTaskCount": 0,
+        "longTaskP95": 0,
+        "longTaskMax": 0,
+        "heapUsedMb": 451.2,
+        "heapLimitMb": 4192,
+        "budgetMode": "disabled",
+        "budgetReason": "disabled",
+        "budgetPressure": 0,
+        "autoGovernor": false
+      }
+    }
+  ],
+  "conditions": {
+    "visibleShadowOn": {
+      "blocks": 2,
+      "renderMedian": {
+        "calls": 536,
+        "triangles": 2106180,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 5.4
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 64
+      },
+      "rafFrameIntervalStats": {
+        "frames": 418,
+        "seconds": 4.83,
+        "fpsMean": 86.5,
+        "fpsMedian": 92.6,
+        "fpsLow1": 17.3,
+        "fpsLow01": 6.8,
+        "meanMs": 11.56,
+        "p50Ms": 10.8,
+        "p95Ms": 17.3,
+        "p99Ms": 34,
+        "p999Ms": 148.1,
+        "maxMs": 148.1,
+        "stdevMs": 8.33,
+        "jankPct": 3.11,
+        "long50": 1,
+        "stutter100": 1
+      },
+      "cpuSubmitMsMedian": 5.4
+    },
+    "hiddenShadowOn": {
+      "blocks": 2,
+      "renderMedian": {
+        "calls": 526,
+        "triangles": 2090336,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 5.85
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 64
+      },
+      "rafFrameIntervalStats": {
+        "frames": 438,
+        "seconds": 4.81,
+        "fpsMean": 91.1,
+        "fpsMedian": 95.2,
+        "fpsLow1": 23.8,
+        "fpsLow01": 10.6,
+        "meanMs": 10.98,
+        "p50Ms": 10.5,
+        "p95Ms": 16.6,
+        "p99Ms": 18.7,
+        "p999Ms": 94.1,
+        "maxMs": 94.1,
+        "stdevMs": 5.37,
+        "jankPct": 0.91,
+        "long50": 1,
+        "stutter100": 0
+      },
+      "cpuSubmitMsMedian": 5.85
+    },
+    "visibleShadowOff": {
+      "blocks": 2,
+      "renderMedian": {
+        "calls": 218,
+        "triangles": 1264753,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 3.3
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 90.5
+      },
+      "rafFrameIntervalStats": {
+        "frames": 513,
+        "seconds": 4.82,
+        "fpsMean": 106.5,
+        "fpsMedian": 113.6,
+        "fpsLow1": 35.2,
+        "fpsLow01": 25.4,
+        "meanMs": 9.39,
+        "p50Ms": 8.8,
+        "p95Ms": 16.5,
+        "p99Ms": 19.3,
+        "p999Ms": 39.3,
+        "maxMs": 39.3,
+        "stdevMs": 4.21,
+        "jankPct": 0.78,
+        "long50": 0,
+        "stutter100": 0
+      },
+      "cpuSubmitMsMedian": 3.3
+    },
+    "hiddenShadowOff": {
+      "blocks": 2,
+      "renderMedian": {
+        "calls": 212.5,
+        "triangles": 1257312,
+        "lines": 0,
+        "points": 4176,
+        "cpuSubmitMs": 3.25
+      },
+      "resourcesMedian": {
+        "geometries": 291,
+        "textures": 162,
+        "programs": 93.5
+      },
+      "rafFrameIntervalStats": {
+        "frames": 460,
+        "seconds": 4.82,
+        "fpsMean": 95.5,
+        "fpsMedian": 99,
+        "fpsLow1": 30.5,
+        "fpsLow01": 20.5,
+        "meanMs": 10.47,
+        "p50Ms": 10.1,
+        "p95Ms": 16,
+        "p99Ms": 26.2,
+        "p999Ms": 48.7,
+        "maxMs": 48.7,
+        "stdevMs": 3.95,
+        "jankPct": 1.09,
+        "long50": 0,
+        "stutter100": 0
+      },
+      "cpuSubmitMsMedian": 3.25
+    }
+  },
+  "deltas": {
+    "armouryWithShadows": {
+      "calls": 10,
+      "triangles": 15844,
+      "lines": 0,
+      "points": 0
+    },
+    "armouryWithoutShadows": {
+      "calls": 6,
+      "triangles": 8226,
+      "lines": 0,
+      "points": 0
+    },
+    "shadowPassAttribution": {
+      "calls": 4,
+      "triangles": 7618,
+      "lines": 0,
+      "points": 0
+    }
+  },
+  "sampledDeltas": {
+    "armouryWithShadows": {
+      "calls": 10,
+      "triangles": 15844,
+      "lines": 0,
+      "points": 0
+    },
+    "armouryWithoutShadows": {
+      "calls": 5.5,
+      "triangles": 7441,
+      "lines": 0,
+      "points": 0
+    },
+    "shadowPassAttribution": {
+      "calls": 4.5,
+      "triangles": 8403,
+      "lines": 0,
+      "points": 0
+    }
+  },
+  "directRenderAttribution": {
+    "sequence": [
+      {
+        "label": "direct-visible-shadow-on",
+        "armouryChildMeshes": 6,
+        "requested": {
+          "meshVisible": true,
+          "shadowEnabled": true
+        },
+        "observed": {
+          "wrapperVisible": true,
+          "visibleMeshes": 6,
+          "shadowMapEnabled": true,
+          "sunCastShadow": true
+        },
+        "render": {
+          "calls": 519,
+          "triangles": 2114734,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      {
+        "label": "direct-hidden-shadow-on",
+        "armouryChildMeshes": 6,
+        "requested": {
+          "meshVisible": false,
+          "shadowEnabled": true
+        },
+        "observed": {
+          "wrapperVisible": true,
+          "visibleMeshes": 0,
+          "shadowMapEnabled": true,
+          "sunCastShadow": true
+        },
+        "render": {
+          "calls": 509,
+          "triangles": 2098890,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      {
+        "label": "direct-hidden-shadow-on",
+        "armouryChildMeshes": 6,
+        "requested": {
+          "meshVisible": false,
+          "shadowEnabled": true
+        },
+        "observed": {
+          "wrapperVisible": true,
+          "visibleMeshes": 0,
+          "shadowMapEnabled": true,
+          "sunCastShadow": true
+        },
+        "render": {
+          "calls": 509,
+          "triangles": 2098890,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      {
+        "label": "direct-visible-shadow-on",
+        "armouryChildMeshes": 6,
+        "requested": {
+          "meshVisible": true,
+          "shadowEnabled": true
+        },
+        "observed": {
+          "wrapperVisible": true,
+          "visibleMeshes": 6,
+          "shadowMapEnabled": true,
+          "sunCastShadow": true
+        },
+        "render": {
+          "calls": 519,
+          "triangles": 2114734,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      {
+        "label": "direct-visible-shadow-off",
+        "armouryChildMeshes": 6,
+        "requested": {
+          "meshVisible": true,
+          "shadowEnabled": false
+        },
+        "observed": {
+          "wrapperVisible": true,
+          "visibleMeshes": 6,
+          "shadowMapEnabled": false,
+          "sunCastShadow": false
+        },
+        "render": {
+          "calls": 198,
+          "triangles": 1265377,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      {
+        "label": "direct-hidden-shadow-off",
+        "armouryChildMeshes": 6,
+        "requested": {
+          "meshVisible": false,
+          "shadowEnabled": false
+        },
+        "observed": {
+          "wrapperVisible": true,
+          "visibleMeshes": 0,
+          "shadowMapEnabled": false,
+          "sunCastShadow": false
+        },
+        "render": {
+          "calls": 192,
+          "triangles": 1257151,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      {
+        "label": "direct-hidden-shadow-off",
+        "armouryChildMeshes": 6,
+        "requested": {
+          "meshVisible": false,
+          "shadowEnabled": false
+        },
+        "observed": {
+          "wrapperVisible": true,
+          "visibleMeshes": 0,
+          "shadowMapEnabled": false,
+          "sunCastShadow": false
+        },
+        "render": {
+          "calls": 192,
+          "triangles": 1257151,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      {
+        "label": "direct-visible-shadow-off",
+        "armouryChildMeshes": 6,
+        "requested": {
+          "meshVisible": true,
+          "shadowEnabled": false
+        },
+        "observed": {
+          "wrapperVisible": true,
+          "visibleMeshes": 6,
+          "shadowMapEnabled": false,
+          "sunCastShadow": false
+        },
+        "render": {
+          "calls": 198,
+          "triangles": 1265377,
+          "lines": 0,
+          "points": 4176
+        }
+      }
+    ],
+    "conditions": {
+      "visibleShadowOn": {
+        "samples": 2,
+        "renderMedian": {
+          "calls": 519,
+          "triangles": 2114734,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      "hiddenShadowOn": {
+        "samples": 2,
+        "renderMedian": {
+          "calls": 509,
+          "triangles": 2098890,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      "visibleShadowOff": {
+        "samples": 2,
+        "renderMedian": {
+          "calls": 198,
+          "triangles": 1265377,
+          "lines": 0,
+          "points": 4176
+        }
+      },
+      "hiddenShadowOff": {
+        "samples": 2,
+        "renderMedian": {
+          "calls": 192,
+          "triangles": 1257151,
+          "lines": 0,
+          "points": 4176
+        }
+      }
+    },
+    "deltas": {
+      "armouryWithShadows": {
+        "calls": 10,
+        "triangles": 15844,
+        "lines": 0,
+        "points": 0
+      },
+      "armouryWithoutShadows": {
+        "calls": 6,
+        "triangles": 8226,
+        "lines": 0,
+        "points": 0
+      },
+      "shadowPassAttribution": {
+        "calls": 4,
+        "triangles": 7618,
+        "lines": 0,
+        "points": 0
+      }
+    }
+  },
+  "captureDiagnostics": {
+    "pageErrors": [],
+    "consoleErrors": [],
+    "ignoredConsoleErrors": [
+      "THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false\n\nMaterial Name: EquirectangularToCubeUV\nMaterial Type: ShaderMaterial\n\nProgram Info Log: \n\n",
+      "THREE.WebGLProgram: Shader Error 1282 - VALIDATE_STATUS false\n\nMaterial Name: SphericalGaussianBlur\nMaterial Type: ShaderMaterial\n\nProgram Info Log: \n\n",
+      "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb"
+    ]
+  }
+}

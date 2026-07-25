@@ -8,8 +8,13 @@ import {
   buildGraphicsControls,
   buildInterfaceControls,
   buildOptionsMenu,
+  INTERFACE_TAB_LABEL_KEY,
+  INTERFACE_TAB_ORDER,
+  type InterfaceTab,
+  interfaceControlsForTab,
   type OptionsControl,
   type OptionsSettingsSource,
+  optionsControlKeys,
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
@@ -257,51 +262,148 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// optionsControlKeys: scopes a sub-view's "Reset to Defaults" to only the
+// setting keys it actually renders (issue 2341: resetting Audio must not wipe
+// Graphics/Controller/Interface too).
+// ---------------------------------------------------------------------------
+describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
+  it('extracts the setting key from every keyed control, in order, deduped', () => {
+    const controls = buildControllerControls(makeSource());
+    expect(optionsControlKeys(controls)).toEqual([
+      'gamepadEnabled',
+      'gamepadInvertY',
+      'gamepadStickDeadzone',
+      'gamepadCameraSpeed',
+      'gamepadVibration',
+    ]);
+  });
+
+  it('drops NoteControl and MusicToggleControl, which carry no setting key', () => {
+    const controls = buildAudioControls(makeSource());
+    // buildAudioControls includes the bespoke musicToggle marker alongside the
+    // real setting-backed sliders/toggles.
+    expect(controls.some((c) => c.control === 'musicToggle')).toBe(true);
+    const keys = optionsControlKeys(controls);
+    expect(keys).not.toContain('musicToggle');
+    expect(keys).toEqual([
+      'sfxVolume',
+      'musicVolume',
+      'voiceVolume',
+      'voiceEnabled',
+      'footstepSfx',
+      'interfaceSfx',
+      'clickFeedback',
+    ]);
+
+    const graphics = buildGraphicsControls(makeSource(), { touch: false, nativeShell: false });
+    expect(graphics.some((c) => c.control === 'note')).toBe(true);
+    expect(optionsControlKeys(graphics)).not.toContain(undefined);
+    expect(optionsControlKeys(graphics).length).toBe(
+      graphics.filter((c) => c.control !== 'note').length,
+    );
+  });
+});
+
+// The declarative interface controls, grouped by tab in their painted order.
+// interfaceControlsForTab(all, tab) must return exactly these, in order; the
+// concatenation (in INTERFACE_TAB_ORDER) is the whole deduped list.
+const GENERAL_KEYS = [
+  'uiScale',
+  'hudOpacity',
+  'tooltipScale',
+  'frostedPanels',
+  'highContrastText',
+  'reduceMotion',
+  'invertLookY',
+  'landingHighContrast',
+  'showDevBadges',
+  'showWalletOnCharacterScreen',
+  'showWalletOnPlayerCard',
+  'showDailyRewardsChest',
+  'showItemLevel',
+  'showOwnNameplate',
+  'showPlayerNameplates',
+];
+const FRAMES_KEYS = [
+  'playerFrameScale',
+  'targetFrameScale',
+  'partyFrameStyle',
+  'partyFrameScale',
+  'partyFrameWidth',
+  'partyFrameHeight',
+  'partyFrameSpacing',
+  'partyFrameColumns',
+  'partyFrameHealthText',
+  'partyFrameSort',
+  'partyFrameShowResource',
+  'partyFrameShowAbsorbs',
+  'partyFrameShowAuras',
+  'partyFrameShowSelf',
+  'aurasOnPlayerFrame',
+  'showTargetOfTarget',
+];
+const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
+const COMBAT_KEYS = [
+  'startAttackOnAbilityUse',
+  'showAttackButton',
+  'walkByAutoloot',
+  'groundReticle',
+  'mouseoverCast',
+  'stickyTarget',
+  'fctScale',
+  'showSecondaryActionBar',
+  'showThirdActionBar',
+];
+const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
+  general: GENERAL_KEYS,
+  frames: FRAMES_KEYS,
+  chat: CHAT_KEYS,
+  combat: COMBAT_KEYS,
+};
+
 describe('options_view: interface dispatch matrix (cluster 5)', () => {
-  it('lists the comfort sliders then the comfort + accessibility bool toggles', () => {
+  it('lists the four tabs concatenated in order (deduped, partyFrames note dropped)', () => {
     const controls = buildInterfaceControls(makeSource());
     expect(keysOf(controls)).toEqual([
-      'uiScale',
-      'playerFrameScale',
-      'targetFrameScale',
-      'note:hudChrome.partyFrames.section',
-      'partyFrameStyle',
-      'partyFrameScale',
-      'partyFrameWidth',
-      'partyFrameHeight',
-      'partyFrameSpacing',
-      'partyFrameColumns',
-      'partyFrameHealthText',
-      'partyFrameSort',
-      'partyFrameShowResource',
-      'partyFrameShowAbsorbs',
-      'partyFrameShowAuras',
-      'partyFrameShowSelf',
-      'hudOpacity',
-      'tooltipScale',
-      'fctScale',
-      'chatFontScale',
-      'chatOpacity',
-      'compactChat',
-      'frostedPanels',
-      'highContrastText',
-      'reduceMotion',
-      'showWalletOnCharacterScreen',
-      'showWalletOnPlayerCard',
-      'showDevBadges',
-      'showOwnNameplate',
-      'landingHighContrast',
-      'invertLookY',
-      'startAttackOnAbilityUse',
-      'showAttackButton',
-      'walkByAutoloot',
-      'groundReticle',
-      'aurasOnPlayerFrame',
-      'showItemLevel',
-      'showSecondaryActionBar',
-      'showDailyRewardsChest',
+      ...GENERAL_KEYS,
+      ...FRAMES_KEYS,
+      ...CHAT_KEYS,
+      ...COMBAT_KEYS,
     ]);
+    // the redundant partyFrames.section note is gone now that Frames is its own tab
+    expect(keysOf(controls)).not.toContain('note:hudChrome.partyFrames.section');
+    expect(find(controls, 'partyFrameStyle')).toMatchObject({
+      control: 'choice',
+      options: [
+        { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
+        { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
+        { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
+      ],
+    });
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
+    // The sticky-target opt-in renders in the Combat tab with its label key, so
+    // the toggle cannot silently drop out of the options window.
+    expect(find(controls, 'stickyTarget')).toMatchObject({
+      control: 'boolToggle',
+      category: 'combat',
+      labelKey: 'hudChrome.options.stickyTarget',
+    });
+  });
+
+  it('enables the third action-bar toggle only while the secondary row is visible', () => {
+    const hidden = buildInterfaceControls(makeSource());
+    expect(find(hidden, 'showSecondaryActionBar')).toMatchObject({
+      control: 'boolToggle',
+      rerender: true,
+    });
+    expect(find(hidden, 'showThirdActionBar')).toMatchObject({
+      control: 'boolToggle',
+      disabled: true,
+    });
+
+    const visible = buildInterfaceControls(makeSource({}, { showSecondaryActionBar: true }));
+    expect(find(visible, 'showThirdActionBar')).toMatchObject({ disabled: false });
   });
 
   it('marks only uiScale as commit-on-release; the other comfort sliders stay live (#1558)', () => {
@@ -312,6 +414,80 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(controls, 'playerFrameScale')).not.toHaveProperty('commitOnChange');
     expect(find(controls, 'tooltipScale')).not.toHaveProperty('commitOnChange');
     expect(find(controls, 'fctScale')).not.toHaveProperty('commitOnChange');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Interface tab taxonomy (the four-tab split): every control has exactly one
+// category, the union of the tabs is the whole list with no duplicates, and each
+// tab filters to its mapped controls in order. The no-duplicate assertion is what
+// catches the historical showAttackButton dupe (and any future control added
+// without a category, which would land uncategorized / drop out of the union).
+// ---------------------------------------------------------------------------
+describe('options_view: interface tab taxonomy', () => {
+  it('declares the four tabs, in strip order, each with a label key', () => {
+    expect([...INTERFACE_TAB_ORDER]).toEqual(['general', 'frames', 'chat', 'combat']);
+    for (const tab of INTERFACE_TAB_ORDER) {
+      expect(INTERFACE_TAB_LABEL_KEY[tab]).toBe(`hudChrome.interfaceTabs.${tab}`);
+    }
+  });
+
+  it('assigns every interface control to exactly one of the four tabs', () => {
+    const all = buildInterfaceControls(makeSource());
+    for (const c of all) {
+      // an uncategorized control (someone added a setting without a category)
+      // fails here: undefined is not one of the four tabs
+      expect(INTERFACE_TAB_ORDER).toContain(c.category);
+    }
+  });
+
+  it('partitions the full list: the union of the tabs equals it, with NO duplicate keys', () => {
+    const all = buildInterfaceControls(makeSource());
+    const union = INTERFACE_TAB_ORDER.flatMap((tab) => interfaceControlsForTab(all, tab));
+    // every control lands in exactly one tab: the union is the same objects, same size
+    expect(union).toHaveLength(all.length);
+    expect(new Set(union)).toEqual(new Set(all));
+    // no setting key appears twice across the whole interface list. This is RED
+    // while the showAttackButton duplicate is present and GREEN once deduped.
+    // (the interface list is all keyed controls: no notes / music toggle here)
+    const keys = all.map((c) => ('key' in c ? c.key : ''));
+    expect(keys).not.toContain('');
+    expect(new Set(keys).size).toBe(keys.length);
+    // showAttackButton in particular resolves to a single combat-tab control
+    expect(all.filter((c) => 'key' in c && c.key === 'showAttackButton')).toHaveLength(1);
+    expect(find(all, 'showAttackButton')?.category).toBe('combat');
+  });
+
+  it('filters each tab to its mapped controls, in order', () => {
+    const all = buildInterfaceControls(makeSource());
+    for (const tab of INTERFACE_TAB_ORDER) {
+      expect(keysOf(interfaceControlsForTab(all, tab))).toEqual(INTERFACE_KEYS_BY_TAB[tab]);
+    }
+  });
+
+  it('renders one control per setting in a tab when a duplicate descriptor is present', () => {
+    const all = buildInterfaceControls(makeSource({}, { showAttackButton: true }));
+    const attack = find(all, 'showAttackButton');
+    expect(attack).toBeTruthy();
+    const withDuplicate = attack ? [...all, { ...attack }] : all;
+
+    const combat = interfaceControlsForTab(withDuplicate, 'combat');
+    expect(combat.filter((c) => 'key' in c && c.key === 'showAttackButton')).toHaveLength(1);
+    expect(find(combat, 'showAttackButton')).toMatchObject({
+      category: 'combat',
+      control: 'boolToggle',
+      key: 'showAttackButton',
+      labelKey: 'hudChrome.options.showAttackButton',
+      on: true,
+    });
+  });
+
+  it('keeps the dependent action-bar toggles together in the combat tab', () => {
+    // showThirdActionBar's disabled state depends on showSecondaryActionBar, so
+    // both must sit in the same tab or the dependency would span a tab boundary.
+    const all = buildInterfaceControls(makeSource());
+    expect(find(all, 'showSecondaryActionBar')?.category).toBe('combat');
+    expect(find(all, 'showThirdActionBar')?.category).toBe('combat');
   });
 });
 

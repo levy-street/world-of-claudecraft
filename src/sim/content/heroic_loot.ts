@@ -17,6 +17,7 @@
 // than a single token piece.
 
 import type { ItemDef, LootEntry } from '../types';
+import { FERAL } from './items';
 
 // Source level the heroic drop table reads as in the item-level index: the
 // dungeons are level-20 content and heroic is the tier above (+5), so the
@@ -47,9 +48,18 @@ const RAID_SECONDARY_RATING = 20; // 20 rating = 2.0%
 
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
+const HEAL_LEATHER = ['druid'] as ItemDef['requiredClass']; // int/spi leather wearers
 const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
 const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
+const CASTER_WEAPON_CLASSES = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+] as ItemDef['requiredClass'];
 
 export const HEROIC_ITEMS: Record<string, ItemDef> = {
   // ================= Heroic Hollow Crypt: Morthen =================
@@ -139,7 +149,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 22, max: 36, speed: 1.8 },
+    weapon: { min: 22, max: 36, speed: 1.8, dagger: true },
     stats: { agi: 13, sta: 9 },
     critRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
@@ -222,7 +232,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     stats: { int: 13, spi: 9 },
     hitRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
-    requiredClass: CASTER,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   tidewoven_trousers: {
     id: 'tidewoven_trousers',
@@ -368,6 +378,65 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 9500,
     requiredClass: HEAL_MAIL,
   },
+  // ================= Heroic leather caster line (druid int/spi) =================
+  lunarward_cinch: {
+    id: 'lunarward_cinch',
+    name: 'Lunarward Cinch',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'waist',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: waist budget 15.
+    stats: { armor: 100, int: 9, spi: 6 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 9500,
+    requiredClass: HEAL_LEATHER,
+  },
+  dreamroot_boots: {
+    id: 'dreamroot_boots',
+    name: 'Dreamroot Boots',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'feet',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: feet budget 14.
+    stats: { armor: 96, int: 8, spi: 6 },
+    critRating: ARMOR_RATING,
+    sellValue: 9500,
+    requiredClass: HEAL_LEATHER,
+  },
+  stormbark_mantle: {
+    id: 'stormbark_mantle',
+    name: 'Stormbark Mantle',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'shoulder',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: shoulder budget 16.
+    stats: { armor: 148, int: 9, spi: 5, sta: 2 },
+    critRating: ARMOR_RATING,
+    sellValue: 11000,
+    requiredClass: HEAL_LEATHER,
+  },
+  wildsoul_maul: {
+    id: 'wildsoul_maul',
+    name: 'Wildsoul Maul',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only feral two-hander: 2H dps on the weaponDpsBudget(31)
+    // x TWOHAND_DPS_MULT curve (~18.4 at speed 3.6), stat budget 29.
+    weapon: { min: 55, max: 78, speed: 3.6 },
+    stats: { str: 13, agi: 9, sta: 7 },
+    hitRating: FIVE_MAN_WEAPON_RATING,
+    sellValue: 15000,
+    requiredClass: FERAL,
+  },
   // ================= Heroic Nythraxis, Scourge of Thornpeak (raid) =================
   scepter_of_the_deathless_court: {
     id: 'scepter_of_the_deathless_court',
@@ -388,10 +457,15 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     name: 'Deathless Greatblade',
     kind: 'weapon',
     slot: 'mainhand',
+    hand: 'twohand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 45, max: 68, speed: 3.4 },
-    stats: { str: 14, sta: 9 },
+    // 2H dps premium at the raid tier: weaponDpsBudget(33) = 16.6 x
+    // TWOHAND_DPS_MULT -> 19.1 dps.
+    weapon: { min: 52, max: 78, speed: 3.4 },
+    // v0.27.1 re-budget: round(primaryStatBudget(33, epic, mainhand) = 23 x
+    // TWOHAND_STAT_MULT) = 30 points; the dps premium is the 2H's compensation.
+    stats: { str: 18, sta: 12 },
     hitRating: RAID_WEAPON_PRIMARY_RATING,
     critRating: RAID_SECONDARY_RATING,
     sellValue: 16000,
@@ -477,9 +551,10 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
 // heroic kill). loot_roll.ts rolls these only for a heroic-claimed instance.
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   morthen: [
-    { itemId: 'morthens_cryptforged_hauberk', chance: 0.34, rollGroup: 'morthen_heroic' },
-    { itemId: 'shadowpulse_handwraps', chance: 0.33, rollGroup: 'morthen_heroic' },
-    { itemId: 'bonechill_striders', chance: 0.33, rollGroup: 'morthen_heroic' },
+    { itemId: 'morthens_cryptforged_hauberk', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'shadowpulse_handwraps', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'bonechill_striders', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'lunarward_cinch', chance: 0.25, rollGroup: 'morthen_heroic' },
     { itemId: 'cryptplate_helm', chance: 0.34, rollGroup: 'morthen_heroic2' },
     { itemId: 'shadowpulse_slippers', chance: 0.33, rollGroup: 'morthen_heroic2' },
     { itemId: 'bonechill_cord', chance: 0.33, rollGroup: 'morthen_heroic2' },
@@ -488,14 +563,16 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'mistcallers_fang', chance: 0.34, rollGroup: 'vael_heroic' },
     { itemId: 'tidebound_spaulders', chance: 0.33, rollGroup: 'vael_heroic' },
     { itemId: 'sash_of_the_sunken_court', chance: 0.33, rollGroup: 'vael_heroic' },
-    { itemId: 'mistforged_pauldrons', chance: 0.34, rollGroup: 'vael_heroic2' },
-    { itemId: 'tideguard_faceguard', chance: 0.33, rollGroup: 'vael_heroic2' },
-    { itemId: 'sunken_court_mantle', chance: 0.33, rollGroup: 'vael_heroic2' },
+    { itemId: 'mistforged_pauldrons', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'tideguard_faceguard', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'sunken_court_mantle', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'dreamroot_boots', chance: 0.25, rollGroup: 'vael_heroic2' },
   ],
   ysolei: [
-    { itemId: 'lunar_tide_greatstaff', chance: 0.34, rollGroup: 'ysolei_heroic' },
-    { itemId: 'tidewoven_trousers', chance: 0.33, rollGroup: 'ysolei_heroic' },
-    { itemId: 'choirmothers_casque', chance: 0.33, rollGroup: 'ysolei_heroic' },
+    { itemId: 'lunar_tide_greatstaff', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'tidewoven_trousers', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'choirmothers_casque', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'stormbark_mantle', chance: 0.25, rollGroup: 'ysolei_heroic' },
     { itemId: 'lunar_choir_leggings', chance: 0.34, rollGroup: 'ysolei_heroic2' },
     { itemId: 'choir_blessed_spaulders', chance: 0.33, rollGroup: 'ysolei_heroic2' },
     { itemId: 'tideworn_warboots', chance: 0.33, rollGroup: 'ysolei_heroic2' },
@@ -504,9 +581,10 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'gravewyrm_cleaver', chance: 0.34, rollGroup: 'korzul_heroic' },
     { itemId: 'shroud_of_the_gravewyrm', chance: 0.33, rollGroup: 'korzul_heroic' },
     { itemId: 'sanctum_prowlers_grips', chance: 0.33, rollGroup: 'korzul_heroic' },
-    { itemId: 'gravewyrm_claws', chance: 0.34, rollGroup: 'korzul_heroic2' },
-    { itemId: 'gravescale_girdle', chance: 0.33, rollGroup: 'korzul_heroic2' },
-    { itemId: 'wyrmchoir_handwraps', chance: 0.33, rollGroup: 'korzul_heroic2' },
+    { itemId: 'gravewyrm_claws', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'gravescale_girdle', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'wyrmchoir_handwraps', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'wildsoul_maul', chance: 0.25, rollGroup: 'korzul_heroic2' },
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:

@@ -21,8 +21,19 @@
 //   charClass  data-class of the class card to pick (default 'warrior')
 //   charName   name typed into #char-name when that field is present (default 'Adventurer')
 //   settleMs   pause after Enter World for the world to load (default 2500; 0 to skip)
+//   dismissMobilePreflight  wait for and dismiss the touch-only gate (default true)
+//   mobilePreflightTimeoutMs  maximum wait for the touch-only gate (default 5000)
+//   gameBootTimeoutMs  maximum wait for window.__game.sim.player (default 30000)
+// Returns true when the world boot hook appeared before gameBootTimeoutMs, otherwise false.
 export async function enterOfflineGame(page, opts = {}) {
-  const { charClass = 'warrior', charName = 'Adventurer', settleMs = 2500 } = opts;
+  const {
+    charClass = 'warrior',
+    charName = 'Adventurer',
+    settleMs = 2500,
+    dismissMobilePreflight = true,
+    mobilePreflightTimeoutMs = 5000,
+    gameBootTimeoutMs = 30000,
+  } = opts;
   const card = `#offline-select .mini-class[data-class="${charClass}"]`;
   await page.waitForSelector('#btn-offline', { timeout: 30000 });
   // Hidden legacy hook: fire its handler in-page rather than page.click (no clickable point).
@@ -41,35 +52,32 @@ export async function enterOfflineGame(page, opts = {}) {
   await page.evaluate(() => document.querySelector('#btn-start-offline')?.click());
   // On touch viewports a mobile preflight ("tap to continue") gates the world; dismiss it
   // so the world actually boots. No-op on desktop, where the preflight never appears.
-  await page
-    .waitForSelector('#mobile-preflight-continue', { visible: true, timeout: 5000 })
-    .catch(() => {});
-  await page.evaluate(() => document.querySelector('#mobile-preflight-continue')?.click());
-  // The post-login Welcome Screen (news, Discord strip, Continue) now sits between
-  // Enter World and the actual game boot on every entry whose DOM has #welcome-screen
-  // (index.html; absent on /play). Continue enables immediately offline (no connection
-  // to wait on), so click through it the moment it appears. No-op when the screen is
-  // absent (a future pre-game UI change stays a one-line fix here, per the file header).
-  await page
-    .waitForSelector('#ws-continue:not([disabled])', { visible: true, timeout: 5000 })
-    .catch(() => {});
-  await page.evaluate(() => {
-    const btn = document.querySelector('#ws-continue');
-    if (btn && !btn.disabled) btn.click();
-  });
+  if (dismissMobilePreflight) {
+    await page
+      .waitForSelector('#mobile-preflight-continue', {
+        visible: true,
+        timeout: mobilePreflightTimeoutMs,
+      })
+      .catch(() => {});
+    await page.evaluate(() => document.querySelector('#mobile-preflight-continue')?.click());
+  }
   // Wait for the world to actually boot (the window.__game debug hook appears post-start)
   // rather than guessing with a fixed delay, so post-entry code that reads window.__game.sim
   // does not race the loader. Falls back to the settle delay if the hook never shows.
-  await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 30000 }).catch(() => {});
+  const gameBooted = await page
+    .waitForFunction(() => window.__game?.sim?.player, { timeout: gameBootTimeoutMs })
+    .then(() => true)
+    .catch(() => false);
   if (settleMs > 0) await new Promise((r) => setTimeout(r, settleMs));
 
   await dismissEntryOverlays(page);
+  return gameBooted;
 }
 
 // Skip the first-spawn intro cinematic (Escape is its documented skip gesture), click any
 // "skip tutorial" button, and confirm the camera-mode-choice prompt. Polls a few rounds
 // since the intro cinematic's own listeners can attach a beat after the world boots.
-async function dismissEntryOverlays(page) {
+export async function dismissEntryOverlays(page) {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   for (let i = 0; i < 5; i++) {
     const state = await page

@@ -18,6 +18,7 @@
 
 import { QUESTS, questRewardItem } from '../../../sim/data';
 import type { PlayerClass, QuestProgress } from '../../../sim/types';
+import { questObjectiveRequired } from '../../../sim/types';
 
 /** One row in the quest list column. */
 export interface QuestLogItem {
@@ -99,12 +100,15 @@ export function buildQuestLogView(input: QuestLogInput): QuestLogView {
       detail = {
         questId: selectedQuestId,
         suggestedPlayers: quest.suggestedPlayers,
-        objectives: quest.objectives.map((o, i) => ({
-          index: i,
-          count: qp.counts[i],
-          required: o.count,
-          done: qp.counts[i] >= o.count,
-        })),
+        objectives: quest.objectives.map((_o, i) => {
+          const required = questObjectiveRequired(quest, qp, i);
+          return {
+            index: i,
+            count: qp.counts[i],
+            required,
+            done: qp.counts[i] >= required,
+          };
+        }),
         xpReward: quest.xpReward,
         copperReward: quest.copperReward,
         rewardItemId: questRewardItem(quest, playerClass) ?? null,

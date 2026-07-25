@@ -101,6 +101,10 @@ yourself or the S3 guard throws "status.json is missing".
 
 ## Running & adding
 - Single file (preferred while iterating): `npx vitest run tests/<file>.test.ts`.
+- **Opt-in DB gates.** `*_integration.test.ts` bodies run only when `TEST_DATABASE_URL`
+  is set (dev DB via `npm run db:up`; without it they skip green), and SQL differential
+  blocks gate on `WOCC_PG_DIFFERENTIAL=1`. Run the relevant ones before calling DB-shape
+  work done; CI's floor is the DB-free structural pins.
 - **DOM in tests, the two-branch rule.** The default Vitest env is plain Node (no
   `document`/`window`). Game-HUD/UI tests stay there: stub a single global on `globalThis`
   (`localStorage` in `keybinds.test.ts`, `WebSocket` in `snapshots.test.ts`) or build a small

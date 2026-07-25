@@ -1,22 +1,35 @@
 import { SPORT_ABILITIES } from '../../../sim/content/vale_cup';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
+import type { ActionBarLayout } from '../../../world_api/action_bar';
+import { WARRIOR_STANCE_GROUP } from '../../stance_bar_view';
+import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
+import {
+  actionBarFormSeededKey,
+  actionBarSlotMapKey,
+  actionBarStealthInitializedKey,
+  captureActionBarLayout,
+} from './action_bar_layout_sync';
 import {
   actionForAttackSlot,
   attackSlotStorageKey,
   buildDefaultFormBar,
   clearHotbarSlot,
   type HotbarAction,
+  isAbilityActionBarEligible,
   parseHotbarActions,
   placeAbilityOnSlot,
   classHasFormBars as playerClassHasFormBars,
   loadAttackSlotAction as readAttackSlotAction,
+  sanitizeHotbarAction,
+  sanitizeHotbarActions,
   shouldSeedFormBar,
+  storedHotbarHasIneligibleAbility,
   syncHotbarActions,
   saveAttackSlotAction as writeAttackSlotAction,
 } from './hotbar';
 
-export const ACTION_BAR_ABILITY_SLOTS = 22;
+export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
 export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth' | 'sport';
 
@@ -30,6 +43,12 @@ export interface ActionBarControllerDeps {
   hasAura(kind: string): boolean;
   isInSportMatch(): boolean;
   showAttackButton(): boolean;
+  // The persistence seam: called after a user-driven layout change (never during
+  // initial load) with the FULL captured layout. Offline it is a no-op
+  // (localStorage is the store); online the ClientWorld debounces a wire save.
+  // Optional so an offline/test controller with no server persistence just skips
+  // it and keeps its byte-identical localStorage behavior.
+  persistLayout?(layout: ActionBarLayout): void;
 }
 
 /** Owns action-bar pages, migrations, persistence, and attack-slot assignment. */
@@ -42,12 +61,34 @@ export class ActionBarController {
   private loadedFromStorage = false;
   private knownAbilityIdsAtLastSync: Set<string> | null = null;
   private attackActionState: HotbarAction = null;
+  // Suppresses the persistence seam while the controller is loading/seeding from
+  // storage: only user-driven changes after init should upload. Flipped true at
+  // the end of init()/reload().
+  private ready = false;
 
   constructor(private readonly deps: ActionBarControllerDeps) {}
 
   init(): void {
     this.loadActions();
     this.loadAttackAction();
+    this.ready = true;
+  }
+
+  /** Re-seed every bar/attack slot from storage (after the server layout has
+   *  overwritten the local mirror at login). Persistence stays suppressed while
+   *  reloading so restoring a server copy never bounces straight back up. */
+  reload(): void {
+    this.ready = false;
+    this.loadActions();
+    this.loadAttackAction();
+    this.ready = true;
+  }
+
+  private persist(): void {
+    if (!this.ready || !this.deps.persistLayout) return;
+    this.deps.persistLayout(
+      captureActionBarLayout(this.deps.storage, this.deps.playerClass, this.deps.playerName),
+    );
   }
 
   get activeForm(): HotbarForm {
@@ -59,7 +100,7 @@ export class ActionBarController {
   }
 
   replaceActions(actions: HotbarAction[]): void {
-    this.actionState = actions;
+    this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
   }
 
   get attackAction(): HotbarAction {
@@ -67,7 +108,9 @@ export class ActionBarController {
   }
 
   replaceAttackAction(action: HotbarAction): void {
-    this.attackActionState = action;
+    this.attackActionState = sanitizeHotbarAction(action, (id) =>
+      this.isAbilityPlacementAllowed(id),
+    );
   }
 
   resolveActiveForm(): HotbarForm {
@@ -98,6 +141,12 @@ export class ActionBarController {
     const knownAbilityIds = [...this.deps.knownAbilityIds()];
     const autoPlaceAbilityIds = new Set<string>();
     const consider = (id: string): void => {
+      // A passive (Measured Fury) is known but never castable, so it never
+      // auto-places on the action bar (a manual drag would be a dead slot too).
+      if (!this.isAbilityPlacementAllowed(id)) return;
+      // Warrior stances live on the dedicated #stancebar, never the action bar,
+      // so learning one on level-up must not consume an action slot.
+      if (ABILITIES[id]?.exclusiveGroup === WARRIOR_STANCE_GROUP) return;
       if (this.shouldAutoPlaceOnForm(id, this.activeFormState)) autoPlaceAbilityIds.add(id);
     };
     if (this.knownAbilityIdsAtLastSync === null) {
@@ -111,13 +160,21 @@ export class ActionBarController {
     }
     const formToggle = this.formToggleAbilityId();
     if (formToggle && knownAbilityIds.includes(formToggle)) autoPlaceAbilityIds.add(formToggle);
-    const synced = syncHotbarActions(this.actionState, knownAbilityIds, autoPlaceAbilityIds);
+    const synced = syncHotbarActions(
+      this.actionState,
+      knownAbilityIds,
+      autoPlaceAbilityIds,
+      (id) => !this.isAbilityPlacementAllowed(id),
+    );
     this.actionState = synced.actions;
     if (synced.changed) this.saveActions();
     this.knownAbilityIdsAtLastSync = new Set(knownAbilityIds);
   }
 
   addAbility(abilityId: string): boolean {
+    // A passive is never castable: reject a manual drag/spellbook add so it
+    // cannot occupy a dead action slot (auto-place already skips passives).
+    if (!this.isAbilityPlacementAllowed(abilityId)) return false;
     if (this.actionState.some((action) => action?.type === 'ability' && action.id === abilityId)) {
       return false;
     }
@@ -161,12 +218,23 @@ export class ActionBarController {
   }
 
   isHotbarItemId(itemId: string): boolean {
+    // Gathering implements (#2343): the simple pole (use.type 'fishing') and
+    // every gatherTool (picks, axes, sickles, tiered rods) are placeable, so
+    // a keybound press works the tool exactly like the bags click.
     const item = ITEMS[itemId];
     return (
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||
-      item?.use?.type === 'fishing'
+      item?.use?.type === 'fishing' ||
+      item?.use?.type === 'gatherTool'
+    );
+  }
+
+  isAssignableAction(action: Exclude<HotbarAction, null>): boolean {
+    if (action.type === 'item') return this.isHotbarItemId(action.id);
+    return (
+      this.deps.knownAbilityIds().includes(action.id) && this.isAbilityPlacementAllowed(action.id)
     );
   }
 
@@ -187,6 +255,7 @@ export class ActionBarController {
     } catch {
       // Storage can be unavailable in private browsing modes.
     }
+    this.persist();
   }
 
   saveAttackAction(): void {
@@ -199,14 +268,16 @@ export class ActionBarController {
     } catch {
       // Storage can be unavailable in private browsing modes.
     }
+    this.persist();
   }
 
   private slotMapKey(form: HotbarForm = this.activeFormState): string {
-    const base = `woc_hotbar_${this.deps.playerClass}_${this.deps.playerName}`;
-    return form === 'normal' ? base : `${base}_${form}`;
+    return actionBarSlotMapKey(this.deps.playerClass, this.deps.playerName, form);
   }
 
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
+    // Passives never castable: keep them off every seeded/form kit bar too.
+    if (!this.isAbilityPlacementAllowed(id)) return false;
     if (form === 'sport') return !!SPORT_ABILITIES[id];
     if (SPORT_ABILITIES[id]) return false;
     if (this.isStealthForm(form)) return false;
@@ -224,8 +295,23 @@ export class ActionBarController {
     return form === 'stealth' || form === 'cat_stealth';
   }
 
+  private abilityDef(id: string) {
+    return ABILITIES[id] ?? SPORT_ABILITIES[id];
+  }
+
+  private isAbilityPlacementAllowed(id: string): boolean {
+    const ability = this.abilityDef(id);
+    // Direct setter compatibility for host-provided known ids that are not in the
+    // static client table; every real AbilityDef still follows the passive rule.
+    return ability === undefined || isAbilityActionBarEligible(ability);
+  }
+
+  private isStoredAbilityEligible(id: string): boolean {
+    return isAbilityActionBarEligible(this.abilityDef(id));
+  }
+
   private formBarSeededKey(form: HotbarForm = this.activeFormState): string {
-    return `${this.slotMapKey(form)}_seeded`;
+    return actionBarFormSeededKey(this.slotMapKey(form));
   }
 
   private markFormBarSeeded(form: HotbarForm = this.activeFormState): void {
@@ -237,7 +323,7 @@ export class ActionBarController {
   }
 
   private stealthBarInitializedKey(form: HotbarForm = this.activeFormState): string {
-    return `${this.slotMapKey(form)}_blank_v1`;
+    return actionBarStealthInitializedKey(this.slotMapKey(form));
   }
 
   private loadStealthActions(
@@ -328,9 +414,16 @@ export class ActionBarController {
     const parsed = parseHotbarActions(
       raw,
       ACTION_BAR_ABILITY_SLOTS,
-      (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
+      (id) => this.isStoredAbilityEligible(id),
       (id) => this.isHotbarItemId(id),
     );
+    if (stored && storedHotbarHasIneligibleAbility(raw, (id) => this.isStoredAbilityEligible(id))) {
+      try {
+        this.deps.storage.setItem(this.slotMapKey(), JSON.stringify(parsed));
+      } catch {
+        // Storage can be unavailable in private browsing modes.
+      }
+    }
     if (this.activeFormState === 'sport') {
       if (parsed.every((action) => action === null)) {
         this.actionState = buildDefaultFormBar(
@@ -369,13 +462,17 @@ export class ActionBarController {
   }
 
   private loadAttackAction(): void {
+    const key = attackSlotStorageKey(this.slotMapKey());
+    let storedRaw: string | null = null;
     try {
+      storedRaw = this.deps.storage.getItem(key);
       this.attackActionState = readAttackSlotAction(
         this.deps.storage,
-        attackSlotStorageKey(this.slotMapKey()),
-        (id) => this.deps.knownAbilityIds().includes(id),
+        key,
+        (id) => this.deps.knownAbilityIds().includes(id) && this.isAbilityPlacementAllowed(id),
         (id) => this.isHotbarItemId(id),
       );
+      if (storedRaw !== null && this.attackActionState === null) this.deps.storage.removeItem(key);
     } catch {
       this.attackActionState = null;
     }

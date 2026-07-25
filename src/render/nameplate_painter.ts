@@ -19,13 +19,14 @@
 import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { type Entity, isQuestTurnInNpc } from '../sim/types';
+import { type Entity, GATHER_CAST_ID, isQuestTurnInNpc } from '../sim/types';
 import { deedTitleText } from '../ui/deed_i18n';
 import {
   devTierBadgeDataUrl,
   devTierByIndex,
   devTierDisplayName,
   devTierNameOutlineColor,
+  isSignificantDevTier,
 } from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
 import { tEntity } from '../ui/entity_i18n';
@@ -33,15 +34,17 @@ import {
   holderTierBadgeDataUrl,
   holderTierByIndex,
   holderTierDisplayName,
+  holderTierIsRegalia,
 } from '../ui/holder_tier';
 import { formatNumber, getLanguage, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
-import { castBarState } from './cast_bar';
+import { castBarState, castBarVisible } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
+import { nameplateHeightPx, nameplatePlateKind, nameplateRowMask } from './nameplate_extent_core';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
@@ -51,6 +54,11 @@ import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
 const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
+const STATE_CURRENT_TARGET = 1 << 0;
+const STATE_HOSTILE = 1 << 1;
+const STATE_DEAD_ENEMY = 1 << 2;
+const STATE_MY_PET = 1 << 3;
+const STATE_AGGROED_ON_ME = 1 << 4;
 
 export interface NameplatePainterDeps {
   /** the per-entity view pool the renderer owns (keyed by entity id) */
@@ -65,6 +73,8 @@ export interface NameplatePainterDeps {
   showDevBadges: () => boolean;
   /** the player's own-nameplate toggle: render your own plate as others see it */
   showOwnNameplate: () => boolean;
+  /** the player's other-players nameplate toggle (current target exempt) */
+  showPlayerNameplates: () => boolean;
   /** PvP reaction check, owned by the renderer (duel/arena state) */
   isHostilePlayer: (e: Entity) => boolean;
 }
@@ -77,18 +87,21 @@ export class NameplatePainter {
   private readonly showNameplates: () => boolean;
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
+  private readonly showPlayerNameplates: () => boolean;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   // scratch reused every frame (no per-frame alloc); was renderer.tmpV/tmpV2.
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
   // one plan, rewritten per entity by the pure core (allocation-light hot path).
   private readonly plan: NameplatePlan = newNameplatePlan();
-  // This frame's projected anchors, fed through the declutter pass below so
-  // overlapping nameplates (e.g. two nearby same-named mobs) stack apart
-  // instead of rendering on top of each other. The anchor OBJECTS are pooled
-  // too, not just the array: at crowd size this loop runs for every visible
-  // plate every frame, and a fresh {id,sx,sy} per plate was steady GC churn
-  // proportional to the player count. `anchorCount` is the live prefix length.
+  // This frame's projected anchors, fed through the vertical stacking pass
+  // below so overlapping nameplates (e.g. two nearby same-named mobs) form a
+  // column instead of rendering on top of each other. Each anchor carries its
+  // plate height and whether it is pinned (the current target), which is what
+  // the pass stacks against. The anchor OBJECTS are pooled too, not just the
+  // array: at crowd size this loop runs for every visible plate every frame,
+  // and a fresh object per plate was steady GC churn proportional to the player
+  // count. `anchorCount` is the live prefix length.
   private readonly anchorScratch: NameplateAnchor[] = [];
   private anchorCount = 0;
 
@@ -100,6 +113,7 @@ export class NameplatePainter {
     this.showNameplates = deps.showNameplates;
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
+    this.showPlayerNameplates = deps.showPlayerNameplates;
     this.isHostilePlayer = deps.isHostilePlayer;
   }
 
@@ -113,11 +127,20 @@ export class NameplatePainter {
     const showNameplates = this.showNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
+    const showPlayerNameplates = this.showPlayerNameplates();
     this.anchorCount = 0;
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
-      const plan = nameplatePlanInto(this.plan, e, p, v.height, showNameplates, showOwnNameplate);
+      const plan = nameplatePlanInto(
+        this.plan,
+        e,
+        p,
+        v.height,
+        showNameplates,
+        showOwnNameplate,
+        showPlayerNameplates,
+      );
       if (plan.hidden) {
         this.hideNameplate(v);
         continue;
@@ -135,26 +158,66 @@ export class NameplatePainter {
       }
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      // Record the anchor; the transform is written once, after declutter has
-      // had its say, so a plate never builds two transform strings per frame.
+      const isCurrentTarget = id === p.targetId;
+      const isSelf = id === p.id;
+      // The self plate is normally suppressed; with "Show My Nameplate" on it
+      // renders (and stacks) exactly like any other player's.
+      const suppressSelf = isSelf && !showOwnNameplate;
+      // Which content branch this plate takes, resolved ONCE: the branch chain
+      // below switches on it and the row model reads the same value, so the
+      // stacked height can never disagree with the rows actually rendered.
+      const plateKind = nameplatePlateKind(e);
+      // party raid/target marker (only mobs are markable, so this is null
+      // elsewhere); read every pass because it is one of the plate's rows
+      const raidMark = world.markerFor(e.id);
+      // How tall this plate renders, so the stacking pass spaces a tall player
+      // plate (guild tag + deed title + cast bar) further than a bare mob plate.
+      // Derived from the entity, NOT from the DOM: reading offsetHeight here
+      // would force a layout flush for every plate, every frame. It runs on
+      // throttled passes too, where the content branch below never does, so the
+      // stack keeps tracking the camera at the tier's reduced content cadence.
+      const height = nameplateHeightPx(
+        nameplateRowMask(
+          e,
+          plateKind,
+          suppressSelf,
+          castBarVisible(e),
+          plan.comboPips,
+          plan.hasOverheadEmote,
+          raidMark !== null,
+          MOBS[e.templateId]?.elite === true,
+        ),
+      );
+      // Record the anchor; the transform is written once, after the stacking
+      // pass has had its say, so a plate never builds two transform strings per
+      // frame. The current target is pinned: it keeps its projected position and
+      // the rest of the stack flows around it.
       const slot = this.anchorScratch[this.anchorCount];
       if (slot) {
         slot.id = id;
         slot.sx = sx;
         slot.sy = sy;
+        slot.height = height;
+        slot.pinned = isCurrentTarget;
       } else {
-        this.anchorScratch.push({ id, sx, sy });
+        this.anchorScratch.push({ id, sx, sy, height, pinned: isCurrentTarget });
       }
       this.anchorCount++;
       if (v.nameplateDisplay !== '') {
         v.nameplate.style.display = '';
         v.nameplateDisplay = '';
       }
+      const deadEnemy = e.dead && (e.hostile || (e.kind === 'player' && this.isHostilePlayer(e)));
+      let stateMask = 0;
+      if (isCurrentTarget) stateMask |= STATE_CURRENT_TARGET;
+      if (e.hostile) stateMask |= STATE_HOSTILE;
+      if (deadEnemy) stateMask |= STATE_DEAD_ENEMY;
+      if (e.ownerId === p.id) stateMask |= STATE_MY_PET;
+      if (e.aggroTargetId === p.id) stateMask |= STATE_AGGROED_ON_ME;
+      this.setNameplateState(v, stateMask);
       if (!fullPass && !plan.urgent) continue;
-      const isSelf = id === p.id;
       v.nameplate.classList.toggle('has-emote', plan.hasOverheadEmote);
 
-      // party raid/target marker (only mobs are markable, so this is null elsewhere)
       const emote = e.overheadEmoteId
         ? OVERHEAD_EMOTES.find((x) => x.id === e.overheadEmoteId)
         : null;
@@ -169,7 +232,6 @@ export class NameplatePainter {
       }
       v.nameEl.style.display = '';
 
-      const raidMark = world.markerFor(e.id);
       if (raidMark !== null) {
         v.raidMarkEl.style.backgroundImage = `url(${raidMarkerDataUrl(raidMark)})`;
         v.raidMarkEl.style.display = '';
@@ -180,7 +242,7 @@ export class NameplatePainter {
       // combo points the local player has built on this entity (rogue/druid)
       this.setNameplateCombo(v, plan.comboPips);
 
-      if (e.kind === 'object') {
+      if (plateKind === 'object') {
         // dungeon doorways announce themselves
         const objName = objectDisplayName(e);
         this.setNameplateStatic(
@@ -193,12 +255,12 @@ export class NameplatePainter {
           'np-marker',
           '1',
         );
-      } else if (e.kind === 'player') {
+        this.setNameplateLevel(v, '', '');
+      } else if (plateKind === 'player') {
         // Players: friendly blue with an hp bar; <Guild> tag under the name. Your
-        // OWN plate is normally suppressed (suppressSelf), but with the "Show My
-        // Nameplate" option on it renders exactly like another player's, so you can
-        // see your name / level / hp / guild and all your flair the way others do.
-        const suppressSelf = isSelf && !showOwnNameplate;
+        // OWN plate is normally suppressed (suppressSelf, computed above), but with
+        // the "Show My Nameplate" option on it renders exactly like another player's,
+        // so you can see your name / level / hp / guild and all your flair as others do.
         const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
         const nameDisplay = suppressSelf ? 'none' : '';
         const hpDisplay = e.dead || suppressSelf ? 'none' : '';
@@ -207,7 +269,14 @@ export class NameplatePainter {
         const roleKey = suppressSelf ? undefined : e.discordRole;
         const roleColor = specialRoleColor(roleKey);
         const roleTag = discordRoleTagLabel(roleKey);
-        const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
+        const baseName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
+        // Client-side AFK tag: the away flag rides the entity (`ak` wire bit ->
+        // e.afk), but the label is localized HERE, never baked into the wire
+        // name. Suppressed on your own hidden plate; shown on everyone else's.
+        // Folded into displayName so it flows through the repaint signature
+        // below (the plate repaints the instant AFK toggles).
+        const displayName =
+          !suppressSelf && e.afk ? `<${t('hudChrome.nameplate.afkTag')}> ${baseName}` : baseName;
         // Significant-contributor outline: a glowing outline drawn on top of the
         // existing name color (Discord staff or default) for a high dev tier, so
         // both read at once. Null for non-significant tiers, for a suppressed self
@@ -220,9 +289,9 @@ export class NameplatePainter {
         const isAi = !suppressSelf && e.aiAccount === true;
         this.setNameplateStatic(
           v,
-          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}|${isAi ? 1 : 0}`,
+          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}|${isAi ? 1 : 0}|${deadEnemy ? 1 : 0}`,
           displayName,
-          roleColor ?? '#7fb8ff',
+          deadEnemy ? null : (roleColor ?? '#7fb8ff'),
           hpDisplay,
           '',
           'np-marker',
@@ -242,7 +311,8 @@ export class NameplatePainter {
         // Book of Deeds title subtitle (the `title` wire field, a deed id).
         this.setNameplateTitle(v, suppressSelf ? undefined : e.title);
         this.setNameplateHp(v, e);
-      } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
+        this.setNameplateLevel(v, '', '');
+      } else if (plateKind === 'npc') {
         const npcName =
           e.kind === 'npc'
             ? npcDisplayName(e.templateId)
@@ -279,6 +349,8 @@ export class NameplatePainter {
           markerClass,
           '1',
         );
+        this.setNameplateLevel(v, '', '');
+        this.setFriendlyPetState(v, false);
       } else {
         const diff = e.level - p.level;
         const template = MOBS[e.templateId];
@@ -288,13 +360,14 @@ export class NameplatePainter {
         // classic level-difference ("con") color.
         const friendlyPet = isFriendlyPet(e, world.entities, this.isHostilePlayer);
         const color = mobNameColor(diff, e.dead, friendlyPet);
+        this.setFriendlyPetState(v, friendlyPet);
         const mobName = e.ownerId !== null ? e.name : mobDisplayName(e.templateId);
-        const name = e.dead
-          ? t('worldContent.corpseName', { name: mobName })
-          : t(elite ? 'hudChrome.nameplate.mobElite' : 'hudChrome.nameplate.mob', {
+        const levelText = e.dead
+          ? ''
+          : t(elite ? 'hudChrome.nameplate.mobEliteLevel' : 'hudChrome.nameplate.mobLevel', {
               level: formatNumber(e.level, { maximumFractionDigits: 0 }),
-              name: mobName,
             });
+        const displayName = e.dead ? t('worldContent.corpseName', { name: mobName }) : mobName;
         const hpDisplay = e.dead ? 'none' : '';
         // Quest-target marking lives in the mob's hover tooltip (Questie-style
         // quest + progress lines), not as an overhead glyph: the marker slot
@@ -304,15 +377,16 @@ export class NameplatePainter {
         const frame = e.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
         this.setNameplateStatic(
           v,
-          `mob|${name}|${color}|${hpDisplay}|${marker}|${frame}`,
-          name,
-          color,
+          `mob|${displayName}|${levelText}|${color}|${hpDisplay}|${marker}|${frame}`,
+          displayName,
+          deadEnemy ? null : '#fff',
           hpDisplay,
           marker,
           'np-marker loot',
           '1',
           frame,
         );
+        this.setNameplateLevel(v, levelText, color);
         this.setNameplateHp(v, e);
         // threat plate: tint the bar red when this mob is aggroed on me
         v.nameplate.classList.toggle('np-threat', plan.threat);
@@ -321,12 +395,14 @@ export class NameplatePainter {
       this.updateCastBar(v, e);
     }
 
-    // Second pass: re-anchor any nameplates that collided during projection
-    // (e.g. two nearby same-named mobs) so they stack apart instead of
-    // rendering fully on top of each other. A no-op for the common case
-    // where nothing overlapped. This is also where EVERY visible plate gets
-    // its one transform write of the frame.
-    declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
+    // Second pass: stack any nameplates that collided during projection (e.g.
+    // two nearby same-named mobs) into a vertical column, lifting the farther
+    // plates above the nearer ones and leaving the current target where it
+    // projected. A no-op for the common case where nothing overlapped. This is
+    // also where EVERY visible plate gets its one transform write of the frame.
+    // 0 is the viewport top: a plate is never lifted off screen, because an
+    // invisible nameplate is information the player acts on.
+    declutterNameplatesInPlace(this.anchorScratch, this.anchorCount, undefined, 0);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       const v = this.views.get(anchor.id);
@@ -344,13 +420,54 @@ export class NameplatePainter {
       v.nameplate.style.display = 'none';
       v.nameplateDisplay = 'none';
     }
+    if (v.nameplateStateMask !== 0) {
+      v.nameplate.classList.remove(
+        'np-current-target',
+        'np-hostile',
+        'np-dead-enemy',
+        'np-my-pet',
+        'np-aggroed-on-me',
+      );
+      v.nameplateStateMask = 0;
+    }
+    if (v.nameplateFriendlyPet) {
+      v.nameplate.classList.remove('np-friendly-pet');
+      v.nameplateFriendlyPet = false;
+    }
+  }
+
+  private setNameplateState(v: EntityView, nextMask: number): void {
+    const changed = v.nameplateStateMask ^ nextMask;
+    if (changed === 0) return;
+    if (changed & STATE_CURRENT_TARGET) {
+      v.nameplate.classList.toggle('np-current-target', !!(nextMask & STATE_CURRENT_TARGET));
+    }
+    if (changed & STATE_HOSTILE) {
+      v.nameplate.classList.toggle('np-hostile', !!(nextMask & STATE_HOSTILE));
+    }
+    if (changed & STATE_DEAD_ENEMY) {
+      v.nameplate.classList.toggle('np-dead-enemy', !!(nextMask & STATE_DEAD_ENEMY));
+    }
+    if (changed & STATE_MY_PET) {
+      v.nameplate.classList.toggle('np-my-pet', !!(nextMask & STATE_MY_PET));
+    }
+    if (changed & STATE_AGGROED_ON_ME) {
+      v.nameplate.classList.toggle('np-aggroed-on-me', !!(nextMask & STATE_AGGROED_ON_ME));
+    }
+    v.nameplateStateMask = nextMask;
+  }
+
+  private setFriendlyPetState(v: EntityView, friendly: boolean): void {
+    if (v.nameplateFriendlyPet === friendly) return;
+    v.nameplate.classList.toggle('np-friendly-pet', friendly);
+    v.nameplateFriendlyPet = friendly;
   }
 
   private setNameplateStatic(
     v: EntityView,
     sig: string,
     name: string,
-    color: string,
+    color: string | null,
     hpDisplay: string,
     marker: string,
     markerClass: string,
@@ -363,7 +480,11 @@ export class NameplatePainter {
     if (sig === v.nameplateSig) return;
     v.nameplateSig = sig;
     v.nameEl.textContent = name;
-    v.nameEl.style.color = color;
+    if (color === null) {
+      v.nameEl.style.removeProperty('color');
+    } else {
+      v.nameEl.style.color = color;
+    }
     v.hpBar.style.display = hpDisplay;
     v.hpBar.classList.toggle('elite', frame === 'elite');
     v.hpBar.classList.toggle('boss', frame === 'boss');
@@ -405,9 +526,18 @@ export class NameplatePainter {
     if (def) {
       v.tierEl.src = holderTierBadgeDataUrl(def, 32);
       v.tierEl.title = t('wallet.holderTierTitle', { tier: holderTierDisplayName(def) });
+      // Static per-tier halo (the "stand out" knob): the tier glow hue drives a
+      // CSS drop-shadow whose strength is a named CSS tunable (--holder-halo /
+      // --holder-halo-strong), moderately stronger for the two band IV regalia.
+      // Cosmetic-only and static, written here on the tier cheap-diff (never per
+      // frame), like the src/title/display above.
+      v.tierEl.style.setProperty('--holder-glow', def.glow);
+      v.tierEl.classList.toggle('np-tier-regalia', holderTierIsRegalia(def));
       v.tierEl.style.display = '';
     } else {
       v.tierEl.removeAttribute('src');
+      v.tierEl.style.removeProperty('--holder-glow');
+      v.tierEl.classList.remove('np-tier-regalia');
       v.tierEl.style.display = 'none';
     }
   }
@@ -421,9 +551,17 @@ export class NameplatePainter {
     if (def) {
       v.devTierEl.src = devTierBadgeDataUrl(def, 32);
       v.devTierEl.title = t('hudChrome.devBadge.badgeTitle', { tier: devTierDisplayName(def) });
+      // Static per-tier halo, mirroring the holder badge: the tier glow hue drives
+      // a CSS drop-shadow whose strength is the shared named tunable, stronger for
+      // the two significant-contributor rungs (Architect, Worldwright). Cosmetic and
+      // static, written on the tier cheap-diff (never per frame), like src above.
+      v.devTierEl.style.setProperty('--dev-glow', def.glow);
+      v.devTierEl.classList.toggle('np-dev-tier-strong', isSignificantDevTier(def.index));
       v.devTierEl.style.display = '';
     } else {
       v.devTierEl.removeAttribute('src');
+      v.devTierEl.style.removeProperty('--dev-glow');
+      v.devTierEl.classList.remove('np-dev-tier-strong');
       v.devTierEl.style.display = 'none';
     }
   }
@@ -475,6 +613,22 @@ export class NameplatePainter {
     v.hpFill.style.width = width;
   }
 
+  // Show/hide the mob level badge (e.g. "[5]" / "[5+]") in its own element.
+  // levelText='' hides the element (used for players, NPCs, objects, and dead mobs).
+  // Cheap-diffed on (levelText|color) so no DOM write on unchanged entities.
+  private setNameplateLevel(v: EntityView, levelText: string, color: string): void {
+    const sig = `${levelText}|${color}`;
+    if (sig === v.levelSig) return;
+    v.levelSig = sig;
+    if (levelText) {
+      v.levelEl.textContent = levelText;
+      v.levelEl.style.color = color;
+      v.levelEl.style.display = '';
+    } else {
+      v.levelEl.style.display = 'none';
+    }
+  }
+
   // Light `count` of the COMBO_PIP_MAX pips over this nameplate; hide the row
   // entirely at zero so non-combo classes/targets show nothing.
   private setNameplateCombo(v: EntityView, count: number): void {
@@ -504,8 +658,10 @@ export class NameplatePainter {
     // cast_bar.ts keeps st.label as a stable id (DOM/i18n-free); localize here.
     v.castLabel.textContent = st.fishing
       ? t('abilityUi.cast.fishing')
-      : ABILITIES[st.label]
-        ? tEntity({ kind: 'ability', id: st.label, field: 'name' })
-        : st.label;
+      : st.label === GATHER_CAST_ID
+        ? t('abilityUi.cast.gathering')
+        : ABILITIES[st.label]
+          ? tEntity({ kind: 'ability', id: st.label, field: 'name' })
+          : st.label;
   }
 }

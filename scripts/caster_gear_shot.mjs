@@ -1,6 +1,6 @@
 // Visual proof of PR #1965's crafted caster-stat (int/spi) gear: 3 common-tier
 // pieces (Eastbrook Ritual Vestments / Druid's Hide / Warded Leggings) and 3
-// hub-tier rares (Wardweave Cowl, Duskhide Wraps, Sootscale Mantle). Boots the
+// hub-tier rares (Wardweave Cowl, Duskhide Wraps, Kilnscale Mantle). Boots the
 // offline game as a priest (cloth caster), drops all six new items into the
 // bags, hovers each for a tooltip capture (stats visible: int/spi/armor), then
 // equips the hub-tier cowl and shoots the character sheet paperdoll + stat
@@ -50,7 +50,7 @@ const NEW_ITEMS = [
   ['eastbrook_warded_leggings', 'Eastbrook Warded Leggings'],
   ['wardweave_cowl', 'Wardweave Cowl'],
   ['duskhide_wraps', 'Duskhide Wraps'],
-  ['sootscale_mantle', 'Sootscale Mantle'],
+  ['sootscale_mantle', 'Kilnscale Mantle'],
 ];
 
 const inv = await page.evaluate((ids) => {

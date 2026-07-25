@@ -174,7 +174,7 @@ describe('update runbook guards', () => {
     expect(deployDoc).toContain('npm ci');
     // The two substrings above are satisfiable by two unrelated lines. The gate only
     // works if `npm ci` (to get devDependencies) and `npx tsc --noEmit` run TOGETHER
-    // inside node:22-alpine, because a deploy host has neither Node nor devDependencies.
+    // inside node:26-slim, because a deploy host has neither Node nor devDependencies.
     // Pin the whole invocation as one contiguous block so a split can never pass. It
     // must sweep every .env and .git out of the copy (the host .env holds every
     // production secret, and a nested clone's .env or .git config can carry tokens),
@@ -185,7 +185,7 @@ describe('update runbook guards', () => {
     // memory pressure the game service's mem_limit exists to prevent.
     expect(deployDoc).toContain(
       [
-        'sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /app node:22-alpine \\',
+        'sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /app node:26-slim \\',
         "  sh -c 'cp -a /src/. /app && find /app \\( -name .git -o -name .env \\) -prune -exec rm -rf {} + && npm ci --ignore-scripts --no-audit --no-fund && npx tsc --noEmit'",
       ].join('\n'),
     );

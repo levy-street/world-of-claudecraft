@@ -1,12 +1,13 @@
 // Common-tier crafting resolution (issue #1127). Behind the SimContext seam:
 // checks a player has every reagent a recipe requires, consumes them (denying
-// and consuming NOTHING if any reagent is short), rolls the output's quality
-// via the shared material-rarity ladder (rollMaterialRarity, keyed on the
-// player's craft skill for this recipe's craft rather than gathering
-// proficiency: same ladder, different "power" input, exactly the reuse the
-// gathering.ts comment on that function invites), grants the resulting item,
-// and grants a flat point of craft skill (see wheel.ts: additive-only,
-// free-floor).
+// and consuming NOTHING if any reagent is short), grants the recipe's declared
+// output deterministically (Professions 2.0 retired the output quality
+// roll: the only output-side rng is the single masterwork proc draw below, at
+// the same draw position the old roll occupied), and grants a flat point of
+// craft skill (see wheel.ts: additive-only, free-floor). A proc mints a
+// masterwork instance whose bonus stats are baked from the item budget
+// (professions/masterwork.ts): add-only, never a downgrade. Input-side rng
+// (gathering.ts rollMaterialRarity) is untouched by the deterministic-output model.
 //
 // Scope: originally the common-tier path only; the module now also resolves
 // the higher-tier content that landed on it (content/recipes.ts TOOL_RECIPES
@@ -14,15 +15,19 @@
 // the #1129 archetype empowerment ceiling, the #1299 acquisition gate, and
 // the #1301 gold sink + output throttle. There is still NO skillReq
 // admission gate: any known recipe is attemptable on materials alone, and
-// tier only shapes skill-gain scaling and (via the ceiling) output quality.
+// tier only shapes skill-gain scaling, the masterwork proc chance, and (via
+// the ceiling) masterwork eligibility.
 //
-// #1149 (Battlefield Experience) attribution: a crafted output that rolls
-// rare-or-better is stamped with its crafter's name via ctx.addItemInstance,
-// same signable-rarity threshold and same {signer} shape gathering.ts's
-// harvestCorpse already uses for monster materials (#1145). Below that
-// threshold the output stays a plain fungible grant, unchanged from before
-// this issue. This is what gives professions/battlefield_xp.ts a `signer` to
-// resolve later, when that specific copy is drunk/worn/lands a killing blow.
+// #1149 (Battlefield Experience) attribution: a crafted output whose DEF
+// quality is rare-or-better is stamped with its crafter's name via
+// ctx.addItemInstance (the signing threshold reads the static
+// def quality, since outputs no longer roll one), same signable-rarity
+// threshold and same {signer} shape gathering.ts's harvestCorpse already uses
+// for monster materials (#1145). Below that threshold the output stays a
+// plain fungible grant. A masterwork proc's copy is always instanced and
+// signed, whatever its def quality. This is what gives
+// professions/battlefield_xp.ts a `signer` to resolve later, when that
+// specific copy is drunk/worn/lands a killing blow.
 //
 // Specialization material discount (#1134): once a player is specialized in a
 // recipe's craft (wheel.ts `isSpecialized`, gated on `PERK_THRESHOLDS`
@@ -46,62 +51,86 @@
 // specialized crafter using their own self-signed material gets both
 // benefits and neither discount can ever waive a reagent entirely.
 //
+// The masterwork proc's signed-reagent term (masterwork.ts) is DELIBERATELY
+// wider than #1145 (the 2026-07-17 design ruling): it counts a held signed
+// instance with ANY player's signature, the crafter's own included, so buying
+// a gatherer's signed materials is worth as much to the proc as gathering
+// your own. It is also decoupled from the quantity discount: a count-1 signed
+// reagent feeds the proc even though the discount can never fire for it. Only
+// the quantity discount stays self-only.
+//
 // Combo-recipe requirement (issue #1132): a recipe may carry a
 // `comboRequirement` naming one specific adjacent craft pair and a minimum
-// tier both must meet. `meetsComboRequirement` checks the player's tier
-// capability in BOTH named crafts (via wheel.ts tierCapability), independent
-// of the recipe's `professionId`. Only the two named crafts ever count: a
-// player's skill in any other craft, however high, never substitutes for
-// either half of the pair.
+// tier both must meet. The character must be attuned to that exact unordered
+// pair, and both named crafts must reach the required archetype-gated tier.
 //
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/
 // game/net imports, no Math.random/Date.now, host-agnostic so it runs
 // offline, on the server, and in the headless RL env unchanged.
 
-import {
-  CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
-} from '../content/professions';
+import { bagCapacity, fitsAll, removeStacked } from '../bags';
+import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
+import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { archetypeCeilingFor, craftCeiling } from './archetype';
-import { canUseCraftingHubStation } from './crafting_hub';
-import {
-  clampMaterialRarity,
-  isSignableMaterialRarity,
-  type MaterialRarity,
-  rollMaterialRarity,
-} from './gathering';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../types';
+import { recordAction, withinActionThrottle } from './action_throttle';
+import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
+import { comboEligibility } from './combo_eligibility';
+import { isCommissionEligible } from './commission';
+import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
+import { masterworkBonusStats, masterworkBumpedQuality, masterworkProcChance } from './masterwork';
+import { materialTierBonusForReagents } from './material_tier';
+import { isStationActive } from './mobile_station';
 import { craftActionXp } from './profession_xp';
+import { isAtStation, stationTypeForCraft } from './stations';
 import type { ProfessionReagent, ProfessionRecipeRecord } from './types';
 import {
   type CraftSkillState,
   type CraftSkills,
   gainCraftSkill,
+  isSpecialized,
   materialCostMultiplier,
   tierCapability,
   tierForSkill,
-  tierProgressMultiplier,
 } from './wheel';
 
-// One flat craft-skill point per successful common-tier craft (the free-floor
-// rule: common-tier crafting itself never costs anything, but skill still
-// accrues so later tiers have something to build a gate against).
+// The BASE craft-skill amount per successful craft, scaled by the
+// four-state mastery curve at the gain site below (CRAFT_SKILL_GAIN *
+// craftSkillGainMultiplier): full 1, reduced 0.5, minimal 0.25, gray 0. The
+// old tier-0 free-floor GAIN rule (skill always accrues on the cheapest
+// recipe) is retired; the free-floor COST rule (common-tier crafting never
+// costs anything) lives on in recipes.ts/types.ts.
 const CRAFT_SKILL_GAIN = 1;
 
 export interface CraftResult {
   ok: boolean;
   recipeId: string;
-  // Present only when ok: the granted item id/count and the rolled quality.
+  // Present only when ok: the granted item id/count and the OUTPUT DEF quality
+  // (outputs are deterministic, so quality is a static fact of the
+  // result item's def, normalized onto the MaterialRarity ladder; the rolled
+  // quality is retired).
   itemId?: string;
   count?: number;
   quality?: MaterialRarity;
+  // Masterwork model: true only when the masterwork effect applied to
+  // this craft's output (a proc hit AND the effect gates passed). Absent
+  // otherwise, including on every plain deterministic success.
+  masterwork?: boolean;
   // #1145: true when at least one consumed reagent had a self-gathered signed
   // instance (signer === the crafting player's own name) counted toward it,
   // reducing that reagent's required quantity by one for this craft.
   selfSignedBonusApplied?: boolean;
+  // Commissions (Professions 2.0): true only when the opt-in flag
+  // was honored, i.e. the output is an eligible equipment kind and every
+  // granted copy was minted armed with bindOnTrade (commission.ts). Absent
+  // when the flag was not set AND when it was silently ignored for an
+  // ineligible output kind. Sim-internal: this field is NOT projected into
+  // CraftResultView (world_api/professions.ts) or the craftResult SimEvent,
+  // so no UI may consume it (the honored-vs-ignored pins are its consumer);
+  // the player-visible commission fact is the payload's bindOnTrade arm.
+  commission?: boolean;
   // Present only when !ok: a stable reason code, not player-facing prose (the
   // caller renders/localizes the denial).
   reason?:
@@ -110,7 +139,8 @@ export interface CraftResult {
     | 'combo_requirement_unmet'
     | 'recipe_not_learned'
     | 'throttled'
-    | 'not_at_hub';
+    | 'station_required'
+    | 'no_bag_space';
 }
 
 /** Whether `meta` currently knows `recipe` (issue #1299): a recipe with no
@@ -154,8 +184,11 @@ export function acquireRecipe(
 /** Acquire one already-resolved recipe record from one source. Exported
  *  separately from `acquireRecipe` (mirroring the resolveCraft /
  *  resolveCraftForRecipe split above) so tests can exercise the success and
- *  wrong_source arms against a synthetic gated recipe without needing an
- *  acquisition-gated entry in `content/recipes.ts` (none exists yet). */
+ *  wrong_source arms against a synthetic gated recipe, independent of the
+ *  real acquisition-gated content (since Professions 2.0 the three
+ *  COMBO_RECIPES in `content/recipes.ts` are trainer-gated; see
+ *  ./training.ts for the training flow that feeds this the 'trainer'
+ *  source). */
 export function acquireRecipeForRecipe(
   ctx: SimContext,
   pid: number,
@@ -173,24 +206,31 @@ export function acquireRecipeForRecipe(
   return { ok: true, recipeId };
 }
 
-/** Whether `meta`'s rolling craft-output window (issue #1301) still has room
- *  for one more successful craft, advancing/resetting the window against
- *  `now` (sim time, deterministic) as a side effect exactly like a real
- *  rolling window would. A maxed specialist is capped at
- *  `CRAFT_THROTTLE_MAX_PER_WINDOW` successful crafts per
- *  `CRAFT_THROTTLE_WINDOW_SECONDS`, regardless of skill or material supply. */
-function withinCraftThrottle(meta: PlayerMeta, now: number): boolean {
-  if (now - meta.craftThrottle.windowStart >= CRAFT_THROTTLE_WINDOW_SECONDS) {
-    meta.craftThrottle.windowStart = now;
-    meta.craftThrottle.count = 0;
-  }
-  return meta.craftThrottle.count < CRAFT_THROTTLE_MAX_PER_WINDOW;
+/** Whether `inventory` holds a slot for `itemId` carrying a signed instance
+ *  stamped with `playerName` (a self-gathered signed material). The
+ *  host-agnostic form of the #1145 self-signed predicate: no PlayerMeta, so
+ *  the crafting window's view core (src/ui/crafting_view.ts) consumes the
+ *  SAME check the sim charges by, and the two can never diverge. */
+export function holdsSelfSignedInstance(
+  inventory: readonly InvSlot[],
+  playerName: string,
+  itemId: string,
+): boolean {
+  return inventory.some((s) => s.itemId === itemId && s.instance?.signer === playerName);
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
  *  instance stamped with `meta`'s OWN name (a self-gathered signed material). */
 function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
-  return meta.inventory.some((s) => s.itemId === itemId && s.instance?.signer === meta.name);
+  return holdsSelfSignedInstance(meta.inventory, meta.name, itemId);
+}
+
+/** Whether `meta` holds an inventory slot for `itemId` carrying a signed
+ *  instance with ANY signer (the crafter's own name included). Feeds the
+ *  masterwork proc's signed-reagent term (2026-07-17 ruling); the #1145
+ *  quantity discount keeps using the self-only check above. */
+function hasSignedInstance(meta: PlayerMeta, itemId: string): boolean {
+  return meta.inventory.some((s) => s.itemId === itemId && !!s.instance?.signer);
 }
 
 /** The result of resolving one reagent's required quantity: the final count
@@ -218,10 +258,29 @@ export function requiredReagentCount(
   craftSkills: CraftSkillState,
   professionId: string,
 ): RequiredReagentResult {
-  const afterSelfSigned =
-    meta && hasSelfSignedInstance(meta, reagent.itemId)
-      ? Math.max(1, reagent.count - 1)
-      : reagent.count;
+  return requiredReagentCountFor(
+    !!meta && hasSelfSignedInstance(meta, reagent.itemId),
+    reagent,
+    craftSkills,
+    professionId,
+  );
+}
+
+/**
+ * The count math behind `requiredReagentCount`, with the #1145 self-signed
+ * fact resolved by the caller (holdsSelfSignedInstance above) instead of read
+ * off a PlayerMeta. Host-agnostic and draw-free, exported so the crafting
+ * window's view core computes its displayed requirement and Craft gate with
+ * the SAME function the sim's availability check and consumption use, the
+ * single-surface doctrine the difficulty label already follows.
+ */
+export function requiredReagentCountFor(
+  hasSelfSigned: boolean,
+  reagent: ProfessionReagent,
+  craftSkills: CraftSkillState,
+  professionId: string,
+): RequiredReagentResult {
+  const afterSelfSigned = hasSelfSigned ? Math.max(1, reagent.count - 1) : reagent.count;
   const multiplier = materialCostMultiplier(craftSkills, professionId);
   return {
     count: Math.max(1, Math.floor(afterSelfSigned * multiplier)),
@@ -247,33 +306,22 @@ export function hasRecipeMaterials(
   );
 }
 
-/** Whether the given player's craft skills satisfy a recipe's dual-craft
- *  combo requirement (issue #1132): true if the recipe carries no
- *  `comboRequirement` at all, otherwise true only when the player's
- *  archetype-gated tier ceiling (archetype.ts `craftCeiling`, which composes
- *  wheel.ts `tierCapability` with the #1129 empowerment ceiling) in BOTH
- *  named crafts is at or above `minTier`. Deliberately does not fall back to
- *  any other craft: a high skill in a craft outside the required pair never
- *  satisfies this check. `activeArchetype`/`pairedMajor` default to `null`
- *  (the uncapped-to-rare pre-archetype state) so existing raw-skills callers
- *  keep working unchanged. Every `COMBO_RECIPES` pair in content/recipes.ts
- *  is ring-adjacent (content/professions.ts `adjacentCrafts`), i.e. exactly
- *  the shape of a player's two majors, so a specialist attuned to that pair
- *  qualifies (both sides unlimited via `pairedMajor`); the stubbed default
- *  pair (archetype.ts `defaultPairedMajor`) prefers a craft's content-combo
- *  partner precisely so attuning either side of a combo never strands it. */
+/** Whether the player satisfies a recipe's dual-craft combo requirement.
+ *  Recipes without a combo requirement pass. Combo recipes require the exact
+ *  unordered active pair plus the minimum reachable tier in both crafts.
+ *  Raw skill alone, a hobby craft, or a different adjacent pair never passes. */
 export function meetsComboRequirement(
   skills: CraftSkills,
   recipe: ProfessionRecipeRecord,
   activeArchetype: string | null = null,
   pairedMajor: string | null = null,
+  hobbyCraft: string | null = null,
 ): boolean {
-  const combo = recipe.comboRequirement;
-  if (!combo) return true;
-  return (
-    craftCeiling(skills, activeArchetype, pairedMajor, combo.craftA) >= combo.minTier &&
-    craftCeiling(skills, activeArchetype, pairedMajor, combo.craftB) >= combo.minTier
-  );
+  return comboEligibility(recipe.comboRequirement, skills, {
+    activeArchetype,
+    pairedMajor,
+    hobbyCraft,
+  }).ok;
 }
 
 /** Pure resolution of one craft attempt against an already-resolved recipe
@@ -282,30 +330,42 @@ export function meetsComboRequirement(
  *  is short OR the recipe's `comboRequirement` (if any) is unmet, partial
  *  consumption never happens. On success, consumes every reagent (each
  *  discounted per the crafter's #1145 self-signed reduction composed with
- *  their #1134 specialization discount), rolls the output's quality off the
- *  player's current skill in the recipe's craft, grants the output item
- *  (signing a rare-or-better single-copy output for #1149 Battlefield
- *  Experience attribution), and grants craft skill scaled by tier mastery:
- *  full at or above the player's archetype-gated tier ceiling (archetype.ts
- *  `craftCeiling`, including always-full for the common tier, regardless of
- *  capability), reduced one tier below, zero two or more tiers below.
- *  Exported separately from `resolveCraft` so tests
+ *  their #1134 specialization discount), draws the single masterwork proc
+ *  roll (the one and only output-side rng draw; the old quality
+ *  roll is retired and outputs are deterministic), grants the recipe's
+ *  declared output (signing a rare-or-better-DEF single-copy output for
+ *  #1149 Battlefield Experience attribution; a masterwork proc mints a
+ *  signed instance carrying its baked bonus stats), and grants craft skill
+ *  scaled by tier mastery: full at or above the player's archetype-gated
+ *  tier ceiling (archetype.ts `craftCeiling`, including always-full for the
+ *  common tier, regardless of capability), reduced one tier below, zero two
+ *  or more tiers below. Exported separately from `resolveCraft` so tests
  *  can exercise the tier curve against a synthetic recipe without needing
  *  higher-tier content in `content/recipes.ts`. */
 export function resolveCraftForRecipe(
   ctx: SimContext,
   pid: number,
   recipe: ProfessionRecipeRecord,
+  commission = false,
 ): CraftResult {
   const meta = ctx.players.get(pid);
-  // #1297: a station-bound recipe (TOOL_RECIPES today) requires the player to
-  // be physically present at the level-20 crafting hub. Checked before every
-  // other gate, no side effect on denial, same shape as the combo-requirement
-  // check below.
-  if (recipe.requiresHubStation) {
+  // Station gate (supersedes #1297's hub gate; the level arm retired
+  // with it): a station-bound recipe requires the player to stand at a
+  // station of the recipe's type, OR to have their own ACTIVE mobile station
+  // (mobile_station.ts) whose craft maps to that type. Checked before every
+  // other gate, no side effect on denial, no rng, same shape as the
+  // combo-requirement check below.
+  if (recipe.stationType) {
     const entity = ctx.entities.get(pid);
-    if (!entity || !canUseCraftingHubStation(entity.pos, entity.level)) {
-      return { ok: false, recipeId: recipe.id, reason: 'not_at_hub' };
+    const mobileSatisfies =
+      !!meta?.mobileStation &&
+      isStationActive(meta.mobileStation, ctx.tickCount) &&
+      stationTypeForCraft(meta.mobileStation.craftId) === recipe.stationType;
+    if (
+      !entity ||
+      (!isAtStation(ctx.stationPlacements, entity.pos, recipe.stationType) && !mobileSatisfies)
+    ) {
+      return { ok: false, recipeId: recipe.id, reason: 'station_required' };
     }
   }
   if (
@@ -315,6 +375,7 @@ export function resolveCraftForRecipe(
       recipe,
       meta ? meta.archetype.activeArchetype : null,
       meta ? meta.archetype.pairedMajor : null,
+      meta ? meta.archetype.hobbyCraft : null,
     )
   ) {
     return { ok: false, recipeId: recipe.id, reason: 'combo_requirement_unmet' };
@@ -325,11 +386,109 @@ export function resolveCraftForRecipe(
   if (!hasRecipeMaterials(ctx, recipe, pid)) {
     return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };
   }
-  // #1301 output throttle: a flat cap on successful crafts per rolling
-  // window, checked (never side-effected on denial beyond the window's own
-  // natural rollover) before any reagent is consumed.
-  if (meta && !withinCraftThrottle(meta, ctx.time)) {
+  // #1301 output throttle, shared: one action window paced across
+  // crafting, disenchant, enchant-apply, and salvage (action_throttle.ts),
+  // checked (never side-effected on denial beyond the window's own natural
+  // rollover) before any reagent is consumed.
+  if (meta && !withinActionThrottle(meta, ctx.time)) {
     return { ok: false, recipeId: recipe.id, reason: 'throttled' };
+  }
+  const craftSkills = meta ? meta.craftSkills : {};
+  // The output's deterministic facts, hoisted above the #2350 capacity gate
+  // so it can model the exact grant arms below. Every one of these is a pure
+  // read (content lookups plus archetype state; none reads the inventory and
+  // none draws rng), so computing them before the reagents are consumed
+  // changes no behavior and the one-draw-per-successful-craft contract is
+  // untouched: the single masterwork proc draw stays exactly where it was, on
+  // the success path after consumption.
+  const def: ItemDef | undefined = ITEMS[recipe.resultItemId];
+  const outputQuality = defOutputQuality(def);
+  // #1129/#1148: the archetype empowerment ceiling. With deterministic
+  // outputs, the only remaining quality-EXCEEDING mechanism is the masterwork
+  // bump, so the ceiling now gates the masterwork effect (the proc arm
+  // below) and the skill-gain curve (further below): a dormant craft (common
+  // ceiling) can never masterwork at all, and a hobby craft (rare ceiling)
+  // cannot masterwork a rare-def recipe past its ceiling.
+  const ceilingTier = meta
+    ? archetypeCeilingFor(
+        meta.archetype.activeArchetype,
+        meta.archetype.pairedMajor,
+        recipe.professionId,
+        meta.archetype.hobbyCraft,
+      )
+    : Infinity;
+  const bumped = masterworkBumpedQuality(def?.quality);
+  const bonusStats = def
+    ? masterworkBonusStats({
+        // The recipe's own level: the source level item_level.ts registers a
+        // crafted output at, so the baked delta rides the same budget curve.
+        level: recipe.level,
+        quality: def.quality,
+        slot: def.slot,
+        stats: def.stats,
+      })
+    : null;
+  // Commissions (Professions 2.0): the opt-in flag arms every
+  // granted copy with the bind-on-trade primitive, but ONLY for the
+  // ruled-in equipment kinds (commission.ts isCommissionEligible). For any
+  // other output kind the flag is silently ignored (server authority: a
+  // tampered flag can never arm a potion), and a non-commission craft is
+  // byte-identical to the pre-phase behavior below.
+  const commissioned = commission && !!meta && isCommissionEligible(def);
+  // #2350 capacity gate: the output must fit AFTER the reagents leave, so
+  // simulate the consumption on a scratch copy (removeStacked mirrors the
+  // removeItem walk; the required counts recompute identically in the real
+  // consumption loop below) and require EVERY possible grant shape to fit:
+  // the deterministic no-proc arm, and, whenever the masterwork effect gates
+  // pass, the proc arm's instanced shape too (the proc chance always has a
+  // positive base, and a denial must not depend on a draw it never makes, so
+  // the gate treats a gates-open proc as possible rather than reading the
+  // chance). Denies with no side effect and draws nothing, like every arm
+  // above; placed before the gold sink so a denial never charges the fee.
+  if (meta) {
+    const scratch = meta.inventory.map((s) => ({ ...s }));
+    for (const reagent of recipe.reagents) {
+      const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
+      removeStacked(scratch, reagent.itemId, required.count);
+    }
+    // The grant shapes, mirroring the grant arms below field for field so the
+    // modeled payloads merge exactly like the minted ones.
+    const shapes: InvSlot[][] = [];
+    if (recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
+      const payload: ItemInstancePayload = { signer: meta.name };
+      if (commissioned) payload.bindOnTrade = true;
+      shapes.push([{ itemId: recipe.resultItemId, count: 1, instance: payload }]);
+    } else if (commissioned) {
+      shapes.push([
+        { itemId: recipe.resultItemId, count: recipe.resultCount, instance: { bindOnTrade: true } },
+      ]);
+    } else {
+      shapes.push([{ itemId: recipe.resultItemId, count: recipe.resultCount }]);
+    }
+    if (bonusStats !== null && bumped !== null && bumped.tier <= ceilingTier) {
+      const payload: ItemInstancePayload = {
+        signer: meta.name,
+        rolled: { masterwork: true, stats: bonusStats },
+      };
+      if (commissioned) payload.bindOnTrade = true;
+      const adds: InvSlot[] = [{ itemId: recipe.resultItemId, count: 1, instance: payload }];
+      if (recipe.resultCount > 1) {
+        adds.push(
+          commissioned
+            ? {
+                itemId: recipe.resultItemId,
+                count: recipe.resultCount - 1,
+                instance: { bindOnTrade: true },
+              }
+            : { itemId: recipe.resultItemId, count: recipe.resultCount - 1 },
+        );
+      }
+      shapes.push(adds);
+    }
+    const capacity = bagCapacity(meta.bags);
+    if (!shapes.every((adds) => fitsAll(scratch, capacity, adds))) {
+      return { ok: false, recipeId: recipe.id, reason: 'no_bag_space' };
+    }
   }
   // #1301 gold sink: a fee proportional to the recipe's item-level budget,
   // charged on every successful craft, common tier included (the free-floor
@@ -344,81 +503,162 @@ export function resolveCraftForRecipe(
     const goldFee = Math.ceil(recipe.itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
     meta.copper = Math.max(0, meta.copper - goldFee);
   }
-  const craftSkills = meta ? meta.craftSkills : {};
   let selfSignedBonusApplied = false;
+  // The masterwork signed-reagent input: a holding check over the recipe's
+  // reagents BEFORE consumption (removeItem consumes end-backward, so the
+  // signed copy itself may be what gets consumed), any signer counting.
+  let signedReagentUsed = false;
   for (const reagent of recipe.reagents) {
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
+    if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
     ctx.removeItem(reagent.itemId, required.count, pid);
   }
-  const skill = meta ? (meta.craftSkills[recipe.professionId] ?? 0) : 0;
-  const rawQuality = rollMaterialRarity(skill, ctx.rng);
-  // #1129/#1148 review: output quality must respect the empowerment ceiling
-  // too, not just skill-gain (a dormant or hobby craft can still roll high off
-  // raw skill; the actual granted quality is clamped to what that craft is
-  // empowered to produce).
-  const ceilingTier = meta
-    ? archetypeCeilingFor(
-        meta.archetype.activeArchetype,
-        meta.archetype.pairedMajor,
-        recipe.professionId,
-      )
-    : Infinity;
-  const quality = clampMaterialRarity(rawQuality, ceilingTier);
-  // #1149: sign a single rare-or-better copy so it carries an attribution
-  // target for Battlefield Experience; anything below that stays fungible,
-  // and a resultCount > 1 output is never itself signable (only single-copy
-  // grants are, matching every recipe in content/recipes.ts today).
-  if (meta && recipe.resultCount === 1 && isSignableMaterialRarity(quality)) {
-    ctx.addItemInstance(recipe.resultItemId, { signer: meta.name, rolled: { quality } }, pid);
+  // Masterwork proc draw: the single output-side rng draw, at the
+  // exact position the retired quality roll occupied so the world's draw
+  // order and the one-draw-per-successful-craft contract are preserved. The
+  // draw is UNCONDITIONAL on the success path: it happens even when the
+  // effect is gated off below, so the draw count per successful craft is
+  // always exactly 1 regardless of archetype state or output type. Every
+  // denial path above draws nothing, unchanged.
+  const procRoll = ctx.rng.next();
+  const procChance = masterworkProcChance({
+    tiersAboveRecipe:
+      tierCapability(craftSkills, recipe.professionId) - tierForSkill(recipe.skillReq),
+    signedReagent: signedReagentUsed,
+    specialized: isSpecialized(craftSkills, recipe.professionId),
+    // Higher-tier materials raise the proc odds. Pure def-level
+    // lookup over the recipe's declared reagent list (material_tier.ts), so
+    // it draws nothing and cannot move the single procRoll draw above.
+    materialTierBonus: materialTierBonusForReagents(recipe.reagents),
+  });
+  // Effect gate (gates the EFFECT, never the draw): the def must bake a
+  // non-null bonus record, and the bumped quality tier must not exceed the
+  // archetype ceiling (the invariant that a dormant or hobby craft's
+  // output never exceeds its ceiling tier). When
+  // gated off, the craft still succeeds as a plain deterministic craft.
+  const masterwork =
+    !!meta &&
+    procRoll < procChance &&
+    bonusStats !== null &&
+    bumped !== null &&
+    bumped.tier <= ceilingTier;
+  // Deterministic grant: every successful craft yields recipe.resultItemId.
+  // #1149 signing rule preserved on the DEF quality: a single-copy output
+  // whose def is rare-or-better is a signed instance so it carries an
+  // attribution target for Battlefield Experience; anything below stays
+  // fungible, and a resultCount > 1 output is never itself signable
+  // (matching every recipe in content/recipes.ts today). A masterwork proc
+  // is always minted as ONE signed instance carrying the baked bonus stats;
+  // a resultCount > 1 recipe grants the remainder plain, exactly as the
+  // plain arm would. NEW crafts never write rolled.quality (retired for new
+  // writes; legacy payloads keep loading). A commissioned craft arms every
+  // copy (the player opted the CRAFT in, so a multi-copy output mints each
+  // remainder copy as its own armed instance; they stack byte-equal), and a
+  // commissioned sub-rare output forces the instance path a plain grant
+  // would skip. Commission never adds signer: the #1149 signing rule is
+  // untouched (the bond composes with the maker's mark, it does not extend
+  // it). silent on every grant below: the craftResult event fires its own
+  // per-family cue (audio.craftSuccess, plus audio.masterwork layered on top
+  // for a proc) in src/game/audio.ts; the generic loot ding would otherwise
+  // stack on top of it for every single craft.
+  if (meta && masterwork && bonusStats) {
+    const payload: ItemInstancePayload = {
+      signer: meta.name,
+      rolled: { masterwork: true, stats: bonusStats },
+    };
+    if (commissioned) payload.bindOnTrade = true;
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, { silent: true });
+    if (recipe.resultCount > 1) {
+      if (commissioned) {
+        for (let i = 1; i < recipe.resultCount; i++) {
+          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, { silent: true });
+        }
+      } else {
+        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, { silent: true });
+      }
+    }
+  } else if (meta && recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
+    const payload: ItemInstancePayload = { signer: meta.name };
+    if (commissioned) payload.bindOnTrade = true;
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, { silent: true });
+  } else if (commissioned) {
+    for (let i = 0; i < recipe.resultCount; i++) {
+      ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, { silent: true });
+    }
   } else {
-    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid);
+    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid, { silent: true });
   }
   if (meta) {
-    // #1129/#1148 review: a recipe whose tier is ABOVE this craft's ARCHETYPE
-    // ceiling (ceilingTier, the same archetypeCeilingFor value the quality
-    // clamp reads above) must grant zero progress, full stop, never the
-    // ordinary diminishing-returns treatment: that is what makes a dormant or
-    // hobby craft's climb actually stop at its cap. The guard deliberately
-    // compares against the archetype ceiling ALONE, never craftCeiling's
-    // min-with-raw-capability: there is NO skillReq admission gate on
-    // crafting (content/recipes.ts documents that resolveCraft does not read
-    // skillReq), so a recipe tier above the player's RAW capability is the
-    // ordinary, doc-confirmed climb ("full at or above capability: this is
-    // how capability advances in the first place", wheel.ts) and must keep
-    // granting full progress exactly as base did. Below or at the ceiling,
-    // the ordinary curve (full at/above raw capability, reduced one tier
-    // under, zero two-plus under) applies unchanged off raw capability.
-    const recipeTier = tierForSkill(recipe.skillReq);
-    const multiplier =
-      recipeTier > ceilingTier
-        ? 0
-        : tierProgressMultiplier(tierCapability(meta.craftSkills, recipe.professionId), recipeTier);
+    // The #1129/#1148 gain doctrine (archetype ceiling alone zeroes, ordinary
+    // curve off raw capability otherwise) lives in the shared
+    // craftSkillGainMultiplier, which the crafting window's difficulty label
+    // also consumes so the hint can never diverge from this grant.
+    const multiplier = craftSkillGainMultiplier(
+      meta.craftSkills,
+      meta.archetype.activeArchetype,
+      meta.archetype.pairedMajor,
+      recipe.professionId,
+      meta.archetype.hobbyCraft,
+      recipe.skillReq,
+    );
+    const skillBefore = meta.craftSkills[recipe.professionId] ?? 0;
     gainCraftSkill(meta.craftSkills, recipe.professionId, CRAFT_SKILL_GAIN * multiplier);
-    meta.craftThrottle.count += 1;
-    // Character XP for the craft (profession_xp.ts), tier-scaled and
-    // level-gated the same way gathering/kill XP are: a max-level player
-    // spamming a trivial (gray) recipe gets zero.
+    const skillLearned = (meta.craftSkills[recipe.professionId] ?? 0) - skillBefore;
+    recordAction(meta);
+    // Character XP for the craft is LEARNING XP: the level-banded curve
+    // (profession_xp.ts) scaled by the skill this craft actually taught (the
+    // applied post-clamp delta, 0..CRAFT_SKILL_GAIN). A craft that teaches
+    // nothing, gray by tier, above the archetype ceiling, or at the craft's
+    // 125 content cap, pays nothing. The character-level green/gray falloff
+    // alone cannot bound a level-20 recipe at the level-20 character cap, so
+    // the skill journey is the dimension that keeps total craft XP finite
+    // (craft skill is additive-only and hard-capped, so every recipe's
+    // lifetime XP contribution per character is a closed sum).
     const entity = ctx.entities.get(pid);
-    if (entity) ctx.grantXp(craftActionXp(recipe.level, entity.level), meta);
+    if (entity) {
+      const xp = Math.round(
+        craftActionXp(recipe.level, entity.level) * (skillLearned / CRAFT_SKILL_GAIN),
+      );
+      if (xp > 0) ctx.grantXp(xp, meta);
+    }
   }
-  return {
+  const result: CraftResult = {
     ok: true,
     recipeId: recipe.id,
     itemId: recipe.resultItemId,
     count: recipe.resultCount,
-    quality,
+    quality: outputQuality,
     selfSignedBonusApplied,
   };
+  if (masterwork) result.masterwork = true;
+  if (commissioned) result.commission = true;
+  return result;
+}
+
+/** The OUTPUT DEF quality a successful craft reports (CraftResult.quality)
+ *  and signs against: the result item def's own static quality, normalized
+ *  onto the MaterialRarity ladder ('poor' or absent read as 'common', the
+ *  same normalization the budget math applies; no recipe outputs a poor def
+ *  today). The rolled output quality is retired, so quality is a
+ *  fact of the def, identical for every craft of the same recipe. */
+function defOutputQuality(def: ItemDef | undefined): MaterialRarity {
+  const quality = def?.quality;
+  return quality === undefined || quality === 'poor' ? 'common' : quality;
 }
 
 /** Pure resolution of one craft attempt against one recipe id, given an
  *  already-resolved player entity id: denies with `unknown_recipe` if the id
  *  does not resolve, otherwise delegates to `resolveCraftForRecipe`. */
-export function resolveCraft(ctx: SimContext, pid: number, recipeId: string): CraftResult {
+export function resolveCraft(
+  ctx: SimContext,
+  pid: number,
+  recipeId: string,
+  commission = false,
+): CraftResult {
   const recipe = recipeById(recipeId);
   if (!recipe) return { ok: false, recipeId, reason: 'unknown_recipe' };
-  return resolveCraftForRecipe(ctx, pid, recipe);
+  return resolveCraftForRecipe(ctx, pid, recipe, commission);
 }
 
 // Command entry point (behind the SimContext seam): resolves one player's
@@ -429,19 +669,37 @@ export function resolveCraft(ctx: SimContext, pid: number, recipeId: string): Cr
 // hudChrome.crafting.* catalog keys; this must not also emit a ctx.error
 // toast, or a denied craft prints twice and the second copy is unlocalized.
 // Runs on the deterministic tick the wire command arrives on, never off-tick.
-export function craftItem(ctx: SimContext, recipeId: string, pid?: number): CraftResult {
+// `commission` is the opt-in boolean off the craft command; the
+// resolve honors it only for eligible equipment outputs (commission.ts).
+export function craftItem(
+  ctx: SimContext,
+  recipeId: string,
+  commission = false,
+  pid?: number,
+): CraftResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, recipeId, reason: 'unknown_recipe' };
-  const result = resolveCraft(ctx, r.meta.entityId, recipeId);
+  const result = resolveCraft(ctx, r.meta.entityId, recipeId, commission);
   if (result.ok) {
     ctx.bumpDeedStat(r.meta, 'craftsPerformed', 1);
-    // A station-bound success already proved hub position and level in the
-    // resolve's hub gate, so the recipe flag alone identifies a hub craft.
-    if (recipeById(recipeId)?.requiresHubStation) {
+    // A station-bound success already proved station presence in the
+    // resolve's station gate, so stationType alone identifies one. The
+    // persisted stat key stays 'hubCraftsPerformed' for save back-compat: it
+    // now means station-bound crafts (the gate was renamed, not the key).
+    if (recipeById(recipeId)?.stationType) {
       ctx.bumpDeedStat(r.meta, 'hubCraftsPerformed', 1);
+    }
+    // A masterwork proc feeds the Masterwright counter
+    // (prog_masterwright). Resolved strictly AFTER the resolve's single
+    // output-side proc draw; this bump draws nothing. Deliberately NO retro
+    // arm: masterworking is repeatable, so a veteran whose procs predate the
+    // counter simply earns it on the next proc.
+    if (result.masterwork) {
+      ctx.bumpDeedStat(r.meta, 'masterworksCrafted', 1);
     }
     // The dirty mark also covers the craft-skill gain the resolve applied.
     ctx.markDeedsDirty(r.meta.entityId);
+    ctx.onRecipeCraftedForQuests(recipeId, r.meta);
   }
   return result;
 }

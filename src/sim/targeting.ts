@@ -19,6 +19,7 @@
 // Three/render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { corpseInteractionAvailability } from './corpse_interaction';
 import { deadTargetSelectable } from './dead_target';
 import type { SimContext } from './sim_context';
 import { isVcupCrossTeam } from './social/vale_cup';
@@ -50,9 +51,17 @@ export class Targeting {
       return;
     }
     const e = this.ctx.entities.get(id);
-    if (!e || (e.dead && !deadTargetSelectable(e, p.id))) return;
+    if (!e || (e.dead && !this.deadEntitySelectableFor(e, p.id))) return;
     p.targetId = id;
     if (!this.ctx.isHostileTo(p, e) || e.dead) p.autoAttack = false;
+  }
+
+  private deadEntitySelectableFor(e: Entity, viewerId: number): boolean {
+    if (!deadTargetSelectable(e, viewerId)) return false;
+    if (e.kind === 'mob' && e.lootable) {
+      return corpseInteractionAvailability(this.ctx, e, viewerId, true).canInteract;
+    }
+    return true;
   }
 
   tabTarget(pid?: number): void {
@@ -69,7 +78,7 @@ export class Targeting {
         dx: c.e.pos.x - p.pos.x,
         dz: c.e.pos.z - p.pos.z,
         d: c.d,
-        engaged: c.e.aggroTargetId === p.id || c.e.targetId === p.id,
+        engaged: this.isEnemyEngagedWith(c.e, p),
       })),
       p.facing,
     );
@@ -94,10 +103,16 @@ export class Targeting {
     if (!r) return;
     const p = r.e;
     let best: Entity | null = null;
+    let bestEngaged = false;
     let bestD2 = TAB_QUERY_RADIUS * TAB_QUERY_RADIUS;
     this.ctx.grid.forEachInRadius(p.pos.x, p.pos.z, TAB_QUERY_RADIUS, (e, d2) => {
       if (!this.isEnemyTargetCandidate(p, e)) return;
-      if (d2 < bestD2) {
+      const engaged = this.isEnemyEngagedWith(e, p);
+      if (
+        (engaged && !bestEngaged) ||
+        (engaged === bestEngaged && (d2 < bestD2 || (d2 === bestD2 && (!best || e.id < best.id))))
+      ) {
+        bestEngaged = engaged;
         bestD2 = d2;
         best = e;
       }
@@ -113,6 +128,10 @@ export class Targeting {
       out.push({ e, d: Math.sqrt(d2) });
     });
     return out;
+  }
+
+  private isEnemyEngagedWith(target: Entity, attacker: Entity): boolean {
+    return target.aggroTargetId === attacker.id || target.targetId === attacker.id;
   }
 
   private isEnemyTargetCandidate(attacker: Entity, target: Entity): boolean {

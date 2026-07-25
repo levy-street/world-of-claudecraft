@@ -158,6 +158,7 @@ export const zh_CN: Record<string, string> = {
   'stats.uptime': '运行时长',
   'stats.avgTick': '平均帧时',
   'stats.serverRss': '服务器内存',
+  'stats.playersCap': '玩家上限',
   'online.title': '在线玩家',
   'online.refreshHint': '每5秒刷新',
   'online.empty': '当前无人在线',

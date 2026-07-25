@@ -43,6 +43,7 @@ export const QUALITY_STAT_MULT: Record<string, number> = {
 // (head ~1.0, shoulder ~0.75, gloves ~0.65, waist ~0.55) applied to stat points.
 export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
   mainhand: 1.0,
+  offhand: 0.75,
   chest: 1.0,
   legs: 0.9,
   helmet: 0.85,
@@ -62,6 +63,24 @@ export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
 // Primary-stat points granted per item level at full (rare-mult x chest-mult = 1).
 export const STAT_PER_ILVL = 0.7;
 
+// v0.27.1 re-budget: a two-handed weapon differentiates on weapon DPS (see
+// TWOHAND_DPS_MULT below), never on stats. It carries a modest premium over the
+// one-handed mainhand line and MUST stay strictly below the combined mainhand +
+// offhand slot weights (1.0 + 0.75), so every dual-wield or weapon-and-shield
+// setup out-stats a two-hander of the same item level (tests/twohand_rebudget
+// pins this). The old value of 2 (both hands' budgets) assumed the offhand slot
+// was sacrificed; Titan's Grip broke that assumption by filling both slots with
+// two-handers. Consumers apply this only when an ItemDef is a weapon with hand
+// 'twohand', rounding the product so budgets stay integral.
+export const TWOHAND_STAT_MULT = 1.3;
+
+// The weapon-DPS premium a two-hander carries over the one-hand budget line: the
+// damage side of the stat tradeoff above (big slow swings, thinner stat sheet).
+// Codifies the previously informal "Eastbrook/Highwatch greatsword rule" (the top
+// of the 10-to-15% band) that the zone3 epics were authored against, so items,
+// heroic variants, and tests all share one number.
+export const TWOHAND_DPS_MULT = 1.15;
+
 // The source level the "Heroic X" upgraded drop variants read as: one heroic tier
 // above the level-20 dungeons, so epics land at item level 28 (22 + the epic bump
 // of 6) and rares at 25 (22 + 3). content/heroic_variants.ts scales each variant's
@@ -75,6 +94,8 @@ export const HEROIC_VARIANT_SOURCE_LEVEL = 22;
 // near 11 to 11.5, the ilvl-26 dungeon epics near 14 to 15, and this puts ilvl-31 at
 // 16.0, above the item-level-26 epics and below the hand-authored legendaries (item
 // level 33 at 17+). Slope 0.3/ilvl keeps it under that legendary ceiling at the cap.
+// Two-handers ride TWOHAND_DPS_MULT above this line (their side of the stat tradeoff),
+// which puts a top-tier 2H above the one-hand legendary ceiling on raw weapon dps.
 export function weaponDpsBudget(level: number): number {
   return 6.7 + 0.3 * level;
 }

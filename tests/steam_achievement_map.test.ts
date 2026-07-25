@@ -9,8 +9,10 @@ import { DEEDS } from '../src/sim/content/deeds';
 const ACH_NAME_RE = /^ACH_[A-Z0-9_]+$/;
 
 describe('Steam achievement map', () => {
-  it('has exactly the 72 registered entries (68 launch + 4 catalog refresh)', () => {
-    expect(Object.keys(ACHIEVEMENT_MAP).length).toBe(72);
+  it('has exactly the 75 registered entries (68 launch + 4 catalog refresh + 3 professions marquee)', () => {
+    // The three Professions 2.0 marquee deeds
+    // (prog_guildsworn, prog_masterwright, prog_master_angler) join the map.
+    expect(Object.keys(ACHIEVEMENT_MAP).length).toBe(75);
   });
 
   it('stays within the App Admin cap', () => {
@@ -59,9 +61,10 @@ describe('Steam achievement map', () => {
     expect(ACHIEVEMENT_MAP.dgn_deepward).toBe('ACH_DEEPWARD');
     expect(ACHIEVEMENT_MAP.pvp_vcup_golden_goal).toBe('ACH_VCUP_GOLDEN_GOAL');
     expect(ACHIEVEMENT_MAP.prog_crown_below).toBe('ACH_CROWN_BELOW');
+    expect(ACHIEVEMENT_MAP.prog_guildsworn).toBe('ACH_GUILDSWORN');
   });
 
-  it('pins the full 72-entry registered map as a literal (permanent Steam API names)', () => {
+  it('pins the full 75-entry registered map as a literal (permanent Steam API names)', () => {
     // ACH names are permanent once shipped; a bulk regeneration that swapped two
     // deed-to-ACH mappings would keep the count, the shape, and the uniqueness
     // checks above all green. Only a literal snapshot of every pair catches it.
@@ -78,6 +81,9 @@ describe('Steam achievement map', () => {
       prog_crown_below: 'ACH_CROWN_BELOW',
       prog_mere_at_rest: 'ACH_MERE_AT_REST',
       prog_tools_of_the_trade: 'ACH_TOOLS_OF_THE_TRADE',
+      prog_guildsworn: 'ACH_GUILDSWORN',
+      prog_masterwright: 'ACH_MASTERWRIGHT',
+      prog_master_angler: 'ACH_MASTER_ANGLER',
       cmb_first_blood: 'ACH_FIRST_BLOOD',
       cmb_slayer: 'ACH_SLAYER',
       cmb_first_fall: 'ACH_FIRST_FALL',

@@ -48,7 +48,7 @@
  */
 
 /** Who owns a touch, in router priority order (modal/menu highest, camera lowest). */
-export type TouchOwner = 'movement' | 'combatButton' | 'camera' | 'menu' | 'ignored';
+export type TouchOwner = 'movement' | 'combatButton' | 'camera' | 'groundAim' | 'menu' | 'ignored';
 
 /**
  * The minimal structural shape this module needs from a DOM target: enough to

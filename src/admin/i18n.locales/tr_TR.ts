@@ -149,6 +149,7 @@ export const tr_TR: Record<string, string> = {
   'stats.onlineAccounts': 'çevrimiçi hesaplar',
   'stats.siteUsersNow': 'şu anki site kullanıcıları',
   'stats.peakOnline': 'en yüksek çevrimiçi',
+  'stats.playersCap': 'oyuncu kapasitesi',
   'stats.peakOnlineToday': 'son 24 saatin en yüksek çevrimiçisi',
   'stats.peakOnlineAllTime': 'tüm zamanların en yüksek çevrimiçisi',
   'stats.accounts': 'hesaplar',

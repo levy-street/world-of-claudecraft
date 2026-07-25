@@ -1,7 +1,10 @@
 // Pure presentation logic for the overhead spell cast/channel bar. Kept DOM-free
 // (and free of i18n: no t()/tEntity here) so the fill + label rules stay
 // unit-testable without a WebGL context. The renderer turns this into DOM and
-// resolves the visible text (fishing label vs. ability name) via i18n.
+// resolves the visible text (fishing/gathering label vs. ability name) via
+// i18n. Fishing shows a constant full waiting bar (the bite is signaled by
+// the bobber + cue, never by the bar); the gather cast fills like any
+// hardcast and its label rides `label` + castDisplayName.
 import { CONSUME_DURATION, type Consuming, type Entity, FISHING_CAST_ID } from '../sim/types';
 
 export interface CastBarState {
@@ -23,11 +26,24 @@ export interface CastBarState {
 
 const HIDDEN: CastBarState = { visible: false, channel: false, fill: 0, label: '', fishing: false };
 
-export function castBarState(e: Entity): CastBarState {
+/**
+ * Whether the overhead cast bar shows at all. Split out so callers that only
+ * need the row's presence (the nameplate stacking pass, which asks for every
+ * visible plate every frame) can skip building a CastBarState object.
+ */
+export function castBarVisible(e: Entity): e is Entity & { castingAbility: string } {
   // corpses, doors/crates, and idle entities show nothing; guard the divide too
-  if (e.dead || e.kind === 'object' || !e.castingAbility || e.castTotal <= 0) return HIDDEN;
+  return !e.dead && e.kind !== 'object' && !!e.castingAbility && e.castTotal > 0;
+}
+
+export function castBarState(e: Entity): CastBarState {
+  if (!castBarVisible(e)) return HIDDEN;
   const remaining = Math.max(0, Math.min(1, e.castRemaining / e.castTotal));
-  const fill = e.channeling ? remaining : 1 - remaining;
+  // Fishing (Professions 2.0) renders a CONSTANT full waiting bar:
+  // the bite moment is the bobber + cue, and the bar must carry no bite (or
+  // session-progress) information a modified client could read timing off.
+  // The gather cast is an ordinary filling hardcast through the generic path.
+  const fill = e.castingAbility === FISHING_CAST_ID ? 1 : e.channeling ? remaining : 1 - remaining;
   return {
     visible: true,
     channel: e.channeling,

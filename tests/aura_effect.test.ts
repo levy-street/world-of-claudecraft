@@ -4,6 +4,13 @@ import { type AuraEffectInput, auraEffectDescriptor } from '../src/ui/aura_effec
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
 describe('auraEffectDescriptor', () => {
+  it('describes the cancelable protective Hourglass aura', () => {
+    expect(desc({ id: 'temporal_hourglass', kind: 'stasis', value: 1.5 })).toEqual({
+      key: 'hudChrome.auraEffect.temporalHourglass',
+      nums: {},
+    });
+  });
+
   it('describes a damage-over-time with value, school and interval', () => {
     expect(desc({ kind: 'dot', value: 15, tickInterval: 3, school: 'shadow' })).toEqual({
       key: 'hudChrome.auraEffect.dot',
@@ -35,6 +42,13 @@ describe('auraEffectDescriptor', () => {
   it('reports a movement speed buff as a percent increase (absolute multiplier)', () => {
     expect(desc({ kind: 'buff_speed', value: 1.4 })).toEqual({
       key: 'hudChrome.auraEffect.speed',
+      nums: { pct: 40 },
+    });
+  });
+
+  it('describes Fireball Form without calling it the Druid travel form', () => {
+    expect(desc({ kind: 'form_fireball', value: 1.4 })).toEqual({
+      key: 'hudChrome.auraEffect.formFireball',
       nums: { pct: 40 },
     });
   });
@@ -187,5 +201,25 @@ describe('auraEffectDescriptor', () => {
   it('is a pure function: same input gives the same output', () => {
     const input: AuraEffectInput = { kind: 'dot', value: 12, tickInterval: 2, school: 'nature' };
     expect(desc(input)).toEqual(desc(input));
+  });
+
+  it('describes the damage-dealt fraction buff as a percent in both directions', () => {
+    // Rune of Power / Elemental Convergence: the bearer deals more damage.
+    expect(desc({ kind: 'buff_dmg_done', value: 0.1 })).toEqual({
+      key: 'hudChrome.auraEffect.dmgDone',
+      nums: { pct: 10 },
+    });
+    // Negative = a demoralize (Direhowl's pct form): the reduce wording.
+    expect(desc({ kind: 'buff_dmg_done', value: -0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.dmgDoneReduce',
+      nums: { pct: 20 },
+    });
+  });
+
+  it('explains how Heating Up becomes Hot Streak', () => {
+    expect(desc({ id: 'heating_up', kind: 'internal_cd', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.heatingUp',
+      nums: {},
+    });
   });
 });

@@ -35,6 +35,7 @@ function stubInfo(over: Partial<NonNullable<ArenaInfo['match']>['yumi']> = {}): 
     queueSize: 0,
     match: {
       format: 'yumi3',
+      map: 'coliseum' as const,
       state: yumi.phase === 'sudden' ? 'active' : (yumi.phase as 'countdown' | 'active' | 'over'),
       oppName: 'Them',
       oppClass: 'warrior',

@@ -51,6 +51,7 @@ export type StatId =
   | 'critRating'
   | 'hasteRating'
   | 'hitRating'
+  | 'parry'
   | 'warfare';
 
 /** A single contribution line. `value` is already in the unit the line displays
@@ -154,6 +155,9 @@ export interface StatTooltipInput {
   hasteRating: number;
   /** entity.hitRating, the accumulated hit rating from gear + set bonuses. */
   hitRating: number;
+  /** The warrior's front-arc parry chance, 0..1 (warriorParryChance from
+   *  Strength); every other class stays at 0. */
+  parryChance: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
   /** Equipped items contributing stats, for the gear source line (HUD maps from
@@ -168,6 +172,7 @@ export interface StatTooltipInput {
 const AGI_ARMOR_PER_POINT = 2; // entity.ts: s.armor += s.agi * 2
 const AGI_CRIT_PER_POINT = 0.0005; // entity.ts: critChance = 0.05 + s.agi * 0.0005
 const AGI_DODGE_PER_POINT = 0.0005; // entity.ts: dodgeChance = 0.05 + s.agi * 0.0005
+const STR_PARRY_PER_POINT = 0.0005; // warrior_hit_table.ts: parry = 0.05 + str * 0.0005
 const HUNTER_RANGED_AP_PER_AGI = 2; // entity.ts: rangedPower = s.agi * 2 (hunter)
 const INT_SPELLCRIT_PER_POINT = 0.0008; // sim.ts spellCrit(): 0.05 + int * 0.0008
 const AP_PER_DPS = 14; // sim.ts: attackPower / 14 = bonus dps
@@ -336,6 +341,14 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       baseChanceNote = true;
       break;
     }
+    case 'parry': {
+      // Front-only avoidance, shown as a percent like dodge (the warrior starts
+      // at a base chance and scales with Strength; other classes stay at 0).
+      isPrimary = false;
+      statValue = input.parryChance * 100;
+      baseChanceNote = input.parryChance > 0;
+      break;
+    }
     case 'critRating': {
       isPrimary = false;
       statValue = input.critRating;
@@ -498,6 +511,16 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
         sources.push({ ...b, value: b.value * 100 });
       }
       return finish(input.dodgeChance * 100, 0.1);
+    }
+    case 'parry': {
+      // Warrior-only: base 5% plus Strength scaling (warrior_hit_table.ts).
+      // Non-parry classes show a bare 0 with no misleading base line.
+      if (input.parryChance > 0) {
+        sources.push({ kind: 'base', value: 5 });
+        const fromStr = stats.str * STR_PARRY_PER_POINT * 100;
+        if (fromStr !== 0) sources.push({ kind: 'attributes', value: fromStr, fromStat: 'str' });
+      }
+      return finish(input.parryChance * 100, 0.1);
     }
     // The dps cell is an estimate the panel computes from weapon + AP; it has no
     // clean per-source attribution, so it shows none (just its approximate note).

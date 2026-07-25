@@ -90,7 +90,6 @@ describe('LeaderboardWindow: stale async board responses', () => {
           cls: 'mage',
           level: 20,
           renown: 4200,
-          deedCount: 77,
           title: null,
         },
       ],

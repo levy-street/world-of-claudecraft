@@ -52,20 +52,31 @@ function producesEffect(cls: PlayerClass, specId: string, sig: string): string {
     res: p.resource,
     allyHp: ally.hp,
   };
-  let ev = false;
-  for (let i = 0; i < 20 * 3; i++) {
+  // The mage rework swapped Pyromancy's signature from the instant Combustion buff to
+  // Pyrelance (pyroblast), a 6s hard cast whose bolt then travels: long enough for the
+  // unaggroed dummy to wander behind a collider and fizzle the finish on line of sight,
+  // so the dummy's position is pinned each tick like its hp, and the watch window is 8s
+  // (6s cast plus bolt flight). The effect check latches per tick (with an early exit)
+  // so instant signatures resolve as fast as before and a short-lived aura cannot
+  // expire unobserved.
+  const mobHome = { x: mob.pos.x, y: mob.pos.y, z: mob.pos.z };
+  let fired = false;
+  for (let i = 0; i < 20 * 8 && !fired; i++) {
     mob.hp = 1_000_000;
+    mob.pos.x = mobHome.x;
+    mob.pos.y = mobHome.y;
+    mob.pos.z = mobHome.z;
     if (i === 0) sim.castAbility(sig, pid, { x: mob.pos.x, z: mob.pos.z });
     for (const e of sim.tick())
-      if ((e.type === 'damage' || e.type === 'heal') && (e as any).sourceId === pid) ev = true;
+      if ((e.type === 'damage' || e.type === 'heal') && (e as any).sourceId === pid) fired = true;
+    fired =
+      fired ||
+      p.auras.length > before.pA ||
+      mob.auras.length > before.mA ||
+      p.cooldowns.size > before.cd ||
+      p.resource < before.res ||
+      ally.hp > before.allyHp;
   }
-  const fired =
-    ev ||
-    p.auras.length > before.pA ||
-    mob.auras.length > before.mA ||
-    p.cooldowns.size > before.cd ||
-    p.resource < before.res ||
-    ally.hp > before.allyHp;
   return fired ? '' : 'cast produced no observable effect';
 }
 

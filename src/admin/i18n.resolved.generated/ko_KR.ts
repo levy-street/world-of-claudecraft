@@ -46,6 +46,7 @@ export const ko_KR: AdminTranslations = {
   "stats.peakOnline": "최대 접속",
   "stats.peakOnlineToday": "24시간 최대 접속",
   "stats.peakOnlineAllTime": "전체 최대 접속",
+  "stats.playersCap": "플레이어 상한",
   "stats.accounts": "계정 수",
   "stats.characters": "캐릭터 수",
   "stats.newAccounts24h": "신규 계정 24시간",

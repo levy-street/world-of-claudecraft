@@ -2,7 +2,7 @@
 // otherwise scan every entity. Cells are re-bucketed once per tick (gradual
 // movement) and kept exact on spawn/despawn/teleport, so queries always see
 // the same roster as the entities map.
-import { Entity } from './types';
+import type { Entity } from './types';
 
 // shifts negative cell coordinates into the positive range before packing
 const OFFSET = 32768;
@@ -14,7 +14,9 @@ export class SpatialGrid {
   constructor(readonly cellSize = 32) {}
 
   private keyAt(x: number, z: number): number {
-    return (Math.floor(x / this.cellSize) + OFFSET) * 65536 + (Math.floor(z / this.cellSize) + OFFSET);
+    return (
+      (Math.floor(x / this.cellSize) + OFFSET) * 65536 + (Math.floor(z / this.cellSize) + OFFSET)
+    );
   }
 
   insert(e: Entity): void {
@@ -39,6 +41,19 @@ export class SpatialGrid {
       list[i] = list[list.length - 1];
       list.pop();
     }
+    // An emptied cell is dropped entirely rather than left as dead weight.
+    // `insert()` reuses an existing array, so `cells.size` was already bounded
+    // by the number of distinct cells ever occupied (not by movement/spawn
+    // churn), so this is not unbounded growth. Still, a stale empty array
+    // serves no purpose (a re-`insert` recreates it on demand), so reclaim it
+    // now to keep `cells.size` tracking the true occupied-cell count.
+    if (list.length === 0) this.cells.delete(key);
+  }
+
+  // Number of occupied cells currently tracked, for tests/diagnostics: proves
+  // an emptied cell is reclaimed rather than left behind as dead weight.
+  cellCount(): number {
+    return this.cells.size;
   }
 
   // Re-bucket an entity whose position changed cells (movement, teleport).

@@ -58,6 +58,13 @@ const LOOT_ROLL_TIMEOUT = 60;
 // refreshes the roll to a fresh LOOT_ROLL_TIMEOUT need/greed window.
 const MASTER_LOOT_TIMEOUT = 300;
 
+// Lifecycle decoupling: how long (seconds) a corpse stays open for
+// its remaining half once one half is consumed, an unclaimed harvest after the
+// loot empties (pruneCorpseLoot) or leftover loot after the harvest claim is
+// spent (harvestCorpse). Shorter than the full decay window, longer than the
+// both-halves-consumed fast collapse below.
+export const CORPSE_INTERACT_GRACE_SECONDS = 30;
+
 // The server-authoritative pending need-greed roll record. Sim-internal (the public
 // projection clients see is LootRollPrompt); the `pendingLootRolls` map lives on Sim
 // and is reached through the SimContext seam.
@@ -130,6 +137,39 @@ function effectiveItemLootStrategy(ctx: SimContext, itemId: string, mob: Entity)
   return q === 'poor' || q === 'common' ? strategies.commonItems : strategies.premiumItems;
 }
 
+// Resolves a single exclusive rollGroup draw to its winning entry. Pure partition
+// math; the caller supplies the one rng draw so the draw-order/parity contract
+// (exactly one ctx.rng.next() per group) is unaffected by the dedup below.
+//
+// When the partition lands on an item id already awarded by an earlier group in
+// this same loot event, this falls forward deterministically to the next entry in
+// the SAME group (wrapping), rather than dropping the slot entirely: that is what
+// actually raises drop variety per kill (a plain skip just deletes the duplicate,
+// leaving the surviving item set unchanged and costing the raid a guaranteed
+// drop). Only when every entry in the group is already awarded does the slot
+// legitimately produce nothing.
+export function pickRollGroupWinner(
+  roll: number,
+  group: LootEntry[],
+  awardedItemIds: Set<string>,
+): LootEntry | null {
+  let cumulative = 0;
+  let winnerIndex = -1;
+  for (let i = 0; i < group.length; i++) {
+    cumulative += group[i].chance;
+    if (roll < cumulative) {
+      winnerIndex = i;
+      break;
+    }
+  }
+  if (winnerIndex === -1) return null;
+  for (let offset = 0; offset < group.length; offset++) {
+    const candidate = group[(winnerIndex + offset) % group.length];
+    if (!candidate.itemId || !awardedItemIds.has(candidate.itemId)) return candidate;
+  }
+  return null;
+}
+
 function needsQuestDrop(ctx: SimContext, entry: LootEntry, meta: PlayerMeta): boolean {
   if (!entry.questId || !entry.itemId) return false;
   const qp = meta.questLog.get(entry.questId);
@@ -162,6 +202,14 @@ export function rollLoot(
   let copper = 0;
   const items: LootSlot[] = [];
   const rolledGroups = new Set<string>();
+  // Cross-group duplicate guard: several exclusive rollGroups on the same mob (e.g.
+  // Nythraxis's 4 helm/shoulder slots) can share item ids, and each group draws its
+  // own independent rng.next(). Without this, one kill could hand out the same piece
+  // twice (or more) instead of a spread across the raid; a repeated winner falls
+  // forward to the next non-awarded entry in its own group instead (see
+  // pickRollGroupWinner), preserving both the guaranteed per-group drop and the
+  // single rng draw.
+  const awardedItemIds = new Set<string>();
   // A heroic dungeon claim upgrades the mob's normal epic/rare drops to their
   // "Heroic" variant in place (content/heroic_variants.ts). Resolved once and
   // reused by the heroic-only append below. No rng is drawn here, so normal-run
@@ -187,13 +235,12 @@ export function rollLoot(
       rolledGroups.add(entry.rollGroup);
       const group = template.loot.filter((l) => l.rollGroup === entry.rollGroup);
       const roll = ctx.rng.next();
-      let cumulative = 0;
-      for (const g of group) {
-        cumulative += g.chance;
-        if (roll < cumulative) {
-          if (g.itemId) items.push({ itemId: heroicItem(g.itemId), count: 1 });
-          break;
-        }
+      const winner = pickRollGroupWinner(roll, group, awardedItemIds);
+      if (winner?.itemId) {
+        const resolvedId = heroicItem(winner.itemId);
+        items.push({ itemId: resolvedId, count: 1 });
+        awardedItemIds.add(winner.itemId);
+        awardedItemIds.add(resolvedId);
       }
       continue;
     }
@@ -244,13 +291,10 @@ export function rollLoot(
           rolledGroups.add(entry.rollGroup);
           const group = heroicEntries.filter((l) => l.rollGroup === entry.rollGroup);
           const roll = ctx.rng.next();
-          let cumulative = 0;
-          for (const g of group) {
-            cumulative += g.chance;
-            if (roll < cumulative) {
-              if (g.itemId) items.push({ itemId: g.itemId, count: 1 });
-              break;
-            }
+          const winner = pickRollGroupWinner(roll, group, awardedItemIds);
+          if (winner?.itemId) {
+            items.push({ itemId: winner.itemId, count: 1 });
+            awardedItemIds.add(winner.itemId);
           }
           continue;
         }
@@ -667,10 +711,14 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       ctx.emit({ type: 'loot', text: `Everyone passed on [[i:${roll.itemId}]].`, pid });
     return;
   }
-  // Reveal every roll, classic-style: one loot line per need/greed roller so the
-  // whole group can audit the outcome (passes were already visible live via
-  // lootRollGroupStatus and have no number to reveal).
-  for (const entry of entries) {
+  // Reveal one loot line per CONTENDING roller only: when anyone needed, need
+  // beats greed, so the greed numbers cannot affect the outcome and revealing
+  // them is noise. Nothing is hidden that matters: every choice (need, greed,
+  // pass) was already visible live via lootRollGroupStatus while the roll was
+  // open, and the winner line below still closes the roll. With no needers the
+  // greed rolls are the contest and all of them are revealed as before (passes
+  // have no number to reveal).
+  for (const entry of contenders) {
     const rollerName =
       ctx.players.get(entry.pid)?.name ?? roll.candidateNames.get(entry.pid) ?? 'Unknown';
     for (const pid of partyMembersForRoll(roll)) {
@@ -741,7 +789,7 @@ export function lootSlotVisibleTo(slot: LootSlot, pid: number): boolean {
   return slot.openToAll || !slot.personalFor || slot.personalFor.includes(pid);
 }
 
-function hasPendingLootRollForMob(ctx: SimContext, mobId: number): boolean {
+export function hasPendingLootRollForMob(ctx: SimContext, mobId: number): boolean {
   return [...ctx.pendingLootRolls.values()].some((roll) => roll.mobId === mobId);
 }
 
@@ -758,6 +806,16 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
       return;
     }
     mob.loot = null;
+    // An emptied corpse that still owes an unclaimed harvest stays
+    // open for a short grace window (empty loot rows plus the picker; the
+    // respawn gate in mob/locomotion.ts collapses it at corpseTimer 0). Only
+    // a corpse with both halves consumed, or no harvest half at all, takes
+    // the fast arm.
+    if (MOBS[mob.templateId]?.componentTags?.length && mob.harvestClaimedBy === null) {
+      mob.lootable = true;
+      mob.corpseTimer = Math.min(mob.corpseTimer, CORPSE_INTERACT_GRACE_SECONDS);
+      return;
+    }
     mob.lootable = false;
     mob.corpseTimer = Math.min(mob.corpseTimer, 4);
   }

@@ -10,10 +10,11 @@
 //
 // Determinism rules this file obeys:
 //   - It NEVER captures a 500 produced by the pool-less db (a test artifact). Every
-//     captured case returns BEFORE touching Postgres, or returns an empty payload
-//     because the leaderboard cache swallows the db error. Db-dependent success
-//     paths (project-stats, arena ladder, populated leaderboards, the OAuth/Discord
-//     success bounces) are DEFERRED, see the trailing comment block.
+//     captured case returns BEFORE touching Postgres, or returns an empty/zero
+//     payload because a TTL cache swallows the db error (the leaderboard, arena
+//     ladder, and project-stats caches all degrade deterministically). The remaining
+//     db-dependent success paths (populated leaderboards, the OAuth/Discord success
+//     bounces) are DEFERRED, see the trailing comment block.
 //   - The harness normalizer masks the dynamic fields (challengeId/nonce) by key, so
 //     the native-attestation challenge golden is byte-stable across runs.
 //   - The GitHub releases proxy does a network fetch; it is pinned deterministic by
@@ -21,6 +22,7 @@
 //     GitHub is unreachable returns an empty feed), never by editing source.
 
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { resetPublicReadRateLimits } from '../../../server/ratelimit';
 import { type Dispatch, goldenMaster, makeReq } from '../helpers';
 import { goldenContentTypeMismatch } from './content_type_consistency';
 
@@ -32,7 +34,12 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase3';
 
 // routeHttpRequest is synchronous fire-and-forget (void handleApi(...)), so the
 // dispatcher must poll res.writableEnded before the captured triple is readable.
-const MAX_POLL_TICKS = 5000;
+const MAX_POLL_TICKS = 200_000;
+// See the matching comment in parity.test.ts: a local dev Postgres reachable on
+// the dummy DATABASE_URL's port turns the leaderboard cases' DB reads (and this
+// suite's cold ensureSchema boot) into real work that can exceed vitest's
+// default 10s hookTimeout.
+const BEFORE_ALL_HOOK_TIMEOUT_MS = 60_000;
 // Where this surface's goldens live: tests/server/fixtures/main/.
 const FIXTURE_DIR = `${__dirname}/../fixtures/main`;
 
@@ -84,7 +91,7 @@ beforeAll(async () => {
   // legacy characterization it has always been, immune to the default flip.
   main.setApiDispatchModeForTests('legacy');
   dispatch = await loadDispatch();
-});
+}, BEFORE_ALL_HOOK_TIMEOUT_MS);
 
 afterAll(() => {
   for (const key of DISCORD_ENV_KEYS) {
@@ -182,46 +189,101 @@ describe('main /api characterization: GitHub releases proxy (network stubbed to 
 });
 
 describe('main /api characterization: leaderboard payload shapes (empty cache)', () => {
-  it('GET /api/leaderboard default paged board', async () => {
-    await characterize('leaderboard_default', makeReq({ method: 'GET', url: '/api/leaderboard' }));
+  // Unlike the rest of this file's contract paths, the leaderboard board reads
+  // (getLeaderboard/getGuildLeaderboard/getDeedsLeaderboard) genuinely await the
+  // db pool before falling back to an empty page. A dummy DATABASE_URL that
+  // nothing answers on rejects fast, but a contributor whose local dev Postgres
+  // happens to be reachable on that same port pays a real query round trip;
+  // give these three real headroom above vitest's 5s default.
+  const LEADERBOARD_TEST_TIMEOUT_MS = 30_000;
+
+  it(
+    'GET /api/leaderboard default paged board',
+    async () => {
+      await characterize(
+        'leaderboard_default',
+        makeReq({ method: 'GET', url: '/api/leaderboard' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'GET /api/leaderboard?board=guilds guild board',
+    async () => {
+      await characterize(
+        'leaderboard_guilds',
+        makeReq({ method: 'GET', url: '/api/leaderboard?board=guilds' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'GET /api/leaderboard?board=deeds Renown board (anonymous, empty cache)',
+    async () => {
+      // The account-level Renown board: fixed scope 'global', metric 'renown',
+      // no self row for an anonymous caller. The pool-less refresh serves the
+      // deterministic empty page, like the other board fixtures.
+      await characterize(
+        'leaderboard_deeds',
+        makeReq({ method: 'GET', url: '/api/leaderboard?board=deeds' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'GET /api/leaderboard?scope=global global scope',
+    async () => {
+      await characterize(
+        'leaderboard_scope_global',
+        makeReq({ method: 'GET', url: '/api/leaderboard?scope=global' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'GET /api/leaderboard?scope=realm realm scope',
+    async () => {
+      await characterize(
+        'leaderboard_scope_realm',
+        makeReq({ method: 'GET', url: '/api/leaderboard?scope=realm' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'GET /api/leaderboard?limit=5 legacy single-page board',
+    async () => {
+      await characterize(
+        'leaderboard_limit5',
+        makeReq({ method: 'GET', url: '/api/leaderboard?limit=5' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
+});
+
+// The arena ladder and project-stats used to be DEFERRED (their unguarded db read
+// 500'd against the pool-less db). Now a TTL cache fronts each: the cold-cache read
+// degrades deterministically (arena to an empty ladder, project-stats to
+// accounts_created 0), so both are captured goldens like the empty-cache boards
+// above. The public-read limiter is reset per case so the captured status is always
+// the 200 body, never a 429 from an accumulated bucket.
+describe('main /api characterization: arena ladder + project-stats (cold-cache degrade)', () => {
+  beforeEach(() => {
+    resetPublicReadRateLimits();
   });
 
-  it('GET /api/leaderboard?board=guilds guild board', async () => {
-    await characterize(
-      'leaderboard_guilds',
-      makeReq({ method: 'GET', url: '/api/leaderboard?board=guilds' }),
-    );
+  it('GET /api/arena/leaderboard degrades to an empty 1v1 ladder', async () => {
+    await characterize('arena_default', makeReq({ method: 'GET', url: '/api/arena/leaderboard' }));
   });
 
-  it('GET /api/leaderboard?board=deeds Renown board (anonymous, empty cache)', async () => {
-    // The account-level Renown board: fixed scope 'global', metric 'renown',
-    // no self row for an anonymous caller. The pool-less refresh serves the
-    // deterministic empty page, like the other board fixtures.
-    await characterize(
-      'leaderboard_deeds',
-      makeReq({ method: 'GET', url: '/api/leaderboard?board=deeds' }),
-    );
-  });
-
-  it('GET /api/leaderboard?scope=global global scope', async () => {
-    await characterize(
-      'leaderboard_scope_global',
-      makeReq({ method: 'GET', url: '/api/leaderboard?scope=global' }),
-    );
-  });
-
-  it('GET /api/leaderboard?scope=realm realm scope', async () => {
-    await characterize(
-      'leaderboard_scope_realm',
-      makeReq({ method: 'GET', url: '/api/leaderboard?scope=realm' }),
-    );
-  });
-
-  it('GET /api/leaderboard?limit=5 legacy single-page board', async () => {
-    await characterize(
-      'leaderboard_limit5',
-      makeReq({ method: 'GET', url: '/api/leaderboard?limit=5' }),
-    );
+  it('GET /api/project-stats degrades to accounts_created 0 and characters_created 0', async () => {
+    await characterize('project_stats', makeReq({ method: 'GET', url: '/api/project-stats' }));
   });
 });
 
@@ -478,9 +540,10 @@ afterAll(() => {
 });
 
 // DEFERRED /api routes (db- or network-dependent success paths; capturing them
-// here would either bless a pool-less 500 or record a non-deterministic body):
-//   - GET  /api/project-stats          getAccountsCount() hits the db -> pool-less 500.
-//   - GET  /api/arena/leaderboard      topArenaRatings() hits the db per request -> 500.
+// here would either bless a pool-less 500 or record a non-deterministic body).
+// (/api/project-stats and /api/arena/leaderboard graduated OUT of this list: a TTL
+// cache now fronts each, so a cold-cache db error degrades deterministically instead
+// of 500ing; both are captured goldens above.)
 //   - GET  /api/woc/balance            live Solana RPC fetch -> non-deterministic.
 //   - GET  /api/email/unsubscribe?token=<non-empty>   accountByUnsubscribeToken() -> db 500.
 //   - GET  /api/search?q=<term> WITH a valid bearer    searchCharacters() -> db.

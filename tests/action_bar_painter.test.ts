@@ -62,6 +62,7 @@ function slotElements(tag: string): ActionBarSlotElements {
     keybindEl: { tag: `${tag}-kb` } as unknown as HTMLElement,
     cdOverlay: { tag: `${tag}-cd` } as unknown as HTMLElement,
     cdText: { tag: `${tag}-cdtext` } as unknown as HTMLElement,
+    rechargeOverlay: { tag: `${tag}-recharge` } as unknown as HTMLElement,
   };
 }
 
@@ -76,9 +77,13 @@ function slotState(over: Partial<ActionBarSlotState> = {}): ActionBarSlotState {
     cooldownPercent: 0,
     cdText: '',
     count: '',
+    isCharges: false,
+    rechargePercent: 0,
     usable: true,
     outOfRange: false,
     queued: false,
+    procGlow: false,
+    empowered: false,
     ariaLabel: 'A',
     keybindLabel: 'K',
     ...over,
@@ -100,10 +105,13 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
           iconKey: 'ability:fireball',
           cooldownPercent: 50,
           cdText: '3',
-          count: '',
+          count: '2',
+          isCharges: true,
+          rechargePercent: 25,
           usable: false,
           outOfRange: true,
           queued: true,
+          empowered: true,
           ariaLabel: 'aria1',
           keybindLabel: '1',
         }),
@@ -114,13 +122,17 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
     expect(calls).toEqual([
       { m: 'toggleClass', args: [CONTAINER, 'many-spells', true] },
       { m: 'setStyleProp', args: [el.label, 'background-image', 'URL(ability:fireball)'] },
-      { m: 'setText', args: [el.countEl, ''] },
-      { m: 'setStyleProp', args: [el.cdOverlay, 'height', '50%'] },
+      { m: 'setText', args: [el.countEl, '2'] },
+      { m: 'toggleClass', args: [el.countEl, 'charge-count', true] },
+      { m: 'setStyleProp', args: [el.cdOverlay, '--cd-fill', '50%'] },
+      { m: 'setStyleProp', args: [el.rechargeOverlay, 'height', '25%'] },
       { m: 'setText', args: [el.cdText, '3'] },
       { m: 'toggleClass', args: [el.btn, 'empty', false] },
       { m: 'toggleClass', args: [el.btn, 'unusable', true] },
       { m: 'toggleClass', args: [el.btn, 'oor', true] },
       { m: 'toggleClass', args: [el.btn, 'queued', true] },
+      { m: 'toggleClass', args: [el.btn, 'proc', false] },
+      { m: 'toggleClass', args: [el.btn, 'empowered', true] },
       { m: 'setAttr', args: [el.btn, 'aria-label', 'aria1'] },
       { m: 'setText', args: [el.keybindEl, '1'] },
     ]);
@@ -197,6 +209,7 @@ function idleWorld(): ActionBarWorldInput {
       potionCdRemaining: 0,
       queuedOnSwing: null,
       stealthed: false,
+      auras: [],
       pos: { x: 0, y: 0, z: 0 },
     },
     target: null,
@@ -224,6 +237,7 @@ describe('ActionBarPainter: aria-label + icon elision (Top risks 1 + 4)', () => 
       keybindEl: recordingEl().el,
       cdOverlay: recordingEl().el,
       cdText: recordingEl().el,
+      rechargeOverlay: recordingEl().el,
     };
 
     const deps = fakeDeps();

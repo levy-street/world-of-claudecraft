@@ -103,6 +103,12 @@ const PENDING_LOGIN_TTL_MINUTES = 15;
 const DEFAULT_INVITE = 'https://discord.com/invite/worldofclaudecraft';
 const NATIVE_DISCORD_REDIRECT = 'worldofclaudecraft://discord-auth';
 const NATIVE_REDIRECT_STATE_PREFIX = `${NATIVE_DISCORD_REDIRECT}?challenge=`;
+// Marks a login start that ran in the desktop app's SYSTEM BROWSER (Electron/Steam,
+// via shell.openExternal), not the native mobile app: the callback must bounce back
+// to /desktop-login (which mints the worldofclaudecraft:// deep-link code the shell
+// is waiting for) instead of the plain web '/'. Distinct from the `native` PKCE
+// handoff above, which is mobile-only and never runs a browser redirect at all.
+const DESKTOP_REDIRECT_MARKER = 'desktop-login';
 
 // Lightweight local instrumentation hook. Admin-dashboard usage metrics require a
 // registered typed key + per-locale label, which is more coupling than this
@@ -209,6 +215,7 @@ export async function handleDiscordStart(
     native?: boolean;
     nativeChallenge?: string;
     nativeAttestation?: unknown;
+    desktop?: boolean;
   },
 ): Promise<void> {
   note('discord.start.request');
@@ -236,7 +243,11 @@ export async function handleDiscordStart(
     codeVerifier,
     mode: opts.mode,
     accountId: opts.accountId,
-    redirectTo: opts.native ? `${NATIVE_REDIRECT_STATE_PREFIX}${opts.nativeChallenge}` : null,
+    redirectTo: opts.native
+      ? `${NATIVE_REDIRECT_STATE_PREFIX}${opts.nativeChallenge}`
+      : opts.desktop
+        ? DESKTOP_REDIRECT_MARKER
+        : null,
     ttlMinutes: STATE_TTL_MINUTES,
   });
   const url = buildAuthorizeUrl({
@@ -290,8 +301,9 @@ export async function handleDiscordCallback(
   const mode: DiscordLinkMode = isDiscordLinkMode(stateRow.mode) ? stateRow.mode : 'login';
   const nativeChallenge = nativeChallengeFromState(stateRow.redirect_to);
   const native = nativeChallenge !== null;
+  const desktopReturn = !native && stateRow.redirect_to === DESKTOP_REDIRECT_MARKER;
   const respond = (status: number, payload: BouncePayload): void =>
-    discordOAuthResponse(req, res, status, payload, native);
+    discordOAuthResponse(req, res, status, payload, native, desktopReturn);
 
   if (isIpBlocked(requestIp(req))) {
     return respond(403, { ok: false, mode, error: 'server_error' });
@@ -1004,9 +1016,10 @@ function discordOAuthResponse(
   status: number,
   payload: BouncePayload,
   native: boolean,
+  desktopReturn = false,
 ): void {
   if (!native) {
-    bouncePage(res, status, payload);
+    bouncePage(res, status, payload, desktopReturn);
     return;
   }
   const url = new URL(NATIVE_DISCORD_REDIRECT);
@@ -1051,7 +1064,12 @@ export async function handleNativeDiscordExchange(
 // Render the callback result as an HTML page that messages the SPA. Works whether
 // the OAuth flow ran in a popup (postMessage to the opener + close) or as a
 // top-level redirect (store the session + go to the app).
-function bouncePage(res: http.ServerResponse, status: number, payload: BouncePayload): void {
+function bouncePage(
+  res: http.ServerResponse,
+  status: number,
+  payload: BouncePayload,
+  desktopReturn = false,
+): void {
   // Escape '<'/'>' (blocks </script> + <!-- breakout) and the JS line separators
   // U+2028/U+2029 (legal in JSON, illegal in a pre-ES2019 JS string) inside the
   // inlined JSON so a value can never break out of or corrupt the <script>.
@@ -1066,6 +1084,7 @@ function bouncePage(res: http.ServerResponse, status: number, payload: BouncePay
 </head><body><main><p id="m">Connecting Discord...</p></main><script>
 (function(){
   var p = ${data};
+  var target = ${JSON.stringify(desktopReturn ? '/desktop-login' : '/')};
   try {
     if (p.ok && p.mode === 'login' && p.token) {
       localStorage.setItem('woc_session', JSON.stringify({ token: p.token, username: p.username }));
@@ -1078,9 +1097,9 @@ function bouncePage(res: http.ServerResponse, status: number, payload: BouncePay
   var msg = { source: 'woc-discord', ok: p.ok, mode: p.mode, error: p.error || null };
   if (window.opener) {
     try { window.opener.postMessage(msg, location.origin); } catch (e) {}
-    setTimeout(function(){ try { window.close(); } catch (e) {} location.replace('/'); }, 200);
+    setTimeout(function(){ try { window.close(); } catch (e) {} location.replace(target); }, 200);
   } else {
-    location.replace('/');
+    location.replace(target);
   }
 })();
 </script></body></html>`;
@@ -1266,12 +1285,14 @@ async function discordStartHandler(ctx: Ctx): Promise<void> {
   const native = ctx.url.searchParams.get('native') === '1';
   const nativeChallenge = ctx.url.searchParams.get('challenge') ?? undefined;
   const body = native ? await readJsonBody(ctx.req) : {};
+  const desktop = mode === 'login' && ctx.url.searchParams.get('desktop') === '1';
   return handleDiscordStart(ctx.req, ctx.res, {
     mode,
     accountId,
     native,
     nativeChallenge,
     nativeAttestation: body.nativeAttestation,
+    desktop,
   });
 }
 

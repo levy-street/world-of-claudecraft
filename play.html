@@ -197,6 +197,23 @@
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
       </div>
       <div class="uf-buffs" id="tf-debuffs"></div>
+      <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
+           who the current target is targeting. A #target-frame child that hides with the
+           whole frame when there is no target; hud.css anchors it BESIDE the frame's
+           right edge (the below-frame band belongs to the #tf-debuffs strip) and
+           compounds the target frame scale into its own mini zoom. Its own unit_frame
+           painter toggles it flex/none when the target-of-target is known/unknown.
+           Portrait + name + hp bar only (no resource/cast/debuffs). -->
+      <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark">
+        <div class="portrait-wrap">
+          <div class="portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
+          <div class="level-chip" id="totf-level"></div>
+        </div>
+        <div class="uf-bars">
+          <div class="uf-name" id="totf-name"></div>
+          <div class="bar hp"><div class="bar-fill" id="totf-hp"></div><div class="bar-text" id="totf-hp-text"></div></div>
+        </div>
+      </div>
     </div>
 
     <div id="party-frames" role="group" data-i18n-aria="hudChrome.unitFrame.partyLabel" aria-label="Your Band"></div>
@@ -223,6 +240,10 @@
         <!-- Ravenpost envelope: visible while unread letters wait (role=status so
              arrivals are announced; reading them still requires a mailbox). -->
         <div id="mail-indicator" role="status" hidden data-icon="mail"><span class="mail-indicator-count">0</span></div>
+        <!-- World Market coin: visible while sale proceeds or returned items wait at
+             the Merchant; opens the market window when standing at the Merchant, and
+             is informational only (the tooltip) anywhere else. -->
+        <button id="market-indicator" type="button" hidden data-icon="market" aria-live="polite" data-i18n-title="hudChrome.marketIndicator.tip" data-i18n-aria="hudChrome.marketIndicator.aria" title="Gold or items are waiting for you at the Merchant." aria-label="World Market collection waiting"></button>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
@@ -284,9 +305,11 @@
             </div>
           </div>
           <div id="petbar" class="panel"></div>
-          <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
+          <div id="stancebar"></div>
+          <div id="actionbar3" class="panel"></div>
           <div id="actionbar2" class="panel"></div>
           <div id="actionbar" class="panel"></div>
+          <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
         </div>
         <div id="meters-window" class="panel">
           <div class="panel-title">
@@ -341,6 +364,8 @@
     <div id="quest-log-window" class="window panel"></div>
     <div id="crafting-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
+    <div id="train-window" class="window panel"></div>
+    <div id="unbind-window" class="window panel"></div>
     <div id="card-duel-window" class="window panel"></div>
     <div id="town-focus-window" class="window panel"></div>
     <div id="map-window" class="window panel">
@@ -363,6 +388,7 @@
     <div id="mailbox-window" class="window panel"></div>
     <div id="bank-window" class="window panel"></div>
     <div id="deeds-window" class="window panel"></div>
+    <div id="professions-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
     <button type="button" id="vcup-indicator" data-i18n-title="hudChrome.vcup.indicatorOpen" data-i18n-aria="hudChrome.vcup.indicatorOpen" title="Open the Vale Cup window" aria-label="Open the Vale Cup window"></button>
@@ -371,26 +397,31 @@
     <div id="social-window" class="window panel"></div>
     <div id="report-window" class="window panel"></div>
     <div id="side-buttons">
-      <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
-      <button class="micro-btn" id="mm-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
-      <button class="micro-btn" id="mm-spell" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="keybind">p</span></button>
-      <button class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
-      <button class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
-      <button class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
-      <button class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
-      <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
-      <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
-      <button class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
-      <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
-      <button class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
-      <button class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
-      <button class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
-      <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
-      <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
-      <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
-      <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
-      <button class="micro-btn" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind">u</span></button>
-      <button class="micro-btn" id="mm-options" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="keybind">esc</span></button>
+      <div id="side-buttons-col-a" class="side-buttons-col">
+        <button class="micro-btn" id="mm-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
+        <button class="micro-btn" id="mm-spell" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="keybind">p</span></button>
+        <button class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
+        <button class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
+        <button class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
+        <button class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
+        <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="keybind">s-p</span></button>
+        <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
+        <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
+        <button class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
+      </div>
+      <div id="side-buttons-col-b" class="side-buttons-col">
+        <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
+        <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
+        <button class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
+        <button class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
+        <button class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
+        <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
+        <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
+        <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
+        <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
+        <button class="micro-btn" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind">u</span></button>
+        <button class="micro-btn" id="mm-options" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="keybind">esc</span></button>
+      </div>
     </div>
     <div id="tooltip" class="panel"></div>
 
@@ -475,6 +506,18 @@
   </div>
 
   <main id="start-screen">
+    <!-- World-entry crash recovery notice (src/game/entry_crash_guard.ts): parity with
+         index.html so a /play player who hit a process kill sees the same explanation
+         after the preset is stepped down. /play has no footer graphics selector, but the
+         in-game Options menu (reachable once in-world) is the graphics path the banner
+         body points to as well. -->
+    <div id="entry-guard-banner" class="entry-guard-banner" role="status" hidden>
+      <div class="entry-guard-text">
+        <strong class="entry-guard-title" data-i18n="entryGuard.title">Graphics lowered</strong>
+        <span class="entry-guard-body"></span>
+      </div>
+      <button type="button" class="entry-guard-dismiss" data-i18n="entryGuard.dismiss">Dismiss</button>
+    </div>
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
     <div id="start-screen-backdrop" aria-hidden="true">
       <!-- Looping cinematic background video; poster = static key-art for instant paint + fallback. -->
@@ -555,7 +598,7 @@
             </button>
             <div class="play-online-status">
               <span class="server-dot" data-mode="online" aria-hidden="true"></span>
-              <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
+              <b class="stats-value js-stat-characters">…</b> <span data-i18n="stats.charactersCreated">Characters Created</span>
             </div>
           </div>
 
@@ -771,7 +814,14 @@
                 <div class="cs-preview-name" id="charselect-preview-name" aria-live="polite"></div>
                 <canvas id="char-preview-canvas"></canvas>
               </div>
-              <div id="charselect-class-details" class="class-details-panel" aria-live="polite"></div>
+            </div>
+            <!-- Desktop docks this over the stage's left edge; mobile lets it
+                 flow below the roster/preview so the page scrolls to it. -->
+            <div id="charselect-news" class="cs-news-panel">
+              <div class="cs-news-title" data-i18n="news.title">News &amp; Updates</div>
+              <div id="charselect-news-feed" class="cs-news-feed" aria-live="polite">
+                <div class="news-loading" data-i18n="news.loading">Loading the latest updates...</div>
+              </div>
             </div>
           </div>
         </div>
@@ -865,13 +915,13 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.30.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.0-win.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.30.0-win.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
           </div>
@@ -911,7 +961,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.27.0</div>
+      <div id="game-version">v0.30.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
@@ -967,7 +1017,7 @@
       <button class="mobile-btn" type="button" id="mobile-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="mobile-label" data-i18n="hud.core.mobileSocial">Social</span></button>
       <button class="mobile-btn" type="button" id="mobile-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="mobile-label" data-i18n="questUi.tracker.title">Quests</span></button>
       <button class="mobile-btn" type="button" id="mobile-menu" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="mobile-label" data-i18n="hud.core.mobileSettings">Settings</span></button>
-      <button class="mobile-btn" type="button" id="mobile-more" data-i18n-title="hud.core.mobileMoreAria" data-i18n-aria="hud.core.mobileMoreAria" title="Show more menus" aria-label="Show more menus" data-icon="more"><span class="mobile-label" data-i18n="hud.core.mobileMore">More</span></button>
+      <button class="mobile-btn" type="button" id="mobile-more" data-i18n-title="hud.core.mobileMoreAria" data-i18n-aria="hud.core.mobileMoreAria" title="Show more menus" aria-label="Show more menus" aria-controls="mobile-extra-controls" aria-expanded="false" data-icon="more"><span class="mobile-label" data-i18n="hud.core.mobileMore">More</span></button>
     </div>
     <div id="mobile-action-ring" data-i18n-aria="hudChrome.mobile.actionRing" aria-label="Combat actions">
       <button class="mobile-action-slot" type="button" data-mobile-index="0"></button>
@@ -996,7 +1046,8 @@
         <button class="mobile-consumable-slot" type="button" data-consumable-index="5"></button>
       </div>
     </div>
-      <div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title">
+  </div>
+      <div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" aria-hidden="true">
         <div class="panel-title">
           <span id="mobile-more-title" data-i18n="hud.core.mobileMore">More</span>
           <button type="button" class="x-btn" id="mobile-more-close" data-i18n-title="hud.options.returnToGame" data-i18n-aria="hud.options.returnToGame" title="Return to Game" aria-label="Return to Game" data-icon="close"></button>
@@ -1017,12 +1068,12 @@
           <button class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
           <button type="button" class="mobile-btn" id="mobile-daily-rewards" data-i18n-title="hudChrome.dailyRewards.title" data-i18n-aria="hudChrome.dailyRewards.title" title="Daily Rewards" aria-label="Daily Rewards" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.dailyRewards">Rewards</span></button>
           <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
+          <button type="button" class="mobile-btn" id="mobile-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="mobile-label" data-i18n="hudChrome.mobile.professions">Professions</span></button>
           <button class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>
           <button class="mobile-btn" id="mobile-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Toggle music" data-icon="music"><span class="mobile-label" data-i18n="hud.options.music">Music</span></button>
           <button class="mobile-btn" id="mobile-haptics" data-i18n-title="hudChrome.mobile.toggleHaptics" data-i18n-aria="hudChrome.mobile.toggleHaptics" title="Toggle haptic feedback" aria-label="Toggle haptic feedback" aria-pressed="true" data-icon="vibrate"><span class="mobile-label" data-i18n="hudChrome.mobile.haptics">Haptics</span></button>
         </div>
       </div>
-  </div>
   <div id="mobile-window-backdrop" aria-hidden="true"></div>
   <div id="mobile-preflight" role="dialog" aria-modal="true" aria-labelledby="mobile-preflight-title">
     <div class="preflight-panel">
@@ -1046,6 +1097,7 @@
       <div class="ls-bar"><div id="ls-fill"></div></div>
       <div id="ls-status" data-i18n="loading.enteringWorld">Entering the world...</div>
       <div id="ls-tip"></div>
+      <div id="ls-slow-hint" data-i18n="loading.slowConnection" role="status" aria-live="polite">This is taking longer than usual. Check your internet connection.</div>
     </div>
   </div>
 

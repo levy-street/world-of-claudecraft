@@ -38,6 +38,11 @@ export const SETTING_RANGES = {
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
   cameraFov: { min: 55, max: 100, def: 60 },
+  // Camera zoom distance (Input.camDist), remembered across sessions like the other
+  // camera settings. Range mirrors Input.zoomBy's clamp; def 12 is the shipped starting
+  // distance. Set by the wheel/pinch zoom (persisted debounced from main.ts), applied back
+  // to Input on boot via the startup apply-all loop and on Reset (issue 1657).
+  cameraZoom: { min: 3, max: 22, def: 12 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn
@@ -117,8 +122,10 @@ export const SETTING_RANGES = {
   // The target frame's twin of playerFrameScale, via --target-frame-scale.
   // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
   targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
-  // Party/raid frame layout. partyFrameStyle: 0 automatic, 1 classic, 2 raid.
-  // partyFrameHealthText: 0 none, 1 percent, 2 current, 3 current/max.
+  // WoW-style party/raid frame profile. Width/height are CSS pixels before the
+  // independent scale; columns and spacing let raids grow across rather than
+  // covering the whole left edge. style: 0 automatic, 1 classic, 2 raid frames.
+  // healthTextMode: 0 none, 1 percent, 2 current, 3 current/max.
   // partyFrameSort: 0 group, 1 role, 2 name.
   partyFrameStyle: { min: 0, max: 2, def: 0 },
   partyFrameScale: { min: 0.7, max: 1.4, def: 1 },
@@ -191,6 +198,11 @@ export const BOOL_SETTINGS = {
   // vacated top spot) so incoming debuffs keep one glanceable classic corner.
   // Desktop only; the mobile layout keeps its own aura placement.
   aurasOnPlayerFrame: { def: false },
+  // on by default: Clique-style mouseover casting. Pressing an action-bar key
+  // for a friendly (heal/buff) ability while the cursor is over a party frame
+  // casts it on the hovered member without touching the current target (read
+  // live by Hud.castSlot). Off restores the classic target-else-self routing.
+  mouseoverCast: { def: true },
   // Party/raid frame display profile. Health is always visible; these switches
   // choose the supporting information layered around it.
   partyFrameShowResource: { def: true },
@@ -233,6 +245,11 @@ export const BOOL_SETTINGS = {
   // it, so Discord linking and other flair changes have immediate visual feedback.
   // Purely a local display preference; players can turn it off for the classic view.
   showOwnNameplate: { def: true },
+  // on by default: render OTHER players' overhead nameplates. Off hides them
+  // (the current target stays visible so a clicked player is still readable),
+  // decluttering crowded hubs on short mobile viewports. Purely a local display
+  // preference; mob nameplates and unit frames are unaffected.
+  showPlayerNameplates: { def: true },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },
@@ -255,6 +272,12 @@ export const BOOL_SETTINGS = {
   // red when the click lands on a hostile. Purely a local presentation cue; it
   // never touches sim state. Off removes the marker entirely.
   clickFeedback: { def: true },
+  // off by default (the classic behavior: a left-click on empty ground clears
+  // your target). When on, a ground left-click keeps the current target, so
+  // click-to-move players can reposition without deselecting; the target still
+  // drops by targeting something else, target death, or range/stealth as normal.
+  // Read by the pick handler via shouldClearTargetOnGroundClick (target_click.ts).
+  stickyTarget: { def: false },
   // off by default: swap the looping landing-page trailer for a static, dimmed,
   // high-contrast backdrop so the start-screen text stays legible (and the
   // 5.7 MB video is never fetched). Forced on regardless for phones / Save-Data /
@@ -277,6 +300,16 @@ export const BOOL_SETTINGS = {
   // applied in main.ts. Purely a display preference; the slots stay reachable via
   // their keybinds either way, so the row being hidden never disables those abilities.
   showSecondaryActionBar: { def: false },
+  // off by default: reveals the third desktop action bar row (#actionbar3, slots
+  // 23..33). main.ts enforces that this row can only remain enabled while the
+  // secondary row is visible. Mobile exposes the same slots through ring pages.
+  showThirdActionBar: { def: false },
+  // off by default: the classic "target of target" mini-frame. When on, and you have
+  // a target, a small unit frame under the target frame shows who YOUR target is
+  // targeting (a mob's aggro target, a player's selected target). Purely a display
+  // preference read by the HUD's target-frame update; the id it reads already rides
+  // the wire, and the frame hides itself when the target-of-target is unknown.
+  showTargetOfTarget: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
@@ -381,9 +414,25 @@ export class Settings {
     return v as GameSettings[K];
   }
 
-  reset(): void {
-    for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
-    for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+  /** Restore defaults. With no `keys`, every setting resets (the historical
+   *  behavior). With `keys`, only those keys reset, so a caller that owns just
+   *  one sub-view (e.g. the options window's per-panel footer) can offer a
+   *  "Reset to Defaults" that does not silently wipe settings the player
+   *  never saw (issue 2341). */
+  reset(keys?: readonly (keyof GameSettings)[]): void {
+    if (!keys) {
+      for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
+      for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+      this.save();
+      return;
+    }
+    for (const key of keys) {
+      if ((BOOL_KEYS as readonly string[]).includes(key as string)) {
+        this.values[key as BoolSettingKey] = BOOL_SETTINGS[key as BoolSettingKey].def;
+      } else if ((NUMERIC_KEYS as readonly string[]).includes(key as string)) {
+        this.values[key as NumericSettingKey] = SETTING_RANGES[key as NumericSettingKey].def;
+      }
+    }
     this.save();
   }
 }

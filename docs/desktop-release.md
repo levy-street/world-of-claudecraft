@@ -447,6 +447,59 @@ Rules that keep this working:
    the working lever there; Windows 11 with an attached eGPU can ignore the per-app
    preference while the eGPU is connected; pre-1803 Windows 10 ignores the key
    entirely.
+   On Linux, hybrid-graphics laptops (NVIDIA Optimus, AMD/Intel Mesa PRIME) have no
+   per-app OS preference and the Chromium switch is a no-op (the GPU adapter is
+   resolved by the driver's client library at dynamic-link time, before Chromium
+   parses its switches). Setting the PRIME render-offload environment variables
+   (`DRI_PRIME=1` for Mesa; `__NV_PRIME_RENDER_OFFLOAD=1` /
+   `__GLX_VENDOR_LIBRARY_NAME=nvidia` / `__EGL_VENDOR_LIBRARY_FILENAMES=<nvidia glvnd
+   EGL ICD json>` / `__VK_LAYER_NV_optimus=NVIDIA_only` for the NVIDIA proprietary
+   driver) in the running main process does NOT reach the GPU process either:
+   Electron's Linux GPU process forks from a zygote that already exec'd (and
+   snapshotted its environ) before any main-process JS runs, so a process.env write
+   there is invisible to it. Which variable does the lifting depends on the path
+   Chromium takes (both measured on real hybrid hardware): under the
+   `--ozone-platform=x11` backend the shell forces, ANGLE binds through GLX and the
+   `__NV_PRIME_RENDER_OFFLOAD` + `__GLX_VENDOR_LIBRARY_NAME` pair selects the
+   adapter; on EGL paths (a player-forced Wayland ozone) that pair is a decoy (it
+   flips `glxinfo` while the unmasked renderer stays on the iGPU) and
+   `__EGL_VENDOR_LIBRARY_FILENAMES` is the lever. The EGL entry is only ever set
+   when the NVIDIA ICD json actually exists, because glvnd treats it as a
+   replacement of its vendor list and naming a missing file would leave a
+   non-NVIDIA machine with no EGL vendors at all. The same hardware also
+   crash-loops the GPU process on a Wayland session once PRIME offload is
+   requested (falls back to software rendering, worse than the iGPU), so Chromium
+   must additionally be forced onto the X11 Ozone backend, which (like the env
+   vars) only works as a real argv flag present before Electron's own startup,
+   never an `appendSwitch` call in the running process.
+   `main.cjs` therefore calls `relaunchForLinuxPrime` as the very first thing it
+   does (before crash reporting, logging, or any window): on a HYBRID Linux
+   machine (two or more GPUs under `/sys/class/drm`; single-GPU machines are left
+   completely untouched), it re-execs the app with the PRIME variables baked into
+   the new process's environment from birth plus `--ozone-platform=x11` appended
+   to argv, and the original process exits immediately. The spawn source is
+   `$APPIMAGE` (the outer AppImage file, the same source electron-updater restarts
+   from) when set, because inside an AppImage `process.execPath` lives in a FUSE
+   mount that dies with the exiting parent; other installs re-exec the binary
+   itself. An explicit player `--ozone-platform` choice is never overridden (a
+   bare `--ozone-platform-hint` deliberately does not count), and no env name the
+   player's own environment already set (their own `prime-run` wrapper) is ever
+   replaced: with no marker and every variable present, no relaunch happens at
+   all. The relaunch marker does NOT permanently suppress re-execs: a marked
+   process whose argv lost the ozone flag (electron-updater's restart-to-update
+   respawns with the current env but empty argv) relaunches once more purely to
+   restore the flag. The dev loop (`npm run electron:dev`) pre-applies the same
+   configuration to the electron it spawns, so no relaunch happens there and the
+   Vite teardown-on-exit logic keeps working.
+   Verify with `ps -o pid,ppid,cmd -C world-of-claudecraft` (or the AppImage/binary
+   name) showing the relaunched PID's parent already exited, and `[gpu] running as
+   PRIME-relaunched child` in `main.log` (the child writes it; the parent exits
+   before file logging exists).
+   Known follow-ups, not yet addressed: the relaunch's interaction with the
+   second-instance deep-link path (`worldofclaudecraft://` login handoff) has not
+   been verified against a login link that arrives during the brief relaunch
+   window, and the Steam channel's process tracking (overlay, playtime) has not
+   been verified against the parent exiting within milliseconds of launch.
 3. Login both paths: email/password in-app, and Discord via the external browser +
    `worldofclaudecraft://desktop-login` deep link handoff (app focuses and enters
    the world; second-instance and cold-start deep links both work).

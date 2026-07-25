@@ -9,14 +9,54 @@
 // `src/sim`-pure: imports only sibling sim types (no DOM/Three/render/ui/game/net,
 // no Math.random/Date.now), enforced by tests/architecture.test.ts.
 
-import type { Aura, Entity } from '../types';
+import type { Aura, DamageBreakBudget, Entity } from '../types';
 
-// A stun freezes everything: movement, casts, melee, abilities. Incapacitate and
-// polymorph share the same total-lockout shape.
+// Some scripted encounter control is part of the encounter timeline rather
+// than ordinary combat CC. Player immunity, cleanse, dispel, control-break, and
+// damage-break paths all consult this predicate. Expiry and encounter-owned
+// cleanup deliberately do not, so the encounter remains the lifecycle owner.
+export function isUnbreakableControlAura(aura: Pick<Aura, 'unbreakableControl'>): boolean {
+  return aura.unbreakableControl === true;
+}
+
+const MOVEMENT_LOCK_AURA_KINDS: ReadonlySet<Aura['kind']> = new Set([
+  'stun',
+  'stasis',
+  'root',
+  'incapacitate',
+  'polymorph',
+]);
+
+export function hasUnbreakableMovementLock(
+  entity: Pick<Entity, 'auras'>,
+  excludedAura?: Aura,
+): boolean {
+  return entity.auras.some(
+    (aura) =>
+      aura !== excludedAura &&
+      MOVEMENT_LOCK_AURA_KINDS.has(aura.kind) &&
+      isUnbreakableControlAura(aura),
+  );
+}
+
+export function damageBreakThreshold(maxHp: number, budget: DamageBreakBudget): number {
+  return Math.min(budget.max, Math.max(budget.min, Math.round(maxHp * budget.maxHpPct)));
+}
+
+// A stun freezes everything: movement, casts, melee, abilities. Stasis,
+// incapacitate, and polymorph share the same total-lockout shape.
 export function isStunned(e: Entity): boolean {
   return e.auras.some(
-    (a) => a.kind === 'stun' || a.kind === 'incapacitate' || a.kind === 'polymorph',
+    (a) =>
+      a.kind === 'stun' ||
+      a.kind === 'stasis' ||
+      a.kind === 'incapacitate' ||
+      a.kind === 'polymorph',
   );
+}
+
+export function isInStasis(e: Entity): boolean {
+  return e.auras.some((a) => a.kind === 'stasis');
 }
 
 export function isRooted(e: Entity): boolean {

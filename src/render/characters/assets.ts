@@ -5,20 +5,30 @@
 //
 // Loading contract: fetches kick off at module import and register with the
 // preload registry; main.ts awaits assetsReady() before the Renderer exists,
-// so everything here can assume resolved GLTFs synchronously afterwards.
+// so everything here can assume resolved GLTFs synchronously afterwards. The
+// landing character-creation preview is the one exception: it awaits the
+// narrower charactersReady() below instead (this file's boot GLBs + skin
+// atlases only, with its own retries), since gating it on the site-wide
+// assetsReady() left an unrelated preload failure anywhere on the site
+// permanently blanking it on a cold, first-visit cache.
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
 import { backGripFor } from './back_grips';
+import { dequantizeAttribute } from './dequantize_attribute';
+import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import {
   type AttachDef,
   characterPreloadUrls,
   itemWeaponModelUrl,
+  offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
   VISUALS,
@@ -33,12 +43,6 @@ import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
-
-type HandGrip = {
-  position: [number, number, number];
-  quaternion: [number, number, number, number];
-  scale: number;
-};
 
 // KayKit adventurer standalone weapon glbs ship a left-hand mesh offset on a
 // lone child node. handslot.r/l children in the character glbs carry the
@@ -150,6 +154,7 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   // Bow-SLOT skin with crossbow HANDLING (a gun aims, it is not drawn): the
   // grip family follows the handling, like the attach bone below.
   encore_the_second_falling_star: 'VAR_CROSSBOW',
+  ...KAYKIT_SHIELD_ACCESSORIES,
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach
@@ -209,6 +214,7 @@ const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
   '1H_Wand': {
     r: { position: [0, 0.2174, 0], quaternion: [0, 1, 0, 0], scale: 0.4831 },
   },
+  ...KAYKIT_SHIELD_GRIPS,
 };
 
 function isHandslotBone(name: string): boolean {
@@ -280,10 +286,10 @@ function flattenWeaponScene(src: THREE.Object3D): THREE.Object3D {
   return holder;
 }
 
-// Marks the holder group of the equipped-weapon attachment (the `weaponSlot`
-// entry), so setHeldWeapon can find and replace exactly that prop without
-// touching fixed offhands (rogue's second dagger, the warlock spellbook).
+// Mainhand and actual offhand holders have separate replacement cycles, so a
+// mainhand cosmetic swap cannot remove or reskin a shield or second weapon.
 const SWAP_WEAPON_TAG = 'swapWeaponHolder';
+const SWAP_OFFHAND_TAG = 'swapOffhandHolder';
 
 // Marks EVERY attached prop holder (swap slots AND fixed offhands), so the
 // sheathe toggle can strip and re-attach the full held set at once.
@@ -331,14 +337,20 @@ function attachProp(
   root: THREE.Object3D,
   bone: THREE.Object3D,
   att: AttachDef,
-  markSwap = false,
+  swapKind: 'mainhand' | 'offhand' | null = null,
   stowed = false,
 ): THREE.Object3D {
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
   });
-  if (markSwap) payload.userData[SWAP_WEAPON_TAG] = true;
+  if (swapKind === 'mainhand') {
+    payload.userData[SWAP_WEAPON_TAG] = true;
+    payload.userData.heldSlot = 0;
+  } else if (swapKind === 'offhand') {
+    payload.userData[SWAP_OFFHAND_TAG] = true;
+    payload.userData.heldSlot = 1;
+  }
   payload.userData[HELD_PROP_TAG] = true;
   const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
   if (variantGrip) {
@@ -377,6 +389,20 @@ function swapAttachDef(
 ): AttachDef {
   const url = weaponSkinModelUrl(weaponSkinId) ?? itemWeaponModelUrl(weaponItemId);
   return url ? { url, bone: base.bone } : base;
+}
+
+// The AttachDef for the actual equipped offhand. Its model is the offhand item's
+// own, EXCEPT when the active mainhand skin mirrors onto it (a matching-type
+// offhand weapon), in which case the offhand renders the skin too.
+// Shields, held offhands (orbs/tomes), and different-type weapons never mirror
+// (offhandModelUrl gates it on the pure rule) and keep their item model.
+function offhandAttachDef(
+  base: AttachDef,
+  offhandItemId: string | null | undefined,
+  weaponSkinId: string | null | undefined = null,
+): AttachDef | null {
+  const url = offhandModelUrl(offhandItemId, weaponSkinId);
+  return url ? { url, bone: base.bone } : null;
 }
 
 // Classes without weaponSlots keep a FIXED weapon visual (the hunter's ranged
@@ -458,6 +484,45 @@ for (const [key, list] of Object.entries(SKINS)) {
 }
 for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
 
+/** Resolve once every boot-time character GLB + skin atlas is cached, retrying
+ *  whatever is still missing instead of depending on the site-wide assetsReady()
+ *  barrier. That barrier is one shared promise over EVERY registered preload
+ *  (terrain, dungeon, foliage, ...): an unrelated failure there must not sink the
+ *  character-creation preview, and loadGltf/loadTexture already evict a failed
+ *  URL from their own cache on rejection, so a fresh call here genuinely
+ *  re-fetches rather than re-awaiting a permanently rejected promise. A transient
+ *  failure is far more likely on a cold, first-visit cache (no warm HTTP cache to
+ *  fall back on), which is exactly when this matters most.
+ *
+ *  Each outer attempt here already follows loadGltf's own three inner attempts
+ *  (400/800ms backoff, see load_retry.ts), so a URL that reaches this loop's
+ *  retry has already spent that whole window failing. Waiting again before the
+ *  next outer attempt (same schedule, reused) widens the retry window instead
+ *  of hammering a still-flaky connection three more times back to back in one
+ *  tick. */
+export async function charactersReady(maxAttempts = 3): Promise<void> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
+    const missingSkins = [...bootSkinUrls].filter((u) => !skinTexByUrl.has(u));
+    if (missingGltf.length === 0 && missingSkins.length === 0) return;
+    if (attempt > 1) {
+      await new Promise((resolve) => setTimeout(resolve, gltfRetryDelayMs(attempt)));
+    }
+    const results = await Promise.allSettled([
+      ...missingGltf.map((u) => loadGltf(u).then((g) => void gltfByUrl.set(u, g))),
+      ...missingSkins.map((u) => loadSkinTexInto(u, skinTexByUrl)),
+    ]);
+    if (attempt === maxAttempts) {
+      const failed = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
+      if (failed.length > 0) {
+        throw new Error(
+          `character preview assets failed to load (${failed.length}): ${failed.map((f) => String(f.reason)).join('; ')}`,
+        );
+      }
+    }
+  }
+}
+
 /** Resolved skin texture for a visual key + skin index, or null for the model's
  *  embedded default (index 0, unknown key, or an atlas that is not loaded yet). */
 export function skinTexture(key: string, skinIndex: number): THREE.Texture | null {
@@ -513,6 +578,33 @@ export function preloadMechAssets(): Promise<void> {
   return mechAssetsPromise;
 }
 
+// Lazy fetch for the Training Dummy (models/creatures/training_dummy.glb):
+// it appears in exactly one hub (zone3.ts, count: 1), so like the mech it is
+// kept out of the eager boot sweep. Unlike the mech, nothing previously
+// triggered this load: Renderer.createView called resolvedGltf() directly
+// and threw "character asset not preloaded" every frame once a dummy became
+// a view candidate, permanently stalling Renderer.sync() (the screen froze
+// while the sim tick and audio, on a separate per-frame path, kept running).
+// Mirrors preloadMechAssets/mechAssetsReady: memoized, no skin/emissive maps
+// needed since the dummy has no cosmetic variants.
+let trainingDummyAssetsPromise: Promise<void> | null = null;
+export function preloadTrainingDummyAssets(): Promise<void> {
+  if (trainingDummyAssetsPromise) return trainingDummyAssetsPromise;
+  const def = VISUALS.mob_training_dummy;
+  if (!def) return Promise.resolve();
+  trainingDummyAssetsPromise = loadGltf(def.url)
+    .then((g) => {
+      gltfByUrl.set(def.url, g);
+    })
+    .then(() => undefined);
+  return trainingDummyAssetsPromise;
+}
+
+export function trainingDummyAssetsReady(): boolean {
+  const def = VISUALS.mob_training_dummy;
+  return !!def && gltfByUrl.has(assetUrl(def.url));
+}
+
 export function mechAssetsReady(): boolean {
   const def = VISUALS.player_mech;
   if (!def || !gltfByUrl.has(assetUrl(def.url))) return false;
@@ -556,7 +648,11 @@ function optimizedScene(url: string): THREE.Object3D {
 
 /** Fresh SkeletonUtils clone of a manifest entry with its kit applied.
  *  Pure model space — normalization (scale/yaw/feet offset) happens upstream. */
-export function assembleModel(def: VisualDef, weaponItemId?: string | null): THREE.Object3D {
+export function assembleModel(
+  def: VisualDef,
+  weaponItemId?: string | null,
+  offhandItemId?: string | null,
+): THREE.Object3D {
   const root = cloneSkinned(optimizedScene(def.url));
   // tag the character's own meshes (body + accessories share one texture atlas)
   // so a skin override hits them but not the separate weapons attached below
@@ -577,7 +673,7 @@ export function assembleModel(def: VisualDef, weaponItemId?: string | null): THR
   // Low tier still downgrades body/material cost, but keeps attachments visible.
   // Built SKINLESS and drawn: CharacterVisual applies the weapon skin (and any
   // active sheathe) on its first diff, right after assembly.
-  attachAllProps(root, def, weaponItemId ?? null, null, false);
+  attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
   // Re-orient mis-baked built-in weapon nodes (e.g. the golem axe) in place.
   for (const fix of def.weaponFix ?? []) {
     const node =
@@ -603,31 +699,46 @@ function attachTargetBone(
 }
 
 // Attach every authored prop: swappable slots take the equipped item's model (or an
-// applied weapon skin, which wins); every other attachment is fixed (the warlock's
+// applied weapon skin, which wins); the actual offhand slot takes the equipped
+// offhand's model (or the same skin mirrored onto a matching-type weapon,
+// or nothing while none is equipped); every other attachment is fixed (the warlock's
 // spellbook offhand), except the hunter's fixed RANGED attach, which a bow/crossbow
 // skin replaces in place. The rogue lists both hand slots so a dagger shows in both.
 // A manifest/bone mismatch ships without that prop. Returns the WEAPON payload roots
-// (the swap + ranged-swap ones), the set rarity VFX and orientation pins ride.
+// (the swap + ranged-swap ones), plus a skin-mirrored offhand payload, the set
+// rarity VFX and orientation pins ride; a NON-mirrored offhand has its own cycle
+// (setHeldOffhand) and stays out of the returned set.
 function attachAllProps(
   root: THREE.Object3D,
   def: VisualDef,
   weaponItemId: string | null,
   weaponSkinId: string | null,
   stowed: boolean,
+  offhandItemId: string | null = null,
 ): THREE.Object3D[] {
   const attachments = visibleAttachmentsForGraphics(def);
+  // A skin mirrored onto the offhand rides the same rarity-VFX + material path as
+  // the mainhand skin, so its payload joins the returned set (the caller runs the
+  // VFX/isolation pass over these). A plain offhand (shield/held-offhand/different
+  // -type weapon) stays out, untouched.
+  const offhandSkinned = offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId);
   const payloads: THREE.Object3D[] = [];
   for (let i = 0; i < attachments.length; i++) {
     const base = attachments[i];
     const isSwap = def.weaponSlots?.includes(i) ?? false;
+    const isOffhandSwap = def.offhandSlot === i;
     const isWeapon = isSwap || isRangedSwapAttach(base);
     const att = isSwap
       ? swapAttachDef(base, weaponItemId, weaponSkinId)
-      : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
+      : isOffhandSwap
+        ? offhandAttachDef(base, offhandItemId, weaponSkinId)
+        : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
+    if (!att) continue;
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
-    const payload = attachProp(root, bone, att, isWeapon, stowed);
-    if (isWeapon) payloads.push(payload);
+    const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
+    const payload = attachProp(root, bone, att, swapKind, stowed);
+    if (isWeapon || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
   }
   return payloads;
 }
@@ -636,8 +747,9 @@ function attachAllProps(
  *  for a runtime gear swap or a weapon-skin change. Re-attaches every swap slot (the
  *  rogue has two, so both hands update) plus, for classes with a fixed ranged visual
  *  (hunter), the fixed ranged attach that a bow/crossbow skin replaces, honoring an
- *  active sheathe. Returns the attached weapon payload roots so the caller can hang
- *  rarity VFX off them. The caller must re-apply materials and re-snapshot the
+ *  active sheathe. The actual equipped offhand has a separate replacement cycle
+ *  (setHeldOffhand). Returns the attached weapon payload roots so the caller can
+ *  hang rarity VFX off them. The caller must re-apply materials and re-snapshot the
  *  original-material map afterwards (see CharacterVisual.setWeapon), since the new
  *  weapon meshes start on the source GLB's raw materials. */
 export function setHeldWeapon(
@@ -666,9 +778,36 @@ export function setHeldWeapon(
       : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
-    payloads.push(attachProp(root, bone, att, true, stowed));
+    payloads.push(attachProp(root, bone, att, 'mainhand', stowed));
   }
   return payloads;
+}
+
+/** Replace only the actual offhand attachment, honoring an active sheathe. The
+ *  offhand renders its own item model UNLESS the active mainhand skin mirrors onto
+ *  it (a matching-type weapon), in which case it shows the skin (and the
+ *  caller must run the rarity-VFX/material pass over the returned payload). Mainhand
+ *  item/cosmetic models and their rarity VFX remain untouched. */
+export function setHeldOffhand(
+  root: THREE.Object3D,
+  def: VisualDef,
+  offhandItemId: string | null,
+  weaponSkinId: string | null = null,
+  stowed = false,
+): THREE.Object3D[] {
+  if (def.offhandSlot === undefined) return [];
+  const stale: THREE.Object3D[] = [];
+  root.traverse((o) => {
+    if (o.userData[SWAP_OFFHAND_TAG]) stale.push(o);
+  });
+  for (const o of stale) o.removeFromParent();
+
+  const base = def.attach?.[def.offhandSlot];
+  if (!base) return [];
+  const att = offhandAttachDef(base, offhandItemId, weaponSkinId);
+  if (!att) return [];
+  const bone = attachTargetBone(root, att, stowed);
+  return bone ? [attachProp(root, bone, att, 'offhand', stowed)] : [];
 }
 
 /** A standalone display clone of a weapon-skin model for the armory inspect
@@ -691,17 +830,19 @@ export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   return payload;
 }
 
-/** Move every held prop (swap slots AND fixed offhands: the rogue's second dagger,
- *  the hunter crossbow, the warlock spellbook) between the hands and the on-back
- *  sheathed pose, in place, keeping any applied weapon skin. Returns the weapon
- *  payload roots (same contract as setHeldWeapon: the caller re-applies materials,
- *  re-snapshots originals, and rebuilds the skin VFX afterwards). */
+/** Move every held prop (swap slots, the actual equipped offhand, AND fixed
+ *  offhands: the rogue's second dagger, the hunter crossbow, the warlock
+ *  spellbook) between the hands and the on-back sheathed pose, in place, keeping
+ *  any applied weapon skin. Returns the weapon payload roots (same contract as
+ *  setHeldWeapon: the caller re-applies materials, re-snapshots originals, and
+ *  rebuilds the skin VFX afterwards). */
 export function setWeaponsStowed(
   root: THREE.Object3D,
   def: VisualDef,
   weaponItemId: string | null,
   weaponSkinId: string | null,
   stowed: boolean,
+  offhandItemId: string | null = null,
 ): THREE.Object3D[] {
   if (!def.attach?.length) return [];
   const stale: THREE.Object3D[] = [];
@@ -709,7 +850,7 @@ export function setWeaponsStowed(
     if (o.userData[HELD_PROP_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
-  return attachAllProps(root, def, weaponItemId, weaponSkinId, stowed);
+  return attachAllProps(root, def, weaponItemId, weaponSkinId, stowed, offhandItemId);
 }
 
 // ---------------------------------------------------------------------------
@@ -824,6 +965,11 @@ export function applyMaterials(
     // and restores. Tinting either (or re-deriving them from the shared cache
     // on a body-skin change) corrupts live handles, so both stay untouched.
     if (mesh.userData.weaponVfxMesh || mesh.userData.weaponSkinIsolated) return;
+    // The class halo's shared additive material must never be re-mapped or
+    // tinted (visual.ts adds it after the constructor's applyMaterials for the
+    // same reason); a skin or weapon swap re-running this sweep used to wash
+    // the golden ring toward the body tint until relog.
+    if (mesh.name === 'class_halo') return;
     // Always derive a skin/material variant from the assembled model's source
     // material. Reusing the last applied variant would retain its alternate map
     // when skin 0 asks to restore the embedded default texture.
@@ -1024,7 +1170,11 @@ function bakeStaticPose(
     }
     out.setAttribute('position', new THREE.BufferAttribute(baked, 3));
     const uv = srcGeo.getAttribute('uv');
-    if (uv) out.setAttribute('uv', uv.clone());
+    // Different source primitives can quantize uv differently (e.g. a
+    // normalized Uint16Array on one, a plain Float32Array on another);
+    // dequantize so every baked geo's uv shares one typed-array type and
+    // mergeGeometries below can combine them.
+    if (uv) out.setAttribute('uv', dequantizeAttribute(uv as THREE.BufferAttribute));
     if (srcGeo.index) out.setIndex(srcGeo.index.clone());
     out.computeVertexNormals();
     geos.push(out);

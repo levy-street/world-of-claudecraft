@@ -179,7 +179,21 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',
   'stealthed', // derived cache of auras.some(a => a.kind === 'stealth'); auras is sampled
+  // Rewind's per-player damage-loss ring (combat/damage_history.ts): a runtime-only
+  // accumulator, never serialized or wired, rebuilt deterministically from dealDamage
+  // on every host. Its EFFECT (Rewind's heal2 events) is pinned by the event digest,
+  // so excluding the raw ring avoids per-combat-frame digest churn without losing
+  // gameplay coverage (like wireRev above).
+  'damageHistory',
   'weaponStowed', // Z-key sheathe pose; render-only, no gameplay path reads it
+  // Derived crit core (recalcPlayerStats): a pure function of sampled inputs
+  // (gear ratings, talents, auras), like the derived meta fields below.
+  'sharedCritBonus',
+  // The castNth empower guard flag (combat/empower_next.ts sets it, the same
+  // cast's onCastCompleted clears it): lives only inside one cast's resolution,
+  // never serialized or wired. Its EFFECT (which procs fire) is pinned by the
+  // event digest and procState counters.
+  'castConsumedEmpower',
 ]);
 
 // Session-only / presentation / derived PlayerMeta fields. Derived fields

@@ -23,8 +23,17 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; never trust stale prose).
-const EXPECTED_SEND_COUNT = 154; // +frontier_enter/frontier_leave/arena_daily_claim; +Season 1 Armory skin, ignore_add/ignore_remove, stow_weapon, Dungeon Finder, inv_move, Card Duel minigame (card_queue_join/leave, play_card, card_forfeit)
-const EXPECTED_DISPATCH_COUNT = 163; // +frontier_enter/frontier_leave/arena_daily_claim; +Season 1 Armory skin, ignore_add/ignore_remove, stow_weapon, Dungeon Finder, inv_move, Card Duel minigame (card_queue_join/leave, play_card, card_forfeit)
+// Merged union: the Talent V2 row-selection surface (selectTalentRow supersedes the
+// mage line's pickRowTalent) plus the mage line's empowered-cast release and pet
+// Water Jet commands, on top of Season 1 Armory skin, ignore_add/ignore_remove,
+// stow_weapon, Dungeon Finder, inv_move, the release's Card Duel minigame
+// (card_queue_join/leave, play_card, card_forfeit), and Professions 2.0's
+// place_mobile_station, train_recipe, the three enchanting actions
+// (disenchant_item, apply_enchant, salvage_item), and unbind_item (the
+// Maker's Bond unbind service); plus the Frostreach Frontier surface
+// (frontier_enter/frontier_leave/arena_daily_claim).
+const EXPECTED_SEND_COUNT = 167;
+const EXPECTED_DISPATCH_COUNT = 176;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

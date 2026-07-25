@@ -234,6 +234,29 @@ describe('isBuffered/preload', () => {
   });
 });
 
+// playAt's boolean return is the load-bearing contract behind the mob
+// idle-bark per-entity cooldown (src/ui/mob_idle_sfx.ts, hud.ts): a caller
+// stamps its own cooldown only when this returns true, so a false positive
+// here (returning true on a cooldown-blocked or unbuffered attempt) would
+// silently bench a mob for the full cooldown window over a bark that never
+// actually played, the exact bug the design's own doc comment warns about.
+describe('playAt return value', () => {
+  it('returns false for an unbuffered key (kicks off the async load instead)', () => {
+    expect(sfx.playAt('mob_beast_idle', 0, 0, 0)).toBe(false);
+  });
+
+  it('returns true for a scheduled play, then false for an immediate repeat blocked by the per-key cooldown', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('foot_stone', { duration: 0.3 });
+
+    expect(sfx.playAt('foot_stone', 0, 0, 0)).toBe(true);
+    expect(sfx.playAt('foot_stone', 0, 0, 0)).toBe(false); // same instant, default 0.03s cooldown blocks it
+
+    nowT += 1; // clear the cooldown
+    expect(sfx.playAt('foot_stone', 0, 0, 0)).toBe(true);
+  });
+});
+
 // Footstep sounds ship OFF by default and are toggleable via the footstepSfx
 // setting. While disabled, footstep() must be a no-op (no source created) for
 // self and other entities alike; re-enabling resumes playback.

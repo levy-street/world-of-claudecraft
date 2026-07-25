@@ -26,6 +26,8 @@
 import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
+import type { ArchetypeState } from '../professions/archetype';
+import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { grantHonor } from '../pvp';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
@@ -37,9 +39,16 @@ import {
   type QuestDef,
   type QuestProgress,
   type QuestState,
+  questObjectiveRequired,
   questTurnInNpcIds,
 } from '../types';
 import { dailyQuestDoneToday, recordDailyQuestDone } from './daily_quest';
+import {
+  applyProfessionQuestEffect,
+  professionQuestSelectionTargets,
+  resolvedQuestObjectiveCounts,
+  validateProfessionQuestSelection,
+} from './profession_quest_effects';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -49,21 +58,50 @@ export function computeQuestState(
   questLog: Map<string, QuestProgress>,
   questsDone: Set<string>,
   playerLevel: number,
+  professionState?: ArchetypeState,
+  // The set of quest ids currently inside their repeat-cadence window.
+  // Built per-tick-domain by the caller (the Sim from PlayerMeta.questCadence +
+  // ctx.tickCount, the online client from the server-computed cprof mirror), so
+  // this shared decision point never reasons about tick domains itself.
+  withinCadence?: ReadonlySet<string>,
   // A daily quest already completed on the current host day: shows 'done' (on
   // cooldown) until the day rolls. Only consulted when the quest is NOT active in
-  // the log (an accepted daily still reads active/ready). Defaults false so the
-  // ClientWorld's four-arg call site stays byte-identical.
+  // the log (an accepted daily still reads active/ready). Defaults false so
+  // legacy four-arg call sites stay byte-identical.
   dailyCompletedToday = false,
 ): QuestState {
-  if (questsDone.has(questId)) return 'done';
   const qp = questLog.get(questId);
   if (qp) return qp.state === 'ready' ? 'ready' : 'active';
   if (dailyCompletedToday) return 'done';
   const quest = QUESTS[questId];
   if (!quest) return 'unavailable';
+  if (questsDone.has(questId) && !quest.repeatable) return 'done';
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
   if (quest.retired) return 'unavailable';
+  if (
+    quest.completionEffect &&
+    professionState &&
+    professionQuestSelectionTargets(quest, professionState).length === 0
+  ) {
+    return 'unavailable';
+  }
+  // One pending identity transition at a time: while any attunePair-effect
+  // quest is active, every OTHER attunePair-effect quest is unavailable.
+  // resolvedCounts is stamped at accept and turn-in never re-resolves it, so a
+  // banked second amends would complete at a stale cost after the first return
+  // raised switchCount, dodging the 5 + 3 * switchCount escalation. The gate
+  // lives here so both hosts and the server accept path share it (the quest
+  // already in the log returned 'active' above, so it never gates itself).
+  if (quest.completionEffect?.type === 'attunePair') {
+    for (const activeId of questLog.keys()) {
+      if (QUESTS[activeId]?.completionEffect?.type === 'attunePair') return 'unavailable';
+    }
+  }
+  // A repeatable work order inside its cooldown window is unavailable until it
+  // lapses (the turn-in armed it; the window is server-authoritative and mirrors
+  // to the online client via cprof).
+  if (withinCadence?.has(questId)) return 'unavailable';
   return 'available';
 }
 
@@ -73,11 +111,17 @@ export function questState(ctx: SimContext, questId: string, pid?: number): Ques
   const quest = QUESTS[questId];
   const dailyCompletedToday =
     !!quest?.daily && dailyQuestDoneToday(r.meta.dailyQuests, ctx.utcDay, questId);
+  const withinCadence =
+    r.meta.questCadence.size > 0
+      ? new Set(cadenceBlockedKeys(r.meta.questCadence, ctx.tickCount))
+      : undefined;
   return computeQuestState(
     questId,
     r.meta.questLog,
     r.meta.questsDone,
     r.e.level,
+    r.meta.archetype,
+    withinCadence,
     dailyCompletedToday,
   );
 }
@@ -110,8 +154,16 @@ export function finalizeQuestAccept(
   questId: string,
   quest: QuestDef,
   meta: PlayerMeta,
-): void {
-  meta.questLog.set(questId, { questId, counts: quest.objectives.map(() => 0), state: 'active' });
+  selection?: string,
+): boolean {
+  if (!validateProfessionQuestSelection(quest, meta, selection)) return false;
+  meta.questLog.set(questId, {
+    questId,
+    counts: quest.objectives.map(() => 0),
+    state: 'active',
+    ...(selection === undefined ? {} : { selection }),
+    resolvedCounts: resolvedQuestObjectiveCounts(quest, meta),
+  });
   for (const itemId of questFallbackGrants(quest, (id) => ctx.countItem(id, meta.entityId) > 0)) {
     ctx.addItem(itemId, 1, meta.entityId);
   }
@@ -123,10 +175,18 @@ export function finalizeQuestAccept(
     pid: meta.entityId,
   });
   ctx.onInventoryChangedForQuests(meta);
+  return true;
 }
 
-export function acceptQuest(ctx: SimContext, questId: string, pid?: number): void {
-  const r = ctx.resolve(pid);
+export function acceptQuest(
+  ctx: SimContext,
+  questId: string,
+  selectionOrPid?: string | number,
+  pid?: number,
+): void {
+  const selection = typeof selectionOrPid === 'string' ? selectionOrPid : undefined;
+  const resolvedPid = typeof selectionOrPid === 'number' ? selectionOrPid : pid;
+  const r = ctx.resolve(resolvedPid);
   if (!r) return;
   const quest = QUESTS[questId];
   const { meta, e: p } = r;
@@ -143,12 +203,16 @@ export function acceptQuest(ctx: SimContext, questId: string, pid?: number): voi
     ctx.error(meta.entityId, 'That quest is not available.');
     return;
   }
+  if (!validateProfessionQuestSelection(quest, meta, selection)) {
+    ctx.error(meta.entityId, 'That profession choice is not available.');
+    return;
+  }
   const nearby = questNpcFor(ctx, questId, 'giver', p);
   if (!nearby.npc) {
     ctx.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest giver is not nearby.');
     return;
   }
-  finalizeQuestAccept(ctx, questId, quest, meta);
+  finalizeQuestAccept(ctx, questId, quest, meta, selection);
 }
 
 export function acceptLinkedQuest(
@@ -218,6 +282,10 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
     ctx.error(meta.entityId, 'That quest is not complete.');
     return;
   }
+  if (!validateProfessionQuestSelection(quest, meta, qp.selection)) {
+    ctx.error(meta.entityId, 'That profession choice is no longer available.');
+    return;
+  }
   const nearby = questNpcFor(ctx, questId, 'turnIn', p);
   if (!nearby.npc) {
     ctx.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest turn-in is not nearby.');
@@ -229,7 +297,10 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
   if (rewardItem) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
     for (const obj of quest.objectives) {
-      if (obj.type === 'collect' && obj.itemId) removeStacked(scratch, obj.itemId, obj.count);
+      if (obj.type === 'collect' && obj.itemId) {
+        const index = quest.objectives.indexOf(obj);
+        removeStacked(scratch, obj.itemId, questObjectiveRequired(quest, qp, index));
+      }
     }
     if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
       bagsFullError(ctx, meta.entityId);
@@ -251,11 +322,14 @@ export function turnInQuestCore(
   questId: string,
   quest: QuestDef,
   meta: PlayerMeta,
-): void {
+): boolean {
   const qp = meta.questLog.get(questId);
-  if (!qp) return;
-  for (const obj of quest.objectives) {
-    if (obj.type === 'collect' && obj.itemId) ctx.removeItem(obj.itemId, obj.count, meta.entityId);
+  if (!qp) return false;
+  if (!applyProfessionQuestEffect(ctx, quest, qp, meta)) return false;
+  for (const [index, obj] of quest.objectives.entries()) {
+    if (obj.type === 'collect' && obj.itemId) {
+      ctx.removeItem(obj.itemId, questObjectiveRequired(quest, qp, index), meta.entityId);
+    }
   }
   qp.state = 'done';
   meta.questLog.delete(questId);
@@ -264,10 +338,12 @@ export function turnInQuestCore(
     // it re-opens once the host day rolls (dailyQuestDoneToday/computeQuestState gate
     // re-accept until then). Offline/headless never rolls a day, so it stays done.
     meta.dailyQuests = recordDailyQuestDone(meta.dailyQuests, ctx.utcDay, questId);
+    meta.counters.questsCompleted++;
   } else {
+    const firstCompletion = !meta.questsDone.has(questId);
     meta.questsDone.add(questId);
+    if (firstCompletion) meta.counters.questsCompleted++;
   }
-  meta.counters.questsCompleted++;
   // Quest and chapter deed predicates read questsDone, so re-check this player.
   ctx.markDeedsDirty(meta.entityId);
   if (quest.honorReward && quest.honorReward > 0) {
@@ -284,6 +360,12 @@ export function turnInQuestCore(
   const rewardItem = questRewardItemId(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
   ctx.grantXp(quest.xpReward, meta);
+  // Arm the repeat-cadence window (work orders): the quest stays
+  // unavailable (computeQuestState) until now + repeatCadenceTicks, server-
+  // authoritative and persisted per character with zero-default omission.
+  if (quest.repeatCadenceTicks && quest.repeatCadenceTicks > 0) {
+    armCadence(meta.questCadence, questId, ctx.tickCount, quest.repeatCadenceTicks);
+  }
   ctx.emit({ type: 'questDone', questId, pid: meta.entityId });
   ctx.emit({
     type: 'log',
@@ -294,4 +376,5 @@ export function turnInQuestCore(
   // Quests with an authored Ravenpost letter have their giver write to the
   // player a little while after the turn-in (mail/post_office.ts).
   ctx.queueQuestLetter(questId, meta.entityId);
+  return true;
 }

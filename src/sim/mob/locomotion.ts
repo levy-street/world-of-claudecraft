@@ -26,6 +26,7 @@
 // sibling targeting module are imported directly (already pure); everything that
 // touches not-yet-extracted Sim state routes through the seam.
 
+import { hasUnbreakableMovementLock } from '../combat/cc';
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
@@ -43,6 +44,7 @@ import {
   type Entity,
   LEASH_DISTANCE,
   MELEE_RANGE,
+  type MobTemplate,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   SISTER_NHALIA_BOSS_ID,
@@ -51,6 +53,12 @@ import {
   type Vec3,
 } from '../types';
 import { groundHeight, waterLevelAt } from '../world';
+import {
+  cancelMobChargeDash,
+  resetMobCharge,
+  tryStartMobCharge,
+  updateMobChargeDash,
+} from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
@@ -74,6 +82,11 @@ const BODY_RADIUS = PLAYER_BODY_RADIUS;
 // full (mirrors the player out-of-combat window, so combat exits cleanly while the
 // damage meter keeps the finished segment's DPS).
 const DUMMY_RESET_SECONDS = 5;
+const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
+  'nythraxis_heroic_warrior_add',
+  'nythraxis_heroic_priest_add',
+  'nythraxis_heroic_rogue_add',
+]);
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
@@ -119,6 +132,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
       mob.inCombat = false;
       mob.hp = mob.maxHp;
+      mob.aiState = 'idle';
+      mob.aggroTargetId = null;
+      mob.forcedTargetId = null;
+      mob.forcedTargetTimer = 0;
+      clearThreat(mob);
     } else {
       mob.inCombat = true;
     }
@@ -187,7 +205,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // non-hostile mob is therefore a leak — exactly the "immortal, invalid
   // target" wolves players hit. Restore hostility so no mob can ever be left
   // permanently untargetable, whatever path corrupted it.
-  if (mob.templateId === NYTHRAXIS_ADD_ID && mob.despawnTimer !== undefined) {
+  if (
+    (mob.templateId === NYTHRAXIS_ADD_ID || NYTHRAXIS_HEROIC_ADD_IDS.has(mob.templateId)) &&
+    mob.despawnTimer !== undefined
+  ) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -204,7 +225,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.nythraxis &&
       (mob.nythraxis.phase === 'transition' ||
         mob.nythraxis.deathlessCastRemaining > 0 ||
-        mob.nythraxis.deathlessStunRemaining > 0);
+        mob.nythraxis.deathlessStunRemaining > 0 ||
+        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0);
     if (isNythraxis) {
       ctx.updateNythraxisEncounter(mob);
       if (
@@ -212,7 +234,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         (mob.nythraxis &&
           (mob.nythraxis.phase === 'transition' ||
             mob.nythraxis.deathlessCastRemaining > 0 ||
-            mob.nythraxis.deathlessStunRemaining > 0))
+            mob.nythraxis.deathlessStunRemaining > 0 ||
+            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
     } else {
@@ -221,11 +244,16 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   if (ctx.isStunned(mob)) {
+    // A total lockout (stun/stasis/incapacitate/polymorph) breaks an in-flight
+    // charge dash. This branch is the only mob code that runs while locked, so
+    // the dash cancel must live here: the dash step itself is never reached.
+    cancelMobChargeDash(mob);
     // A taunt/growl window is real-time: keep it counting down even while the mob
     // is stunned, since the stun path skips updateMobTarget where it normally ticks.
     tickForcedTarget(mob);
     if (ctx.updateFearMovement(mob)) return;
-    if (mob.auras.some((a) => a.kind === 'polymorph')) {
+    const polymorphAura = mob.auras.find((a) => a.kind === 'polymorph');
+    if (polymorphAura && !hasUnbreakableMovementLock(mob, polymorphAura)) {
       mob.wanderTimer -= DT;
       if (mob.wanderTimer <= 0) {
         mob.wanderTimer = ctx.rng.range(0.8, 2);
@@ -333,11 +361,23 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     case 'chase':
     case 'attack': {
+      // A heroic charge dash in flight owns the mob's movement for the tick
+      // (mirrors the player's updateChargeMovement early return); it also ticks
+      // the charge cooldown, so this runs before the combat-profile runner on
+      // every engaged tick. Zero rng in every branch: inert for normal spawns.
+      if (updateMobChargeDash(ctx, mob)) break;
+      // A live Grave Inferno channel owns the whole engaged tick: the boss is
+      // rooted, does not melee, and only the channel pulses fire. The cadence
+      // countdown itself ticks inside runMobAttackMechanics with the other
+      // boss mechanics (melee-gated), so a kited boss does not bank channels.
+      if (updateInfernoChannel(ctx, mob)) break;
       const result = updateMobCombatProfile(ctx, mob, () => {
-        // The anti-kite snare and loud battle cries fire once per engaged tick,
-        // from either engaged state (mid-chase is the kite case they exist for).
+        // The anti-kite snare, loud battle cries, and the heroic charge trigger
+        // fire once per engaged tick, from either engaged state (mid-chase is
+        // the kite case they exist for).
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
+        tryStartMobCharge(ctx, mob);
       });
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
       break;
@@ -412,7 +452,101 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 }
 
+// Tick a LIVE inferno channel (returns true while channeling, owning the
+// tick). Pulses fire at duration/pulses intervals; pulse k rolls
+// range(min, max) x k x mechanicDamageMult, unmitigated and non-crit, on
+// every living player inside the radius. Each pulse emits a nova spellfx so
+// the burning ring reads on screen. Uninterruptible by construction: nothing
+// in here checks stun/silence (the one authored carrier, Korzul, is ccImmune
+// on both difficulties anyway).
+function updateInfernoChannel(ctx: SimContext, mob: Entity): boolean {
+  const inferno = MOBS[mob.templateId]?.infernoChannel;
+  if (!inferno || mob.infernoRemaining <= 0) return false;
+  const interval = inferno.duration / inferno.pulses;
+  mob.infernoRemaining = Math.max(0, mob.infernoRemaining - DT);
+  const elapsedAfter = inferno.duration - mob.infernoRemaining;
+  const duePulses = Math.min(inferno.pulses, Math.floor(elapsedAfter / interval));
+  while (mob.infernoPulsesFired < duePulses) {
+    mob.infernoPulsesFired++;
+    const k = mob.infernoPulsesFired;
+    const school = (inferno.school ?? 'fire') as Aura['school'];
+    // spellfxAt with radius: the renderer drapes an AoE ring at the TRUE
+    // blast size, so the 14yd edge players dodge is the 14yd edge they see.
+    ctx.emit({
+      type: 'spellfxAt',
+      x: mob.pos.x,
+      z: mob.pos.z,
+      school,
+      fx: 'nova',
+      radius: inferno.radius,
+    });
+    // One draw per pulse regardless of who stands in it (stream stability).
+    const roll = ctx.rng.range(inferno.min, inferno.max);
+    for (const meta of ctx.players.values()) {
+      const pe = ctx.entities.get(meta.entityId);
+      if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > inferno.radius) continue;
+      const dmg = Math.round(roll * k * (mob.mechanicDamageMult ?? 1));
+      ctx.dealDamage(mob, pe, dmg, false, school, inferno.name, 'hit', true);
+    }
+  }
+  if (mob.infernoRemaining <= 0) {
+    mob.infernoPulsesFired = 0;
+    // A gate crossed DURING this channel was served by it: consume it now so
+    // the cadence path in runMobAttackMechanics cannot chain a back-to-back
+    // channel off a threshold the players already burned through.
+    consumeCrossedInfernoGates(mob, inferno);
+    return false; // channel over: the boss acts normally again this tick
+  }
+  return true;
+}
+
+// Consume every infernoChannel.atHpPct threshold the mob's current hp has
+// crossed (mirroring the summonAdds firedSummons walk); returns whether any
+// was consumed this call. Pure counter bookkeeping: no rng, no events.
+function consumeCrossedInfernoGates(
+  mob: Entity,
+  inferno: NonNullable<MobTemplate['infernoChannel']>,
+): boolean {
+  const gates = inferno.atHpPct;
+  if (!gates) return false;
+  const hpFrac = mob.hp / Math.max(1, mob.maxHp);
+  let crossed = false;
+  while (mob.infernoGatesFired < gates.length && hpFrac <= gates[mob.infernoGatesFired]) {
+    mob.infernoGatesFired++;
+    crossed = true;
+  }
+  return crossed;
+}
+
 function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
+  // Grave Inferno cadence: melee-gated like every other boss mechanic. At
+  // zero the channel arms and updateInfernoChannel owns subsequent ticks.
+  // An atHpPct gate arms it immediately regardless of the cadence (and
+  // reseeds the cadence), so a fast kill still meets the burn phase.
+  const inferno = MOBS[mob.templateId]?.infernoChannel;
+  if (inferno && mob.infernoRemaining <= 0) {
+    mob.infernoTimer -= DT;
+    if (consumeCrossedInfernoGates(mob, inferno) || mob.infernoTimer <= 0) {
+      mob.infernoTimer = inferno.every;
+      mob.infernoRemaining = inferno.duration;
+      mob.infernoPulsesFired = 0;
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${inferno.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
+      ctx.emit({
+        type: 'spellfxAt',
+        x: mob.pos.x,
+        z: mob.pos.z,
+        school: (inferno.school ?? 'fire') as Aura['school'],
+        fx: 'nova',
+        radius: inferno.radius,
+      });
+    }
+  }
   // Boss/miniboss pulse mechanic.
   const pulse = MOBS[mob.templateId]?.aoePulse;
   if (pulse) {
@@ -668,6 +802,14 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  // A mid-flight inferno channel dies with the pull; the cadence reseeds and
+  // the hp gates re-arm alongside firedSummons above.
+  mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;
+  mob.infernoRemaining = 0;
+  mob.infernoPulsesFired = 0;
+  mob.infernoGatesFired = 0;
+  // Charge resets READY (cooldown 0), not telegraphed: the next pull opens with it.
+  resetMobCharge(mob);
   mob.aoeSlowTimer = MOBS[mob.templateId]?.aoeSlow?.every ?? 0;
   mob.loudYellTimer = MOBS[mob.templateId]?.battleYells?.every ?? 0;
   mob.loudYellIndex = 0;

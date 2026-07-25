@@ -34,6 +34,7 @@ describe('isDebuffAura', () => {
       'lockout',
       'slow',
       'dot',
+      'bleed_vuln',
     ] as AuraKind[]) {
       expect(isDebuffAura(aura('x', kind))).toBe(true);
       expect(isCancelableAura(aura('x', kind))).toBe(false);
@@ -56,12 +57,24 @@ describe('isDebuffAura', () => {
       'thorns',
       'form_bear',
       'form_cat',
+      'form_fireball',
+      'form_moonkin',
+      'form_shadow',
       'stealth',
       'defensive_stance',
       'righteous_fury',
     ] as AuraKind[]) {
       expect(isCancelableAura(aura('x', kind))).toBe(true);
     }
+  });
+
+  it('never exposes unbreakable encounter control as player-cancelable', () => {
+    const scriptedStasis = {
+      ...aura('scripted_stasis', 'stasis'),
+      unbreakableControl: true,
+    } as Aura;
+
+    expect(isCancelableAura(scriptedStasis)).toBe(false);
   });
 });
 
@@ -86,6 +99,12 @@ describe('removeCancelableAura', () => {
   it('refuses to cancel a debuff sharing the requested id (no-op, returns null)', () => {
     const auras = [aura('hex', 'hex')];
     expect(removeCancelableAura(auras, 'hex')).toBeNull();
+    expect(auras).toHaveLength(1);
+  });
+
+  it('refuses to cancel bleed vulnerability', () => {
+    const auras = [aura('hemorrhage_bleed_vuln', 'bleed_vuln', 0.4)];
+    expect(removeCancelableAura(auras, 'hemorrhage_bleed_vuln')).toBeNull();
     expect(auras).toHaveLength(1);
   });
 

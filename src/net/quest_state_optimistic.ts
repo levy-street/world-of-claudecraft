@@ -20,6 +20,7 @@
 // optimism reconciled the moment a real snapshot lands and clears
 // `pendingQuestCommands` (see `ClientWorld.applySnapshot`); the server still
 // authoritatively resolves the turn-in itself.
+import type { ArchetypeState } from '../sim/professions/archetype';
 import { computeQuestState } from '../sim/sim';
 import type { QuestProgress, QuestState } from '../sim/types';
 
@@ -29,6 +30,9 @@ export function optimisticQuestState(
   questsDone: Set<string>,
   pendingQuestCommands: Map<string, 'accept' | 'turnin'>,
   playerLevel: number,
+  professionState?: ArchetypeState,
+  // The server-computed work-order cooldown set, mirrored via cprof.
+  withinCadence?: ReadonlySet<string>,
   // A daily quest already completed on the current host day (mirrored from the
   // server's `dailyq` snapshot self-field): forwarded to computeQuestState so the
   // online client shows the daily done-for-today exactly like the offline Sim.
@@ -48,6 +52,8 @@ export function optimisticQuestState(
     questLog,
     effectiveDone,
     playerLevel,
+    professionState,
+    withinCadence,
     dailyCompletedToday,
   );
   const pending = pendingQuestCommands.get(questId);

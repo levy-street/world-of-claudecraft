@@ -210,3 +210,87 @@ Overpower, Frost Nova, Arcane Intellect, Holy Light, Arcane Shot, Frost Shock, F
   Infernal) because the operator decision is to re-theme the WHOLE set. If that decision changes
   at NAME-MAP lock, those three are hardcoded in the scanner and need a deliberate edit there,
   not just a map flip (documented in the test header).
+
+## REQUEST ROWS: Talents 2.0 flip, 51 granted-ability names (2026-07-07, pending operator sign-off)
+
+The flip PR (choice rows) grants 51 abilities ported from the fun-pass
+branch, all carrying verbatim WoW names. 9 resolve by existing locked rows
+(Last Prayer, Bristleguard, Stilled Mind, Lifesap, Eleventh Hour,
+Contingency, Racing Mind, Shadeslip, Silent Treatment). The remaining 42
+need new rows; proposals below follow house style (grim grounded
+dark-fantasy, existing family vocabulary: Guise aspects, Hex curses,
+Grave/Wraith/Dread/Ward/Dirge families, Dirt Nap-register humor for rogue).
+Implemented provisionally in the flip branch; every row is operator-vetoable
+before the flip PR opens.
+
+| old | proposed | family/rationale |
+|---|---|---|
+| Aspect of the Wild | Wildfang Guise | unified-aspects Guise family; Wildfang = feral spec |
+| Avatar | Colossus | grounded, no franchise tie |
+| Avenging Wrath | Wrathwing | wings visual; Wrath is a keep word |
+| Berserk | Red Haze | grim, grounded |
+| Bladestorm | Steel Cyclone | pairs with Bladed Gyre (whirlwind) |
+| Blink | Flickerstep | mage teleport, Shadeslip register |
+| Bloodlust | War Drums | classic alternative, grounded |
+| Chain Lightning | Forked Lightning | natural phrase |
+| Chaos Bolt | Ruinbolt | Ruination spec family |
+| Cloak of Shadows | Shadecloak | Shade family |
+| Cone of Cold | Frostsweep | descriptive |
+| Counter Shot | Hushing Shot | interrupt flavor, Rattling Shot register |
+| Counterspell | Spellbreak | descriptive |
+| Curse of Exhaustion | Leaden Hex | Deepened Hex family |
+| Death Coil | Grave Coil | Grave family |
+| Deep Freeze | Deadfrost | grim |
+| Divine Shield | Lightward | Ward family (Thunder Ward, Oathward) |
+| Earthbind | Gripping Earth | descriptive |
+| Evocation | Aetherwell | Aethermancy spec family |
+| Frenzied Regeneration | Savage Mending | descriptive |
+| Frost Trap | Rime Snare | Deep Rime family |
+| Ghostly Strike | Wraith Strike | Wraithborn family |
+| Hammer of Wrath | Tolling Hammer | knell/execute flavor |
+| Healing Stream | Springwell | grounded |
+| Heroic Leap | Warleap | descriptive |
+| Holy Wrath | Saint's Ire | grim liturgical |
+| Howl of Terror | Dread Howl | Dread family (demonology) |
+| Ice Block | Cold Coffin | Dirt Nap register |
+| Kick | Boot | Eye Jab/Dirt Nap register |
+| Mend Pet | Patch Up | plain register |
+| Meteor | Skystone | grounded |
+| Mind Sear | Thoughtburn | descriptive |
+| Multi-Shot | Splitshot | descriptive |
+| Prayer of Healing | Choirmend | Pale Choir faction family |
+| Psychic Scream | Terror Shriek | descriptive |
+| Rallying Cry | Muster | ties to the Fenbridge Muster quest |
+| Rebuke | Reproach | liturgical register |
+| Shield Wall | Bulwark | Ironguard family |
+| Skull Bash | Headbutt | plain register |
+| Spell Lock | Gag Order | Silent Treatment family |
+| Tranquility | Gladesong | Groveheart family |
+
+RATIFICATION REQUESTS (already shipped in #1543, invented under time
+pressure before this process was found; veto = rename in a follow-up):
+| old | shipped | note |
+|---|---|---|
+| Feral Charge (ability) | Primal Surge | map's Path of Fangs is the choice-row name, kept reserved |
+| Shadowform (ability) | Gloamveil Form | derived from locked Gloamveil (mastery); avoids exact display dup |
+| Pummel | Jawcrack | missed in the first batch; warrior interrupt, Eye Jab register |
+| Moonfury (row option) | Moonspite | balance druid row; Moongrove register |
+| Shatter (row option) | Coldsnap Break | map's Brittlebreak is taken by the frost mastery |
+| Aura Mastery (row option + new active) | Radiant Swell | paladin row-quality pass; the WoW-named passive option became a coined active (aura_surge); veto = rename in a follow-up |
+
+RATIFICATION REQUESTS (warrior Blaine1705 talent port, 2026-07-09):
+| old | shipped | note |
+|---|---|---|
+| Double Charge | Twin Onrush | warrior row option; pairs with Onrush ability |
+| Pursuit | Hot Pursuit | warrior row option and kill-speed aura |
+| Crushing Charge | Crushing Onrush | warrior row option; pairs with Onrush ability |
+| Second Wind | Rallying Breath | warrior row option; avoids verbatim talent name |
+| Die by the Sword | Swordguard | warrior row option and granted defensive cooldown |
+| Victory Rush | Triumph Rush | warrior row option and granted kill-window strike |
+| Piercing Howl | Razor Howl | warrior row option and granted AoE slow |
+| Storm Bolt | Stormthrow | warrior row option and granted ranged stun |
+| Anger Management | Rage Discipline | warrior row option; resource passive |
+| Recklessness | Reckless Vow | warrior row option and granted offensive cooldown |
+| Bloodbath | Red Harvest | warrior row option and kill-stack aura |
+| Colossal Might | Giant's Momentum | warrior row option; rage-spend cooldown refund |
+| Sanguine Aura | Red Banner | warrior row option and granted party damage cooldown |

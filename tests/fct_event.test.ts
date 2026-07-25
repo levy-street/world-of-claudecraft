@@ -1,5 +1,5 @@
 // Determinism + faithfulness guard for the pure SimEvent -> FctEvent discrimination
-// (fct_event.ts). Pins each of the 8 hud.ts spawn-site paths to the { kind, isSelf,
+// (fct_event.ts). Pins each hud.ts spawn-site path to the { kind, isSelf,
 // crit } triple the old inline literal produced, plus the one null (no-float) case, so the
 // extraction is byte-faithful. The mapper is i18n-free / clock-free / IWorld-free (the text
 // and target stay at the call site); the UI-purity guard (tests/architecture.test.ts) is the
@@ -100,7 +100,15 @@ describe('fctSpawnShape: landed hit (damage-done vs damage-taken vs none)', () =
   });
 });
 
-describe('fctSpawnShape: heal / xp / rested-xp / honor / self-note', () => {
+describe('fctSpawnShape: absorb / heal / xp / rested-xp / honor / self-note', () => {
+  it('absorb is an informational self floater', () => {
+    expect(fctSpawnShape({ type: 'absorb' })).toEqual<FctSpawnShape>({
+      kind: 'absorb',
+      isSelf: true,
+      crit: false,
+    });
+  });
+
   it('heal isSelf tracks isPlayerTarget and passes crit through', () => {
     expect(
       fctSpawnShape({ type: 'heal', crit: false, isPlayerTarget: true }),

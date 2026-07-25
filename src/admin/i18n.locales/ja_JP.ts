@@ -160,6 +160,7 @@ export const ja_JP: Record<string, string> = {
   'stats.uptime': '稼働時間',
   'stats.avgTick': '平均tick',
   'stats.serverRss': 'サーバーRSS',
+  'stats.playersCap': 'プレイヤー上限',
   'online.title': 'オンラインのプレイヤー',
   'online.refreshHint': '5秒ごとに更新',
   'online.empty': '現在オンラインのプレイヤーはいません',

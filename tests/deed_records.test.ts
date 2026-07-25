@@ -55,6 +55,7 @@ import {
 import { GameServer } from '../server/game';
 import { onDeedRecorded } from '../server/steam/mirror';
 import { DEEDS } from '../src/sim/content/deeds';
+import { announceAttunement } from '../src/sim/professions/attunement_events';
 import type { DeedDef } from '../src/sim/types';
 
 const insertMock = vi.mocked(insertCharacterDeed);
@@ -133,6 +134,16 @@ describe('isMarqueeDeed', () => {
   it('agrees with the real catalog on the two exemplars', () => {
     expect(isMarqueeDeed(DEEDS.prog_veteran)).toBe(true); // title reward at renown 10
     expect(isMarqueeDeed(DEEDS.prog_first_steps)).toBe(false); // renown 5, rewardless
+  });
+
+  it('agrees with the catalog on the profession exemplars', () => {
+    // The marquee pair (renown 25 plus a title each), the routine 50 rung, and
+    // the renown-0 rare finds: the profession catalog's broadcast surface.
+    expect(isMarqueeDeed(DEEDS.prog_guildsworn)).toBe(true);
+    expect(isMarqueeDeed(DEEDS.prog_masterwright)).toBe(true);
+    expect(isMarqueeDeed(DEEDS.prog_master_angler)).toBe(true);
+    expect(isMarqueeDeed(DEEDS.prog_engineering_50)).toBe(false);
+    expect(isMarqueeDeed(DEEDS.col_pristine_vein)).toBe(false);
   });
 });
 
@@ -564,6 +575,87 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     const [who, ids] = insertDeedsMock.mock.calls[0];
     expect(who).toEqual({ realm: 'Claudemoon', characterId: 42, accountId: 7 });
     expect([...ids]).toContain('prog_veteran');
+    expect(broadcastSpy).not.toHaveBeenCalled();
+    expect(broadcastsFlagMock).not.toHaveBeenCalled();
+  });
+
+  it('a profession marquee deed (Craftsworn) broadcasts live through the authoritative tick', async () => {
+    // A concrete instance of the generic marquee routing above: the REAL
+    // attunement announce site bumps the counter on the server's own sim, the
+    // tick-tail sweep grants prog_guildsworn (marquee: renown 25 plus a
+    // title), and the observer fans exactly that id out.
+    const fc = fakeWs();
+    const session = server.join(fc.ws as never, 7, 42, 'Hilda', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    const broadcastSpy = vi
+      .spyOn(server.social, 'broadcastDeedUnlock')
+      .mockResolvedValue(undefined);
+    tickAndDetect(); // settle the fresh join
+    await settle();
+    insertMock.mockClear();
+    insertDeedsMock.mockClear();
+
+    announceAttunement(server.sim.ctx, session.pid, 'weaponcrafting+armorcrafting');
+    tickAndDetect();
+    await settle();
+
+    expect(server.sim.meta(session.pid)?.deedsEarned.has('prog_guildsworn')).toBe(true);
+    const rows = insertMock.mock.calls.map((c) => c[0].deedId);
+    const batched = insertDeedsMock.mock.calls.flatMap((c) => [...c[1]]);
+    expect([...rows, ...batched]).toContain('prog_guildsworn');
+    expect(broadcastSpy).toHaveBeenCalledWith(
+      { characterId: 42, name: 'Hilda' },
+      'prog_guildsworn',
+    );
+    expect(broadcastsFlagMock).toHaveBeenCalledWith(7);
+  });
+
+  it('the Craftsworn veteran heal on join records its row but NEVER broadcasts', async () => {
+    // A legacy attuned veteran: attunedPairs in the blob, zero counters.
+    // The join retro sweep back-credits prog_guildsworn with retro: true, so
+    // the drain must record the row while the marquee fan-out stays silent
+    // (a veteran's first login after rollout must not spam their guild).
+    const state = {
+      level: 1,
+      xp: 0,
+      lifetimeXp: 0,
+      copper: 0,
+      hp: 100,
+      resource: 0,
+      pos: { x: 2, z: -2 },
+      facing: 0,
+      equipment: {},
+      inventory: [],
+      questLog: [],
+      questsDone: [],
+      archetype: {
+        activeArchetype: 'armorcrafting',
+        pairedMajor: 'weaponcrafting',
+        hobbyCraft: 'tailoring',
+        attunedPairs: ['weaponcrafting+armorcrafting'],
+        switchCount: 0,
+        amendsProgress: 0,
+      },
+      masteryResetApplied: true,
+    };
+    const fc = fakeWs();
+    const session = server.join(fc.ws as never, 7, 42, 'Returning', 'warrior', state as never);
+    if ('error' in session) throw new Error(session.error);
+    const broadcastSpy = vi
+      .spyOn(server.social, 'broadcastDeedUnlock')
+      .mockResolvedValue(undefined);
+    expect(server.sim.meta(session.pid)?.deedsEarned.has('prog_guildsworn')).toBe(true);
+    // Let the join's own reconcile batch land and clear it, so the assertion
+    // isolates the post-save DRAIN of the retro unlock the next tick delivers.
+    await settle();
+    insertMock.mockClear();
+    insertDeedsMock.mockClear();
+    tickAndDetect();
+    await settle();
+
+    const rows = insertMock.mock.calls.map((c) => c[0].deedId);
+    const batched = insertDeedsMock.mock.calls.flatMap((c) => [...c[1]]);
+    expect([...rows, ...batched]).toContain('prog_guildsworn');
     expect(broadcastSpy).not.toHaveBeenCalled();
     expect(broadcastsFlagMock).not.toHaveBeenCalled();
   });

@@ -30,6 +30,17 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
 const dist2d = (a: { x: number; z: number }, b: { x: number; z: number }) =>
   Math.hypot(a.x - b.x, a.z - b.z);
 
+describe('heroic set item identity', () => {
+  it('shares the normal set id and carries the heroic variant marker', () => {
+    // This line uses the auto-generated heroic_<base> variants (heroic_variants.ts),
+    // marked via heroicOf, not the PTR-era bespoke <base>_heroic pieces with a
+    // standalone heroic flag.
+    expect(ITEMS.heroic_crownforged_dreadhelm.set).toBe(ITEMS.crownforged_dreadhelm.set);
+    expect(ITEMS.heroic_crownforged_dreadhelm.set).toBe('crownforged');
+    expect(ITEMS.heroic_crownforged_dreadhelm.heroicOf).toBe('crownforged_dreadhelm');
+  });
+});
+
 describe('aggregateSetBonuses (pure resolver)', () => {
   it('grants nothing below the 2-piece threshold', () => {
     const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 1 }));
@@ -208,13 +219,13 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     expect(three.attackPower).toBe(three.stats.str * 2 + 40);
   });
 
-  it('Wyrmshadow (t1 agility): crit gains the flat 2% at 3pc on top of agi-derived crit', () => {
+  it('Wyrmshadow (t1 agility): crit gains 1% at 3pc on top of agi-derived crit', () => {
     const three = statsFor('rogue', 20, {
       chest: 'wyrmshadow_harness',
       feet: 'wyrmshadow_treads',
       legs: 'wyrmshadow_legguards',
     });
-    expect(three.critChance).toBeCloseTo(0.05 + three.stats.agi * 0.0005 + 0.02);
+    expect(three.critChance).toBeCloseTo(0.05 + three.stats.agi * 0.0005 + 0.01);
   });
 
   it('Crownforged (t2 strength, 4 pieces): the 4-set Hit bonus lands on the equipped hitRating', () => {

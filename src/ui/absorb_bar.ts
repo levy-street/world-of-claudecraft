@@ -14,6 +14,7 @@ export interface AbsorbBarInput {
   hp: number;
   maxHp: number;
   auras?: Aura[];
+  /** Compact pre-summed value used by party snapshots, which do not carry full auras. */
   total?: number;
 }
 

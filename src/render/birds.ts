@@ -4,7 +4,7 @@ import { GFX } from './gfx';
 
 // Ambient high-altitude BIRD FLOCK — a render-only flourish, no sim state.
 // A small V-formation of dark silhouettes drifts across the sky high above the
-// player, wings flapping in a travelling wave. Distinct from ground critters
+// player, wings flapping in a travelling wave. Distinct from ground wildlife
 // and airborne motes: birds live in the sky band, far above terrain, and never
 // interact with the world. Follows the foliage/clouds contract: a fixed pool is
 // recycled around the moving player, never rebuilt, with no per-frame allocs.

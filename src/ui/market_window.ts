@@ -14,7 +14,7 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { EquipSlot } from '../sim/types';
+import type { ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
@@ -24,11 +24,15 @@ import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
+  MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
+  MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
   MARKET_WEAPON_TYPE_FILTERS,
+  type MarketArmorClassFilter,
   type MarketItemTypeFilter,
+  type MarketPrimaryStatFilter,
   type MarketQuery,
   type MarketRarityFilter,
   type MarketSubtypeFilter,
@@ -75,7 +79,7 @@ export interface MarketWindowDeps extends PainterHostPresentation {
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
   showError(text: string): void;
-  slotName(slot: EquipSlot): string;
+  slotName(slot: ItemSlot): string;
   /** Render the bags window and, when `open`, reveal it alongside the market. */
   syncBags(open: boolean): void;
 }
@@ -85,6 +89,8 @@ export class MarketWindow {
   private tab: MarketTab = 'browse';
   private itemTypeFilter: MarketItemTypeFilter = 'all';
   private subtypeFilter: MarketSubtypeFilter = 'all';
+  private armorClassFilter: MarketArmorClassFilter = 'all';
+  private primaryStatFilter: MarketPrimaryStatFilter = 'all';
   private rarityFilter: MarketRarityFilter = 'all';
   private browsePage = 0;
   private sellItemId: string | null = null;
@@ -110,6 +116,8 @@ export class MarketWindow {
     this.tab = 'browse';
     this.itemTypeFilter = 'all';
     this.subtypeFilter = 'all';
+    this.armorClassFilter = 'all';
+    this.primaryStatFilter = 'all';
     this.rarityFilter = 'all';
     this.browsePage = 0;
     this.sellItemId = null;
@@ -118,7 +126,12 @@ export class MarketWindow {
     this.lastSig = '';
     this.render();
     this.deps.root().style.display = 'flex';
-    // Bags ride alongside so you can click items straight onto the Sell tab.
+    // Bags ride alongside so you can click items straight onto the Sell tab. The
+    // body class drives the desktop docking pair in components.css (the bank-open
+    // pattern): without it, both #market-window (centered) and #bags resolve their
+    // percentages against #ui independently and can overlap on common laptop
+    // widths, covering the Sell-tab drop target (review round 4).
+    document.body.classList.add('market-open');
     this.deps.syncBags(true);
     audio.bagOpen();
   }
@@ -129,6 +142,7 @@ export class MarketWindow {
     this.sellItemId = null;
     this.deps.root().style.display = 'none';
     this.deps.hideTooltip();
+    document.body.classList.remove('market-open');
     this.deps.syncBags(false);
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -146,6 +160,8 @@ export class MarketWindow {
       search: this.searchQuery,
       itemType: this.itemTypeFilter,
       subtype: this.subtypeFilter,
+      armorClass: this.armorClassFilter,
+      primaryStat: this.primaryStatFilter,
       rarity: this.rarityFilter,
       page: this.browsePage,
     };
@@ -168,6 +184,8 @@ export class MarketWindow {
       this.tab,
       this.itemTypeFilter,
       this.subtypeFilter,
+      this.armorClassFilter,
+      this.primaryStatFilter,
       this.rarityFilter,
       this.browsePage,
       info?.listings,
@@ -211,6 +229,19 @@ export class MarketWindow {
     };
     const tab = (id: MarketTab) =>
       `<button type="button" class="mkt-tab${this.tab === id ? ' sel' : ''}" data-tab="${id}" aria-pressed="${this.tab === id ? 'true' : 'false'}">${esc(tabLabel(id))}</button>`;
+    // The search box and the type/subtype/rarity dropdowns are both filter controls for
+    // the Browse tab, so they render side by side in one `.mkt-controls` row: the search
+    // box lives here (rather than being created inside #market-body by renderBrowse) so it
+    // can sit in the same flex row as the filter menus. It is only rebuilt when render()
+    // rebuilds the whole window (tab switch, filter pick), never on every keystroke:
+    // renderBrowse's own reuse-and-sync logic (below) is what preserves focus while typing.
+    const controlsHtml =
+      this.tab === 'browse'
+        ? `<div class="mkt-controls">` +
+          `<input type="search" class="mkt-search" placeholder="${esc(t('itemUi.market.searchPlaceholder'))}" aria-label="${esc(t('itemUi.market.searchAria'))}" value="${esc(this.searchQuery)}">` +
+          this.renderMarketFilters() +
+          `</div>`
+        : '';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('itemUi.market.title'))} <span class="panel-subtitle">${esc(t('itemUi.market.subtitle'))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.market.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="mkt-tabs">` +
@@ -218,9 +249,15 @@ export class MarketWindow {
       tab('sell') +
       tab('collect') +
       `</div>` +
-      this.renderMarketFilters() +
+      controlsHtml +
       `<div id="market-body"></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    const searchInput = el.querySelector<HTMLInputElement>('.mkt-search');
+    searchInput?.addEventListener('input', () => {
+      this.searchQuery = searchInput.value;
+      this.browsePage = 0;
+      this.pushQuery();
+    });
     el.querySelectorAll('[data-tab]').forEach((node) => {
       node.addEventListener('click', () => {
         const next = (node as HTMLElement).dataset.tab as MarketTab;
@@ -299,10 +336,18 @@ export class MarketWindow {
           if (next !== this.itemTypeFilter) {
             this.itemTypeFilter = next;
             this.subtypeFilter = 'all';
+            this.armorClassFilter = 'all';
+            this.primaryStatFilter = 'all';
             this.browsePage = 0;
           }
         } else if (key === 'subtype') {
           this.subtypeFilter = value as MarketSubtypeFilter;
+          this.browsePage = 0;
+        } else if (key === 'armorClass') {
+          this.armorClassFilter = value as MarketArmorClassFilter;
+          this.browsePage = 0;
+        } else if (key === 'primaryStat') {
+          this.primaryStatFilter = value as MarketPrimaryStatFilter;
           this.browsePage = 0;
         } else if (key === 'rarity') {
           this.rarityFilter = value as MarketRarityFilter;
@@ -391,6 +436,8 @@ export class MarketWindow {
       filters: {
         itemType: this.itemTypeFilter,
         subtype: this.subtypeFilter,
+        armorClass: this.armorClassFilter,
+        primaryStat: this.primaryStatFilter,
         rarity: this.rarityFilter,
       },
       sellItemId: this.sellItemId,
@@ -412,25 +459,15 @@ export class MarketWindow {
   }
 
   private renderBrowse(body: HTMLElement, view: MarketBrowseBody): void {
-    // Reuse the search field and list container across refreshes so typing in
-    // the box never loses focus when the server streams back filtered results.
-    let search = body.querySelector('.mkt-search') as HTMLInputElement | null;
+    // The search field lives in the `.mkt-controls` row above #market-body (see render()),
+    // not inside body, so it survives untouched across a renderContent()-only refresh
+    // (typing calls pushQuery + renderContent, never the full render() rebuild); reuse the
+    // list container the same way so typing in the box never loses focus when the server
+    // streams back filtered results.
+    const search = this.deps.root().querySelector<HTMLInputElement>('.mkt-search');
     let list = body.querySelector('.mkt-list') as HTMLElement | null;
-    if (!search || !list) {
+    if (!list) {
       body.innerHTML = '';
-      search = document.createElement('input');
-      search.type = 'search';
-      search.className = 'mkt-search';
-      search.placeholder = t('itemUi.market.searchPlaceholder');
-      search.setAttribute('aria-label', t('itemUi.market.searchAria'));
-      search.value = this.searchQuery;
-      search.addEventListener('input', () => {
-        if (!search) return;
-        this.searchQuery = search.value;
-        this.browsePage = 0;
-        this.pushQuery();
-      });
-      body.appendChild(search);
       list = document.createElement('div');
       list.className = 'mkt-list';
       body.appendChild(list);
@@ -450,7 +487,7 @@ export class MarketWindow {
       body.appendChild(status);
     }
     // Keep the field in sync on external resets, but never clobber active typing.
-    if (document.activeElement !== search && search.value !== this.searchQuery) {
+    if (search && document.activeElement !== search && search.value !== this.searchQuery) {
       search.value = this.searchQuery;
     }
     list.innerHTML = '';
@@ -541,7 +578,12 @@ export class MarketWindow {
           this.lastSig = '';
           audio.click();
           this.renderContent();
+          // #market-body scrolls on desktop; on mobile the sheet base makes
+          // #market-window (deps.root()) the actual scroller instead (see
+          // hud.mobile.css). Reset whichever one is live; the other is a no-op
+          // (overflow: hidden / visible has no scroll position to clear).
           body.scrollTop = 0;
+          this.deps.root().scrollTop = 0;
           // The pager is rebuilt by renderContent, so move focus to the matching new
           // page button (or any enabled pager button if it became disabled at an end),
           // keeping the keyboard user off <body> (WCAG 2.4.3).
@@ -698,6 +740,7 @@ export class MarketWindow {
     if (filter === 'uncommon') return t('itemUi.market.rarityUncommon');
     if (filter === 'rare') return t('itemUi.market.rarityRare');
     if (filter === 'epic') return t('itemUi.market.rarityEpic');
+    if (filter === 'legendary') return t('itemUi.market.rarityLegendary');
     return t('itemUi.market.filterRarityAll');
   }
 
@@ -710,9 +753,23 @@ export class MarketWindow {
   private marketSubtypeLabel(): string {
     return t(
       this.itemTypeFilter === 'armor'
-        ? 'itemUi.market.filterArmorType'
+        ? 'itemUi.market.filterArmorSlot'
         : 'itemUi.market.filterWeaponType',
     );
+  }
+
+  private marketArmorClassLabel(filter: MarketArmorClassFilter): string {
+    if (filter === 'cloth') return t('itemUi.market.armorCloth');
+    if (filter === 'leather') return t('itemUi.market.armorLeather');
+    if (filter === 'mail') return t('itemUi.market.armorMail');
+    return t('itemUi.market.filterArmorClassAll');
+  }
+
+  private marketPrimaryStatLabel(filter: MarketPrimaryStatFilter): string {
+    if (filter === 'str') return t('itemUi.stats.str');
+    if (filter === 'agi') return t('itemUi.stats.agi');
+    if (filter === 'int') return t('itemUi.stats.int');
+    return t('itemUi.market.filterPrimaryStatAll');
   }
 
   private marketSubtypeOptionLabel(filter: MarketSubtypeFilter): string {
@@ -722,7 +779,7 @@ export class MarketWindow {
           ? 'itemUi.market.filterArmorAll'
           : 'itemUi.market.filterWeaponAll',
       );
-    if (this.itemTypeFilter === 'armor') return this.deps.slotName(filter as EquipSlot);
+    if (this.itemTypeFilter === 'armor') return this.deps.slotName(filter as ItemSlot);
     if (filter === 'sword') return t('itemUi.market.weaponSword');
     if (filter === 'dagger') return t('itemUi.market.weaponDagger');
     if (filter === 'staff') return t('itemUi.market.weaponStaff');
@@ -732,7 +789,7 @@ export class MarketWindow {
   }
 
   private renderMarketFilterMenu(
-    menu: 'itemType' | 'subtype' | 'rarity',
+    menu: 'itemType' | 'subtype' | 'armorClass' | 'primaryStat' | 'rarity',
     label: string,
     value: string,
     options: readonly string[],
@@ -747,7 +804,7 @@ export class MarketWindow {
       .join('');
     return (
       `<div class="mkt-filter"><span>${esc(label)}</span><div class="mkt-select" data-market-filter-menu="${menu}">` +
-      `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(`${label}: ${current}`)}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
+      `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
       `<div class="mkt-select-menu" role="listbox" hidden>${optionHtml}</div>` +
       `</div></div>`
     );
@@ -757,7 +814,7 @@ export class MarketWindow {
     if (this.tab !== 'browse') return '';
     const hasSubtype = this.itemTypeFilter === 'armor' || this.itemTypeFilter === 'weapon';
     return (
-      `<div class="mkt-filters${hasSubtype ? ' has-subtype' : ''}" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
+      `<div class="mkt-filters" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
       this.renderMarketFilterMenu(
         'itemType',
         t('itemUi.market.filterType'),
@@ -772,6 +829,24 @@ export class MarketWindow {
             this.subtypeFilter,
             this.marketSubtypeOptions(),
             (filter) => this.marketSubtypeOptionLabel(filter as MarketSubtypeFilter),
+          )
+        : '') +
+      (this.itemTypeFilter === 'armor'
+        ? this.renderMarketFilterMenu(
+            'armorClass',
+            t('itemUi.market.filterArmorType'),
+            this.armorClassFilter,
+            MARKET_ARMOR_CLASS_FILTERS,
+            (filter) => this.marketArmorClassLabel(filter as MarketArmorClassFilter),
+          )
+        : '') +
+      (hasSubtype
+        ? this.renderMarketFilterMenu(
+            'primaryStat',
+            t('itemUi.market.filterPrimaryStat'),
+            this.primaryStatFilter,
+            MARKET_PRIMARY_STAT_FILTERS,
+            (filter) => this.marketPrimaryStatLabel(filter as MarketPrimaryStatFilter),
           )
         : '') +
       this.renderMarketFilterMenu(

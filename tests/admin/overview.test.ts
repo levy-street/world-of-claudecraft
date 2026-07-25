@@ -17,6 +17,7 @@ const overviewData = {
   avgPlaytimeSeconds: 900,
   peakOnlineToday: 9,
   peakOnlineAllTime: 14,
+  playersCap: 512,
   siteUsersNow: 6,
   server: {
     online: 3,
@@ -81,6 +82,10 @@ describe('Overview', () => {
     render(Overview);
     expect(await screen.findByText(t('stats.onlineNow'))).toBeInTheDocument();
     expect(await screen.findByText(t('stats.siteUsersNow'))).toBeInTheDocument();
+    // The realm player-cap StatCard: its label and its bound value (distinctive, so a
+    // card wired to the wrong field would not render 512) both render.
+    expect(screen.getByText(t('stats.playersCap'))).toBeInTheDocument();
+    expect(screen.getByText('512')).toBeInTheDocument();
     expect(screen.getByText(t('online.empty'))).toBeInTheDocument();
     expect(screen.getByRole('button', { name: t('charts.range.24h') })).toHaveAttribute(
       'aria-pressed',

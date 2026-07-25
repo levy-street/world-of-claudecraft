@@ -3,6 +3,7 @@ import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes
 import { Sim } from '../src/sim/sim';
 import { type AuraKind, dist2d } from '../src/sim/types';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 const NEW_DRUID = [
   'travel_form',
@@ -97,9 +98,17 @@ describe('druid spell pack — definitions', () => {
 });
 
 describe('druid spell pack — level gating', () => {
-  it('teaches nothing new before level 16 and everything by 20', () => {
+  it('gates each pack spell at its learn level and teaches everything by 20', () => {
+    // The choice-row unlock guard moved travel_form (11), bash (8), and rip (14)
+    // earlier so the rows that modify them are live at unlock; the rest of the
+    // pack still lands 16 to 20.
     const known15 = abilitiesKnownAt('druid', 15).map((k) => k.def.id);
-    for (const id of NEW_DRUID) expect(known15).not.toContain(id);
+    const stillLate = NEW_DRUID.filter((id) => !['travel_form', 'bash', 'rip'].includes(id));
+    for (const id of stillLate) expect(known15).not.toContain(id);
+    for (const id of NEW_DRUID) {
+      const before = abilitiesKnownAt('druid', ABILITIES[id].learnLevel - 1).map((k) => k.def.id);
+      expect(before, `${id} known too early`).not.toContain(id);
+    }
 
     const known20 = abilitiesKnownAt('druid', 20).map((k) => k.def.id);
     for (const id of NEW_DRUID) expect(known20).toContain(id);
@@ -158,6 +167,7 @@ describe('druid spell pack — casting applies effects', () => {
     const distanceOver = (withForm: boolean): number => {
       const sim = makeWorld();
       const a = sim.addPlayer('druid', 'Strider');
+      placePlayerInOpenField(sim, a);
       const e = sim.entities.get(a)!;
       sim.setPlayerLevel(20, a);
       e.resource = 100;
@@ -190,6 +200,7 @@ describe('druid spell pack — casting applies effects', () => {
     const distanceOver = (withProwl: boolean): number => {
       const sim = makeWorld();
       const pid = sim.addPlayer('druid', withProwl ? 'Prowler' : 'Runner');
+      placePlayerInOpenField(sim, pid);
       const e = sim.entities.get(pid)!;
       sim.setPlayerLevel(20, pid);
       e.resource = e.maxResource;

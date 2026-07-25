@@ -11,7 +11,7 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
-import { canEquipItem, slotAcceptsItem } from '../sim/equipment_rules';
+import { canEquipItem, canEquipItemInSlot, slotAcceptsItem } from '../sim/equipment_rules';
 import { meetsLevelRequirement, requiredLevelFor } from '../sim/item_level_req';
 import type { EquipSlot, ItemDef, PlayerClass } from '../sim/types';
 
@@ -29,13 +29,16 @@ export function paperdollDropAction(
   slot: EquipSlot,
   cls: PlayerClass,
   level: number,
+  spec?: string | null,
 ): PaperdollDropAction {
   // Only real gear equips; a consumable or material declares no slot at all, and
   // a bag equips into its own bar socket, never the paperdoll.
-  if (item.kind !== 'weapon' && item.kind !== 'armor') return 'blockedSlot';
+  if (item.kind !== 'weapon' && item.kind !== 'armor' && item.kind !== 'held_offhand')
+    return 'blockedSlot';
   if (!slotAcceptsItem(item, slot)) return 'blockedSlot';
   if (!canEquipItem(cls, item)) return 'blockedClass';
   if (!meetsLevelRequirement(level, item)) return 'blockedLevel';
+  if (!canEquipItemInSlot(cls, item, slot, spec)) return 'blockedClass';
   return 'equip';
 }
 
@@ -50,5 +53,7 @@ export function dropRequiredLevel(item: ItemDef): number {
  *  so a stack of cloth never advertises an equip it cannot do. Slot legality per
  *  socket is still paperdollDropAction's call. */
 export function isPaperdollDraggable(item: ItemDef): boolean {
-  return (item.kind === 'weapon' || item.kind === 'armor') && !!item.slot;
+  return (
+    (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand') && !!item.slot
+  );
 }

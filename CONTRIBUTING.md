@@ -88,8 +88,8 @@ the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
   Checking a single file ad hoc (`npx tsc somefile.ts`) errors when the directory
   has a `tsconfig.json`; pass `--ignoreConfig` for the old behavior.
 - **Lockfile.** Regenerate `package-lock.json` only with
-  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics (CI
-  runs Node 22's bundled npm), and newer npm majors silently drop
+  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics, and
+  newer npm majors (including the npm 11 that CI's Node 26 bundles) silently drop
   `svelte-check`'s nested optional-peer entries, which desyncs `npm ci` in CI.
   Plain `npm ci` is safe under any npm major. After regenerating, confirm
   `npm ci --dry-run` is in sync under both npm 10 and your workstation's npm.
@@ -231,8 +231,45 @@ new contributors are always welcome.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the
-project's [MIT License](LICENSE), the same license that covers the project.
+By contributing code, you agree that your code contributions will be licensed
+under the project's [MIT License](LICENSE), the same license that covers the
+project.
+
+The MIT License means what it says: anyone may use, modify, and redistribute the
+code, commercially or not. Our
+[Terms of Service](https://worldofclaudecraft.com/terms) govern the hosted game
+we operate at worldofclaudecraft.com (accounts, conduct, virtual items) and do
+not restrict the rights the MIT License gives you or anyone else in this code.
+The "World of ClaudeCraft" and "Levy Street" names and branding are not covered
+by the MIT License.
+
+Original creative assets (sound recordings, music, art, and similar authored
+works) are the exception. If you contribute an original asset you created, you
+may instead keep copyright and contribute it under a license of your choice
+(for example CC BY-NC 4.0), provided that:
+
+- the license, the asset paths it covers, and your attribution are recorded in
+  the license table in [CREDITS.md](CREDITS.md) as part of the same pull
+  request, and
+- it includes at minimum a perpetual, royalty-free grant to Levy Street to use
+  the assets commercially in World of ClaudeCraft, including official releases
+  and the in-game store.
+
+For assets listed in the CREDITS.md table, that recorded license controls over
+the project's default MIT license.
+
+**Media assets with no CREDITS.md entry are not licensed under MIT.** The
+register is still being completed, so a missing entry means the terms are
+unrecorded, not that the asset is free to take. This is deliberate: it stops an
+unregistered contribution being given away by default. Code is the other way
+around, and anything not carved out in CREDITS.md is MIT.
+
+That is exactly why the register entry is not optional paperwork. If you
+contribute an asset without a CREDITS.md row, nobody downstream can use it and
+we have no record of what you granted us. Record the **Redistribution** column
+honestly too. It is what tells someone forking this project whether they may
+pass your asset on, and some rows are marked "No, permission required" precisely
+because they may not.
 
 ---
 

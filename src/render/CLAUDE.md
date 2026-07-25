@@ -18,19 +18,33 @@ Everything else is a sibling module in one of these families:
 - **World subsystems** export a `build*()` returning a `*View` the renderer
   owns: `terrain.ts` (chunked LOD + PBR splat), `props.ts`/`foliage.ts`/
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
-  shore-depth core in `water_core.ts`), `sky.ts`. Event/minigame scenes follow
+  shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
+  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
   the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
-  Performance) and `crowd_lod.ts` (pure crowd policy: pulls character
-  shadow/anim cadence in as rig counts climb; cosmetic-only, exempts what a
-  player reacts to).
+  Performance) and `crowd_lod.ts` (pure character LOD policy: the band plan
+  `characterLodBands` returns, which pulls shadow/anim cadence in as rig counts
+  climb and holds an animated far band, articulated rig at a low cadence, before
+  the frozen single-draw far mesh takes over. Its extension eases out on the
+  crowd knee, the per-tier `GFX.farCharacterAnimScale` ceiling, and live budget
+  pressure; cosmetic-only, and `showsStaticFarMesh` keeps anything a player
+  reacts to out of the frozen mesh inside the uncrowded base range).
+- `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
+  in per-frame paths, including required targets, form swaps, and visual-key
+  swaps (`tests/view_create_retry.test.ts`).
 - `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
   online pose extrapolation + rate-limited self yaw; never touch world state,
   see `src/net/CLAUDE.md`).
+- `camera_boom_core.ts`/`camera_feel_core.ts`/`camera_director_core.ts`: the
+  AAA chase-camera feel stack `updateCamera` composes (spring-arm pivot lag,
+  look-ahead + FOV kicks + landing thump, directed zone-vista/death-drift
+  moves). All display-only, all gated by the reduced-motion switch; driven
+  from `renderer.ts` `updateCamera` and the hud event hooks
+  (`tests/camera_*_core.test.ts`).
 - `voxel_terrain.ts`: verification-only prototype (proposal #1611, driven by
   `scripts/`, NOT the live path); live terrain is `terrain.ts` sampling sim heights.
 
@@ -52,8 +66,11 @@ combo; allocation-free: `nameplatePlanInto` fills a caller-owned `NameplatePlan`
 `nameplate_painter.ts` does the Three projection, DOM writes, and ALL the
 localization (per-tier cadence via `ui_tier_knobs.nameplateIntervalSec`); the
 significant-contributor name glow lives there too. Narrow helpers:
-`nameplate_combo/threat/projection/declutter.ts` plus `entity_labels.ts`
-(shared localized display names). Drive changes from `tests/nameplate_*.test.ts`.
+`nameplate_combo/threat/projection/declutter.ts` (the last one is the
+classic-style vertical stacking pass: plates only ever move UP from their own
+anchor, the current target is pinned, and separation follows each plate's real
+height from `nameplate_extent_core.ts`) plus `entity_labels.ts` (shared
+localized display names). Drive changes from `tests/nameplate_*.test.ts`.
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives
@@ -74,20 +91,14 @@ significant-contributor name glow lives there too. Narrow helpers:
 - **VFX:** add an effect to `vfx.ts` (emit into the pooled particle cloud; HDR
   colour multipliers via `hdr()` so it blooms on composer tiers). Sprite atlas
   cells are append-only (`SPRITE_FILES`/`SPR` must stay in sync).
-- **Models are real GLB assets** (CC0 kits plus Tripo-generated models: props,
-  foliage, dungeon, critters, fish, gather nodes, mailbox, delve props,
-  characters), loaded via `assets/loader.ts`, then baked/merged/instanced at
-  build time.
-- **Creature GLBs take an explicit forward-yaw correction.** A Tripo creature
-  GLB's authored nose-to-tail axis is corrected per species via
-  `creatureForwardCorrectionYaw` (`critters.ts`), Box3 re-seated so its feet
-  sit at y=0, then wrapped in an outer `THREE.Group` so per-frame heading and
-  position writes never clobber the baked correction (the
-  `delve_props.ts`/`mailbox.ts` standalone-prop idiom). Never infer the
-  forward axis from a bounding-box long-axis heuristic: it measures the
-  widest silhouette, not nose-to-tail, and gets both the axis and the sign
-  wrong. Pinned by `tests/critters.test.ts`.
-
+- **Models are real GLB assets** (CC0 kits, Tripo-generated models, and the
+  image-to-GLB procedural exporters: props, foliage, dungeon, fish, gather nodes,
+  mailbox, delve props, characters, the Eastbrook town kit), loaded via
+  `assets/loader.ts`, then baked/merged/instanced at build time. A new
+  reference-image asset follows the `image-to-glb` skill
+  (`.claude/skills/image-to-glb/SKILL.md`): exporter under `scripts/assets/`, a
+  parsed-GLB contract test, and its own thin `src/render/<asset>.ts` adapter
+  (exemplars: `banker_chest.ts`, `eastbrook_grand_armoury.ts`, `noticeboard.ts`).
 ## Asset loading (`assets/`)
 `loader.ts` (`loadGltf`/`loadHdr`/`loadTexture`, one parse per URL) plus these
 rules, all CI-enforced:
@@ -104,7 +115,7 @@ rules, all CI-enforced:
 - **Every asset under `public/` must be in the media manifest** (regenerate via
   `node scripts/build_media_manifest.mjs generate`, automatic in `npm run build`).
   `tests/render_glb_replacement_assets.test.ts` fails on a GLB missing from
-  disk or the manifest; export a `*PreloadInternalsForTest` (see `critters.ts`)
+  disk or the manifest; export a `*PreloadInternalsForTest` (see `fish.ts`)
   so it covers your module.
 
 ## i18n: overhead labels are the only string surface here

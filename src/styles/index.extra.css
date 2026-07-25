@@ -38,7 +38,7 @@
   content: "";
   flex: 1 1 auto;
   height: 1px;
-  background: #463a1c;
+  background: var(--color-border-showcase);
 }
 /* The shared .auth-or has a bottom-only margin, which leaves the first-login chooser's
    "already have an account?" divider hugging the Create button instead of centered
@@ -110,7 +110,7 @@
   border-radius: 7px;
   background: #2a2414;
   color: #d8cba0;
-  border: 1px solid #463a1c;
+  border: 1px solid var(--color-border-showcase);
 }
 .uf-dc-chip.role {
   color: #100;
@@ -131,7 +131,7 @@
   position: fixed;
   z-index: 70;
   background: #14110a;
-  border: 1px solid #463a1c;
+  border: 1px solid var(--color-border-showcase);
   border-radius: 8px;
   box-shadow: 0 8px 24px -6px #000a;
   overflow: hidden;
@@ -243,6 +243,67 @@
 }
 #discord-cta-banner .dc-cta-x:hover {
   background: #ffffff3a;
+}
+/* World-entry crash recovery notice (entry_crash_guard): same fixed top-center slot as
+   the Discord CTA, amber to read as a warning rather than a promo. Shown at boot only
+   after a crash-recovery downgrade, so the two banners do not stack in practice. */
+#entry-guard-banner {
+  position: fixed;
+  /* iOS-scoped notice: respect the notch/status bar (matches the HUD's inset idiom). */
+  top: max(10px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 201;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(620px, 94vw);
+  padding: 10px 10px 10px 14px;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(180deg, #8a6116, #6b4a0e);
+  border: 1px solid #52380a;
+  box-shadow:
+    0 6px 20px -6px #000a,
+    0 0 0 1px #ffffff14 inset;
+}
+#entry-guard-banner[hidden] {
+  display: none;
+}
+#entry-guard-banner .entry-guard-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+#entry-guard-banner .entry-guard-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+#entry-guard-banner .entry-guard-body {
+  font-size: 13px;
+  opacity: 0.95;
+}
+#entry-guard-banner .entry-guard-dismiss {
+  flex: none;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: 9px;
+  border: 1px solid #ffffff3a;
+  background: #ffffff1c;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+#entry-guard-banner .entry-guard-dismiss:hover {
+  background: #ffffff30;
+}
+/* The recovery banner and the Discord CTA share the fixed top-center slot. The recovery
+   notice is a rare, must-read boot message, so suppress the promotional CTA while it is
+   up (entry_guard_banner.ts toggles body.entry-guard-open); the CTA returns once the
+   banner is dismissed. Class + id outranks the CTA's own id rule, so no !important. */
+body.entry-guard-open #discord-cta-banner {
+  display: none;
 }
 /* Phones: the desktop flex row squeezes the title column down to one word per line
    (the fixed logo/button/dismiss starve it) and the vertically centered button then

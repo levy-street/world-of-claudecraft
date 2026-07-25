@@ -2,28 +2,48 @@
 // is an ADJACENT PAIR (the two majors), not a single craft (see the module
 // comment on src/sim/professions/archetype.ts). This pins the reachable-ceiling
 // math that makes it matter (archetypeCeilingFor/craftCeiling) plus its
-// composition into crafting.ts's tier-progress multiplier, output-quality clamp,
-// and combo-recipe gate.
+// composition into crafting.ts's tier-progress multiplier, masterwork-effect
+// gate (Professions 2.0: outputs are deterministic at the def quality,
+// so the ceiling binds craft outputs by gating the masterwork bump), and
+// combo-recipe gate.
 
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING, oppositeCraft } from '../src/sim/content/professions';
-import { COMBO_RECIPES } from '../src/sim/content/recipes';
-import { archetypeCeilingFor, craftCeiling } from '../src/sim/professions/archetype';
+import { COMBO_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { ITEMS } from '../src/sim/data';
+import {
+  archetypeCeilingFor,
+  craftCeiling,
+  craftSkillGainMultiplier,
+  enchantingGainMultiplier,
+} from '../src/sim/professions/archetype';
 import { meetsComboRequirement, resolveCraftForRecipe } from '../src/sim/professions/crafting';
-import { clampMaterialRarity } from '../src/sim/professions/gathering';
+import { MASTERWORK_BASE_CHANCE } from '../src/sim/professions/masterwork';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type CraftSkills, emptyCraftSkills, tierCapability } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
+import type { InvSlot } from '../src/sim/types';
 
-const ARMOR = CRAFT_RING[0].id; // 'armorcrafting'
+const ARMOR = CRAFT_RING[9].id; // 'armorcrafting' (the ring's wrap point since the Professions 2.0 reorder)
 // The second major acceptArchetypeQuest(ARMOR) defaults to: pinned as a
 // LITERAL (not recomputed via adjacentCrafts/defaultPairedMajor) so a change
 // to the default-pair rule reddens here deliberately. armorcrafting's content
-// combo partner (recipes.ts COMBO_RECIPES) is weaponcrafting, its ring-next
-// neighbor, so the combo-aware default picks it over the ring-prev neighbor.
+// combo partner (recipes.ts COMBO_RECIPES) is weaponcrafting, its ring-prev
+// neighbor, so the combo-aware default picks it over the ring-next neighbor
+// (engineering, across the wrap).
 const PAIRED_MAJOR = 'weaponcrafting';
-const COOKING = oppositeCraft(ARMOR).id; // opposite of ARMOR (the title major) -> the hobby
-const OUTSIDE = CRAFT_RING.find((c) => ![ARMOR, PAIRED_MAJOR, COOKING].includes(c.id))!.id;
+// getHobbyCraft's deterministic single-craft fallback: the craft opposite the
+// title major ('tailoring'). This is what the PURE ceiling helpers default to
+// when no explicit hobby argument is passed.
+const FALLBACK_HOBBY = oppositeCraft(ARMOR).id;
+// The ACTUAL persisted hobby acceptArchetypeQuest(ARMOR) selects with zero
+// skills: defaultHobbyForPair over the pair's two opposites (tailoring,
+// leatherworking) tie-breaks by ring order to leatherworking. Pinned as a
+// LITERAL so a change to the hobby-default rule reddens here deliberately.
+const STATE_HOBBY = 'leatherworking';
+const OUTSIDE = CRAFT_RING.find(
+  (c) => ![ARMOR, PAIRED_MAJOR, FALLBACK_HOBBY, STATE_HOBBY].includes(c.id),
+)!.id;
 
 function skillsAt(craftId: string, skill: number): CraftSkills {
   const skills = emptyCraftSkills();
@@ -34,7 +54,7 @@ function skillsAt(craftId: string, skill: number): CraftSkills {
 describe('archetypeCeilingFor (#1129/#1203 empowerment ceiling, pair model)', () => {
   it('is uncapped-to-rare for every craft before any archetype has been chosen', () => {
     expect(archetypeCeilingFor(null, null, ARMOR)).toBe(2);
-    expect(archetypeCeilingFor(null, null, COOKING)).toBe(2);
+    expect(archetypeCeilingFor(null, null, FALLBACK_HOBBY)).toBe(2);
     expect(archetypeCeilingFor(null, null, OUTSIDE)).toBe(2);
   });
 
@@ -47,7 +67,7 @@ describe('archetypeCeilingFor (#1129/#1203 empowerment ceiling, pair model)', ()
   });
 
   it('is capped at rare (tier 2) for the hobby: the opposite craft on CRAFT_RING from the title major', () => {
-    expect(archetypeCeilingFor(ARMOR, PAIRED_MAJOR, COOKING)).toBe(2);
+    expect(archetypeCeilingFor(ARMOR, PAIRED_MAJOR, FALLBACK_HOBBY)).toBe(2);
   });
 
   it('is capped at common (tier 0) for every craft outside the pair and the hobby once an archetype is set', () => {
@@ -73,13 +93,13 @@ describe('craftCeiling composes tierCapability with the archetype ceiling (min o
   });
 
   it('hobby craft is clamped to rare even with very high raw skill', () => {
-    const skills = skillsAt(COOKING, 500);
-    expect(craftCeiling(skills, ARMOR, PAIRED_MAJOR, COOKING)).toBe(2);
+    const skills = skillsAt(FALLBACK_HOBBY, 500);
+    expect(craftCeiling(skills, ARMOR, PAIRED_MAJOR, FALLBACK_HOBBY)).toBe(2);
   });
 
   it('hobby craft with raw skill below the rare ceiling is bounded by the raw skill instead', () => {
-    const skills = skillsAt(COOKING, 10); // tierCapability = 0
-    expect(craftCeiling(skills, ARMOR, PAIRED_MAJOR, COOKING)).toBe(0);
+    const skills = skillsAt(FALLBACK_HOBBY, 10); // tierCapability = 0
+    expect(craftCeiling(skills, ARMOR, PAIRED_MAJOR, FALLBACK_HOBBY)).toBe(0);
   });
 
   it('a craft outside the pair and the hobby is clamped to common (0) regardless of raw skill', () => {
@@ -96,10 +116,9 @@ describe('meetsComboRequirement composes the archetype ceiling (#1132 combo gate
   };
   const recipe = { comboRequirement: combo } as unknown as ProfessionRecipeRecord;
 
-  it('defaults activeArchetype/pairedMajor to null (uncapped-to-rare), unchanged for existing raw-skills callers', () => {
+  it('denies an unattuned raw-skills caller even when both craft tiers are high', () => {
     const skills = { ...emptyCraftSkills(), [ARMOR]: 25, [PAIRED_MAJOR]: 25 };
-    // Both crafts individually reach tier 1 with no archetype context passed at all.
-    expect(meetsComboRequirement(skills, recipe)).toBe(true);
+    expect(meetsComboRequirement(skills, recipe)).toBe(false);
   });
 
   it('an attuned specialist meets a minTier-1 combo over their OWN adjacent pair once both reach tier 1 (#1638 review)', () => {
@@ -117,11 +136,13 @@ describe('meetsComboRequirement composes the archetype ceiling (#1132 combo gate
     expect(meetsComboRequirement(skills, otherRecipe, ARMOR, PAIRED_MAJOR)).toBe(false);
   });
 
-  it('the hobby craft can still meet a minTier-1 (below the rare ceiling) combo requirement', () => {
-    const hobbyCombo = { craftA: ARMOR, craftB: COOKING, minTier: 1 };
-    const skills = { ...emptyCraftSkills(), [ARMOR]: 25, [COOKING]: 25 };
+  it('a major plus hobby never substitutes for the exact active pair', () => {
+    const hobbyCombo = { craftA: ARMOR, craftB: STATE_HOBBY, minTier: 1 };
+    const skills = { ...emptyCraftSkills(), [ARMOR]: 25, [STATE_HOBBY]: 25 };
     const hobbyRecipe = { comboRequirement: hobbyCombo } as unknown as ProfessionRecipeRecord;
-    expect(meetsComboRequirement(skills, hobbyRecipe, ARMOR, PAIRED_MAJOR)).toBe(true);
+    expect(meetsComboRequirement(skills, hobbyRecipe, ARMOR, PAIRED_MAJOR, STATE_HOBBY)).toBe(
+      false,
+    );
   });
 
   it('every real content combo stays craftable after attuning to EITHER of its two crafts (#1638 review round 2)', () => {
@@ -193,7 +214,6 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       resultCount: 1,
       reagents: [],
       skillReq: 50, // recipeTier = 2
-      trivialAt: 100,
       itemLevelBudget: 10,
       level: 10,
     };
@@ -222,7 +242,6 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       resultCount: 1,
       reagents: [],
       skillReq: 25, // recipeTier = 1, above the common (0) dormancy ceiling
-      trivialAt: 50,
       itemLevelBudget: 10,
       level: 10,
     };
@@ -232,12 +251,17 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
     expect(meta.craftSkills[OUTSIDE]).toBe(20); // frozen at 20: the climb itself is denied
   });
 
-  it('a common-tier (recipeTier 0) craft still produces skill progress at the free floor even when dormant', () => {
+  it('a common-tier (recipeTier 0) craft in a dormant craft rides the mastery curve, never the ceiling', () => {
+    // This once pinned the tier-0 free floor (100 -> 101 even when
+    // dormant). The floor is retired: a common recipe now scores against raw
+    // capability like every other tier, while the common CEILING still never
+    // blocks it (recipeTier 0 is never above ceiling 0), so what stops the
+    // gain below is the curve alone.
     const sim = makeSim();
     const pid = sim.playerId;
     sim.acceptArchetypeQuest(ARMOR);
     const meta = metaOf(sim, pid);
-    meta.craftSkills[OUTSIDE] = 100;
+    meta.craftSkills[OUTSIDE] = 100; // tier-4 capability: common is gray now
 
     const recipe: ProfessionRecipeRecord = {
       id: 'test_recipe_common_outside',
@@ -245,15 +269,22 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       resultItemId: 'bone_fragments',
       resultCount: 1,
       reagents: [],
-      skillReq: 0, // recipeTier = 0 (common, the free floor)
-      trivialAt: 25,
+      skillReq: 0, // recipeTier = 0 (common)
       itemLevelBudget: 1,
       level: 1,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
     expect(result.ok).toBe(true);
-    expect(meta.craftSkills[OUTSIDE]).toBe(101); // full progress, unaffected by the ceiling
+    expect(meta.craftSkills[OUTSIDE]).toBe(100); // gray by capability, not the ceiling
+
+    // The ceiling-independence arm the old pin carried: at tier-1 capability
+    // (one tier above common) the dormant craft still gains the yellow 0.5
+    // through the common ceiling.
+    meta.craftSkills[OUTSIDE] = 30;
+    const again = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
+    expect(again.ok).toBe(true);
+    expect(meta.craftSkills[OUTSIDE]).toBe(30.5);
   });
 
   it('grants full skill progress in the title major even at very high raw skill', () => {
@@ -270,7 +301,6 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       resultCount: 1,
       reagents: [],
       skillReq: 100, // recipeTier = 4, exactly at capability -> full progress
-      trivialAt: 200,
       itemLevelBudget: 10,
       level: 10,
     };
@@ -294,7 +324,6 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       resultCount: 1,
       reagents: [],
       skillReq: 100,
-      trivialAt: 200,
       itemLevelBudget: 10,
       level: 10,
     };
@@ -309,23 +338,22 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
     const pid = sim.playerId;
     sim.acceptArchetypeQuest(ARMOR);
     const meta = metaOf(sim, pid);
-    meta.craftSkills[COOKING] = 50; // tierCapability = 2 (rare), exactly at the hobby ceiling
+    meta.craftSkills[STATE_HOBBY] = 50; // tierCapability = 2 (rare), exactly at the hobby ceiling
 
     const recipe: ProfessionRecipeRecord = {
       id: 'test_recipe_tier3_hobby',
-      professionId: COOKING,
+      professionId: STATE_HOBBY,
       resultItemId: 'bone_fragments',
       resultCount: 1,
       reagents: [],
       skillReq: 75, // recipeTier = 3, above the rare ceiling
-      trivialAt: 100,
       itemLevelBudget: 10,
       level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
     expect(result.ok).toBe(true);
-    expect(meta.craftSkills[COOKING]).toBe(50); // frozen at the rare ceiling
+    expect(meta.craftSkills[STATE_HOBBY]).toBe(50); // frozen at the rare ceiling
   });
 
   // #1638 review round 2: the freeze guard must fire ONLY above the archetype
@@ -350,7 +378,6 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       resultCount: 1,
       reagents: [],
       skillReq: 75, // recipeTier = 3, far above raw capability, within the unlimited ceiling
-      trivialAt: 200,
       itemLevelBudget: 10,
       level: 10,
     };
@@ -365,23 +392,22 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
     const pid = sim.playerId;
     sim.acceptArchetypeQuest(ARMOR);
     const meta = metaOf(sim, pid);
-    meta.craftSkills[COOKING] = 30; // raw capability 1, below the rare (2) hobby ceiling
+    meta.craftSkills[STATE_HOBBY] = 30; // raw capability 1, below the rare (2) hobby ceiling
 
     const recipe: ProfessionRecipeRecord = {
       id: 'test_recipe_tier2_hobby_climb',
-      professionId: COOKING,
+      professionId: STATE_HOBBY,
       resultItemId: 'bone_fragments',
       resultCount: 1,
       reagents: [],
       skillReq: 50, // recipeTier = 2: above raw capability, exactly at the ceiling
-      trivialAt: 100,
       itemLevelBudget: 10,
       level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
     expect(result.ok).toBe(true);
-    expect(meta.craftSkills[COOKING]).toBe(31); // full progress up to the ceiling
+    expect(meta.craftSkills[STATE_HOBBY]).toBe(31); // full progress up to the ceiling
   });
 
   it('pre-archetype, a recipe above the rare ceiling grants zero progress (uncapped-to-rare)', () => {
@@ -397,7 +423,6 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       resultCount: 1,
       reagents: [],
       skillReq: 75, // recipeTier = 3, above the pre-archetype rare ceiling
-      trivialAt: 100,
       itemLevelBudget: 10,
       level: 10,
     };
@@ -408,77 +433,271 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
   });
 });
 
-describe('resolveCraftForRecipe clamps output quality to the empowerment ceiling (#1129)', () => {
-  function makeSim(seed = 42) {
-    return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+describe('archetype ceilings gate the masterwork effect (ceilings bind craft outputs)', () => {
+  // Professions 2.0 retired the rolled output quality: a craft's
+  // output is its recipe's declared item at the DEF quality, and the only way
+  // an output can exceed that tier is the masterwork bump (def quality + 1 on
+  // the ladder). The empowerment ceiling therefore binds craft outputs by
+  // gating the masterwork EFFECT, never the proc draw itself: every successful
+  // craft below still draws exactly once.
+  //
+  // PROC_SEED was HUNTED (loop seeds, build the scenario, craft once, keep the
+  // first seed whose proc roll lands under MASTERWORK_BASE_CHANCE) and is
+  // pinned as a literal; the hunt loop is not committed. At this seed the
+  // craft's proc roll is the FIRST rng draw after Sim construction in every
+  // arm below (nothing else here draws), so the identical roll value reaches
+  // the proc comparison each time: only the archetype ceiling changes the
+  // outcome, which is exactly what these cases pin.
+  const PROC_SEED = 18;
+
+  function makeSim() {
+    return new Sim({ seed: PROC_SEED, playerClass: 'warrior', autoEquip: false });
   }
 
-  function metaOf(sim: Sim, pid: number) {
-    return (sim as unknown as { players: Map<number, { craftSkills: CraftSkills }> }).players.get(
-      pid,
-    )!;
+  interface CraftMeta {
+    name: string;
+    craftSkills: CraftSkills;
+    archetype: {
+      activeArchetype: string | null;
+      pairedMajor: string | null;
+      hobbyCraft: string | null;
+    };
+    inventory: InvSlot[];
+  }
+
+  function metaOf(sim: Sim, pid: number): CraftMeta {
+    return (sim as unknown as { players: Map<number, CraftMeta> }).players.get(pid)!;
   }
 
   function ctxOf(sim: Sim) {
     return (sim as unknown as { ctx: Parameters<typeof resolveCraftForRecipe>[0] }).ctx;
   }
 
-  // At skill 100 the rarity roll's `common` weight is exactly 0 (gathering.ts
-  // MATERIAL_RARITY_MAX_PROFICIENCY), so EVERY draw yields uncommon or better:
-  // these two arms are decisive for any rng draw, no seed hunting.
-  it('a dormant craft with maxed raw skill still only ever produces common output', () => {
-    const sim = makeSim();
-    const pid = sim.playerId;
-    sim.acceptArchetypeQuest(ARMOR);
-    const meta = metaOf(sim, pid);
-    meta.craftSkills[OUTSIDE] = 100; // raw roll can never be common; ceiling is common (0)
+  /** Run `fn` while observing rng draws: returns the draw count and the last
+   *  drawn value (the proc roll, since every arm draws exactly once). */
+  function observeDraws<T>(sim: Sim, fn: () => T): { result: T; draws: number; roll: number } {
+    const rng = ctxOf(sim).rng;
+    let draws = 0;
+    let roll = -1;
+    rng.setObserver((value) => {
+      draws += 1;
+      roll = value;
+    });
+    const result = fn();
+    rng.setObserver(null);
+    return { result, draws, roll };
+  }
 
-    const recipe: ProfessionRecipeRecord = {
-      id: 'test_recipe_quality_dormant',
-      professionId: OUTSIDE,
-      resultItemId: 'bone_fragments',
+  function syntheticRecipe(
+    professionId: string,
+    resultItemId: string,
+    level: number,
+  ): ProfessionRecipeRecord {
+    return {
+      id: `test_recipe_masterwork_${professionId}_${resultItemId}`,
+      professionId,
+      resultItemId,
       resultCount: 1,
       reagents: [],
       skillReq: 0,
-      trivialAt: 25,
-      itemLevelBudget: 1,
-      level: 1,
+      itemLevelBudget: level,
+      level,
     };
-    const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
+  }
 
-    expect(result.ok).toBe(true);
-    expect(result.quality).toBe('common'); // clamped down from a guaranteed uncommon+ roll
+  it('a dormant craft never produces a masterwork, even on the seed whose roll procs under a major', () => {
+    const recipe = recipeById('recipe_eastbrook_ritual_vestments')!;
+    expect(recipe.professionId).toBe('tailoring');
+    expect(ITEMS[recipe.resultItemId].quality).toBe('uncommon'); // bump target: rare (tier 2)
+
+    // Major control arm (the full Sim.craftItem path): attuned to tailoring,
+    // the pinned seed's roll procs and the effect applies.
+    const major = makeSim();
+    const majorPid = major.playerId;
+    major.acceptArchetypeQuest('tailoring');
+    for (const r of recipe.reagents) major.addItem(r.itemId, r.count, majorPid);
+    const majorRun = observeDraws(major, () => major.craftItem(recipe.id, false, majorPid));
+    expect(majorRun.draws).toBe(1);
+    expect(majorRun.roll).toBeLessThan(MASTERWORK_BASE_CHANCE); // the hunted premise
+    expect(major.lastCraftResult?.masterwork).toBe(true);
+    expect(major.events.filter((e) => e.type === 'masterwork')).toEqual([
+      {
+        type: 'masterwork',
+        recipeId: recipe.id,
+        itemId: recipe.resultItemId,
+        crafter: majorPid,
+        pid: majorPid,
+      },
+    ]);
+    expect(major.lastMasterwork).toEqual({
+      recipeId: recipe.id,
+      itemId: recipe.resultItemId,
+      crafter: majorPid,
+    });
+    const minted = metaOf(major, majorPid).inventory.find((s) => s.itemId === recipe.resultItemId);
+    expect(minted?.instance?.rolled?.masterwork).toBe(true);
+
+    // Dormant replay: same seed, same recipe, but attuned to armorcrafting
+    // (majors armorcrafting+weaponcrafting, persisted hobby leatherworking),
+    // so tailoring sits OUTSIDE the pair and the hobby: common ceiling. The
+    // identical roll still draws (and lands under the proc chance), but the
+    // effect is gated off entirely.
+    const dormant = makeSim();
+    const pid = dormant.playerId;
+    dormant.acceptArchetypeQuest(ARMOR);
+    expect(metaOf(dormant, pid).archetype.hobbyCraft).toBe(STATE_HOBBY); // not tailoring: dormant
+    for (const r of recipe.reagents) dormant.addItem(r.itemId, r.count, pid);
+    const run = observeDraws(dormant, () => dormant.craftItem(recipe.id, false, pid));
+    expect(run.draws).toBe(1); // the proc draw is unconditional on success
+    expect(run.roll).toBe(majorRun.roll); // the very roll that procced under the major
+    expect(dormant.lastCraftResult?.ok).toBe(true);
+    expect(dormant.lastCraftResult?.masterwork).toBeUndefined();
+    expect(dormant.events.some((e) => e.type === 'masterwork')).toBe(false);
+    expect(dormant.lastMasterwork).toBeNull();
+    // The deterministic output still lands, plain and instance-free.
+    expect(dormant.countItem(recipe.resultItemId, pid)).toBe(1);
+    expect(
+      metaOf(dormant, pid).inventory.some((s) => s.itemId === recipe.resultItemId && s.instance),
+    ).toBe(false);
   });
 
-  it('a major with maxed raw skill is never clamped down to common', () => {
+  it('a hobby craft (rare ceiling) still masterworks an uncommon-def output: the rare bump sits at the ceiling', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     sim.acceptArchetypeQuest(ARMOR);
-    const meta = metaOf(sim, pid);
-    meta.craftSkills[ARMOR] = 100;
-
-    const recipe: ProfessionRecipeRecord = {
-      id: 'test_recipe_quality_major',
-      professionId: ARMOR,
-      resultItemId: 'bone_fragments',
-      resultCount: 1,
-      reagents: [],
-      skillReq: 0,
-      trivialAt: 25,
-      itemLevelBudget: 1,
-      level: 1,
-    };
-    const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
-
+    expect(metaOf(sim, pid).archetype.hobbyCraft).toBe(STATE_HOBBY);
+    expect(ITEMS.eastbrook_ritual_vestments.quality).toBe('uncommon');
+    const recipe = syntheticRecipe(STATE_HOBBY, 'eastbrook_ritual_vestments', 9);
+    const { result, draws, roll } = observeDraws(sim, () =>
+      resolveCraftForRecipe(ctxOf(sim), pid, recipe),
+    );
+    expect(draws).toBe(1);
+    expect(roll).toBeLessThan(MASTERWORK_BASE_CHANCE);
     expect(result.ok).toBe(true);
-    expect(result.quality).not.toBe('common'); // unlimited ceiling: the raw roll stands
+    expect(result.masterwork).toBe(true);
+    expect(result.quality).toBe('uncommon'); // the DEF quality; the bump rides the instance
+    const minted = metaOf(sim, pid).inventory.find((s) => s.itemId === recipe.resultItemId);
+    expect(minted?.instance?.rolled?.masterwork).toBe(true);
   });
 
-  it('clampMaterialRarity lowers a roll to the cap and never raises one', () => {
-    expect(clampMaterialRarity('legendary', 2)).toBe('rare');
-    expect(clampMaterialRarity('epic', 0)).toBe('common');
-    expect(clampMaterialRarity('uncommon', 2)).toBe('uncommon'); // below the cap: untouched
-    expect(clampMaterialRarity('common', 4)).toBe('common'); // a cap never raises a roll
-    expect(clampMaterialRarity('legendary', Infinity)).toBe('legendary'); // no-op ceiling
+  it('a hobby craft never masterworks a rare-def output: the epic bump would exceed the rare ceiling', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.acceptArchetypeQuest(ARMOR);
+    expect(metaOf(sim, pid).archetype.hobbyCraft).toBe(STATE_HOBBY);
+    expect(ITEMS.moggers_copper_cudgel.quality).toBe('rare');
+    const recipe = syntheticRecipe(STATE_HOBBY, 'moggers_copper_cudgel', 10);
+    const { result, draws, roll } = observeDraws(sim, () =>
+      resolveCraftForRecipe(ctxOf(sim), pid, recipe),
+    );
+    expect(draws).toBe(1); // gating the EFFECT never suppresses the draw
+    expect(roll).toBeLessThan(MASTERWORK_BASE_CHANCE); // this roll DID land in the proc window
+    expect(result.ok).toBe(true);
+    expect(result.masterwork).toBeUndefined();
+    expect(result.quality).toBe('rare');
+    // The rare-def output still lands as the plain SIGNED single copy (#1149
+    // attribution keyed on the def quality), never a masterwork instance.
+    const minted = metaOf(sim, pid).inventory.find((s) => s.itemId === recipe.resultItemId);
+    expect(minted?.instance?.signer).toBe(metaOf(sim, pid).name);
+    expect(minted?.instance?.rolled).toBeUndefined();
+  });
+
+  it('a major masterworks the same rare-def output the hobby could not (unlimited ceiling)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.acceptArchetypeQuest(ARMOR);
+    const recipe = syntheticRecipe(ARMOR, 'moggers_copper_cudgel', 10);
+    const { result, draws, roll } = observeDraws(sim, () =>
+      resolveCraftForRecipe(ctxOf(sim), pid, recipe),
+    );
+    expect(draws).toBe(1);
+    expect(roll).toBeLessThan(MASTERWORK_BASE_CHANCE);
+    expect(result.ok).toBe(true);
+    expect(result.masterwork).toBe(true);
+    const minted = metaOf(sim, pid).inventory.find((s) => s.itemId === recipe.resultItemId);
+    expect(minted?.instance?.rolled?.masterwork).toBe(true);
+  });
+});
+
+// Crafting keeps the HARD above-ceiling zero
+// (craftSkillGainMultiplier unchanged), while enchanting gets the GAINS arms
+// of the min(): above-ceiling INPUT degrades to the ceiling tier instead of
+// zeroing, because an input item is whatever the world dropped, not a chosen
+// recipe target.
+describe('enchantingGainMultiplier: the SOFT archetype ceiling', () => {
+  it('an epic input under the pre-archetype rare ceiling grants the rare-tier gain, never zero', () => {
+    // The crafting contrast arm ("unchanged for crafting"):
+    // a tier-3 recipe (skillReq 75) above the pre-archetype rare (2) ceiling
+    // hard-zeroes.
+    expect(craftSkillGainMultiplier(emptyCraftSkills(), null, null, 'enchanting', null, 75)).toBe(
+      0,
+    );
+    // Enchanting's soft rule degrades epic (tier 3) input to the ceiling
+    // tier: min(3, 2) = 2, at/above capability 0 -> full gain.
+    expect(enchantingGainMultiplier(emptyCraftSkills(), null, null, null, 3)).toBe(1);
+    // At capability 3 (skill 75) the degraded rare tier sits one below:
+    // yellow 0.5, still never zero.
+    expect(enchantingGainMultiplier(skillsAt('enchanting', 75), null, null, null, 3)).toBe(0.5);
+  });
+
+  it('a dormant enchanting craft (common ceiling) treats every input as tier 0', () => {
+    // ARMOR pair with the persisted hobby: enchanting sits outside the pair
+    // and the hobby, so its archetype ceiling is common (0) and min(tier, 0)
+    // collapses every input quality to tier 0.
+    for (const tier of [0, 1, 2, 3, 4]) {
+      // Capability 0: tier-0 input is at capability -> full gain, whatever
+      // the input rarity was.
+      expect(
+        enchantingGainMultiplier(emptyCraftSkills(), ARMOR, PAIRED_MAJOR, STATE_HOBBY, tier),
+      ).toBe(1);
+      // Capability 2 (skill 50): tier-0 input is two below -> green 0.25 for
+      // EVERY input rarity: rarity cannot buy past a dormant ceiling.
+      expect(
+        enchantingGainMultiplier(
+          skillsAt('enchanting', 50),
+          ARMOR,
+          PAIRED_MAJOR,
+          STATE_HOBBY,
+          tier,
+        ),
+      ).toBe(0.25);
+    }
+  });
+
+  it('gain is non-decreasing in input rarity for any fixed skills and identity (min is monotone)', () => {
+    // Identities spanning the three ceiling shapes: pre-archetype (rare 2),
+    // enchanting as a major (unlimited), and dormant (common 0).
+    const identities: [string | null, string | null, string | null][] = [
+      [null, null, null],
+      ['enchanting', 'jewelcrafting', null],
+      [ARMOR, PAIRED_MAJOR, STATE_HOBBY],
+    ];
+    for (const skill of [0, 25, 50, 75, 100]) {
+      for (const [active, paired, hobby] of identities) {
+        const gains = [0, 1, 2, 3, 4].map((tier) =>
+          enchantingGainMultiplier(skillsAt('enchanting', skill), active, paired, hobby, tier),
+        );
+        for (let i = 1; i < gains.length; i++) {
+          expect(
+            gains[i],
+            `tier ${i} under ${active}/${paired}/${hobby} at skill ${skill}`,
+          ).toBeGreaterThanOrEqual(gains[i - 1]);
+        }
+      }
+    }
+  });
+
+  it('commons gray out at enchanting capability 3+ (skill 75+)', () => {
+    // min(common 0, any ceiling) = 0; capability 3 sits three tiers above ->
+    // gray 0. The gray floor arrives with capability, exactly like crafting.
+    expect(enchantingGainMultiplier(skillsAt('enchanting', 75), null, null, null, 0)).toBe(0);
+    expect(enchantingGainMultiplier(skillsAt('enchanting', 100), null, null, null, 0)).toBe(0);
+  });
+
+  it('the four-state fractions surface through enchantingGainMultiplier (the 0.5 and 0.25 arms)', () => {
+    // Capability 1 (skill 25), common input one tier below: yellow 0.5.
+    expect(enchantingGainMultiplier(skillsAt('enchanting', 25), null, null, null, 0)).toBe(0.5);
+    // Capability 2 (skill 50), common input two tiers below: green 0.25.
+    expect(enchantingGainMultiplier(skillsAt('enchanting', 50), null, null, null, 0)).toBe(0.25);
   });
 });

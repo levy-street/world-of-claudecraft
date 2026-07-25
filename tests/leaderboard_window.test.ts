@@ -272,10 +272,11 @@ describe('leaderboard_window: Renown (deeds) board tab', () => {
   });
 
   it('renders no deed-count column: Renown is the one ranked number on the board', () => {
-    // The column was removed deliberately (issue #2044): the completion count
-    // lives in the Book of Deeds header, never on a ranked surface.
+    // The column was removed deliberately (the ranked-surface rule in
+    // docs/design/deeds.md): the completion count lives in the Book of Deeds
+    // header, never on a ranked surface, and the entry type carries no count
+    // field for the painter to read.
     expect(code).not.toContain('lb-deeds-count');
-    expect(code).not.toContain('deedCount');
   });
 
   it('renders the localized Renown-tab empty state', () => {

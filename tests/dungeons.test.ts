@@ -4,6 +4,7 @@
 // the party-shared instance, the claim -> free empty-reset, and the raid-lockout gate.
 
 import { describe, expect, it } from 'vitest';
+import { resolvePosition } from '../src/sim/colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
@@ -84,20 +85,21 @@ function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
 // record, independently of mobTemplateForDungeonDifficulty, mirroring createMob's
 // formulas. Dropping any multiplier from the transform reddens these pins even
 // though forcing level 22 alone would already raise the per-level stats.
+// Per-mob health overrides (healthMultiplierByMob) take precedence over the
+// dungeon-wide healthMultiplier -- e.g. 2026-07-24 nerf: skeleton adds at 2.22x
+// their normal-mode pool (3,768 HP) via healthMultiplierByMob.nythraxis_skeleton_warrior.
 function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   const levelUps = tuning.level - 1;
   const hpMult = template.elite ? 2.3 : 1;
   const dmgMult = template.elite ? 1.5 : 1;
+  const tuningDmg = tuning.damageMultiplierByMob?.[template.id] ?? tuning.damageMultiplier;
+  const tuningHp = tuning.healthMultiplierByMob?.[template.id] ?? tuning.healthMultiplier;
   const dmg =
-    (template.dmgBase * tuning.damageMultiplier +
-      template.dmgPerLevel * tuning.damageMultiplier * levelUps) *
-    dmgMult;
+    (template.dmgBase * tuningDmg + template.dmgPerLevel * tuningDmg * levelUps) * dmgMult;
   return {
     maxHp: Math.round(
-      (template.hpBase * tuning.healthMultiplier +
-        template.hpPerLevel * tuning.healthMultiplier * levelUps) *
-        hpMult,
+      (template.hpBase * tuningHp + template.hpPerLevel * tuningHp * levelUps) * hpMult,
     ),
     weaponMin: Math.round(dmg * 0.8),
     weaponMax: Math.round(dmg * 1.25),
@@ -106,6 +108,16 @@ function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
 }
 
 describe('dungeons: door-trigger entry/exit', () => {
+  it('reports whether direct dungeon entry and exit changed the world', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Solo');
+
+    expect(enterDungeon(sim.ctx, 'missing_dungeon', pid)).toBe(false);
+    expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
+    expect(leaveDungeon(sim.ctx, pid)).toBe(true);
+    expect(leaveDungeon(sim.ctx, pid)).toBe(false);
+  });
+
   it('walking onto a dungeon door teleports the player into a freshly claimed instance', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Solo');
@@ -862,12 +874,16 @@ describe('dungeons: heroic difficulty', () => {
     expect(heroicMorthen.weapon.min).toBeGreaterThan(normalMorthen.weapon.min);
     expect(normalMorthen.mechanicDamageMult).toBeUndefined();
     expect(normalMorthen.mechanicHealMult).toBeUndefined();
-    // Normal Morthen keeps his template speed and stays controllable.
+    // Normal Morthen keeps his template speed. He is still CC- and snare-immune,
+    // but through the TEMPLATE flags (bosses are immune on both difficulties,
+    // tests/dungeon_difficulty.test.ts): the heroic entity stamp stays heroic-only.
     expect(normalMorthen.moveSpeed).toBe(7);
+    expect(normalMorthen.ccImmune).toBeUndefined();
+    expect(normalMorthen.slowImmune).toBeUndefined();
     (normal as any).applyAura(normalMorthen, stunAura(normalPid));
     (normal as any).applyAura(normalMorthen, slowAura(normalPid));
-    expect(normalMorthen.auras.some((a: any) => a.id === 'test_stun')).toBe(true);
-    expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(true);
+    expect(normalMorthen.auras.some((a: any) => a.id === 'test_stun')).toBe(false);
+    expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(false);
   });
 
   it('supports heroic mode across the four five-player dungeons only', () => {
@@ -1866,20 +1882,24 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       expect(add.templateId).toBe(NYTHRAXIS_ADD_ID);
       expect(add.level).toBe(22);
       expect(add.maxHp).toBe(addPins.maxHp);
+      // Encounter add waves ride the per-mob override (7.5x holds the Royal
+      // Guard at the heroic 500 floor), not the boss's dungeon-wide 8.75x.
       expect(add.mechanicDamageMult).toBe(
-        HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplier,
+        HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplierByMob?.[NYTHRAXIS_ADD_ID],
       );
     }
   });
 
-  it('a normal raid claim is untransformed; a heroic kill pays marks to every raider', () => {
+  it('a normal raid claim carries the normal retune; a heroic kill pays marks to every raider', () => {
     const normal = raidSetup('normal');
     const nBoss = mobInInstance(normal.sim, normal.inst, NYTHRAXIS_BOSS_ID);
-    expect(nBoss.maxHp).toBe(60000); // the untransformed raid boss (60k on normal)
-    expect(nBoss.mechanicDamageMult).toBeUndefined();
+    // Normal Nythraxis rides NORMAL_DUNGEON_TUNING (economy retune): doubled
+    // health (was 60000) and the 5x per-mob multiplier stamped for mechanics.
+    expect(nBoss.maxHp).toBe(120000);
+    expect(nBoss.mechanicDamageMult).toBe(5);
     spawnNythraxisAdds(normal.sim.ctx, nBoss);
     const nAdd = normal.sim.entities.get((nBoss.summonedIds as number[])[0]) as AnyEntity;
-    expect(nAdd.mechanicDamageMult).toBeUndefined();
+    expect(nAdd.mechanicDamageMult).toBe(5);
 
     const { sim, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
@@ -2289,6 +2309,39 @@ describe('dungeons: ghost corpse-run re-entry', () => {
     expect(p.dead).toBe(false);
     expect(p.ghost).toBe(false);
     expect(sim.instanceSlotAt(p.pos)).not.toBeNull(); // back inside, alive
+  });
+
+  it('pulls a ghost back into the Abandoned Crypt from a realistic (collision-resolved) approach', () => {
+    // A ghost can only re-enter through the walk-in proximity trigger (interact()
+    // refuses it while dead), so the door's own world position must be reachable
+    // through the FULL collider stack, not just teleportable onto directly. The
+    // crypt door reuses the "mine entrance" decorative prop for its visual, and
+    // that prop's rock-mound collider used to bleed forward far enough to swallow
+    // the door tile itself, stranding every ghost outside the 2.0yd trigger.
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'CryptRunner');
+    const p = sim.entities.get(pid) as AnyEntity;
+    enterDungeon(sim.ctx, 'nythraxis_crypt', pid);
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull();
+    p.dead = true;
+    sim.releaseSpirit(pid);
+    expect(p.ghost).toBe(true);
+    expect(sim.instanceSlotAt(p.pos)).toBeNull();
+
+    const door = [...sim.entities.values()].find(
+      (e: AnyEntity) => e.templateId === 'dungeon_door' && e.dungeonId === 'nythraxis_crypt',
+    ) as AnyEntity;
+    // The door's own world position must itself be walkable (not buried inside
+    // the mound's collider); resolving it against the full collider stack must
+    // be a no-op, proving a real approach can actually reach the trigger.
+    const resolved = resolvePosition(sim.cfg.seed, door.pos.x, door.pos.z, 0.5);
+    expect(dist2d({ ...resolved, y: 0 }, door.pos)).toBeLessThan(1e-6);
+    teleport(sim, p, resolved.x, resolved.z);
+    sim.tick();
+
+    expect(p.dead).toBe(false);
+    expect(p.ghost).toBe(false);
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull();
   });
 });
 

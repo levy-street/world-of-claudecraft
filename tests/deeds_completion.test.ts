@@ -11,9 +11,9 @@
 //    list makes that a conscious, reviewed act instead of a silent default,
 //  - cross-surface parity: the Book of Deeds header (buildDeedsView), the
 //    predicate, and the character sheet (characterSheet) agree on one earned
-//    state, while the board's deprecated deedCount agrees ONLY on an
-//    all-renown-bearing set (the scoring set is a different concept by
-//    design; issue #2044 removes that wire field),
+//    state, while the board's Renown sums the SCORING set (a different
+//    concept by design: invariant under zero-renown earns, which the
+//    completion pair counts),
 //  - the two-character account fixture: the board unions each deed once per
 //    account, the ONE sanctioned scope difference from the per-character Book.
 
@@ -114,10 +114,17 @@ describe('the real catalog', () => {
       (id) => DEEDS[id].renown === 0 && DEEDS[id].feat !== true,
     ).sort();
     expect(zeroNonFeat).toEqual([
+      // Deliberate growth: the four luck-based rare-find deeds
+      // (pristine vein, ancient heartwood, moonlit bloom, perfect specimen)
+      // join the zero-renown class per rule 2 (luck earns no Renown).
+      'col_ancient_heartwood',
       'col_first_epic',
       'col_first_legendary',
       'col_first_rare',
       'col_glimmerfin',
+      'col_moonlit_bloom',
+      'col_perfect_specimen',
+      'col_pristine_vein',
       'col_set_boundstone_vanguard',
       'col_set_crownforged',
       'col_set_deathlord',
@@ -205,19 +212,37 @@ describe('cross-surface parity', () => {
     expect(sheet.deeds.earnedCount).toBe(pair.earned);
   });
 
-  it('the board deedCount equals the completion count ONLY for an all-renown-bearing set', () => {
-    // The scoring set and the completion set are different concepts that
-    // coincide exactly when every earned deed bears renown; the deprecated
-    // deedCount (issue #2044) is the scoring-set size.
-    const CATALOG: Record<string, DeedDef> = { a: deed('a', 25), b: deed('b', 50) };
-    const rows: DeedsBoardSourceRow[] = [
+  it('an earned zero-renown deed grows the completion count but never the board score', () => {
+    // The 142-vs-129 class, restated in renown-sum terms: the board's score
+    // is invariant under a zero-renown earn (it sums the SCORING set), while
+    // the Book's completion pair counts it. The two surfaces stay coherent
+    // because the board shows no count at all, only Renown.
+    const CATALOG: Record<string, DeedDef> = {
+      a: deed('a', 25),
+      b: deed('b', 50),
+      z: deed('z', 0),
+    };
+    const ORDER = ['a', 'b', 'z'];
+    const base: DeedsBoardSourceRow[] = [
       { accountId: 1, characterId: 11, deedId: 'a', earnedAt: '2026-07-01T00:00:00.000Z' },
       { accountId: 1, characterId: 11, deedId: 'b', earnedAt: '2026-07-02T00:00:00.000Z' },
     ];
-    const board = computeDeedsBoard(rows, CATALOG).ranked;
-    const pair = completionCounts(new Set(['a', 'b']), CATALOG, ['a', 'b']);
-    expect(board).toHaveLength(1);
-    expect(board[0].deedCount).toBe(pair.earned);
+    const withZero: DeedsBoardSourceRow[] = [
+      ...base,
+      { accountId: 1, characterId: 11, deedId: 'z', earnedAt: '2026-07-03T00:00:00.000Z' },
+    ];
+    // The board score equals the renown summed over the earned completion set
+    // (here every scoring deed also completes), and the zero-renown earn moves
+    // the completion count from 2 to 3 without moving the score.
+    const baseBoard = computeDeedsBoard(base, CATALOG).ranked;
+    const withZeroBoard = computeDeedsBoard(withZero, CATALOG).ranked;
+    expect(baseBoard[0].renown).toBe(75);
+    expect(withZeroBoard[0].renown).toBe(75);
+    // Nor the tie-break: if 'z' entered the scoring set, its later earn would
+    // drag completionTime past the score point (the 'b' earn).
+    expect(withZeroBoard[0].completionTime).toBe(Date.parse('2026-07-02T00:00:00.000Z'));
+    expect(completionCounts(new Set(['a', 'b']), CATALOG, ORDER).earned).toBe(2);
+    expect(completionCounts(new Set(['a', 'b', 'z']), CATALOG, ORDER).earned).toBe(3);
   });
 
   it('two characters, one account: the board unions once, each Book counts its own', () => {
@@ -233,9 +258,9 @@ describe('cross-surface parity', () => {
     ];
     const board = computeDeedsBoard(rows, CATALOG).ranked;
     expect(board).toHaveLength(1);
-    // Union renown 75: 'a' scores once for the account despite two earners.
+    // Union renown 75 (25 + 50), never the raw-row 100: 'a' scores once for
+    // the account despite two earners.
     expect(board[0].renown).toBe(75);
-    expect(board[0].deedCount).toBe(2);
     // Per-character Books: char 11 completed 1 of 2, char 12 completed 2 of 2.
     expect(completionCounts(new Set(['a']), CATALOG, ['a', 'b']).earned).toBe(1);
     expect(completionCounts(new Set(['a', 'b']), CATALOG, ['a', 'b']).earned).toBe(2);

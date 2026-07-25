@@ -9,15 +9,12 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import type { ActionBarLayout } from '../src/world_api/action_bar';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
-import {
-  DAILY_REWARD_EVENTS_CONCURRENT_INDEX_SQL,
-  DAILY_REWARD_EVENTS_INVALID_INDEX_CHECK_SQL,
-  DAILY_REWARD_EVENTS_INVALID_INDEX_DROP_SQL,
-} from './daily_rewards_schema';
+import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { GITHUB_SCHEMA } from './github_db';
@@ -31,13 +28,11 @@ import {
   runMarketBackfill,
 } from './market_backfill';
 import { OAUTH_SCHEMA } from './oauth_db';
+import { PLAY_SESSION_RETENTION_SCHEMA } from './play_session_retention_db';
 import {
   closeOrphanPlayerSessions,
   closePlayerSession,
   openPlayerSession,
-  PLAYER_METRICS_CONCURRENT_INDEX_SQL,
-  PLAYER_METRICS_INVALID_INDEX_CHECK_SQL,
-  PLAYER_METRICS_INVALID_INDEX_DROP_SQL,
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
@@ -54,20 +49,9 @@ import { USER_ASSETS_SCHEMA } from './user_assets_db';
 // consumers (the market tests) keep importing it from ./db unchanged.
 export { marketStateKey } from './market_backfill';
 
-try {
-  process.loadEnvFile?.();
-} catch {
-  // .env is optional; production usually injects DATABASE_URL directly.
-}
-try {
-  // Local-dev convenience: also load .env.local so the server can reuse the
-  // client's VITE_* values (e.g. the Solana RPC + $WOC mint) for the in-world
-  // holder-tier reads. Existing keys from .env are not overwritten. In
-  // production these come from real env vars (SOLANA_RPC_URL / WOC_MINT).
-  process.loadEnvFile?.('.env.local');
-} catch {
-  // .env.local is optional.
-}
+// The actual load lives in server/env.ts so import-time readers other than
+// db.ts (realm.ts via main.ts's first import) share one bootstrap.
+import './env';
 
 export const DATABASE_URL =
   process.env.DATABASE_URL ??
@@ -98,10 +82,10 @@ export const DB_STATEMENT_TIMEOUT_MS = 15_000;
 
 // The raised per-transaction allowance for the known heavy reads (the cached
 // leaderboard / board / metrics aggregates and the final character save, plus the
-// on-demand admin reads: the sessions-by-day chart, the client perf summary, the
-// account-detail playtime aggregate, and the chat-log prune), applied via
-// runWithStatementTimeout. Bounded so even an exempted scan that goes runaway still
-// dies rather than pinning a pooled client indefinitely.
+// on-demand admin reads: the sessions-by-day chart, the client perf summary, and
+// the account-detail playtime aggregate), applied via runWithStatementTimeout.
+// Bounded so even an exempted scan that goes runaway still dies rather than
+// pinning a pooled client indefinitely.
 export const DB_HEAVY_STATEMENT_TIMEOUT_MS = 60_000;
 
 // Client-side backstop timeout per connection. query_timeout is enforced in the
@@ -194,6 +178,24 @@ const LIFETIME_XP_EXPR = "((state->>'lifetimeXp')::bigint)";
 export const ELIGIBLE_ACCOUNT_SQL =
   'a.banned_at IS NULL AND (a.suspended_until IS NULL OR a.suspended_until <= now())';
 
+// Additive scope-domain hardening for auth_tokens. NOT VALID avoids a table
+// scan and tolerates any historical bad rows during deploy, while PostgreSQL
+// still enforces the constraint for every new or updated row. Runtime token
+// decoding independently fails closed on historical values outside this set.
+// Exported so the opt-in real-Postgres migration test executes this exact DDL.
+export const AUTH_TOKENS_SCOPE_CONSTRAINT_SQL = `DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'auth_tokens_scope_check'
+      AND conrelid = 'auth_tokens'::regclass
+  ) THEN
+    ALTER TABLE auth_tokens
+      ADD CONSTRAINT auth_tokens_scope_check CHECK (scope IN ('full', 'read')) NOT VALID;
+  END IF;
+END $$;`;
+
 export const SCHEMA = `
 CREATE TABLE IF NOT EXISTS accounts (
   id SERIAL PRIMARY KEY,
@@ -216,6 +218,7 @@ CREATE INDEX IF NOT EXISTS auth_tokens_account ON auth_tokens(account_id);
 -- token in the account portal so a user can revoke a specific one.
 ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS scope TEXT NOT NULL DEFAULT 'full';
 ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS label TEXT;
+${AUTH_TOKENS_SCOPE_CONSTRAINT_SQL}
 CREATE TABLE IF NOT EXISTS characters (
   id SERIAL PRIMARY KEY,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
@@ -233,9 +236,20 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS realm TEXT NOT NULL DEFAULT '${R
 -- "last seen" readout on offline guild-roster rows. Nullable: a character that
 -- has never entered the world since this column was added reads NULL.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
+-- Per-character action-bar layout (JSONB). This is client PRESENTATION state (a
+-- remap over learned abilities + item shortcuts), NOT deterministic gameplay
+-- state, so it lives in its own additive column rather than the sim-owned state
+-- blob: keeping it out of CharacterState leaves sim serialization byte-identical
+-- and the offline Sim host-agnostic. Nullable/absent until the character first
+-- saves one; the server treats the value as opaque and re-validates its bounds
+-- (sanitizeActionBarLayout) on both read and write.
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS hotbar_layout JSONB;
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
--- (cross-realm) home-page board.
+-- (cross-realm) home-page board. Both are expression indexes on the bare
+-- LIFETIME_XP_EXPR: a reader (topLifetimeXp) must predicate and order on that
+-- exact bare expression; a COALESCE wrapper or an alias sort key cannot match
+-- the index and falls back to a full scan plus sort.
 CREATE INDEX IF NOT EXISTS characters_lifetime_xp
   ON characters (realm, ${LIFETIME_XP_EXPR} DESC);
 CREATE INDEX IF NOT EXISTS characters_lifetime_xp_global
@@ -686,6 +700,20 @@ CREATE INDEX IF NOT EXISTS client_perf_reports_created ON client_perf_reports(cr
 CREATE INDEX IF NOT EXISTS client_perf_reports_release_created ON client_perf_reports(release_version, created_at DESC);
 CREATE INDEX IF NOT EXISTS client_perf_reports_gpu_created ON client_perf_reports(gl_renderer_bucket, created_at DESC);
 CREATE INDEX IF NOT EXISTS client_perf_reports_session_created ON client_perf_reports(session_id, created_at DESC);
+-- Packet 0 report dimensions (rulings R3-R7). crowd_bucket keeps the summary
+-- statement's GROUPING-bits contract (every grouped column TEXT NOT NULL
+-- DEFAULT ''; pre-column rows fold to 'unknown' in the read-time mapper). The
+-- worst-10s ranking index builds via CONCURRENT_INDEX_MIGRATIONS
+-- (server/client_perf_indexes.ts), never here.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS crowd_bucket TEXT NOT NULL DEFAULT '';
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS sim_entities INT NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS active_views INT NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS visible_views INT NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS worst_10s_frame_p95_ms REAL NOT NULL DEFAULT 0;
+-- Phase 05 (ruling R14): client-computed perf-doctor suggestion ids, validated
+-- against the server allowlist in perf_report.ts before storage (filter,
+-- dedupe, cap 3). Pre-column and healthy rows both read as the empty array.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}';
 -- Non-custodial Solana wallet links (PRD: docs/prd/woc/wallet-link.md). One
 -- wallet per account (account_id is the PK) and one account per wallet (pubkey
 -- is UNIQUE). The server never holds keys; ownership is proven by a signed
@@ -756,18 +784,6 @@ CREATE TABLE IF NOT EXISTS daily_reward_ip_bans (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-CREATE OR REPLACE VIEW daily_reward_excluded_accounts AS
-SELECT account_id, reason FROM daily_reward_bans
- WHERE expires_at IS NULL OR expires_at > now()
-UNION
-SELECT a.id AS account_id, ib.reason
-  FROM accounts a
-  JOIN daily_reward_ip_bans ib
-    ON ib.ip_address = a.last_login_ip
-    OR EXISTS (
-      SELECT 1 FROM play_sessions ps
-       WHERE ps.account_id = a.id AND ps.ip_address = ib.ip_address
-    );
 CREATE TABLE IF NOT EXISTS daily_reward_events (
   id BIGSERIAL PRIMARY KEY,
   day TEXT NOT NULL,
@@ -968,6 +984,39 @@ CREATE INDEX IF NOT EXISTS character_deeds_character_earned
   ON character_deeds(character_id, earned_at DESC);
 `;
 
+// Kept out of SCHEMA on purpose: the association arm reads
+// account_ip_associations, which PLAY_SESSION_RETENTION_SCHEMA creates, and
+// SCHEMA executes before it on a fresh database. ensureSchema applies this
+// constant right after the retention schema, inside the same transaction.
+export const DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL = `
+-- Exclusion arms stay OR-free so each rides its own index path (an OR inside a
+-- join arm forces a nested loop with a re-probed subquery); any new exclusion
+-- source joins as another UNION arm, never as an OR in an existing arm. The ban
+-- arm's expiry predicate is what un-bans an expired timed ban. The association
+-- arm covers sessions the retention fold has already deleted: an account's
+-- account-to-IP link lives on in account_ip_associations after its raw
+-- play_sessions rows fold away, so an IP ban keeps excluding the account; the
+-- join is index-served by account_ip_associations_ip.
+CREATE OR REPLACE VIEW daily_reward_excluded_accounts AS
+SELECT account_id, reason FROM daily_reward_bans
+ WHERE expires_at IS NULL OR expires_at > now()
+UNION
+SELECT a.id AS account_id, ib.reason
+  FROM accounts a
+  JOIN daily_reward_ip_bans ib
+    ON ib.ip_address = a.last_login_ip
+UNION
+SELECT ps.account_id, ib.reason
+  FROM play_sessions ps
+  JOIN daily_reward_ip_bans ib
+    ON ib.ip_address = ps.ip_address
+UNION
+SELECT assoc.account_id, ib.reason
+  FROM account_ip_associations assoc
+  JOIN daily_reward_ip_bans ib
+    ON ib.ip_address = assoc.ip_address;
+`;
+
 const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01; // "WOC\x01"
 
 export async function ensureSchema(): Promise<void> {
@@ -1005,6 +1054,14 @@ export async function ensureSchema(): Promise<void> {
     // play_sessions from the core schema. The tables start empty and collect
     // lifecycle facts prospectively, so boot never runs a production backfill.
     await client.query(PLAYER_METRICS_SCHEMA);
+    // Fold-forward retention rollups for play_sessions (lifetime playtime
+    // totals + the account-to-IP association ledger). FK-references
+    // accounts(id), so it runs after SCHEMA.
+    await client.query(PLAY_SESSION_RETENTION_SCHEMA);
+    // The daily-reward exclusion view joins account_ip_associations in its
+    // association arm, so it is created after the retention schema above; on a
+    // fresh database SCHEMA alone could not create it.
+    await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
     await client.query(SOCIAL_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
@@ -1090,19 +1147,16 @@ export async function ensureSchema(): Promise<void> {
       concurrentMigrationLocked = true;
       // A prior boot's build may have died mid-CONCURRENTLY (a deploy-watchdog
       // restart, a crash), stranding an INVALID index that IF NOT EXISTS would
-      // treat as existing forever. Drop the carcass so the build self-heals.
-      const invalidIndex = await client.query(PLAYER_METRICS_INVALID_INDEX_CHECK_SQL);
-      if ((invalidIndex.rowCount ?? 0) > 0) {
-        await client.query(PLAYER_METRICS_INVALID_INDEX_DROP_SQL);
+      // treat as existing forever. Each entry drops its carcass first so the
+      // build self-heals; the list and its order live in
+      // server/concurrent_indexes.ts.
+      for (const migration of CONCURRENT_INDEX_MIGRATIONS) {
+        const invalidIndex = await client.query(migration.checkSql);
+        if ((invalidIndex.rowCount ?? 0) > 0) {
+          await client.query(migration.dropSql);
+        }
+        await client.query(migration.createSql);
       }
-      await client.query(PLAYER_METRICS_CONCURRENT_INDEX_SQL);
-      const invalidDailyRewardIndex = await client.query(
-        DAILY_REWARD_EVENTS_INVALID_INDEX_CHECK_SQL,
-      );
-      if ((invalidDailyRewardIndex.rowCount ?? 0) > 0) {
-        await client.query(DAILY_REWARD_EVENTS_INVALID_INDEX_DROP_SQL);
-      }
-      await client.query(DAILY_REWARD_EVENTS_CONCURRENT_INDEX_SQL);
     } finally {
       if (concurrentMigrationLocked) {
         await client.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
@@ -1428,6 +1482,13 @@ export async function getAccountsCount(): Promise<number> {
   return res.rows[0]?.count ?? 0;
 }
 
+export async function getCharactersCount(realm: string): Promise<number> {
+  const res = await pool.query('SELECT COUNT(*)::int AS count FROM characters WHERE realm = $1', [
+    realm,
+  ]);
+  return res.rows[0]?.count ?? 0;
+}
+
 export async function touchLogin(accountId: number, meta: RequestMetadata = {}): Promise<void> {
   await pool.query(
     `UPDATE accounts
@@ -1464,18 +1525,11 @@ export async function saveToken(
   );
 }
 
-export async function accountForToken(token: string): Promise<number | null> {
-  const res = await pool.query(
-    'SELECT account_id FROM auth_tokens WHERE token = $1 AND expires_at > now()',
-    [token],
-  );
-  return res.rows[0]?.account_id ?? null;
-}
-
-// Account + scope for a live token. Mirrors accountForToken but also returns the
-// token's scope so read routes can accept 'read'|'full' while mutating routes
-// (via bearerActiveAccount) reject anything that is not 'full'. Old tokens
-// predating the scope column read as 'full' via the column default.
+// Account + scope for a live token. Every caller receives the authority context:
+// read routes may accept both scopes, while mutation and privileged boundaries
+// require exact full scope. Unknown database values fail closed instead of being
+// promoted to full authority. Such a historical token also cannot authenticate
+// its own logout; account-level revocation remains available to clear the row.
 export async function accountAndScopeForToken(
   token: string,
 ): Promise<{ accountId: number; scope: TokenScope } | null> {
@@ -1485,7 +1539,8 @@ export async function accountAndScopeForToken(
   );
   const row = res.rows[0];
   if (!row) return null;
-  return { accountId: row.account_id, scope: row.scope === 'read' ? 'read' : 'full' };
+  if (row.scope !== 'full' && row.scope !== 'read') return null;
+  return { accountId: row.account_id, scope: row.scope };
 }
 
 export interface AccountInfoRow {
@@ -1968,6 +2023,9 @@ export async function consumeRecoveryCode(accountId: number, codeHash: string): 
 
 // GDPR-style data export bundle: the account's own profile plus every character
 // it owns on this realm, as plain JSON. Excludes secrets (password hash, tokens).
+// Also carries the folded retention rollups (lifetime playtime totals and the
+// account-to-IP association ledger): they are stored personal data, so a data
+// export must include them even after the raw sessions folded away.
 export async function exportAccountData(
   accountId: number,
 ): Promise<Record<string, unknown> | null> {
@@ -1975,6 +2033,20 @@ export async function exportAccountData(
   if (!acct) return null;
   const characters = await listCharacters(accountId);
   const twoFactorEnabled = await accountTwoFactorEnabled(accountId);
+  const playtimeTotals = await pool.query(
+    `SELECT character_id, playtime_seconds, sessions, last_played
+       FROM play_session_totals
+      WHERE account_id = $1
+      ORDER BY character_id`,
+    [accountId],
+  );
+  const ipAssociations = await pool.query(
+    `SELECT ip_address, last_seen_at
+       FROM account_ip_associations
+      WHERE account_id = $1
+      ORDER BY last_seen_at DESC`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -1993,6 +2065,8 @@ export async function exportAccountData(
       level: c.level,
       state: c.state,
     })),
+    playtimeTotals: playtimeTotals.rows,
+    ipAssociations: ipAssociations.rows,
   };
 }
 
@@ -2418,6 +2492,9 @@ export interface CharacterRow {
   force_rename: boolean;
   last_played?: Date | string | null;
   playtime_seconds?: string | number | null;
+  // Per-character action-bar layout (own JSONB column, not the sim state blob).
+  // Opaque to the server beyond bounds validation; only the join path selects it.
+  hotbar_layout?: ActionBarLayout | null;
 }
 
 // The account's "top" character on this realm (highest level, then lifetime XP),
@@ -2444,7 +2521,8 @@ export async function highestCharacterForAccount(accountId: number): Promise<Cha
 export async function listCharacters(accountId: number): Promise<CharacterRow[]> {
   const res = await pool.query(
     `SELECT c.id, c.account_id, c.name, c.class, c.level, c.state, c.is_gm, c.force_rename,
-            ps.last_played, ps.playtime_seconds
+            GREATEST(ps.last_played, totals.last_played) AS last_played,
+            (COALESCE(ps.playtime_seconds, 0) + COALESCE(totals.playtime_seconds, 0))::bigint AS playtime_seconds
        FROM characters c
        LEFT JOIN (
          SELECT character_id,
@@ -2454,6 +2532,10 @@ export async function listCharacters(accountId: number): Promise<CharacterRow[]>
           WHERE account_id = $1
           GROUP BY character_id
        ) ps ON ps.character_id = c.id
+       -- The rollup term keeps lifetime playtime identical after old sessions fold forward;
+       -- this login-path read stays on the default statement timeout, never the heavy wrap.
+       LEFT JOIN play_session_totals totals
+         ON totals.account_id = c.account_id AND totals.character_id = c.id
       WHERE c.account_id = $1 AND c.realm = $2
       ORDER BY c.id`,
     [accountId, REALM],
@@ -2466,10 +2548,24 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;
+}
+
+/** Persist a character's action-bar layout in its dedicated JSONB column. The
+ *  layout is already sanitized/bounded by the caller (server-side, untrusted
+ *  client input); stored as an opaque document, replaced whole (last write wins).
+ *  Parameterized: characterId is $1, the JSON document is $2. */
+export async function setCharacterHotbarLayout(
+  characterId: number,
+  layout: ActionBarLayout,
+): Promise<void> {
+  await pool.query('UPDATE characters SET hotbar_layout = $2::jsonb WHERE id = $1', [
+    characterId,
+    JSON.stringify(layout),
+  ]);
 }
 
 // Active character names on this realm for the public character sitemap, ranked
@@ -2866,8 +2962,9 @@ export async function topArenaRatings(
 
 // ---------------------------------------------------------------------------
 // Lifetime-XP leaderboard (Max-Level XP Overflow). Ranks characters by the
-// `lifetimeXp` stored in their state JSONB. Realm-scoped (FR-4.3) and backed by
-// the `characters_lifetime_xp` index. Read through the server-side cache in
+// `lifetimeXp` stored in their state JSONB. The realm-scoped read (FR-4.3) is
+// backed by the `characters_lifetime_xp` index and the global read by
+// `characters_lifetime_xp_global`. Read through the server-side cache in
 // main.ts, never run per request under load.
 // ---------------------------------------------------------------------------
 
@@ -2884,8 +2981,10 @@ export interface LifetimeXpLeaderRow {
 }
 
 // `global: true` ranks across every realm (for the home-page board); otherwise
-// it is scoped to this process's realm (the in-game panel). Both paths sort on
-// the indexed lifetime-XP expression and are read through the main.ts cache.
+// it is scoped to this process's realm (the in-game panel). Both paths filter
+// and order on the bare LIFETIME_XP_EXPR so the expression indexes serve them
+// (the SELECT-list COALESCE is output-only, never a filter or sort key), and
+// both are read through the main.ts cache.
 export async function topLifetimeXp(
   limit = 100,
   opts: { global?: boolean } = {},
@@ -2902,10 +3001,10 @@ export async function topLifetimeXp(
                 state->>'activeTitle' AS active_title
            FROM characters
           WHERE state IS NOT NULL
-            AND COALESCE((state->>'lifetimeXp')::bigint, 0) > 0
+            AND ${LIFETIME_XP_EXPR} > 0
             AND EXISTS (SELECT 1 FROM accounts a
                          WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
-          ORDER BY lifetime_xp DESC, level DESC, name ASC
+          ORDER BY ${LIFETIME_XP_EXPR} DESC, level DESC, name ASC
           LIMIT $1`,
           [cap],
         )
@@ -2916,10 +3015,10 @@ export async function topLifetimeXp(
                 state->>'activeTitle' AS active_title
            FROM characters
           WHERE realm = $1 AND state IS NOT NULL
-            AND COALESCE((state->>'lifetimeXp')::bigint, 0) > 0
+            AND ${LIFETIME_XP_EXPR} > 0
             AND EXISTS (SELECT 1 FROM accounts a
                          WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
-          ORDER BY lifetime_xp DESC, level DESC, name ASC
+          ORDER BY ${LIFETIME_XP_EXPR} DESC, level DESC, name ASC
           LIMIT $2`,
           [REALM, cap],
         ),
@@ -3027,9 +3126,7 @@ export async function topGuilds(
 // completionTime is max over the scoring set of each deed's EARLIEST earn; the
 // display character is the account's highest per-character Renown character,
 // ties to the lowest id; ordering is renown desc, completion asc, accountId
-// asc. deed_count (the scoring-set size) is a deprecated wire-compat output
-// removed next release together with the pure spec's field (issue #2044,
-// executable-spec lockstep both times); it is not displayed by current clients.
+// asc.
 export async function deedsBoardRanked(
   deedIds: readonly string[],
   renowns: readonly number[],
@@ -3060,7 +3157,6 @@ export async function deedsBoardRanked(
      account_agg AS (
        SELECT pd.account_id,
               sum(r.renown)::int AS renown,
-              count(*)::int AS deed_count,
               max(pd.first_earned) AS completion_time
          FROM per_deed pd
          JOIN renown r ON r.deed_id = pd.deed_id
@@ -3083,7 +3179,6 @@ export async function deedsBoardRanked(
      )
      SELECT aa.account_id,
             aa.renown,
-            aa.deed_count,
             aa.completion_time,
             d.character_id AS display_character_id
        FROM account_agg aa
@@ -3094,7 +3189,6 @@ export async function deedsBoardRanked(
     const ranked: RankedDeedsAccount[] = res.rows.map((r) => ({
       accountId: Number(r.account_id),
       renown: Number(r.renown),
-      deedCount: Number(r.deed_count),
       // TIMESTAMPTZ back to epoch ms (Date via pg; string tolerated for driver
       // config drift), matching computeDeedsBoard's earnedMs.
       completionTime: new Date(r.completion_time).getTime(),
@@ -3156,6 +3250,15 @@ export async function charactersForDeedsBoard(
 // benchmark runs with no account, and one session may emit several samples.
 // ---------------------------------------------------------------------------
 
+// The worst-10s concurrent index (ruling R7). Defined in the dependency-free
+// client_perf_indexes.ts (the registry evaluates before this module's body;
+// see the note there) and re-exported here beside the table's accessors.
+export {
+  CLIENT_PERF_WORST10S_INDEX_SQL,
+  CLIENT_PERF_WORST10S_INVALID_INDEX_CHECK_SQL,
+  CLIENT_PERF_WORST10S_INVALID_INDEX_DROP_SQL,
+} from './client_perf_indexes';
+
 export interface ClientPerfReportInsert {
   schemaVersion: number;
   releaseVersion: string;
@@ -3194,6 +3297,12 @@ export interface ClientPerfReportInsert {
   glRendererBucket: string;
   zoneOrScenario: string;
   source: string;
+  crowdBucket: string;
+  simEntities: number;
+  activeViews: number;
+  visibleViews: number;
+  worst10sFrameP95Ms: number;
+  suggestionIds: string[];
   rawSummary: Record<string, unknown>;
 }
 
@@ -3206,7 +3315,9 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
-       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source, raw_summary
+       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
+       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
+       suggestion_ids, raw_summary
      ) VALUES (
        $1, $2, $3, $4, $5, $6, $7,
        $8, $9, $10, $11, $12, $13,
@@ -3214,7 +3325,9 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        $18, $19, $20, $21, $22,
        $23, $24, $25, $26,
        $27, $28, $29, $30, $31,
-       $32, $33, $34, $35, $36, $37, $38
+       $32, $33, $34, $35, $36, $37,
+       $38, $39, $40, $41, $42,
+       $43, $44
      )`,
     [
       row.schemaVersion,
@@ -3254,20 +3367,36 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
       row.glRendererBucket,
       row.zoneOrScenario,
       row.source,
+      row.crowdBucket,
+      row.simEntities,
+      row.activeViews,
+      row.visibleViews,
+      row.worst10sFrameP95Ms,
+      row.suggestionIds,
       JSON.stringify(row.rawSummary),
     ],
   );
 }
 
 // Keeps production telemetry bounded. PERF_REPORT_RETENTION_DAYS=0 disables
-// pruning for a short manual capture window.
-export async function pruneClientPerfReports(retentionDays: number): Promise<number> {
+// pruning for a short manual capture window. One bounded batch per call: the
+// caller (the retention sweep) drives iteration, so each DELETE is a short
+// autocommit statement on the default statement timeout, riding
+// client_perf_reports_created via the oldest-first ORDER BY.
+export async function pruneClientPerfReportsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
   if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
   const days = Math.max(1, Math.floor(retentionDays));
   const res = await pool.query(
     `DELETE FROM client_perf_reports
-      WHERE created_at < now() - ($1 || ' days')::interval`,
-    [String(days)],
+      WHERE id IN (
+        SELECT id FROM client_perf_reports
+         WHERE created_at < now() - ($1 || ' days')::interval
+         ORDER BY created_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
   );
   return res.rowCount ?? 0;
 }
@@ -3544,13 +3673,25 @@ export async function insertChatLogs(rows: ChatLogRow[]): Promise<void> {
   );
 }
 
-// Keeps the table bounded; CHAT_LOG_RETENTION_DAYS=0 disables pruning.
-export async function pruneChatLogs(retentionDays: number): Promise<number> {
+// Keeps the table bounded; CHAT_LOG_RETENTION_DAYS=0 disables pruning. One bounded
+// batch per call: the caller (the retention sweep) drives iteration, so each DELETE
+// is a short autocommit statement on the DEFAULT statement timeout. Batching is what
+// makes the default allowance safe here; do not re-wrap this in the heavy allowance.
+export async function pruneChatLogsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
   if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    query(`DELETE FROM chat_logs WHERE created_at < now() - ($1 || ' days')::interval`, [
-      String(Math.floor(retentionDays)),
-    ]),
+  // A fractional value must clamp to at least one day, never floor to '0 days'.
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM chat_logs
+      WHERE id IN (
+        SELECT id FROM chat_logs
+         WHERE created_at < now() - ($1 || ' days')::interval
+         ORDER BY created_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
   );
   return res.rowCount ?? 0;
 }

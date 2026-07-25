@@ -57,6 +57,7 @@
 //                                          union of the facets.
 // ---------------------------------------------------------------------------
 
+import type { IWorldActionBar } from './world_api/action_bar';
 import type { IWorldBank } from './world_api/bank';
 import type { IWorldCardMinigame } from './world_api/card_minigame';
 import type { IWorldChat } from './world_api/chat';
@@ -105,10 +106,42 @@ export type {
   OverheadEmoteId,
 } from './sim/types';
 
+// Online world-layout compatibility is encoded in the first WebSocket frame's
+// discriminator. Changing the authoritative town layout requires a new epoch:
+// the strict discriminator makes both rolling-deploy directions fail closed
+// before either binary loads a character into a differently shaped world.
+export const ONLINE_WORLD_LAYOUT_VERSION = 3 as const;
+export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
+// The one wire literal both sides emit for a layout-epoch mismatch. The server
+// rejects with it, the client synthesizes it for pre-epoch servers, and the UI
+// matcher re-localizes it, so all three must stay byte-identical.
+export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE =
+  'Game and server versions are incompatible. Reload or update, then try again.' as const;
+
+// Snapshot timer wire capability shared by the browser mirror and authoritative
+// server. Keep the version exact so rolling deploys can negotiate fail-closed.
+export const STABLE_TIMER_WIRE_VERSION = 2 as const;
+export type StableTimerWireVersion = typeof STABLE_TIMER_WIRE_VERSION;
+
+// Absolute cooldown schedule in server simulation seconds. A number is the
+// expiry for 1x recovery. The tuple adds a temporary recovery-rate segment;
+// after acceleratedUntil, recovery continues at 1x until expiresAt.
+export type StableCooldownWire =
+  | number
+  | readonly [expiresAt: number, recoveryRate: number, acceleratedUntil: number];
+
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
+export type {
+  ActionBarFormLayout,
+  ActionBarLayout,
+  ActionBarLayoutForm,
+  ActionBarLayoutRestore,
+  ActionBarSlotAction,
+} from './world_api/action_bar';
 export type { BankBonusSource, BankInfo } from './world_api/bank';
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
+export type { ActiveFrostRing, ActiveTemporalHourglass } from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
   DailyRewardEligibilityView,
@@ -154,10 +187,17 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout } from './world_api/dungeons';
+export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
-export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
+export type {
+  CraftingIdentityView,
+  CraftResultView,
+  DisenchantResultView,
+  PlayerProfessionsView,
+  RecipeDef,
+} from './world_api/professions';
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
@@ -184,7 +224,9 @@ export type {
   VcMatchInfo,
   VcPhase,
   VcRosterPlayer,
+  VcSharedCupInfo,
   VcStanding,
+  VcViewerReadout,
 } from './world_api/vale_cup';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
@@ -218,6 +260,7 @@ export interface IWorld
     IWorldBank,
     IWorldValeCup,
     IWorldDungeonFinder,
+    IWorldActionBar,
     IWorldDeeds {}
 
 // ---------------------------------------------------------------------------
@@ -270,6 +313,7 @@ export const COMMAND_NAMES = [
   'sell_all_junk',
   'harvest_node',
   'craft_item',
+  'place_mobile_station',
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
@@ -296,8 +340,10 @@ export const COMMAND_NAMES = [
   'pet_rename',
   'pet_revive',
   'pet_attack',
+  'pet_water_jet',
   'pet_taunt',
   'pet_auto_taunt',
+  'pet_auto_water_jet',
   'pet_feed',
   'pet_heal',
   'pet_mode',
@@ -389,6 +435,7 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'releaseEmpowered',
   'df_roles',
   'df_queue',
   'df_queue_leave',
@@ -404,6 +451,30 @@ export const COMMAND_NAMES = [
   'ignore_add',
   'ignore_remove',
   'stow_weapon',
+  // Append-only protocol addition for the canonical Talents V2 row mutation.
+  'selectTalentRow',
+  'resurrect_respond',
+  // Recipe training (Professions 2.0): learn a trainer-taught recipe
+  // at its craft's station (Sim.trainRecipe via professions/training.ts).
+  'train_recipe',
+  // Per-character action-bar layout persistence: the owning client uploads its
+  // full arranged layout (debounced) so it restores at login on any device.
+  'save_hotbar_layout',
+  // Enchanting profession actions (Professions 2.0): disenchant a held
+  // piece into arcane materials, apply an enchant to a held copy, or salvage a
+  // held piece into generic materials (Sim.disenchantItem/applyEnchant/salvageItem
+  // via src/sim/professions/enchanting.ts and salvage.ts).
+  'disenchant_item',
+  'apply_enchant',
+  'salvage_item',
+  // Maker's Bond unbind service (Professions 2.0): clear the
+  // boundTo trade lock on one held bound commission piece for the
+  // tier-scaled gold fee (Sim.unbindItem via src/sim/professions/
+  // commission.ts).
+  'unbind_item',
+  // Guild billboard: set (or clear, with '') the officer-editable message
+  // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
+  'guild_set_motd',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -472,6 +543,7 @@ export type WorldFacet =
   | 'IWorldBank'
   | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
+  | 'IWorldActionBar'
   | 'IWorldDeeds';
 
 export const COMMAND_FACETS = {
@@ -479,6 +551,7 @@ export const COMMAND_FACETS = {
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
   castAt: 'IWorldCombat',
+  releaseEmpowered: 'IWorldCombat',
   cancel_aura: 'IWorldCombat',
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
@@ -487,6 +560,7 @@ export const COMMAND_FACETS = {
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',
   resurrect_healer: 'IWorldCombat',
+  resurrect_respond: 'IWorldCombat',
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
@@ -504,6 +578,7 @@ export const COMMAND_FACETS = {
   applyTalents: 'IWorldTalents',
   respec: 'IWorldTalents',
   setSpec: 'IWorldTalents',
+  selectTalentRow: 'IWorldTalents',
   saveLoadout: 'IWorldTalents',
   switchLoadout: 'IWorldTalents',
   deleteLoadout: 'IWorldTalents',
@@ -519,8 +594,10 @@ export const COMMAND_FACETS = {
   pet_rename: 'IWorldPet',
   pet_revive: 'IWorldPet',
   pet_attack: 'IWorldPet',
+  pet_water_jet: 'IWorldPet',
   pet_taunt: 'IWorldPet',
   pet_auto_taunt: 'IWorldPet',
+  pet_auto_water_jet: 'IWorldPet',
   pet_feed: 'IWorldPet',
   pet_heal: 'IWorldPet',
   pet_mode: 'IWorldPet',
@@ -591,6 +668,7 @@ export const COMMAND_FACETS = {
   guild_disband: 'IWorldSocialGraph',
   guild_event_create: 'IWorldSocialGraph',
   guild_event_remove: 'IWorldSocialGraph',
+  guild_set_motd: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
@@ -655,4 +733,7 @@ export const COMMAND_FACETS = {
   // design). deedsEarned/deedStats/renown/activeTitle are snapshot reads (no
   // send, untagged).
   deed_set_title: 'IWorldDeeds',
+  // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
+  // is a login-time read (no send, untagged).
+  save_hotbar_layout: 'IWorldActionBar',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

@@ -1,9 +1,10 @@
 // Tests for src/sim/dead_target.ts: which DEAD entities stay selectable. Covers the
 // pure predicate directly, plus an integration check that Targeting.targetEntity lets
-// a player select their OWN dead pet (so the Revive/Abandon menu is reachable after
-// login) while still rejecting other corpses that are neither lootable nor owned.
+// a player select their OWN dead pet and dead players while still rejecting other
+// corpses that are neither lootable nor owned.
 
 import { describe, expect, it, vi } from 'vitest';
+import { ClientWorld } from '../src/net/online';
 import { deadTargetSelectable } from '../src/sim/dead_target';
 import type { SimContext } from '../src/sim/sim_context';
 import { Targeting } from '../src/sim/targeting';
@@ -45,8 +46,8 @@ describe('deadTargetSelectable', () => {
     expect(deadTargetSelectable(ent({ id: 10, dead: true }), 1)).toBe(false);
   });
 
-  it('rejects a dead player corpse (not a pet, not lootable)', () => {
-    expect(deadTargetSelectable(ent({ id: 5, kind: 'player', dead: true }), 1)).toBe(false);
+  it('allows a dead player corpse so allies can target it for resurrection', () => {
+    expect(deadTargetSelectable(ent({ id: 5, kind: 'player', dead: true }), 1)).toBe(true);
   });
 });
 
@@ -62,6 +63,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       },
       stopFollow,
       isHostileTo: (_a: Entity, b: Entity) => b.kind === 'mob' && b.hostile === true,
+      partyOf: () => null,
     } as unknown as SimContext;
     return { ctx, entities };
   }
@@ -92,5 +94,77 @@ describe('Targeting.targetEntity with a dead pet', () => {
     targeting.targetEntity(21, 1);
 
     expect(player.targetId).toBeNull();
+  });
+
+  it('does not select a lootable corpse when the viewer has no loot or harvest rights', () => {
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const corpse = ent({
+      id: 30,
+      kind: 'mob',
+      templateId: 'kobold_miner',
+      dead: true,
+      lootable: true,
+      tappedById: 2,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: 2,
+    });
+    entities.set(1, player);
+    entities.set(30, corpse);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(30, 1);
+
+    expect(player.targetId).toBeNull();
+  });
+
+  it('selects a lootable corpse when the viewer owns the shared loot rights', () => {
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const corpse = ent({
+      id: 31,
+      kind: 'mob',
+      templateId: 'kobold_miner',
+      dead: true,
+      lootable: true,
+      tappedById: 1,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: 2,
+    });
+    entities.set(1, player);
+    entities.set(31, corpse);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(31, 1);
+
+    expect(player.targetId).toBe(31);
+  });
+});
+
+describe('ClientWorld.targetEntity with a dead player', () => {
+  it('mirrors the dead-player selection optimistically before the server reply', () => {
+    const viewer = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const fallen = ent({ id: 5, kind: 'player', dead: true, hostile: false });
+    const client = Object.create(ClientWorld.prototype) as {
+      playerId: number;
+      entities: Map<number, Entity>;
+      targetEntity(id: number | null): void;
+      cmd: ReturnType<typeof vi.fn>;
+    };
+    Object.assign(client, {
+      playerId: viewer.id,
+      entities: new Map([
+        [viewer.id, viewer],
+        [fallen.id, fallen],
+      ]),
+      cmd: vi.fn(),
+    });
+
+    client.targetEntity(fallen.id);
+
+    expect(viewer.targetId).toBe(fallen.id);
+    expect(client.cmd).toHaveBeenCalledWith({ cmd: 'target', id: fallen.id });
   });
 });

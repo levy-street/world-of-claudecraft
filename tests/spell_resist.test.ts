@@ -2,7 +2,7 @@
 // Covers the pure leaf (src/sim/combat/spell_resist.ts) AND the behavioral fix at
 // the cast site (applyAbility in combat/casting_lifecycle.ts): an avoided hostile
 // spell must emit kind:'resist' (not 'miss') with zero damage, while a physical
-// ability (sunder) still emits kind:'miss'.
+// ability (Shieldcrack) still emits kind:'miss'.
 
 import { describe, expect, it } from 'vitest';
 import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle';
@@ -94,15 +94,19 @@ describe('spell_resist: cast outcome labeling', () => {
     expect(dmg.every((e) => e.amount === 0)).toBe(true);
   });
 
-  it('a physical ability (sunder) still emits kind:"miss" when avoided', () => {
+  it('a physical ability (Shieldcrack) still emits kind:"miss" when avoided', () => {
     const { sim, p, meta } = makeSim('warrior', 12);
+    expect(sim.setSpec('prot', p.id)).toBe(true);
     const mob = spawnTarget(sim, p, 60, 2);
-    sim.rng.chance = () => true; // meleeMissChance roll -> miss
+    // meleeSwing draws avoidance from ONE rng.next() roll against stacked
+    // bands (miss first); pin the roll to 0 so it always lands in the miss
+    // band regardless of upstream draw-order changes.
+    sim.rng.next = () => 0;
 
     const events: any[] = [];
     sim.ctx.emit = (e: any) => events.push(e);
 
-    castAbility(sim.ctx, 'sunder_armor', p.id);
+    castAbility(sim.ctx, 'shield_slam', p.id);
     let n = 0;
     while (p.castingAbility && n++ < 1000) updateCasting(sim.ctx, p, meta);
 

@@ -8,7 +8,7 @@
 // other surface (a window, the HUD chrome, the action bar) is inert, so releasing a
 // stack over the chat box never destroys it.
 
-import { EQUIP_SLOTS, type EquipSlot } from '../sim/types';
+import { ALL_EQUIP_SLOTS, type EquipSlot } from '../sim/types';
 
 /** The world surface: the one element the destroy drop accepts. */
 const WORLD_CANVAS_SELECTOR = '#game-canvas';
@@ -34,7 +34,10 @@ export function resolveDropTargetAt(
   const raw = socket?.dataset.equipSlot;
   // Validate against the canonical slot list rather than trusting the attribute:
   // a stale or hand-edited value must resolve to no target, never to a wrong slot.
-  if (raw && (EQUIP_SLOTS as readonly string[]).includes(raw)) {
+  // ALL_EQUIP_SLOTS (includes the additive 'offhand' slot), not the frozen
+  // EQUIP_SLOTS, else a finger-drag released over the offhand socket resolves to
+  // no target.
+  if (raw && (ALL_EQUIP_SLOTS as readonly string[]).includes(raw)) {
     return { kind: 'equip', slot: raw as EquipSlot };
   }
   // A bag cell (the manual-order drop): its data-bag-index IS an inventory index

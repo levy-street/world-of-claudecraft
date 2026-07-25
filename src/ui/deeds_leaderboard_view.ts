@@ -25,8 +25,9 @@ import type { DeedsLeaderboardPage } from '../world_api';
 import type { LeaderboardPager } from './leaderboard_view';
 
 /** One ranked account row, faced by its display character. Renown is the one
- *  ranked number on the row: the deprecated wire deedCount is deliberately NOT
- *  mapped here (issue #2044; the completion count lives in the Book header). */
+ *  ranked number on the row (the ranked-surface rule, docs/design/deeds.md:
+ *  no deed count rides this board; the completion count lives in the Book
+ *  of Deeds header). */
 export interface DeedsLeaderboardRow {
   rank: number;
   name: string;

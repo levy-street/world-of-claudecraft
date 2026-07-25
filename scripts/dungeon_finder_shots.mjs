@@ -17,7 +17,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const errors = [];
 
 async function bootOffline(page, name) {
-  page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+  page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
   await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
   // Skip the first-spawn intro cinematic (it inline-hides #ui while it runs).
   await page.evaluate((n) => {
@@ -221,7 +221,7 @@ await landscape.close();
 
 await browser.close();
 if (errors.length) {
-  console.error('page errors:\n' + errors.join('\n'));
+  console.error(`page errors:\n${errors.join('\n')}`);
   process.exit(1);
 }
 console.log('done');

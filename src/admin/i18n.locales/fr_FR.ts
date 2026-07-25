@@ -107,6 +107,7 @@ export const fr_FR: Record<string, string> = {
   'stats.onlineAccounts': 'comptes en ligne',
   'stats.siteUsersNow': 'utilisateurs du site maintenant',
   'stats.peakOnline': 'pic en ligne',
+  'stats.playersCap': 'limite de joueurs',
   'stats.peakOnlineToday': 'pic en ligne 24 h',
   'stats.peakOnlineAllTime': 'pic en ligne historique',
   'stats.accounts': 'comptes',

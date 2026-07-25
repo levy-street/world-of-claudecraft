@@ -85,7 +85,8 @@
 |---|---|---|---|---|
 | `arcane_explosion` | 14 | 60 | inst | aoeDamage 26–31, radius 10 (caster-centered) |
 | `scorch` | 16 | 35 | 1.5s | directDamage 32–40 (fast fire filler) |
-| `ice_barrier` | 20 | 90 | inst, 30cd | absorb 130, 60s (self) |
+| `ice_barrier` / `blazing_barrier` | 5 (R2 12, R3 18) | 45 / 65 / 90 | inst, 30cd | absorb 50 / 90 / 130 + 50% Spell Power, 60s (self) |
+| `temporal_barrier` | 5 (R2 12, R3 18) | 50 / 75 / 105 | inst, 12cd | absorb 55 / 100 / 160 + 25% Spell Power, 10s (friendly) |
 | `pyroblast` | 20 | 125 | 6.0s cast | directDamage 75–100 + dot 24/12s (6×4) — big nuke + burn |
 
 **Sanity** — L14: Fireball R3 avg 42 (+6 dot) ≈ 48/cast → 292 hp ≈ 6.1 casts ✓. L20: FB R4 avg 68 (+12) = 80 → 400 hp = 5 casts (+Fire Blast R3 trims one) ✓.
@@ -369,7 +370,7 @@
 | Class | New abilities (id @ level) | New sim work |
 |---|---|---|
 | Warrior | execute@14, slam@16, cleave@18 | wire existing `requiresTargetHpBelow` |
-| Mage | arcane_explosion@14, scorch@16, ice_barrier@20, pyroblast@20 | none |
+| Mage | personal barrier@5 (R2@12, R3@18), arcane_explosion@14, scorch@16, pyroblast@20 | none |
 | Rogue | kidney_shot@14, ambush@16, adrenaline_rush@20 | **finisherStun effect (the only new effect type)** |
 | Paladin | flash_of_light@12, exorcism@14, consecration@18 | none |
 | Hunter | aspect_of_the_cheetah@14, aimed_shot@16, rapid_fire@20 | none |
@@ -379,3 +380,30 @@
 | Druid | regrowth@14, barkskin@16, starfire@18 | none |
 
 Files to touch when implementing: `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/data.ts` (ABILITIES ranks + new entries, CLASSES.abilities arrays, 2 conjured-water items), `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/types.ts` (one new AbilityEffect variant `finisherStun`, XP_TABLE/MAX_LEVEL extension per the brief).
+
+---
+
+## 2026-07 cap retune: the missing level-20 heal step (healers-vs-heroics rebalance)
+
+Player pools and instance damage outscaled heals across v0.24-v0.29 (heroic/raid
+stamina budgets, prot mastery, Litany, elixirs, masterwork), while the heal
+ladders above stood still: a top heal restored 6.5-8% of a buffed tank pool
+against a classic-era reference of 15-25%. The fix keeps leveling untouched and
+lands entirely at the cap, alongside the heal-side Spell Power doubling
+(`HEALING_SP_SCALE`, 1 healing per point of Intellect) and tank crit immunity:
+
+- Ladders whose top rank was already learned AT 20 are revalued in place
+  (endgame-only by construction): heal R2 335-390, renew R3 205/15s,
+  flash_heal 174-206, rejuvenation R4 168/12s, healing_touch R4 254-302,
+  holy_light R4 275-322.
+- Ladders topping below 20 gain a NEW cap rank at level 20 (~1.45x the prior
+  top, cost ~1.3x, so healing-per-mana improves with the rank): lesser_heal R4
+  160-192 c85, power_word_shield R4 absorb 210 c130, prayer_of_healing R2
+  145-177 c170, holy_nova R2 heal-side 49-61 c90, healing_wave R5 200-238
+  c115, regrowth R2 75-90 + hot 71/21s c72, flash_of_light R2 90-110 c46,
+  holy_shock R2 heal-side 58-73 c72.
+- Deliberately skipped (their descriptions hardcode numbers; ranking them
+  without a reword would make tooltips lie): chain_heal, healing_stream,
+  tranquility. Follow-up: modernize those descriptions to $d, then rank them.
+
+Pinned by tests/heal_rank_caps.test.ts (sub-cap ranks are asserted unchanged).

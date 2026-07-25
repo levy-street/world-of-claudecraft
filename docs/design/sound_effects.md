@@ -273,6 +273,34 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `mudfin`, `burrower`,
 | `dragonkin` | a dragonkin — fierce roaring alert with wing flap / snapping bite roar / dying roar collapse |
 | `demon` | a demon — sinister hissing snarl / shrieking demonic strike / agonized demonic death wail |
 
+### Idle vocalizations (spatial, ambient bark)
+`mob_<family>_idle` (one per family, `reptile` included, 13 total), plus a
+subfamily-specific `mob_<family>_<subfamily>_idle` for the wolf aliases (see
+`SUBFAMILY_ALIAS` in `src/ui/combat_sfx.ts`; a matching `mob_undead_skeleton_*`
+set exists on disk but is not currently wired to any live template, an
+inherited gap this feature did not introduce). Unlike the reactive
+aggro/attack/death/hurt vocalizations (fired directly off sim combat events),
+idle barks are presentation-only ambience: a shared periodic sweep
+(`Hud.sweepMobIdleBarks`, throttled to `MOB_IDLE_CHECK_INTERVAL_MS` from
+`update()`, never per-mob-per-frame) considers every non-combat, unowned,
+non-dummy, unmuted mob within `MOB_IDLE_SCAN_RADIUS` of the player and rolls
+each one independently
+against `MOB_IDLE_BASE_CHANCE`, damped by how many same-family mobs are
+clustered nearby (`idleDensityFactor`, `src/ui/mob_idle_sfx.ts`) so a dense
+pack does not all bark in the same sweep. If several rolls succeed, exactly
+one is selected uniformly for an attempt. That fixed invariant bounds cold
+audio fetch/decode fan-out to one attempt per sweep on every client. A
+per-entity cooldown
+(`MOB_IDLE_PER_ENTITY_COOLDOWN_MS`) additionally rate-limits one mob's own
+repeats, stamped only when `sfx.playAt` reports the sound actually played
+(not merely attempted), so losing the shared per-key playback cooldown
+(`MOB_IDLE_KEY_COOLDOWN_S`, the backstop against two mobs barking the
+identical clip at once) does not silently bench a mob for the full
+per-entity window. Plays at `MOB_IDLE_GAIN`, a dedicated lower bucket
+distinct from the combat layer's `COMBAT_GAIN`. Timing is client-local and
+non-deterministic across players by design (presentation-only, same category
+as footstep variant choice, not gameplay-affecting).
+
 ### Ambient loops
 | key | loop | spatial | prompt summary |
 |---|---|---|---|
@@ -303,16 +331,33 @@ Fiesta) and every world/spatial sound ignore the toggle.
 
 | keys | purpose |
 |---|---|
-| `ui_click`, `ui_error` | basic interaction and invalid-action feedback |
+| `ui_click`, `ui_error` | basic interaction and invalid-action feedback (every failure reason shares one `ui_error` cue, rate-limited to 1.5s via `sfx.playUi`'s `cooldown` option so repeatedly failing the same action does not spam it; splitting by failure reason was tried and deliberately reverted once it turned out `playUi` never actually enforced the cooldown option in the first place) |
 | `ui_bag_open`, `ui_bag_close` | inventory transitions |
 | `ui_coin`, `ui_loot_item` | currency and item rewards |
-| `ui_quest_accept`, `ui_quest_done`, `ui_level_up` | progression feedback |
+| `ui_quest_done`, `ui_level_up`, `ui_cosmetic_unlock` | progression feedback (cosmetic/skin unlocks split off from level-up so they no longer share a sound) |
 | `ui_achievement` | Book of Deeds unlock chime |
-| `ui_whisper`, `ui_sheep`, `ui_death` | message, transformation, and defeat events |
-| `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | duel lifecycle |
+| `ui_whisper`, `ui_sheep`, `ui_death` | message, transformation, and defeat events (`ui_death` also covers Fiesta/Yumi/Vale Cup match-loss; Arena rating loss has its own `ui_arena_loss`) |
+| `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | shared "a match is starting" lifecycle: a real duel and an Arena queue pop reuse this same family (deliberately, not a mixup). Vale Cup shares challenge/countdown/end but has its own kickoff cue, `ui_vcup_kickoff`, split off from `ui_duel_start` so a real duel-start recording does not also fire for the soccer minigame. Unlike most notification cues, this family is never silenced by the Interface & Feedback Sounds toggle (same category as the ready-check chime), since a real challenge is time-critical to respond to. Party invite, guild invite, and a resurrection offer play the same `ui_duel_challenge` clip through the separate `invitePrompt()` method instead (the old, separate, misnamed `ui_quest_accept` those used is retired): same sound, but gated by the toggle like a normal notification, since those prompts aren't time-critical the way a real challenge is. |
+| `ui_ready_check` | group ready-check three-note prompt |
+| `ui_weapon_sheathe`, `ui_weapon_unsheathe` | weapon stow toggle (Z key) |
 | `ui_fiesta_word_0` through `ui_fiesta_word_3` | escalating Fiesta takedown tiers |
 | `ui_fiesta_score_mine`, `ui_fiesta_score_other` | team score feedback |
 | `ui_fiesta_wave`, `ui_fiesta_augment`, `ui_fiesta_down`, `ui_fiesta_revive` | Fiesta round and player-state feedback |
+| `ui_card_play`, `ui_card_reveal` | Card Duel minigame (`src/sim/social/card_duel.ts`): a card played, and every round's simultaneous reveal. High-frequency (once per round each), multi-take. |
+| `ui_card_round_push` | Card Duel: layers on top of the reveal cue when a round ties (nobody scores), never a replacement for it |
+| `ui_card_shuffle` | Card Duel: the initial deal at match start AND a mid-match reshuffle (discard pile shuffled back into the deck once it empties), same cue for both moments |
+| `ui_gather_cast` | the gather cast starting (Professions 2.0 Phase 12b), a soft tool wind-up; PLACEHOLDER (deterministic synth, issue #2208) ONLY as the flat fallback for when `gatherCast()` is called with no node type known. In practice `ui_gather_cast_<nodeType>` below always takes over: `harvestNode` is the sole gather `castStart` emit site and always sets the type |
+| `ui_gather_cast_ore`, `ui_gather_cast_wood`, `ui_gather_cast_herb` | the real, per-node-type "pulling the tool out" recordings that supersede `ui_gather_cast` above, via `audio.gatherCast(nodeType)` |
+| `ui_fish_cast` | the fishing line cast whoosh and plop |
+| `ui_fish_bite` | the bite signal opening the reel window; the one gameplay-timing cue of this family, so it ignores the Interface & Feedback Sounds toggle (rides `play()`, never `playFeedback()`) |
+| `ui_fish_reel` | the landed reel crank and splash |
+| `ui_gather_ore`, `ui_gather_wood`, `ui_gather_herb` | gathering-node harvest, keyed by `GatherNodeType` (`src/sim/types.ts`) off the `gatherResult` sim event via `audio.gather(nodeType)`; replaces the old flat `ui_gather_strike`/`ui_gather_rare` placeholders |
+| `ui_gather_rare`, `ui_gather_epic`, `ui_gather_legendary` | rare-or-better gather stinger, layered ALONGSIDE the `ui_gather_<nodeType>` cue above via `audio.gatherRareTier(tier)`, never a replacement for it; tier tracks `gatherResult.rarity` 1:1, with a rare-event roll forcing at least the epic tier regardless of the rolled material rarity |
+| `ui_craft_engineering`, `ui_craft_alchemy`, `ui_craft_cooking`, `ui_craft_leatherworking`, `ui_craft_tailoring`, `ui_craft_inscription`, `ui_craft_enchanting`, `ui_craft_jewelcrafting`, `ui_craft_weaponcrafting`, `ui_craft_armorcrafting` | crafting completion, one per `CRAFT_RING` family (`src/sim/content/professions.ts`), resolved from the `craftResult` event's `recipeId` via `audio.craftSuccess(professionId)`; an unrecognized family falls back to `ui_loot_item`. `ui_craft_enchanting` never actually fires: the enchanting profession has no craftable recipes in `recipes.ts`, so `craftResult` can never resolve to it |
+| `ui_masterwork` | masterwork proc: plays via `audio.masterwork()` layered ALONGSIDE the `ui_craft_<family>` cue above on the same `craftResult`, never a replacement for it |
+| `ui_craft_disenchant` | the enchanting profession's disenchant action (`src/sim/professions/enchanting.ts` `disenchantItem`), wired to `audio.disenchant()` on a successful `disenchantResult` |
+| `ui_craft_salvage` | the enchanting profession's salvage action (`src/sim/professions/salvage.ts`), wired to `audio.salvage()` on a successful `salvageResult` |
+| `ui_craft_enchanting` (via `audio.enchant()`) | the enchanting profession's ONE recording, reused for its real action: applying an enchant to a held item (`src/sim/professions/enchanting.ts` `applyEnchant`), wired on a successful `enchantResult`. The same file also sits in `craftByFamily.enchanting` above, harmlessly, since that path never fires |
 
 ---
 

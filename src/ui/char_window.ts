@@ -18,10 +18,10 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { GatheringProfessionId } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
@@ -31,8 +31,11 @@ import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
+import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { archetypeImageUrl, professionImageUrl } from './profession_art';
+import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
@@ -45,61 +48,64 @@ const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
-// The ten craft-archetype title keys (issue 1130), one per craft id on the ring (see
-// src/sim/content/professions.ts CRAFT_RING and src/sim/professions/archetype.ts
-// getArchetypeTitle: the title identifier IS the craft id). Every player-visible
-// string is a t() key, so this is a literal id-to-key table, never a built string.
-const ARCHETYPE_TITLE_KEYS: Record<string, TranslationKey> = {
-  armorcrafting: 'hudChrome.archetypeTitle.armorcrafting',
-  weaponcrafting: 'hudChrome.archetypeTitle.weaponcrafting',
-  jewelcrafting: 'hudChrome.archetypeTitle.jewelcrafting',
-  alchemy: 'hudChrome.archetypeTitle.alchemy',
-  engineering: 'hudChrome.archetypeTitle.engineering',
-  cooking: 'hudChrome.archetypeTitle.cooking',
-  inscription: 'hudChrome.archetypeTitle.inscription',
-  enchanting: 'hudChrome.archetypeTitle.enchanting',
-  tailoring: 'hudChrome.archetypeTitle.tailoring',
-  leatherworking: 'hudChrome.archetypeTitle.leatherworking',
+// The ten pair-archetype title keys (issue 1130, pair-named under Professions
+// 2.0), one per canonical pair id (see src/sim/professions/archetype.ts
+// ARCHETYPE_PAIR_TARGETS and getArchetypeTitle: the title identifier IS the
+// pair id). Every player-visible string is a t() key, so this is a literal
+// id-to-key table, never a built string.
+const ARCHETYPE_PAIR_TITLE_KEYS: Record<string, TranslationKey> = {
+  'engineering+alchemy': 'hudChrome.archetypePair.engineering+alchemy',
+  'alchemy+cooking': 'hudChrome.archetypePair.alchemy+cooking',
+  'cooking+leatherworking': 'hudChrome.archetypePair.cooking+leatherworking',
+  'leatherworking+tailoring': 'hudChrome.archetypePair.leatherworking+tailoring',
+  'tailoring+inscription': 'hudChrome.archetypePair.tailoring+inscription',
+  'inscription+enchanting': 'hudChrome.archetypePair.inscription+enchanting',
+  'enchanting+jewelcrafting': 'hudChrome.archetypePair.enchanting+jewelcrafting',
+  'jewelcrafting+weaponcrafting': 'hudChrome.archetypePair.jewelcrafting+weaponcrafting',
+  'weaponcrafting+armorcrafting': 'hudChrome.archetypePair.weaponcrafting+armorcrafting',
+  'armorcrafting+engineering': 'hudChrome.archetypePair.armorcrafting+engineering',
 };
 
-/** Localized text for the granted archetype title, or the "no title yet" copy
+// The ten per-craft display-name keys, one per craft id on the ring (see
+// src/sim/content/professions.ts CRAFT_RING). Used wherever a CRAFT (not a
+// title) is meant: the hobby line, skill rows, section headers, combo labels.
+const CRAFT_NAME_KEYS: Record<string, TranslationKey> = {
+  armorcrafting: 'hudChrome.craftName.armorcrafting',
+  weaponcrafting: 'hudChrome.craftName.weaponcrafting',
+  jewelcrafting: 'hudChrome.craftName.jewelcrafting',
+  alchemy: 'hudChrome.craftName.alchemy',
+  engineering: 'hudChrome.craftName.engineering',
+  cooking: 'hudChrome.craftName.cooking',
+  inscription: 'hudChrome.craftName.inscription',
+  enchanting: 'hudChrome.craftName.enchanting',
+  tailoring: 'hudChrome.craftName.tailoring',
+  leatherworking: 'hudChrome.craftName.leatherworking',
+};
+
+/** Localized text for the granted pair-archetype title (the input is the
+ *  canonical pair id from IWorld `archetypeTitle`), or the "no title yet" copy
  *  when the player has not completed the zone-1 acceptance quest (or the id is
  *  somehow unrecognized). Exported for the view-model test. */
-export function archetypeTitleText(craftId: string | null): string {
-  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
+export function archetypeTitleText(pairId: string | null): string {
+  const key = pairId !== null ? ARCHETYPE_PAIR_TITLE_KEYS[pairId] : undefined;
   return t(key ?? 'hudChrome.archetypeTitle.none');
 }
 
-/** Localized text for the hobby craft (issue 1294): the same per-craft name
- *  table as the archetype title (a hobby id IS a craft id on the ring), or
- *  the "no hobby yet" copy before an archetype has ever been chosen.
+/** Localized display name for one craft on the ring, or the same "none" copy
+ *  for null/unrecognized ids. Exported for the crafting window, identity card,
+ *  and quest dialog (every surface that names a CRAFT rather than a title). */
+export function craftNameText(craftId: string | null): string {
+  const key = craftId !== null ? CRAFT_NAME_KEYS[craftId] : undefined;
+  return t(key ?? 'hudChrome.archetypeTitle.none');
+}
+
+/** Localized text for the hobby craft (issue 1294): a hobby id IS a craft id
+ *  on the ring, so this renders the per-craft display name, or the "no hobby
+ *  yet" copy before an archetype has ever been chosen.
  *  Exported for the view-model test. */
 export function hobbyCraftText(craftId: string | null): string {
-  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
-  return t(key ?? 'hudChrome.archetypeTitle.none');
+  return craftNameText(craftId);
 }
-
-// The character-sheet stat cells, primaries down the left column and derived
-// stats down the right (the CSS grid wraps two per row). The HUD builds each cell
-// from the unit-tested stat_tooltip_view model, so the order is the only stat
-// concern this painter owns.
-const STAT_GRID: readonly StatId[] = [
-  'str',
-  'armor',
-  'agi',
-  'attackPower',
-  'sta',
-  'dps',
-  'int',
-  'critChance',
-  'spi',
-  'dodge',
-  'spellPower',
-  'critRating',
-  'hasteRating',
-  'hitRating',
-  'warfare',
-];
 
 /**
  * Hud-supplied glue. Composes the shared PainterHostPresentation bag
@@ -144,14 +150,15 @@ export interface CharWindowDeps extends PainterHostPresentation {
   showError(text: string): void;
 }
 
-// Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
-const GATHERING_PROFESSION_LABEL_KEY: Record<
-  GatheringProfessionId,
-  'hudChrome.gathering.mining' | 'hudChrome.gathering.logging' | 'hudChrome.gathering.herbalism'
-> = {
+// Maps each gathering profession id to its hud_chrome display-name key (issue
+// 1124). String-keyed like the sibling professions_window.ts GATHERING_NAME_KEYS
+// (and this file's CRAFT_NAME_KEYS): an id with no key here renders no row
+// (fishing landed with Professions 2.0).
+const GATHERING_PROFESSION_LABEL_KEY: Record<string, TranslationKey> = {
   mining: 'hudChrome.gathering.mining',
   logging: 'hudChrome.gathering.logging',
   herbalism: 'hudChrome.gathering.herbalism',
+  fishing: 'hudChrome.gathering.fishing',
 };
 
 const SHARE_GLYPH =
@@ -199,12 +206,16 @@ export class CharWindow {
     // WCAG 2.2 AA: name the focus-trapped root via the character title span.
     markDialogRoot(el, { labelledBy: 'char-title' });
     const archetypeTitle = archetypeTitleText(world.archetypeTitle);
+    const archetypeCrestUrl = archetypeImageUrl(world.archetypeTitle);
+    const archetypeCrest = archetypeCrestUrl
+      ? `<img class="char-archetype-title-crest" src="${esc(archetypeCrestUrl)}" alt="" draggable="false">`
+      : '';
     const hobbyCraft = hobbyCraftText(world.hobbyCraft);
     const hobbyRow =
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -213,7 +224,18 @@ export class CharWindow {
       </div>
       <div class="equip-col equip-col-right" id="equip-col-right"></div>
     </div>`;
-    html += `<div class="char-stats">${STAT_GRID.map((stat) => this.deps.statCellHtml(stat)).join('')}</div>`;
+    // Stats as the showcase layout: five primary tiles, then the Offense and
+    // Defense panels. The partition + heading keys come from the char_stats_view
+    // pure core; each cell is the same unit-tested stat_tooltip_view cell (colon
+    // dropped, since flex layout separates label from value in tiles and panels).
+    html += `<div class="stat-panels">${STAT_PANELS.map((panel) => {
+      const cells = panel.stats.map((stat) => this.deps.statCellHtml(stat)).join('');
+      const title = panel.titleKey
+        ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
+        : '';
+      const cls = panel.kind === 'tiles' ? 'stat-panel attrs-tiles' : 'stat-panel';
+      return `<div class="${cls}">${title}${cells}</div>`;
+    }).join('')}</div>`;
     html += this.deps.talentSummaryHtml();
     html += this.deps.progressionHtml(p.level);
     html += this.gatheringHtml(world);
@@ -231,14 +253,13 @@ export class CharWindow {
       audio.click();
       this.deps.openPlayerCard();
     });
-
     const view = buildPaperdollView(world.equipment, ITEMS);
     const leftCol = el.querySelector('#equip-col-left');
     const rightCol = el.querySelector('#equip-col-right');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
 
-    for (const cell of el.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
+    for (const cell of el.querySelectorAll<HTMLElement>('.stat-panels [data-stat]')) {
       const stat = cell.dataset.stat as StatId;
       // Resolve the tooltip lazily, on show, so the breakdown reflects the
       // player's current stats at the moment they hover, not at render time.
@@ -256,10 +277,15 @@ export class CharWindow {
   private gatheringHtml(world: IWorld): string {
     const rows = buildGatheringProficiencyRows(world);
     const items = rows
-      .map(
-        (r) =>
-          `<span>${esc(t(GATHERING_PROFESSION_LABEL_KEY[r.professionId]))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`,
-      )
+      .map((r) => {
+        const key = GATHERING_PROFESSION_LABEL_KEY[r.professionId];
+        if (key === undefined) return '';
+        const imageUrl = professionImageUrl(`gather_${r.professionId}`);
+        const icon = imageUrl
+          ? `<img class="char-gather-icon" src="${esc(imageUrl)}" alt="" draggable="false">`
+          : '';
+        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${formatNumber(r.displayValue, { maximumFractionDigits: 0 })}</b></span></span>`;
+      })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
   }
@@ -285,11 +311,21 @@ export class CharWindow {
     row.innerHTML = `${icon}
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     if (item) {
-      this.deps.attachTooltip(
-        row,
-        () =>
-          `${this.deps.itemTooltip(item)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`,
-      );
+      // Soft glow in the item's quality color (derived, no getComputedStyle).
+      const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
+      if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
+      this.deps.attachTooltip(row, () => {
+        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
+        // the self entity mirror carries equippedInstances in both worlds.
+        // Projected through wornTooltipInstance so the offline
+        // full payload renders exactly what the online eqi-trimmed mirror
+        // does: worn identity is signer/enchant/rolled, never the bond.
+        const world = this.deps.world();
+        const instance = wornTooltipInstance(
+          world.entities.get(world.playerId)?.equippedInstances?.[slot],
+        );
+        return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
+      });
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.
       const unequip = document.createElement('button');
@@ -333,7 +369,9 @@ export class CharWindow {
     const item = ITEMS[itemId];
     if (!item) return;
     const world = this.deps.world();
-    switch (paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level)) {
+    switch (
+      paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level, world.talentSpec)
+    ) {
       case 'blockedSlot':
         this.deps.showError(tSim('error.wrongEquipSlot'));
         return;
@@ -368,7 +406,13 @@ export class CharWindow {
       const accepts =
         !!item &&
         !!slot &&
-        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) === 'equip';
+        paperdollDropAction(
+          item,
+          slot,
+          world.cfg.playerClass,
+          world.player.level,
+          world.talentSpec,
+        ) === 'equip';
       row.classList.toggle('drop-target', accepts);
     }
   }
@@ -384,7 +428,13 @@ export class CharWindow {
       const world = this.deps.world();
       if (
         !item ||
-        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) !== 'equip'
+        paperdollDropAction(
+          item,
+          slot,
+          world.cfg.playerClass,
+          world.player.level,
+          world.talentSpec,
+        ) !== 'equip'
       )
         return;
       e.preventDefault();

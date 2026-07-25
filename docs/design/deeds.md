@@ -32,7 +32,17 @@ the `renown` sum and the persisted `deedStats` lifetime counters, and emits
 the id-based `deedUnlocked` event (never English text); on world join it
 re-evaluates every predicate against loaded state and grants with
 `retro: true`, so veterans get credit for anything their character verifiably
-already did. The server is an observer, never the authority: it upserts
+already did. The same join pass carries the fallback heals
+(`retroFallbackGrants` in `src/sim/deeds.ts`), idempotent and re-run every
+login: PROOF inferences grant a deed whose evidence predates its counter (a
+positive craft skill proves the first craft; a completed single-source
+ground-pickup quest proves the first sparkle, pinned by
+`GROUND_PICKUP_PROVING_QUESTS`), and STRANDED heals grant a deed once it has
+become permanently impossible for that character (the five-up killing blow
+once no creditable mob can sit five levels above, ceiling pinned by
+`MAX_CREDITABLE_MOB_LEVEL`; rested XP at the cap where the pool is frozen),
+keeping rule 5 honest and `feat_book_complete` reachable. Both proof sets are
+re-derived from the live content tables by `tests/deeds_content.test.ts`. The server is an observer, never the authority: it upserts
 unlocks into the `character_deeds` table fire-and-forget
 (`server/deeds_records.ts`), fans out marquee broadcasts, and serves rarity
 percentages and the account-level Renown leaderboard (scored by
@@ -69,7 +79,13 @@ server store always canonical.
    one fits.
 4. **Skill tasks fail only through player error, never RNG.**
 5. **No permanently missable deeds.** Anything tied to seasonal or retired
-   content becomes a Feat, preserved visibly, never deleted.
+   content becomes a Feat, preserved visibly, never deleted. A deed that can
+   silently become permanently impossible for an individual character (an
+   earning window their level has passed, a pool frozen at the cap, a counter
+   whose only feed sits behind consumed one-shot quests) is healed at world
+   join instead: `retroFallbackGrants` grants it from proof where persisted
+   state demonstrates the action, or outright once no earn path can ever
+   exist again for that character (see Architecture).
 6. **Count outcomes, not attempts.** No deed may reward griefing, AFK
    attendance, or pure login. PvP uses rating thresholds and milestones that
    cannot be win-traded profitably; multiplayer deeds must be satisfiable
@@ -117,8 +133,8 @@ and it surfaces as Renown, never as a count.
 number shown on a ranked surface must be either recomputable by the player
 from an in-game surface or explicitly labeled with its set and scope. The
 Renown board therefore displays Renown alone: there is no deed-count column
-(the retired wire field is deprecated and tracked for removal in issue
-#2044), the account scope is stated in visible text on the tab
+and no count rides the wire (the deprecated wire-compat output was removed
+by issue #2044), the account scope is stated in visible text on the tab
 (`hudChrome.deeds.lbScopeNote`), and the self line carries the account's
 board-scored Renown so a single-character player can verify it against their
 Book. If a deed count is ever re-added to a ranked surface, it must be named
@@ -172,13 +188,12 @@ the root `CLAUDE.md` content rule points here.
   strictly per-character and `server/deeds_records.ts` is observer-only; an
   account-level grant lane must exist first.
 - **`prog_ringwright`**: jewelcrafting and inscription have zero recipes
-  today, and enchanting (which ships an enchant table and gains skill from
-  disenchant and apply-enchant in the sim) has no player-facing wiring on
-  any host yet, so the ten-craft ring cannot complete and the deed would be
-  visible yet unearnable.
-- **The salvage pair** (`soc_first_salvage`, `soc_salvage_50`): salvage has
-  no player-facing wiring on any host yet (no `IWorld` member, no UI caller,
-  no wire or server command).
+  today (their depth arrives with the post-level-20 zone expansion, per
+  `docs/design/professions.md`), so the ten-craft ring cannot complete and
+  the deed would be visible yet unearnable. Their per-craft milestone and
+  Grandmaster deeds stay deferred with it. Enchanting is no longer a
+  blocker: it is player-wired (disenchant, apply-enchant, salvage) and its
+  deeds shipped.
 - **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
   Renown.
 

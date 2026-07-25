@@ -39,12 +39,6 @@ export interface DeedsLeaderboardEntry {
   cls: PlayerClass;
   level: number;
   renown: number;
-  /** @deprecated Wire-compat only, removed next release (issue #2044): the
-   *  board displays no deed count anymore (Renown is the one ranked number;
-   *  the completion count lives in the Book of Deeds header). The server
-   *  keeps populating it so a stale client's column renders real data; new
-   *  clients never read it. */
-  deedCount: number;
   // The display character's selected title: a deed id the client localizes
   // through deed_i18n.ts (never display text), or null when untitled.
   title: string | null;

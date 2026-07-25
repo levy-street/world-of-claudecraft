@@ -21,7 +21,25 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   guess; see the P0 comment in `manifest.ts` and
   `tests/render_asset_preload.test.ts`). `prepareVisual(key)` memoizes
   normalize transform, resolved clips, click-capsule radius, and a baked
-  idle-pose geo (far-LOD/shadow proxy).
+  idle-pose geo (far-LOD/shadow proxy). `charactersReady()` is a narrower gate
+  than the site-wide `assetsReady()`: only this file's boot GLBs + skin atlases,
+  with its own retry loop (delayed, backed off between outer attempts) so a
+  transient failure anywhere else on the site can never permanently blank the
+  landing character-creation preview (`src/main.ts` awaits it there instead of
+  `assetsReady()`; see `tests/character_preview_boot.test.ts`).
+- `asset_miss_log.ts`: once-per-key dev logging for character-asset failures in
+  per-frame render paths; `createCharacterVisual` returns null on such a
+  failure so callers skip the view for the frame instead of stalling the
+  renderer (`tests/character_visual_fail_soft.test.ts`).
+- `halo.ts`: the class halo (the priest's Light): `buildHalo(color, upOffset,
+  radius)`, driven by `VisualDef.halo` plus the optional
+  `haloUpOffset`/`haloRadius` placement overrides (defaults live here; the
+  priest overrides only the lift, for hat clearance). Texture, per-color
+  materials, and
+  per-radius geometries are shared never-disposed caches; radii must come from
+  static `VisualDef` values so the cache keys stay bounded. `visual.ts` parents
+  the mesh to the head bone and keeps it out of the shadow-caster sweeps
+  (`tests/character_halo.test.ts`).
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
@@ -29,7 +47,8 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   plumbing, one-shot triggers, death/revive edge logic.
 - `preview.ts`: `CharacterPreview`, the character-creation turntable (own scene/
   camera/loop), driven from `src/main.ts`; `preview_appearance.ts` resolves a
-  `PreviewAppearance` (class, skin, mech, mainhand) to its visual key + weapon layout.
+  `PreviewAppearance` (class, skin, mech, mainhand, offhand) to its visual key and
+  independent held-item layout.
 - `portrait.ts`: offscreen-WebGL headshot factory: renders a (class/visual-key, skin)
   PNG at the requested `PortraitFraming` from the real model, caches the data URL.
 - `weapon_grip.ts`: pure, three-free per-weapon grip nudges
@@ -60,18 +79,23 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
 
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`
-  (`idle|walk|walkBack|run|cast|swim|sit|jump`) live in `anim_state.ts`, which
+  (`idle|walk|walkBack|run|cast|spin|swim|sit|jump`) live in `anim_state.ts`, which
   also owns `desiredBaseState()` (pose selection) and `locomotionTimeScale()`
   (foot-speed matching). Clip *names* are per source rig in the `ClipMap`
   factories (`manifest.ts`); names differ per rig (e.g. KayKit `Walking_A`,
   Quaternius `Gallop`), `baseAction()` falls back gracefully.
 - **`src/render/renderer.ts` is the sole driver.** It builds `AnimState` each
   frame (swimming/sitting derived there, sim is unaware), calls `update(dt, s,
-  animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles
-  `setFar`/`setShadow`/`setProxyShadow`/`setGhost`. Don't drive visuals elsewhere.
-- **Crowd scaling:** the renderer consults `src/render/crowd_lod.ts` (pure,
-  unit-tested) for shadow/anim-cadence ranges as rig counts climb; the policy
-  is cosmetic-only and exempts anything a player reacts to.
+  animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles live
+  held items and effects. Don't drive visuals elsewhere.
+- **Crowd scaling / LOD bands:** the renderer consults `src/render/crowd_lod.ts`
+  (pure, unit-tested) for the shadow/anim-cadence ranges as rig counts climb,
+  and for where `setFar` swaps the rig for the baked idle-pose mesh. Between the
+  articulated band and that swap sits the animated far band: the rig keeps its
+  clips at a low cadence (the mixer integrates the skipped time via `pendingDt`,
+  so the clip plays at its real speed, just at fewer pose updates) instead of
+  freezing. The policy is cosmetic-only and exempts anything a player reacts to
+  from BOTH the cadence and the frozen mesh.
 - Death/revive are **edge-triggered locally** from `s.dead` (clamped one-shot);
   `flourish` plays on respawn. One-shots clamp on the last frame, see the
   T-pose-pop comment in `playOneShot`.

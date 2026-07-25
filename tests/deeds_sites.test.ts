@@ -5,12 +5,8 @@
 // the player's earned set, every negative targets one exact gate condition.
 import { describe, expect, it } from 'vitest';
 import { handleDeath } from '../src/sim/combat/damage';
-import {
-  CRAFTING_HUB_MIN_LEVEL,
-  CRAFTING_HUB_POS,
-  CRAFTING_HUB_RADIUS,
-} from '../src/sim/content/professions';
-import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
+import { STATION_RADIUS } from '../src/sim/content/professions';
+import { DUNGEONS, instanceOrigin, MOBS, STATIONS } from '../src/sim/data';
 import {
   type CupMatchForDeeds,
   onArenaMatchEndForDeeds,
@@ -41,6 +37,7 @@ import {
 import { createMob } from '../src/sim/entity';
 import { respawnMob } from '../src/sim/mob/lifecycle';
 import { craftItem } from '../src/sim/professions/crafting';
+import { stationsOfType } from '../src/sim/professions/stations';
 import { type ArenaMatch, type InstanceSlot, type PlayerMeta, Sim } from '../src/sim/sim';
 import { endArenaMatch } from '../src/sim/social/arena';
 import { applyResurrectionSickness } from '../src/sim/spirit';
@@ -1332,26 +1329,31 @@ describe('kill-credit negatives (onMobKillCreditForDeeds)', () => {
   });
 });
 
-describe('hub-station craft counter (prog_tools_of_the_trade)', () => {
-  // The station-bound tool recipe and a free-field common recipe (recipes.ts).
-  const HUB_RECIPE = 'recipe_thorium_mining_pick';
+describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
+  // The station-bound tool recipe (toolworks) and a free-field common recipe
+  // (recipes.ts). The gate is per-type station POSITION only; the
+  // old level-20 hub arm is retired.
+  const STATION_RECIPE = 'recipe_thorium_mining_pick';
   const FIELD_RECIPE = 'recipe_eastbrook_arming_sword';
+  // The station the recipe binds to, read from the STATIONS record so a
+  // content re-placement can never silently strand this suite.
+  const toolworks = stationsOfType(STATIONS, 'toolworks')[0];
 
-  function hubCrafter(sim: Sim, level = CRAFTING_HUB_MIN_LEVEL): PlayerMeta {
+  function stationCrafter(sim: Sim, level = 20): PlayerMeta {
     const meta = addMeta(sim, 'Crafter');
     const e = entityOf(sim, meta);
     e.level = level;
-    e.pos.x = CRAFTING_HUB_POS.x;
-    e.pos.z = CRAFTING_HUB_POS.z;
+    e.pos.x = toolworks.pos.x;
+    e.pos.z = toolworks.pos.z;
     sim.ctx.addItem('thorium_ore', 4, meta.entityId);
     sim.ctx.addItem('mithril_mining_pick', 1, meta.entityId);
     return meta;
   }
 
-  it('a station-bound craft at the hub bumps the counter and grants after the tick', () => {
+  it('a station-bound craft at the station bumps the counter and grants after the tick', () => {
     const sim = makeSim();
-    const meta = hubCrafter(sim);
-    const result = craftItem(sim.ctx, HUB_RECIPE, meta.entityId);
+    const meta = stationCrafter(sim);
+    const result = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     expect(meta.deedStats.counters.craftsPerformed).toBe(1);
@@ -1359,41 +1361,45 @@ describe('hub-station craft counter (prog_tools_of_the_trade)', () => {
     expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
   });
 
-  it('one step outside the hub circle denies, and the denied attempt counts nothing', () => {
+  it('one step outside the station circle denies, and the denied attempt counts nothing', () => {
     const sim = makeSim();
-    const meta = hubCrafter(sim);
+    const meta = stationCrafter(sim);
     const e = entityOf(sim, meta);
-    e.pos.z = CRAFTING_HUB_POS.z + CRAFTING_HUB_RADIUS + 1;
-    const denied = craftItem(sim.ctx, HUB_RECIPE, meta.entityId);
+    e.pos.z = toolworks.pos.z + STATION_RADIUS + 1;
+    const denied = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
     expect(denied.ok).toBe(false);
-    expect(denied.reason).toBe('not_at_hub');
+    expect(denied.reason).toBe('station_required');
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(0);
     expect(meta.deedStats.counters.craftsPerformed).toBe(0);
     // One step back inside the boundary, the same craft resolves and counts.
-    e.pos.z = CRAFTING_HUB_POS.z + CRAFTING_HUB_RADIUS - 1;
-    expect(craftItem(sim.ctx, HUB_RECIPE, meta.entityId).ok).toBe(true);
+    e.pos.z = toolworks.pos.z + STATION_RADIUS - 1;
+    expect(craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId).ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
     expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
   });
 
-  it('below the hub level gate the same on-the-spot craft denies and counts nothing', () => {
+  it('the retired level arm: an under-20 crafter AT the station succeeds and counts', () => {
+    // Inversion of the old level-20 hub gate (2026-07-17 maintainer
+    // ruling): the same on-the-spot craft that used to deny with not_at_hub
+    // one level under now resolves, counts, and grants.
     const sim = makeSim();
-    const meta = hubCrafter(sim, CRAFTING_HUB_MIN_LEVEL - 1);
-    const denied = craftItem(sim.ctx, HUB_RECIPE, meta.entityId);
-    expect(denied.ok).toBe(false);
-    expect(denied.reason).toBe('not_at_hub');
-    expect(meta.deedStats.counters.hubCraftsPerformed).toBe(0);
+    const meta = stationCrafter(sim, 19);
+    const result = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
+    expect(result.ok).toBe(true);
+    expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
-    expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(false);
+    expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
   });
 
-  it('an ordinary field recipe crafted while standing at the hub never counts', () => {
+  it('an ordinary field recipe crafted while standing at the station never counts', () => {
     const sim = makeSim();
-    const meta = hubCrafter(sim);
-    sim.ctx.addItem('bone_fragments', 2, meta.entityId);
-    sim.ctx.addItem('linen_scrap', 1, meta.entityId);
-    const result = craftItem(sim.ctx, FIELD_RECIPE, meta.entityId);
+    const meta = stationCrafter(sim);
+    // Reagents for the field sword.
+    sim.ctx.addItem('wolf_fang', 2, meta.entityId);
+    sim.ctx.addItem('bone_fragments', 4, meta.entityId);
+    sim.ctx.addItem('smithing_flux', 6, meta.entityId);
+    const result = craftItem(sim.ctx, FIELD_RECIPE, false, meta.entityId);
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.craftsPerformed).toBe(1);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(0);
@@ -1412,19 +1418,24 @@ describe('enchanting skill-gain sites', () => {
   // addItem marks the player dirty on FIRST discovery of an item id, which
   // would mask a missing site mark (a veteran who long since discovered the
   // dust gets no discovery mark from the disenchant yield).
-  function stagedAt74(sim: Sim): PlayerMeta {
+  // Re-pin: enchanting gains are quality-tiered now, so a common
+  // sword/dust action at capability 2 (skill 50-74.75) grants the green 0.25
+  // (min(common 0, pre-archetype ceiling 2) = 0, two tiers below), not the
+  // retired flat 1. Staging at 74.75 keeps the threshold crossing exact:
+  // 74.75 + 0.25 = 75.
+  function stagedJustUnderThreshold(sim: Sim): PlayerMeta {
     const meta = sim.players.get(sim.playerId)!;
     sim.addItem('eastbrook_arming_sword', 1, sim.playerId);
     sim.addItem('arcane_dust', 5, sim.playerId);
     sim.tick();
     expect(meta.deedsEarned.has('prog_craft_specialist')).toBe(false);
-    meta.craftSkills.enchanting = 74;
+    meta.craftSkills.enchanting = 74.75;
     return meta;
   }
 
   it('a disenchant that lifts enchanting skill over a craftSkill threshold grants after the tick', () => {
     const sim = makeSim();
-    const meta = stagedAt74(sim);
+    const meta = stagedJustUnderThreshold(sim);
     sim.disenchantItem('eastbrook_arming_sword');
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(meta.craftSkills.enchanting).toBe(75);
@@ -1434,7 +1445,7 @@ describe('enchanting skill-gain sites', () => {
 
   it('an apply-enchant that lifts enchanting skill over the threshold grants after the tick', () => {
     const sim = makeSim();
-    const meta = stagedAt74(sim);
+    const meta = stagedJustUnderThreshold(sim);
     sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might');
     expect(sim.lastEnchantResult?.ok).toBe(true);
     expect(meta.craftSkills.enchanting).toBe(75);

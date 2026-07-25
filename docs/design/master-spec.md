@@ -199,7 +199,7 @@ Ground sparkles: highwatch_summons ×2 at (1,654),(-2,657); ogre_war_totem ×7 a
 |---|---|---|---|---|---|---|---|
 | q_highwatch_summons | The Watch on the Peaks | brother_aldric_fen → captain_thessaly | collect 1 highwatch_summons (sparkle, Highwatch gate) | 500 | 500 | — | minLevel 12 (breadcrumb; NOT gated on the 5-man Bastion) |
 | q_stalkers | Stalkers on the Ridge | captain_thessaly | kill 12 ridge_stalker | 2200 | 1000 | — | — |
-| q_stalker_pelts | Winter Is Coming to Highwatch | quartermaster_bree | collect 8 ridge_stalker_pelt | 2300 | 1000 | ridgestalker_treads (all) | — |
+| q_stalker_pelts | First Frost at Highwatch | quartermaster_bree | collect 8 ridge_stalker_pelt | 2300 | 1000 | ridgestalker_treads (all) | none |
 | q_kobold_tunnels | Deeprock Trouble | loremaster_caddis | kill 12 deeprock_kobold | 2500 | 1200 | — | minLevel 14 |
 | q_glowing_wax | Strange Wax | quartermaster_bree | collect 6 glowing_wax | 2500 | 1200 | — | requires q_kobold_tunnels |
 | q_ogre_edges | Ogres at the Foothills | scout_maren_highwatch | kill 12 thornpeak_ogre | 2900 | 1400 | — | minLevel 15 |
@@ -444,7 +444,7 @@ Economy continuity: zone-2 quests pay 2–25s (total ≈ 1g31s + ~1g+ mob copper
 | icevein_dirk | Icevein Dirk | weapon (10–16 spd 1.8, dagger) | common | 6000 | 600 |
 | highwatch_breastplate | Highwatch Breastplate | armor/chest, armor 160 | common | 7000 | 700 |
 | peakwool_robe | Peakwool Robe | armor/chest, armor 50 | common | 5000 | 500 |
-| stalkerhide_jerkin | Stalkerhide Jerkin | armor/chest, armor 95 | common | 6000 | 600 |
+| stalkerhide_jerkin | Prowlhide Jerkin | armor/chest, armor 95 | common | 6000 | 600 |
 | cragwalker_boots | Cragwalker Boots | armor/feet, armor 55 | common | 4000 | 400 |
 | windguard_leggings | Windguard Leggings | armor/legs, armor 70 | common | 4500 | 450 |
 

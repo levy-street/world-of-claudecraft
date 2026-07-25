@@ -32,8 +32,9 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 |---|---|
 | `main.ts` | HTTP server + the prefix-ladder dispatch (`routeHttpRequest` sends `/api` `/admin/api` `/oauth` `/internal` to four flag-gated entries) + the RETAINED legacy handler ladder, WS `/ws` upgrade wiring (builds the `createWsAuth` deps bag), boot/shutdown, leaderboard cache. Migrated routes live in per-domain `RouteDef` modules behind `server/http/` (see `server/http/CLAUDE.md`), NOT in a route table here |
 | `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file; extract beside it, never grow it** (Module-first above) |
-| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): first-frame `{t:'auth'}` check, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
+| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): strict first-frame `ONLINE_WORLD_AUTH_TYPE` check before credential or DB work, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
 | `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
+| `msg_rate_limit.ts` / `msg_lanes.ts` / `list_read_guard.ts` | the inbound WS flood defense: the pre-parse gate (frame + byte buckets and the shared abuse window that kicks), the post-parse per-class lanes, and the ignore/block list-readout meter (see "Inbound WS flood defense") |
 | `linkdead.ts` | pure session-lifecycle decision core: `planJoin` (resume/reject/join) + `LINKDEAD_GRACE_MS` (see Persistence) |
 | `keepalive_sweep.ts` | pure self-clocked keepalive-sweep decision (`keepaliveSweepDelayed`, `KEEPALIVE_STALL_FACTOR`): a sweep that fires late (an event-loop stall) re-arms every session instead of terminating them, so one stall can never mass-disconnect the realm; a genuinely dead socket still reaps one clean interval later |
 | `db.ts` | `pg` pool, core `SCHEMA` DDL + `ensureSchema`, character/account/token/world-state queries. Owns the timeout ladder (connect < statement default < the `runWithStatementTimeout` heavy allowance < the driver-side `query_timeout` backstop; constants + rationale at the top, relation pinned by `tests/server/tunables.test.ts`): wrap a known-long read in `runWithStatementTimeout`, never lift the session default, and remember `SET LOCAL` cannot lift the driver backstop. Boot DDL runs on a dedicated non-pool `Client` so schema setup is never capped |
@@ -62,9 +63,13 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `github.ts` (+ `github_oauth`/`github_db`/`github_contributors`) | GitHub contributor linking for the developer badge + merged-PR tally |
 | `oauth.ts`/`oauth_db.ts`, `character_sheet.ts`, `profile_page.ts`, `avatar.ts` | read-only companion API: OAuth code+PKCE and device grants (scope `character:read`), pure sheet normalizer, public SEO profile pages + generated avatars |
 | `maps.ts`/`maps_db.ts`/`maps_routes.ts`, `user_assets*.ts` | map editor: custom-map persistence with fork lineage / hardened player GLB uploads (both mirror the `SocialService`/`SocialDb` split) |
-| `tick_profiler.ts` / `tick_rate_meter.ts` / `client_perf_metrics_db.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header), capped client-perf aggregates behind `/metrics` |
+| `tick_profiler.ts` / `tick_rate_meter.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header) |
 | `mob_scan_tick_stats.ts` | folds the sim's per-tick mob-scan visit counters (`Sim.mobScanCounters`, observer-only) into the `PERF_TICK_LOG` heartbeat tokens (`aggroVisits=`/`threatVisits=`) and the admin tick-capture accumulators; `game.ts` keeps only the holder and the apply call |
 | `perf_report.ts` / `provider_usage.ts` | rate-limited client perf-report ingestion / process-local provider and usage telemetry for the admin dashboard |
+| `cached_read.ts` / `deeds_board_warm.ts` | the two shared-read cache shapes: single-key `createCachedRead` (TTL, single-flight, stale-on-error, joiner-refusing bust) / the extended `singleFlight(run, epochOf?)` for per-scope epoch-keyed board flights (see Hot paths) |
+| `retention_sweep.ts` | the advisory-locked, self-clocked nightly sweep of batched per-table prunes; every table that grows without bound registers here (see Hot paths) |
+| `concurrent_indexes.ts` | post-boot `CREATE INDEX CONCURRENTLY` seam for new indexes on big live tables |
+| `realm_readout_memo.ts` / `event_frame.ts` / `interest_candidates.ts` | broadcast build-once seams: per-pass realm readout memo (rides `maybeRaw`), serialize-once event frames (sent via `sendRaw`), per-cell shared interest gathering (see Hot paths) |
 
 ## Invariants, YOU MUST keep these
 - **Trust nothing from the client.** Movement intent + `cmd`s arrive over WS;
@@ -73,7 +78,9 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   method, keep that guarding when you add a command.
 - **Wire protocol lockstep with `src/net/online.ts`.** Server sends `hello` /
   `snap` (with `self`/`ents`/`keep`) / `events` / `social` / `censor` / `error`; client
-  first sends `{t:'auth',token,character}`. Any wire change must land in both files together.
+  first sends `{ t: ONLINE_WORLD_AUTH_TYPE, token, character }`. The versioned discriminator
+  rejects mixed built-in world layouts in both rolling-deploy directions before admission.
+  Any wire change must land in both files together.
 - **No browser/render/ui imports.** This bundles for Node, import only from
   `src/sim/`, `src/world_api.ts`, and `node:*`. Never from `render/`/`ui/`/`game/`/`net/`.
 - **SQL lives only in `db.ts` and `*_db.ts`.** Logic modules (`game.ts`,
@@ -115,6 +122,84 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 - Leaderboards (`topLifetimeXp`, `topArenaRatings`) sort on JSONB expressions and
   are read through the **in-memory cache in main.ts**, never per-request under load.
 
+## Hot paths: shared reads, retention, broadcast
+One process serves a whole realm, so per-request and per-tick cost is what scales.
+Three seams keep it flat; use them, never re-invent them.
+
+- **Shared (viewer-identical) reads are cached with single-flight.** Two shapes:
+  `createCachedRead(refresh, {ttlMs})` (`cached_read.ts`) for a single-key read (TTL,
+  single-flight, stale-on-error, and a bust that refuses in-flight joiners), and the
+  extended `singleFlight(run, epochOf?)` (`deeds_board_warm.ts`) for per-scope board
+  flights keyed on `() => boardEpoch`, so the existing `bustBoardCaches` epoch bump also
+  evicts readers that joined mid-refresh. Exemplars: `admin_overview_cache.ts` (dual-arm
+  memo), `daily_rewards_board_cache.ts` (day-scoped), the leaderboard/guild/arena/deeds
+  flights in `main.ts`; pinned by `tests/server/board_read_single_flight.test.ts`.
+  Rules: a new endpoint whose response is identical for every caller (a board, a count,
+  an aggregate) reads through one of these two shapes, never a per-request `pool.query`;
+  anything a moderation action can change MUST be bust-wired in the same change (TTL
+  alone delays enforcement); a deliberately non-busted read (a moderation-invariant
+  COUNT) records why in a comment.
+
+- **Every table that grows without bound gets a retention story in the same change.**
+  The nightly sweep (`retention_sweep.ts`, registered after listen in `main.ts`) runs
+  batched prunes under a per-run budget; windows are env keys in `.env.example` (unset =
+  keep forever, deliberately fail-safe). A new per-event, per-session, or per-day table
+  either registers a prune primitive in its `*_db.ts` or carries an explicit
+  keep-forever comment at the DDL. Fold before deleting when readers need lifetime
+  history (`play_session_retention_db.ts` is the exemplar: an atomic fold-into-rollups
+  CTE, then delete). Prune SQL: batch via a LIMIT subquery; no ORDER BY unless the
+  cutoff column is indexed (unindexed, it plans a full sort per batch; pin the absence);
+  NOT EXISTS over NOT IN for referent guards (NOT IN falls off a work_mem cliff).
+
+- **SQL shape on hot paths.** A query the planner should serve from an expression index
+  must share the index's SQL text verbatim (one exported constant, e.g.
+  `LIFETIME_XP_EXPR`, used by both the query and the DDL). Hot views prefer plain UNION
+  arms over OR-joined EXISTS (`DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL`). Known-long
+  reads ride `runWithStatementTimeout` (see the `db.ts` timeout ladder), and new indexes
+  on big live tables go through `concurrent_indexes.ts`, never boot DDL.
+
+- **The broadcast loop builds shared things once per pass, never per session.** A
+  realm-wide viewer-independent readout builds and stringifies ONCE per pass via
+  `realm_readout_memo.ts` and rides `maybeRaw(...)` (the Vale Cup and dungeon-finder
+  boards are the tenants); events stringify once per batch (`event_frame.ts`) and go out
+  via `sendRaw`, never re-`send` per session; interest gathering scans each occupied
+  grid cell once (`interest_candidates.ts`) and re-applies each viewer's exact radius.
+  Refactors here prove byte-identity with pinned tests (`tests/bandwidth.test.ts`,
+  `tests/snapshots.test.ts`); cadence gates use a `>=` dueness tracker, never
+  `tickCount % N` (catch-up ticks stride past a modulo and stall the gate).
+
+## Inbound WS flood defense (`msg_rate_limit.ts`, `msg_lanes.ts`, `list_read_guard.ts`)
+Three pure metering modules (injected `nowSec`, no `Date.now`; unit-tested without a
+server) verdict every inbound frame; `game.ts` is a thin consumer. The design record is
+`docs/design/player-performance/packet-3-input-cadence.md`.
+- **Order and placement are load-bearing.** The pre-parse gate (frame ceiling + byte
+  budget, sized against the real client cadence model in `src/net/input_send_cadence.ts`)
+  verdicts ABOVE `JSON.parse`, so a flooder buys token math, never parse CPU. The
+  per-class lanes (movement / command / chat) are post-parse at the dispatch switch, so
+  one class can never starve another. Every verdict is allow-or-DROP, never queue or
+  defer: deferred delivery shifts receive time and poisons the bot detector's timing
+  strategies.
+- **Detector placement contract:** movement drops before `observeInput` (a dropped frame
+  reaches neither sim nor detector), command drops after `observeCommand`
+  (observe-then-drop, the detector keeps seeing traffic shape). Keep these when touching
+  the dispatch arms.
+- **One shared abuse window.** Drops of every cause feed `tallyDrop` on the session's
+  one window; sustained abuse kicks. Allowed frames never reset it: a counter that
+  resets on any allow is dead code against interleaved refill (the retired
+  consecutive-violations ladder was exactly that).
+- **Every client-triggerable per-call DB read on this path must sit behind a meter** (a
+  lane, a dedicated guard bucket, a ladder token, or a cached read). An ALLOWED
+  under-ceiling frame books no drop, so an unmetered read is sustainable at the full
+  frame ceiling and the abuse window can structurally never kick it. That is a defect,
+  not a style choice; `list_read_guard.ts` exists because review found exactly this on
+  the ignore/block readouts.
+- **Closed vocabularies, pinned lockstep.** Drop causes are the fixed `WS_DROP_CAUSES`
+  set on the game-signals seam (a new shed mechanism adds its cause there, never a
+  per-player label). The kick literal (`MSG_RATE_KICK_REASON`) is byte-exact wire
+  contract with the client matcher, and `tests/localization_fixes.test.ts` counts the
+  `kickSession` sites passing it: a NEW kick arm must consciously join that pin, the
+  matcher, and the frame pins together.
+
 ## Realms / auth / limits
 - **One process = one realm.** Characters/friends/guilds/presence are scoped to
   `REALM`; every realm process shares one `DATABASE_URL`. Schema setup is
@@ -149,7 +234,14 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   pinned by `ALL_DELTA_KEYS` + `TERSE_TO_IWORLD` in `tests/snapshots.test.ts` (W0a),
   which owns the list and guards the `selfWireJson` (encode) to `applySnapshot`
   (decode) round-trip. A new heavy self field lands in `selfWireJson` (here) and
-  `applySnapshot` (`online.ts`) in one commit, and is added to that registry.
+  `applySnapshot` (`online.ts`) in one commit, and is added to that registry. A value
+  already serialized once realm-wide (the Vale Cup shared fragment on `vcupb`, built
+  and stringified a single time per broadcast pass by the realm-readout memo) rides
+  via `maybeRaw(...)` instead of `maybe(...)`, so the per-session diff reuses the one
+  memoized string rather than re-stringifying it for every viewer. The `vcup` and
+  `vcupb` keys are asserted directly in the round-trip test rather than mapped in
+  `TERSE_TO_IWORLD` (they merge back into one `cupInfo` on decode), the same way `tal`
+  fans out to several members and is asserted directly.
 
 - The PHYSICAL `game.ts` restructure (facet-ordered dispatch, per-facet command
   modules, a facet-aligned encoder) is workstream #4; until it lands, add new
@@ -232,3 +324,9 @@ then drives handlers via `routes` + `configureLeaderboardRuntime` + `fakeCtx`). 
 ## Never do this here
 - Never resolve gameplay (damage, drops, gold, XP) on the server outside the `Sim`.
 - Never widen WS `maxPayload` (16 KiB) or skip field validation: one socket must not be able to crash the loop or OOM the process.
+- Never serve a viewer-identical read with a per-request `pool.query`, and never leave a
+  moderation-visible cache without a bust wire (Hot paths above).
+- Never add a table that grows per event or session without a retention registration or
+  an explicit keep-forever comment at the DDL.
+- Never serialize a realm-identical broadcast payload per session: build once per pass,
+  reuse the bytes.

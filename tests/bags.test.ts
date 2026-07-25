@@ -8,12 +8,15 @@ import {
   BAG_SOCKETS,
   bagCapacity,
   canAddItem,
+  consumeOneScratch,
   countFit,
   fitsAll,
   migrationBagsFor,
   stackSizeOf,
 } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
+import { removePreferFungible } from '../src/sim/items';
+import { isEnchantedInstance } from '../src/sim/professions/enchanting';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
 
@@ -85,6 +88,60 @@ describe('stack sizes and stacking math', () => {
       { itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } },
       { itemId: 'baked_bread', count: 3 },
     ]);
+  });
+
+  it('an instanced add merges into a byte-equal slot and never into a plain one', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } },
+      { itemId: 'baked_bread', count: 5 },
+    ];
+    // Both slots occupied (capacity 2): the byte-equal signed stack is the only
+    // top-up room the signed add sees; the plain stack offers it none.
+    expect(countFit(inv, 2, 'baked_bread', 99, { signer: 'Ana' })).toBe(15);
+    addStacked(inv, 'baked_bread', 3, { signer: 'Ana' });
+    expect(inv).toEqual([
+      { itemId: 'baked_bread', count: 8, instance: { signer: 'Ana' } },
+      { itemId: 'baked_bread', count: 5 },
+    ]);
+    // A differently-signed add gets no top-up room from either slot.
+    expect(countFit(inv, 2, 'baked_bread', 1, { signer: 'Bru' })).toBe(0);
+  });
+
+  it('the merge stops AT the stack cap: room is exactly stackSize minus count', () => {
+    const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 19, instance: { signer: 'Ana' } }];
+    expect(countFit(inv, 1, 'baked_bread', 99, { signer: 'Ana' })).toBe(1);
+    addStacked(inv, 'baked_bread', 1, { signer: 'Ana' });
+    expect(inv[0].count).toBe(20);
+    // At the cap the full stack offers zero room and a fresh add needs a slot.
+    expect(countFit(inv, 1, 'baked_bread', 1, { signer: 'Ana' })).toBe(0);
+  });
+
+  it('a charge-bearing payload gets one unit per fresh slot and never tops up its twin', () => {
+    const charged = { signer: 'Ana', charges: { zap: 2 } };
+    const inv: InvSlot[] = [
+      { itemId: 'baked_bread', count: 1, instance: { ...charged, charges: { zap: 2 } } },
+    ];
+    // capacity 3: the byte-equal charged slot offers NO room (mergeability),
+    // and each of the two free slots absorbs exactly one charged unit.
+    expect(countFit(inv, 3, 'baked_bread', 99, charged)).toBe(2);
+    addStacked(inv, 'baked_bread', 2, charged);
+    expect(inv).toHaveLength(3);
+    for (const s of inv) expect(s.count).toBe(1);
+  });
+
+  it('fresh instanced slots each carry their own deep clone of the payload', () => {
+    const payload = { signer: 'Ana', rolled: { stats: { str: 1 } } };
+    const inv: InvSlot[] = [];
+    // 25 mergeable copies split 20 + 5 across two fresh slots; a shared payload
+    // object between them (or with the caller) would alias rolled.stats.
+    addStacked(inv, 'baked_bread', 25, payload);
+    expect(inv).toHaveLength(2);
+    expect(inv[0].instance).toEqual(payload);
+    expect(inv[1].instance).toEqual(payload);
+    expect(inv[0].instance).not.toBe(inv[1].instance);
+    payload.rolled.stats.str = 99;
+    expect(inv[0].instance?.rolled?.stats?.str).toBe(1);
+    expect(inv[1].instance?.rolled?.stats?.str).toBe(1);
   });
 
   it('fitsAll simulates the batch cumulatively', () => {
@@ -420,5 +477,168 @@ describe('pre-bag save migration (equivalent bags for earned space)', () => {
     )!;
     expect(m2.bags).toEqual([null, null, null, null]);
     expect(sim2.canAddItem('wolf_fang', 1, pid)).toBe(false); // overflow just blocks pickups
+  });
+});
+
+describe('consumeOneScratch (#2350)', () => {
+  // A real weapon (unstackable, enchantable) so instanced/enchant fixtures match
+  // how gear actually carries a payload, and a real stackable junk id for the
+  // plain-stack cases. consumeOneScratch itself keys only on itemId and instance
+  // shape (no ITEMS lookup), so the ids are chosen for realism, not behavior.
+  const GEAR = 'eastbrook_arming_sword';
+  const STACK = 'spider_leg';
+
+  // Victim-order pins: the pure three-pass walk over an InvSlot[], no Sim.
+  // Pass 1 = highest-index plain slot; pass 2 = highest-index instanced slot the
+  // exclude predicate does not match; pass 3 = highest-index instanced slot
+  // (the excluded ones), the fallback when no preferred copy is left.
+
+  it('prefers a plain slot over an instanced one even at a lower index', () => {
+    const scratch: InvSlot[] = [
+      { itemId: GEAR, count: 1 }, // plain, index 0
+      { itemId: GEAR, count: 1, instance: { signer: 'A' } }, // instanced, higher index
+    ];
+    const payload = consumeOneScratch(scratch, GEAR);
+    expect(payload).toBeUndefined(); // a plain victim carries no payload
+    expect(scratch).toEqual([{ itemId: GEAR, count: 1, instance: { signer: 'A' } }]);
+  });
+
+  it('among plain slots consumes the highest index (the count drop proves which)', () => {
+    const scratch: InvSlot[] = [
+      { itemId: STACK, count: 3 },
+      { itemId: STACK, count: 3 },
+    ];
+    consumeOneScratch(scratch, STACK);
+    expect(scratch[0].count).toBe(3); // lower index untouched
+    expect(scratch[1].count).toBe(2); // highest index took the unit
+  });
+
+  it('prefers an unexcluded instanced slot over an excluded one at a higher index', () => {
+    const scratch: InvSlot[] = [
+      { itemId: GEAR, count: 1, instance: { signer: 'A' } }, // unexcluded, index 0
+      { itemId: GEAR, count: 1, instance: { enchant: 'enchant_weapon_might' } }, // excluded, index 1
+    ];
+    const payload = consumeOneScratch(scratch, GEAR, (p) => p.enchant !== undefined);
+    expect(payload).toEqual({ signer: 'A' }); // the unexcluded copy is the victim
+    expect(scratch).toEqual([
+      { itemId: GEAR, count: 1, instance: { enchant: 'enchant_weapon_might' } },
+    ]);
+  });
+
+  it('falls back to the highest-index excluded slot when only excluded copies remain (pass 3)', () => {
+    const scratch: InvSlot[] = [
+      { itemId: GEAR, count: 1, instance: { enchant: 'enchant_weapon_might' } },
+      { itemId: GEAR, count: 1, instance: { enchant: 'enchant_weapon_agility' } },
+    ];
+    const payload = consumeOneScratch(scratch, GEAR, (p) => p.enchant !== undefined);
+    expect(payload).toEqual({ enchant: 'enchant_weapon_agility' }); // highest-index excluded
+    expect(scratch).toEqual([
+      { itemId: GEAR, count: 1, instance: { enchant: 'enchant_weapon_might' } },
+    ]);
+  });
+
+  it('splices a count-1 victim out and decrements a higher-count victim in place', () => {
+    const single: InvSlot[] = [{ itemId: GEAR, count: 1 }];
+    consumeOneScratch(single, GEAR);
+    expect(single).toHaveLength(0); // the emptied slot is removed
+
+    const triple: InvSlot[] = [{ itemId: STACK, count: 3 }];
+    consumeOneScratch(triple, STACK);
+    expect(triple).toEqual([{ itemId: STACK, count: 2 }]); // decremented, slot stays
+  });
+
+  it('returns the victim payload by reference, and undefined for a plain or absent victim', () => {
+    const inst = { signer: 'A' };
+    const instanced: InvSlot[] = [{ itemId: STACK, count: 2, instance: inst }];
+    expect(consumeOneScratch(instanced, STACK)).toBe(inst); // the SAME object, not a clone
+
+    const plain: InvSlot[] = [{ itemId: STACK, count: 2 }];
+    expect(consumeOneScratch(plain, STACK)).toBeUndefined();
+
+    const untouched: InvSlot[] = [{ itemId: GEAR, count: 1 }];
+    const before = untouched.map((s) => ({ ...s }));
+    expect(consumeOneScratch(untouched, STACK)).toBeUndefined(); // no slot matches STACK
+    expect(untouched).toEqual(before); // and the scratch is left untouched
+  });
+
+  // Mirror-vs-real drift pins (the #2139 class): consumeOneScratch run on a deep
+  // copy must land the exact inventory the live remover it models produces, or a
+  // capacity pre-check would disagree with the actual consumption.
+  const shape = (inv: InvSlot[]) =>
+    inv.map((s) => ({ itemId: s.itemId, count: s.count, instance: s.instance }));
+
+  it('mirrors removePreferFungible: the salvage path consumes the plain copy first', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const pmeta = sim.ctx.resolve(pid)!.meta;
+    const fixture: InvSlot[] = [
+      { itemId: GEAR, count: 1 }, // plain fungible copy
+      { itemId: GEAR, count: 1, instance: { signer: 'X' } }, // unenchanted instanced
+      {
+        itemId: GEAR,
+        count: 1,
+        instance: { enchant: 'enchant_weapon_might', rolled: { stats: { str: 2 } } },
+      }, // enchanted instanced
+      { itemId: STACK, count: 5 }, // unrelated filler
+    ];
+    const copy = structuredClone(fixture);
+    pmeta.inventory = fixture;
+
+    removePreferFungible(sim.ctx, GEAR, 1, pid); // the live salvage remover (no exclusion)
+    consumeOneScratch(copy, GEAR);
+
+    expect(shape(pmeta.inventory)).toEqual(shape(copy));
+  });
+
+  it('mirrors removeEnchantableItem: apply-enchant takes the unenchanted instanced copy (pass 2)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const pmeta = sim.ctx.resolve(pid)!.meta;
+    // No plain copy, so removeEnchantableItem's fungible pass finds nothing and
+    // its instanced pass fires: consumeOneScratch's pass 2 must match it.
+    const fixture: InvSlot[] = [
+      { itemId: GEAR, count: 1, instance: { signer: 'X' } }, // unenchanted instanced
+      {
+        itemId: GEAR,
+        count: 1,
+        instance: { enchant: 'enchant_weapon_might', rolled: { stats: { str: 2 } } },
+      }, // enchanted instanced, excluded from the pass
+      { itemId: STACK, count: 5 },
+    ];
+    const copy = structuredClone(fixture);
+    pmeta.inventory = fixture;
+
+    sim.removeEnchantableItem(GEAR, 1, pid);
+    consumeOneScratch(copy, GEAR, isEnchantedInstance);
+
+    expect(shape(pmeta.inventory)).toEqual(shape(copy));
+  });
+
+  it('mirrors the disenchant fallback removeItem when every copy is enchanted (pass 3)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const pmeta = sim.ctx.resolve(pid)!.meta;
+    // Every copy of GEAR is enchanted-instanced, so countEnchantableItem is 0 and
+    // resolveDisenchant falls back to the plain removeItem walk (highest index).
+    const fixture: InvSlot[] = [
+      {
+        itemId: GEAR,
+        count: 1,
+        instance: { enchant: 'enchant_weapon_might', rolled: { stats: { str: 2 } } },
+      },
+      {
+        itemId: GEAR,
+        count: 1,
+        instance: { enchant: 'enchant_weapon_might', rolled: { stats: { str: 3 } } },
+      },
+      { itemId: STACK, count: 5 },
+    ];
+    const copy = structuredClone(fixture);
+    pmeta.inventory = fixture;
+
+    sim.ctx.removeItem(GEAR, 1, pid);
+    consumeOneScratch(copy, GEAR, isEnchantedInstance);
+
+    expect(shape(pmeta.inventory)).toEqual(shape(copy));
   });
 });

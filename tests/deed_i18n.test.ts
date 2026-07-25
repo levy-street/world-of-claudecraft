@@ -44,9 +44,10 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 193 deeds x (name + desc) + the 19 shipped title rewards.
-    expect(manifest.length).toBe(193 * 2 + 19);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(19);
+    // 221 deeds x (name + desc) + the 31 shipped title rewards (both counts
+    // pinned by tests/deeds_content.test.ts).
+    expect(manifest.length).toBe(221 * 2 + 31);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(31);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',
@@ -117,8 +118,9 @@ describe('titledDisplayName + titledNameDecoration (the name-plus-title pattern)
     const fn = hudSrc.slice(hudSrc.indexOf('private chatLogFrom('));
     // The window spans the sender-span setup: the name is now clickable/tappable as
     // well as right-clickable, so the contextmenu arm sits behind those handlers.
-    expect(fn.slice(0, 2400)).toContain('sender.textContent = titledDisplayName(name, fromTitle);');
-    expect(fn.slice(0, 2400)).toContain('this.openChatPlayerContextMenu(name, ev.clientX');
+    // (widened from 2400: the classId doc comment above the --class-color stamp)
+    expect(fn.slice(0, 3200)).toContain('sender.textContent = titledDisplayName(name, fromTitle);');
+    expect(fn.slice(0, 3200)).toContain('this.openChatPlayerContextMenu(name, ev.clientX');
     const toWhisperArm = hudSrc.slice(hudSrc.indexOf('CHAT_TEMPLATE_KEYS.toWhisper') - 200);
     expect(toWhisperArm.slice(0, 400)).not.toContain('ev.fromTitle');
   });

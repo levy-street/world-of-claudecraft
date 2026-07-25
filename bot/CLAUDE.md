@@ -52,8 +52,10 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - Role sync + members-meta push: every `ROLE_SYNC_INTERVAL_MS` (5 min), plus once on
   `GUILD_CREATE`. Tier-role refresh + special-roles refresh: once at startup (before the
   gateway connects) and every 5 min, NOT on `GUILD_CREATE`. The same sync also
-  sets the level-on-name nickname (`buildLevelNick`, built from the stable Discord
-  handle so re-syncs never compound; `DISCORD_SYNC_NICKNAMES=0` disables).
+  sets the level-on-name nickname (`buildLevelNick`; the base name fallback can be
+  the member's own already-suffixed live nick, so `buildLevelNick` strips any
+  existing suffix first to stay idempotent across re-syncs;
+  `DISCORD_SYNC_NICKNAMES=0` disables).
 - Presence push: debounced `PRESENCE_DEBOUNCE_MS` (4 s) after voice/presence events.
 - Relay, activity feed, daily-rewards winners: drained every `RELAY_POLL_MS` (3 s).
   Daily-rewards days are marked back on the server only after a successful post,

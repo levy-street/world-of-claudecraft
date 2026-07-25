@@ -24,7 +24,7 @@ const {
   withCspHeader,
   ALLOWED_PERMISSIONS,
 } = require('./shell_guards.cjs');
-const { resolveDesktopConfig } = require('./desktop_config.cjs');
+const { resolveDesktopConfig, walletConnectionSupported } = require('./desktop_config.cjs');
 const { createSteamShell } = require('./steam.cjs');
 const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
 const {
@@ -38,7 +38,32 @@ const { initLogging } = require('./logging.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
 const { attachRendererCrashRecovery, installProcessCrashGuards } = require('./crash_guard.cjs');
 const { initUpdater } = require('./updater.cjs');
-const { forceHighPerformanceGpu, summarizeGpuDevices } = require('./gpu_preference.cjs');
+const {
+  forceHighPerformanceGpu,
+  PRIME_RELAUNCH_MARKER,
+  relaunchForLinuxPrime,
+  summarizeGpuDevices,
+} = require('./gpu_preference.cjs');
+const {
+  buildWalletHandoffBrowserUrl,
+  parseWalletHandoffDeepLink,
+} = require('./wallet_handoff.cjs');
+
+// On a Linux hybrid-graphics laptop, the PRIME render-offload env vars (DRI_PRIME,
+// __NV_PRIME_RENDER_OFFLOAD, etc; see electron/gpu_preference.cjs) only reach the GPU
+// process if they are present in THIS process's environment from birth: Electron's Linux
+// GPU process forks from a zygote that already exec'd (and snapshotted its environ) before
+// any of this script's lines run, so a later process.env write is invisible to it. This is
+// the earliest point re-exec can happen (before crash reporting, logging, or any window are
+// set up in this soon-to-exit process), and it must run before app 'ready'. log: console
+// because file logging is deliberately not initialized yet in this soon-to-exit process; the
+// durable main.log evidence is the relaunched-child line the child writes below.
+if (relaunchForLinuxPrime({ log: console })) {
+  // process.exit stops the main script before any statement below runs, so this
+  // soon-to-be-replaced process never sets up crash reporting, logging, or a window
+  // (app.exit would also exit promptly, but process.exit depends on nothing).
+  process.exit(0);
+}
 
 const APP_ORIGIN = 'app://worldofclaudecraft';
 // The Vite dev server URL is a DEV-ONLY seam (electron-dev.mjs sets it): its
@@ -52,6 +77,7 @@ const appOrigins = appNavigationOrigins(APP_ORIGIN, devServerUrl);
 const deepLinkProtocol = 'worldofclaudecraft';
 let mainWindow = null;
 let pendingLoginCode = null;
+let pendingWalletHandoffCode = null;
 // Session cap counter for the renderer console mirror (used by the
 // 'console-message' handler in createMainWindow).
 let consoleLinesMirrored = 0;
@@ -106,6 +132,13 @@ crashReporter.start({
 // diagnosable; the renderer's warnings/errors and uncaught exceptions are
 // mirrored into the same file below.
 const { log, filePath: logFilePath } = initLogging({ isPackaged: app.isPackaged });
+
+// The durable evidence that the Linux PRIME relaunch happened: the parent that spawned us
+// exited before logging existed, so the CHILD records it (docs/desktop-release.md points
+// its GPU verification checklist at this line).
+if (process.platform === 'linux' && process.env[PRIME_RELAUNCH_MARKER] === '1') {
+  log.info('[gpu] running as PRIME-relaunched child (Linux discrete-GPU offload env active)');
+}
 
 // Force the discrete high-performance GPU on hybrid (Optimus) systems, with zero user
 // action. Runs before app 'ready' (so the Chromium switches are read) and before any
@@ -350,6 +383,10 @@ function openDesktopLogin() {
   shell.openExternal(url.toString());
 }
 
+function openDesktopWalletHandoff(code) {
+  return shell.openExternal(buildWalletHandoffBrowserUrl(apiOrigin, code));
+}
+
 function deliverLoginCode(code) {
   pendingLoginCode = code;
   if (!mainWindow) return;
@@ -358,7 +395,21 @@ function deliverLoginCode(code) {
   mainWindow.focus();
 }
 
+function deliverWalletHandoffCode(code) {
+  pendingWalletHandoffCode = code;
+  if (process.platform === 'darwin') app.focus({ steal: true });
+  if (!mainWindow) return;
+  mainWindow.webContents.send('desktop-wallet-handoff-code', code);
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.focus();
+}
+
 function handleDeepLink(url) {
+  const walletHandoff = parseWalletHandoffDeepLink(url);
+  if (walletHandoff) {
+    deliverWalletHandoffCode(walletHandoff.code);
+    return;
+  }
   let parsed;
   try {
     parsed = new URL(url);
@@ -412,6 +463,13 @@ ipcMain.handle('desktop-steam-capability', (event) => {
   return steamShell.enabled;
 });
 
+// WalletConnect is available in the website-distributed desktop shell but is
+// intentionally absent from Steam until that distribution enables it.
+ipcMain.handle('desktop-wallet-capability', (event) => {
+  if (!trustedSender(event)) return false;
+  return walletConnectionSupported(desktopConfig);
+});
+
 ipcMain.handle('desktop-login-open-browser', (event) => {
   if (!trustedSender(event)) return null;
   openDesktopLogin();
@@ -422,6 +480,23 @@ ipcMain.handle('desktop-login-take-code', (event) => {
   if (!trustedSender(event)) return null;
   const code = pendingLoginCode;
   pendingLoginCode = null;
+  return code;
+});
+
+ipcMain.handle('desktop-wallet-open-browser', async (event, code) => {
+  if (!trustedSender(event)) return false;
+  try {
+    await openDesktopWalletHandoff(code);
+    return true;
+  } catch {
+    return false;
+  }
+});
+
+ipcMain.handle('desktop-wallet-take-code', (event) => {
+  if (!trustedSender(event)) return null;
+  const code = pendingWalletHandoffCode;
+  pendingWalletHandoffCode = null;
   return code;
 });
 

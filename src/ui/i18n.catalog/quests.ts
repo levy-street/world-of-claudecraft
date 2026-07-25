@@ -35,6 +35,13 @@ const questStringsEn = {
       readyQuestAria: 'Quest ready to turn in: {name}',
       discussQuest: 'Discuss {name}.',
       discussQuestAria: 'Discuss quest: {name}',
+      // The profession masters' locked-quest hint row. Deliberately terse:
+      // both {placeholders} resolve to already
+      // localized leaves (the giver NPC's name, the intro quest's title), and
+      // the template itself carries no 4-letter lowercase run, so it stays
+      // under the M16 untranslated-English bar while its locale fills are
+      // pending (tests/prof_intro_hint.test.ts pins this property).
+      profIntroHint: 'See {name} for "{quest}".',
       nythraxisDeathlessKingWarning:
         'The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and the abandoned crypt is the way down.',
       browseGoods: 'Let me browse your goods.',
@@ -835,5 +842,8 @@ export const questStrings = {
   },
 };
 
-questStrings.es_ES = questStrings.es;
-questStrings.fr_CA = questStrings.fr_FR;
+// The casts follow the abilities.ts/hud.ts aliasing precedent: an embedded arm
+// may trail questStringsEn while a new key's locale fills are pending (the
+// resolver falls back to English and books the pending row).
+questStrings.es_ES = questStrings.es as typeof questStringsEn;
+questStrings.fr_CA = questStrings.fr_FR as typeof questStringsEn;

@@ -115,6 +115,7 @@ export function createArmoryPreview(
     appearance.skin,
     pv.weaponItemId,
     pv.weaponOverride,
+    pv.offhandItemId,
   );
   characterGroup.add(visual.root);
   // This rig's camera matches the VFX sprite math's native 35 degree fov.

@@ -127,7 +127,7 @@ export function partyFrameSignature(
     if (m.auras) {
       for (const a of m.auras) sig += `${a.id},${a.kind},${a.neg ? 1 : 0},${a.remaining ?? ''};`;
     }
-    sig += `I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}|`;
+    sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}|`;
   }
   return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;
 }

@@ -399,18 +399,33 @@ export async function ignoreReport(
   return (res.rowCount ?? 0) > 0;
 }
 
-// Fired after every SUCCESSFUL moderateAccount commit, of ANY action kind, so
-// main.ts can bust the public board caches: a ban delists and an unban relists
-// immediately instead of waiting out a board TTL. Injected at boot the same
-// runtime-injection way as the route modules (this module must not import
-// main.ts). Hooking the write itself, rather than one route, covers every
-// caller: both admin dispatch arms AND the in-game GM sanctions
-// (server/game.ts ModerationService).
+// Fired after every SUCCESSFUL moderateAccount commit, of ANY action kind,
+// and after the daily-rewards ban writes below (setDailyRewardsBan /
+// setDailyRewardsIpBan, whose tables feed the daily_reward_excluded_accounts
+// view that every ranked daily-board read embeds), so main.ts can bust the
+// public board caches: a ban delists and an unban relists immediately instead
+// of waiting out a board TTL. Injected at boot the same runtime-injection way
+// as the route modules (this module must not import main.ts). Hooking the
+// write itself, rather than one route, covers every caller: both admin
+// dispatch arms AND the in-game GM sanctions (server/game.ts
+// ModerationService).
 let onAccountModerated: (() => void) | null = null;
 
 /** Inject (or clear) the post-moderation hook. Called once at boot by main.ts. */
 export function setOnAccountModerated(hook: (() => void) | null): void {
   onAccountModerated = hook;
+}
+
+// The shared post-commit epilogue: the action is committed by the time this
+// runs, and a cache-bust failure must never surface as a failed moderation
+// action, so the hook fires outside every transaction path and swallows its
+// own errors.
+function fireOnAccountModerated(): void {
+  try {
+    onAccountModerated?.();
+  } catch (err) {
+    console.error('post-moderation hook failed:', err);
+  }
 }
 
 export async function moderateAccount(input: {
@@ -497,13 +512,7 @@ export async function moderateAccount(input: {
   } finally {
     client.release();
   }
-  // The action is committed; a cache-bust failure must never surface as a
-  // failed moderation action, so the hook runs outside the transaction path.
-  try {
-    onAccountModerated?.();
-  } catch (err) {
-    console.error('post-moderation hook failed:', err);
-  }
+  fireOnAccountModerated();
 }
 
 export async function muteAccountChat(input: {
@@ -771,6 +780,7 @@ export async function setDailyRewardsBan(input: {
   } finally {
     client.release();
   }
+  fireOnAccountModerated();
 }
 
 export async function setDailyRewardsIpBan(input: {
@@ -820,6 +830,7 @@ export async function setDailyRewardsIpBan(input: {
   } finally {
     client.release();
   }
+  fireOnAccountModerated();
 }
 
 // Audit-only record for an in-game action whose live effect is owned by the

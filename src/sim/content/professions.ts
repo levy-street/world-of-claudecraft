@@ -9,11 +9,21 @@
 // types.ts, from #1164) with the display metadata (name/icon/description)
 // the `/dev gather` chat cheat and a future UI need; category/maxSkill are
 // the fields later profession issues (#1120/#1125/#1126/#1140) read against.
-// maxSkill follows the classic 1-300 profession skill scale.
+// maxSkill (Professions 2.0) is an ENFORCED per-profession cap over
+// the classic skill scale: it ends where shipped content ends and rises with
+// future zones by data edit alone. Enforcement lives at the four gain/load
+// arms (wheel.ts gainCraftSkill/normalizeCraftSkills, gathering.ts
+// drainGatheringGrants/normalizeGatheringProficiency); at cap, actions still
+// resolve, proc, and yield, only skill gain stops.
+
+import { EASTBROOK_STATIONS_BY_ID } from '../eastbrook_layout';
 import type { ProfessionRecord } from '../professions/types';
+import type { StationDef, StationType } from '../types';
+import { ZONE1_ZONE } from './zone1';
+import { ZONE2_ZONE } from './zone2';
 import { ZONE3_ZONE } from './zone3';
 
-export type GatheringProfessionId = 'mining' | 'logging' | 'herbalism';
+export type GatheringProfessionId = 'mining' | 'logging' | 'herbalism' | 'fishing';
 
 export interface GatheringProfessionDef extends ProfessionRecord {
   id: GatheringProfessionId;
@@ -26,7 +36,7 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
   mining: {
     id: 'mining',
     category: 'gathering',
-    maxSkill: 300,
+    maxSkill: 100,
     name: 'Mining',
     icon: 'mining',
     description: 'Extracting ore and stone from nodes found in the wild.',
@@ -34,7 +44,7 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
   logging: {
     id: 'logging',
     category: 'gathering',
-    maxSkill: 300,
+    maxSkill: 100,
     name: 'Logging',
     icon: 'logging',
     description: 'Felling timber from trees found across the zones.',
@@ -42,16 +52,31 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
   herbalism: {
     id: 'herbalism',
     category: 'gathering',
-    maxSkill: 300,
+    maxSkill: 100,
     name: 'Herbalism',
     icon: 'herbalism',
     description: 'Collecting herbs and plants growing in the wild.',
   },
+  fishing: {
+    id: 'fishing',
+    category: 'gathering',
+    maxSkill: 200,
+    name: 'Fishing',
+    icon: 'fishing',
+    description: 'Reeling catches from the rivers and lakes across the zones.',
+  },
 };
 
 // Stable iteration order, used for defaulting/normalizing a per-player
-// proficiency record. Keep in sync with GATHERING_PROFESSIONS above.
-export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'logging', 'herbalism'];
+// proficiency record. Keep in sync with GATHERING_PROFESSIONS above. Fishing is
+// appended LAST (Professions 2.0) so the pre-existing iteration order
+// of the starter three is preserved for every consumer that walks this list.
+export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
+  'mining',
+  'logging',
+  'herbalism',
+  'fishing',
+];
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
 // gathering tool's tier (see ../professions/tools.ts). Each effect carries its
@@ -69,16 +94,54 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'log
 // item wired up so far are listed here; a mob whose componentTags don't map to any
 // of these still becomes single-use claimed, it just yields no item yet (future
 // profession-harvest issues wire up the rest).
-// KNOWN CONTENT GAP (v0.21.0 release-merge audit, needs a maintainer content call):
-// hide/silk/venomSac map to kind:'quest' items (q_boars/q_spiders/q_widows), so a
-// harvest currently grants quest-collect credit from ANY tagged mob (a wolf hide
-// advances the boar quest). The intended fix is dedicated profession-material
-// items, which is content design, not wiring; do not paper over it here.
+// The v0.21.0 collision gap is closed: hide/silk/venomSac now yield the
+// dedicated profession materials (content/profession_items.ts), so a harvest
+// never grants quest-collect credit. The old quest items (boar_hide via
+// q_boars kill loot, webwood_silk via q_spiders, widow_venom_sac via q_widows)
+// keep their quest roles only.
 export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
-  hide: 'boar_hide',
+  hide: 'rough_hide',
   fang: 'wolf_fang',
-  silk: 'webwood_silk',
-  venomSac: 'widow_venom_sac',
+  silk: 'spider_silk',
+  venomSac: 'venom_gland',
+  meat: 'game_meat',
+  cloth: 'homespun_cloth',
+};
+
+// Monster material access tiers (Professions 2.0): which tool tier
+// the corpse-harvest premium (signed/specimen) arm requires per component
+// family, checked against the player's best owned gathering tool of ANY
+// profession (professions/tools.ts bestOwnedAnyGatherToolTier). EVERY
+// HARVEST_COMPONENT_ITEMS key is listed explicitly, ALL at 1 in wave one
+// (the prime directive: all pre-existing content stays bare-hands
+// harvestable); future corpse families may ship higher.
+export const MONSTER_MATERIAL_TIERS: Readonly<Record<string, number>> = {
+  hide: 1,
+  fang: 1,
+  silk: 1,
+  venomSac: 1,
+  meat: 1,
+  cloth: 1,
+};
+
+// The access tier for one component family. An unlisted component (a future
+// tag added before its tier row lands) defaults to 1: never gated, matching
+// the bare-hands floor.
+export function monsterMaterialTierFor(component: string): number {
+  return MONSTER_MATERIAL_TIERS[component] ?? 1;
+}
+
+// Perfect specimens: the signed jackpot family. When a corpse
+// harvest's rarity roll clears the signable floor (rare-or-better,
+// isSignableMaterialRarity), the harvester is granted the component family's
+// specimen as a SIGNED instance in addition to the plain component grant
+// (src/sim/interaction.ts harvestCorpse). Families without a specimen keep
+// the fallback behavior (the regular component itself grants signed).
+export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
+  hide: 'pristine_hide',
+  silk: 'pristine_silk',
+  venomSac: 'pristine_venom_gland',
+  meat: 'prime_cut',
 };
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
@@ -134,7 +197,7 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
   },
   quickening_charm: {
     id: 'quickening_charm',
-    name: 'Quickening Charm',
+    name: 'Springback Charm',
     icon: 'quickening_charm',
     description: 'Slotted onto a gathering tool: shortens the node respawn timer it triggers.',
     kind: 'respawnSpeed',
@@ -154,23 +217,22 @@ export const TOOL_EFFECT_IDS: ToolEffectId[] = [
 // no mechanic wiring: this file only defines the ring geometry (order, pole tags)
 // and the adjacency/opposite lookups derived from it. See issue #1125.
 //
-// Design-doc note (#1148 tuning pass): the canonical ring order lives at
-// https://woc.nervemart.com/docs/professions-system, which returned 403 Forbidden
-// when this file was authored and is reachable again as of this pass. The doc's
-// own ring text ("Engineering, Alchemy, Cooking, Leatherworking, Tailoring,
-// Inscription, Enchanting, Jewelcrafting, Weaponcrafting, Armorcrafting") differs
-// from the exact rotation below in SOME non-adjacent-pair placements, but every
-// adjacency this codebase has already committed to in real content is confirmed
-// consistent with it: armorcrafting-weaponcrafting (doc: adjacent, wrapping the
-// ring) and alchemy-engineering (doc: adjacent) are exactly the two pairs
-// content/recipes.ts COMBO_RECIPES already require. A full reorder to match the
-// doc craft-for-craft would also reshuffle every OTHER adjacency/opposite pair
-// (affecting future hobby/combo assignments) with a blast radius broader than
-// this pass's scope; deferred as its own follow-up rather than an unreviewed
-// reshuffle here. The 4 poles are this codebase's own grouping (not named in the
-// doc): Material (crafts that shape raw matter into gear), Experimental (crafts
-// driven by trial-and-error formulae), Formal (crafts built on exact patterns/
-// measurements), Cross-cutting (crafts that touch every other craft's output).
+// Design-doc note (#1148 tuning pass, reorder adopted in the Professions 2.0
+// blueprint): the canonical ring order lives at
+// https://woc.nervemart.com/docs/professions-system, and CRAFT_RING below now
+// matches the doc's ring text craft for craft ("Engineering, Alchemy, Cooking,
+// Leatherworking, Tailoring, Inscription, Enchanting, Jewelcrafting,
+// Weaponcrafting, Armorcrafting"). Both adjacencies this codebase commits to in
+// real content survive the reorder unchanged: armorcrafting-weaponcrafting
+// (adjacent, wrapping the ring) and alchemy-engineering (adjacent) are exactly
+// the two pairs content/recipes.ts COMBO_RECIPES requires, pinned by the
+// adjacency test in tests/professions.test.ts so a future reorder cannot
+// silently orphan a combo recipe. The 4 poles are this codebase's own grouping
+// (not named in the doc): Material (crafts that shape raw matter into gear),
+// Experimental (crafts driven by trial-and-error formulae), Formal (crafts
+// built on exact patterns/measurements), Cross-cutting (crafts that touch
+// every other craft's output). Each pole tag travels with its craft record, so
+// the reorder never re-grouped any craft.
 
 export type CraftPole = 'Material' | 'Experimental' | 'Formal' | 'Cross-cutting';
 
@@ -178,21 +240,25 @@ export interface CraftDef {
   id: string;
   name: string;
   pole: CraftPole;
+  /** Enforced skill cap for this craft: where shipped content
+   *  ends. Enforced at wheel.ts gainCraftSkill and normalizeCraftSkills;
+   *  at cap, crafts still resolve and proc, only skill gain stops. */
+  maxSkill: number;
 }
 
 // Fixed ring order (index is the ring position). Opposite crafts sit 5 positions
 // apart; adjacent crafts sit 1 position apart on either side.
 export const CRAFT_RING: CraftDef[] = [
-  { id: 'armorcrafting', name: 'Armorcrafting', pole: 'Material' },
-  { id: 'weaponcrafting', name: 'Weaponcrafting', pole: 'Material' },
-  { id: 'jewelcrafting', name: 'Jewelcrafting', pole: 'Material' },
-  { id: 'alchemy', name: 'Alchemy', pole: 'Experimental' },
-  { id: 'engineering', name: 'Engineering', pole: 'Experimental' },
-  { id: 'cooking', name: 'Cooking', pole: 'Cross-cutting' },
-  { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting' },
-  { id: 'enchanting', name: 'Enchanting', pole: 'Cross-cutting' },
-  { id: 'tailoring', name: 'Tailoring', pole: 'Formal' },
-  { id: 'leatherworking', name: 'Leatherworking', pole: 'Formal' },
+  { id: 'engineering', name: 'Engineering', pole: 'Experimental', maxSkill: 125 },
+  { id: 'alchemy', name: 'Alchemy', pole: 'Experimental', maxSkill: 125 },
+  { id: 'cooking', name: 'Cooking', pole: 'Cross-cutting', maxSkill: 125 },
+  { id: 'leatherworking', name: 'Leatherworking', pole: 'Formal', maxSkill: 125 },
+  { id: 'tailoring', name: 'Tailoring', pole: 'Formal', maxSkill: 125 },
+  { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting', maxSkill: 125 },
+  { id: 'enchanting', name: 'Enchanting', pole: 'Cross-cutting', maxSkill: 125 },
+  { id: 'jewelcrafting', name: 'Jewelcrafting', pole: 'Material', maxSkill: 125 },
+  { id: 'weaponcrafting', name: 'Weaponcrafting', pole: 'Material', maxSkill: 125 },
+  { id: 'armorcrafting', name: 'Armorcrafting', pole: 'Material', maxSkill: 125 },
 ];
 
 const RING_SIZE = CRAFT_RING.length;
@@ -228,93 +294,18 @@ export function craftById(craftId: string): CraftDef {
   return CRAFT_RING[indexOf(craftId)];
 }
 
-// The tier-4/5 tool recipes formerly stubbed here (#1135's `TOOL_RECIPE_STUBS`)
-// moved into COMMON_RECIPES in content/recipes.ts once #1127's crafting action
-// landed to consume them (see recipes.ts for the six 'engineering' recipes
-// producing thorium_mining_pick, arcanite_mining_pick, ashwood_axe,
-// elderwood_axe, goldleaf_sickle, and sunpetal_sickle).
-// P3 reconciliation stub (#1135): the crafted tier-4/5 base tools added for
-// this issue (see src/sim/content/items.ts: thorium_mining_pick,
-// arcanite_mining_pick, ashwood_axe, elderwood_axe, goldleaf_sickle,
-// sunpetal_sickle) are meant to be produced via a P3 recipe/crafting action
-// (#1127), NOT bought from a vendor. #1127 (the crafting action itself) has
-// not been implemented in any branch yet, so there is nowhere to register a
-// real, consumed recipe: adding one to a live recipe table would be dead data
-// nobody reads. Instead this is an INERT, documentation-only shape of what
-// each recipe SHOULD look like once #1127 lands. Nothing in the engine reads
-// `TOOL_RECIPE_STUBS` today: it is not merged into any content table by
-// data.ts, and no SimContext callback or effect references it.
-//
-// TODO(#1127): once the crafting action exists, move (not copy) this shape
-// into whatever the real recipe table turns out to be (ingredients + a craft
-// verb the player performs), wire `outputItemId` to the actual item grant,
-// and delete this stub in the same change.
-export interface ToolRecipeStub {
-  /** Item id this recipe would produce once #1127 can consume recipes. */
-  outputItemId: string;
-  /** Which craft on the CRAFT_RING would perform this (see #1125's ring). */
-  craftId: string;
-  /** Placeholder ingredient list: itemId plus quantity consumed per craft. */
-  ingredients: { itemId: string; qty: number }[];
+/** The enforced skill cap for one craft, read off its CRAFT_RING
+ *  record. Throws on an unknown craft id, same as craftById. */
+export function craftMaxSkillFor(craftId: string): number {
+  return craftById(craftId).maxSkill;
 }
 
-// NOTE: several `ingredients[].itemId` values below (thorium_ore,
-// arcanite_bar, ashwood_log, elderwood_log, goldleaf_herb, sunpetal_herb) are
-// PLACEHOLDER ids: no matching ItemDef exists yet, because the monster
-// material / node-drop items they'd come from are their own future content
-// slice. That is fine ONLY because this table is inert and unread by the
-// engine; do not merge TOOL_RECIPE_STUBS into ITEMS or any live table until
-// those ingredient items are real and #1127 exists to consume the recipe.
-export const TOOL_RECIPE_STUBS: ToolRecipeStub[] = [
-  {
-    outputItemId: 'thorium_mining_pick',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'thorium_ore', qty: 4 },
-      { itemId: 'mithril_mining_pick', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'arcanite_mining_pick',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'arcanite_bar', qty: 2 },
-      { itemId: 'thorium_mining_pick', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'ashwood_axe',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'ashwood_log', qty: 4 },
-      { itemId: 'ironbark_axe', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'elderwood_axe',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'elderwood_log', qty: 2 },
-      { itemId: 'ashwood_axe', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'goldleaf_sickle',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'goldleaf_herb', qty: 4 },
-      { itemId: 'silverleaf_sickle', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'sunpetal_sickle',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'sunpetal_herb', qty: 2 },
-      { itemId: 'goldleaf_sickle', qty: 1 },
-    ],
-  },
-];
+// The tier-4/5 tool recipes formerly stubbed here (#1135's inert
+// `TOOL_RECIPE_STUBS`) are live in content/recipes.ts as TOOL_RECIPES,
+// de-stubbed once #1127's crafting action landed to consume them. They are
+// deliberately kept OUT of COMMON_RECIPES (that table's module doc and tests
+// fix skillReq at 0 for every entry, and FIELD_RECIPES derives bare-hands
+// field-craftability from COMMON membership).
 
 // Specialization perk thresholds (#1134): a pure additive bonus layer on top
 // of the crafting path (P3, #1127) and the ten-craft wheel (P5, #1125/#1128).
@@ -361,8 +352,9 @@ export const PERK_THRESHOLDS: Record<string, PerkThresholdDef> = Object.fromEntr
 
 // Mobile crafting station (#1134): how long a placed station stays usable
 // before it expires. See ../professions/mobile_station.ts for the placement
-// mechanic itself and why it is currently inert (no town/crafting-station
-// proximity gate exists anywhere in the engine yet for it to bypass).
+// mechanic; an active mobile station satisfies the station
+// gate (../professions/crafting.ts) for recipes whose stationType matches
+// the placing craft (STATION_TYPE_BY_CRAFT below).
 export const MOBILE_CRAFTING_STATION_DURATION_TICKS = 20 * 60 * 10; // 10 minutes
 
 // Gold sink + output throttle tuning (#1301): professions is a large new
@@ -382,64 +374,80 @@ export const CRAFT_GOLD_SINK_COPPER_PER_BUDGET = 2;
 export const CRAFT_THROTTLE_WINDOW_SECONDS = 60;
 export const CRAFT_THROTTLE_MAX_PER_WINDOW = 10;
 
-// Level-20 crafting hub (issue #1297): a designated in-world location hosting
-// a station for every craft on CRAFT_RING, gated to characters at or above
-// zone3's top level. The gate/read logic lives in
-// ../professions/crafting_hub.ts behind the SimContext seam; this is the
-// content half: WHERE the hub sits and WHICH stations it hosts.
+// Crafting stations and masters (Professions 2.0): the content half
+// of ../professions/stations.ts. The old single level-20 crafting hub
+// (#1297's CRAFTING_HUB_* constants and its Highwatch circle) is retired
+// with its level gate (2026-07-17 maintainer ruling: the level arm goes
+// away entirely); in its place, six typed stations spread across the three
+// town hubs, each run by a resident master NPC.
 //
-// Location: rather than build a fourth, brand-new town (out of scope per the
-// issue's own notes: "Scope (which zone, what the hub includes) needs
-// maintainer confirmation... Independent of the wheel mechanics"), this reuses
-// Thornpeak Heights' existing Highwatch hub (content/zone3.ts ZONE3_ZONE.hub):
-// zone3's levelRange tops out at exactly 20 (`[13, 20]`), so "the level-20
-// zone" already exists and Highwatch is its town center. Importing the hub
-// circle directly (rather than re-typing its coordinates) keeps this content
-// from silently drifting if Highwatch's hub ever moves.
-export const CRAFTING_HUB_ZONE_ID = ZONE3_ZONE.id;
-export const CRAFTING_HUB_POS: { readonly x: number; readonly z: number } = {
-  x: ZONE3_ZONE.hub.x,
-  z: ZONE3_ZONE.hub.z,
+// Gate range around each station's pos (world units, the same order of
+// magnitude the old hub circle used).
+export const STATION_RADIUS = 20;
+
+// Which station type serves each craft. Crafts absent from this table
+// (jewelcrafting, inscription, enchanting) have no physical station and no
+// station-bound recipes today.
+export const STATION_TYPE_BY_CRAFT: Readonly<Record<string, StationType>> = {
+  weaponcrafting: 'forge',
+  armorcrafting: 'forge',
+  cooking: 'kitchens',
+  alchemy: 'apothecary',
+  leatherworking: 'tannery',
+  tailoring: 'loom',
+  engineering: 'toolworks',
 };
-export const CRAFTING_HUB_RADIUS = ZONE3_ZONE.hub.radius;
 
-// The level a character must have reached to use a hub station (issue
-// #1297's own title: "Professions: level-20 zone and crafting hub"). Matches
-// zone3's top level exactly, rather than inventing an unrelated number: by
-// the time a character can comfortably work the zone whose town hosts the
-// hub, they have reached the level the hub gates on.
-export const CRAFTING_HUB_MIN_LEVEL = 20;
-
-export interface CraftingHubStationDef {
-  /** Which craft on CRAFT_RING this station serves. */
-  craftId: string;
-  /** Offset from CRAFTING_HUB_POS, kept well within CRAFTING_HUB_RADIUS so
-   *  every station sits inside the hub's gate circle. */
-  offset: { x: number; z: number };
-}
-
-// One station per craft on the ring (ten total), laid out on a small circle
-// around the hub center so no two stations overlap. A future render pass
-// reads `craftId` + `offset` to place a minimal prop per station; this table
-// carries no display "name" field of its own (avoiding a new player-visible
-// string surface in this pass) since a station is identified by its craft id,
-// which already has a localized display name (src/ui/i18n.catalog/hud_chrome.ts
-// `archetypeTitle.<craftId>` / `gathering.*`).
-//
-// Has zero consumers today: forward content for that future render pass, kept
-// data-as-code (module-init cost is negligible, ten cheap trig calls). Its
-// `offset` is render-only positioning; never feed it back into sim state if a
-// consumer lands.
-export const CRAFTING_HUB_STATIONS: readonly CraftingHubStationDef[] = CRAFT_RING.map(
-  (craft, index) => {
-    const angle = (index / CRAFT_RING.length) * Math.PI * 2;
-    const stationRadius = CRAFTING_HUB_RADIUS * 0.6;
-    return {
-      craftId: craft.id,
-      offset: {
-        x: Math.round(Math.cos(angle) * stationRadius),
-        z: Math.round(Math.sin(angle) * stationRadius),
-      },
-    };
+// The six stations. `pos` values are final guard-safe town placements: each
+// sits inside its hosting hub circle, its master NPC stands 1 to 3 units
+// beside it, and every spot clears the strictest camp-safety margin any
+// pre-existing town NPC satisfies (about 11.2 units beyond camp radius plus
+// aggro radius; the bar is pinned in tests/professions_station_placement.test.ts). The
+// zone-1 forge shares smith_haldren's forge. `masterNpcId` values name the
+// resident master each station belongs to (NpcDefs in the zone modules).
+export const STATIONS: readonly StationDef[] = [
+  {
+    id: 'station_eastbrook_forge',
+    type: 'forge',
+    zoneId: ZONE1_ZONE.id,
+    pos: { ...EASTBROOK_STATIONS_BY_ID.station_eastbrook_forge.position },
+    masterNpcId: 'forgemistress_darva',
   },
-);
+  {
+    id: 'station_eastbrook_kitchens',
+    type: 'kitchens',
+    zoneId: ZONE1_ZONE.id,
+    pos: { ...EASTBROOK_STATIONS_BY_ID.station_eastbrook_kitchens.position },
+    masterNpcId: 'cook_marlow',
+  },
+  {
+    id: 'station_eastbrook_loom',
+    type: 'loom',
+    zoneId: ZONE1_ZONE.id,
+    pos: { ...EASTBROOK_STATIONS_BY_ID.station_eastbrook_loom.position },
+    masterNpcId: 'weaver_ottilie',
+  },
+  {
+    id: 'station_eastbrook_toolworks',
+    type: 'toolworks',
+    zoneId: ZONE1_ZONE.id,
+    pos: { ...EASTBROOK_STATIONS_BY_ID.station_eastbrook_toolworks.position },
+    masterNpcId: 'tinker_gizzel',
+  },
+  {
+    id: 'station_fenbridge_tannery',
+    type: 'tannery',
+    zoneId: ZONE2_ZONE.id,
+    // Northwest edge of Fenbridge, downwind of the square.
+    pos: { x: -13, z: 314 },
+    masterNpcId: 'tanner_hesk',
+  },
+  {
+    id: 'station_highwatch_apothecary',
+    type: 'apothecary',
+    zoneId: ZONE3_ZONE.id,
+    // East of the Highwatch well, between it and the loremaster.
+    pos: { x: 7, z: 660 },
+    masterNpcId: 'alchemist_verane',
+  },
+];

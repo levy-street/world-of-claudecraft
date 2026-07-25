@@ -26,8 +26,14 @@ const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to de
 // so it is the one const exported back to sim.ts; the rest are market-internal.
 export const MARKET_MAX_LISTINGS = 12; // active player listings per seller
 const MARKET_MIN_PRICE = 1; // copper
-const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling — guards against overflow / fat-finger
-const MARKET_CUT = 0.05; // the Merchant's cut on a completed sale (a gold sink)
+const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling, guards against overflow / fat-finger
+// Exported for the wiki generator (scripts/wiki/build_content.mjs) and its
+// accuracy guard: the published cut percent derives from this one constant.
+export const MARKET_CUT = 0.05; // the Merchant's cut on a completed sale (a gold sink)
+// No listing deposit is charged today; the constant exists so the wiki reads
+// the sim's own number instead of hardcoding one, and so a future deposit
+// lever has a named home the published page tracks automatically.
+export const MARKET_LISTING_DEPOSIT_COPPER = 0;
 const MARKET_LISTING_DURATION = 48 * 3600; // sim-seconds an unsold listing lingers before returning
 const MARKET_WIRE_LIMIT = 120; // most listings shipped to one client at a time
 
@@ -444,6 +450,17 @@ export class Market {
         });
       }
     }
+  }
+
+  // Whether anything (sale gold or returned items) waits for this player at the
+  // Merchant. The always-streamed HUD indicator bit (the mailUnread pattern):
+  // unlike marketInfoFor it has NO proximity gate, so the minimap badge can
+  // light anywhere in the world; collection itself stays at the Merchant.
+  collectPendingFor(pid: number): boolean {
+    const meta = this.ctx.players.get(pid);
+    if (!meta) return false;
+    const col = this.collectionForSeller(meta);
+    return !!col && (col.copper > 0 || col.items.length > 0);
   }
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
