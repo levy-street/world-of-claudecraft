@@ -5035,6 +5035,15 @@
   body.mobile-touch.hud-mobile-compact #swingbar {
     left: calc(50% - 15px);
   }
+  /* Left-handed mirrors Jump (and the ring) to the left, so mirror this nudge
+     right by the same magnitude, matching the #mobile-action-ring mirror above. */
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #player-frame {
+    left: calc(50% + 15px);
+  }
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+    left: calc(50% + 15px);
+  }
   /* Narrowest compact phones (galaxy-s8-class 740px and below): at that width the
      centred frame's right tail (right edge ~445) runs into Jump's ring crescent
      (its circle centre sits only ~82px right of viewport centre on so narrow a
@@ -5054,6 +5063,12 @@
     body.mobile-touch.hud-mobile-compact #castbar,
     body.mobile-touch.hud-mobile-compact #swingbar {
       left: calc(50% - 44px);
+    }
+    /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #player-frame,
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+      left: calc(50% + 44px);
     }
   }
   /* Tablet: a large viewport can afford a bigger, easier-to-hit cluster than

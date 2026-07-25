@@ -83,20 +83,14 @@ significant-contributor name glow lives there too. Narrow helpers:
 - **VFX:** add an effect to `vfx.ts` (emit into the pooled particle cloud; HDR
   colour multipliers via `hdr()` so it blooms on composer tiers). Sprite atlas
   cells are append-only (`SPRITE_FILES`/`SPR` must stay in sync).
-- **Models are real GLB assets** (CC0 kits plus Tripo-generated models: props,
-  foliage, dungeon, critters, fish, gather nodes, mailbox, delve props,
-  characters), loaded via `assets/loader.ts`, then baked/merged/instanced at
-  build time.
-- **Creature GLBs take an explicit forward-yaw correction.** A Tripo creature
-  GLB's authored nose-to-tail axis is corrected per species via
-  `creatureForwardCorrectionYaw` (`critters.ts`), Box3 re-seated so its feet
-  sit at y=0, then wrapped in an outer `THREE.Group` so per-frame heading and
-  position writes never clobber the baked correction (the
-  `delve_props.ts`/`mailbox.ts` standalone-prop idiom). Never infer the
-  forward axis from a bounding-box long-axis heuristic: it measures the
-  widest silhouette, not nose-to-tail, and gets both the axis and the sign
-  wrong. Pinned by `tests/critters.test.ts`.
-
+- **Models are real GLB assets** (CC0 kits, Tripo-generated models, and the
+  image-to-GLB procedural exporters: props, foliage, dungeon, fish, gather nodes,
+  mailbox, delve props, characters, the Eastbrook town kit), loaded via
+  `assets/loader.ts`, then baked/merged/instanced at build time. A new
+  reference-image asset follows the `image-to-glb` skill
+  (`.claude/skills/image-to-glb/SKILL.md`): exporter under `scripts/assets/`, a
+  parsed-GLB contract test, and its own thin `src/render/<asset>.ts` adapter
+  (exemplars: `banker_chest.ts`, `eastbrook_grand_armoury.ts`, `noticeboard.ts`).
 ## Asset loading (`assets/`)
 `loader.ts` (`loadGltf`/`loadHdr`/`loadTexture`, one parse per URL) plus these
 rules, all CI-enforced:
@@ -113,7 +107,7 @@ rules, all CI-enforced:
 - **Every asset under `public/` must be in the media manifest** (regenerate via
   `node scripts/build_media_manifest.mjs generate`, automatic in `npm run build`).
   `tests/render_glb_replacement_assets.test.ts` fails on a GLB missing from
-  disk or the manifest; export a `*PreloadInternalsForTest` (see `critters.ts`)
+  disk or the manifest; export a `*PreloadInternalsForTest` (see `fish.ts`)
   so it covers your module.
 
 ## i18n: overhead labels are the only string surface here

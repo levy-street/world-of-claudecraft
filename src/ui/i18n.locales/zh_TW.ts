@@ -504,6 +504,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.close': '關閉每日獎勵',
   'hudChrome.dailyRewards.loading': '正在載入每日獎勵...',
   'hudChrome.dailyRewards.error': '無法載入每日獎勵。',
+  'hudChrome.dailyRewards.disabled':
+    '每日獎勵目前已停用。我們將在 Discord 頻道中公布此功能的更新。',
   'hudChrome.dailyRewards.intro':
     '在已驗證的錢包中持有足夠的 WOC 即可解鎖每日獎勵。透過每日一次轉盤與輪換任務賺取點數，再登上每日排行榜以分得獎池的一份獎勵。',
   'hudChrome.dailyRewards.disclaimer':
@@ -752,6 +754,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.claw': '爪',
   'hudChrome.corpseHarvest.components.horn': '角',
   'hudChrome.corpseHarvest.components.tusk': '獠牙',
+  'hudChrome.corpseHarvest.components.cloth': '布',
   'hudChrome.townFocus.title': '城鎮專注',
   'hudChrome.townFocus.hint':
     '專注點會在每種材料的基礎產出上疊加加成。未專注的材料保持基礎產出不變。',
@@ -1418,9 +1421,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.reconnectingNow': '連線已中斷，正在重新連線...（第 {attempt}/{maxAttempts} 次嘗試）',
   'loading.slowConnection': '載入時間比平常長。請檢查您的網路連線。',
   'loading.connectionRejected': '伺服器已關閉連線。',
+  'loading.incompatibleWorldVersion': '遊戲與伺服器版本不相容。請重新整理或更新後再試一次。',
   'loading.realmFull': '這個世界目前已滿，請於幾分鐘後再試。',
   'loading.tooManyConnections':
     '您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。',
+  'loading.messageRateExceeded': '由於發送操作過快，您已中斷連線。請稍候片刻後重新登入。',
   'errors.nothingInteract': '附近沒有可互動目標。',
   'errors.noEnemyNearby': '附近沒有敵人。',
   'errors.characterNameRequired': '請輸入角色名稱。',
@@ -1804,6 +1809,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': '你獲得了 {name}。',
   'hud.combat.auraFade': '{name}從你身上消失。',
   'hud.combat.auraAfflicted': '{target}受到了 {name} 影響。',
+  'hud.combat.auraGainOther': '{target}獲得了 {name}。',
   'hud.system.playerDeath': '你已經死亡。',
   'hud.system.respawn': '你再次感到精力恢復、身體完整。',
   'hud.system.ignoringChat': '已封鎖來自 {name} 的聊天。',
@@ -2663,7 +2669,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '將目標纏繞在原地，最多持續 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形態',
   'entities.abilities.bear_form.description':
-    '變形為熊：護甲 +90%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。',
+    '變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。',
   'entities.abilities.maul.name': '碎骨擊',
   'entities.abilities.maul.description':
     '一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。在你的下一次揮擊時觸發。僅限巨熊形態。',
@@ -6130,6 +6136,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'gpuNotice.bodyWeb':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
   'gpuNotice.dismiss': '關閉',
+  'perfNudge.integratedGpu':
+    '遊戲目前在內建（省電）顯示晶片上執行。如果這台電腦還配有獨立遊戲顯示卡，請在 Windows 的 設定 > 系統 > 顯示器 > 顯示卡 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇遊戲顯示卡。',
+  'perfNudge.hardwareAccelerationDesktop':
+    '遊戲目前在沒有 GPU 加速的情況下執行，因此非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
+  'perfNudge.hardwareAccelerationWeb':
+    '遊戲目前在沒有 GPU 加速的情況下執行，因此非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
+  'perfNudge.dismiss': '關閉',
   'editor.appTitle': '地圖編輯器',
   'editor.docTitle': '地圖編輯器 - World of ClaudeCraft',
   'editor.untitledMap': '未命名地圖',
@@ -6680,6 +6693,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': '達到更高階級才能領取此項目。',
   'apiError.discord.swag_points': '點數不足。',
   'hudChrome.mailbox.title': '郵箱',
+  'hudChrome.noticeboard.empty': '看起來沒有張貼任何內容。',
   'hudChrome.mailbox.subtitle': '渡鴉郵驛',
   'hudChrome.mailbox.close': '關閉郵箱',
   'hudChrome.mailbox.tabInbox': '收件匣',
@@ -6724,6 +6738,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': '那封信已不在你的郵箱裡。',
   'hudChrome.mailbox.result.takeParcelsFirst': '請先取出包裹再丟棄信件。',
   'worldContent.mailboxName': '郵箱',
+  'worldContent.noticeboardName': '告示板',
   'entities.letters.ravenpost_welcome.sender': '渡鴉郵驛',
   'entities.letters.ravenpost_welcome.subject': '渡鴉如今為你飛翔',
   'entities.letters.ravenpost_welcome.body':
@@ -6847,6 +6862,31 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.logging': '你需要{tier}階伐木斧才能砍伐這片林木。',
   'hudChrome.gathering.toolTierUnmet.herbalism': '你需要{tier}階草藥鐮才能採集這片草藥叢。',
   'hudChrome.gathering.toolTierUnmetCorpse': '你需要{tier}階採集工具才能取得最上等的材料。',
+  'hudChrome.gathering.requiresTool.mining': '需要採礦鎬',
+  'hudChrome.gathering.requiresTool.logging': '需要伐木斧',
+  'hudChrome.gathering.requiresTool.herbalism': '需要草藥鐮',
+  'hudChrome.gathering.toolRequired.mining': '你需要採礦鎬才能開採這條礦脈。',
+  'hudChrome.gathering.toolRequired.logging': '你需要伐木斧才能砍伐這片林木。',
+  'hudChrome.gathering.toolRequired.herbalism': '你需要草藥鐮才能採集這片草藥叢。',
+  'hudChrome.gathering.toolRequired.fishing': '你需要釣竿才能拋竿垂釣。',
+  'hudChrome.gathering.noNodeNearby.mining': '附近沒有礦脈可供開採。',
+  'hudChrome.gathering.noNodeNearby.logging': '附近沒有林木可供砍伐。',
+  'hudChrome.gathering.noNodeNearby.herbalism': '附近沒有草藥叢可供採集。',
+  'hudChrome.gathering.toolTooltip.kind.mining': '採礦工具（{tier}階）',
+  'hudChrome.gathering.toolTooltip.kind.logging': '伐木工具（{tier}階）',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': '草藥工具（{tier}階）',
+  'hudChrome.gathering.toolTooltip.kind.fishing': '釣魚竿（{tier}階）',
+  'hudChrome.gathering.toolTooltip.unlocks.mining': '開採最高{tier}階的礦脈所需。',
+  'hudChrome.gathering.toolTooltip.unlocks.logging': '砍伐最高{tier}階的林木所需。',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism': '採集最高{tier}階的草藥叢所需。',
+  'hudChrome.gathering.toolTooltip.use.mining': '使用：開採附近的礦脈。',
+  'hudChrome.gathering.toolTooltip.use.logging': '使用：砍伐附近的林木。',
+  'hudChrome.gathering.toolTooltip.use.herbalism': '使用：採集附近的草藥叢。',
+  'hudChrome.gathering.toolTooltip.speed': '在低於{tier}階的節點採集速度更快。',
+  'hudChrome.gathering.toolTooltip.rodRequired': '釣魚所需。',
+  'hudChrome.gathering.toolTooltip.rodBite': '魚上鉤最多可提前{seconds}秒。',
+  'hudChrome.gathering.toolTooltip.rodReel': '收線時限延長{seconds}秒。',
+  'hudChrome.gathering.toolTooltip.rodBand': '釣魚技能達到{skill}後可解鎖更豐富的漁獲。',
   'hudChrome.gathering.downgradeMark': '背包已滿：這份收穫未能留下採集者的印記。',
   'hudChrome.gathering.downgradeFind': '背包已滿：一件完美的收穫溜走了。',
   'hudChrome.gathering.stateReady': '可採集',
@@ -6912,6 +6952,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.comboRequirementUnmet': '你尚未達到該配方所需組合的兩項製造技能等級。',
   'hudChrome.crafting.throttled': '你製作得太快了，請稍等片刻後再試。',
   'hudChrome.crafting.recipeNotLearned': '你還沒有學會這個配方。',
+  'hudChrome.crafting.noBagSpace': '背包空間不足，無法存放製作的物品。',
   // Professions 2.0 (M16 non-Latin fills).
   'hudChrome.crafting.attunementReturnCost':
     '若你離開這個組合，日後想要重歸需要完成 {cost} 項補償任務。',
@@ -7347,7 +7388,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': '月潮（週期性範圍傷害）',
   'hudChrome.finder.mech.enrage': '低血量時狂怒',
   'hudChrome.finder.mech.shuddering_stomp': '震顫踐踏（範圍暈眩）',
-  'hudChrome.finder.mech.necrotic_shockwave': '死靈衝擊波（高額範圍傷害）',
+  'hudChrome.finder.mech.grave_inferno': '墓場煉獄（引導火焰AoE，保持分散）',
   'hudChrome.finder.mech.grave_cleaver': '掘墓劈砍（正面順劈）',
   'hudChrome.finder.mech.shadow_nova': '暗影新星（範圍爆發）',
   'hudChrome.finder.mech.profane_mending': '褻瀆治療（治療其盟友）',
@@ -7819,6 +7860,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '你的{ability}被{target}招架了。',
   'hudChrome.options.mouseoverCast': '對隊伍框架滑鼠指向施法',
   'hudChrome.options.showTargetOfTarget': '顯示目標的目標',
+  'hudChrome.options.stickyTarget': '點擊地面時保留目標',
   'hudChrome.unitFrame.targetOfTargetLabel': '目標的目標',
   'hudChrome.mobile.professions': '專業',
   'hudChrome.professions.title': '專業',
@@ -7887,8 +7929,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.stateKnown': '已學會',
   'hudChrome.training.stateTeachable': '可學習',
   'hudChrome.training.stateLocked': '未解鎖',
+  'hudChrome.training.statePending': '學習中',
   'hudChrome.training.requirement': '需要{craft}達到 {skill} 後傳授',
   'hudChrome.training.trainAria': '花費{fee}學習{name}',
+  'hudChrome.training.pendingAria': '正在學習{name}',
   'hudChrome.training.dialogOption': '訓練',
   'hudChrome.training.dialogOptionAria': '向{name}學習配方',
   'hudChrome.training.learned': '已學會配方：{recipe}',
@@ -8071,6 +8115,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.enchantWrongSlot': '該附魔無法施加於那件物品。',
   'hudChrome.enchanting.enchantUnknown': '該附魔不存在。',
   'hudChrome.enchanting.enchantInsufficient': '你沒有該附魔所需的材料。',
+  'hudChrome.enchanting.disenchantNoSpace': '背包空間不足，無法存放奧術材料。',
+  'hudChrome.enchanting.salvageNoSpace': '背包空間不足，無法存放拆解出的材料。',
+  'hudChrome.enchanting.enchantNoSpace': '背包空間不足，無法存放附魔後的物品。',
   'hudChrome.enchanting.disenchantConfirmTitle': '分解 {item}？',
   'hudChrome.enchanting.disenchantConfirmBody': '這會摧毀 {item} 並產出奧術材料。此操作無法復原。',
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
@@ -8269,6 +8316,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': '該物品未綁定。',
   'hudChrome.unbind.cannotAfford': '你付不起解綁費用。',
   'hudChrome.unbind.outOfRange': '你必須站在對應的工作臺旁才能解綁。',
+  'hudChrome.unbind.noSpace': '背包空間不足，無法存放解綁後的物品。',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '製作之輪',
@@ -8362,7 +8410,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.specializationBody': '技能達到{at}即在本行業專精，配方材料消耗減少{pct}%。',
   'guide.profPages.ench.disenchantHeading': '分解',
   'guide.profPages.ench.disenchantNote':
-    '分解任何普通品質及以上的武器或護甲（未附魔的），每次只消耗一件。普通與優秀品質的裝備研磨後隨機產出若干鈴音之塵，稀有度越高、等級越高則產量越豐；精良品起，產出形態改變：精良件出一個鈴音精華，史詩或傳說件出一個鈴音碎片，另附一個與原件材質掛鉤的定向副產物。',
+    '分解任何普通品質及以上的武器或護甲，每次只消耗一件，優先消耗未附魔的；當只剩下已附魔的裝備時，會連同附魔一併分解其中一件。普通與優秀品質的裝備研磨後隨機產出若干鈴音之塵，稀有度越高、等級越高則產量越豐；精良品起，產出形態改變：精良件出一個鈴音精華，史詩或傳說件出一個鈴音碎片，另附一個與原件材質掛鉤的定向副產物。',
   'guide.profPages.ench.typedHeading': '定向副產物',
   'guide.profPages.ench.typedNote':
     '精良及以上的裝備還會產出一種定向的、交易綁定的副產物：精良裝備產出{rare}件，史詩或傳說產出{epicMin}到{epicMax}件。',
@@ -8384,11 +8432,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '任何人都可以把武器或護甲按品質回收成普通材料，無需附魔技能。',
   'guide.profPages.ench.bonusFmt': '+{value}{stat}',
   'guide.profPages.gatherIntro.mining':
-    '採礦在三大區域的礦脈中開採礦石，供給鍛造類行業，上限為100。',
+    '採礦直接從世界的岩層中開採礦石：東溪谷產銅礦，泥沼濕地產鐵礦，荊峰高地產鋨礦，供給鍛造類行業。從1級起人人皆可採集：只需背包中備有一把採礦鎬，各區域主城均售20銅幣。以獨立計數器追蹤，上限為100。',
   'guide.profPages.gatherIntro.logging':
-    '伐木在三大區域的林地中砍伐木材，供給武器柄材與工具，上限為100。',
+    '伐木在三大區域的林地中砍伐木材：東溪谷產鐵皮木，泥沼濕地產梣木，荊峰高地產高松，供給武器柄材、法杖與工程師工坊。從1級起人人皆可伐木，只需背包中備有一把伐木斧（各區域主城20銅幣），以獨立計數器追蹤，上限為100。',
   'guide.profPages.gatherIntro.herbalism':
-    '藥草學在三大區域採集草藥，供給鍊金術與烹飪，上限為100。',
+    '藥草學採集野地所生的草藥：東溪谷產潤光葉，泥沼濕地產金葉，荊峰高地產日瓣草，這些葉與莖讓藥劑類行業得以持續調製。從1級起人人皆可採集，只需背包中備有一把草藥鐮（各區域主城20銅幣），以獨立計數器追蹤，上限為100。',
   'guide.profPages.gatherIntro.fishing':
     '釣魚通過咬鉤與收線的節奏，在每個區域的開闊水面垂釣，上限為200。',
   'guide.profPages.rhythmHeading': '採集節奏',
@@ -8400,13 +8448,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.nodesNote':
     '節點的位置、階級、所需工具與產出；每個節點在你採集後{respawn}秒才會為你本人重生。',
   'guide.profPages.toolsHeading': '工具',
-  'guide.profPages.toolsNote': '工具階梯與確切的商人售價；4階與5階工具只能製作，無法購買。',
+  'guide.profPages.toolsNote':
+    '每一處節點都需要背包中備有對應行業的工具，1階節點也不例外：沒有採礦鎬就採不到礦石，沒有魚竿就釣不上魚。商人階梯涵蓋1階到3階，各區域主城皆有備貨；工具只要放在背包裡即可，沒有裝備欄位，也沒有耐久度，因此每件都只需購買一次。門檻只看階級：工具的稀有度顏色純屬外觀。\n\n商人階梯之上還有兩件製作工具，4階與5階，由工程師在工坊打造，任何NPC都不販售。目前沒有任何節點需要超過3階的工具，因此它們現階段的價值在於速度：頂階工具能把低階節點的施法時間壓到下限；等更高階的地域開放時，它們便是入場券。',
   'guide.profPages.toolCrafted': '製作獲得（{craft}）',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '無販售',
   'guide.profPages.priceNone': '無販售',
   'guide.profPages.toolTierReq': '{tier}階工具',
-  'guide.profPages.bareHands': '徒手即可',
   'guide.profPages.bandsHeading': '熟練度區間',
   'guide.profPages.bandsBody': '熟練度區間會加快你的採集施法；對釣魚而言還決定漁獲表。',
   'guide.profPages.bandFmt': '區間{band}：自{at}熟練度起',
@@ -8623,4 +8671,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出處與市場',
   'guide.profPages.craftProse.enchanting.marketBody':
     '施加附魔消耗背包中未裝備的一件副本加材料，交還一件獨立的附魔副本；穿上它，加成永遠跟隨。一件一附魔：附魔副本不能再附魔也不能分解，出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。世界市場只經手無標記的普通貨，附魔與署名件都面對面交易；材料才是可上市的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。',
+  'hudChrome.corpseHarvest.components.meat': '獸肉',
 };

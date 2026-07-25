@@ -348,6 +348,7 @@ function summarizeResult(result) {
     lastLabel: last?.label ?? '',
     fps: lastReport.fps ?? 0,
     fps10s: lastReport.windows?.last10s?.fps ?? 0,
+    frames: lastReport.frames ?? 0,
     frameP95: lastReport.frameMs?.p95 ?? 0,
     frameP95_10s: lastReport.windows?.last10s?.frameMs?.p95 ?? 0,
     frameLong50: lastReport.frameMs?.long50 ?? 0,
@@ -558,10 +559,19 @@ async function runViewport(browser, viewport) {
 
 fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
 
+// PERF_GPU=1 opts into a HEADED browser on the real GPU; the default stays the
+// headless swiftshader software path (portable, deterministic-ish, CI-shaped).
+// The real-GPU mode exists for the R13 honest-gate baseline captures
+// (frameLong50 / tourMinFrames in tests/hud_perf_budget.baseline.md), which are
+// same-machine values that would be meaningless under software rasterization.
+const PERF_GPU = process.env.PERF_GPU === '1';
+
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
-  headless: 'new',
-  args: ['--window-size=1600,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+  headless: PERF_GPU ? false : 'new',
+  args: PERF_GPU
+    ? ['--window-size=1600,900', '--ignore-gpu-blocklist', '--enable-gpu']
+    : ['--window-size=1600,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
 
 const startedAt = new Date().toISOString();
@@ -579,6 +589,7 @@ const artifact = {
   generatedAt: startedAt,
   baseUrl: BASE_URL,
   url: perfUrl(),
+  gpuMode: PERF_GPU ? 'real-gpu-headed' : 'swiftshader-headless',
   scenario: PERF_SCENARIO,
   stepMs: STEP_MS,
   settleMs: SETTLE_MS,

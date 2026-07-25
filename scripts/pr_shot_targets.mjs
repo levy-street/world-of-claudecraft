@@ -359,44 +359,73 @@ export const TARGETS = [
     // the gain ladder (commons two tiers below = minimal green, a known
     // rung-25 recipe = reduced yellow, a known rung-50 recipe = full orange),
     // and ceiling-state switches to the armorcrafting tab where the 75 row
-    // sits above the pre-attunement ceiling (none, gray).
+    // sits above the pre-attunement ceiling (none, gray). The discount
+    // variants stage the #1134 specialization scene: an armorcrafter at
+    // skill 80 holding EXACTLY the discounted reagent amounts for the chain
+    // vest (listed 4 copper / 9 flux, charged 3 / 7 at the 0.8 multiplier),
+    // so the reagent line and the Craft gate show the discounted requirement.
     variants: [
       { key: 'desktop' },
       { key: 'mobile', mobile: true },
       { key: 'desktop-four-states', fourStates: true },
       { key: 'desktop-ceiling-state', fourStates: true, selectTab: 'armorcrafting' },
+      { key: 'desktop-discount', discount: true, selectTab: 'armorcrafting' },
+      { key: 'mobile-discount', discount: true, mobile: true, selectTab: 'armorcrafting' },
+      // Issue #2375, the bag-freshness scene, and the one variant whose point
+      // is WHEN the window repaints rather than how it looks: the default
+      // grant leaves the minor healing potion at 2 of its 3 reagents, so the
+      // window opens with that row disabled, and the missing silverleaf is
+      // granted AFTERWARDS (the shopkeeper handing it over). The shot is taken
+      // a slow band later. Before the fix the row is still disabled and the
+      // reagent still reads 0/2; after it, the row is live.
+      { key: 'desktop-bag-freshness', bagFreshness: true, selectTab: 'alchemy' },
+      { key: 'mobile-bag-freshness', bagFreshness: true, mobile: true, selectTab: 'alchemy' },
     ],
     // Grant a spread of reagents across a few professions so several recipes read
     // craftable, force-hide then toggle so the open is deterministic, and clip to
     // the window.
     async capture(page, variant) {
-      await page.evaluate((fourStates) => {
-        document.querySelector('#gpu-notice')?.remove();
-        const sim = window.__game?.sim;
-        const ids = ['bone_fragments', 'linen_scrap', 'spider_leg'];
-        for (const id of ids) {
-          try {
-            sim?.addItem(id, 10);
-          } catch {}
-        }
-        if (fourStates) {
-          const meta = sim?.players?.get(sim.primaryId);
-          if (meta) {
-            meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 60 };
-            meta.knownRecipes.add('recipe_ironedge_longsword');
-            meta.knownRecipes.add('recipe_thorium_warblade');
+      await page.evaluate(
+        (staging) => {
+          document.querySelector('#gpu-notice')?.remove();
+          const sim = window.__game?.sim;
+          const ids = ['bone_fragments', 'linen_scrap', 'spider_leg'];
+          for (const id of ids) {
+            try {
+              sim?.addItem(id, 10);
+            } catch {}
           }
-        }
-        const el = document.querySelector('#crafting-window');
-        if (el) el.style.display = 'none';
-        window.__game?.hud?.toggleCrafting?.();
-      }, Boolean(variant?.fourStates));
+          if (staging.fourStates) {
+            const meta = sim?.players?.get(sim.primaryId);
+            if (meta) {
+              meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 60 };
+              meta.knownRecipes.add('recipe_ironedge_longsword');
+              meta.knownRecipes.add('recipe_thorium_warblade');
+            }
+          }
+          if (staging.discount) {
+            try {
+              sim?.addItem('copper_ore', 3);
+              sim?.addItem('smithing_flux', 7);
+            } catch {}
+            const meta = sim?.players?.get(sim.primaryId);
+            if (meta) meta.craftSkills = { ...meta.craftSkills, armorcrafting: 80 };
+          }
+          const el = document.querySelector('#crafting-window');
+          if (el) el.style.display = 'none';
+          window.__game?.hud?.toggleCrafting?.();
+        },
+        {
+          fourStates: Boolean(variant?.fourStates),
+          discount: Boolean(variant?.discount),
+        },
+      );
       // A first-open crafting window with several icon-bearing recipe rows takes
       // noticeably longer to lay out in headless swiftshader than the plain-list
       // bags/map windows do (getBoundingClientRect can report 0x0 for 2-4s), so
       // poll for a real size instead of guessing a fixed wait.
       const open = await pollForSize(page, '#crafting-window');
-      if (open && variant?.fourStates) {
+      if (open && (variant?.fourStates || variant?.discount)) {
         // Staging mid-tier craft skills trips the once-ever first-tier
         // explainer modal over the window, on a drain-window delay rather
         // than synchronously; poll-dismiss it so the shot frames the recipe
@@ -420,7 +449,23 @@ export const TARGETS = [
         }, variant.selectTab);
         await wait(300);
       }
-      if (open && (variant?.mobile || variant?.fourStates)) {
+      if (open && variant?.bagFreshness) {
+        // The whole point of the scene: the bag changes while the window is
+        // already open and the player never touches it. Grant the missing
+        // reagent through the sim (the same mutation a vendor buy, a loot, or
+        // a trade lands) and wait past the 500ms slow band, so the shot shows
+        // what the window says a moment after the reagent arrived.
+        await page.evaluate(() => {
+          try {
+            window.__game?.sim?.addItem('silverleaf_herb', 2);
+          } catch {}
+        });
+        await wait(900);
+      }
+      if (
+        open &&
+        (variant?.mobile || variant?.fourStates || variant?.discount || variant?.bagFreshness)
+      ) {
         // The identity card fills the top of the window (all of it on the short
         // landscape viewport); scroll the first recipe section into view so the
         // legibility rows, and for four-states the whole difficulty ladder
@@ -434,6 +479,112 @@ export const TARGETS = [
         await wait(300);
       }
       return open ? { clip: '#crafting-window' } : {};
+    },
+  },
+  {
+    key: 'gather-tool-tooltip',
+    label: 'Bag tooltip: gathering implement kind/requirement/use/bonus lines (#2343)',
+    when: ['ui/gather_tool_tooltip', 'professions/tools'],
+    // Grant the implements, open bags, focus one cell: the new tooltip lines
+    // (kind, required-to, use, speed or bite/reel/band bonuses) read in one
+    // frame. Full-frame shot: the tooltip renders beside the bags window.
+    variants: [
+      { key: 'pick', hover: 'Iron Mining Pick' },
+      { key: 'rod', hover: 'Ironreel Fishing Rod' },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        try {
+          sim?.addItem?.('iron_mining_pick', 1);
+          sim?.addItem?.('ironreel_fishing_rod', 1);
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      let open = await pollForSize(page, '#bags');
+      if (!open) {
+        await page.evaluate(() => window.__game?.hud?.toggleBags?.());
+        open = await pollForSize(page, '#bags');
+      }
+      if (!open) return {};
+      await page.evaluate((name) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        // Real focus fires attachTooltip's focusin arm (keyboard-nav path), a
+        // sturdier trigger than synthetic mouseenter under headless.
+        const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
+          b.getAttribute('aria-label')?.includes(name),
+        );
+        cell?.scrollIntoView({ block: 'center' });
+        cell?.focus();
+      }, variant?.hover ?? 'Iron Mining Pick');
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return {};
+    },
+  },
+  {
+    key: 'gather-node-hover-tooltip',
+    label: 'World hover: gather-node requirement line, tier 1 included (#2343)',
+    when: ['ui/gather_node_tooltip', 'ui/gathering_view', 'professions/gathering'],
+    // Teleport onto the starter ore vein and sweep the REAL mouse over it: the
+    // hover tooltip only paints through the live pointermove raycast, so the
+    // sweep proves the actual path. Toolless shows the red requires-a-pick
+    // line; tooled shows it neutral.
+    variants: [{ key: 'toolless' }, { key: 'tooled', tooled: true }],
+    async capture(page, variant) {
+      await page.evaluate((tooled) => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        const sim = window.__game?.sim;
+        try {
+          // The vein sits inside the Copper Dig mob camp: silence the camp
+          // FIRST (the test-suite despawnMobs idiom) or the level-1 subject
+          // dies mid-hover, then teleport beside ore_eastbrook_1 at (-70,-53).
+          for (const e of sim?.entities?.values?.() ?? []) {
+            if (e.kind !== 'mob') continue;
+            e.dead = true;
+            e.hp = 0;
+            e.aiState = 'dead';
+            e.respawnTimer = 9999;
+            e.corpseTimer = 9999;
+            e.inCombat = false;
+          }
+          sim?.chat?.('/dev tp -70 -52');
+          if (tooled) sim?.addItem?.('copper_mining_pick', 1);
+        } catch {}
+      }, Boolean(variant?.tooled));
+      await wait(800); // let the teleport settle and the camera follow
+      const vp = page.viewport() ?? { width: 1280, height: 720 };
+      let shown = false;
+      // The vein sits at the player's feet after the teleport, so sweep the
+      // lower-center screen region; each stop outwaits the 120ms pick
+      // throttle, and the x range stays off the right-edge icon column.
+      outer: for (const dy of [60, 100, 140, 20, 180, -20]) {
+        for (const dx of [0, -60, 60, -120, 120]) {
+          await page.mouse.move(vp.width / 2 + dx, vp.height / 2 + dy);
+          await wait(170);
+          const visible = await page.evaluate(() => {
+            const tip = document.getElementById('tooltip');
+            return !!tip && getComputedStyle(tip).display !== 'none' && tip.offsetWidth > 0;
+          });
+          if (visible) {
+            shown = true;
+            break outer;
+          }
+        }
+      }
+      // No honest hover, no shot: never fake the tooltip into the DOM.
+      if (!shown) throw new Error('node hover tooltip never appeared through the live raycast');
+      await wait(200);
+      return {};
     },
   },
   {
@@ -1217,6 +1368,42 @@ export const TARGETS = [
     },
   },
   {
+    key: 'perf-nudge',
+    label: 'Performance nudge toast (perf-doctor machine-local causes)',
+    when: ['ui/perf_nudge', 'game/perf_nudge'],
+    variants: [
+      { key: 'web-integrated', ids: ['integrated-gpu'], desktopShell: false },
+      { key: 'web-software', ids: ['hardware-acceleration'], desktopShell: false },
+      { key: 'desktop-shell-software', ids: ['hardware-acceleration'], desktopShell: true },
+      { key: 'web-mobile-integrated', ids: ['integrated-gpu'], desktopShell: false, mobile: true },
+    ],
+    // The nudge fires only when the live perf-doctor finds a machine-local cause
+    // (software GL, or a hybrid laptop pinned to its integrated GPU), which a
+    // healthy capture machine never produces; import the module directly (Vite
+    // serves /src in dev) and force the id set, exactly what src/game/perf_nudge.ts
+    // would pass on an affected box. Clearing the persisted dismissal and any prior
+    // element keeps the recipe rerunnable; removing #gpu-notice keeps the sibling
+    // toast slot out of the clip.
+    async capture(page, variant) {
+      await page.evaluate(
+        async (opts) => {
+          localStorage.removeItem('woc_perf_nudge_dismissed');
+          document.querySelector('#perf-nudge')?.remove();
+          document.querySelector('#gpu-notice')?.remove();
+          const mod = await import('/src/ui/perf_nudge_toast.ts');
+          mod.initPerfNudgeToast({
+            suggestionIds: opts.ids,
+            softwareNoticeAlreadyShown: false,
+            desktopShell: opts.desktopShell,
+          });
+        },
+        { ids: variant?.ids ?? ['integrated-gpu'], desktopShell: Boolean(variant?.desktopShell) },
+      );
+      const open = await pollForSize(page, '#perf-nudge');
+      return open ? { clip: '#perf-nudge' } : {};
+    },
+  },
+  {
     key: 'gather-node',
     label: 'Gather node (click/tap-to-harvest #1866; tool tier gating, Professions 2.0)',
     when: ['gather_node', 'gather_nodes', 'gathering_view', 'professions/tools'],
@@ -1619,6 +1806,99 @@ export const TARGETS = [
         });
         await wait(300);
       }
+      return { clip: '#train-window' };
+    },
+  },
+  {
+    key: 'train-window-pending',
+    label: 'Train view: Learn in flight (pending row disables, issue #2342)',
+    when: ['ui/hud/vendor/train_learn_core'],
+    // Desktop and mobile: the pending row IS the first-click feedback (the
+    // button reads a disabled Learning state until the trainResult lands), so
+    // it must read on both form factors.
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Pendaline' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Pendamora', mobile: true },
+    ],
+    // The forge staging of train-window above (weaponcrafting 30 makes
+    // recipe_forgeguard_bulwark_gauntlets the TEACHABLE row), then stage the
+    // in-flight state exactly as trainRecipeClicked paints it: open the learn
+    // flight on the HUD tracker and repaint. The staged flight never sends the
+    // command, because offline the sim answers synchronously and the very next
+    // event drain would resolve the row back out of pending; online this state
+    // is what the window shows for the whole round trip.
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const master = [...sim.entities.values()].find(
+          (e) => e.templateId === 'forgemistress_darva',
+        );
+        if (!master) return { ok: false, reason: 'no forgemistress_darva entity' };
+        const meta = sim.players.get(sim.primaryId);
+        if (!meta) return { ok: false, reason: 'no primary player meta' };
+        meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 30, armorcrafting: 10 };
+        meta.knownRecipes.delete('recipe_forgeguard_bulwark_gauntlets');
+        meta.knownRecipes.delete('recipe_ironbound_warplate_helm');
+        sim.copper = 100000;
+        const p = sim.player;
+        if (p?.pos) {
+          p.pos.x = master.pos.x;
+          p.pos.z = master.pos.z - 2;
+        }
+        const el = document.querySelector('#train-window');
+        if (el) el.style.display = 'none';
+        game.hud.openTrain(master.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`train-window-pending setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#train-window');
+      if (!open) throw new Error('train window did not open');
+      // The once-ever first-tier explainer fires on a drain-window delay
+      // (the train-window target's trap); poll-dismiss it before staging the
+      // flight so the 5s pending TTL cannot lapse under the dismiss loop.
+      for (let i = 0; i < 10; i++) {
+        const dismissed = await page.evaluate(() => {
+          const ok = document.querySelector('#profession-tutorial .cd-ok');
+          if (ok) ok.click();
+          return Boolean(ok);
+        });
+        if (dismissed) break;
+        await wait(300);
+      }
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const hud = game?.hud;
+        if (!hud?.trainLearns) return { ok: false, reason: 'no trainLearns tracker on hud' };
+        hud.trainLearns.begin('recipe_forgeguard_bulwark_gauntlets', performance.now());
+        hud.renderTrain();
+        // The staged skills leave SEVERAL rows teachable (both crafts' tier-0
+        // rungs plus the tier-1 weaponcrafting ones); exactly the begun one
+        // must read disabled-pending, every copper check passes (affordable
+        // rows never disable on their own at the staged purse).
+        const disabled = document.querySelectorAll('#train-window .train-teachable:disabled');
+        if (disabled.length !== 1) {
+          return { ok: false, reason: `expected 1 disabled pending row, got ${disabled.length}` };
+        }
+        return { ok: true, state: disabled[0].querySelector('.train-state')?.textContent ?? '' };
+      });
+      if (!staged.ok) throw new Error(`pending staging failed: ${staged.reason}`);
+      // Bring the pending row into the frame (the ladder scrolls on both form
+      // factors and the combo row sits deep in the weaponcrafting section).
+      await page.evaluate(() => {
+        document
+          .querySelector('#train-window .train-teachable:disabled')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      await wait(300);
       return { clip: '#train-window' };
     },
   },

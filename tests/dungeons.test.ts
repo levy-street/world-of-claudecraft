@@ -85,19 +85,21 @@ function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
 // record, independently of mobTemplateForDungeonDifficulty, mirroring createMob's
 // formulas. Dropping any multiplier from the transform reddens these pins even
 // though forcing level 22 alone would already raise the per-level stats.
+// Per-mob health overrides (healthMultiplierByMob) take precedence over the
+// dungeon-wide healthMultiplier -- e.g. 2026-07-24 nerf: skeleton adds at 2.22x
+// their normal-mode pool (3,768 HP) via healthMultiplierByMob.nythraxis_skeleton_warrior.
 function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   const levelUps = tuning.level - 1;
   const hpMult = template.elite ? 2.3 : 1;
   const dmgMult = template.elite ? 1.5 : 1;
   const tuningDmg = tuning.damageMultiplierByMob?.[template.id] ?? tuning.damageMultiplier;
+  const tuningHp = tuning.healthMultiplierByMob?.[template.id] ?? tuning.healthMultiplier;
   const dmg =
     (template.dmgBase * tuningDmg + template.dmgPerLevel * tuningDmg * levelUps) * dmgMult;
   return {
     maxHp: Math.round(
-      (template.hpBase * tuning.healthMultiplier +
-        template.hpPerLevel * tuning.healthMultiplier * levelUps) *
-        hpMult,
+      (template.hpBase * tuningHp + template.hpPerLevel * tuningHp * levelUps) * hpMult,
     ),
     weaponMin: Math.round(dmg * 0.8),
     weaponMax: Math.round(dmg * 1.25),

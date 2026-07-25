@@ -1114,6 +1114,18 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'stalkerhide_jerkin',
       'cragwalker_boots',
       'windguard_leggings',
+      // Gathering tools (#2343: every node harvest needs a matching tool, so
+      // each zone hub stocks the tiers its own nodes use; Thornpeak has
+      // tier-1 through tier-3 nodes). Tiered rods stay a Wilkes exclusive.
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'mithril_mining_pick',
+      'handaxe',
+      'felling_axe',
+      'ironbark_axe',
+      'gathering_sickle',
+      'bronze_sickle',
+      'silverleaf_sickle',
       'simple_fishing_pole',
       // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
       // trade-goods vendor, so every station-bound (stationType) recipe has

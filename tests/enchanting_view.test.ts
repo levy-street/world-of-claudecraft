@@ -31,6 +31,10 @@ describe('enchanting_view: disenchant toast mapping', () => {
     expect(disenchantResultToast({ ok: false, reason: 'unknown_item' }).key).toBe(
       'hudChrome.enchanting.notHeld',
     );
+    expect(disenchantResultToast({ ok: false, reason: 'no_bag_space' })).toEqual({
+      key: 'hudChrome.enchanting.disenchantNoSpace',
+      sink: 'error',
+    });
   });
 });
 
@@ -54,6 +58,10 @@ describe('enchanting_view: salvage toast mapping', () => {
     expect(salvageResultToast({ ok: false, reason: 'unknown_item' }).key).toBe(
       'hudChrome.enchanting.notHeld',
     );
+    expect(salvageResultToast({ ok: false, reason: 'no_bag_space' })).toEqual({
+      key: 'hudChrome.enchanting.salvageNoSpace',
+      sink: 'error',
+    });
   });
 });
 
@@ -83,6 +91,10 @@ describe('enchanting_view: apply-enchant toast mapping', () => {
     expect(applyEnchantResultToast({ ok: false, reason: 'unknown_item' }).key).toBe(
       'hudChrome.enchanting.notHeld',
     );
+    expect(applyEnchantResultToast({ ok: false, reason: 'no_bag_space' })).toEqual({
+      key: 'hudChrome.enchanting.enchantNoSpace',
+      sink: 'error',
+    });
   });
   it('always routes a failure through the error sink', () => {
     for (const reason of [
@@ -92,6 +104,7 @@ describe('enchanting_view: apply-enchant toast mapping', () => {
       'insufficient_materials',
       'not_held',
       'unknown_item',
+      'no_bag_space',
     ] as const) {
       expect(applyEnchantResultToast({ ok: false, reason }).sink).toBe('error');
     }

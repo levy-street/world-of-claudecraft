@@ -98,11 +98,21 @@ state is three transient Entity fields (`fishBiteAtTick`,
 cleared on every cast-end path.
 
 ### Tools and the mastery curve
-Bare hands are effective tool tier 1; only tier-2+ content gates
-(`bestOwnedAnyGatherToolTier`, `src/sim/professions/tools.ts`, scans bags,
-spans all four gathering professions). The gate holds at cast START and is
-deliberately not re-checked at completion; completion re-validates exactly
-range, respawn, and capacity. Skill gain follows the four-state curve
+Every NODE harvest requires a matching-profession gathering tool covering
+the node's tier anywhere in bags (#2343, the RuneScape rule: bare hands
+never mine, fell, or pick; `bestOwnedGatherToolTierOrNone` +
+`canGatherTier`, `src/sim/professions/tools.ts`). Casting a fishing line
+likewise requires a fishing implement in bags: the simple pole or any
+tiered rod (`hasFishingImplement`, the startFishing gate). Bare hands
+still resolve to effective tool tier 1 ONLY on the surfaces that keep the
+old floor: corpse harvesting (`bestOwnedAnyGatherToolTier`, spans all four
+professions) and fishing's bite/reel/band synergy math. The node gate
+holds at cast START and is deliberately not re-checked at completion;
+completion re-validates exactly range, respawn, and capacity. Using a
+pick/axe/sickle from the bags starts the standard gather cast on the
+nearest matching in-range node (`useGatherToolItem`,
+`src/sim/professions/gathering.ts`), preferring a ready node, and emits
+the text-free `gatherToolNoNode` event when nothing is in reach. Skill gain follows the four-state curve
 (`tierProgressMultiplier`, `src/sim/professions/wheel.ts`: 1 / 0.5 / 0.25 / 0
 by tiers below capability, every tier included, no free floor), with
 deterministic fractional gains and never a skill-up roll. Caps are enforced
@@ -113,6 +123,36 @@ flag (`src/sim/professions/mastery_reset.ts`); `normalizeArchetypeState` is
 the single load-time reader of PRE-reset skill values and must keep running
 before `applyMasteryReset`. Tool effects/charges/recharge stay PARKED as
 dormant pure modules in `tools.ts`: do not wire, do not delete.
+
+Character XP from crafting is LEARNING XP: the level-banded curve
+(`craftActionXp`, `src/sim/professions/profession_xp.ts`) scaled at the
+grant site (`resolveCraftForRecipe`, `src/sim/professions/crafting.ts`) by
+the skill the craft actually taught, the applied post-clamp
+`gainCraftSkill` delta. The shared `craftSkillGainMultiplier` also returns
+0 outright at the craft's content cap, which keeps the crafting window's
+difficulty label, the skill grant, and the XP grant in lockstep. The
+character-level green/gray falloff alone cannot bound a level-20 recipe at
+the level-20 character cap (gray for skillReq 75+ would need capability
+past the 125 cap), so the skill journey is the dimension that makes every
+recipe's lifetime character-XP contribution finite: craft skill is
+additive-only and hard-capped, so a recipe that no longer teaches pays
+nothing, and a vendor-fed recipe's character XP stays bounded like every
+other's (pinned end to end by `tests/professions_craft_xp.test.ts`, the
+boundedness sweep included).
+Gathering XP (`gatherActionXp`) deliberately keeps the plain level band:
+nodes cannot be vendor-fed, harvesting is movement- and respawn-paced like
+mob grinding, and it stays a post-launch watch rather than a coupling.
+
+The economy invariant carries a discount-aware arm as well:
+the listed-count "no recipe vendors above its input value" rule prices the
+naive craft, but a specialized crafter consumes discounted counts (the
+`requiredReagentCountFor` composition), so a fully-vendor-fed recipe can
+flip gold-positive while the listed arm passes (the Kilnscale Mantle did:
+listed 520 against a 470 vendor-back, but cheapest achievable consumption
+300). Every fully-vendor-fed recipe (membership derived from the NPC
+vendor tables and pinned) must vendor strictly below its CHEAPEST
+achievable input, specialized plus self-signed, enforced in
+`tests/recipe_economy.test.ts`.
 
 ### Provenance and instance stacking
 Two slots merge only when itemId matches AND the instance payload is

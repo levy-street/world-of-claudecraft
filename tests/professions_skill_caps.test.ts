@@ -173,6 +173,8 @@ describe('at cap, actions still work: only skill gain stops', () => {
   it('a harvest at mining 100 still yields the node material; proficiency stays at cap', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Capped');
+    // #2343: every node harvest needs the matching-profession tool in bags.
+    sim.addItem('copper_mining_pick', 1, pid);
     const meta = mustMeta(sim, pid);
     meta.gatheringProficiency.mining = 100;
     const p = (sim as any).entities.get(pid);

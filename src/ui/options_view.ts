@@ -473,6 +473,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
       boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
+      boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
       slider(s, 'fctScale', 'hud.options.fctScale'),
       boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar', {
         rerender: true,
@@ -482,6 +483,21 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       }),
     ]),
   ];
+}
+
+/** Keys of the controls in `controls` that write a GameSettings value: sliders,
+ *  toggles, boolToggles and choices all carry a `key`. NoteControl (a display-only
+ *  line) and MusicToggleControl (reads the live MusicDirector, not a stored
+ *  setting) carry no key and are skipped. Used to scope a sub-view's "Reset to
+ *  Defaults" button to only the settings that view actually renders, instead of
+ *  resetting the whole GameSettings object (issue 2341). */
+export function optionsControlKeys(controls: OptionsControl[]): string[] {
+  const keys = new Set<string>();
+  for (const c of controls) {
+    if (c.control === 'note' || c.control === 'musicToggle') continue;
+    keys.add(c.key);
+  }
+  return [...keys];
 }
 
 /** The interface controls that belong to `tab`, in declaration order. The

@@ -33,7 +33,7 @@ import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../insta
 import { heroicLockoutId, instanceLockoutMetas } from '../instances/dungeons';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { clearThreat, threatEntries } from '../threat';
+import { addThreat, clearThreat, SUMMONED_ADD_THREAT_SEED, threatEntries } from '../threat';
 import {
   type AuraKind,
   angleTo,
@@ -72,6 +72,7 @@ const NYTHRAXIS_WARDSTONE_RANGE = 100;
 const NYTHRAXIS_GRAVEBREAKER_EVERY = 12;
 const NYTHRAXIS_GRAVEBREAKER_RANGE = 11;
 const NYTHRAXIS_GRAVEBREAKER_HALF_ARC = Math.PI / 3;
+const NYTHRAXIS_GRAVEBREAKER_SPLASH_MULT = 1.5;
 const NYTHRAXIS_OPENER_SECOND_YELL_DELAY = 4;
 const NYTHRAXIS_DIALOGUE_LINE_SECONDS = 2.6;
 // Raise Fallen add-wave cadence, both difficulties (heroic scales the ADDS,
@@ -244,8 +245,9 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       transitionReleased: false,
       dialogueBusyUntil: 0,
       dialogueToken: 0,
-      gravebreakerTimer: 1.5,
+      gravebreakerTimer: NYTHRAXIS_GRAVEBREAKER_EVERY,
       gravebreakerCasts: 0,
+      gravebreakerCharged: false,
       raiseFallenTimer: NYTHRAXIS_RAISE_FALLEN_EVERY,
       soulRendTimer: NYTHRAXIS_SOUL_REND_EVERY,
       soulRendMarks: [],
@@ -653,14 +655,40 @@ export function updateNythraxisDreadCurse(
 
 // ----- phase-one mechanics --------------------------------------------------------
 
+// Gravebreaker is a CHARGED AUTO-ATTACK: this cadence only ARMS it. The next
+// melee swing the boss actually LANDS releases the splash (the on-swing hook
+// below, reached from runMobSwingAffixes), so it can never stack on top of a
+// separate swing, the tank-facing hit goes through the normal hit table, and
+// avoidance (dodge/parry/miss) holds the charge for the next swing. The old
+// free-standing cast fired its first arc at 1.5s on the pull, stacking with
+// the opening swing into a tank-killing burst no heal could beat.
 export function updateNythraxisGravebreaker(
-  ctx: SimContext,
-  boss: Entity,
+  _ctx: SimContext,
+  _boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
   st.gravebreakerTimer -= DT;
   if (st.gravebreakerTimer > 0) return;
   st.gravebreakerTimer = NYTHRAXIS_GRAVEBREAKER_EVERY;
+  st.gravebreakerCharged = true;
+}
+
+// Release a charged Gravebreaker off a LANDED boss swing. `rawDmg` is the
+// swing's own pre-armor roll (crit/enrage already folded in by the mobSwing
+// shell), so the release draws NO extra rng. The swing target takes only the
+// swing itself; everyone else inside the 11yd frontal arc takes the splash at
+// 1.5x, armor-mitigated per victim. The splash never crits: a critting swing
+// doubles the primary hit only, so the un-crit basis is restored here.
+export function nythraxisGravebreakerOnMobSwing(
+  ctx: SimContext,
+  boss: Entity,
+  target: Entity,
+  rawDmg: number,
+  crit: boolean,
+): void {
+  const st = boss.nythraxis;
+  if (!st?.gravebreakerCharged) return;
+  st.gravebreakerCharged = false;
   st.gravebreakerCasts = (st.gravebreakerCasts ?? 0) + 1;
   if (st.gravebreakerCasts % 3 === 0)
     nythraxisSay(ctx, boss, 'nythraxis', 'Kneel before your king');
@@ -671,23 +699,30 @@ export function updateNythraxisGravebreaker(
     school: 'physical',
     fx: 'nova',
   });
-  let rawDmg =
-    ctx.rng.range(boss.weapon.min, boss.weapon.max) +
-    (ctx.effectiveAttackPower(boss) / 14) * boss.weapon.speed;
-  const enrage = MOBS[boss.templateId]?.enrage;
-  if (boss.enraged && enrage) rawDmg *= enrage.dmgMult;
+  const splashBasis = crit ? rawDmg / 2 : rawDmg;
   for (const p of playersInNythraxisRoom(ctx, boss)) {
+    if (p.id === target.id) continue;
     const d = dist2d(p.pos, boss.pos);
     if (d > NYTHRAXIS_GRAVEBREAKER_RANGE) continue;
     const delta = Math.abs(normAngle(angleTo(boss.pos, p.pos) - boss.facing));
     if (delta > NYTHRAXIS_GRAVEBREAKER_HALF_ARC) continue;
-    const offTarget = p.id !== boss.aggroTargetId;
-    const mult = offTarget ? 1.5 : 1;
-    const mitigated = rawDmg * mult * (1 - armorReduction(ctx.effectiveArmor(p), boss.level));
-    const dmg = Math.max(1, Math.round(mitigated));
-    ctx.dealDamage(boss, p, dmg, false, 'physical', 'Gravebreaker', 'hit', true);
-    // An arc hit on anyone but the current target taints the positioning task.
-    if (offTarget) deedsMod.onBossSplashHitForDeeds(ctx, boss);
+    const mitigated =
+      splashBasis *
+      NYTHRAXIS_GRAVEBREAKER_SPLASH_MULT *
+      (1 - armorReduction(ctx.effectiveArmor(p), boss.level));
+    ctx.dealDamage(
+      boss,
+      p,
+      Math.max(1, Math.round(mitigated)),
+      false,
+      'physical',
+      'Gravebreaker',
+      'hit',
+      true,
+    );
+    // Every splash victim is off-target by construction: the arc hit taints
+    // the positioning task exactly as before.
+    deedsMod.onBossSplashHitForDeeds(ctx, boss);
   }
 }
 
@@ -740,7 +775,12 @@ export function spawnNythraxisAdds(ctx: SimContext, boss: Entity): void {
     ctx.addEntity(add);
     boss.summonedIds.push(add.id);
     inst?.mobIds.push(add.id);
-    if (victim && !victim.dead && victim.kind === 'player') ctx.aggroMob(add, victim, false);
+    if (victim && !victim.dead && victim.kind === 'player') {
+      ctx.aggroMob(add, victim, false);
+      // The same real tank lead spawnBossAdds seeds (aggroMob only planted 1
+      // point): without it the first heal peeled every wave onto the healer.
+      addThreat(add, victim.id, SUMMONED_ADD_THREAT_SEED - 1);
+    }
   }
   ctx.emit({
     type: 'spellfx',
@@ -809,7 +849,12 @@ export function spawnNythraxisHeroicAdds(ctx: SimContext, boss: Entity): void {
     ctx.addEntity(add);
     boss.summonedIds.push(add.id);
     inst?.mobIds.push(add.id);
-    if (victim && !victim.dead && victim.kind === 'player') ctx.aggroMob(add, victim, false);
+    if (victim && !victim.dead && victim.kind === 'player') {
+      ctx.aggroMob(add, victim, false);
+      // The same real tank lead spawnBossAdds seeds (aggroMob only planted 1
+      // point): without it the first heal peeled every wave onto the healer.
+      addThreat(add, victim.id, SUMMONED_ADD_THREAT_SEED - 1);
+    }
   });
   ctx.emit({
     type: 'spellfx',

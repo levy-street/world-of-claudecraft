@@ -1197,7 +1197,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'rare',
     stats: { armor: 78, int: 6, spi: 4 },
-    sellValue: 470,
+    // Economy invariant, discount-aware arm: both reagents are vendor-stocked
+    // at the forge, and a specialized crafter holding a self-signed ore
+    // consumes as little as 4 ore + 3 flux = 300c, so the old 470 vendor-back
+    // sat gold-positive. Re-priced below that cheapest achievable
+    // input (the v0.29.0 output-re-price precedent); the vendor-loop bound is
+    // pinned by tests/recipe_economy.test.ts.
+    sellValue: 280,
   },
   // --- Hollow Crypt rewards (rare/blue) ---
   // Item-level showcase: these rares are NORMALIZED to the stat budget their item

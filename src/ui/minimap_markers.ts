@@ -31,12 +31,12 @@
 // to a color, never the resolved color.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
-import { GATHER_NODES, isDelvePos, isYumiMazePos, QUESTS, STATIONS, zoneAt } from '../sim/data';
+import { GATHER_NODES, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import { isQuestTurnInNpc } from '../sim/types';
 import type { IWorld } from '../world_api';
-import { viewerBestToolTier } from './gathering_view';
+import { viewerOwnedToolTier } from './gathering_view';
 
 // Markers beyond (S/2 - RIM_INSET) from the centre are culled (entities) or pinned to
 // that rim as an arrow (party). Byte-faithful to the inline `S/2 - 7`.
@@ -259,7 +259,7 @@ export function createMinimapMarkers(): MinimapMarkers {
         const professionId = NODE_HARVEST_TABLE[node.type].professionId;
         let best = bestToolTiers.get(professionId);
         if (best === undefined) {
-          best = viewerBestToolTier(world, professionId);
+          best = viewerOwnedToolTier(world, professionId);
           bestToolTiers.set(professionId, best);
         }
         markers.push({
@@ -271,10 +271,9 @@ export function createMinimapMarkers(): MinimapMarkers {
         });
       }
 
-      // Crafting stations (Professions 2.0): static content positions, one marker per
-      // station, identical for every viewer (no per-viewer classification, unlike the
-      // gather nodes above).
-      for (const station of STATIONS) {
+      // Crafting stations (Professions 2.0): positions come through IWorld so
+      // custom maps cannot inherit fixed built-in Eastbrook markers.
+      for (const station of world.stationPlacements) {
         const dx = -(station.pos.x - p.pos.x) * pxPerYard;
         const dz = -(station.pos.z - p.pos.z) * pxPerYard;
         if (dx * dx + dz * dz > rim2) continue;

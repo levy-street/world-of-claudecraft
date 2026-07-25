@@ -38,7 +38,7 @@ import {
 } from './gather_events';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
-import { BARE_HANDS_TOOL_TIER, bestOwnedGatherToolTier, canGatherTier } from './tools';
+import { bestOwnedGatherToolTierOrNone, canGatherTier, NO_TOOL_OWNED } from './tools';
 import type { PlayerProfessionSkill } from './types';
 import { tierProgressMultiplier } from './wheel';
 
@@ -342,29 +342,26 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
     return false;
   }
-  // Tool gate: pure access gating, never a speed mechanic. Bare hands
-  // resolve to tier 1 (BARE_HANDS_TOOL_TIER floors the owned-best bag scan),
-  // so a tier-1 node, which is ALL content predating tool tiers, skips this branch
-  // entirely and its hot path is untouched. A tier-2+ node needs a
-  // matching-profession gatherTool of at least the node's tier anywhere in
-  // bags (no equip slot). The gate is rng-free and sits before both rng draws:
-  // a denial never touches the respawn timer, never draws rng, and never
-  // consumes anything.
+  // Tool gate (#2343, the RuneScape rule): pure access gating, never a speed
+  // mechanic. EVERY node harvest requires a matching-profession gatherTool of
+  // at least the node's tier anywhere in bags (no equip slot); bare hands
+  // never harvest, so a tier-1 node needs a tier-1 tool and requiredTier 1 on
+  // the denial means "no tool owned at all". The gate is rng-free and sits
+  // before both rng draws: a denial never touches the respawn timer, never
+  // draws rng, and never consumes anything.
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
   // One bag scan serves both the tool gate and the cast-duration formula
   // below (pure lookup, no rng, so hoisting it cannot shift the draw order).
-  const ownedToolTier = bestOwnedGatherToolTier(meta.inventory, professionId, ITEMS);
-  if (node.tier > BARE_HANDS_TOOL_TIER) {
-    if (!canGatherTier(ownedToolTier, node.tier)) {
-      ctx.emit({
-        type: 'gatherDenied',
-        pid: meta.entityId,
-        surface: 'node',
-        professionId,
-        requiredTier: node.tier,
-      });
-      return false;
-    }
+  const ownedToolTier = bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS);
+  if (ownedToolTier === NO_TOOL_OWNED || !canGatherTier(ownedToolTier, node.tier)) {
+    ctx.emit({
+      type: 'gatherDenied',
+      pid: meta.entityId,
+      surface: 'node',
+      professionId,
+      requiredTier: node.tier,
+    });
+    return false;
   }
   // Capacity pre-gate on the material this zone's node actually grants. The
   // item id is known BEFORE any rng draw (zone x type lookup, no roll), so a
@@ -392,6 +389,59 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   p.gatherCastNodeId = node.id;
   ctx.emit({ type: 'castStart', entityId: p.id, ability: GATHER_CAST_ID, time: duration });
   return true;
+}
+
+// Inverse of NODE_HARVEST_TABLE for the tool-use path below: which node type
+// a gathering tool works. Fishing has no world nodes (its gatherTool rods
+// route to startFishing at the items.ts boundary), so it never appears here.
+export const NODE_TYPE_BY_PROFESSION: Partial<Record<GatheringProfessionId, GatherNodeType>> = {
+  mining: 'ore',
+  logging: 'wood',
+  herbalism: 'herb',
+};
+
+// Using a pick/axe/sickle from the bags (#2343): behaves like the interact
+// press, scoped to the tool's own profession. Finds the nearest matching
+// node within interact range, preferring one that is ready for this player
+// over one still respawning, and starts the standard gather cast on it
+// through harvestNode (which re-runs every gate: dead, busy, range, respawn,
+// tool, capacity). With no matching node in range it emits the text-free
+// gatherToolNoNode event so the click is never a silent no-op. The scan is
+// pure state (no rng), so a no-node denial draws nothing.
+export function useGatherToolItem(
+  ctx: SimContext,
+  professionId: GatheringProfessionId,
+  pid?: number,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const { meta, e: p } = r;
+  const nodeType = NODE_TYPE_BY_PROFESSION[professionId];
+  if (!nodeType) return false;
+  let best: GatherNodeDef | null = null;
+  let bestDist = Infinity;
+  let bestReady = false;
+  for (const node of GATHER_NODES) {
+    if (node.type !== nodeType) continue;
+    const d = distToNode(p.pos, node.pos);
+    if (d > INTERACT_RANGE) continue;
+    const ready = isNodeHarvestableBy(meta, node.id, ctx.time);
+    // A ready node always beats a respawning one; ties resolve by distance.
+    if (ready !== bestReady) {
+      if (!ready) continue;
+      best = node;
+      bestDist = d;
+      bestReady = true;
+    } else if (d < bestDist) {
+      best = node;
+      bestDist = d;
+    }
+  }
+  if (!best) {
+    ctx.emit({ type: 'gatherToolNoNode', pid: meta.entityId, professionId });
+    return false;
+  }
+  return harvestNode(ctx, best.id, pid);
 }
 
 // Completion of a running gather cast, reached through the

@@ -10,6 +10,7 @@
 import process from 'node:process';
 import pg from 'pg';
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 process.loadEnvFile?.();
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
@@ -75,7 +76,7 @@ class Client {
       this.ws = new WebSocket(`${WS_BASE}/ws`);
       const timeout = setTimeout(() => reject(new Error('connect timeout')), 8000);
       this.ws.on('open', () => {
-        this.send({ t: 'auth', token, character: characterId });
+        this.send(worldAuthMessage(token, characterId));
       });
       this.ws.on('message', (data) => {
         const msg = JSON.parse(String(data));

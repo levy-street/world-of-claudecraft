@@ -149,7 +149,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_floes.name': 'Glaces flottantes',
   'entities.abilities.ice_floes.description':
     "Tes deux prochains sorts qui ont un temps d'incantation peuvent être lancés en mouvement. Dure 15 s. (Talent de mage)",
-  'entities.abilities.ignition.name': 'Embrasement',
   'entities.abilities.ignition.description':
     'Passif : les coups critiques de tes sorts enflamment la cible et lui infligent 40% des dégâts causés sur 6 s; cet effet se cumule. (Maîtrise du Feu)',
   'entities.abilities.mass_barrier.name': 'Bouclier collectif',

@@ -5,6 +5,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 type TestSim = Sim & {
   nextId: number;
@@ -18,6 +19,7 @@ function harness(sim: Sim): TestSim {
 function simWithRows(cls: PlayerClass, rows: Record<number, string>): TestSim {
   const sim = harness(new Sim({ seed: 1756, playerClass: cls, autoEquip: false }));
   sim.setPlayerLevel(20);
+  placePlayerInOpenField(sim);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   return sim;
 }

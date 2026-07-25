@@ -42,6 +42,7 @@ import {
   bagQualityKey,
   bagShiftLinks,
   bagStackIndex,
+  bagsMoneyRowStale,
   bagTooltipHintKey,
   bankDepositOpensPrompt,
   buildBagBar,
@@ -164,6 +165,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
+  /** Gathering-tool click routing (#2343): true when the interact-style
+   *  handler consumed the use (nearest matching node + autorun stop); false
+   *  falls back to the plain useItem command. */
+  useGatherTool(item: ItemDef): boolean;
   // Hotbar drag plumbing (cross-window drag state lives on the HUD).
   isHotbarItemId(itemId: string): boolean;
   setDragAction(action: { type: 'item'; id: string } | null): void;
@@ -214,7 +219,54 @@ export class BagsWindow {
   // (vendor / mobile), where a null restore is a safe no-op.
   private openerFocus: HTMLElement | null = null;
 
+  // The purse as of the last money-row paint (issue #2373), re-armed by every paint
+  // whatever caused it. -1 is the cold sentinel: a real purse is never negative, so
+  // a window shown without a paint would always converge on the first probe.
+  private lastMoneyCopper = -1;
+
   constructor(private readonly deps: BagsWindowDeps) {}
+
+  /**
+   * Repaint the money row when the purse moved, the staleness contract this window
+   * owns (issue #2373). Joins the refreshIfChanged family the HUD's slow band drives
+   * (bank / mailbox / market / social / deeds / professions / calendar), so the
+   * coordinator stays a one-line consumer.
+   *
+   * Deliberately NOT a full render(): nothing else inside #bags reads copper, and a
+   * rebuild would tear down the hovered row's tooltip, the bag-search caret and an
+   * armed touch drag. This edge fires from a server credit or a coin-only mob loot
+   * with no user action behind it, so unlike the user-initiated paint paths it must
+   * not move anything the player is holding. Same reason refreshGrid() exists for
+   * live search.
+   */
+  refreshIfChanged(): void {
+    const el = this.deps.root();
+    if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper))
+      return;
+    this.refreshMoneyRow();
+  }
+
+  /** Rewrite ONLY the .money footer in place, re-binding its two launchers. Shared by
+   *  the full render() and the purse probe, so the latch arms on both. */
+  private paintMoneyRow(row: HTMLElement, copper: number): void {
+    row.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(copper)}`;
+    row.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
+      this.deps.openClaudium();
+    });
+    row.querySelector('[data-wallet-action]')?.addEventListener('click', () => {
+      this.deps.openWallet();
+    });
+    this.lastMoneyCopper = copper;
+  }
+
+  /** The narrow repaint: find the existing footer and re-paint it. A window that has
+   *  never been rendered has no .money row yet, so this is a no-op rather than a
+   *  partial paint. */
+  private refreshMoneyRow(): void {
+    const row = this.deps.root().querySelector('.money') as HTMLElement | null;
+    if (!row) return;
+    this.paintMoneyRow(row, this.deps.world().copper);
+  }
 
   /** Record the element that opened the window, so close() can return focus to it.
    *  Called by the HUD's toggleBags on the keyboard/minimap open path. */
@@ -266,14 +318,8 @@ export class BagsWindow {
     grid.scrollTop = prevScrollTop;
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
-    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
     el.appendChild(moneyRow);
-    moneyRow.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
-      this.deps.openClaudium();
-    });
-    moneyRow.querySelector('[data-wallet-action]')?.addEventListener('click', () => {
-      this.deps.openWallet();
-    });
+    this.paintMoneyRow(moneyRow, world.copper);
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so
       // this bags x-btn is the whole cluster's single close control: it closes the
@@ -852,11 +898,16 @@ export class BagsWindow {
         this.deps.hideTooltip();
         this.render();
         break;
-      case 'use':
-        this.deps.world().useItem(s.itemId);
+      case 'use': {
+        // Gathering tools (#2343) route through the interact-style handler
+        // (nearest matching node + autorun stop) when main.ts has wired it;
+        // everything else, and any unwired host, keeps the plain useItem.
+        const item = ITEMS[s.itemId];
+        if (!item || !this.deps.useGatherTool(item)) this.deps.world().useItem(s.itemId);
         this.render();
         this.deps.renderCharIfOpen();
         break;
+      }
     }
   }
 

@@ -361,6 +361,14 @@ export const TALENT_ABILITIES_V2_A = {
     school: 'holy',
     requiresTarget: false,
     effects: [{ type: 'aoeHeal', min: 100, max: 122, radius: 30 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 170,
+        effects: [{ type: 'aoeHeal', min: 145, max: 177, radius: 30 }],
+      },
+    ],
     description: 'Heals nearby allies for $d. (Priest talent)',
   },
   mind_sear: {

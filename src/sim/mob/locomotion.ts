@@ -365,6 +365,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // the charge cooldown, so this runs before the combat-profile runner on
       // every engaged tick. Zero rng in every branch: inert for normal spawns.
       if (updateMobChargeDash(ctx, mob)) break;
+      // A live Grave Inferno channel owns the whole engaged tick: the boss is
+      // rooted, does not melee, and only the channel pulses fire. The cadence
+      // countdown itself ticks inside runMobAttackMechanics with the other
+      // boss mechanics (melee-gated), so a kited boss does not bank channels.
+      if (updateInfernoChannel(ctx, mob)) break;
       const result = updateMobCombatProfile(ctx, mob, () => {
         // The anti-kite snare, loud battle cries, and the heroic charge trigger
         // fire once per engaged tick, from either engaged state (mid-chase is
@@ -446,7 +451,77 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 }
 
+// Tick a LIVE inferno channel (returns true while channeling, owning the
+// tick). Pulses fire at duration/pulses intervals; pulse k rolls
+// range(min, max) x k x mechanicDamageMult, unmitigated and non-crit, on
+// every living player inside the radius. Each pulse emits a nova spellfx so
+// the burning ring reads on screen. Uninterruptible by construction: nothing
+// in here checks stun/silence (the one authored carrier, Korzul, is ccImmune
+// on both difficulties anyway).
+function updateInfernoChannel(ctx: SimContext, mob: Entity): boolean {
+  const inferno = MOBS[mob.templateId]?.infernoChannel;
+  if (!inferno || mob.infernoRemaining <= 0) return false;
+  const interval = inferno.duration / inferno.pulses;
+  mob.infernoRemaining = Math.max(0, mob.infernoRemaining - DT);
+  const elapsedAfter = inferno.duration - mob.infernoRemaining;
+  const duePulses = Math.min(inferno.pulses, Math.floor(elapsedAfter / interval));
+  while (mob.infernoPulsesFired < duePulses) {
+    mob.infernoPulsesFired++;
+    const k = mob.infernoPulsesFired;
+    const school = (inferno.school ?? 'fire') as Aura['school'];
+    // spellfxAt with radius: the renderer drapes an AoE ring at the TRUE
+    // blast size, so the 14yd edge players dodge is the 14yd edge they see.
+    ctx.emit({
+      type: 'spellfxAt',
+      x: mob.pos.x,
+      z: mob.pos.z,
+      school,
+      fx: 'nova',
+      radius: inferno.radius,
+    });
+    // One draw per pulse regardless of who stands in it (stream stability).
+    const roll = ctx.rng.range(inferno.min, inferno.max);
+    for (const meta of ctx.players.values()) {
+      const pe = ctx.entities.get(meta.entityId);
+      if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > inferno.radius) continue;
+      const dmg = Math.round(roll * k * (mob.mechanicDamageMult ?? 1));
+      ctx.dealDamage(mob, pe, dmg, false, school, inferno.name, 'hit', true);
+    }
+  }
+  if (mob.infernoRemaining <= 0) {
+    mob.infernoPulsesFired = 0;
+    return false; // channel over: the boss acts normally again this tick
+  }
+  return true;
+}
+
 function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
+  // Grave Inferno cadence: melee-gated like every other boss mechanic. At
+  // zero the channel arms and updateInfernoChannel owns subsequent ticks.
+  const inferno = MOBS[mob.templateId]?.infernoChannel;
+  if (inferno && mob.infernoRemaining <= 0) {
+    mob.infernoTimer -= DT;
+    if (mob.infernoTimer <= 0) {
+      mob.infernoTimer = inferno.every;
+      mob.infernoRemaining = inferno.duration;
+      mob.infernoPulsesFired = 0;
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${inferno.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
+      ctx.emit({
+        type: 'spellfxAt',
+        x: mob.pos.x,
+        z: mob.pos.z,
+        school: (inferno.school ?? 'fire') as Aura['school'],
+        fx: 'nova',
+        radius: inferno.radius,
+      });
+    }
+  }
   // Boss/miniboss pulse mechanic.
   const pulse = MOBS[mob.templateId]?.aoePulse;
   if (pulse) {

@@ -18,7 +18,7 @@
 // (cached for the frame, never per-marker); every other literal (font, radius,
 // line width, label offset, triangle geometry) is a named constant.
 
-import type { ZoneDef } from '../sim/data';
+import { getActiveWorldContent, type ZoneDef } from '../sim/data';
 import { type Decoration, generateDecorations } from '../sim/world';
 import type { IWorld } from '../world_api';
 import { dungeonDisplayName, zoneDisplayName, zonePoiLabel } from './entity_i18n';
@@ -87,6 +87,7 @@ const MAP_COLOR_TOKENS = {
   tree: '--color-map-tree',
   oak: '--color-map-oak',
   buildingOutline: '--color-map-building-outline',
+  buildingArmoury: '--color-map-building-armoury',
   buildingChapel: '--color-map-building-chapel',
   buildingInn: '--color-map-building-inn',
   buildingHouse: '--color-map-building-house',
@@ -156,6 +157,7 @@ export class MapWindowPainter {
     if (!this.decorations) this.decorations = generateDecorations(world.cfg.seed);
     const model = buildOverworldMapModel({
       world,
+      props: getActiveWorldContent().props,
       zone: opts.zone,
       zoom: opts.zoom,
       center: opts.center,
@@ -345,11 +347,13 @@ export class MapWindowPainter {
     ctx.strokeStyle = colors.buildingOutline;
     for (const b of detail.buildings) {
       ctx.fillStyle =
-        b.kind === 'chapel'
-          ? colors.buildingChapel
-          : b.kind === 'inn'
-            ? colors.buildingInn
-            : colors.buildingHouse;
+        b.kind === 'armoury'
+          ? colors.buildingArmoury
+          : b.kind === 'chapel'
+            ? colors.buildingChapel
+            : b.kind === 'inn'
+              ? colors.buildingInn
+              : colors.buildingHouse;
       ctx.beginPath();
       ctx.moveTo(b.points[0].mx, b.points[0].my);
       for (let i = 1; i < b.points.length; i++) ctx.lineTo(b.points[i].mx, b.points[i].my);

@@ -235,6 +235,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // Periodic (DoT) ticks are not a direct attack: they must not walk a
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
+            false,
+            // Banks copied from resolved damage (Ignite) skip the source-output
+            // multipliers so the payout equals what was banked, once.
+            a.finalDamage === true,
           );
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);

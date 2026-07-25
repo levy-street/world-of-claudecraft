@@ -114,8 +114,9 @@ describe('bag_item_context_menu: confirm escalation predicate', () => {
   });
 
   it('disenchant skips the already-enchanted copy when choosing the victim', () => {
-    // The last copy is enchanted (never consumed by disenchant); the masterwork
-    // copy before it is the real victim, so the stronger warning fires.
+    // The last copy is enchanted (only consumed once no unenchanted copy is
+    // left); the masterwork copy before it is the real victim, so the
+    // stronger warning fires.
     const held = [
       copy({ rolled: { masterwork: true } }),
       copy({ enchant: 'enchant_weapon_might' }),
@@ -123,7 +124,31 @@ describe('bag_item_context_menu: confirm escalation predicate', () => {
     expect(destroyConsumesSpecialCopy('disenchant', held)).toBe(true);
   });
 
+  // Issue #2340: the sim now falls back to consuming an enchanted copy once
+  // no unenchanted copy remains, so the predicate must warn (an enchanted
+  // copy is always special) instead of silently reporting no victim.
+  it('disenchant warns when every held copy is enchanted (the fallback victim)', () => {
+    expect(
+      destroyConsumesSpecialCopy('disenchant', [copy({ enchant: 'enchant_weapon_might' })]),
+    ).toBe(true);
+    // Legacy enchanted shape (bare rolled.stats, no marker) counts the same.
+    expect(
+      destroyConsumesSpecialCopy('disenchant', [copy({ rolled: { stats: { str: 5 } } })]),
+    ).toBe(true);
+    expect(
+      destroyConsumesSpecialCopy('disenchant', [
+        copy({ enchant: 'enchant_weapon_might' }),
+        copy({ enchant: 'enchant_helmet_fortitude' }),
+      ]),
+    ).toBe(true);
+  });
+
   it('disenchant does not warn on a lone plain copy', () => {
     expect(destroyConsumesSpecialCopy('disenchant', [copy()])).toBe(false);
+  });
+
+  it('never warns when no copies are held at all', () => {
+    expect(destroyConsumesSpecialCopy('disenchant', [])).toBe(false);
+    expect(destroyConsumesSpecialCopy('salvage', [])).toBe(false);
   });
 });

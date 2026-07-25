@@ -128,4 +128,38 @@ describe('DailyRewardsWindow close notification', () => {
     win.close();
     expect(win.isOpen).toBe(false);
   });
+
+  it('renders the disabled state without depending on payout history', async () => {
+    const root = rootStub();
+    root.style.display = 'block';
+    const history = vi.fn(async () => {
+      throw new Error('history unavailable');
+    });
+    const onStatus = vi.fn();
+    const win = new DailyRewardsWindow({
+      root: () => root,
+      world: () =>
+        ({
+          ...worldStub(),
+          dailyRewards: async () => ({
+            ...(await worldStub().dailyRewards()),
+            enabled: false,
+          }),
+          dailyRewardHistory: history,
+        }) as IWorld,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+      onStatus,
+    });
+    const paint = vi
+      .spyOn(win as unknown as { paint(view: unknown): void }, 'paint')
+      .mockImplementation(() => undefined);
+
+    await win.render();
+
+    expect(history).not.toHaveBeenCalled();
+    expect(onStatus).toHaveBeenCalledOnce();
+    expect(paint).toHaveBeenCalledWith({ kind: 'disabled' });
+  });
 });

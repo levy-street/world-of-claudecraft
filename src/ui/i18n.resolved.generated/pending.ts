@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "es_ES": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "fr_FR": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "fr_CA": [
+    "hudChrome.options.stickyTarget"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "de_DE": [
+    "hudChrome.options.stickyTarget"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.options.stickyTarget"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "nl_NL": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "pl_PL": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "id_ID": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "tr_TR": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "sv_SE": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "vi_VN": [
+    "hudChrome.options.stickyTarget"
+  ],
+  "da_DK": [
+    "hudChrome.options.stickyTarget"
+  ]
 };

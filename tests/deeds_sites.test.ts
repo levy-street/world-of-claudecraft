@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { handleDeath } from '../src/sim/combat/damage';
 import { STATION_RADIUS } from '../src/sim/content/professions';
-import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
+import { DUNGEONS, instanceOrigin, MOBS, STATIONS } from '../src/sim/data';
 import {
   type CupMatchForDeeds,
   onArenaMatchEndForDeeds,
@@ -1337,7 +1337,7 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
   const FIELD_RECIPE = 'recipe_eastbrook_arming_sword';
   // The station the recipe binds to, read from the STATIONS record so a
   // content re-placement can never silently strand this suite.
-  const toolworks = stationsOfType('toolworks')[0];
+  const toolworks = stationsOfType(STATIONS, 'toolworks')[0];
 
   function stationCrafter(sim: Sim, level = 20): PlayerMeta {
     const meta = addMeta(sim, 'Crafter');

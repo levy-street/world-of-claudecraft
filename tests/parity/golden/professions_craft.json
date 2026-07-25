@@ -441,8 +441,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "fec08f3c",
-      "events": "c6dd8553",
+      "state": "bb62bbb0",
+      "events": "ad9c7241",
       "rng": {
         "draws": 2,
         "digest": "d6442b50"
@@ -471,7 +471,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 91
+            "xpGained": 24
           },
           "craftSkills": {
             "alchemy": 1,
@@ -557,7 +557,7 @@
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
-          "lifetimeXp": 91,
+          "lifetimeXp": 24,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -565,7 +565,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 91
+          "xp": 24
         }
       ],
       "entities": [
@@ -638,7 +638,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "ea39b8bf",
+      "state": "4b90794c",
       "events": "fd5f12a8",
       "rng": {
         "draws": 3,
@@ -668,7 +668,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 115
+            "xpGained": 48
           },
           "craftSkills": {
             "alchemy": 2,
@@ -752,7 +752,7 @@
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
-          "lifetimeXp": 115,
+          "lifetimeXp": 48,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -760,7 +760,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 115
+          "xp": 48
         }
       ],
       "entities": [
@@ -833,7 +833,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "ea39b8bf",
+      "state": "4b90794c",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -863,7 +863,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 115
+            "xpGained": 48
           },
           "craftSkills": {
             "alchemy": 2,
@@ -947,7 +947,7 @@
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
-          "lifetimeXp": 115,
+          "lifetimeXp": 48,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -955,7 +955,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 115
+          "xp": 48
         }
       ],
       "entities": [

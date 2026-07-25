@@ -116,6 +116,10 @@ describe('gather quest objectives', () => {
     ]);
     const ore = GATHER_NODES.find((node) => node.type === 'ore')!;
     const wood = GATHER_NODES.find((node) => node.type === 'wood')!;
+    // #2343: every node harvest needs the matching-profession tool in bags
+    // (the too-far denial below still fires before the tool gate).
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('handaxe', 1, pid);
 
     // Too far away, so the server denies without quest credit.
     sim.harvestNode(ore.id, pid);

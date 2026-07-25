@@ -267,6 +267,12 @@ export const BOOL_SETTINGS = {
   // red when the click lands on a hostile. Purely a local presentation cue; it
   // never touches sim state. Off removes the marker entirely.
   clickFeedback: { def: true },
+  // off by default (the classic behavior: a left-click on empty ground clears
+  // your target). When on, a ground left-click keeps the current target, so
+  // click-to-move players can reposition without deselecting; the target still
+  // drops by targeting something else, target death, or range/stealth as normal.
+  // Read by the pick handler via shouldClearTargetOnGroundClick (target_click.ts).
+  stickyTarget: { def: false },
   // off by default: swap the looping landing-page trailer for a static, dimmed,
   // high-contrast backdrop so the start-screen text stays legible (and the
   // 5.7 MB video is never fetched). Forced on regardless for phones / Save-Data /
@@ -403,9 +409,25 @@ export class Settings {
     return v as GameSettings[K];
   }
 
-  reset(): void {
-    for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
-    for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+  /** Restore defaults. With no `keys`, every setting resets (the historical
+   *  behavior). With `keys`, only those keys reset, so a caller that owns just
+   *  one sub-view (e.g. the options window's per-panel footer) can offer a
+   *  "Reset to Defaults" that does not silently wipe settings the player
+   *  never saw (issue 2341). */
+  reset(keys?: readonly (keyof GameSettings)[]): void {
+    if (!keys) {
+      for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
+      for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+      this.save();
+      return;
+    }
+    for (const key of keys) {
+      if ((BOOL_KEYS as readonly string[]).includes(key as string)) {
+        this.values[key as BoolSettingKey] = BOOL_SETTINGS[key as BoolSettingKey].def;
+      } else if ((NUMERIC_KEYS as readonly string[]).includes(key as string)) {
+        this.values[key as NumericSettingKey] = SETTING_RANGES[key as NumericSettingKey].def;
+      }
+    }
     this.save();
   }
 }

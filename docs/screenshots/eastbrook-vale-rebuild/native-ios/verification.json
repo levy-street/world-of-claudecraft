@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "branch": "feature/banker-chest-glb",
+    "baseCommit": "9b7fdd5de0ebae1fb39eba4c0885938aac9a5523",
+    "state": "working-tree Eastbrook Vale rebuild"
+  },
+  "toolchain": {
+    "xcode": "26.6 (17F113)",
+    "capacitorCommand": "npx cap sync ios",
+    "nativeBuildCommand": "npm run build:native",
+    "xcodeConfiguration": "Debug",
+    "codeSigningAllowed": false
+  },
+  "simulator": {
+    "device": "iPhone 16 Pro Max",
+    "runtime": "iOS 18.4 (22E238)",
+    "udid": "C83401FD-DE42-48DF-B747-71EA131975E4",
+    "bundleId": "com.worldofclaudecraft"
+  },
+  "results": {
+    "nativeBuild": "PASS",
+    "capacitorSync": "PASS",
+    "xcodeSimulatorBuild": "PASS",
+    "installAndLaunch": "PASS",
+    "landscapeLeft": "PASS",
+    "landscapeRight": "PASS",
+    "safeAreaAndDynamicViewportAtLanding": "PASS",
+    "backgroundResume": {
+      "status": "PASS",
+      "pidBefore": 24790,
+      "pidAfter": 24790,
+      "events": [
+        "iOS application will resign active",
+        "iOS application entered background",
+        "iOS application will enter foreground",
+        "iOS application became active"
+      ],
+      "visibleRepaint": true
+    },
+    "bundledAssetResidency": {
+      "status": "PASS",
+      "byteIdenticalLogicalAssets": 12,
+      "hashedProductionCopiesPresent": 12,
+      "assets": [
+        "models/props/eastbrook_bank.glb",
+        "models/props/eastbrook_chapel.glb",
+        "models/props/eastbrook_civic_well_beacon.glb",
+        "models/props/eastbrook_inn.glb",
+        "models/props/eastbrook_market_stall.glb",
+        "models/props/eastbrook_smithy.glb",
+        "models/props/eastbrook_toolworks.glb",
+        "models/props/eastbrook_wall_wing.glb",
+        "models/props/eastbrook_weaving_workshop.glb",
+        "models/props/eastbrook_grand_armoury.glb",
+        "models/props/banker_chest.glb",
+        "textures/eastbrook_surface_atlas.webp"
+      ]
+    },
+    "filteredProcessLog": {
+      "webglContextLosses": 0,
+      "assetLoadFailures": 0
+    }
+  },
+  "screenshots": [
+    "native-ios/iphone16-pro-max-ios18.4-landscape-left.webp",
+    "native-ios/iphone16-pro-max-ios18.4-landscape-right.webp",
+    "native-ios/iphone16-pro-max-ios18.4-resumed-right.webp"
+  ],
+  "verify": [
+    "Authenticated in-game native touch, camera, movement, combat, and interaction pass: the production native build intentionally exposes online play only and no task-scoped test account was available.",
+    "Physical-device GPU performance, memory-pressure background eviction, and context recovery: matching signing identity/provisioning was unavailable and automatic provisioning would mutate an external Apple developer service.",
+    "Explicit WEBGL_lose_context injection in WKWebView: Safari Web Inspector automation was unavailable; deterministic context-loss/restoration tests and browser mobile evidence passed, but this is not claimed as native runtime proof."
+  ]
+}

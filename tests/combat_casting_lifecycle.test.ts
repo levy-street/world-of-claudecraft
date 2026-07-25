@@ -29,6 +29,7 @@ import {
   CHANNEL_PUSHBACK_FRACTION,
   FISHING_CAST_ID,
 } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -36,6 +37,7 @@ type AnyEntity = Entity & Record<string, any>;
 function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; meta: any } {
   const sim = new Sim({ seed: 99, playerClass: cls, autoEquip: true }) as AnySim;
   sim.setPlayerLevel(level);
+  placePlayerInOpenField(sim);
   const p = sim.player as AnyEntity;
   const meta = sim.players.get(p.id);
   p.resource = p.maxResource;
@@ -109,6 +111,8 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     const { sim, p, meta } = makeSim('priest', 12);
     const ally = sim.entities.get(sim.addPlayer('warrior', 'Ally')) as AnyEntity;
     const bystander = sim.entities.get(sim.addPlayer('rogue', 'Bystander')) as AnyEntity;
+    placePlayerInOpenField(sim, ally.id, { x: 2 });
+    placePlayerInOpenField(sim, bystander.id, { x: 4 });
     ally.hp = Math.max(1, ally.maxHp - 500);
     bystander.hp = Math.max(1, bystander.maxHp - 500);
     const allyHp0 = ally.hp;

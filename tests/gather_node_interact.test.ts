@@ -225,6 +225,9 @@ describe('the real harvestNode behind the helper (cast start)', () => {
   it('a successful interact starts the gather cast and returns true before any grant', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Interactor');
+    // #2343: bare hands never gather, so the fixture carries the tier-1 pick
+    // (addItem draws no rng).
+    sim.addItem('copper_mining_pick', 1, pid);
     const node = GATHER_NODES[0];
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing entity');
@@ -234,7 +237,8 @@ describe('the real harvestNode behind the helper (cast start)', () => {
     p.prevPos = { ...p.pos };
     expect(sim.harvestNode(node.id, pid)).toBe(true);
     expect(p.castingAbility).toBe(GATHER_CAST_ID);
-    // Fresh player, bare hands, band 0, tier-1 node: the 2.5 s base literal.
+    // Band 0, tier-1 node: a tier-1 pick at a tier-1 node still casts the
+    // 2.5s base (only a tool tier ABOVE the node shortens it).
     expect(p.castTotal).toBe(2.5);
     // The grant has NOT landed yet: it belongs to cast completion.
     expect(sim.countItem(nodeMaterialFor(node.type, node.zoneId).itemId, pid)).toBe(0);

@@ -228,7 +228,9 @@ export const GATHER_NODES: GatherNodeDef[] = [
   },
 
   // Tool-tier ramp. Zone 1 (eastbrook_vale) stays ALL tier 1: every node
-  // above keeps tier 1, so nothing harvestable there ever needs a tool. The
+  // above keeps tier 1, so the 20-copper starter tools cover the whole zone
+  // (#2343: every harvest needs its profession's tool, tier 1 included; the
+  // starter tools are sold a few steps from spawn). The
   // ramp comes only from the NEW veins
   // below: mirefen_marsh gains one tier-2 node per type, thornpeak_heights
   // gains one tier-2 and one tier-3 node per type. Each sits a short walk

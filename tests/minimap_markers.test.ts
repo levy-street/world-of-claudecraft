@@ -105,6 +105,7 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     delveRun: null,
     cfg: { seed: 42, playerClass: 'warrior' },
     playerId: 1,
+    stationPlacements: STATIONS,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
   } as unknown as IWorld;
 }
@@ -293,6 +294,7 @@ describe('station markers (Professions 2.0)', () => {
       delveRun: null,
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
+      stationPlacements: STATIONS,
       questState: () => 'unavailable',
       nodeHarvestableByMe: () => true,
       ...over,
@@ -326,6 +328,27 @@ describe('station markers (Professions 2.0)', () => {
     const world = makeStationWorld('sim');
     (world.player as unknown as { pos: { x: number; z: number } }).pos = { x: 0, z: 150 };
     expect(stationMarkers(world)).toHaveLength(0);
+  });
+
+  it('reads the active IWorld station surface, so a custom world leaks no built-in markers', () => {
+    expect(stationMarkers(makeStationWorld('sim', { stationPlacements: [] }))).toEqual([]);
+    const custom = [
+      {
+        id: 'custom_station',
+        type: 'forge',
+        zoneId: 'custom',
+        pos: { x: 2, z: 12 },
+        masterNpcId: 'custom_master',
+      },
+    ] as const;
+    const markers = stationMarkers(makeStationWorld('sim', { stationPlacements: custom }));
+    expect(markers).toEqual([
+      {
+        kind: 'station',
+        mx: S / 2 - (2 - VIEW_POS.x) * PPY,
+        my: S / 2 - (12 - VIEW_POS.z) * PPY,
+      },
+    ]);
   });
 
   it('is host- and viewer-invariant: shapes and unrelated stub state never change the set', () => {
@@ -408,6 +431,7 @@ describe('gather-node markers: the locked dimension', () => {
       delveRun: null,
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
+      stationPlacements: STATIONS,
       inventory: opts.inventory ?? [],
       nodeHarvestableByMe: opts.harvestable ?? (() => true),
       questState: () => 'unavailable',
@@ -421,19 +445,21 @@ describe('gather-node markers: the locked dimension', () => {
     >[];
   }
 
-  it('a bare-hands viewer sees the tier-2 vein locked and every tier-1 node unlocked', () => {
+  it('a toolless viewer sees EVERY node locked (#2343: bare hands never gather)', () => {
     const markers = gatherMarkers(makeGatherWorld('sim'));
-    expect(markers.map((m) => m.locked)).toEqual([false, false, false, false, true]);
-    // The locked marker is the vein under the viewer: the exact map centre.
-    const locked = markers.find((m) => m.locked);
-    expect(locked).toMatchObject({ mx: S / 2, my: S / 2, ready: true });
+    expect(markers.map((m) => m.locked)).toEqual([true, true, true, true, true]);
+    // The centre marker is the tier-2 vein under the viewer, still ready:
+    // locked is the tool dimension, never the respawn one.
+    const centre = markers.find((m) => m.mx === S / 2 && m.my === S / 2);
+    expect(centre).toMatchObject({ locked: true, ready: true });
   });
 
-  it('owning the tier-2 pick unlocks the vein; the ready silhouette stays composable', () => {
+  it('the tier-2 pick unlocks only the ore nodes; herb stays locked without a sickle', () => {
     const tooled = gatherMarkers(
       makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
     );
-    expect(tooled.map((m) => m.locked)).toEqual([false, false, false, false, false]);
+    // GATHER_NODES rim order: ore t1, ore t1, herb t1, herb t1, ore t2 (centre).
+    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
     // Locked composes WITH the respawn dimension, never replaces it: a
     // cooling locked vein keeps ready=false (the silhouette the painter keeps
     // readable under the locked tint).

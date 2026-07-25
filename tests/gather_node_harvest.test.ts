@@ -119,6 +119,7 @@ describe('gather node harvest (#1121)', () => {
   it('a player near a node receives the material item on harvest', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Miner');
+    sim.addItem('copper_mining_pick', 1, pid); // tier-1 pick: bare hands never harvest (#2343)
     teleportOntoNode(sim, pid, NODE_ID);
 
     const node = mustNode(NODE_ID);
@@ -132,6 +133,8 @@ describe('gather node harvest (#1121)', () => {
   it('denies harvest when the player is too far from the node', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'FarAway');
+    // Tool in bags (#2343) so the too-far arm is decisively the denier.
+    sim.addItem('copper_mining_pick', 1, pid);
     const p = mustEntity(sim, pid);
     p.pos.x = -9999;
     p.pos.z = -9999;
@@ -150,6 +153,9 @@ describe('gather node harvest (#1121)', () => {
     const sim = makeWorld();
     const pidA = sim.addPlayer('warrior', 'PlayerA');
     const pidB = sim.addPlayer('warrior', 'PlayerB');
+    // Each carries their own tier-1 pick: bare hands never harvest (#2343).
+    sim.addItem('copper_mining_pick', 1, pidA);
+    sim.addItem('copper_mining_pick', 1, pidB);
     teleportOntoNode(sim, pidA, NODE_ID);
     teleportOntoNode(sim, pidB, NODE_ID);
 
@@ -176,6 +182,7 @@ describe('gather node harvest (#1121)', () => {
   it('denies a second harvest by the SAME player before their own timer elapses, allows it after', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Repeat');
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
@@ -209,6 +216,7 @@ describe('gather node harvest (#1121)', () => {
     const run = () => {
       const sim = makeWorld();
       const pid = sim.addPlayer('warrior', 'Det');
+      sim.addItem('copper_mining_pick', 1, pid);
       teleportOntoNode(sim, pid, NODE_ID);
       castAndComplete(sim, NODE_ID, pid);
       const node = mustNode(NODE_ID);
@@ -245,6 +253,7 @@ describe('gather node harvest (#1121)', () => {
   it('a harvest grants the matching gathering profession one point of skill', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Skiller');
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
@@ -265,6 +274,7 @@ describe('gather node harvest (#1121)', () => {
   it('a harvest grants character XP scaled to the node level (profession XP)', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'XpMiner');
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     const meta = mustMeta(sim, pid);
     const before = meta.xp;
@@ -277,6 +287,7 @@ describe('gather node harvest (#1121)', () => {
   it('a harvest of a node far below a high-level player grants zero XP (gray band)', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'MaxLevelMiner');
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     sim.setPlayerLevel(20);
     const meta = mustMeta(sim, pid);
@@ -290,6 +301,8 @@ describe('gather node harvest (#1121)', () => {
   it('denies harvest for a dead player without granting the item or the timer', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Ghost');
+    // Tool in bags (#2343) so the dead gate, not the tool gate, is the denier.
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     const p = mustEntity(sim, pid);
     p.dead = true;
@@ -310,18 +323,25 @@ describe('gather node harvest (#1121)', () => {
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
 
-    // Fill every bag slot with non-stacking instanced junk so canAddItem
+    // Fill all but one bag slot with non-stacking instanced junk so canAddItem
     // denies regardless of the harvested item's own stack state (an
-    // instanced slot, unlike a plain stack, never merges further adds).
+    // instanced slot, unlike a plain stack, never merges further adds); the
+    // tier-1 pick takes the last slot, so the tool gate (#2343) passes and
+    // the bags-full arm below is really the denier.
     const meta = mustMeta(sim, pid);
     const capacity = bagCapacity(meta.bags);
     meta.inventory.length = 0;
-    for (let i = 0; i < capacity; i++) {
+    for (let i = 0; i < capacity - 1; i++) {
       meta.inventory.push({ itemId: 'bone_fragments', count: 1, instance: { boundTo: pid } });
     }
+    sim.addItem('copper_mining_pick', 1, pid);
     expect(sim.canAddItem(NODE_MATERIAL.itemId, 1, pid)).toBe(false);
 
+    sim.drainEvents();
     sim.harvestNode(NODE_ID, pid);
+    const ev = sim.drainEvents();
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
+    expect(ev.some((e) => e.type === 'gatherDenied')).toBe(false);
     sim.tick();
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(true);
   });
@@ -330,6 +350,9 @@ describe('gather node harvest (#1121)', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'DrawCount');
     const fullBagsPid = sim.addPlayer('warrior', 'DrawCountFull');
+    // The tier-1 pick (#2343): the granted path needs it, and the bags-full
+    // arm must reach PAST the tool gate to stay a bags-full denial.
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     teleportOntoNode(sim, fullBagsPid, NODE_ID);
     const node = mustNode(NODE_ID);
@@ -340,13 +363,15 @@ describe('gather node harvest (#1121)', () => {
     // (the readiness check sits before the capacity check).
     const fullMeta = mustMeta(sim, fullBagsPid);
     fullMeta.inventory.length = 0;
-    for (let i = 0; i < bagCapacity(fullMeta.bags); i++) {
+    for (let i = 0; i < bagCapacity(fullMeta.bags) - 1; i++) {
       fullMeta.inventory.push({
         itemId: 'bone_fragments',
         count: 1,
         instance: { boundTo: fullBagsPid },
       });
     }
+    // Their pick takes the last slot: still zero room for the material.
+    sim.addItem('copper_mining_pick', 1, fullBagsPid);
     expect(sim.canAddItem(NODE_MATERIAL.itemId, 1, fullBagsPid)).toBe(false);
 
     // The harvest rolls pull from the SHARED sim rng, so a draw on a denial
@@ -389,6 +414,7 @@ describe('gather-completion event for audio (#1729)', () => {
   it('a granted harvest emits a personal gatherResult carrying node/profession/item/rarity', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Harvester');
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
@@ -417,6 +443,7 @@ describe('gather-completion event for audio (#1729)', () => {
   it('the emitted rarity reflects the actual roll: a max-proficiency harvest never reports common', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Proficient');
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
@@ -438,6 +465,8 @@ describe('gather-completion event for audio (#1729)', () => {
   it('no gatherResult is emitted on any denial path (too far, dead, unknown node)', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Denied');
+    // Tool in bags (#2343): each arm's own gate, not the tool gate, denies.
+    sim.addItem('copper_mining_pick', 1, pid);
     const p = mustEntity(sim, pid);
     // Too far from any node.
     p.pos.x = -9999;
@@ -466,6 +495,7 @@ describe('gather-completion event for audio (#1729)', () => {
     const run = () => {
       const sim = makeWorld();
       const pid = sim.addPlayer('warrior', 'Det');
+      sim.addItem('copper_mining_pick', 1, pid);
       teleportOntoNode(sim, pid, NODE_ID);
       sim.drainEvents();
       sim.harvestNode(NODE_ID, pid);
@@ -476,12 +506,14 @@ describe('gather-completion event for audio (#1729)', () => {
   });
 });
 
-// The prime directive: every node def that shipped BEFORE the tool
-// tier ramp keeps tier 1 and stays harvestable with no tool at all. The id
-// list is LITERAL, never derived from GATHER_NODES (the FIELD_RECIPES
-// tautology lesson): a future tier edit on any shipped node reds this pin
-// decisively instead of silently re-deriving.
-describe('lockout prevention: pre-phase nodes stay bare-hands harvestable', () => {
+// The prime directive, inverted by #2343 (the RuneScape rule): every node
+// def that shipped BEFORE the tool tier ramp keeps tier 1, and tier 1 now
+// means "needs the matching TIER-1 tool", never bare hands: a toolless
+// attempt is denied with requiredTier 1 ("no tool owned") and the tier-1
+// tool restores access. The id list is LITERAL, never derived from
+// GATHER_NODES (the FIELD_RECIPES tautology lesson): a future tier edit on
+// any shipped node reds this pin decisively instead of silently re-deriving.
+describe('the RuneScape rule (#2343): pre-phase nodes deny bare hands and need only a tier-1 tool', () => {
   const PRE_PHASE_NODE_IDS = [
     'ore_eastbrook_1',
     'ore_eastbrook_2',
@@ -509,29 +541,70 @@ describe('lockout prevention: pre-phase nodes stay bare-hands harvestable', () =
     'herb_thornpeak_2',
   ] as const;
 
-  it('all 24 pre-phase defs carry tier 1 and a bare-hands player harvests every one', () => {
+  // The tier-1 tool per node type (content ids, src/sim/content/items.ts).
+  const TIER1_TOOL_BY_NODE_TYPE = {
+    ore: 'copper_mining_pick',
+    wood: 'handaxe',
+    herb: 'gathering_sickle',
+  } as const;
+
+  // Literal, deliberately NOT derived from NODE_HARVEST_TABLE (the table
+  // production reads): an edit to the table must fail this pin, never move
+  // the expectation and the behavior together.
+  const PROFESSION_BY_NODE_TYPE = {
+    ore: 'mining',
+    wood: 'logging',
+    herb: 'herbalism',
+  } as const;
+
+  it('all 24 pre-phase defs carry tier 1: bare hands deny with requiredTier 1 and zero draws, the matching tier-1 tool grants', () => {
     expect(PRE_PHASE_NODE_IDS).toHaveLength(24);
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'BareHands');
     const meta = mustMeta(sim, pid);
     // Genuinely bare-handed: the starting kit carries no gathering tool.
     expect(meta.inventory.some((s) => ITEMS[s.itemId]?.use?.type === 'gatherTool')).toBe(false);
-    for (const id of PRE_PHASE_NODE_IDS) {
-      expect(mustNode(id).tier, id).toBe(1);
-      teleportOntoNode(sim, pid, id);
-      sim.drainEvents();
-      expect(sim.harvestNode(id, pid), id).toBe(true);
-      expect(
-        sim.drainEvents().some((e) => e.type === 'gatherDenied'),
-        id,
-      ).toBe(false);
-      // A successful interaction STARTS a cast; drop it so the
-      // next node's attempt is not denied as busy (this lockout pin is about
-      // access, not grants).
-      const p = mustEntity(sim, pid);
-      p.castingAbility = null;
-      p.castRemaining = 0;
-      p.gatherCastNodeId = '';
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      for (const id of PRE_PHASE_NODE_IDS) {
+        const node = mustNode(id);
+        expect(node.tier, id).toBe(1);
+        const professionId = PROFESSION_BY_NODE_TYPE[node.type];
+        teleportOntoNode(sim, pid, id);
+        sim.drainEvents();
+        // Bare hands: denied, with exactly one gatherDenied whose
+        // requiredTier 1 on a tier-1 node means "no tool owned at all";
+        // no cast starts.
+        expect(sim.harvestNode(id, pid), id).toBe(false);
+        expect(
+          sim.drainEvents().filter((e) => e.type === 'gatherDenied'),
+          id,
+        ).toEqual([{ type: 'gatherDenied', pid, surface: 'node', professionId, requiredTier: 1 }]);
+        expect(mustEntity(sim, pid).castingAbility, id).toBe(null);
+        // The matching tier-1 tool in bags grants the SAME node: the cast
+        // starts and no denial fires.
+        const toolId = TIER1_TOOL_BY_NODE_TYPE[node.type];
+        sim.addItem(toolId, 1, pid);
+        sim.drainEvents();
+        expect(sim.harvestNode(id, pid), id).toBe(true);
+        expect(
+          sim.drainEvents().some((e) => e.type === 'gatherDenied'),
+          id,
+        ).toBe(false);
+        // A successful interaction STARTS a cast; drop it, and the tool, so
+        // the next node's attempt is bare-handed again and not denied as
+        // busy (this pin is about access, not grants).
+        const p = mustEntity(sim, pid);
+        p.castingAbility = null;
+        p.castRemaining = 0;
+        p.gatherCastNodeId = '';
+        meta.inventory = meta.inventory.filter((s) => s.itemId !== toolId);
+      }
+      // Every arm above, denial and cast start alike, is rng-draw-free.
+      expect(draws).toBe(0);
+    } finally {
+      sim.rng.setObserver(null);
     }
   });
 
@@ -599,9 +672,10 @@ describe('node tool gate ordering', () => {
     expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(false);
   });
 
-  it('a tier-1 harvest takes the untouched hot path: no gatherDenied, exactly the two pinned draws', () => {
+  it('a tier-1 node with a tier-1 tool takes the untouched hot path: no gatherDenied, exactly the two pinned draws', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'HotPath');
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE_ID);
     sim.drainEvents();
     let draws = 0;

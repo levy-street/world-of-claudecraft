@@ -626,7 +626,8 @@ const toolRow = (itemId, tier) => {
 const toolLadderFor = (professionId) => {
   const rows = [];
   // The simple pole is the fishing ladder's tier-1 rung (use type 'fishing'
-  // resolves to the bare-hands tier-1 floor, professions/tools.ts).
+  // resolves to effective tier 1 and satisfies the #2343 implement gate,
+  // professions/tools.ts).
   if (professionId === 'fishing') rows.push(toolRow('simple_fishing_pole', 1));
   for (const [id, def] of Object.entries(ITEMS)) {
     if (def.use?.type === 'gatherTool' && def.use.professionId === professionId) {
@@ -637,7 +638,8 @@ const toolLadderFor = (professionId) => {
 };
 
 // Node lists per zone: count, node tier (which IS the required tool tier;
-// tier 1 is the bare-hands floor), and the zone's material.
+// every tier requires its tool, tier 1 included, #2343), and the zone's
+// material.
 const nodeRowsFor = (professionId) => {
   const byKey = new Map();
   for (const node of GATHER_NODES) {

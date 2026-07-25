@@ -40,14 +40,21 @@
 //   ARM 3 - PERF_TOUR-DELEGATED (env HUD_PERF_BUDGET_TOUR=1, runs in the perf row, NOT
 //     bare `npm test`): the wall-clock + elision + macro-pool budget. It reads a perf_tour
 //     artifact (a real-browser run of scripts/perf_tour.mjs) and the same committed baseline,
-//     and asserts (a) frameP95 <= the baseline (same-machine; see the baseline file, frameP95
-//     is NOT portable, so an operator on other hardware overrides the reference with a fresh
-//     re-run via HUD_PERF_BUDGET_TOUR_FRAME_BASELINE), (b) the elision-bypass write COUNT
+//     and asserts (a) the tour rendered at least `tourMinFrames` real frames AND kept the
+//     long-frame count `frameLong50` at or under the committed anchor (both captured under
+//     PERF_GPU=1 on the owner's machine, so same-machine; on other hardware override the
+//     long-frame anchor with a fresh same-machine capture via
+//     HUD_PERF_BUDGET_TOUR_LONG50_BASELINE. The retired frameP95 gate was mathematically
+//     unfailable: its 250 ms threshold EQUALED the sample clamp, so a saturated
+//     catastrophically-slow run still passed; the frames floor kills that inverted-saturation
+//     hole and the long-frame count actually moves when the frame path regresses),
+//     (b) the elision-bypass write COUNT
 //     `hudHotDomWrites` <= the baseline anchor, EVERY viewport (the run-length-independent
 //     collapse signal; the skip RATIO is frame-count-dependent so it stays in the console for
 //     context, not a hard gate), and (c) the FCT pool stays at/under FCT_POOL_CAP under
 //     the scripted AoE burst (fctBurstBoundedNodes). SKIPPED when the env flag is unset so
-//     bare `npm test` stays fast and portable.
+//     bare `npm test` stays fast and portable (the baseline rows are still READ at
+//     collection time, so a deleted row fails loudly even in bare `npm test`).
 //
 // COVERAGE NOTE (not a silent cap): the ARM 2 skip-rate loop drives the five non-pooled
 // per-frame painters (xp_bar, swing_timer, cast_bar, unit_frame, action_bar), which
@@ -120,8 +127,9 @@ function readBaselineSkipRateFloor(): number {
 
 // The DURABLE, RUN-LENGTH-INDEPENDENT anchor: the elision-bypass write COUNT
 // (`hudHotDomWrites`). Unlike the skip RATIO (skipped / total), this does not move with the
-// frame count, so it is the same on desktop, mobile, and every re-run (the baseline pins it
-// at 153, the post-extraction steady state, byte-identical across profiles). A collapse
+// frame count. The establishing-write floor differs by viewport (the touch HUD builds more
+// per-frame elements) and jitters by a write or two run to run, so the committed anchor is a
+// single canonical row covering the WORST viewport plus that jitter as headroom. A collapse
 // of write-elision makes it BALLOON toward the frame count; a healthy run holds it. This is the
 // signal ARM 3 gates on instead of the frame-count-dependent ratio. The baseline records it as
 // the canonical table row `| hudHotDomWrites | <count> | ...`; this parses THAT row specifically
@@ -141,20 +149,49 @@ function readBaselineBypassCount(): number {
   return Number(match[1]);
 }
 
-// frameP95 is SAME-MACHINE-RELATIVE only (software-WebGL ms, not portable). ARM 3 reads
-// it as the reference, but an operator on other hardware overrides it with a fresh
-// same-machine re-run (HUD_PERF_BUDGET_TOUR_FRAME_BASELINE).
-function readBaselineFrameP95(): number {
-  const line = baselineMd.split('\n').find((l) => l.includes('frameP95') && /\d+\s*ms/.test(l));
-  const match = line?.match(/(\d+)\s*ms/);
+// ARM 3's long-frame anchor: the COUNT of frames at or over 50 ms in the tour's sample
+// window (`frameMs.long50`). Unlike the RETIRED frameP95 gate, whose 250 ms threshold
+// EQUALED the PerfMonitor sample clamp and so could never fail (every catastrophic frame
+// saturated INTO the passing value), the long-frame count grows with every hitch and
+// cannot saturate into a pass. Same-machine-relative (captured under PERF_GPU=1, real
+// GPU, on the owner's machine; see the baseline file): an operator on other hardware
+// overrides it with a fresh same-machine capture via HUD_PERF_BUDGET_TOUR_LONG50_BASELINE.
+// Parses ONLY the canonical table row `| frameLong50 | <count> | ...` (never a loose
+// prose mention), throws if absent.
+function readBaselineLongFrames(): number {
+  const line = baselineMd.split('\n').find((l) => /\|\s*frameLong50\s*\|\s*\d+\s*\|/.test(l));
+  const match = line?.match(/\|\s*frameLong50\s*\|\s*(\d+)\s*\|/);
   if (!match) {
-    throw new Error('hud_perf_budget.baseline.md: the frameP95 baseline (`NNN ms`) is missing.');
+    throw new Error(
+      'hud_perf_budget.baseline.md: the canonical frameLong50 anchor row (`| frameLong50 | <count> |`) is missing. The committed baseline is absent or the key was removed; the long-frame budget cannot be grounded.',
+    );
+  }
+  return Number(match[1]);
+}
+
+// ARM 3's saturation floor: the tour must have rendered at least this many real frames
+// (`summary.frames`, the PerfMonitor frame counter). This is the other half of killing
+// the inverted-saturation hole: a run so slow that every sample clamps also renders
+// almost NO frames, so a frames floor fails it where the old p95 ceiling passed it.
+// Parses ONLY the canonical table row `| tourMinFrames | <count> | ...`, throws if absent.
+function readBaselineTourMinFrames(): number {
+  const line = baselineMd.split('\n').find((l) => /\|\s*tourMinFrames\s*\|\s*\d+\s*\|/.test(l));
+  const match = line?.match(/\|\s*tourMinFrames\s*\|\s*(\d+)\s*\|/);
+  if (!match) {
+    throw new Error(
+      'hud_perf_budget.baseline.md: the canonical tourMinFrames floor row (`| tourMinFrames | <count> |`) is missing. The committed baseline is absent or the key was removed; the tour frame floor cannot be grounded.',
+    );
   }
   return Number(match[1]);
 }
 
 const SKIP_RATE_FLOOR = readBaselineSkipRateFloor();
 const BYPASS_ANCHOR = readBaselineBypassCount();
+// Read at collection time (not inside the env-gated describe) so a deleted or
+// unregenerated baseline row fails bare `npm test` loudly instead of silently
+// skipping with the ARM 3 gate.
+const LONG50_ANCHOR = readBaselineLongFrames();
+const TOUR_MIN_FRAMES = readBaselineTourMinFrames();
 
 // --------------------------------------------------------------------------
 // ARM 1 - static raw-write rejection over every hot-path painter.
@@ -690,14 +727,19 @@ tourDescribe(
     // the perf_tour measurement path, never a new one.
     const viewport = process.env.HUD_PERF_BUDGET_TOUR_VIEWPORT ?? 'desktop';
     const resultPath = process.env.HUD_PERF_BUDGET_TOUR_RESULT ?? 'tmp/perf-tour-desktop.json';
-    const frameRef = process.env.HUD_PERF_BUDGET_TOUR_FRAME_BASELINE
-      ? Number(process.env.HUD_PERF_BUDGET_TOUR_FRAME_BASELINE)
-      : readBaselineFrameP95();
+    const long50Ref = process.env.HUD_PERF_BUDGET_TOUR_LONG50_BASELINE
+      ? Number(process.env.HUD_PERF_BUDGET_TOUR_LONG50_BASELINE)
+      : LONG50_ANCHOR;
 
     function loadArtifact(): {
       summary: Record<
         string,
-        { frameP95: number; hudHotDomSkipRate: number; hudHotDomWrites: number }
+        {
+          frames: number;
+          frameLong50: number;
+          hudHotDomSkipRate: number;
+          hudHotDomWrites: number;
+        }
       >;
       results: Array<{
         viewport: string;
@@ -710,23 +752,37 @@ tourDescribe(
       return JSON.parse(readFileSync(abs, 'utf8'));
     }
 
-    it(`frameP95 stays within the same-machine baseline (${viewport})`, () => {
+    // The frames floor is what makes the frame gate FAILABLE: the retired frameP95
+    // ceiling equaled the 250 ms sample clamp, so a catastrophically slow run
+    // saturated every sample into a pass. A run that slow renders almost no frames,
+    // so it dies here instead.
+    it(`the tour renders at least tourMinFrames real frames on ${viewport}`, () => {
       const summary = loadArtifact().summary[viewport];
       expect(summary, `perf_tour artifact has no ${viewport} summary`).toBeDefined();
       expect(
-        summary.frameP95,
-        `${viewport} frameP95 ${summary.frameP95}ms exceeds the baseline ${frameRef}ms (same-machine; on other hardware set HUD_PERF_BUDGET_TOUR_FRAME_BASELINE to a fresh re-run).`,
-      ).toBeLessThanOrEqual(frameRef);
+        summary.frames,
+        `${viewport} rendered ${summary.frames} frames, below the committed tourMinFrames floor ${TOUR_MIN_FRAMES}; the tour did not actually exercise the frame path (or the frame counter regressed). The floor is a PERF_GPU=1 same-machine value; see hud_perf_budget.baseline.md.`,
+      ).toBeGreaterThanOrEqual(TOUR_MIN_FRAMES);
+    });
+
+    it(`long frames stay at or under the frameLong50 anchor on ${viewport}`, () => {
+      const summary = loadArtifact().summary[viewport];
+      expect(summary, `perf_tour artifact has no ${viewport} summary`).toBeDefined();
+      expect(
+        summary.frameLong50,
+        `${viewport} produced ${summary.frameLong50} frames at or over 50 ms, above the anchor ${long50Ref} (same-machine PERF_GPU=1 value; on other hardware set HUD_PERF_BUDGET_TOUR_LONG50_BASELINE to a fresh same-machine capture).`,
+      ).toBeLessThanOrEqual(long50Ref);
     });
 
     // ELISION-COLLAPSE GATE (every viewport). The regression signal is the elision-BYPASS
     // COUNT (`hudHotDomWrites`): the writes that bypassed the cache. It is run-length-
     // INDEPENDENT - a longer tour adds only SKIPS, never new bypass writes once state is
-    // steady - so it is the same on desktop, mobile, and every re-run (the baseline pins it
-    // at 153). The skip RATIO (skipped / total) is a DERIVED quantity whose denominator is
-    // the total frame count, which jitters with software-WebGL fps + machine load: a clean
-    // re-run measured desktop 0.959 vs the recorded 0.962 with hudHotDomWrites IDENTICALLY
-    // 152 (elision intact, pure ratio noise), so the ratio is NOT a safe cross-run hard gate.
+    // steady - so the committed anchor is a single canonical row covering the WORST viewport
+    // (the touch HUD establishes more elements than desktop) plus a write or two of run
+    // jitter; a collapse balloons the count toward the frame count, far past that headroom.
+    // The skip RATIO (skipped / total) is a DERIVED quantity whose denominator is
+    // the total frame count, which jitters with fps + machine load run to run, so the
+    // ratio is NOT a safe cross-run hard gate.
     // We gate the COUNT (closes the mobile gap the old desktop-only ratio gate left open);
     // the ratio stays in the perf_tour console for human context. ARM 2's ratio floor is
     // safe because its fake-DOM loop has a FIXED denominator.

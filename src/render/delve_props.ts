@@ -828,9 +828,11 @@ export function syncDelveInteractableVisibility(
   group: THREE.Object3D,
   templateId: string | null,
   lootable: boolean,
+  compilePending: boolean,
   withinPortalRange = true,
 ): boolean {
-  const visible = delveInteractableVisible(templateId, lootable) && withinPortalRange;
+  const visible =
+    !compilePending && delveInteractableVisible(templateId, lootable) && withinPortalRange;
   group.visible = visible;
   return visible;
 }

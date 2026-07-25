@@ -4,7 +4,9 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
-import { ABILITIES } from '../src/sim/data';
+import { ABILITIES, ITEMS } from '../src/sim/data';
+import { itemDisplayName } from '../src/ui/entity_i18n';
+import { Hud } from '../src/ui/hud';
 import {
   cs_CZ,
   da_DK,
@@ -14,6 +16,8 @@ import {
   ensureLocaleLoaded,
   es,
   es_ES,
+  formatMoney as formatLocalizedMoney,
+  formatNumber,
   fr_CA,
   fr_FR,
   id_ID,
@@ -27,6 +31,7 @@ import {
   setLanguage,
   supportedLanguages,
   sv_SE,
+  t,
   tr_TR,
   vi_VN,
   zh_CN,
@@ -709,6 +714,58 @@ describe("R2: bug-report errors map to the server's exact emitted bytes", () => 
   });
 });
 
+// --- R3: the flood-kick reason maps byte-exact to its matcher arm. Same drift
+// class as R1/R2, for the limiter kick lane: kickSession sends { t: 'error',
+// error }, a shape the S3 emit scanner is structurally blind to, so the
+// server-literal-to-matcher lockstep is source-pinned here instead. Block and
+// full-line comments are stripped before matching so a commented-out arm
+// cannot satisfy a pin; a trailing comment cannot fake one either, since every
+// pin needs the live code portion of its line. ---
+describe("R3: the flood-kick reason maps to the client matcher's exact bytes", () => {
+  const stripComments = (src: string) =>
+    src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+
+  it('binds the server kick literal to its userFacingApiError arm and all three kick sites', () => {
+    const limiterSrc = stripComments(
+      fs.readFileSync(path.resolve(process.cwd(), 'server/msg_rate_limit.ts'), 'utf8'),
+    );
+    const exported = limiterSrc.match(/export const MSG_RATE_KICK_REASON = '([^']+)';/);
+    expect(exported, 'MSG_RATE_KICK_REASON export not found in msg_rate_limit.ts').not.toBeNull();
+    // The wire bytes themselves, pinned against a disagreeing literal (the
+    // ws_auth byte-exact model): a deliberate reword is a wire-contract change
+    // and must update this pin, the matcher arm, and the frame pins together.
+    expect(exported?.[1]).toBe('message rate exceeded');
+
+    // All three flood kick arms (the pre-parse gate in handleMessage, the
+    // post-parse lane path in consumeLane, and the list-read guard path in
+    // consumeListRead per the phase 06 maintainer ruling) pass the CONSTANT,
+    // never an inline literal, with the grep-ability 'message flood'
+    // leaveReason label; the anti-bot kick keeps its deliberately vague
+    // literal pair, byte-untouched. The exact count keeps this pin selective:
+    // a NEW kick site must consciously join it.
+    const gameSrc = stripComments(
+      fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8'),
+    );
+    const kickArms = gameSrc.match(
+      /kickSession\(session, MSG_RATE_KICK_REASON, 'message flood'\)/g,
+    );
+    expect(kickArms, 'all three flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(3);
+    expect(gameSrc).toContain("kickSession(session, 'rejected by server', 'disconnected')");
+
+    // The matcher arm recognizes the same bytes and returns the loading key. A
+    // reword on either side alone breaks this equality, which is exactly the
+    // raw-English leak this guard exists to catch.
+    const matcherSrc = stripComments(
+      fs.readFileSync(path.resolve(process.cwd(), 'src/ui/api_error_i18n.ts'), 'utf8'),
+    );
+    const arm = matcherSrc.match(
+      /if \(normalized === '([^']+)'\)\s*return t\('loading\.messageRateExceeded'\);/,
+    );
+    expect(arm, 'userFacingApiError arm for the flood-kick reason not found').not.toBeNull();
+    expect(arm?.[1]).toBe(exported?.[1]);
+  });
+});
+
 // --- A1: admin class column is localized (MED-5) ---
 describe('A1: admin classLabel localizes the raw class id', () => {
   const classIds = [
@@ -1343,5 +1400,62 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
   it('the pre-rename aura string keeps a legacy alias for the deploy window', () => {
     setLanguage('en');
     expect(localizeSimAuraName('Venomfire Vigor')).toBe('Vipersear Vigor');
+  });
+});
+
+// --- Vendor-sell log line: the "Sold <item>[ xN] for <money>." arm in
+// Hud.localizeLootText must localize the item name whether or not the sim
+// appended the " xN" stack suffix. A greedy single capture feeds "Copper Ore
+// x2" whole into the exact-name lookup, which only matches bare item names:
+// the lookup misses and the raw English name (plus the sim's bare "xN"
+// spelling) leaks into an otherwise-localized sentence. Exercised via a bare
+// Hud prototype (the weapon_type_tooltip / hud_confirm_gates precedent)
+// since localizeLootText is private and reads no instance state here.
+describe('vendor sell log line localizes the item name for both a single item and a sold stack', () => {
+  interface LootTextHarness {
+    localizeLootText(text: string): string;
+  }
+  const harness = (): LootTextHarness => Object.create(Hud.prototype) as unknown as LootTextHarness;
+
+  it('localizes a single-item sale (no xN suffix) in every locale', () => {
+    try {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        const expected = t('hud.logs.soldItem', {
+          item: itemDisplayName(ITEMS.copper_ore),
+          money: formatLocalizedMoney(4),
+        });
+        const out = harness().localizeLootText('Sold Copper Ore for 4c.');
+        expect(out, lang).toBe(expected);
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('localizes a STACKED sale (quantity > 1) in every locale instead of leaking raw English', () => {
+    try {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        const expectedItem = `${itemDisplayName(ITEMS.copper_ore)} ${t('itemUi.bags.stackCount', {
+          count: formatNumber(2, { maximumFractionDigits: 0 }),
+        })}`;
+        const expected = t('hud.logs.soldItem', {
+          item: expectedItem,
+          money: formatLocalizedMoney(8),
+        });
+        const out = harness().localizeLootText('Sold Copper Ore x2 for 8c.');
+        expect(out, lang).toBe(expected);
+        // The regression this guards: the item name (and the sim's bare "xN"
+        // spelling) must never survive verbatim inside an otherwise-localized
+        // sentence.
+        if (lang !== 'en' && lang !== 'en_CA') {
+          expect(out, lang).not.toContain('Copper Ore x2');
+          expect(out, lang).not.toBe('Sold Copper Ore x2 for 8c.');
+        }
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 });
