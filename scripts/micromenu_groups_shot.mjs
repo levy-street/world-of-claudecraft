@@ -105,7 +105,17 @@ async function setMetrics({ width, height, dsf, mobile = false }) {
 
 // 2x for the desktop rail shots: the whole point is a 1px keyline between
 // sections, which is not legible in a 1x capture.
-await setMetrics({ ...DESKTOP, dsf: 2 });
+//
+// page.setViewport, NOT the raw-CDP setMetrics above: puppeteer re-applies its
+// own last-known viewport around page.screenshot, so a device-scale-factor set
+// only through CDP is silently reverted and the capture comes out at 1x (which
+// is exactly what happened, and made a 1px rule almost invisible in the PR
+// images). Safe here because the world is already up; setting 2x before entry
+// is what broke the pre-game class select.
+await page.setViewport({ ...DESKTOP, deviceScaleFactor: 2 });
+await sleep(400);
+const shotScale = await page.evaluate(() => window.devicePixelRatio);
+if (shotScale !== 2) throw new Error(`expected a 2x capture, got ${shotScale}x`);
 
 // The headless GPU-acceleration warning is a dismissible banner that must
 // never appear in a captured screenshot (repo rule). enterOfflineGame clears
