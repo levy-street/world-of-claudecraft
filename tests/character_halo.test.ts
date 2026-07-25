@@ -73,8 +73,9 @@ describe('class halo geometry', () => {
     const visual = new CharacterVisual('player_priest', 0xffffff, 0);
     const halo = visual.root.getObjectByName('class_halo') as THREE.Mesh;
     expect(halo).toBeDefined();
-    expect(halo.position.y).toBe(1.6);
-    expect((halo.geometry as THREE.PlaneGeometry).parameters.width).toBeCloseTo(1.6);
+    expect(halo.position.y).toBe(1.45);
+    // no radius override: the priest rides the shared default-size geometry
+    expect((halo.geometry as THREE.PlaneGeometry).parameters.width).toBeCloseTo(1.0);
     // the caster sweeps must not overwrite buildHalo's castShadow = false
     expect(halo.castShadow).toBe(false);
 
@@ -102,8 +103,11 @@ describe('class halo geometry', () => {
     const priest = VISUALS.player_priest;
     expect(priest.halo).toBe(0xffd766);
     // Screenshot-tuned against the mage.glb hat cone; see the manifest comment.
-    expect(priest.haloUpOffset).toBe(1.6);
-    expect(priest.haloRadius).toBe(0.8);
+    // Raise-only: the default-size ring clears the cone at tip height, and
+    // staying below the hat's bounding-box top keeps portrait framing
+    // untouched for priests.
+    expect(priest.haloUpOffset).toBe(1.45);
+    expect(priest.haloRadius).toBeUndefined();
     for (const [key, def] of Object.entries(VISUALS)) {
       if (key === 'player_priest') continue;
       // placement overrides are meaningless without a halo; a future second

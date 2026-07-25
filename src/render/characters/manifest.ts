@@ -590,14 +590,14 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     // The priest's Light: a warm golden halo ring above the crown. The mage
-    // model's pointed hat is canon here, and the default halo geometry
-    // intersects its cone, so the ring is widened and raised to crown the hat
-    // tip with visible clearance on every side (values tuned by screenshot
-    // against the current mage.glb; a hat reshape in an asset update means
-    // re-tuning them).
+    // model's pointed hat is canon here, and at the default lift the ring
+    // plane crosses the hat cone where it is wide, clipping through it; +0.15
+    // raises the plane to the cone tip, where the default-size ring clears it
+    // on every side (tuned by screenshot against the current mage.glb; a hat
+    // reshape in an asset update means re-tuning). Kept just below the hat's
+    // bounding-box top so portrait/turntable framing is unchanged for priests.
     halo: 0xffd766,
-    haloUpOffset: 1.6,
-    haloRadius: 0.8,
+    haloUpOffset: 1.45,
     // show is a no-op for the hat/cape: the current mage.glb rigs every
     // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
     // hides non-skinned nodes, so the hat always renders. Sanctioned look.
