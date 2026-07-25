@@ -13,7 +13,7 @@ const sfxMock = vi.hoisted(() => ({
 
 vi.mock('../src/game/sfx', () => ({ sfx: sfxMock }));
 
-import { GameAudio } from '../src/game/audio';
+import { GameAudio, UI_CUES } from '../src/game/audio';
 
 const ROOT = join(import.meta.dirname, '..');
 
@@ -297,6 +297,26 @@ describe('deterministic UI SFX catalog', () => {
       true,
     );
     for (const key of keys) expect(fullCatalogKeys.has(key), key).toBe(true);
+  });
+
+  // Closes the class of bug where a UI_CUES entry points at a key nobody
+  // ever registered in sfx_prompts.mjs: GameAudio's methods and
+  // tests/sfx_manifest.test.ts's totals both stay green in that case
+  // (mocked sfx.playUi asserts the key STRING, never that it resolves; the
+  // manifest test pins counts, not membership), so playUi silently no-ops
+  // in production (src/game/sfx.ts's unknown-key path). Walks every leaf
+  // string under UI_CUES (one level of nested plain objects/arrays, the only
+  // shapes it currently has) against the real catalog.
+  it('every UI_CUES leaf key resolves to a real catalog entry', () => {
+    const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
+    const leaves: string[] = [];
+    for (const value of Object.values(UI_CUES)) {
+      if (typeof value === 'string') leaves.push(value);
+      else if (Array.isArray(value)) leaves.push(...value);
+      else for (const nested of Object.values(value)) leaves.push(nested as string);
+    }
+    expect(leaves.length).toBeGreaterThan(0);
+    for (const key of leaves) expect(fullCatalogKeys.has(key), key).toBe(true);
   });
 
   it('builds stable shell-free FFmpeg arguments with fixed noise seeds', () => {

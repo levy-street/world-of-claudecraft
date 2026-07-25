@@ -6784,7 +6784,11 @@ export class Sim {
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
-      silent: opts?.silent,
+      // Conditional, not `silent: opts?.silent`: writing the key even as
+      // `undefined` on every grant moved every loot event's parity digest
+      // (the canonicalizer keeps `undefined` keys, tests/parity/trace.ts),
+      // dragging goldens with no professions content into every regen.
+      ...(opts?.silent ? { silent: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
     if (
@@ -6843,7 +6847,8 @@ export class Sim {
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
-      silent: opts?.silent,
+      // Conditional, see the matching comment in addItem above.
+      ...(opts?.silent ? { silent: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
   }

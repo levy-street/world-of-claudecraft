@@ -729,12 +729,30 @@ export const SFX = [
   { key: 'ui_card_round_push', custom: true },
   { key: 'ui_card_shuffle', custom: true },
 
+  // --- Fishing (custom recordings, replacing the retired synth placeholders
+  // in scripts/sfx/ui_sfx.mjs) --------------------------------------------
+  // fishBite is the one gameplay-timing cue of the family (it opens the live
+  // reel window, audio.ts's ungated play() arm); fishCast/fishReel are
+  // feedback notifications. Multi-take (no-repeat-random picker).
+  { key: 'ui_fish_cast', custom: true },
+  { key: 'ui_fish_bite', custom: true },
+  { key: 'ui_fish_reel', custom: true },
+
   // --- Gathering node harvests (custom recordings, not ElevenLabs) ----------
   // One cue per GatherNodeType ('ore'/'wood'/'herb', src/sim/types.ts), fired
   // from the gatherResult sim event. Multi-take (no-repeat-random picker).
   { key: 'ui_gather_ore', custom: true },
   { key: 'ui_gather_wood', custom: true },
   { key: 'ui_gather_herb', custom: true },
+
+  // --- Gathering tool-out cue, per node type (custom recordings) -----------
+  // Fires at gather CAST START (audio.gatherCast(nodeType)), a "pulling the
+  // tool out" beat for the cast bar's anticipation window; distinct from the
+  // completion cue above. Falls back to the flat ui_gather_cast placeholder
+  // (scripts/sfx/ui_sfx.mjs) when no node type is known. Multi-take.
+  { key: 'ui_gather_cast_ore', custom: true },
+  { key: 'ui_gather_cast_wood', custom: true },
+  { key: 'ui_gather_cast_herb', custom: true },
 
   // Rare-or-better gather stinger: layers ALONGSIDE the ui_gather_<nodeType>
   // cue above, one tier per rolled MaterialRarity (common/uncommon get none).

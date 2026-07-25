@@ -12,7 +12,10 @@ import { sfx } from './sfx';
 // so an unrelated error class right after still sounds immediately.
 const ERROR_SFX_COOLDOWN_SECONDS = 1.5;
 
-const UI_CUES = {
+// Exported ONLY so tests/game_audio.test.ts's catalog-completeness guard can
+// walk every leaf key against the real SFX_FIXED_CATALOG_KEYS; not consumed
+// anywhere else (GameAudio's methods are the real call surface).
+export const UI_CUES = {
   bagOpen: 'ui_bag_open',
   bagClose: 'ui_bag_close',
   click: 'ui_click',
