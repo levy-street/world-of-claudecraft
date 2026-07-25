@@ -27,7 +27,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "es_ES": [
     "hudChrome.bags.itemAriaBound",
@@ -47,7 +48,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "fr_FR": [
     "hudChrome.bags.itemAriaBound",
@@ -67,7 +69,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "fr_CA": [
     "hudChrome.bags.itemAriaBound",
@@ -87,7 +90,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "en_CA": [],
   "it_IT": [
@@ -108,7 +112,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "de_DE": [
     "hudChrome.bags.itemAriaBound",
@@ -128,7 +133,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -152,7 +158,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -173,7 +180,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "nl_NL": [
     "hudChrome.bags.itemAriaBound",
@@ -193,7 +201,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "pl_PL": [
     "hudChrome.bags.itemAriaBound",
@@ -213,7 +222,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "id_ID": [
     "hudChrome.bags.itemAriaBound",
@@ -233,7 +243,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "tr_TR": [
     "hudChrome.bags.itemAriaBound",
@@ -253,7 +264,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "sv_SE": [
     "hudChrome.bags.itemAriaBound",
@@ -273,7 +285,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "vi_VN": [
     "hudChrome.bags.itemAriaBound",
@@ -293,7 +306,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ],
   "da_DK": [
     "hudChrome.bags.itemAriaBound",
@@ -313,6 +327,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.materialHint.resonantLinks",
     "hudChrome.materialHint.resonantSteel",
     "hudChrome.materialHint.resonantThread",
-    "hudChrome.materialHint.resonantTimber"
+    "hudChrome.materialHint.resonantTimber",
+    "hudChrome.options.stickyTarget"
   ]
 };
