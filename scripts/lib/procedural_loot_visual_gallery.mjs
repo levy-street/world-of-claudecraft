@@ -319,7 +319,7 @@ function pageShell(title, subtitle, content, pageClass = '') {
     }
     .legendary-list {
       display: grid;
-      gap: 7px;
+      gap: 6px;
     }
     .legendary-row {
       align-items: center;
@@ -329,8 +329,8 @@ function pageShell(title, subtitle, content, pageClass = '') {
       display: grid;
       gap: 14px;
       grid-template-columns: 250px 62px minmax(260px, 1fr) 320px;
-      min-height: 61px;
-      padding: 7px 12px;
+      min-height: 60px;
+      padding: 3px 12px;
     }
     .legendary-family {
       color: #e8dbc0;

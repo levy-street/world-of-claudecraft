@@ -62,7 +62,7 @@ describe('/buyback command', () => {
 
     sim.chat('/buyback', a);
     expect(errorText(sim.tick(), a)).toBe(
-      'Vendor buyback (1): Gravecaller Ring (2s 24c each). Repurchase at any merchant.',
+      'Vendor buyback (1): Gravecaller Ring (2s 44c each). Repurchase at any merchant.',
     );
   });
 

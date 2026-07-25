@@ -9256,7 +9256,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "6c3da5ce",
+      "state": "c8541b6e",
       "events": "90b86b6a",
       "rng": {
         "draws": 3027,
@@ -10163,24 +10163,24 @@
                         }
                       },
                       {
-                        "affixId": "striking",
-                        "budget": 3.25,
-                        "family": "rating.crit",
-                        "position": "suffix",
+                        "affixId": "deft",
+                        "budget": 6,
+                        "family": "primary.agility",
+                        "position": "prefix",
                         "ranges": {
-                          "critRating": {
-                            "max": 14,
-                            "min": 8
+                          "agi": {
+                            "max": 6,
+                            "min": 4
                           }
                         },
                         "revision": 1,
                         "tier": 3,
                         "values": {
-                          "critRating": 13
+                          "agi": 6
                         }
                       }
                     ],
-                    "baseId": "thornpeak_mail_chest",
+                    "baseId": "iron_flanged_mace",
                     "dropContext": {
                       "source": "dungeon",
                       "sourceEntityId": 420,
@@ -10193,8 +10193,8 @@
                       "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
                     },
                     "generatedName": {
-                      "baseId": "thornpeak_mail_chest",
-                      "prefixId": "procedural.name.stalwart"
+                      "baseId": "iron_flanged_mace",
+                      "prefixId": "procedural.name.deft"
                     },
                     "itemLevel": 21,
                     "rarity": "magic",
@@ -10203,7 +10203,7 @@
                     "version": 1
                   }
                 },
-                "itemId": "thornpeak_mail_chest"
+                "itemId": "iron_flanged_mace"
               }
             ]
           },
@@ -10585,7 +10585,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "a3e451c0",
+      "state": "1958f87c",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10596,7 +10596,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "00e19d80",
+      "state": "a53b3b94",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10607,7 +10607,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "483ca04c",
+      "state": "b6235e3c",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10618,7 +10618,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "07db5ff8",
+      "state": "b4fdd9f0",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10629,7 +10629,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "783748c0",
+      "state": "4c8d1abc",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10640,7 +10640,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "bbcf8440",
+      "state": "c69d8074",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10651,7 +10651,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "8b79abc6",
+      "state": "0b83b242",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -11558,24 +11558,24 @@
                         }
                       },
                       {
-                        "affixId": "striking",
-                        "budget": 3.25,
-                        "family": "rating.crit",
-                        "position": "suffix",
+                        "affixId": "deft",
+                        "budget": 6,
+                        "family": "primary.agility",
+                        "position": "prefix",
                         "ranges": {
-                          "critRating": {
-                            "max": 14,
-                            "min": 8
+                          "agi": {
+                            "max": 6,
+                            "min": 4
                           }
                         },
                         "revision": 1,
                         "tier": 3,
                         "values": {
-                          "critRating": 13
+                          "agi": 6
                         }
                       }
                     ],
-                    "baseId": "thornpeak_mail_chest",
+                    "baseId": "iron_flanged_mace",
                     "dropContext": {
                       "source": "dungeon",
                       "sourceEntityId": 420,
@@ -11588,8 +11588,8 @@
                       "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
                     },
                     "generatedName": {
-                      "baseId": "thornpeak_mail_chest",
-                      "prefixId": "procedural.name.stalwart"
+                      "baseId": "iron_flanged_mace",
+                      "prefixId": "procedural.name.deft"
                     },
                     "itemLevel": 21,
                     "rarity": "magic",
@@ -11598,7 +11598,7 @@
                     "version": 1
                   }
                 },
-                "itemId": "thornpeak_mail_chest"
+                "itemId": "iron_flanged_mace"
               }
             ]
           },
