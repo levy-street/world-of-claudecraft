@@ -96,6 +96,8 @@ import {
   setDailyRewardsBan,
   setDailyRewardsIpBan,
 } from './moderation_db';
+import { adminPluginRowJson, pendingReviewRowJson } from './plugins';
+import { bustPluginsCatalog, livePluginsService } from './plugins_routes';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
 import {
@@ -795,6 +797,22 @@ export async function handleAdminApi(
       return done ? ok(res, { ok: true }) : fail(res, 404, 'asset_not_found');
     }
 
+    // Plugin store moderation: the review decision on a pending version and
+    // the listing kill switch. Rules live in PluginsService (server/plugins.ts);
+    // both dispatch arms call the shared cores below.
+    const pluginReviewMatch = /^\/admin\/api\/plugins\/versions\/(\d+)\/review$/.exec(path);
+    if (req.method === 'POST' && pluginReviewMatch) {
+      return await adminPluginReviewCore(req, res, accountId, Number(pluginReviewMatch[1]));
+    }
+    const pluginListedMatch = /^\/admin\/api\/plugins\/(\d+)\/(delist|relist)$/.exec(path);
+    if (req.method === 'POST' && pluginListedMatch) {
+      return await adminPluginSetListedCore(
+        res,
+        Number(pluginListedMatch[1]),
+        pluginListedMatch[2] === 'relist',
+      );
+    }
+
     if (req.method === 'POST' && path === '/admin/api/antibot-config') {
       return await handleAntibotConfigSave(req, res, game, accountId);
     }
@@ -1020,6 +1038,13 @@ export async function handleAdminApi(
       const { page, limit } = parsePageParams(url.searchParams);
       const { rows, total } = await adminUserAssetsDb().listAdmin(limit, (page - 1) * limit);
       return ok(res, { rows, total, page, limit });
+    }
+    if (path === '/admin/api/plugins') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      return await adminPluginsListCore(res, page, limit);
+    }
+    if (path === '/admin/api/plugins/pending') {
+      return await adminPluginsPendingCore(res);
     }
 
     fail(res, 404, 'unknown admin endpoint');
@@ -2076,6 +2101,93 @@ function adminAssetStatusHandler(status: 'blocked' | 'active') {
 const adminAssetBlockHandler = adminAssetStatusHandler('blocked');
 const adminAssetUnblockHandler = adminAssetStatusHandler('active');
 
+// Plugin store moderation cores. BOTH dispatch arms call these (the
+// maps_routes core pattern) so the success/error bodies cannot drift. The
+// service singleton lives in plugins_routes.ts (livePluginsService), read at
+// call time so its test seam applies here too.
+
+/** GET /admin/api/plugins: the paginated all-plugins moderation list. */
+async function adminPluginsListCore(
+  res: http.ServerResponse,
+  page: number,
+  limit: number,
+): Promise<void> {
+  const { rows, total } = await livePluginsService().adminList(page, limit);
+  return ok(res, { rows: rows.map(adminPluginRowJson), total, page, limit });
+}
+
+/** GET /admin/api/plugins/pending: the review queue, oldest submission first. */
+async function adminPluginsPendingCore(res: http.ServerResponse): Promise<void> {
+  const rows = await livePluginsService().listPendingReview();
+  return ok(res, { rows: rows.map(pendingReviewRowJson) });
+}
+
+/** POST /admin/api/plugins/versions/:id/review { action: approve|reject, note? }:
+ * the human review decision. An approval makes the version live for every
+ * installer, so it busts the public catalog cache in the same call. */
+async function adminPluginReviewCore(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  reviewerAccountId: number,
+  versionId: number,
+): Promise<void> {
+  const body = await readBody(req);
+  const action =
+    body.action === 'approve' ? 'approved' : body.action === 'reject' ? 'rejected' : null;
+  if (!action) return fail(res, 400, 'invalid_review_action');
+  const result = await livePluginsService().review(versionId, reviewerAccountId, action, body.note);
+  if (result === 'invalid') return fail(res, 400, 'invalid_review_note');
+  if (!result) return fail(res, 404, 'plugin_version_not_reviewable');
+  if (action === 'approved') bustPluginsCatalog();
+  return ok(res, {
+    version: {
+      id: result.id,
+      pluginId: result.pluginId,
+      version: result.version,
+      status: result.status,
+    },
+  });
+}
+
+/** POST /admin/api/plugins/:id/(delist|relist): the listing kill switch. A
+ * delisted plugin drops out of the catalog AND every installer's boot payload
+ * (within the catalog TTL for the former, next fetch for the latter). */
+async function adminPluginSetListedCore(
+  res: http.ServerResponse,
+  pluginId: number,
+  listed: boolean,
+): Promise<void> {
+  const done = await livePluginsService().setListed(pluginId, listed);
+  if (done) bustPluginsCatalog();
+  return done ? ok(res, { ok: true }) : fail(res, 404, 'plugin_not_found');
+}
+
+async function adminPluginsListHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  return adminPluginsListCore(ctx.res, page, limit);
+}
+
+async function adminPluginsPendingHandler(ctx: Ctx): Promise<void> {
+  return adminPluginsPendingCore(ctx.res);
+}
+
+async function adminPluginReviewHandler(ctx: Ctx): Promise<void> {
+  return adminPluginReviewCore(
+    ctx.req,
+    ctx.res,
+    adminIdentityOf(ctx).accountId,
+    adminTargetId(ctx),
+  );
+}
+
+function adminPluginListedHandler(listed: boolean) {
+  return async (ctx: Ctx): Promise<void> => {
+    return adminPluginSetListedCore(ctx.res, adminTargetId(ctx), listed);
+  };
+}
+const adminPluginDelistHandler = adminPluginListedHandler(false);
+const adminPluginRelistHandler = adminPluginListedHandler(true);
+
 // ---------------------------------------------------------------------------
 // The route table. registry.ts spreads this into apiRoutes. login is anonymous
 // (no requireAdmin, its own in-handler limiter); every other route carries
@@ -2561,5 +2673,45 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('user_asset')],
     meta: adminTargetMeta('user_asset'),
     handler: adminAssetUnblockHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/plugins',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: adminPluginsListHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/plugins/pending',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: adminPluginsPendingHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/plugins/versions/:id/review',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('plugin_version')],
+    meta: adminTargetMeta('plugin_version'),
+    handler: adminPluginReviewHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/plugins/:id/delist',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('plugin')],
+    meta: adminTargetMeta('plugin'),
+    handler: adminPluginDelistHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/plugins/:id/relist',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('plugin')],
+    meta: adminTargetMeta('plugin'),
+    handler: adminPluginRelistHandler,
   },
 ];

@@ -12481,3 +12481,273 @@
   line-height: 1.25;
   font-weight: 600;
 }
+
+@layer components {
+  /* ---------- plugins store ---------- */
+  /* The Plugin Store window (#plugins-window, src/ui/plugins/): browse and
+     install community mods, manage installs, and submit new ones for review.
+     The floating .plugin-panel overlays are the contained per-plugin surfaces
+     the runtime hands to approved mods (plugin_api.ts). */
+  #plugins-window {
+    width: 640px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #plugins-window .plugins-tabs {
+    flex: none;
+    display: flex;
+    gap: 6px;
+    margin: 8px 0;
+  }
+  #plugins-window .plugins-tab {
+    flex: 1 1 0;
+    padding: 8px 10px;
+    background: #1c1712;
+    color: #c9b27a;
+    border: 1px solid #4a3b24;
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+  }
+  #plugins-window .plugins-tab.active {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: #2c2410;
+  }
+  #plugins-window .plugins-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 120px;
+  }
+  #plugins-window .plugins-filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  #plugins-window .plugins-search {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #plugins-window .plugins-note,
+  #plugins-window .plugins-hint {
+    color: #c9b27a;
+    font-size: 13px;
+    margin: 8px 0;
+  }
+  #plugins-window .plugins-hint {
+    font-size: 12px;
+    opacity: 0.85;
+  }
+  #plugins-window .plugins-error {
+    color: var(--color-danger, #e66);
+    font-size: 13px;
+    margin: 6px 0;
+  }
+  #plugins-window .plugins-notice {
+    color: var(--gold);
+    font-size: 13px;
+    margin: 6px 0;
+  }
+  #plugins-window .plugins-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  #plugins-window .plugins-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 10px;
+    background: #1c171266;
+    border: 1px solid #4a3b24;
+    border-radius: 4px;
+  }
+  #plugins-window .plugins-row-main {
+    flex: 1 1 320px;
+    min-width: 0;
+  }
+  #plugins-window .plugins-row-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  #plugins-window .plugins-name {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 15px;
+  }
+  #plugins-window .plugins-version {
+    font-size: 11px;
+    color: #c9b27a;
+  }
+  #plugins-window .plugins-chip {
+    font-size: 11px;
+    color: #c9b27a;
+    border: 1px solid #4a3b24;
+    border-radius: 10px;
+    padding: 1px 8px;
+  }
+  #plugins-window .plugins-row-sub {
+    font-size: 12px;
+    color: #c9b27a;
+    margin-top: 2px;
+  }
+  #plugins-window .plugins-summary {
+    font-size: 13px;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+  }
+  #plugins-window .plugins-row-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  #plugins-window .plugins-btn {
+    padding: 8px 12px;
+    background: #1c1712;
+    color: #e8d9b0;
+    border: 1px solid #4a3b24;
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+  }
+  #plugins-window .plugins-btn.primary {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: #2c2410;
+  }
+  #plugins-window .plugins-btn.danger {
+    color: var(--color-danger, #e66);
+    border-color: #6a2a24;
+  }
+  #plugins-window .plugins-btn.ghost {
+    opacity: 0.85;
+  }
+  #plugins-window .plugins-source {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  #plugins-window .plugins-source pre {
+    max-height: 260px;
+    overflow: auto;
+    background: #12100c;
+    border: 1px solid #4a3b24;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  #plugins-window .plugins-desc {
+    font-size: 13px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  #plugins-window .plugins-review-note {
+    font-size: 12px;
+    color: var(--color-danger, #e66);
+    margin-top: 4px;
+  }
+  #plugins-window .plugins-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0 12px;
+  }
+  #plugins-window .plugins-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #c9b27a;
+  }
+  #plugins-window .plugins-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
+  }
+  #plugins-window .plugins-form input,
+  #plugins-window .plugins-form select,
+  #plugins-window .plugins-form textarea {
+    font: inherit;
+    font-size: 13px;
+    background: #12100c;
+    color: #e8d9b0;
+    border: 1px solid #4a3b24;
+    border-radius: 4px;
+    padding: 8px;
+  }
+  #plugins-window .plugins-code {
+    font-family: ui-monospace, monospace;
+    white-space: pre;
+  }
+  #plugins-window .plugins-form-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  #plugins-window .plugins-mine-title {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 14px;
+    margin: 10px 0 6px;
+  }
+  /* The floating per-plugin overlay panels (outside the window; the fixed
+     #plugin-panels layer is click-through except the panels themselves). */
+  #plugin-panels {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+  }
+  #plugin-panels .plugin-panel {
+    position: absolute;
+    left: 16px;
+    top: 120px;
+    min-width: 140px;
+    max-width: 340px;
+    background: #14110cd9;
+    border: 1px solid #4a3b24;
+    border-radius: 4px;
+    pointer-events: auto;
+    color: #e8d9b0;
+    font-size: 12px;
+  }
+  #plugin-panels .plugin-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 4px 6px;
+    background: #1c1712;
+    border-bottom: 1px solid #4a3b24;
+    cursor: move;
+    touch-action: none;
+    user-select: none;
+  }
+  #plugin-panels .plugin-panel-title {
+    color: var(--gold);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #plugin-panels .plugin-panel-hide {
+    background: none;
+    border: none;
+    color: #c9b27a;
+    cursor: pointer;
+    font: inherit;
+    padding: 2px 6px;
+  }
+  #plugin-panels .plugin-panel-body {
+    padding: 6px 8px;
+    max-height: 40vh;
+    overflow: auto;
+  }
+}

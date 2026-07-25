@@ -10,6 +10,7 @@ vi.mock('../server/db', () => ({
   touchLogin: vi.fn(),
   saveToken: vi.fn(),
   accountAndScopeForToken: vi.fn(),
+  moderationStatusForAccount: vi.fn(async () => ({ banned: false, suspendedUntil: null })),
   isAdminAccount: vi.fn(),
   accountMailTarget: vi.fn(async () => null),
   accountById: vi.fn(),

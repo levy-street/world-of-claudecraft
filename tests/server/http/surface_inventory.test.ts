@@ -138,13 +138,22 @@ const dispatchedRows = SURFACE_INVENTORY.filter(
   (r) => !r.unreachable && startsWithDispatchedPrefix(r.path),
 );
 
-const inventoryExactPaths = new Set(dispatchedRows.filter((r) => !r.match).map((r) => r.path));
+const inventoryExactPaths = new Set(
+  dispatchedRows.filter((r) => !r.match && !r.path.includes(':')).map((r) => r.path),
+);
 const inventoryRegexSources = new Set(
   SURFACE_INVENTORY.filter((r) => !r.unreachable && r.match).map((r) => (r.match as RegExp).source),
 );
+// Registry-only :param rows (a RouteDef path template with NO legacy `*Match`
+// regex, the plugins-family new-route rule): validated against the registry's
+// own path templates below, the same way exact registry paths join the exact
+// set (a registered RouteDef is a dispatch arm all the same).
+const inventoryRegistryParamRows = dispatchedRows.filter((r) => !r.match && r.path.includes(':'));
 // Every concrete (method, path) the inventory records for an exact dispatched arm.
 const inventoryMethodPathPairs = new Set(
-  dispatchedRows.filter((r) => !r.match).map((r) => `${r.method} ${r.path}`),
+  dispatchedRows
+    .filter((r) => !r.match && !r.path.includes(':'))
+    .map((r) => `${r.method} ${r.path}`),
 );
 
 const sorted = (s: Set<string>): string[] => [...s].sort();
@@ -179,6 +188,22 @@ describe('surface inventory: route-count freshness gate', () => {
     const fromSource = sourceParamRegexSources(readSources());
     expect(fromSource.size).toBeGreaterThan(10);
     expect(sorted(fromSource)).toEqual(sorted(inventoryRegexSources));
+  });
+
+  it('param (:id) rows with no match regex are registered RouteDef templates', () => {
+    // The registry-only new-route rule for :param paths: no legacy regex to
+    // anchor on, so the row's path template must be a registered (method, path)
+    // in apiRoutes, and every registry :param template must carry inventory rows.
+    const registryParamPairs = new Set(
+      apiRoutes.filter((r) => r.path.includes(':')).map((r) => `${r.method} ${r.path}`),
+    );
+    // Non-vacuous: the plugins family ships registry-only :param rows.
+    expect(inventoryRegistryParamRows.length).toBeGreaterThan(0);
+    for (const row of inventoryRegistryParamRows) {
+      expect(registryParamPairs.has(`${row.method} ${row.path}`), `${row.method} ${row.path}`).toBe(
+        true,
+      );
+    }
   });
 
   it('every method-first (method, path) arm in source has an inventory row', () => {

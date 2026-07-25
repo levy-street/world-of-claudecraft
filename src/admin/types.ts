@@ -547,6 +547,61 @@ export interface StaffHistoryData {
   rows: RoleChangeRow[];
 }
 
+// Plugin store moderation. Mirrors server/plugins.ts adminPluginRowJson (the
+// GET /admin/api/plugins list) and pendingReviewRowJson (the review queue at
+// GET /admin/api/plugins/pending) exactly.
+export type PluginStatus = 'pending' | 'listed' | 'delisted';
+
+export type PluginCategory = 'combat' | 'economy' | 'social' | 'interface' | 'tools';
+
+// One reviewer-facing pre-screen finding (server/plugin_screen.ts): a stable
+// machine code plus the 1-based source line of the first match. `code` stays a
+// string client-side so a rule added server-side still renders (raw) instead of
+// failing the fetch; the known set is mapped to labels in plugin_review.ts.
+export interface PluginScreenFlag {
+  code: string;
+  line: number;
+}
+
+export interface AdminPluginRow {
+  id: number;
+  accountId: number | null;
+  slug: string;
+  name: string;
+  summary: string;
+  category: PluginCategory;
+  author: string | null;
+  status: PluginStatus;
+  liveVersion: number | null;
+  installs: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AdminPluginsData = Paginated<AdminPluginRow>;
+
+export interface PendingPluginVersionRow {
+  versionId: number;
+  pluginId: number;
+  slug: string;
+  accountId: number | null;
+  author: string | null;
+  version: number;
+  name: string;
+  summary: string;
+  description: string;
+  category: PluginCategory;
+  notes: string;
+  source: string;
+  screen: PluginScreenFlag[];
+  submittedAt: string;
+  isUpdate: boolean;
+}
+
+export interface PendingPluginReviewsData {
+  rows: PendingPluginVersionRow[];
+}
+
 // Server tick-loop profiling (GET /admin/api/perf/tick, POST .../capture). Mirrors
 // server/game.ts PerfCaptureResult/PerfCaptureStatus and the TickProfiler shape.
 export interface PerfPhaseStats {

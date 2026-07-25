@@ -72,6 +72,22 @@ const EXPECTED_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
+  'plugins.invalid_name',
+  'plugins.name_not_allowed',
+  'plugins.invalid_handle',
+  'plugins.invalid_summary',
+  'plugins.invalid_description',
+  'plugins.invalid_category',
+  'plugins.invalid_source',
+  'plugins.source_too_large',
+  'plugins.source_syntax',
+  'plugins.limit_reached',
+  'plugins.install_limit',
+  'plugins.not_found',
+  'plugins.not_listed',
+  'plugins.not_installed',
+  'plugins.slug_unavailable',
+  'plugins.review_invalid',
 ];
 
 describe('ERROR_CODES catalog', () => {

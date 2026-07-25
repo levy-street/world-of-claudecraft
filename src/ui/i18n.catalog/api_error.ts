@@ -183,4 +183,23 @@ export const apiErrorStrings = {
   wallet: {
     handoff_invalid: 'That wallet authorization expired or could not be verified. Try again.',
   },
+  // plugins: the community plugin store (server/plugins*.ts).
+  plugins: {
+    invalid_name: 'Plugin names use 3 to 40 letters, numbers, spaces, apostrophes, or hyphens.',
+    name_not_allowed: 'That plugin name is not allowed.',
+    invalid_handle: 'Author names use 2 to 24 letters, numbers, spaces, apostrophes, or hyphens.',
+    invalid_summary: 'The summary must be one line of up to 140 characters.',
+    invalid_description: 'The description is too long or contains unsupported characters.',
+    invalid_category: 'Pick one of the listed categories.',
+    invalid_source: 'The plugin source is empty.',
+    source_too_large: 'The plugin source is too large.',
+    source_syntax: 'The plugin source has a syntax error.',
+    limit_reached: 'You have reached the plugin limit for this account.',
+    install_limit: 'You have reached the installed plugin limit.',
+    not_found: 'Plugin not found.',
+    not_listed: 'This plugin is not available right now.',
+    not_installed: 'This plugin is not installed.',
+    slug_unavailable: 'Could not reserve a link name for this plugin. Try a different name.',
+    review_invalid: 'That review action is not valid.',
+  },
 };

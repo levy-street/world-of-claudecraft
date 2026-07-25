@@ -387,6 +387,37 @@ export function resetMapMutationRateLimits(): void {
   mapMutationAccountAttempts.clear();
 }
 
+// Plugin store mutations (create/update/install/uninstall/delete). Submissions
+// are review-queue writes and installs are single-row upserts; 20/min leaves
+// headroom for an author iterating on a submission while bounding floods.
+export const PLUGIN_MUTATION_MAX_PER_MINUTE = 20;
+const pluginMutationIpAttempts = new Map<string, number[]>();
+const pluginMutationAccountAttempts = new Map<number, number[]>();
+
+/** Per-IP AND per-account throttle shared by every /api/plugins mutation. */
+export function pluginMutationRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    pluginMutationIpAttempts,
+    requestIp(req),
+    PLUGIN_MUTATION_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    pluginMutationAccountAttempts,
+    accountId,
+    PLUGIN_MUTATION_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset plugin-mutation throttles. Test-only. */
+export function resetPluginMutationRateLimits(): void {
+  pluginMutationIpAttempts.clear();
+  pluginMutationAccountAttempts.clear();
+}
+
 const assetUploadIpAttempts = new Map<string, number[]>();
 const assetUploadAccountAttempts = new Map<number, number[]>();
 

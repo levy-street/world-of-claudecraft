@@ -62,6 +62,12 @@ import {
   setMapsGuardDbForTests,
   setMapsServiceForTests,
 } from '../../../server/maps_routes';
+import {
+  resetPluginsGuardDbForTests,
+  resetPluginsServiceForTests,
+  setPluginsGuardDbForTests,
+  setPluginsServiceForTests,
+} from '../../../server/plugins_routes';
 import { resetRateLimits } from '../../../server/ratelimit';
 import {
   resetUserAssetsGuardDbForTests,
@@ -146,6 +152,12 @@ function installDenyingMapsAndAssets(): void {
   setUserAssetsServiceForTests({
     listMine: async () => [],
   } as unknown as import('../../../server/user_assets').UserAssetsService);
+  // Same deny environment for the plugin store's owner loader (getPlugin
+  // always misses, so every account-owned plugins :id route denies with 404).
+  setPluginsGuardDbForTests(guardOverrides);
+  setPluginsServiceForTests({
+    getPlugin: async () => null,
+  } as unknown as import('../../../server/plugins').PluginsService);
 }
 
 // Install a fully stubbed runtime so a handler that DID run (the negative control,
@@ -220,6 +232,8 @@ describe('ownership coverage: registry-wide deny-by-default sweep', () => {
     resetMapsServiceForTests();
     resetUserAssetsGuardDbForTests();
     resetUserAssetsServiceForTests();
+    resetPluginsGuardDbForTests();
+    resetPluginsServiceForTests();
     vi.restoreAllMocks();
   });
 

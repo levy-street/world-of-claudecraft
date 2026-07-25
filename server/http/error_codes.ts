@@ -192,6 +192,42 @@ export const ERROR_CODES = deepFreeze({
   'steam.upstream': { params: [] },
   // wallet: the desktop browser handoff was malformed, expired, or mismatched.
   'wallet.handoff_invalid': { params: [] },
+
+  // --- Plugin store codes (server/plugins*.ts). Community client-side mods:
+  // every version is human-reviewed before it is served to any player. ---
+
+  // The plugin name failed the shape check (letters/digits/spaces, 3 to 40).
+  'plugins.invalid_name': { params: [] },
+  // The plugin name tripped the obscenity screen.
+  'plugins.name_not_allowed': { params: [] },
+  // The author handle failed the shape or obscenity check.
+  'plugins.invalid_handle': { params: [] },
+  // The one-line summary is missing, too long, or not allowed.
+  'plugins.invalid_summary': { params: [] },
+  // The description is too long or contains control characters.
+  'plugins.invalid_description': { params: [] },
+  // The category is not one of the known plugin categories.
+  'plugins.invalid_category': { params: [] },
+  // The source is missing or empty.
+  'plugins.invalid_source': { params: [] },
+  // The source exceeds the per-plugin byte cap (413).
+  'plugins.source_too_large': { params: [] },
+  // The source does not parse as JavaScript.
+  'plugins.source_syntax': { params: [] },
+  // The per-account plugin cap is reached.
+  'plugins.limit_reached': { params: [] },
+  // The per-account install cap is reached.
+  'plugins.install_limit': { params: [] },
+  // No such plugin (or not yours, on owner routes; anti-enumeration 404).
+  'plugins.not_found': { params: [] },
+  // The plugin is not currently listed (pending review or delisted).
+  'plugins.not_listed': { params: [] },
+  // The plugin is not installed for this account.
+  'plugins.not_installed': { params: [] },
+  // Could not allocate a unique slug (409).
+  'plugins.slug_unavailable': { params: [] },
+  // The review action or note failed validation.
+  'plugins.review_invalid': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

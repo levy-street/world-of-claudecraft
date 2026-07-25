@@ -142,6 +142,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/delve/delve_map.ts',
+  'src/ui/plugins/plugin_events_core.ts',
+  'src/ui/plugins/plugins_store_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',

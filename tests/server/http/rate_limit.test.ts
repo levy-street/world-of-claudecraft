@@ -31,6 +31,7 @@ import {
   CLAUDIUM_SPEND_POLICY,
   CLAUDIUM_SPEND_PRE_AUTH_POLICY,
   DISCORD_POLICY,
+  PLUGIN_MUTATION_POLICY,
   PUBLIC_READ_POLICY,
   type RateLimitPolicy,
   REPORTS_CREATE_POLICY,
@@ -48,6 +49,7 @@ import {
   CLAUDIUM_QUOTE_MAX_PER_MINUTE,
   CLAUDIUM_SPEND_MAX_PER_MINUTE,
   DISCORD_MAX_PER_MINUTE,
+  PLUGIN_MUTATION_MAX_PER_MINUTE,
   PUBLIC_READ_MAX_PER_MINUTE,
   REPORTS_CREATE_MAX_PER_MINUTE,
   resetCardUploadRateLimits,
@@ -399,6 +401,7 @@ describe('rateLimit: policy derivation guard', () => {
       { policy: CHARACTER_TAKEOVER_POLICY, limit: CHARACTER_MUTATION_MAX_PER_MINUTE },
       { policy: REPORTS_CREATE_POLICY, limit: REPORTS_CREATE_MAX_PER_MINUTE },
       { policy: DISCORD_POLICY, limit: DISCORD_MAX_PER_MINUTE },
+      { policy: PLUGIN_MUTATION_POLICY, limit: PLUGIN_MUTATION_MAX_PER_MINUTE },
     ];
     for (const { policy, limit } of table) {
       expect(policy.limit, `${policy.name} limit`).toBe(limit);

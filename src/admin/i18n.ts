@@ -215,6 +215,11 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'password reset failed': 'error.resetPasswordFailed',
   'password must be at least 6 chars': 'error.passwordTooShort',
   'password must be at most 128 chars': 'error.passwordTooLong',
+  // Plugin store moderation codes (server/admin.ts plugin review + listing cores).
+  invalid_review_action: 'error.invalidReviewAction',
+  invalid_review_note: 'error.invalidReviewNote',
+  plugin_version_not_reviewable: 'error.pluginVersionNotReviewable',
+  plugin_not_found: 'error.pluginNotFound',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

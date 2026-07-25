@@ -164,6 +164,21 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/,
     permission: 'content.moderate',
   },
+
+  // Plugin store review and moderation (the same content-moderation authority
+  // as maps and uploaded assets).
+  { method: 'GET', pattern: '/admin/api/plugins', permission: 'content.moderate' },
+  { method: 'GET', pattern: '/admin/api/plugins/pending', permission: 'content.moderate' },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/plugins\/versions\/(\d+)\/review$/,
+    permission: 'content.moderate',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/plugins\/(\d+)\/(delist|relist)$/,
+    permission: 'content.moderate',
+  },
 ];
 
 function matches(pattern: string | RegExp, path: string): boolean {

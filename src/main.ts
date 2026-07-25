@@ -280,6 +280,7 @@ import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
+import { PluginsClient } from './ui/plugins';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
@@ -1192,6 +1193,13 @@ async function startGame(
       constrainedMemory: GFX.constrainedMemory,
     });
     perf.setHud(hud);
+    // Community plugin store, online only (installs and submissions are
+    // account state; the offline world has no REST session). The client rides
+    // the live bearer token; the HUD boot-syncs installed plugins so approved
+    // versions activate at login with no redeploy.
+    if (online) {
+      hud.enablePlugins(new PluginsClient({ token: () => api.token, base: api.base }));
+    }
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
     applyPerfOrnamentVars(); // Performance Overlay window's gilded corner/edge masks
     applyMinimapOrnamentVars(); // minimap disc's gilded ring

@@ -112,6 +112,12 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/broadcasts',
   '/api/steam/link',
   '/api/steam/status',
+  '/api/plugins',
+  '/api/plugins/installed',
+  '/api/plugins/mine',
+  '/api/plugins/:id',
+  '/api/plugins/:id/versions',
+  '/api/plugins/:id/install',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -349,6 +355,18 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/assets/mine' },
     { method: 'GET', path: '/api/assets/:file' },
     { method: 'DELETE', path: '/api/assets/:id' },
+    // The plugin store family (server/plugins_routes.ts): registry-only routes
+    // born AFTER the migration like deeds/steam/claudium, so every arm is
+    // asserted here and REGISTRY_ONLY_PATHS carries every path.
+    { method: 'GET', path: '/api/plugins' },
+    { method: 'POST', path: '/api/plugins' },
+    { method: 'GET', path: '/api/plugins/installed' },
+    { method: 'GET', path: '/api/plugins/mine' },
+    { method: 'GET', path: '/api/plugins/:id' },
+    { method: 'DELETE', path: '/api/plugins/:id' },
+    { method: 'POST', path: '/api/plugins/:id/versions' },
+    { method: 'POST', path: '/api/plugins/:id/install' },
+    { method: 'DELETE', path: '/api/plugins/:id/install' },
   ];
   const MIGRATED_PATHS = MIGRATED_ROUTES.map((r) => r.path);
 

@@ -240,6 +240,13 @@ For off-box safety, sync the directory to S3 occasionally:
   (durations editable in the same tab). `CHAT_CENSOR_LIST` / `CHAT_CENSOR_FILE`
   are still read **once**, on the first boot of a fresh database, to seed the soft
   list; after that they are ignored and the dashboard is authoritative.
+- **Plugin store seeds**: `npm run db:seed-plugins` (reads `DATABASE_URL`)
+  upserts the first-party plugin catalog (`server/plugins_seed/`). Idempotent:
+  run it once after the first deploy of the store and again whenever a seed
+  plugin changes; an operator-delisted seed stays delisted. Community
+  submissions are reviewed in the admin dashboard (Plugins page,
+  `content.moderate`); the review posture and kill-switch runbook live in
+  `docs/prd/plugins-store.md`.
 - **Realms (horizontal scaling)**: each server process serves one realm,
   set by `REALM_NAME` (default `Claudemoon`). To add a realm, run another
   process against the **same** `DATABASE_URL` with a different `REALM_NAME`

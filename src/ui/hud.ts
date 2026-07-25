@@ -440,6 +440,13 @@ import {
   type PlayerTooltipModel,
   playerTooltipHtml,
 } from './player_tooltip_view';
+import {
+  buildPlayerSnapshot,
+  PluginHost,
+  type PluginSoundCue,
+  type PluginsClient,
+  PluginsStoreWindow,
+} from './plugins';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
@@ -1985,6 +1992,7 @@ export class Hud {
     $('#mm-town-focus')?.addEventListener('click', () => this.toggleTownFocus());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
+    $('#mm-plugins')?.addEventListener('click', () => this.togglePluginsStore());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
     // Collapse/expand the on-screen quest tracker by clicking its header. The
     // overlay is click-through (pointer-events:none) except the header button, so
@@ -2703,6 +2711,10 @@ export class Hud {
       case 'deeds-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.deedsWindow.close();
+        break;
+      case 'plugins-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.pluginsWindow.close();
         break;
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -3809,6 +3821,23 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#deeds-window'),
     onWatchChanged: () => this.updateDeedTracker(),
+  });
+  // Community plugin store: the authed REST client arrives from main.ts after
+  // login (enablePlugins); the runtime host is created with it. Both stay null
+  // offline, so the whole subsystem is inert outside an online session.
+  private pluginsClient: PluginsClient | null = null;
+  private pluginsHost: PluginHost | null = null;
+  // Plugin Store window painter (plugins_store_view.ts core +
+  // plugins_store_window.ts painter): browse/install/develop over the plugins
+  // REST client, with instant runtime activation through the host. A
+  // standalone trapping window (windowFocus), the deeds shape exactly.
+  private readonly pluginsWindow = new PluginsStoreWindow({
+    root: () => $('#plugins-window'),
+    closeOthers: () => this.closeOtherWindows('#plugins-window'),
+    ...this.windowFocus('#plugins-window'),
+    client: () => this.pluginsClient,
+    host: () => this.pluginsHost,
+    defaultAuthor: () => this.sim.player.name,
   });
   // Professions window painter (professions_view.ts core + the composed
   // profession_identity_view model + professions_window.ts painter): the
@@ -8811,6 +8840,10 @@ export class Hud {
 
   handleEvents(events: SimEvent[]): void {
     const sim = this.sim;
+    // Community plugins tap the same drained stream, mapped to the versioned
+    // plugin vocabulary inside the host (src/ui/plugins/); a throwing plugin
+    // is contained there and can never break this dispatcher.
+    this.pluginsHost?.dispatchSimEvents(events);
     // Book of Deeds unlocks batch across the whole drain (handleDeedUnlocks):
     // banners coalesce to the last unlock, retro back-credits collapse into
     // one summary line, and the celebration sound plays once.
@@ -12053,6 +12086,41 @@ export class Hud {
 
   closeDeeds(): void {
     this.deedsWindow.close();
+  }
+
+  togglePluginsStore(): void {
+    this.pluginsWindow.toggle();
+  }
+
+  /**
+   * Wire the plugin store for an online session: main.ts hands over the authed
+   * REST client, the runtime host is built against the HUD's own presentation
+   * seams, the installed set boot-syncs (approved updates go live here, no
+   * redeploy), and the micromenu button is revealed. Safe to call again after
+   * a re-login; the host reconciles rather than restarting unchanged plugins.
+   */
+  enablePlugins(client: PluginsClient): void {
+    this.pluginsClient = client;
+    if (!this.pluginsHost) {
+      const cueMap: Record<PluginSoundCue, () => void> = {
+        click: () => audio.click(),
+        coin: () => audio.coin(),
+        chime: () => audio.whisper(),
+        level: () => audio.levelUp(),
+        quest: () => audio.questDone(),
+        alert: () => audio.readyCheck(),
+      };
+      this.pluginsHost = new PluginHost({
+        panelLayer: () => document.getElementById('plugin-panels'),
+        toast: (text) => this.showSelfNote(text),
+        sound: (cue) => cueMap[cue]?.(),
+        playerSnapshot: () => buildPlayerSnapshot(this.sim),
+        onAutoDisabled: (name) => this.showSelfNote(t('hudChrome.plugins.autoDisabled', { name })),
+      });
+    }
+    const host = this.pluginsHost;
+    void client.installed().then((rows) => host.syncInstalled(rows));
+    document.getElementById('mm-plugins')?.removeAttribute('hidden');
   }
 
   toggleDeeds(): void {

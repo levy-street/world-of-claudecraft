@@ -2611,7 +2611,8 @@
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
   body.mobile-touch #dev-command-window,
-  body.mobile-touch #claudium-window {
+  body.mobile-touch #claudium-window,
+  body.mobile-touch #plugins-window {
     left: 10px;
     right: 10px;
     top: 10px;

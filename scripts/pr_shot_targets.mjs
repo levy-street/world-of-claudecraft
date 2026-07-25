@@ -231,6 +231,132 @@ export const TARGETS = [
     },
   },
   {
+    key: 'plugins-store',
+    label: 'Plugin Store window (community client-side mods)',
+    when: ['ui/plugins/', 'plugins_routes', 'plugins_db', 'server/plugins', 'plugins_seed'],
+    // The store is online-only, so the recipe injects a canned PluginsClient
+    // through the debug hook (duck-typed; enablePlugins only calls its async
+    // reads) and opens the window over the offline world. One installed row
+    // carries a tiny real plugin source so the runtime host actually starts it
+    // and its overlay panel is genuinely live in the shot.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const now = new Date().toISOString();
+        const catalog = [
+          [
+            'battle-scribe',
+            'Battle Scribe',
+            'A personal damage meter with automatic pull tracking and a best-pull record.',
+            'combat',
+            412,
+          ],
+          [
+            'loot-ledger',
+            'Loot Ledger',
+            'Session gold and XP tracker with per-hour rates and a recent-loot list.',
+            'economy',
+            371,
+          ],
+          [
+            'wayfarer-waypoints',
+            'Wayfarer Waypoints',
+            'Save named spots and get live distance and direction to each one.',
+            'tools',
+            285,
+          ],
+          [
+            'chat-chimes',
+            'Chat Chimes',
+            'A soft chime and toast whenever someone says your name or whispers you.',
+            'social',
+            244,
+          ],
+          [
+            'xp-forecast',
+            'XP Forecast',
+            'Rolling XP per hour and a live estimate of the time to your next level.',
+            'interface',
+            198,
+          ],
+          [
+            'adventure-journal',
+            'Adventure Journal',
+            'A timestamped session diary of level ups, deeds, quests, deaths, and loot rolls.',
+            'tools',
+            153,
+          ],
+        ].map(([slug, name, summary, category, installs], i) => ({
+          id: i + 1,
+          slug,
+          name,
+          summary,
+          category,
+          author: null,
+          version: 1,
+          installs,
+          updatedAt: now,
+        }));
+        const demoSource =
+          "var p = woc.ui.panel({ id: 'demo', title: 'Battle Scribe' });" +
+          "p.body.innerHTML = '<div><b>This pull</b> 128 dps</div>';";
+        const installed = [
+          {
+            id: 1,
+            slug: 'battle-scribe',
+            name: 'Battle Scribe',
+            summary: catalog[0].summary,
+            category: 'combat',
+            version: 1,
+            enabled: true,
+            source: demoSource,
+            updatedAt: now,
+          },
+        ];
+        const mine = [
+          {
+            id: 9,
+            slug: 'pull-timer',
+            name: 'Pull Timer',
+            summary: 'Counts down a pull with big numbers.',
+            description: '',
+            category: 'combat',
+            author: 'Aldwin',
+            status: 'pending',
+            liveVersion: null,
+            latest: { version: 1, status: 'pending', reviewNote: '', submittedAt: now },
+            updatedAt: now,
+          },
+        ];
+        hud.enablePlugins({
+          catalog: async () => catalog,
+          installed: async () => installed,
+          mine: async () => mine,
+          detail: async () => null,
+          install: async () => ({ ok: true, enabled: true }),
+          uninstall: async () => ({ ok: true }),
+          create: async () => ({ plugin: { id: 1, slug: 'demo' } }),
+          submitVersion: async () => ({ version: { version: 2, status: 'pending' } }),
+          remove: async () => ({ ok: true }),
+        });
+        // The camera-mode prompt can land after the shared entry flow's poll
+        // window; confirm it away so it never overlays the store.
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const el = document.querySelector('#plugins-window');
+        if (el) el.style.display = 'none';
+        hud.togglePluginsStore();
+      });
+      await pollForSize(page, '#plugins-window');
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+      });
+      await wait(600);
+      return { clip: '#plugins-window' };
+    },
+  },
+  {
     key: 'corpse-unified-press',
     label: 'Unified corpse press: one interact loots AND harvests (Professions 2.0)',
     when: [

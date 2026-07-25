@@ -38,7 +38,9 @@ import {
   MAP_MUTATION_MAX_PER_MINUTE,
   mapMutationRateLimited,
   mergeFusedOutcomes,
+  PLUGIN_MUTATION_MAX_PER_MINUTE,
   PUBLIC_READ_MAX_PER_MINUTE,
+  pluginMutationRateLimited,
   publicReadRateLimited,
   REPORTS_CREATE_MAX_PER_MINUTE,
   rateLimitNow,
@@ -359,6 +361,18 @@ export const MAP_MUTATION_POLICY: RateLimitPolicy = {
   limit: MAP_MUTATION_MAX_PER_MINUTE,
   windowSeconds: WINDOW_SECONDS,
   tier1: (ctx) => mapMutationRateLimited(ctx.req, ctxAccountId(ctx)),
+  tier2: 'global',
+};
+
+// The plugin store mutation limiter (registry-only routes, no legacy arm).
+// Fused ip+account bucket like MAP_MUTATION_POLICY; mounts BEHIND the route's
+// auth guard.
+export const PLUGIN_MUTATION_POLICY: RateLimitPolicy = {
+  name: 'plugin_mutation',
+  keyClass: 'ip+account',
+  limit: PLUGIN_MUTATION_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => pluginMutationRateLimited(ctx.req, ctxAccountId(ctx)),
   tier2: 'global',
 };
 

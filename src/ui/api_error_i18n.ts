@@ -117,6 +117,24 @@ export const API_ERROR_KEYS = {
   'steam.account_taken': 'apiError.steam.account_taken',
   'steam.upstream': 'apiError.steam.upstream',
   'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
+
+  // plugins: the community plugin store.
+  'plugins.invalid_name': 'apiError.plugins.invalid_name',
+  'plugins.name_not_allowed': 'apiError.plugins.name_not_allowed',
+  'plugins.invalid_handle': 'apiError.plugins.invalid_handle',
+  'plugins.invalid_summary': 'apiError.plugins.invalid_summary',
+  'plugins.invalid_description': 'apiError.plugins.invalid_description',
+  'plugins.invalid_category': 'apiError.plugins.invalid_category',
+  'plugins.invalid_source': 'apiError.plugins.invalid_source',
+  'plugins.source_too_large': 'apiError.plugins.source_too_large',
+  'plugins.source_syntax': 'apiError.plugins.source_syntax',
+  'plugins.limit_reached': 'apiError.plugins.limit_reached',
+  'plugins.install_limit': 'apiError.plugins.install_limit',
+  'plugins.not_found': 'apiError.plugins.not_found',
+  'plugins.not_listed': 'apiError.plugins.not_listed',
+  'plugins.not_installed': 'apiError.plugins.not_installed',
+  'plugins.slug_unavailable': 'apiError.plugins.slug_unavailable',
+  'plugins.review_invalid': 'apiError.plugins.review_invalid',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */
