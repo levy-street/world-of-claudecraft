@@ -312,6 +312,22 @@ describe('prestige', () => {
     expect(sim.prestige()).toBe(false);
     expect(sim.prestigeRank).toBe(0);
   });
+
+  it('emits a dedicated prestige event carrying the new rank (issue #2137)', () => {
+    // Regression: the character sheet only repaints on a small explicit set of
+    // triggers, and prestige used to emit only a chat 'log' line, so an
+    // already-open sheet kept showing the stale rank. A dedicated event lets
+    // the HUD repaint the sheet the moment prestige lands.
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(MAX_LEVEL);
+    sim.grantXp(PRESTIGE_XP_PER_RANK);
+    sim.events.length = 0;
+    expect(sim.prestige()).toBe(true);
+    const prestigeEvents = sim.events.filter((e) => e.type === 'prestige');
+    expect(prestigeEvents).toHaveLength(1);
+    expect((prestigeEvents[0] as any).rank).toBe(1);
+    expect(sim.prestigeRank).toBe(1);
+  });
 });
 
 describe('prestige anti-abuse gate (server-locked rank)', () => {

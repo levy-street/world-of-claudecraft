@@ -17,11 +17,12 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type {
-  DeedsLeaderboardEntry,
-  DeedsLeaderboardSelf,
-  GuildLeaderboardEntry,
-  LeaderboardEntry,
+import {
+  type DeedsLeaderboardEntry,
+  type DeedsLeaderboardSelf,
+  type GuildLeaderboardEntry,
+  type LeaderboardEntry,
+  ONLINE_WORLD_AUTH_TYPE,
 } from '../src/world_api';
 import {
   configureAccountRuntime,
@@ -3006,7 +3007,7 @@ export async function startServer(): Promise<http.Server> {
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
-    console.log(`  WS:   /ws, then first message {t:"auth",token,character}`);
+    console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
 
   // Off-peak batched retention. The sweep self-clocks once per UTC day behind a

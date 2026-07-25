@@ -12,24 +12,31 @@
 //     enchanted): bag_item_context_menu.ts decides that predicate.
 //   - Apply Enchant opens a two-step picker (also on #ctx-menu): the enchants
 //     that consume the reagent, each with affordability + target slot, then the
-//     held eligible targets, then world.applyEnchant. enchant_apply_view.ts
-//     models both steps.
+//     eligible targets (the held copies AND the WORN ones, which enchant in
+//     place), then world.applyEnchant. enchant_apply_view.ts models both steps.
 //
 // The pure decisions live in the two view cores; this owns only DOM + dispatch,
 // talks to the world exclusively through IWorld, and never decides an outcome.
 
 import { ITEMS } from '../sim/data';
-import type { ItemDef, ItemSlot } from '../sim/types';
+import type { EquipSlot, ItemDef, ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   type BagItemContextActionId,
   bagItemContextActions,
   destroyConsumesSpecialCopy,
 } from './bag_item_context_menu';
-import { enchantNameKey, enchantsForReagent, enchantTargets } from './enchant_apply_view';
+import { disenchantYieldLines } from './disenchant_yield_view';
+import {
+  enchantNameKey,
+  enchantSectionsForReagent,
+  enchantTargets,
+  wornEnchantTargets,
+} from './enchant_apply_view';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { t } from './i18n';
+import { itemNumber, itemStatName } from './item_instance_tooltip';
 
 /** Modifier class the picker states set on the shared #ctx-menu element: the
  *  Apply Enchant pickers size differently from every other menu in the family
@@ -43,6 +50,15 @@ export const CTX_MENU_PICKER_CLASS = 'ctx-menu-picker';
  *  rendered box instead of the full uncapped list estimate. */
 const PICKER_MAX_HEIGHT_VIEWPORT_FRACTION = 0.6;
 const PICKER_MAX_HEIGHT_DESKTOP_PX = 560;
+
+/** One painted row of the shared #ctx-menu popup: a selectable action (`act`),
+ *  an inert disabled row, or a non-interactive tier section caption. */
+interface PickerRow {
+  act?: string;
+  html: string;
+  disabled?: boolean;
+  header?: boolean;
+}
 
 /** The #ctx-menu seam this painter drives, wired by the HUD from the same
  *  helpers the player menus use (placePopupAt + keepPopupOnScreen, and
@@ -117,9 +133,15 @@ export class BagItemActionMenu {
               : ('hudChrome.enchanting.salvageConfirmBody' as const),
             ok: 'hudChrome.itemMenu.salvage' as const,
           };
+    // The disenchant arm also states what the destroy PAYS OUT (the sim's own
+    // yield functions, via the pure view core), so an irreversible action is
+    // not a blind trade. Salvage keeps its existing body: its generic yield is
+    // a separate system (professions/salvage.ts).
+    const yieldLines = action === 'disenchant' ? disenchantYieldLines(def) : [];
+    const body = [t(c.body, { item: name }), ...yieldLines].join('\n');
     this.deps.confirmDialog(
       t(c.title, { item: name }),
-      t(c.body, { item: name }),
+      body,
       t(c.ok),
       t('hud.chat.context.cancel'),
       () => {
@@ -130,14 +152,17 @@ export class BagItemActionMenu {
     );
   }
 
-  // Step one: the enchants that consume the chosen reagent. Each row shows the
-  // localized enchant name, its target slot, and the per-reagent affordability;
+  // Step one: the enchants that consume the chosen reagent, grouped into the
+  // three tier sections and slot-sorted inside each (enchant_apply_view.ts owns
+  // both decisions). Each row shows the localized enchant name, WHAT THE ENCHANT
+  // DOES (its stat bonus, inline: the picker also lives on touch, where there is
+  // no hover to reveal it), its target slot, and the per-reagent affordability;
   // an unaffordable enchant is shown but not selectable (aria-disabled).
   private openEnchantPicker(reagentItemId: string, x: number, y: number): void {
     const world = this.deps.world();
-    const picks = enchantsForReagent(world.inventory, reagentItemId);
+    const sections = enchantSectionsForReagent(world.inventory, reagentItemId);
     const title = esc(t('hudChrome.enchanting.pickerTitle'));
-    if (picks.length === 0) {
+    if (sections.length === 0) {
       this.paint(
         [{ html: esc(t('hudChrome.enchanting.noEnchants')), disabled: true }],
         x,
@@ -148,28 +173,46 @@ export class BagItemActionMenu {
       );
       return;
     }
-    const rows = picks.map((pick) => {
-      // Each unsatisfied reagent carries a class the CSS tints (the crafting
-      // window's reagent-line idiom): redundant beside the have/required
-      // counts the text already carries, so the color is a hint, never the
-      // only signal (fairness).
-      const reagentsHtml = pick.reagents
-        .map(
-          (reagent) =>
-            `<span class="ctx-reagent${reagent.have >= reagent.required ? '' : ' unsat'}">${esc(
-              t('hudChrome.crafting.reagentLine', {
-                name: itemDisplayName(ITEMS[reagent.itemId]),
-                have: reagent.have,
-                required: reagent.required,
-              }),
-            )}</span>`,
-        )
-        .join(', ');
-      const html = `${esc(t(enchantNameKey(pick.enchantId)))}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>`;
-      return pick.affordable
-        ? { act: `enchant:${pick.enchantId}`, html }
-        : { html, disabled: true };
-    });
+    const rows: PickerRow[] = [];
+    for (const section of sections) {
+      rows.push({ html: esc(t(section.titleKey)), header: true });
+      for (const pick of section.rows) {
+        // Each unsatisfied reagent carries a class the CSS tints (the crafting
+        // window's reagent-line idiom): redundant beside the have/required
+        // counts the text already carries, so the color is a hint, never the
+        // only signal (fairness).
+        const reagentsHtml = pick.reagents
+          .map(
+            (reagent) =>
+              `<span class="ctx-reagent${reagent.have >= reagent.required ? '' : ' unsat'}">${esc(
+                t('hudChrome.crafting.reagentLine', {
+                  name: itemDisplayName(ITEMS[reagent.itemId]),
+                  have: reagent.have,
+                  required: reagent.required,
+                }),
+              )}</span>`,
+          )
+          .join(', ');
+        // The effect line reuses the item tooltip's own stat-line key and stat
+        // names, so "+4 Stamina" reads identically here and on the enchanted
+        // copy's tooltip; no new i18n for the effect itself.
+        const effectsText = pick.effects
+          .map((effect) =>
+            t('itemUi.tooltip.stat', {
+              value: itemNumber(effect.value),
+              stat: itemStatName(effect.stat),
+            }),
+          )
+          .join(', ');
+        const effectHtml = effectsText
+          ? `<span class="ctx-item-effect">${esc(effectsText)}</span>`
+          : '';
+        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>`;
+        rows.push(
+          pick.affordable ? { act: `enchant:${pick.enchantId}`, html } : { html, disabled: true },
+        );
+      }
+    }
     this.paint(
       rows,
       x,
@@ -180,13 +223,25 @@ export class BagItemActionMenu {
     );
   }
 
-  // Step two: the held items eligible as the enchant target (def slot matches,
-  // a non-already-enchanted copy is held), then world.applyEnchant.
+  // Step two: every eligible enchant target, then world.applyEnchant. Two
+  // families, in one list: the bagged copies (def slot matches, a
+  // non-already-enchanted copy is held) and the WORN copies (the same match
+  // against the equipped set), since worn gear is enchanted in place and needs no
+  // unequip / re-equip round trip. A worn row carries its equipment slot both in
+  // its label and in its dispatch, which is what separates a dual-wielded pair or
+  // two rings holding identical copies.
   private openTargetPicker(enchantId: string, x: number, y: number): void {
     const world = this.deps.world();
     const targets = enchantTargets(world.inventory, enchantId);
+    // The self entity mirror carries equippedInstances in BOTH worlds (offline
+    // Sim and online ClientWorld), the same read the paperdoll tooltip uses.
+    const worn = wornEnchantTargets(
+      world.equipment,
+      world.entities.get(world.playerId)?.equippedInstances ?? {},
+      enchantId,
+    );
     const title = esc(t('hudChrome.enchanting.targetTitle'));
-    if (targets.length === 0) {
+    if (targets.length === 0 && worn.length === 0) {
       this.paint(
         [{ html: esc(t('hudChrome.enchanting.noTargets')), disabled: true }],
         x,
@@ -197,19 +252,34 @@ export class BagItemActionMenu {
       );
       return;
     }
-    const rows = targets.map((target) => {
-      const def = ITEMS[target.itemId];
-      return {
+    const nameOf = (itemId: string): string => {
+      const def = ITEMS[itemId];
+      return esc(def ? itemDisplayName(def) : itemId);
+    };
+    const rows = [
+      ...worn.map((target) => ({
+        act: `worn:${target.slot}`,
+        html: `${nameOf(target.itemId)}<span class="ctx-item-meta">${esc(
+          t('hudChrome.enchanting.wornTag', { slot: this.deps.slotName(target.slot) }),
+        )}</span>`,
+      })),
+      ...targets.map((target) => ({
         act: `target:${target.itemId}`,
-        html: esc(def ? itemDisplayName(def) : target.itemId),
-      };
-    });
+        html: nameOf(target.itemId),
+      })),
+    ];
     this.paint(
       rows,
       x,
       y,
       (act) => {
-        world.applyEnchant(act.slice('target:'.length), enchantId);
+        if (act.startsWith('worn:')) {
+          const slot = act.slice('worn:'.length) as EquipSlot;
+          const target = worn.find((row) => row.slot === slot);
+          if (target) world.applyEnchant(target.itemId, enchantId, slot);
+        } else {
+          world.applyEnchant(act.slice('target:'.length), enchantId);
+        }
         this.deps.afterAction();
       },
       title,
@@ -219,10 +289,11 @@ export class BagItemActionMenu {
 
   // Build the #ctx-menu popup: an optional title, then the rows. A row with an
   // `act` is a selectable .ctx-item[data-act]; a `disabled` row is inert
-  // (bindContextMenuActions ignores rows without data-act). Reuses the shared
-  // placement + action binding, never a bespoke menu.
+  // (bindContextMenuActions ignores rows without data-act); a `header` row is a
+  // non-interactive tier caption that also NAMES the group of rows under it.
+  // Reuses the shared placement + action binding, never a bespoke menu.
   private paint(
-    rows: { act?: string; html: string; disabled?: boolean }[],
+    rows: PickerRow[],
     x: number,
     y: number,
     onActivate: (act: string) => void,
@@ -232,10 +303,23 @@ export class BagItemActionMenu {
     const el = this.deps.ctxMenu.element();
     el.classList.toggle(CTX_MENU_PICKER_CLASS, picker);
     let html = titleHtml ? `<div class="ctx-title">${titleHtml}</div>` : '';
+    // A tier caption opens a labelled GROUP around the rows beneath it, so the
+    // ladder reaches assistive tech too: the rows are role=button stops
+    // (bindContextMenuActions), and without the group a keyboard user would step
+    // row to row never learning which tier they are in. The caption itself stays
+    // unfocusable; it is the group's accessible name, not a menu item.
+    let openGroup = false;
+    let sectionSeq = 0;
     for (const row of rows) {
-      if (row.act) html += `<div class="ctx-item" data-act="${row.act}">${row.html}</div>`;
+      if (row.header) {
+        if (openGroup) html += '</div>';
+        const id = `ctx-section-${sectionSeq++}`;
+        html += `<div class="ctx-group" role="group" aria-labelledby="${id}"><div class="ctx-section" id="${id}">${row.html}</div>`;
+        openGroup = true;
+      } else if (row.act) html += `<div class="ctx-item" data-act="${row.act}">${row.html}</div>`;
       else html += `<div class="ctx-item" aria-disabled="true">${row.html}</div>`;
     }
+    if (openGroup) html += '</div>';
     el.innerHTML = html;
     el.style.display = 'block';
     const naturalReserve = 80 + rows.length * (this.deps.isMobileLayout() ? 48 : 32);

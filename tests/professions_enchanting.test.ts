@@ -8,6 +8,7 @@ import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
 import { characterDerivedStats } from '../src/sim/entity';
 import { removePreferFungible } from '../src/sim/items';
+import { CRAFT_THROTTLE_MAX_PER_WINDOW } from '../src/sim/professions/action_throttle';
 import {
   disenchantItem,
   disenchantYield,
@@ -847,5 +848,238 @@ describe('quality-tiered enchanting gains', () => {
     // Derivation: shard-derived tier 2 (still capability 1 at skill 25.5),
     // at/above capability -> full 1. Total 25.5 + 1 = 26.5.
     expect(meta.craftSkills.enchanting).toBe(26.5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The WORN arm: enchant equipped gear in place, no unequip / re-equip dance.
+// Every gate mirrors the bagged arm; the only structural differences are that
+// the merged payload lands on PlayerMeta.equipmentInstance[slot] (so the stats
+// must be re-baked on the spot) and that there is deliberately NO bag-capacity
+// gate, since nothing enters the bags.
+// ---------------------------------------------------------------------------
+const WORN_SWORD = 'eastbrook_arming_sword';
+const WORN_ENCHANT = 'enchant_weapon_might'; // itemSlot 'mainhand', 5x arcane_dust, str +2
+const WORN_HELMET_ENCHANT = 'enchant_helmet_fortitude';
+
+/** A sim whose player is wearing `itemId` in `slot`, with `dust` arcane_dust in
+ *  the bags. Goes through the REAL equip path so equipmentInstance is populated
+ *  exactly as it is in play. */
+function wearing(
+  slot: 'mainhand' | 'offhand' | 'ring1' | 'ring2',
+  itemId: string,
+  opts: { cls?: 'warrior' | 'rogue'; dust?: number; instance?: Record<string, unknown> } = {},
+) {
+  const sim = new Sim({ seed: 7, playerClass: opts.cls ?? 'rogue', autoEquip: false });
+  const pid = sim.playerId;
+  if (opts.instance) sim.ctx.addItemInstance(itemId, opts.instance as never, pid);
+  else sim.addItem(itemId, 1, pid);
+  sim.equipItemToSlot(itemId, slot, pid);
+  if (opts.dust) sim.addItem('arcane_dust', opts.dust, pid);
+  return { sim, pid, meta: sim.players.get(pid)! };
+}
+
+describe('apply enchant to WORN gear (in place)', () => {
+  it('enchants the worn copy in place: payload on the slot, stats re-baked, reagents consumed', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    expect(meta.equipment.mainhand).toBe(WORN_SWORD);
+    expect(meta.equipmentInstance.mainhand).toBeUndefined(); // a plain worn copy
+    const strBefore = sim.player.stats.str;
+
+    const result = resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand');
+    expect(result).toEqual({ ok: true, itemId: WORN_SWORD, enchantId: WORN_ENCHANT });
+
+    // The payload landed on the WORN slot, marked with the enchant id.
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
+    expect(meta.equipmentInstance.mainhand?.rolled?.stats).toEqual({ str: 2 });
+    // The piece never left the slot and no copy appeared in the bags.
+    expect(meta.equipment.mainhand).toBe(WORN_SWORD);
+    expect(sim.countItem(WORN_SWORD, pid)).toBe(0);
+    // The stat pipeline saw it: recalcPlayerStats folded rolled.stats in.
+    expect(sim.player.stats.str).toBe(strBefore + 2);
+    // Reagents came out of the bags.
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+  });
+
+  it('merges onto a worn signed masterwork copy: signer and masterwork survive, stats sum', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, {
+      dust: 5,
+      instance: { signer: 'Tester', rolled: { masterwork: true, stats: { str: 3 } } },
+    });
+    const strBefore = sim.player.stats.str;
+    expect(strBefore).toBeGreaterThan(0);
+
+    expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(true);
+
+    const worn = meta.equipmentInstance.mainhand;
+    expect(worn?.signer).toBe('Tester');
+    expect(worn?.rolled?.masterwork).toBe(true);
+    // ADDITIVE: the masterwork bake (3) plus the enchant (2), never a replace.
+    expect(worn?.rolled?.stats).toEqual({ str: 5 });
+    expect(worn?.enchant).toBe(WORN_ENCHANT);
+    // The masterwork bake was already live in the stats, so only the enchant's
+    // +2 is new here.
+    expect(sim.player.stats.str).toBe(strBefore + 2);
+  });
+
+  it('draws ZERO rng, so it cannot shift the shared stream (determinism)', () => {
+    // The worn arm is rng-free by construction: no roll, no capacity model.
+    // Pinned mechanically, because a future "enchant can fail" roll here would
+    // silently move every downstream draw in the same tick, and nothing else in
+    // the suite would go red. Two sims on the SAME seed: one applies the worn
+    // enchant, one does not; the next draw off each rng must be identical.
+    const a = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    const b = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    expect(resolveApplyEnchant(a.sim.ctx, a.pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(
+      true,
+    );
+    expect(a.sim.ctx.rng.next()).toBe(b.sim.ctx.rng.next());
+  });
+
+  it('denies an already-enchanted worn copy with no side effect (double-enchant blocked)', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, {
+      dust: 10,
+      instance: { enchant: 'enchant_weapon_agility', rolled: { stats: { agi: 2 } } },
+    });
+    const strBefore = sim.player.stats.str;
+    const result = resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('not_held');
+    // Untouched: the original enchant, the reagents, and the stats.
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe('enchant_weapon_agility');
+    expect(meta.equipmentInstance.mainhand?.rolled?.stats).toEqual({ agi: 2 });
+    expect(sim.countItem('arcane_dust', pid)).toBe(10);
+    expect(sim.player.stats.str).toBe(strBefore);
+  });
+
+  it('denies an EMPTY slot and a slot wearing a different item, reagents untouched', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    // offhand is empty.
+    const empty = resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'offhand');
+    expect(empty.ok).toBe(false);
+    expect(empty.reason).toBe('not_held');
+    expect(meta.equipmentInstance.offhand).toBeUndefined();
+
+    // mainhand is worn, but by a DIFFERENT item than the one named.
+    const other = resolveApplyEnchant(sim.ctx, pid, 'keen_dirk', WORN_ENCHANT, 'mainhand');
+    expect(other.ok).toBe(false);
+    expect(other.reason).toBe('not_held');
+    expect(meta.equipmentInstance.mainhand).toBeUndefined();
+    expect(sim.countItem('arcane_dust', pid)).toBe(5);
+  });
+
+  it('denies a wrong-slot enchant on the worn arm exactly like the bagged arm', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    const result = resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_HELMET_ENCHANT, 'mainhand');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('wrong_slot');
+    expect(meta.equipmentInstance.mainhand).toBeUndefined();
+    expect(sim.countItem('arcane_dust', pid)).toBe(5);
+  });
+
+  it('reagents are all-or-nothing from the BAGS: one short denies and consumes nothing', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 4 }); // needs 5
+    const result = resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('insufficient_materials');
+    expect(sim.countItem('arcane_dust', pid)).toBe(4);
+    expect(meta.equipmentInstance.mainhand).toBeUndefined();
+  });
+
+  it('draws from the SAME action throttle as the bagged arm', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    // Spend the whole shared window on bagged salvages, then the worn enchant
+    // must deny at the boundary with nothing consumed.
+    sim.addItem(WORN_SWORD, CRAFT_THROTTLE_MAX_PER_WINDOW, pid);
+    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW; i++) sim.salvageItem(WORN_SWORD, pid);
+    const result = resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('throttled');
+    expect(sim.countItem('arcane_dust', pid)).toBe(5);
+    expect(meta.equipmentInstance.mainhand).toBeUndefined();
+  });
+
+  it('has NO bag-capacity gate: a completely full pack still enchants worn gear', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    // Fill every remaining bag slot with DISTINCT item ids (each takes its own
+    // slot, whatever its stack size) until nothing more fits.
+    const filler = Object.keys(ITEMS).filter((id) => id !== 'arcane_dust' && id !== WORN_SWORD);
+    let i = 0;
+    while (i < filler.length && sim.ctx.canAddItem(filler[i], 1, pid)) {
+      sim.addItem(filler[i], 1, pid);
+      i++;
+    }
+    // The premise the #2350 capacity gate keys on is now false: a fresh copy of
+    // this very item could not be minted into the bags at all.
+    expect(sim.ctx.canAddItem(WORN_SWORD, 1, pid)).toBe(false);
+    // The worn arm never mints into the bags (it rewrites the worn slot and only
+    // SPENDS reagents), so a full pack is irrelevant to it.
+    expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(true);
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
+  });
+
+  it('dual wield, identical copies: the mainhand slot enchants ONLY the mainhand copy', () => {
+    // A rogue dual-wielding two copies of the SAME item id: the item id alone
+    // cannot name a target, which is exactly why the discriminator is a slot.
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    sim.addItem(WORN_SWORD, 1, pid);
+    sim.equipItemToSlot(WORN_SWORD, 'offhand', pid);
+    expect(meta.equipment.mainhand).toBe(WORN_SWORD);
+    expect(meta.equipment.offhand).toBe(WORN_SWORD);
+
+    expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(true);
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
+    // The other hand is untouched: no payload leaked across slots.
+    expect(meta.equipmentInstance.offhand).toBeUndefined();
+  });
+
+  it('two rings, identical copies: the ring2 slot enchants ONLY the ring2 copy', () => {
+    const RING = 'seal_of_the_nine_oaths'; // slot 'ring', covers ring1 AND ring2
+    const RING_ENCHANT = 'enchant_ring_spirit';
+    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: false });
+    const pid = sim.playerId;
+    while (sim.player.level < 20) sim.grantXp(xpForLevel(sim.player.level));
+    sim.addItem(RING, 2, pid);
+    sim.equipItemToSlot(RING, 'ring1', pid);
+    sim.equipItemToSlot(RING, 'ring2', pid);
+    const meta = sim.players.get(pid)!;
+    expect(meta.equipment.ring1).toBe(RING);
+    expect(meta.equipment.ring2).toBe(RING);
+    for (const reagent of ENCHANTS[RING_ENCHANT].reagents) {
+      sim.addItem(reagent.itemId, reagent.count, pid);
+    }
+
+    expect(resolveApplyEnchant(sim.ctx, pid, RING, RING_ENCHANT, 'ring2').ok).toBe(true);
+    expect(meta.equipmentInstance.ring2?.enchant).toBe(RING_ENCHANT);
+    expect(meta.equipmentInstance.ring1).toBeUndefined();
+  });
+
+  it('the applyEnchant command entry point forwards the slot and stashes the result', () => {
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    sim.applyEnchant(WORN_SWORD, WORN_ENCHANT, 'mainhand', pid);
+    expect(sim.lastEnchantResult?.ok).toBe(true);
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
+    // Same skill gain as the bagged arm (dust enchant tier 0, capability 0 ->
+    // full base gain).
+    expect(meta.craftSkills.enchanting).toBe(ENCHANTING_SKILL_GAIN);
+  });
+
+  it('an in-place enchant on worn gear survives a save/reload round-trip', () => {
+    const { sim, pid } = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(true);
+    const boostedStr = sim.player.stats.str;
+
+    const state = sim.serializeCharacter(pid);
+    expect(state).not.toBeNull();
+    // The in-place write went through equipmentInstance, which is exactly the
+    // optional CharacterState field the equip path persists, so the enchant is
+    // durable without any new save shape.
+    expect(state!.equipmentInstance?.mainhand?.enchant).toBe(WORN_ENCHANT);
+    expect(state!.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(2);
+
+    const reloadedSim = new Sim({ seed: 7, playerClass: 'rogue', noPlayer: true });
+    const reloadedPid = reloadedSim.addPlayer('rogue', 'Reload', { state: state! });
+    expect(reloadedSim.meta(reloadedPid)!.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
+    expect(reloadedSim.entities.get(reloadedPid)!.stats.str).toBe(boostedStr);
   });
 });

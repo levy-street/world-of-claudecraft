@@ -15,7 +15,12 @@ import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
-import { type BankBonusSource, STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
+import {
+  type BankBonusSource,
+  ONLINE_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
+  STABLE_TIMER_WIRE_VERSION,
+} from '../src/world_api';
 import type {
   AccountChatMuteStatus,
   AccountCosmetics,
@@ -52,6 +57,7 @@ const WS_AUTH_ERROR = {
   tooManyConnections: 'too many connections from your network',
   forceRename: 'This character must be renamed before entering the world.',
   authTimedOut: 'authentication timed out',
+  incompatibleWorldLayout: ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
 } as const;
 
 // The first auth frame must arrive within this window or the socket is closed.
@@ -236,8 +242,16 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       rejectHandshake(ws, WS_AUTH_ERROR.badAuthMessage);
       return;
     }
-    if (msg?.t !== 'auth') {
-      rejectHandshake(ws, WS_AUTH_ERROR.authRequired);
+    if (msg?.t !== ONLINE_WORLD_AUTH_TYPE) {
+      const authType = msg?.t;
+      const isWorldAuthAttempt =
+        authType === 'auth' ||
+        (typeof authType === 'string' &&
+          (authType === 'auth-world' || authType.startsWith('auth-world-')));
+      rejectHandshake(
+        ws,
+        isWorldAuthAttempt ? WS_AUTH_ERROR.incompatibleWorldLayout : WS_AUTH_ERROR.authRequired,
+      );
       return;
     }
 

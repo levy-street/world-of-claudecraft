@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
-  CAMPS,
+  BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
+  getActiveWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
-  ZONES,
 } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isInSowfieldShell } from '../sim/vale_cup_layout';
@@ -22,6 +22,12 @@ import {
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import {
+  eastbrookGrassExclusions,
+  insideDressingExclusion,
+  insideEastbrookGrassExclusion,
+  insideGrassHubExclusion,
+} from './foliage_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { grassTuftTexture } from './textures';
 
@@ -181,6 +187,7 @@ const ROCK_SNOWLINE_Y = 34; // terrain snow tint starts at h~34 (terrain.ts)
 // grass/dressing refuse cliff faces (mirrors ROCK_SLOPE_START in terrain.ts)
 const GRASS_MAX_SLOPE = 0.62;
 const GRASS_SLOPE_EPS = 1.2;
+const GRASS_BUILDING_PADDING = 0.35;
 
 export interface FoliageView {
   group: THREE.Group;
@@ -1157,6 +1164,7 @@ function tooSteep(x: number, z: number, seed: number): boolean {
 
 function generateDressing(seed: number): DressingSpot[] {
   const out: DressingSpot[] = [];
+  const activeContent = getActiveWorldContent();
   const xHalf = WORLD_MAX_X - 16;
   const step = dressStep();
   const scaleBoost = GFX.leanFoliage ? DRESS_LOW_SCALE_BOOST : 1;
@@ -1168,21 +1176,7 @@ function generateDressing(seed: number): DressingSpot[] {
       if (r > density) continue;
       const x = gx + (hashAt(gx, gz, 42) - 0.5) * step;
       const z = gz + (hashAt(gx, gz, 43) - 0.5) * step;
-      let blocked = false;
-      for (const zone of ZONES) {
-        if (Math.hypot(x - zone.hub.x, z - zone.hub.z) < zone.hub.radius + 4) {
-          blocked = true;
-          break;
-        }
-      }
-      if (blocked) continue;
-      for (const camp of CAMPS) {
-        if (Math.hypot(x - camp.center.x, z - camp.center.z) < camp.radius + 2) {
-          blocked = true;
-          break;
-        }
-      }
-      if (blocked) continue;
+      if (insideDressingExclusion(activeContent.zones, activeContent.camps, x, z)) continue;
       if (roadDistance(x, z) < 4) continue;
       if (terrainHeight(x, z, seed) < waterLevelAt(x, z) + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
@@ -1411,6 +1405,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const chunkHalfDiag = Math.SQRT2 * GRASS_CHUNK_SIZE * 0.5;
   const buildBudgetMs = GRASS_CHUNK_BUILD_BUDGET_MS;
   const cacheLimit = GFX.leanFoliage ? GRASS_CHUNK_CACHE_LIMIT_LOW : GRASS_CHUNK_CACHE_LIMIT_HIGH;
+  // Snapshot the active world's town exclusions once. The canonical Eastbrook
+  // layout is included only for the built-in world; editor/custom maps never
+  // inherit its fixed coordinates.
+  const activeContent = getActiveWorldContent();
+  const townExclusions = eastbrookGrassExclusions(
+    activeContent.props.buildings,
+    activeContent === BUILTIN_WORLD,
+    activeContent.services?.noticeboards ?? [],
+  );
 
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
@@ -1512,15 +1515,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (h < waterLevelAt(x, z) + 1.6) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
-        let nearHub = false;
-        for (const zn of ZONES) {
-          if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 15) {
-            nearHub = true;
-            break;
-          }
-        }
-        if (nearHub) continue;
+        if (insideGrassHubExclusion(activeContent.zones, x, z)) continue;
         if (roadDistance(x, z) < 3.2) continue;
+        if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
         if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
         const s = (lush ? 0.55 : 0.45) + r * (lush ? 1.1 : 1);
         q.setFromAxisAngle(up, r * 12.4);

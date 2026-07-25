@@ -105,6 +105,7 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     delveRun: null,
     cfg: { seed: 42, playerClass: 'warrior' },
     playerId: 1,
+    stationPlacements: STATIONS,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
   } as unknown as IWorld;
 }
@@ -293,6 +294,7 @@ describe('station markers (Professions 2.0)', () => {
       delveRun: null,
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
+      stationPlacements: STATIONS,
       questState: () => 'unavailable',
       nodeHarvestableByMe: () => true,
       ...over,
@@ -326,6 +328,27 @@ describe('station markers (Professions 2.0)', () => {
     const world = makeStationWorld('sim');
     (world.player as unknown as { pos: { x: number; z: number } }).pos = { x: 0, z: 150 };
     expect(stationMarkers(world)).toHaveLength(0);
+  });
+
+  it('reads the active IWorld station surface, so a custom world leaks no built-in markers', () => {
+    expect(stationMarkers(makeStationWorld('sim', { stationPlacements: [] }))).toEqual([]);
+    const custom = [
+      {
+        id: 'custom_station',
+        type: 'forge',
+        zoneId: 'custom',
+        pos: { x: 2, z: 12 },
+        masterNpcId: 'custom_master',
+      },
+    ] as const;
+    const markers = stationMarkers(makeStationWorld('sim', { stationPlacements: custom }));
+    expect(markers).toEqual([
+      {
+        kind: 'station',
+        mx: S / 2 - (2 - VIEW_POS.x) * PPY,
+        my: S / 2 - (12 - VIEW_POS.z) * PPY,
+      },
+    ]);
   });
 
   it('is host- and viewer-invariant: shapes and unrelated stub state never change the set', () => {
@@ -408,6 +431,7 @@ describe('gather-node markers: the locked dimension', () => {
       delveRun: null,
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
+      stationPlacements: STATIONS,
       inventory: opts.inventory ?? [],
       nodeHarvestableByMe: opts.harvestable ?? (() => true),
       questState: () => 'unavailable',

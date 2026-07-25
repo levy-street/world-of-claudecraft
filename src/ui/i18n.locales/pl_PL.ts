@@ -239,11 +239,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Odzyskiwanie to brat zwykłych ludzi dla rozkładania zaklęć: te same bronie i zbroje, nie wymaga umiejętności i żadnej nie daje, zwracając zwykłe rzemieślnicze złomy według jakości zamiast czegokolwiek arkanicznego. Może to robić każdy, zaklinacz czy nie. Gdy trzymasz przedmiot wart rozbicia, wybór jest prosty: od rzadkiego wzwyż rozkładanie zaklęć jest bezwzględnie lepszą ofertą, a przy pospolitym oba plony sprzedają się za mniej więcej tyle samo, więc rozbijaj w stronę materiału, którego faktycznie potrzebujesz.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Górnictwo wydobywa rudę wprost ze skalnego łona świata: miedź we Wschodniej Dolinie Potoku, żelazo w Bagnie Mirefen i osmium w górach Szczytu Cierni, zasilając rzemiosła kowalskie. Dostępne dla każdego od 1 poziomu, bez żadnych wymagań, śledzone na własnym liczniku do limitu 100.',
+    'Górnictwo wydobywa rudę wprost ze skalnego łona świata: miedź w Dolinie Wschodniego Strumienia, żelazo na Trzęsawisku Mokrzawia i osmium wysoko na Wyżynach Ciernistego Szczytu, zasilając rzemiosła kowalskie. Dostępne dla każdego od 1 poziomu: wystarczy kilof górniczy w torbach, za 20 miedziaków w ośrodku każdej strefy. Śledzone na własnym liczniku do limitu 100.',
   'guide.profPages.gatherIntro.logging':
-    'Drwalstwo wycina drewno z drzewostanów we wszystkich trzech strefach: żelaznokora we Wschodniej Dolinie Potoku, jesionowe drewno w Bagnie Mirefen i Wysoka Sosna na Szczycie Cierni - surowiec na drzewca, kije i stół inżyniera. Dostępne dla każdego od 1 poziomu, śledzone na własnym liczniku do limitu 100.',
+    'Drwalstwo wycina drewno z drzewostanów we wszystkich trzech strefach: żelaznokora w Dolinie Wschodniego Strumienia, jesionowe drewno na Trzęsawisku Mokrzawia i wysoka sosna na Wyżynach Ciernistego Szczytu, surowiec na drzewca, kije i stół inżyniera. Dostępne dla każdego od 1 poziomu, o ile masz w torbach siekierę drwala (20 miedziaków w ośrodku każdej strefy), śledzone na własnym liczniku do limitu 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Zielarstwo zbiera to, co rośnie dziko: lśnolist we Wschodniej Dolinie Potoku, złotolist w Bagnie Mirefen i słoneczny płatek na Szczycie Cierni - liść i łodygę, dzięki którym aptekarskie warsztaty nie stoją. Dostępne dla każdego od 1 poziomu, śledzone na własnym liczniku do limitu 100.',
+    'Zielarstwo zbiera to, co rośnie dziko: lśnolist w Dolinie Wschodniego Strumienia, złotolist na Trzęsawisku Mokrzawia i słoneczny płatek na Wyżynach Ciernistego Szczytu, liść i łodygę, dzięki którym aptekarskie warsztaty nie stoją. Dostępne dla każdego od 1 poziomu, o ile masz w torbach sierp zielarski (20 miedziaków w ośrodku każdej strefy), śledzone na własnym liczniku do limitu 100.',
   'guide.profPages.gatherIntro.fishing':
     'Wędkarstwo to wyjątek wśród zawodów zbierackich, i to najgłębszy: prawdziwa mini-gra z braniem i holowaniem, własne tabele połowów w każdej strefie i limit biegłości 200 - dwukrotnie wyższy niż u pozostałych. Kup wędkę, stań nad otwartą wodą i rzuć.',
   'guide.profPages.rhythmHeading': 'Rytm zbierania',
@@ -256,7 +256,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Gdzie są węzły, ich poziom, potrzebne narzędzie i co dają. Każdy węzeł odradza się dla ciebie {respawn} sekund po twoim własnym zebraniu, a ten timer jest tylko twój: inny zbieracz pracujący przy tym samym węźle nigdy nie opóźnia twojego, więc nie ma wyścigów o węzły ani wyczekiwania. Każda strefa wyżej w hierarchii przynosi lepszy materiał z twardszego podłoża.',
   'guide.profPages.toolsHeading': 'Narzędzia',
   'guide.profPages.toolsNote':
-    'Gołe ręce liczą się jako narzędzie poziomu 1, więc żaden węzeł poziomu 1 w grze nie wymaga narzędzia. Drabina sprzedawców obejmuje poziomy 1 do 3; narzędzie musi być tylko w twoich torbach, nie ma slotu na ekwipunek ani trwałości, więc każde to jednorazowy zakup. Liczy się tylko poziom przy bramce: kolor rzadkości narzędzia jest kosmetyczny.\n\nPowyżej drabiny sprzedawców są dwa wytwarzane narzędzia, poziomy 4 i 5, produkowane w warsztacie przez inżynierów i nigdy niesprzedawane przez żadnego BNP. Żaden dzisiejszy węzeł nie wymaga więcej niż poziomu 3, więc ich wartość teraz to szybkość: najlepsze narzędzie sprowadza rzucanie do dolnej granicy na niższych węzłach i będzie biletem wstępu, gdy pojawi się wyższy poziom terenu.',
+    'Każdy węzeł wymaga narzędzia swojego fachu w twoich torbach, także na poziomie 1: bez kilofa nie ma rudy, bez wędki nie ma ryb. Drabina sprzedawców obejmuje poziomy od 1 do 3 i jest dostępna w ośrodku każdej strefy; wystarczy, że narzędzie leży w twoich torbach, nie ma slotu na ekwipunek ani trwałości, więc każde to jednorazowy zakup. Liczy się tylko poziom przy bramce: kolor rzadkości narzędzia jest kosmetyczny.\n\nPowyżej drabiny sprzedawców są dwa wytwarzane narzędzia, poziomy 4 i 5, produkowane w warsztacie przez inżynierów i nigdy niesprzedawane przez żadnego BNP. Żaden dzisiejszy węzeł nie wymaga więcej niż poziomu 3, więc ich wartość teraz to szybkość: najlepsze narzędzie sprowadza rzucanie do dolnej granicy na niższych węzłach i będzie biletem wstępu, gdy pojawi się wyższy poziom terenu.',
   'guide.profPages.toolCrafted': 'Wytworzony ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Niesprzedawany',
@@ -410,59 +410,59 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'cardDuel.yourTurn': 'Zagraj kartę',
   'entities.abilities.arcane_surge.description':
     'Przepuszcza przez wroga falę surowego eteru, zadając {damage} obrażeń. Każde rzucenie czaru pozostawia Eteryczny Ładunek zwiększający obrażenia i prędkość rzucania kolejnego Aether Surge (o 5% szybciej za każdy), lecz znacznie podnoszący koszt many, maksymalnie do 4; Eteryczne strzały wydają te ładunki. Każde rzucenie może również naładować Eteryczny Pęd, czyniąc następny Aether Surge darmowym i dwukrotnie szybszym w rzucaniu.',
-  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.arcane_surge.name': 'Przypływ eteru',
   'entities.abilities.blizzard.description':
     'Przywołuje burzę lodową nad wybranym obszarem na 6 sek., zadając {damage} obrażeń od Mrozu co sekundę i spowalniając wrogów o 40%. Każdy trafiony wróg skraca odnowienie Frozen Orb o 0,5 sek., maksymalnie 3 sek. na rzucenie. (Mróz)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Zamieć',
+  'entities.abilities.brain_freeze.name': 'Zamrożenie mózgu',
   'entities.abilities.dragons_breath.description':
     'Przytrzymaj, aby zebrać rosnący stożek płomieni, a następnie go wypuść. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Trafieni wrogowie zostają zdezorientowani, a obrażenia zrywają efekt; maksymalny ładunek zawsze trafia krytycznie i wlicza się raz do Gorącej Serii. (Ogień)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Smoczy oddech',
   'entities.abilities.fingers_of_frost.description':
     'Szronowa lanca ma 15% szansy na przyznanie Palców Mrozu, do 2 ładunków: następna Ice Lance traktuje cel jako zamrożony. (Mróz)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Palce mrozu',
   'entities.abilities.fireball_form.description':
     'Przemienia się w płonący żar, zwiększając prędkość ruchu o {buff}%. W tej postaci nie możesz atakować ani rzucać czarów. Ponownie rzuć, aby powrócić do normalnej formy.',
-  'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.fireball_form.name': 'Postać żaru',
+  'entities.abilities.flurry.name': 'Zimowy bicz',
+  'entities.abilities.frozen_orb.name': 'Zmrożona kula',
   'entities.abilities.glacial_front.description':
     'Przytrzymaj, aby zebrać rosnący front lodowy, a następnie go wypuść w stożku. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Wszyscy trafieni wrogowie zostają spowolnieni o 50% na 4 sek.; maksymalny ładunek dodatkowo unieruchamia ich na 1 sek. (Mróz)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Front lodowcowy',
   'entities.abilities.glacial_spike.description':
     'Przywołuje masywny sopel lodu, pochłaniając 5 Soplii, aby zadać {damage} obrażeń od Mrozu i zamrozić cel w miejscu na 4 sek. (Mróz)',
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Lodowcowy kolec',
   'entities.abilities.ice_lance.description':
     'Ciska odłamkiem lodu, zadając {damage} obrażeń od Mrozu, potrojonych przeciwko zamrożonemu celowi. Wydaje Palce Mrozu lub ładunek Winterowego Chłodu, traktując cel jako zamrożony. (Mróz)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Lodowa lanca',
   'entities.abilities.perfect_moment.description':
     'Uchwyć swój doskonały moment: natychmiast zyskujesz 4 Eteryczne Ładunki i przez 10 sek. Eteryczne strzały ich nie wydają. (Chronomancja)',
-  'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.perfect_moment.name': 'Idealna chwila',
+  'entities.abilities.shatter.name': 'Krucha ruina',
   'entities.abilities.temporal_acceleration.description':
     'Przyspiesza bieg czasu dla twojej grupy lub rajdu, zwiększając prędkość ataku, rzucania czarów i kanalizowania o 30% przez 15 sek. Sojusznicy, na których niedawno działała Temporal Acceleration lub Bębny Wojny, są zbyt wyczerpani, aby skorzystać z efektu. (Chronomancja)',
-  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_acceleration.name': 'Przyspieszenie czasu',
   'entities.abilities.temporal_barrier.description':
     'Przesuwa cel o chwilę poza teraźniejszość, tworząc temporalną powłokę pochłaniającą {damage} obrażeń przez 10 sek., po czym oś czasu powraca do normy.',
-  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_barrier.name': 'Czasowa bariera',
   'entities.abilities.temporal_cascade.description':
     'Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. (Chronomancja)',
-  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_cascade.name': 'Czasowa kaskada',
   'entities.abilities.temporal_echo.description':
     'Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. część zadawanych przez ciebie obrażeń Arkanów jest przekierowywana przez echo, aby go leczyć.',
-  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_echo.name': 'Czasowe echo',
   'entities.abilities.temporal_hourglass.description':
     'Umieszcza temporalną klepsydrę w wybranym miejscu. Pod wrogiem zawiesza go na {hostilePveDuration} sek. w PvE lub {hostilePvpDuration} sek. w PvP, uniemożliwiając wszelkie działania; obrażenia przerywają efekt. U twoich stóp lub pod sojusznikiem z grupy nadaje stazę na {duration} sek., zapobiega obrażeniom i działaniom, przywraca {healing}% maksymalnego zdrowia i przyspiesza regenerację czasu odnowienia o {selfCooldownRecovery}% dla ciebie lub {allyCooldownRecovery}% dla sojusznika. Na pustej ziemi klepsydra czeka {groundDuration} sek. i działa na pierwszą prawidłową postać, która na nią wejdzie. Korzystną aurę można zdjąć ręcznie.',
-  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_hourglass.name': 'Klepsydra zawieszenia',
   'entities.abilities.temporal_mend.description':
     'Przyciąga sojusznika chwilę naprzód w czasie, lecząc {damage} punktów zdrowia, gdy ciało osiada w swym zdrowszym, przyszłym wcieleniu. (Sygnatura Chronomancji)',
-  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_mend.name': 'Czasowe ukojenie',
   'entities.abilities.temporal_reversal.description':
     'Przewija oś czasu poległego sojusznika, przywracając go do życia przy jego ciele z częścią zdrowia i many, nawet w środku walki. (Chronomancja)',
-  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_reversal.name': 'Odwrócenie czasu',
   'entities.abilities.temporal_rewind.description':
     'Wysyła arkaniczną falę przez twoją grupę lub rajd, cofając czas, aby przywrócić 30% obrażeń zadanych każdemu sojusznikowi w zasięgu 40 jardów w ciągu ostatnich 5 sekund (maksymalnie 35% ich maksymalnego zdrowia). Nie może być trafieniem krytycznym. (Chronomancja)',
-  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.abilities.temporal_rewind.name': 'Cofnięcie czasu',
   'entities.items.sootscale_mantle.name': 'Peleryna Poczernionej Łuski',
   'entities.items.arcane_dust.name': 'Pył Kuranta',
   'entities.items.arcane_essence.name': 'Esencja Kuranta',
@@ -2871,7 +2871,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.garrote.name': 'Drut na gardło',
   'entities.abilities.ghost_wolf.description':
     'Przemienia cię w Shadewolfa, zwiększając prędkość ruchu o 40% na 10 min.',
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': 'Cieniowilk',
   'entities.abilities.gouge.description':
     'Uderza w cel, zadając {damage} obrażeń i obezwładniając go na 4 sek. Każde obrażenie przerywa efekt. Przyznaje 1 punkt kombinacji.',
   'entities.abilities.gouge.name': 'Cios w oko',
@@ -2912,7 +2912,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.instant_poison.name': 'Ukąszenie żmii',
   'entities.abilities.judgement.description':
     'Uwalnia twoją aktywną pieczęć na wrogu, zużywając ją, by zadać zmagazynowane obrażenia od Świętości.',
-  'entities.abilities.judgement.name': 'Verdict',
+  'entities.abilities.judgement.name': 'Wyrok',
   'entities.abilities.kidney_shot.description':
     'Ruch kończący, który ogłusza cel. Trwa o 1 sek dłużej za każdy punkt kombinacji.',
   'entities.abilities.kidney_shot.name': 'Cios poniżej pasa',
@@ -3049,7 +3049,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Spadające niebo',
   'entities.abilities.stealth.description':
     'Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 50% wolniej. Atak lub otrzymanie obrażeń przerywa Duskveil. Rzuć ponownie, aby się ujawnić.',
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Zasłona zmierzchu',
   'entities.abilities.stormstrike.description':
     'Kieruje burzę przez twoją broń, natychmiast uderzając za obrażenia broni plus {damage}.',
   'entities.abilities.stormstrike.name': 'Uderzenie przodków',
@@ -9100,7 +9100,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Pełny przyrost umiejętności',
   'hudChrome.crafting.difficultyNone': 'Żadnego przyrostu umiejętności',
   'hudChrome.crafting.difficultyReduced': 'Zmniejszony przyrost umiejętności',
-  'hudChrome.crafting.enchantedLine': 'Zaczarowany',
   'hudChrome.crafting.makersMark': 'Stworzone przez {name}',
   'hudChrome.crafting.masterworkSeal': 'Arcydzieło',
   'hudChrome.crafting.masterworkToast': 'Arcydzieło! {name}',
@@ -9204,4 +9203,59 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': 'Odwiąż {name} za {fee}',
   'hudChrome.unbind.unbound':
     'Odwiązano {name} za {fee}. Przywiąże się ponownie przy kolejnej transakcji.',
+  'hud.combat.auraGainOther': '{target} zyskuje {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Tkanina',
+  'hudChrome.corpseHarvest.components.meat': 'Mięso',
+  'hudChrome.crafting.noBagSpace': 'Nie masz miejsca na wytworzony przedmiot.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Nie masz miejsca na magiczne materiały.',
+  'hudChrome.enchanting.enchantNoSpace': 'Nie masz miejsca na zaklęty przedmiot.',
+  'hudChrome.enchanting.salvageNoSpace': 'Nie masz miejsca na odzyskane materiały.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'W zasięgu nie ma żadnej kępy ziół.',
+  'hudChrome.gathering.noNodeNearby.logging': 'W zasięgu nie ma żadnego drzewostanu.',
+  'hudChrome.gathering.noNodeNearby.mining': 'W zasięgu nie ma żadnej żyły rudy.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Wymaga sierpa zielarskiego',
+  'hudChrome.gathering.requiresTool.logging': 'Wymaga siekiery drwala',
+  'hudChrome.gathering.requiresTool.mining': 'Wymaga kilofa górniczego',
+  'hudChrome.gathering.toolRequired.fishing': 'Potrzebujesz wędki, aby zarzucić żyłkę.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Potrzebujesz sierpa zielarskiego, aby zebrać tę kępę ziół.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Potrzebujesz siekiery drwala, aby ściąć ten drzewostan.',
+  'hudChrome.gathering.toolRequired.mining':
+    'Potrzebujesz kilofa górniczego, aby wydobyć rudę z tej żyły.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Wędka (poziom {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Narzędzie zielarskie (poziom {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Narzędzie drwalskie (poziom {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Narzędzie górnicze (poziom {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Odblokowuje bogatsze połowy przy umiejętności rybołówstwa {skill} i wyższej.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Ryby biorą nawet o {seconds} s wcześniej.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Wydłuża czas na wyciągnięcie ryby o {seconds} s.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Wymagana do łowienia ryb.',
+  'hudChrome.gathering.toolTooltip.speed': 'Szybciej zbiera z węzłów poniżej poziomu {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Wymagany do zbierania kęp ziół do poziomu {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Wymagana do ścinania drzewostanów do poziomu {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Wymagany do wydobywania żył rudy do poziomu {tier}.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': 'Użycie: zbierz zioła z pobliskiej kępy.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Użycie: zetnij pobliski drzewostan.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Użycie: wydobądź rudę z pobliskiej żyły.',
+  'hudChrome.noticeboard.empty': 'Wygląda na to, że nic tu nie wywieszono.',
+  'hudChrome.training.pendingAria': 'Trwa nauka: {name}',
+  'hudChrome.training.statePending': 'Trwa nauka',
+  'hudChrome.unbind.noSpace': 'Nie masz miejsca na odwiązaną kopię.',
+  'loading.incompatibleWorldVersion':
+    'Wersje gry i serwera są niezgodne. Odśwież lub zaktualizuj grę, a potem spróbuj ponownie.',
+  'loading.messageRateExceeded':
+    'Rozłączono cię za zbyt szybkie wysyłanie akcji. Odczekaj chwilę i zaloguj się ponownie.',
+  'perfNudge.dismiss': 'Zamknij',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Gra działa bez akceleracji GPU, przez co jest bardzo wolna. Zaktualizuj sterowniki karty graficznej, a następnie uruchom grę ponownie. W systemie Windows ustaw też dla gry tryb „Wysoka wydajność” w Ustawienia > System > Ekran > Grafika.',
+  'perfNudge.hardwareAccelerationWeb':
+    'Gra działa bez akceleracji GPU, przez co jest bardzo wolna. Włącz akcelerację sprzętową w ustawieniach przeglądarki, zaktualizuj sterowniki karty graficznej, a następnie uruchom przeglądarkę ponownie.',
+  'perfNudge.integratedGpu':
+    'Gra działa na zintegrowanym (energooszczędnym) układzie graficznym. Jeśli ten komputer ma też kartę graficzną do gier, ustaw dla przeglądarki tryb „Wysoka wydajność” w Ustawienia > System > Ekran > Grafika w systemie Windows, a następnie uruchom przeglądarkę ponownie. Aplikacja na komputery wybiera kartę do gier automatycznie.',
+  'worldContent.noticeboardName': 'Tablica ogłoszeń',
 };

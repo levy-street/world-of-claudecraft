@@ -194,6 +194,11 @@ export class CharacterVisual {
   private shadowProxy: THREE.Mesh | null = null;
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
+  /** The halo's build-time shared additive material. Re-snapshots after a
+   *  swap must record THIS handle, not the live material: a swap under an
+   *  active overlay (ghost/shadowform/...) would otherwise capture the
+   *  overlay clone as "original" and the golden ring never restores. */
+  private haloBaseMaterial: THREE.Material | THREE.Material[] | null = null;
   private weaponAuraMeshes: THREE.Mesh[] = [];
   private weaponAuraOn = false;
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
@@ -269,7 +274,11 @@ export class CharacterVisual {
     // swaps restore it like any other mesh.
     if (this.def.halo !== undefined) {
       const head = this.model.getObjectByName('head');
-      head?.add(buildHalo(this.def.halo));
+      if (head) {
+        const halo = buildHalo(this.def.halo, this.def.haloUpOffset, this.def.haloRadius);
+        this.haloBaseMaterial = halo.material;
+        head.add(halo);
+      }
     }
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
@@ -284,7 +293,9 @@ export class CharacterVisual {
 
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh) return;
+      // the halo is an unlit additive FX quad: keep it out of the caster list
+      // or this sweep overwrites buildHalo's castShadow = false
+      if (!mesh.isMesh || mesh.name === 'class_halo') return;
       mesh.castShadow = true;
       mesh.receiveShadow = false;
       // skinned bounds drift outside bind-pose spheres; entity-level culling
@@ -682,8 +693,12 @@ export class CharacterVisual {
       const mesh = o as THREE.Mesh;
       // VFX rig meshes stay out of the ghost/restore cycle: their shader
       // materials are owned by the weapon-skin handle, never overlaid.
-      if (mesh.isMesh && !mesh.userData.weaponVfxMesh)
-        this.originalMaterials.set(mesh, mesh.material);
+      if (!mesh.isMesh || mesh.userData.weaponVfxMesh) return;
+      // applyMaterials skips the halo, so mid-overlay its live material is
+      // the overlay clone; snapshot the build-time handle instead
+      const original =
+        mesh.name === 'class_halo' ? (this.haloBaseMaterial ?? mesh.material) : mesh.material;
+      this.originalMaterials.set(mesh, original);
     });
     this.applyVisualMaterials();
   }
@@ -1056,6 +1071,14 @@ export class CharacterVisual {
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh || mesh.userData.weaponVfxMesh) return;
+      if (mesh.name === 'class_halo') {
+        // unlit additive FX quad: never a shadow caster, but its material must
+        // stay in the snapshot so ghost/stealth swaps restore it; snapshot the
+        // build-time handle, since the live one may be an overlay clone when
+        // the swap happens mid-ghost/shadowform
+        this.originalMaterials.set(mesh, this.haloBaseMaterial ?? mesh.material);
+        return;
+      }
       mesh.castShadow = this.shadowOn;
       mesh.receiveShadow = false;
       if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;

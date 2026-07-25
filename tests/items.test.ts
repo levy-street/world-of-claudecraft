@@ -168,7 +168,10 @@ describe('items.useItem', () => {
     sim.addItem('elixir_of_the_bear', 1, pid);
 
     items.useItem(ctx, 'elixir_of_the_bear', pid);
-    expect(p.auras.some((a) => a.id === 'elixir_elixir_of_the_bear')).toBe(true);
+    const aura = p.auras.find((a) => a.id === 'elixir_buff_sta');
+    expect(aura).toBeTruthy();
+    expect(aura!.kind).toBe('buff_sta');
+    expect(aura!.value).toBe(12);
     expect(sim.countItem('elixir_of_the_bear', pid)).toBe(0);
   });
 

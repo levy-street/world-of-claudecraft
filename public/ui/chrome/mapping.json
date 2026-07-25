@@ -1,0 +1,26 @@
+{
+  "license": "Project asset, rights reserved. Generated for World of ClaudeCraft; see the HUD chrome launcher icons row in CREDITS.md.",
+  "iconSize": 128,
+  "note": "Painted art for the HUD's primary destinations (DESIGN.md section 6): the side-rail launchers, the mobile bottom bar, and the mobile More tray. Each file basename is a UiIconName listed in CHROME_ART_IDS (src/ui/chrome_icon_art.ts). Authored on a flat magenta (#FF00FF) key, then keyed to alpha, trimmed, centered, and encoded by `npm run assets:chrome`. WebP only; tests/chrome_icons.test.ts gates the tree, the alpha, the 128px square, and the wiring in both directions.",
+  "source": "Google Gemini image generation, one shared art direction: painted classic-MMO icon, pale gold and warm bronze with cream parchment, thick dark outline, simple silhouette that reads at 24px, light from the top left.",
+  "entries": [
+    { "icon": "arena", "motif": "Crossed swords over a round shield" },
+    { "icon": "bags", "motif": "Leather satchel drawn shut with a gold cord" },
+    { "icon": "ball", "motif": "Hand-stitched leather ball (the Vale Cup)" },
+    { "icon": "book", "motif": "Clasped tome with gold corners (the Book of Deeds)" },
+    { "icon": "cards", "motif": "Two fanned playing cards with gilded backs" },
+    { "icon": "character", "motif": "Plumed helm and pauldrons, front facing" },
+    { "icon": "chest", "motif": "Open treasure chest spilling coins (the store)" },
+    { "icon": "crafting", "motif": "Anvil with a smith's hammer" },
+    { "icon": "dfinder", "motif": "Stone dungeon archway with a raised portcullis" },
+    { "icon": "donate", "motif": "Solid gold heart" },
+    { "icon": "emote", "motif": "Round gold medallion with a smiling face in relief" },
+    { "icon": "leaderboard", "motif": "Three-step podium under a crown" },
+    { "icon": "map", "motif": "Rolled parchment map with a drawn compass" },
+    { "icon": "professions", "motif": "Stone mortar and pestle with herb leaves" },
+    { "icon": "questlog", "motif": "Unrolled scroll with a wax seal and a quill" },
+    { "icon": "social", "motif": "Two figures shoulder to shoulder before a banner" },
+    { "icon": "spellbook", "motif": "Open spellbook with an arcane glow" },
+    { "icon": "talents", "motif": "Talent tree, three gems joined by branches" }
+  ]
+}

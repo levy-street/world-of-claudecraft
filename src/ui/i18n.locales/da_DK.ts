@@ -240,11 +240,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bjærgning er den almuemandsmæssige fætter til affortrylling: de samme våben og rustning, ingen færdighed krævet og ingen optjent, der returnerer ordinært håndværksskrot efter kvalitet i stedet for noget arkan. Enhver kan gøre det, fortryllet eller ej. Når du holder et stykke værd at bryde, er valget enkelt: fra sjælden og op er affortrylling strengt den bedre aftale, mens ved almindelig sælger de to udbytter for omtrent det samme hos en handlende, så bry mod det materiale du faktisk har brug for.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Minedrift trækker malm direkte ud af verdens klipper: kobber i Østbæk Dal, jern i Mirefen Mose og osmium i Tornetop-Højderne, der fodrer smedehåndværkene. Åbent for alle fra niveau 1, ingen som helst adgangsbetingelse, spores på sin egen tæller op til en grænse på 100.',
+    'Minedrift trækker malm direkte ud af verdens klipper: kobber i Østbæk Dal, jern i Mirefen Mose og osmium i Tornetop-Højderne, der fodrer smedehåndværkene. Åbent for alle fra niveau 1: der skal blot en minehakke i dine tasker, 20 kobber i enhver hub-by. Spores på sin egen tæller op til en grænse på 100.',
   'guide.profPages.gatherIntro.logging':
-    'Skovhugst fælder tømmer fra skovstande i alle tre zoner: jernbark i Østbæk Dal, asketræ i Mirefen Mose og højfyrre i Tornetop-Højderne, råmaterialerne til skafter, stave og ingeniørens bænk. Åbent for alle fra niveau 1, spores på sin egen tæller op til en grænse på 100.',
+    'Skovhugst fælder tømmer fra skovstande i alle tre zoner: jernbark i Østbæk Dal, asketræ i Mirefen Mose og højfyrre i Tornetop-Højderne, råmaterialerne til skafter, stave og ingeniørens bænk. Åbent for alle fra niveau 1 med en skovhuggeøkse i dine tasker (20 kobber i enhver hub-by), spores på sin egen tæller op til en grænse på 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Urtekundskab indsamler det, der vokser vildt: glansbladet i Østbæk Dal, guldblad i Mirefen Mose og solkrone i Tornetop-Højderne, blade og stilke der holder apotekerhandelen i gang. Åbent for alle fra niveau 1, spores på sin egen tæller op til en grænse på 100.',
+    'Urtekundskab indsamler det, der vokser vildt: glansbladet i Østbæk Dal, guldblad i Mirefen Mose og solkrone i Tornetop-Højderne, blade og stilke der holder apotekerhandelen i gang. Åbent for alle fra niveau 1 med en urtesegl i dine tasker (20 kobber i enhver hub-by), spores på sin egen tæller op til en grænse på 100.',
   'guide.profPages.gatherIntro.fishing':
     'Fiskeri er det anderledes fag blandt indsamlingsfagene, og det dybeste: et rigtigt bid-og-hiv-minispil, sine egne fangsttabeller i hver zone, og en færdighedsgrænse på 200, det dobbelte af de andre. Køb en stang, vend dig mod åbent vand, og kast.',
   'guide.profPages.rhythmHeading': 'Indsamlingsrytmen',
@@ -257,7 +257,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Hvor ressourcekilderne er, deres niveau, det værktøj de kræver, og hvad de giver. Enhver ressourcekilde genskabes for dig {respawn} sekunder efter din egen høst, og den timer er kun din: en anden indsamler, der arbejder den samme ressourcekilde, forsinker aldrig din, så der er ingen kappestrid om ressourcekilder og ingen lejrsidderi. Hver zone højere på stigen giver et bedre materiale fra hårdere terræn.',
   'guide.profPages.toolsHeading': 'Værktøjer',
   'guide.profPages.toolsNote':
-    "Bare hænder tæller som et niveau 1-værktøj, så enhver niveau 1-ressourcekilde i spillet kræver slet intet værktøj. Forhandlerstigen dækker niveau 1 til 3; et værktøj skal blot være i dine tasker, der er ingen udstyringsplads og ingen holdbarhed, så hvert er et engangskøb. Kun niveau'et betyder noget for adgangsbetingelsen: et værktøjs sjældenhedsfarve er kosmetisk.\n\nOver forhandlerstigen sidder to fremstillede værktøjer, niveau 4 og niveau 5, lavet på værkstedet af ingeniører og aldrig solgt af nogen NPC. Ingen ressourcekilde i dag kræver mere end niveau 3, så deres værdi lige nu er fart: et topværktøj fastholder kastet ved dets gulv på lavere ressourcekilder, og det vil være adgangskortet, når terræn af højere niveau ankommer.",
+    'Enhver ressourcekilde kræver sit fags værktøj i dine tasker, også niveau 1: ingen hakke, ingen malm, og ingen stang, ingen fisk. Forhandlerstigen dækker niveau 1 til 3 og føres i enhver hub-by; et værktøj skal blot være i dine tasker, der er ingen udstyringsplads og ingen holdbarhed, så hvert er et engangskøb. Kun niveauet betyder noget for adgangsbetingelsen: et værktøjs sjældenhedsfarve er kosmetisk.\n\nOver forhandlerstigen sidder to fremstillede værktøjer, niveau 4 og niveau 5, lavet på værkstedet af ingeniører og aldrig solgt af nogen NPC. Ingen ressourcekilde i dag kræver mere end niveau 3, så deres værdi lige nu er fart: et topværktøj fastholder kastet ved dets gulv på lavere ressourcekilder, og det vil være adgangskortet, når terræn af højere niveau ankommer.',
   'guide.profPages.toolCrafted': 'Fremstillet ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Sælges ikke',
@@ -410,59 +410,59 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'cardDuel.yourTurn': 'Spil et kort',
   'entities.abilities.arcane_surge.description':
     'Leder en bølge af rå æter gennem fjenden og påfører {damage} skade. Hvert kast efterlader en Arkan Ladning, der øger din næste Aether Surges skade og kastetempo (5% hurtigere for hvert) men øger manakostningen kraftigt, stablet op til 4; Æterpile bruger ladningerne. Hvert kast kan også udløse Æterrus, der gør din næste Aether Surge gratis og dobbelt så hurtig at kaste.',
-  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.arcane_surge.name': 'Arkan kraft',
   'entities.abilities.blizzard.description':
     'Kalder en isstorm ned over målområdet i 6 sek., gør {damage} Frost-skade hvert sekund og sætter fjenders hast ned med 40%. Hver fjende ramt reducerer Frozen Orb med 0,5 sek., op til 3 sek. pr. kast. (Frost)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Snestorm',
+  'entities.abilities.brain_freeze.name': 'Hjernefrys',
   'entities.abilities.dragons_breath.description':
     'Hold for at samle et stadig bredere åndedrag af flammer, og slip det derefter i en kegle. Længere opladning rækker længere og gør mere skade. Fjender ramt bliver desorienterede og skade afbryder effekten; maksimal opladning rammer altid kritisk og tæller én gang mod Hed Stime. (Ild)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Drageånde',
   'entities.abilities.fingers_of_frost.description':
     'Rimlanse har 15% chance for at give Fingers of Frost, op til 2 ladninger: din næste Ice Lance behandler målet som frosset. (Frost)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Frostens Fingre',
   'entities.abilities.fireball_form.description':
     'Forvandl dig til en brændende glød og forøg bevægelseshastighed med {buff}%. Du kan ikke angribe eller kaste trolddom, mens du er forvandlet. Genudkast for at vende tilbage til din normale form.',
-  'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.fireball_form.name': 'Glødform',
+  'entities.abilities.flurry.name': 'Vinterpisk',
+  'entities.abilities.frozen_orb.name': 'Frossen Kugle',
   'entities.abilities.glacial_front.description':
     'Hold for at samle en stadig bredere front af frost, og slip den derefter i en kegle. Længere opladning rækker længere og gør mere skade. Alle fjender ramt sættes ned med 50% i 4 sek.; maksimal opladning rodfæster dem også i 1 sek. (Frost)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Gletsjerfront',
   'entities.abilities.glacial_spike.description':
     'Fremkald en massiv isspids og forbrug 5 Istapper for at gøre {damage} Frost-skade og fryse målet på stedet i 4 sek. (Frost)',
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Gletsjerspyd',
   'entities.abilities.ice_lance.description':
     'Kast en isskarv og gør {damage} Frost-skade, tredoblet mod et frosset mål. Bruger Fingers of Frost eller en ladning af Vinterkulden til at behandle målet som frosset. (Frost)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Islanse',
   'entities.abilities.perfect_moment.description':
     'Grib dit perfekte øjeblik: få øjeblikkeligt 4 Arkane Ladninger, og i 10 sek. bruger Æterpile dem ikke. (Kronomantik)',
-  'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.perfect_moment.name': 'Perfekt Øjeblik',
+  'entities.abilities.shatter.name': 'Skrøbelig Undergang',
   'entities.abilities.temporal_acceleration.description':
     'Fremskynder tidens gang for din gruppe eller raid og øger angrebshastighed, kastetempo og kanaliseringstempo med 30% i 15 sek. Allierede der for nylig blev påvirkede af Temporal Acceleration eller Krigstrommer er for udmattede til at have gavn af det. (Kronomantik)',
-  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_acceleration.name': 'Tidsacceleration',
   'entities.abilities.temporal_barrier.description':
     'Forskydes målet et hjerteslag ud af nutiden, og et tidsskjold absorberer {damage} skade i 10 sek. inden tidslinjen snapper tilbage.',
-  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_barrier.name': 'Tidsbarriere',
   'entities.abilities.temporal_cascade.description':
     'Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkooer for at helbrede dem. (Kronomantik)',
-  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_cascade.name': 'Tidskaskade',
   'entities.abilities.temporal_echo.description':
     'Mærker en alliert med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. trækkes en del af den Arkane skade du gør tilbage gennem ekkoet for at helbrede dem.',
-  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_echo.name': 'Tidsekko',
   'entities.abilities.temporal_hourglass.description':
     'Placer et tidssandur på det valgte sted. Under en fjende suspenderer det dem i {hostilePveDuration} sek. i PvE eller {hostilePvpDuration} sek. i PvP og forhindrer alle handlinger; skade bryder effekten. Ved dine fødder eller under en gruppealliert giver det stasis i {duration} sek., forhindrer skade og handlinger, gendanner {healing}% af maksimalt helbred og får nedkølingerne til at gendannes {selfCooldownRecovery}% hurtigere for dig eller {allyCooldownRecovery}% hurtigere for en alliert. På tomt terræn venter sandurret i {groundDuration} sek. og påvirker den første gyldige enhed, der træder på det. Den gavnlige aura kan fjernes manuelt.',
-  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_hourglass.name': 'Standsningens Timeglas',
   'entities.abilities.temporal_mend.description':
     'Trækker en alliert et øjeblik fremad i tiden og gendanner {damage} helbred, mens kroppen falder til ro i sin sundere fremtidige form. (Kronomantik-signatur)',
-  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_mend.name': 'Tidsheling',
   'entities.abilities.temporal_reversal.description':
     'Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved deres krop med en del af deres helbred og mana, selv midt i kamp. (Kronomantik)',
-  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_reversal.name': 'Tidsvending',
   'entities.abilities.temporal_rewind.description':
     'Sender en arkan bølge gennem din gruppe eller raid og tilbagespoler tiden for at gendanne 30% af den skade, hver alliert inden for 40 yards tog de seneste 5 sekunder (op til 35% af deres maksimale helbred). Kan ikke være en kritisk effekt. (Kronomantik)',
-  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.abilities.temporal_rewind.name': 'Tilbagespoling',
   'entities.items.sootscale_mantle.name': 'Sodskæl-Kappe',
   'entities.items.arcane_dust.name': 'Arkan Støv',
   'entities.items.arcane_essence.name': 'Arkan Essens',
@@ -981,7 +981,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blink.name': 'Flimmertrin',
   'entities.abilities.bloodlust.name': 'Krigstrommer',
   'entities.abilities.chain_lightning.name': 'Gaffellyn',
-  'entities.abilities.chaos_bolt.name': 'Ruinbolt',
+  'entities.abilities.chaos_bolt.name': 'Undergangslyn',
   'entities.abilities.cloak_of_shadows.name': 'Skyggekappe',
   'entities.abilities.cone_of_cold.name': 'Frostfej',
   'entities.abilities.curse_of_exhaustion.name': 'Blytung forbandelse',
@@ -2714,7 +2714,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.garrote.name': 'Strubetråd',
   'entities.abilities.ghost_wolf.description':
     'Forvandler dig til en Shadewolf og øger bevægelseshastigheden med 40% i 10 min.',
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': 'Skyggeulv',
   'entities.abilities.gouge.description':
     'Rammer målet for {damage} skade og sætter det ud af spillet i 4 sek. Enhver skade bryder effekten. Giver 1 kombopoint.',
   'entities.abilities.gouge.name': 'Øjenstik',
@@ -2773,7 +2773,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_shield.name': 'Tordenværn',
   'entities.abilities.mark_of_the_wild.description':
     'Anbringer Wildward på et venligt mål og øger rustningen med {buff} i 30 min.',
-  'entities.abilities.mark_of_the_wild.name': 'Wildward',
+  'entities.abilities.mark_of_the_wild.name': 'Vildværn',
   'entities.abilities.maul.description':
     'Et lemlæstende angreb, der øger nærkampsskaden med {damage} og skaber en stor mængde trussel. Aktiveres ved dit næste hug. Kun i Bruin-form.',
   'entities.abilities.maul.name': 'Knogleknus',
@@ -2889,7 +2889,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Himmelfald',
   'entities.abilities.stealth.description':
     'Skjuler dig i skyggerne: fjender lægger knap mærke til dig, men du bevæger dig 50 % langsommere. Angreb eller skade bryder Duskveil. Kast igen for at træde frem.',
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Skumringsslør',
   'entities.abilities.stormstrike.description':
     'Kanaliserer stormen gennem dit våben og rammer øjeblikkeligt for våbenskade plus {damage}.',
   'entities.abilities.stormstrike.name': 'Forfædrenes Slag',
@@ -9000,7 +9000,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimal færdighedsgevinst',
   'hudChrome.crafting.difficultyNone': 'Ingen færdighedsforøgelse',
   'hudChrome.crafting.difficultyReduced': 'Reduceret færdighedsforøgelse',
-  'hudChrome.crafting.enchantedLine': 'Fortryllet',
   'hudChrome.crafting.gatheredBy': 'Indsamlet af {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} ved {station} kan lære dig flere {craft}-opskrifter.',
@@ -9139,4 +9138,60 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.title': 'Aflæsning: {name}',
   'hudChrome.unbind.unbindAria': 'Aflæs {name} for {fee}',
   'hudChrome.unbind.unbound': 'Aflæste {name} for {fee}. Det vil binde igen ved næste handel.',
+  'hud.combat.auraGainOther': '{target} får {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Stof',
+  'hudChrome.corpseHarvest.components.meat': 'Kød',
+  'hudChrome.crafting.noBagSpace': 'Du har ikke plads til den fremstillede genstand.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Du har ikke plads til de arkane materialer.',
+  'hudChrome.enchanting.enchantNoSpace': 'Du har ikke plads til den fortryllede genstand.',
+  'hudChrome.enchanting.salvageNoSpace': 'Du har ikke plads til de bjærgede materialer.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'Der er ingen urteplette inden for rækkevidde.',
+  'hudChrome.gathering.noNodeNearby.logging': 'Der er ingen tømmerlund inden for rækkevidde.',
+  'hudChrome.gathering.noNodeNearby.mining': 'Der er ingen malmåre inden for rækkevidde.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Kræver en urtesegl',
+  'hudChrome.gathering.requiresTool.logging': 'Kræver en skovhuggeøkse',
+  'hudChrome.gathering.requiresTool.mining': 'Kræver en minehakke',
+  'hudChrome.gathering.toolRequired.fishing':
+    'Du har brug for en fiskestang for at kaste linen ud.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Du har brug for en urtesegl for at samle denne plette.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Du har brug for en skovhuggeøkse for at fælde denne lund.',
+  'hudChrome.gathering.toolRequired.mining': 'Du har brug for en minehakke for at høste denne åre.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Fiskestang (niveau {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Urtekundskabsværktøj (niveau {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Skovhugstværktøj (niveau {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Minedriftsværktøj (niveau {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Låser op for rigere fangsttabeller ved fiskerifærdighed {skill} og derover.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Fisk bider op til {seconds}s tidligere.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Forlænger indhivningsvinduet med {seconds}s.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Kræves for at fiske.',
+  'hudChrome.gathering.toolTooltip.speed':
+    'Indsamler hurtigere ved ressourcekilder under niveau {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Kræves for at samle urtepletter op til niveau {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Kræves for at fælde tømmerlunde op til niveau {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Kræves for at høste malmårer op til niveau {tier}.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': 'Brug: Saml fra en nærliggende urteplette.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Brug: Fæld en nærliggende tømmerlund.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Brug: Høst en nærliggende malmåre.',
+  'hudChrome.noticeboard.empty': 'Der ser ikke ud til at være slået noget op.',
+  'hudChrome.training.pendingAria': '{name} læres',
+  'hudChrome.training.statePending': 'Læres',
+  'hudChrome.unbind.noSpace': 'Du har ikke plads til det aflæste eksemplar.',
+  'loading.incompatibleWorldVersion':
+    'Spillets og serverens versioner er ikke kompatible. Genindlæs eller opdater, og prøv derefter igen.',
+  'loading.messageRateExceeded':
+    'Forbindelsen blev afbrudt, fordi du sendte handlinger for hurtigt. Vent et øjeblik, og log ind igen.',
+  'perfNudge.dismiss': 'Afvis',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Spillet kører uden GPU-acceleration, hvilket gør det meget langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.',
+  'perfNudge.hardwareAccelerationWeb':
+    'Spillet kører uden GPU-acceleration, hvilket gør det meget langsomt. Aktiver hardwareacceleration i din browsers indstillinger, opdater dine grafikdrivere og genstart derefter din browser.',
+  'perfNudge.integratedGpu':
+    "Spillet kører på den integrerede (strømbesparende) GPU. Hvis denne computer også har en gaming-GPU, skal du på Windows indstille din browser til Høj ydeevne under Indstillinger, System, Skærm, Grafik og derefter genstarte browseren. Skrivebordsappen vælger selv gaming-GPU'en.",
+  'worldContent.noticeboardName': 'Opslagstavle',
 };

@@ -83,10 +83,14 @@ significant-contributor name glow lives there too. Narrow helpers:
 - **VFX:** add an effect to `vfx.ts` (emit into the pooled particle cloud; HDR
   colour multipliers via `hdr()` so it blooms on composer tiers). Sprite atlas
   cells are append-only (`SPRITE_FILES`/`SPR` must stay in sync).
-- **Models are real GLB assets** (CC0 kits plus Tripo-generated models: props,
-  foliage, dungeon, fish, gather nodes, mailbox, delve props,
-  characters), loaded via `assets/loader.ts`, then baked/merged/instanced at
-  build time.
+- **Models are real GLB assets** (CC0 kits, Tripo-generated models, and the
+  image-to-GLB procedural exporters: props, foliage, dungeon, fish, gather nodes,
+  mailbox, delve props, characters, the Eastbrook town kit), loaded via
+  `assets/loader.ts`, then baked/merged/instanced at build time. A new
+  reference-image asset follows the `image-to-glb` skill
+  (`.claude/skills/image-to-glb/SKILL.md`): exporter under `scripts/assets/`, a
+  parsed-GLB contract test, and its own thin `src/render/<asset>.ts` adapter
+  (exemplars: `banker_chest.ts`, `eastbrook_grand_armoury.ts`, `noticeboard.ts`).
 ## Asset loading (`assets/`)
 `loader.ts` (`loadGltf`/`loadHdr`/`loadTexture`, one parse per URL) plus these
 rules, all CI-enforced:

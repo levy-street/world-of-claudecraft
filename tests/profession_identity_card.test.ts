@@ -572,13 +572,13 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
     // compares the live set's signature against the last painted one.
     expect(hud).toContain("$('#crafting-window').style.display === 'flex' &&");
     expect(hud).toMatch(
-      /stationTypesSignature\(inRangeStationTypes\(sim\.player\.pos, sim\.activeMobileStationCraft\)\) !==\s*this\.lastCraftingStationSig/,
+      /stationTypesSignature\(\s*inRangeStationTypes\(\s*sim\.stationPlacements,\s*sim\.player\.pos,\s*sim\.activeMobileStationCraft,?\s*\),\s*\) !==\s*this\.lastCraftingStationSig/,
     );
   });
 
   it('renderCrafting records the painted signature and feeds the same set to the view', () => {
     expect(hud).toMatch(
-      /const inRangeStations = inRangeStationTypes\(\s*this\.sim\.player\.pos,\s*this\.sim\.activeMobileStationCraft,\s*\);/,
+      /const inRangeStations = inRangeStationTypes\(\s*this\.sim\.stationPlacements,\s*this\.sim\.player\.pos,\s*this\.sim\.activeMobileStationCraft,\s*\);/,
     );
     expect(hud).toContain('this.lastCraftingStationSig = stationTypesSignature(inRangeStations);');
   });

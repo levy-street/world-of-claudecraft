@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  FURY_ENTITY_ID,
   FURY_NPC,
   FURY_STOCK,
   WARFARE_ITEMS,
@@ -157,9 +158,12 @@ describe('FURY WARFARE stock', () => {
     for (const id of FURY_STOCK) expect(ITEMS[id], id).toBe(WARFARE_ITEMS[id]);
 
     expect(NPCS.fury).toBe(FURY_NPC);
+    expect(FURY_ENTITY_ID).toBe(1_000_000_001);
     expect(NPCS.fury.name).toBe('FURY');
     expect(NPCS.fury.title).toBe('Honor Quartermaster');
-    expect(NPCS.fury.pos).toEqual({ x: -11, z: 1 });
+    expect(NPCS.fury.pos).toEqual({ x: -22.5, z: -7.5 });
+    expect(NPCS.fury.facing).toBe(1.171280832795522);
+    expect(NPCS.fury.dynamic).toBe(true);
     expect(NPCS.fury.vendorItems).toEqual(FURY_STOCK);
   });
 

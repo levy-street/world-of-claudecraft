@@ -241,11 +241,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tháo dỡ là người anh em bình dân của hủy pháp khắc: cùng vũ khí và giáp đó, không cần kỹ năng và không nhận kỹ năng, trả về phế liệu chế tác thông thường theo phẩm chất thay vì bất cứ thứ gì huyền bí. Ai cũng làm được, có pháp khắc hay không. Khi bạn cầm trên tay một món đáng phá, lựa chọn rất đơn giản: từ hiếm trở lên, hủy pháp khắc luôn là lựa chọn tốt hơn, còn ở phổ thông thì hai sản lượng bán cho NPC xấp xỉ nhau, nên hãy chọn theo loại nguyên liệu bạn thực sự cần.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Khai Khoáng kéo quặng thẳng từ đá của thế giới: đồng ở Eastbrook Vale, sắt ở Mirefen Marsh, và osmium trên Thornpeak Heights, nuôi sống các nghề rèn đúc. Mở cho mọi người từ cấp 1, không có rào cản nào, theo dõi trên bộ đếm riêng đến giới hạn 100.',
+    'Khai Khoáng kéo quặng thẳng từ đá của thế giới: đồng ở Thung Lũng Đông Khê, sắt ở Đầm Lầy Bùn Sâu, và osmium trên Cao Nguyên Đỉnh Gai, nuôi sống các nghề rèn đúc. Mở cho mọi người từ cấp 1: chỉ cần một cây cuốc khai khoáng trong túi, giá 20 đồng ở bất kỳ thị trấn trung tâm nào. Theo dõi trên bộ đếm riêng đến giới hạn 100.',
   'guide.profPages.gatherIntro.logging':
-    'Đốn Gỗ chặt gỗ từ các rừng cây ở cả ba khu vực: sắt mộc ở Eastbrook Vale, tro mộc ở Mirefen Marsh, và thông cao ở Thornpeak Heights, nguyên liệu thô cho cán vũ khí, gậy, và bàn thợ cơ khí. Mở cho mọi người từ cấp 1, theo dõi trên bộ đếm riêng đến giới hạn 100.',
+    'Đốn Gỗ chặt gỗ từ các rừng cây ở cả ba khu vực: sắt mộc ở Thung Lũng Đông Khê, tro mộc ở Đầm Lầy Bùn Sâu, và thông cao ở Cao Nguyên Đỉnh Gai, nguyên liệu thô cho cán vũ khí, gậy, và bàn thợ cơ khí. Mở cho mọi người từ cấp 1 với một cây rìu đốn gỗ trong túi (20 đồng ở bất kỳ thị trấn trung tâm nào), theo dõi trên bộ đếm riêng đến giới hạn 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Thảo Dược Học thu hái những gì mọc hoang: sheenleaf ở Eastbrook Vale, goldleaf ở Mirefen Marsh, và sunpetal ở Thornpeak Heights, lá và thân nuôi sống các nghề bào chế. Mở cho mọi người từ cấp 1, theo dõi trên bộ đếm riêng đến giới hạn 100.',
+    'Thảo Dược Học thu hái những gì mọc hoang: sheenleaf ở Thung Lũng Đông Khê, goldleaf ở Đầm Lầy Bùn Sâu, và sunpetal ở Cao Nguyên Đỉnh Gai, lá và thân nuôi sống các nghề bào chế. Mở cho mọi người từ cấp 1 với một cái liềm thảo dược trong túi (20 đồng ở bất kỳ thị trấn trung tâm nào), theo dõi trên bộ đếm riêng đến giới hạn 100.',
   'guide.profPages.gatherIntro.fishing':
     'Câu Cá là nghề thu thập khác biệt nhất và sâu sắc nhất: một minigame cắn câu và giật cần thực sự, bảng loại cá riêng ở mỗi khu vực, và giới hạn thành thạo là 200, gấp đôi các nghề khác. Mua cần câu, hướng ra mặt nước rộng, và thả câu.',
   'guide.profPages.rhythmHeading': 'Nhịp thu hoạch',
@@ -258,7 +258,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Vị trí các điểm tài nguyên, bậc của chúng, công cụ cần thiết, và những gì chúng mang lại. Mỗi điểm tài nguyên hồi sinh cho bạn {respawn} giây sau khi bạn tự thu hoạch, và bộ đếm đó là của riêng bạn: người thu thập khác làm việc cùng điểm tài nguyên đó không bao giờ làm chậm bộ đếm của bạn, nên không có tranh giành điểm tài nguyên và không cần canh gác. Mỗi khu vực lên cao hơn mang lại nguyên liệu tốt hơn từ mặt đất khó hơn.',
   'guide.profPages.toolsHeading': 'Công cụ',
   'guide.profPages.toolsNote':
-    'Tay không được tính là công cụ bậc 1, nên mọi điểm tài nguyên bậc 1 trong game không cần công cụ nào cả. Thang bán của người bán bao gồm bậc 1 đến 3; công cụ chỉ cần có trong túi, không có ô trang bị và không có độ bền, nên mỗi cái chỉ cần mua một lần. Chỉ bậc mới quan trọng cho yêu cầu: màu hiếm của công cụ chỉ là trang trí.\n\nTrên thang bán của người bán có hai công cụ chế tạo, bậc 4 và bậc 5, được làm tại xưởng dụng cụ bởi các kỹ sư và không bao giờ được bán bởi NPC nào. Không có điểm tài nguyên nào hiện tại cần hơn bậc 3, nên giá trị của chúng hiện tại là tốc độ: công cụ hàng đầu giữ thời gian thu thập ở mức sàn trên các điểm tài nguyên thấp hơn, và nó sẽ là vé vào cửa khi xuất hiện vùng đất bậc cao hơn.',
+    'Mọi điểm tài nguyên đều cần công cụ của nghề tương ứng nằm trong túi, kể cả bậc 1: không có cuốc thì không có quặng, không có cần câu thì không có cá. Thang bán của người bán bao gồm bậc 1 đến 3, luôn có hàng ở mọi thị trấn trung tâm; công cụ chỉ cần có trong túi, không có ô trang bị và không có độ bền, nên mỗi cái chỉ cần mua một lần. Chỉ bậc mới quan trọng cho yêu cầu: màu độ hiếm của công cụ chỉ là trang trí.\n\nCao hơn thang bán của người bán là hai công cụ chế tạo, bậc 4 và bậc 5, được làm tại xưởng dụng cụ bởi các kỹ sư và không bao giờ được bán bởi NPC nào. Không có điểm tài nguyên nào hiện tại cần hơn bậc 3, nên giá trị của chúng hiện tại là tốc độ: công cụ hàng đầu giữ thời gian thu thập ở mức sàn trên các điểm tài nguyên thấp hơn, và nó sẽ là vé vào cửa khi xuất hiện vùng đất bậc cao hơn.',
   'guide.profPages.toolCrafted': 'Chế tạo ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Không bán',
@@ -414,56 +414,56 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.name': 'Sức Mạnh Bí Thuật',
   'entities.abilities.blizzard.description':
     'Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frozen Orb, tối đa 3 giây mỗi lần thi triển. (Băng)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Bão Tuyết',
+  'entities.abilities.brain_freeze.name': 'Đóng Băng Trí Não',
   'entities.abilities.dragons_breath.description':
     'Giữ để tích tụ làn hơi thở lửa ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Kẻ thù bị trúng sẽ mất định hướng và sát thương sẽ phá vỡ hiệu ứng; tích tụ tối đa luôn chí mạng và tính một lần vào Hot Streak. (Lửa)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Hơi Thở Rồng',
   'entities.abilities.fingers_of_frost.description':
     'Thương Băng Giá có 15% xác suất ban Fingers of Frost, tối đa 2 điện tích: Ice Lance tiếp theo của bạn coi mục tiêu như đang đóng băng. (Băng)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Ngón Tay Băng Giá',
   'entities.abilities.fireball_form.description':
     'Biến thành than hồng rực cháy, tăng tốc độ di chuyển lên {buff}%. Bạn không thể tấn công hay thi triển phép trong khi biến đổi. Thi triển lại để trở về dạng bình thường.',
-  'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.fireball_form.name': 'Dạng Than Hồng',
+  'entities.abilities.flurry.name': 'Roi Mùa Đông',
+  'entities.abilities.frozen_orb.name': 'Quả Cầu Băng Giá',
   'entities.abilities.glacial_front.description':
     'Giữ để tích tụ màn băng giá ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Tất cả kẻ thù bị trúng sẽ bị làm chậm 50% trong 4 giây; tích tụ tối đa còn cố định chúng trong 1 giây. (Băng)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Tiền Tuyến Băng Hà',
   'entities.abilities.glacial_spike.description':
     'Triệu hồi một gai băng khổng lồ, tiêu hao 5 Băng Nhọn để gây {damage} sát thương Băng và đóng băng mục tiêu tại chỗ trong 4 giây. (Băng)',
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Chông Băng Hà',
   'entities.abilities.ice_lance.description':
     'Phóng một mảnh băng gây {damage} sát thương Băng, nhân ba lần với mục tiêu đang đóng băng. Tiêu hao Fingers of Frost hoặc một điện tích Cơn Lạnh Mùa Đông để coi mục tiêu như đang đóng băng. (Băng)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Thương Băng',
   'entities.abilities.perfect_moment.description':
     'Chớp lấy khoảnh khắc hoàn hảo của bạn: lập tức nhận 4 Điện Tích Bí Thuật và trong 10 giây Phi Tiêu Ê-te không tiêu hao chúng. (Thời Thuật)',
-  'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.perfect_moment.name': 'Khoảnh Khắc Hoàn Hảo',
+  'entities.abilities.shatter.name': 'Hủy Diệt Giòn Tan',
   'entities.abilities.temporal_acceleration.description':
     'Tăng tốc dòng chảy thời gian cho nhóm hoặc đột kích của bạn, tăng tốc độ tấn công, thi triển phép và kênh phép lên 30% trong 15 giây. Đồng minh vừa bị ảnh hưởng bởi Tăng Tốc Thời Gian hoặc Trống Chiến sẽ quá kiệt sức để nhận lợi ích. (Thời Thuật)',
-  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_acceleration.name': 'Gia Tốc Thời Gian',
   'entities.abilities.temporal_barrier.description':
     'Dịch chuyển mục tiêu ra khỏi thực tại một nhịp tim, một lớp bọc thời gian hấp thụ {damage} sát thương trong 10 giây trước khi dòng thời gian bật trở lại.',
-  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_barrier.name': 'Lá Chắn Thời Gian',
   'entities.abilities.temporal_cascade.description':
     'Gửi một tiếng vang lan tỏa qua nhóm của bạn: mục tiêu và tối đa bốn đồng minh gần nhất của họ được chữa lành cùng lúc và mỗi người được đánh dấu trong {duration} giây, kéo một phần sát thương Bí Thuật bạn gây ra trở lại qua những tiếng vang của họ để chữa lành họ. (Thời Thuật)',
-  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_cascade.name': 'Thác Đổ Thời Gian',
   'entities.abilities.temporal_echo.description':
     'Đánh dấu một đồng minh bằng tiếng vang của một khoảnh khắc khỏe mạnh hơn, hồi phục {damage} máu ngay lập tức. Trong {duration} giây, một phần sát thương Bí Thuật bạn gây ra sẽ được kéo trở lại qua tiếng vang để chữa lành họ.',
-  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_echo.name': 'Vọng Âm Thời Gian',
   'entities.abilities.temporal_hourglass.description':
     'Đặt một đồng hồ cát thời gian tại vị trí đã chọn. Bên dưới kẻ thù, nó treo lơ lửng họ trong {hostilePveDuration} giây trong PvE hoặc {hostilePvpDuration} giây trong PvP và ngăn mọi hành động; sát thương phá vỡ hiệu ứng. Dưới chân bạn hoặc dưới đồng minh trong nhóm, nó ban trạng thái tĩnh lặng trong {duration} giây, ngăn sát thương và hành động, hồi phục {healing}% máu tối đa và giúp thời gian hồi chiêu phục hồi nhanh hơn {selfCooldownRecovery}% cho bạn hoặc {allyCooldownRecovery}% cho đồng minh. Trên nền đất trống, đồng hồ cát chờ trong {groundDuration} giây và ảnh hưởng đến đơn vị hợp lệ đầu tiên bước lên nó. Hào quang có lợi có thể bị hủy bỏ thủ công.',
-  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_hourglass.name': 'Đồng Hồ Cát Ngưng Đọng',
   'entities.abilities.temporal_mend.description':
     'Kéo một đồng minh tiến một khoảnh khắc vào tương lai, hồi phục {damage} máu khi cơ thể ổn định vào phiên bản tương lai khỏe mạnh hơn của mình. (Thời Thuật nguyên thủy)',
-  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_mend.name': 'Hàn Gắn Thời Gian',
   'entities.abilities.temporal_reversal.description':
     'Tua lại dòng thời gian của một đồng minh đã ngã xuống, đưa họ trở lại cuộc sống tại thân xác với một phần máu và mana, ngay cả giữa chiến đấu. (Thời Thuật)',
-  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_reversal.name': 'Đảo Ngược Thời Gian',
   'entities.abilities.temporal_rewind.description':
     'Gửi một làn sóng bí thuật qua nhóm hoặc đột kích của bạn, tua lại thời gian để phục hồi 30% sát thương mỗi đồng minh trong phạm vi 40 thước đã nhận trong 5 giây qua (tối đa 35% máu tối đa của họ). Không thể là hiệu ứng chí mạng. (Thời Thuật)',
-  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.abilities.temporal_rewind.name': 'Quay Ngược',
   'entities.items.sootscale_mantle.name': 'Áo Choàng Vai Vảy Lò',
   'entities.items.arcane_dust.name': 'Bụi Thanh Âm',
   'entities.items.arcane_essence.name': 'Tinh Chất Thanh Âm',
@@ -2761,7 +2761,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_charge.name': 'Cú Lao Bruin',
   'entities.abilities.bear_form.description':
     'Biến hình thành gấu: giáp +130%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
-  'entities.abilities.bear_form.name': 'Bruin Form',
+  'entities.abilities.bear_form.name': 'Hình Bruin',
   'entities.abilities.berserker_rage.description':
     'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
   'entities.abilities.berserker_rage.name': 'Thịnh Nộ Sục Sôi',
@@ -2923,7 +2923,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.garrote.name': 'Dây Siết Cổ',
   'entities.abilities.ghost_wolf.description':
     'Biến bạn thành Shadewolf, tăng tốc độ di chuyển 40% trong 10 phút.',
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': 'Sói Bóng',
   'entities.abilities.gouge.description':
     'Đâm vào mục tiêu gây {damage} sát thương, khiến nó bất lực trong 4 giây. Mọi sát thương sẽ phá vỡ hiệu ứng. Tặng 1 điểm liên hoàn.',
   'entities.abilities.gouge.name': 'Thọc Mắt',
@@ -2964,7 +2964,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.instant_poison.name': 'Vết Cắn Rắn Độc',
   'entities.abilities.judgement.description':
     'Giải phóng Ấn đang kích hoạt của bạn lên kẻ địch, tiêu hao nó để gây lượng sát thương Thánh tích trữ trong đó.',
-  'entities.abilities.judgement.name': 'Verdict',
+  'entities.abilities.judgement.name': 'Phán Quyết',
   'entities.abilities.kidney_shot.description':
     'Đòn kết liễu làm choáng mục tiêu. Kéo dài thêm 1 giây cho mỗi điểm liên hoàn.',
   'entities.abilities.kidney_shot.name': 'Đòn Chơi Xấu',
@@ -2983,7 +2983,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_shield.name': 'Bùa Hộ Sấm Sét',
   'entities.abilities.mark_of_the_wild.description':
     'Đặt Wildward lên một đồng minh, tăng giáp thêm {buff} trong 30 phút.',
-  'entities.abilities.mark_of_the_wild.name': 'Wildward',
+  'entities.abilities.mark_of_the_wild.name': 'Hộ Vệ Hoang Dã',
   'entities.abilities.maul.description':
     'Một đòn vồ tăng sát thương cận chiến thêm {damage} và gây ra lượng đe dọa lớn. Kích hoạt ở đòn đánh tiếp theo của bạn. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.maul.name': 'Nghiền Xương',
@@ -3103,7 +3103,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Thiên Giáng',
   'entities.abilities.stealth.description':
     'Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Duskveil. Niệm lại để bước ra.',
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Màn Chạng Vạng',
   'entities.abilities.stormstrike.description':
     'Dẫn dắt cơn bão qua vũ khí của bạn, tức thì đánh gây sát thương vũ khí cộng thêm {damage}.',
   'entities.abilities.stormstrike.name': 'Đòn Tổ Tiên',
@@ -3149,7 +3149,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.name': 'Huyết Sói',
   'entities.abilities.travel_form.description':
     'Tức thì biến thành Fleet Form nhanh nhẹn, tăng 40% tốc độ di chuyển. Bạn không thể dùng các kỹ năng khác khi đã biến hình, nhưng có thể biến hình trong hoặc ngoài chiến đấu, lý tưởng để chạy trốn.',
-  'entities.abilities.travel_form.name': 'Fleet Form',
+  'entities.abilities.travel_form.name': 'Hình Thần Tốc',
   'entities.abilities.vanish.description':
     'Biến mất khỏi tầm nhìn, đi vào Duskveil ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây.',
   'entities.abilities.vanish.name': 'Bước Khói',
@@ -9057,7 +9057,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Đạt được kỹ năng đầy đủ',
   'hudChrome.crafting.difficultyNone': 'Không đạt được kỹ năng',
   'hudChrome.crafting.difficultyReduced': 'Giảm khả năng nhận được kỹ năng',
-  'hudChrome.crafting.enchantedLine': 'mê hoặc',
   'hudChrome.crafting.makersMark': 'Được chế tạo bởi {name}',
   'hudChrome.crafting.masterworkSeal': 'Kiệt tác',
   'hudChrome.crafting.masterworkToast': 'Tuyệt tác! {name}',
@@ -9184,4 +9183,60 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': 'Gỡ ràng buộc {name} với phí {fee}',
   'hudChrome.unbind.unbound':
     'Đã gỡ ràng buộc {name} với phí {fee}. Nó sẽ ràng buộc lại trong lần giao dịch tiếp theo.',
+  'hud.combat.auraGainOther': '{target} nhận được {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Vải',
+  'hudChrome.corpseHarvest.components.meat': 'Thịt',
+  'hudChrome.crafting.noBagSpace': 'Túi của bạn không còn chỗ cho vật phẩm vừa chế tạo.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Túi của bạn không còn chỗ cho nguyên liệu bí thuật.',
+  'hudChrome.enchanting.enchantNoSpace': 'Túi của bạn không còn chỗ cho vật phẩm đã pháp khắc.',
+  'hudChrome.enchanting.salvageNoSpace':
+    'Túi của bạn không còn chỗ cho nguyên liệu thu được từ tháo dỡ.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'Không có khóm thảo dược nào trong tầm với.',
+  'hudChrome.gathering.noNodeNearby.logging': 'Không có cụm cây gỗ nào trong tầm với.',
+  'hudChrome.gathering.noNodeNearby.mining': 'Không có mạch quặng nào trong tầm với.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Cần liềm thảo dược',
+  'hudChrome.gathering.requiresTool.logging': 'Cần rìu đốn gỗ',
+  'hudChrome.gathering.requiresTool.mining': 'Cần cuốc khai khoáng',
+  'hudChrome.gathering.toolRequired.fishing': 'Bạn phải có cần câu mới buông câu được.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Bạn cần liềm thảo dược để thu hái khóm thảo dược này.',
+  'hudChrome.gathering.toolRequired.logging': 'Bạn cần rìu đốn gỗ để đốn hạ cụm cây này.',
+  'hudChrome.gathering.toolRequired.mining':
+    'Bạn cần cuốc khai khoáng để khai thác mạch quặng này.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Cần câu (bậc {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Công cụ thảo dược (bậc {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Công cụ đốn gỗ (bậc {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Công cụ khai khoáng (bậc {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Mở khóa danh sách cá phong phú hơn khi kỹ năng câu cá đạt {skill} trở lên.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Cá cắn câu sớm hơn tới {seconds} giây.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Kéo dài thời gian thu dây thêm {seconds} giây.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Cần thiết để câu cá.',
+  'hudChrome.gathering.toolTooltip.speed':
+    'Thu hoạch nhanh hơn tại các điểm tài nguyên dưới bậc {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Cần thiết để thu hái các khóm thảo dược đến bậc {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Cần thiết để đốn hạ các cụm cây gỗ đến bậc {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Cần thiết để khai thác các mạch quặng đến bậc {tier}.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': 'Sử dụng: Thu hái từ khóm thảo dược gần đó.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Sử dụng: Đốn hạ cụm cây gỗ gần đó.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Sử dụng: Khai thác mạch quặng gần đó.',
+  'hudChrome.noticeboard.empty': 'Có vẻ như chưa có gì được dán lên.',
+  'hudChrome.training.pendingAria': 'Đang học {name}',
+  'hudChrome.training.statePending': 'Đang học',
+  'hudChrome.unbind.noSpace': 'Túi của bạn không còn chỗ cho bản đã gỡ ràng buộc.',
+  'loading.incompatibleWorldVersion':
+    'Phiên bản trò chơi và máy chủ không tương thích. Hãy tải lại hoặc cập nhật, rồi thử lại.',
+  'loading.messageRateExceeded':
+    'Bạn đã bị ngắt kết nối do gửi thao tác quá nhanh. Vui lòng đợi một lát rồi đăng nhập lại.',
+  'perfNudge.dismiss': 'Đóng',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Trò chơi đang chạy mà không có tăng tốc GPU nên rất chậm. Hãy cập nhật trình điều khiển đồ họa, rồi khởi động lại trò chơi. Ngoài ra, trên Windows hãy đặt trò chơi ở chế độ “Hiệu năng cao” trong Cài đặt > Hệ thống > Màn hình > Đồ họa.',
+  'perfNudge.hardwareAccelerationWeb':
+    'Trò chơi đang chạy mà không có tăng tốc GPU nên rất chậm. Hãy bật tăng tốc phần cứng trong cài đặt trình duyệt, cập nhật trình điều khiển đồ họa, rồi khởi động lại trình duyệt.',
+  'perfNudge.integratedGpu':
+    'Trò chơi đang chạy trên GPU tích hợp (tiết kiệm điện). Nếu máy tính này còn có card đồ họa chơi game, hãy đặt trình duyệt ở chế độ “Hiệu năng cao” trong Cài đặt > Hệ thống > Màn hình > Đồ họa trên Windows, rồi khởi động lại trình duyệt. Ứng dụng máy tính tự động chọn card đồ họa chơi game.',
+  'worldContent.noticeboardName': 'Bảng Thông Báo',
 };

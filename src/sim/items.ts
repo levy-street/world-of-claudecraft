@@ -473,11 +473,19 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
   } else if (def.kind === 'elixir') {
     // Battle elixir: grant a temporary stat-buff aura. Usable in combat (classic),
     // no shared potion cooldown; re-quaffing refreshes the buff via applyAura.
+    // The aura id is keyed on the elixir's EFFECT kind, not the item, so every
+    // elixir of one stat shares one id and the same-id replacement in applyAura
+    // makes same-stat elixirs exclusive: last drunk wins (classic overwrite,
+    // weaker included). Different-kind elixirs coexist; class buffs
+    // (buff_sta_pct) and negative buff_sta debuffs ride their own ids. This
+    // assumes one stat kind equals one exclusivity slot: if a guardian elixir
+    // family that should stack with battle elixirs ever lands, the id needs a
+    // family component (elixir_battle_...), not just the kind.
     const elx = def.elixir;
     if (!elx) return;
     ctx.removeItem(itemId, 1, meta.entityId);
     ctx.applyAura(p, {
-      id: `elixir_${itemId}`,
+      id: `elixir_${elx.kind}`,
       name: elx.aura,
       kind: elx.kind,
       remaining: elx.duration,

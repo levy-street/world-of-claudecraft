@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
 import { LADDER_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, STATIONS } from '../src/sim/data';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
 
@@ -57,7 +57,7 @@ describe('ladder recipe execution sweep (all 54)', () => {
           sim.addItem(reagent.itemId, reagent.count, pid);
         }
       }
-      placeAt(sim, pid, stationsOfType(recipe.stationType!)[0].pos);
+      placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
       sim.craftItem(recipe.id, false, pid);
       expect(meta.lastCraftResult?.ok, `${recipe.id}: ${meta.lastCraftResult?.reason}`).toBe(true);
       expect(sim.countItem(recipe.resultItemId, pid), `${recipe.id} output`).toBe(
@@ -105,7 +105,7 @@ describe('Sim.trainRecipe on real ladder rungs', () => {
     const rung0 = LADDER_RECIPES.find(
       (r) => r.professionId === 'weaponcrafting' && r.skillReq === 0,
     )!;
-    placeAt(sim, pid, stationsOfType(rung0.stationType!)[0].pos);
+    placeAt(sim, pid, stationsOfType(STATIONS, rung0.stationType!)[0].pos);
     const copperBefore = meta.copper;
     sim.trainRecipe(rung0.id, pid);
     expect(meta.lastTrainResult?.ok).toBe(true);
@@ -123,7 +123,7 @@ describe('Sim.trainRecipe on real ladder rungs', () => {
     )!;
     meta.craftSkills.weaponcrafting = 50;
     meta.copper = 10_005;
-    placeAt(sim, pid, stationsOfType(rung50.stationType!)[0].pos);
+    placeAt(sim, pid, stationsOfType(STATIONS, rung50.stationType!)[0].pos);
     sim.trainRecipe(rung50.id, pid);
     expect(meta.lastTrainResult?.ok).toBe(true);
     expect(meta.lastTrainResult?.fee).toBe(10_000);
@@ -160,7 +160,7 @@ describe('crafted elixir defs and the live use path', () => {
       sim.addItem(id, 1, pid);
       sim.useItem(id, pid);
       const p = (sim as any).entities.get(pid);
-      const aura = p.auras.find((a: { id: string }) => a.id === `elixir_${id}`);
+      const aura = p.auras.find((a: { id: string }) => a.id === 'elixir_buff_sta');
       expect(aura, `${id} aura applied`).toBeTruthy();
       expect(aura.kind).toBe('buff_sta');
       expect(aura.value).toBe(expected.value);

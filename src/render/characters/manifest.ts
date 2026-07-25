@@ -100,8 +100,13 @@ export interface VisualDef {
    *  applied as a local-space rotation (radians) after the bind transform. */
   weaponFix?: { node: string; rotX?: number; rotY?: number; rotZ?: number }[];
   /** Glowing ring parented behind the head bone (the priest's Light halo).
-   *  Value is the glow color; geometry/placement live in visual.ts. */
+   *  Value is the glow color; geometry/placement live in halo.ts. */
   halo?: number;
+  /** Halo placement overrides, head-bone space (defaults in halo.ts): lift
+   *  above the bone and ring radius, for models whose headgear the default
+   *  ring would clip. */
+  haloUpOffset?: number;
+  haloRadius?: number;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -584,8 +589,18 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
-    // The priest's Light: a warm golden halo ring above the crown.
+    // The priest's Light: a warm golden halo ring above the crown. The mage
+    // model's pointed hat is canon here, and at the default lift the ring
+    // plane crosses the hat cone where it is wide, clipping through it; +0.15
+    // raises the plane to the cone tip, where the default-size ring clears it
+    // on every side (tuned by screenshot against the current mage.glb; a hat
+    // reshape in an asset update means re-tuning). Kept just below the hat's
+    // bounding-box top so portrait/turntable framing is unchanged for priests.
     halo: 0xffd766,
+    haloUpOffset: 1.45,
+    // show is a no-op for the hat/cape: the current mage.glb rigs every
+    // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
+    // hides non-skinned nodes, so the hat always renders. Sanctioned look.
     show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
@@ -613,8 +628,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
-    // no Mage_Hat on players: the brim hides the whole body from the default
-    // chase-camera pitch (NPC mages keep theirs — they're seen from the side)
+    // The hat and cape render regardless of this list: the current mage.glb
+    // rigs every accessory as a SkinnedMesh, and the show allowlist
+    // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
+    // sanctioned mage look; listing Mage_Cape is inert but kept as intent.
     show: ['Mage_Cape'],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],

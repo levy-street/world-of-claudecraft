@@ -26,6 +26,7 @@
 
 import { recipeById } from '../content/recipes';
 import type { PlayerMeta } from '../sim';
+import type { StationDef } from '../types';
 import { isRecipeKnown } from './crafting';
 import { isAtStation, stationTypeForCraft } from './stations';
 import type { ProfessionRecipeRecord } from './types';
@@ -99,6 +100,7 @@ export interface TrainResult {
  * 7. otherwise ok, with the fee to charge.
  */
 export function resolveTrain(
+  stations: readonly StationDef[],
   meta: PlayerMeta | undefined,
   pos: { x: number; z: number } | undefined,
   recipeId: string,
@@ -113,7 +115,7 @@ export function resolveTrain(
     return { ok: false, recipeId, reason: 'train_not_taught_here', fee };
   }
   const stationType = stationTypeForCraft(recipe.professionId);
-  if (!stationType || !pos || !isAtStation(pos, stationType)) {
+  if (!stationType || !pos || !isAtStation(stations, pos, stationType)) {
     return { ok: false, recipeId, reason: 'train_out_of_range', fee };
   }
   if (!teachTierMet(recipe, meta ? meta.craftSkills : {})) {

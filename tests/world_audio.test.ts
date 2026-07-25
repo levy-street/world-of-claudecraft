@@ -5,7 +5,9 @@ import {
   footstepSurfaceAt,
   isOnDockDeck,
 } from '../src/render/world_audio';
+import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, PROPS, setActiveWorldContent } from '../src/sim/data';
+import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 import { groundHeight } from '../src/sim/world';
 
@@ -76,7 +78,7 @@ describe('world audio routing', () => {
     expect(crowdAmbienceAt(0, 0, false, true)).toBe(0);
   });
 
-  it('builds stable point sources for every campfire and only the two smithies', () => {
+  it('builds stable point sources for every campfire and both built-in smithies', () => {
     const sources = buildWorldAmbientSources(SEED);
     const campfires = sources.filter((source) => source.kind === 'campfire');
     const forges = sources.filter((source) => source.kind === 'forge');
@@ -93,10 +95,28 @@ describe('world audio routing', () => {
       });
     }
 
-    expect(PROPS.stalls.filter((stall) => stall.smithy)).toHaveLength(2);
+    const eastbrookSmithy = EASTBROOK_LAYOUT.buildings.find(
+      (building) => building.id === 'eastbrook_smithy',
+    );
+    expect(eastbrookSmithy).toBeDefined();
+    expect(PROPS.stalls.filter((stall) => stall.smithy)).toHaveLength(1);
     expect(forges.map(({ x, z }) => [x, z])).toEqual([
-      [9.5, 17.5],
+      [eastbrookSmithy?.position.x, eastbrookSmithy?.position.z],
       [-4.5, 673.5],
     ]);
+  });
+
+  it('uses active custom props without leaking Eastbrook ambient anchors', () => {
+    const props = clonePropsWithoutEastbrookLayout(BUILTIN_WORLD.props);
+    setActiveWorldContent({ ...BUILTIN_WORLD, props });
+
+    const sources = buildWorldAmbientSources(SEED);
+    const campfires = sources.filter((source) => source.kind === 'campfire');
+    const forges = sources.filter((source) => source.kind === 'forge');
+
+    expect(campfires).toHaveLength(props.campfires.length);
+    expect(campfires.map(({ x, z }) => [x, z])).toEqual(props.campfires);
+    expect(forges.map(({ x, z }) => [x, z])).toEqual([[-4.5, 673.5]]);
+    expect(sources.some((source) => source.id === 'world:forge:4.5:18.5')).toBe(false);
   });
 });

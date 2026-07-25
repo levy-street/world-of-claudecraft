@@ -1,20 +1,24 @@
 // Glowing head halo (VisualDef.halo): a soft additive ring parented behind the
-// head bone, the priest's Light. Texture + material are module-level caches
-// shared by every clone; the mesh itself is per-visual and lives in the model
-// subtree, so LOD/visibility toggles and scene removal need no extra plumbing
-// (geometry/materials are shared caches and never disposed, like the rest of
-// the character asset caches).
+// head bone, the priest's Light. Texture, per-color materials, and per-radius
+// geometries are module-level caches shared by every clone; the mesh itself is
+// per-visual and lives in the model subtree, so LOD/visibility toggles and
+// scene removal need no extra plumbing (geometry/materials are shared caches
+// and never disposed, like the rest of the character asset caches; the cache
+// keys stay bounded because radii only ever come from static VisualDef
+// values, never computed per-instance).
 import * as THREE from 'three';
 
 // Bone-space (raw KayKit rig units): a HORIZONTAL ring floating above the
 // crown (angel style). A vertical disc behind the head fights the wide hat
 // brim from half the camera angles; hovering above it never clips.
-const HALO_RADIUS = 0.5;
-const HALO_UP_OFFSET = 1.3;
+// Defaults; a VisualDef can override both (haloUpOffset/haloRadius) when its
+// model's headgear needs different clearance.
+export const HALO_RADIUS = 0.5;
+export const HALO_UP_OFFSET = 1.3;
 
 let haloTex: THREE.Texture | null = null;
 const haloMats = new Map<number, THREE.MeshBasicMaterial>();
-let haloGeo: THREE.PlaneGeometry | null = null;
+const haloGeos = new Map<number, THREE.PlaneGeometry>();
 
 /** Soft annulus on a transparent canvas: bright ring band, feathered falloff. */
 function haloTexture(): THREE.Texture {
@@ -59,12 +63,24 @@ function haloMaterial(color: number): THREE.MeshBasicMaterial {
   return mat;
 }
 
+function haloGeometry(radius: number): THREE.PlaneGeometry {
+  let geo = haloGeos.get(radius);
+  if (!geo) {
+    geo = new THREE.PlaneGeometry(radius * 2, radius * 2);
+    haloGeos.set(radius, geo);
+  }
+  return geo;
+}
+
 /** Build the per-visual halo mesh; the caller parents it to the head bone. */
-export function buildHalo(color: number): THREE.Mesh {
-  haloGeo ??= new THREE.PlaneGeometry(HALO_RADIUS * 2, HALO_RADIUS * 2);
-  const mesh = new THREE.Mesh(haloGeo, haloMaterial(color));
+export function buildHalo(
+  color: number,
+  upOffset: number = HALO_UP_OFFSET,
+  radius: number = HALO_RADIUS,
+): THREE.Mesh {
+  const mesh = new THREE.Mesh(haloGeometry(radius), haloMaterial(color));
   mesh.name = 'class_halo';
-  mesh.position.set(0, HALO_UP_OFFSET, 0);
+  mesh.position.set(0, upOffset, 0);
   mesh.rotation.x = -Math.PI / 2;
   mesh.castShadow = false;
   mesh.receiveShadow = false;

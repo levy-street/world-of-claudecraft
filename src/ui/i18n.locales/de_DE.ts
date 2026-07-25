@@ -256,11 +256,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Zerlegen ist der volkstümliche Cousin des Entzauberns: dieselben Waffen und Rüstungen, keine Fertigkeit erforderlich und keine erworben, liefert schlichte Handwerksschrott nach Qualität statt etwas Arkanem. Jeder kann es tun, Verzauberer oder nicht. Hältst du ein Stück, das es wert ist, zerbrochen zu werden, ist die Wahl einfach: Ab Selten ist Entzaubern das eindeutig bessere Geschäft, während bei Gewöhnlich beide Erträge für etwa dasselbe an einen Händler verkaufen, also zerbrich in Richtung des Materials, das du tatsächlich brauchst.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Bergbau fördert Erz direkt aus dem Fels der Welt: Kupfer in Eastbrook Vale, Eisen in Mirefen Marsh und Osmium oben in den Thornpeak-Höhen, Nahrung für die Schmiedeberufe. Für jeden ab Stufe 1 zugänglich, ohne jegliche Voraussetzung, auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
+    'Bergbau fördert Erz direkt aus dem Fels der Welt: Kupfer im Eastbrook-Tal, Eisen im Mirefen-Moor und Osmium oben in den Thornpeak-Höhen, Nahrung für die Schmiedeberufe. Für jeden ab Stufe 1 zugänglich: Alles, was du brauchst, ist eine Bergbau-Spitzhacke in deinen Taschen, 20 Kupfer in jeder größeren Stadt. Auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
   'guide.profPages.gatherIntro.logging':
-    'Holzfällen fällt Holz aus Baumgruppen in allen drei Zonen: Eisenrinde in Eastbrook Vale, Eschenholz in Mirefen Marsh und Hochfichte in den Thornpeak-Höhen, das Rohmaterial für Schäfte, Stäbe und die Ingenieursbank. Für jeden ab Stufe 1 zugänglich, auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
+    'Holzfällen fällt Holz aus Baumgruppen in allen drei Zonen: Eisenrinde im Eastbrook-Tal, Eschenholz im Mirefen-Moor und Hochfichte in den Thornpeak-Höhen, das Rohmaterial für Schäfte, Stäbe und die Ingenieursbank. Für jeden ab Stufe 1 zugänglich, mit einer Holzfäller-Axt in deinen Taschen (20 Kupfer in jeder größeren Stadt), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
   'guide.profPages.gatherIntro.herbalism':
-    'Kräuterkunde sammelt, was wild wächst: Schimmerblatt in Eastbrook Vale, Goldblatt in Mirefen Marsh und Sonnenblüte in den Thornpeak-Höhen, das Blatt und der Stiel, der die Apothekarberufe am Köcheln hält. Für jeden ab Stufe 1 zugänglich, auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
+    'Kräuterkunde sammelt, was wild wächst: Schimmerblatt im Eastbrook-Tal, Goldblatt im Mirefen-Moor und Sonnenblüte in den Thornpeak-Höhen, das Blatt und der Stiel, die die Apothekarberufe am Köcheln halten. Für jeden ab Stufe 1 zugänglich, mit einer Kräuterkunde-Sichel in deinen Taschen (20 Kupfer in jeder größeren Stadt), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.',
   'guide.profPages.gatherIntro.fishing':
     'Angeln ist das Sonderglied unter den Sammelberufen und das tiefgründigste: ein echtes Biss-und-Einhol-Minispiel, eigene Fangtabellen in jeder Zone und eine Fertigkeitsobergrenze von 200, doppelt so viel wie die anderen. Kaufe eine Angel, blicke auf offenes Wasser und wirf.',
   'guide.profPages.rhythmHeading': 'Der Sammelrhythmus',
@@ -273,7 +273,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Wo die Knoten sind, ihre Stufe, das Werkzeug, das sie benötigen, und was sie abwerfen. Jeder Knoten wächst {respawn} Sekunden nach deiner eigenen Ernte wieder für dich nach, und dieser Timer gehört nur dir: Ein anderer Sammler, der denselben Knoten bearbeitet, verzögert deinen nie, also gibt es kein Knotenrennen und kein Lauern. Jede Zone auf der Leiter bringt ein besseres Material aus härterem Boden.',
   'guide.profPages.toolsHeading': 'Werkzeuge',
   'guide.profPages.toolsNote':
-    'Bloße Hände zählen als Werkzeug der Stufe 1, daher benötigt jeder Knoten der Stufe 1 im Spiel überhaupt kein Werkzeug. Die Händlerleiter deckt Stufe 1 bis 3 ab; ein Werkzeug muss nur in deinen Taschen sein, es gibt keinen Ausrüstungsplatz und keine Haltbarkeit, sodass jedes ein Einmalkauf ist. Nur die Stufe ist für die Voraussetzung relevant: Die Seltenheitsfarbe eines Werkzeugs ist kosmetisch.\n\nOberhalb der Händlerleiter sitzen zwei hergestellte Werkzeuge, Stufe 4 und Stufe 5, gefertigt in der Werkzeugmacherei von Ingenieuren und von keinem NSC verkauft. Kein Knoten benötigt heute mehr als Stufe 3, daher liegt ihr Wert im Moment in der Geschwindigkeit: Ein Spitzenwerkzeug fixiert die Herstellungszeit auf ihrem Boden bei niedrigeren Knoten, und es wird das Eintrittszertifikat sein, wenn höherstufiges Gelände erscheint.',
+    'Jeder Knoten verlangt das Werkzeug seines Berufs in deinen Taschen, Stufe 1 eingeschlossen: ohne Spitzhacke kein Erz, ohne Angel kein Fisch. Die Händlerleiter deckt Stufe 1 bis 3 ab und wird in jeder größeren Stadt geführt; ein Werkzeug muss nur in deinen Taschen sein, es gibt keinen Ausrüstungsplatz und keine Haltbarkeit, sodass jedes ein Einmalkauf ist. Nur die Stufe ist für die Voraussetzung relevant: Die Seltenheitsfarbe eines Werkzeugs ist kosmetisch.\n\nOberhalb der Händlerleiter sitzen zwei hergestellte Werkzeuge, Stufe 4 und Stufe 5, gefertigt in der Werkzeugmacherei von Ingenieuren und von keinem NSC verkauft. Kein Knoten benötigt heute mehr als Stufe 3, daher liegt ihr Wert im Moment in der Geschwindigkeit: Ein Spitzenwerkzeug fixiert die Sammelzeit bei niedrigeren Knoten auf ihrem Minimum, und es wird die Eintrittskarte sein, wenn höherstufiges Gelände erscheint.',
   'guide.profPages.toolCrafted': 'Hergestellt ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Nicht erhältlich',
@@ -429,35 +429,35 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'cardDuel.yourTurn': 'Karte ausspielen',
   'entities.abilities.arcane_surge.description':
     'Zieht eine Woge rohen Äthers durch den Feind und verursacht {damage} Schaden. Jeder Einsatz hinterlässt eine Arkane Ladung, die Schaden und Zaubertempo des nächsten Aether Surge erhöhen (jeweils 5% schneller), aber seine Manakosten stark erhöht, bis zu 4 Stapel; Aether-Pfeile verbraucht die Ladungen. Jeder Einsatz kann außerdem Ätheransturm auslösen, sodass dein nächster Aether Surge kostenlos und doppelt so schnell ist.',
-  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.arcane_surge.name': 'Ätherschwall',
   'entities.abilities.blizzard.description':
     'Ruft 6 Sek. lang einen Eissturm auf das Zielgebiet, der pro Sekunde {damage} Frostschaden verursacht und Feinde um 40% verlangsamt. Jeder getroffene Feind verkürzt Frozen Orb um 0,5 Sek., bis zu 3 Sek. pro Einsatz. (Frost)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Schneesturm',
+  'entities.abilities.brain_freeze.name': 'Hirnfrost',
   'entities.abilities.dragons_breath.description':
     'Halte gedrückt, um einen sich ausbreitenden Flammenodem aufzuladen, und lass ihn dann als Kegel los. Längere Aufladungen reichen weiter und verursachen mehr Schaden. Getroffene Feinde werden desorientiert, und Schaden bricht den Effekt; maximale Aufladung trifft immer kritisch und zählt einmal für Heiße Serie. (Feuer)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Drachenatem',
   'entities.abilities.fingers_of_frost.description':
     'Rimelance hat eine 15% Chance, Fingers of Frost zu gewähren, bis zu 2 Ladungen: dein nächstes Ice Lance behandelt das Ziel als eingefroren. (Frost)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Frostfinger',
   'entities.abilities.fireball_form.description':
     'Verwandelt dich in eine lodernde Glut und erhöht die Bewegungsgeschwindigkeit um {buff}%. Während der Verwandlung kannst du weder angreifen noch Zauber wirken. Erneut wirken, um zur normalen Gestalt zurückzukehren.',
   'entities.abilities.fireball_form.name': 'Glutgestalt',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.flurry.name': 'Winterpeitsche',
+  'entities.abilities.frozen_orb.name': 'Frostkugel',
   'entities.abilities.glacial_front.description':
     'Halte gedrückt, um eine sich ausbreitende Frostfront aufzuladen, und lass sie dann als Kegel los. Längere Aufladungen reichen weiter und verursachen mehr Schaden. Alle getroffenen Feinde werden 4 Sek. lang um 50% verlangsamt; maximale Aufladung verwurzelt sie zusätzlich 1 Sek. lang. (Frost)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Gletscherfront',
   'entities.abilities.glacial_spike.description':
     'Beschwört einen mächtigen Eiszapfen und verbraucht 5 Eiszapfen, um {damage} Frostschaden zu verursachen und das Ziel 4 Sek. lang einzufrieren. (Frost)',
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Gletscherstachel',
   'entities.abilities.ice_lance.description':
     'Schleudert einen Eissplitter und verursacht {damage} Frostschaden, dreifach gegen ein eingefrorenes Ziel. Verbraucht Fingers of Frost oder eine Ladung Winterskälte, um das Ziel als eingefroren zu behandeln. (Frost)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Eislanze',
   'entities.abilities.perfect_moment.description':
     'Nutze deinen perfekten Moment: Gewinne sofort 4 Arkane Ladungen, und für 10 Sek. verbraucht Aether-Pfeile diese nicht. (Chronomantie)',
-  'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.perfect_moment.name': 'Perfekter Moment',
+  'entities.abilities.shatter.name': 'Sprödes Verderben',
   'entities.abilities.temporal_acceleration.description':
     'Beschleunigt den Zeitfluss für deine Gruppe oder deinen Schlachtzug und erhöht Angriffs-, Zauber- und Kanalisierungsgeschwindigkeit 15 Sek. lang um 30%. Verbündete, die kürzlich von Temporaler Beschleunigung oder Kriegstrommeln betroffen waren, sind zu erschöpft, um davon zu profitieren. (Chronomantie)',
   'entities.abilities.temporal_acceleration.name': 'Temporale Beschleunigung',
@@ -481,7 +481,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_reversal.name': 'Temporale Umkehr',
   'entities.abilities.temporal_rewind.description':
     'Sendet eine arkane Welle durch deine Gruppe oder deinen Schlachtzug und dreht die Zeit zurück, um 30% des Schadens wiederherzustellen, den jeder Verbündete innerhalb von 40 Metern in den letzten 5 Sekunden erlitten hat (bis zu 35% seiner maximalen Gesundheit). Kann kein kritischer Effekt sein. (Chronomantie)',
-  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.abilities.temporal_rewind.name': 'Rückspulen',
   'entities.items.sootscale_mantle.name': 'Rußschuppen-Umhang',
   'entities.items.arcane_dust.name': 'Arkanstaub',
   'entities.items.arcane_essence.name': 'Arkanessenz',
@@ -1104,10 +1104,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Drisch den Ball flach und hart nach vorn übers Feld.',
   'entities.abilities.sport_hoof.name': 'Bolzen',
   'entities.abilities.sport_kick.description': 'Stoß den Ball flach über den Boden zum Zielpunkt.',
-  'entities.abilities.sport_kick.name': 'Kick',
+  'entities.abilities.sport_kick.name': 'Tritt',
   'entities.abilities.sport_pass.description':
     'Spiel einen scharfen Pass auf deinen anvisierten Mitspieler, genau in seinen Lauf.',
-  'entities.abilities.sport_pass.name': 'Pass',
+  'entities.abilities.sport_pass.name': 'Zuspiel',
   'entities.abilities.sport_punt.description': 'Ein Abschlag des Torhüters, hoch und weit.',
   'entities.abilities.sport_punt.name': 'Weiter Abschlag',
   'entities.abilities.sport_second_wind.description':
@@ -3891,7 +3891,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.battle_shout.name': 'Eisernes Gebrüll',
   'entities.abilities.battle_shout.description':
     'Ein Ruf, der die Angriffskraft aller Gruppenmitglieder 30 Min. lang um {buff}% erhöht.',
-  'entities.abilities.demoralizing_shout.name': 'Direhowl',
+  'entities.abilities.demoralizing_shout.name': 'Unheilsheulen',
   'entities.abilities.demoralizing_shout.description':
     'Stößt einen furchterregenden Ruf aus und verringert den verursachten Schaden aller nahen Gegner 20 Sek. lang um {buff}%.',
   'entities.abilities.charge.name': 'Vorpreschen',
@@ -3905,7 +3905,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verkrüppelt den Gegner für {damage} Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
   'entities.abilities.bloodrage.name': 'Blutzoll',
   'entities.abilities.bloodrage.description': 'Erzeugt 10 Wut auf Kosten von Gesundheit.',
-  'entities.abilities.overpower.name': 'Redhand',
+  'entities.abilities.overpower.name': 'Rothand',
   'entities.abilities.overpower.description':
     'Sofortiger Angriff mit Waffenschaden plus {damage}. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
   'entities.abilities.execute.name': 'Frühes Grab',
@@ -3948,7 +3948,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.name': 'Aether-Einsicht',
   'entities.abilities.arcane_intellect.description':
     'Erhöht die Intelligenz 30 Min. lang um {buff}.',
-  'entities.abilities.frostbolt.name': 'Rimelance',
+  'entities.abilities.frostbolt.name': 'Reiflanze',
   'entities.abilities.frostbolt.description':
     'Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%.',
   'entities.abilities.blazing_barrier.name': 'Flammende Barriere',
@@ -3987,13 +3987,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_water_elemental.name': 'Wasserelementar beschwören',
   'entities.abilities.summon_water_elemental.description':
     'Beschwört einen Wasserelementar, der an Eurer Seite kämpft, Wasserblitze auf Euer Ziel schleudert und Wasserstrahl kanalisiert. (Frost)',
-  'entities.abilities.conjure_water.name': 'Waterbind',
+  'entities.abilities.conjure_water.name': 'Wasserbindung',
   'entities.abilities.conjure_water.description':
     'Beschwört 2 Flaschen Wasser, die beim Trinken Mana wiederherstellen. Höhere Ränge beschwören reineres Wasser.',
-  'entities.abilities.conjure_food.name': 'Breadbind',
+  'entities.abilities.conjure_food.name': 'Brotbindung',
   'entities.abilities.conjure_food.description':
     'Beschwört 2 Portionen Brot, die beim Essen Gesundheit wiederherstellen. Höhere Ränge beschwören nahrhaftere Speisen.',
-  'entities.abilities.fire_blast.name': 'Cinderfall',
+  'entities.abilities.fire_blast.name': 'Glutsturz',
   'entities.abilities.fire_blast.description':
     'Trifft den Gegner für {damage} Feuerschaden. Sofort.',
   'entities.abilities.arcane_missiles.name': 'Aether-Pfeile',
@@ -4002,16 +4002,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.polymorph.name': 'Behexen',
   'entities.abilities.polymorph.description':
     'Verwandelt den Gegner bis zu {duration} Sek. lang in eine Kröte. Die Kröte wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
-  'entities.abilities.frost_nova.name': 'Icebind',
+  'entities.abilities.frost_nova.name': 'Eisfessel',
   'entities.abilities.frost_nova.description':
     'Friert alle nahen Gegner bis zu 8 Sek. lang fest und verursacht {damage} Frostschaden. Der Festhalteeffekt endet nach kumulativem Schaden in Höhe von 15 % der maximalen Gesundheit des Ziels, mindestens jedoch 20 und höchstens 60 Schaden.',
-  'entities.abilities.arcane_explosion.name': 'Aetherburst',
+  'entities.abilities.arcane_explosion.name': 'Ätherexplosion',
   'entities.abilities.arcane_explosion.description':
     'Ein Ausbruch arkaner Energie trifft alle nahen Gegner für {damage} Arkanschaden.',
   'entities.abilities.scorch.name': 'Verbrühen',
   'entities.abilities.scorch.description':
     'Versengt den Gegner für {damage} Feuerschaden. Schnell zu wirken.',
-  'entities.abilities.pyroblast.name': 'Pyrelance',
+  'entities.abilities.pyroblast.name': 'Flammenlanze',
   'entities.abilities.pyroblast.description':
     'Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
   'entities.abilities.ice_barrier.name': 'Frostschleier',
@@ -4028,7 +4028,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.gouge.name': 'Augenstich',
   'entities.abilities.gouge.description':
     'Trifft das Ziel für {damage} Schaden und macht es 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. Gewährt 1 Combopunkt.',
-  'entities.abilities.evasion.name': 'Ghostfoot',
+  'entities.abilities.evasion.name': 'Geisterfuß',
   'entities.abilities.evasion.description': 'Erhöht eure Ausweichchance 15 Sek. lang um 50%.',
   'entities.abilities.slice_and_dice.name': 'Mörderisches Tempo',
   'entities.abilities.slice_and_dice.description':
@@ -4041,7 +4041,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.name': 'Lauererstoß',
   'entities.abilities.ambush.description':
     'Überfällt das Ziel für 250% Waffenschaden plus {damage}. Ihr müsst verstohlen und hinter dem Ziel sein. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Dämmerschleier',
   'entities.abilities.stealth.description':
     'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um hervorzutreten.',
   'entities.abilities.adrenaline_rush.name': 'Beschleunigtes Blut',
@@ -4065,7 +4065,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rupture.name': 'Ausbluten',
   'entities.abilities.rupture.description':
     'Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt.',
-  'entities.abilities.vanish.name': 'Smokestep',
+  'entities.abilities.vanish.name': 'Rauchschritt',
   'entities.abilities.vanish.description':
     'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
   'entities.abilities.instant_poison.name': 'Natternbiss',
@@ -4077,14 +4077,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.name': 'Dreckwurf',
   'entities.abilities.blind.description':
     'Blendet das Ziel, sodass es 8 Sek. lang desorientiert umherirrt. Jeder Schaden bricht den Effekt.',
-  'entities.abilities.seal_of_righteousness.name': 'Oathbrand',
+  'entities.abilities.seal_of_righteousness.name': 'Eidmal',
   'entities.abilities.seal_of_righteousness.description':
     'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung {damage} zusätzlichen Heiligschaden verursacht. Mit Verdict entfesseln.',
-  'entities.abilities.holy_light.name': 'Mending Light',
+  'entities.abilities.holy_light.name': 'Heilendes Licht',
   'entities.abilities.holy_light.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.devotion_aura.name': 'Standhafte Aura',
   'entities.abilities.devotion_aura.description': 'Erhöht eure Rüstung 30 Min. lang um {buff}.',
-  'entities.abilities.judgement.name': 'Verdict',
+  'entities.abilities.judgement.name': 'Urteil',
   'entities.abilities.judgement.description':
     'Entfesselt euer aktives Siegel auf den Gegner, verbraucht es und verursacht seinen gespeicherten Heiligschaden.',
   'entities.abilities.blessing_of_might.name': 'Eid des Eisens',
@@ -4098,7 +4098,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': 'Letzte Ölung',
   'entities.abilities.lay_on_hands.description':
     'Ein gewaltiger Heilungsstoß: Stellt {damage} Gesundheit wieder her. 10 Min. Abklingzeit.',
-  'entities.abilities.flash_of_light.name': 'Lightmend',
+  'entities.abilities.flash_of_light.name': 'Lichtheilung',
   'entities.abilities.flash_of_light.description':
     'Ein schneller, effizienter Lichtstoß, der ein freundliches Ziel um {damage} heilt.',
   'entities.abilities.exorcism.name': 'Ritus der Austreibung',
@@ -4113,7 +4113,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.retribution_aura.name': 'Aura der Vergeltung',
   'entities.abilities.retribution_aura.description':
     'Umgibt Euch 30 Min. lang mit heiliger Energie und fügt jedem Gegner, der Euch im Nahkampf trifft, 5 Heiligschaden zu.',
-  'entities.abilities.tame_beast.name': 'Wildbond',
+  'entities.abilities.tame_beast.name': 'Wildband',
   'entities.abilities.tame_beast.description':
     'Beginnt, ein Wildtier als Begleiter zu zähmen. Es muss eure Stufe oder niedriger haben und darf kein Elitegegner sein. Euer Begleiter folgt euch, greift eure Gegner an und hält eigene Bedrohung. Ihr könnt nur einen Begleiter zugleich haben.',
   'entities.abilities.dismiss_pet.name': 'Begleiter entlassen',
@@ -4133,7 +4133,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.concussive_shot.name': 'Rasselnder Schuss',
   'entities.abilities.concussive_shot.description':
     'Macht das Ziel für {damage} Schaden benommen und verringert sein Bewegungstempo 4 Sek. lang um 50%.',
-  'entities.abilities.mongoose_bite.name': 'Counterfang',
+  'entities.abilities.mongoose_bite.name': 'Gegenbiss',
   'entities.abilities.mongoose_bite.description':
     'Kontert, nachdem das Ziel ausgewichen ist, für Waffenschaden plus {damage}. Kann nicht ausgewichen werden.',
   'entities.abilities.wing_clip.name': 'Fesselnder Hieb',
@@ -4165,7 +4165,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schützt das Ziel und absorbiert 30 Sek. lang {damage} Schaden.',
   'entities.abilities.renew.name': 'Anhaltende Gnade',
   'entities.abilities.renew.description': 'Heilt das Ziel über 15 Sek. um {damage}.',
-  'entities.abilities.mind_blast.name': 'Mindfracture',
+  'entities.abilities.mind_blast.name': 'Geistesbruch',
   'entities.abilities.mind_blast.description':
     'Trifft den Geist des Ziels für {damage} Schattenschaden.',
   'entities.abilities.heal.name': 'Feierliches Gebet',
@@ -4203,7 +4203,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.name': 'Rimebound-Waffe',
   'entities.abilities.frostbrand_weapon.description':
     'Verzaubert Eure Waffe mit beißendem Frost: Jeder Schlag verursacht 5 Min. lang {damage} zusätzlichen Schaden.',
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': 'Schattenwolf',
   'entities.abilities.ghost_wolf.description':
     'Verwandelt euch in einen Shadewolf und erhöht euer Bewegungstempo 10 Min. lang um 40%.',
   'entities.abilities.stormstrike.name': 'Ahnenhieb',
@@ -4212,13 +4212,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadow_bolt.name': 'Gloom-Blitz',
   'entities.abilities.shadow_bolt.description':
     'Sendet einen schattenhaften Blitz auf den Gegner und verursacht {damage} Schattenschaden.',
-  'entities.abilities.demon_skin.name': 'Fiendhide',
+  'entities.abilities.demon_skin.name': 'Dämonenhaut',
   'entities.abilities.demon_skin.description':
     'Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.immolate.name': 'Brennender Pakt',
   'entities.abilities.immolate.description':
     'Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek.',
-  'entities.abilities.corruption.name': 'Blackrot',
+  'entities.abilities.corruption.name': 'Schwarzfäule',
   'entities.abilities.corruption.description':
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
   'entities.abilities.life_tap.name': 'Harter Handel',
@@ -4238,29 +4238,29 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': 'Dämmerfeuer',
   'entities.abilities.shadowburn.description':
     'Trifft das Ziel sofort mit sengendem Schatten für {damage} Schattenschaden.',
-  'entities.abilities.wrath.name': 'Wildbolt',
+  'entities.abilities.wrath.name': 'Wildblitz',
   'entities.abilities.wrath.description':
     'Schleudert einen Blitz Naturenergie für {damage} Naturschaden.',
-  'entities.abilities.healing_touch.name': 'Wildmend',
+  'entities.abilities.healing_touch.name': 'Wildheilung',
   'entities.abilities.healing_touch.description': 'Heilt ein freundliches Ziel um {damage}.',
-  'entities.abilities.mark_of_the_wild.name': 'Wildward',
+  'entities.abilities.mark_of_the_wild.name': 'Wildwacht',
   'entities.abilities.mark_of_the_wild.description':
     'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.moonfire.name': 'Mondsturm',
   'entities.abilities.moonfire.description':
     'Verbrennt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
-  'entities.abilities.rejuvenation.name': 'Wildbloom',
+  'entities.abilities.rejuvenation.name': 'Wildblüte',
   'entities.abilities.rejuvenation.description': 'Heilt das Ziel über 12 Sek. um {damage}.',
-  'entities.abilities.thorns.name': 'Briarguard',
+  'entities.abilities.thorns.name': 'Dornenwacht',
   'entities.abilities.thorns.description':
     'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden {buff} Naturschaden.',
   'entities.abilities.entangling_roots.name': 'Greifende Wurzeln',
   'entities.abilities.entangling_roots.description':
     'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.',
-  'entities.abilities.bear_form.name': 'Bruin Form',
+  'entities.abilities.bear_form.name': 'Bruin-Gestalt',
   'entities.abilities.bear_form.description':
     'Verwandelt euch in einen Bären: Rüstung +130%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
-  'entities.abilities.maul.name': 'Bonecrush',
+  'entities.abilities.maul.name': 'Knochenmalmer',
   'entities.abilities.maul.description':
     'Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bruin Form.',
   'entities.abilities.growl.name': 'Bedrohen',
@@ -4272,7 +4272,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': 'Klaue',
   'entities.abilities.claw.description':
     'Kratzt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
-  'entities.abilities.ferocious_bite.name': 'Gorebite',
+  'entities.abilities.ferocious_bite.name': 'Blutbiss',
   'entities.abilities.ferocious_bite.description':
     'Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt.',
   'entities.abilities.swipe.name': 'Fegende Klauen',
@@ -4284,17 +4284,17 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Eichenhaut',
   'entities.abilities.barkskin.description':
     'Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um 150.',
-  'entities.abilities.starfire.name': 'Skyfall',
+  'entities.abilities.starfire.name': 'Himmelssturz',
   'entities.abilities.starfire.description':
     'Ruft einen Bolzen aus Sternenfeuer herab, der {damage} Arkanschaden verursacht.',
-  'entities.abilities.travel_form.name': 'Fleet Form',
+  'entities.abilities.travel_form.name': 'Fleet-Gestalt',
   'entities.abilities.travel_form.description':
     'Nehmt augenblicklich eine flinke Fleet Form an, was das Lauftempo um 40% erhöht. In dieser Gestalt könnt ihr keine anderen Fähigkeiten einsetzen, aber ihr könnt im Kampf hinein- und herauswechseln. Ideal zur Flucht.',
   'entities.abilities.enrage.name': 'Anfachen',
   'entities.abilities.enrage.description': 'Erzeugt sofort 20 Wut. Nur in Bruin Form.',
   'entities.abilities.bash.name': 'Erschüttern',
   'entities.abilities.bash.description': 'Betäubt das Ziel 2 Sek. lang. Nur in Bruin Form.',
-  'entities.abilities.faerie_fire.name': 'Witchlight',
+  'entities.abilities.faerie_fire.name': 'Hexenlicht',
   'entities.abilities.faerie_fire.description':
     'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%. Nicht mit Rüstungsspalter kumulierbar.',
   'entities.abilities.hibernate.name': 'Schlummer',
@@ -4303,13 +4303,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dash.name': 'Sprint',
   'entities.abilities.dash.description':
     'Sprintet vorwärts und erhöht das Lauftempo 15 Sek. lang um 50%. Nur in Wolfsgestalt.',
-  'entities.abilities.pounce.name': 'Slinkstrike',
+  'entities.abilities.pounce.name': 'Schleichschlag',
   'entities.abilities.pounce.description':
     'Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.insect_swarm.name': 'Stechender Schwarm',
   'entities.abilities.insect_swarm.description':
     'Der Gegner wird von Insekten umschwärmt und erleidet {damage} Naturschaden über 12 Sek.',
-  'entities.abilities.tigers_fury.name': 'Wolfsblood',
+  'entities.abilities.tigers_fury.name': 'Wolfsblut',
   'entities.abilities.tigers_fury.description':
     'Erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Wolfsgestalt.',
   'entities.abilities.rip.name': 'Zerfetzen',
@@ -4321,7 +4321,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': 'Aderlass',
   'entities.abilities.bloodthirst.description':
     'Greift sofort in blutiger Raserei an und verursacht 60% Waffenschaden plus {damage}. (Furor-Signatur)',
-  'entities.abilities.shield_slam.name': 'Shieldcrack',
+  'entities.abilities.shield_slam.name': 'Schildschmettern',
   'entities.abilities.shield_slam.description':
     'Schlägt das Ziel mit eurem Schild für 50% Waffenschaden plus {damage} und erzeugt enorme Bedrohung. (Schutz-Signatur)',
   'entities.abilities.whirlwind.name': 'Klingenwirbel',
@@ -8227,31 +8227,31 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossTitle': 'Wenn der Gipfel erwacht: der Weltboss',
   'entities.abilities.chain_heal.description':
     'Heilt ein verbündetes Ziel um einen großen Betrag und springt dann auf bis zu 2 weitere Verbündete in der Nähe über. Die Heilung verringert sich mit jedem Sprung um 50%. (Wiederherstellungs-Signatur)',
-  'entities.abilities.chain_heal.name': 'Chain Heal',
+  'entities.abilities.chain_heal.name': 'Kettenheilung',
   'entities.abilities.counter_shot.description':
     'Ein schneller Schuss, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken.',
-  'entities.abilities.counter_shot.name': 'Hushing Shot',
+  'entities.abilities.counter_shot.name': 'Schweigeschuss',
   'entities.abilities.counterspell.description':
     'Kontert das Zauberwirken des Ziels und hindert es 6 Sek. lang daran, Zauber dieser Schule zu wirken.',
-  'entities.abilities.counterspell.name': 'Spellbreak',
+  'entities.abilities.counterspell.name': 'Zauberbruch',
   'entities.abilities.holy_taunt.description':
     'Verspottet das Ziel: Eure Bedrohung steigt auf den Wert seines meistgehassten Feindes, und es wird 3 Sek. lang gezwungen, Euch anzugreifen.',
-  'entities.abilities.holy_taunt.name': 'Sacred Goad',
+  'entities.abilities.holy_taunt.name': 'Heiliger Ansporn',
   'entities.abilities.kick.description':
     'Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken.',
-  'entities.abilities.kick.name': 'Boot',
+  'entities.abilities.kick.name': 'Fußtritt',
   'entities.abilities.pummel.description':
     'Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken.',
-  'entities.abilities.pummel.name': 'Jawcrack',
+  'entities.abilities.pummel.name': 'Kieferbrecher',
   'entities.abilities.rebuke.description':
     'Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken.',
-  'entities.abilities.rebuke.name': 'Reproach',
+  'entities.abilities.rebuke.name': 'Tadel',
   'entities.abilities.skull_bash.description':
     'Ein vorstoßender Kopfstoß, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken.',
-  'entities.abilities.skull_bash.name': 'Headbutt',
+  'entities.abilities.skull_bash.name': 'Kopfstoß',
   'entities.abilities.spell_lock.description':
     'Bringt das Ziel mitten im Zauberwirken zum Schweigen und hindert es 5 Sek. lang daran, Zauber dieser Schule zu wirken.',
-  'entities.abilities.spell_lock.name': 'Gag Order',
+  'entities.abilities.spell_lock.name': 'Schweigegebot',
   'entities.items.ashen_focus_ring.name': 'Aschener Fokusring',
   'entities.items.ashstalker_cowl.name': 'Aschenpirscher-Kapuze',
   'entities.items.ashstalker_grips.name': 'Aschenpirscher-Handschützer',
@@ -9090,7 +9090,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Voller Fähigkeitsgewinn',
   'hudChrome.crafting.difficultyNone': 'Kein Fähigkeitsgewinn',
   'hudChrome.crafting.difficultyReduced': 'Reduzierter Fähigkeitsgewinn',
-  'hudChrome.crafting.enchantedLine': 'Verzaubert',
   'hudChrome.crafting.makersMark': 'Hergestellt von {name}',
   'hudChrome.crafting.masterworkSeal': 'Meisterwerk',
   'hudChrome.crafting.masterworkToast': 'Meisterwerk! {name}',
@@ -9346,4 +9345,62 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': '{name} für {fee} entbinden',
   'hudChrome.unbind.unbound':
     '{name} für {fee} entbunden. Es bindet sich beim nächsten Handel erneut.',
+  'hud.combat.auraGainOther': '{target} erhält {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Stoff',
+  'hudChrome.corpseHarvest.components.meat': 'Fleisch',
+  'hudChrome.crafting.noBagSpace': 'Du hast keinen Platz für den hergestellten Gegenstand.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Du hast keinen Platz für die arkanen Materialien.',
+  'hudChrome.enchanting.enchantNoSpace': 'Du hast keinen Platz für den verzauberten Gegenstand.',
+  'hudChrome.enchanting.salvageNoSpace':
+    'Du hast keinen Platz für die Materialien aus dem Zerlegen.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'In Reichweite ist keine Kräuterpflanze.',
+  'hudChrome.gathering.noNodeNearby.logging': 'In Reichweite ist keine Baumgruppe.',
+  'hudChrome.gathering.noNodeNearby.mining': 'In Reichweite ist keine Erzader.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Erfordert eine Kräuterkunde-Sichel',
+  'hudChrome.gathering.requiresTool.logging': 'Erfordert eine Holzfäller-Axt',
+  'hudChrome.gathering.requiresTool.mining': 'Erfordert eine Bergbau-Spitzhacke',
+  'hudChrome.gathering.toolRequired.fishing': 'Du brauchst eine Angel, um die Schnur auszuwerfen.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Du brauchst eine Kräuterkunde-Sichel, um diese Pflanze zu sammeln.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Du brauchst eine Holzfäller-Axt, um diese Baumgruppe zu fällen.',
+  'hudChrome.gathering.toolRequired.mining':
+    'Du brauchst eine Bergbau-Spitzhacke, um diese Ader abzubauen.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Angelrute (Stufe {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Kräuterkunde-Werkzeug (Stufe {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Holzfäller-Werkzeug (Stufe {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Bergbau-Werkzeug (Stufe {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Schaltet ab Angelfertigkeit {skill} reichhaltigere Fangtabellen frei.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Fische beißen bis zu {seconds} Sek. früher an.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Verlängert das Einholfenster um {seconds} Sek.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Zum Angeln erforderlich.',
+  'hudChrome.gathering.toolTooltip.speed':
+    'Sammelt schneller an Knoten unterhalb von Stufe {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Erforderlich, um Kräuterpflanzen bis Stufe {tier} zu sammeln.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Erforderlich, um Baumgruppen bis Stufe {tier} zu fällen.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Erforderlich, um Erzadern bis Stufe {tier} abzubauen.',
+  'hudChrome.gathering.toolTooltip.use.herbalism':
+    'Benutzen: Sammelt von einer Kräuterpflanze in der Nähe.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Benutzen: Fällt eine Baumgruppe in der Nähe.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Benutzen: Baut eine Erzader in der Nähe ab.',
+  'hudChrome.noticeboard.empty': 'Hier scheint nichts ausgehängt zu sein.',
+  'hudChrome.training.pendingAria': '{name} wird gelernt',
+  'hudChrome.training.statePending': 'Wird gelernt',
+  'hudChrome.unbind.noSpace': 'Du hast keinen Platz für die entbundene Kopie.',
+  'loading.incompatibleWorldVersion':
+    'Spiel- und Serverversion sind nicht kompatibel. Lade neu oder aktualisiere und versuche es dann erneut.',
+  'loading.messageRateExceeded':
+    'Du wurdest getrennt, weil du Aktionen zu schnell gesendet hast. Bitte warte einen Moment und melde dich erneut an.',
+  'perfNudge.dismiss': 'Schließen',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Das Spiel läuft ohne GPU-Beschleunigung und ist dadurch sehr langsam. Aktualisiere deine Grafiktreiber und starte das Spiel neu. Unter Windows stelle das Spiel außerdem über Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein.',
+  'perfNudge.hardwareAccelerationWeb':
+    'Das Spiel läuft ohne GPU-Beschleunigung und ist dadurch sehr langsam. Aktiviere die Hardwarebeschleunigung in deinen Browsereinstellungen, aktualisiere deine Grafiktreiber und starte deinen Browser neu.',
+  'perfNudge.integratedGpu':
+    'Das Spiel läuft auf der integrierten (stromsparenden) GPU. Wenn dieser Computer auch eine Gaming-GPU hat, stelle deinen Browser unter Windows über Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein und starte den Browser danach neu. Die Desktop-App wählt die Gaming-GPU automatisch.',
+  'worldContent.noticeboardName': 'Anschlagtafel',
 };

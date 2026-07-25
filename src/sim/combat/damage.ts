@@ -137,7 +137,7 @@ export function dealDamage(
   // Cauterize (fire spec): +12% Fire damage to enemies while the caster is burning
   // (combat/fire_mage.ts). Returns 1x for everyone else and for the self-burn, so all
   // other damage is byte-identical.
-  amount = Math.round(amount * cauterizeFireDamageMult(source, target, school));
+  if (!alreadyFinal) amount = Math.round(amount * cauterizeFireDamageMult(source, target, school));
 
   // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
   // through raid bosses to inspect drops without one-shotting them past their phase

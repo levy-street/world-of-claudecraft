@@ -74,15 +74,24 @@ export interface NormalDungeonTuning {
   damageMultiplierByMob: Record<string, number>;
 }
 
-// Economy retune (v0.29): soloable normal Sanctum runs were printing up to 6
-// gold per clear. Calibration target: every mob's health DOUBLES, and the
-// minimum non-crit swing lands at least 300 (trash) / 600 (bosses) on the
-// maximum-mitigation reference warrior: level-20 prot in the max-armor kit
-// (full heroic plate + shield, prot mastery), 2861 armor, in Defensive Stance
-// (takes 10% less), i.e. only ~37-38% of a raw swing gets through. Solving the
-// floor per mob at its minimum spawn level gives the ladder below; the
-// non-elite raised_bonewalker needs roughly double the trash factor because it
-// lacks the 1.5x elite swing multiplier. Pinned by
+// Fresh-group retune (v0.30): normal Sanctum is the fresh-20 group dungeon,
+// and the v0.29 economy floors (trash 200 / bosses 420 / adds 150 on the
+// max-mitigation reference warrior) landed 22-54% of a freshly-capped tank's
+// pool PER SWING (quest greens/blues: 1371-1752 hp, 1439-2361 armor across
+// the three committed tanks); the Monte Carlo survival bench
+// (scripts/sanctum_fresh_montecarlo.ts) showed 0% clears and a tank death in
+// every run even against single bosses with a healer. New calibration: the
+// minimum non-crit swing on the same reference warrior (level-20 prot in the
+// max-armor kit, 2861 armor, Defensive Stance) lands at least 90 (trash),
+// 200 (bosses; Korgath/Korzul land ~245, Velkhar sits at the 200 line
+// because he swings at 2.0s and layers his summon waves on top), and 50
+// (Velkhar's non-elite bonewalker waves, which spawn three at a time and are
+// wave pressure, not extra bosses). That prices a boss swing at ~25% of the
+// fresh tank pool (~20.5% for Velkhar), the same audience-pool share the
+// heroic and Nythraxis calibrations use, with tanks crit-immune since
+// v0.29.1 so there is no spike tail above the 1.25x roll cap; an add swing
+// is ~5-7%. The DOUBLED health stays: the economy lever is clear time, not
+// lethality. Pinned by
 // tests/gravewyrm_normal_tuning.test.ts, which also pins the heroic transform
 // literals so a base-template edit cannot slip through unnoticed.
 //
@@ -97,12 +106,12 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     difficulty: 'normal',
     healthMultiplier: 2.0,
     damageMultiplierByMob: {
-      sanctum_boneguard: 7.5,
-      sanctum_drakonid: 7.25,
-      raised_bonewalker: 11.25,
-      korgath_the_bound: 13.5,
-      grand_necromancer_velkhar: 14,
-      korzul_the_gravewyrm: 13,
+      sanctum_boneguard: 3.4,
+      sanctum_drakonid: 3.3,
+      raised_bonewalker: 3.75,
+      korgath_the_bound: 7.75,
+      grand_necromancer_velkhar: 6.6,
+      korzul_the_gravewyrm: 7.5,
     },
   },
   nythraxis_boss_arena: {
@@ -123,8 +132,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     level: 22,
     healthMultiplier: 3.8,
     damageMultiplier: 20,
-    // No hollow_crypt boss summons adds; kept at the half convention, inert.
-    addDamageMultiplier: 10,
+    // No hollow_crypt boss summons adds; inert, but rides the v0.30 40% add
+    // nerf with the other heroics so a future summoner starts on-model.
+    addDamageMultiplier: 6,
     armorMultiplier: 1.3,
     finalBossId: 'morthen',
     marksPerParticipant: 1,
@@ -135,9 +145,11 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     level: 22,
     healthMultiplier: 4.0,
     damageMultiplier: 18,
-    // Vael's drowned_thrall summons are non-elite: 16.25x lands the summoned
-    // 250 floor (adds are wave pressure, not extra bosses; 2026-07 retune).
-    addDamageMultiplier: 16.25,
+    // Vael's drowned_thrall summons are non-elite. v0.30: boss-summoned adds
+    // hit 40% softer across every heroic five-man (the 250 floor drops to
+    // 150); a tanked triple wave stacked on the boss was still overwhelming
+    // healers after the 2026-07 retune.
+    addDamageMultiplier: 9.75,
     armorMultiplier: 1.3,
     finalBossId: 'vael_the_mistcaller',
     marksPerParticipant: 1,
@@ -148,9 +160,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     level: 22,
     healthMultiplier: 5.2,
     damageMultiplier: 16.5,
-    // Ysolei's moonspawn summons are non-elite: 15.25x lands the summoned
-    // 250 floor (2026-07 retune).
-    addDamageMultiplier: 15.25,
+    // Ysolei's moonspawn summons are non-elite; 40% add nerf (v0.30), the
+    // summoned floor drops from 250 to 150.
+    addDamageMultiplier: 9.15,
     armorMultiplier: 1.25,
     finalBossId: 'ysolei',
     marksPerParticipant: 1,
@@ -161,11 +173,11 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     level: 22,
     healthMultiplier: 4.0,
     damageMultiplier: 15.5,
-    // Velkhar's raised_bonewalker summons are non-elite: 14.25x lands the
-    // summoned 250 floor (2026-07 retune).
-    addDamageMultiplier: 14.25,
+    // Velkhar's raised_bonewalker summons are non-elite; 40% add nerf
+    // (v0.30), the summoned floor drops from 250 to 150.
+    addDamageMultiplier: 8.55,
     // The Sanctum bosses must out-hit their retuned NORMAL selves (normal
-    // floors them at 420 post-mitigation since the 2026-07 fresh-group
+    // floors them at 200-247 post-mitigation since the v0.30 fresh-group
     // retune): 19x lands 652-708, comfortably above.
     damageMultiplierByMob: {
       korgath_the_bound: 19,

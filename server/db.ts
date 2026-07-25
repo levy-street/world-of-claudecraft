@@ -700,6 +700,20 @@ CREATE INDEX IF NOT EXISTS client_perf_reports_created ON client_perf_reports(cr
 CREATE INDEX IF NOT EXISTS client_perf_reports_release_created ON client_perf_reports(release_version, created_at DESC);
 CREATE INDEX IF NOT EXISTS client_perf_reports_gpu_created ON client_perf_reports(gl_renderer_bucket, created_at DESC);
 CREATE INDEX IF NOT EXISTS client_perf_reports_session_created ON client_perf_reports(session_id, created_at DESC);
+-- Packet 0 report dimensions (rulings R3-R7). crowd_bucket keeps the summary
+-- statement's GROUPING-bits contract (every grouped column TEXT NOT NULL
+-- DEFAULT ''; pre-column rows fold to 'unknown' in the read-time mapper). The
+-- worst-10s ranking index builds via CONCURRENT_INDEX_MIGRATIONS
+-- (server/client_perf_indexes.ts), never here.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS crowd_bucket TEXT NOT NULL DEFAULT '';
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS sim_entities INT NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS active_views INT NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS visible_views INT NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS worst_10s_frame_p95_ms REAL NOT NULL DEFAULT 0;
+-- Phase 05 (ruling R14): client-computed perf-doctor suggestion ids, validated
+-- against the server allowlist in perf_report.ts before storage (filter,
+-- dedupe, cap 3). Pre-column and healthy rows both read as the empty array.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}';
 -- Non-custodial Solana wallet links (PRD: docs/prd/woc/wallet-link.md). One
 -- wallet per account (account_id is the PK) and one account per wallet (pubkey
 -- is UNIQUE). The server never holds keys; ownership is proven by a signed
@@ -3236,6 +3250,15 @@ export async function charactersForDeedsBoard(
 // benchmark runs with no account, and one session may emit several samples.
 // ---------------------------------------------------------------------------
 
+// The worst-10s concurrent index (ruling R7). Defined in the dependency-free
+// client_perf_indexes.ts (the registry evaluates before this module's body;
+// see the note there) and re-exported here beside the table's accessors.
+export {
+  CLIENT_PERF_WORST10S_INDEX_SQL,
+  CLIENT_PERF_WORST10S_INVALID_INDEX_CHECK_SQL,
+  CLIENT_PERF_WORST10S_INVALID_INDEX_DROP_SQL,
+} from './client_perf_indexes';
+
 export interface ClientPerfReportInsert {
   schemaVersion: number;
   releaseVersion: string;
@@ -3274,6 +3297,12 @@ export interface ClientPerfReportInsert {
   glRendererBucket: string;
   zoneOrScenario: string;
   source: string;
+  crowdBucket: string;
+  simEntities: number;
+  activeViews: number;
+  visibleViews: number;
+  worst10sFrameP95Ms: number;
+  suggestionIds: string[];
   rawSummary: Record<string, unknown>;
 }
 
@@ -3286,7 +3315,9 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
-       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source, raw_summary
+       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
+       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
+       suggestion_ids, raw_summary
      ) VALUES (
        $1, $2, $3, $4, $5, $6, $7,
        $8, $9, $10, $11, $12, $13,
@@ -3294,7 +3325,9 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        $18, $19, $20, $21, $22,
        $23, $24, $25, $26,
        $27, $28, $29, $30, $31,
-       $32, $33, $34, $35, $36, $37, $38
+       $32, $33, $34, $35, $36, $37,
+       $38, $39, $40, $41, $42,
+       $43, $44
      )`,
     [
       row.schemaVersion,
@@ -3334,6 +3367,12 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
       row.glRendererBucket,
       row.zoneOrScenario,
       row.source,
+      row.crowdBucket,
+      row.simEntities,
+      row.activeViews,
+      row.visibleViews,
+      row.worst10sFrameP95Ms,
+      row.suggestionIds,
       JSON.stringify(row.rawSummary),
     ],
   );

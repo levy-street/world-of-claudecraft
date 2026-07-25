@@ -33,7 +33,7 @@ import {
   VALE_CUP_BALL_TEMPLATE_ID,
   vcNation,
 } from '../content/vale_cup';
-import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS, NPCS } from '../data';
+import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
@@ -44,6 +44,7 @@ import {
   dist2d,
   type Entity,
   MELEE_RANGE,
+  type NpcDef,
   type SportRole,
   type VcBracket,
   type VcNationId,
@@ -355,14 +356,18 @@ function deserterUntil(ctx: SimContext, name: string): number {
 
 // ---------------------------------------------------------------------------
 // World init: Groundskeeper Bram at the Sowfield gate (reserved id, see above).
-// The caller (the Sim ctor) resolves `safe` through the SAME findSafePos path
-// the generic NPC surface-placement loop uses, so Bram is nudged out of water
-// or a building exactly like every other NPC; only his id allocation differs.
+// The caller (the Sim ctor) supplies both the configured world's definition and
+// a `safe` point resolved through the SAME findSafePos path the generic NPC
+// surface-placement loop uses. Bram can therefore neither leak from built-in
+// content nor spawn inside water/buildings; only his id allocation differs.
 // ---------------------------------------------------------------------------
 
-export function spawnGroundskeeper(ctx: SimContext, safe: { x: number; z: number }): void {
-  const def = NPCS.groundskeeper_bram;
-  if (!def || ctx.entities.has(VALE_CUP_BRAM_ID)) return;
+export function spawnGroundskeeper(
+  ctx: SimContext,
+  def: NpcDef,
+  safe: { x: number; z: number },
+): void {
+  if (ctx.entities.has(VALE_CUP_BRAM_ID)) return;
   const npc = createNpc(VALE_CUP_BRAM_ID, def, ctx.groundPos(safe.x, safe.z));
   ctx.addEntity(npc);
 }

@@ -7637,4 +7637,65 @@
       min-width: 40px;
     }
   }
+
+  /* ---------- performance nudge toast ---------- */
+  /* Owned by src/ui/perf_nudge_toast.ts: the one-time machine-local performance
+     nudge (packet 0 rulings R14-R16), a SIBLING of the software rendering
+     notice above with the same visual language. It sits one slot BELOW the
+     gpu-notice slot so the stack can never overlap; the two toasts are mutually
+     exclusive by construction (the nudge's software arm is suppressed when the
+     boot notice showed), but the fixed slot keeps a defensive ordering anyway. */
+  #perf-nudge {
+    position: fixed;
+    /* Same safe-area handling as #gpu-notice: clear of a notch on mobile
+       shells, zero everywhere else; 112px clears both toast slots above.
+       Unlike the pre-game portrait sibling, this toast surfaces IN-GAME,
+       where web mobile is landscape-only, so the right edge also clears a
+       rotated notch / rounded corner. */
+    top: calc(var(--spacing-md) + 112px + env(safe-area-inset-top, 0px));
+    right: calc(var(--spacing-md) + env(safe-area-inset-right, 0px));
+    z-index: 260;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    max-width: min(440px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  #perf-nudge[hidden] {
+    display: none;
+  }
+  #perf-nudge button {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    /* WCAG 2.5.8 absolute floor on any pointer; the coarse-pointer block below
+       raises it to the repo's 40x40 mobile touch floor (this toast can surface
+       in a mobile browser mid-session). */
+    min-height: 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font: inherit;
+    cursor: var(--cursor-point);
+  }
+  #perf-nudge button:hover {
+    border-color: var(--color-primary);
+  }
+  #perf-nudge button:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (pointer: coarse) {
+    #perf-nudge button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+  }
 }
