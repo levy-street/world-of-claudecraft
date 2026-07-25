@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  applyPropCellMode,
   PROP_FAR_CELL_SIZE,
   PROP_FAR_SWAP_DISTANCE,
+  type PropCellRuntime,
   propCellBoxDistance,
   propCellKey,
   propCellMode,
@@ -65,5 +67,83 @@ describe('propCellMode', () => {
   it('honors a custom swap distance', () => {
     expect(propCellMode(bounds, 100 - 30, 0, 470, 30).farMode).toBe(true);
     expect(propCellMode(bounds, 100 - 29, 0, 470, 30).farMode).toBe(false);
+  });
+});
+
+describe('applyPropCellMode', () => {
+  function makeCell(): PropCellRuntime {
+    return {
+      farMode: false,
+      visible: true,
+      meshes: [
+        { visible: true, count: 0 },
+        { visible: true, count: 0 },
+      ],
+      hideables: [
+        {
+          suppressed: false,
+          hidden: false,
+          bakeMeshes: [{ mesh: { visible: true } }, { mesh: { visible: true } }],
+          mats: [{ mat: { colorWrite: true, depthWrite: true }, depthWrite: true }],
+        },
+      ],
+    };
+  }
+
+  it('transitions to far mode: bake fully on, individuals suppressed', () => {
+    const cell = makeCell();
+    applyPropCellMode(cell, { farMode: true, showMerged: true });
+    expect(cell.farMode).toBe(true);
+    expect(cell.meshes.every((m) => m.visible && m.count === 1)).toBe(true);
+    const h = cell.hideables[0];
+    expect(h.suppressed).toBe(true);
+    expect(h.bakeMeshes.every((b) => !b.mesh.visible)).toBe(true);
+  });
+
+  it('transitions back to near mode: bake shadow-only, individuals restored', () => {
+    const cell = makeCell();
+    applyPropCellMode(cell, { farMode: true, showMerged: true });
+    applyPropCellMode(cell, { farMode: false, showMerged: false });
+    expect(cell.farMode).toBe(false);
+    // Near mode keeps the bake VISIBLE (it is the cell's shadow caster) but
+    // count-gated out of the color pass.
+    expect(cell.meshes.every((m) => m.visible && m.count === 0)).toBe(true);
+    const h = cell.hideables[0];
+    expect(h.suppressed).toBe(false);
+    expect(h.bakeMeshes.every((b) => b.mesh.visible)).toBe(true);
+  });
+
+  it('hides the bake past the fog while staying in far mode', () => {
+    const cell = makeCell();
+    applyPropCellMode(cell, { farMode: true, showMerged: true });
+    applyPropCellMode(cell, { farMode: true, showMerged: false });
+    expect(cell.farMode).toBe(true);
+    expect(cell.meshes.every((m) => !m.visible)).toBe(true);
+    // and back inside the fog without a mode flip
+    applyPropCellMode(cell, { farMode: true, showMerged: true });
+    expect(cell.meshes.every((m) => m.visible && m.count === 1)).toBe(true);
+  });
+
+  it('clears a stale ghost fade when entering far mode (teleport case)', () => {
+    const cell = makeCell();
+    const h = cell.hideables[0];
+    // ghost fade active: color/depth writes off
+    h.hidden = true;
+    h.mats[0].mat.colorWrite = false;
+    h.mats[0].mat.depthWrite = false;
+    applyPropCellMode(cell, { farMode: true, showMerged: true });
+    expect(h.hidden).toBe(false);
+    expect(h.mats[0].mat.colorWrite).toBe(true);
+    expect(h.mats[0].mat.depthWrite).toBe(true);
+  });
+
+  it('is edge-triggered: reapplying the same mode touches nothing', () => {
+    const cell = makeCell();
+    applyPropCellMode(cell, { farMode: true, showMerged: true });
+    // poke state that a redundant reapply must NOT overwrite
+    cell.meshes[0].count = 1;
+    cell.hideables[0].hidden = true;
+    applyPropCellMode(cell, { farMode: true, showMerged: true });
+    expect(cell.hideables[0].hidden).toBe(true);
   });
 });

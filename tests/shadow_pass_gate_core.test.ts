@@ -44,4 +44,10 @@ describe('attachShadowPassOnlyGate', () => {
     const mesh = gated(12);
     expect(mesh.count).toBe(0);
   });
+
+  it('exposes the real count for cost telemetry', () => {
+    const mesh = gated(48) as FakeMesh & { shadowPassFullCount?: number };
+    // the budget report must not read the gated 0
+    expect(mesh.shadowPassFullCount).toBe(48);
+  });
 });

@@ -24,6 +24,9 @@ export interface ShadowPassGatedMesh {
   count: number;
   onBeforeShadow: unknown;
   onAfterShadow: unknown;
+  /** The real instance count, for cost telemetry: `count` reads 0 outside
+   * the shadow draw once the gate is attached. */
+  shadowPassFullCount?: number;
 }
 
 /**
@@ -33,6 +36,7 @@ export interface ShadowPassGatedMesh {
  */
 export function attachShadowPassOnlyGate(mesh: ShadowPassGatedMesh): void {
   const fullCount = mesh.count;
+  mesh.shadowPassFullCount = fullCount;
   mesh.onBeforeShadow = () => {
     mesh.count = fullCount;
   };

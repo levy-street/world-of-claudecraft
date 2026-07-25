@@ -129,7 +129,7 @@ import {
   syncFrostNovaRootVisual,
 } from './frost_nova_root_visual';
 import { FrozenOrbFx } from './frozen_orb_fx';
-import { buildGatherNodes } from './gather_nodes';
+import { buildGatherNodes, resolveGatherNodePick } from './gather_nodes';
 import {
   GFX,
   type GfxBucketBands,
@@ -7097,21 +7097,7 @@ export class Renderer {
       -(clientY / this.viewport.height) * 2 + 1,
     );
     this.raycaster.setFromCamera(ndc, this.camera);
-    const hits = this.raycaster.intersectObjects(this.gatherNodeMeshes, true);
-    for (const hit of hits) {
-      // Instanced node batches resolve through the hit's instanceId.
-      const ids = hit.object.userData.gatherNodeIds as string[] | undefined;
-      if (Array.isArray(ids) && typeof hit.instanceId === 'number') {
-        const id = ids[hit.instanceId];
-        if (typeof id === 'string') return id;
-      }
-      let o: THREE.Object3D | null = hit.object;
-      while (o) {
-        if (typeof o.userData.gatherNodeId === 'string') return o.userData.gatherNodeId as string;
-        o = o.parent;
-      }
-    }
-    return null;
+    return resolveGatherNodePick(this.raycaster.intersectObjects(this.gatherNodeMeshes, true));
   }
 
   pick(clientX: number, clientY: number): number | null {

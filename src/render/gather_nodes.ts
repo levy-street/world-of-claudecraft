@@ -58,6 +58,10 @@ interface NodeTemplatePart {
 }
 
 function nodeTemplateParts(type: GatherNodeType): NodeTemplatePart[] {
+  // Placement identity with the old per-node scene clones assumes the GLB
+  // scene ROOT has an identity transform (GLTFLoader always creates a fresh
+  // root Group): the old code overwrote the clone root's position, while the
+  // instanced matrices retain any root offset inside `matrixWorld`.
   const loaded = loadedNodeGltf.get(type);
   if (loaded) {
     loaded.updateMatrixWorld(true);
@@ -126,6 +130,35 @@ export function buildGatherNodes(seed: number): GatherNodesView {
     }
   }
   return { group };
+}
+
+// Structural raycast-hit shape shared with THREE.Intersection, so the
+// resolver is Node-testable without a renderer.
+export interface GatherNodePickHit {
+  object: { userData: Record<string, unknown>; parent?: unknown } | null;
+  instanceId?: number;
+}
+
+/**
+ * Resolve a raycast hit list to a gather-node content id: instanced batches
+ * resolve through instanceId against the batch's `gatherNodeIds` list, and
+ * any non-instanced mesh falls back to the legacy per-object
+ * `gatherNodeId` parent walk. Returns null when nothing matches.
+ */
+export function resolveGatherNodePick(hits: readonly GatherNodePickHit[]): string | null {
+  for (const hit of hits) {
+    const ids = hit.object?.userData.gatherNodeIds;
+    if (Array.isArray(ids) && typeof hit.instanceId === 'number') {
+      const id = ids[hit.instanceId];
+      if (typeof id === 'string') return id;
+    }
+    let o = hit.object ?? null;
+    while (o) {
+      if (typeof o.userData.gatherNodeId === 'string') return o.userData.gatherNodeId as string;
+      o = (o.parent ?? null) as GatherNodePickHit['object'];
+    }
+  }
+  return null;
 }
 
 /** Test-only window into the preload asset set (mirrors props.ts). */

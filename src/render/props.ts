@@ -21,7 +21,12 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
-import { type PropCellBounds, propCellKey, propCellMode } from './prop_cell_core';
+import {
+  applyPropCellMode,
+  type PropCellBounds,
+  propCellKey,
+  propCellMode,
+} from './prop_cell_core';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -1592,32 +1597,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       // (where the ghost fade can fire) draw the individuals while the bake
       // stays as the shadow-only caster. Pixel-identical both ways.
       for (const cell of farCells) {
-        const mode = propCellMode(cell.bounds, camX, camZ, fogFar);
-        // Near cells stay visible for the shadow pass (count-gated out of the
-        // color pass); far cells hide entirely past the fog.
-        const visible = mode.farMode ? mode.showMerged : true;
-        if (visible !== cell.visible) {
-          cell.visible = visible;
-          for (const m of cell.meshes) m.visible = visible;
-        }
-        if (mode.farMode !== cell.farMode) {
-          cell.farMode = mode.farMode;
-          for (const m of cell.meshes) m.count = mode.farMode ? 1 : 0;
-          for (const h of cell.hideables) {
-            h.suppressed = mode.farMode;
-            for (const b of h.bakeMeshes) b.mesh.visible = !mode.farMode;
-            // A stale ghost fade (camera teleport) must not survive into far
-            // mode, or the merged bake would double-draw over a solid twin
-            // when the cell swaps back.
-            if (mode.farMode && h.hidden) {
-              h.hidden = false;
-              for (const m of h.mats) {
-                m.mat.colorWrite = true;
-                m.mat.depthWrite = m.depthWrite;
-              }
-            }
-          }
-        }
+        applyPropCellMode(cell, propCellMode(cell.bounds, camX, camZ, fogFar));
       }
       for (const h of hideables) {
         const dx = camX - h.x,
@@ -1626,6 +1606,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
         }
+        // LOAD-BEARING ORDER: visible=true must be restored BEFORE the
+        // suppressed continue, or a lowProps group left invisible by the
+        // ghost path (mats.length === 0 hides the whole group) would stay
+        // stranded invisible when its cell enters far mode.
         h.group.visible = true;
         // Far mode: the merged cell bake draws instead; flames/transparent
         // members stay live on the group, and the ghost fade cannot fire.
@@ -1977,7 +1961,11 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     }
     // The individuals never cast: the bake carries the cell's shadows in
     // both modes (identical union geometry). Flames/transparent meshes are
-    // not in the bake and keep their own flags.
+    // not in the bake and keep their own flags. Ghost fades keep their
+    // shadow via the bake exactly as they did per-material before; the
+    // lowProps ghost path (whole-group hide) cannot diverge because every
+    // lowProps profile also disables dynamicShadows (gfx.ts:
+    // constrainedMemory is true whenever nativeIosMemoryProfile is).
     for (const h of cellBuild.hideables) {
       for (const b of h.bakeMeshes) b.mesh.castShadow = false;
     }

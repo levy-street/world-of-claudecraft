@@ -97,7 +97,10 @@ export const stationsPreloadInternalsForTest = {
 // One template part per mesh primitive of a station model, with the per-kind
 // height normalization baked in: normalize = T(0, -scaledMinY, 0) * S(scale),
 // exactly the transform the old per-placement clones applied, so instanced
-// placement is pixel-identical.
+// placement is pixel-identical. That identity assumes the GLB scene ROOT has
+// no x/z offset (GLTFLoader always creates a fresh identity root): the old
+// clone path applied the scale around the reseated root, which cancels a
+// root y offset exactly but would drift x/z by offset*(1-scale).
 interface StationTemplatePart {
   geo: THREE.BufferGeometry;
   mat: THREE.Material;

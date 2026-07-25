@@ -278,9 +278,13 @@ function triangleCountFor(geometry?: THREE.BufferGeometry): number {
 }
 
 function bucketMeshCost(mesh: THREE.InstancedMesh): Pick<BucketMesh, 'draws' | 'triangles'> {
+  // Shadow-gated clones read count 0 outside the shadow draw; the gate
+  // stashes the real count so the budget telemetry keeps their true cost.
+  const count =
+    (mesh as unknown as { shadowPassFullCount?: number }).shadowPassFullCount ?? mesh.count;
   return {
     draws: drawCountFor(mesh.material, mesh.geometry),
-    triangles: triangleCountFor(mesh.geometry) * Math.max(0, mesh.count),
+    triangles: triangleCountFor(mesh.geometry) * Math.max(0, count),
   };
 }
 
