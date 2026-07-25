@@ -77,6 +77,23 @@ describe('class halo geometry', () => {
     expect((halo.geometry as THREE.PlaneGeometry).parameters.width).toBeCloseTo(1.6);
     // the caster sweeps must not overwrite buildHalo's castShadow = false
     expect(halo.castShadow).toBe(false);
+
+    // the rebuildCasters arm has the same two obligations: after a model-graph
+    // change re-lists the casters with shadows on, the halo stays out of the
+    // caster list, and its material stays in the ghost-restore snapshot
+    const originalMat = halo.material;
+    visual.setShadow(true);
+    expect(halo.castShadow).toBe(false);
+    visual.setWeapon('bogoak_staff');
+    expect(halo.castShadow).toBe(false);
+    visual.setShadow(false);
+    visual.setShadow(true);
+    expect(halo.castShadow).toBe(false);
+    visual.setGhost(true);
+    expect(halo.material).not.toBe(originalMat);
+    visual.setGhost(false);
+    expect(halo.material).toBe(originalMat);
+
     vi.doUnmock('../src/render/assets/loader');
     vi.resetModules();
   });
