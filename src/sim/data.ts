@@ -178,6 +178,7 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { RIFT_MOBS } from './content/rift/mobs';
+import { TOWER_MOBS } from './content/rift/tower_mobs';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -358,6 +359,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
   ...RIFT_MOBS,
+  ...TOWER_MOBS,
   ...YUMI_MOBS,
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
