@@ -284,7 +284,9 @@ export class CharacterVisual {
 
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh) return;
+      // the halo is an unlit additive FX quad: keep it out of the caster list
+      // or this sweep overwrites buildHalo's castShadow = false
+      if (!mesh.isMesh || mesh.name === 'class_halo') return;
       mesh.castShadow = true;
       mesh.receiveShadow = false;
       // skinned bounds drift outside bind-pose spheres; entity-level culling
@@ -1056,6 +1058,12 @@ export class CharacterVisual {
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh || mesh.userData.weaponVfxMesh) return;
+      if (mesh.name === 'class_halo') {
+        // unlit additive FX quad: never a shadow caster, but its material must
+        // stay in the snapshot so ghost/stealth swaps restore it
+        this.originalMaterials.set(mesh, mesh.material);
+        return;
+      }
       mesh.castShadow = this.shadowOn;
       mesh.receiveShadow = false;
       if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;

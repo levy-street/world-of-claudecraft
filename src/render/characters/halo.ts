@@ -1,9 +1,11 @@
 // Glowing head halo (VisualDef.halo): a soft additive ring parented behind the
-// head bone, the priest's Light. Texture + material are module-level caches
-// shared by every clone; the mesh itself is per-visual and lives in the model
-// subtree, so LOD/visibility toggles and scene removal need no extra plumbing
-// (geometry/materials are shared caches and never disposed, like the rest of
-// the character asset caches).
+// head bone, the priest's Light. Texture, per-color materials, and per-radius
+// geometries are module-level caches shared by every clone; the mesh itself is
+// per-visual and lives in the model subtree, so LOD/visibility toggles and
+// scene removal need no extra plumbing (geometry/materials are shared caches
+// and never disposed, like the rest of the character asset caches; the cache
+// keys stay bounded because radii only ever come from static VisualDef
+// values, never computed per-instance).
 import * as THREE from 'three';
 
 // Bone-space (raw KayKit rig units): a HORIZONTAL ring floating above the
