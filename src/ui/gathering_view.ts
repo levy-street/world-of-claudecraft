@@ -19,7 +19,7 @@
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from '../sim/content/professions';
 import { GATHER_NODES, ITEMS } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
-import { bestOwnedGatherToolTier, canGatherTier } from '../sim/professions/tools';
+import { bestOwnedGatherToolTierOrNone, canGatherTier } from '../sim/professions/tools';
 import type { GatherNodeDef } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n.catalog';
@@ -36,10 +36,11 @@ export function classifyGatherNode(world: IWorld, nodeId: string): GatherNodeSta
 
 /** The viewer's best owned gatherTool tier for one gathering profession
  *  (Professions 2.0), resolved from the same IWorld bags read the
- *  bags window renders (IWorldInventory#inventory). Bare hands floor to
- *  tier 1, so every tier-1 node reads as unlocked with no tool at all. */
-export function viewerBestToolTier(world: IWorld, professionId: GatheringProfessionId): number {
-  return bestOwnedGatherToolTier(world.inventory, professionId, ITEMS);
+ *  bags window renders (IWorldInventory#inventory). 0 means no matching tool
+ *  owned at all (#2343: bare hands never gather, so there is no floor here
+ *  and every node, tier 1 included, reads locked without its tool). */
+export function viewerOwnedToolTier(world: IWorld, professionId: GatheringProfessionId): number {
+  return bestOwnedGatherToolTierOrNone(world.inventory, professionId, ITEMS);
 }
 
 /** Whether a node of this tier is tool-locked for the viewer: a SEPARATE
@@ -50,7 +51,7 @@ export function isNodeToolLockedFor(
   node: Pick<GatherNodeDef, 'type' | 'tier'>,
 ): boolean {
   return !canGatherTier(
-    viewerBestToolTier(world, NODE_HARVEST_TABLE[node.type].professionId),
+    viewerOwnedToolTier(world, NODE_HARVEST_TABLE[node.type].professionId),
     node.tier,
   );
 }
@@ -119,18 +120,35 @@ export function buildGatherNodeTooltip(
 
 /** The i18n key the gatherDenied SimEvent's error toast resolves (the sim is
  *  text-free: the client composes its own copy off surface + professionId +
- *  requiredTier). `professionId` is present exactly when surface === 'node';
- *  anything unexpected falls back to the profession-neutral corpse line. */
+ *  requiredTier). Surface 'fishing' is the startFishing implement gate
+ *  (#2343); surface 'node' with requiredTier 1 means "no tool owned at all"
+ *  so the tierless line is used; anything unexpected falls back to the
+ *  profession-neutral corpse line. */
 export function gatherDeniedLineKey(
-  surface: 'node' | 'corpse',
+  surface: 'node' | 'corpse' | 'fishing',
   professionId?: GatheringProfessionId,
+  requiredTier?: number,
 ): TranslationKey {
+  if (surface === 'fishing') return 'hudChrome.gathering.toolRequired.fishing';
   if (surface === 'node') {
     if (professionId === 'mining' || professionId === 'logging' || professionId === 'herbalism') {
-      return `hudChrome.gathering.toolTierUnmet.${professionId}`;
+      return requiredTier !== undefined && requiredTier <= 1
+        ? `hudChrome.gathering.toolRequired.${professionId}`
+        : `hudChrome.gathering.toolTierUnmet.${professionId}`;
     }
   }
   return 'hudChrome.gathering.toolTierUnmetCorpse';
+}
+
+/** The i18n key the gatherToolNoNode SimEvent's error toast resolves (#2343:
+ *  a gathering tool was used from the bags with no matching node within
+ *  reach). Fishing never emits it (rods route to startFishing), so anything
+ *  but the three node professions takes a safe fallback. */
+export function gatherToolNoNodeKey(professionId: GatheringProfessionId): TranslationKey {
+  if (professionId === 'logging' || professionId === 'herbalism') {
+    return `hudChrome.gathering.noNodeNearby.${professionId}`;
+  }
+  return 'hudChrome.gathering.noNodeNearby.mining';
 }
 
 /** The i18n key the gatherDowngrade SimEvent's toast resolves (the
@@ -143,10 +161,16 @@ export function gatherDowngradeLineKey(lost: 'mark' | 'find'): TranslationKey {
 }
 
 /** One row of the gathering-proficiency display: a profession id plus its
- *  current point value, in the fixed GATHERING_PROFESSION_IDS order. */
+ *  current point value, in the fixed GATHERING_PROFESSION_IDS order. `value`
+ *  is the raw, possibly fractional proficiency (the repaint-signature input,
+ *  full granularity); `displayValue` floors it for readouts, the
+ *  buildSkillBar convention (issue 2339): a fractional value never rounds a
+ *  threshold forward, so 99.5 reads 99, not a fake crossed 100 while the
+ *  100-proficiency deed is still locked. */
 export interface GatheringProficiencyRow {
   professionId: GatheringProfessionId;
   value: number;
+  displayValue: number;
 }
 
 /** Builds the proficiency display rows from IWorldProfessions#professionsState,
@@ -156,6 +180,6 @@ export function buildGatheringProficiencyRows(world: IWorld): GatheringProficien
   return GATHERING_PROFESSION_IDS.map((professionId) => {
     const raw = bySkill.get(professionId);
     const value = typeof raw === 'number' && Number.isFinite(raw) ? Math.max(0, raw) : 0;
-    return { professionId, value };
+    return { professionId, value, displayValue: Math.floor(value) };
   });
 }

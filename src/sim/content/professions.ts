@@ -15,8 +15,10 @@
 // arms (wheel.ts gainCraftSkill/normalizeCraftSkills, gathering.ts
 // drainGatheringGrants/normalizeGatheringProficiency); at cap, actions still
 // resolve, proc, and yield, only skill gain stops.
-import type { StationDef, StationType } from '../professions/stations';
+
+import { EASTBROOK_STATIONS_BY_ID } from '../eastbrook_layout';
 import type { ProfessionRecord } from '../professions/types';
+import type { StationDef, StationType } from '../types';
 import { ZONE1_ZONE } from './zone1';
 import { ZONE2_ZONE } from './zone2';
 import { ZONE3_ZONE } from './zone3';
@@ -408,32 +410,28 @@ export const STATIONS: readonly StationDef[] = [
     id: 'station_eastbrook_forge',
     type: 'forge',
     zoneId: ZONE1_ZONE.id,
-    // Smith Haldren's forge, northeast of the square.
-    pos: { x: 7, z: 16.5 },
+    pos: { ...EASTBROOK_STATIONS_BY_ID.station_eastbrook_forge.position },
     masterNpcId: 'forgemistress_darva',
   },
   {
     id: 'station_eastbrook_kitchens',
     type: 'kitchens',
     zoneId: ZONE1_ZONE.id,
-    // West side of the square, by the provisioner's stall.
-    pos: { x: -11, z: 4.5 },
+    pos: { ...EASTBROOK_STATIONS_BY_ID.station_eastbrook_kitchens.position },
     masterNpcId: 'cook_marlow',
   },
   {
     id: 'station_eastbrook_loom',
     type: 'loom',
     zoneId: ZONE1_ZONE.id,
-    // South of the well, on the quiet side of the square.
-    pos: { x: -2, z: -8 },
+    pos: { ...EASTBROOK_STATIONS_BY_ID.station_eastbrook_loom.position },
     masterNpcId: 'weaver_ottilie',
   },
   {
     id: 'station_eastbrook_toolworks',
     type: 'toolworks',
     zoneId: ZONE1_ZONE.id,
-    // Southeast corner, between the inn and the chronicler.
-    pos: { x: 11, z: -12 },
+    pos: { ...EASTBROOK_STATIONS_BY_ID.station_eastbrook_toolworks.position },
     masterNpcId: 'tinker_gizzel',
   },
   {

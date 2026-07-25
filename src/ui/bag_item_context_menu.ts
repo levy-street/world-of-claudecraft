@@ -113,9 +113,11 @@ export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolea
  *  copies):
  *   - salvage (items.ts removePreferFungible): once fungible is exhausted the
  *     highest-index instanced copy of ANY kind is taken (enchanted included).
- *   - disenchant (sim.ts removeEnchantableItem): the highest-index NON-enchanted
- *     instanced copy is taken (already-enchanted copies are never eligible, so
- *     they are skipped when choosing the victim). */
+ *   - disenchant (professions/enchanting.ts resolveDisenchant): the
+ *     highest-index NON-enchanted instanced copy is taken first
+ *     (removeEnchantableItem); once every remaining copy is enchanted, the
+ *     highest-index enchanted copy is the victim (issue #2340), which is
+ *     always special, so that arm always warns. */
 export function destroyConsumesSpecialCopy(
   action: 'disenchant' | 'salvage',
   copies: readonly BagCopy[],
@@ -127,5 +129,8 @@ export function destroyConsumesSpecialCopy(
     if (action === 'disenchant' && isEnchantedInstance(instance)) continue;
     return isSpecialCopy(instance);
   }
-  return false;
+  // Reachable with held copies only on the disenchant arm with every copy
+  // enchanted (salvage returns on the first instanced copy above): the sim's
+  // fallback consumes an enchanted copy, special by definition.
+  return copies.length > 0;
 }

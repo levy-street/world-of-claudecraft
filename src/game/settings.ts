@@ -403,9 +403,25 @@ export class Settings {
     return v as GameSettings[K];
   }
 
-  reset(): void {
-    for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
-    for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+  /** Restore defaults. With no `keys`, every setting resets (the historical
+   *  behavior). With `keys`, only those keys reset, so a caller that owns just
+   *  one sub-view (e.g. the options window's per-panel footer) can offer a
+   *  "Reset to Defaults" that does not silently wipe settings the player
+   *  never saw (issue 2341). */
+  reset(keys?: readonly (keyof GameSettings)[]): void {
+    if (!keys) {
+      for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
+      for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+      this.save();
+      return;
+    }
+    for (const key of keys) {
+      if ((BOOL_KEYS as readonly string[]).includes(key as string)) {
+        this.values[key as BoolSettingKey] = BOOL_SETTINGS[key as BoolSettingKey].def;
+      } else if ((NUMERIC_KEYS as readonly string[]).includes(key as string)) {
+        this.values[key as NumericSettingKey] = SETTING_RANGES[key as NumericSettingKey].def;
+      }
+    }
     this.save();
   }
 }

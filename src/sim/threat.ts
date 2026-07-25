@@ -12,6 +12,12 @@
 import type { Entity } from './types';
 
 export const MELEE_SWITCH_MULT = 1.1;
+// Boss-summoned adds spawn with this much threat on the boss's current target
+// (the tank): enough that normal healing cannot peel a fresh wave, low enough
+// that sustained DPS focus still rips one loose. Consumed by Sim.spawnBossAdds
+// (the five-man summoners) AND the Nythraxis encounter-script spawners, so the
+// two paths cannot drift. Pinned by tests/summon_threat_seed.test.ts.
+export const SUMMONED_ADD_THREAT_SEED = 750;
 export const RANGED_SWITCH_MULT = 1.3;
 export const HEAL_THREAT_FACTOR = 0.5;
 export const DEFENSIVE_STANCE_THREAT_MULT = 1.3;

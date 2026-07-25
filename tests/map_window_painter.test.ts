@@ -1,14 +1,15 @@
 // No-magic-values + cadence guard for the overworld map painter.
 //
-// The painter's paintOverworld needs a real 2D context + getComputedStyle, so its
-// draw is not exercised in this Node suite; the pure geometry it draws is covered
-// by tests/map_window_view.test.ts. This guard pins the painter contract that a
-// 2D context cannot express: zero literal colors (tokens resolved once per redraw
-// via getComputedStyle, never per-marker), and the cached terrain background +
-// mediumHud cadence preserved from the inline site.
+// The pure geometry is covered by tests/map_window_view.test.ts. This suite also
+// drives the real painter through a narrow fake 2D context so adapter wiring and
+// token selection are behavior assertions rather than source-text guesses.
 
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { BUILTIN_WORLD, setActiveWorldContent, ZONES } from '../src/sim/data';
+import { emptyZoneProps } from '../src/sim/types';
+import { MapWindowPainter } from '../src/ui/map_window_painter';
+import type { IWorld } from '../src/world_api';
 
 const painter = readFileSync(new URL('../src/ui/map_window_painter.ts', import.meta.url), 'utf8');
 // Drop comments so prose can't create a false positive (mirrors architecture.test).
@@ -29,6 +30,7 @@ const MAP_COLOR_TOKENS = [
   '--color-map-tree',
   '--color-map-oak',
   '--color-map-building-outline',
+  '--color-map-building-armoury',
   '--color-map-building-chapel',
   '--color-map-building-inn',
   '--color-map-building-house',
@@ -40,6 +42,82 @@ const MAP_COLOR_TOKENS = [
   '--color-map-mudhut',
   '--color-map-campfire',
 ];
+
+interface PaintTrace {
+  fills: Array<{ style: string; commands: string[] }>;
+  styleReads: string[];
+}
+
+function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
+  let commands: string[] = [];
+  const ctx = {
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    font: '',
+    textAlign: 'start',
+    imageSmoothingEnabled: false,
+    drawImage(): void {},
+    beginPath(): void {
+      commands = [];
+    },
+    arc(): void {
+      commands.push('arc');
+    },
+    moveTo(): void {
+      commands.push('moveTo');
+    },
+    lineTo(): void {
+      commands.push('lineTo');
+    },
+    closePath(): void {
+      commands.push('closePath');
+    },
+    fill(): void {
+      trace.fills.push({ style: String(ctx.fillStyle), commands: [...commands] });
+    },
+    stroke(): void {},
+    fillText(): void {},
+    strokeText(): void {},
+    save(): void {},
+    restore(): void {},
+    translate(): void {},
+    rotate(): void {},
+  };
+  return ctx as unknown as CanvasRenderingContext2D;
+}
+
+function installMapStyleGlobals(trace: PaintTrace): void {
+  vi.stubGlobal('document', { documentElement: {} });
+  vi.stubGlobal('getComputedStyle', () => ({
+    getPropertyValue(token: string): string {
+      trace.styleReads.push(token);
+      return `paint:${token}`;
+    },
+  }));
+}
+
+function mapWorld(): IWorld {
+  return {
+    player: {
+      id: 1,
+      kind: 'player',
+      name: 'Painter',
+      pos: { x: 17.5, z: -5.5 },
+      facing: 0,
+    },
+    entities: new Map(),
+    socialInfo: null,
+    cfg: { seed: 42, playerClass: 'warrior' },
+    questState: () => 'unavailable',
+    questLog: new Map(),
+  } as unknown as IWorld;
+}
+
+afterEach(() => {
+  setActiveWorldContent(null);
+  vi.unstubAllGlobals();
+});
 
 describe('map_window_painter: no magic values', () => {
   it('carries no literal hex or rgb color in TS', () => {
@@ -64,6 +142,64 @@ describe('map_window_painter: no magic values', () => {
       expect(code, `painter never reads ${tok}`).toContain(tok);
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
     }
+  });
+
+  it('draws the active-world armoury footprint with its dedicated token', () => {
+    const trace: PaintTrace = { fills: [], styleReads: [] };
+    installMapStyleGlobals(trace);
+    const ctx = fakeMapContext(trace);
+    const painter = new MapWindowPainter();
+    const world = mapWorld();
+    const emptyProps = emptyZoneProps();
+    const background = { width: 560, height: 560 } as HTMLCanvasElement;
+    const options = {
+      zone: ZONES[0],
+      bg: background,
+      canvasSize: 560,
+      zoom: 6,
+      center: { x: 17.5, z: -5.5 },
+    };
+    const buildingStyles = new Set([
+      'paint:--color-map-building-armoury',
+      'paint:--color-map-building-chapel',
+      'paint:--color-map-building-inn',
+      'paint:--color-map-building-house',
+    ]);
+
+    // An empty active-world props bundle must suppress the built-in Eastbrook
+    // lots. This fails if the adapter silently falls back to static PROPS.
+    setActiveWorldContent({ ...BUILTIN_WORLD, props: emptyProps });
+    painter.paintOverworld(ctx, world, options);
+    expect(trace.fills.filter((fill) => buildingStyles.has(fill.style))).toEqual([]);
+
+    trace.fills.length = 0;
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      props: {
+        ...emptyProps,
+        buildings: [
+          {
+            kind: 'inn',
+            landmark: 'eastbrook_grand_armoury',
+            x: 17.5,
+            z: -5.5,
+            w: 13,
+            d: 9,
+            rot: -Math.PI / 2,
+          },
+        ],
+      },
+    });
+    painter.paintOverworld(ctx, world, options);
+
+    const buildingFills = trace.fills.filter((fill) => buildingStyles.has(fill.style));
+    expect(buildingFills).toEqual([
+      {
+        style: 'paint:--color-map-building-armoury',
+        commands: ['moveTo', 'lineTo', 'lineTo', 'lineTo', 'closePath'],
+      },
+    ]);
+    expect(trace.styleReads.filter((token) => token.endsWith('building-armoury'))).toHaveLength(2);
   });
 
   it('caches the whole-world decorations once instead of regenerating per redraw', () => {

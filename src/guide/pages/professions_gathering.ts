@@ -69,11 +69,7 @@ function nodesSection(g: GuideProfGathering): string {
         <td>${esc(n.zone)}</td>
         <td>${esc(formatNumber(n.count))}</td>
         <td>${esc(formatNumber(n.tier))}</td>
-        <td>${esc(
-          n.toolTier > 1
-            ? t('guide.profPages.toolTierReq', { tier: formatNumber(n.toolTier) })
-            : t('guide.profPages.bareHands'),
-        )}</td>
+        <td>${esc(t('guide.profPages.toolTierReq', { tier: formatNumber(n.toolTier) }))}</td>
         <td>${esc(n.material)}</td>
       </tr>`,
     )

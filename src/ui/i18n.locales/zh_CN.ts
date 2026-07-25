@@ -504,6 +504,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.close': '关闭每日奖励',
   'hudChrome.dailyRewards.loading': '正在加载每日奖励...',
   'hudChrome.dailyRewards.error': '无法加载每日奖励。',
+  'hudChrome.dailyRewards.disabled':
+    '每日奖励目前已停用。我们将在 Discord 频道中公布此功能的更新。',
   'hudChrome.dailyRewards.intro':
     '在已验证的钱包中持有足够的 WOC 即可解锁每日奖励。通过每日一次转盘和轮换任务赚取积分，然后攀登每日排行榜，赢取奖池分成。',
   'hudChrome.dailyRewards.disclaimer':
@@ -751,6 +753,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.claw': '爪',
   'hudChrome.corpseHarvest.components.horn': '角',
   'hudChrome.corpseHarvest.components.tusk': '獠牙',
+  'hudChrome.corpseHarvest.components.cloth': '布',
   'hudChrome.townFocus.title': '城镇专注',
   'hudChrome.townFocus.hint':
     '专注点会在每种材料的基础产出上叠加加成。未专注的材料保持基础产出不变。',
@@ -1417,9 +1420,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.reconnectingNow': '连接已断开，正在立即重新连接...（第 {attempt}/{maxAttempts} 次尝试）',
   'loading.slowConnection': '加载时间比平时长。请检查您的网络连接。',
   'loading.connectionRejected': '服务器关闭了连接。',
+  'loading.incompatibleWorldVersion': '游戏与服务器版本不兼容。请刷新或更新后重试。',
   'loading.realmFull': '当前服务器已满，请稍后几分钟再试。',
   'loading.tooManyConnections':
     '您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。',
+  'loading.messageRateExceeded': '由于发送操作过快，您已断开连接。请稍等片刻后重新登录。',
   'errors.nothingInteract': '附近没有可互动目标。',
   'errors.noEnemyNearby': '附近没有敌人。',
   'errors.characterNameRequired': '请输入角色名称。',
@@ -1802,6 +1807,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': '你获得了 {name}。',
   'hud.combat.auraFade': '{name}从你身上消失。',
   'hud.combat.auraAfflicted': '{target}受到了 {name} 影响。',
+  'hud.combat.auraGainOther': '{target}获得了 {name}。',
   'hud.system.playerDeath': '你已经死亡。',
   'hud.system.respawn': '你再次感到精力恢复、身体完整。',
   'hud.system.ignoringChat': '已屏蔽来自 {name} 的聊天。',
@@ -2661,7 +2667,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '将目标缠绕在原地，最多持续 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形态',
   'entities.abilities.bear_form.description':
-    '变形为熊：护甲 +90%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
+    '变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
   'entities.abilities.maul.name': '碎骨击',
   'entities.abilities.maul.description':
     '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。',
@@ -6130,6 +6136,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'gpuNotice.bodyWeb':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。',
   'gpuNotice.dismiss': '关闭',
+  'perfNudge.integratedGpu':
+    '游戏正在集成（节能）显卡上运行。如果这台电脑还配有独立游戏显卡，请在 Windows 的 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择游戏显卡。',
+  'perfNudge.hardwareAccelerationDesktop':
+    '游戏正在没有 GPU 加速的情况下运行，因此非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
+  'perfNudge.hardwareAccelerationWeb':
+    '游戏正在没有 GPU 加速的情况下运行，因此非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。',
+  'perfNudge.dismiss': '关闭',
   'editor.appTitle': '地图编辑器',
   'editor.docTitle': '地图编辑器 - World of ClaudeCraft',
   'editor.untitledMap': '未命名地图',
@@ -6679,6 +6692,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': '达到更高段位即可领取。',
   'apiError.discord.swag_points': '积分不足。',
   'hudChrome.mailbox.title': '邮箱',
+  'hudChrome.noticeboard.empty': '看起来没有张贴任何内容。',
   'hudChrome.mailbox.subtitle': '渡鸦邮驿',
   'hudChrome.mailbox.close': '关闭邮箱',
   'hudChrome.mailbox.tabInbox': '收件箱',
@@ -6725,6 +6739,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': '那封信已不在你的邮箱里。',
   'hudChrome.mailbox.result.takeParcelsFirst': '请先取出包裹再丢弃信件。',
   'worldContent.mailboxName': '邮箱',
+  'worldContent.noticeboardName': '告示板',
   'entities.letters.ravenpost_welcome.sender': '渡鸦邮驿',
   'entities.letters.ravenpost_welcome.subject': '渡鸦如今为你飞翔',
   'entities.letters.ravenpost_welcome.body':
@@ -6848,6 +6863,31 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.logging': '你需要{tier}阶伐木斧才能砍伐这片林木。',
   'hudChrome.gathering.toolTierUnmet.herbalism': '你需要{tier}阶草药镰才能采集这片草药丛。',
   'hudChrome.gathering.toolTierUnmetCorpse': '你需要{tier}阶采集工具才能取得最上等的材料。',
+  'hudChrome.gathering.requiresTool.mining': '需要采矿镐',
+  'hudChrome.gathering.requiresTool.logging': '需要伐木斧',
+  'hudChrome.gathering.requiresTool.herbalism': '需要草药镰',
+  'hudChrome.gathering.toolRequired.mining': '你需要采矿镐才能开采这条矿脉。',
+  'hudChrome.gathering.toolRequired.logging': '你需要伐木斧才能砍伐这片林木。',
+  'hudChrome.gathering.toolRequired.herbalism': '你需要草药镰才能采集这片草药丛。',
+  'hudChrome.gathering.toolRequired.fishing': '你需要钓竿才能抛竿垂钓。',
+  'hudChrome.gathering.noNodeNearby.mining': '附近没有矿脉可供开采。',
+  'hudChrome.gathering.noNodeNearby.logging': '附近没有林木可供砍伐。',
+  'hudChrome.gathering.noNodeNearby.herbalism': '附近没有草药丛可供采集。',
+  'hudChrome.gathering.toolTooltip.kind.mining': '采矿工具（{tier}阶）',
+  'hudChrome.gathering.toolTooltip.kind.logging': '伐木工具（{tier}阶）',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': '草药工具（{tier}阶）',
+  'hudChrome.gathering.toolTooltip.kind.fishing': '钓鱼竿（{tier}阶）',
+  'hudChrome.gathering.toolTooltip.unlocks.mining': '开采最高{tier}阶的矿脉所需。',
+  'hudChrome.gathering.toolTooltip.unlocks.logging': '砍伐最高{tier}阶的林木所需。',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism': '采集最高{tier}阶的草药丛所需。',
+  'hudChrome.gathering.toolTooltip.use.mining': '使用：开采附近的矿脉。',
+  'hudChrome.gathering.toolTooltip.use.logging': '使用：砍伐附近的林木。',
+  'hudChrome.gathering.toolTooltip.use.herbalism': '使用：采集附近的草药丛。',
+  'hudChrome.gathering.toolTooltip.speed': '在低于{tier}阶的节点采集速度更快。',
+  'hudChrome.gathering.toolTooltip.rodRequired': '钓鱼所需。',
+  'hudChrome.gathering.toolTooltip.rodBite': '鱼上钩最多可提前{seconds}秒。',
+  'hudChrome.gathering.toolTooltip.rodReel': '收线时限延长{seconds}秒。',
+  'hudChrome.gathering.toolTooltip.rodBand': '钓鱼技能达到{skill}后可解锁更丰富的渔获。',
   'hudChrome.gathering.downgradeMark': '背包已满：这份收获未能留下采集者的印记。',
   'hudChrome.gathering.downgradeFind': '背包已满：一件完美的收获溜走了。',
   'hudChrome.gathering.stateReady': '可采集',
@@ -6913,6 +6953,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.comboRequirementUnmet': '你没有达到该配方所需组合的两项制造技能等级。',
   'hudChrome.crafting.throttled': '你制作得太快了，请稍等片刻后再试。',
   'hudChrome.crafting.recipeNotLearned': '你还没有学会这个配方。',
+  'hudChrome.crafting.noBagSpace': '背包空间不足，无法存放制作的物品。',
   // Professions 2.0 (M16 non-Latin fills).
   'hudChrome.crafting.attunementReturnCost':
     '若你离开这个组合，日后想要重归需要完成 {cost} 项补偿任务。',
@@ -7348,7 +7389,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': '月潮（周期性范围伤害）',
   'hudChrome.finder.mech.enrage': '低血量时狂怒',
   'hudChrome.finder.mech.shuddering_stomp': '震颤践踏（范围眩晕）',
-  'hudChrome.finder.mech.necrotic_shockwave': '死灵冲击波（高额范围伤害）',
+  'hudChrome.finder.mech.grave_inferno': '墓场炼狱（引导火焰AoE，保持分散）',
   'hudChrome.finder.mech.grave_cleaver': '掘墓劈砍（正面顺劈）',
   'hudChrome.finder.mech.shadow_nova': '暗影新星（范围爆发）',
   'hudChrome.finder.mech.profane_mending': '亵渎治疗（治疗其盟友）',
@@ -7888,8 +7929,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.stateKnown': '已学会',
   'hudChrome.training.stateTeachable': '可学习',
   'hudChrome.training.stateLocked': '未解锁',
+  'hudChrome.training.statePending': '学习中',
   'hudChrome.training.requirement': '需要{craft}达到 {skill} 后传授',
   'hudChrome.training.trainAria': '花费{fee}学习{name}',
+  'hudChrome.training.pendingAria': '正在学习{name}',
   'hudChrome.training.dialogOption': '训练',
   'hudChrome.training.dialogOptionAria': '向{name}学习配方',
   'hudChrome.training.learned': '已学会配方：{recipe}',
@@ -8072,6 +8115,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.enchantWrongSlot': '该附魔无法施加于那件物品。',
   'hudChrome.enchanting.enchantUnknown': '该附魔不存在。',
   'hudChrome.enchanting.enchantInsufficient': '你没有该附魔所需的材料。',
+  'hudChrome.enchanting.disenchantNoSpace': '背包空间不足，无法存放奥术材料。',
+  'hudChrome.enchanting.salvageNoSpace': '背包空间不足，无法存放拆解出的材料。',
+  'hudChrome.enchanting.enchantNoSpace': '背包空间不足，无法存放附魔后的物品。',
   'hudChrome.enchanting.disenchantConfirmTitle': '分解{item}？',
   'hudChrome.enchanting.disenchantConfirmBody': '这会摧毁{item}并产出奥术材料。此操作无法撤销。',
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
@@ -8270,6 +8316,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': '该物品未绑定。',
   'hudChrome.unbind.cannotAfford': '你付不起解绑费用。',
   'hudChrome.unbind.outOfRange': '你必须站在工作台旁才能解绑。',
+  'hudChrome.unbind.noSpace': '背包空间不足，无法存放解绑后的物品。',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '制作之轮',
@@ -8363,7 +8410,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.specializationBody': '技能达到{at}即在本行业专精，配方材料消耗减少{pct}%。',
   'guide.profPages.ench.disenchantHeading': '分解',
   'guide.profPages.ench.disenchantNote':
-    '分解会消耗一件普通品质或更高的武器或护甲，但已附魔的物品不会被分解。普通与优秀品质的物品磨碎后产出数量不等的铃音之尘，稀有度越高或等级越高的物品产量越丰；从精良品质起，产出形态不同：精良件恰好给出一个铃音精华，史诗或传说件恰好给出一个铃音碎片，此外还附带一种与物品材质相关的定向副产物。',
+    '分解会消耗一件普通品质或更高的武器或护甲，优先消耗未附魔的物品；当只剩下已附魔的物品时，将连同附魔一并分解其中一件。普通与优秀品质的物品磨碎后产出数量不等的铃音之尘，稀有度越高或等级越高的物品产量越丰；从精良品质起，产出形态不同：精良件恰好给出一个铃音精华，史诗或传说件恰好给出一个铃音碎片，此外还附带一种与物品材质相关的定向副产物。',
   'guide.profPages.ench.typedHeading': '定向副产物',
   'guide.profPages.ench.typedNote':
     '精良及以上的装备还会产出一种定向的、交易绑定的副产物：精良装备产出{rare}件，史诗或传说产出{epicMin}到{epicMax}件。',
@@ -8385,11 +8432,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '任何人都可以把武器或护甲按品质回收成普通材料，无需附魔技能。',
   'guide.profPages.ench.bonusFmt': '+{value}{stat}',
   'guide.profPages.gatherIntro.mining':
-    '采矿从世界的岩层中直接提取矿石：Eastbrook Vale产铜矿，Mirefen Marsh产铁矿，Thornpeak Heights产锇矿，为锻造类行业供料。从1级起向所有人开放，无任何门槛，以独立计数器追踪，上限为100。',
+    '采矿从世界的岩层中直接提取矿石：东溪谷产铜矿，泥沼湿地产铁矿，荆峰高地产锇矿，为锻造类行业供料。从1级起向所有人开放：只需背包里备有一把采矿镐，任意主城均售20铜。以独立计数器追踪，上限为100。',
   'guide.profPages.gatherIntro.logging':
-    '伐木在三大区域的林地中砍伐木材：Eastbrook Vale产铁皮木，Mirefen Marsh产梣木，Thornpeak Heights产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，以独立计数器追踪，上限为100。',
+    '伐木在三大区域的林地中砍伐木材：东溪谷产铁皮木，泥沼湿地产梣木，荆峰高地产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，只需背包里备有一把伐木斧（任意主城20铜），以独立计数器追踪，上限为100。',
   'guide.profPages.gatherIntro.herbalism':
-    '草药学采集野生植物：Eastbrook Vale产润光叶，Mirefen Marsh产金叶，Thornpeak Heights产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，以独立计数器追踪，上限为100。',
+    '草药学采集野生植物：东溪谷产润光叶，泥沼湿地产金叶，荆峰高地产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，只需背包里备有一把草药镰（任意主城20铜），以独立计数器追踪，上限为100。',
   'guide.profPages.gatherIntro.fishing':
     '钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。',
   'guide.profPages.rhythmHeading': '采集节奏',
@@ -8401,13 +8448,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.nodesNote':
     '节点的位置、阶级、所需工具与产出；每个节点在你采集后{respawn}秒才会为你本人刷新。',
   'guide.profPages.toolsHeading': '工具',
-  'guide.profPages.toolsNote': '工具阶梯与确切的商人售价；4阶与5阶工具只能制作，无法购买。',
+  'guide.profPages.toolsNote':
+    '每一处节点都需要背包里备有对应行业的工具，1阶节点也不例外：没有采矿镐就采不到矿石，没有鱼竿就钓不上鱼。商人阶梯覆盖1到3阶，各主城均有备货；工具只需放在背包里即可，没有装备栏位，也没有耐久，因此每件都是一次性购置。门槛只看阶级：工具的品质颜色纯属外观。\n\n商人阶梯之上还有两件制作工具，4阶与5阶，由工程师在工坊打造，任何NPC都不出售。目前没有任何节点需要3阶以上的工具，因此它们眼下的价值在于速度：顶级工具能把低阶节点的采集读条压到时间下限；等更高阶的地界开放时，它们便是入场券。',
   'guide.profPages.toolCrafted': '制作获得（{craft}）',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '无出售',
   'guide.profPages.priceNone': '无出售',
   'guide.profPages.toolTierReq': '{tier}阶工具',
-  'guide.profPages.bareHands': '徒手即可',
   'guide.profPages.bandsHeading': '熟练度区间',
   'guide.profPages.bandsBody': '熟练度区间会加快你的采集施法；对钓鱼而言还决定渔获表。',
   'guide.profPages.bandFmt': '区间{band}：自{at}熟练度起',
@@ -8624,4 +8671,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出处与市场',
   'guide.profPages.craftProse.enchanting.marketBody':
     '施加附魔消耗背包中未装备的一件副本加材料，交还一件独立的附魔副本；穿上它，加成永远跟随。一件一附魔：附魔副本不能再附魔也不能分解，出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。世界市场只经手无标记的普通货，附魔与署名件都面对面交易；材料才是可上市的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。',
+  'hudChrome.corpseHarvest.components.meat': '兽肉',
 };

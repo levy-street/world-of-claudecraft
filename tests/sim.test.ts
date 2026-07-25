@@ -7,6 +7,7 @@ import {
   ITEMS,
   LAKE,
   NPCS,
+  QUESTS,
 } from '../src/sim/data';
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
 import { completeFishing } from '../src/sim/professions/fishing';
@@ -25,6 +26,7 @@ import {
   xpForLevel,
 } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -129,6 +131,7 @@ function despawnMobs(sim: Sim) {
 }
 
 function forwardDistance(sim: Sim, ticks = 60): number {
+  placePlayerInOpenField(sim);
   const start = { ...sim.player.pos };
   sim.moveInput.forward = true;
   for (let i = 0; i < ticks; i++) sim.tick();
@@ -1576,7 +1579,9 @@ describe('quests', () => {
 
   it('collect quest tracks inventory and consumes items on turn-in', () => {
     const sim = makeSim('warrior');
-    teleportTo(sim, -7, 1);
+    const giver = NPCS[QUESTS.q_boars.giverNpcId];
+    if (!giver) throw new Error('q_boars giver fixture missing');
+    teleportTo(sim, giver.pos.x, giver.pos.z);
     sim.interact();
     expect(sim.questState('q_boars')).toBe('active');
     sim.addItem('boar_hide', 5);

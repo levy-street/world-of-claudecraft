@@ -11,8 +11,12 @@
 // Sim (PlayerMeta.bags); Sim keeps thin same-named delegates.
 //
 // Capacity is enforced at the command boundaries (buy, loot, pick up, fish,
-// conjure, market collect, trade accept, quest turn-in, unequip) via
-// canAddItem/fitsAll pre-checks. Grant paths a player cannot re-try (winning a
+// conjure, market collect, trade accept, quest turn-in, unequip, and the
+// profession transforms: craft, salvage, disenchant, enchant apply, and the
+// unbind stack split, #2350) via canAddItem/fitsAll/countFit pre-checks; a
+// transform command models the post-consumption inventory on a scratch copy
+// (removeStacked/consumeOneScratch below) so consuming the inputs can free
+// the room the output needs. Grant paths a player cannot re-try (winning a
 // need/greed roll, master loot, delve end-of-run rewards, dev gives) skip the
 // check on purpose: an over-capacity inventory is tolerated (pre-bag saves may
 // load overflowing too) and simply blocks new pickups until space is freed.
@@ -212,6 +216,46 @@ export function removeStacked(inventory: InvSlot[], itemId: string, count: numbe
     remaining -= take;
     if (s.count <= 0) inventory.splice(i, 1);
   }
+}
+
+/** Scratch mirror of the sim's preferential single-copy removers, for
+ *  capacity simulations (#2350): removes ONE unit of `itemId` from a scratch
+ *  inventory, choosing the victim slot exactly like the live removers do: a
+ *  plain fungible slot first (highest index, removeFungibleItem's walk), then
+ *  an instanced slot `excludeInstance` does not match (highest index,
+ *  removeEnchantableItem's second pass), and only then an excluded instanced
+ *  slot (highest index: with no preferred copy left, the live paths fall back
+ *  to the plain removeItem walk, where only excluded slots remain). With no
+ *  `excludeInstance` it models items.ts removePreferFungible (salvage); with
+ *  professions/enchanting.ts isEnchantedInstance it models the
+ *  countEnchantableItem >= 1 ? removeEnchantableItem : removeItem split
+ *  (disenchant) and removeEnchantableItem alone (apply-enchant, whose
+ *  not_held gate already guarantees an unexcluded copy exists). Returns the
+ *  victim slot's payload (undefined for a plain victim or no victim at all)
+ *  so a transform command can model the grant it mints FROM the consumed
+ *  copy. A capacity pre-check must model the removal identically to the
+ *  remover it gates, or the guard re-opens the overflow class (#2139). */
+export function consumeOneScratch(
+  scratch: InvSlot[],
+  itemId: string,
+  excludeInstance?: (instance: ItemInstancePayload) => boolean,
+): ItemInstancePayload | undefined {
+  const passes: ((s: InvSlot) => boolean)[] = [
+    (s) => !s.instance,
+    (s) => !!s.instance && !excludeInstance?.(s.instance),
+    (s) => !!s.instance,
+  ];
+  for (const eligible of passes) {
+    for (let i = scratch.length - 1; i >= 0; i--) {
+      const s = scratch[i];
+      if (s.itemId !== itemId || !eligible(s)) continue;
+      const instance = s.instance;
+      s.count -= 1;
+      if (s.count <= 0) scratch.splice(i, 1);
+      return instance;
+    }
+  }
+  return undefined;
 }
 
 /** The standard full-bags rejection, shared by every capacity-gated command. */

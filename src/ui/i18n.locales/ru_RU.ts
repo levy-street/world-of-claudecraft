@@ -511,6 +511,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.close': 'Закрыть ежедневные награды',
   'hudChrome.dailyRewards.loading': 'Загрузка ежедневных наград...',
   'hudChrome.dailyRewards.error': 'Не удалось загрузить ежедневные награды.',
+  'hudChrome.dailyRewards.disabled':
+    'Ежедневные награды сейчас отключены. Мы сообщим об обновлениях этой функции в канале Discord.',
   'hudChrome.dailyRewards.intro':
     'Держите достаточно WOC в подтвержденном кошельке, чтобы открыть ежедневные награды. Зарабатывайте очки за один ежедневный спин и сменяющиеся задания, затем поднимайтесь в ежедневной таблице лидеров ради доли призового фонда.',
   'hudChrome.dailyRewards.disclaimer':
@@ -777,6 +779,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.claw': 'Коготь',
   'hudChrome.corpseHarvest.components.horn': 'Рог',
   'hudChrome.corpseHarvest.components.tusk': 'Бивень',
+  'hudChrome.corpseHarvest.components.cloth': 'Ткань',
   'hudChrome.townFocus.title': 'Фокус города',
   'hudChrome.townFocus.hint':
     'Очки фокуса добавляют бонус поверх базового выхода каждого компонента. Компоненты без фокуса остаются на базовом уровне.',
@@ -1498,10 +1501,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.slowConnection':
     'Загрузка занимает больше времени, чем обычно. Проверьте подключение к интернету.',
   'loading.connectionRejected': 'Сервер закрыл соединение.',
+  'loading.incompatibleWorldVersion':
+    'Версии игры и сервера несовместимы. Перезагрузите или обновите игру, затем повторите попытку.',
   'loading.realmFull':
     'Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.',
   'loading.tooManyConnections':
     'Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.',
+  'loading.messageRateExceeded':
+    'Вы были отключены за слишком быструю отправку действий. Пожалуйста, подождите немного и войдите снова.',
   'errors.nothingInteract': 'Нет объекта для взаимодействия.',
   'errors.noEnemyNearby': 'Рядом нет врагов.',
   'errors.characterNameRequired': 'Введите имя персонажа.',
@@ -1906,6 +1913,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': 'Вы получаете {name}.',
   'hud.combat.auraFade': '{name} спадает с вас.',
   'hud.combat.auraAfflicted': '{target} поражен эффектом {name}.',
+  'hud.combat.auraGainOther': '{target} получает {name}.',
   'hud.system.playerDeath': 'Вы погибли.',
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
@@ -2810,7 +2818,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оплетает цель корнями на месте на срок до 12 сек.',
   'entities.abilities.bear_form.name': 'Облик бурого',
   'entities.abilities.bear_form.description':
-    'Вы принимаете облик медведя: броня +90%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
+    'Вы принимаете облик медведя: броня +130%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.maul.name': 'Костолом',
   'entities.abilities.maul.description':
     'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
@@ -6528,6 +6536,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'gpuNotice.bodyWeb':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.',
   'gpuNotice.dismiss': 'Закрыть',
+  'perfNudge.integratedGpu':
+    'Игра работает на встроенном (энергосберегающем) графическом процессоре. Если в этом компьютере есть и игровая видеокарта, выберите для браузера режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика в Windows, затем перезапустите браузер. Настольная версия выбирает игровую видеокарту автоматически.',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Игра работает без GPU-ускорения и поэтому сильно тормозит. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
+  'perfNudge.hardwareAccelerationWeb':
+    'Игра работает без GPU-ускорения и поэтому сильно тормозит. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.',
+  'perfNudge.dismiss': 'Закрыть',
   'editor.appTitle': 'Редактор карт',
   'editor.docTitle': 'Редактор карт - World of ClaudeCraft',
   'editor.untitledMap': 'Карта без названия',
@@ -7142,6 +7157,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': 'Достигните более высокого ранга, чтобы получить это.',
   'apiError.discord.swag_points': 'Недостаточно очков.',
   'hudChrome.mailbox.title': 'Почтовый ящик',
+  'hudChrome.noticeboard.empty': 'Похоже, здесь ничего не опубликовано.',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',
   'hudChrome.mailbox.close': 'Закрыть почтовый ящик',
   'hudChrome.mailbox.tabInbox': 'Входящие',
@@ -7189,6 +7205,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Этого письма больше нет в вашем ящике.',
   'hudChrome.mailbox.result.takeParcelsFirst': 'Сначала заберите посылки, затем удаляйте письмо.',
   'worldContent.mailboxName': 'Почтовый ящик',
+  'worldContent.noticeboardName': 'Доска объявлений',
   'entities.letters.ravenpost_welcome.sender': 'Вороновая почта',
   'entities.letters.ravenpost_welcome.subject': 'Теперь вороны летают и для вас',
   'entities.letters.ravenpost_welcome.body':
@@ -7333,6 +7350,35 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы собрать эти заросли, нужен серп травника {tier} уровня.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     'Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.',
+  'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',
+  'hudChrome.gathering.requiresTool.logging': 'Требуется лесорубный топор',
+  'hudChrome.gathering.requiresTool.herbalism': 'Требуется серп травника',
+  'hudChrome.gathering.toolRequired.mining': 'Чтобы разработать эту жилу, нужна шахтерская кирка.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Чтобы срубить этот древостой, нужен лесорубный топор.',
+  'hudChrome.gathering.toolRequired.herbalism': 'Чтобы собрать эти заросли, нужен серп травника.',
+  'hudChrome.gathering.toolRequired.fishing': 'Чтобы рыбачить, нужна удочка.',
+  'hudChrome.gathering.noNodeNearby.mining': 'Поблизости нет рудной жилы.',
+  'hudChrome.gathering.noNodeNearby.logging': 'Поблизости нет древостоя.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'Поблизости нет зарослей трав.',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Шахтерский инструмент ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Лесорубный инструмент ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Инструмент травника ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Удочка ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.unlocks.mining': 'Нужна для добычи рудных жил до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging': 'Нужен для валки древостоев до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Нужен для сбора зарослей трав до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Использование: добыть руду из ближайшей жилы.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Использование: срубить ближайший древостой.',
+  'hudChrome.gathering.toolTooltip.use.herbalism':
+    'Использование: собрать травы из ближайших зарослей.',
+  'hudChrome.gathering.toolTooltip.speed': 'Быстрее собирает на узлах ниже {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Нужна для рыбалки.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Рыба клюет до {seconds} с быстрее.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Продлевает окно подсечки на {seconds} с.',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Открывает более богатый улов при навыке рыбалки от {skill}.',
   'hudChrome.gathering.downgradeMark': 'Сумки полны: добыча сохранена без метки сборщика.',
   'hudChrome.gathering.downgradeFind': 'Сумки полны: превосходная находка ускользнула.',
   'hudChrome.gathering.stateReady': 'Готово',
@@ -7396,6 +7442,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.throttled':
     'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
+  'hudChrome.crafting.noBagSpace': 'В сумках нет места для созданного предмета.',
   // Professions 2.0 (M16 non-Latin fills).
   'hudChrome.crafting.attunementReturnCost':
     'Если вы покинете эту пару, возвращение к ней позже обойдётся в {cost} заданий искупления.',
@@ -7855,8 +7902,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': 'Лунный прилив (периодический урон по области)',
   'hudChrome.finder.mech.enrage': 'Приходит в ярость при низком здоровье',
   'hudChrome.finder.mech.shuddering_stomp': 'Сотрясающий топот (оглушение по области)',
-  'hudChrome.finder.mech.necrotic_shockwave':
-    'Некротическая ударная волна (высокий урон по области)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Могильный инферно (канализируемый огненный AoE, держите дистанцию)',
   'hudChrome.finder.mech.grave_cleaver': 'Могильный секач (рассекающий удар спереди)',
   'hudChrome.finder.mech.shadow_nova': 'Кольцо тьмы (взрыв по области)',
   'hudChrome.finder.mech.profane_mending': 'Нечестивое исцеление (лечит союзников)',
@@ -8447,8 +8494,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.stateKnown': 'Изучено',
   'hudChrome.training.stateTeachable': 'Доступно',
   'hudChrome.training.stateLocked': 'Недоступно',
+  'hudChrome.training.statePending': 'Изучается',
   'hudChrome.training.requirement': 'Обучение при {craft} {skill}',
   'hudChrome.training.trainAria': 'Изучить {name} за {fee}',
+  'hudChrome.training.pendingAria': 'Изучается {name}',
   'hudChrome.training.dialogOption': 'Обучение',
   'hudChrome.training.dialogOptionAria': 'Пройти обучение у {name}',
   'hudChrome.training.learned': 'Рецепт изучен: {recipe}',
@@ -8636,6 +8685,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.enchantWrongSlot': 'Эти чары нельзя наложить на этот предмет.',
   'hudChrome.enchanting.enchantUnknown': 'Таких чар не существует.',
   'hudChrome.enchanting.enchantInsufficient': 'У вас нет материалов для этих чар.',
+  'hudChrome.enchanting.disenchantNoSpace': 'В сумках нет места для чародейских материалов.',
+  'hudChrome.enchanting.salvageNoSpace': 'В сумках нет места для материалов от разбора.',
+  'hudChrome.enchanting.enchantNoSpace': 'В сумках нет места для зачарованного предмета.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Распылить {item}?',
   'hudChrome.enchanting.disenchantConfirmBody':
     'Это уничтожит {item} и даст тайные материалы. Действие необратимо.',
@@ -8846,6 +8898,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': 'Этот предмет не привязан.',
   'hudChrome.unbind.cannotAfford': 'Вам не хватает денег на снятие привязки.',
   'hudChrome.unbind.outOfRange': 'Для снятия привязки нужно стоять у мастерской.',
+  'hudChrome.unbind.noSpace': 'В сумках нет места для предмета со снятой привязкой.',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': 'Кольцо ремесел',
@@ -8941,7 +8994,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Достигнув навыка {at}, вы специализируетесь в этом ремесле, и материалы рецептов дешевеют на {pct}%.',
   'guide.profPages.ench.disenchantHeading': 'Распыление',
   'guide.profPages.ench.disenchantNote':
-    'Распыление берет любое оружие или доспех обычного качества и выше и уничтожает одну копию, никогда уже зачарованную. Обычные и необычные вещи дробятся в горсть пыли перезвона, чуть богаче для более редких и высокоуровневых вещей; от редкого и выше выход меняет форму: ровно одна эссенция перезвона из редкой вещи или один осколок перезвона из эпической или легендарной, плюс типовой дополнительный материал, привязанный к тому, из чего была сделана вещь.',
+    'Распыление берет любое оружие или доспех обычного качества и выше и уничтожает одну копию, сперва обычную, а не зачарованную; если остались только зачарованные копии, одна из них уничтожается вместе с чарами. Обычные и необычные вещи дробятся в горсть пыли перезвона, чуть богаче для более редких и высокоуровневых вещей; от редкого и выше выход меняет форму: ровно одна эссенция перезвона из редкой вещи или один осколок перезвона из эпической или легендарной, плюс типовой дополнительный материал, привязанный к тому, из чего была сделана вещь.',
   'guide.profPages.ench.typedHeading': 'Типовые побочные материалы',
   'guide.profPages.ench.typedNote':
     'Вещи редкого качества и выше дают еще и типовой побочный материал с привязкой при передаче: {rare} с редкой вещи, от {epicMin} до {epicMax} с эпической или легендарной.',
@@ -8963,11 +9016,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Любой может разобрать оружие или доспех на обычные материалы согласно качеству; навык наложения чар не нужен.',
   'guide.profPages.ench.bonusFmt': '+{value} к {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Горное дело добывает руду прямо из камня мира: медь в Eastbrook Vale, железо в Mirefen Marsh и осмиевую руду в Thornpeak Heights, кормит кузнечные ремесла. Открыто для всех с 1 уровня, никаких ворот, ведется на собственном счетчике до предела в 100.',
+    'Горное дело добывает руду прямо из камня мира: медь в Истврукской долине, железо в Мирефенской топи и осмий на Терновых высотах, питая кузнечные ремёсла. Открыто для всех с 1 уровня: нужна лишь кирка в сумках, 20 меди в любом узловом городе. Ведётся на собственном счётчике до предела в 100.',
   'guide.profPages.gatherIntro.logging':
-    'Лесозаготовка валит лес с деревьев во всех трех зонах: ironbark в Eastbrook Vale, ashwood в Mirefen Marsh и бревна горной сосны в Thornpeak Heights, сырье для древков, посохов и стола инженера. Открыта для всех с 1 уровня, ведется на собственном счетчике до предела в 100.',
+    'Лесозаготовка валит лес в рощах всех трёх зон: железнокорое дерево в Истврукской долине, пепельное дерево в Мирефенской топи и горную сосну на Терновых высотах, сырьё для древков, посохов и стола инженера. Открыта для всех с 1 уровня, нужен лишь лесорубный топор в сумках (20 меди в любом узловом городе), ведётся на собственном счётчике до предела в 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Травничество собирает дикорастущее: трава глянцелист в Eastbrook Vale, goldleaf в Mirefen Marsh и sunpetal в Thornpeak Heights, лист и стебель, что поддерживает варение аптечных ремесел. Открыто для всех с 1 уровня, ведется на собственном счетчике до предела в 100.',
+    'Травничество собирает дикорастущее: глянцелист в Истврукской долине, золотолист в Мирефенской топи и солнцелепест на Терновых высотах, лист и стебель, на которых держатся аптечные ремёсла. Открыто для всех с 1 уровня, нужен лишь серп травника в сумках (20 меди в любом узловом городе), ведётся на собственном счётчике до предела в 100.',
   'guide.profPages.gatherIntro.fishing':
     'Рыбная ловля тянет улов из открытой воды каждой зоны в ритме поклевки и подсечки и ограничена 200.',
   'guide.profPages.rhythmHeading': 'Ритм сбора',
@@ -8980,13 +9033,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Где лежат залежи, их уровень, нужный инструмент и добыча; каждая залежь возрождается лично для вас через {respawn} секунд после вашего сбора.',
   'guide.profPages.toolsHeading': 'Инструменты',
   'guide.profPages.toolsNote':
-    'Лестница инструментов с точными ценами торговцев; инструменты 4 и 5 уровня только создаются и не продаются.',
+    'Для любой залежи нужен инструмент своего ремесла в сумках, в том числе для залежей 1 уровня: без кирки нет руды, без удочки нет рыбы. У торговцев есть инструменты с 1 по 3 уровень, и их держат в каждом узловом городе; инструменту достаточно лежать в сумках, ячейки экипировки и прочности у него нет, так что покупка разовая. Для проверки важен только уровень инструмента: цвет редкости чисто декоративный.\n\nВыше торговой лестницы стоят два создаваемых инструмента, 4 и 5 уровня: их делают инженеры в мастерской, и ни один NPC их не продаёт. Сегодня ни одной залежи не нужно больше 3 уровня, поэтому их ценность сейчас в скорости: лучший инструмент удерживает время сбора на минимуме на низких залежах и станет пропуском, когда появятся угодья более высоких уровней.',
   'guide.profPages.toolCrafted': 'Создается ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Не продается',
   'guide.profPages.priceNone': 'Не продается',
   'guide.profPages.toolTierReq': 'Инструмент {tier} уровня',
-  'guide.profPages.bareHands': 'Голыми руками',
   'guide.profPages.bandsHeading': 'Разряды мастерства',
   'guide.profPages.bandsBody':
     'Разряды мастерства ускоряют сбор, а в рыбной ловле еще и открывают таблицы улова.',
@@ -9208,4 +9260,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Коллекционеры, трофеи и цена истории',
   'guide.profPages.econ.collectorsBody':
     'Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.',
+  'hudChrome.corpseHarvest.components.meat': 'Мясо',
 };

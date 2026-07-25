@@ -380,3 +380,30 @@
 | Druid | regrowth@14, barkskin@16, starfire@18 | none |
 
 Files to touch when implementing: `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/data.ts` (ABILITIES ranks + new entries, CLASSES.abilities arrays, 2 conjured-water items), `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/types.ts` (one new AbilityEffect variant `finisherStun`, XP_TABLE/MAX_LEVEL extension per the brief).
+
+---
+
+## 2026-07 cap retune: the missing level-20 heal step (healers-vs-heroics rebalance)
+
+Player pools and instance damage outscaled heals across v0.24-v0.29 (heroic/raid
+stamina budgets, prot mastery, Litany, elixirs, masterwork), while the heal
+ladders above stood still: a top heal restored 6.5-8% of a buffed tank pool
+against a classic-era reference of 15-25%. The fix keeps leveling untouched and
+lands entirely at the cap, alongside the heal-side Spell Power doubling
+(`HEALING_SP_SCALE`, 1 healing per point of Intellect) and tank crit immunity:
+
+- Ladders whose top rank was already learned AT 20 are revalued in place
+  (endgame-only by construction): heal R2 335-390, renew R3 205/15s,
+  flash_heal 174-206, rejuvenation R4 168/12s, healing_touch R4 254-302,
+  holy_light R4 275-322.
+- Ladders topping below 20 gain a NEW cap rank at level 20 (~1.45x the prior
+  top, cost ~1.3x, so healing-per-mana improves with the rank): lesser_heal R4
+  160-192 c85, power_word_shield R4 absorb 210 c130, prayer_of_healing R2
+  145-177 c170, holy_nova R2 heal-side 49-61 c90, healing_wave R5 200-238
+  c115, regrowth R2 75-90 + hot 71/21s c72, flash_of_light R2 90-110 c46,
+  holy_shock R2 heal-side 58-73 c72.
+- Deliberately skipped (their descriptions hardcode numbers; ranking them
+  without a reword would make tooltips lie): chain_heal, healing_stream,
+  tranquility. Follow-up: modernize those descriptions to $d, then rank them.
+
+Pinned by tests/heal_rank_caps.test.ts (sub-cap ranks are asserted unchanged).

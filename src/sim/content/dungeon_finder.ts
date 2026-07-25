@@ -121,7 +121,7 @@ const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
   { mobId: 'korgath_the_bound', mechanics: ['shuddering_stomp', 'enrage'] },
   { mobId: 'grand_necromancer_velkhar', mechanics: ['summons_adds'] },
-  { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['necrotic_shockwave', 'enrage'] },
+  { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['grave_inferno', 'enrage'] },
 ];
 
 const NYTHRAXIS_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [

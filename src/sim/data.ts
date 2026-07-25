@@ -44,6 +44,9 @@ import {
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { MAGE_PET_MOBS } from './content/mage_pets';
+import { MAILBOXES } from './content/mailboxes';
+import { NOTICEBOARDS } from './content/noticeboards';
+import { STATIONS } from './content/professions';
 import {
   ALL_RECIPES as ALL_RECIPES_CONTENT,
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
@@ -105,6 +108,7 @@ import {
   ZONE3_ZONE,
 } from './content/zone3';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
+import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -140,7 +144,6 @@ function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef
 export type { ClassDef } from './content/classes';
 export { ABILITIES, abilitiesKnownAt, CLASSES } from './content/classes';
 export { GATHER_NODE_TYPES } from './content/gather_nodes';
-export { STATIONS } from './content/professions';
 // Re-export content shapes so existing `from './data'` imports keep working.
 export type {
   BiomeId,
@@ -155,6 +158,7 @@ export type {
   ZoneDef,
   ZonePropsDef,
 } from './types';
+export { STATIONS };
 
 // ---------------------------------------------------------------------------
 // Merged content tables
@@ -287,6 +291,8 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     mudHuts: sets.flatMap((s) => s.mudHuts),
     ruinRings: sets.flatMap((s) => s.ruinRings),
     fences: sets.flatMap((s) => s.fences),
+    benches: sets.flatMap((s) => s.benches ?? []),
+    walls: sets.flatMap((s) => s.walls ?? []),
     graveyards: sets.flatMap((s) => s.graveyards),
     // optional per-zone field, was being dropped here, so the delve entrance
     // marker (name slab + arch) never reached the renderer (props.ts)
@@ -336,7 +342,7 @@ export const WORLD_MAX_X = WORLD_SIZE / 2;
 export const WORLD_MIN_Z = ZONES[0].zMin;
 export const WORLD_MAX_Z = ZONES[ZONES.length - 1].zMax;
 
-export const PLAYER_START = { x: 2, z: -2 };
+export const PLAYER_START = { ...EASTBROOK_LAYOUT.services.playerStart.position };
 
 // ---------------------------------------------------------------------------
 // Active world content registry.
@@ -359,6 +365,12 @@ export const BUILTIN_WORLD: WorldContent = {
   roads: ROADS,
   props: PROPS,
   playerStart: PLAYER_START,
+  services: {
+    stations: STATIONS,
+    mailboxes: MAILBOXES,
+    noticeboards: NOTICEBOARDS,
+    graveyards: OVERWORLD_GRAVEYARDS,
+  },
   blockers: JAIL_BLOCKERS,
   terrainEdits: JAIL_TERRAIN_EDITS,
 };

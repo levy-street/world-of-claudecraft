@@ -1611,7 +1611,7 @@ export const guideStrings = {
     ench: {
       disenchantHeading: 'Disenchanting',
       disenchantNote:
-        'Disenchanting takes any weapon or armor piece of common quality or better and consumes one copy, never a copy that is already enchanted. Common and uncommon pieces mill down into a rolled handful of Chime Dust, a little richer for rarer and higher-level pieces; from rare up the yield changes shape, exactly one Chime Essence from a rare piece or one Chime Shard from an epic or legendary one, plus a typed secondary keyed to what the piece was made of.',
+        'Disenchanting takes any weapon or armor piece of common quality or better and consumes one copy, taking a plain copy before an enchanted one; when only enchanted copies remain, one of those is destroyed, enchant and all. Common and uncommon pieces mill down into a rolled handful of Chime Dust, a little richer for rarer and higher-level pieces; from rare up the yield changes shape, exactly one Chime Essence from a rare piece or one Chime Shard from an epic or legendary one, plus a typed secondary keyed to what the piece was made of.',
       typedHeading: 'Typed secondaries',
       typedNote:
         'The typed secondaries follow the material: cloth armor yields Resonant Thread, leather Resonant Hide, mail Resonant Links, melee weapons Resonant Steel, and staves, wands, bows, and crossbows Resonant Timber. A rare piece gives exactly {rare}; an epic or legendary piece gives {epicMin} or {epicMax}. Rings and necklaces have no armor class, so they yield only the primary material.\n\nMind the fine print: the Resonant secondaries bind on trade, so each can change hands exactly once, straight from the breaker to the enchanter who will burn it. Dust, Essence, and Shards carry no such string and move like any other trade good.',
@@ -1637,11 +1637,11 @@ export const guideStrings = {
     },
     gatherIntro: {
       mining:
-        "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, feeding the forge crafts. Open to everyone from level 1, no gate of any kind, tracked on its own counter to a cap of 100.",
+        "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, feeding the forge crafts. Open to everyone from level 1: all it takes is a mining pick in your bags, 20 copper at any zone hub. Tracked on its own counter to a cap of 100.",
       logging:
-        "Logging fells timber from stands of trees in all three zones: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, and highpine in Thornpeak Heights, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1, tracked on its own counter to a cap of 100.",
+        "Logging fells timber from stands of trees in all three zones: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, and highpine in Thornpeak Heights, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1 with a logging axe in your bags (20 copper at any zone hub), tracked on its own counter to a cap of 100.",
       herbalism:
-        'Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, and sunpetal in Thornpeak Heights, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1, tracked on its own counter to a cap of 100.',
+        'Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, and sunpetal in Thornpeak Heights, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at any zone hub), tracked on its own counter to a cap of 100.',
       fishing:
         'Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in every zone, and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast.',
     },
@@ -1655,13 +1655,12 @@ export const guideStrings = {
       'Where the nodes are, their tier, the tool they need, and what they yield. Every node respawns for you {respawn} seconds after your own harvest, and that timer is yours alone: another gatherer working the same node never delays yours, so there is no node racing and no camping. Each zone up the ladder brings a better material out of tougher ground.',
     toolsHeading: 'Tools',
     toolsNote:
-      "Bare hands count as a tier 1 tool, so every tier 1 node in the game needs no tool at all. The vendor ladder covers tiers 1 to 3; a tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase. Only the tier matters to the gate: a tool's rarity color is cosmetic.\n\nAbove the vendor ladder sit two crafted tools, tier 4 and tier 5, made at the toolworks by engineers and never sold by any NPC. No node today needs more than tier 3, so their value right now is speed: a top tool pins the cast at its floor on lower nodes, and it will be the entry ticket when higher-tier ground arrives.",
+      "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3, stocked at every zone hub; a tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase. Only the tier matters to the gate: a tool's rarity color is cosmetic.\n\nAbove the vendor ladder sit two crafted tools, tier 4 and tier 5, made at the toolworks by engineers and never sold by any NPC. No node today needs more than tier 3, so their value right now is speed: a top tool pins the cast at its floor on lower nodes, and it will be the entry ticket when higher-tier ground arrives.",
     toolCrafted: 'Crafted ({craft})',
     toolVendor: '{name} ({hub})',
     toolUnavailable: 'Not sold',
     priceNone: 'Not sold',
     toolTierReq: 'Tier {tier} tool',
-    bareHands: 'Bare hands',
     yieldsHeading: 'What a harvest yields',
     yieldsBody:
       'Every harvest rolls a quality for what it grants, and your proficiency is the whole story of that roll. A brand new gatherer always pulls common material; every point of skill moves weight steadily out of common into the higher grades and never backward, until at the 100 cap the common grade disappears entirely: 60 percent uncommon, 30 percent rare, 8 percent epic, and 2 percent legendary, every time.\n\nQuality also means quantity: a common roll yields 1 unit, uncommon and rare yield 2, epic 3, and legendary 4. Any rare, epic, or legendary pull arrives as a signed instance stamped Gathered by you: at cap that is four harvests in ten carrying your name, and the provenance rules on the Crafting Economy page explain why crafters pay extra for exactly those stacks.',

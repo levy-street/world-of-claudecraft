@@ -355,6 +355,7 @@ export const en_CA: EnTranslations = {
       "close": "Close daily rewards",
       "loading": "Loading daily rewards...",
       "error": "Could not load daily rewards.",
+      "disabled": "Daily Rewards is currently disabled. We will announce updates to this feature in the Discord channel.",
       "intro": "Hold enough WOC in your verified wallet to unlock daily rewards. Earn points with one daily spin and rotating tasks, then climb the daily leaderboard for a share of the prize pool.",
       "disclaimer": "WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.",
       "prize": "Prize Pool",
@@ -1212,8 +1213,8 @@ export const en_CA: EnTranslations = {
         "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
         "critChance": "Your chance for an attack to strike critically, dealing double damage.",
         "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
-        "critRating": "Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 10 rating grants exactly 1% crit.",
-        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 10 rating grants exactly 1% haste.",
+        "critRating": "Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 20 rating grants exactly 1% haste.",
         "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.",
         "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. Every 10 rating grants exactly 1% hit.",
         "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
@@ -1459,7 +1460,9 @@ export const en_CA: EnTranslations = {
         "gills": "Gills",
         "claw": "Claw",
         "horn": "Horn",
-        "tusk": "Tusk"
+        "tusk": "Tusk",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {
@@ -1995,6 +1998,9 @@ export const en_CA: EnTranslations = {
       "aria": "World Market collection waiting",
       "tip": "Gold or items are waiting for you at the Merchant."
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "The Gilded Strongbox",
@@ -2135,12 +2141,51 @@ export const en_CA: EnTranslations = {
         "logging": "Requires a tier {tier} logging axe",
         "herbalism": "Requires a tier {tier} herbalism sickle"
       },
+      "requiresTool": {
+        "mining": "Requires a mining pick",
+        "logging": "Requires a logging axe",
+        "herbalism": "Requires a herbalism sickle"
+      },
       "toolTierUnmet": {
         "mining": "You need a tier {tier} mining pick to harvest this vein.",
         "logging": "You need a tier {tier} logging axe to fell this stand.",
         "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
       },
+      "toolRequired": {
+        "mining": "You need a mining pick to harvest this vein.",
+        "logging": "You need a logging axe to fell this stand.",
+        "herbalism": "You need a herbalism sickle to gather this patch.",
+        "fishing": "You need a fishing pole to cast a line."
+      },
+      "noNodeNearby": {
+        "mining": "There is no ore vein within reach.",
+        "logging": "There is no timber stand within reach.",
+        "herbalism": "There is no herb patch within reach."
+      },
       "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "toolTooltip": {
+        "kind": {
+          "mining": "Mining tool (tier {tier})",
+          "logging": "Logging tool (tier {tier})",
+          "herbalism": "Herbalism tool (tier {tier})",
+          "fishing": "Fishing rod (tier {tier})"
+        },
+        "unlocks": {
+          "mining": "Required to mine ore veins up to tier {tier}.",
+          "logging": "Required to fell timber stands up to tier {tier}.",
+          "herbalism": "Required to gather herb patches up to tier {tier}."
+        },
+        "use": {
+          "mining": "Use: Mine a nearby ore vein.",
+          "logging": "Use: Fell a nearby timber stand.",
+          "herbalism": "Use: Gather from a nearby herb patch."
+        },
+        "speed": "Gathers faster at nodes below tier {tier}.",
+        "rodRequired": "Required to fish.",
+        "rodBite": "Fish bite up to {seconds}s sooner.",
+        "rodReel": "Extends the reel window by {seconds}s.",
+        "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
+      },
       "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
       "downgradeFind": "Bags full: a pristine find slipped away.",
       "stateReady": "Ready",
@@ -2316,6 +2361,7 @@ export const en_CA: EnTranslations = {
       },
       "throttled": "You are crafting too quickly. Wait a moment and try again.",
       "recipeNotLearned": "You have not learned that recipe yet.",
+      "noBagSpace": "You do not have room for the crafted item.",
       "skillReqLine": "Requires {craft} {skill}",
       "difficultyFull": "Full skill gain",
       "difficultyReduced": "Reduced skill gain",
@@ -2367,6 +2413,9 @@ export const en_CA: EnTranslations = {
       "enchantWrongSlot": "That enchant cannot be applied to that item.",
       "enchantUnknown": "That enchant does not exist.",
       "enchantInsufficient": "You do not have the materials for that enchant.",
+      "disenchantNoSpace": "You do not have room for the arcane materials.",
+      "salvageNoSpace": "You do not have room for the salvaged materials.",
+      "enchantNoSpace": "You do not have room for the enchanted item.",
       "disenchantConfirmTitle": "Disenchant {item}?",
       "disenchantConfirmBody": "This destroys {item} and yields arcane materials. This cannot be undone.",
       "disenchantConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields arcane materials. This cannot be undone.",
@@ -2386,8 +2435,10 @@ export const en_CA: EnTranslations = {
       "stateKnown": "Known",
       "stateTeachable": "Available",
       "stateLocked": "Locked",
+      "statePending": "Learning",
       "requirement": "Taught at {craft} {skill}",
       "trainAria": "Learn {name} for {fee}",
+      "pendingAria": "Learning {name}",
       "dialogOption": "Training",
       "dialogOptionAria": "Browse training from {name}",
       "learned": "Recipe learned: {recipe}",
@@ -2414,7 +2465,8 @@ export const en_CA: EnTranslations = {
       "notEligible": "That item cannot be unbound.",
       "notBound": "That item is not bound.",
       "cannotAfford": "You cannot afford the unbinding fee.",
-      "outOfRange": "You must be at a crafting station to unbind."
+      "outOfRange": "You must be at a crafting station to unbind.",
+      "noSpace": "You do not have room for the unbound copy."
     },
     "finder": {
       "title": "Dungeon Finder",
@@ -2502,7 +2554,7 @@ export const en_CA: EnTranslations = {
         "lunar_tide": "Lunar Tide (pulsing area damage)",
         "enrage": "Enrages at low health",
         "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_inferno": "Grave Inferno (channeled fire AoE, stay spread)",
         "grave_cleaver": "Grave-Cleaver (frontal cleave)",
         "shadow_nova": "Shadow Nova (area burst)",
         "profane_mending": "Profane Mending (heals its allies)",
@@ -3788,7 +3840,7 @@ export const en_CA: EnTranslations = {
       "specializationBody": "At skill {at} this craft specializes you, no quest needed: recipes cost {pct}% fewer materials from then on, and specialization adds its own bump to the masterwork chance.\n\nSpecialists also learn to take the workshop with them: a specialized crafter can set up a mobile station in the field for ten minutes at a time, so station-bound recipes can be worked at the mine mouth instead of back in town. Its limits are deliberate: it never counts for training with a master or for unbinding a commissioned piece, and it expires on its timer whether or not you used it.",
       "ench": {
         "disenchantHeading": "Disenchanting",
-        "disenchantNote": "Disenchanting takes any weapon or armor piece of common quality or better and consumes one copy, never a copy that is already enchanted. Common and uncommon pieces mill down into a rolled handful of Chime Dust, a little richer for rarer and higher-level pieces; from rare up the yield changes shape, exactly one Chime Essence from a rare piece or one Chime Shard from an epic or legendary one, plus a typed secondary keyed to what the piece was made of.",
+        "disenchantNote": "Disenchanting takes any weapon or armor piece of common quality or better and consumes one copy, taking a plain copy before an enchanted one; when only enchanted copies remain, one of those is destroyed, enchant and all. Common and uncommon pieces mill down into a rolled handful of Chime Dust, a little richer for rarer and higher-level pieces; from rare up the yield changes shape, exactly one Chime Essence from a rare piece or one Chime Shard from an epic or legendary one, plus a typed secondary keyed to what the piece was made of.",
         "typedHeading": "Typed secondaries",
         "typedNote": "The typed secondaries follow the material: cloth armor yields Resonant Thread, leather Resonant Hide, mail Resonant Links, melee weapons Resonant Steel, and staves, wands, bows, and crossbows Resonant Timber. A rare piece gives exactly {rare}; an epic or legendary piece gives {epicMin} or {epicMax}. Rings and necklaces have no armor class, so they yield only the primary material.\n\nMind the fine print: the Resonant secondaries bind on trade, so each can change hands exactly once, straight from the breaker to the enchanter who will burn it. Dust, Essence, and Shards carry no such string and move like any other trade good.",
         "colSource": "Broken from",
@@ -3810,9 +3862,9 @@ export const en_CA: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, feeding the forge crafts. Open to everyone from level 1, no gate of any kind, tracked on its own counter to a cap of 100.",
-        "logging": "Logging fells timber from stands of trees in all three zones: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, and highpine in Thornpeak Heights, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1, tracked on its own counter to a cap of 100.",
-        "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, and sunpetal in Thornpeak Heights, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1, tracked on its own counter to a cap of 100.",
+        "mining": "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, feeding the forge crafts. Open to everyone from level 1: all it takes is a mining pick in your bags, 20 copper at any zone hub. Tracked on its own counter to a cap of 100.",
+        "logging": "Logging fells timber from stands of trees in all three zones: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, and highpine in Thornpeak Heights, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1 with a logging axe in your bags (20 copper at any zone hub), tracked on its own counter to a cap of 100.",
+        "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, and sunpetal in Thornpeak Heights, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at any zone hub), tracked on its own counter to a cap of 100.",
         "fishing": "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in every zone, and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast."
       },
       "rhythmHeading": "The gathering rhythm",
@@ -3821,13 +3873,12 @@ export const en_CA: EnTranslations = {
       "nodesHeading": "Nodes by zone",
       "nodesNote": "Where the nodes are, their tier, the tool they need, and what they yield. Every node respawns for you {respawn} seconds after your own harvest, and that timer is yours alone: another gatherer working the same node never delays yours, so there is no node racing and no camping. Each zone up the ladder brings a better material out of tougher ground.",
       "toolsHeading": "Tools",
-      "toolsNote": "Bare hands count as a tier 1 tool, so every tier 1 node in the game needs no tool at all. The vendor ladder covers tiers 1 to 3; a tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase. Only the tier matters to the gate: a tool's rarity color is cosmetic.\n\nAbove the vendor ladder sit two crafted tools, tier 4 and tier 5, made at the toolworks by engineers and never sold by any NPC. No node today needs more than tier 3, so their value right now is speed: a top tool pins the cast at its floor on lower nodes, and it will be the entry ticket when higher-tier ground arrives.",
+      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3, stocked at every zone hub; a tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase. Only the tier matters to the gate: a tool's rarity color is cosmetic.\n\nAbove the vendor ladder sit two crafted tools, tier 4 and tier 5, made at the toolworks by engineers and never sold by any NPC. No node today needs more than tier 3, so their value right now is speed: a top tool pins the cast at its floor on lower nodes, and it will be the entry ticket when higher-tier ground arrives.",
       "toolCrafted": "Crafted ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Not sold",
       "priceNone": "Not sold",
       "toolTierReq": "Tier {tier} tool",
-      "bareHands": "Bare hands",
       "yieldsHeading": "What a harvest yields",
       "yieldsBody": "Every harvest rolls a quality for what it grants, and your proficiency is the whole story of that roll. A brand new gatherer always pulls common material; every point of skill moves weight steadily out of common into the higher grades and never backward, until at the 100 cap the common grade disappears entirely: 60 percent uncommon, 30 percent rare, 8 percent epic, and 2 percent legendary, every time.\n\nQuality also means quantity: a common roll yields 1 unit, uncommon and rare yield 2, epic 3, and legendary 4. Any rare, epic, or legendary pull arrives as a signed instance stamped Gathered by you: at cap that is four harvests in ten carrying your name, and the provenance rules on the Crafting Economy page explain why crafters pay extra for exactly those stacks.",
       "bandsHeading": "Proficiency bands",
@@ -5527,8 +5578,10 @@ export const en_CA: EnTranslations = {
     "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
     "slowConnection": "This is taking longer than usual. Check your internet connection.",
     "connectionRejected": "The server closed the connection.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "This world is full right now. Please try again in a few minutes.",
     "tooManyConnections": "Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.",
+    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
     "tips": {
       "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
       "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
@@ -5596,6 +5649,12 @@ export const en_CA: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
     "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
+  },
+  "perfNudge": {
+    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
+    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
     "dismiss": "Dismiss"
   },
   "realm": {
@@ -6022,7 +6081,8 @@ export const en_CA: EnTranslations = {
       "death": "{name} dies.",
       "auraGain": "You gain {name}.",
       "auraFade": "{name} fades from you.",
-      "auraAfflicted": "{target} is afflicted by {name}."
+      "auraAfflicted": "{target} is afflicted by {name}.",
+      "auraGainOther": "{target} gains {name}."
     },
     "system": {
       "playerDeath": "You have died.",
@@ -7283,7 +7343,7 @@ export const en_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +90%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +130%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",
@@ -7431,7 +7491,7 @@ export const en_CA: EnTranslations = {
       },
       "combustion": {
         "name": "Phoenix Trance",
-        "description": "Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)"
+        "description": "Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)"
       },
       "icy_veins": {
         "name": "Icy Veins",
@@ -11662,12 +11722,12 @@ export const en_CA: EnTranslations = {
     "itemSets": {
       "boundstone_vanguard": {
         "name": "Boundstone Vanguard",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "crownforged": {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
@@ -11678,7 +11738,7 @@ export const en_CA: EnTranslations = {
       },
       "greyjaw_stalker": {
         "name": "Greyjaw Stalker's Kit",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "necromancers": {
         "name": "Mournweave Raiment",
@@ -11689,29 +11749,29 @@ export const en_CA: EnTranslations = {
       "nighttalon": {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.",
+        "bonus3": "Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.",
         "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
-        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
-        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "wyrmshadow": {
         "name": "Nightfang Vestments",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%.",
+        "bonus3": "Increases Agility by 15 and critical strike chance by 1%.",
         "bonus4": "Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec."
       }
     }
@@ -11729,6 +11789,7 @@ export const en_CA: EnTranslations = {
     "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
     "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "noticeboardName": "Notice Board"
   }
 };

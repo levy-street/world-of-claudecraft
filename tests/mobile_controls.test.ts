@@ -452,6 +452,7 @@ function installMobileControlDom(): {
   emoteButton: FakeElement;
   discordButton: FakeElement;
   donateButton: FakeElement;
+  chatButton: FakeElement;
   windowTarget: EventTarget;
 } {
   const autorunTarget = new FakeElement();
@@ -476,6 +477,7 @@ function installMobileControlDom(): {
     ['mobile-emote', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
+    ['mobile-chat', new FakeElement()],
     // The chat composer, so exitChatReply (value clear + blur) is exercised in the
     // fake DOM: the setActive draft-survival test reads its .value.
     ['chat-input', new FakeElement()],
@@ -514,6 +516,7 @@ function installMobileControlDom(): {
     emoteButton: elements.get('mobile-emote')!,
     discordButton: elements.get('mobile-discord')!,
     donateButton: elements.get('mobile-donate')!,
+    chatButton: elements.get('mobile-chat')!,
     windowTarget,
   };
 }
@@ -2014,6 +2017,73 @@ describe('MobileControls pointer lifecycle', () => {
       }),
     );
     expect(lookActive).toEqual([true, false, false]);
+  });
+});
+
+describe('MobileControls chat button long-press', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const noopInput = () =>
+    ({
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: () => {},
+    }) as unknown as Input;
+
+  it('toggles the log peek on an uninterrupted long press, and releasing afterward does not also open the composer', () => {
+    vi.useFakeTimers();
+    const { chatButton } = installMobileControlDom();
+    const chatOpens: string[] = [];
+    const callbacks = { ...mobileCallbacks(), onChatOpen: () => chatOpens.push('open') };
+    new MobileControls(noopInput(), callbacks).start();
+
+    chatButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 1 }));
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS);
+    expect(document.body.classList.contains('mobile-chatlog-peek')).toBe(true);
+
+    chatButton.dispatchEvent(pointerEvent('pointerup', { pointerId: 1 }));
+    expect(document.body.classList.contains('mobile-chatlog-peek')).toBe(true);
+    expect(chatOpens).toEqual([]);
+  });
+
+  it('cancels a pending long press on window blur so it never fires blind once the timer elapses', () => {
+    vi.useFakeTimers();
+    const { chatButton, windowTarget } = installMobileControlDom();
+    const chatOpens: string[] = [];
+    const callbacks = { ...mobileCallbacks(), onChatOpen: () => chatOpens.push('open') };
+    new MobileControls(noopInput(), callbacks).start();
+
+    chatButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 2 }));
+    // Interrupt well before the long-press threshold elapses, as an app/tab
+    // switch mid-gesture would.
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS - 100);
+    (windowTarget as unknown as EventTarget).dispatchEvent(new Event('blur'));
+
+    // Advance well past the original deadline: without the fix the backgrounded
+    // setTimeout would still fire here and toggle the peek blind.
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS);
+    expect(document.body.classList.contains('mobile-chatlog-peek')).toBe(false);
+    expect(chatOpens).toEqual([]);
+  });
+
+  it('cancels a pending long press when the tab is hidden (visibilitychange) so it never fires blind once the timer elapses', () => {
+    vi.useFakeTimers();
+    const { chatButton } = installMobileControlDom();
+    new MobileControls(noopInput(), mobileCallbacks()).start();
+
+    chatButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 3 }));
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS - 100);
+
+    (document as unknown as { visibilityState: string }).visibilityState = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS);
+    expect(document.body.classList.contains('mobile-chatlog-peek')).toBe(false);
   });
 });
 

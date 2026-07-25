@@ -60,6 +60,7 @@ import type {
   SimConfig,
   SimEvent,
   SkinCatalog,
+  StationDef,
   Vec3,
 } from './types';
 
@@ -75,6 +76,8 @@ export interface SimContextPrimitives {
   // Live player roster (keyed by entity id). Stays a Sim field; exposed here so the
   // moved party machine (A1) resolves member names/metas through the seam.
   readonly players: Map<number, PlayerMeta>;
+  /** Static crafting stations owned by this Sim's authored world bundle. */
+  readonly stationPlacements: readonly StationDef[];
   // The local / RL player id (single-player + renderer contexts). Reassigned on the
   // first join and on the primary's departure, so it is a LIVE getter, not a snapshot.
   // Stays a Sim field; the moved raid-marker `markerFor` (T1) reads it through the seam.
@@ -873,6 +876,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get players() {
       return host.players;
+    },
+    get stationPlacements() {
+      return host.stationPlacements;
     },
     get primaryId() {
       return host.primaryId;

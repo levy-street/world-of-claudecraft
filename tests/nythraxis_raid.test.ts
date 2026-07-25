@@ -5,10 +5,11 @@ import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
+import { nythraxisGravebreakerOnMobSwing } from '../src/sim/encounters/nythraxis';
 import { isShieldItem } from '../src/sim/equipment_rules';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
-import { type Aura, dist2d, type Entity } from '../src/sim/types';
+import { type Aura, armorReduction, dist2d, type Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 type TickEvent = ReturnType<Sim['tick']>[number];
@@ -481,11 +482,13 @@ describe('Nythraxis raid encounter', () => {
     tank.hp = tank.maxHp;
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     boss.moveSpeed = 0;
-    boss.swingTimer = 999;
-    teleport(sim, tankPid, origin.x, origin.z + 36);
+    boss.swingTimer = 0;
+    // In melee so the charged Gravebreaker (armed at 12s) releases on a landed
+    // swing while the opening dialogue is still in scope.
+    teleport(sim, tankPid, boss.pos.x, boss.pos.z + 2);
     engage(boss, tank);
 
-    const events = collectEventsForSeconds(sim, 12);
+    const events = collectEventsForSeconds(sim, 18);
     const bossYells = events
       .filter(isTimedChatEvent)
       .filter((row) => row.event.from === boss.name && row.event.channel === 'yell');
@@ -525,8 +528,8 @@ describe('Nythraxis raid encounter', () => {
     tank.hp = tank.maxHp;
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     boss.moveSpeed = 0;
-    boss.swingTimer = 999;
-    teleport(sim, tankPid, origin.x, origin.z + 36);
+    boss.swingTimer = 0;
+    teleport(sim, tankPid, boss.pos.x, boss.pos.z + 2);
     engage(boss, tank);
     boss.nythraxis = {
       phase: 2,
@@ -539,6 +542,7 @@ describe('Nythraxis raid encounter', () => {
       dialogueToken: 0,
       gravebreakerTimer: 1.5,
       gravebreakerCasts: 0,
+      gravebreakerCharged: false,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -564,15 +568,20 @@ describe('Nythraxis raid encounter', () => {
       .filter(isTimedChatEvent)
       .filter((row) => row.event.text === 'Kneel before your king' && row.event.from === boss.name);
 
-    expect(gravebreakerFx).toHaveLength(6);
-    expect(kneelYells).toHaveLength(2);
-    expect(kneelYells[0].at).toBeGreaterThanOrEqual(25);
-    expect(kneelYells[0].at).toBeCloseTo(gravebreakerFx[2].at, 5);
-    expect(kneelYells[1].at).toBeCloseTo(gravebreakerFx[5].at, 5);
-    expect(kneelYells[1].at - kneelYells[0].at).toBeGreaterThanOrEqual(35);
+    // Releases ride landed swings now: cadence-driven but swing-quantized. At
+    // least 5 releases fit in 66s, each a full cadence apart, and the kneel
+    // line lands on every third RELEASE.
+    expect(gravebreakerFx.length).toBeGreaterThanOrEqual(5);
+    for (let i = 1; i < gravebreakerFx.length; i++) {
+      expect(gravebreakerFx[i].at - gravebreakerFx[i - 1].at).toBeGreaterThanOrEqual(9);
+    }
+    expect(kneelYells).toHaveLength(Math.floor(gravebreakerFx.length / 3));
+    kneelYells.forEach((yell, i) => {
+      expect(yell.at).toBeCloseTo(gravebreakerFx[i * 3 + 2].at, 5);
+    });
   });
 
-  it('deals normal Gravebreaker damage to the tank and 150 percent to secondary cone targets', () => {
+  it('splashes cone bystanders at 150 percent of the swing roll, never the swing target', () => {
     const sim = makeWorld();
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
@@ -600,8 +609,9 @@ describe('Nythraxis raid encounter', () => {
       transitionReleased: false,
       dialogueBusyUntil: 0,
       dialogueToken: 0,
-      gravebreakerTimer: 0,
+      gravebreakerTimer: 999,
       gravebreakerCasts: 0,
+      gravebreakerCharged: true,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -614,7 +624,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
 
-    const events = sim.tick();
+    sim.drainEvents();
+    nythraxisGravebreakerOnMobSwing(sim.ctx, boss, tank, 1000, false);
+    const events = sim.drainEvents();
     const gravebreakerHits = events
       .filter(isDamageEvent)
       .filter(
@@ -623,12 +635,17 @@ describe('Nythraxis raid encounter', () => {
     const tankHit = gravebreakerHits.find((ev) => ev.targetId === tank.id);
     const secondaryHit = gravebreakerHits.find((ev) => ev.targetId === secondary.id);
 
-    expect(tankHit?.amount).toBeGreaterThan(0);
-    expect(secondaryHit?.amount).toBeGreaterThan(0);
-    expect(secondaryHit!.amount / tankHit!.amount).toBeCloseTo(1.5, 1);
+    // The swing target takes only the swing itself; the cone bystander takes
+    // 1.5x of the (un-crit) swing roll after their own armor step.
+    const expected = Math.max(
+      1,
+      Math.round(1000 * 1.5 * (1 - armorReduction(sim.ctx.effectiveArmor(secondary), boss.level))),
+    );
+    expect(tankHit).toBeUndefined();
+    expect(secondaryHit?.amount).toBe(expected);
   });
 
-  it('only hits players in front of Nythraxis with Gravebreaker placement', () => {
+  it('only splashes players in front of Nythraxis, never the swing target', () => {
     const sim = makeWorld();
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
@@ -659,8 +676,9 @@ describe('Nythraxis raid encounter', () => {
       transitionReleased: false,
       dialogueBusyUntil: 0,
       dialogueToken: 0,
-      gravebreakerTimer: 0,
+      gravebreakerTimer: 999,
       gravebreakerCasts: 0,
+      gravebreakerCharged: true,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -673,7 +691,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
 
-    const events = sim.tick();
+    sim.drainEvents();
+    nythraxisGravebreakerOnMobSwing(sim.ctx, boss, tank, 1000, false);
+    const events = sim.drainEvents();
     const gravebreakerHits = events
       .filter(isDamageEvent)
       .filter(
@@ -683,9 +703,8 @@ describe('Nythraxis raid encounter', () => {
     const besideTankHit = gravebreakerHits.find((ev) => ev.targetId === besideTank.id);
     const behindHit = gravebreakerHits.find((ev) => ev.targetId === behind.id);
 
-    expect(tankHit?.amount).toBeGreaterThan(0);
-    expect(besideTankHit?.amount).toBeGreaterThan(tankHit!.amount);
-    expect(besideTankHit!.amount / tankHit!.amount).toBeCloseTo(1.5, 1);
+    expect(tankHit).toBeUndefined();
+    expect(besideTankHit?.amount).toBeGreaterThan(0);
     expect(behindHit).toBeUndefined();
   });
 
@@ -729,8 +748,9 @@ describe('Nythraxis raid encounter', () => {
       transitionReleased: false,
       dialogueBusyUntil: 0,
       dialogueToken: 0,
-      gravebreakerTimer: 0,
+      gravebreakerTimer: 999,
       gravebreakerCasts: 0,
+      gravebreakerCharged: true,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -743,14 +763,16 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
 
-    const events = sim.tick();
+    sim.drainEvents();
+    nythraxisGravebreakerOnMobSwing(sim.ctx, boss, tank, 1000, false);
+    const events = sim.drainEvents();
     const gravebreakerHits = events
       .filter(isDamageEvent)
       .filter(
         (ev) => ev.sourceId === boss.id && ev.ability === 'Gravebreaker' && ev.kind === 'hit',
       );
 
-    expect(gravebreakerHits.some((ev) => ev.targetId === tank.id)).toBe(true);
+    expect(gravebreakerHits.some((ev) => ev.targetId === tank.id)).toBe(false);
     expect(gravebreakerHits.some((ev) => ev.targetId === inside.id)).toBe(true);
     expect(gravebreakerHits.some((ev) => ev.targetId === outside.id)).toBe(false);
   });
@@ -776,8 +798,9 @@ describe('Nythraxis raid encounter', () => {
       transitionReleased: false,
       dialogueBusyUntil: (sim as unknown as { time: number }).time + 30,
       dialogueToken: 1,
-      gravebreakerTimer: 0,
+      gravebreakerTimer: 999,
       gravebreakerCasts: 2,
+      gravebreakerCharged: true,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -790,7 +813,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
 
-    const events = sim.tick();
+    sim.drainEvents();
+    nythraxisGravebreakerOnMobSwing(sim.ctx, boss, tank, 1000, false);
+    const events = sim.drainEvents();
 
     expect(
       events.some(

@@ -1,4 +1,9 @@
 import {
+  buildingCameraHeight,
+  buildingTerrainEnvelope,
+  isEastbrookGrandArmoury,
+} from './building_layout';
+import {
   arenaOriginAt,
   DUNGEON_X_THRESHOLD,
   defaultDelveModules,
@@ -25,7 +30,7 @@ import {
 } from './dungeon_layout';
 import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
-import { generateDecorations, groundHeight } from './world';
+import { generateDecorations, groundHeight, terrainHeight } from './world';
 import { yumiMazeColliders } from './yumi_maze_layout';
 
 // Static world collision. Prop placement comes from the per-zone content
@@ -80,6 +85,23 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
 }
 
+// default backward offset/radius for a mine's spoil mound behind the timber portal,
+// shared with the renderer (src/render/props.ts) so the two can't drift apart
+export const MINE_MOUND_DEFAULT_OFFSET = 3.4;
+export const MINE_MOUND_DEFAULT_RADIUS = 5;
+
+export function mineMoundFootprint(m: {
+  x: number;
+  z: number;
+  rot: number;
+  moundOffset?: number;
+  moundRadius?: number;
+}): { x: number; z: number; r: number } {
+  const r = m.moundRadius ?? MINE_MOUND_DEFAULT_RADIUS;
+  const mound = rotY(0, -(m.moundOffset ?? MINE_MOUND_DEFAULT_OFFSET), m.rot);
+  return { x: m.x + mound.x, z: m.z + mound.z, r };
+}
+
 // ---------------------------------------------------------------------------
 // Collider sets
 // ---------------------------------------------------------------------------
@@ -93,7 +115,9 @@ function staticWorldColliders(seed: number): Collider[] {
   // chase cam no longer pulls in for them; the renderer hides whichever one
   // crosses the eye-to-camera segment instead.
   for (const b of PROPS.buildings) {
-    const height = b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0;
+    const cameraTopY = isEastbrookGrandArmoury(b)
+      ? buildingTerrainEnvelope(b, (x, z) => terrainHeight(x, z, seed)).cameraTopY
+      : topY(seed, b.x, b.z, buildingCameraHeight(b));
     out.push({
       type: 'obb',
       x: b.x,
@@ -101,7 +125,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hw: b.w / 2,
       hd: b.d / 2,
       rot: b.rot,
-      cameraTopY: topY(seed, b.x, b.z, height),
+      cameraTopY,
       camGhost: true,
     });
   }
@@ -111,25 +135,65 @@ function staticWorldColliders(seed: number): Collider[] {
       x: w.x,
       z: w.z,
       r: w.r,
-      cameraTopY: topY(seed, w.x, w.z, 3.7),
-      camGhost: true,
+      cameraTopY: topY(seed, w.x, w.z, w.height ?? 3.7),
+      camGhost: w.camGhost ?? true,
     });
-  for (const s of PROPS.stalls)
+  for (const s of PROPS.stalls) {
+    const cameraTopY = topY(seed, s.x, s.z, s.height ?? 3.1);
+    if (s.w !== undefined && s.d !== undefined) {
+      out.push({
+        type: 'obb',
+        x: s.x,
+        z: s.z,
+        hw: s.w / 2,
+        hd: s.d / 2,
+        rot: s.rot,
+        cameraTopY,
+        camGhost: s.camGhost ?? true,
+      });
+    } else {
+      out.push({
+        type: 'circle',
+        x: s.x,
+        z: s.z,
+        r: s.r,
+        cameraTopY,
+        camGhost: s.camGhost ?? true,
+      });
+    }
+  }
+  for (const prop of [...(PROPS.benches ?? []), ...(PROPS.walls ?? [])]) {
     out.push({
-      type: 'circle',
-      x: s.x,
-      z: s.z,
-      r: s.r,
-      cameraTopY: topY(seed, s.x, s.z, 3.1),
+      type: 'obb',
+      x: prop.x,
+      z: prop.z,
+      hw: prop.w / 2,
+      hd: prop.d / 2,
+      rot: prop.rot,
+      cameraTopY: topY(seed, prop.x, prop.z, prop.height),
+      camGhost: prop.camGhost ?? false,
+    });
+  }
+
+  // Interactable town boards are authored through active WorldContent rather
+  // than PROPS. The same service record drives their spawn and exact OBB, and
+  // custom worlds that omit the service inherit no Eastbrook collision.
+  for (const board of content.services?.noticeboards ?? []) {
+    out.push({
+      type: 'obb',
+      x: board.x,
+      z: board.z,
+      hw: board.width / 2,
+      hd: board.depth / 2,
+      rot: board.rotation,
+      cameraTopY: topY(seed, board.x, board.z, board.height),
       camGhost: true,
     });
+  }
 
   // mines: mound behind the timber portal
   for (const m of PROPS.mines) {
-    const r = m.moundRadius ?? 5;
-    const mound = rotY(0, -(m.moundOffset ?? 3.4), m.rot);
-    const x = m.x + mound.x,
-      z = m.z + mound.z;
+    const { x, z, r } = mineMoundFootprint(m);
     out.push({ type: 'circle', x, z, r, cameraTopY: topY(seed, x, z, r + 0.2), camGhost: true });
   }
 
@@ -180,14 +244,15 @@ function staticWorldColliders(seed: number): Collider[] {
     if (len < 1e-6) continue;
     const x = (f.x1 + f.x2) / 2,
       z = (f.z1 + f.z2) / 2;
+    const halfDepth = (f.width ?? FENCE_HALF_DEPTH * 2) / 2;
     out.push({
       type: 'obb',
       x,
       z,
-      hw: len / 2 + FENCE_END_PAD,
-      hd: FENCE_HALF_DEPTH,
+      hw: len / 2 + (f.width === undefined ? FENCE_END_PAD : halfDepth),
+      hd: halfDepth,
       rot: Math.atan2(-dz, dx),
-      cameraTopY: topY(seed, x, z, FENCE_RAIL_HEIGHT),
+      cameraTopY: topY(seed, x, z, f.height ?? FENCE_RAIL_HEIGHT),
       camGhost: true,
       isFence: true,
     });
@@ -265,6 +330,10 @@ function staticWorldColliders(seed: number): Collider[] {
   out.push(...valeCupColliders());
   return out;
 }
+
+/** Test-only visibility into the authored static set so world-layout tests can
+ *  pin real collider extents and camera tops rather than re-testing helpers. */
+export const colliderInternalsForTest = { staticWorldColliders };
 
 // Interior collision sets, in instance-local coordinates. Derived from the
 // SAME plain-data layouts the renderer builds the KayKit modules from
@@ -494,7 +563,8 @@ function crossesFence(fromX: number, fromZ: number, toX: number, toZ: number, r:
     const hitX = fromX + (toX - fromX) * t;
     const hitZ = fromZ + (toZ - fromZ) * t;
     const along = (hitX - f.x1) * ux + (hitZ - f.z1) * uz;
-    if (along >= -FENCE_END_PAD - r && along <= len + FENCE_END_PAD + r) return true;
+    const endPad = f.width === undefined ? FENCE_END_PAD : f.width / 2;
+    if (along >= -endPad - r && along <= len + endPad + r) return true;
   }
   return false;
 }

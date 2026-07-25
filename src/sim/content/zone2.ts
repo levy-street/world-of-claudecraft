@@ -664,6 +664,15 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'reedwoven_jerkin',
       'fenwalker_boots',
       'reedwoven_trousers',
+      // Gathering tools (#2343: every node harvest needs a matching tool, so
+      // each zone hub stocks the tiers its own nodes use; Mirefen has tier-1
+      // and tier-2 nodes). Tiered rods stay a Trader Wilkes exclusive.
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'handaxe',
+      'felling_axe',
+      'gathering_sickle',
+      'bronze_sickle',
       'simple_fishing_pole',
     ],
     greeting:

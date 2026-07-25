@@ -124,6 +124,112 @@ describe('disenchant', () => {
   });
 });
 
+// Regression for issue #2340: the bag menu offers Disenchant on the item DEF,
+// but the resolver gated on countEnchantableItem, which excludes every
+// already-enchanted copy. A player whose ONLY copy was enchanted was denied
+// not_held ("You do not have that item") for an item sitting in their bags,
+// and an enchanted piece could never be broken back into materials. The
+// resolver now gates on countItem (any held copy), keeps the old preference
+// order (plain fungible first, then an unenchanted instanced copy), and only
+// when every held copy is enchanted consumes one of those, destroying the
+// piece enchant and all. Apply-enchant keeps the enchanted-copy exclusion.
+describe('disenchanting an enchanted copy (issue #2340)', () => {
+  const SWORD = 'eastbrook_arming_sword';
+
+  // Build the bug's exact setup via the real apply flow: after this, the only
+  // copy of SWORD in bags is the freshly-enchanted instanced copy.
+  function simWithEnchantedSwordOnly() {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem(SWORD, 1, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(resolveApplyEnchant(sim.ctx, pid, SWORD, 'enchant_weapon_might').ok).toBe(true);
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+    expect(sim.ctx.countEnchantableItem(SWORD, pid)).toBe(0);
+    return { sim, pid };
+  }
+
+  it('succeeds when the only held copy is enchanted: consumes it and grants the arcane yield', () => {
+    const { sim, pid } = simWithEnchantedSwordOnly();
+    const result = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(result.ok).toBe(true);
+    expect(result.materialItemId).toBe('arcane_dust');
+    expect(result.count).toBeGreaterThan(0);
+    expect(sim.countItem(SWORD, pid)).toBe(0);
+    expect(sim.countItem('arcane_dust', pid)).toBe(result.count);
+  });
+
+  it('a legacy enchanted copy (bare rolled.stats, no marker) disenchants the same way', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(SWORD, { rolled: { stats: { str: 5 } } }, pid);
+    expect(sim.ctx.countEnchantableItem(SWORD, pid)).toBe(0);
+    const result = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem(SWORD, pid)).toBe(0);
+  });
+
+  it('still prefers the plain copy when both a plain and an enchanted copy are held', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // Two plain copies + dust; the apply consumes one plain copy and appends
+    // the enchanted instance at the HIGHEST inventory index, so a regression
+    // to plain removeItem (highest-index-first, any kind) would consume the
+    // enchanted copy and leave the fungible one, failing below.
+    sim.addItem(SWORD, 2, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(resolveApplyEnchant(sim.ctx, pid, SWORD, 'enchant_weapon_might').ok).toBe(true);
+    expect(sim.ctx.countFungibleItem(SWORD, pid)).toBe(1);
+
+    const result = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem(SWORD, pid)).toBe(1);
+    // The plain copy died; the survivor is the enchanted instance.
+    expect(sim.ctx.countFungibleItem(SWORD, pid)).toBe(0);
+    const slot = sim.ctx.resolve(pid)?.meta.inventory.find((s) => s.itemId === SWORD);
+    expect(slot?.instance?.enchant).toBe('enchant_weapon_might');
+  });
+
+  it('prefers an unenchanted instanced copy (crafted) over the enchanted one', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // Crafted-style unenchanted instance FIRST (lowest index), then the
+    // enchanted instance lands at the highest index via the real apply flow,
+    // so index order alone cannot pass this: the resolver must actively skip
+    // the enchanted copy while an unenchanted one remains.
+    sim.ctx.addItemInstance(SWORD, { signer: 'Tester', rolled: { quality: 'rare' } }, pid);
+    sim.addItem(SWORD, 1, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(resolveApplyEnchant(sim.ctx, pid, SWORD, 'enchant_weapon_might').ok).toBe(true);
+
+    const result = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem(SWORD, pid)).toBe(1);
+    const slot = sim.ctx.resolve(pid)?.meta.inventory.find((s) => s.itemId === SWORD);
+    // The crafted copy was the victim; the enchanted copy survived.
+    expect(slot?.instance?.enchant).toBe('enchant_weapon_might');
+    expect(slot?.instance?.signer).toBeUndefined();
+  });
+
+  it('the not_held deny is reserved for genuinely not holding the item', () => {
+    const { sim, pid } = simWithEnchantedSwordOnly();
+    expect(resolveDisenchant(sim.ctx, pid, SWORD).ok).toBe(true);
+    // Bags now hold zero copies of any kind: the deny is accurate again.
+    const denied = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(denied.ok).toBe(false);
+    expect(denied.reason).toBe('not_held');
+  });
+
+  it('apply-enchant still refuses the enchanted-only copy (no silent overwrite)', () => {
+    const { sim, pid } = simWithEnchantedSwordOnly();
+    sim.addItem('arcane_dust', 5, pid);
+    const second = resolveApplyEnchant(sim.ctx, pid, SWORD, 'enchant_weapon_might');
+    expect(second.ok).toBe(false);
+    expect(second.reason).toBe('not_held');
+    expect(sim.countItem(SWORD, pid)).toBe(1);
+  });
+});
+
 describe('applyEnchant', () => {
   it('denies an unknown item id or unknown enchant id', () => {
     const sim = makeSim();

@@ -92,6 +92,49 @@ describe('renderTrainWindow fee arms (gold chip on affordable rows ONLY)', () =>
   });
 });
 
+describe('renderTrainWindow pending rows (learn in flight, issue #2342)', () => {
+  it('a pending teachable row disables the button and swaps to the in-flight label', () => {
+    const el = paint([row({ pending: true })]);
+    const button = el.querySelector('.train-teachable') as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    expect(button.querySelector('.train-state')?.textContent).toBe('Learning');
+    // The accessible name must carry the in-flight state too: aria-label
+    // overrides element content, so the visible pill alone never reaches AT.
+    expect(button.getAttribute('aria-label')).toBe('Learning Eastbrook Arming Sword');
+    // The fee chip stays (the row is still affordable; the disabled opacity
+    // mutes it), per the vendor-family price-rendering contract.
+    expect(button.querySelector('.vi-price-chip')).not.toBeNull();
+  });
+
+  it('a disabled pending button never reaches onTrain, an enabled row does', () => {
+    const d = deps();
+    const el = document.createElement('div');
+    const view: TrainView = {
+      stationType: 'forge',
+      rows: [row({ pending: true }), row({ recipeId: 'r_live' })],
+    };
+    renderTrainWindow(el, 'Darva', view, d);
+    const [pendingButton, liveButton] = Array.from(
+      el.querySelectorAll<HTMLButtonElement>('.train-teachable'),
+    );
+    pendingButton.click();
+    expect(d.onTrain).not.toHaveBeenCalled();
+    liveButton.click();
+    expect(d.onTrain).toHaveBeenCalledWith('r_live');
+  });
+
+  it('a non-pending row keeps the Available label and the Learn-for-fee aria arm', () => {
+    const el = paint([row({})]);
+    expect(el.querySelector('.train-state')?.textContent).toBe('Available');
+    // The aria-label rides its OWN ternary, independent of the visible label:
+    // pin the non-pending arm too, or an inverted ternary that always
+    // announces the pending copy would leave every visible pin green.
+    const aria = el.querySelector('.train-teachable')?.getAttribute('aria-label') ?? '';
+    expect(aria).toMatch(/^Learn Eastbrook Arming Sword for /);
+    expect(aria).not.toContain('Learning');
+  });
+});
+
 describe('renderTrainWindow quality-glow socket', () => {
   it('every row carries the shared socket span, glowing from the item quality', () => {
     const el = paint([

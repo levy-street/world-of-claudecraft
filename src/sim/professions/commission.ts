@@ -31,10 +31,11 @@
 // net imports, no randomness at all (commissions draw nothing), no Sim
 // import (PlayerMeta arrives type-only, the crafting.ts/training.ts idiom).
 
+import { bagCapacity, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { cloneItemInstancePayload, type ItemDef } from '../types';
+import { cloneItemInstancePayload, type ItemDef, type StationDef } from '../types';
 import { MASTERWORK_QUALITY_LADDER } from './masterwork';
 import { isAtAnyStation } from './stations';
 
@@ -73,6 +74,7 @@ export type UnbindDenyReason =
   | 'unbind_not_eligible'
   | 'unbind_not_bound'
   | 'unbind_out_of_range'
+  | 'unbind_no_space'
   | 'unbind_cannot_afford';
 
 export interface UnbindResult {
@@ -114,10 +116,17 @@ function firstBoundSlotIndex(meta: PlayerMeta, itemId: string): number {
  * 4. not within STATION_RADIUS of ANY static station (stations.ts
  *    isAtAnyStation; every station master offers the service, and a mobile
  *    station NEVER satisfies it, the training precedent): unbind_out_of_range;
- * 5. fee unaffordable (meta.copper below unbindFeeFor): unbind_cannot_afford;
- * 6. otherwise ok, with the fee to charge.
+ * 5. the bound slot holds several copies and the unbound copy the split arm
+ *    peels off (unbindItem below) cannot fit anywhere (#2350: the split
+ *    re-grants through the uncapped hub, so the boundary owns the check;
+ *    modeled with the exact freed payload so an unbound armed stack with
+ *    room still counts, and never checked for the count-1 in-place clear,
+ *    which needs no room): unbind_no_space;
+ * 6. fee unaffordable (meta.copper below unbindFeeFor): unbind_cannot_afford;
+ * 7. otherwise ok, with the fee to charge.
  */
 export function resolveUnbind(
+  stations: readonly StationDef[],
   meta: PlayerMeta | undefined,
   pos: { x: number; z: number } | undefined,
   itemId: string,
@@ -128,11 +137,22 @@ export function resolveUnbind(
   if (!isCommissionEligible(def)) {
     return { ok: false, itemId, reason: 'unbind_not_eligible', fee };
   }
-  if (!meta || firstBoundSlotIndex(meta, itemId) === -1) {
+  const boundIdx = meta ? firstBoundSlotIndex(meta, itemId) : -1;
+  if (!meta || boundIdx === -1) {
     return { ok: false, itemId, reason: 'unbind_not_bound', fee };
   }
-  if (!pos || !isAtAnyStation(pos)) {
+  if (!pos || !isAtAnyStation(stations, pos)) {
     return { ok: false, itemId, reason: 'unbind_out_of_range', fee };
+  }
+  const boundSlot = meta.inventory[boundIdx];
+  if (boundSlot.count > 1 && boundSlot.instance) {
+    const scratch = meta.inventory.map((s) => ({ ...s }));
+    scratch[boundIdx] = { ...scratch[boundIdx], count: scratch[boundIdx].count - 1 };
+    const freed = cloneItemInstancePayload(boundSlot.instance);
+    delete freed.boundTo;
+    if (countFit(scratch, bagCapacity(meta.bags), itemId, 1, freed) < 1) {
+      return { ok: false, itemId, reason: 'unbind_no_space', fee };
+    }
   }
   if (meta.copper < fee) {
     return { ok: false, itemId, reason: 'unbind_cannot_afford', fee };
@@ -157,7 +177,7 @@ export function unbindItem(ctx: SimContext, itemId: string, pid?: number): Unbin
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, fee: 0 };
   const meta = r.meta;
-  const result = resolveUnbind(meta, r.e.pos, itemId);
+  const result = resolveUnbind(ctx.stationPlacements, meta, r.e.pos, itemId);
   if (!result.ok) return result;
   const slotIdx = firstBoundSlotIndex(meta, itemId);
   const slot = meta.inventory[slotIdx];

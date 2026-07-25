@@ -40,7 +40,12 @@ describe('coverage: each scenario fires its subsystem', () => {
 
   it('solo_mage: casting lifecycle runs', () => {
     const rec = run('solo_mage');
-    expect((rec.allEvents as Ev[]).some((e) => e.type === 'castStart')).toBe(true);
+    const events = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId;
+    expect(events.some((e) => e.type === 'castStart')).toBe(true);
+    // The fixture lives in the shared collider-free lane so this proves effect
+    // dispatch and spell damage, not merely that a cast bar began behind town LOS.
+    expect(events.some((e) => e.type === 'damage' && e.sourceId === pid)).toBe(true);
   });
 
   it('frost_proc_orb: committed Frost reaches proc draws and Frozen Orb pulses', () => {

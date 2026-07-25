@@ -92,7 +92,7 @@ describe('healer primary mana efficiency', () => {
   it('pins the tuned Mending Light rank costs', () => {
     const holyLight = ABILITIES.holy_light;
     expect([holyLight.cost, ...(holyLight.ranks ?? []).map((rank) => rank.cost)]).toEqual([
-      25, 50, 70, 115,
+      25, 50, 70, 117,
     ]);
   });
 

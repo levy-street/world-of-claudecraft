@@ -62,6 +62,8 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
     setPendingPetFeed: noop,
     resetPetBarSig: noop,
     isHotbarItemId: () => false,
+    // Gathering-tool bag use (#2343): never consumes the click in this fixture.
+    useGatherTool: () => false,
     setDragAction: noop,
     clearActionDropTargets: noop,
     dragState: new ItemDragState(),

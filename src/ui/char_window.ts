@@ -284,7 +284,7 @@ export class CharWindow {
         const icon = imageUrl
           ? `<img class="char-gather-icon" src="${esc(imageUrl)}" alt="" draggable="false">`
           : '';
-        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span></span>`;
+        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${formatNumber(r.displayValue, { maximumFractionDigits: 0 })}</b></span></span>`;
       })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;

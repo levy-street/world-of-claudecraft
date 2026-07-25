@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
+import { mineMoundFootprint } from '../sim/colliders';
+import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
   DOCK_SECTION_SURFACE_Y,
@@ -12,6 +13,13 @@ import { hash2 } from '../sim/rng';
 import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
+import {
+  isEastbrookRebuildBuilding,
+  isEastbrookRebuildFence,
+  isEastbrookRebuildStall,
+  isEastbrookRebuildWell,
+} from './eastbrook_town';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
@@ -679,6 +687,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
   const fireLights: THREE.PointLight[] = [];
+  const activeContent = getActiveWorldContent();
+  const builtInWorld = activeContent === BUILTIN_WORLD;
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
@@ -798,9 +808,19 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     inn: 7.6,
   };
 
-  for (const b of getActiveWorldContent().props.buildings) {
+  for (const b of activeContent.props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
+    const armoury = buildEastbrookGrandArmouryView(b, ground);
+    if (armoury) {
+      group.add(armoury.group);
+      registerHideable(
+        armoury.group,
+        obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, armoury.cameraTopY),
+      );
+      continue;
+    }
+    if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts
     const roofY = y + (b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0);
     if (b.kind === 'chapel') {
@@ -835,7 +855,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
-  getActiveWorldContent().props.stalls.forEach((s, i) => {
+  activeContent.props.stalls.forEach((s, i) => {
+    if (builtInWorld && isEastbrookRebuildStall(s)) return;
     const key = s.x * 7.7 + s.z * 2.3;
     const g = new THREE.Group();
     const standKey: PropKey = i % 2 === 0 ? 'stand1' : 'stand2';
@@ -859,7 +880,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   });
 
   // ---- wells ---------------------------------------------------------------
-  for (const w of getActiveWorldContent().props.wells) {
+  for (const w of activeContent.props.wells) {
+    if (builtInWorld && isEastbrookRebuildWell(w)) continue;
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
@@ -894,7 +916,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- town fences: village fence module repeated along the run ------------
-  for (const f of getActiveWorldContent().props.fences) {
+  for (const f of activeContent.props.fences) {
+    if (builtInWorld && isEastbrookRebuildFence(f)) continue;
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
     const n = Math.max(1, Math.round(len / 2.35));
     const dirx = (f.x2 - f.x1) / len,
@@ -1183,10 +1206,11 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.position.set(m.x, ground(m.x, m.z), m.z);
     g.rotation.y = m.rot;
     group.add(shadowed(g));
-    // mound circle behind the portal — same offset/radius as the collider
-    const mx = m.x - 3.4 * Math.sin(m.rot),
-      mz = m.z - 3.4 * Math.cos(m.rot);
-    registerHideable(g, circleFootprint(mx, mz, 5, ground(mx, mz) + 5.2));
+    // mound circle behind the portal, same offset/radius as the collider
+    // (src/sim/colliders.ts), via the shared mineMoundFootprint helper so the
+    // two can never drift apart again
+    const { x: mx, z: mz, r: moundRadius } = mineMoundFootprint(m);
+    registerHideable(g, circleFootprint(mx, mz, moundRadius, ground(mx, mz) + moundRadius + 0.2));
   }
 
   // ---- fishing docks: pirate-kit platforms, moored rowboat, stone hut ------
