@@ -1,5 +1,7 @@
+import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS } from './data';
+import { applyDevKit } from './dev_kit';
 import { createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
@@ -188,6 +190,37 @@ export function handleDevChat(
     const count = clampInteger(Number(giveMatch[2] ?? 1), 1, 20);
     if (!ITEMS[itemId]) ctx.error(pid, `[dev] Unknown item '${itemId}'.`);
     else ctx.addItem(itemId, count, pid);
+    return null;
+  }
+
+  // /dev kit [spec]: wear the fresh-level-20 preset for this character's class and
+  // the named spec (defaulting to the one currently specced). GEAR ONLY: level, spec
+  // and talents are deliberately untouched, so a tester can vary gear and level
+  // independently instead of the two being welded together.
+  const kitMatch = /^\/(?:dev\s+kit|devkit)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (kitMatch) {
+    const meta = ctx.players.get(pid);
+    if (!meta) return null;
+    const spec = kitMatch[1] ?? meta.talents.spec;
+    if (!spec) {
+      ctx.error(pid, '[dev] No spec chosen; pass one, e.g. /dev kit fury.');
+      return null;
+    }
+    if (!devKitRole(meta.cls, spec)) {
+      const known = (DEV_KIT_ROLES[meta.cls] ?? []).map((role) => role.spec).join(', ');
+      ctx.error(pid, `[dev] '${spec}' is not a ${meta.cls} spec. Try: ${known}.`);
+      return null;
+    }
+    const applied = applyDevKit(ctx, meta.cls, spec, pid);
+    if (!applied) {
+      ctx.error(pid, `[dev] No kit for ${meta.cls} ${spec}.`);
+      return null;
+    }
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Equipped the fresh-20 ${meta.cls} ${spec} kit: ${applied.slots} pieces and ${applied.bagsEquipped} bags.`,
+    );
     return null;
   }
 
@@ -399,7 +432,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

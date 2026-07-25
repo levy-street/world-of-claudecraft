@@ -12,6 +12,7 @@ import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
   type AnimState,
+  advanceSwimBlend,
   type BaseState,
   desiredBaseState,
   locomotionTimeScale,
@@ -217,7 +218,8 @@ export class CharacterVisual {
   private attackIdx = 0;
   private hitCooldown = 0;
   private pendingDt = 0;
-  private swimPitch = 0;
+  private swimBlend = 0;
+  private swimBobTime = 0;
   private spinAngle = 0;
   private spinOnceTimer = 0;
 
@@ -404,14 +406,12 @@ export class CharacterVisual {
 
     // swim pose: Lie_Idle (when the rig has it) + pitch and surface bob
     const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
-    const wantPitch = s.swimming && !s.dead ? proneAngle : 0;
-    this.swimPitch += (wantPitch - this.swimPitch) * Math.min(1, dt * 8);
-    this.poseWrap.rotation.x = this.swimPitch;
+    this.swimBlend = advanceSwimBlend(this.swimBlend, s.swimming && !s.dead, dt);
+    this.swimBobTime += dt;
+    this.poseWrap.rotation.x = proneAngle * this.swimBlend;
     this.poseWrap.rotation.z = 0;
     this.poseWrap.position.y =
-      s.swimming && !s.dead
-        ? SWIM_RISE + Math.sin(performance.now() / 500 + this.bobPhase) * 0.08
-        : 0;
+      this.swimBlend * (SWIM_RISE + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08);
 
     // distant corpses show the static idle far mesh — tip it over
     if (this.farMesh && this.farMesh.visible) {

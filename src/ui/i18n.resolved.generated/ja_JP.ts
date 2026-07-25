@@ -38,6 +38,14 @@ export const ja_JP: EnTranslations = {
     "filterLabel": "コマンドを絞り込む",
     "filterPlaceholder": "このカテゴリを検索",
     "noMatches": "一致するコマンドはありません。",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
     "invalidValues": "実行する前に有効な値を選択してください。",
     "sent": "送信済み：{command}",
@@ -55,7 +63,8 @@ export const ja_JP: EnTranslations = {
       "z": "Z",
       "dungeon": "ダンジョン",
       "difficulty": "難易度",
-      "name": "名前"
+      "name": "名前",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "ノーマル",
@@ -113,6 +122,10 @@ export const ja_JP: EnTranslations = {
       "give": {
         "label": "アイテムを付与",
         "description": "プレイヤーのインベントリにアイテムを追加します。"
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "ゴールドを追加",

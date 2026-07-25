@@ -29,12 +29,13 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { vcupBothSeated } from '../social/vale_cup';
-import { addThreat, clearThreat } from '../threat';
+import { addThreat, canDetectStealthedTarget, clearThreat } from '../threat';
 import type { Entity } from '../types';
 import {
   berserkerCritDamage,
@@ -76,6 +77,7 @@ const VICTORY_RUSH_WINDOW = 20;
 const PURSUIT_SPEED_DURATION = 6;
 const BLOODBATH_DURATION = 8;
 const BLOODBATH_MAX_STACKS = 5;
+const PET_STEALTH_DETECTION_RADIUS = 50;
 
 // Baseline uninterruptible casts and a resolved talent modifier can each block
 // classic-era damage pushback. The resolved check is player-only and reads the
@@ -120,6 +122,13 @@ export function dealDamage(
   aoe = false,
 ): void {
   if (target.dead) return;
+  if (
+    source?.kind === 'mob' &&
+    source.ownerId !== null &&
+    target.kind === 'player' &&
+    !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
+  )
+    return;
   if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
@@ -1305,6 +1314,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // Settle the heroic reward and its realm-reset lockout together. This runs
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
+    lockNormalDungeonResetOnBossKill(ctx, e);
     ctx.awardHeroicMarks(e, heroicRewardRecipients);
     // Nythraxis normal and heroic raid lockouts use a wider room sweep than
     // generic dungeon claims. Run it after heroic settlement so its lock stamp

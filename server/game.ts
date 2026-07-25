@@ -150,6 +150,7 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
@@ -1077,6 +1078,8 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
+  if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;
+  if (e.forcedTargetTimer > 0) out.ftm = round2(e.forcedTargetTimer);
   // A player's/bot's SELECTED target (mobs use aggroTargetId above): rides so the
   // client can render the target-of-target frame for a PLAYER target, exactly as
   // `aggro` already enables it for a mob/pet target. Emitted only for an entity that
@@ -6470,10 +6473,12 @@ export class GameServer {
           anchorPid = target.pid;
           anchorPos = targetEntity.pos;
         }
+        const anchorParty = this.sim.partyOf(anchorPid);
         const mine: string[] = [];
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
           if (suppressedInvites?.has(ev)) continue;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (

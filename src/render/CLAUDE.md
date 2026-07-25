@@ -18,7 +18,8 @@ Everything else is a sibling module in one of these families:
 - **World subsystems** export a `build*()` returning a `*View` the renderer
   owns: `terrain.ts` (chunked LOD + PBR splat), `props.ts`/`foliage.ts`/
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
-  shore-depth core in `water_core.ts`), `sky.ts`. Event/minigame scenes follow
+  shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
+  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
   the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.

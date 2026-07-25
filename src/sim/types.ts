@@ -2283,6 +2283,10 @@ export interface AbilityDef {
   exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
+  // The ability cannot be activated while physically inside a claimed dungeon or
+  // raid instance. Toggle buffs may still be cancelled there to avoid trapping the
+  // player in an action-locking form.
+  requiresOutsideInstance?: boolean;
   // Usable only while the caster wears an aura of this kind (Victory Rush's
   // on-kill window); runEffects consumes the enabling aura on a successful cast.
   requiresAuraKind?: AuraKind;
@@ -3248,15 +3252,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'xp'; amount: number; rested?: number }
   | { type: 'honor'; amount: number; reason: HonorReason }
   | { type: 'levelup'; level: number }
+  // opt-in post-cap rank reset (always personal: emitted with pid), fired by
+  // prestige() in src/sim/progression/xp.ts alongside the 'log' chat line. The
+  // rank itself rides every self snapshot, so this exists to tell an open
+  // character sheet WHEN to repaint, the same job the honor event does for the
+  // Honor row. Text-free: the chat line is the 'log' event.
+  | { type: 'prestige'; rank: number }
   // post-cap cosmetic progression (Max-Level XP Overflow): crossing a virtual
   // level past the cap (milestone unlocks ride the deedUnlocked event since
   // the milestone unification; the legacy milestoneUnlocked emit is gone)
   | { type: 'virtualLevelUp'; level: number }
-  // Cosmetic prestige (prestige(), src/sim/progression/xp.ts): fired alongside
-  // the 'log' chat line so the client can repaint an already-open character
-  // sheet's prestige rank without waiting for an unrelated repaint trigger
-  // (closing/reopening the window). Text-free: the chat line is the 'log' event.
-  | { type: 'prestige'; rank: number }
   // Book of Deeds unlock (always personal: emitted with pid). Carries the deed
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.

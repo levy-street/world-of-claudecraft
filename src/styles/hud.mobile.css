@@ -756,7 +756,7 @@
     color: #fff;
   }
   /* Cooldown sweep + used-flash + state dimming reuse the SAME classes/structure
-     as .action-btn (cd-overlay height% sweep, .empty/.unusable/.oor/.queued),
+     as .action-btn (cd-overlay conic-gradient clock wipe, .empty/.unusable/.oor/.queued),
      scoped here so no desktop selector changes. */
   body.mobile-touch #mobile-action-ring button .icon-label {
     position: absolute;
@@ -779,18 +779,19 @@
   }
   body.mobile-touch #mobile-action-ring button .cd-overlay {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 0;
-    border-radius: 0 0 50% 50%;
-    background: #000a;
+    inset: 0;
+    /* Classic radial clock wipe (issue 1660): the dark wedge covers the remaining
+       cooldown (--cd-fill, written by the shared action_bar_painter) and sweeps
+       away clockwise. Circular to match the round ring button. */
+    background: conic-gradient(
+      transparent 0 calc(100% - var(--cd-fill, 0%)),
+      #000a calc(100% - var(--cd-fill, 0%))
+    );
+    border-radius: 50%;
     pointer-events: none;
   }
-  /* The cooldown sweep is a rectangle whose TOP corners are square, so on a
-     near-full sweep (every GCD tick) it poked outside the circular button as
-     a dark square. Clip every ring button to its own circle; children (label,
-     count, cdtext) all sit inside the circle already. */
+  /* Clip every ring button to its own circle so children (label, count, cdtext)
+     stay inside the round button. */
   body.mobile-touch #mobile-action-ring > button {
     overflow: hidden;
   }
@@ -813,7 +814,13 @@
     position: relative;
     font-size: 15px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
+    /* Legible outline on any icon (issue 1660), matching the desktop cdtext. */
+    text-shadow:
+      0 0 4px #000,
+      1px 1px 1px #000,
+      -1px -1px 1px #000,
+      1px -1px 1px #000,
+      -1px 1px 1px #000;
     pointer-events: none;
   }
   body.mobile-touch #mobile-action-ring button .item-count {
@@ -1030,19 +1037,26 @@
   }
   body.mobile-touch .mobile-consumable-slot .cd-overlay {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 0;
-    border-radius: 0 0 50% 50%;
-    background: #000a;
+    inset: 0;
+    /* Radial clock wipe (issue 1660), circular to match the round slot. */
+    background: conic-gradient(
+      transparent 0 calc(100% - var(--cd-fill, 0%)),
+      #000a calc(100% - var(--cd-fill, 0%))
+    );
+    border-radius: 50%;
     pointer-events: none;
   }
   body.mobile-touch .mobile-consumable-slot .cdtext {
     position: relative;
     font-size: 13px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px #000;
+    /* Legible outline on any icon (issue 1660), matching the desktop cdtext. */
+    text-shadow:
+      0 0 4px #000,
+      1px 1px 1px #000,
+      -1px -1px 1px #000,
+      1px -1px 1px #000,
+      -1px 1px 1px #000;
     pointer-events: none;
   }
   body.mobile-touch .mobile-consumable-slot .item-count {

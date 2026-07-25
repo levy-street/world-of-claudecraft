@@ -898,6 +898,7 @@ export function isConstrainedBrowser(
 export type GpuClass =
   | 'software'
   | 'strongDesktop'
+  | 'appleSilicon'
   | 'flagshipMobile'
   | 'midIntegrated'
   | 'midMobile'
@@ -918,11 +919,14 @@ export function classifyGpuRenderer(name: string | undefined): GpuClass {
   // mid-integrated bucket so an Iris Plus 6xx / UHD 6xx / HD 5xx-6xx stays weak, consistent with
   // the existing leanFoliage treatment in settingsFor).
   if (isWeakIntegratedGpu(name)) return 'weak';
-  // Strong desktop discrete + Apple Silicon. The `(\(tm\))?` tolerates the "(TM)" some Windows
-  // drivers print after "Radeon" ("Radeon(TM) RX 580").
-  if (
-    /\b(rtx|gtx)\b|geforce|radeon(\(tm\))?\s?(rx|pro|vii)|\barc\b|\bnvidia\b|apple\s?m[1-9]/.test(n)
-  )
+  // Apple Silicon (M1..M9). Split out of strongDesktop: these are thermally constrained laptop
+  // SoCs (the MacBook form factor has no active-cooling headroom), so the resolver defaults them
+  // to the safe middle tier rather than ultra (issue 1676). Kept AHEAD of strongDesktop, whose
+  // regex no longer claims `apple m`. A player can still pick ultra manually.
+  if (/apple\s?m[1-9]/.test(n)) return 'appleSilicon';
+  // Strong desktop discrete. The `(\(tm\))?` tolerates the "(TM)" some Windows drivers print
+  // after "Radeon" ("Radeon(TM) RX 580").
+  if (/\b(rtx|gtx)\b|geforce|radeon(\(tm\))?\s?(rx|pro|vii)|\barc\b|\bnvidia\b/.test(n))
     return 'strongDesktop';
   // Recent flagship mobile.
   if (
@@ -992,6 +996,12 @@ export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
   if (gpu === 'strongDesktop' && !isMobile) return ampleOrUnknownMem ? PRESET_ULTRA : PRESET_HIGH;
   // A strong/flagship GPU on a touch device: capped at HIGH (ultra is desktop-only) for thermals.
   if (gpu === 'flagshipMobile' || (gpu === 'strongDesktop' && isMobile)) return PRESET_HIGH;
+  // Apple Silicon: an M-series iPad (touch) keeps the mobile HIGH cap above; an M-series Mac
+  // (non-touch) defaults to the safe middle. These SoCs can render high, but the thermally
+  // constrained MacBook form factor overheats and drains battery on a sustained ultra load, so
+  // medium is the right auto-default (the runtime governor can still climb; ultra stays a manual
+  // opt-in). Issue 1676.
+  if (gpu === 'appleSilicon') return isMobile ? PRESET_HIGH : PRESET_MEDIUM;
   if (gpu === 'midIntegrated' || gpu === 'midMobile') return PRESET_MEDIUM;
   if (
     gpu === 'unknown' &&

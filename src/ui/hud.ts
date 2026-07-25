@@ -142,6 +142,7 @@ import { charBagsPaired } from './char_bags_pairing_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
+import { chatBubbleStyle } from './chat_bubble_style';
 import {
   ignoreKey,
   type PlayerSocialFlags,
@@ -238,6 +239,10 @@ import {
   gatherToolNoNodeKey,
 } from './gathering_view';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
+import {
+  handleShiftClearContextMenu,
+  handleShiftClearKeydown,
+} from './hud/action_bar/action_bar_clear';
 import { ActionBarController } from './hud/action_bar/action_bar_controller';
 import {
   ACTION_BAR_ABILITY_SLOTS,
@@ -3628,8 +3633,15 @@ export class Hud {
       this.showPrompt(text, acceptLabel, onAccept, onDecline),
     startWhisper: (name) => this.startWhisper(name),
   });
+  // Set by main.ts once the realm's /api/status advert answers, which lands AFTER
+  // this window is constructed: a hosted dev/PBE realm booted with
+  // ALLOW_DEV_COMMANDS=1 lights the /dev GUI without needing a dev client build
+  // (production realms never set the env, so it stays dark there). Kept beside the
+  // build-time HudFeatures flag rather than mutating it, so the constructor's
+  // features bag stays the immutable record of what the BUILD asked for.
+  private devCommandsAdvertised = false;
   private readonly devCommandWindow = new DevCommandWindow({
-    available: () => this.features.devCommandsEnabled === true,
+    available: () => this.devCommandsAvailable,
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#dev-command-window'),
     ...this.windowFocus('#dev-command-window'),
@@ -5804,15 +5816,10 @@ export class Hud {
           this.hideTooltip();
         };
         btn.addEventListener('contextmenu', (e) => {
-          if (!e.shiftKey) return;
-          e.preventDefault();
-          clearSlot();
+          handleShiftClearContextMenu(e, clearSlot);
         });
         btn.addEventListener('keydown', (e) => {
-          if (!e.shiftKey || (e.key !== 'Delete' && e.key !== 'Backspace')) return;
-          e.preventDefault();
-          e.stopPropagation();
-          clearSlot();
+          handleShiftClearKeydown(e, clearSlot);
         });
         btn.addEventListener('dragstart', (e) => {
           const action = this.actionForSlot(slot);
@@ -5881,29 +5888,29 @@ export class Hud {
           this.clearActionDropTargets();
         });
         this.bindMobileActionDrag(btn, slot);
-        // right-click clears the slot so a full bar can make room for new spells
-        btn.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          if (this.hotbarActions[slot - 1] === null) return;
-          this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
-          this.saveSlotMap();
-          this.hideTooltip();
-        });
       } else {
         // Slot 0 (Attack). Right-click removes the Attack toggle from the bar
         // (Interface option showAttackButton -> off), freeing the slot and its key
-        // for a normal action; right-click again clears whatever was dropped in.
-        // The Options toggle restores Attack at any time.
+        // for a normal action. The Options toggle restores Attack at any time.
         btn.draggable = true;
-        btn.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          if (this.attackSlotIsAttack()) {
-            this.optionsHooks?.settings.set('showAttackButton', false);
-          } else if (this.attackSlotAction !== null) {
-            this.attackSlotAction = null;
-            this.saveAttackSlotAction();
-          }
+        const clearAttackSlotAction = () => {
+          if (this.attackSlotAction === null) return;
+          this.attackSlotAction = null;
+          this.saveAttackSlotAction();
           this.hideTooltip();
+        };
+        btn.addEventListener('contextmenu', (e) => {
+          if (this.attackSlotIsAttack()) {
+            e.preventDefault();
+            this.optionsHooks?.settings.set('showAttackButton', false);
+            this.hideTooltip();
+            return;
+          }
+          handleShiftClearContextMenu(e, clearAttackSlotAction);
+        });
+        btn.addEventListener('keydown', (e) => {
+          if (this.attackSlotIsAttack()) return;
+          handleShiftClearKeydown(e, clearAttackSlotAction);
         });
         btn.addEventListener('dragstart', (e) => {
           const action = this.actionForSlot(0);
@@ -9040,6 +9047,14 @@ export class Hud {
           }
           break;
         }
+        // The rank itself already rides every self snapshot; the open character
+        // sheet is only repainted on an explicit trigger, so without this it
+        // keeps showing the pre-prestige rank until closed and reopened. Same
+        // job the 'honor' case below does for the sheet's Honor balance.
+        case 'prestige': {
+          this.renderCharIfOpen();
+          break;
+        }
         case 'honor': {
           const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
           const honorMessage = t('hudChrome.warfare.honorGain', {
@@ -9075,7 +9090,12 @@ export class Hud {
           audio.levelUp();
           if (isTalentRowUnlockLevel(ev.level)) {
             this.showBanner(t('game.talents.rowUnlockToast'));
-            sfx.playUi('quest_ready', { gain: 4.5 });
+            // No local gain override: the manifest's resolved gain (keyTrimDb)
+            // is the single source of truth, same fix efe124264 already
+            // applied to every other quest_ready call site. This one was
+            // missed; stacking this on top of the corrected catalog gain was
+            // clipping (+3.4dBTP effective).
+            sfx.playUi('quest_ready');
           }
           if (ev.level === 5) {
             const characterId = (this.sim as unknown as { characterId?: number }).characterId;
@@ -9102,15 +9122,6 @@ export class Hud {
             '#ffd100',
           );
           audio.levelUp();
-          break;
-        }
-        case 'prestige': {
-          // Keep the character sheet's prestige rank live if the sheet is open
-          // (mirrors the 'honor' case above): the chat/log line already
-          // announced the rank via the accompanying 'log' event, this just
-          // repaints an already-open sheet instead of leaving it stale until
-          // some unrelated trigger closes/reopens it.
-          this.renderCharIfOpen();
           break;
         }
         case 'deedUnlocked': {
@@ -9756,13 +9767,19 @@ export class Hud {
               );
               break;
           }
-          if (
-            (ev.channel === 'say' || ev.channel === 'yell' || ev.channel === 'emote') &&
-            ev.entityId !== undefined
-          ) {
+          // Overhead speech bubbles. say/yell/emote carry the speaker's entity
+          // id; party also anchors on the speaker because its emit sets
+          // fromPid = the speaker entity (#1659), so it bubbles with no sim
+          // change. chatBubbleStyle returns null for every channel that does not
+          // bubble: general/world/lfg/whisper/roll (too noisy or private) and
+          // guild/officer (server social broadcasts that carry no speaker id, so
+          // the client has no entity to anchor to; a server/wire follow-up).
+          const bubbleStyle = ev.channel === undefined ? null : chatBubbleStyle(ev.channel);
+          const bubbleSpeakerId = ev.entityId ?? ev.fromPid;
+          if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
             const masked = this.maskChat(this.chatLinkPlainText(ev.text));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
-            this.renderer.showChatBubble(ev.entityId, bubble, ev.channel === 'yell');
+            this.renderer.showChatBubble(bubbleSpeakerId, bubble, bubbleStyle);
           }
           // Voiced encounter dialogue (boss/NPC yells) — no-op unless a clip was
           // generated for this exact line (scripts/voices/extra_lines.mjs).
@@ -9823,7 +9840,7 @@ export class Hud {
           break;
         }
         case 'partyInvite':
-          audio.invitePrompt();
+          audio.partyInvite();
           this.showPrompt(
             t('hud.prompts.partyInvite', { name: `<b>${esc(ev.fromName)}</b>` }),
             t('hud.prompts.joinParty'),
@@ -9872,7 +9889,7 @@ export class Hud {
           );
           break;
         case 'guildInvite':
-          audio.invitePrompt();
+          audio.levelUp();
           this.showPrompt(
             t('hud.prompts.guildInvite', {
               name: `<b>${esc(ev.fromName)}</b>`,
@@ -13791,6 +13808,21 @@ export class Hud {
 
   toggleSocial(): void {
     this.socialWindow.toggle();
+  }
+
+  // The single source of truth for "may this client offer the /dev GUI": either the
+  // build asked for it (local `npm run dev`) or the connected realm advertised
+  // ALLOW_DEV_COMMANDS=1. Both the window's own `available` gate and the "/dev gui"
+  // chat hook in main.ts read THIS, so the two can never disagree.
+  get devCommandsAvailable(): boolean {
+    return this.features.devCommandsEnabled === true || this.devCommandsAdvertised;
+  }
+
+  // Latch the realm's dev-command advert on. One-way on purpose: the advert is only
+  // ever consulted to LIGHT the surface, and every dev_* command is re-gated
+  // server-side per message, so this can never grant power the realm withholds.
+  noteDevCommandsAdvertised(): void {
+    this.devCommandsAdvertised = true;
   }
 
   toggleDevCommandWindow(): boolean {

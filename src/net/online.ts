@@ -956,6 +956,19 @@ export class Api {
     }
   }
 
+  // Whether this realm was booted with ALLOW_DEV_COMMANDS=1, so the client can
+  // offer the /dev GUI on a hosted dev/PBE realm instead of only in a local dev
+  // build. Advert only: every dev_* cheat is re-gated server-side per message,
+  // so a forged true opens an inert window. Fails closed on any error.
+  async devCommandsAdvert(): Promise<boolean> {
+    try {
+      const data = await this.get('/api/status');
+      return data.dev_commands === true;
+    } catch {
+      return false;
+    }
+  }
+
   // Current account's Steam link status ({ enabled, linked, steamId? }).
   async steamStatus(): Promise<Record<string, unknown>> {
     return this.get('/api/steam/status');
@@ -2513,6 +2526,8 @@ export class ClientWorld implements IWorld {
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
+      e.forcedTargetId = w.ft ?? null;
+      e.forcedTargetTimer = w.ftm ?? 0;
       // Another entity's selected target (players/bots; mobs use aggro above). Powers
       // the target-of-target frame for a player target. For the SELF record this is
       // re-set authoritatively from `s.target` in the self-decode below (same value),

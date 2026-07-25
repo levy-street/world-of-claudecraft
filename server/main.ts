@@ -1875,6 +1875,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
+        // The /dev GUI capability advert. NOT hardcoded like steam.enabled above:
+        // the dev_* cheats ride the websocket dispatcher, which this arm serves
+        // exactly as the migrated one does, so advertising the real env here
+        // strands nobody. Dual-arm edit: the migrated statusHandler
+        // (server/leaderboard.ts) carries the same dev_commands field. Read live
+        // per request, mirroring the /api/perf gate just below.
+        dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load

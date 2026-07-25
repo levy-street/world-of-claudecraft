@@ -38,6 +38,14 @@ export const pt_BR: EnTranslations = {
     "filterLabel": "Filtrar comandos",
     "filterPlaceholder": "Pesquisar nesta categoria",
     "noMatches": "Nenhum comando correspondente.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "Os comandos de trapaça do servidor ainda exigem ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Escolha valores válidos antes de executar este comando.",
     "sent": "Enviado: {command}",
@@ -55,7 +63,8 @@ export const pt_BR: EnTranslations = {
       "z": "Z",
       "dungeon": "Masmorra",
       "difficulty": "Dificuldade",
-      "name": "Nome"
+      "name": "Nome",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const pt_BR: EnTranslations = {
       "give": {
         "label": "Dar item",
         "description": "Adiciona um item ao inventário do jogador."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "Adicionar ouro",

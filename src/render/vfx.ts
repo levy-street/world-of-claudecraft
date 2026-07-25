@@ -772,6 +772,107 @@ export class Vfx {
     }
   }
 
+  /**
+   * Brief water-entry droplets. These reuse the single pooled point cloud, so
+   * an impact adds no mesh, material, texture, or draw call. Continuous motion
+   * belongs to the height-field wake; this only fires on discrete impacts.
+   */
+  waterSplash(x: number, y: number, z: number, radius = 0.45, strength = 1): void {
+    const safeRadius = Math.min(1.4, Math.max(0.2, radius));
+    const safeStrength = Math.min(1.5, Math.max(0.25, strength));
+    const requestedDrops = Math.min(8, Math.max(3, Math.round(3 + safeStrength * 3)));
+    const dropCount = this.scaledCount(requestedDrops);
+    for (let i = 0; i < dropCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const offset = Math.sqrt(Math.random()) * safeRadius * 0.32;
+      const outward = (0.55 + Math.random() * 0.9) * (0.7 + safeStrength * 0.45);
+      const upward = (1.2 + Math.random() * 1.4) * (0.65 + safeStrength * 0.35);
+      this.spawn(
+        x + Math.cos(angle) * offset,
+        y + 0.025,
+        z + Math.sin(angle) * offset,
+        Math.cos(angle) * outward,
+        upward,
+        Math.sin(angle) * outward,
+        i % 3 === 0 ? 0xc8e6e8 : 0x78b9c2,
+        0.1 + Math.random() * 0.075,
+        0.34 + Math.random() * 0.2,
+        7.5,
+        SPR.glowSoft,
+      );
+    }
+
+    // One tiny foam flash gives the droplets a readable point of impact.
+    this.spawn(
+      x,
+      y + 0.035,
+      z,
+      0,
+      0.12,
+      0,
+      0x68aeb8,
+      0.17 + safeRadius * 0.28,
+      0.12,
+      0,
+      SPR.glowSoft,
+      0,
+    );
+  }
+
+  /** Directional, low-arc spray for a character crossing the waterline. */
+  characterWaterSplash(
+    x: number,
+    y: number,
+    z: number,
+    dirX: number,
+    dirZ: number,
+    radius = 0.5,
+    strength = 1,
+  ): void {
+    const safeRadius = Math.min(1.4, Math.max(0.25, radius));
+    const safeStrength = Math.min(1.5, Math.max(0.35, strength));
+    const directionLength = Math.max(Math.hypot(dirX, dirZ), 0.0001);
+    const forwardX = dirX / directionLength;
+    const forwardZ = dirZ / directionLength;
+    const sideX = -forwardZ;
+    const sideZ = forwardX;
+    const dropCount = this.scaledCount(Math.min(12, Math.max(7, Math.round(7 + safeStrength * 3))));
+    for (let i = 0; i < dropCount; i++) {
+      const side = Math.random() * 2 - 1;
+      const spread = side * safeRadius * (0.3 + Math.random() * 0.45);
+      const forward = safeRadius * (Math.random() * 0.28 - 0.08);
+      const lateralSpeed = side * (0.8 + Math.random() * 0.9) * safeStrength;
+      const forwardSpeed = (0.25 + Math.random() * 0.65) * safeStrength;
+      this.spawn(
+        x + sideX * spread + forwardX * forward,
+        y + 0.025,
+        z + sideZ * spread + forwardZ * forward,
+        sideX * lateralSpeed + forwardX * forwardSpeed,
+        (1.35 + Math.random() * 1.55) * (0.75 + safeStrength * 0.25),
+        sideZ * lateralSpeed + forwardZ * forwardSpeed,
+        i % 4 === 0 ? 0xb9dadd : 0x6faeb7,
+        0.16 + Math.random() * 0.11,
+        0.4 + Math.random() * 0.2,
+        7.2,
+        SPR.glowSoft,
+      );
+    }
+    this.spawn(
+      x,
+      y + 0.03,
+      z,
+      forwardX * 0.18,
+      0.08,
+      forwardZ * 0.18,
+      0x6aaeb6,
+      0.24 + safeRadius * 0.34,
+      0.15,
+      0,
+      SPR.glowSoft,
+      0,
+    );
+  }
+
   tick(targetId: number, school: string): void {
     const at = this.anchor(targetId, 0.55);
     if (at) this.burst(at, school, 7, 0.6);
@@ -1105,24 +1206,6 @@ export class Vfx {
         smoke ? SPR.smoke : SPR.magicWisp,
       );
     }
-  }
-
-  swimRipple(at: THREE.Vector3, dt: number): void {
-    if (!this.emitChance(9, dt)) return;
-    const a = Math.random() * Math.PI * 2;
-    this.spawn(
-      at.x + Math.sin(a) * 0.5,
-      at.y + 0.55,
-      at.z + Math.cos(a) * 0.5,
-      Math.sin(a) * 1.2,
-      1.1,
-      Math.cos(a) * 1.2,
-      0xcfe9ff,
-      0.3,
-      0.55,
-      5,
-      SPR.glowSoft,
-    );
   }
 
   campfireEmber(at: THREE.Vector3, dt: number): void {

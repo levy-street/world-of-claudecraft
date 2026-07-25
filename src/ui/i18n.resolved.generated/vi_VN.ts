@@ -38,6 +38,14 @@ export const vi_VN: EnTranslations = {
     "filterLabel": "Lọc lệnh",
     "filterPlaceholder": "Tìm trong danh mục này",
     "noMatches": "Không có lệnh phù hợp.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "Lệnh gian lận phía máy chủ vẫn cần ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Hãy chọn giá trị hợp lệ trước khi chạy lệnh này.",
     "sent": "Đã gửi: {command}",
@@ -55,7 +63,8 @@ export const vi_VN: EnTranslations = {
       "z": "Z",
       "dungeon": "Hầm Ngục",
       "difficulty": "Độ Khó",
-      "name": "Tên"
+      "name": "Tên",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Thường",
@@ -113,6 +122,10 @@ export const vi_VN: EnTranslations = {
       "give": {
         "label": "Trao vật phẩm",
         "description": "Thêm một vật phẩm vào túi đồ của người chơi."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "Thêm vàng",

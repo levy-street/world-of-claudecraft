@@ -1358,3 +1358,27 @@ describe('Input touch invert-look', () => {
     expect(dragYawDelta).toBeGreaterThan(rawYawDelta * 1.5);
   });
 });
+
+describe('Input camera zoom (issue 1657)', () => {
+  it('zoomBy clamps camDist to [3,22] and reports each change to onCameraDistChange', () => {
+    const { input } = makeInput();
+    const changes: number[] = [];
+    input.onCameraDistChange = (d) => changes.push(d);
+    expect(input.camDist).toBe(12);
+    input.zoomBy(4); // 12 -> 16
+    input.zoomBy(-100); // clamps to the 3 min
+    input.zoomBy(100); // clamps to the 22 max
+    expect(input.camDist).toBe(22);
+    expect(changes).toEqual([16, 3, 22]);
+  });
+
+  it('does not fire onCameraDistChange when the clamp leaves camDist unchanged (no spurious persist)', () => {
+    const { input } = makeInput();
+    input.zoomBy(-100); // camDist -> 3 (min)
+    const changes: number[] = [];
+    input.onCameraDistChange = (d) => changes.push(d);
+    input.zoomBy(-5); // already at the min, no change
+    expect(input.camDist).toBe(3);
+    expect(changes).toEqual([]);
+  });
+});

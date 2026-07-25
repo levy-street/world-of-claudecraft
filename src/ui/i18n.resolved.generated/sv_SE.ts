@@ -38,6 +38,14 @@ export const sv_SE: EnTranslations = {
     "filterLabel": "Filtrera kommandon",
     "filterPlaceholder": "Sök i den här kategorin",
     "noMatches": "Inga matchande kommandon.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "Serverfusk kräver fortfarande ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Välj giltiga värden innan du kör kommandot.",
     "sent": "Skickat: {command}",
@@ -55,7 +63,8 @@ export const sv_SE: EnTranslations = {
       "z": "Z",
       "dungeon": "Fängelsehåla",
       "difficulty": "Svårighetsgrad",
-      "name": "Namn"
+      "name": "Namn",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const sv_SE: EnTranslations = {
       "give": {
         "label": "Ge föremål",
         "description": "Lägg till ett föremål i spelarens inventarium."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "Lägg till guld",

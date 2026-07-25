@@ -38,6 +38,14 @@ export const tr_TR: EnTranslations = {
     "filterLabel": "Komutları filtrele",
     "filterPlaceholder": "Bu kategoride ara",
     "noMatches": "Eşleşen komut yok.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "Sunucu hileleri için yine de ALLOW_DEV_COMMANDS=1 gerekir.",
     "invalidValues": "Bu komutu çalıştırmadan önce geçerli değerler seç.",
     "sent": "Gönderildi: {command}",
@@ -55,7 +63,8 @@ export const tr_TR: EnTranslations = {
       "z": "Z",
       "dungeon": "Zindan",
       "difficulty": "Zorluk",
-      "name": "Ad"
+      "name": "Ad",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const tr_TR: EnTranslations = {
       "give": {
         "label": "Öğe ver",
         "description": "Oyuncu envanterine bir öğe ekle."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "Altın ekle",

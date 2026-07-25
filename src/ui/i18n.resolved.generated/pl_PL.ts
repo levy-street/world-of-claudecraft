@@ -38,6 +38,14 @@ export const pl_PL: EnTranslations = {
     "filterLabel": "Filtruj polecenia",
     "filterPlaceholder": "Przeszukaj tę kategorię",
     "noMatches": "Brak pasujących poleceń.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "Cheaty serwera nadal wymagają ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Wybierz prawidłowe wartości przed uruchomieniem tego polecenia.",
     "sent": "Wysłano: {command}",
@@ -55,7 +63,8 @@ export const pl_PL: EnTranslations = {
       "z": "Z",
       "dungeon": "Loch",
       "difficulty": "Poziom trudności",
-      "name": "Nazwa"
+      "name": "Nazwa",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Normalny",
@@ -113,6 +122,10 @@ export const pl_PL: EnTranslations = {
       "give": {
         "label": "Daj przedmiot",
         "description": "Dodaj przedmiot do ekwipunku gracza."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "Dodaj złoto",

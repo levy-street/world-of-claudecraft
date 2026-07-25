@@ -38,6 +38,14 @@ export const ko_KR: EnTranslations = {
     "filterLabel": "명령어 필터",
     "filterPlaceholder": "이 범주 검색",
     "noMatches": "일치하는 명령어가 없습니다.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "서버 치트 기능에는 여전히 ALLOW_DEV_COMMANDS=1이 필요합니다.",
     "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
     "sent": "전송됨: {command}",
@@ -55,7 +63,8 @@ export const ko_KR: EnTranslations = {
       "z": "Z",
       "dungeon": "던전",
       "difficulty": "난이도",
-      "name": "이름"
+      "name": "이름",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "일반",
@@ -113,6 +122,10 @@ export const ko_KR: EnTranslations = {
       "give": {
         "label": "아이템 지급",
         "description": "플레이어 소지품에 아이템을 추가합니다."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "골드 추가",

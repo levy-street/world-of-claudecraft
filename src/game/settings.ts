@@ -38,6 +38,11 @@ export const SETTING_RANGES = {
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
   cameraFov: { min: 55, max: 100, def: 60 },
+  // Camera zoom distance (Input.camDist), remembered across sessions like the other
+  // camera settings. Range mirrors Input.zoomBy's clamp; def 12 is the shipped starting
+  // distance. Set by the wheel/pinch zoom (persisted debounced from main.ts), applied back
+  // to Input on boot via the startup apply-all loop and on Reset (issue 1657).
+  cameraZoom: { min: 3, max: 22, def: 12 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn

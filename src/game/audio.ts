@@ -21,6 +21,7 @@ export const UI_CUES = {
   click: 'ui_click',
   coin: 'ui_coin',
   levelUp: 'ui_level_up',
+  questReady: 'quest_ready',
   achievement: 'ui_achievement',
   cosmeticUnlock: 'ui_cosmetic_unlock',
   lootItem: 'ui_loot_item',
@@ -260,6 +261,14 @@ export class GameAudio {
   // of consolidating onto duelChallenge(), not a deliberate change.
   invitePrompt(): void {
     this.playFeedback(UI_CUES.duelChallenge);
+  }
+
+  // Party/group invite gets its own cue, distinct from the shared duelChallenge
+  // invitePrompt() above (resurrectionOffer still uses that one unchanged) and
+  // from guildInvite's own levelUp cue. Feedback-gated the same way: not
+  // time-critical, respects the Interface & Feedback Sounds toggle.
+  partyInvite(): void {
+    this.playFeedback(UI_CUES.questReady);
   }
 
   duelCountdownTick(): void {

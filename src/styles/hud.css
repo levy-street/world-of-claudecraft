@@ -1169,6 +1169,31 @@
     background-position: center;
     background-repeat: no-repeat;
   }
+  /* QoL: an aura in its final seconds (auras_view isAuraExpiring) blinks so an
+     expiring DoT/buff reads at a glance on the status panels. Opacity floors at
+     0.45 so the icon identity stays readable mid-blink; under reduced motion the
+     blink becomes a steady brightened state (the same shape the low-resource
+     label uses), so the cue survives without animation. */
+  .buff.expiring {
+    animation: aura-expire-blink 0.8s ease-in-out infinite;
+  }
+  @keyframes aura-expire-blink {
+    0%,
+    100% {
+      opacity: 1;
+      filter: brightness(1);
+    }
+    50% {
+      opacity: 0.45;
+      filter: brightness(1.5);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .buff.expiring {
+      animation: none;
+      filter: brightness(1.4);
+    }
+  }
   /* A debuff reads as harmful at a glance: a thicker border (border-box, so no
      layout shift) tinted by magic school, WoW-style (physical keeps the base red). */
   .buff.debuff {
@@ -1538,7 +1563,13 @@
     justify-content: center;
     font-size: 13px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
+    /* Same legible outline as the action bar cdtext (issue 1660). */
+    text-shadow:
+      0 0 4px #000,
+      1px 1px 1px #000,
+      -1px -1px 1px #000,
+      1px -1px 1px #000,
+      -1px 1px 1px #000;
     font-weight: bold;
     pointer-events: none;
   }
@@ -1694,16 +1725,26 @@
     justify-content: center;
     font-size: 17px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
+    /* Crisp dark outline plus a soft halo so the gold number stays legible on
+       bright or warm icons, not just a thin 1px shadow that the art swallows. */
+    text-shadow:
+      0 0 4px #000,
+      1px 1px 1px #000,
+      -1px -1px 1px #000,
+      1px -1px 1px #000,
+      -1px 1px 1px #000;
   }
   .action-btn .cd-overlay {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #000d;
-    height: 0%;
-    border-radius: 0 0 4px 4px;
+    inset: 0;
+    /* Classic radial clock wipe: the dark wedge covers the remaining cooldown
+       (--cd-fill, written by action_bar_painter) and sweeps away clockwise as it
+       recovers, instead of the old bottom-up height fill. */
+    background: conic-gradient(
+      transparent 0 calc(100% - var(--cd-fill, 0%)),
+      #000d calc(100% - var(--cd-fill, 0%))
+    );
+    border-radius: 4px;
   }
   /* The recharge veil on a charge-pool ability (Twinstrike, Double Charge): a
      spent charge regenerating while the button stays pressable. Same bottom-up

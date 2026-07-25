@@ -38,6 +38,14 @@ export const da_DK: EnTranslations = {
     "filterLabel": "Filtrér kommandoer",
     "filterPlaceholder": "Søg i denne kategori",
     "noMatches": "Ingen matchende kommandoer.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "Serverfusk kræver stadig ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Vælg gyldige værdier, før du kører kommandoen.",
     "sent": "Sendt: {command}",
@@ -55,7 +63,8 @@ export const da_DK: EnTranslations = {
       "z": "Z",
       "dungeon": "Fangekælder",
       "difficulty": "Sværhedsgrad",
-      "name": "Navn"
+      "name": "Navn",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const da_DK: EnTranslations = {
       "give": {
         "label": "Giv genstand",
         "description": "Føj en genstand til spillerens inventar."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "Tilføj guld",

@@ -139,6 +139,10 @@ export class Input {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // Fired whenever the player changes the zoom distance (wheel / pinch), so main.ts can
+  // persist it to settings (issue 1657). Not fired on a direct camDist assignment (the
+  // startup restore / Reset path sets the field itself), so restoring never re-persists.
+  onCameraDistChange?: (dist: number) => void;
   autorun = false;
   suspendMovement = false;
   // click-to-move (#95): a world destination the player clicked; the frame loop
@@ -377,7 +381,10 @@ export class Input {
 
   /** Move the camera in/out, clamped to the zoom limits. */
   zoomBy(delta: number): void {
-    this.camDist = Math.min(22, Math.max(3, this.camDist + delta));
+    const next = Math.min(22, Math.max(3, this.camDist + delta));
+    if (next === this.camDist) return;
+    this.camDist = next;
+    this.onCameraDistChange?.(next);
   }
 
   /** True while a mouse button is held for camera drag. */

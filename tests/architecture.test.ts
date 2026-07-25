@@ -202,6 +202,7 @@ const UI_PURE_CORES = [
   'src/ui/guild_leaderboard_view.ts',
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/dev_command_view.ts',
+  'src/ui/dev_item_picker_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
   'src/ui/deeds_view.ts',
@@ -238,6 +239,7 @@ const UI_PURE_CORES = [
   'src/ui/pet_action_icons.ts',
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',
+  'src/ui/chat_bubble_style.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));
@@ -311,6 +313,7 @@ const BARE_NAMED = [
   'src/ui/mobile_hud_layout.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/chat_bubble_style.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',

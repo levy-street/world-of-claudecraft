@@ -26,6 +26,7 @@
 import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
+import { corpseInteractionAvailability } from './corpse_interaction';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -556,18 +557,18 @@ export function interact(
     const target = ctx.entities.get(p.targetId);
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
       if (target.kind === 'mob' && target.lootable) {
-        // Unified press, targeted arm: same composition as the
-        // proximity-scan arm below (harvest while the corpse still owes its
-        // unclaimed half, omitted components = the town focus default, then
-        // loot; separate calls so neither refusal blocks the other).
-        if (
-          isHarvestableCorpse(MOBS[target.templateId]?.componentTags) &&
-          target.harvestClaimedBy === null
-        ) {
-          harvestCorpse(ctx, target.id, undefined, p.id);
+        const availability = corpseInteractionAvailability(ctx, target, p.id, true);
+        if (availability.canInteract) {
+          // Unified press, targeted arm: same composition as the
+          // proximity-scan arm below (harvest while the corpse still owes its
+          // unclaimed half, omitted components = the town focus default, then
+          // loot; separate calls so neither refusal blocks the other).
+          if (availability.harvestable) {
+            harvestCorpse(ctx, target.id, undefined, p.id);
+          }
+          lootCorpse(ctx, target.id, p.id);
+          return;
         }
-        lootCorpse(ctx, target.id, p.id);
-        return;
       }
       if (target.kind === 'object' && target.lootable) {
         if (target.templateId === 'dungeon_door' && target.dungeonId) {
@@ -605,7 +606,12 @@ export function interact(
   let bestQuestEntity: Entity | null = null;
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
   ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
-    if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) {
+    if (
+      e.kind === 'mob' &&
+      e.lootable &&
+      corpseInteractionAvailability(ctx, e, p.id, true).canInteract &&
+      d2 < bestCorpseD2
+    ) {
       bestCorpse = e;
       bestCorpseD2 = d2;
     }
@@ -630,10 +636,7 @@ export function interact(
     // still owes its unclaimed harvest half; omitted components = the town
     // focus default) and loots. Two separate calls on purpose: a harvest
     // refusal never blocks the loot half, and vice versa.
-    if (
-      isHarvestableCorpse(MOBS[corpse.templateId]?.componentTags) &&
-      corpse.harvestClaimedBy === null
-    ) {
+    if (corpseInteractionAvailability(ctx, corpse, p.id, true).harvestable) {
       harvestCorpse(ctx, corpse.id, undefined, p.id);
     }
     lootCorpse(ctx, corpse.id, p.id);

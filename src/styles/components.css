@@ -12224,6 +12224,107 @@
     color: var(--color-text);
     background: var(--panel-base);
   }
+  /* Item picker combobox. Replaces a native <select> over all ~672 ITEMS, which
+     rendered taller than the viewport and covered its own window. Reuses the
+     .soc-suggest / .soc-sugg-item visual treatment from the social panel so no new
+     design-system surface is introduced. The wrapper anchors the absolutely
+     positioned listbox; max-height is what keeps the list from ever growing back
+     into the bug this replaced. */
+  .dev-item-pick {
+    position: relative;
+  }
+  .dev-item-suggest {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 3px);
+    display: none;
+    z-index: 30;
+    background: #14110d;
+    border: 1px solid #6f5a2a;
+    border-radius: 5px;
+    max-height: 210px;
+    overflow-y: auto;
+    box-shadow: 0 6px 18px #000a;
+  }
+  .dev-item-opt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    cursor: var(--cursor-point);
+    font-size: 12px;
+  }
+  .dev-item-opt:hover,
+  .dev-item-opt.active {
+    background: #2f2740;
+  }
+  .dev-item-opt.active {
+    box-shadow: inset 2px 0 0 var(--gold);
+  }
+  .dev-item-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Text-colour twins of the .q-* icon-border classes, same canonical quality hexes,
+     so a row is scannable by quality at a glance. */
+  .dev-item-name.qt-poor {
+    color: #9d9d9d;
+  }
+  .dev-item-name.qt-common {
+    color: #d8d8d8;
+  }
+  .dev-item-name.qt-uncommon {
+    color: #1eff00;
+  }
+  .dev-item-name.qt-rare {
+    color: #3d9bff;
+  }
+  .dev-item-name.qt-epic {
+    color: #c77dff;
+  }
+  .dev-item-name.qt-legendary {
+    color: #ff8000;
+  }
+  .dev-item-tag {
+    flex: 0 0 auto;
+    padding: 1px 5px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+  /* The heroic tag is the ONLY thing separating the 57 duplicate display names (a
+     base piece and its generated heroic variant), so it gets real contrast rather
+     than the muted treatment the slot tag uses. */
+  .dev-item-tag.heroic {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  .dev-item-id {
+    flex: 0 0 auto;
+    color: var(--color-text-muted);
+    font-family: var(--mono-font, monospace);
+    font-size: 10px;
+  }
+  .dev-item-empty,
+  .dev-item-more {
+    padding: 7px 9px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .dev-item-status {
+    min-height: 13px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .dev-item-status.unknown {
+    color: var(--danger, #e06c6c);
+  }
   .dev-command-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

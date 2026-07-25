@@ -20,11 +20,8 @@ import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 import { DT } from '../src/sim/types';
 
-type AnyEntity = Entity & Record<string, any>;
-type AnySim = Sim & Record<string, any>;
-
-function makeSim(seed = 7373): AnySim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as AnySim;
+function makeSim(seed = 7373): Sim {
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
 }
 
 function aura(kind: Aura['kind'], value: number, extra: Partial<Aura> = {}): Aura {
@@ -41,13 +38,13 @@ function aura(kind: Aura['kind'], value: number, extra: Partial<Aura> = {}): Aur
   } as Aura;
 }
 
-function spawnMob(sim: AnySim, hp = 1000): AnyEntity {
-  const p = sim.player as AnyEntity;
+function spawnMob(sim: Sim, hp = 1000): Entity {
+  const p = sim.player;
   const mob = createMob(sim.nextId++, MOBS.forest_wolf, 5, {
     x: p.pos.x + 40,
     y: p.pos.y,
     z: p.pos.z + 40,
-  }) as AnyEntity;
+  });
   mob.maxHp = hp;
   mob.hp = hp;
   sim.addEntity(mob);
@@ -94,7 +91,7 @@ describe('auras: unbreakable control replacement', () => {
 describe('auras: updateTimers', () => {
   it('decrements gcd, advances rule/combat timers, and expires cooldowns', () => {
     const sim = makeSim();
-    const p = sim.player as AnyEntity;
+    const p = sim.player;
     p.gcdRemaining = DT; // exactly one tick from 0
     p.fiveSecondRule = 0;
     p.combatTimer = 0;
@@ -131,6 +128,35 @@ describe('auras: updateAuras DoT tick', () => {
     updateAuras(sim.ctx, mob);
     expect(mob.dead).toBe(true);
   });
+
+  // Re-entrancy repro: a DoT tick calls ctx.dealDamage, which runs its own
+  // backward sweeps over this SAME e.auras array and can splice a breaksOnDamage
+  // control aura (Fear and friends) or a depleted absorb shield out mid-walk.
+  // With that aura at a LOWER index than the DoT (pushed first, so the backward
+  // walk reaches the DoT before it), the removal shifts the array and a
+  // live-indexed walk lands the just-processed DoT back under the cursor: its
+  // remaining/tickTimer are decremented twice and it deals a SECOND tick of
+  // damage in the same sim tick.
+  it('a DoT tick that breaks a lower-indexed breaksOnDamage aura ages and ticks exactly once', () => {
+    const sim = makeSim();
+    const mob = spawnMob(sim, 1000);
+    const fear = aura('incapacitate', 0, { breaksOnDamage: true, remaining: 10, duration: 10 });
+    const dot = aura('dot', 50, { tickInterval: DT, remaining: 60, duration: 60 });
+    mob.auras.push(fear, dot);
+
+    const hp0 = mob.hp;
+    updateAuras(sim.ctx, mob);
+
+    // Exactly one tick: the double-tick this guards against would take 100.
+    expect(hp0 - mob.hp).toBe(50);
+    // The DoT's own damage still breaks the fear, as it should.
+    expect(mob.auras.some((a) => a.kind === 'incapacitate')).toBe(false);
+    // ...and the DoT aged by exactly one DT, not two.
+    const survivingDot = mob.auras.find((a) => a.kind === 'dot');
+    expect(survivingDot).toBeTruthy();
+    expect(survivingDot?.remaining).toBeCloseTo(60 - DT, 9);
+    expect(mob.auras.length).toBe(1);
+  });
 });
 
 describe('auras: updateAuras expiry / HoT / top guard', () => {
@@ -164,7 +190,7 @@ describe('auras: updateAuras expiry / HoT / top guard', () => {
 describe('auras: updateRegen', () => {
   it('eat heals an out-of-combat player on the 40-tick boundary, decrementing the food', () => {
     const sim = makeSim();
-    const p = sim.player as AnyEntity;
+    const p = sim.player;
     const meta = sim.players.get(p.id) as PlayerMeta;
     p.inCombat = false;
     p.hp = Math.max(1, p.maxHp - 500);
@@ -178,7 +204,7 @@ describe('auras: updateRegen', () => {
 
   it('does nothing off the 40-tick boundary', () => {
     const sim = makeSim();
-    const p = sim.player as AnyEntity;
+    const p = sim.player;
     const meta = sim.players.get(p.id) as PlayerMeta;
     p.inCombat = false;
     p.hp = Math.max(1, p.maxHp - 500);
@@ -194,10 +220,8 @@ describe('auras: updateRegen', () => {
 describe('auras: cleanseFriendlyNpcAuras', () => {
   it('strips rejected control/debuff auras and leaves benign ones', () => {
     const sim = makeSim();
-    const npc = {
-      id: 999,
-      auras: [aura('stun', 1), aura('hot', 1), aura('root', 1)],
-    } as unknown as AnyEntity;
+    const npc = spawnMob(sim);
+    npc.auras = [aura('stun', 1), aura('hot', 1), aura('root', 1)];
     cleanseFriendlyNpcAuras(sim.ctx, npc);
     expect(npc.auras.map((a: Aura) => a.kind)).toEqual(['hot']); // stun + root stripped
   });
