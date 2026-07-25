@@ -926,6 +926,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/progression.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/rift_lockpick.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/portals.ts'), 'utf8'),
+    // The Demon Tower's wave announcements and floor-clear lines.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/tower.ts'), 'utf8'),
     // Mob locomotion: the deathZoneCast/deathZoneStrike driver emits def.detonateText
     // at zone expiry (type:'log', telegraph:true). These are the only player-facing
     // emits in this file; re-localized via the sim.rift.detonate* rules.

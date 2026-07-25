@@ -1046,6 +1046,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "es_ES": [
@@ -2085,6 +2089,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "fr_FR": [
@@ -3124,6 +3132,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "fr_CA": [
@@ -4163,6 +4175,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "en_CA": [],
@@ -5203,6 +5219,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "de_DE": [
@@ -6242,6 +6262,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "zh_CN": [
@@ -6264,7 +6288,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
-    "hudChrome.mountRace.timeLeft"
+    "hudChrome.mountRace.timeLeft",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave"
   ],
   "zh_TW": [
     "abilityUi.cast.rift_arcane_execution",
@@ -6286,7 +6314,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
-    "hudChrome.mountRace.timeLeft"
+    "hudChrome.mountRace.timeLeft",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave"
   ],
   "ko_KR": [
     "abilityUi.cast.rift_arcane_execution",
@@ -6308,7 +6340,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
-    "hudChrome.mountRace.timeLeft"
+    "hudChrome.mountRace.timeLeft",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave"
   ],
   "ja_JP": [
     "abilityUi.cast.rift_arcane_execution",
@@ -6330,7 +6366,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
-    "hudChrome.mountRace.timeLeft"
+    "hudChrome.mountRace.timeLeft",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave"
   ],
   "pt_BR": [
     "abilityUi.cast.rift_arcane_execution",
@@ -7369,6 +7409,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "ru_RU": [
@@ -7391,7 +7435,11 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
-    "hudChrome.mountRace.timeLeft"
+    "hudChrome.mountRace.timeLeft",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave"
   ],
   "cs_CZ": [
     "abilityUi.cast.rift_arcane_execution",
@@ -8485,6 +8533,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "nl_NL": [
@@ -9559,6 +9611,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "pl_PL": [
@@ -10633,6 +10689,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "id_ID": [
@@ -11707,6 +11767,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "tr_TR": [
@@ -12781,6 +12845,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "sv_SE": [
@@ -13855,6 +13923,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "vi_VN": [
@@ -14929,6 +15001,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ],
   "da_DK": [
@@ -16003,6 +16079,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.seqReset",
     "sim.rift.socketsShut",
     "sim.rift.stepBack",
+    "sim.rift.towerBossWave",
+    "sim.rift.towerCleared",
+    "sim.rift.towerFloorClear",
+    "sim.rift.towerWave",
     "sim.rift.wayDownOpens"
   ]
 };

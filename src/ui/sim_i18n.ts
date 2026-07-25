@@ -7792,6 +7792,26 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.pylonLit', { lit: m[1], total: m[2] }),
   },
   { re: /^The way down tears open\.$/, build: () => t('sim.rift.wayDownOpens') },
+  // The Demon Tower (src/sim/rift/tower.ts): wave announcements and the two
+  // floor-clear lines. The counter captures are permissive (matching the pylon
+  // rule above) rather than \d+, because the S3 drift guard probes every rule
+  // with a placeholder substitution rather than a real number.
+  {
+    re: /^The Demon Core howls\. Wave ([^ ]+) of ([^ ]+)\.$/,
+    build: (m) => t('sim.rift.towerWave', { wave: m[1], total: m[2] }),
+  },
+  {
+    re: /^The core splits open\. Something far worse steps through\.$/,
+    build: () => t('sim.rift.towerBossWave'),
+  },
+  {
+    re: /^The Demon Core cracks\. The way up is open\.$/,
+    build: () => t('sim.rift.towerFloorClear'),
+  },
+  {
+    re: /^The Demon Core goes dark\. The tower is yours\.$/,
+    build: () => t('sim.rift.towerCleared'),
+  },
   { re: /^The frost sigil blazes\. The way stirs\.$/, build: () => t('sim.rift.iceGoalLit') },
   { re: /^The sockets grind shut\. The way stirs\.$/, build: () => t('sim.rift.socketsShut') },
   {

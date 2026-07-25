@@ -38,7 +38,12 @@ import {
 } from './ranks';
 import { generateRiftFloor, isSetPieceRift, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
-import { DEMON_TOWER_PUZZLE_KIND, resetTowerFloor, updateDemonTower } from './tower';
+import {
+  DEMON_TOWER_PUZZLE_KIND,
+  resetTowerFloor,
+  spawnDemonTowerDoor,
+  updateDemonTower,
+} from './tower';
 import type { RiftInstance, RiftRoller } from './types';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
@@ -1020,6 +1025,10 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
   // post-exit grace, so leaving a rift never bounces the player back in).
   if (ctx.time < (p.riftReentryGraceUntil ?? -Infinity)) return;
   if (ctx.riftPortalIds === null) {
+    // The Demon Tower's door is a permanent landmark rather than a scheduled
+    // event, so it is minted here, once, before the portal cache is built (which
+    // then contains it and is what keeps this from running twice).
+    spawnDemonTowerDoor(ctx);
     ctx.riftPortalIds = [];
     for (const e of ctx.entities.values()) {
       if (e.templateId === 'rift_portal') ctx.riftPortalIds.push(e.id);

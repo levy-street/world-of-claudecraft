@@ -27,10 +27,11 @@
 // a result this driver draws ZERO rng: releasing a wave cannot shift the shared
 // stream for anything else in the world.
 
+import { DEMON_TOWER_SEED, DEMON_TOWER_THEME_NAME } from '../content/rift/demon_tower';
 import { MOBS, riftInstanceOrigin } from '../data';
-import { createMob } from '../entity';
+import { createGroundObject, createMob } from '../entity';
 import type { SimContext } from '../sim_context';
-import { riftHeroicTemplate } from './ranks';
+import { RIFT_RANK_BASE_LEVEL, riftHeroicTemplate } from './ranks';
 import {
   DEMON_TOWER_FLOOR_COUNT,
   DEMON_TOWER_MAX_LIVE_DEMONS,
@@ -42,6 +43,43 @@ import type { RiftInstance } from './types';
 
 /** The floor plan's puzzle kind that marks an instance as a tower floor. */
 export const DEMON_TOWER_PUZZLE_KIND = 'demon_waves';
+
+/** Where the tower stands: the eastern reach of Thornpeak Heights (zone 3, the
+ * endgame zone, z 540..900), clear of the authored points of interest so the
+ * landmark never lands on top of one. A FIXED position, because the whole point
+ * of the tower is that it is always in the same place. */
+export const DEMON_TOWER_DOOR = { x: 140, z: 850 } as const;
+
+/**
+ * Spawn the permanent Demon Tower door, once per world.
+ *
+ * The entry mechanism is deliberately the one rift portals already use: a ground
+ * object carrying `templateId: 'rift_portal'` plus a `riftSeed`. Walking into it
+ * enters the rift with that seed, and because the tower's seed is the reserved
+ * sentinel, that is the tower. No new entry path, no new trigger, and the
+ * descriptor stays exactly what every host already regenerates content from.
+ *
+ * Unlike a scheduled portal this one has no tier, no event, and no expiry: it is
+ * a landmark, not a world event, so it never announces, never collapses, and is
+ * never sealed by a clear.
+ */
+export function spawnDemonTowerDoor(ctx: SimContext): number {
+  const door = createGroundObject(
+    ctx.nextId++,
+    '',
+    DEMON_TOWER_THEME_NAME,
+    ctx.groundPos(DEMON_TOWER_DOOR.x, DEMON_TOWER_DOOR.z),
+  );
+  door.templateId = 'rift_portal';
+  door.objectItemId = null;
+  door.lootable = true;
+  door.riftSeed = DEMON_TOWER_SEED;
+  // Entered at the top rank's base level: the tower is endgame raid content and
+  // its own per-floor curve carries the difficulty from there.
+  door.riftBaseLevel = RIFT_RANK_BASE_LEVEL.S;
+  ctx.addEntity(door);
+  return door.id;
+}
 
 /** Reset the tower bookkeeping for a freshly built floor. Called from the shared
  * floor-spawn path, so a slot reused by a later run never inherits wave state. */
@@ -146,15 +184,26 @@ function releaseWave(
 
   inst.towerWave++;
   const total = demonTowerFloorTuning(inst.floorIndex).waveCount;
+  // Each announcement is emitted from its own site with a LITERAL text, rather
+  // than one emit fed by a ternary: the S3 drift guard
+  // (tests/localization_fixes.test.ts) only sees string literals at the emit
+  // site, so a variable-routed text would silently drop out of its coverage.
   for (const pid of playerIds) {
-    ctx.emit({
-      type: 'log',
-      text: wave.releasesBoss
-        ? 'The core splits open. Something far worse steps through.'
-        : `The Demon Core howls. Wave ${inst.towerWave} of ${total}.`,
-      color: '#f67',
-      pid,
-    });
+    if (wave.releasesBoss) {
+      ctx.emit({
+        type: 'log',
+        text: 'The core splits open. Something far worse steps through.',
+        color: '#f67',
+        pid,
+      });
+    } else {
+      ctx.emit({
+        type: 'log',
+        text: `The Demon Core howls. Wave ${inst.towerWave} of ${total}.`,
+        color: '#f67',
+        pid,
+      });
+    }
   }
 }
 
@@ -184,15 +233,22 @@ export function updateDemonTower(
   // boss failed to spawn would hand out a free clear.
   if (isDemonTowerBossFloor(inst.floorIndex) && inst.towerBossId === null) return;
   inst.puzzleSolved = true;
+  const summit = inst.floorIndex === DEMON_TOWER_FLOOR_COUNT - 1;
   for (const pid of playerIds) {
-    ctx.emit({
-      type: 'log',
-      text:
-        inst.floorIndex === DEMON_TOWER_FLOOR_COUNT - 1
-          ? 'The Demon Core goes dark. The tower is yours.'
-          : 'The Demon Core cracks. The way up is open.',
-      color: '#9f6',
-      pid,
-    });
+    if (summit) {
+      ctx.emit({
+        type: 'log',
+        text: 'The Demon Core goes dark. The tower is yours.',
+        color: '#9f6',
+        pid,
+      });
+    } else {
+      ctx.emit({
+        type: 'log',
+        text: 'The Demon Core cracks. The way up is open.',
+        color: '#9f6',
+        pid,
+      });
+    }
   }
 }
