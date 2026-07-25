@@ -7,8 +7,11 @@
 //      the drift tests/entry_window_parity.test.ts does not catch (it scans
 //      `.window panel` divs only, never the rail).
 //   2. A section whose every entry is hidden (#mm-town-focus out of town,
-//      #mm-discord on a non-Discord build, the lone chest when daily rewards
-//      are off) must vanish whole, or its keyline paints with nothing under it.
+//      #mm-discord on a non-Discord build, the lone daily chest whenever the
+//      showDailyRewardsChest setting is off) must collapse AND take its
+//      keyline with it. display:none does not remove it from the sibling
+//      chain, so the obvious adjacent-sibling divider still rules the next
+//      surviving section against nothing.
 //   3. The sections are wrappers around buttons the HUD finds by id. A button
 //      dropped or renamed during a regroup would leave a dead $('#mm-...').
 import { readFileSync } from 'node:fs';
@@ -117,18 +120,22 @@ describe('micro-menu sections: the keyline and its hidden-section rule', () => {
     return match[1];
   };
 
-  // The divider rule, matched by its exact selector: it is load-bearing that
-  // this is the "still has a visible section AFTER it" form, not the adjacent
-  // sibling one (see the orphan test below).
-  const DIVIDER_RULE =
-    /\.micro-group:has\(> :not\(\[hidden\]\)\):has\(~ \.micro-group:has\(> :not\(\[hidden\]\)\)\) \{([^}]*)\}/;
+  // These are SOURCE pins: they prove the rules are written, never that they
+  // match anything. The rendered behavior (which is what actually regressed
+  // once, via an invalid nested :has) is asserted against a real engine in
+  // tests/browser/micromenu_groups.browser.test.ts.
+  const DIVIDER_RULE = /\n {2}\.micro-group \+ \.micro-group \{([^}]*)\}/;
+  // Quote-agnostic: biome normalizes CSS attribute selectors to double quotes,
+  // so pinning one form makes the test a formatting hostage.
+  const NEUTRALIZER_RULE =
+    /\.micro-group\[data-group=["']rewards["']\]:not\(:has\(> :not\(\[hidden\]\)\)\) \+ \.micro-group \{([^}]*)\}/;
 
   it('draws the divider in the shared showcase keyline token, no new color', () => {
     const rule = DIVIDER_RULE.exec(hudCss)?.[1];
     expect(rule, 'missing the section-divider rule in src/styles/hud.css').toBeTruthy();
-    expect(rule).toMatch(/border-bottom:\s*1px solid var\(--color-border-showcase\)/);
+    expect(rule).toMatch(/border-top:\s*1px solid var\(--color-border-showcase\)/);
     // A border on `.micro-group` itself would rule every section, including
-    // the last one in a column.
+    // the first one in a column.
     expect(block('.micro-group')).not.toMatch(/border/);
     // The token has to exist upstream in tokens.css rather than be invented here.
     expect(read('../src/styles/tokens.css')).toMatch(/--color-border-showcase:\s*#[0-9a-f]{6};/);
@@ -140,8 +147,8 @@ describe('micro-menu sections: the keyline and its hidden-section rule', () => {
     expect(block('.side-buttons-col')).toMatch(/flex-direction:\s*column/);
     expect(block('.micro-group')).toMatch(/flex-direction:\s*column/);
     const rule = DIVIDER_RULE.exec(hudCss)?.[1] ?? '';
-    expect(rule).toMatch(/border-bottom:/);
-    expect(rule).not.toMatch(/border-(left|right|top):/);
+    expect(rule).toMatch(/border-top:/);
+    expect(rule).not.toMatch(/border-(left|right|bottom):/);
   });
 
   it('collapses a section that has nothing visible left in it', () => {
@@ -151,20 +158,52 @@ describe('micro-menu sections: the keyline and its hidden-section rule', () => {
     expect(hudCss).toMatch(/\.micro-group:not\(:has\(> :not\(\[hidden\]\)\)\) \{\s*display: none;/);
   });
 
-  it('never leaves a keyline with no section on one side of it', () => {
-    // The regression this rule exists for: display:none does NOT remove a
-    // collapsed section from the sibling chain, so the obvious adjacent-sibling
-    // form still matches the first SURVIVING section and rules it against
-    // nothing. That is live, not hypothetical: the rewards section is a lone
-    // #daily-rewards-button and hides whenever daily rewards are off.
-    expect(
-      hudCss,
-      'the adjacent-sibling divider orphans a keyline when a section collapses',
-    ).not.toMatch(/\.micro-group \+ \.micro-group\s*\{/);
-    // Both ends: the selector requires a visible section AFTER this one (no
-    // orphan below the last section) and only matches a section that is itself
-    // visible (no orphan above the first surviving one).
-    expect(hudCss).toMatch(/\.micro-group:has\(> :not\(\[hidden\]\)\):has\(~ \.micro-group/);
+  it('drops the keyline off the section below the one that can collapse', () => {
+    // display:none does NOT remove a collapsed section from the sibling chain,
+    // so `.micro-group + .micro-group` still matches the first SURVIVING
+    // section and would rule it against nothing. Live, not hypothetical: the
+    // rewards section is a lone #daily-rewards-button that the
+    // showDailyRewardsChest setting hides, and it is first in its column.
+    const rule = NEUTRALIZER_RULE.exec(hudCss)?.[1];
+    expect(rule, 'missing the collapsed-section keyline neutralizer').toBeTruthy();
+    expect(rule).toMatch(/border-top:\s*0;/);
+    // Zeroed together: leaving the margin or padding behind keeps the dead
+    // space even once the rule itself is gone.
+    expect(rule).toMatch(/margin-top:\s*0;/);
+    expect(rule).toMatch(/padding-top:\s*0;/);
+  });
+
+  it('leaves every other section incapable of collapsing, which is what makes one neutralizer enough', () => {
+    // The neutralizer is deliberately scoped to `rewards` rather than written
+    // as a general "after any collapsed section" rule, because a general rule
+    // would ALSO strip the keyline off the section following a collapsed
+    // MIDDLE section, which should keep it. That scoping is only sound while
+    // rewards is the sole section that can empty. Pin exactly that: every
+    // other section must hold at least one entry the HUD never hides, so a
+    // future all-conditional section fails here until it gets its own
+    // neutralizer (or the rule is generalized).
+    const CONDITIONAL = new Set(['mm-town-focus', 'mm-discord', 'daily-rewards-button']);
+    const neutralized = new Set(['rewards']);
+    for (const [group, ids] of [...COL_A_SECTIONS, ...COL_B_SECTIONS]) {
+      if (neutralized.has(group)) continue;
+      expect(
+        ids.some((id) => !CONDITIONAL.has(id)),
+        `section "${group}" can empty but has no keyline neutralizer`,
+      ).toBe(true);
+    }
+  });
+
+  it('never nests :has() inside :has(), which drops the whole rule', () => {
+    // The exact bug this suite was extended for: `:has()` inside `:has()` is
+    // invalid per Selectors 4 and every shipping engine discards the entire
+    // rule (verified in Chrome 150). The stylesheet still reads correctly and
+    // every other source pin here still passes, while nothing paints.
+    const railRules = hudCss.match(/^ {2}\.micro-group[^{]*\{/gm) ?? [];
+    expect(railRules.length).toBeGreaterThan(2);
+    for (const selector of railRules) {
+      const outer = /:has\((.*)\)/s.exec(selector)?.[1] ?? '';
+      expect(outer, `nested :has() in "${selector.trim()}" drops the rule`).not.toMatch(/:has\(/);
+    }
   });
 
   it('keeps .micro-group free of anything that opens a stacking context', () => {
@@ -173,9 +212,12 @@ describe('micro-menu sections: the keyline and its hidden-section rule', () => {
     // re-break the clipping #side-buttons-col-b's z-index exists to fix.
     // Both rules that target a section, not just the base one: a transform on
     // the divider rule would trap the flyout just as effectively.
-    const rules = [block('.micro-group'), DIVIDER_RULE.exec(hudCss)?.[1] ?? ''];
-    for (const [i, rule] of rules.entries()) {
-      const where = i === 0 ? '.micro-group' : 'the section-divider rule';
+    const rules: Array<[string, string]> = [
+      ['.micro-group', block('.micro-group')],
+      ['the section-divider rule', DIVIDER_RULE.exec(hudCss)?.[1] ?? ''],
+      ['the keyline neutralizer', NEUTRALIZER_RULE.exec(hudCss)?.[1] ?? ''],
+    ];
+    for (const [where, rule] of rules) {
       for (const prop of ['position', 'z-index', 'opacity', 'transform', 'filter']) {
         expect(rule, `${where} must not declare ${prop}`).not.toMatch(
           new RegExp(`(?:^|[\\s;])${prop}\\s*:`),

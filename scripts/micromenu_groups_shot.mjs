@@ -47,8 +47,22 @@ const page = await browser.newPage();
 // reliably under a 2x boot, and enterOfflineGame then times out on its card.
 // The rail shots bump the scale factor AFTER the world is up.
 await page.setViewport({ ...DESKTOP, deviceScaleFactor: 1 });
-await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
-await enterOfflineGame(page, { settleMs: 2000 });
+
+// The pre-game class-select occasionally does not paint on the first load
+// against a dev server that is still warming its module graph, and
+// enterOfflineGame then times out on its card. Reload and retry rather than
+// failing the whole capture on a transient.
+let entered = false;
+for (let attempt = 1; attempt <= 3 && !entered; attempt++) {
+  try {
+    await page.goto(URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    await enterOfflineGame(page, { settleMs: 2000 });
+    entered = true;
+  } catch (err) {
+    console.warn(`entry attempt ${attempt} failed: ${String(err).split('\n')[0]}`);
+    if (attempt === 3) throw err;
+  }
+}
 
 const cdp = await page.createCDPSession();
 

@@ -1852,18 +1852,34 @@
     display: none;
   }
   /* The section keyline, in the panel-divider language: the shared gold-brown
-     showcase hairline, perpendicular to the column's stacking axis.
-     Hidden-section hygiene, second half, and the reason this is a BOTTOM rule
-     on the earlier section rather than a top rule on the later one: display:
-     none does NOT take a collapsed section out of the sibling chain, so
-     `.micro-group + .micro-group` would still paint a keyline above the first
-     surviving section with nothing over it (visible whenever the lone-chest
-     rewards section hides). Drawing on a section that still has a VISIBLE
-     section after it leaves no orphan at either end of the column. */
-  .micro-group:has(> :not([hidden])):has(~ .micro-group:has(> :not([hidden]))) {
-    margin-bottom: 3px;
-    padding-bottom: 3px;
-    border-bottom: 1px solid var(--color-border-showcase);
+     showcase hairline, perpendicular to the column's stacking axis. Every
+     section after the first carries it. */
+  .micro-group + .micro-group {
+    margin-top: 3px;
+    padding-top: 3px;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  /* Hidden-section hygiene, second half: collapsing a section with display:none
+     does NOT take it out of the sibling chain, so the rule above still matches
+     the section AFTER a collapsed one and would rule the first surviving
+     section against nothing. Reachable by any player: the whole rewards
+     section is the lone daily chest the showDailyRewardsChest setting hides,
+     and it is the FIRST section in its column, so the activities section below
+     it would inherit a keyline with nothing above it.
+     Scoped to that one section on purpose, rather than a general
+     "any collapsed section" rule: a general rule would also strip the keyline
+     off the section after a collapsed MIDDLE section, which should keep it
+     (the visible section above it is still there). rewards is the only
+     section that can empty, because every other one holds at least one entry
+     the HUD never hides; tests/micromenu_groups.test.ts pins that, so a future
+     all-conditional section cannot quietly need a neutralizer it lacks.
+     Not written as one nested :has(): :has() inside :has() is invalid per
+     Selectors 4 and drops the entire rule in every shipping engine (verified
+     in Chrome 150), which would silently un-paint every divider. */
+  .micro-group[data-group="rewards"]:not(:has(> :not([hidden]))) + .micro-group {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
   .micro-btn {
     width: 34px;
