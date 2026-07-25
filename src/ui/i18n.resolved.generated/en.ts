@@ -1753,7 +1753,18 @@ export const en: EnTranslations = {
       "label": "Reset Frame Positions"
     },
     "itemTooltip": {
-      "requiresLevel": "Requires Level {level}"
+      "requiresLevel": "Requires Level {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const en: EnTranslations = {
       "makersMark": "Crafted by {name}",
       "gatheredBy": "Gathered by {name}",
       "masterworkSeal": "Masterwork",
-      "enchantedLine": "Enchanted",
       "commissionToggle": "Commission piece",
       "commissionToggleHint": "Binds to the first character to receive it in a trade.",
       "commissionUnbound": "Commission piece: binds to the first recipient",
@@ -2421,7 +2431,15 @@ export const en: EnTranslations = {
       "pickerTitle": "Apply Enchant",
       "targetTitle": "Choose an item to enchant",
       "noEnchants": "No enchant uses this reagent.",
-      "noTargets": "No eligible item to enchant."
+      "noTargets": "No eligible item to enchant.",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Training: {name}",

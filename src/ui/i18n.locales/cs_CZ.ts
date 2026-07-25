@@ -8913,7 +8913,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Plný zisk dovedností',
   'hudChrome.crafting.difficultyNone': 'Žádný zisk dovedností',
   'hudChrome.crafting.difficultyReduced': 'Snížený zisk dovedností',
-  'hudChrome.crafting.enchantedLine': 'Okouzlený',
   'hudChrome.crafting.makersMark': 'Vytvořil {name}',
   'hudChrome.crafting.masterworkSeal': 'Mistrovské dílo',
   'hudChrome.crafting.masterworkToast': 'Mistrovské dílo! {name}',

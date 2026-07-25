@@ -1753,7 +1753,18 @@ export const es: EnTranslations = {
       "label": "Restablecer posición de los marcos"
     },
     "itemTooltip": {
-      "requiresLevel": "Requiere nivel {level}"
+      "requiresLevel": "Requiere nivel {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const es: EnTranslations = {
       "makersMark": "Elaborado por {name}",
       "gatheredBy": "Recolectado por {name}",
       "masterworkSeal": "obra maestra",
-      "enchantedLine": "encantada",
       "commissionToggle": "Encargo",
       "commissionToggleHint": "Se vincula al primer personaje que lo reciba en un intercambio.",
       "commissionUnbound": "Encargo: se vincula al primer destinatario",
@@ -2421,7 +2431,15 @@ export const es: EnTranslations = {
       "pickerTitle": "Aplicar encantamiento",
       "targetTitle": "Elige un objeto para encantar",
       "noEnchants": "Ningún encantamiento usa este reactivo.",
-      "noTargets": "No hay ningún objeto elegible para encantar."
+      "noTargets": "No hay ningún objeto elegible para encantar.",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Formación: {name}",

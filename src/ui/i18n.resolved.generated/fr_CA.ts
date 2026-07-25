@@ -1753,7 +1753,18 @@ export const fr_CA: EnTranslations = {
       "label": "Réinitialiser la position des cadres"
     },
     "itemTooltip": {
-      "requiresLevel": "Niveau requis : {level}"
+      "requiresLevel": "Niveau requis : {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const fr_CA: EnTranslations = {
       "makersMark": "Fabriqué par {name}",
       "gatheredBy": "Collecté par {name}",
       "masterworkSeal": "Chef-d'œuvre",
-      "enchantedLine": "Enchanté",
       "commissionToggle": "Pièce de commande",
       "commissionToggleHint": "Se lie au premier personnage qui la reçoit lors d'un échange.",
       "commissionUnbound": "Pièce de commande : se lie au premier destinataire",
@@ -2421,7 +2431,15 @@ export const fr_CA: EnTranslations = {
       "pickerTitle": "Appliquer un enchantement",
       "targetTitle": "Choisissez un objet à enchanter",
       "noEnchants": "Aucun enchantement n'utilise ce réactif.",
-      "noTargets": "Aucun objet éligible à enchanter."
+      "noTargets": "Aucun objet éligible à enchanter.",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Formation : {name}",

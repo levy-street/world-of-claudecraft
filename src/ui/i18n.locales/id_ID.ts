@@ -9117,7 +9117,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Perolehan keterampilan minimal',
   'hudChrome.crafting.difficultyNone': 'Tidak ada perolehan keterampilan',
   'hudChrome.crafting.difficultyReduced': 'Mengurangi perolehan keterampilan',
-  'hudChrome.crafting.enchantedLine': 'Terpesona',
   'hudChrome.crafting.gatheredBy': 'Dikumpulkan oleh {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} di {station} dapat mengajarkan lebih banyak resep {craft} padamu.',

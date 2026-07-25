@@ -82,6 +82,34 @@ describe('#ctx-menu picker sizing (Apply Enchant picker)', () => {
     expect(Number(cap?.[2])).toBe(Number(px?.[1]));
   });
 
+  it('the tier headers and effect lines are styled once, from tokens, never inline', () => {
+    const section = block(HUD_CSS, /#ctx-menu \.ctx-section\s*\{[^}]*\}/);
+    // A caption, not a row: no pointer affordance and no hover treatment.
+    expect(section).not.toMatch(/cursor:/);
+    expect(HUD_CSS).not.toContain('#ctx-menu .ctx-section:hover');
+    const effect = block(HUD_CSS, /#ctx-menu \.ctx-item-effect\s*\{[^}]*\}/);
+    // Block-level so the effect never collides with the enchant name inline,
+    // and colored from a token (the same bonus-stat green the item tooltip's
+    // own gain lines use), never a literal in CSS or the painter.
+    expect(effect).toMatch(/display:\s*block/);
+    expect(effect).toMatch(/var\(--color-stat-bonus\)/);
+    expect(read('../src/styles/tokens.css')).toContain('--color-stat-bonus:');
+    expect(PAINTER_TS).not.toMatch(/ctx-item-effect[^`]*style=/);
+    // Always-on: neither is gated behind a graphics tier.
+    expect(section).not.toContain('--fx-');
+    expect(effect).not.toContain('--fx-');
+  });
+
+  it('the confirm dialog honors the multi-line yield body', () => {
+    // The confirm body is escaped PLAIN text, so the disenchant yield preview's
+    // newlines only render as lines because the scoped body rule says so.
+    const body = block(
+      read('../src/styles/components.css'),
+      /#confirm-dialog \.cd-body\s*\{[^}]*\}/,
+    );
+    expect(body).toMatch(/white-space:\s*pre-line/);
+  });
+
   it('the painter toggles the modifier and every plain paint site clears it', () => {
     // The picker paints set it; a plain bag action menu paint clears it (the
     // toggle runs on every paint with the picker flag).

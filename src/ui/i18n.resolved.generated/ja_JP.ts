@@ -1753,7 +1753,18 @@ export const ja_JP: EnTranslations = {
       "label": "フレーム位置をリセット"
     },
     "itemTooltip": {
-      "requiresLevel": "必要レベル {level}"
+      "requiresLevel": "必要レベル {level}",
+      "statEnchanted": "+{value} {stat}（エンチャント）"
+    },
+    "materialHint": {
+      "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
+      "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
+      "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",
+      "resonantThread": "エンチャントの材料。レア以上の布防具を魔力分解して得られる。",
+      "resonantHide": "エンチャントの材料。レア以上の革防具を魔力分解して得られる。",
+      "resonantLinks": "エンチャントの材料。レア以上の鎖防具を魔力分解して得られる。",
+      "resonantSteel": "エンチャントの材料。レア以上の近接武器を魔力分解して得られる。",
+      "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。"
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const ja_JP: EnTranslations = {
       "makersMark": "製作者：{name}",
       "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
-      "enchantedLine": "エンチャント済み",
       "commissionToggle": "受注品として制作",
       "commissionToggleHint": "取引で最初に受け取ったキャラクターにバインドされます。",
       "commissionUnbound": "受注品：最初の受取人にバインドされる",
@@ -2421,7 +2431,15 @@ export const ja_JP: EnTranslations = {
       "pickerTitle": "エンチャントを付与",
       "targetTitle": "エンチャントするアイテムを選択",
       "noEnchants": "この素材を使うエンチャントはありません。",
-      "noTargets": "エンチャントできるアイテムがありません。"
+      "noTargets": "エンチャントできるアイテムがありません。",
+      "tier": {
+        "base": "基本エンチャント",
+        "runed": "ルーンエンチャント",
+        "greater": "上級エンチャント"
+      },
+      "yieldHeader": "獲得予定の材料:",
+      "yieldLineExact": "{item} {count}個",
+      "yieldLineRange": "{item} {min}から{max}個"
     },
     "training": {
       "title": "訓練：{name}",

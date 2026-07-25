@@ -9000,7 +9000,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimal færdighedsgevinst',
   'hudChrome.crafting.difficultyNone': 'Ingen færdighedsforøgelse',
   'hudChrome.crafting.difficultyReduced': 'Reduceret færdighedsforøgelse',
-  'hudChrome.crafting.enchantedLine': 'Fortryllet',
   'hudChrome.crafting.gatheredBy': 'Indsamlet af {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} ved {station} kan lære dig flere {craft}-opskrifter.',

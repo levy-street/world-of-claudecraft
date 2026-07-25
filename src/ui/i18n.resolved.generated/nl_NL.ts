@@ -1753,7 +1753,18 @@ export const nl_NL: EnTranslations = {
       "label": "Frameposities herstellen"
     },
     "itemTooltip": {
-      "requiresLevel": "Vereist niveau {level}"
+      "requiresLevel": "Vereist niveau {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const nl_NL: EnTranslations = {
       "makersMark": "Gemaakt door {name}",
       "gatheredBy": "Verzameld door {name}",
       "masterworkSeal": "Meesterwerk",
-      "enchantedLine": "Betoverd",
       "commissionToggle": "Opdrachtsstuk",
       "commissionToggleHint": "Bindt aan het eerste personage dat het via een ruil ontvangt.",
       "commissionUnbound": "Opdrachtsstuk: bindt aan de eerste ontvanger",
@@ -2421,7 +2431,15 @@ export const nl_NL: EnTranslations = {
       "pickerTitle": "Betovering aanbrengen",
       "targetTitle": "Kies een voorwerp om te betoveren",
       "noEnchants": "Geen betovering gebruikt dit reagens.",
-      "noTargets": "Geen geschikt voorwerp om te betoveren."
+      "noTargets": "Geen geschikt voorwerp om te betoveren.",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Opleiding: {name}",

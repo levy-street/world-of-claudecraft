@@ -33,6 +33,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import {
   type BagDestroyAction,
@@ -62,7 +63,7 @@ import type { PainterHostPresentation } from './painter_host';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
-import { svgIcon } from './ui_icons';
+import { svgIcon, type UiIconName } from './ui_icons';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
@@ -87,6 +88,16 @@ export function dismissBagPrompts(): void {
 // QUALITY_COLOR map carries the real per-quality hex; this token covers the rare
 // item with no quality field, so no raw hex lives in the painter.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
+
+// The procedural chrome glyph each per-copy corner kind paints
+// (bag_instance_glyph_view.ts decides WHICH kind; this maps it to art). The
+// masterwork kind is absent on purpose: it keeps its authored seal IMAGE, and
+// the generic kind keeps the pre-existing CSS wedge. No binary asset is added.
+const BAG_GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconName>> = {
+  enchanted: 'enchant-rune',
+  signed: 'makers-mark',
+  bound: 'bond-link',
+};
 
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
@@ -562,7 +573,10 @@ export class BagsWindow {
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
-      const isMasterwork = s.instance?.rolled?.masterwork === true;
+      // The single corner-glyph decision for this stack (bag_instance_glyph_view.ts
+      // owns the priority: masterwork, then enchanted, signed, bound, generic).
+      const glyphKind = bagInstanceGlyphKind(s.instance);
+      const isMasterwork = glyphKind === 'masterwork';
       row.style.setProperty('--bag-slot-quality', qColor);
       // An instanced stack's accessible name carries the per-copy flag the
       // aria-hidden corner marker shows sighted players (the review's a11y
@@ -579,12 +593,20 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // The instanced-slot corner marker (Professions 2.0): a plain
-      // signed/enchanted copy keeps the static tab, while a masterwork replaces
-      // it with the authored seal (never both). Either treatment composes with
-      // the count badge and stays visible without hover on desktop and touch.
+      // The instanced-slot corner marker (Professions 2.0): one glyph per
+      // stack, naming WHICH kind of special copy it is. A masterwork keeps the
+      // authored seal exactly as before; enchanted / signed / bound each get
+      // their own procedural glyph (no new binary asset); an instanced payload
+      // matching none of them keeps the pre-existing generic tab, so no copy
+      // silently loses its marker. Exactly one treatment ever renders, it
+      // composes with the bottom-right count badge, and it stays visible
+      // without hover on desktop and touch, identical on every graphics preset.
       const instanceMark =
-        s.instance && !isMasterwork ? '<span class="bi-instance" aria-hidden="true"></span>' : '';
+        glyphKind === 'generic'
+          ? '<span class="bi-instance" aria-hidden="true"></span>'
+          : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
+            ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
+            : '';
       const masterworkSeal = isMasterwork
         ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
         : '';

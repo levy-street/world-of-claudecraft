@@ -1753,7 +1753,18 @@ export const sv_SE: EnTranslations = {
       "label": "Återställ ramarnas positioner"
     },
     "itemTooltip": {
-      "requiresLevel": "Kräver nivå {level}"
+      "requiresLevel": "Kräver nivå {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const sv_SE: EnTranslations = {
       "makersMark": "Skapad av {name}",
       "gatheredBy": "Samlat av {name}",
       "masterworkSeal": "Mästerverk",
-      "enchantedLine": "Förtrollad",
       "commissionToggle": "Beställningsstycke",
       "commissionToggleHint": "Binds till den första karaktären som tar emot det i en handel.",
       "commissionUnbound": "Beställningsstycke: binds till den första mottagaren",
@@ -2421,7 +2431,15 @@ export const sv_SE: EnTranslations = {
       "pickerTitle": "Applicera förtrollning",
       "targetTitle": "Välj ett föremål att förtrylla",
       "noEnchants": "Inget förtrollning använder det reagnset.",
-      "noTargets": "Inget behörigt föremål att förtrylla."
+      "noTargets": "Inget behörigt föremål att förtrylla.",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Utbildning: {name}",

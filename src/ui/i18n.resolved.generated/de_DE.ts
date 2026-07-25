@@ -1753,7 +1753,18 @@ export const de_DE: EnTranslations = {
       "label": "Fensterpositionen zurücksetzen"
     },
     "itemTooltip": {
-      "requiresLevel": "Benötigt Stufe {level}"
+      "requiresLevel": "Benötigt Stufe {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const de_DE: EnTranslations = {
       "makersMark": "Hergestellt von {name}",
       "gatheredBy": "Gesammelt von {name}",
       "masterworkSeal": "Meisterwerk",
-      "enchantedLine": "Verzaubert",
       "commissionToggle": "Auftragsarbeit",
       "commissionToggleHint": "Bindet sich an den ersten Charakter, der es im Handel erhält.",
       "commissionUnbound": "Auftragsarbeit: bindet sich an den ersten Empfänger",
@@ -2421,7 +2431,15 @@ export const de_DE: EnTranslations = {
       "pickerTitle": "Verzauberung anwenden",
       "targetTitle": "Wähle einen Gegenstand zum Verzaubern",
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
-      "noTargets": "Kein geeigneter Gegenstand zum Verzaubern."
+      "noTargets": "Kein geeigneter Gegenstand zum Verzaubern.",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Ausbildung: {name}",

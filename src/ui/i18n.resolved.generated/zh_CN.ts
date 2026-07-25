@@ -1753,7 +1753,18 @@ export const zh_CN: EnTranslations = {
       "label": "重置框体位置"
     },
     "itemTooltip": {
-      "requiresLevel": "需要等级 {level}"
+      "requiresLevel": "需要等级 {level}",
+      "statEnchanted": "+{value} {stat}（附魔）"
+    },
+    "materialHint": {
+      "arcaneDust": "附魔材料。分解普通和优秀品质的装备可得。",
+      "arcaneEssence": "附魔材料。分解精良品质的装备可得。",
+      "arcaneShard": "附魔材料。分解史诗和传说品质的装备可得。",
+      "resonantThread": "附魔材料。分解精良及以上品质的布甲可得。",
+      "resonantHide": "附魔材料。分解精良及以上品质的皮甲可得。",
+      "resonantLinks": "附魔材料。分解精良及以上品质的锁甲可得。",
+      "resonantSteel": "附魔材料。分解精良及以上品质的近战武器可得。",
+      "resonantTimber": "附魔材料。分解精良及以上品质的法杖、魔杖、弓和弩可得。"
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const zh_CN: EnTranslations = {
       "makersMark": "制作者：{name}",
       "gatheredBy": "采集者：{name}",
       "masterworkSeal": "杰作",
-      "enchantedLine": "已附魔",
       "commissionToggle": "委托制品",
       "commissionToggleHint": "将绑定给交易中第一个收到它的角色。",
       "commissionUnbound": "委托制品：将绑定给第一位收货人",
@@ -2421,7 +2431,15 @@ export const zh_CN: EnTranslations = {
       "pickerTitle": "施加附魔",
       "targetTitle": "选择要附魔的物品",
       "noEnchants": "没有附魔会用到这种材料。",
-      "noTargets": "没有可供附魔的物品。"
+      "noTargets": "没有可供附魔的物品。",
+      "tier": {
+        "base": "基础附魔",
+        "runed": "符文附魔",
+        "greater": "强效附魔"
+      },
+      "yieldHeader": "预计产出材料：",
+      "yieldLineExact": "{item} {count} 个",
+      "yieldLineRange": "{item} {min} 至 {max} 个"
     },
     "training": {
       "title": "训练：{name}",

@@ -5072,6 +5072,28 @@
   #ctx-menu .ctx-item-meta .ctx-reagent.unsat {
     color: var(--color-text-error);
   }
+  /* What the enchant actually DOES, inline on the row above the meta line: the
+     picker also lives on touch, where there is no hover to reveal it. Green,
+     matching the item tooltip's own bonus stat lines (the same
+     itemUi.tooltip.stat wording feeds both). */
+  #ctx-menu .ctx-item-effect {
+    display: block;
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: var(--color-stat-bonus);
+  }
+  /* Apply Enchant picker tier headers: the flat list of every enchant a reagent
+     unlocked gave no sense of the ladder, so the rows group under Base / Runed /
+     Greater captions. Presentational only (role=presentation): the rows under a
+     caption already name their own enchant. */
+  #ctx-menu .ctx-section {
+    font-family: var(--title-font);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: 7px 10px 2px;
+  }
   #ctx-menu .ctx-item[aria-disabled="true"] {
     color: var(--color-text-muted);
     cursor: default;

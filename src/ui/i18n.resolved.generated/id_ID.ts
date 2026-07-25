@@ -1753,7 +1753,18 @@ export const id_ID: EnTranslations = {
       "label": "Atur Ulang Posisi Bingkai"
     },
     "itemTooltip": {
-      "requiresLevel": "Membutuhkan Level {level}"
+      "requiresLevel": "Membutuhkan Level {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const id_ID: EnTranslations = {
       "makersMark": "Dibuat oleh {name}",
       "gatheredBy": "Dikumpulkan oleh {name}",
       "masterworkSeal": "Karya besar",
-      "enchantedLine": "Terpesona",
       "commissionToggle": "Karya pesanan",
       "commissionToggleHint": "Terikat pada karakter pertama yang menerimanya dalam perdagangan.",
       "commissionUnbound": "Karya pesanan: terikat pada penerima pertama",
@@ -2421,7 +2431,15 @@ export const id_ID: EnTranslations = {
       "pickerTitle": "Terapkan Mantrai",
       "targetTitle": "Pilih barang untuk dimantrai",
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
-      "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai."
+      "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai.",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Pelatihan: {name}",

@@ -134,8 +134,10 @@ export function isDisenchantable(def: ItemDef | undefined): boolean {
 
 /** The rarity/tier-scaled base yield the rng bonus rides on: the shared term
  *  of disenchantYield and maxDisenchantYield, so the #2350 capacity gate's
- *  worst case can never drift from the rolled grant. */
-function baseDisenchantYield(def: ItemDef): number {
+ *  worst case can never drift from the rolled grant. Exported so the UI's
+ *  disenchant-confirm yield preview (src/ui/disenchant_yield_view.ts) reads the
+ *  LOW end of the sub-rare range from this same term instead of restating it. */
+export function baseDisenchantYield(def: ItemDef): number {
   const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
   const tierBonus = Math.floor(requiredLevelFor(def) / 10);
   return qualityIdx + tierBonus + 1;

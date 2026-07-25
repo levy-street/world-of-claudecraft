@@ -381,6 +381,7 @@ import {
   questAreaObjectivesAt,
 } from './map_window_view';
 import { MarketWindow } from './market_window';
+import { materialHintLine } from './material_hint_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -4770,6 +4771,10 @@ export class Hud {
     // pole render their kind, requirement, use, and bonus lines from the
     // pure sibling module (the item_instance_tooltip.ts pattern).
     html += gatherToolTooltipLines(item);
+    // Purpose hint for the eight enchanting materials (material_hint_view.ts
+    // keys the table by item id): what the reagent is for and which gear
+    // disenchants into it. Every other item id renders nothing here.
+    html += materialHintLine(item.id);
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)

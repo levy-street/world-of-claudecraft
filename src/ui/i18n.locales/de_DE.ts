@@ -9090,7 +9090,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Voller Fähigkeitsgewinn',
   'hudChrome.crafting.difficultyNone': 'Kein Fähigkeitsgewinn',
   'hudChrome.crafting.difficultyReduced': 'Reduzierter Fähigkeitsgewinn',
-  'hudChrome.crafting.enchantedLine': 'Verzaubert',
   'hudChrome.crafting.makersMark': 'Hergestellt von {name}',
   'hudChrome.crafting.masterworkSeal': 'Meisterwerk',
   'hudChrome.crafting.masterworkToast': 'Meisterwerk! {name}',

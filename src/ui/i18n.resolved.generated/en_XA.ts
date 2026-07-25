@@ -1753,7 +1753,18 @@ export const en_XA: EnTranslations = {
       "label": "[Ŕéšéţ Ƒŕáɱé Þóšíţíóñš]"
     },
     "itemTooltip": {
-      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]"
+      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
+      "statEnchanted": "[+{value} {stat} (Éñçĥáñţéð)]"
+    },
+    "materialHint": {
+      "arcaneDust": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ çóɱɱóñ áñð úñçóɱɱóñ ĝéáŕ.]",
+      "arcaneEssence": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé ĝéáŕ.]",
+      "arcaneShard": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ éþíç áñð ļéĝéñðáŕý ĝéáŕ.]",
+      "resonantThread": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ çļóţĥ áŕɱóŕ.]",
+      "resonantHide": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ļéáţĥéŕ áŕɱóŕ.]",
+      "resonantLinks": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ɱáíļ áŕɱóŕ.]",
+      "resonantSteel": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ɱéļéé ŵéáþóñš.]",
+      "resonantTimber": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ šţáʋéš, ŵáñðš, ƀóŵš, áñð çŕóššƀóŵš.]"
     },
     "discord": {
       "title": "[Ðíšçóŕð]",
@@ -2383,7 +2394,6 @@ export const en_XA: EnTranslations = {
       "makersMark": "[Çŕáƒţéð ƀý {name}]",
       "gatheredBy": "[Ĝáţĥéŕéð ƀý {name}]",
       "masterworkSeal": "[Ɱášţéŕŵóŕķ]",
-      "enchantedLine": "[Éñçĥáñţéð]",
       "commissionToggle": "[Çóɱɱíššíóñ þíéçé]",
       "commissionToggleHint": "[Ɓíñðš ţó ţĥé ƒíŕšţ çĥáŕáçţéŕ ţó ŕéçéíʋé íţ íñ á ţŕáðé.]",
       "commissionUnbound": "[Çóɱɱíššíóñ þíéçé: ƀíñðš ţó ţĥé ƒíŕšţ ŕéçíþíéñţ]",
@@ -2421,7 +2431,15 @@ export const en_XA: EnTranslations = {
       "pickerTitle": "[Áþþļý Éñçĥáñţ]",
       "targetTitle": "[Çĥóóšé áñ íţéɱ ţó éñçĥáñţ]",
       "noEnchants": "[Ñó éñçĥáñţ úšéš ţĥíš ŕéáĝéñţ.]",
-      "noTargets": "[Ñó éļíĝíƀļé íţéɱ ţó éñçĥáñţ.]"
+      "noTargets": "[Ñó éļíĝíƀļé íţéɱ ţó éñçĥáñţ.]",
+      "tier": {
+        "base": "[Ɓášé Éñçĥáñţš]",
+        "runed": "[Ŕúñéð Éñçĥáñţš]",
+        "greater": "[Ĝŕéáţéŕ Éñçĥáñţš]"
+      },
+      "yieldHeader": "[Éẋþéçţéð ɱáţéŕíáļš:]",
+      "yieldLineExact": "[{count} {item}]",
+      "yieldLineRange": "[{min} ţó {max} {item}]"
     },
     "training": {
       "title": "[Ţŕáíñíñĝ: {name}]",

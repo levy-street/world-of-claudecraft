@@ -1753,7 +1753,18 @@ export const cs_CZ: EnTranslations = {
       "label": "Resetovat pozice rámů"
     },
     "itemTooltip": {
-      "requiresLevel": "Vyžaduje úroveň {level}"
+      "requiresLevel": "Vyžaduje úroveň {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -2383,7 +2394,6 @@ export const cs_CZ: EnTranslations = {
       "makersMark": "Vytvořil {name}",
       "gatheredBy": "Sesbíráno {name}",
       "masterworkSeal": "Mistrovské dílo",
-      "enchantedLine": "Okouzlený",
       "commissionToggle": "Zakázkový předmět",
       "commissionToggleHint": "Váže se na první postavu, která ho přijme v obchodu.",
       "commissionUnbound": "Zakázkový předmět: váže se na prvního příjemce",
@@ -2421,7 +2431,15 @@ export const cs_CZ: EnTranslations = {
       "pickerTitle": "Aplikovat okouzlení",
       "targetTitle": "Vybrat předmět",
       "noEnchants": "Žádné okouzlení nepoužívá tuto reagencii.",
-      "noTargets": "Žádný způsobilý předmět k okouzlení."
+      "noTargets": "Žádný způsobilý předmět k okouzlení.",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Školení: {name}",

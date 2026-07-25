@@ -1839,6 +1839,30 @@ export const hudChromeStrings = {
   // through formatNumber.
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',
+    // The enchant-attributed sibling of itemUi.tooltip.stat, rendered on the
+    // share of a per-copy bonus stat that an applied enchant granted
+    // (item_instance_tooltip.ts instanceBonusStatLines). It replaced the old
+    // standalone "Enchanted" badge, so the tooltip names WHICH bonus the
+    // enchant paid for instead of only that one exists. Its own key with its
+    // own fills: the suffix is never concatenated onto the plain stat line.
+    statEnchanted: '+{value} {stat} (Enchanted)',
+  },
+  // Purpose hints for the eight enchanting materials
+  // (src/ui/material_hint_view.ts), keyed by item id there. Each says what the
+  // material is for and which gear disenchants into it, so a junk-kind reagent
+  // stops being an unexplained stack in the bags. The sources track the sim's
+  // own routing: DISENCHANT_MATERIAL_BY_QUALITY for the three arcane tiers,
+  // ARMOR_SECONDARY_BY_TYPE / TIMBER_WEAPON_TYPES for the five resonants.
+  materialHint: {
+    arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
+    arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
+    arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',
+    resonantThread: 'Enchanting reagent. Disenchanted from rare and better cloth armor.',
+    resonantHide: 'Enchanting reagent. Disenchanted from rare and better leather armor.',
+    resonantLinks: 'Enchanting reagent. Disenchanted from rare and better mail armor.',
+    resonantSteel: 'Enchanting reagent. Disenchanted from rare and better melee weapons.',
+    resonantTimber:
+      'Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows.',
   },
   discord: {
     title: 'Discord',
@@ -2636,9 +2660,9 @@ export const hudChromeStrings = {
     // payload, different wording.
     gatheredBy: 'Gathered by {name}',
     masterworkSeal: 'Masterwork',
-    // Generic enchanted marker: EnchantDef.name has no localized display
-    // surface yet, so the tooltip marks the state without naming the enchant.
-    enchantedLine: 'Enchanted',
+    // (The standalone `enchantedLine` badge was retired: the enchanted state is
+    // now attributed inline on the bonus stat lines it caused, through
+    // hudChrome.itemTooltip.statEnchanted.)
     // Commissions and the Maker's Bond (Professions 2.0): the
     // per-craft opt-in control in the crafting window, and the two tooltip
     // lines a commissioned copy renders beside the soulbound line. The bound
@@ -2700,6 +2724,23 @@ export const hudChromeStrings = {
     targetTitle: 'Choose an item to enchant',
     noEnchants: 'No enchant uses this reagent.',
     noTargets: 'No eligible item to enchant.',
+    // The Apply Enchant picker's three section headers, in ladder order. The
+    // tier is derived from the reagents alone (enchant_apply_view.ts
+    // enchantTier), so these headers name the same ladder content/enchants.ts
+    // documents: the dust/essence basics, the typed resonant tier, and the
+    // shard-consuming top tier.
+    tier: {
+      base: 'Base Enchants',
+      runed: 'Runed Enchants',
+      greater: 'Greater Enchants',
+    },
+    // The disenchant confirm's expected-yield preview
+    // (src/ui/disenchant_yield_view.ts), appended under the destroy warning so
+    // an irreversible destroy states what it pays out first. The range shape
+    // covers the sub-rare rng bonus arm and the epic/legendary secondary roll.
+    yieldHeader: 'Expected materials:',
+    yieldLineExact: '{count} {item}',
+    yieldLineRange: '{min} to {max} {item}',
   },
   // Recipe training window (Professions 2.0): a station master
   // teaches trainer-acquisition recipes for a tier-priced copper fee

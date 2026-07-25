@@ -1,14 +1,22 @@
 // Pure-core tests for the Apply Enchant picker (Professions 2.0):
-// the enchants a reagent unlocks with their per-reagent affordability, the
-// eligible-target list (slot match, already-enchanted exclusion, the
-// masterwork-still-enchantable case, grouping by item id), and the enchant
-// name-key contract.
+// the enchants a reagent unlocks with their EFFECT facts and per-reagent
+// affordability, the reagent-derived tier classification and the tiered,
+// slot-sorted sections built on it, the eligible-target list (slot match,
+// already-enchanted exclusion, the masterwork-still-enchantable case, grouping
+// by item id), and the enchant name-key contract.
 
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemSlot } from '../src/sim/types';
-import { enchantNameKey, enchantsForReagent, enchantTargets } from '../src/ui/enchant_apply_view';
+import {
+  ENCHANT_TIER_ORDER,
+  enchantNameKey,
+  enchantSectionsForReagent,
+  enchantsForReagent,
+  enchantTargets,
+  enchantTier,
+} from '../src/ui/enchant_apply_view';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 // A real item id for a slot, taken from live content so the def.slot match is
@@ -81,6 +89,160 @@ describe('enchant_apply_view: enchantsForReagent', () => {
 
   it('returns nothing for an id no enchant consumes', () => {
     expect(enchantsForReagent([{ itemId: 'arcane_dust', count: 9 }], 'bone_fragments')).toEqual([]);
+  });
+});
+
+describe('enchant_apply_view: effect facts on the pick row', () => {
+  it('carries the enchant stat bonus straight off the content table', () => {
+    const rows = enchantsForReagent([{ itemId: 'arcane_dust', count: 99 }], 'arcane_dust');
+    const fortitude = rows.find((r) => r.enchantId === 'enchant_helmet_fortitude');
+    expect(fortitude?.effects).toEqual([
+      { stat: 'sta', value: ENCHANTS.enchant_helmet_fortitude.statBonus.sta },
+    ]);
+    // Not a hardcoded 3: the row must track the live table.
+    expect(fortitude?.effects[0].value).toBe(3);
+  });
+
+  it('every listed enchant carries at least one effect, matching its statBonus', () => {
+    for (const reagentId of ['arcane_dust', 'arcane_essence', 'arcane_shard', 'resonant_steel']) {
+      for (const row of enchantsForReagent([], reagentId)) {
+        const bonus = ENCHANTS[row.enchantId].statBonus;
+        expect(row.effects.length, `${row.enchantId} effects`).toBeGreaterThan(0);
+        expect(Object.fromEntries(row.effects.map((e) => [e.stat, e.value]))).toEqual(bonus);
+      }
+    }
+  });
+
+  it('an armor-axis enchant reports its armor points, not a primary stat', () => {
+    const armor = enchantsForReagent([], 'arcane_dust').find(
+      (r) => r.enchantId === 'enchant_chest_armor',
+    );
+    expect(armor?.effects).toEqual([
+      { stat: 'armor', value: ENCHANTS.enchant_chest_armor.statBonus.armor },
+    ]);
+  });
+});
+
+describe('enchant_apply_view: tier classification', () => {
+  it('a shard-consuming enchant is Greater', () => {
+    expect(enchantTier('enchant_weapon_greater_might')).toBe('greater');
+    expect(enchantTier('enchant_gloves_greater_agility')).toBe('greater');
+  });
+
+  it('a typed resonant secondary marks the Runed tier', () => {
+    expect(enchantTier('enchant_weapon_runed_edge')).toBe('runed');
+    expect(enchantTier('enchant_helmet_runed_links')).toBe('runed');
+  });
+
+  it('dust/essence-only enchants are Base', () => {
+    expect(enchantTier('enchant_weapon_might')).toBe('base');
+    // essence-consuming but neither shard nor resonant: still Base.
+    expect(enchantTier('enchant_chest_stamina')).toBe('base');
+  });
+
+  it('classifies every live enchant, and each tier matches its reagents', () => {
+    for (const id of Object.keys(ENCHANTS)) {
+      const tier = enchantTier(id);
+      const reagentIds = ENCHANTS[id].reagents.map((r) => r.itemId);
+      if (reagentIds.includes('arcane_shard')) expect(tier).toBe('greater');
+      else if (reagentIds.some((r) => r.startsWith('resonant_'))) expect(tier).toBe('runed');
+      else expect(tier).toBe('base');
+    }
+  });
+
+  it('an unknown enchant id falls back to Base rather than throwing', () => {
+    expect(enchantTier('not_a_real_enchant')).toBe('base');
+  });
+});
+
+describe('enchant_apply_view: enchantSectionsForReagent', () => {
+  it('groups essence enchants into the ladder order, base then runed then greater', () => {
+    // arcane_essence is the one reagent that reaches all three tiers, which is
+    // exactly the wall this grouping exists for.
+    const sections = enchantSectionsForReagent([], 'arcane_essence');
+    expect(sections.map((s) => s.tier)).toEqual(['base', 'runed', 'greater']);
+    for (const section of sections) {
+      expect(section.titleKey).toBe(`hudChrome.enchanting.tier.${section.tier}`);
+      expect(section.rows.length).toBeGreaterThan(0);
+      for (const row of section.rows) expect(enchantTier(row.enchantId)).toBe(section.tier);
+    }
+    // Every row the flat list would have shown is still shown, none duplicated.
+    const flat = enchantsForReagent([], 'arcane_essence').map((r) => r.enchantId);
+    const grouped = sections.flatMap((s) => s.rows.map((r) => r.enchantId));
+    expect(grouped.slice().sort()).toEqual(flat.slice().sort());
+  });
+
+  it('omits an empty section: a dust reagent paints only the Base header', () => {
+    const sections = enchantSectionsForReagent([], 'arcane_dust');
+    expect(sections.map((s) => s.tier)).toEqual(['base']);
+  });
+
+  it('a typed secondary paints only the Runed section', () => {
+    expect(enchantSectionsForReagent([], 'resonant_steel').map((s) => s.tier)).toEqual(['runed']);
+  });
+
+  it('sorts each section by paperdoll slot, then by name key', () => {
+    const PAPERDOLL: readonly string[] = [
+      'mainhand',
+      'helmet',
+      'neck',
+      'shoulder',
+      'chest',
+      'waist',
+      'legs',
+      'gloves',
+      'feet',
+      'ring',
+    ];
+    for (const section of enchantSectionsForReagent([], 'arcane_essence')) {
+      const slots = section.rows.map((r) => PAPERDOLL.indexOf(r.itemSlot));
+      expect(slots, `${section.tier} slots resolvable`).not.toContain(-1);
+      expect(slots.slice().sort((a, b) => a - b)).toEqual(slots);
+      // Ties on a slot break by name key, so two enchants on one slot keep a
+      // stable, alphabetical order rather than table declaration order.
+      for (let i = 1; i < section.rows.length; i++) {
+        if (slots[i] !== slots[i - 1]) continue;
+        expect(
+          enchantNameKey(section.rows[i].enchantId) > enchantNameKey(section.rows[i - 1].enchantId),
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('the Base section really does re-order the raw table (the sort is load-bearing)', () => {
+    const base = enchantSectionsForReagent([], 'arcane_dust')[0];
+    const raw = enchantsForReagent([], 'arcane_dust').map((r) => r.enchantId);
+    expect(base.rows.map((r) => r.enchantId)).not.toEqual(raw);
+  });
+
+  it('carries affordability through the grouping unchanged', () => {
+    const inventory: InvSlot[] = [
+      { itemId: 'arcane_shard', count: 1 },
+      { itemId: 'arcane_essence', count: 2 },
+    ];
+    const greater = enchantSectionsForReagent(inventory, 'arcane_shard').find(
+      (s) => s.tier === 'greater',
+    );
+    const might = greater?.rows.find((r) => r.enchantId === 'enchant_weapon_greater_might');
+    expect(might?.affordable).toBe(true);
+    const chest = greater?.rows.find((r) => r.enchantId === 'enchant_chest_greater_stamina');
+    // Chest Greater needs 3 essence; only 2 are held.
+    expect(chest?.affordable).toBe(false);
+  });
+
+  it('returns nothing for an id no enchant consumes', () => {
+    expect(enchantSectionsForReagent([], 'bone_fragments')).toEqual([]);
+  });
+
+  it('pins an English header row for every tier', () => {
+    const headers = hudChromeStrings.enchanting.tier as Record<string, string>;
+    for (const tier of ENCHANT_TIER_ORDER) {
+      expect(typeof headers[tier], `header for ${tier}`).toBe('string');
+      expect(headers[tier].length).toBeGreaterThan(0);
+    }
+    expect(Object.keys(headers).slice().sort()).toEqual(
+      [...ENCHANT_TIER_ORDER].slice().sort() as string[],
+    );
   });
 });
 
