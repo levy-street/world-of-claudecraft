@@ -9150,7 +9150,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimale vaardigheidswinst',
   'hudChrome.crafting.difficultyNone': 'Geen vaardigheidswinst',
   'hudChrome.crafting.difficultyReduced': 'Verminderde vaardigheidswinst',
-  'hudChrome.crafting.enchantedLine': 'Betoverd',
   'hudChrome.crafting.makersMark': 'Gemaakt door {name}',
   'hudChrome.crafting.masterworkSeal': 'Meesterwerk',
   'hudChrome.crafting.masterworkToast': 'Meesterwerk! {name}',

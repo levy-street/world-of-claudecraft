@@ -46,8 +46,6 @@ const LEAP_TRAVEL = 3.2; // horizontal distance covered across a leap
 const REST_MIN = 1.4; // idle seconds between a fish's leaps
 const REST_MAX = 7.0;
 const RETRY_REST = 0.6; // shorter wait when no water was found nearby
-const SPLASH_TIME = 0.42; // how long an entry/exit ripple lives
-const SPLASH_MAX = 1.7; // ripple radius at full expansion
 const PLACE_TRIES = 6; // attempts to find deep water per leap
 
 export interface FishView {
@@ -102,15 +100,11 @@ type Phase = 'rest' | 'leap';
 
 interface Fish {
   body: THREE.Object3D;
-  splash: THREE.Mesh;
   phase: Phase;
   timer: number; // rest countdown / leap elapsed depending on phase
   ox: number; // leap origin (where it breaks the surface)
   oz: number;
   heading: number; // travel + facing yaw
-  splashAt: number; // -1 = idle; otherwise seconds since the active ripple began
-  splashX: number;
-  splashZ: number;
 }
 
 // A small fish silhouette: a stretched ellipsoid body + a flat tail fin, merged
@@ -125,23 +119,16 @@ function fishGeometry(): THREE.BufferGeometry {
   return mergeGeometries([body, tail]);
 }
 
-// A flat expanding ring used for the surface splash, laid in the XZ plane.
-function splashGeometry(): THREE.RingGeometry {
-  const ring = new THREE.RingGeometry(0.5, 1, 16);
-  ring.rotateX(-Math.PI / 2);
-  return ring;
-}
-
-const scratch = new THREE.Vector3();
-
-export function buildFish(seed: number): FishView {
+export function buildFish(
+  seed: number,
+  onSplash?: (x: number, z: number, radius: number, strength: number) => void,
+): FishView {
   const group = new THREE.Group();
   group.name = 'fish';
   const rng = mulberry32(seed ^ 0x515f1577);
   const count = GFX.standardMaterials ? 12 : 5;
 
   const bodyGeo = fishGeometry();
-  const splashGeo = splashGeometry();
   const bodyMat = GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({
         color: 0x7f97a6,
@@ -151,13 +138,6 @@ export function buildFish(seed: number): FishView {
         emissiveIntensity: 0.18,
       })
     : new THREE.MeshLambertMaterial({ color: 0x95a9b6 });
-  const splashMat = new THREE.MeshBasicMaterial({
-    color: 0xdff1ff,
-    transparent: true,
-    opacity: 0,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-  });
 
   const depthAt = (x: number, z: number): number => waterLevelAt(x, z) - terrainHeight(x, z, seed);
 
@@ -180,20 +160,14 @@ export function buildFish(seed: number): FishView {
   for (let i = 0; i < count; i++) {
     const body = buildBody();
     body.visible = false;
-    const splash = new THREE.Mesh(splashGeo, splashMat.clone());
-    splash.visible = false;
-    group.add(body, splash);
+    group.add(body);
     fish.push({
       body,
-      splash,
       phase: 'rest',
       timer: REST_MIN + (rng() * (REST_MAX - REST_MIN) * (i + 1)) / count, // stagger the first wave
       ox: 0,
       oz: 0,
       heading: 0,
-      splashAt: -1,
-      splashX: 0,
-      splashZ: 0,
     });
   }
 
@@ -213,31 +187,6 @@ export function buildFish(seed: number): FishView {
     return false;
   };
 
-  const startSplash = (f: Fish, x: number, z: number): void => {
-    f.splashAt = 0;
-    f.splashX = x;
-    f.splashZ = z;
-  };
-
-  const animateSplash = (f: Fish, dt: number): void => {
-    if (f.splashAt < 0) {
-      f.splash.visible = false;
-      return;
-    }
-    f.splashAt += dt;
-    const u = f.splashAt / SPLASH_TIME;
-    if (u >= 1) {
-      f.splashAt = -1;
-      f.splash.visible = false;
-      return;
-    }
-    const s = 0.3 + u * SPLASH_MAX;
-    f.splash.position.set(f.splashX, waterLevel() + 0.02, f.splashZ);
-    f.splash.scale.set(s, 1, s);
-    (f.splash.material as THREE.MeshBasicMaterial).opacity = (1 - u) * 0.7;
-    f.splash.visible = true;
-  };
-
   return {
     group,
     update(px: number, pz: number, dt: number): void {
@@ -255,7 +204,7 @@ export function buildFish(seed: number): FishView {
             if (seekWater(f, px, pz)) {
               f.phase = 'leap';
               f.timer = 0;
-              startSplash(f, f.ox, f.oz); // surface break ripple
+              onSplash?.(f.ox, f.oz, 0.42, 0.55);
             } else {
               f.timer = RETRY_REST; // no water nearby — try again shortly
             }
@@ -277,10 +226,9 @@ export function buildFish(seed: number): FishView {
             f.phase = 'rest';
             f.timer = REST_MIN + rng() * (REST_MAX - REST_MIN);
             f.body.visible = false;
-            startSplash(f, x, z); // re-entry ripple where it lands
+            onSplash?.(x, z, 0.58, 0.9);
           }
         }
-        animateSplash(f, dt);
       }
     },
   };

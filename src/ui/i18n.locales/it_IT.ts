@@ -9180,7 +9180,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Guadagno completo di abilità',
   'hudChrome.crafting.difficultyNone': 'Nessun guadagno di abilità',
   'hudChrome.crafting.difficultyReduced': 'Guadagno di abilità ridotto',
-  'hudChrome.crafting.enchantedLine': 'Incantato',
   'hudChrome.crafting.makersMark': 'Realizzato da {name}',
   'hudChrome.crafting.masterworkSeal': 'Capolavoro',
   'hudChrome.crafting.masterworkToast': 'Capolavoro! {name}',

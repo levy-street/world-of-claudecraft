@@ -7,7 +7,7 @@
 // player page through and filter the WHOLE market, not just the first wire window.
 
 import { ITEMS } from './data';
-import type { ItemDef } from './types';
+import type { ArmorType, ItemDef } from './types';
 
 export const MARKET_ITEM_TYPE_FILTERS = [
   'all',
@@ -40,6 +40,20 @@ export const MARKET_WEAPON_TYPE_FILTERS = [
   'axe',
   'other',
 ] as const;
+// Bound to the content union both ways on purpose: `satisfies` rejects an option that is not
+// a real ArmorType, and the Exclude assertion below reddens tsc if ArmorType ever gains a class
+// with no option here (which would silently make that whole armor class unbrowsable).
+export const MARKET_ARMOR_CLASS_FILTERS = [
+  'all',
+  'cloth',
+  'leather',
+  'mail',
+] as const satisfies readonly ('all' | ArmorType)[];
+type AssertNever<T extends never> = T;
+type _EveryArmorTypeIsFilterable = AssertNever<
+  Exclude<ArmorType, (typeof MARKET_ARMOR_CLASS_FILTERS)[number]>
+>;
+export const MARKET_PRIMARY_STAT_FILTERS = ['all', 'str', 'agi', 'int'] as const;
 export const MARKET_RARITY_FILTERS = [
   'all',
   'poor',
@@ -58,26 +72,46 @@ export type MarketItemTypeFilter = (typeof MARKET_ITEM_TYPE_FILTERS)[number];
 export type MarketArmorTypeFilter = (typeof MARKET_ARMOR_TYPE_FILTERS)[number];
 export type MarketWeaponTypeFilter = (typeof MARKET_WEAPON_TYPE_FILTERS)[number];
 export type MarketSubtypeFilter = MarketArmorTypeFilter | MarketWeaponTypeFilter;
+export type MarketArmorClassFilter = (typeof MARKET_ARMOR_CLASS_FILTERS)[number];
+export type MarketPrimaryStatFilter = (typeof MARKET_PRIMARY_STAT_FILTERS)[number];
 export type MarketRarityFilter = (typeof MARKET_RARITY_FILTERS)[number];
 
-/** The full browse state: search text, the three filters, and the page index. */
+/** The full browse state: search text, filters, and the page index. */
 export interface MarketQuery {
   search: string;
   itemType: MarketItemTypeFilter;
   subtype: MarketSubtypeFilter;
+  armorClass: MarketArmorClassFilter;
+  primaryStat: MarketPrimaryStatFilter;
   rarity: MarketRarityFilter;
   page: number;
 }
 
 export function defaultMarketQuery(): MarketQuery {
-  return { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 };
+  return {
+    search: '',
+    itemType: 'all',
+    subtype: 'all',
+    armorClass: 'all',
+    primaryStat: 'all',
+    rarity: 'all',
+    page: 0,
+  };
 }
 
 // Coerce an untrusted (wire) query into a valid MarketQuery: unknown enum values
 // fall back to 'all', the search is trimmed to 40 chars, the page floored at 0.
 export function sanitizeMarketQuery(
   raw:
-    | { search?: unknown; itemType?: unknown; subtype?: unknown; rarity?: unknown; page?: unknown }
+    | {
+        search?: unknown;
+        itemType?: unknown;
+        subtype?: unknown;
+        armorClass?: unknown;
+        primaryStat?: unknown;
+        rarity?: unknown;
+        page?: unknown;
+      }
     | null
     | undefined,
 ): MarketQuery {
@@ -95,6 +129,8 @@ export function sanitizeMarketQuery(
       raw?.subtype,
       'all',
     ),
+    armorClass: oneOf(MARKET_ARMOR_CLASS_FILTERS, raw?.armorClass, 'all'),
+    primaryStat: oneOf(MARKET_PRIMARY_STAT_FILTERS, raw?.primaryStat, 'all'),
     rarity: oneOf(MARKET_RARITY_FILTERS, raw?.rarity, 'all'),
     page,
   };
@@ -146,6 +182,20 @@ function itemMatchesRarity(item: ItemDef, filter: MarketRarityFilter): boolean {
   return (item.quality ?? 'common') === filter;
 }
 
+function itemMatchesArmorClass(item: ItemDef, query: MarketQuery): boolean {
+  if (query.armorClass === 'all' || query.itemType !== 'armor') return true;
+  return item.kind === 'armor' && item.armorType === query.armorClass;
+}
+
+function itemMatchesPrimaryStat(item: ItemDef, query: MarketQuery): boolean {
+  if (query.primaryStat === 'all' || (query.itemType !== 'armor' && query.itemType !== 'weapon'))
+    return true;
+
+  const selected = item.stats?.[query.primaryStat] ?? 0;
+  if (selected <= 0) return false;
+  return (['str', 'agi', 'int'] as const).every((stat) => selected >= (item.stats?.[stat] ?? 0));
+}
+
 // True when a listing's item passes the search substring AND the type/subtype/rarity
 // filters of `query`. The single source of truth used by the server's authoritative
 // browse and (via market_filters re-export) the client's option chrome.
@@ -160,6 +210,8 @@ export function marketItemMatches(itemId: string, query: MarketQuery): boolean {
   return (
     itemMatchesType(item, query.itemType) &&
     itemMatchesSubtype(item, query) &&
+    itemMatchesArmorClass(item, query) &&
+    itemMatchesPrimaryStat(item, query) &&
     itemMatchesRarity(item, query.rarity)
   );
 }

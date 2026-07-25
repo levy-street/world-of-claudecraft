@@ -97,12 +97,14 @@ export function applyDungeonMobTuning(
 ): void {
   if (difficulty !== 'heroic') {
     // Normal retunes: the mob's own melee factor drives its mechanics too, so
-    // an aoePulse/stomp keeps pace with the swing it lands between. Heals from
-    // support mobs keep pace with the doubled health pool.
+    // an aoePulse/stomp keeps pace with the swing it lands between, unless the
+    // tuning carries a mechanicDamageMultiplierByMob override (an avoidable
+    // telegraphed mechanic priced independently of the tank-swing floor).
+    // Heals from support mobs keep pace with the doubled health pool.
     const normal = NORMAL_DUNGEON_TUNING[dungeonId];
     const dmgMult = normal?.damageMultiplierByMob[mob.templateId];
     if (normal && dmgMult !== undefined) {
-      mob.mechanicDamageMult = dmgMult;
+      mob.mechanicDamageMult = normal.mechanicDamageMultiplierByMob?.[mob.templateId] ?? dmgMult;
       mob.mechanicHealMult = normal.healthMultiplier;
     }
     return;

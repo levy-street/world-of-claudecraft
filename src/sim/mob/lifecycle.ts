@@ -87,6 +87,12 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  // A mid-flight inferno channel dies with the life; the cadence reseeds and
+  // the hp gates re-arm alongside firedSummons above.
+  mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;
+  mob.infernoRemaining = 0;
+  mob.infernoPulsesFired = 0;
+  mob.infernoGatesFired = 0;
   // Charge resets READY (cooldown 0), not telegraphed: a fresh life opens with it.
   resetMobCharge(mob);
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;

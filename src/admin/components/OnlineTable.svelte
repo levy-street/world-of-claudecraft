@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { LivePlayer } from '../types';
   import { classLabel, zoneLabel, t } from '../i18n';
-  import { fmtDuration } from '../format';
+  import { fmtDuration, fmtNumber } from '../format';
+  import AccountLink from './AccountLink.svelte';
   import LocationCell from './LocationCell.svelte';
 
   // Live players table (refreshed every 5s by Overview). Ported from renderOnlineTable.
@@ -36,7 +37,7 @@
           <td class="num">{p.hp}/{p.maxHp}</td>
           <td class="num">{fmtDuration(p.sessionSeconds)}</td>
           <td class="num">{t('common.ago', { value: fmtDuration(p.lastSaveSecondsAgo) })}</td>
-          <td class="num">{p.accountId}</td>
+          <td class="num"><AccountLink accountId={p.accountId} label={fmtNumber(p.accountId)} /></td>
         </tr>
       {/each}
     </tbody>

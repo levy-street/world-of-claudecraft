@@ -38,6 +38,14 @@ export const tr_TR: EnTranslations = {
     "filterLabel": "Komutları filtrele",
     "filterPlaceholder": "Bu kategoride ara",
     "noMatches": "Eşleşen komut yok.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "Sunucu hileleri için yine de ALLOW_DEV_COMMANDS=1 gerekir.",
     "invalidValues": "Bu komutu çalıştırmadan önce geçerli değerler seç.",
     "sent": "Gönderildi: {command}",
@@ -55,7 +63,8 @@ export const tr_TR: EnTranslations = {
       "z": "Z",
       "dungeon": "Zindan",
       "difficulty": "Zorluk",
-      "name": "Ad"
+      "name": "Ad",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const tr_TR: EnTranslations = {
       "give": {
         "label": "Öğe ver",
         "description": "Oyuncu envanterine bir öğe ekle."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "Altın ekle",
@@ -1049,6 +1062,7 @@ export const tr_TR: EnTranslations = {
       "walkByAutoloot": "Yanından Geçerken Otomatik Yağma",
       "groundReticle": "Yer hedefleme halkası",
       "mouseoverCast": "Grup Çerçevelerinde İmleçle Büyü Yapma",
+      "stickyTarget": "Keep Target on Ground Click",
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
@@ -1529,6 +1543,8 @@ export const tr_TR: EnTranslations = {
       "dragDestroyHint": "Yok etmek için dünyaya sürükle",
       "reorderNeedsRecent": "Çantalarını yeniden düzenlemek için filtreyi temizle ve Son Eklenen sıralama seçeneğini kullan",
       "itemAriaInstanced": "{item}, adet {count}, ustaişareti kopyası",
+      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
+      "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, adet {count}, şaheser",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
@@ -1753,7 +1769,19 @@ export const tr_TR: EnTranslations = {
       "label": "Çerçeve Konumlarını Sıfırla"
     },
     "itemTooltip": {
-      "requiresLevel": "Gereken Seviye {level}"
+      "requiresLevel": "Gereken Seviye {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)",
+      "enchantedFallback": "Enchanted"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -1994,6 +2022,10 @@ export const tr_TR: EnTranslations = {
         "takeParcelsFirst": "Mektubu atmadan önce paketleri çıkar."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market collection waiting",
+      "tip": "Gold or items are waiting for you at the Merchant."
+    },
     "noticeboard": {
       "empty": "Görünüşe göre hiçbir şey asılmamış."
     },
@@ -2113,7 +2145,19 @@ export const tr_TR: EnTranslations = {
       "onlineHeader": "Çevrimiçi ({n})",
       "offlineHeader": "Çevrimdışı ({n})",
       "hideOffline": "Çevrimdışıları gizle",
-      "hideOfflineTitle": "Çevrimdışı lonca üyelerini gizle"
+      "hideOfflineTitle": "Çevrimdışı lonca üyelerini gizle",
+      "billboard": {
+        "label": "Guild Billboard",
+        "empty": "Nothing on the billboard yet.",
+        "setBy": "Set by {name}",
+        "save": "Save",
+        "placeholder": "Write a message for the guild",
+        "inputLabel": "Guild billboard message",
+        "result": {
+          "set": "The guild billboard was updated.",
+          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+        }
+      }
     },
     "gathering": {
       "title": "Toplama",
@@ -2383,7 +2427,6 @@ export const tr_TR: EnTranslations = {
       "makersMark": "{name} tarafından hazırlanmıştır",
       "gatheredBy": "{name} tarafından toplandı",
       "masterworkSeal": "Şaheser",
-      "enchantedLine": "Büyülü",
       "commissionToggle": "Sipariş parçası",
       "commissionToggleHint": "Ticaret yoluyla alan ilk karaktere bağlanır.",
       "commissionUnbound": "Sipariş parçası: ilk alıcıya bağlanır",
@@ -2421,7 +2464,16 @@ export const tr_TR: EnTranslations = {
       "pickerTitle": "Büyü Uygula",
       "targetTitle": "Büyülenecek eşya seçin",
       "noEnchants": "Hiçbir büyü bu malzemeyi kullanmıyor.",
-      "noTargets": "Büyülenecek uygun eşya yok."
+      "noTargets": "Büyülenecek uygun eşya yok.",
+      "wornTag": "Worn ({slot})",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}"
     },
     "training": {
       "title": "Eğitim: {name}",
@@ -6181,6 +6233,7 @@ export const tr_TR: EnTranslations = {
       "arenaJoin": "Kül Koliseumu sırasına katıldın. Layık bir rakip için bekle...",
       "arenaLeave": "Kül Koliseumu sırasından ayrıldın.",
       "arenaSands": "Kül Koliseumu'nun kumlarına adım atıyorsun.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "{name} ile takas yapmak için istek gönderdin.",
       "tradeOpened": "Takas penceresi açıldı.",
       "tradeComplete": "Takas tamamlandı.",
@@ -6349,6 +6402,11 @@ export const tr_TR: EnTranslations = {
       "playerLevelClassTitle": "{name} - Sv {level} {className}",
       "noChallengers": "Henüz sıralanmış meydan okuyan yok - ilk sen ol.",
       "matchInProgress": "{name} ile maç sürüyor.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Sıradan Çık",
       "searching": "Bir rakip aranıyor... (sırada {count})",
       "enterQueue": "Sıraya Gir",
@@ -6641,6 +6699,7 @@ export const tr_TR: EnTranslations = {
       "pageNextAria": "Sonraki pazar sayfası",
       "pageStatus": "Sayfa {current} / {total}",
       "filters": "Pazar filtreleri",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Tür",
       "filterTypeAll": "Tüm türler",
       "filterTypeWeapon": "Silahlar",
@@ -6651,8 +6710,15 @@ export const tr_TR: EnTranslations = {
       "filterTypeOther": "Diğer",
       "filterArmorType": "Zırh türü",
       "filterArmorAll": "Tüm zırhlar",
+      "filterArmorSlot": "Armor slot",
+      "filterArmorClassAll": "All armor types",
+      "armorCloth": "Cloth",
+      "armorLeather": "Leather",
+      "armorMail": "Mail",
       "filterWeaponType": "Silah türü",
       "filterWeaponAll": "Tüm silahlar",
+      "filterPrimaryStat": "Primary stat",
+      "filterPrimaryStatAll": "Any primary stat",
       "filterRarity": "Nadirlik",
       "filterRarityAll": "Tüm nadirlikler",
       "weaponSword": "Kılıçlar",

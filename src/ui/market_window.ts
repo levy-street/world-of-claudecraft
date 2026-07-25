@@ -24,11 +24,15 @@ import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
+  MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
+  MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
   MARKET_WEAPON_TYPE_FILTERS,
+  type MarketArmorClassFilter,
   type MarketItemTypeFilter,
+  type MarketPrimaryStatFilter,
   type MarketQuery,
   type MarketRarityFilter,
   type MarketSubtypeFilter,
@@ -85,6 +89,8 @@ export class MarketWindow {
   private tab: MarketTab = 'browse';
   private itemTypeFilter: MarketItemTypeFilter = 'all';
   private subtypeFilter: MarketSubtypeFilter = 'all';
+  private armorClassFilter: MarketArmorClassFilter = 'all';
+  private primaryStatFilter: MarketPrimaryStatFilter = 'all';
   private rarityFilter: MarketRarityFilter = 'all';
   private browsePage = 0;
   private sellItemId: string | null = null;
@@ -110,6 +116,8 @@ export class MarketWindow {
     this.tab = 'browse';
     this.itemTypeFilter = 'all';
     this.subtypeFilter = 'all';
+    this.armorClassFilter = 'all';
+    this.primaryStatFilter = 'all';
     this.rarityFilter = 'all';
     this.browsePage = 0;
     this.sellItemId = null;
@@ -152,6 +160,8 @@ export class MarketWindow {
       search: this.searchQuery,
       itemType: this.itemTypeFilter,
       subtype: this.subtypeFilter,
+      armorClass: this.armorClassFilter,
+      primaryStat: this.primaryStatFilter,
       rarity: this.rarityFilter,
       page: this.browsePage,
     };
@@ -174,6 +184,8 @@ export class MarketWindow {
       this.tab,
       this.itemTypeFilter,
       this.subtypeFilter,
+      this.armorClassFilter,
+      this.primaryStatFilter,
       this.rarityFilter,
       this.browsePage,
       info?.listings,
@@ -324,10 +336,18 @@ export class MarketWindow {
           if (next !== this.itemTypeFilter) {
             this.itemTypeFilter = next;
             this.subtypeFilter = 'all';
+            this.armorClassFilter = 'all';
+            this.primaryStatFilter = 'all';
             this.browsePage = 0;
           }
         } else if (key === 'subtype') {
           this.subtypeFilter = value as MarketSubtypeFilter;
+          this.browsePage = 0;
+        } else if (key === 'armorClass') {
+          this.armorClassFilter = value as MarketArmorClassFilter;
+          this.browsePage = 0;
+        } else if (key === 'primaryStat') {
+          this.primaryStatFilter = value as MarketPrimaryStatFilter;
           this.browsePage = 0;
         } else if (key === 'rarity') {
           this.rarityFilter = value as MarketRarityFilter;
@@ -416,6 +436,8 @@ export class MarketWindow {
       filters: {
         itemType: this.itemTypeFilter,
         subtype: this.subtypeFilter,
+        armorClass: this.armorClassFilter,
+        primaryStat: this.primaryStatFilter,
         rarity: this.rarityFilter,
       },
       sellItemId: this.sellItemId,
@@ -731,9 +753,23 @@ export class MarketWindow {
   private marketSubtypeLabel(): string {
     return t(
       this.itemTypeFilter === 'armor'
-        ? 'itemUi.market.filterArmorType'
+        ? 'itemUi.market.filterArmorSlot'
         : 'itemUi.market.filterWeaponType',
     );
+  }
+
+  private marketArmorClassLabel(filter: MarketArmorClassFilter): string {
+    if (filter === 'cloth') return t('itemUi.market.armorCloth');
+    if (filter === 'leather') return t('itemUi.market.armorLeather');
+    if (filter === 'mail') return t('itemUi.market.armorMail');
+    return t('itemUi.market.filterArmorClassAll');
+  }
+
+  private marketPrimaryStatLabel(filter: MarketPrimaryStatFilter): string {
+    if (filter === 'str') return t('itemUi.stats.str');
+    if (filter === 'agi') return t('itemUi.stats.agi');
+    if (filter === 'int') return t('itemUi.stats.int');
+    return t('itemUi.market.filterPrimaryStatAll');
   }
 
   private marketSubtypeOptionLabel(filter: MarketSubtypeFilter): string {
@@ -753,7 +789,7 @@ export class MarketWindow {
   }
 
   private renderMarketFilterMenu(
-    menu: 'itemType' | 'subtype' | 'rarity',
+    menu: 'itemType' | 'subtype' | 'armorClass' | 'primaryStat' | 'rarity',
     label: string,
     value: string,
     options: readonly string[],
@@ -768,7 +804,7 @@ export class MarketWindow {
       .join('');
     return (
       `<div class="mkt-filter"><span>${esc(label)}</span><div class="mkt-select" data-market-filter-menu="${menu}">` +
-      `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(`${label}: ${current}`)}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
+      `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
       `<div class="mkt-select-menu" role="listbox" hidden>${optionHtml}</div>` +
       `</div></div>`
     );
@@ -793,6 +829,24 @@ export class MarketWindow {
             this.subtypeFilter,
             this.marketSubtypeOptions(),
             (filter) => this.marketSubtypeOptionLabel(filter as MarketSubtypeFilter),
+          )
+        : '') +
+      (this.itemTypeFilter === 'armor'
+        ? this.renderMarketFilterMenu(
+            'armorClass',
+            t('itemUi.market.filterArmorType'),
+            this.armorClassFilter,
+            MARKET_ARMOR_CLASS_FILTERS,
+            (filter) => this.marketArmorClassLabel(filter as MarketArmorClassFilter),
+          )
+        : '') +
+      (hasSubtype
+        ? this.renderMarketFilterMenu(
+            'primaryStat',
+            t('itemUi.market.filterPrimaryStat'),
+            this.primaryStatFilter,
+            MARKET_PRIMARY_STAT_FILTERS,
+            (filter) => this.marketPrimaryStatLabel(filter as MarketPrimaryStatFilter),
           )
         : '') +
       this.renderMarketFilterMenu(

@@ -377,13 +377,13 @@ describe('casting_lifecycle: spell queue (#1360)', () => {
     expect(p.queuedCastAim).toBeNull();
     // Flamestrike is a real 2s cast now (fire-spec redesign, instant only under Hot
     // Streak): once the queued cast fires it becomes the active cast, carrying the
-    // queued aim point through. Draining it lands the blast and arms its cooldown.
+    // queued aim point through. Draining it lands the blast without a cooldown.
     expect(p.castingAbility).toBe('flamestrike');
     // The queued aim point carried through (the cast resolves a y ground height).
     expect(p.castAim?.x).toBe(aim.x);
     expect(p.castAim?.z).toBe(aim.z);
     while (p.castingAbility) sim.tick();
-    expect(p.cooldowns.has('flamestrike')).toBe(true);
+    expect(p.cooldowns.has('flamestrike')).toBe(false);
   });
 
   it('holds a queued cast that would complete before the arming GCD clears, and fires it once the GCD does', () => {

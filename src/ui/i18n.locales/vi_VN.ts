@@ -9057,7 +9057,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Đạt được kỹ năng đầy đủ',
   'hudChrome.crafting.difficultyNone': 'Không đạt được kỹ năng',
   'hudChrome.crafting.difficultyReduced': 'Giảm khả năng nhận được kỹ năng',
-  'hudChrome.crafting.enchantedLine': 'mê hoặc',
   'hudChrome.crafting.makersMark': 'Được chế tạo bởi {name}',
   'hudChrome.crafting.masterworkSeal': 'Kiệt tác',
   'hudChrome.crafting.masterworkToast': 'Tuyệt tác! {name}',

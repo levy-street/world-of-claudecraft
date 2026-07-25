@@ -225,6 +225,23 @@ describe('interaction.interact dispatch', () => {
     expect(obj.lootable).toBe(false);
   });
 
+  it('target-path: skips a corpse without rights and falls through to a nearby object', () => {
+    const { sim, a, b } = twoPlayers();
+    const mob = corpse(sim, 20, 21, b, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.harvestClaimedBy = b;
+    const obj = groundObj(sim, 'wolf_fang', 20, 21.5);
+    const player = sim.entities.get(a) as AnyEntity;
+    player.targetId = mob.id;
+    sim.events = [];
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    expect(obj.lootable).toBe(false);
+    expect(errors(sim)).not.toContain("You don't have permission to loot that.");
+  });
+
   it('nearest-scan: with no target, picks up the nearest lootable object', () => {
     const { sim, a } = twoPlayers();
     const obj = groundObj(sim, 'wolf_fang', 20, 21);

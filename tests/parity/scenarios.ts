@@ -3883,12 +3883,28 @@ function marketRoundTrip(): Scenario {
 
       // 2) browse filter narrows to the wolf_fang listing, then clears.
       sim.marketSearch(
-        { search: 'wolf', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        {
+          search: 'wolf',
+          itemType: 'all',
+          subtype: 'all',
+          armorClass: 'all',
+          primaryStat: 'all',
+          rarity: 'all',
+          page: 0,
+        },
         seller,
       );
       rec.snapshot('searched');
       sim.marketSearch(
-        { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        {
+          search: '',
+          itemType: 'all',
+          subtype: 'all',
+          armorClass: 'all',
+          primaryStat: 'all',
+          rarity: 'all',
+          page: 0,
+        },
         seller,
       );
       rec.snapshot('search-cleared');
@@ -3989,6 +4005,12 @@ function inventoryVendor(): Scenario {
       sim.addItem('elixir_of_the_bear', 1, buyer);
       sim.useItem('elixir_of_the_bear', buyer);
       rec.snapshot('quaffed-elixir');
+      // A second same-stat elixir pins the per-kind exclusivity path (the
+      // shared elixir_buff_sta id replaces the Bear aura, last drunk wins,
+      // plus the fade event for the displaced different-name aura).
+      sim.addItem('elixir_of_the_serpent', 1, buyer);
+      sim.useItem('elixir_of_the_serpent', buyer);
+      rec.snapshot('quaffed-second-elixir');
 
       // 5) discard one of a gray stack.
       sim.addItem('wolf_fang', 3, buyer);

@@ -1122,6 +1122,40 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     expect(cleared.harvestClaimedBy).toBeNull();
     expect(corpseLootAvailability(cleared, sb.pid).harvestable).toBe(true);
   });
+
+  it('an owner-lock lapse after first sight rides a lite delta record and reopens the picker', () => {
+    // The `ffa` key flips once per corpse INSIDE dynamicFields, the same
+    // cached-record path as hcb, so the flip must invalidate the per-entity
+    // dyn cache and reach a viewer who already saw the locked corpse.
+    const { server, fcB, sa, sb, mob } = liveSetup();
+    mob.lootable = true;
+    mob.tappedById = sa.pid;
+    mob.harvestClaimedBy = sa.pid; // harvest arm closed: canOpen isolates loot rights
+    mob.lootFfaTimer = 60;
+    mob.loot = { copper: 10, items: [{ itemId: 'wolf_fang', count: 1 }] };
+
+    broadcast(server);
+    const client = bareClient(sb.pid);
+    (client as any).applySnapshot(lastSnap(fcB.sent));
+    const locked = client.entities.get(mob.id)!;
+    expect(locked.lootFfaTimer).toBe(Infinity);
+    expect(corpseLootAvailability(locked, sb.pid).canOpen).toBe(false);
+
+    // The lock lapses AFTER Bravo has seen the corpse: the next broadcast must
+    // carry ffa:1 as a dyn-only lite record (identity already sent).
+    mob.lootFfaTimer = 0;
+    server.sim.tick();
+    broadcast(server);
+    const snap = lastSnap(fcB.sent);
+    const rec = snap.ents.find((e: any) => e.id === mob.id);
+    expect(rec.ffa).toBe(1);
+    expect(rec).not.toHaveProperty('nm'); // lite record: no identity resend
+
+    (client as any).applySnapshot(snap);
+    const lapsed = client.entities.get(mob.id)!;
+    expect(corpseLootAvailability(lapsed, sb.pid).canOpen).toBe(true);
+    expect(corpseLootAvailability(lapsed, sb.pid).hasLoot).toBe(true);
+  });
 });
 
 // The omitted-components town-focus default depends on an ABSENT

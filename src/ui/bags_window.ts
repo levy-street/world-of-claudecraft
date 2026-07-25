@@ -33,6 +33,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { type BagInstanceGlyphKind, bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import {
   type BagDestroyAction,
@@ -62,7 +63,7 @@ import type { PainterHostPresentation } from './painter_host';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
-import { svgIcon } from './ui_icons';
+import { svgIcon, type UiIconName } from './ui_icons';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
@@ -87,6 +88,29 @@ export function dismissBagPrompts(): void {
 // QUALITY_COLOR map carries the real per-quality hex; this token covers the rare
 // item with no quality field, so no raw hex lives in the painter.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
+
+// The procedural chrome glyph each per-copy corner kind paints
+// (bag_instance_glyph_view.ts decides WHICH kind; this maps it to art). The
+// masterwork kind is absent on purpose: it keeps its authored seal IMAGE, and
+// the generic kind keeps the pre-existing CSS wedge. No binary asset is added.
+const BAG_GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconName>> = {
+  enchanted: 'enchant-rune',
+  signed: 'makers-mark',
+  bound: 'bond-link',
+};
+
+// The accessible name each corner kind gives its CELL. The glyph is aria-hidden,
+// so this is the ONLY channel carrying the per-copy fact to assistive tech: the
+// three visual kinds must not collapse back into one label. 'signed' and the
+// unclassified 'generic' both keep the pre-existing maker-marked wording, which
+// is accurate for a signer payload and is the status quo for the rest.
+const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> = {
+  masterwork: 'hudChrome.bags.itemAriaMasterwork',
+  enchanted: 'hudChrome.bags.itemAriaEnchanted',
+  signed: 'hudChrome.bags.itemAriaInstanced',
+  bound: 'hudChrome.bags.itemAriaBound',
+  generic: 'hudChrome.bags.itemAriaInstanced',
+};
 
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
@@ -246,8 +270,17 @@ export class BagsWindow {
     this.refreshMoneyRow();
   }
 
-  /** Rewrite ONLY the .money footer in place, re-binding its two launchers. Shared by
-   *  the full render() and the purse probe, so the latch arms on both. */
+  /** Rewrite ONLY the .money footer in place, re-binding its two launchers. Every
+   *  paint path runs through here (the full render(), the purse probe, and the async
+   *  $WOC / Claudium balance reads), so the latch arms on all of them.
+   *
+   *  Deliberately does NOT restore focus across the rewrite, unlike the
+   *  deeds/professions refocus family. Two reasons, both settled on PR #2377: the
+   *  footer's launchers are BUTTONs, and input.ts leaves a focused button's Enter
+   *  default alone on the chat edge, so parking focus back on one makes the player's
+   *  next Enter open chat AND re-fire the button; and #bags is non-modal and absent
+   *  from isModalOpen(), so canUseGameKeys() stays true and Tab is swallowed by
+   *  target-nearest, which means keyboard focus never lands in here to begin with. */
   private paintMoneyRow(row: HTMLElement, copper: number): void {
     row.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(copper)}`;
     row.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
@@ -261,8 +294,11 @@ export class BagsWindow {
 
   /** The narrow repaint: find the existing footer and re-paint it. A window that has
    *  never been rendered has no .money row yet, so this is a no-op rather than a
-   *  partial paint. */
-  private refreshMoneyRow(): void {
+   *  partial paint. Public because the async $WOC / Claudium balance reads land on
+   *  their own schedule and need the same footer-only treatment: before this they
+   *  called the HUD's full renderBags() from a promise resolve, which tore the window
+   *  down under a player who had not touched anything. */
+  refreshMoneyRow(): void {
     const row = this.deps.root().querySelector('.money') as HTMLElement | null;
     if (!row) return;
     this.paintMoneyRow(row, this.deps.world().copper);
@@ -562,16 +598,16 @@ export class BagsWindow {
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
-      const isMasterwork = s.instance?.rolled?.masterwork === true;
+      // The single corner-glyph decision for this stack (bag_instance_glyph_view.ts
+      // owns the priority: masterwork, then enchanted, signed, bound, generic).
+      const glyphKind = bagInstanceGlyphKind(s.instance);
+      const isMasterwork = glyphKind === 'masterwork';
       row.style.setProperty('--bag-slot-quality', qColor);
       // An instanced stack's accessible name carries the per-copy flag the
-      // aria-hidden corner marker shows sighted players (the review's a11y
-      // arm); plain stacks keep the plain label.
-      const itemAriaKey = isMasterwork
-        ? 'hudChrome.bags.itemAriaMasterwork'
-        : s.instance
-          ? 'hudChrome.bags.itemAriaInstanced'
-          : 'itemUi.bags.itemAria';
+      // aria-hidden corner glyph shows sighted players (the review's a11y arm),
+      // now per KIND so the two channels agree; plain stacks keep the plain
+      // label.
+      const itemAriaKey = glyphKind ? BAG_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
@@ -579,12 +615,20 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // The instanced-slot corner marker (Professions 2.0): a plain
-      // signed/enchanted copy keeps the static tab, while a masterwork replaces
-      // it with the authored seal (never both). Either treatment composes with
-      // the count badge and stays visible without hover on desktop and touch.
+      // The instanced-slot corner marker (Professions 2.0): one glyph per
+      // stack, naming WHICH kind of special copy it is. A masterwork keeps the
+      // authored seal exactly as before; enchanted / signed / bound each get
+      // their own procedural glyph (no new binary asset); an instanced payload
+      // matching none of them keeps the pre-existing generic tab, so no copy
+      // silently loses its marker. Exactly one treatment ever renders, it
+      // composes with the bottom-right count badge, and it stays visible
+      // without hover on desktop and touch, identical on every graphics preset.
       const instanceMark =
-        s.instance && !isMasterwork ? '<span class="bi-instance" aria-hidden="true"></span>' : '';
+        glyphKind === 'generic'
+          ? '<span class="bi-instance" aria-hidden="true"></span>'
+          : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
+            ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
+            : '';
       const masterworkSeal = isMasterwork
         ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
         : '';

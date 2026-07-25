@@ -66,34 +66,50 @@ export interface HeroicDungeonTuning {
 // Unlike the heroic table this one is PER MOB, because the floor-style targets
 // below need different factors for trash, non-elite adds (no 1.5x elite swing
 // multiplier), and bosses. The per-mob factor also drives mechanicDamageMult,
-// so a boss's aoePulse/stomp scale with its own melee (../instances/difficulty.ts).
+// so a boss's aoePulse/stomp scale with its own melee (../instances/difficulty.ts),
+// UNLESS the mob has a mechanicDamageMultiplierByMob override: that decouples an
+// AVOIDABLE telegraphed mechanic from the unavoidable tank-swing calibration, so
+// a skill check can stay lethal while melee intake is priced for the fresh tank.
 export interface NormalDungeonTuning {
   id: string;
   difficulty: Extract<DungeonDifficulty, 'normal'>;
   healthMultiplier: number;
   damageMultiplierByMob: Record<string, number>;
+  // Optional per-mob override for mechanicDamageMult only (aoePulse, stomp,
+  // infernoChannel); a mob absent here falls back to its damageMultiplierByMob
+  // factor. Keys must be a subset of damageMultiplierByMob (pinned by
+  // tests/gravewyrm_normal_tuning.test.ts).
+  mechanicDamageMultiplierByMob?: Record<string, number>;
 }
 
-// Fresh-group retune (v0.30): normal Sanctum is the fresh-20 group dungeon,
-// and the v0.29 economy floors (trash 200 / bosses 420 / adds 150 on the
-// max-mitigation reference warrior) landed 22-54% of a freshly-capped tank's
-// pool PER SWING (quest greens/blues: 1371-1752 hp, 1439-2361 armor across
-// the three committed tanks); the Monte Carlo survival bench
-// (scripts/sanctum_fresh_montecarlo.ts) showed 0% clears and a tank death in
-// every run even against single bosses with a healer. New calibration: the
-// minimum non-crit swing on the same reference warrior (level-20 prot in the
-// max-armor kit, 2861 armor, Defensive Stance) lands at least 90 (trash),
-// 200 (bosses; Korgath/Korzul land ~245, Velkhar sits at the 200 line
-// because he swings at 2.0s and layers his summon waves on top), and 50
-// (Velkhar's non-elite bonewalker waves, which spawn three at a time and are
-// wave pressure, not extra bosses). That prices a boss swing at ~25% of the
-// fresh tank pool (~20.5% for Velkhar), the same audience-pool share the
-// heroic and Nythraxis calibrations use, with tanks crit-immune since
-// v0.29.1 so there is no spike tail above the 1.25x roll cap; an add swing
-// is ~5-7%. The DOUBLED health stays: the economy lever is clear time, not
-// lethality. Pinned by
-// tests/gravewyrm_normal_tuning.test.ts, which also pins the heroic transform
-// literals so a base-template edit cannot slip through unnoticed.
+// Fresh-group retune (v0.30), pressure pass (2026-07-26): the first v0.30
+// calibration (trash 90 / bosses 200 / adds 50 floors) fixed the unclearable
+// v0.29 economy floors, but overshot soft: a fresh THREE-player group cleared
+// the dungeon without pressure, because its Monte Carlo bench modeled the
+// worst-case healer (autopilot, no cooldowns) and priced the floors so that
+// worst case barely survived. This pass raises the minimum non-crit swing on
+// the reference warrior (level-20 prot in the max-armor kit, 2861 armor,
+// Defensive Stance) to at least 100 (trash, lands 103+) and 200 (bosses:
+// Korgath 301 / Korzul 280, ~29-31% of a fresh tank pool per average swing;
+// Velkhar is UNCHANGED at the 200 line, ~21%, because he was already the
+// peak fight: he swings at 2.0s and layers his summon waves on top for a
+// ~305 dtps wave-window peak), with the summoned bonewalkers still at 50
+// (wave pressure, not extra bosses). Korgath and Korzul rise to MEET
+// Velkhar: boss dtps on a fresh tank now runs ~179-193, pressed above a
+// fresh healer's sustain so the tank loses ground without cooldowns; tanks
+// are crit-immune since v0.29.1, so no swing can spike past the 1.25x roll
+// cap (~38% of pool). Korzul's melee sits below Korgath's per-multiplier
+// because he also carries the guaranteed inferno channel (the 50% hp gate)
+// on top of his 30% enrage.
+// Korzul additionally carries a mechanicDamageMultiplierByMob override: his
+// Grave Inferno channel is fully avoidable (rooted boss, no melee during it,
+// true-radius telegraph), so it prices at 15x, lethal to a ~1000hp fresh
+// melee pool that stands all four pulses (1050-1350 raw) while pulse one
+// stays a scratch; his melee stays on the tank calibration above. The
+// DOUBLED health stays: the economy lever is clear time, not lethality.
+// Pinned by tests/gravewyrm_normal_tuning.test.ts, which also pins the
+// heroic transform literals so a base-template edit cannot slip through
+// unnoticed.
 //
 // Normal Nythraxis gets the same treatment (2x health, boss floor 600,
 // skeleton waves floor 300, both landing at their level-20 spawns): the boss
@@ -106,12 +122,15 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     difficulty: 'normal',
     healthMultiplier: 2.0,
     damageMultiplierByMob: {
-      sanctum_boneguard: 3.4,
-      sanctum_drakonid: 3.3,
+      sanctum_boneguard: 3.8,
+      sanctum_drakonid: 3.7,
       raised_bonewalker: 3.75,
-      korgath_the_bound: 7.75,
+      korgath_the_bound: 9.5,
       grand_necromancer_velkhar: 6.6,
-      korzul_the_gravewyrm: 7.5,
+      korzul_the_gravewyrm: 8.5,
+    },
+    mechanicDamageMultiplierByMob: {
+      korzul_the_gravewyrm: 15,
     },
   },
   nythraxis_boss_arena: {
@@ -177,8 +196,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // (v0.30), the summoned floor drops from 250 to 150.
     addDamageMultiplier: 8.55,
     // The Sanctum bosses must out-hit their retuned NORMAL selves (normal
-    // floors them at 200-247 post-mitigation since the v0.30 fresh-group
-    // retune): 19x lands 652-708, comfortably above.
+    // floors them at 200-301 post-mitigation since the v0.30 fresh-group
+    // pressure pass): 19x lands 652-708, comfortably above.
     damageMultiplierByMob: {
       korgath_the_bound: 19,
       grand_necromancer_velkhar: 19,

@@ -1351,6 +1351,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'fire',
     requiresTarget: false,
+    requiresOutOfCombat: true,
+    requiresOutsideInstance: true,
     effects: [{ type: 'selfBuff', kind: 'form_fireball', value: 1.4, duration: 3600 }],
     description:
       'Transform into a blazing ember, increasing movement speed by $b%. You cannot attack or cast spells while transformed. Recast to return to your normal form.',
@@ -1944,7 +1946,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner rule 2026-07-11: a real cast, EXCEPT under Hot Streak, whose
     // next_cast_instant makes it instant and free (the spender machinery).
     castTime: 2,
-    cooldown: 12,
+    // Owner release rule 2026-07-19: cast time and the GCD pace it, no cooldown.
+    cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: false,
@@ -6402,6 +6405,30 @@ function scaleEffect(
       return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
     case 'gainResource':
       return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
+    case 'groundAoE':
+      // Rune of Power's pulse is an ally damage-done buff, not a damage roll
+      // (its authored min/max are 0/0): leave it untouched so a flat talent
+      // mod can never turn a buff zone into a damage zone.
+      return eff.allyBuffPct
+        ? eff
+        : {
+            ...eff,
+            min: Math.round(eff.min * dmgMult + flat),
+            max: Math.round(eff.max * dmgMult + flat),
+          };
+    case 'repositionToAim':
+      // Heroic Leap's landing hit is a groundAoE-shaped rider on the
+      // reposition; scale it the same way a groundAoE pulse scales.
+      return eff.landingAoe
+        ? {
+            ...eff,
+            landingAoe: {
+              ...eff.landingAoe,
+              min: Math.round(eff.landingAoe.min * dmgMult + flat),
+              max: Math.round(eff.landingAoe.max * dmgMult + flat),
+            },
+          }
+        : eff;
     default:
       return eff;
   }

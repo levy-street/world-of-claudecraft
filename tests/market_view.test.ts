@@ -10,6 +10,7 @@ import {
   COPPER_PER_GOLD,
   COPPER_PER_SILVER,
   marketCollectBadgeCount,
+  marketCollectIndicatorView,
 } from '../src/ui/market_view';
 import type { MarketInfo, MarketListingView } from '../src/world_api';
 
@@ -127,6 +128,14 @@ describe('market_view: browse states', () => {
         reason: 'filtered',
       },
     );
+    expect(buildMarketBrowse(info({ listings: [] }), { ...ALL, armorClass: 'mail' })).toEqual({
+      state: 'empty',
+      reason: 'filtered',
+    });
+    expect(buildMarketBrowse(info({ listings: [] }), { ...ALL, primaryStat: 'int' })).toEqual({
+      state: 'empty',
+      reason: 'filtered',
+    });
   });
 
   it('renders the server page rows and drops listings whose item is unknown', () => {
@@ -345,5 +354,15 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
       });
       expect(sim).toEqual(mirror);
     }
+  });
+});
+
+// The minimap-corner collect indicator (the mailIndicatorView pattern): driven by
+// the always-streamed IWorld.marketCollectPending bit, NOT by marketInfo (which is
+// null away from the Merchant), so it lights anywhere in the world.
+describe('marketCollectIndicatorView', () => {
+  it('is visible exactly while a collection is pending', () => {
+    expect(marketCollectIndicatorView(true)).toEqual({ visible: true });
+    expect(marketCollectIndicatorView(false)).toEqual({ visible: false });
   });
 });
