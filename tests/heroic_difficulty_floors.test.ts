@@ -1,8 +1,10 @@
 // Heroic retune (economy pass, 2026-07): every heroic mob's health DOUBLES
-// versus the previous heroic calibration, and the minimum non-crit swing lands
-// at least 500 post-mitigation on the maximum-mitigation reference warrior
-// (see below). The Nythraxis raid joins the model: its heroic boss floors at
-// 1200, its add waves at the 500 heroic line, and NORMAL Nythraxis gets the
+// versus the previous heroic calibration, and the minimum non-crit swing of
+// every SPAWN-LIST mob lands at least 500 post-mitigation on the
+// maximum-mitigation reference warrior (see below); boss-summoned adds floor
+// at 150 since the v0.30 40% add nerf. The Nythraxis raid rides the model on
+// its own numbers: heroic boss floor 1000 (2026-07-24 nerf), encounter-script
+// add waves at the raid 250 line, and NORMAL Nythraxis gets the
 // normal-Gravewyrm treatment (2x health, boss >= 600, adds >= 300).
 //
 // Reference warrior (the "fully geared" mitigation ceiling, same as
@@ -28,10 +30,13 @@ import { armorReduction } from '../src/sim/types';
 const REF_ARMOR = 2861;
 const DEFENSIVE_STANCE_TAKEN = 0.9;
 const HEROIC_MOB_FLOOR = 500;
-// 2026-07 retune: summoned/scripted add waves floor at HALF the mob line.
-// Adds were hitting 78-89% as hard as their bosses (a tanked triple wave
-// overwhelmed the tank outright); they are wave pressure, not extra bosses.
-const SUMMONED_ADD_FLOOR = 250;
+// v0.30: five-man boss-summoned adds hit 40% softer again (the 2026-07
+// half-the-mob-line 250 floor was still overwhelming healers when a tanked
+// triple wave stacked on the boss); they are wave pressure, not extra bosses.
+// The RAID's encounter-script waves deliberately keep the old 250 line: a
+// ten-player group brings two or three healers.
+const SUMMONED_ADD_FLOOR = 150;
+const RAID_ADD_FLOOR = 250;
 // 2026-07-24 heroic Nythraxis nerf: boss floor 1200 -> 1000 (mult 7.25)
 // and the skeleton waves to 1.2x their NORMAL-mode health via the new
 // healthMultiplierByMob map. Ships with the wave-2 package; the morning
@@ -100,7 +105,7 @@ describe('heroic five-man floors', () => {
     }
   });
 
-  it('every boss-summoned add swings for at least the 250 add floor on the reference warrior', () => {
+  it('every boss-summoned add swings for at least the 150 add floor on the reference warrior', () => {
     for (const dungeonId of FIVE_MANS) {
       for (const mobId of spawnListMobIds(dungeonId)) {
         const summoned = MOBS[mobId]?.summonAdds?.mobId;
@@ -141,11 +146,11 @@ describe('heroic five-man doubled health', () => {
 });
 
 describe('Nythraxis raid floors', () => {
-  it('heroic boss swings for at least 1000, add waves for the 250 add floor', () => {
+  it('heroic boss swings for at least 1000, add waves for the raid 250 add floor', () => {
     expect(minSwing(RAID_BOSS, RAID, 'heroic')).toBeGreaterThanOrEqual(HEROIC_NYTHRAXIS_BOSS_FLOOR);
     for (const addId of RAID_HEROIC_ADDS) {
       const swing = minSwing(addId, RAID, 'heroic');
-      expect(swing, addId).toBeGreaterThanOrEqual(SUMMONED_ADD_FLOOR);
+      expect(swing, addId).toBeGreaterThanOrEqual(RAID_ADD_FLOOR);
       expect(swing, `${addId} above the mob line`).toBeLessThan(HEROIC_MOB_FLOOR);
     }
   });
@@ -190,10 +195,10 @@ describe('heroic tuning data contract', () => {
         ]),
       ),
     ).toEqual({
-      hollow_crypt: [3.8, 20, 10],
-      sunken_bastion: [4.0, 18, 16.25],
-      drowned_temple: [5.2, 16.5, 15.25],
-      gravewyrm_sanctum: [4.0, 15.5, 14.25],
+      hollow_crypt: [3.8, 20, 6],
+      sunken_bastion: [4.0, 18, 9.75],
+      drowned_temple: [5.2, 16.5, 9.15],
+      gravewyrm_sanctum: [4.0, 15.5, 8.55],
       nythraxis_boss_arena: [3.2, 7.25, 7.25],
     });
   });

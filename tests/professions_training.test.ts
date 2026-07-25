@@ -5,6 +5,7 @@
 // arm lives in tests/professions_grandfather.test.ts; the online wire arm in
 // tests/professions_training_online.test.ts.
 import { describe, expect, it } from 'vitest';
+import { STATIONS } from '../src/sim/content/professions';
 import {
   COMBO_RECIPES,
   COMMON_RECIPES,
@@ -53,7 +54,7 @@ function placeAtTrainerFor(sim: Sim, pid: number, recipeId: string) {
   if (!recipe) throw new Error(`unknown recipe ${recipeId}`);
   const type = stationTypeForCraft(recipe.professionId);
   if (!type) throw new Error(`${recipe.professionId} has no station`);
-  placeAt(sim, pid, stationsOfType(type)[0].pos);
+  placeAt(sim, pid, stationsOfType(STATIONS, type)[0].pos);
 }
 
 function trainResultsOf(events: SimEvent[]): SimEvent[] {
@@ -118,7 +119,7 @@ describe('resolveTrain deny order (replay safety)', () => {
   it('an unknown recipe id denies silently: ok false, NO reason, fee 0', () => {
     const sim = makeSim();
     const meta = metaOf(sim, sim.playerId);
-    const result = resolveTrain(meta, { x: 0, z: 0 }, 'recipe_that_never_was');
+    const result = resolveTrain(STATIONS, meta, { x: 0, z: 0 }, 'recipe_that_never_was');
     expect(result.ok).toBe(false);
     expect(result.reason).toBeUndefined();
     expect(result.fee).toBe(0);
@@ -130,7 +131,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     meta.knownRecipes.add(ALCH_COMBO_ID);
     meta.copper = 0;
     // Away from every station too: known-ness precedes the range arm as well.
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result.reason).toBe('train_already_known');
     expect(result.ok).toBe(false);
   });
@@ -144,9 +145,9 @@ describe('resolveTrain deny order (replay safety)', () => {
     const sim = makeSim();
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 0;
-    const common = resolveTrain(meta, FIELD_POS, COMMON_RECIPES[0].id);
+    const common = resolveTrain(STATIONS, meta, FIELD_POS, COMMON_RECIPES[0].id);
     expect(common.reason).toBe('train_already_known');
-    const tool = resolveTrain(meta, FIELD_POS, TOOL_RECIPES[0].id);
+    const tool = resolveTrain(STATIONS, meta, FIELD_POS, TOOL_RECIPES[0].id);
     expect(tool.reason).toBe('train_already_known');
   });
 
@@ -163,7 +164,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 999999;
     meta.craftSkills.alchemy = 25;
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result.reason).toBe('train_out_of_range');
   });
 
@@ -172,7 +173,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 999999;
     meta.craftSkills.alchemy = 0; // tier unmet too, but range must win
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result.reason).toBe('train_out_of_range');
   });
 
@@ -184,7 +185,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 0;
     meta.craftSkills.alchemy = 0;
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result).toEqual({
       ok: false,
       recipeId: ALCH_COMBO_ID,
@@ -201,7 +202,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     meta.copper = 0;
     meta.craftSkills.alchemy = 24;
     const entity = (sim as any).entities.get(pid);
-    const result = resolveTrain(meta, entity.pos, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, entity.pos, ALCH_COMBO_ID);
     expect(result.reason).toBe('train_tier_unmet');
   });
 
@@ -209,7 +210,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     const sim = makeSim();
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 0;
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result.fee).toBe(2500);
   });
 });
@@ -381,7 +382,7 @@ describe('knowing vs crafting stay orthogonal (no use-gate)', () => {
     const meta = metaOf(sim, pid);
     expect(meta.craftSkills.engineering ?? 0).toBe(0);
     const recipe = recipeById('recipe_thorium_mining_pick')!; // grandfathered known
-    placeAt(sim, pid, stationsOfType(recipe.stationType!)[0].pos);
+    placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
     for (let i = 0; i < 4; i++) sim.addItem('thorium_ore', 1, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
 
@@ -395,7 +396,7 @@ describe('knowing vs crafting stay orthogonal (no use-gate)', () => {
     const meta = metaOf(sim, sim.playerId);
     for (const recipe of COMMON_RECIPES) {
       expect(isRecipeKnown(meta, recipe), recipe.id).toBe(true);
-      const result = resolveTrain(meta, FIELD_POS, recipe.id);
+      const result = resolveTrain(STATIONS, meta, FIELD_POS, recipe.id);
       expect(result.reason, recipe.id).toBe('train_already_known');
       expect(trainingFeeFor(recipe), recipe.id).toBe(0);
     }

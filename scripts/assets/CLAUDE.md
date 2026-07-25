@@ -8,6 +8,8 @@
 Offline asset pipeline: optimize raw downloaded model packs into shipping files
 under `public/`. Run manually (not part of `npm run build`):
 `node scripts/assets/build_assets.mjs scripts/assets/specs/<spec>.json`.
+For reference-image reconstruction and procedural GLB authoring, read the living
+`docs/image-to-glb-asset-workflow.md` runbook before adding a model-specific exporter.
 
 - **`specs/*.json`** declare *what* to build: `{ items: [{ src, out, type, ... }] }`.
   `src` is usually under `tmp/asset_src` (raw packs, gitignored); `out` is relative
@@ -26,6 +28,20 @@ under `public/`. Run manually (not part of `npm run build`):
 - **`build_foliage.mjs`** is a superset for `foliage.json`: adds `weld + simplify`
   (target `ratio`), strips constant-white `COLOR_0`, and hue-rotates leaf textures
   via `recolor` rules. Use this only for foliage.
+- **Per-asset procedural exporters** (`banker_chest/`, `eastbrook_town/`,
+  `eastbrook_grand_armoury/`, `eastbrook_mailbox/`, `eastbrook_noticeboard/`) author GLBs
+  from reference images: deterministic `model.js` factory, browser `export_entry.js`,
+  driver `export_<asset>.mjs`, and a spec with `keepExtras: true`. The condensed procedure
+  is the `image-to-glb` skill (`.claude/skills/image-to-glb/SKILL.md`); a new asset copies
+  the mailbox/noticeboard archetype (or the town contract-table archetype for a wave),
+  never a bespoke pipeline.
+- **Source fingerprints are load-bearing.** Eastbrook-era exporters stamp a sha256 over a
+  pinned input list (factory/entry/exporter/spec, `build_assets.mjs`, reference
+  turnarounds, the shared atlas, and `package-lock.json`) into the GLB extras, and tests
+  recompute it live. Any change to a fingerprinted input, including a lockfile-only bump,
+  means re-exporting the affected families (`--no-preview`), regenerating the media
+  manifest, and re-pinning the sha256/fingerprint literals in tests, docs, and capture
+  evidence JSONs in the same change.
 
 ## Relationship to the rest
 - **Output to `public/`** (the GLB/texture/HDRI tree the game loads at runtime).

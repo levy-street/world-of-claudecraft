@@ -8,26 +8,21 @@
 // overworld healers are spawned from OVERWORLD_GRAVEYARDS in the Sim ctor and the
 // per-instance dungeon/raid healers in instances/dungeons.ts (claimInstance).
 
-import type { NpcDef } from '../types';
+import { EASTBROOK_LAYOUT } from '../eastbrook_layout';
+import type { GraveyardDef, NpcDef } from '../types';
 
-export interface GraveyardDef {
-  id: string;
-  // Internal label (zone-themed). Not player-visible: the angel's NAME is the only
-  // player-facing string, and it is the shared SPIRIT_HEALER name, localized once.
-  name: string;
-  // Overworld world position the released spirit appears at (a Spirit Healer hovers
-  // here). Dungeon/raid graveyards are NOT in this list: they live at the instance
-  // entry and are resolved per-instance in spirit.ts / instances/dungeons.ts.
-  x: number;
-  z: number;
-}
+export type { GraveyardDef } from '../types';
 
 // One graveyard per existing headstone cluster (the ZonePropsDef.graveyards anchors
 // across all three zones), so every visible graveyard on the map gets an angel and
 // no overworld death is ever far from one.
 export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // Eastbrook Vale (zone 1)
-  { id: 'gy_eastbrook', name: 'Eastbrook Rest', x: -14, z: -14 },
+  {
+    id: 'gy_eastbrook',
+    name: 'Eastbrook Rest',
+    ...EASTBROOK_LAYOUT.services.graveyard.position,
+  },
   { id: 'gy_vale_chapel', name: 'Vale Chapel Yard', x: 4, z: -56 },
   // Mirefen Marsh (zone 2)
   { id: 'gy_fenbridge', name: 'Fenbridge Barrow', x: -18, z: 286 },

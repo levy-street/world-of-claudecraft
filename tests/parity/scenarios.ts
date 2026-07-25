@@ -41,12 +41,18 @@ import {
   xpForLevel,
 } from '../../src/sim/types';
 import { terrainHeight } from '../../src/sim/world';
+import { OPEN_FIELD } from '../helpers/open_field';
 import type { Recorder, Scenario } from './record';
 
 // ----- shared helpers ---------------------------------------------------------
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
+
+// Combat-only fixtures need a deterministic patch that does not overlap a town
+// landmark. This south-field anchor keeps their authored relative spacing while
+// decoupling the scenarios from Eastbrook's southeast civic lot.
+const EASTBROOK_PARITY_OPEN_FIELD = { x: 2, z: -21 } as const;
 
 // Move an entity to (x,z) on the terrain and keep the spatial grid consistent —
 // the same idiom every existing scenario test uses.
@@ -162,6 +168,7 @@ function soloMage(): Scenario {
       sim.setPlayerLevel(10);
       const p = sim.player as AnyEntity;
       beef(p);
+      teleport(sim, p, OPEN_FIELD.x, OPEN_FIELD.z);
       const mob = spawnMob(sim, 'forest_wolf', 5, p.pos.x, p.pos.y, p.pos.z + 18);
       beef(mob, 9000);
       rec.track(mob.id);
@@ -344,6 +351,7 @@ function mobSwingAffixes(): Scenario {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(16);
       const p = sim.player as AnyEntity;
+      teleport(sim, p, EASTBROOK_PARITY_OPEN_FIELD.x, EASTBROOK_PARITY_OPEN_FIELD.z);
       // beef() does not stick on a player (applyAura -> recalcPlayerStats resets maxHp,
       // and several affixes ride negative buff_* drains); top the player up right before
       // each swing so it survives every draw, mirroring mob_locomotion's reviveTarget.
@@ -547,6 +555,7 @@ function petAi(): Scenario {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(12);
       const p = sim.player as AnyEntity;
+      teleport(sim, p, OPEN_FIELD.x, OPEN_FIELD.z);
       beef(p);
 
       // Emberkin (petRanged demon): pre-targeted on a beefed wolf inside bolt range so

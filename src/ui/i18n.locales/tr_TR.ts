@@ -240,11 +240,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hurda toplama, büyü bozumunun herkese açık kuzenidir: aynı silahlar ve zırhlar, beceri gerekmez ve kazanılmaz, bunun yerine arkanik bir şey değil kaliteye göre düz zanaat hurdası döner. Herkes yapabilir, büyücü olup olmak fark etmez. Bozulmaya değer bir parça tuttuğunuzda seçim basittir: nadir ve üzeri için büyü bozumu kesinlikle daha iyi bir anlaşmadır; sıradan kalitede ise ikisinin de satıcıya verdiği değer yaklaşık aynıdır, dolayısıyla gerçekten hangi malzemeye ihtiyacınız varsa onu gözetecek şekilde bozun.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    "Madencilik cevheri doğrudan dünyanın kayasından çıkarır: Doğudere Vadisi'nde bakır, Mirefen Bataklığı'nda demir ve Dikenzirve Yükseklikleri'nde osmiyum; ocak zanaat dallarını besler. 1. seviyeden itibaren herkese açık, hiçbir engel yok, 100 tavanına kadar kendi sayacında takip edilir.",
+    "Madencilik cevheri doğrudan dünyanın kayasından çıkarır: Doğudere Vadisi'nde bakır, Mirefen Bataklığı'nda demir ve Dikenzirve Tepeleri'nde osmiyum; ocak zanaat dallarını besler. 1. seviyeden itibaren herkese açık: tek gereken çantanda bir madenci kazması, her bölge merkezinde 20 bakır. 100 tavanına kadar kendi sayacında takip edilir.",
   'guide.profPages.gatherIntro.logging':
-    "Odun Kesimi her üç bölgedeki ağaç kümelerinden kereste keser: Doğudere Vadisi'nde demir kabuklular, Mirefen Bataklığı'nda dişbudak ve Dikenzirve Yükseklikleri'nde yüksekçam; sap, asa ve mühendis tezgahı için ham malzeme. 1. seviyeden itibaren herkese açık, 100 tavanına kadar kendi sayacında takip edilir.",
+    "Odun Kesimi her üç bölgedeki ağaç kümelerinden kereste keser: Doğudere Vadisi'nde demir kabuklular, Mirefen Bataklığı'nda dişbudak ve Dikenzirve Tepeleri'nde yüksekçam; sap, asa ve mühendis tezgahı için ham malzeme. Çantanda bir oduncu baltasıyla (her bölge merkezinde 20 bakır) 1. seviyeden itibaren herkese açık, 100 tavanına kadar kendi sayacında takip edilir.",
   'guide.profPages.gatherIntro.herbalism':
-    "Otçuluk doğada yetişenleri toplar: Doğudere Vadisi'nde parlakyaprak, Mirefen Bataklığı'nda altın yaprak ve Dikenzirve Yükseklikleri'nde güneş yaprağı; eczane mesleklerini kaynatan yaprak ve sap. 1. seviyeden itibaren herkese açık, 100 tavanına kadar kendi sayacında takip edilir.",
+    "Otçuluk doğada yetişenleri toplar: Doğudere Vadisi'nde parlakyaprak, Mirefen Bataklığı'nda altın yaprak ve Dikenzirve Tepeleri'nde güneş yaprağı; eczane mesleklerini kaynatan yaprak ve sap. Çantanda bir otçu orağıyla (her bölge merkezinde 20 bakır) 1. seviyeden itibaren herkese açık, 100 tavanına kadar kendi sayacında takip edilir.",
   'guide.profPages.gatherIntro.fishing':
     "Balık Tutma, toplama meslekleri arasında en sıra dışı ve en derin olanıdır: gerçek bir balık tutma ve çekme minigame'i, her bölgede kendine özgü av tabloları ve diğerlerinin iki katı olan 200 yetkinlik tavanı. Bir olta al, açık suyun önünde dur ve at.",
   'guide.profPages.rhythmHeading': 'Toplama ritmi',
@@ -257,7 +257,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düğümlerin nerede olduğu, kademeleri, hangi aleti gerektirdikleri ve ne verdikleri. Her düğüm, kendi hasatının {respawn} saniye sonra senin için yeniden oluşur; bu zamanlayıcı yalnızca senindir: aynı düğümde çalışan başka bir toplayıcı seni asla geciktirmez, bu yüzden düğüm yarışması ve bekleme yoktur. Merdivende yukarı çıkan her bölge, daha sert araziden daha iyi malzeme çıkarır.',
   'guide.profPages.toolsHeading': 'Aletler',
   'guide.profPages.toolsNote':
-    "Çıplak eller kademe 1 alet sayılır; bu nedenle oyundaki her kademe 1 düğüm hiç alet gerektirmez. Satıcı merdiveni kademe 1'den 3'e kadar uzanır; bir aletin yalnızca çantanda olması yeterlidir, ekipman yuvası veya dayanıklılık yoktur; bu nedenle her biri tek seferlik bir satın alımdır. Kapıya yalnızca kademe önemlidir: aletin nadirlik rengi kozmetiktir.\n\nSatıcı merdiveninin üzerinde, kademe 4 ve kademe 5 olmak üzere iki üretilmiş alet vardır; bunlar mühendisler tarafından alet atölyesinde yapılır ve hiçbir NPC tarafından satılmaz. Bugün hiçbir düğüm kademe 3'ten fazlasını gerektirmez; bu nedenle şu anki değerleri hızdır: üst düzey bir alet çekimi daha düşük düğümlerdeki tabanında sabitler ve daha yüksek kademeli arazi geldiğinde giriş bileti olacak.",
+    "Her düğüm, kademe 1 dahil, o mesleğin aletinin çantanda olmasını ister: kazma yoksa cevher de yok, olta kamışı yoksa balık da yok. Satıcı merdiveni kademe 1'den 3'e kadar uzanır ve her bölge merkezinde bulunur; bir aletin yalnızca çantanda olması yeterlidir, ekipman yuvası veya dayanıklılık yoktur; bu nedenle her biri tek seferlik bir satın alımdır. Geçiş için yalnızca kademe önemlidir: aletin nadirlik rengi kozmetiktir.\n\nSatıcı merdiveninin üzerinde, kademe 4 ve kademe 5 olmak üzere iki üretilmiş alet vardır; bunlar mühendisler tarafından alet atölyesinde yapılır ve hiçbir NPC tarafından satılmaz. Bugün hiçbir düğüm kademe 3'ten fazlasını gerektirmez; bu nedenle şu anki değerleri hızdır: üst düzey bir alet, daha düşük kademeli düğümlerde toplama süresini tabanına sabitler ve daha yüksek kademeli arazi geldiğinde giriş bileti olacak.",
   'guide.profPages.toolCrafted': 'Üretilmiş ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Satılmaz',
@@ -413,32 +413,32 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.name': 'Aether Dalgası',
   'entities.abilities.blizzard.description':
     "Hedef alana 6 saniye boyunca buz fırtınası çağırır, her saniye {damage} Don hasarı verir ve düşmanları %40 yavaşlatır. Vurulan her düşman Donmuş Küre'nin süresini 0,5 saniye azaltır (kullanım başına en fazla 3 saniye). (Don)",
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Kar Fırtınası',
+  'entities.abilities.brain_freeze.name': 'Beyin Donması',
   'entities.abilities.dragons_breath.description':
     'Genişleyen bir alev nefesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan düşmanlar yönelim kaybeder; hasar bu etkiyi bozar. Azami şarj her zaman kritik vurur ve Sıcak Seri için bir kez sayılır. (Ateş)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Ejderha Nefesi',
   'entities.abilities.fingers_of_frost.description':
     "Ayaz Mızrağı'nın 2 yüke kadar Donmuş Parmaklar kazandırma ihtimali %15'tir: bir sonraki Ice Lance hedefi donmuş gibi değerlendirir. (Don)",
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Don Parmakları',
   'entities.abilities.fireball_form.description':
     'Alev saçan bir köze dönüşerek hareket hızını {buff}% artır. Dönüşüm sırasında saldıramazsın veya büyü kullanamazsın. Normal formuna dönmek için yeniden kullan.',
   'entities.abilities.fireball_form.name': 'Kor Formu',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.flurry.name': 'Kış Kırbacı',
+  'entities.abilities.frozen_orb.name': 'Donmuş Küre',
   'entities.abilities.glacial_front.description':
     'Genişleyen bir don cephesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan tüm düşmanlar 4 saniye boyunca %50 yavaşlar. Azami şarj ayrıca onları 1 saniye kökler. (Don)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Buzul Cephesi',
   'entities.abilities.glacial_spike.description':
     'Devasa bir buz dikeni çağırarak 5 Buz Parçası tüketir, {damage} Don hasarı verir ve hedefi 4 saniye olduğu yere dondurur. (Don)',
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Buzul Dikeni',
   'entities.abilities.ice_lance.description':
     "Bir buz kıymığı fırlatarak {damage} Don hasarı verir; donmuş hedefe karşı üç kat etkilidir. Donmuş Parmaklar'ı veya Kışın Üşümesi'nin bir yükünü harcayarak hedefi donmuş gibi değerlendirir. (Don)",
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Buz Mızrağı',
   'entities.abilities.perfect_moment.description':
     'Mükemmel anını yakala: anında 4 Gizemli Yük kazan ve 10 saniye boyunca Aether Okları onları tüketmez. (Kronomansi)',
   'entities.abilities.perfect_moment.name': 'Mükemmel An',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.shatter.name': 'Kırılgan Yıkım',
   'entities.abilities.temporal_acceleration.description':
     "Grubunuz veya akınınız için zamanın akışını hızlandırarak saldırı, büyü atma ve kanalize hızını 15 saniye boyunca %30 artırır. Yakın zamanda Zamansal Hızlanma veya Savaş Davulları'ndan etkilenen müttefikler bu etkiden yararlanamayacak kadar tükenmiştir. (Kronomansi)",
   'entities.abilities.temporal_acceleration.name': 'Zamansal Hızlanma',
@@ -2828,7 +2828,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.garrote.name': 'Boğaz Teli',
   'entities.abilities.ghost_wolf.description':
     "Seni bir Shadewolf'a dönüştürür ve hareket hızını 10 dakika boyunca %40 artırır.",
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': 'Gölge Kurdu',
   'entities.abilities.gouge.description':
     'Hedefe {damage} hasar vererek onu 4 saniye boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. 1 kombo puanı kazandırır.',
   'entities.abilities.gouge.name': 'Göz Dürtme',
@@ -2889,7 +2889,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_shield.name': 'Gök Gürültüsü Siperi',
   'entities.abilities.mark_of_the_wild.description':
     "Dost bir hedefe Wildward'ı yerleştirir ve zırhını 30 dakika boyunca {buff} artırır.",
-  'entities.abilities.mark_of_the_wild.name': 'Wildward',
+  'entities.abilities.mark_of_the_wild.name': 'Yaban Siperi',
   'entities.abilities.maul.description':
     'Yakın dövüş hasarını {damage} artıran ve yüksek miktarda tehdit yaratan hırpalayıcı bir saldırı. Bir sonraki vuruşunda etkinleşir. Yalnızca Bruin Formu.',
   'entities.abilities.maul.name': 'Kemik Kıran',
@@ -3005,7 +3005,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Gök Düşüşü',
   'entities.abilities.stealth.description':
     "Seni gölgelerde gizler: düşmanlar seni güçlükle fark eder, ancak %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Duskveil'i bozar. Çıkmak için tekrar kullan.",
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Alaca Örtüsü',
   'entities.abilities.stormstrike.description':
     'Fırtınayı silahından geçirir ve silah hasarı artı {damage} için anında vurur.',
   'entities.abilities.stormstrike.name': 'Atalar Darbesi',
@@ -8360,7 +8360,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Şafakta dövülmüş bir kalkan fırlatarak {damage} Kutsal hasar verir, ana hedefi 2 sn susturur ve ardından 10 metre içindeki en fazla 2 ek düşmana sekerek her sekmede %75 hasar verir. (Paladin yeteneği)',
   'entities.abilities.aspect_of_the_wild.description':
     '30 m içindeki müttefikleri vahşi güçle cesaretlendirir, saldırı güçlerini 45 ve saldırı hızlarını 5 dk. boyunca %5 artırır. (Avcı yeteneği)',
-  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.name': 'Savaş Timsali',
   'entities.abilities.avatar.description':
     '20 sn boyunca bir devcüsseye dönüşür, üzerindeki tüm kontrol etkilerini kırar ve verdiğin hasarı %20 artırırsın.',
   'entities.abilities.avenging_wrath.description':
@@ -8942,7 +8942,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Tam beceri kazanımı',
   'hudChrome.crafting.difficultyNone': 'Beceri kazanımı yok',
   'hudChrome.crafting.difficultyReduced': 'Azaltılmış beceri kazanımı',
-  'hudChrome.crafting.enchantedLine': 'Büyülü',
   'hudChrome.crafting.makersMark': '{name} tarafından hazırlanmıştır',
   'hudChrome.crafting.masterworkSeal': 'Şaheser',
   'hudChrome.crafting.masterworkToast': 'Şaheser! {name}',
@@ -9159,4 +9158,61 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': '{name} için {fee} karşılığında bağı çöz',
   'hudChrome.unbind.unbound':
     '{name} için {fee} karşılığında bağ çözüldü. Bir sonraki takasında yeniden bağlanacak.',
+  'hud.combat.auraGainOther': '{target}, {name} etkisini kazandı.',
+  'hudChrome.corpseHarvest.components.cloth': 'Kumaş',
+  'hudChrome.corpseHarvest.components.meat': 'Et',
+  'hudChrome.crafting.noBagSpace': 'Çantanızda üretilen eşya için yer yok.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Çantanızda gizemli malzemeler için yer yok.',
+  'hudChrome.enchanting.enchantNoSpace': 'Çantanızda büyülü eşya için yer yok.',
+  'hudChrome.enchanting.salvageNoSpace': 'Çantanızda parçalamadan çıkan malzemeler için yer yok.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'Erişebileceğiniz bir ot öbeği yok.',
+  'hudChrome.gathering.noNodeNearby.logging': 'Erişebileceğiniz bir ağaç kümesi yok.',
+  'hudChrome.gathering.noNodeNearby.mining': 'Erişebileceğiniz bir cevher damarı yok.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Otçu orağı gerektirir',
+  'hudChrome.gathering.requiresTool.logging': 'Oduncu baltası gerektirir',
+  'hudChrome.gathering.requiresTool.mining': 'Madenci kazması gerektirir',
+  'hudChrome.gathering.toolRequired.fishing':
+    'Balık tutmak için bir olta kamışına ihtiyacınız var.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Bu ot öbeğini toplamak için bir otçu orağına ihtiyacınız var.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Bu ağaç kümesini devirmek için bir oduncu baltasına ihtiyacınız var.',
+  'hudChrome.gathering.toolRequired.mining':
+    'Bu cevher damarını kazmak için bir madenci kazmasına ihtiyacınız var.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Olta kamışı (kademe {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Otçuluk aleti (kademe {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Odun kesimi aleti (kademe {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Madencilik aleti (kademe {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Balıkçılık becerisi {skill} ve üzerinde daha zengin av listelerinin kilidini açar.',
+  'hudChrome.gathering.toolTooltip.rodBite':
+    "Balıklar {seconds} sn'ye kadar daha erken oltaya vurur.",
+  'hudChrome.gathering.toolTooltip.rodReel': 'Olta çekme süresini {seconds} sn uzatır.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Balık tutmak için gereklidir.',
+  'hudChrome.gathering.toolTooltip.speed': 'Kademe {tier} altındaki düğümlerde daha hızlı toplar.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Kademe {tier} ve altındaki ot öbeklerini toplamak için gereklidir.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Kademe {tier} ve altındaki ağaç kümelerini devirmek için gereklidir.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Kademe {tier} ve altındaki cevher damarlarını kazmak için gereklidir.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': 'Kullanım: Yakındaki bir ot öbeğini toplar.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Kullanım: Yakındaki bir ağaç kümesini devirir.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Kullanım: Yakındaki bir cevher damarını kazar.',
+  'hudChrome.noticeboard.empty': 'Görünüşe göre hiçbir şey asılmamış.',
+  'hudChrome.training.pendingAria': '{name} öğreniliyor',
+  'hudChrome.training.statePending': 'Öğreniliyor',
+  'hudChrome.unbind.noSpace': 'Çantanızda bağı çözülmüş kopya için yer yok.',
+  'loading.incompatibleWorldVersion':
+    'Oyun ve sunucu sürümleri uyumsuz. Yeniden yükleyin veya güncelleyin, ardından tekrar deneyin.',
+  'loading.messageRateExceeded':
+    'Eylemleri çok hızlı gönderdiğiniz için bağlantınız kesildi. Lütfen biraz bekleyip tekrar giriş yapın.',
+  'perfNudge.dismiss': 'Kapat',
+  'perfNudge.hardwareAccelerationDesktop':
+    "Oyun, GPU hızlandırması olmadan çalışıyor ve bu yüzden çok yavaş. Ekran kartı sürücülerinizi güncelleyin, ardından oyunu yeniden başlatın. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler bölümünden oyunu “Yüksek performans” olarak ayarlayın.",
+  'perfNudge.hardwareAccelerationWeb':
+    'Oyun, GPU hızlandırması olmadan çalışıyor ve bu yüzden çok yavaş. Tarayıcı ayarlarınızdan donanım hızlandırmayı açın, ekran kartı sürücülerinizi güncelleyin, ardından tarayıcınızı yeniden başlatın.',
+  'perfNudge.integratedGpu':
+    "Oyun, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda bir oyun ekran kartı da varsa, Windows'ta Ayarlar > Sistem > Ekran > Grafikler bölümünden tarayıcınızı “Yüksek performans” olarak ayarlayın, ardından tarayıcıyı yeniden başlatın. Masaüstü uygulaması oyun ekran kartını otomatik olarak seçer.",
+  'worldContent.noticeboardName': 'İlan Tahtası',
 };

@@ -245,11 +245,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Salvagen is de alledaagse neef van onbetoveren: dezelfde wapens en wapenrusting, geen vaardigheid vereist en geen vaardigheid gewonnen, waarbij gewone knutselschroot wordt teruggegeven per kwaliteit in plaats van iets arcaans. Iedereen kan het doen, betoveraar of niet. Wanneer je een stuk vasthoudt dat de moeite waard is te breken, is de keuze eenvoudig: vanaf zeldzaam is onbetoveren strikt de betere deal, terwijl bij gewoon de twee opbrengsten voor ongeveer hetzelfde bij een handelaar verkopen, dus breek naar welk materiaal je daadwerkelijk nodig hebt.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Mijnbouw haalt erts rechtstreeks uit het gesteente: koper in Eastbrook-Dal, ijzer in Mirefen-Veen, en osmium in Doorntop-Hoogten, als voeding voor de smeedambachten. Open voor iedereen vanaf niveau 1, geen enkele toegangsbeperking, bijgehouden op zijn eigen teller tot een grens van 100.',
+    'Mijnbouw haalt erts rechtstreeks uit het gesteente: koper in Oostbeekdal, ijzer in Slijkveenmoeras, en osmium in Doorntop-Hoogten, als voeding voor de smeedambachten. Open voor iedereen vanaf niveau 1: je hebt alleen een mijnhouweel in je tassen nodig, 20 koper bij elke zonehub. Bijgehouden op zijn eigen teller tot een grens van 100.',
   'guide.profPages.gatherIntro.logging':
-    'Houtkap velt hout uit boomstanden in alle drie zones: ijzerschors in Eastbrook-Dal, essenhout in Mirefen-Veen, en hoogden in Doorntop-Hoogten, de ruwe grondstof voor schachten, staven en de gereedschapsmakerij. Open voor iedereen vanaf niveau 1, bijgehouden op zijn eigen teller tot een grens van 100.',
+    'Houtkap velt hout uit houtopstanden in alle drie zones: ijzerschors in Oostbeekdal, essenhout in Slijkveenmoeras, en hoogden in Doorntop-Hoogten, de ruwe grondstof voor schachten, staven en de gereedschapsmakerij. Open voor iedereen vanaf niveau 1 met een kapbijl in je tassen (20 koper bij elke zonehub), bijgehouden op zijn eigen teller tot een grens van 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Kruidenkunde verzamelt wat wild groeit: glansloofkruid in Eastbrook-Dal, goudblad in Mirefen-Veen, en zonnepetaal in Doorntop-Hoogten, het blad en de stengel die de apotheekambachten draaiende houden. Open voor iedereen vanaf niveau 1, bijgehouden op zijn eigen teller tot een grens van 100.',
+    'Kruidenkunde verzamelt wat wild groeit: glansloofkruid in Oostbeekdal, goudblad in Slijkveenmoeras, en zonnepetaal in Doorntop-Hoogten, het blad en de stengel die de apotheekambachten draaiende houden. Open voor iedereen vanaf niveau 1 met een kruidenkunde-sikkel in je tassen (20 koper bij elke zonehub), bijgehouden op zijn eigen teller tot een grens van 100.',
   'guide.profPages.gatherIntro.fishing':
     'Vissen is de vreemde eend onder de verzamelberoepen, en het diepste: een echt aas-en-optrekken-minispel, eigen vangsttabellen in elke zone, en een vaardigheidsgrens van 200, het dubbele van de anderen. Koop een hengel, kijk naar open water, en gooi.',
   'guide.profPages.rhythmHeading': 'Het verzamelritme',
@@ -262,7 +262,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Waar de grondstoffenpunten zijn, hun rang, het gereedschap dat ze nodig hebben en wat ze opleveren. Elk grondstoffenpunt hergroeit voor jou {respawn} seconden na je eigen oogst, en die timer is alleen van jou: een andere verzamelaar die hetzelfde grondstoffenpunt bewerkt vertraagt de jouwe nooit, dus er is geen wedloop om grondstoffenpunten en geen kamperen. Elke zone hoger op de ladder brengt een beter materiaal op uit zwaarder terrein.',
   'guide.profPages.toolsHeading': 'Gereedschap',
   'guide.profPages.toolsNote':
-    'Blote handen tellen als rang 1 gereedschap, dus elk rang 1-grondstoffenpunt in het spel heeft helemaal geen gereedschap nodig. De verkoopladder dekt de rangen 1 tot 3; een gereedschapsstuk hoeft alleen in je tassen te zitten, er is geen uitrustslot en geen duurzaamheid, dus elk is een eenmalige aankoop. Alleen de rang telt voor de toegangspoort: de zeldzaamheidskleur van gereedschap is puur cosmetisch.\n\nBoven de verkoopladder staan twee gemaakte gereedschappen, rang 4 en rang 5, gemaakt in de gereedschapsmakerij door knutselaars en nooit verkocht door een NPC. Geen enkel grondstoffenpunt heeft nu meer dan rang 3 nodig, dus hun huidige waarde zit in snelheid: een topgereedschap pinnt de cast op zijn vloer op lagere grondstoffenpunten, en het zal het toegangsticket zijn wanneer hoger terrein arriveert.',
+    'Elk grondstoffenpunt vraagt het gereedschap van zijn ambacht in je tassen, rang 1 inbegrepen: zonder mijnhouweel geen erts, zonder hengel geen vis. De verkoopladder dekt de rangen 1 tot 3 en ligt bij elke zonehub in voorraad; een gereedschapsstuk hoeft alleen in je tassen te zitten, er is geen uitrustslot en geen duurzaamheid, dus elk is een eenmalige aankoop. Alleen de rang telt voor de toegangspoort: de zeldzaamheidskleur van gereedschap is puur cosmetisch.\n\nBoven de verkoopladder staan twee gemaakte gereedschappen, rang 4 en rang 5, gemaakt in de gereedschapsmakerij door knutselaars en nooit verkocht door een NPC. Geen enkel grondstoffenpunt heeft nu meer dan rang 3 nodig, dus hun huidige waarde zit in snelheid: een topgereedschap pinnt de cast op zijn vloer op lagere grondstoffenpunten, en het zal het toegangsticket zijn wanneer hoger terrein arriveert.',
   'guide.profPages.toolCrafted': 'Gemaakt ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Niet verkocht',
@@ -416,59 +416,59 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'cardDuel.yourTurn': 'Speel een kaart',
   'entities.abilities.arcane_surge.description':
     'Trekt een golf rauwe aether door de vijand voor {damage} schade. Elke worp laat een Arcanelading achter die de schade en werpsnelheid van je volgende Aether Surge vergroot (5% sneller per lading), maar de manakosten sterk verhoogt, tot maximaal 4 ladingen; Aetherpijlen verbruikt de ladingen. Elke worp kan ook Aetherhaast activeren, waardoor je volgende Aether Surge gratis is en twee keer zo snel te werpen.',
-  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.arcane_surge.name': 'Arcanekracht',
   'entities.abilities.blizzard.description':
     'Roept een ijsstorm op over het doelgebied gedurende 6 sec, die {damage} Vorstschade per seconde toebrengt en vijanden met 40% vertraagt. Elk getroffen vijand haalt 0,5 sec af van Frozen Orb, tot 3 sec per worp. (Vorst)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Sneeuwstorm',
+  'entities.abilities.brain_freeze.name': 'Hersenbevriezing',
   'entities.abilities.dragons_breath.description':
     'Houd ingedrukt om een brede vuurstroom op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Getroffen vijanden raken gedesoriënteerd en schade verbreekt het effect; maximale lading treft altijd kritiek en telt eenmaal mee voor Hete reeks. (Vuur)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Drakenadem',
   'entities.abilities.fingers_of_frost.description':
     'Rijplans heeft 15% kans om Fingers of Frost te verlenen, tot 2 ladingen: je volgende Ice Lance behandelt het doelwit als bevroren. (Vorst)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Vingers van Vorst',
   'entities.abilities.fireball_form.description':
     'Verander in een vlammende sintel, waardoor je bewegingssnelheid met {buff}% toeneemt. Je kunt niet aanvallen of spreuken uitspreken terwijl je getransformeerd bent. Heractiveer om terug te keren naar je normale gedaante.',
-  'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.fireball_form.name': 'Gloedgedaante',
+  'entities.abilities.flurry.name': 'Wintergesel',
+  'entities.abilities.frozen_orb.name': 'Bevroren Bol',
   'entities.abilities.glacial_front.description':
     'Houd ingedrukt om een brede vorstgolf op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Alle getroffen vijanden worden gedurende 4 sec met 50% vertraagd; maximale lading wortelt ze ook 1 sec vast. (Vorst)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Gletsjerfront',
   'entities.abilities.glacial_spike.description':
     'Bezweer een massieve ijspiek die 5 IJsschilfers verbruikt om {damage} Vorstschade toe te brengen en het doelwit 4 sec op zijn plek te bevriezen. (Vorst)',
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Gletsjerspies',
   'entities.abilities.ice_lance.description':
     'Slingert een ijsscherf die {damage} Vorstschade toebrengt, verdrievoudigd tegen een bevroren doelwit. Verbruikt Fingers of Frost of een lading Winterskil om het doelwit als bevroren te behandelen. (Vorst)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'IJslans',
   'entities.abilities.perfect_moment.description':
     'Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet. (Chronomantie)',
-  'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.perfect_moment.name': 'Volmaakt Ogenblik',
+  'entities.abilities.shatter.name': 'Broze Ondergang',
   'entities.abilities.temporal_acceleration.description':
     'Versnelt de tijdstroom voor je groep of raid, waardoor aanvals-, bezwerings- en kanalisatiesnelheid gedurende 15 sec met 30% toeneemt. Bondgenoten die recentelijk door Temporal Acceleration of Oorlogstrommen zijn getroffen, zijn te uitgeput om ervan te profiteren. (Chronomantie)',
-  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_acceleration.name': 'Temporele Versnelling',
   'entities.abilities.temporal_barrier.description':
     'Verschuift het doelwit een hartslag buiten het heden: een tijdschild absorbeert {damage} schade gedurende 10 sec voordat de tijdlijn terugknalt.',
-  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_barrier.name': 'Temporele Barrière',
   'entities.abilities.temporal_cascade.description':
     'Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. (Chronomantie)',
-  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_cascade.name': 'Temporele Cascade',
   'entities.abilities.temporal_echo.description':
     'Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec stroomt een deel van de Arcaneschade die je aanricht terug door de echo om hen te genezen.',
-  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_echo.name': 'Temporele Echo',
   'entities.abilities.temporal_hourglass.description':
     'Plaatst een tijdzandloper op de geselecteerde locatie. Onder een vijand schorst het hen {hostilePveDuration} sec in PvE of {hostilePvpDuration} sec in PvP en verhindert alle acties; schade verbreekt het effect. Aan je voeten of onder een groepsbondgenoot verleent het {duration} sec stasis, verhindert schade en acties, herstelt {healing}% van maximale gezondheid, en laat afkoeltijden {selfCooldownRecovery}% sneller herstellen voor jezelf of {allyCooldownRecovery}% sneller voor een bondgenoot. Op leeg terrein wacht de zandloper {groundDuration} sec en treft de eerste geldige eenheid die erop stapt. De heilzame aura kan handmatig worden verwijderd.',
-  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_hourglass.name': 'Zandloper van Stilstand',
   'entities.abilities.temporal_mend.description':
     'Trekt een bondgenoot een moment vooruit in de tijd, waarbij {damage} gezondheid wordt hersteld terwijl het lichaam zijn gezondere toekomstige zelf vindt. (Chronomantie-handtekening)',
-  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_mend.name': 'Temporele Heling',
   'entities.abilities.temporal_reversal.description':
     'Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem bij zijn lichaam tot leven met een deel van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)',
-  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_reversal.name': 'Temporele Omkering',
   'entities.abilities.temporal_rewind.description':
     'Stuurt een arcanegolf door je groep of raid en spoelt de tijd terug om 30% van de schade te herstellen die elke bondgenoot binnen 40 meter de afgelopen 5 seconden heeft opgelopen (tot 35% van hun maximale gezondheid). Kan geen kritiek effect zijn. (Chronomantie)',
-  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.abilities.temporal_rewind.name': 'Terugspoelen',
   'entities.items.sootscale_mantle.name': 'Roetschubben-Mantel',
   'entities.items.arcane_dust.name': 'Arcaan Stof',
   'entities.items.arcane_essence.name': 'Arcanessentie',
@@ -1139,7 +1139,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_kick.name': 'Trap',
   'entities.abilities.sport_pass.description':
     'Speel een strakke pass naar je aangewezen teamgenoot, in de loop.',
-  'entities.abilities.sport_pass.name': 'Pass',
+  'entities.abilities.sport_pass.name': 'Passen',
   'entities.abilities.sport_punt.description': 'Een uittrap van de keeper, hoog en ver.',
   'entities.abilities.sport_punt.name': 'Verre Uittrap',
   'entities.abilities.sport_second_wind.description':
@@ -2958,7 +2958,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.garrote.name': 'Keeldraad',
   'entities.abilities.ghost_wolf.description':
     'Verandert je in een Shadewolf en verhoogt de bewegingssnelheid met 40% gedurende 10 min.',
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': 'Schaduwwolf',
   'entities.abilities.gouge.description':
     'Treft het doelwit voor {damage} schade en maakt het 4 sec strijdongeschikt. Elke schade verbreekt het effect. Levert 1 combopunt op.',
   'entities.abilities.gouge.name': 'Oogstoot',
@@ -3000,7 +3000,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.instant_poison.name': 'Adderbeet',
   'entities.abilities.judgement.description':
     'Ontketent je actieve Zegel op de vijand en verbruikt het om de opgeslagen Heilige schade toe te brengen.',
-  'entities.abilities.judgement.name': 'Verdict',
+  'entities.abilities.judgement.name': 'Vonnis',
   'entities.abilities.kidney_shot.description':
     'Afmaakzet die het doelwit verdooft. Duurt 1 sec langer per combopunt.',
   'entities.abilities.kidney_shot.name': 'Lage Stoot',
@@ -3140,7 +3140,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Hemelval',
   'entities.abilities.stealth.description':
     'Verbergt je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt Duskveil. Bezweer opnieuw om eruit te stappen.',
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Schemersluier',
   'entities.abilities.stormstrike.description':
     'Kanaliseert de storm door je wapen en treft ogenblikkelijk voor wapenschade plus {damage}.',
   'entities.abilities.stormstrike.name': 'Voorouderslag',
@@ -9150,7 +9150,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimale vaardigheidswinst',
   'hudChrome.crafting.difficultyNone': 'Geen vaardigheidswinst',
   'hudChrome.crafting.difficultyReduced': 'Verminderde vaardigheidswinst',
-  'hudChrome.crafting.enchantedLine': 'Betoverd',
   'hudChrome.crafting.makersMark': 'Gemaakt door {name}',
   'hudChrome.crafting.masterworkSeal': 'Meesterwerk',
   'hudChrome.crafting.masterworkToast': 'Meesterwerk! {name}',
@@ -9265,4 +9264,61 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': '{name} ontbinden voor {fee}',
   'hudChrome.unbind.unbound':
     '{name} ontbonden voor {fee}. Het bindt opnieuw bij de volgende ruil.',
+  'hud.combat.auraGainOther': '{target} krijgt {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Stof',
+  'hudChrome.corpseHarvest.components.meat': 'Vlees',
+  'hudChrome.crafting.noBagSpace': 'Je hebt geen ruimte voor het vervaardigde voorwerp.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Je hebt geen ruimte voor de magische materialen.',
+  'hudChrome.enchanting.enchantNoSpace': 'Je hebt geen ruimte voor het betoverde voorwerp.',
+  'hudChrome.enchanting.salvageNoSpace': 'Je hebt geen ruimte voor de geborgen materialen.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'Er is geen kruidenveld binnen bereik.',
+  'hudChrome.gathering.noNodeNearby.logging': 'Er is geen houtopstand binnen bereik.',
+  'hudChrome.gathering.noNodeNearby.mining': 'Er is geen ertsader binnen bereik.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Vereist een kruidenkunde-sikkel',
+  'hudChrome.gathering.requiresTool.logging': 'Vereist een kapbijl',
+  'hudChrome.gathering.requiresTool.mining': 'Vereist een mijnhouweel',
+  'hudChrome.gathering.toolRequired.fishing': 'Je hebt een hengel nodig om je lijn uit te werpen.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Je hebt een kruidenkunde-sikkel nodig om dit kruidenveld te oogsten.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Je hebt een kapbijl nodig om deze houtopstand te vellen.',
+  'hudChrome.gathering.toolRequired.mining':
+    'Je hebt een mijnhouweel nodig om deze ertsader te ontginnen.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Hengel (rang {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Kruidenkundegereedschap (rang {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Houtkapgereedschap (rang {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Mijnbouwgereedschap (rang {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Ontgrendelt een rijkere vangst vanaf visvaardigheid {skill}.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Vissen bijten tot {seconds} s eerder.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Verlengt de binnenhaaltijd met {seconds} s.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Vereist om te vissen.',
+  'hudChrome.gathering.toolTooltip.speed':
+    'Verzamelt sneller bij grondstoffenpunten onder rang {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Vereist om kruidenvelden tot en met rang {tier} te oogsten.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Vereist om houtopstanden tot en met rang {tier} te vellen.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Vereist om ertsaders tot en met rang {tier} te ontginnen.',
+  'hudChrome.gathering.toolTooltip.use.herbalism':
+    'Gebruik: oogst van een nabijgelegen kruidenveld.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Gebruik: vel een nabijgelegen houtopstand.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Gebruik: ontgin een nabijgelegen ertsader.',
+  'hudChrome.noticeboard.empty': 'Er lijkt niets opgehangen te zijn.',
+  'hudChrome.training.pendingAria': '{name} wordt geleerd',
+  'hudChrome.training.statePending': 'Wordt geleerd',
+  'hudChrome.unbind.noSpace': 'Je hebt geen ruimte voor het ontbonden exemplaar.',
+  'loading.incompatibleWorldVersion':
+    'Spel- en serverversie zijn niet compatibel. Laad opnieuw of werk bij en probeer het daarna nogmaals.',
+  'loading.messageRateExceeded':
+    'De verbinding is verbroken omdat je te snel acties verstuurde. Wacht even en log opnieuw in.',
+  'perfNudge.dismiss': 'Sluiten',
+  'perfNudge.hardwareAccelerationDesktop':
+    "Het spel draait zonder GPU-versnelling, waardoor het erg traag is. Werk je grafische stuurprogramma's bij en start het spel opnieuw. Stel het spel in Windows ook in op Hoge prestaties via Instellingen > Systeem > Beeldscherm > Beeldinstellingen.",
+  'perfNudge.hardwareAccelerationWeb':
+    "Het spel draait zonder GPU-versnelling, waardoor het erg traag is. Schakel hardwareversnelling in bij de instellingen van je browser, werk je grafische stuurprogramma's bij en start je browser opnieuw.",
+  'perfNudge.integratedGpu':
+    'Het spel draait op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, stel je browser in Windows dan in op Hoge prestaties via Instellingen > Systeem > Beeldscherm > Beeldinstellingen en start de browser opnieuw. De desktop-app kiest de game-GPU automatisch.',
+  'worldContent.noticeboardName': 'Mededelingenbord',
 };

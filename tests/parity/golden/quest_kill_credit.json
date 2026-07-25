@@ -148,7 +148,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "834c0c77",
+      "state": "f00da35a",
       "events": "9b7e48a7",
       "rng": {
         "draws": 0,
@@ -263,9 +263,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
+            "x": 4.5,
             "y": 1.5,
-            "z": 6
+            "z": 5.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -296,7 +296,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 424,
-      "state": "cbb5ad0b",
+      "state": "2931d52e",
       "events": "90016984",
       "rng": {
         "draws": 40,
@@ -442,9 +442,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
+            "x": 4.5,
             "y": 1.5,
-            "z": 6
+            "z": 5.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -475,7 +475,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 424,
-      "state": "2a61c10c",
+      "state": "a8908153",
       "events": "6df26093",
       "rng": {
         "draws": 40,
@@ -613,9 +613,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
+            "x": 4.5,
             "y": 1.5,
-            "z": 6
+            "z": 5.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -646,7 +646,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 424,
-      "state": "8b1963b1",
+      "state": "47c250f6",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -784,9 +784,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
+            "x": 4.5,
             "y": 1.5,
-            "z": 6
+            "z": 5.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

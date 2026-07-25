@@ -25,7 +25,14 @@ import {
 import { resolveSportKit } from '../sim/content/vale_cup';
 import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
-import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
+import {
+  ALL_RECIPES,
+  abilitiesKnownAt,
+  CLASSES,
+  NPCS,
+  resolveDelveShopOffers,
+  STATIONS,
+} from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
@@ -97,6 +104,8 @@ import {
   type LockpickView,
   type MailInfo,
   type MarketInfo,
+  ONLINE_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
   type PlayerProfessionsView,
@@ -120,6 +129,8 @@ import type {
   SalvageResultView,
 } from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
+import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import {
@@ -217,14 +228,14 @@ export function buildWebSocketAuthMessage(
   characterId: number,
   clientSeed = '',
 ): {
-  t: 'auth';
+  t: typeof ONLINE_WORLD_AUTH_TYPE;
   token: string;
   character: number;
   clientSeed: string;
   timerWire: typeof STABLE_TIMER_WIRE_VERSION;
 } {
   return {
-    t: 'auth',
+    t: ONLINE_WORLD_AUTH_TYPE,
     token,
     character: characterId,
     clientSeed,
@@ -1058,6 +1069,12 @@ const ACTION_BAR_SAVE_DEBOUNCE_MS = 1500;
 const RECONNECT_BASE_DELAY_MS = 1_000;
 const RECONNECT_MAX_DELAY_MS = 15_000;
 const RECONNECT_MAX_ATTEMPTS = 40;
+// A pre-layout-gate server accepts only `t:'auth'`, so it rejects our current
+// discriminator with this otherwise-generic literal. During a handshake only,
+// turn that legacy response into the same actionable reason a current server
+// emits for an old client. Never reinterpret an error on an established session.
+const LEGACY_WORLD_AUTH_REQUIRED_ERROR = 'authentication required';
+const INCOMPATIBLE_WORLD_VERSION_ERROR = ONLINE_WORLD_INCOMPATIBLE_MESSAGE;
 // ...but only for entities last seen near/beyond the interest boundary, where
 // that churn happens. A close-range disappearance is intentional (an enemy going
 // stealth) and must hide at once, so anything nearer than this drops immediately.
@@ -1065,6 +1082,15 @@ const RECONNECT_MAX_ATTEMPTS = 40;
 // DESPAWN_GRACE_MS before vanishing — acceptable, since you can only see a
 // stealthed unit at that range when far out-leveling it.
 const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
+// How many self snapshots a pending target echo may hold the optimistic value
+// before the server's value wins regardless (the reconcile valve: a server
+// REFUSAL, an invalid, dead, or out-of-interest target, must still win). Self
+// snapshots broadcast once per 50 ms server loop callback, so 3 spans ~150 ms,
+// comfortably past the typical command round trip; on a slower link the worst
+// case degrades to the pre-fix one-snapshot blink, never a stuck target. A
+// snapshot COUNT rather than wall-clock keeps the valve deterministic in tests
+// (and needs no clock at all in the decode path).
+const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
 
 function blankEntity(id: number): Entity {
   return {
@@ -1344,8 +1370,10 @@ export class ClientWorld implements IWorld {
   // the write rule. NON-IWorld mirror: the seam exposes only `accountFlair`.
   private playerFlair = new Map<string, PlayerFlair>();
   // --- IWorldMarket: World Market view, mirrored from the snapshot self
-  // (`s.market`, delta-omitted). ---
+  // (`s.market`, delta-omitted). `s.mktU` is the always-streamed collect
+  // indicator bit (the mailU pattern; the minimap badge). ---
   marketInfo: MarketInfo | null = null;
+  marketCollectPending = false;
   // --- IWorldMail: Ravenpost mailbox view + unread badge, mirrored from the
   // snapshot self (`s.mail` / `s.mailU`, delta-omitted). ---
   mailInfo: MailInfo | null = null;
@@ -1423,6 +1451,9 @@ export class ClientWorld implements IWorld {
   // tier plus combo recipes) ships with the client bundle like every other
   // content table, so this needs no wire round-trip. See src/world_api/professions.ts.
   recipeList: readonly RecipeDef[] = ALL_RECIPES;
+  // Online realms always use the version-pinned built-in static layout; no
+  // snapshot field is needed for authored station markers.
+  readonly stationPlacements = STATIONS;
   // Craft-result surface (#1127), mirrored from the server's `craftResult`
   // event (applyEvent below). Null until this session's first craft attempt.
   lastCraftResult: CraftResultView | null = null;
@@ -1494,6 +1525,9 @@ export class ClientWorld implements IWorld {
   // scratch for applySnapshot's per-message "ids present in this snap" set,
   // reused across snapshots (20 Hz) instead of allocating a Set per message
   private wireSeen = new Set<number>();
+  // always-on net-pipeline counters (net_pipeline_stats.ts); no initializer on
+  // purpose, see netPipeline() below
+  private netPipelineStats: NetPipelineStats | undefined;
   // camera follow for keyboard turns applied by the main loop
   pendingFacingDelta = 0;
   connected = false;
@@ -1547,6 +1581,17 @@ export class ClientWorld implements IWorld {
   profanityWords: string[] = [];
   private profanityDirty = false;
   private pendingQuestCommands = new Map<string, 'accept' | 'turnin'>();
+  // Pending-target echo protection, the same sanctioned display-only-optimism
+  // idiom as pendingQuestCommands / quest_state_optimistic.ts. targetEntity
+  // writes the optimistic targetId locally, but a snapshot the server generated
+  // BEFORE processing the 'target' command is nearly always already in flight
+  // and still carries the OLD target; applying it blanks the target frame for
+  // one snapshot (and re-toggles the party-frames below-target push), the
+  // select flicker. While set, every self targetId write routes through
+  // applySelfTargetFromServer, which keeps displaying the optimistic id until
+  // the server echoes it or the snapshot budget runs out (server authority is
+  // untouched: a refusal still wins via that valve).
+  private pendingTargetEcho: { id: number | null; snapshotsLeft: number } | null = null;
   private nextCommandOutcomeId = 1;
   private pendingCommandOutcomes = new Map<
     number,
@@ -1571,8 +1616,9 @@ export class ClientWorld implements IWorld {
     this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
     this.openSocket();
-    // input stream at sim rate
-    this.sendTimer = window.setInterval(() => this.sendInput(), 50);
+    // unconditional input stream beat; constants + gate shared with the
+    // cadence-model matrix via input_send_cadence.ts (R13)
+    this.sendTimer = window.setInterval(() => this.sendInput(), INPUT_SEND_TIMER_INTERVAL_MS);
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -1790,7 +1836,7 @@ export class ClientWorld implements IWorld {
     const sig = this.inputSignature();
     if (changedOnly) {
       if (sig === this.lastInputSig) return false;
-      if (now - this.lastInputSentAt < 16) return false;
+      if (!inputFlushGateOpen(now, this.lastInputSentAt)) return false;
     }
     const mi = this.moveInput;
     const msg: Record<string, unknown> = {
@@ -1882,13 +1928,27 @@ export class ClientWorld implements IWorld {
     this.rawCmd(payload);
   }
 
+  /**
+   * Lazy holder, never a field initializer (the wireSeen pattern): bareClient
+   * suites build instances via Object.create(ClientWorld.prototype), which
+   * skips field initializers. main.ts drains this once per animation frame
+   * (main.ts is the src/net to src/game junction; this module never imports
+   * src/game, ruling R8).
+   */
+  netPipeline(): NetPipelineStats {
+    if (this.netPipelineStats === undefined) this.netPipelineStats = createNetPipelineStats();
+    return this.netPipelineStats;
+  }
+
   private onMessage(raw: string): void {
     let msg: any;
+    const parseStart = performance.now();
     try {
       msg = JSON.parse(raw);
     } catch {
       return;
     }
+    const parseMs = performance.now() - parseStart;
     if (
       msg.t === 'commandOutcome' &&
       Number.isSafeInteger(msg.rid) &&
@@ -1924,6 +1984,10 @@ export class ClientWorld implements IWorld {
         this.inputEchoSamples = [];
         this.missingSince.clear();
         this.lastSnapAt = 0;
+        // any in-flight target echo died with the old transport; the resent
+        // world's value must apply from the first snapshot
+        this.pendingTargetEcho = null;
+        this.netPipeline().noteReset();
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
         this.spectating = null;
@@ -1940,6 +2004,9 @@ export class ClientWorld implements IWorld {
       this.spectating = typeof msg.name === 'string' ? msg.name : null;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
+      // the spectate swap changes whose record the self-decode writes; a hold
+      // armed for the previous identity must not shadow the new one's target
+      this.pendingTargetEcho = null;
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
       if (typeof this.spectating !== 'string') {
@@ -1959,6 +2026,7 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'error') {
+      const wasConnected = this.connected;
       this.connected = false;
       // Mid-reconnect, 'character already in world' is the transient window
       // where the server has not yet noticed the old socket died (a
@@ -1983,8 +2051,12 @@ export class ClientWorld implements IWorld {
       }
       // any other server rejection (kick, moderation, takeover, failed auth)
       // ends the session for good: no auto-reconnect
+      const rejection =
+        !wasConnected && msg.error === LEGACY_WORLD_AUTH_REQUIRED_ERROR
+          ? INCOMPATIBLE_WORLD_VERSION_ERROR
+          : msg.error;
       this.endSession();
-      this.onDisconnect?.(msg.error ?? 'rejected by server');
+      this.onDisconnect?.(rejection ?? 'rejected by server');
       return;
     }
     if (msg.t === 'events') {
@@ -2050,7 +2122,21 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'snap') {
+      // Raw inter-arrival gap, read BEFORE applySnapshot updates lastSnapAt
+      // and feeds its (5,500)-windowed EWMA: the raw ring keeps the stall
+      // outliers that filter deliberately eats (finding 20, ruling R9).
+      const applyStart = performance.now();
+      const rawGapMs = this.lastSnapAt > 0 ? applyStart - this.lastSnapAt : null;
       this.applySnapshot(msg);
+      this.netPipeline().recordSnapshot({
+        nowMs: applyStart,
+        approxBytes: raw.length,
+        parseMs,
+        applyMs: performance.now() - applyStart,
+        entCount: Array.isArray(msg.ents) ? msg.ents.length : 0,
+        keepCount: Array.isArray(msg.keep) ? msg.keep.length : 0,
+        rawGapMs,
+      });
     }
   }
 
@@ -2429,12 +2515,21 @@ export class ClientWorld implements IWorld {
       e.aggroTargetId = w.aggro ?? null;
       // Another entity's selected target (players/bots; mobs use aggro above). Powers
       // the target-of-target frame for a player target. For the SELF record this is
-      // re-set authoritatively from `s.target` in the self-decode below (same value).
-      e.targetId = w.tgt ?? null;
+      // re-set authoritatively from `s.target` in the self-decode below (same value),
+      // and both writes route through the pending-target echo guard (countStale
+      // false here: the self-decode owns the budget decrement).
+      if (w.id === this.playerId) this.applySelfTargetFromServer(e, w.tgt ?? null, false);
+      else e.targetId = w.tgt ?? null;
       e.tappedById = w.tap ?? null;
       // corpse harvest claim: unconditional so a record without hcb (unclaimed,
       // or a respawn that cleared the claim) resets any stale mirrored pid
       e.harvestClaimedBy = typeof w.hcb === 'number' ? w.hcb : null;
+      // loot owner-lock lapse: flag present means lapsed (mirror as already
+      // counted down), absent means the lock still holds or never started;
+      // unconditional so a respawned record resets any stale lapse (same
+      // contract as hcb above). The server owns the countdown; the client only
+      // ever needs the boolean.
+      e.lootFfaTimer = w.ffa ? 0 : Infinity;
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
@@ -2672,7 +2767,11 @@ export class ClientWorld implements IWorld {
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
-      e.targetId = s.target ?? null;
+      // Routed through the pending-target echo guard: a stale in-flight
+      // snapshot must not clobber an optimistic targetEntity write (the target
+      // frame + party-frames select flicker). This is the counting site: one
+      // budget decrement per self snapshot.
+      this.applySelfTargetFromServer(e, s.target ?? null, true);
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
       e.queuedOnSwing = s.queued ?? null;
@@ -2717,7 +2816,15 @@ export class ClientWorld implements IWorld {
       // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
       // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
       // the move; the offline counterpart is src/sim/items.ts.
-      this.copper = s.copper ?? 0;
+      // A money-only delta carries no inventory echo at all (a proceeds-only market
+      // collect, a trainer fee, a bank slot buy all move meta.copper and nothing else),
+      // so without this the bag money row and vendor affordability sat stale until the
+      // window was reopened (#2373). DIFF against the prior mirror, never a presence
+      // test: copper rides EVERY self-frame, so `s.copper !== undefined` would raise the
+      // flag at 20 Hz and rebuild the bags under the player's cursor continuously.
+      const copper = s.copper ?? 0;
+      if (copper !== this.copper) this.invChanged = true;
+      this.copper = copper;
       if (s.inv !== undefined) {
         this.inventory = s.inv;
         this.invChanged = true;
@@ -2797,6 +2904,7 @@ export class ClientWorld implements IWorld {
       if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
       if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
       if (s.market !== undefined) this.marketInfo = s.market;
+      if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
       // `bank` is delta-omitted when unchanged (an omitted key means unchanged, NOT
@@ -3074,26 +3182,84 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'resurrect_respond', accept });
   }
 
+  // The single write path for the LOCAL player's mirrored targetId from server
+  // state. Two snapshot sites assign it (the wireEntity `tgt` decode in
+  // applyWire and the precise `target` self-decode, same server-side value per
+  // server/game.ts selfWireJson) and both must apply the same echo protection,
+  // else the unguarded one re-introduces the clobber. `countStale` is true only
+  // for the self-decode, so one snapshot never burns two units of the budget.
+  private applySelfTargetFromServer(
+    e: Entity,
+    serverTarget: number | null,
+    countStale: boolean,
+  ): void {
+    const pending = this.pendingTargetEcho;
+    if (!pending) {
+      e.targetId = serverTarget;
+      return;
+    }
+    if (serverTarget === pending.id) {
+      // The echo landed: the server agrees, resume normal mirroring so a LATER
+      // server-initiated change (target death, out of interest) applies again.
+      this.pendingTargetEcho = null;
+      e.targetId = serverTarget;
+      return;
+    }
+    if (countStale) {
+      pending.snapshotsLeft -= 1;
+      if (pending.snapshotsLeft <= 0) {
+        // Reconciliation valve: the server never echoed the command (it refused
+        // an invalid, dead, or out-of-interest target). Server authority wins.
+        this.pendingTargetEcho = null;
+        e.targetId = serverTarget;
+        return;
+      }
+    }
+    // A stale pre-command snapshot: keep displaying the optimistic value.
+    // Assigned (not merely skipped) so the applyWire write earlier in the same
+    // snapshot pass cannot leave the clobbered value behind.
+    e.targetId = pending.id;
+  }
+
   // --- IWorldTargeting: target selection + tab cycling ---
   targetEntity(id: number | null): void {
-    // optimistic local update for snappy UI
+    // optimistic local update for snappy UI, plus the pending echo record that
+    // shields it from in-flight stale snapshots (applySelfTargetFromServer).
+    // Armed only when the optimistic write actually happened, and never while
+    // spectating: cmd() drops non-chat commands in spectate, so no echo would
+    // ever arrive to release the hold on the spectated player's mirror.
     const p = this.entities.get(this.playerId);
     if (p) {
-      if (id === null) p.targetId = null;
-      else {
+      if (id === null) {
+        p.targetId = null;
+        if (typeof this.spectating !== 'string') {
+          // last write wins: a newer call replaces any older pending record
+          this.pendingTargetEcho = { id: null, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
+        }
+      } else {
         const e = this.entities.get(id);
-        if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) p.targetId = id;
+        if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) {
+          p.targetId = id;
+          if (typeof this.spectating !== 'string') {
+            this.pendingTargetEcho = { id, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
+          }
+        }
       }
     }
     this.cmd({ cmd: 'target', id });
   }
   tabTarget(): void {
+    // Server-resolved retarget: its result must apply from the very next
+    // snapshot, so drop any in-flight click echo hold before sending.
+    this.pendingTargetEcho = null;
     this.cmd({ cmd: 'tab' });
   }
   targetNearestFriendly(): void {
+    this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'targetNearestFriendly' });
   }
   friendlyTabTarget(): void {
+    this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'tabFriendly' });
   }
 
@@ -3628,6 +3794,9 @@ export class ClientWorld implements IWorld {
   }
   guildEventRemove(eventId: number): void {
     this.cmd({ cmd: 'guild_event_remove', id: eventId });
+  }
+  guildSetMotd(text: string): void {
+    this.cmd({ cmd: 'guild_set_motd', text });
   }
   async searchCharacters(query: string): Promise<CharacterSearchResult[]> {
     const q = query.trim();

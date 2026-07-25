@@ -10,7 +10,9 @@ import {
   type ClientPerfSummaryRow,
   cleanHours,
   mapClientPerfSummaryRows,
+  mapSuggestionCountRows,
   PERF_SUMMARY_LIMITS,
+  type PerfSuggestionCountRow,
   perfAggregateFromRow,
 } from '../../server/client_perf_summary_shape';
 
@@ -61,6 +63,7 @@ const KEY_COLUMNS = {
   browser: 'browser_family',
   os: 'os_family',
   scenario: 'zone_or_scenario',
+  crowd: 'crowd_bucket',
 } as const;
 
 // The () set row: every GROUPING() bit rolled up (1), every key column NULL.
@@ -71,11 +74,13 @@ function totalsRow(seed: number): Row {
     browser_family: null,
     os_family: null,
     zone_or_scenario: null,
+    crowd_bucket: null,
     g_preset: 1,
     g_gpu: 1,
     g_browser: 1,
     g_os: 1,
     g_scenario: 1,
+    g_crowd: 1,
     vol_rank: 1,
     worst_rank: 1,
     ...agg(seed),
@@ -109,6 +114,7 @@ describe('mapClientPerfSummaryRows classification', () => {
       bucketRow('browser', 'Chrome', 1, 1, 5),
       bucketRow('os', 'Windows', 1, 1, 6),
       bucketRow('scenario', 'elwynn', 1, 1, 7),
+      bucketRow('crowd', '25-49', 1, 1, 8),
     ]);
     expect(out.totals).toEqual(expectedAgg(9));
     expect(out.byPreset).toEqual([{ key: '', ...expectedAgg(3) }]);
@@ -116,7 +122,25 @@ describe('mapClientPerfSummaryRows classification', () => {
     expect(out.byBrowser).toEqual([{ key: 'Chrome', ...expectedAgg(5) }]);
     expect(out.byOs).toEqual([{ key: 'Windows', ...expectedAgg(6) }]);
     expect(out.byScenario).toEqual([{ key: 'elwynn', ...expectedAgg(7) }]);
+    expect(out.byCrowd).toEqual([{ key: '25-49', ...expectedAgg(8) }]);
     expect(out.worstGpuBuckets).toEqual([{ key: 'adreno', ...expectedAgg(4) }]);
+  });
+
+  it('folds the legacy empty-string crowd key to unknown at read time, and ONLY there', () => {
+    // Pre-column rows aggregate under crowd_bucket '' (ruling R3); the mapper
+    // relabels them 'unknown' without merging them into the real unknown
+    // bucket (percentiles do not compose), while every other list keeps ''
+    // as-is (the preset '' key is legitimate data).
+    const out = mapClientPerfSummaryRows([
+      bucketRow('crowd', '', 1, 1, 3),
+      bucketRow('crowd', 'unknown', 2, 2, 4),
+      bucketRow('preset', '', 1, 1, 5),
+    ]);
+    expect(out.byCrowd).toEqual([
+      { key: 'unknown', ...expectedAgg(3) },
+      { key: 'unknown', ...expectedAgg(4) },
+    ]);
+    expect(out.byPreset).toEqual([{ key: '', ...expectedAgg(5) }]);
   });
 
   it('returns the totals row as-is, never rebuilt from the bucket rows', () => {
@@ -187,6 +211,7 @@ describe('mapClientPerfSummaryRows caps', () => {
     for (let i = 1; i <= 32; i++) rows.push(bucketRow('scenario', `z${i}`, i, i, i));
     for (let i = 1; i <= 21; i++) rows.push(bucketRow('os', `o${i}`, i, i, i));
     for (let i = 1; i <= 22; i++) rows.push(bucketRow('browser', `b${i}`, i, i, i));
+    for (let i = 1; i <= 10; i++) rows.push(bucketRow('crowd', `c${i}`, i, i, i));
     const out = mapClientPerfSummaryRows(rows);
     expect(out.byPreset).toHaveLength(20);
     expect(out.byPreset[19].key).toBe('p20');
@@ -199,6 +224,9 @@ describe('mapClientPerfSummaryRows caps', () => {
     expect(out.byBrowser).toHaveLength(20);
     expect(out.byBrowser[19].key).toBe('b20');
     expect(out.byBrowser.map((b) => b.key)).not.toContain('b21');
+    expect(out.byCrowd).toHaveLength(8);
+    expect(out.byCrowd[7].key).toBe('c8');
+    expect(out.byCrowd.map((b) => b.key)).not.toContain('c9');
   });
 
   it('pins the per-array caps to the literal numbers the admin lists show', () => {
@@ -208,8 +236,43 @@ describe('mapClientPerfSummaryRows caps', () => {
       byBrowser: 20,
       byOs: 20,
       byScenario: 30,
+      byCrowd: 8,
       worstGpu: 20,
+      suggestionCounts: 12,
     });
+  });
+});
+
+describe('mapSuggestionCountRows', () => {
+  it('maps the unnest rows preserving the statement order', () => {
+    const rows: PerfSuggestionCountRow[] = [
+      { suggestion_id: 'hardware-acceleration', sample_count: 9 },
+      { suggestion_id: 'integrated-gpu', sample_count: 4 },
+    ];
+    expect(mapSuggestionCountRows(rows)).toEqual([
+      { id: 'hardware-acceleration', sampleCount: 9 },
+      { id: 'integrated-gpu', sampleCount: 4 },
+    ]);
+  });
+
+  it('caps defensively at the suggestionCounts limit, keeping the boundary row', () => {
+    const rows: PerfSuggestionCountRow[] = [];
+    for (let i = 1; i <= 14; i++) rows.push({ suggestion_id: `s${i}`, sample_count: 100 - i });
+    const out = mapSuggestionCountRows(rows);
+    expect(out).toHaveLength(12);
+    expect(out[11]).toEqual({ id: 's12', sampleCount: 88 });
+    expect(out.map((c) => c.id)).not.toContain('s13');
+  });
+
+  it('folds a defensive NULL id to the empty string and a missing count to zero', () => {
+    expect(mapSuggestionCountRows([{ suggestion_id: null, sample_count: 3 }, {}])).toEqual([
+      { id: '', sampleCount: 3 },
+      { id: '', sampleCount: 0 },
+    ]);
+  });
+
+  it('yields an empty list for an empty window', () => {
+    expect(mapSuggestionCountRows([])).toEqual([]);
   });
 });
 
@@ -232,6 +295,7 @@ describe('mapClientPerfSummaryRows empty window', () => {
     expect(out.byBrowser).toEqual([]);
     expect(out.byOs).toEqual([]);
     expect(out.byScenario).toEqual([]);
+    expect(out.byCrowd).toEqual([]);
     expect(out.worstGpuBuckets).toEqual([]);
   });
 });

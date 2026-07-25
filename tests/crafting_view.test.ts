@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { archetypeCeilingFor } from '../src/sim/professions/archetype';
 import { requiredReagentCount } from '../src/sim/professions/crafting';
@@ -773,7 +774,7 @@ describe('craftLearnHints (discoverability)', () => {
   it('hints a craft with unlearned trainer recipes at its station and master (positive)', () => {
     // Nothing learned: every stationed craft with a trainer recipe is hinted,
     // naming its station type and resident master.
-    const hints = craftLearnHints([]);
+    const hints = craftLearnHints([], STATIONS);
     expect(trainerRecipeIdsFor('weaponcrafting').length).toBeGreaterThan(0);
     expect(hints.get('weaponcrafting')).toEqual({
       stationType: 'forge',
@@ -784,11 +785,11 @@ describe('craftLearnHints (discoverability)', () => {
   it('drops the hint once every trainer recipe of the craft is known (fully-trained negative)', () => {
     const known = trainerRecipeIdsFor('weaponcrafting');
     expect(known.length).toBeGreaterThan(0);
-    expect(craftLearnHints(known).has('weaponcrafting')).toBe(false);
+    expect(craftLearnHints(known, STATIONS).has('weaponcrafting')).toBe(false);
   });
 
   it('never hints a craft with no physical station, and stays safe for unknown crafts', () => {
-    const hints = craftLearnHints([]);
+    const hints = craftLearnHints([], []);
     // Every hinted craft resolves to the station type it was paired with.
     for (const [craft, hint] of hints) {
       expect(stationTypeForCraft(craft)).toBe(hint.stationType);

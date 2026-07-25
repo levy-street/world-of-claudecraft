@@ -219,13 +219,13 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     expect(three.attackPower).toBe(three.stats.str * 2 + 40);
   });
 
-  it('Wyrmshadow (t1 agility): crit gains the flat 2% at 3pc on top of agi-derived crit', () => {
+  it('Wyrmshadow (t1 agility): crit gains 1% at 3pc on top of agi-derived crit', () => {
     const three = statsFor('rogue', 20, {
       chest: 'wyrmshadow_harness',
       feet: 'wyrmshadow_treads',
       legs: 'wyrmshadow_legguards',
     });
-    expect(three.critChance).toBeCloseTo(0.05 + three.stats.agi * 0.0005 + 0.02);
+    expect(three.critChance).toBeCloseTo(0.05 + three.stats.agi * 0.0005 + 0.01);
   });
 
   it('Crownforged (t2 strength, 4 pieces): the 4-set Hit bonus lands on the equipped hitRating', () => {

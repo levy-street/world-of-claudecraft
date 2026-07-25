@@ -5,6 +5,7 @@
 // the shared types are importable from the barrel without duplication.
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { STATIONS } from '../src/sim/data';
 import type { ProfessionRecord } from '../src/sim/professions';
 import { emptyCraftSkills } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
@@ -70,6 +71,13 @@ describe('professions contracts (#1164)', () => {
   it('IWorldProfessions.professionsState is a stub empty view on ClientWorld (not yet mirrored from a snapshot)', () => {
     const client = makeClientWorld();
     expect(client.professionsState).toEqual({ skills: [] });
+  });
+
+  it('serves the same version-pinned station placements through both IWorld implementations', () => {
+    const sim = new Sim({ seed: SIM_SEED, playerClass: PROBE_CLASS });
+    const client = makeClientWorld();
+    expect(sim.stationPlacements).toBe(STATIONS);
+    expect(client.stationPlacements).toBe(STATIONS);
   });
 
   it('a fresh pre-sync ClientWorld exposes empty-but-well-formed craft skills', () => {

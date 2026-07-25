@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import { ALL_RECIPES, COMBO_RECIPES, LADDER_RECIPES, recipeById } from '../src/sim/content/recipes';
-import { ITEMS, NPCS } from '../src/sim/data';
+import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
@@ -205,7 +205,7 @@ describe('REFERENTIAL INTEGRITY', () => {
         type,
         `${recipe.id}: professionId ${recipe.professionId} has no station type`,
       ).toBeDefined();
-      const stations = stationsOfType(type as NonNullable<typeof type>);
+      const stations = stationsOfType(STATIONS, type as NonNullable<typeof type>);
       expect(stations.length, `${recipe.id}: no station of type ${type}`).toBeGreaterThan(0);
       for (const station of stations) {
         expect(
@@ -224,7 +224,7 @@ describe('REFERENTIAL INTEGRITY', () => {
       expect(recipe.stationType, `${recipe.id} should have no stationType`).toBeUndefined();
       const type = stationTypeForCraft(recipe.professionId);
       expect(type, `${recipe.id}: combo home unresolved`).toBeDefined();
-      expect(stationsOfType(type as NonNullable<typeof type>).length).toBeGreaterThan(0);
+      expect(stationsOfType(STATIONS, type as NonNullable<typeof type>).length).toBeGreaterThan(0);
     }
   });
 
@@ -236,7 +236,7 @@ describe('REFERENTIAL INTEGRITY', () => {
         `${recipe.id}: stationType ${recipe.stationType} is not a runtime StationType`,
       ).toBe(true);
       expect(
-        stationsOfType(recipe.stationType).length,
+        stationsOfType(STATIONS, recipe.stationType).length,
         `${recipe.id}: ${recipe.stationType}`,
       ).toBeGreaterThan(0);
     }

@@ -4,36 +4,28 @@
 // (`updateRested` / `isResting`), MOVED verbatim out of sim.ts behind SimContext
 // (move + import, not a rewrite). The XP curve formulas (xpForLevel / canPrestige)
 // stay pure in ../types and are imported here.
-import { PROPS } from '../data';
+
+import { buildingContainsRestPoint, buildingRestPadding } from '../building_layout';
+import { getActiveWorldContent } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { canPrestige, DT, type Entity, MAX_LEVEL, xpForLevel } from '../types';
+import { type BuildingDef, canPrestige, DT, type Entity, MAX_LEVEL, xpForLevel } from '../types';
 
 // Rested-XP tuning. Consumed only by updateRested / isResting below.
 const RESTED_SECONDS_PER_GAME_HOUR = 60; // 1 in-game hour = 60 sim seconds
 const RESTED_FILL_FRACTION = 0.05; // a full "bubble" = 5% of the level's XP-to-level
 const RESTED_FILL_HOURS = 8; // accrued per this many in-game hours of resting
 const RESTED_CAP_LEVELS = 1.5; // pool clamps to 1.5 levels of XP, the classic-era cap
-const RESTED_INN_PADDING = 2; // yards of slack around the inn footprint that still counts as resting
-
 // True while the player is standing in (or just beside) an inn footprint and
 // out of combat — the classic "resting" state that accrues rested XP.
-export function isResting(p: Entity): boolean {
+export function isResting(
+  p: Entity,
+  buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
+): boolean {
   if (p.inCombat) return false;
-  for (const b of PROPS.buildings) {
+  for (const b of buildings) {
     if (b.kind !== 'inn') continue;
-    // Point-in-rotated-rect: bring the player into the inn's local frame.
-    const dx = p.pos.x - b.x;
-    const dz = p.pos.z - b.z;
-    const cos = Math.cos(-b.rot);
-    const sin = Math.sin(-b.rot);
-    const lx = dx * cos - dz * sin;
-    const lz = dx * sin + dz * cos;
-    if (
-      Math.abs(lx) <= b.w / 2 + RESTED_INN_PADDING &&
-      Math.abs(lz) <= b.d / 2 + RESTED_INN_PADDING
-    )
-      return true;
+    if (buildingContainsRestPoint(b, p.pos.x, p.pos.z, buildingRestPadding(b))) return true;
   }
   return false;
 }
@@ -41,14 +33,18 @@ export function isResting(p: Entity): boolean {
 // Accrue rested XP while resting in an inn. Classic-era rate: 5% of the level's
 // XP-to-level per 8 in-game hours, clamped to 1.5 levels. Deterministic —
 // paced off DT, never wall-clock. No accrual at the cap (no level bar).
-export function updateRested(p: Entity, meta: PlayerMeta): void {
+export function updateRested(
+  p: Entity,
+  meta: PlayerMeta,
+  buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
+): void {
   if (p.level >= MAX_LEVEL) return;
   const cap = RESTED_CAP_LEVELS * xpForLevel(p.level);
   if (meta.restedXp >= cap) {
     meta.restedXp = cap;
     return;
   }
-  if (!isResting(p)) return;
+  if (!isResting(p, buildings)) return;
   const fillSeconds = RESTED_FILL_HOURS * RESTED_SECONDS_PER_GAME_HOUR;
   const perSecond = (RESTED_FILL_FRACTION * xpForLevel(p.level)) / fillSeconds;
   meta.restedXp = Math.min(cap, meta.restedXp + perSecond * DT);

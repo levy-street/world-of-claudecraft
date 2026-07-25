@@ -27,6 +27,14 @@ function moveToMailbox(sim: Sim, pid: number): void {
   sim.rebucket(p);
 }
 
+function moveAwayFromMailboxes(sim: Sim, pid: number): void {
+  const p = sim.entities.get(pid);
+  if (!p) throw new Error('missing player');
+  p.pos = sim.groundPos(50, 0);
+  p.prevPos = { ...p.pos };
+  sim.rebucket(p);
+}
+
 function tickFor(sim: Sim, seconds: number): SimEvent[] {
   const out: SimEvent[] = [];
   for (let i = 0; i < Math.ceil(seconds * 20); i++) out.push(...sim.tick());
@@ -130,7 +138,9 @@ describe('sending a letter', () => {
       return r && r.type === 'mailResult' ? r.code : null;
     };
 
-    // Away from any mailbox.
+    // The rebuilt Eastbrook mailbox is intentionally close to the fresh start,
+    // so move to an explicit non-service point for the proximity denial.
+    moveAwayFromMailboxes(sim, alice);
     sim.mailSend('Alice', 'x', 'y', 0, [], alice);
     expect(lastCode()).toBe('tooFar');
 

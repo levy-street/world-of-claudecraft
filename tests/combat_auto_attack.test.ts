@@ -19,6 +19,7 @@ import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type PlayerClass } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -43,6 +44,7 @@ function makeSim(
 ): { sim: AnySim; p: AnyEntity; meta: any } {
   const sim = new Sim({ seed, playerClass: cls, autoEquip: true }) as AnySim;
   sim.setPlayerLevel(level);
+  placePlayerInOpenField(sim);
   const p = sim.player as AnyEntity;
   const meta = sim.players.get(p.id);
   p.resource = p.maxResource;

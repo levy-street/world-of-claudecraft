@@ -15,9 +15,13 @@
 // This module is the DECISION layer (Three/DOM-free, deterministic, unit-tested);
 // renderer.ts is the thin consumer that runs the manifest the policy describes.
 
+import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
+
 /** Manifest entries a constrained device still runs; everything else is skipped. */
 export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.required',
+  'views.landmarks',
+  'views.persistent-portals',
   'views.nearby',
   'textures.scene',
   'programs.compile',
@@ -28,6 +32,78 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
 export const CONSTRAINED_TEXTURE_BATCH_SIZE = 4;
 export const CONSTRAINED_TEXTURE_MAX_MS = 1200;
 export const CONSTRAINED_ENTRY_VIEW_RAMP_MS = 300;
+export const NEARBY_LANDMARK_STREAM_RADIUS = 16;
+
+export interface MandatoryLandmarkCandidate {
+  kind: string;
+  templateId: string | null;
+  pos: { x: number; z: number };
+}
+
+export interface MandatoryLandmarkPartition<T> {
+  /** Service landmarks actionable from the current entry position. */
+  mandatory: T[];
+  /** Every other candidate, including remote service landmarks. */
+  ordinary: T[];
+}
+
+function authoredLandmarkInteractionRadius(templateId: string | null): number | null {
+  if (templateId === EASTBROOK_LAYOUT.services.mailbox.templateId) {
+    return EASTBROOK_LAYOUT.services.mailbox.interactionRadius;
+  }
+  if (templateId === EASTBROOK_LAYOUT.services.noticeboard.templateId) {
+    return EASTBROOK_LAYOUT.services.noticeboard.interactionRadius;
+  }
+  return null;
+}
+
+/** Runtime-streaming fallback priority. Entry readiness uses the mandatory
+ * radius-aware partition below and never relies on this ordinary queue rank. */
+export function interactionLandmarkViewPriority(
+  templateId: string | null,
+  distanceSq: number,
+): number | null {
+  if (authoredLandmarkInteractionRadius(templateId) === null) return null;
+  // A readable service landmark already inside the immediate town view should
+  // stream before the NPC backlog after entry. Farther landmarks retain their
+  // ordinary rank, so this never turns into whole-world eager instantiation.
+  return distanceSq <= NEARBY_LANDMARK_STREAM_RADIUS * NEARBY_LANDMARK_STREAM_RADIUS ? 0.5 : 1.5;
+}
+
+/**
+ * Separate actionable service landmarks from the ordinary entry backlog. Only the
+ * authored interaction radii qualify: recognizing a template never instantiates its
+ * view when the player entered elsewhere in the world.
+ */
+export function partitionMandatoryLandmarkCandidates<T extends MandatoryLandmarkCandidate>(
+  candidates: Iterable<T>,
+  origin: { x: number; z: number },
+): MandatoryLandmarkPartition<T> {
+  const mandatory: T[] = [];
+  const ordinary: T[] = [];
+  for (const candidate of candidates) {
+    const radius = authoredLandmarkInteractionRadius(candidate.templateId);
+    const dx = candidate.pos.x - origin.x;
+    const dz = candidate.pos.z - origin.z;
+    if (candidate.kind === 'object' && radius !== null && dx * dx + dz * dz <= radius * radius) {
+      mandatory.push(candidate);
+    } else ordinary.push(candidate);
+  }
+  return { mandatory, ordinary };
+}
+
+/** A landmark is entry-ready only after its real view exists and its bounded
+ * async-compile gate has cleared. No-parallel-compile views begin cleared. */
+export function mandatoryLandmarkViewsReady<T extends { compilePending: boolean }>(
+  mandatoryIds: readonly number[],
+  views: ReadonlyMap<number, T>,
+): boolean {
+  for (const id of mandatoryIds) {
+    const view = views.get(id);
+    if (!view || view.compilePending) return false;
+  }
+  return true;
+}
 
 export interface PrewarmPolicyInput {
   /** GFX.constrainedMemory: the phone-class memory-ceiling profile is active. */

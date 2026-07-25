@@ -19,6 +19,7 @@ import {
 // Base deps: nothing learned, no skill, comfortable purse.
 function deps(over: Partial<TrainViewDeps> & Record<string, unknown> = {}): TrainViewDeps {
   return {
+    stations: STATIONS,
     knownRecipes: [],
     craftSkills: {},
     copper: 100000,
@@ -40,12 +41,13 @@ describe('isStationMasterNpc', () => {
     // master from recognition (a non-combo master included) must fail here,
     // not just the two combo-teaching ones.
     for (const station of STATIONS) {
-      expect(isStationMasterNpc(station.masterNpcId), station.masterNpcId).toBe(true);
+      expect(isStationMasterNpc(station.masterNpcId, STATIONS), station.masterNpcId).toBe(true);
     }
     expect(STATIONS).toHaveLength(6);
-    expect(isStationMasterNpc('marshal_redbrook')).toBe(false);
-    expect(isStationMasterNpc('smith_haldren')).toBe(false); // the stall smith is NOT the forge master
-    expect(isStationMasterNpc('')).toBe(false);
+    expect(isStationMasterNpc('marshal_redbrook', STATIONS)).toBe(false);
+    expect(isStationMasterNpc('smith_haldren', STATIONS)).toBe(false); // the stall smith is NOT the forge master
+    expect(isStationMasterNpc('', STATIONS)).toBe(false);
+    expect(isStationMasterNpc('forgemistress_darva', [])).toBe(false);
   });
 });
 

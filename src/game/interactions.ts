@@ -1,8 +1,14 @@
-import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
+import {
+  dist2d,
+  EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
+  EASTBROOK_NOTICEBOARD_TEMPLATE_ID,
+  type Entity,
+  INTERACT_RANGE,
+} from '../sim/types';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
-import { corpseLootAvailability } from './corpse_loot_availability';
+import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import type { HoverCursorKind } from './cursors';
 import type { InteractionOutcome } from './interaction_autorun';
 
@@ -12,6 +18,9 @@ export interface PickInteractionWorld {
   entities: IWorld['entities'];
   duelInfo?: IWorld['duelInfo'];
   arenaInfo?: IWorld['arenaInfo'];
+  // Local party roster for the corpse rights check; optional so party-less
+  // fixtures stay valid.
+  partyInfo?: IWorld['partyInfo'];
   targetEntity(id: number | null): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
   leaveDungeon(): InteractionOutcome;
@@ -113,12 +122,20 @@ export function isActivePvpOpponent(world: PickInteractionWorld, e: Entity): boo
   );
 }
 
+/** Resolve the client-side range for a lootable object before dispatch or approach. */
+export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): number {
+  return entity.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID
+    ? EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS
+    : INTERACT_RANGE;
+}
+
 /** Whether an otherwise incomplete entity click represents a useful movement intent. */
 export function shouldApproachPickedEntity(
   player: Entity,
   entity: Entity,
   didInteract: boolean,
   harvestStateReliable = true,
+  partyMemberIds: readonly number[] | null = null,
 ): boolean {
   if (didInteract || player.dead || entity.id === player.id) return false;
   const d = dist2d(player.pos, entity.pos);
@@ -127,10 +144,10 @@ export function shouldApproachPickedEntity(
       entity.kind === 'mob' &&
       entity.lootable &&
       d > INTERACT_RANGE + 1 &&
-      corpseLootAvailability(entity, player.id, harvestStateReliable).canOpen
+      corpseLootAvailability(entity, player.id, harvestStateReliable, partyMemberIds).canOpen
     );
   }
-  if (entity.kind === 'object') return d > INTERACT_RANGE;
+  if (entity.kind === 'object') return d > objectInteractionRange(entity);
   if (entity.kind === 'npc') return d > INTERACT_RANGE + 2;
   return true;
 }
@@ -159,7 +176,7 @@ export function handlePickedEntity(
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
-      if (d > INTERACT_RANGE) {
+      if (d > objectInteractionRange(e)) {
         hud.showError(t('questUi.errors.tooFar'));
         return false;
       }
@@ -177,8 +194,12 @@ export function handlePickedEntity(
       }
       if (d <= INTERACT_RANGE + 1) {
         if (
-          !corpseLootAvailability(e, world.playerId ?? world.player.id, harvestStateReliable)
-            .canOpen
+          !corpseLootAvailability(
+            e,
+            world.playerId ?? world.player.id,
+            harvestStateReliable,
+            localPartyMemberIds(world.partyInfo),
+          ).canOpen
         )
           return false;
         hud.openLoot(id, screenX, screenY);
@@ -231,7 +252,7 @@ export function handlePickedEntity(
         return false;
       }
       const d = dist2d(world.player.pos, e.pos);
-      if (d > INTERACT_RANGE) return false;
+      if (d > objectInteractionRange(e)) return false;
       if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
       if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
       if (e.templateId === 'mailbox') {
@@ -247,8 +268,12 @@ export function handlePickedEntity(
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 1) {
         if (
-          !corpseLootAvailability(e, world.playerId ?? world.player.id, harvestStateReliable)
-            .canOpen
+          !corpseLootAvailability(
+            e,
+            world.playerId ?? world.player.id,
+            harvestStateReliable,
+            localPartyMemberIds(world.partyInfo),
+          ).canOpen
         )
           return false;
         hud.openLoot(id, screenX, screenY);

@@ -875,6 +875,10 @@ export const hudChromeStrings = {
     // Interface panel toggle: Clique-style mouseover casting of friendly abilities
     // on the hovered party frame (on by default).
     mouseoverCast: 'Mouseover Cast on Party Frames',
+    // Combat-tab toggle (off by default: ground left-clicks clear the target,
+    // the classic behavior). On keeps the target on a ground left-click so
+    // click-to-move repositioning does not deselect.
+    stickyTarget: 'Keep Target on Ground Click',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
     itemLevelLine: 'Item Level {level}',
@@ -1099,9 +1103,9 @@ export const hudChromeStrings = {
       critChance: 'Your chance for an attack to strike critically, dealing double damage.',
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
       critRating:
-        'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 10 rating grants exactly 1% crit.',
+        'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.',
       hasteRating:
-        'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 10 rating grants exactly 1% haste.',
+        'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 20 rating grants exactly 1% haste.',
       parry:
         'Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.',
       hitRating:
@@ -1534,6 +1538,15 @@ export const hudChromeStrings = {
     // visual tab is aria-hidden, so the per-copy flag rides the cell's label
     // (the tooltip on focus stays the detail surface).
     itemAriaInstanced: '{item}, quantity {count}, maker-marked copy',
+    // Per-kind accessible names for the bag corner glyphs
+    // (src/ui/bag_instance_glyph_view.ts decides the kind). The glyph itself is
+    // aria-hidden, so the CELL's name is what carries the fact: without these
+    // an enchanted or bound copy announced as "maker-marked copy", which is
+    // both a mislabel and less than the three distinguishable glyphs a sighted
+    // player gets. A signed copy keeps itemAriaInstanced above (that wording is
+    // accurate for it), as does an instanced copy of no recognized kind.
+    itemAriaEnchanted: '{item}, quantity {count}, enchanted copy',
+    itemAriaBound: '{item}, quantity {count}, bound copy',
     // Accessible-name sibling for the authored masterwork seal. Keep the whole
     // phrase in one key so punctuation and status placement remain localizable.
     itemAriaMasterwork: '{item}, quantity {count}, masterwork',
@@ -1839,6 +1852,38 @@ export const hudChromeStrings = {
   // through formatNumber.
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',
+    // The enchant-attributed sibling of itemUi.tooltip.stat, rendered on the
+    // share of a per-copy bonus stat that an applied enchant granted
+    // (item_instance_tooltip.ts instanceBonusStatLines). It replaced the old
+    // standalone "Enchanted" badge, so the tooltip names WHICH bonus the
+    // enchant paid for instead of only that one exists. Its own key with its
+    // own fills: the suffix is never concatenated onto the plain stat line.
+    statEnchanted: '+{value} {stat} (Enchanted)',
+    // The safety net behind statEnchanted: attribution can only speak through a
+    // bonus stat line, so a copy whose enchant grants no readable line (an
+    // enchant id this client's ENCHANTS table does not know, e.g. mid-rollout
+    // against a newer server, or a payload carrying the marker without
+    // rolled.stats) would otherwise say nothing at all about being enchanted,
+    // while its bag corner still paints the enchant glyph. Rendered ONLY in
+    // that case, never beside an attributed line.
+    enchantedFallback: 'Enchanted',
+  },
+  // Purpose hints for the eight enchanting materials
+  // (src/ui/material_hint_view.ts), keyed by item id there. Each says what the
+  // material is for and which gear disenchants into it, so a junk-kind reagent
+  // stops being an unexplained stack in the bags. The sources track the sim's
+  // own routing: DISENCHANT_MATERIAL_BY_QUALITY for the three arcane tiers,
+  // ARMOR_SECONDARY_BY_TYPE / TIMBER_WEAPON_TYPES for the five resonants.
+  materialHint: {
+    arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
+    arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
+    arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',
+    resonantThread: 'Enchanting reagent. Disenchanted from rare and better cloth armor.',
+    resonantHide: 'Enchanting reagent. Disenchanted from rare and better leather armor.',
+    resonantLinks: 'Enchanting reagent. Disenchanted from rare and better mail armor.',
+    resonantSteel: 'Enchanting reagent. Disenchanted from rare and better melee weapons.',
+    resonantTimber:
+      'Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows.',
   },
   discord: {
     title: 'Discord',
@@ -2100,6 +2145,16 @@ export const hudChromeStrings = {
       takeParcelsFirst: 'Take the parcels out before discarding the letter.',
     },
   },
+  // The World Market coin by the minimap (the mailbox indicator pattern):
+  // visible while sale proceeds or returned items wait at the Merchant.
+  // (Wordy, M16: the five non-Latin fills land in this same change.)
+  marketIndicator: {
+    aria: 'World Market collection waiting',
+    tip: 'Gold or items are waiting for you at the Merchant.',
+  },
+  noticeboard: {
+    empty: 'Nothing seems posted.',
+  },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial
   // amount; the footer buys 6-slot expansion blocks. The withdraw-quantity and
@@ -2239,6 +2294,22 @@ export const hudChromeStrings = {
     offlineHeader: 'Offline ({n})',
     hideOffline: 'Hide offline',
     hideOfflineTitle: 'Hide offline guild members',
+    // The guild billboard: a short officer-set message (announcements, Discord
+    // links) pinned atop the Guild tab. Rendered as plain escaped text only,
+    // deliberately (player-controlled; never linkified). {name} in setBy is the
+    // setter's character name, spliced verbatim.
+    billboard: {
+      label: 'Guild Billboard',
+      empty: 'Nothing on the billboard yet.',
+      setBy: 'Set by {name}',
+      save: 'Save',
+      placeholder: 'Write a message for the guild',
+      inputLabel: 'Guild billboard message',
+      result: {
+        set: 'The guild billboard was updated.',
+        notOfficer: 'Only officers and the Guild Master may edit the billboard.',
+      },
+    },
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).
@@ -2633,9 +2704,9 @@ export const hudChromeStrings = {
     // payload, different wording.
     gatheredBy: 'Gathered by {name}',
     masterworkSeal: 'Masterwork',
-    // Generic enchanted marker: EnchantDef.name has no localized display
-    // surface yet, so the tooltip marks the state without naming the enchant.
-    enchantedLine: 'Enchanted',
+    // (The standalone `enchantedLine` badge was retired: the enchanted state is
+    // now attributed inline on the bonus stat lines it caused, through
+    // hudChrome.itemTooltip.statEnchanted.)
     // Commissions and the Maker's Bond (Professions 2.0): the
     // per-craft opt-in control in the crafting window, and the two tooltip
     // lines a commissioned copy renders beside the soulbound line. The bound
@@ -2697,6 +2768,23 @@ export const hudChromeStrings = {
     targetTitle: 'Choose an item to enchant',
     noEnchants: 'No enchant uses this reagent.',
     noTargets: 'No eligible item to enchant.',
+    // The Apply Enchant picker's three section headers, in ladder order. The
+    // tier is derived from the reagents alone (enchant_apply_view.ts
+    // enchantTier), so these headers name the same ladder content/enchants.ts
+    // documents: the dust/essence basics, the typed resonant tier, and the
+    // shard-consuming top tier.
+    tier: {
+      base: 'Base Enchants',
+      runed: 'Runed Enchants',
+      greater: 'Greater Enchants',
+    },
+    // The disenchant confirm's expected-yield preview
+    // (src/ui/disenchant_yield_view.ts), appended under the destroy warning so
+    // an irreversible destroy states what it pays out first. The range shape
+    // covers the sub-rare rng bonus arm and the epic/legendary secondary roll.
+    yieldHeader: 'Expected materials:',
+    yieldLineExact: '{count} {item}',
+    yieldLineRange: '{min} to {max} {item}',
   },
   // Recipe training window (Professions 2.0): a station master
   // teaches trainer-acquisition recipes for a tier-priced copper fee

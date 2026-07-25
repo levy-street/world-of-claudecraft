@@ -452,6 +452,17 @@ export class Market {
     }
   }
 
+  // Whether anything (sale gold or returned items) waits for this player at the
+  // Merchant. The always-streamed HUD indicator bit (the mailUnread pattern):
+  // unlike marketInfoFor it has NO proximity gate, so the minimap badge can
+  // light anywhere in the world; collection itself stays at the Merchant.
+  collectPendingFor(pid: number): boolean {
+    const meta = this.ctx.players.get(pid);
+    if (!meta) return false;
+    const col = this.collectionForSeller(meta);
+    return !!col && (col.copper > 0 || col.items.length > 0);
+  }
+
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
     const meta = this.ctx.players.get(pid);
     const e = this.ctx.entities.get(pid);

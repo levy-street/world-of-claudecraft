@@ -256,6 +256,7 @@ function makeFakeHost() {
       return entities;
     },
     players: new Map(),
+    stationPlacements: [],
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),
