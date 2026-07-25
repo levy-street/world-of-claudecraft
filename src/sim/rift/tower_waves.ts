@@ -78,7 +78,7 @@ export function demonTowerRingRadius(floorIndex: number): number {
 export function demonTowerWavePlan(floorIndex: number): DemonTowerWave[] {
   const k = clampTowerFloorIndex(floorIndex);
   const tuning = demonTowerFloorTuning(k);
-  const window = demonTowerRosterWindow(k);
+  const tier = demonTowerRosterWindow(k);
   const radius = demonTowerRingRadius(k);
   const bossFloor = isDemonTowerBossFloor(k);
   const waves: DemonTowerWave[] = [];
@@ -90,7 +90,7 @@ export function demonTowerWavePlan(floorIndex: number): DemonTowerWave[] {
     for (let i = 0; i < tuning.packSize; i++) {
       const angle = offset + (i / tuning.packSize) * Math.PI * 2;
       spawns.push({
-        templateId: window[i % window.length],
+        templateId: tier[i % tier.length],
         x: round3(Math.sin(angle) * radius),
         z: round3(Math.cos(angle) * radius),
       });

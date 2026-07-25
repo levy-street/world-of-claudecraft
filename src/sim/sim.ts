@@ -2155,6 +2155,10 @@ export class Sim {
         rewarded: false,
         seqResetAt: -Infinity,
         bossDeathZones: [],
+        towerWave: 0,
+        towerWaveMobIds: [],
+        towerBossId: null,
+        towerCoreId: null,
       });
     }
 

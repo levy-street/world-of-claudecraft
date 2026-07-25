@@ -31,12 +31,14 @@ import { addRiftClearGearLoot, addRiftProgressionLoot } from './progression';
 import { claimRiftFirstClear, markRiftEventActive } from './race';
 import {
   RIFT_RANK_MECHANIC_BUDGET,
+  riftFloorLevel,
   riftHeroicTemplate,
   riftHeroicTuningFor,
   riftRankForBaseLevel,
 } from './ranks';
 import { generateRiftFloor, isSetPieceRift, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
+import { DEMON_TOWER_PUZZLE_KIND, resetTowerFloor, updateDemonTower } from './tower';
 import type { RiftInstance, RiftRoller } from './types';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
@@ -263,6 +265,9 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
+  // Demon Tower bookkeeping (inert on every other rift): a reused slot must
+  // never inherit the previous run's wave progress.
+  resetTowerFloor(inst);
 
   // B-, A- and S-rank rifts are heroic scaled: a spawn-time stat transform plus the
   // per-entity mechanic multipliers, mirroring instances/difficulty.ts. The rank
@@ -356,6 +361,11 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
       case 'infernal_orb':
         // Dormant until this floor's miniboss dies (updateRiftInstances arms it).
         inst.orbId = spawnObj('rift_infernal_orb', obj.name, obj.x, obj.z);
+        break;
+      case 'tower_core':
+        // The Demon Tower centrepiece. Purely the anchor the waves erupt from:
+        // it is never attacked, so it stays a plain ground object.
+        inst.towerCoreId = spawnObj('rift_tower_core', obj.name, obj.x, obj.z);
         break;
       // 'chest'/'exit' are placed on boss death (openExit).
     }
@@ -1534,6 +1544,17 @@ export function updateRiftInstances(ctx: SimContext): void {
           });
         }
       }
+    }
+
+    // The Demon Tower sends its floor's population wave by wave; the driver
+    // flips puzzleSolved when the last one falls, which the gate below reads.
+    if (floor.puzzle.kind === DEMON_TOWER_PUZZLE_KIND) {
+      updateDemonTower(
+        ctx,
+        inst,
+        riftFloorLevel(inst.baseLevel, inst.floorIndex),
+        instancePlayerIds(ctx, inst),
+      );
     }
 
     if (floor.isBoss) {

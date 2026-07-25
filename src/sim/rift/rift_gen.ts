@@ -11,6 +11,13 @@
 
 import type { Collider } from '../colliders';
 import {
+  buildDemonTowerFloor,
+  DEMON_TOWER_FLOOR_COUNT,
+  DEMON_TOWER_THEME_ID,
+  demonTowerName,
+  isDemonTowerSeed,
+} from '../content/rift/demon_tower';
+import {
   buildInfernalCitadelFloor,
   INFERNAL_FLOOR_COUNT,
   INFERNAL_THEME_ID,
@@ -90,6 +97,7 @@ export function isSetPieceRift(seed: number, baseLevel: number): boolean {
  * procedural rift (including any B/A/S run) is 3 to 6 floors. `baseLevel`
  * defaults to the C-rank baseline for legacy seed-only callers. */
 export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_LEVEL.C): number {
+  if (isDemonTowerSeed(seed)) return DEMON_TOWER_FLOOR_COUNT;
   if (isSetPieceRift(seed, baseLevel)) return INFERNAL_FLOOR_COUNT;
   return new Rng(mixSeed(seed, 0x510f)).int(MIN_FLOORS, MAX_FLOORS);
 }
@@ -730,6 +738,15 @@ function floorLevelFor(baseLevel: number, floorIndex: number): number {
 
 /** The rift as a whole: name + floor count (derived from seed + baseLevel). */
 export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
+  if (isDemonTowerSeed(seed)) {
+    return {
+      seed,
+      baseLevel,
+      name: demonTowerName(),
+      themeId: DEMON_TOWER_THEME_ID,
+      floorCount: DEMON_TOWER_FLOOR_COUNT,
+    };
+  }
   if (isSetPieceRift(seed, baseLevel)) {
     return {
       seed,
@@ -764,6 +781,21 @@ export function generateRiftFloor(
   const key = `${seed >>> 0}:${Math.round(baseLevel)}:${floorIndex}`;
   const cached = FLOOR_CACHE.get(key);
   if (cached) return upgradedFloor(cached, upgrade);
+
+  // The Demon Tower is a fixed landmark on a reserved seed: it short-circuits
+  // ahead of everything, at every rank, and draws nothing from the shared stream.
+  if (isDemonTowerSeed(seed)) {
+    const towerIndex = Math.max(0, Math.min(DEMON_TOWER_FLOOR_COUNT - 1, floorIndex));
+    const tower = buildDemonTowerFloor(
+      seed,
+      baseLevel,
+      floorLevelFor(baseLevel, towerIndex),
+      towerIndex,
+    );
+    if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
+    FLOOR_CACHE.set(key, tower);
+    return upgradedFloor(tower, upgrade);
+  }
 
   // Authored set-piece runs short-circuit the whole procedural chain BEFORE any
   // draw is made, so the procedural draw order for every other run is untouched.

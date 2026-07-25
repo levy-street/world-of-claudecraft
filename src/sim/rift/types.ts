@@ -138,7 +138,8 @@ export type RiftObjectKind =
   | 'boulder' // a pushable strength boulder
   | 'boulder_pad' // the socket a boulder must be pushed onto
   | 'seq_rune' // a numbered rune in a Simon-style step-in-order sequence
-  | 'infernal_orb'; // an authored altar orb: dormant until its miniboss dies, then opens the gate
+  | 'infernal_orb' // an authored altar orb: dormant until its miniboss dies, then opens the gate
+  | 'tower_core'; // the Demon Tower centrepiece: the wave anchor at the middle of every arena
 
 /** A placed interactable, instance-local. `descent` sinks the party to the next
  * floor; `exit` returns them to the overworld; `chest` is the floor reward; the
@@ -157,8 +158,18 @@ export interface RiftObjectPlan {
  * - `rune_pylons`: light every pylon (walk-on).
  * - `ice_slide`: slide across the ice sheet and stop on the goal tile (FFX/Pokemon).
  * - `boulder_push`: shove every strength boulder onto its socket pad (Pokemon Strength).
- * - `sequence`: step the runes in the shown order (Simon / pattern memory). */
-export type RiftPuzzleKind = 'none' | 'rune_pylons' | 'ice_slide' | 'boulder_push' | 'sequence';
+ * - `sequence`: step the runes in the shown order (Simon / pattern memory).
+ * - `demon_waves`: the Demon Tower's floor gate. The core sends `waveCount` packs
+ *   (rift/tower_waves.ts); the ascent opens when the last demon, plus any boss the
+ *   final wave released, is dead. Driven by rift/tower.ts, which flips
+ *   `puzzleSolved` exactly like a full set of lit pylons. */
+export type RiftPuzzleKind =
+  | 'none'
+  | 'rune_pylons'
+  | 'ice_slide'
+  | 'boulder_push'
+  | 'sequence'
+  | 'demon_waves';
 
 export interface RiftPuzzle {
   kind: RiftPuzzleKind;
@@ -317,6 +328,16 @@ export interface RiftInstance {
   minibossId: number | null;
   orbId: number | null;
   orbActive: boolean;
+  /** Demon Tower state (inert on every other rift). `towerWave` is the index of
+   * the NEXT wave the core will release, so it equals the floor's wave count once
+   * the floor has sent everything. `towerWaveMobIds` holds the demons currently
+   * on the floor, `towerBossId` the boss the last wave released (the floor-5
+   * gatekeeper, or the summit's Demon Lord, which additionally takes the run's
+   * `bossId`), and `towerCoreId` the centrepiece object the waves erupt from. */
+  towerWave: number;
+  towerWaveMobIds: number[];
+  towerBossId: number | null;
+  towerCoreId: number | null;
   /** Overworld position to return the player to when they leave. */
   returnPos: { x: number; z: number };
   emptyFor: number;
