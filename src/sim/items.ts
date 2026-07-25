@@ -32,6 +32,7 @@ import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
+import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -367,10 +368,14 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
   // the catch band, professions/fishing.ts) but must still CAST like the
   // simple pole, so a fishing-profession gatherTool use routes to the same
   // startFishing (which owns the dead/combat/busy/water gates, exactly as the
-  // arm above). Every OTHER gatherTool use (picks, axes, sickles) stays a safe
-  // no-op exactly as today: node gating scans bags, never an item use.
-  if (def.use?.type === 'gatherTool' && def.use.professionId === 'fishing') {
-    ctx.startFishing(p, meta);
+  // arm above). Every OTHER gatherTool use (picks, axes, sickles) starts
+  // gathering the nearest matching node in range (#2343): useGatherToolItem
+  // routes through harvestNode, which owns the dead/busy/range/respawn/tool/
+  // capacity gates, and a click with nothing in reach gets the text-free
+  // gatherToolNoNode event, never a silent no-op.
+  if (def.use?.type === 'gatherTool') {
+    if (def.use.professionId === 'fishing') ctx.startFishing(p, meta);
+    else useGatherToolItem(ctx, def.use.professionId, meta.entityId);
     return;
   }
   if (def.use?.type === 'mechChroma') {

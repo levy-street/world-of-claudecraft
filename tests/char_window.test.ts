@@ -174,6 +174,73 @@ describe('char_window: profession art placements', () => {
     expect(root.querySelector('.char-archetype-title-crest')).toBeNull();
     expect(root.innerHTML).not.toContain('/ui/professions/archetype_bombardier.webp');
   });
+
+  it('floors a fractional gathering proficiency in the rendered row (issue 2339)', () => {
+    // The sheet must never claim an uncrossed threshold: the deed evaluator
+    // and the band ladder compare the raw value with >=, so 99.5 renders 99
+    // (the professions-window floor convention), never a rounded 100.
+    let canvasContext: unknown;
+    canvasContext = new Proxy(
+      {},
+      {
+        get: () => () => canvasContext,
+        set: () => true,
+      },
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+      'data:image/png;base64,stub',
+    );
+    const root = document.createElement('div');
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: 'jewelcrafting',
+      professionsState: {
+        skills: [
+          { professionId: 'mining', skill: 99.75, maxSkill: 100 },
+          { professionId: 'logging', skill: 12, maxSkill: 100 },
+          { professionId: 'herbalism', skill: 100, maxSkill: 100 },
+          { professionId: 'fishing', skill: 99.5, maxSkill: 200 },
+        ],
+      },
+    };
+    const win = new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: vi.fn(),
+    });
+
+    win.render();
+    const values = [...root.querySelectorAll('.char-gather-row b')].map((b) => b.textContent);
+    expect(values).toEqual(['99', '12', '100', '99']);
+  });
 });
 
 describe('char_window: paperdoll core + HUD-owned preview boundary', () => {

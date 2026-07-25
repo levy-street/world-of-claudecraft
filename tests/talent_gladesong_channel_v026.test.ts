@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { lineOfSightClear } from '../src/sim/colliders';
-import { MOBS, PROPS } from '../src/sim/data';
+import { MOBS } from '../src/sim/data';
+import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity } from '../src/sim/types';
@@ -38,11 +39,22 @@ describe('Gladesong channel healing', () => {
     const nearby = player(sim, nearbyId);
     const blocked = player(sim, blockedId);
     const far = player(sim, farId);
-    const building = PROPS.buildings[0];
-    const span = building.w + building.d;
-    place(sim, caster, building.x - span, building.z);
+    const building = EASTBROOK_BUILDINGS_BY_ID.eastbrook_chapel;
+    const left = localToWorld(
+      building.position,
+      building.rotation,
+      -building.nativeDimensions.width / 2 - 4,
+      0,
+    );
+    const right = localToWorld(
+      building.position,
+      building.rotation,
+      building.nativeDimensions.width / 2 + 4,
+      0,
+    );
+    place(sim, caster, left.x, left.z);
     place(sim, nearby, caster.pos.x, caster.pos.z - 3);
-    place(sim, blocked, building.x + span, building.z);
+    place(sim, blocked, right.x, right.z);
     place(sim, far, caster.pos.x - 35, caster.pos.z);
 
     const hostile = createMob(sim.nextId++, MOBS.forest_wolf, 20, {

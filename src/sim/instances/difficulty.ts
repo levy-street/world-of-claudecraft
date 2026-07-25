@@ -55,12 +55,13 @@ export function mobTemplateForDungeonDifficulty(
   const dmgMult =
     tuning.damageMultiplierByMob?.[template.id] ??
     (role?.summonedAdd ? tuning.addDamageMultiplier : tuning.damageMultiplier);
+  const hpMult = tuning.healthMultiplierByMob?.[template.id] ?? tuning.healthMultiplier;
   return {
     ...template,
     minLevel: tuning.level,
     maxLevel: tuning.level,
-    hpBase: template.hpBase * tuning.healthMultiplier,
-    hpPerLevel: template.hpPerLevel * tuning.healthMultiplier,
+    hpBase: template.hpBase * hpMult,
+    hpPerLevel: template.hpPerLevel * hpMult,
     dmgBase: template.dmgBase * dmgMult,
     dmgPerLevel: template.dmgPerLevel * dmgMult,
     armorPerLevel: template.armorPerLevel * tuning.armorMultiplier,

@@ -94,6 +94,17 @@ describe('hud.ts trainResult event arm (source pins)', () => {
     expect(arm).toContain('this.renderCrafting();');
     expect(arm).toContain("$('#crafting-window').style.display === 'flex'");
   });
+
+  it('resolves the learn flight from the event, ok or deny (issue #2342)', () => {
+    // resolve() closes the pending flight either way and feeds the confirmed
+    // overlay on ok, so the repaint below reads Known even when the cprof
+    // mirror has not caught up yet. It must run BEFORE the renderTrain
+    // repaint, or the repaint paints the stale pending row.
+    const arm = trainResultArm();
+    const resolveAt = arm.indexOf('this.trainLearns.resolve(ev.recipeId, ev.ok);');
+    expect(resolveAt, 'resolve call present in the arm').toBeGreaterThan(-1);
+    expect(resolveAt).toBeLessThan(arm.indexOf('this.renderTrain();'));
+  });
 });
 
 describe('hud.ts crafting known-filter (source pins)', () => {
@@ -113,8 +124,28 @@ describe('hud.ts crafting known-filter (source pins)', () => {
 describe('hud.ts train window wiring (source pins)', () => {
   it('feeds the pure view core from the IWorld identity mirror and routes trains to the seam', () => {
     expect(hudSource).toContain('knownRecipes: identity.knownRecipes');
-    expect(hudSource).toContain('onTrain: (recipeId) => this.sim.trainRecipe(recipeId)');
+    expect(hudSource).toContain('onTrain: (recipeId) => this.trainRecipeClicked(recipeId)');
     expect(hudSource).toContain("this.closeOtherWindows('#train-window')");
+  });
+
+  it('opens the learn flight BEFORE the command leaves and repaints immediately (issue #2342)', () => {
+    // begin() false swallows the activation, so a rapid double-click sends
+    // train_recipe exactly once and train_already_known can never surface
+    // from the trainer window; the immediate renderTrain paints the disabled
+    // pending row as the first click's feedback.
+    expect(hudSource).toMatch(
+      /private trainRecipeClicked\(recipeId: string\): void \{\s*\n\s*if \(!this\.trainLearns\.begin\(recipeId, performance\.now\(\)\)\) return;\s*\n\s*this\.sim\.trainRecipe\(recipeId\);\s*\n\s*this\.renderTrain\(\);/,
+    );
+    expect(hudSource).toMatch(
+      /import \{ TrainLearnTracker \} from '\.\/hud\/vendor\/train_learn_core';/,
+    );
+  });
+
+  it('feeds both tracker read surfaces into buildTrainView', () => {
+    expect(hudSource).toContain('pendingRecipes: this.trainLearns.pendingIds(performance.now())');
+    expect(hudSource).toContain(
+      'confirmedRecipes: this.trainLearns.confirmedIds(identity.knownRecipes)',
+    );
   });
 });
 

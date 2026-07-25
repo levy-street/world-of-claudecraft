@@ -1,5 +1,6 @@
 export * from './heroic_vendor_view';
 export * from './heroic_vendor_window';
+export * from './train_learn_core';
 export * from './train_view';
 export * from './train_window';
 export * from './unbind_view';

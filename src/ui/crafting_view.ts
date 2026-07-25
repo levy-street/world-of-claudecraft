@@ -17,9 +17,10 @@ import {
   comboEligibility,
 } from '../sim/professions/combo_eligibility';
 import { isCommissionEligible } from '../sim/professions/commission';
+import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
 import { type StationType, stationsOfType, stationTypeForCraft } from '../sim/professions/stations';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
-import type { InvSlot, ItemDef } from '../sim/types';
+import type { InvSlot, ItemDef, StationDef } from '../sim/types';
 import { isRecipeKnownForViewer } from './hud/vendor/train_view';
 
 export interface RecipeDefLike {
@@ -118,6 +119,10 @@ function countInInventory(inventory: readonly InvSlot[], itemId: string): number
   return n;
 }
 
+/** The two per-item inventory facts a reagent row needs (see the memo in
+ *  buildCraftingView). */
+type ReagentFacts = { have: number; selfSigned: boolean };
+
 /**
  * Build the structured crafting view from raw inputs: the recipe content list,
  * the local player's inventory, the item table (for display name/icon/
@@ -127,7 +132,10 @@ function countInInventory(inventory: readonly InvSlot[], itemId: string): number
  * currently in range of (station-bound recipes: physical stations
  * plus the own active mobile station, precomputed once per repaint by the
  * HUD via stations.ts inRangeStationTypes; defaults to empty, i.e. out of
- * range of everything, so station-free callers need not pass it). Read-only:
+ * range of everything, so station-free callers need not pass it), and the
+ * local player's name (the #1145 self-signed reduction: defaults to null,
+ * meaning the self-signed check never matches; the #1134 specialization
+ * discount still applies from craftSkills either way). Read-only:
  * never mutates any of its inputs.
  */
 export function buildCraftingView(
@@ -142,19 +150,51 @@ export function buildCraftingView(
     hobbyCraft: null,
   },
   inRangeStations: ReadonlySet<StationType> = new Set(),
+  playerName: string | null = null,
 ): CraftingView {
   // One mutable copy for the sim-side pure functions (their CraftSkills
   // parameter is mutable-typed); they never write it, this is typing only.
   const skills = { ...craftSkills };
+  // Every known recipe is rowed on each rebuild and recipes share reagents
+  // (a craft's recipes pull from the same ore/flux pool), so the two
+  // O(inventory) probes per reagent (stack count plus the #1145 self-signed
+  // check) memoize per itemId. Only the per-ITEM facts are cached, never the
+  // required count (that also depends on the recipe: its professionId and
+  // this reagent's listed count), and the cache lives only for this one
+  // build, so a rebuild re-reads the live inventory through the same
+  // single-surface helpers.
+  const reagentFacts = new Map<string, ReagentFacts>();
+  const factsFor = (itemId: string): ReagentFacts => {
+    let facts = reagentFacts.get(itemId);
+    if (!facts) {
+      facts = {
+        have: countInInventory(inventory, itemId),
+        selfSigned: playerName !== null && holdsSelfSignedInstance(inventory, playerName, itemId),
+      };
+      reagentFacts.set(itemId, facts);
+    }
+    return facts;
+  };
   const rows: CraftingRecipeRow[] = recipes.map((recipe) => {
     const reagentRows: CraftingReagentRow[] = recipe.reagents.map((reagent) => {
-      const have = countInInventory(inventory, reagent.itemId);
+      const { have, selfSigned } = factsFor(reagent.itemId);
+      // The requirement the sim actually charges: the SAME shared
+      // requiredReagentCountFor the resolver's availability check and
+      // consumption use (crafting.ts, #1134 specialization discount composed
+      // with the #1145 self-signed reduction), so the displayed count and the
+      // Craft gate can never diverge from what a craft consumes.
+      const required = requiredReagentCountFor(
+        selfSigned,
+        reagent,
+        skills,
+        recipe.professionId,
+      ).count;
       return {
         itemId: reagent.itemId,
         item: items[reagent.itemId],
-        required: reagent.count,
+        required,
         have,
-        satisfied: have >= reagent.count,
+        satisfied: have >= required,
       };
     });
     const combo = recipe.comboRequirement;
@@ -217,6 +257,51 @@ export function buildCraftingView(
     };
   });
   return { recipes: rows };
+}
+
+// Every item id any recipe consumes, derived ONCE from static content. Both
+// hosts serve ALL_RECIPES verbatim as IWorld#recipeList (src/sim/sim.ts,
+// src/net/online.ts), and reagent ids are authored literals, so this set can
+// never miss a reagent the window might row.
+const REAGENT_ITEM_IDS: ReadonlySet<string> = new Set(
+  ALL_RECIPES.flatMap((recipe) => recipe.reagents.map((reagent) => reagent.itemId)),
+);
+
+/**
+ * Compact signature of every bag fact buildCraftingView above reads, so an
+ * OPEN crafting window can converge on an inventory change without repainting
+ * per frame (issue #2375: buying, looting, or trading for the last reagent
+ * left the Craft button disabled until the window was closed and reopened).
+ *
+ * The window is a cold painter, so the HUD diffs this the same way it diffs
+ * stationTypesSignature for the station-range edge. Two properties earn their
+ * keep here:
+ *  - COMPLETE. Per reagent id it carries the summed stack count (the only
+ *    input to countInInventory, and therefore to `have`, `satisfied`, and the
+ *    Craft gate) plus whether the VIEWER signed any stack of it, the one
+ *    instance fact the #1145 self-signed quantity reduction asks about
+ *    (holdsSelfSignedInstance). Those two are the whole of what the view reads
+ *    off the bag: money and free bag slots are server-side deny reasons, not
+ *    terms in `craftable`. If either ever enters the gate, it belongs here too.
+ *  - QUIET. Non-reagent items are skipped and ids are emitted sorted, so
+ *    looting a grey, rearranging the bags, or a stranger-signed stack changing
+ *    hands never repaints the window under the player.
+ */
+export function craftingReagentSig(
+  inventory: readonly InvSlot[],
+  playerName: string | null,
+): string {
+  const totals = new Map<string, number>();
+  const selfSigned = new Set<string>();
+  for (const slot of inventory) {
+    if (!REAGENT_ITEM_IDS.has(slot.itemId)) continue;
+    totals.set(slot.itemId, (totals.get(slot.itemId) ?? 0) + slot.count);
+    if (playerName !== null && slot.instance?.signer === playerName) selfSigned.add(slot.itemId);
+  }
+  let sig = '';
+  for (const itemId of [...totals.keys()].sort())
+    sig += `${itemId}:${totals.get(itemId)}:${selfSigned.has(itemId) ? 1 : 0}|`;
+  return sig;
 }
 
 // ---------------------------------------------------------------------------
@@ -288,7 +373,10 @@ export interface CraftLearnHint {
  * static content plus the viewer's mirrored known set (both hosts carry
  * knownRecipes on cprof, so no new IWorld member is needed).
  */
-export function craftLearnHints(knownRecipes: readonly string[]): Map<string, CraftLearnHint> {
+export function craftLearnHints(
+  knownRecipes: readonly string[],
+  stations: readonly StationDef[],
+): Map<string, CraftLearnHint> {
   const known = new Set(knownRecipes);
   const hints = new Map<string, CraftLearnHint>();
   for (const recipe of ALL_RECIPES) {
@@ -297,7 +385,7 @@ export function craftLearnHints(knownRecipes: readonly string[]): Map<string, Cr
     if (isRecipeKnownForViewer(recipe, known)) continue;
     const stationType = stationTypeForCraft(recipe.professionId);
     if (!stationType) continue;
-    const station = stationsOfType(stationType)[0];
+    const station = stationsOfType(stations, stationType)[0];
     if (!station) continue;
     hints.set(recipe.professionId, { stationType, masterNpcId: station.masterNpcId });
   }

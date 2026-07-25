@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.29.0",
+  "version": "0.29.1",
   "private": true,
   "license": "MIT",
   "author": {
@@ -54,6 +54,7 @@
     "i18n:hash": "node scripts/i18n_resolved_hash.mjs",
     "i18n:worklist": "node scripts/i18n_fill_worklist.mjs",
     "perf:tour": "node scripts/perf_tour.mjs",
+    "perf:crowd": "node scripts/crowd_fps_bench.mjs",
     "perf:prewarm": "node scripts/prewarm_travel_bench.mjs",
     "ops:cpu-monitor": "node scripts/prod_cpu_monitor.mjs",
     "feel:smoke": "node scripts/feel_smoke.mjs",
@@ -88,7 +89,8 @@
     "sfx:studio": "node scripts/sfx_studio/index.mjs",
     "sfx:studio:smoke": "node scripts/sfx_studio/e2e.mjs",
     "wiki:seed": "node scripts/mediawiki/build_seed.mjs",
-    "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts"
+    "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts",
+    "sim:healing": "tsx scripts/healing_montecarlo.ts"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1084.0",

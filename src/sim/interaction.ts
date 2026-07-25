@@ -24,6 +24,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
+import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
@@ -430,7 +431,12 @@ function focusedHarvestQuantity(
   return Math.round(applyFocusBonus(harvestTierQuantity(tier), component, focus));
 }
 
-export function pickUpObject(ctx: SimContext, objId: number, pid?: number): boolean {
+export function pickUpObject(
+  ctx: SimContext,
+  objId: number,
+  pid?: number,
+  noticeboardDefinitions: readonly NoticeboardDef[] = [],
+): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   const { meta, e: p } = r;
@@ -440,11 +446,27 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
     return false;
   }
   const obj = ctx.entities.get(objId);
-  if (obj?.kind !== 'object' || !obj.lootable || !obj.objectItemId) return false;
-  if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
+  if (obj?.kind !== 'object' || !obj.lootable) return false;
+  const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
+  // Preserve the historical no-op for malformed/non-pickup objects. The board
+  // is the one intentional lootable object without an item payload.
+  if (!noticeboardDef && !obj.objectItemId) return false;
+  const interactionRange = noticeboardDef?.interactionRadius ?? INTERACT_RANGE;
+  if (dist2d(p.pos, obj.pos) > interactionRange) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }
+  if (noticeboardDef) {
+    ctx.emit({
+      type: 'noticeboard',
+      noticeboardId: noticeboardDef.templateId,
+      state: 'empty',
+      pid: meta.entityId,
+    });
+    return true;
+  }
+  const objectItemId = obj.objectItemId;
+  if (!objectItemId) return false;
   const beforeCastingAbility = p.castingAbility;
   const beforeChanneling = p.channeling;
   if (tryStartNythraxisWardChannel(ctx, obj, p)) {
@@ -463,7 +485,7 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
   if (interactObjectForQuests(ctx, obj, meta)) {
     return meta.counters.questProgress !== beforeQuestProgress || ctx.nextId !== beforeQuestNextId;
   }
-  const def = ITEMS[obj.objectItemId];
+  const def = ITEMS[objectItemId];
   if (def?.questId) {
     const qp = meta.questLog.get(def.questId);
     if (!qp || (qp.state !== 'active' && qp.state !== 'ready')) {
@@ -472,7 +494,7 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
     }
     const quest = QUESTS[def.questId];
     const objIdx = quest.objectives.findIndex(
-      (o) => o.type === 'collect' && o.itemId === obj.objectItemId,
+      (o) => o.type === 'collect' && o.itemId === objectItemId,
     );
     if (objIdx < 0) {
       ctx.error(meta.entityId, def.pickupEnough ?? `${def.name} offers nothing more.`);
@@ -480,17 +502,17 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
     }
     if (
       objIdx >= 0 &&
-      ctx.countItem(obj.objectItemId, meta.entityId) >= quest.objectives[objIdx].count
+      ctx.countItem(objectItemId, meta.entityId) >= quest.objectives[objIdx].count
     ) {
       ctx.error(meta.entityId, def.pickupEnough ?? 'You have enough of those.');
       return false;
     }
   }
-  if (!ctx.canAddItem(obj.objectItemId, 1, meta.entityId)) {
+  if (!ctx.canAddItem(objectItemId, 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return false;
   }
-  ctx.addItem(obj.objectItemId, 1, meta.entityId);
+  ctx.addItem(objectItemId, 1, meta.entityId);
   obj.lootable = false;
   obj.respawnTimer = OBJECT_RESPAWN;
   // Success only: a capacity-refused attempt returned above and never counts.
@@ -498,7 +520,11 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
   return true;
 }
 
-export function interact(ctx: SimContext, pid?: number): void {
+export function interact(
+  ctx: SimContext,
+  pid?: number,
+  noticeboardDefinitions: readonly NoticeboardDef[] = [],
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
@@ -557,7 +583,7 @@ export function interact(ctx: SimContext, pid?: number): void {
           return;
         }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
-        pickUpObject(ctx, target.id, p.id);
+        pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
       }
       if (target.kind === 'npc' && ctx.bankerIds.includes(target.id)) {
@@ -584,8 +610,11 @@ export function interact(ctx: SimContext, pid?: number): void {
       bestCorpseD2 = d2;
     }
     if (e.kind === 'object' && e.lootable && d2 < bestObjD2) {
-      bestObj = e;
-      bestObjD2 = d2;
+      const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, e.id);
+      if (!noticeboardDef || d2 <= noticeboardDef.interactionRadius ** 2) {
+        bestObj = e;
+        bestObjD2 = d2;
+      }
     }
     if (ctx.isQuestInteractionEntity(e) && d2 < bestQuestD2) {
       bestQuestEntity = e;
@@ -624,7 +653,7 @@ export function interact(ctx: SimContext, pid?: number): void {
       return;
     }
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;
-    pickUpObject(ctx, obj.id, p.id);
+    pickUpObject(ctx, obj.id, p.id, noticeboardDefinitions);
     return;
   }
   if (questEntity && ctx.bankerIds.includes(questEntity.id)) {

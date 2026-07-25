@@ -24,11 +24,11 @@ export interface EnchantingToast {
 
 export interface DisenchantResultEvent {
   ok: boolean;
-  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled';
+  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
 }
 export interface SalvageResultEvent {
   ok: boolean;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
+  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
 }
 export interface ApplyEnchantResultEvent {
   ok: boolean;
@@ -38,7 +38,8 @@ export interface ApplyEnchantResultEvent {
     | 'wrong_slot'
     | 'not_held'
     | 'insufficient_materials'
-    | 'throttled';
+    | 'throttled'
+    | 'no_bag_space';
 }
 
 /** The toast for one disenchantResult event. Success is a chat line ({ item });
@@ -51,6 +52,8 @@ export function disenchantResultToast(ev: DisenchantResultEvent): EnchantingToas
       return { key: 'hudChrome.enchanting.disenchantThrottled', sink: 'error' };
     case 'not_disenchantable':
       return { key: 'hudChrome.enchanting.notDisenchantable', sink: 'error' };
+    case 'no_bag_space':
+      return { key: 'hudChrome.enchanting.disenchantNoSpace', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }
@@ -65,6 +68,8 @@ export function salvageResultToast(ev: SalvageResultEvent): EnchantingToast {
       return { key: 'hudChrome.enchanting.salvageThrottled', sink: 'error' };
     case 'not_salvageable':
       return { key: 'hudChrome.enchanting.notSalvageable', sink: 'error' };
+    case 'no_bag_space':
+      return { key: 'hudChrome.enchanting.salvageNoSpace', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }
@@ -83,6 +88,8 @@ export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): Enchanting
       return { key: 'hudChrome.enchanting.enchantUnknown', sink: 'error' };
     case 'insufficient_materials':
       return { key: 'hudChrome.enchanting.enchantInsufficient', sink: 'error' };
+    case 'no_bag_space':
+      return { key: 'hudChrome.enchanting.enchantNoSpace', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }

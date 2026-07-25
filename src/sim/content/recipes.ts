@@ -366,7 +366,10 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'sootscale_mantle',
     resultCount: 1,
     // Ore stays (mail theme) plus smithing_flux volume (both sold by
-    // forgemistress_darva at the forge). Input 520 vs output 470.
+    // forgemistress_darva at the forge). Listed input 520 vs output 280:
+    // the output sits below even the cheapest specialized-plus-self-signed
+    // consumption (300, the discount-aware economy arm) so the all-vendor
+    // loop can never print copper.
     reagents: [
       { itemId: 'thorium_ore', count: 7 },
       { itemId: 'smithing_flux', count: 5 },

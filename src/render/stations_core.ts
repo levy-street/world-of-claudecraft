@@ -1,10 +1,10 @@
 // Pure placement core for the crafting-station scenery (Professions 2.0).
-// Maps each STATIONS record (src/sim/content/professions.ts, via
-// the sim/data barrel) to the world-space prop cluster the Three half
+// Maps each station record supplied through the active IWorld seam to the
+// world-space prop cluster the Three half
 // (stations.ts) places at it: one thematic anchor prop on the station pos
 // plus a little fixed clutter beside it. Hand-authored offsets, not
-// procedural scatter, so exact spots matter more than variety (the
-// artisan_row_props.ts idiom); offsets keep clear of each resident master
+// procedural scatter, so exact spots matter more than variety; offsets keep
+// clear of each resident master
 // NPC (1 to 3 units beside the station, see the STATIONS placement notes).
 //
 // Deliberately NO radius ring, circle, or boundary decal spec: the station
@@ -15,8 +15,7 @@
 // Vitest can pin that every station gets a cluster and every placement
 // stays anchored to its station pos.
 
-import { STATIONS } from '../sim/data';
-import type { StationType } from '../sim/professions/stations';
+import type { StationDef, StationType } from '../sim/professions/stations';
 
 /** The reused prop vocabulary a station cluster draws from (each maps to an
  *  EXISTING GLB in stations.ts; no new assets). */
@@ -80,16 +79,16 @@ export const STATION_PROP_CLUSTERS: Readonly<Record<StationType, readonly Statio
   ],
   toolworks: [
     { kind: 'workbench', dx: 0, dz: 0, rot: -0.4 },
-    { kind: 'crate', dx: 1.2, dz: 0.8, rot: 0.2 },
+    { kind: 'crate', dx: -0.9, dz: 0.4, rot: 0.2 },
     { kind: 'barrel', dx: -1.0, dz: 1.1, rot: -0.8 },
   ],
 };
 
-/** Flatten STATIONS x STATION_PROP_CLUSTERS into world-space placements, in
+/** Flatten stations x STATION_PROP_CLUSTERS into world-space placements, in
  *  content order (deterministic). */
-export function stationPropPlacements(): StationPropPlacement[] {
+export function stationPropPlacements(stations: readonly StationDef[]): StationPropPlacement[] {
   const out: StationPropPlacement[] = [];
-  for (const station of STATIONS) {
+  for (const station of stations) {
     for (const prop of STATION_PROP_CLUSTERS[station.type]) {
       out.push({
         stationId: station.id,

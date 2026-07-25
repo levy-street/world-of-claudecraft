@@ -127,8 +127,10 @@ legality), `cooldown_persist.ts` (cooldown save/load), `tab_target.ts`/`assist.t
 `vendor_stack.ts`, `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
 HUD), `resurrection.ts` (sickness rules shared by every death site), and the combat
 leaves `spell_resist.ts`/`ranged_shot.ts`/`aura_stacking.ts`/`aura_cancel.ts`/
-`exclusive_aura.ts`/`form_swing.ts`, and `jail.ts` (moderation-jail cage layout, gate
-teleport, visitor spot; the jail SYSTEM logic stays on `Sim`). A leaf is any `src/sim`
+`exclusive_aura.ts`/`form_swing.ts`, `jail.ts` (moderation-jail cage layout, gate
+teleport, visitor spot; the jail SYSTEM logic stays on `Sim`), and
+`professions/proficiency_display_heal.ts` (the one-time gathering-proficiency
+display-band heal applied at character load). A leaf is any `src/sim`
 file with no `sim_context` import.
 
 ## The SimContext seam (final shape)

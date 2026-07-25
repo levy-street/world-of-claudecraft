@@ -2,6 +2,7 @@ import { dist2d, type Entity, type GatherNodeDef, INTERACT_RANGE } from '../sim/
 import { corpseLootAvailability } from './corpse_loot_availability';
 import { type GatherNodeToolGate, handleGatherNodeInteract } from './gather_node_interact';
 import type { InteractionOutcome } from './interaction_autorun';
+import { objectInteractionRange } from './interactions';
 
 export interface NearbyInteractionWorld {
   player: Entity;
@@ -91,7 +92,7 @@ export function tryNearbyInteraction(
         bestDelveDistance = distance;
       }
     } else if (!player.dead && entity.kind === 'object' && entity.lootable) {
-      if (distance < bestObjectDistance) {
+      if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
         bestObject = entity.id;
         bestObjectDistance = distance;
       }

@@ -29,7 +29,11 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     protection: {
-      stats: { str: 6, dodge: 0.02, armorPct: 0.29 },
+      // staPct 0.35 (2026-07 tank parity): armor was already best-in-class,
+      // but with no stamina multiplier the paladin sat at 76% of the prot
+      // warrior's effective HP. This lands him at rough parity while the
+      // warrior keeps parry/block/stance as the pure-tank identity.
+      stats: { str: 6, dodge: 0.02, armorPct: 0.29, staPct: 0.35 },
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'devotion_aura', buffPct: 0.4 },
@@ -191,7 +195,10 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     feral: {
-      stats: { armorPct: 0.23 },
+      // staPct 0.25 (2026-07 tank parity, with Sloth Form armor 1.9 -> 2.3):
+      // leather has no plate tier to grow into, so the form multiplier and
+      // the baseline carry the difference (the Dire Bear logic).
+      stats: { armorPct: 0.23, staPct: 0.25 },
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'maul', dmgPct: 0.35 },

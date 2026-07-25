@@ -450,11 +450,14 @@ describe('re-crossing the 75/100 thresholds after the reset', () => {
 });
 
 describe('parity: zero new sampled PlayerMeta fields', () => {
-  it('samplePlayerMeta(fresh meta) contains neither reset key', () => {
+  it('samplePlayerMeta(fresh meta) contains no one-time load-flag key', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Sampled');
     const sample = samplePlayerMeta(metaOf(sim, pid)) as Record<string, unknown>;
     expect(Object.keys(sample)).not.toContain('pendingMasteryResetNotice');
     expect(Object.keys(sample)).not.toContain('masteryResetApplied');
+    // The proficiency display heal (issue 2339) follows the same contract:
+    // CharacterState-only, serialized as literal true, no PlayerMeta mirror.
+    expect(Object.keys(sample)).not.toContain('proficiencyDisplayHealApplied');
   });
 });

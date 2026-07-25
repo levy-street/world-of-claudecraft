@@ -1,9 +1,11 @@
 // Professions onboarding quest (issue #1701 follow-up): before this, nothing in
 // the starting flow ever pointed a new player at gathering/crafting/town focus
-// (see the professions.ts GATHERING_PROFESSIONS comment: no level/quest/tool gate
-// exists at the mechanic level, so there was no natural "unlock" moment). This
-// covers both the content shape (q_prof_intro wiring) and that its gather
-// objective is actually satisfied by successful ore-node harvests.
+// (at the time no level/quest/tool gate existed at the mechanic level, so there
+// was no natural "unlock" moment; #2343 has since made a matching-profession
+// tool mandatory for every node harvest, which is why the fixtures below carry
+// a copper mining pick). This covers both the content shape (q_prof_intro
+// wiring) and that its gather objective is actually satisfied by successful
+// ore-node harvests.
 
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES, NPCS, QUEST_ORDER, QUESTS } from '../src/sim/data';
@@ -79,6 +81,8 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
   it('an ore-node harvest advances progress and grants only the ordinary mining material', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Miner');
+    // #2343: every node harvest needs the matching-profession tool in bags.
+    sim.addItem('copper_mining_pick', 1, pid);
     const giver = NPCS.foreman_odell;
     const p = sim.entities.get(pid)!;
     p.pos.x = giver.pos.x;
@@ -102,6 +106,8 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
   it('ordinary mining does not create the retired chunk_of_ore workaround item', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'NoQuest');
+    // #2343: every node harvest needs the matching-profession tool in bags.
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, ORE_NODE_ID);
     // Never accepted q_prof_intro.
     sim.harvestNode(ORE_NODE_ID, pid);
@@ -113,6 +119,10 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
   it('promotes after five granted ore harvests and can be turned in without collect items', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Miner');
+    // #2343: every node harvest needs the matching-profession tool in bags
+    // (all five eastbrook ore nodes are tier 1, so the tier-1 pick covers the
+    // whole promotion loop).
+    sim.addItem('copper_mining_pick', 1, pid);
     const giver = NPCS.foreman_odell;
     const player = sim.entities.get(pid)!;
     player.pos.x = giver.pos.x;

@@ -90,6 +90,11 @@ export function renderCraftingWindow(
 ): void {
   deps.hideTooltip();
   const scrollTop = el.querySelector('.crafting-body')?.scrollTop ?? 0;
+  // The tab strip is its own horizontal scroller on mobile (hud.mobile.css
+  // `.crafting-tabs { overflow-x: auto }`) and is rebuilt with everything
+  // else, so carry its offset across too: a repaint the player did not ask
+  // for must not scroll the craft they are reading off the screen.
+  const tabScrollLeft = el.querySelector('.crafting-tabs')?.scrollLeft ?? 0;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
 
   if (identity) renderProfessionIdentityCard(el, identity);
@@ -135,6 +140,7 @@ export function renderCraftingWindow(
       strip.appendChild(btn);
     }
     el.appendChild(strip);
+    strip.scrollLeft = tabScrollLeft;
   }
 
   const body = document.createElement('div');

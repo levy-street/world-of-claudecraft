@@ -14,12 +14,15 @@
 // forced true (the no-reset baseline). Baseline vs actual isolates EXACTLY
 // the reset's effect; input vs actual is then classified row by row against
 // the documented allowlist (two maps zeroed, legacy professions mirror
-// zeroed, flag added true, load-time cap clamps on the two maps) plus the
+// zeroed, flags added true, load-time cap clamps on the two maps, the
+// one-time proficiency display heal of issue 2339) plus the
 // default fills the no-reset baseline also produces. Anything else fails
 // with a printed per-key diff.
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING, GATHERING_PROFESSIONS } from '../src/sim/content/professions';
+import { PROFICIENCY_BAND_THRESHOLDS } from '../src/sim/professions/proficiency_bands';
+import { DISPLAY_HEAL_BAND } from '../src/sim/professions/proficiency_display_heal';
 import { type CharacterState, Sim } from '../src/sim/sim';
 
 type Blob = Record<string, unknown>;
@@ -88,6 +91,24 @@ function capFor(path: string): number | null {
   return null;
 }
 
+// The one-time proficiency display heal (issue 2339): a gathering leaf inside
+// the half-point display band below a band threshold bumps to that threshold
+// on load, once per character (proficiencyDisplayHealApplied). A documented
+// deploy delta on any blob saved before the heal shipped. Cap-bounded like
+// the production guard: a threshold above the profession's maxSkill never
+// classifies, so the classifier stays exactly as strict as the heal even if
+// pointed at un-normalized rows.
+function isDisplayHealDelta(path: string, before: unknown, after: unknown): boolean {
+  if (typeof before !== 'number' || typeof after !== 'number') return false;
+  const cap = capFor(path);
+  return (
+    PROFICIENCY_BAND_THRESHOLDS.some((t) => t !== 0 && after === t) &&
+    (cap === null || after <= cap) &&
+    before >= after - DISPLAY_HEAL_BAND &&
+    before < after
+  );
+}
+
 interface RehearsalResult {
   applied: boolean;
   violations: string[];
@@ -134,13 +155,23 @@ function rehearse(state: CharacterState, seed: number, playerClass = 'warrior'):
   };
   flatten(baseline, '');
   for (const row of deployDelta) {
-    if (row.path === 'masteryResetApplied' && row.before === undefined && row.after === true) {
-      continue; // the flag lands true
+    if (
+      (row.path === 'masteryResetApplied' || row.path === 'proficiencyDisplayHealApplied') &&
+      row.before === undefined &&
+      row.after === true
+    ) {
+      continue; // the one-time flags land true
     }
     const root = skillMapRoot(row.path);
     if (root !== null && !wasApplied && row.after === 0) continue; // zeroed by the reset
     if (root !== null && typeof row.before === 'number' && row.after === capFor(row.path)) {
       continue; // the documented load-time cap clamp
+    }
+    if (
+      (root === 'gatheringProficiency' || root === 'professions') &&
+      isDisplayHealDelta(row.path, row.before, row.after)
+    ) {
+      continue; // the one-time display heal (issue 2339)
     }
     if (
       row.before === undefined &&
@@ -253,6 +284,31 @@ function buildCorpus(): { id: string; state: CharacterState }[] {
   const overCapApplied = clone(overCap) as Blob;
   overCapApplied.masteryResetApplied = true;
 
+  // A stranded display-band row (issue 2339): the reset long applied, the
+  // heal flag absent, fishing parked at 99.5 (the value the pre-fix sheet
+  // read as "100"). Stabilized first so its deeds/renown already match a
+  // character that once stood at the healed value, then the strand and the
+  // missing flag re-imposed, so the sweep must classify exactly the heal
+  // bump (99.5 to 100 on both gathering keys) plus the flag rows; this is
+  // the row that keeps the isDisplayHealDelta allowlist arm live.
+  const strandedBase = stabilize(
+    (() => {
+      const b = clone(modern) as Blob;
+      (b.gatheringProficiency as Record<string, number>).fishing = 99.5;
+      (b.professions as Record<string, number>).fishing = 99.5;
+      // Absent during stabilization so the heal fires there: the stabilized
+      // deeds/renown then include prog_fishing_100, the state a real
+      // stranded character reaches on its first post-fix login.
+      delete b.proficiencyDisplayHealApplied;
+      return b as unknown as CharacterState;
+    })(),
+    52,
+  );
+  const stranded = clone(strandedBase) as Blob;
+  (stranded.gatheringProficiency as Record<string, number>).fishing = 99.5;
+  (stranded.professions as Record<string, number>).fishing = 99.5;
+  delete stranded.proficiencyDisplayHealApplied;
+
   // A sparse pre-12b row. Its deeds carry the grants a real character with
   // these skills already received the first time it logged in after the Book
   // of Deeds shipped (the skill-proof retro inferences), so the reset cannot
@@ -281,6 +337,7 @@ function buildCorpus(): { id: string; state: CharacterState }[] {
     { id: 'over-cap-already-applied', state: overCapApplied as unknown as CharacterState },
     { id: 'minimal-fresh-shape', state: minimal },
     { id: 'already-applied', state: modernApplied as unknown as CharacterState },
+    { id: 'stranded-display-band', state: stranded as unknown as CharacterState },
   ];
 }
 
@@ -299,6 +356,7 @@ describe('mastery reset rehearsal (the committed synthetic corpus)', () => {
     expect(byId.get('minimal-fresh-shape')?.applied).toBe(true);
     expect(byId.get('over-cap-already-applied')?.applied).toBe(false);
     expect(byId.get('already-applied')?.applied).toBe(false);
+    expect(byId.get('stranded-display-band')?.applied).toBe(false);
   });
 });
 

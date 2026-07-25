@@ -28,7 +28,7 @@ import { DT, type Entity, FISHING_CAST_ID, FISHING_SESSION_CAP_SEC, isConsuming 
 import { groundHeight, waterLevelAt } from '../world';
 import { queueGatheringGrant } from './gathering';
 import { PROFICIENCY_BAND_THRESHOLDS, proficiencyBandFor } from './proficiency_bands';
-import { bestOwnedGatherToolTier, canGatherTier } from './tools';
+import { bestOwnedGatherToolTier, canGatherTier, hasFishingImplement } from './tools';
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 // Facing-forward sample ring the fishable-water check walks. Exported so
@@ -157,6 +157,24 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
       return;
     }
     ctx.error(meta.entityId, 'You are busy.');
+    return;
+  }
+  // Implement gate (#2343, the always-require-a-tool rule's fishing arm):
+  // casting a line needs a fishing implement in bags: the simple pole
+  // (use.type 'fishing') or any fishing-profession gatherTool rod. Sits
+  // AFTER the busy/reel arm (a valid reel must never be eaten; the reel
+  // re-press itself already proves ownership through useItem's countItem
+  // gate) and BEFORE the water check and the one bite-delay draw, so a
+  // denial is rng-free and starts nothing. Text-free denial (the
+  // gatherDenied idiom): the client composes its own localized copy.
+  if (!hasFishingImplement(meta.inventory, ITEMS)) {
+    ctx.emit({
+      type: 'gatherDenied',
+      pid: meta.entityId,
+      surface: 'fishing',
+      professionId: 'fishing',
+      requiredTier: 1,
+    });
     return;
   }
   if (!hasFishableWaterAhead(ctx, p)) {

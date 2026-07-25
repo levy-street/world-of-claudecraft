@@ -4,6 +4,7 @@
 // boss mechanics and group xp over the real server.
 // Requires the server running with ALLOW_DEV_COMMANDS=1.
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -101,7 +102,7 @@ class Bot {
       this.ws = new WebSocket(`${WS_BASE}/ws`);
       const to = setTimeout(() => reject(new Error('join timeout')), 8000);
       this.ws.on('open', () => {
-        this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId }));
+        this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)));
       });
       this.ws.on('message', (data) => {
         const msg = JSON.parse(String(data));

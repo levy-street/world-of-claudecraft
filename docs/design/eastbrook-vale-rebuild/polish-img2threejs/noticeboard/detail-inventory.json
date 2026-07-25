@@ -1,0 +1,192 @@
+{
+  "sourceImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/front-three-quarter.png",
+  "scanMethod": "grid-3x3 plus front, rear, side, and grazing cross-check",
+  "targetMinDetails": 12,
+  "details": [
+    {
+      "id": "roof-course-seams",
+      "kind": "seam",
+      "description": "Three shallow overlapping cobalt shingle rows create a readable rain-hood rhythm.",
+      "region": { "x": 0.08, "y": 0.07, "width": 0.84, "height": 0.22, "units": "normalized" },
+      "scale": "meso",
+      "affects": "geometry and cavity value",
+      "mapsTo": { "type": "component.localFeatures", "ref": "roof-shell/roof-course-seams" },
+      "evidenceRef": "front",
+      "confidence": 0.97
+    },
+    {
+      "id": "eave-chamfer",
+      "kind": "bevel",
+      "description": "The broad eave and dark ridge rail use real low-segment chamfers that survive grazing light.",
+      "region": { "x": 0.07, "y": 0.03, "width": 0.86, "height": 0.28, "units": "normalized" },
+      "scale": "meso",
+      "affects": "silhouette and highlight",
+      "mapsTo": { "type": "component.localFeatures", "ref": "roof-shell/eave-chamfer" },
+      "evidenceRef": "grazing",
+      "confidence": 0.94
+    },
+    {
+      "id": "post-cap-bevels",
+      "kind": "bevel",
+      "description": "Both tall post caps have faceted gold-edged chamfers instead of sharp box corners.",
+      "region": { "x": 0.04, "y": 0.0, "width": 0.92, "height": 0.15, "units": "normalized" },
+      "scale": "micro",
+      "affects": "geometry and metal highlight",
+      "mapsTo": { "type": "component.localFeatures", "ref": "front-frame/post-cap-bevels" },
+      "evidenceRef": "front-three-quarter",
+      "confidence": 0.94
+    },
+    {
+      "id": "corner-plate-fasteners",
+      "kind": "fastener",
+      "description": "Gold corner plates and their round heads repeat at the lower board and roof support joins.",
+      "region": { "x": 0.1, "y": 0.24, "width": 0.8, "height": 0.48, "units": "normalized" },
+      "scale": "micro",
+      "affects": "merged repeated metal detail",
+      "mapsTo": {
+        "type": "component.localFeatures",
+        "ref": "corner-plates/corner-plate-fasteners"
+      },
+      "evidenceRef": "front",
+      "confidence": 0.91
+    },
+    {
+      "id": "timber-grain",
+      "kind": "linework",
+      "description": "Sparse directional grain follows post, rail, board, and brace axes without screen-space noise.",
+      "region": { "x": 0.08, "y": 0.04, "width": 0.84, "height": 0.84, "units": "normalized" },
+      "scale": "micro",
+      "affects": "shared-atlas orientation and vertex value",
+      "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/timber-grain" },
+      "evidenceRef": "grazing",
+      "confidence": 0.89
+    },
+    {
+      "id": "board-plank-seams",
+      "kind": "groove",
+      "description": "Horizontal recessed seams divide the broad notice surface into believable timber planks.",
+      "region": { "x": 0.18, "y": 0.29, "width": 0.64, "height": 0.4, "units": "normalized" },
+      "scale": "meso",
+      "affects": "geometry and cavity AO",
+      "mapsTo": { "type": "component.localFeatures", "ref": "root/board-plank-grooves" },
+      "evidenceRef": "rear",
+      "confidence": 0.96
+    },
+    {
+      "id": "parchment-mottling",
+      "kind": "stain",
+      "description": "Each parchment carries warm value variation and darker handled edges but no letters or pseudo-text.",
+      "region": { "x": 0.2, "y": 0.34, "width": 0.6, "height": 0.34, "units": "normalized" },
+      "scale": "micro",
+      "affects": "vertex-color local mask",
+      "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/parchment-mottling" },
+      "evidenceRef": "front-three-quarter",
+      "confidence": 0.85
+    },
+    {
+      "id": "pin-fasteners",
+      "kind": "fastener",
+      "description": "One or two restrained round gold pin heads anchor each parchment card.",
+      "region": { "x": 0.2, "y": 0.33, "width": 0.6, "height": 0.35, "units": "normalized" },
+      "scale": "micro",
+      "affects": "merged repeated metal detail",
+      "mapsTo": { "type": "component.localFeatures", "ref": "parchment-system/pin-fasteners" },
+      "evidenceRef": "front",
+      "confidence": 0.95
+    },
+    {
+      "id": "crest-relief",
+      "kind": "ridge",
+      "description": "An original abstract Eastbrook sunburst on a cobalt shield projects slightly beneath the eave.",
+      "region": { "x": 0.43, "y": 0.2, "width": 0.14, "height": 0.14, "units": "normalized" },
+      "scale": "meso",
+      "affects": "identity relief",
+      "mapsTo": { "type": "component.localFeatures", "ref": "crest/abstract-eastbrook-relief" },
+      "evidenceRef": "front",
+      "confidence": 0.96
+    },
+    {
+      "id": "frame-chamfers",
+      "kind": "bevel",
+      "description": "Front rails and vertical frame members use small chamfers to separate overlapping timber pieces.",
+      "region": { "x": 0.1, "y": 0.25, "width": 0.8, "height": 0.5, "units": "normalized" },
+      "scale": "micro",
+      "affects": "geometry and highlight",
+      "mapsTo": { "type": "component.localFeatures", "ref": "front-frame/frame-chamfers" },
+      "evidenceRef": "grazing",
+      "confidence": 0.92
+    },
+    {
+      "id": "brace-join-seams",
+      "kind": "seam",
+      "description": "Triangular roof braces visibly overlap the posts and hood with no air gap at their roots.",
+      "region": { "x": 0.08, "y": 0.12, "width": 0.84, "height": 0.25, "units": "normalized" },
+      "scale": "meso",
+      "affects": "attachment and contact shadow",
+      "mapsTo": { "type": "component.localFeatures", "ref": "roof-braces/brace-join-seams" },
+      "evidenceRef": "right",
+      "confidence": 0.96
+    },
+    {
+      "id": "footing-joints",
+      "kind": "groove",
+      "description": "Each footing has two centered stone courses with deep horizontal and offset vertical joints.",
+      "region": { "x": 0.02, "y": 0.78, "width": 0.96, "height": 0.2, "units": "normalized" },
+      "scale": "meso",
+      "affects": "stone geometry and AO",
+      "mapsTo": {
+        "type": "component.localFeatures",
+        "ref": "footing-system/footing-joint-grooves"
+      },
+      "evidenceRef": "front",
+      "confidence": 0.98
+    },
+    {
+      "id": "footing-chamfers",
+      "kind": "bevel",
+      "description": "Exposed footing blocks carry low-segment chamfers that catch the ground-level key light.",
+      "region": { "x": 0.02, "y": 0.78, "width": 0.96, "height": 0.2, "units": "normalized" },
+      "scale": "micro",
+      "affects": "geometry and grazing highlight",
+      "mapsTo": { "type": "component.localFeatures", "ref": "footing-system/footing-chamfers" },
+      "evidenceRef": "grazing",
+      "confidence": 0.94
+    },
+    {
+      "id": "base-cavity-dirt",
+      "kind": "stain",
+      "description": "Dark desaturated contact dirt stays within stone joints and the floor contact bands.",
+      "region": { "x": 0.02, "y": 0.9, "width": 0.96, "height": 0.08, "units": "normalized" },
+      "scale": "micro",
+      "affects": "vertex-color local mask",
+      "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/base-cavity-dirt" },
+      "evidenceRef": "front-three-quarter",
+      "confidence": 0.82
+    },
+    {
+      "id": "rear-frame-seams",
+      "kind": "seam",
+      "description": "Rear horizontal rails and three vertical braces overlap the board with explicit construction seams.",
+      "region": { "x": 0.12, "y": 0.28, "width": 0.76, "height": 0.47, "units": "normalized" },
+      "scale": "meso",
+      "affects": "rear structure and contact shadow",
+      "mapsTo": { "type": "component.localFeatures", "ref": "rear-frame/rear-frame-seams" },
+      "evidenceRef": "rear-three-quarter",
+      "confidence": 0.97
+    },
+    {
+      "id": "paper-depth-stagger",
+      "kind": "seam",
+      "description": "Seven blank parchment faces use small deterministic front-depth offsets so adjacent edges remain distinct without z-fighting.",
+      "region": { "x": 0.2, "y": 0.34, "width": 0.6, "height": 0.34, "units": "normalized" },
+      "scale": "micro",
+      "affects": "depth ordering and contact value",
+      "mapsTo": {
+        "type": "component.localFeatures",
+        "ref": "parchment-system/paper-depth-stagger"
+      },
+      "evidenceRef": "front",
+      "confidence": 0.94
+    }
+  ]
+}

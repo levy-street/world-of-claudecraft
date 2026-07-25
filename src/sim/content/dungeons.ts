@@ -490,7 +490,21 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 7,
     aggroRadius: 18,
-    aoePulse: { min: 30, max: 42, radius: 14, every: 8, name: 'Necrotic Shockwave' },
+    // Grave Inferno (2026-07): the old Necrotic Shockwave aoePulse hit every
+    // melee for an unavoidable, unmitigated 570-798 each 8s. Replaced by a
+    // Geddon-style stationary channel: 8s rooted, no melee, four escalating
+    // fire pulses (base x1/2/3/4 x the per-mob mechanic multiplier), 14yd.
+    // Moving out at the windup eats the small first pulse or nothing.
+    infernoChannel: {
+      every: 30,
+      duration: 8,
+      pulses: 4,
+      min: 7,
+      max: 9,
+      radius: 14,
+      name: 'Grave Inferno',
+      school: 'fire',
+    },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 50000, chance: 1 },
@@ -622,7 +636,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 3.4,
     attackSpeed: 2.0,
     armorPerLevel: 16,
-    moveSpeed: 11,
+    moveSpeed: 8,
     aggroRadius: 14,
     ignoreTaunt: true,
     loot: [],

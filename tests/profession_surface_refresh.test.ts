@@ -29,6 +29,7 @@ function gathering(values: Partial<Record<string, number>> = {}): GatheringProfi
   return GATHERING_PROFESSION_IDS.map((professionId) => ({
     professionId,
     value: values[professionId] ?? 0,
+    displayValue: Math.floor(values[professionId] ?? 0),
   }));
 }
 

@@ -21,7 +21,7 @@ import type { ItemDef } from '../types';
 
 export const HEROIC_VENDOR_NPC_ID = 'heroic_quartermaster';
 
-// One rating per jewelry piece, 25 rating = 2.5% (10 rating = 1%).
+// One rating per jewelry piece. At 25 rating: 2.5% hit or 1.25% crit/haste.
 const JEWELRY_RATING = 25;
 
 export interface HeroicVendorOffer {

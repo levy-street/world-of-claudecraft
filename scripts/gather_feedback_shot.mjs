@@ -41,6 +41,7 @@ await page.evaluate(() => {
 const normal = await page.evaluate(() => {
   const sim = window.__game.sim;
   sim.chat('/dev tp -70 -52');
+  sim.addItem('copper_mining_pick', 1); // #2343: every harvest needs the tool
   return { granted: sim.harvestNode('ore_eastbrook_1') };
 });
 console.log('normal harvest:', JSON.stringify(normal));

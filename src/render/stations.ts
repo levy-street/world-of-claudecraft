@@ -7,17 +7,17 @@
 // stations_core.ts; this module is the Three half.
 //
 // Every model is an EXISTING GLB reused by URL (assets/loader.ts caches one
-// parse per URL, so the copies props.ts / artisan_row_props.ts load are
-// shared). The kitchens anchor replicates the props.ts campfire recipe
+// parse per URL, so copies loaded by props.ts are shared). The kitchens
+// anchor replicates the props.ts campfire recipe
 // (bonfire base + lathe flame + fire light); the returned flames/fireLights
 // join the renderer's campfire flicker + ember pass, the same way
 // vale_cup props ride that budget. Rendered identically on every graphics
 // tier (pure scenery, no actionable info, so no tier split is needed).
 // A primitive fallback keeps the brief pre-load window from showing bare
-// ground, mirroring artisan_row_props.ts / gather_nodes.ts.
+// ground, mirroring gather_nodes.ts.
 
 import * as THREE from 'three';
-import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
+import type { StationDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -29,8 +29,7 @@ import { type StationPropKind, stationPropPlacements } from './stations_core';
 const PITCH_SAMPLE_STEP = 0.4;
 
 // All EXISTING assets: the props.ts qprops/village kit pieces plus the
-// artisan-row Tripo props (already generated, manifested, and preloaded by
-// URL elsewhere; reusing the URL costs nothing extra).
+// former Artisan Row Tripo props (already generated and manifested).
 const STATION_ASSET_URL: Record<StationPropKind, string> = {
   anvil: '/models/props/anvil.glb',
   campfire: '/models/props/bonfire.glb',
@@ -43,8 +42,8 @@ const STATION_ASSET_URL: Record<StationPropKind, string> = {
 };
 
 // Target height (yd) each GLB is normalized to (Box3 rescale + re-seat, the
-// artisan_row idiom), so authored-scale differences between kits never leak
-// into the placements. Artisan pieces keep their artisan_row_props heights;
+// the existing prop idiom), so authored-scale differences between kits never
+// leak into the placements. Reused artisan pieces keep their former heights;
 // crate matches the props.ts hider-comment footprint (crate 0.65).
 const STATION_TARGET_HEIGHT: Record<StationPropKind, number> = {
   anvil: 0.75,
@@ -89,7 +88,7 @@ if (typeof window !== 'undefined') {
   }
 }
 
-/** Test-only window into the preload asset set (mirrors artisan_row_props.ts). */
+/** Test-only window into the preload asset set. */
 export const stationsPreloadInternalsForTest = {
   assetUrl: STATION_ASSET_URL,
   targetHeight: STATION_TARGET_HEIGHT,
@@ -147,17 +146,14 @@ function groundNormal(x: number, z: number, seed: number): THREE.Vector3 {
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
-// Hand-authored landmarks against the built-in towns (the STATIONS pos values
-// are Eastbrook/Fenbridge/Highwatch placements), so like artisan_row_props
-// this only places against the built-in world: the editor's play-test swaps
-// in a custom WorldContent where these fixed spots could land inside a
-// building or below water.
-export function buildStationProps(seed: number): StationPropsView {
+// Station anchors come through the active IWorld. Custom worlds with no
+// authored services therefore get no fixed built-in clusters.
+export function buildStationProps(seed: number, stations: readonly StationDef[]): StationPropsView {
   const group = new THREE.Group();
   group.name = 'stationProps';
   const flames: THREE.Mesh[] = [];
   const fireLights: THREE.PointLight[] = [];
-  if (getActiveWorldContent() !== BUILTIN_WORLD) return { group, flames, fireLights };
+  if (stations.length === 0) return { group, flames, fireLights };
 
   const flameGeo = new THREE.LatheGeometry(
     FLAME_PROFILE.map(([r, y]) => new THREE.Vector2(r, y)),
@@ -165,7 +161,7 @@ export function buildStationProps(seed: number): StationPropsView {
   );
   const usePbr = GFX.standardMaterials;
 
-  for (const p of stationPropPlacements()) {
+  for (const p of stationPropPlacements(stations)) {
     const obj = buildStationMesh(p.kind);
     const holder = new THREE.Group();
     holder.add(obj);

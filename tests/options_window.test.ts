@@ -415,3 +415,43 @@ describe('options_window: settings shows the running version (#1541)', () => {
     expect(body.indexOf("'opt-version'")).toBeGreaterThan(body.indexOf('el.appendChild(list)'));
   });
 });
+
+// Reset to Defaults is scoped per sub-view (#2341): each of Graphics/Audio/Controller
+// must feed its OWN just-built controls list into the shared footer, and the footer
+// must reset/re-apply only the keys those controls carry, never a bare full reset.
+// settings.test.ts and options_view.test.ts already unit-test reset(keys) and
+// optionsControlKeys() in isolation; this pins the WIRING between them so a future
+// footer/call-site edit that quietly reverts to the old shared-state bug (e.g. a
+// call site passing the wrong controls list, or the footer falling back to a bare
+// settings.reset()) fails a test instead of shipping silently.
+describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () => {
+  it('settingsViewFooter derives keys from its controls param and resets/re-applies only those', () => {
+    const footer = painter.slice(
+      painter.indexOf('settingsViewFooter(controls: OptionsControl[]): void {'),
+    );
+    const body = footer.slice(0, footer.indexOf('\n  }\n'));
+    expect(body).toContain('const keys = optionsControlKeys(controls)');
+    // the reset call is scoped, never the bare no-arg full reset
+    expect(body).toContain('hooks?.settings.reset(keys)');
+    expect(body).not.toMatch(/settings\.reset\(\)/);
+    // re-apply loop walks only the scoped keys, never settings.all()
+    expect(body).toContain('for (const k of keys)');
+    expect(body).not.toContain('settings.all()');
+  });
+
+  it.each([
+    ['renderGraphics', 'buildGraphicsControls'],
+    ['renderAudio', 'buildAudioControls'],
+    ['renderController', 'buildControllerControls'],
+  ])(
+    '%s builds its own controls and passes that same list into settingsViewFooter',
+    (method, builder) => {
+      const start = painter.indexOf(`private ${method}(): void {`);
+      expect(start).toBeGreaterThan(-1);
+      const rest = painter.slice(start);
+      const body = rest.slice(0, rest.indexOf('\n  }\n'));
+      expect(body).toContain(builder);
+      expect(body).toContain('this.settingsViewFooter(controls)');
+    },
+  );
+});

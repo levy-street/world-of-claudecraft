@@ -355,6 +355,7 @@ export const zh_TW: EnTranslations = {
       "close": "關閉每日獎勵",
       "loading": "正在載入每日獎勵...",
       "error": "無法載入每日獎勵。",
+      "disabled": "每日獎勵目前已停用。我們將在 Discord 頻道中公布此功能的更新。",
       "intro": "在已驗證的錢包中持有足夠的 WOC 即可解鎖每日獎勵。透過每日一次轉盤與輪換任務賺取點數，再登上每日排行榜以分得獎池的一份獎勵。",
       "disclaimer": "WOC 價格可能快速波動。我們建議持有高於 $20 USD 最低要求的數量，避免正常價格波動導致獎勵被鎖定。這不是財務建議。",
       "prize": "獎池",
@@ -1048,6 +1049,7 @@ export const zh_TW: EnTranslations = {
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
       "mouseoverCast": "對隊伍框架滑鼠指向施法",
+      "stickyTarget": "點擊地面時保留目標",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
@@ -1459,7 +1461,9 @@ export const zh_TW: EnTranslations = {
         "gills": "魚鰓",
         "claw": "爪",
         "horn": "角",
-        "tusk": "獠牙"
+        "tusk": "獠牙",
+        "meat": "獸肉",
+        "cloth": "布"
       }
     },
     "townFocus": {
@@ -1991,6 +1995,9 @@ export const zh_TW: EnTranslations = {
         "takeParcelsFirst": "請先取出包裹再丟棄信件。"
       }
     },
+    "noticeboard": {
+      "empty": "看起來沒有張貼任何內容。"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "鍍金保險箱",
@@ -2143,12 +2150,51 @@ export const zh_TW: EnTranslations = {
         "logging": "需要{tier}階伐木斧",
         "herbalism": "需要{tier}階草藥鐮"
       },
+      "requiresTool": {
+        "mining": "需要採礦鎬",
+        "logging": "需要伐木斧",
+        "herbalism": "需要草藥鐮"
+      },
       "toolTierUnmet": {
         "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",
         "logging": "你需要{tier}階伐木斧才能砍伐這片林木。",
         "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。"
       },
+      "toolRequired": {
+        "mining": "你需要採礦鎬才能開採這條礦脈。",
+        "logging": "你需要伐木斧才能砍伐這片林木。",
+        "herbalism": "你需要草藥鐮才能採集這片草藥叢。",
+        "fishing": "你需要釣竿才能拋竿垂釣。"
+      },
+      "noNodeNearby": {
+        "mining": "附近沒有礦脈可供開採。",
+        "logging": "附近沒有林木可供砍伐。",
+        "herbalism": "附近沒有草藥叢可供採集。"
+      },
       "toolTierUnmetCorpse": "你需要{tier}階採集工具才能取得最上等的材料。",
+      "toolTooltip": {
+        "kind": {
+          "mining": "採礦工具（{tier}階）",
+          "logging": "伐木工具（{tier}階）",
+          "herbalism": "草藥工具（{tier}階）",
+          "fishing": "釣魚竿（{tier}階）"
+        },
+        "unlocks": {
+          "mining": "開採最高{tier}階的礦脈所需。",
+          "logging": "砍伐最高{tier}階的林木所需。",
+          "herbalism": "採集最高{tier}階的草藥叢所需。"
+        },
+        "use": {
+          "mining": "使用：開採附近的礦脈。",
+          "logging": "使用：砍伐附近的林木。",
+          "herbalism": "使用：採集附近的草藥叢。"
+        },
+        "speed": "在低於{tier}階的節點採集速度更快。",
+        "rodRequired": "釣魚所需。",
+        "rodBite": "魚上鉤最多可提前{seconds}秒。",
+        "rodReel": "收線時限延長{seconds}秒。",
+        "rodBand": "釣魚技能達到{skill}後可解鎖更豐富的漁獲。"
+      },
       "downgradeMark": "背包已滿：這份收穫未能留下採集者的印記。",
       "downgradeFind": "背包已滿：一件完美的收穫溜走了。",
       "stateReady": "可採集",
@@ -2324,6 +2370,7 @@ export const zh_TW: EnTranslations = {
       },
       "throttled": "你製作得太快了，請稍等片刻後再試。",
       "recipeNotLearned": "你還沒有學會這個配方。",
+      "noBagSpace": "背包空間不足，無法存放製作的物品。",
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成長",
       "difficultyReduced": "技能成長減少",
@@ -2375,6 +2422,9 @@ export const zh_TW: EnTranslations = {
       "enchantWrongSlot": "該附魔無法施加於那件物品。",
       "enchantUnknown": "該附魔不存在。",
       "enchantInsufficient": "你沒有該附魔所需的材料。",
+      "disenchantNoSpace": "背包空間不足，無法存放奧術材料。",
+      "salvageNoSpace": "背包空間不足，無法存放拆解出的材料。",
+      "enchantNoSpace": "背包空間不足，無法存放附魔後的物品。",
       "disenchantConfirmTitle": "分解 {item}？",
       "disenchantConfirmBody": "這會摧毀 {item} 並產出奧術材料。此操作無法復原。",
       "disenchantConfirmBodySpecial": "這會摧毀一件特殊的 {item}（署名、傑作或已附魔）並產出奧術材料。此操作無法復原。",
@@ -2394,8 +2444,10 @@ export const zh_TW: EnTranslations = {
       "stateKnown": "已學會",
       "stateTeachable": "可學習",
       "stateLocked": "未解鎖",
+      "statePending": "學習中",
       "requirement": "需要{craft}達到 {skill} 後傳授",
       "trainAria": "花費{fee}學習{name}",
+      "pendingAria": "正在學習{name}",
       "dialogOption": "訓練",
       "dialogOptionAria": "向{name}學習配方",
       "learned": "已學會配方：{recipe}",
@@ -2422,7 +2474,8 @@ export const zh_TW: EnTranslations = {
       "notEligible": "該物品無法解綁。",
       "notBound": "該物品未綁定。",
       "cannotAfford": "你付不起解綁費用。",
-      "outOfRange": "你必須站在對應的工作臺旁才能解綁。"
+      "outOfRange": "你必須站在對應的工作臺旁才能解綁。",
+      "noSpace": "背包空間不足，無法存放解綁後的物品。"
     },
     "finder": {
       "title": "地城搜尋器",
@@ -2510,7 +2563,7 @@ export const zh_TW: EnTranslations = {
         "lunar_tide": "月潮（週期性範圍傷害）",
         "enrage": "低血量時狂怒",
         "shuddering_stomp": "震顫踐踏（範圍暈眩）",
-        "necrotic_shockwave": "死靈衝擊波（高額範圍傷害）",
+        "grave_inferno": "墓場煉獄（引導火焰AoE，保持分散）",
         "grave_cleaver": "掘墓劈砍（正面順劈）",
         "shadow_nova": "暗影新星（範圍爆發）",
         "profane_mending": "褻瀆治療（治療其盟友）",
@@ -3796,7 +3849,7 @@ export const zh_TW: EnTranslations = {
       "specializationBody": "技能達到{at}即在本行業專精，配方材料消耗減少{pct}%。",
       "ench": {
         "disenchantHeading": "分解",
-        "disenchantNote": "分解任何普通品質及以上的武器或護甲（未附魔的），每次只消耗一件。普通與優秀品質的裝備研磨後隨機產出若干鈴音之塵，稀有度越高、等級越高則產量越豐；精良品起，產出形態改變：精良件出一個鈴音精華，史詩或傳說件出一個鈴音碎片，另附一個與原件材質掛鉤的定向副產物。",
+        "disenchantNote": "分解任何普通品質及以上的武器或護甲，每次只消耗一件，優先消耗未附魔的；當只剩下已附魔的裝備時，會連同附魔一併分解其中一件。普通與優秀品質的裝備研磨後隨機產出若干鈴音之塵，稀有度越高、等級越高則產量越豐；精良品起，產出形態改變：精良件出一個鈴音精華，史詩或傳說件出一個鈴音碎片，另附一個與原件材質掛鉤的定向副產物。",
         "typedHeading": "定向副產物",
         "typedNote": "精良及以上的裝備還會產出一種定向的、交易綁定的副產物：精良裝備產出{rare}件，史詩或傳說產出{epicMin}到{epicMax}件。",
         "colSource": "拆解來源",
@@ -3818,9 +3871,9 @@ export const zh_TW: EnTranslations = {
         "bonusFmt": "+{value}{stat}"
       },
       "gatherIntro": {
-        "mining": "採礦在三大區域的礦脈中開採礦石，供給鍛造類行業，上限為100。",
-        "logging": "伐木在三大區域的林地中砍伐木材，供給武器柄材與工具，上限為100。",
-        "herbalism": "藥草學在三大區域採集草藥，供給鍊金術與烹飪，上限為100。",
+        "mining": "採礦直接從世界的岩層中開採礦石：東溪谷產銅礦，泥沼濕地產鐵礦，荊峰高地產鋨礦，供給鍛造類行業。從1級起人人皆可採集：只需背包中備有一把採礦鎬，各區域主城均售20銅幣。以獨立計數器追蹤，上限為100。",
+        "logging": "伐木在三大區域的林地中砍伐木材：東溪谷產鐵皮木，泥沼濕地產梣木，荊峰高地產高松，供給武器柄材、法杖與工程師工坊。從1級起人人皆可伐木，只需背包中備有一把伐木斧（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
+        "herbalism": "藥草學採集野地所生的草藥：東溪谷產潤光葉，泥沼濕地產金葉，荊峰高地產日瓣草，這些葉與莖讓藥劑類行業得以持續調製。從1級起人人皆可採集，只需背包中備有一把草藥鐮（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
         "fishing": "釣魚通過咬鉤與收線的節奏，在每個區域的開闊水面垂釣，上限為200。"
       },
       "rhythmHeading": "採集節奏",
@@ -3829,13 +3882,12 @@ export const zh_TW: EnTranslations = {
       "nodesHeading": "各區域節點",
       "nodesNote": "節點的位置、階級、所需工具與產出；每個節點在你採集後{respawn}秒才會為你本人重生。",
       "toolsHeading": "工具",
-      "toolsNote": "工具階梯與確切的商人售價；4階與5階工具只能製作，無法購買。",
+      "toolsNote": "每一處節點都需要背包中備有對應行業的工具，1階節點也不例外：沒有採礦鎬就採不到礦石，沒有魚竿就釣不上魚。商人階梯涵蓋1階到3階，各區域主城皆有備貨；工具只要放在背包裡即可，沒有裝備欄位，也沒有耐久度，因此每件都只需購買一次。門檻只看階級：工具的稀有度顏色純屬外觀。\n\n商人階梯之上還有兩件製作工具，4階與5階，由工程師在工坊打造，任何NPC都不販售。目前沒有任何節點需要超過3階的工具，因此它們現階段的價值在於速度：頂階工具能把低階節點的施法時間壓到下限；等更高階的地域開放時，它們便是入場券。",
       "toolCrafted": "製作獲得（{craft}）",
       "toolVendor": "{name}（{hub}）",
       "toolUnavailable": "無販售",
       "priceNone": "無販售",
       "toolTierReq": "{tier}階工具",
-      "bareHands": "徒手即可",
       "yieldsHeading": "一次採集的收穫",
       "yieldsBody": "每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。",
       "bandsHeading": "熟練度區間",
@@ -5535,8 +5587,10 @@ export const zh_TW: EnTranslations = {
     "reconnectingNow": "連線已中斷，正在重新連線...（第 {attempt}/{maxAttempts} 次嘗試）",
     "slowConnection": "載入時間比平常長。請檢查您的網路連線。",
     "connectionRejected": "伺服器已關閉連線。",
+    "incompatibleWorldVersion": "遊戲與伺服器版本不相容。請重新整理或更新後再試一次。",
     "realmFull": "這個世界目前已滿，請於幾分鐘後再試。",
     "tooManyConnections": "您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。",
+    "messageRateExceeded": "由於發送操作過快，您已中斷連線。請稍候片刻後重新登入。",
     "tips": {
       "classes": "提示：9 個職業玩法各不相同，投入之前不妨都試一試。",
       "talents": "提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。",
@@ -5604,6 +5658,12 @@ export const zh_TW: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
     "bodyWeb": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
+    "dismiss": "關閉"
+  },
+  "perfNudge": {
+    "integratedGpu": "遊戲目前在內建（省電）顯示晶片上執行。如果這台電腦還配有獨立遊戲顯示卡，請在 Windows 的 設定 > 系統 > 顯示器 > 顯示卡 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇遊戲顯示卡。",
+    "hardwareAccelerationDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，因此非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
+    "hardwareAccelerationWeb": "遊戲目前在沒有 GPU 加速的情況下執行，因此非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
     "dismiss": "關閉"
   },
   "realm": {
@@ -6030,7 +6090,8 @@ export const zh_TW: EnTranslations = {
       "death": "{name}死亡。",
       "auraGain": "你獲得了 {name}。",
       "auraFade": "{name}從你身上消失。",
-      "auraAfflicted": "{target}受到了 {name} 影響。"
+      "auraAfflicted": "{target}受到了 {name} 影響。",
+      "auraGainOther": "{target}獲得了 {name}。"
     },
     "system": {
       "playerDeath": "你已經死亡。",
@@ -7291,7 +7352,7 @@ export const zh_TW: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形態",
-        "description": "變形為熊：護甲 +90%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
+        "description": "變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
       },
       "maul": {
         "name": "碎骨擊",
@@ -11737,6 +11798,7 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineCandleInteract": "燭火神龕：按 F 觸碰",
     "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
     "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
-    "mailboxName": "郵箱"
+    "mailboxName": "郵箱",
+    "noticeboardName": "告示板"
   }
 };

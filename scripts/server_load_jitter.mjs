@@ -16,10 +16,18 @@
 //   BOTS=60 DURATION_MS=30000 node scripts/server_load_jitter.mjs
 //
 // Env: BOTS, DURATION_MS, LEVEL, CLUSTER_X, CLUSTER_Z, CLUSTER_R, RAMP_MS,
-//      SERVER_URL, OBSERVER (0 to disable), JSON_OUT.
+//      SERVER_URL, OBSERVER (0 to disable), JSON_OUT, JITTER_MAX_P95 (ceiling on the
+//      OBSERVER snapshot-gap p95 in ms; unset = no ceiling).
+//
+// This is a GATE, not just a probe (scripts/lib/bench_gate.mjs): a partial join
+// fails unconditionally (lower BOTS for exploratory runs), and when JITTER_MAX_P95
+// is set the gate refuses to pass on a disabled observer or on too few observer
+// samples. The verdict rides the exit code and the JSON_OUT report.
 
 import fs from 'node:fs';
 import WebSocket from 'ws';
+import { evaluateJitterRun, gapStats, parseCeilingEnv, pct } from './lib/bench_gate.mjs';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -36,6 +44,7 @@ const WANT_OBSERVER = process.env.OBSERVER !== '0';
 // vs the default farming crowd where loot/level/quest churn is unavoidable.
 const IDLE = process.env.IDLE === '1';
 const JSON_OUT = process.env.JSON_OUT ?? '';
+const MAX_P95 = parseCeilingEnv('JITTER_MAX_P95', process.env.JITTER_MAX_P95);
 
 const uniq = Date.now().toString(36);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -154,7 +163,7 @@ class Client {
       this.ws = new WebSocket(`${WS_BASE}/ws`, { headers: { 'X-Forwarded-For': this.ip } });
       const to = setTimeout(() => reject(new Error('join timeout')), 10000);
       this.ws.on('open', () =>
-        this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId })),
+        this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId))),
       );
       this.ws.on('message', (data) => {
         const raw = String(data);
@@ -205,30 +214,8 @@ class Client {
   }
 }
 
-function pct(sorted, p) {
-  if (sorted.length === 0) return 0;
-  const i = Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length));
-  return sorted[i];
-}
-
-function gapStats(snapTimes) {
-  const gaps = [];
-  for (let i = 1; i < snapTimes.length; i++) gaps.push(snapTimes[i] - snapTimes[i - 1]);
-  const sorted = [...gaps].sort((a, b) => a - b);
-  const over = (t) => gaps.filter((g) => g > t).length;
-  return {
-    snapshots: snapTimes.length,
-    gaps: gaps.length,
-    p50: +pct(sorted, 50).toFixed(1),
-    p95: +pct(sorted, 95).toFixed(1),
-    p99: +pct(sorted, 99).toFixed(1),
-    max: +(sorted.at(-1) ?? 0).toFixed(1),
-    over100: over(100),
-    over150: over(150),
-    over250: over(250),
-    over500: over(500),
-  };
-}
+// pct and gapStats moved VERBATIM to scripts/lib/bench_gate.mjs (R12) so the
+// floor nearest-rank percentile convention is pinned by tests/bench_gate.test.ts.
 
 async function main() {
   console.log(
@@ -379,6 +366,14 @@ async function main() {
         : null,
     serverPerf: perf,
   };
+  const verdict = evaluateJitterRun({
+    joined,
+    expected: BOTS,
+    observer: report.observer,
+    durationMs: DURATION_MS,
+    maxP95: MAX_P95,
+  });
+  report.verdict = verdict;
 
   console.log('\n===== RESULT =====');
   console.log(
@@ -401,6 +396,8 @@ async function main() {
       `SERVER tick p95/max (ms): ${cols.map((n) => `${n}=${ph[n]?.p95 ?? 0}/${ph[n]?.max ?? 0}`).join(' ')} (samples=${perf.samples}, ents=${perf.simEntities}, tickHz=${perf.tickHz ?? 'n/a'})`,
     );
   }
+  for (const f of verdict.failures) console.error(`GATE FAIL: ${f}`);
+  console.log(`verdict: ${verdict.ok ? 'PASS' : 'FAIL'}`);
   if (JSON_OUT) {
     fs.writeFileSync(JSON_OUT, JSON.stringify(report, null, 2) + '\n');
     console.log(`wrote ${JSON_OUT}`);
@@ -409,7 +406,7 @@ async function main() {
   for (const b of bots) b.close();
   observer?.close();
   await sleep(300);
-  process.exit(0);
+  process.exit(verdict.ok ? 0 : 1);
 }
 
 main().catch((err) => {

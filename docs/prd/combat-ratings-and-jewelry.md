@@ -3,6 +3,9 @@
 Status: Implemented in PR #1860. The rating ladder, item assignments, capped
 above-level curve, and ratings-off-primary-budget policy are locked for v1.
 
+Hotfix tuning: crit and haste now require 20 rating per 1%. Hit remains at 10
+rating per 1%. Existing item and set rating amounts stay unchanged.
+
 ## 1. Problem
 
 Two linked problems:
@@ -57,8 +60,8 @@ differentiates the ilvl tiers.
   stats only, bought with Heroic Marks.
 - **crit and haste ratings already exist on items.** `BaseItemDef.critRating` /
   `hasteRating` (`types.ts:386`), summed per piece in `recalcPlayerStats`
-  (`entity.ts:229`), converted via `CRIT_RATING_PER_PCT = HASTE_RATING_PER_PCT = 10`
-  (`types.ts:40`; `critFractionFromRating`/`hasteFractionFromRating`). Also on
+  (`entity.ts:229`), converted via `CRIT_RATING_PER_PCT = HASTE_RATING_PER_PCT = 20`
+  (`types.ts:55-56`; `critFractionFromRating`/`hasteFractionFromRating`). Also on
   `SetBonusEffect` (`types.ts:473`). **No individual item populates them; only set
   bonuses do.** So crit/haste on gear is a content-only change.
 - **Hit rating does NOT exist** on any item, set, or entity, and nothing subtracts
@@ -81,7 +84,7 @@ differentiates the ilvl tiers.
   today, with room to carry ratings.
 
 - **Set bonuses** (`src/sim/content/item_sets.ts`): 3pc bonuses already grant
-  `critRating: 20` (+2% crit) or `hasteRating: 150` (+15% haste). The two WEAK
+  `critRating: 20` (+1% crit) or `hasteRating: 150` (+7.5% haste). The two WEAK
   bonuses are the T2 4-piece bleeds, self-documented as barely beating their own 2pc:
   - `crownforged` (Strength T2) 4pc `set_bonesplinter`: bleed 8/tick/stack, max 3
     (`item_sets.ts:134`).
@@ -152,26 +155,27 @@ make each tier feel distinct. Two levers do the work:
 2. **Count**: number of ratings per piece goes 0 -> 1 -> 2 up the ladder. Nothing
    below 33 has two ratings; that is a qualitative identity, not a bigger number.
 
-Locked v1 allowance (primary rating per piece; 10 rating = 1%):
+Locked v1 allowance (rating per piece; hit uses 10 rating per 1%, crit and haste
+use 20 rating per 1%):
 
 | Tier | Armor | Weapon / Jewelry | Ratings per piece |
 |---|---|---|---|
 | ilvl 26 dungeon/world-boss epics | 0 | 0 | none |
-| ilvl 26 marks jewelry | - | 25 (2.5%) | 1 |
+| ilvl 26 marks jewelry | - | 25 | 1 |
 | ilvl 28 heroic dungeon variants | 0 | 0 | none |
-| ilvl 29 Nythraxis raid epics | 20 (2.0%) | - | 1 |
-| **ilvl 31 heroic boss set** | **40 (4.0%)** | **50 (5.0%)** | **1 (every piece)** |
-| **ilvl 33 Heroic Nythraxis raid** | **55 (5.5%)** | **65 (6.5%)** + **20 (2.0%) 2nd** | **2** |
-| **ilvl 37 Nythraxis legendary variant** | - | **70 (7.0%)** + **30 (3.0%) 2nd** | **2** |
+| ilvl 29 Nythraxis raid epics | 20 | - | 1 |
+| **ilvl 31 heroic boss set** | **40** | **50** | **1 (every piece)** |
+| **ilvl 33 Heroic Nythraxis raid** | **55** | **65 + 20 secondary** | **2** |
+| **ilvl 37 Nythraxis legendary variant** | - | **70 + 30 secondary** | **2** |
 
 What this produces:
 
 - **26 -> 31 now reads as a real step.** An ilvl-26 dungeon chest (0 rating) vs an
-  ilvl-31 chest (+2 primary AND +40 of a combat rating = +4% hit or crit or haste).
+  ilvl-31 chest (+2 primary AND +40 of a combat rating = +4% hit or +2% crit/haste).
   The rating, not the two stat points, is the upgrade.
 - **31 -> 33 is qualitatively new.** ilvl-33 raid pieces carry TWO ratings (a 5.5-6.5%
-  primary plus a 2% secondary). No ilvl-31 or lower piece does. A raider immediately
-  reads "dual-stat" as a tier above.
+  hit or 2.75-3.25% crit/haste primary plus a stat-dependent secondary). No ilvl-31
+  or lower piece does. A raider immediately reads "dual-stat" as a tier above.
 - **Total power stays sane.** With the retuned curve, Heroic (+3) melee miss starts at
   ~26% and spell resist at ~25% (not the old ~44%/~43%). A full ilvl-31 set (~11 slots)
   with ~40% hit pieces (~5 pieces at ~4-5%) yields ~22% hit, enough to close most of
@@ -219,7 +223,9 @@ off-budget), so the budget test still passes.
 
 ### 6.2 ilvl-31 heroic boss set (the differentiator; every piece gets one rating)
 
-Armor 40 (4.0%), weapons 50 (5.0%). Roughly half hit, rest crit/haste by archetype.
+Armor grants 40 rating (4% hit or 2% crit/haste). Weapons grant 50 rating
+(5% hit or 2.5% crit/haste). Roughly half use hit, with the rest using
+crit/haste by archetype.
 
 HEAVY (war/pala/shaman):
 | piece | slot | rating |
@@ -272,10 +278,10 @@ HEAL_MAIL (pala/shaman heal): no hit (heals unaffected), all crit/haste.
 ### 6.3 ilvl-29 Nythraxis raid set pieces (base for the raid variants)
 
 The 8 raid helms/shoulders (`crownforged`/`nighttalon`/`soulflame`/`stormcallers`)
-each gain ONE rating at 20 (2.0%): strength/agility pieces get hit, caster pieces get
-hit, the shaman/paladin caster-mail (`stormcallers`) gets crit. This is deliberately
-small (they are ilvl 29, below the ilvl-31 dungeon set) AND it is the seed the raid
-variant builder scales up.
+each gain ONE rating at 20 (2% hit or 1% crit/haste): strength/agility pieces get
+hit, caster pieces get hit, the shaman/paladin caster-mail (`stormcallers`) gets
+crit. This is deliberately small (they are ilvl 29, below the ilvl-31 dungeon set)
+AND it is the seed the raid variant builder scales up.
 
 ### 6.4 ilvl-33/37 Heroic Nythraxis raid (dual-rating tier)
 
