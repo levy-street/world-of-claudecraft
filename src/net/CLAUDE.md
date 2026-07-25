@@ -45,7 +45,8 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
   `social` sets `socialInfo` and flips `socialDirty`; `censor` live-updates the
   soft-profanity word list; an `error` frame ends the session (subject to
   `reconnect_policy.ts`).
-- **Client to server**: `auth` (`buildWebSocketAuthMessage`), `input` (move intent via
+- **Client to server**: versioned world auth (`ONLINE_WORLD_AUTH_TYPE`, built by
+  `buildWebSocketAuthMessage`), `input` (move intent via
   `sendInput`: an unconditional interval timer plus a changed-only gated flush; the
   cadence constants and gate predicate live in `input_send_cadence.ts`, kept in
   lockstep with the server contract by `tests/input_cadence_model.test.ts`), `cmd`
@@ -74,7 +75,8 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
 REST first: `Api.login`/`register` to bearer `token`; `Api.characters()` lists the
 realm's chars; `Api.realms()`/`setRealm(url)` pick a realm origin (`base`). Then
 `new ClientWorld(token, characterId, cls, base)` opens the WS (realm origin, else
-page host), sends `auth` on open, waits for `hello`.
+page host), sends the current `ONLINE_WORLD_AUTH_TYPE` discriminator on open, and waits
+for `hello`. Old and future world-layout epochs fail closed before character admission.
 
 ## Reconnect and session resume
 An unexpectedly dropped socket auto-reconnects with jittered exponential backoff
@@ -136,7 +138,7 @@ pinned by `tests/command_schema.test.ts` (W0b); the facet tags by
 ## i18n: carries text but does NOT translate it
 `online.ts` imports no `t()` and renders no UI; its only player-facing text is connection
 failure, kept as stable English that `main.ts` re-localizes.
-- **Disconnect literals (byte-identical gotcha):** the two reasons it emits,
+- **Disconnect literals (byte-identical gotcha):** its ordinary local reasons include
   `'Connection to the server was lost.'` (retries exhausted) and `'rejected by server'`
   (the `error`-frame fallback), flow through `onDisconnect(reason)` and map in
   `userFacingApiError` to `t('loading.connectionLost')`/`t('loading.connectionRejected')`.
@@ -149,15 +151,22 @@ failure, kept as stable English that `main.ts` re-localizes.
   compare is on the lowercased raw literal, not the rendered `t()` value).
 - Server `error`-frame text (`msg.error`) and REST `data.error` pass through verbatim and
   are localized in `main.ts` (`userFacingApiError`, plus `tServer` for moderation/throttle);
-  never hard-code your own copy here. The `` `request failed (${res.status})` `` fallback
+  never hard-code your own copy here. One handshake-only exception is deliberate: an old server
+  rejects `ONLINE_WORLD_AUTH_TYPE` with `authentication required`, which `ClientWorld` upgrades
+  to the direction-neutral incompatible-world reason before `onDisconnect`; an established
+  session's same literal remains untouched. The `` `request failed (${res.status})` `` fallback
   stays English by design (the "diagnostic errors stay English" rule).
 
 ## Never
 - Never mutate game state authoritatively here or "predict" an OUTCOME: no
   client-side anticipation of combat, casts, resources, loot, aggro, or anything
   else the server resolves. The only sanctioned optimism inside `net/` is the
-  trivial local UI nudges already present (`targetEntity` setting `targetId`;
-  `pendingQuestCommands`); keep that scope.
+  trivial local UI nudges already present (`targetEntity` setting `targetId`,
+  shielded from stale in-flight snapshots by `pendingTargetEcho`;
+  `pendingQuestCommands`); keep that scope. Both follow the same
+  reconcile-on-snapshot contract: display-only, and the server's value always
+  wins within a bounded window (`tests/target_echo_client.test.ts` pins the
+  target one).
 - **Display-layer locomotion anticipation is the one sanctioned prediction**, and
   it lives OUTSIDE `net/` (`src/render/self_motion.ts`): a visual-only pose for
   the LOCAL player that is (a) bounded by measured latency with a hard cap,

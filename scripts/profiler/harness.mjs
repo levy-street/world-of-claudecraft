@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from '../browser_path.mjs';
+import { worldAuthMessage } from '../lib/world_auth.mjs';
 import { attributeFreezes, frameStats, normalizeReport } from './metrics.mjs';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -199,7 +200,7 @@ class Bot {
       this.ws = new WebSocket(`${this.wsBase}/ws`);
       const to = setTimeout(() => reject(new Error('join timeout')), 12000);
       this.ws.on('open', () =>
-        this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId })),
+        this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId))),
       );
       this.ws.on('message', (data) => {
         const m = JSON.parse(String(data));

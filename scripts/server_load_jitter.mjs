@@ -27,6 +27,7 @@
 import fs from 'node:fs';
 import WebSocket from 'ws';
 import { evaluateJitterRun, gapStats, parseCeilingEnv, pct } from './lib/bench_gate.mjs';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -162,7 +163,7 @@ class Client {
       this.ws = new WebSocket(`${WS_BASE}/ws`, { headers: { 'X-Forwarded-For': this.ip } });
       const to = setTimeout(() => reject(new Error('join timeout')), 10000);
       this.ws.on('open', () =>
-        this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId })),
+        this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId))),
       );
       this.ws.on('message', (data) => {
         const raw = String(data);

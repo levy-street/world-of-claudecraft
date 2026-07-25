@@ -79,7 +79,7 @@ class Lab {
   ) {
     this.srv = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
     this.srv.setPlayerLevel(60);
-    const start = opts.start ?? { x: 0, z: -40 };
+    const start = opts.start ?? { x: 0, z: -80 };
     teleport(this.srv, start.x, start.z);
     this.facing = opts.facing ?? 0;
     this.srv.player.facing = this.facing; // run straight north (+z) by default
@@ -170,7 +170,7 @@ describe('SelfMotionPredictor', () => {
     }
     expect(moved).toBeGreaterThan(0.2); // ~4 frames of RUN_SPEED
     // the server has not even received the input yet (120ms lag > 4 frames)
-    expect(lab.srv.player.pos.z).toBeCloseTo(-40, 3);
+    expect(lab.srv.player.pos.z).toBeCloseTo(-80, 3);
   });
 
   // Running into a blocker is the case the predictor must NOT "correct": the
@@ -220,7 +220,7 @@ describe('SelfMotionPredictor', () => {
   });
 
   it('holds a settled pose while forward is held against a wall', () => {
-    const lab = new Lab(120, FRAME_MS, { start: { x: 0, z: -0.15 }, facing: 0 });
+    const lab = new Lab(120, FRAME_MS, { start: { x: 0, z: -2 }, facing: 0 });
     lab.setInput(mi({ forward: true }));
     for (let i = 0; i < 60; i++) lab.frame(); // run in and settle
 
@@ -417,7 +417,11 @@ describe('SelfMotionPredictor', () => {
     }
 
     function runStall(gapMs: number): StallTrace {
-      const lab = new Lab(ECHO_MS);
+      // Long stalls cover enough northward ground to reach the authored town
+      // wall from the default start, which clamps the server and hides the
+      // snap the 2500 ms scenario exists to prove. Run the stall lab in the
+      // collider-free open-field lane so these pins stay world-independent.
+      const lab = new Lab(ECHO_MS, FRAME_MS, { start: { x: 0, z: -1000 } });
       const budget = lab.budget();
       lab.setInput(mi({ forward: true }));
       let lastZ = Number.NaN;

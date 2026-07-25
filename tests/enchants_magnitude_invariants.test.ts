@@ -172,3 +172,65 @@ describe('the full stamina path in HP', () => {
     expect(sim.player.maxHp).toBe(hpBefore + 240);
   });
 });
+
+// The frozen-magnitude ledger (#2415). The enchant replace arm subtracts the
+// OLD enchant's CURRENT content magnitudes back out of the payload
+// (replacedEnchantPayloadFor), which is exact only while every shipped
+// magnitude stays byte-frozen after launch, the standing rule
+// content/enchants.ts declares. This pins EVERY id's statBonus to a literal,
+// so editing any shipped magnitude is a deliberate red test here first: a
+// nerf would leave permanent residue on every already-replaced copy (and
+// break structural stacking with fresh peers), a buff would delete masterwork
+// baked stats on the same axis via the <= 0 prune. A NEW enchant id extends
+// this table in the same change; an EDITED magnitude needs a migration story
+// for saved payloads before this pin may move.
+describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () => {
+  it('pins every shipped statBonus to a literal, byte for byte', () => {
+    const all = Object.fromEntries(
+      Object.values(ENCHANTS).map((enchant) => [enchant.id, enchant.statBonus]),
+    );
+    expect(all).toEqual({
+      enchant_weapon_might: { str: 2 },
+      enchant_weapon_intellect: { int: 2 },
+      enchant_helmet_fortitude: { sta: 3 },
+      enchant_neck_spirit: { spi: 3 },
+      enchant_shoulder_agility: { agi: 2 },
+      enchant_chest_stamina: { sta: 4 },
+      enchant_waist_stamina: { sta: 3 },
+      enchant_legs_stamina: { sta: 3 },
+      enchant_gloves_agility: { agi: 3 },
+      enchant_gloves_intellect: { int: 3 },
+      enchant_feet_agility: { agi: 2 },
+      enchant_ring_spirit: { spi: 2 },
+      enchant_weapon_agility: { agi: 2 },
+      enchant_helmet_intellect: { int: 4 },
+      enchant_helmet_armor: { armor: 15 },
+      enchant_neck_intellect: { int: 2 },
+      enchant_neck_agility: { agi: 2 },
+      enchant_shoulder_strength: { str: 2 },
+      enchant_shoulder_intellect: { int: 2 },
+      enchant_chest_spirit: { spi: 4 },
+      enchant_chest_armor: { armor: 20 },
+      enchant_waist_strength: { str: 3 },
+      enchant_waist_agility: { agi: 3 },
+      enchant_legs_intellect: { int: 4 },
+      enchant_gloves_strength: { str: 3 },
+      enchant_feet_strength: { str: 2 },
+      enchant_feet_stamina: { sta: 2 },
+      enchant_ring_strength: { str: 2 },
+      enchant_ring_agility: { agi: 2 },
+      enchant_ring_intellect: { int: 2 },
+      enchant_weapon_greater_might: { str: 5 },
+      enchant_weapon_greater_spellpower: { int: 5 },
+      enchant_helmet_greater_fortitude: { sta: 6 },
+      enchant_chest_greater_stamina: { sta: 7 },
+      enchant_legs_greater_stamina: { sta: 6 },
+      enchant_gloves_greater_agility: { agi: 6 },
+      enchant_weapon_runed_edge: { str: 3 },
+      enchant_weapon_runed_focus: { int: 3 },
+      enchant_chest_runeweave: { spi: 5 },
+      enchant_legs_runed_hide: { agi: 4 },
+      enchant_helmet_runed_links: { sta: 5 },
+    });
+  });
+});

@@ -149,7 +149,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 416,
-      "state": "ba90881e",
+      "state": "d78970c6",
       "events": "0df2785f",
       "rng": {
         "draws": 0,
@@ -160,7 +160,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "f5ba636f",
+      "state": "82e93f41",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -171,7 +171,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "d9270038",
+      "state": "dc58f0dc",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -182,7 +182,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "d9270038",
+      "state": "dc58f0dc",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -216,9 +216,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -277,7 +274,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": 1.584521,
           "fiveSecondRule": 102,
           "hp": 100,
           "id": 415,
@@ -292,9 +289,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.584521,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -325,7 +322,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "507e0c05",
+      "state": "cccbbbd7",
       "events": "11d554da",
       "rng": {
         "draws": 75,
@@ -361,9 +358,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -424,7 +418,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": 1.584521,
           "fiveSecondRule": 102,
           "hp": 100,
           "id": 415,
@@ -439,9 +433,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.584521,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -472,7 +466,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "3155417c",
+      "state": "43a21ac8",
       "events": "45d45865",
       "rng": {
         "draws": 75,
@@ -509,9 +503,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -572,7 +563,7 @@
           "critChance": 0.0605,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0605,
-          "fallStartY": 1.5,
+          "fallStartY": 1.584521,
           "fiveSecondRule": 102,
           "hp": 138,
           "id": 415,
@@ -587,9 +578,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.584521,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -620,7 +611,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "d5828f7e",
+      "state": "737defb8",
       "events": "cfd03f2f",
       "rng": {
         "draws": 75,
@@ -657,9 +648,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -720,7 +708,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": 1.584521,
           "fiveSecondRule": 102,
           "hp": 822,
           "id": 415,
@@ -735,9 +723,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.584521,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -768,7 +756,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "87876dad",
+      "state": "b2eac66b",
       "events": "f92c18e2",
       "rng": {
         "draws": 75,
@@ -805,9 +793,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -868,7 +853,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": 1.584521,
           "fiveSecondRule": 102,
           "hp": 822,
           "id": 415,
@@ -883,9 +868,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.584521,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -916,7 +901,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "87876dad",
+      "state": "b2eac66b",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -953,9 +938,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1016,7 +998,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": 1.584521,
           "fiveSecondRule": 102,
           "hp": 822,
           "id": 415,
@@ -1031,9 +1013,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.584521,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -1064,7 +1046,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "87876dad",
+      "state": "b2eac66b",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -1101,9 +1083,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1164,7 +1143,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": 1.584521,
           "fiveSecondRule": 102,
           "hp": 822,
           "id": 415,
@@ -1179,9 +1158,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.584521,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

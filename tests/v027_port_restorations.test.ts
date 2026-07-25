@@ -512,4 +512,28 @@ describe('target-of-target wire field (dynamicFields tgt) and resolution', () =>
     internals.applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
     expect(client.entities.get(a)?.targetId).toBeNull();
   });
+
+  it('carries taunt forced-target state through the entity wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const tank = sim.addPlayer('warrior', 'Tank');
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob');
+    if (!mob) throw new Error('missing mob entity');
+    mob.forcedTargetId = tank;
+    mob.forcedTargetTimer = 2.95;
+    expect(wireEntity(mob)).toMatchObject({ ft: tank, ftm: 2.95 });
+
+    const client = bareClient(tank + 1000);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
+    const mirrored = client.entities.get(mob.id);
+    if (!mirrored) throw new Error('missing mirrored mob');
+    expect(mirrored.forcedTargetId).toBe(tank);
+    expect(mirrored.forcedTargetTimer).toBe(2.95);
+
+    mob.forcedTargetId = null;
+    mob.forcedTargetTimer = 0;
+    internals.applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
+    expect(client.entities.get(mob.id)?.forcedTargetId).toBeNull();
+    expect(client.entities.get(mob.id)?.forcedTargetTimer).toBe(0);
+  });
 });

@@ -153,6 +153,7 @@ describe('activePvpOpponentIds', () => {
         ladder: [],
         ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
+          map: 'coliseum' as const,
           oppPid: 3,
           oppName: 'Arena Rival',
           oppClass: 'warrior',
@@ -199,6 +200,7 @@ describe('activePvpOpponentIds', () => {
       ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
     };
     const matchBase = {
+      map: 'coliseum' as const,
       oppPid: 3,
       oppName: 'Rivals',
       oppClass: 'warrior' as const,
@@ -262,6 +264,7 @@ describe('activePvpOpponentIds', () => {
         ladder: [],
         ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
+          map: 'coliseum' as const,
           oppPid: 3,
           oppName: 'Arena Rival',
           oppClass: 'warrior',
@@ -440,6 +443,44 @@ describe('handlePickedEntity', () => {
     expect(handlePickedEntity(world, hud, 2, button as number, 10, 20)).toBe(true);
     expect(calls).toEqual([expected]);
   });
+
+  it.each([
+    [0, 'inside', 3.99, true, 1],
+    [0, 'exactly at', 4, true, 1],
+    [0, 'outside', 4.01, false, 0],
+    [2, 'inside', 3.99, true, 1],
+    [2, 'exactly at', 4, true, 1],
+    [2, 'outside', 4.01, false, 0],
+  ] as const)(
+    'uses the authored noticeboard boundary for button %i when %s the radius',
+    (button, _position, distance, expectedOutcome, expectedPickups) => {
+      const player = stubEntity({ id: 1, kind: 'player' });
+      const board = stubEntity({
+        id: 2,
+        kind: 'object',
+        templateId: 'noticeboard_eastbrook',
+        lootable: true,
+        pos: { x: distance, y: 0, z: 0 },
+      });
+      const world = {
+        playerId: 1,
+        player,
+        entities: new Map([
+          [1, player],
+          [2, board],
+        ]),
+        targetEntity: vi.fn(),
+        pickUpObject: vi.fn(() => true),
+      } as unknown as Parameters<typeof handlePickedEntity>[0];
+      const hud = {
+        closeContextMenu: vi.fn(),
+        showError: vi.fn(),
+      } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+      expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(expectedOutcome);
+      expect(world.pickUpObject).toHaveBeenCalledTimes(expectedPickups);
+    },
+  );
 
   it('returns a rejected authoritative pickup result', async () => {
     const player = stubEntity({ id: 1, kind: 'player' });
@@ -739,6 +780,46 @@ describe('shouldApproachPickedEntity', () => {
     });
 
     expect(shouldApproachPickedEntity(player, object, false)).toBe(true);
+  });
+
+  it('turns an out-of-range noticeboard tap into approach movement', () => {
+    const board = stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'noticeboard_eastbrook',
+      lootable: true,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, board],
+      ]),
+      targetEntity: vi.fn(),
+      pickUpObject: vi.fn(() => true),
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      closeContextMenu: vi.fn(),
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    const didInteract = handlePickedEntity(world, hud, board.id, 0, 10, 20);
+
+    expect(didInteract).toBe(false);
+    expect(world.pickUpObject).not.toHaveBeenCalled();
+    expect(shouldApproachPickedEntity(player, board, didInteract === true)).toBe(true);
+  });
+
+  it('keeps a generic object at the same distance immediately interactable', () => {
+    const object = stubEntity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+
+    expect(shouldApproachPickedEntity(player, object, false)).toBe(false);
   });
 
   it('approaches distant harvest remains only when the host mirrors claim state', () => {

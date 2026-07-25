@@ -31,6 +31,15 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   per-frame render paths; `createCharacterVisual` returns null on such a
   failure so callers skip the view for the frame instead of stalling the
   renderer (`tests/character_visual_fail_soft.test.ts`).
+- `halo.ts`: the class halo (the priest's Light): `buildHalo(color, upOffset,
+  radius)`, driven by `VisualDef.halo` plus the optional
+  `haloUpOffset`/`haloRadius` placement overrides (defaults live here; the
+  priest overrides only the lift, for hat clearance). Texture, per-color
+  materials, and
+  per-radius geometries are shared never-disposed caches; radii must come from
+  static `VisualDef` values so the cache keys stay bounded. `visual.ts` parents
+  the mesh to the head bone and keeps it out of the shadow-caster sweeps
+  (`tests/character_halo.test.ts`).
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
@@ -79,9 +88,14 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   frame (swimming/sitting derived there, sim is unaware), calls `update(dt, s,
   animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles live
   held items and effects. Don't drive visuals elsewhere.
-- **Crowd scaling:** the renderer consults `src/render/crowd_lod.ts` (pure,
-  unit-tested) for shadow/anim-cadence ranges as rig counts climb; the policy
-  is cosmetic-only and exempts anything a player reacts to.
+- **Crowd scaling / LOD bands:** the renderer consults `src/render/crowd_lod.ts`
+  (pure, unit-tested) for the shadow/anim-cadence ranges as rig counts climb,
+  and for where `setFar` swaps the rig for the baked idle-pose mesh. Between the
+  articulated band and that swap sits the animated far band: the rig keeps its
+  clips at a low cadence (the mixer integrates the skipped time via `pendingDt`,
+  so the clip plays at its real speed, just at fewer pose updates) instead of
+  freezing. The policy is cosmetic-only and exempts anything a player reacts to
+  from BOTH the cadence and the frozen mesh.
 - Death/revive are **edge-triggered locally** from `s.dead` (clamped one-shot);
   `flourish` plays on respawn. One-shots clamp on the last frame, see the
   T-pose-pop comment in `playOneShot`.

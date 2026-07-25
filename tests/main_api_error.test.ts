@@ -167,6 +167,11 @@ describe('userFacingApiError prose fallback (un-migrated routes, until Phase 25)
     expect(userFacingApiError('too many connections from your network')).toBe(
       t('loading.tooManyConnections'),
     );
+    expect(
+      userFacingApiError(
+        'Game and server versions are incompatible. Reload or update, then try again.',
+      ),
+    ).toBe(t('loading.incompatibleWorldVersion'));
   });
 
   it('re-localizes the flood-kick reason and keeps it session-fatal', () => {

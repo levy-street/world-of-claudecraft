@@ -129,7 +129,10 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   }
   removePreferFungible(ctx, itemId, 1, pid);
   const count = salvageYield(def, ctx.rng);
-  ctx.addItem(materialItemId, count, pid);
+  // silent: the salvageResult event fires its own dedicated cue
+  // (audio.salvage in src/game/audio.ts); the generic loot ding would
+  // otherwise stack on top of it for every salvage.
+  ctx.addItem(materialItemId, count, pid, { silent: true });
   if (meta) {
     recordAction(meta);
     // The lifetime salvage counter (soc_first_salvage /

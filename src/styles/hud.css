@@ -634,29 +634,51 @@
     pointer-events: auto;
   }
   /* Target of Target (showTargetOfTarget option): a smaller twin of the target
-     frame, a #target-frame child anchored under the frame's RIGHT edge so it clears
-     the debuff strip that hangs below-left. Shrunk with zoom (compounding the
-     target frame's children-zoom, so it stays proportional), and shown by its own
-     unit_frame painter only when the target-of-target is known. Portrait + name +
-     hp bar only: no resource rail, cast bar, elite tag, or level chip. */
-  #totarget-frame {
+     frame, a #target-frame child anchored BESIDE the frame's right edge, top
+     aligned, so the whole below-frame band belongs to the #tf-debuffs strip (the
+     old below-right anchor shared that band and collided with the strip's first
+     wrapped row at real aura counts). The gap clears the unscaled 24px
+     .tf-move-btn that overhangs the frame corner by 10px. The extra #target-frame
+     id in the selector outranks the children-zoom rule above so the mini zoom
+     actually applies; it compounds --target-frame-scale explicitly to stay
+     proportional at any scale. Percentage offsets resolve against the unzoomed
+     containing block but px lengths are multiplied by the element's zoom, so the
+     gap divides by the same factor to stay a true 18px (clear of the button) at
+     every scale. Shown by its own unit_frame painter only when the
+     target-of-target is known. Portrait + name + hp bar only: no resource rail,
+     cast bar, elite tag, or level chip. A far-right-dragged target frame can push
+     the mini offscreen, the same clipping the debuff strip accepts in extreme
+     drag positions. */
+  #target-frame > #totarget-frame {
     position: absolute;
-    right: -6px;
-    top: calc(100% + 6px);
+    left: calc(100% + 18px / (0.74 * var(--target-frame-scale, 1)));
+    top: 0;
     z-index: 7;
-    zoom: 0.74;
+    zoom: calc(0.74 * var(--target-frame-scale, 1));
     display: none;
   }
-  #totarget-frame .uf-bars {
-    order: 1;
-    width: 132px;
-    margin-left: 0;
-    margin-right: -16px;
-    border-radius: 6px 11px 11px 6px;
-    padding: 4px 22px 4px 8px;
+  /* Boss-ranked target: the boss chrome moves the move button further outside
+     the corner (top: -18px; right: -30px, below) and the dragon emblem
+     overhangs the portrait side by 15px at children-zoom, so the beside-gap
+     widens to a true 36px to clear both. */
+  #target-frame.boss > #totarget-frame {
+    left: calc(100% + 36px / (0.74 * var(--target-frame-scale, 1)));
   }
-  #totarget-frame .portrait-wrap {
+  /* Standard portrait-left orientation: the old right-edge hug flipped the mini
+     bars-first; beside the frame it reads like every other unit frame. The
+     #target-frame prefix outranks the LATER #target-frame .portrait-wrap /
+     .uf-bars mirror rules below, which otherwise win the same-specificity tie
+     on source order and mirror the mini too. */
+  #target-frame > #totarget-frame .portrait-wrap {
+    order: 1;
+  }
+  #target-frame > #totarget-frame .uf-bars {
     order: 2;
+    width: 132px;
+    margin-left: -16px;
+    margin-right: 0;
+    border-radius: 11px 6px 6px 11px;
+    padding: 4px 8px 4px 22px;
   }
   #totarget-frame .level-chip {
     display: none;
@@ -1147,6 +1169,31 @@
     background-position: center;
     background-repeat: no-repeat;
   }
+  /* QoL: an aura in its final seconds (auras_view isAuraExpiring) blinks so an
+     expiring DoT/buff reads at a glance on the status panels. Opacity floors at
+     0.45 so the icon identity stays readable mid-blink; under reduced motion the
+     blink becomes a steady brightened state (the same shape the low-resource
+     label uses), so the cue survives without animation. */
+  .buff.expiring {
+    animation: aura-expire-blink 0.8s ease-in-out infinite;
+  }
+  @keyframes aura-expire-blink {
+    0%,
+    100% {
+      opacity: 1;
+      filter: brightness(1);
+    }
+    50% {
+      opacity: 0.45;
+      filter: brightness(1.5);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .buff.expiring {
+      animation: none;
+      filter: brightness(1.4);
+    }
+  }
   /* A debuff reads as harmful at a glance: a thicker border (border-box, so no
      layout shift) tinted by magic school, WoW-style (physical keeps the base red). */
   .buff.debuff {
@@ -1516,7 +1563,13 @@
     justify-content: center;
     font-size: 13px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
+    /* Same legible outline as the action bar cdtext (issue 1660). */
+    text-shadow:
+      0 0 4px #000,
+      1px 1px 1px #000,
+      -1px -1px 1px #000,
+      1px -1px 1px #000,
+      -1px 1px 1px #000;
     font-weight: bold;
     pointer-events: none;
   }
@@ -1672,16 +1725,26 @@
     justify-content: center;
     font-size: 17px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
+    /* Crisp dark outline plus a soft halo so the gold number stays legible on
+       bright or warm icons, not just a thin 1px shadow that the art swallows. */
+    text-shadow:
+      0 0 4px #000,
+      1px 1px 1px #000,
+      -1px -1px 1px #000,
+      1px -1px 1px #000,
+      -1px 1px 1px #000;
   }
   .action-btn .cd-overlay {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #000d;
-    height: 0%;
-    border-radius: 0 0 4px 4px;
+    inset: 0;
+    /* Classic radial clock wipe: the dark wedge covers the remaining cooldown
+       (--cd-fill, written by action_bar_painter) and sweeps away clockwise as it
+       recovers, instead of the old bottom-up height fill. */
+    background: conic-gradient(
+      transparent 0 calc(100% - var(--cd-fill, 0%)),
+      #000d calc(100% - var(--cd-fill, 0%))
+    );
+    border-radius: 4px;
   }
   /* The recharge veil on a charge-pool ability (Twinstrike, Double Charge): a
      spent charge regenerating while the button stays pressable. Same bottom-up
@@ -5072,6 +5135,28 @@
   #ctx-menu .ctx-item-meta .ctx-reagent.unsat {
     color: var(--color-text-error);
   }
+  /* What the enchant actually DOES, inline on the row above the meta line: the
+     picker also lives on touch, where there is no hover to reveal it. Green,
+     matching the item tooltip's own bonus stat lines (the same
+     itemUi.tooltip.stat wording feeds both). */
+  #ctx-menu .ctx-item-effect {
+    display: block;
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: var(--color-stat-bonus);
+  }
+  /* Apply Enchant picker tier headers: the flat list of every enchant a reagent
+     unlocked gave no sense of the ladder, so the rows group under Base / Runed /
+     Greater captions. Presentational only (role=presentation): the rows under a
+     caption already name their own enchant. */
+  #ctx-menu .ctx-section {
+    font-family: var(--title-font);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: 7px 10px 2px;
+  }
   #ctx-menu .ctx-item[aria-disabled="true"] {
     color: var(--color-text-muted);
     cursor: default;
@@ -5362,7 +5447,11 @@
   }
 
   /* ---------- elite target frame ---------- */
-  #target-frame.elite .portrait {
+  /* Rank chrome binds to the TARGET's own portrait via the direct-child
+     .portrait-wrap: the target-of-target mini is also a #target-frame
+     descendant, and a bare descendant selector would decorate the mini's
+     portrait with the target's elite ring / boss emblem too. */
+  #target-frame.elite > .portrait-wrap .portrait {
     border-color: var(--gold);
     box-shadow:
       0 0 12px #ffd10066,
@@ -5382,7 +5471,7 @@
   /* Boss rank replaces both the creature portrait and the platform-dependent
      Unicode glyph with one generic dragon emblem. The real numeric level stays
      in the lower center chip, matching the classic fantasy target-frame read. */
-  #target-frame.boss .portrait-wrap::before {
+  #target-frame.boss > .portrait-wrap::before {
     content: "";
     position: absolute;
     inset: -15px;
@@ -5394,7 +5483,7 @@
     top: -18px;
     right: -30px;
   }
-  #target-frame.boss .portrait {
+  #target-frame.boss > .portrait-wrap .portrait {
     border-color: transparent;
     outline: 0;
     background: transparent;
@@ -5489,6 +5578,44 @@
   .mail-indicator-count {
     font: 700 11px var(--title-font);
     letter-spacing: 0.4px;
+  }
+  /* ---------- World Market collect indicator ---------- */
+  /* The Merchant's coin: sale proceeds or returned items wait for collection.
+     Same rim-satellite family as the envelope; claims the top-RIGHT corner
+     (raid-lockout owns bottom-left, the envelope bottom-right; guarded by
+     tests/minimap_rim_badges.test.ts). */
+  #market-indicator {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 7px;
+    background: #12100acc;
+    border: 1px solid #cc9a3c88;
+    border-radius: 12px;
+    color: var(--gold);
+    appearance: none;
+    cursor: pointer;
+    font: inherit;
+    pointer-events: auto;
+  }
+  #market-indicator[hidden] {
+    display: none;
+  }
+  #market-indicator:hover,
+  #market-indicator:focus-visible {
+    color: #d8c89a;
+    border-color: #c9a86a;
+    outline: none;
+  }
+  #market-indicator:focus-visible {
+    box-shadow: 0 0 0 2px var(--gold);
+  }
+  #market-indicator .ui-icon {
+    width: 14px;
+    height: 14px;
   }
   /* ---------- intro logo overlay ---------- */
   /* Wordmark shown fading in/hold/out over the opening of the first-spawn intro

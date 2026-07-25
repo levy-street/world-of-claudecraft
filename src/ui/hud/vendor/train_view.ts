@@ -15,13 +15,13 @@
 // unmet. Locked rows are ALWAYS produced (the visible ladder: the player
 // must see what a master will eventually teach), never dropped.
 
-import { STATION_TYPE_BY_CRAFT, STATIONS } from '../../../sim/content/professions';
+import { STATION_TYPE_BY_CRAFT } from '../../../sim/content/professions';
 import { ALL_RECIPES } from '../../../sim/content/recipes';
 import type { StationType } from '../../../sim/professions/stations';
 import { teachTierMet, trainingFeeFor } from '../../../sim/professions/training';
 import type { ProfessionRecipeRecord } from '../../../sim/professions/types';
 import { TIER_SKILL_STEP, tierForSkill } from '../../../sim/professions/wheel';
-import type { ItemDef } from '../../../sim/types';
+import type { ItemDef, StationDef } from '../../../sim/types';
 
 export type TrainRowState = 'known' | 'teachable' | 'locked';
 
@@ -55,6 +55,8 @@ export interface TrainView {
 }
 
 export interface TrainViewDeps {
+  /** Physical stations exposed by the active IWorld. */
+  stations: readonly StationDef[];
   /** The viewer's mirrored known-recipe ids (CraftingIdentityView.knownRecipes). */
   knownRecipes: readonly string[];
   /** The viewer's flat per-craft skills (CraftingIdentityView.craftSkills). */
@@ -75,8 +77,8 @@ export interface TrainViewDeps {
 
 /** True when a station master with `masterNpcId` exists (the gossip dialog's
  *  Train-option gate; template id, never an entity id). */
-export function isStationMasterNpc(masterNpcId: string): boolean {
-  return STATIONS.some((station) => station.masterNpcId === masterNpcId);
+export function isStationMasterNpc(masterNpcId: string, stations: readonly StationDef[]): boolean {
+  return stations.some((station) => station.masterNpcId === masterNpcId);
 }
 
 /** The viewer-side knownness predicate over the MIRRORED known set: exactly
@@ -117,7 +119,7 @@ function rowState(
  * Rows sort by craft, then skillReq, then id (a stable ladder).
  */
 export function buildTrainView(masterNpcId: string, deps: TrainViewDeps): TrainView {
-  const station = STATIONS.find((entry) => entry.masterNpcId === masterNpcId);
+  const station = deps.stations.find((entry) => entry.masterNpcId === masterNpcId);
   if (!station) return { stationType: null, rows: [] };
   const crafts = new Set(
     Object.keys(STATION_TYPE_BY_CRAFT).filter(

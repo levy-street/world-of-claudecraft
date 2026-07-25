@@ -44,6 +44,7 @@ import {
   type Entity,
   LEASH_DISTANCE,
   MELEE_RANGE,
+  type MobTemplate,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   SISTER_NHALIA_BOSS_ID,
@@ -490,18 +491,42 @@ function updateInfernoChannel(ctx: SimContext, mob: Entity): boolean {
   }
   if (mob.infernoRemaining <= 0) {
     mob.infernoPulsesFired = 0;
+    // A gate crossed DURING this channel was served by it: consume it now so
+    // the cadence path in runMobAttackMechanics cannot chain a back-to-back
+    // channel off a threshold the players already burned through.
+    consumeCrossedInfernoGates(mob, inferno);
     return false; // channel over: the boss acts normally again this tick
   }
   return true;
 }
 
+// Consume every infernoChannel.atHpPct threshold the mob's current hp has
+// crossed (mirroring the summonAdds firedSummons walk); returns whether any
+// was consumed this call. Pure counter bookkeeping: no rng, no events.
+function consumeCrossedInfernoGates(
+  mob: Entity,
+  inferno: NonNullable<MobTemplate['infernoChannel']>,
+): boolean {
+  const gates = inferno.atHpPct;
+  if (!gates) return false;
+  const hpFrac = mob.hp / Math.max(1, mob.maxHp);
+  let crossed = false;
+  while (mob.infernoGatesFired < gates.length && hpFrac <= gates[mob.infernoGatesFired]) {
+    mob.infernoGatesFired++;
+    crossed = true;
+  }
+  return crossed;
+}
+
 function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // Grave Inferno cadence: melee-gated like every other boss mechanic. At
   // zero the channel arms and updateInfernoChannel owns subsequent ticks.
+  // An atHpPct gate arms it immediately regardless of the cadence (and
+  // reseeds the cadence), so a fast kill still meets the burn phase.
   const inferno = MOBS[mob.templateId]?.infernoChannel;
   if (inferno && mob.infernoRemaining <= 0) {
     mob.infernoTimer -= DT;
-    if (mob.infernoTimer <= 0) {
+    if (consumeCrossedInfernoGates(mob, inferno) || mob.infernoTimer <= 0) {
       mob.infernoTimer = inferno.every;
       mob.infernoRemaining = inferno.duration;
       mob.infernoPulsesFired = 0;
@@ -777,6 +802,12 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  // A mid-flight inferno channel dies with the pull; the cadence reseeds and
+  // the hp gates re-arm alongside firedSummons above.
+  mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;
+  mob.infernoRemaining = 0;
+  mob.infernoPulsesFired = 0;
+  mob.infernoGatesFired = 0;
   // Charge resets READY (cooldown 0), not telegraphed: the next pull opens with it.
   resetMobCharge(mob);
   mob.aoeSlowTimer = MOBS[mob.templateId]?.aoeSlow?.every ?? 0;

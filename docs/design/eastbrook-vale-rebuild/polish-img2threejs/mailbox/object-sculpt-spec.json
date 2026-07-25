@@ -1,0 +1,3252 @@
+{
+  "schemaVersion": "2.1",
+  "targetName": "Eastbrook Ravenpost Mailbox",
+  "targetId": "eastbrook-ravenpost-mailbox",
+  "sourceImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+  "sourceImageSha256": "3afb0cba1122d334ecc6261a6390454fd9b4d5bcc4e10042f1d3aa4ef0fae4ad",
+  "referenceAdmission": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reference-admission.json",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "freestanding civic mailbox",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized hard-surface", "architectural miniature", "low-poly"],
+      "structureKind": ["compound object", "layered shell", "repeated modules"],
+      "motionPotential": ["static prop", "effect-emitter socket", "future rear-door hinge"],
+      "materialFamilies": ["wood", "stone", "painted roof", "metal"],
+      "notes": "Runtime mail state and glow remain external to the shipping GLB."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 2
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 9,
+        "microFeatureGroups": 16,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The long-distance silhouette depends on a gabled roof, elevated mail body, single post, triangular braces, and stepped stone foot.",
+        "The front slot, Ravenpost relief, rear shutter, side badges, roof courses, gold trim, and collar hardware are separate identity systems.",
+        "Seven admitted views expose enough of the underside, sides, and rear for a complete low-poly volume."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "A shallow house-on-post blockout would miss the slot depth, Ravenpost identity, rear construction, roof rhythm, and service-scale grounding."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "grid-3x3 plus admitted multi-angle cross-check",
+      "targetMinDetails": 12,
+      "details": [
+        {
+          "id": "roof-course-seams",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "roof-shell/roof-course-seams"
+          }
+        },
+        {
+          "id": "ridge-cap-bevel",
+          "kind": "bevel",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "roof-shell/ridge-cap-chamfer"
+          }
+        },
+        {
+          "id": "blue-roof-edge-wear",
+          "kind": "stain",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "town-opaque/roof-edge-wear"
+          }
+        },
+        {
+          "id": "mail-slot-opening",
+          "kind": "hole",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "mail-slot/mail-slot-opening"
+          }
+        },
+        {
+          "id": "mail-slot-frame-bevel",
+          "kind": "bevel",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "mail-slot/slot-frame-chamfer"
+          }
+        },
+        {
+          "id": "raven-emblem-relief",
+          "kind": "ridge",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-crest/raven-relief"
+          }
+        },
+        {
+          "id": "facade-board-seams",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "mailhouse-body/facade-board-seams"
+          }
+        },
+        {
+          "id": "rear-door-seams",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "rear-panel/rear-panel-seams"
+          }
+        },
+        {
+          "id": "gold-bolt-system",
+          "kind": "fastener",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-trim/gold-fastener-heads"
+          }
+        },
+        {
+          "id": "side-diamond-relief",
+          "kind": "ridge",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "side-badges/diamond-relief"
+          }
+        },
+        {
+          "id": "post-collar-fasteners",
+          "kind": "fastener",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "post-collar/collar-studs"
+          }
+        },
+        {
+          "id": "stone-block-joints",
+          "kind": "groove",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "stone-plinth/stone-joint-grooves"
+          }
+        },
+        {
+          "id": "stone-edge-chamfer",
+          "kind": "bevel",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "stone-plinth/stone-edge-chamfers"
+          }
+        },
+        {
+          "id": "base-cavity-dirt",
+          "kind": "stain",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "town-opaque/base-cavity-dirt"
+          }
+        },
+        {
+          "id": "timber-grain",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "town-opaque/timber-grain"
+          }
+        },
+        {
+          "id": "bracket-join-seams",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "support-brackets/bracket-join-seams"
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false
+    }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready stylization",
+    "definitionOfDone": [
+      "Match the accepted 1.65 by 1.05 by 2.9 yard silhouette and player-relative scale across all admitted views.",
+      "Preserve the cobalt gable, timber body, recessed gold mail slot, raven relief, single post, diagonal braces, collar, and two-course stone foot on Low and Ultra.",
+      "Ship at or below 1,800 target triangles and never above 3,000 triangles, with two materials, two primitives, zero embedded textures, zero skins, and zero animations.",
+      "Expose stable ground, mail-interaction, and unread-effect sockets plus compound collider metadata."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 9,
+      "microFeatureGroups": 12,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 7
+    },
+    "featureGroups": [
+      {
+        "id": "mailbox-silhouette",
+        "name": "Gabled mailbox silhouette and player scale",
+        "required": true,
+        "qualityCriteria": [
+          "Gable, body, post, braces, and stepped base keep the measured width-to-height ratios from front and side views."
+        ],
+        "evidenceRefs": ["front", "right", "front-three-quarter"],
+        "failureModes": [
+          "generic birdhouse silhouette",
+          "body or footing exceeds the player-scale contract"
+        ]
+      },
+      {
+        "id": "mail-service-face",
+        "name": "Mail slot and Ravenpost front identity",
+        "required": true,
+        "qualityCriteria": [
+          "The slot is a recessed opening with a faceted frame and the original raven relief remains readable without text."
+        ],
+        "evidenceRefs": ["front", "grazing"],
+        "failureModes": ["painted black slot", "missing or third-party emblem"]
+      },
+      {
+        "id": "roof-and-rear",
+        "name": "Cobalt roof courses and complete rear construction",
+        "required": true,
+        "qualityCriteria": [
+          "Both roof slopes, ridge, overhang, rear shutter, and side depth remain complete from non-front angles."
+        ],
+        "evidenceRefs": ["rear-detail", "left", "rear-three-quarter"],
+        "failureModes": ["facade-only shell", "flat single-card roof"]
+      },
+      {
+        "id": "grounded-assembly",
+        "name": "Post, brace, collar, and stone attachment",
+        "required": true,
+        "qualityCriteria": [
+          "Every overlap is seated with no visible air gap and the floor contract is minY zero."
+        ],
+        "evidenceRefs": ["front-three-quarter", "rear-three-quarter", "grazing"],
+        "failureModes": ["floating braces", "buried or floating footing"]
+      },
+      {
+        "id": "preset-material-read",
+        "name": "Shared-atlas vertex-color material response",
+        "required": true,
+        "qualityCriteria": [
+          "Stone, timber, cobalt, gold, and dark raven zones remain distinct under neutral, grazing, dusk, Ultra, and Lambert-compatible Low views."
+        ],
+        "evidenceRefs": ["front", "grazing"],
+        "failureModes": [
+          "uniform flat plastic",
+          "color identity depends on embedded textures or post effects"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "front and side silhouette delta",
+      "mail-slot depth and frame delta",
+      "roof-course rhythm delta",
+      "rear and underside completeness delta",
+      "player-scale and floor-seating delta",
+      "Low-tier semantic value delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not merge away the slot cavity or raven relief.",
+      "Do not use a facade card or one-camera shell.",
+      "Do not add readable text or a proprietary symbol.",
+      "Do not embed inferred PBR maps from baked studio pixels.",
+      "Do not advance a critical feature below 0.7."
+    ]
+  },
+  "coordinateFrame": {
+    "front": "+Z faces the player and contains the mail slot",
+    "up": "+Y",
+    "right": "+X",
+    "origin": "centered on X/Z at ground contact",
+    "units": "world yards",
+    "scaleReference": "2.6-yard player rig; accepted serialized bounds X 1.65, Y 2.9, Z 1.05",
+    "floorContract": "minY = 0 after serialization; no hidden global scale"
+  },
+  "silhouette": {
+    "boundingShape": "narrow stepped stone foot, single upright, broad elevated house body, and steep overhanging gable",
+    "aspectRatios": [
+      "width:height = 0.50",
+      "depth:width = 0.57",
+      "body width:post width about 3.8"
+    ],
+    "symmetry": "bilateral front mass with intentionally asymmetric raven feather contours and visible side badges",
+    "dominantCurves": [
+      "two straight cobalt roof pitches",
+      "faceted gold slot corners",
+      "stepped stone footing"
+    ],
+    "negativeSpaces": [
+      "deep mail slot opening",
+      "triangular voids beside underside braces",
+      "eave shadow gaps"
+    ],
+    "landmarks": [
+      "gold ridge cap",
+      "dark raven relief",
+      "gold-framed slot",
+      "post collar",
+      "two-course stone base"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front.png",
+      "sha256": "08003690125be17010e015d5ebc5c35d2a39c23efa88d3086a6f6fefd9c33c47",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "canonical front proportions",
+        "slot and raven relief",
+        "stone course layout"
+      ],
+      "confidence": 0.97
+    },
+    {
+      "id": "right",
+      "view": "right",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/right.png",
+      "sha256": "a3c5564c6d8aa5fe673ab85b1c68854bdf5cc579628f64e00f83171eb8f88430",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["roof and body depth", "side badge", "post offset"],
+      "confidence": 0.94
+    },
+    {
+      "id": "rear-detail",
+      "view": "rear-detail",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/rear-detail.png",
+      "sha256": "0b394a8c416f66d518937a4ef821e836c819531c47b0b6d33fdbed26dcbd22ee",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "closed rear shutter",
+        "rear board seams",
+        "rear gable and roof-course contact"
+      ],
+      "confidence": 0.96
+    },
+    {
+      "id": "left",
+      "view": "left",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/left.png",
+      "sha256": "14c9afa9034ed280083bd744b36b35bc4217719f8c35c654f949f73be740ccf2",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["opposite side depth", "side badge parity", "roof overhang"],
+      "confidence": 0.92
+    },
+    {
+      "id": "front-three-quarter",
+      "view": "front-three-quarter",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "sha256": "3afb0cba1122d334ecc6261a6390454fd9b4d5bcc4e10042f1d3aa4ef0fae4ad",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["canonical volume", "front-side attachment", "floor seating"],
+      "confidence": 0.98
+    },
+    {
+      "id": "rear-three-quarter",
+      "view": "rear-three-quarter",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/rear-three-quarter.png",
+      "sha256": "ee5fa76c8964f49c35f11274357c6206750a025bf4ff8b9927988fa5e12dce0f",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["rear-side completeness", "brace overlap", "roof depth"],
+      "confidence": 0.96
+    },
+    {
+      "id": "grazing",
+      "view": "low-grazing",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/grazing.png",
+      "sha256": "f11010d8f1603651f6a751f36dac79dd9d0f159a2828d0fe9c8b3af8bece93ce",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["underside construction", "real bevel response", "slot cavity depth"],
+      "confidence": 0.95
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-07-24T11:38:11.032425+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.74,
+      "aiVisionScore": 0.74,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.72,
+        "formDetail": 0.7,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "mailbox-silhouette",
+          "score": 0.76,
+          "visible": true,
+          "notes": "Gable, cabinet, single support, braces, and stepped base read clearly in the full matched pair."
+        }
+      ],
+      "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/blockout.png",
+      "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/blockout-comparison.png",
+      "cameraView": "front-three-quarter",
+      "notes": "Full object, floor contact, roof apex, body depth, post, braces, and footing are visible in one matched pair.",
+      "aiVisionNotes": "The blockout preserves the reference hierarchy and player-readable service silhouette. It is deliberately undecorated; omitted slot, raven, roof courses, and final surfaces are assigned to later passes rather than averaged into this gate."
+    },
+    {
+      "timestamp": "2026-07-24T11:38:21.296931+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.77,
+        "formDetail": 0.73,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "roof-and-frame-system",
+          "score": 0.76,
+          "visible": true,
+          "notes": "Stepped cobalt roof mass, framed cabinet, and paired diagonal braces are visible and structurally legible."
+        },
+        {
+          "id": "grounded-attachments",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Body, support, braces, collar, and stone footing overlap cleanly with no visible floating contact."
+        }
+      ],
+      "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/structural.png",
+      "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/structural-pass-comparison.png",
+      "cameraView": "front-three-quarter",
+      "notes": "The shared pair exposes the roof/frame rhythm and all primary ground-to-body attachments.",
+      "aiVisionNotes": "The stage locks the load path and complete volume. Service-face ornament is absent by pass design and is reviewed only after form refinement."
+    },
+    {
+      "timestamp": "2026-07-24T11:38:32.506526+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.8,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "mailbox-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "The gabled cabinet, post, braces, and two-course base retain the accepted player-scale hierarchy."
+        },
+        {
+          "id": "mail-service-face",
+          "score": 0.77,
+          "visible": true,
+          "notes": "The dark cavity, gold frame, and faceted raven relief are distinct in the full reference/render pair."
+        },
+        {
+          "id": "roof-and-frame-system",
+          "score": 0.79,
+          "visible": true,
+          "notes": "Course rhythm, overhang, front frame, and structural brace system remain coherent after refinement."
+        }
+      ],
+      "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/form.png",
+      "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/form-refinement-comparison.png",
+      "cameraView": "front-three-quarter",
+      "notes": "One full-object pair exposes the silhouette, service face, roof courses, structural frame, and base.",
+      "aiVisionNotes": "The shipping-oriented form keeps every identity cue while simplifying low-value ornament. The visible recess, silhouette breaks, and stepped construction carry the match without relying on tiny text or texture noise."
+    },
+    {
+      "timestamp": "2026-07-24T11:38:41.949053+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.81,
+        "formDetail": 0.8,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.78
+      },
+      "featureReviews": [
+        {
+          "id": "preset-material-read",
+          "score": 0.79,
+          "visible": true,
+          "notes": "Stone, timber, cobalt, gold, deep slot, and raven zones retain distinct values and material roles in the full-object pair."
+        }
+      ],
+      "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/material.png",
+      "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/material-pass-comparison.png",
+      "cameraView": "front-three-quarter",
+      "notes": "Neutral staging exposes the complete palette and value grouping without bloom or scene-dependent effects.",
+      "aiVisionNotes": "The accepted implementation uses semantic vertex color, two merged material buckets, and the existing external Eastbrook atlas. It does not infer or embed PBR maps from the lit reference."
+    },
+    {
+      "timestamp": "2026-07-24T11:38:52.930419+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.81,
+        "formDetail": 0.8,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "preset-material-read",
+          "score": 0.8,
+          "visible": true,
+          "notes": "The neutral matched pair and recorded dusk/Low corroboration preserve every semantic material family without post-effect dependence."
+        }
+      ],
+      "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev/neutral.png",
+      "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/lighting-pass-comparison.png",
+      "cameraView": "front-three-quarter-neutral",
+      "notes": "The scored pair is neutral; the evidence list records same-output dusk and Low corroboration.",
+      "aiVisionNotes": "Broad neutral illumination shows the authored facets and contacts; companion dusk and Lambert-compatible Low captures prove that the identity does not depend on AO, bloom, subtle PBR, or dynamic shadows."
+    },
+    {
+      "timestamp": "2026-07-24T11:39:08.171280+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.83,
+      "aiVisionScore": 0.83,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.82,
+        "formDetail": 0.8,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "grounded-attachments",
+          "score": 0.82,
+          "visible": true,
+          "notes": "Player-scale capture clearly shows floor contact and gap-free base, post, brace, and body assembly."
+        },
+        {
+          "id": "socket-collider-contract",
+          "visible": false,
+          "notes": "Semantic sockets and collider proxies are intentionally non-rendered and are verified from authored metadata and focused tests, not assigned a visual score."
+        }
+      ],
+      "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev/player-scale.png",
+      "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/interaction-pass-comparison.png",
+      "cameraView": "player-scale-front-three-quarter",
+      "notes": "The full asset and player rig share one grounded frame, exposing approach height and footprint.",
+      "aiVisionNotes": "The rig comparison validates scale, front readability, and grounding. Non-visual interaction metadata is deliberately not fabricated as an image-derived score."
+    },
+    {
+      "timestamp": "2026-07-24T11:39:23.658866+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.83,
+        "formDetail": 0.82,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "complete-multi-angle-volume",
+          "score": 0.83,
+          "visible": true,
+          "notes": "The reviewed contact evidence exposes front, right, rear, left, three-quarter, grazing, roof, and underside construction on the optimized output."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": false,
+          "notes": "Budget acceptance is numeric inspector/build evidence: 1,640 triangles, 2 primitives, 2 materials, 32,884 bytes, zero embedded textures, animations, and skins."
+        }
+      ],
+      "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/reference-vs-optimized-contact.png",
+      "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/optimization-pass-comparison.png",
+      "cameraView": "multi-angle-contact",
+      "notes": "The single reviewed contact artifact contains the complete accepted multi-angle optimized set.",
+      "aiVisionNotes": "The optimized contact evidence remains coherent from every required angle and at grazing incidence. Simplification is concentrated in secondary ornament, not silhouette, service identity, or grounding."
+    }
+  ],
+  "terminologyProfile": {
+    "geometryTerms": [
+      "silhouette",
+      "assembled-solid",
+      "conforming-shell",
+      "surface-relief",
+      "extrude",
+      "instanced-cluster",
+      "chamfer",
+      "recess",
+      "overlap",
+      "socket"
+    ],
+    "materialTerms": [
+      "vertex color",
+      "roughness scalar",
+      "semantic atlas cell",
+      "cavity dirt",
+      "edge wear",
+      "ambient occlusion"
+    ],
+    "lightingTerms": [
+      "neutral key",
+      "fill",
+      "rim",
+      "grazing light",
+      "contact shadow",
+      "tone mapping"
+    ],
+    "descriptionRule": "Describe measurable geometry, material response, attachment, and evidence rather than aesthetic adjectives."
+  },
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Support post and model root",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.97,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The central post is a rigid timber prism with countable planar faces and a tapered lower transition.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly hard-surface post with a tapered upper seat",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": ["subtle deterministic width taper toward body"],
+        "uvStrategy": "shared-atlas timber cell aligned to +Y",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 0.3,
+        "height": 1.35,
+        "depth": 0.3,
+        "units": "yards",
+        "confidence": 0.93
+      },
+      "transform": {
+        "position": [0, 0.42, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 1.0
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [
+          {
+            "id": "Socket_Ground",
+            "localPosition": [0, 0, 0],
+            "localRotation": [0, 0, 0]
+          },
+          {
+            "id": "Socket_MailInteract",
+            "localPosition": [0, 1.86, 0.95],
+            "localRotation": [0, 3.141593, 0]
+          },
+          {
+            "id": "Socket_UnreadGlow",
+            "localPosition": [0, 2.2, 0.48],
+            "localRotation": [0, 0, 0]
+          },
+          {
+            "id": "Socket_BodyMount",
+            "localPosition": [0, 1.48, 0],
+            "localRotation": [0, 0, 0]
+          },
+          {
+            "id": "Socket_BaseMount",
+            "localPosition": [0, 0, 0],
+            "localRotation": [0, 0, 0]
+          }
+        ],
+        "collider": {
+          "type": "compound-box",
+          "offset": [0, 1.35, 0],
+          "scale": [1.3, 2.7, 0.72],
+          "isTrigger": false,
+          "parts": [
+            {
+              "id": "base",
+              "offset": [0, 0.21, 0],
+              "scale": [0.72, 0.42, 0.62]
+            },
+            {
+              "id": "post",
+              "offset": [0, 0.95, 0],
+              "scale": [0.3, 1.1, 0.3]
+            },
+            {
+              "id": "body",
+              "offset": [0, 1.92, 0],
+              "scale": [1.25, 1.0, 0.72]
+            }
+          ]
+        },
+        "constraints": [
+          "floor socket remains at minY zero",
+          "interaction point stays in front of collider",
+          "serialized root scale remains one"
+        ],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "mailbox-root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.08,
+        "microRoughness": 0.12,
+        "bumpAmplitude": 0.01,
+        "normalPattern": "vertical timber grain from shared atlas",
+        "occlusionPattern": "underside and collar contact only",
+        "edgeWearPattern": "restrained lighter crest wear"
+      },
+      "evidenceRefs": ["front", "front-three-quarter", "rear-three-quarter"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(61, 42, 29, 1)",
+        "secondaryAlbedo": "rgba(42, 29, 22, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "mailhouse-body",
+      "name": "Elevated mailhouse body",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The mailbox body is a rigid timber cabinet with planar front, rear, and side faces plus an explicit base sill.",
+      "geometryDescriptor": {
+        "topologyIntent": "beveled box shell with inset facade boards",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.03,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "shared-atlas timber cell with horizontal board orientation",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "Socket_BodyMount",
+        "localStart": [0, 1.38, 0],
+        "localEnd": [0, 2.34, 0],
+        "contactType": "overlap",
+        "overlap": 0.08,
+        "gapTolerance": 0.01,
+        "evidenceRefs": ["front-three-quarter", "rear-three-quarter"]
+      },
+      "dimensions": {
+        "width": 1.18,
+        "height": 0.92,
+        "depth": 0.68,
+        "units": "yards",
+        "confidence": 0.96
+      },
+      "transform": {
+        "position": [0, 1.88, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, -0.46, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.96
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [
+          {
+            "id": "Socket_RoofSeat",
+            "localPosition": [0, 0.44, 0],
+            "localRotation": [0, 0, 0]
+          },
+          {
+            "id": "Socket_SlotFace",
+            "localPosition": [0, 0.02, 0.35],
+            "localRotation": [0, 0, 0]
+          },
+          {
+            "id": "Socket_CrestFace",
+            "localPosition": [0, 0.31, 0.35],
+            "localRotation": [0, 0, 0]
+          },
+          {
+            "id": "Socket_RearPanel",
+            "localPosition": [0, 0, -0.35],
+            "localRotation": [0, 3.141593, 0]
+          },
+          {
+            "id": "Socket_BadgeSides",
+            "localPosition": [0, 0, 0],
+            "localRotation": [0, 0, 0]
+          },
+          {
+            "id": "Socket_TrimFace",
+            "localPosition": [0, 0, 0.36],
+            "localRotation": [0, 0, 0]
+          },
+          {
+            "id": "Socket_BracketLine",
+            "localPosition": [0, -0.46, 0],
+            "localRotation": [0, 0, 0]
+          }
+        ],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["fixed to support post"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "mailhouse",
+          "seamRefs": ["facade-board-seams"],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque"],
+      "localFeatures": [
+        {
+          "id": "facade-board-seams",
+          "type": "linework",
+          "geometryEffect": "shallow horizontal grooves",
+          "placement": "front and side timber panels",
+          "size": [1.02, 0.012, 0.012],
+          "confidence": 0.92
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.08,
+        "microRoughness": 0.14,
+        "bumpAmplitude": 0.008,
+        "normalPattern": "horizontal timber grain",
+        "occlusionPattern": "panel seams and sill contacts",
+        "edgeWearPattern": "front sill handling wear"
+      },
+      "evidenceRefs": ["front", "right", "rear-detail"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(68, 47, 32, 1)",
+        "secondaryAlbedo": "rgba(42, 29, 22, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "roof-shell",
+      "name": "Cobalt gabled roof shell",
+      "level": "macro",
+      "role": "roof",
+      "importance": 1.0,
+      "confidence": 0.98,
+      "primitive": "extrude",
+      "topologyClass": "conforming-shell",
+      "topologyRationale": "Two thin pitched roof planes conform to the gabled body and overhang it without filling the volume beneath.",
+      "geometryDescriptor": {
+        "topologyIntent": "two shallow extruded roof slopes with separate overlapping course relief",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": ["four stepped course offsets per slope"],
+        "uvStrategy": "shared-atlas painted-roof cell aligned along slope",
+        "normalStrategy": "flat course faces with weighted edge normals"
+      },
+      "parent": "mailhouse-body",
+      "attachment": {
+        "parentId": "mailhouse-body",
+        "parentSocket": "Socket_RoofSeat",
+        "localStart": [0, 0.38, 0],
+        "localEnd": [0, 0.86, 0],
+        "contactType": "overlap",
+        "overlap": 0.06,
+        "gapTolerance": 0.01,
+        "evidenceRefs": ["front", "right", "rear-three-quarter"]
+      },
+      "dimensions": {
+        "width": 1.65,
+        "height": 0.52,
+        "depth": 1.05,
+        "units": "yards",
+        "confidence": 1.0
+      },
+      "transform": {
+        "position": [0, 2.56, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, -0.26, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.97
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [
+          {
+            "id": "Socket_RidgeCap",
+            "localPosition": [0, 0.25, 0],
+            "localRotation": [0, 0, 0]
+          }
+        ],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["overhang remains within accepted 1.65 by 1.05 bounds"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "roof",
+          "seamRefs": ["roof-course-seams"],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque"],
+      "localFeatures": [
+        {
+          "id": "roof-course-seams",
+          "type": "seam",
+          "geometryEffect": "four shallow overlapping steps on each slope",
+          "placement": "parallel to both eaves",
+          "size": [1.34, 0.018, 0.02],
+          "confidence": 0.96
+        },
+        {
+          "id": "ridge-cap-chamfer",
+          "type": "bevel",
+          "geometryEffect": "one-segment ridge and end-cap chamfer",
+          "placement": "roof apex",
+          "size": [1.12, 0.06, 0.08],
+          "confidence": 0.92
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.06,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.004,
+        "normalPattern": "restrained painted-grain atlas cell",
+        "occlusionPattern": "course overlaps and eaves",
+        "edgeWearPattern": "thin lighter cobalt eave wear"
+      },
+      "evidenceRefs": ["front", "right", "rear-detail", "grazing"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(18, 55, 137, 1)",
+        "secondaryAlbedo": "rgba(9, 32, 87, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.82
+      }
+    },
+    {
+      "id": "stone-plinth",
+      "name": "Two-course stone plinth",
+      "level": "meso",
+      "role": "base",
+      "importance": 0.88,
+      "confidence": 0.98,
+      "primitive": "instanced-cluster",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The foot consists of a small countable set of rigid chamfered masonry blocks in two courses.",
+      "geometryDescriptor": {
+        "topologyIntent": "merged block cluster with offset joints",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.035,
+          "segments": 1
+        },
+        "deformationStack": ["bounded per-block scale and value variation"],
+        "uvStrategy": "shared-atlas stone cell",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "Socket_BaseMount",
+        "localStart": [0, 0, 0],
+        "localEnd": [0, 0.42, 0],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.005,
+        "evidenceRefs": ["front", "front-three-quarter"]
+      },
+      "dimensions": {
+        "width": 0.72,
+        "height": 0.42,
+        "depth": 0.62,
+        "units": "yards",
+        "confidence": 0.97
+      },
+      "transform": {
+        "position": [0, 0.21, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, -0.21, 0],
+          "axis": [0, 1, 0],
+          "confidence": 1.0
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["minY exactly zero"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "base",
+          "seamRefs": ["stone-joint-grooves"],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque"],
+      "localFeatures": [
+        {
+          "id": "stone-joint-grooves",
+          "type": "groove",
+          "geometryEffect": "recessed course and offset vertical joints",
+          "placement": "between footing blocks",
+          "size": [0.02, 0.025, 0.02],
+          "confidence": 0.98
+        },
+        {
+          "id": "stone-edge-chamfers",
+          "type": "bevel",
+          "geometryEffect": "one-segment chamfer on every exposed block edge",
+          "placement": "all exposed stone edges",
+          "size": [0.035, 0.035, 0.035],
+          "confidence": 0.95
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.14,
+        "microRoughness": 0.2,
+        "bumpAmplitude": 0.012,
+        "normalPattern": "shared-atlas stone grain",
+        "occlusionPattern": "joint and floor-contact darkening",
+        "edgeWearPattern": "lighter exposed chamfers"
+      },
+      "evidenceRefs": ["front", "grazing"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(91, 94, 96, 1)",
+        "secondaryAlbedo": "rgba(59, 62, 65, 1)",
+        "materialClass": "stone",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "post-collar",
+      "name": "Gold post collar",
+      "level": "meso",
+      "role": "trim",
+      "importance": 0.72,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "A shallow faceted metal band and repeated studs sit proud of the rigid timber post.",
+      "geometryDescriptor": {
+        "topologyIntent": "merged four-sided band with raised studs",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.012,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "vertex color gold zone",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "Socket_BaseMount",
+        "localStart": [0, 0.63, 0],
+        "localEnd": [0, 0.78, 0],
+        "contactType": "overlap",
+        "overlap": 0.02,
+        "gapTolerance": 0.005,
+        "evidenceRefs": ["front", "right"]
+      },
+      "dimensions": {
+        "width": 0.39,
+        "height": 0.14,
+        "depth": 0.39,
+        "units": "yards",
+        "confidence": 0.94
+      },
+      "transform": {
+        "position": [0, 0.7, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.96
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["merged into opaque primitive"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "trim",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-metal",
+      "materialLayers": ["town-metal"],
+      "localFeatures": [
+        {
+          "id": "collar-studs",
+          "type": "fastener",
+          "geometryEffect": "four merged raised diamond heads",
+          "placement": "one per post face",
+          "size": [0.055, 0.055, 0.015],
+          "confidence": 0.94
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.02,
+        "microRoughness": 0.04,
+        "bumpAmplitude": 0,
+        "normalPattern": "none",
+        "occlusionPattern": "band-post contact",
+        "edgeWearPattern": "slightly brighter stud crowns"
+      },
+      "evidenceRefs": ["front", "right"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(178, 119, 31, 1)",
+        "secondaryAlbedo": "rgba(105, 63, 17, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "support-brackets",
+      "name": "Paired underside brackets",
+      "level": "meso",
+      "role": "bracing",
+      "importance": 0.78,
+      "confidence": 0.96,
+      "primitive": "instanced-cluster",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Two rigid diagonal timber braces form countable triangular supports beneath the cabinet.",
+      "geometryDescriptor": {
+        "topologyIntent": "paired oriented beveled prisms",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "shared-atlas timber cell aligned along brace axes",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": "mailhouse-body",
+      "attachment": {
+        "parentId": "mailhouse-body",
+        "parentSocket": "Socket_BracketLine",
+        "localStart": [-0.42, -0.44, 0],
+        "localEnd": [-0.13, -0.88, 0],
+        "contactType": "embedded",
+        "embedDepth": 0.035,
+        "gapTolerance": 0.008,
+        "evidenceRefs": ["front-three-quarter", "rear-three-quarter"]
+      },
+      "dimensions": {
+        "width": 0.78,
+        "height": 0.48,
+        "depth": 0.16,
+        "units": "yards",
+        "confidence": 0.92
+      },
+      "transform": {
+        "position": [0, 1.39, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, -0.24, 0],
+          "axis": [0, 0, 1],
+          "confidence": 0.92
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["both braces overlap post and body sill"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "braces",
+          "seamRefs": ["bracket-join-seams"],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque"],
+      "localFeatures": [
+        {
+          "id": "bracket-join-seams",
+          "type": "seam",
+          "geometryEffect": "contact-darkened embedded roots",
+          "placement": "brace-to-post and brace-to-sill joins",
+          "size": [0.14, 0.04, 0.12],
+          "confidence": 0.96
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.07,
+        "microRoughness": 0.12,
+        "bumpAmplitude": 0.008,
+        "normalPattern": "axial timber grain",
+        "occlusionPattern": "joint contacts",
+        "edgeWearPattern": "none"
+      },
+      "evidenceRefs": ["front-three-quarter", "rear-three-quarter"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(55, 38, 27, 1)",
+        "secondaryAlbedo": "rgba(35, 25, 19, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "mail-slot",
+      "name": "Recessed mail slot and gold frame",
+      "level": "meso",
+      "role": "service-cue",
+      "importance": 1.0,
+      "confidence": 0.99,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Four rigid frame bars surround a genuine recessed rectangular cavity with a separate inner reveal.",
+      "geometryDescriptor": {
+        "topologyIntent": "merged chamfered frame bars around a negative opening",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "vertex-color gold and cavity zones",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": "mailhouse-body",
+      "attachment": {
+        "parentId": "mailhouse-body",
+        "parentSocket": "Socket_SlotFace",
+        "localStart": [0, -0.09, 0.3],
+        "localEnd": [0, 0.13, 0.4],
+        "contactType": "embedded",
+        "embedDepth": 0.035,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["front", "grazing"]
+      },
+      "dimensions": {
+        "width": 0.68,
+        "height": 0.23,
+        "depth": 0.11,
+        "units": "yards",
+        "confidence": 0.98
+      },
+      "transform": {
+        "position": [0, 1.9, 0.37],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-service-cue",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.99
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["opening stays non-clickable geometry; gameplay uses root socket"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "slot",
+          "seamRefs": ["mail-slot-opening"],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-metal",
+      "materialLayers": ["town-metal", "town-opaque"],
+      "localFeatures": [
+        {
+          "id": "mail-slot-opening",
+          "type": "hole",
+          "geometryEffect": "0.07-yard deep black-brown cavity with visible inner floor and ceiling",
+          "placement": "front center",
+          "size": [0.5, 0.09, 0.07],
+          "confidence": 0.99
+        },
+        {
+          "id": "slot-frame-chamfer",
+          "type": "bevel",
+          "geometryEffect": "one-segment faceted frame catch light",
+          "placement": "all outer and inner frame edges",
+          "size": [0.025, 0.025, 0.025],
+          "confidence": 0.98
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.02,
+        "microRoughness": 0.04,
+        "bumpAmplitude": 0,
+        "normalPattern": "none",
+        "occlusionPattern": "strong inner reveal only",
+        "edgeWearPattern": "bright upper frame ridge"
+      },
+      "evidenceRefs": ["front", "grazing"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(183, 121, 29, 1)",
+        "secondaryAlbedo": "rgba(46, 27, 16, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "front-crest",
+      "name": "Original Ravenpost relief",
+      "level": "meso",
+      "role": "identity",
+      "importance": 0.92,
+      "confidence": 0.94,
+      "primitive": "extrude",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "A shallow abstract raven head and paired wing plates project from the front gable without independent deep volume.",
+      "geometryDescriptor": {
+        "topologyIntent": "three shallow low-vertex profile extrusions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.008,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "dark vertex-color identity zone",
+        "normalStrategy": "flat front with chamfered edge normals"
+      },
+      "parent": "mailhouse-body",
+      "attachment": {
+        "parentId": "mailhouse-body",
+        "parentSocket": "Socket_CrestFace",
+        "localStart": [0, 0.2, 0.34],
+        "localEnd": [0, 0.42, 0.38],
+        "contactType": "surface-contact",
+        "overlap": 0.012,
+        "gapTolerance": 0.003,
+        "evidenceRefs": ["front", "front-three-quarter"]
+      },
+      "dimensions": {
+        "width": 0.5,
+        "height": 0.28,
+        "depth": 0.035,
+        "units": "yards",
+        "confidence": 0.92
+      },
+      "transform": {
+        "position": [0, 2.22, 0.365],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-identity",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.95
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["original abstract shape only", "no letters or third-party crest"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "crest",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque"],
+      "localFeatures": [
+        {
+          "id": "raven-relief",
+          "type": "ridge",
+          "geometryEffect": "shallow faceted raven head and two wing profiles",
+          "placement": "front gable above slot",
+          "size": [0.5, 0.28, 0.035],
+          "confidence": 0.94
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.03,
+        "microRoughness": 0.05,
+        "bumpAmplitude": 0,
+        "normalPattern": "none",
+        "occlusionPattern": "relief-to-facade contact",
+        "edgeWearPattern": "subtle cool highlight on upper edges"
+      },
+      "evidenceRefs": ["front", "front-three-quarter"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(25, 32, 44, 1)",
+        "secondaryAlbedo": "rgba(13, 18, 27, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.75
+      }
+    },
+    {
+      "id": "rear-panel",
+      "name": "Closed rear shutter panel",
+      "level": "meso",
+      "role": "rear-panel",
+      "importance": 0.7,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A rigid inset timber shutter closes the rear and has explicit planar board seams.",
+      "geometryDescriptor": {
+        "topologyIntent": "inset beveled panel with horizontal grooves",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.015,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "shared-atlas timber cell with horizontal grain",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": "mailhouse-body",
+      "attachment": {
+        "parentId": "mailhouse-body",
+        "parentSocket": "Socket_RearPanel",
+        "localStart": [0, -0.3, -0.34],
+        "localEnd": [0, 0.31, -0.39],
+        "contactType": "embedded",
+        "embedDepth": 0.02,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["rear-detail", "rear-three-quarter"]
+      },
+      "dimensions": {
+        "width": 0.88,
+        "height": 0.58,
+        "depth": 0.05,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [0, 1.93, -0.355],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "future-hinge-static-now",
+        "pivot": {
+          "mode": "hinge",
+          "localPosition": [-0.44, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.83
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [
+          {
+            "id": "Socket_RearDoorHinge",
+            "localPosition": [-0.44, 0, 0],
+            "localRotation": [0, 0, 0]
+          }
+        ],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["closed and non-interactive in shipping build"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "rear-panel",
+          "seamRefs": ["rear-panel-seams"],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque"],
+      "localFeatures": [
+        {
+          "id": "rear-panel-seams",
+          "type": "seam",
+          "geometryEffect": "inset perimeter plus four shallow horizontal grooves",
+          "placement": "rear shutter face",
+          "size": [0.78, 0.012, 0.01],
+          "confidence": 0.96
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.08,
+        "microRoughness": 0.13,
+        "bumpAmplitude": 0.008,
+        "normalPattern": "horizontal timber grain",
+        "occlusionPattern": "perimeter reveal",
+        "edgeWearPattern": "none"
+      },
+      "evidenceRefs": ["rear-detail", "rear-three-quarter"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(60, 42, 29, 1)",
+        "secondaryAlbedo": "rgba(40, 28, 21, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "side-badges",
+      "name": "Paired side diamond badges",
+      "level": "meso",
+      "role": "identity-detail",
+      "importance": 0.6,
+      "confidence": 0.94,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Two shallow faceted gold diamonds project from otherwise planar side walls.",
+      "geometryDescriptor": {
+        "topologyIntent": "two mirrored low-vertex shallow extrusions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.008,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "vertex-color gold zone",
+        "normalStrategy": "flat facets"
+      },
+      "parent": "mailhouse-body",
+      "attachment": {
+        "parentId": "mailhouse-body",
+        "parentSocket": "Socket_BadgeSides",
+        "localStart": [-0.59, 0, 0],
+        "localEnd": [0.59, 0, 0],
+        "contactType": "surface-contact",
+        "overlap": 0.012,
+        "gapTolerance": 0.003,
+        "evidenceRefs": ["right", "left"]
+      },
+      "dimensions": {
+        "width": 1.24,
+        "height": 0.18,
+        "depth": 0.18,
+        "units": "yards",
+        "confidence": 0.91
+      },
+      "transform": {
+        "position": [0, 1.92, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-detail",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.94
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["merge both badges into opaque primitive"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "badges",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-metal",
+      "materialLayers": ["town-metal"],
+      "localFeatures": [
+        {
+          "id": "diamond-relief",
+          "type": "ridge",
+          "geometryEffect": "two mirrored faceted diamond studs",
+          "placement": "center of left and right side walls",
+          "size": [0.16, 0.16, 0.025],
+          "confidence": 0.95
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.02,
+        "microRoughness": 0.04,
+        "bumpAmplitude": 0,
+        "normalPattern": "none",
+        "occlusionPattern": "badge wall contact",
+        "edgeWearPattern": "bright upper facets"
+      },
+      "evidenceRefs": ["right", "left"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(181, 118, 27, 1)",
+        "secondaryAlbedo": "rgba(102, 60, 16, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "front-trim",
+      "name": "Front sill, corner blocks, and fasteners",
+      "level": "meso",
+      "role": "trim",
+      "importance": 0.76,
+      "confidence": 0.95,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "A bounded set of shallow trim blocks and fastener heads sit proud of the cabinet faces.",
+      "geometryDescriptor": {
+        "topologyIntent": "merged trim prisms and repeated low-poly heads",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.012,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "vertex-color timber and gold zones",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": "mailhouse-body",
+      "attachment": {
+        "parentId": "mailhouse-body",
+        "parentSocket": "Socket_TrimFace",
+        "localStart": [-0.58, -0.44, 0.34],
+        "localEnd": [0.58, 0.3, 0.38],
+        "contactType": "surface-contact",
+        "overlap": 0.012,
+        "gapTolerance": 0.003,
+        "evidenceRefs": ["front"]
+      },
+      "dimensions": {
+        "width": 1.22,
+        "height": 0.82,
+        "depth": 0.08,
+        "units": "yards",
+        "confidence": 0.93
+      },
+      "transform": {
+        "position": [0, 1.89, 0.36],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-detail",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.95
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["fasteners merge into opaque primitive"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "front-trim",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque", "town-metal"],
+      "localFeatures": [
+        {
+          "id": "gold-fastener-heads",
+          "type": "fastener",
+          "geometryEffect": "bounded repeated square and diamond heads",
+          "placement": "front corner trim and slot-adjacent plates",
+          "size": [0.035, 0.035, 0.012],
+          "confidence": 0.91
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.04,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0,
+        "normalPattern": "none",
+        "occlusionPattern": "trim-face contacts",
+        "edgeWearPattern": "sill edge wear"
+      },
+      "evidenceRefs": ["front"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(74, 51, 34, 1)",
+        "secondaryAlbedo": "rgba(174, 111, 27, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.82
+      }
+    },
+    {
+      "id": "ridge-cap",
+      "name": "Timber ridge and gold apex cap",
+      "level": "meso",
+      "role": "roof-trim",
+      "importance": 0.64,
+      "confidence": 0.94,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A rigid dark ridge bar and faceted gold apex block cap the two roof slopes.",
+      "geometryDescriptor": {
+        "topologyIntent": "beveled ridge prism with merged end cap",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.018,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "vertex-color timber and gold zones",
+        "normalStrategy": "weighted vertex normals"
+      },
+      "parent": "roof-shell",
+      "attachment": {
+        "parentId": "roof-shell",
+        "parentSocket": "Socket_RidgeCap",
+        "localStart": [0, 0.18, -0.36],
+        "localEnd": [0, 0.28, 0.36],
+        "contactType": "overlap",
+        "overlap": 0.02,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["front", "right", "grazing"]
+      },
+      "dimensions": {
+        "width": 0.18,
+        "height": 0.18,
+        "depth": 0.76,
+        "units": "yards",
+        "confidence": 0.91
+      },
+      "transform": {
+        "position": [0, 2.78, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.95
+        },
+        "transformChannels": {
+          "translate": false,
+          "rotate": false,
+          "scale": false,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [0, 0, 0],
+          "isTrigger": false
+        },
+        "constraints": ["apex remains below 2.9-yard asset height"],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "ridge",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "town-opaque"
+        }
+      },
+      "material": "town-opaque",
+      "materialLayers": ["town-opaque", "town-metal"],
+      "localFeatures": [
+        {
+          "id": "ridge-end-cap-facets",
+          "type": "bevel",
+          "geometryEffect": "faceted gold end and apex cap",
+          "placement": "ridge front and apex",
+          "size": [0.16, 0.14, 0.12],
+          "confidence": 0.91
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.04,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.004,
+        "normalPattern": "axial timber grain",
+        "occlusionPattern": "ridge-slope contact",
+        "edgeWearPattern": "gold crest wear"
+      },
+      "evidenceRefs": ["front", "right", "grazing"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(48, 33, 24, 1)",
+        "secondaryAlbedo": "rgba(169, 105, 24, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.8
+      }
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "roof-course-system",
+      "componentRef": "roof-shell",
+      "method": "merged deterministic repeated extrusions",
+      "count": 8,
+      "distribution": "four evenly stepped courses per slope with bounded 0.01-yard depth offsets",
+      "seed": "fixed asset constant",
+      "drawCallPolicy": "merged into town-opaque"
+    },
+    {
+      "id": "gold-fastener-system",
+      "componentRefs": ["front-trim", "post-collar"],
+      "method": "instanced construction then merged export",
+      "countMax": 12,
+      "distribution": "symmetric semantic anchors only",
+      "seed": "none",
+      "drawCallPolicy": "merged into town-opaque"
+    },
+    {
+      "id": "stone-course-system",
+      "componentRef": "stone-plinth",
+      "method": "instanced construction then merged export",
+      "countMax": 8,
+      "distribution": "two centered courses with offset joints",
+      "seed": "fixed asset constant",
+      "drawCallPolicy": "merged into town-opaque"
+    }
+  ],
+  "materials": [
+    {
+      "id": "town-opaque",
+      "name": "Merged Eastbrook opaque vertex-color material",
+      "type": "standard-with-low-lambert-path",
+      "shaderModel": "MeshStandardMaterial on higher tiers, Lambert-compatible runtime material on Low",
+      "baseColor": "#FFFFFF",
+      "albedo": {
+        "dominant": "semantic COLOR_0",
+        "secondary": ["stone gray", "warm timber", "cobalt blue", "aged gold", "dark raven"],
+        "samplingNotes": "Use sheet-observed value families, not lit pixels as exact albedo."
+      },
+      "colorVariation": {
+        "palette": ["#5B5E60", "#3D2A1D", "#123789", "#B2771F", "#19202C"],
+        "pattern": "semantic vertex-color regions with bounded within-family variation",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.1
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared-external-semantic-cell-atlas",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "stable object-space grain; every UV remains inside its assigned 128px atlas cell"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.14,
+          "role": "semantic stone, timber, cobalt, gold, and raven value groups"
+        },
+        {
+          "id": "meso",
+          "frequency": 10,
+          "amplitude": 0.07,
+          "role": "shared-atlas grain and masonry variation"
+        },
+        {
+          "id": "micro",
+          "frequency": 42,
+          "amplitude": 0.025,
+          "role": "grazing highlight breakup without silhouette noise"
+        }
+      ],
+      "roughness": {
+        "base": 0.72,
+        "variation": 0.22,
+        "map": "independent semantic-family scalar policy; not albedo-derived",
+        "localResponse": "stone and timber stay matte, roof is moderately matte, worn gold facets are smoother"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0.18
+      },
+      "normal": {
+        "pattern": "no embedded normal map; geometry bevels plus restrained shared-atlas runtime detail where supported",
+        "strength": 0.12,
+        "scale": 24,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "shared external atlas only",
+        "amplitude": 0.01,
+        "scale": 18
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.22,
+        "contactShadowBias": 0.32,
+        "notes": "Vertex-color cavity darkening only at joints, contacts, eaves, and slot reveal; never uniform noise."
+      },
+      "wear": {
+        "edgeWear": 0.08,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.06,
+        "cavityBias": 0.85,
+        "color": "#292725"
+      },
+      "localOverrides": [
+        {
+          "id": "roof-edge-wear",
+          "region": "cobalt eaves and course crests",
+          "baseColorShift": "+0.06 value, no hue shift",
+          "roughness": 0.66,
+          "evidenceRefs": ["front-three-quarter", "grazing"]
+        },
+        {
+          "id": "base-cavity-dirt",
+          "region": "stone joints and floor-contact band",
+          "dirtAmount": 0.18,
+          "cavityBias": 1,
+          "streak": false,
+          "evidenceRefs": ["front-three-quarter"]
+        },
+        {
+          "id": "timber-grain",
+          "region": "post, body, braces, shutter, and ridge",
+          "pattern": "directional shared-atlas cell aligned to member axis",
+          "roughness": 0.78,
+          "evidenceRefs": ["grazing"]
+        },
+        {
+          "id": "slot-cavity",
+          "region": "mail slot interior",
+          "baseColor": "#1D120D",
+          "roughness": 0.9,
+          "evidenceRefs": ["front", "grazing"]
+        }
+      ],
+      "shaderNotes": [
+        "COLOR_0 is the semantic palette authority; the shared external atlas is a neutral value multiplier.",
+        "No reference crop, inferred PBR map, or punctual light is embedded in the GLB.",
+        "Roughness and cavity response are independent semantic scalars, never aliases of albedo.",
+        "Unread mail glow is a runtime effect attached to Socket_UnreadGlow and adds no mailbox material."
+      ],
+      "notes": "Intentional game-ready alternative to low-confidence inverse rendering from baked studio pixels."
+    },
+    {
+      "id": "town-metal",
+      "name": "Merged Eastbrook metal accent material",
+      "type": "standard-with-low-lambert-path",
+      "shaderModel": "MeshStandardMaterial on higher tiers, Lambert-compatible runtime material on Low",
+      "baseColor": "#FFFFFF",
+      "albedo": {
+        "dominant": "semantic COLOR_0 aged-gold and dark-iron accents",
+        "secondary": ["aged gold", "dark iron"],
+        "samplingNotes": "Use authored semantic colors and measured value grouping rather than baked reference highlights."
+      },
+      "colorVariation": {
+        "palette": ["#B2771F", "#D29A3B", "#2B3038"],
+        "pattern": "bounded vertex-color variation on exposed hardware facets",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.04
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared-external-semantic-cell-atlas",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "hardware UVs remain inside the shared neutral metal cell; the GLB embeds no texture"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.12,
+          "role": "gold versus iron hardware grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 12,
+          "amplitude": 0.05,
+          "role": "restrained facet-to-facet wear variation"
+        },
+        {
+          "id": "micro",
+          "frequency": 48,
+          "amplitude": 0.018,
+          "role": "subtle grazing breakup without glitter"
+        }
+      ],
+      "roughness": {
+        "base": 0.42,
+        "variation": 0.1,
+        "map": "independent semantic scalar; not albedo-derived",
+        "localResponse": "handled gold edges are smoother while recessed iron and contact seams remain rougher"
+      },
+      "metalness": {
+        "base": 0.62,
+        "variation": 0.18
+      },
+      "normal": {
+        "pattern": "geometry chamfers and weighted normals; no embedded normal map",
+        "strength": 0.06,
+        "scale": 28,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "shared external atlas only",
+        "amplitude": 0.004,
+        "scale": 24
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.16,
+        "contactShadowBias": 0.38,
+        "notes": "Contact darkening is limited to slot, collar, badge, and cap interfaces."
+      },
+      "wear": {
+        "edgeWear": 0.12,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.03,
+        "cavityBias": 0.9,
+        "color": "#2A231C"
+      },
+      "localOverrides": [
+        {
+          "id": "gold-worn-facets",
+          "region": "slot frame, collar studs, badges, fasteners, and apex cap",
+          "baseColorShift": "+0.05 value on upward-facing and handled facets",
+          "roughness": 0.38,
+          "metalness": 0.68,
+          "evidenceRefs": ["front", "right", "grazing"]
+        },
+        {
+          "id": "metal-contact-cavity",
+          "region": "hardware-to-timber contact seams and slot interior edge",
+          "baseColorShift": "-0.08 value",
+          "roughness": 0.56,
+          "metalness": 0.54,
+          "evidenceRefs": ["front", "grazing"]
+        }
+      ],
+      "shaderNotes": [
+        "This is the second and final shipping primitive/material bucket.",
+        "COLOR_0 remains the palette authority on Standard and Lambert-compatible Low paths.",
+        "The existing external Eastbrook atlas is shared and no texture or punctual light is embedded."
+      ],
+      "notes": "Dedicated metal response preserves readable gold hardware without forcing metallic response onto timber, stone, roof, or raven surfaces."
+    }
+  ],
+  "proceduralStrategy": [
+    "Construct every piece deterministically from boxes, shallow extrusions, and bounded repeated clusters.",
+    "Lock floor seating, target bounds, player scale, and the front, side, rear silhouettes before detail.",
+    "Keep the true mail slot cavity, roof-course steps, braces, and stone joints as geometry because they affect negative space or grazing response.",
+    "Carry surface identity with semantic vertex colors and one shared external atlas, then merge to one opaque and one metal primitive.",
+    "Preserve named sockets and collider metadata independently of mesh order.",
+    "Optimize only after every critical feature passes at 0.7 or better."
+  ],
+  "lookDevTargets": {
+    "qualityPriority": "game-ready-shared-atlas",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 512,
+      "preferredTextureResolution": 512,
+      "independentMapChannels": [
+        "vertex-color-albedo",
+        "semantic-roughness-scalars",
+        "geometry-normals",
+        "vertex-cavity",
+        "shared-neutral-detail-atlas"
+      ],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.7,
+        "stopOnLowConfidence": true,
+        "script": "forge/stage1_intake/extract_pbr_evidence.py",
+        "acceptedLimitation": "Generated studio pixels contain baked light. Shipping intentionally uses vertex colors, semantic roughness scalars, and the repository shared atlas instead of pretending exact PBR extraction."
+      },
+      "mustAvoid": [
+        "embedded reference crops",
+        "albedo reused as roughness or AO",
+        "uniform flat plastic",
+        "unbounded micro geometry",
+        "material differences that vanish on Low"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "neutral key",
+        "cool fill",
+        "warm rim",
+        "ACES tone mapping",
+        "contact shadow"
+      ],
+      "mustAvoid": [
+        "ambient-only lighting",
+        "bloom-dependent identity",
+        "point lights in the GLB",
+        "judging material only under one studio setup"
+      ]
+    },
+    "screenshotReview": [
+      "front and side silhouette",
+      "rear and underside completeness",
+      "neutral material value grouping",
+      "grazing bevel and seam response",
+      "dusk cobalt, gold, and raven separation",
+      "2.6-yard player overlay",
+      "Lambert-compatible mobile Low"
+    ]
+  },
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 38,
+    "aspect": 0.954,
+    "orientation": {
+      "yaw": -28,
+      "pitch": -4,
+      "roll": 0
+    },
+    "positionHint": [3.2, 2.4, 5.8],
+    "note": "Match framing by bounds and view label. Do not pixel-fit baked studio shadows."
+  },
+  "lightingFromPhoto": [
+    "Neutral review: broad warm-white key from front-left at elevation 35 degrees, intensity 2.2, with soft shadows.",
+    "Fill review: cool hemisphere or broad right fill at intensity 0.8 so slot and eave cavities remain readable without flattening.",
+    "Rim review: restrained cool rear-right rim or environment reflection at intensity 0.6 for the roof and post silhouette.",
+    "Use ACES-like tone mapping at exposure 1.0, neutral gray background, and a soft ground contact shadow; the asset must also pass dusk and Low without post effects."
+  ],
+  "actionReadiness": {
+    "contract": "Expose stable semantic pivots, sockets, compound collider intent, and runtime metadata even though the shipping mailbox is static.",
+    "defaultRigType": "action-ready-static-prop",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": ["translate", "rotate", "scale", "visibility", "material-state"],
+    "authoringRules": [
+      "The asset root owns whole-object transforms.",
+      "Runtime interaction targets Socket_MailInteract, not an anonymous mesh.",
+      "Runtime unread state targets Socket_UnreadGlow and is not serialized into the GLB.",
+      "Static collision uses the compound proxy and never the visual mesh.",
+      "Every child overlap remains gap-free after optimization."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "mailbox semantic component ids",
+      "debrisStrategy": "No shipping destruction; keep seams only as future metadata."
+    }
+  },
+  "animationAnchors": [
+    "root supports whole-object placement",
+    "rear-panel exposes Socket_RearDoorHinge for future use but ships locked",
+    "Socket_UnreadGlow supports allocation-free runtime effect motion"
+  ],
+  "destructionAnchors": [
+    "stone, post, cabinet, and roof retain separate semantic fracture groups in metadata",
+    "shipping asset is not breakable and exposes no detachable fragments"
+  ],
+  "performanceBudget": {
+    "qualityPriority": "high-performance MMO service landmark",
+    "targetTriangles": 2000,
+    "hardTriangleCeiling": 3000,
+    "actualTriangles": 1640,
+    "targetDrawCalls": 2,
+    "maxDrawCalls": 2,
+    "actualPrimitives": 2,
+    "maxPrimitives": 2,
+    "actualMaterials": 2,
+    "maxMaterials": 2,
+    "actualCompressedBytes": 32884,
+    "actualSha256": "8750b9de2a2f5b29937e580696971ac50677c6ea997722ca06262951a8825acb",
+    "actualSourceFingerprint": "488d484fbdbb15a4953754fbf08dc59880496ff97acec2e63036cde93ae883db",
+    "actualBoundsMin": [-0.82499, 0, -0.52501],
+    "actualBoundsMax": [0.82499, 2.9, 0.52501],
+    "usedAndRequiredExtensions": ["EXT_meshopt_compression", "KHR_mesh_quantization"],
+    "maxCompressedBytes": 102400,
+    "embeddedTextures": 0,
+    "animations": 0,
+    "skins": 0,
+    "cameras": 0,
+    "externalSharedAtlasBytesChargedOnce": true,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Merge into one opaque and one metal bucket, generate repetition through instances before export merge, keep only silhouette and grazing-critical relief, and never remove service readability on Low."
+  },
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full two-primitive asset and runtime unread effect"
+    },
+    {
+      "tier": "normal",
+      "distance": 24,
+      "strategy": "same service silhouette, slot, raven cue, and palette; runtime may reduce cosmetic unread-effect particles only"
+    },
+    {
+      "tier": "far",
+      "distance": 55,
+      "strategy": "same loaded asset and interaction landmark; renderer may omit subpixel shared-atlas detail but not geometry, slot, or service cue"
+    }
+  ],
+  "featureReviewTargets": [
+    {
+      "id": "mailbox-silhouette",
+      "name": "Gable, elevated body, single post, braces, and stepped footing",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["root", "mailhouse-body", "roof-shell", "stone-plinth", "support-brackets"],
+      "evidenceRefs": ["front", "right", "front-three-quarter"]
+    },
+    {
+      "id": "mail-service-face",
+      "name": "Recessed gold slot and original raven relief",
+      "tier": "critical",
+      "passIds": ["form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["mail-slot", "front-crest", "front-trim"],
+      "evidenceRefs": ["front", "grazing"]
+    },
+    {
+      "id": "roof-and-frame-system",
+      "name": "Cobalt course rhythm, body frame, and structural braces",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["roof-shell", "ridge-cap", "mailhouse-body", "support-brackets"],
+      "evidenceRefs": ["front", "right", "front-three-quarter"]
+    },
+    {
+      "id": "grounded-attachments",
+      "name": "Floor seating and gap-free post, brace, body, and stone joins",
+      "tier": "critical",
+      "passIds": ["structural-pass", "interaction-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["root", "stone-plinth", "support-brackets", "mailhouse-body"],
+      "evidenceRefs": ["front-three-quarter", "rear-three-quarter", "grazing"]
+    },
+    {
+      "id": "preset-material-read",
+      "name": "Stone, timber, cobalt, gold, and raven separation on Low and Ultra",
+      "tier": "critical",
+      "passIds": ["material-pass", "lighting-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "mailhouse-body",
+        "roof-shell",
+        "stone-plinth",
+        "mail-slot",
+        "front-crest"
+      ],
+      "evidenceRefs": ["front", "grazing"]
+    },
+    {
+      "id": "socket-collider-contract",
+      "name": "Stable mail, glow, floor sockets and compound collider",
+      "tier": "important",
+      "passIds": ["interaction-pass"],
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "componentRefs": ["root", "rear-panel"],
+      "evidenceRefs": ["front-three-quarter"]
+    },
+    {
+      "id": "shipping-budget",
+      "name": "Two-bucket triangle, draw, and byte contract",
+      "tier": "important",
+      "passIds": ["optimization-pass"],
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "componentRefs": ["root"],
+      "evidenceRefs": ["front", "right", "rear-detail"]
+    },
+    {
+      "id": "complete-multi-angle-volume",
+      "name": "Complete front, side, rear, underside, and roof volume",
+      "tier": "critical",
+      "passIds": ["optimization-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["root", "mailhouse-body", "roof-shell", "support-brackets", "rear-panel"],
+      "evidenceRefs": [
+        "front",
+        "right",
+        "rear-detail",
+        "left",
+        "front-three-quarter",
+        "rear-three-quarter",
+        "grazing"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Lock the accepted 1.65 by 1.05 by 2.9 yard bounds, minY zero, 2.6-yard player relationship, and all silhouette-defining macro masses.",
+      "componentRefs": ["root", "mailhouse-body", "roof-shell", "stone-plinth", "support-brackets"],
+      "acceptance": [
+        "Front, side, rear, and three-quarter silhouettes match the admitted views.",
+        "The mailhouse remains a player-scale service prop, not a building.",
+        "Global and every critical blockout feature score at least 0.7 from one comparison pair per review view."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build body shell, roof courses, supports, slot, crest, shutter, trim, attachments, and repeated systems.",
+      "componentRefs": [
+        "root",
+        "mailhouse-body",
+        "roof-shell",
+        "stone-plinth",
+        "post-collar",
+        "support-brackets",
+        "mail-slot",
+        "front-crest",
+        "rear-panel",
+        "side-badges",
+        "front-trim",
+        "ridge-cap"
+      ],
+      "acceptance": [
+        "All three macro and nine meso components are present.",
+        "Every child contact has a parent socket, endpoints, overlap or embed depth, and gap tolerance.",
+        "The slot is a true recess and rear/side volumes are complete.",
+        "Global and every critical structural feature score at least 0.7."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine roof pitch, overhang, chamfers, stone joints, trim facets, board seams, and low-poly raven relief.",
+      "componentRefs": [
+        "roof-shell",
+        "stone-plinth",
+        "mail-slot",
+        "front-crest",
+        "rear-panel",
+        "front-trim",
+        "ridge-cap"
+      ],
+      "acceptance": [
+        "Grazing light exposes intended bevels and grooves without noisy micro geometry.",
+        "The roof, slot, raven, braces, and base preserve their identity at normal gameplay distance.",
+        "Global and every critical form feature score at least 0.7."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Author semantic vertex-color zones, local wear, cavity response, and shared-atlas UV cells without embedded PBR maps.",
+      "componentRefs": [
+        "root",
+        "mailhouse-body",
+        "roof-shell",
+        "stone-plinth",
+        "post-collar",
+        "mail-slot",
+        "front-crest",
+        "rear-panel",
+        "side-badges",
+        "front-trim",
+        "ridge-cap"
+      ],
+      "acceptance": [
+        "COLOR_0 separates stone, timber, cobalt, gold, cavity, and raven families.",
+        "The shared atlas is external, neutral, cell-contained, and not reused as roughness or AO.",
+        "Neutral and grazing views prove non-flat form on Standard and Lambert-compatible materials.",
+        "Global and every critical material feature score at least 0.7."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Prove material and silhouette readability under neutral, grazing, dusk, Ultra, and mobile Low lighting.",
+      "componentRefs": [
+        "root",
+        "mailhouse-body",
+        "roof-shell",
+        "stone-plinth",
+        "mail-slot",
+        "front-crest"
+      ],
+      "acceptance": [
+        "Key, fill, rim, exposure, tone mapping, background, and contact shadow are recorded.",
+        "Cobalt, gold, timber, stone, and raven remain separable without AO, bloom, or dynamic shadows.",
+        "Global and every critical lighting feature score at least 0.7."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Validate sockets, front standing point, compound collider, static hierarchy, and runtime unread-effect attachment.",
+      "componentRefs": ["root", "rear-panel"],
+      "acceptance": [
+        "Socket_MailInteract is in front of and outside the collider.",
+        "Socket_UnreadGlow remains visible from the approach without creating a GLB light.",
+        "Socket_Ground stays at minY zero and all collision proxies fit within visual bounds.",
+        "Global and every critical interaction feature score at least 0.7."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Merge the accepted asset to one opaque and one metal primitive while meeting triangle, byte, preload, and Low-tier contracts.",
+      "componentRefs": [
+        "root",
+        "mailhouse-body",
+        "roof-shell",
+        "stone-plinth",
+        "post-collar",
+        "support-brackets",
+        "mail-slot",
+        "front-crest",
+        "rear-panel",
+        "side-badges",
+        "front-trim",
+        "ridge-cap"
+      ],
+      "acceptance": [
+        "The accepted output is 1,640 triangles, below the 1,800 target and 3,000 hard ceiling.",
+        "The shipping GLB is 32,884 bytes with two primitives, two materials, zero embedded textures, zero animations, and zero skins.",
+        "Serialized bounds are 1.65 by 1.05 by 2.9 yards, centered on X/Z and floor-seated.",
+        "Deterministic rebuild, source fingerprint, manifest, preload, and Low-tier tests pass.",
+        "No critical feature drops below 0.7 after optimization."
+      ]
+    }
+  ],
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision reviews matched reference and render sheets. Continue requires global score >= 0.7 and every selected critical feature >= 0.7.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.7,
+        "importantAverageThreshold": 0.7,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only identity-defining or high-risk systems visible in the full matched pair; never average away a failed critical feature."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong topology class or primitive family",
+      "wrong bounds or player scale",
+      "unmapped detail",
+      "missing attachment or socket",
+      "material contract contradicts shipping pipeline"
+    ],
+    "codeRefineTriggers": [
+      "spec is correct but geometry floats or intersects",
+      "slot lacks depth",
+      "Low loses semantic value grouping",
+      "triangle or draw budget exceeded",
+      "capture lighting hides the accepted form"
+    ],
+    "stopCriteria": [
+      "accepted fidelity and all shipping contracts are green",
+      "new reference is required to resolve a remaining identity-critical ambiguity"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "repository browser preview or in-game capture",
+      "fallbackCapture": "user-supplied screenshot path",
+      "minimumEvidence": "Matched render, comparison sheet, global score, five layer scores, and selected feature scores.",
+      "reviewPairRule": "Use the matching admitted view and consistent framing; multi-angle self-consistency remains mandatory.",
+      "acceptanceAuthority": "AI vision review with exact 0.7 global and critical-feature gates."
+    }
+  },
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": []
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "gabled mailbox silhouette and player scale",
+      "true mail-slot recess",
+      "original raven relief",
+      "cobalt roof-course rhythm",
+      "complete rear and underside",
+      "floor seating and gap-free attachments",
+      "Low-tier semantic value grouping"
+    ],
+    "niceToHave": [
+      "subtle non-repeating timber grain",
+      "restrained gold crest wear",
+      "future rear hinge metadata"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "front",
+      "right",
+      "rear-detail",
+      "left",
+      "front-three-quarter",
+      "rear-three-quarter",
+      "grazing"
+    ]
+  },
+  "reviewHistory": [
+    {
+      "timestamp": "2026-07-24T11:38:11.032425+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.74,
+      "aiVisionScore": 0.74,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.72,
+        "formDetail": 0.7,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "mailbox-silhouette",
+          "score": 0.76,
+          "visible": true,
+          "notes": "Gable, cabinet, single support, braces, and stepped base read clearly in the full matched pair."
+        }
+      ],
+      "action": "continue",
+      "summary": "Macro silhouette, gable, elevated cabinet, post, braces, and floor-seated footing meet the player-scale blockout contract.",
+      "matched": [
+        "Recognizable gabled mailbox silhouette",
+        "Elevated service body remains prop-scale beside the 2.6-yard player",
+        "Single post, diagonal supports, and stepped footing are grounded"
+      ],
+      "mismatches": [
+        "Blockout intentionally omits service-face relief, roof-course rhythm, and final material separation"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/blockout.png",
+        "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/blockout-comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+        "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/blockout.png",
+        "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/blockout-comparison.png",
+        "cameraView": "front-three-quarter",
+        "notes": "Full object, floor contact, roof apex, body depth, post, braces, and footing are visible in one matched pair.",
+        "aiVisionNotes": "The blockout preserves the reference hierarchy and player-readable service silhouette. It is deliberately undecorated; omitted slot, raven, roof courses, and final surfaces are assigned to later passes rather than averaged into this gate."
+      }
+    },
+    {
+      "timestamp": "2026-07-24T11:38:21.296931+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.77,
+        "formDetail": 0.73,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "roof-and-frame-system",
+          "score": 0.76,
+          "visible": true,
+          "notes": "Stepped cobalt roof mass, framed cabinet, and paired diagonal braces are visible and structurally legible."
+        },
+        {
+          "id": "grounded-attachments",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Body, support, braces, collar, and stone footing overlap cleanly with no visible floating contact."
+        }
+      ],
+      "action": "continue",
+      "summary": "The framed mailhouse, stepped roof courses, support assembly, and grounded stone base form a coherent complete structure.",
+      "matched": [
+        "Roof pitch, overhang, and course rhythm are established",
+        "Cabinet frame, post, braces, collar, and base meet without visible gaps",
+        "Side depth and rear-capable volume replace a facade-only shell"
+      ],
+      "mismatches": [
+        "The structural capture intentionally precedes the recessed slot, raven relief, badges, and final trim pass"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/structural.png",
+        "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/structural-pass-comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+        "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/structural.png",
+        "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/structural-pass-comparison.png",
+        "cameraView": "front-three-quarter",
+        "notes": "The shared pair exposes the roof/frame rhythm and all primary ground-to-body attachments.",
+        "aiVisionNotes": "The stage locks the load path and complete volume. Service-face ornament is absent by pass design and is reviewed only after form refinement."
+      }
+    },
+    {
+      "timestamp": "2026-07-24T11:38:32.506526+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.8,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "mailbox-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "The gabled cabinet, post, braces, and two-course base retain the accepted player-scale hierarchy."
+        },
+        {
+          "id": "mail-service-face",
+          "score": 0.77,
+          "visible": true,
+          "notes": "The dark cavity, gold frame, and faceted raven relief are distinct in the full reference/render pair."
+        },
+        {
+          "id": "roof-and-frame-system",
+          "score": 0.79,
+          "visible": true,
+          "notes": "Course rhythm, overhang, front frame, and structural brace system remain coherent after refinement."
+        }
+      ],
+      "action": "continue",
+      "summary": "Form refinement restores the identity-critical recessed slot, raven relief, gold trim, side accents, roof detail, and chamfered stone rhythm.",
+      "matched": [
+        "Mailbox silhouette remains proportional after detail is added",
+        "Mail slot reads as a framed recess rather than a painted mark",
+        "Raven cue, roof courses, trim, and stone steps remain legible at gameplay scale"
+      ],
+      "mismatches": [
+        "Procedural raven relief is more angular and restrained than the generated reference",
+        "Roof eave and facade trim use fewer ornamental facets for the MMO budget"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/form.png",
+        "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/form-refinement-comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+        "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/form.png",
+        "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/form-refinement-comparison.png",
+        "cameraView": "front-three-quarter",
+        "notes": "One full-object pair exposes the silhouette, service face, roof courses, structural frame, and base.",
+        "aiVisionNotes": "The shipping-oriented form keeps every identity cue while simplifying low-value ornament. The visible recess, silhouette breaks, and stepped construction carry the match without relying on tiny text or texture noise."
+      }
+    },
+    {
+      "timestamp": "2026-07-24T11:38:41.949053+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.81,
+        "formDetail": 0.8,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.78
+      },
+      "featureReviews": [
+        {
+          "id": "preset-material-read",
+          "score": 0.79,
+          "visible": true,
+          "notes": "Stone, timber, cobalt, gold, deep slot, and raven zones retain distinct values and material roles in the full-object pair."
+        }
+      ],
+      "action": "continue",
+      "summary": "Two export buckets preserve distinct cobalt, timber, stone, gold, cavity, and raven value families without embedded textures.",
+      "matched": [
+        "Cobalt roof remains the dominant color landmark",
+        "Warm timber, gray stone, gold hardware, and dark service-face cues remain separable",
+        "Faceted value changes and shared-atlas treatment avoid a uniform flat-plastic read"
+      ],
+      "mismatches": [
+        "Reference stone and painted-wood variation is richer",
+        "Shipping surface noise is intentionally restrained to preserve Low-tier clarity and shared-atlas reuse"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/material.png",
+        "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/material-pass-comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+        "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/stages/material.png",
+        "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/material-pass-comparison.png",
+        "cameraView": "front-three-quarter",
+        "notes": "Neutral staging exposes the complete palette and value grouping without bloom or scene-dependent effects.",
+        "aiVisionNotes": "The accepted implementation uses semantic vertex color, two merged material buckets, and the existing external Eastbrook atlas. It does not infer or embed PBR maps from the lit reference."
+      }
+    },
+    {
+      "timestamp": "2026-07-24T11:38:52.930419+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.81,
+        "formDetail": 0.8,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "preset-material-read",
+          "score": 0.8,
+          "visible": true,
+          "notes": "The neutral matched pair and recorded dusk/Low corroboration preserve every semantic material family without post-effect dependence."
+        }
+      ],
+      "action": "continue",
+      "summary": "Neutral, dusk, and Low look-development captures preserve silhouette, recess depth, and semantic value grouping without bloom-dependent identity.",
+      "matched": [
+        "Neutral light keeps roof courses, slot cavity, and brace contacts readable",
+        "Dusk retains cobalt, gold, stone, timber, and raven separation",
+        "Lambert-compatible Low retains the service landmark silhouette and front cue"
+      ],
+      "mismatches": [
+        "The generated sheet uses softer studio fill and stronger painted-edge highlights than the deterministic game-oriented capture"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev/neutral.png",
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev/dusk.png",
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev/low.png",
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev-contact.png",
+        "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/lighting-pass-comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+        "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev/neutral.png",
+        "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/lighting-pass-comparison.png",
+        "cameraView": "front-three-quarter-neutral",
+        "notes": "The scored pair is neutral; the evidence list records same-output dusk and Low corroboration.",
+        "aiVisionNotes": "Broad neutral illumination shows the authored facets and contacts; companion dusk and Lambert-compatible Low captures prove that the identity does not depend on AO, bloom, subtle PBR, or dynamic shadows."
+      }
+    },
+    {
+      "timestamp": "2026-07-24T11:39:08.171280+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.83,
+      "aiVisionScore": 0.83,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.82,
+        "formDetail": 0.8,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "grounded-attachments",
+          "score": 0.82,
+          "visible": true,
+          "notes": "Player-scale capture clearly shows floor contact and gap-free base, post, brace, and body assembly."
+        },
+        {
+          "id": "socket-collider-contract",
+          "visible": false,
+          "notes": "Semantic sockets and collider proxies are intentionally non-rendered and are verified from authored metadata and focused tests, not assigned a visual score."
+        }
+      ],
+      "action": "continue",
+      "summary": "Player-scale evidence confirms a readable approach face, floor seating, and clear space around the support assembly.",
+      "matched": [
+        "The mail slot sits at a readable service height relative to the 2.6-yard rig",
+        "Footing is visibly floor-seated",
+        "Front approach remains outside the narrow visual footprint"
+      ],
+      "mismatches": [
+        "Socket and compound-collider metadata are non-rendered contracts and therefore remain test/spec evidence rather than inferred pixels"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev/player-scale.png",
+        "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/interaction-pass-comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+        "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-lookdev/player-scale.png",
+        "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/interaction-pass-comparison.png",
+        "cameraView": "player-scale-front-three-quarter",
+        "notes": "The full asset and player rig share one grounded frame, exposing approach height and footprint.",
+        "aiVisionNotes": "The rig comparison validates scale, front readability, and grounding. Non-visual interaction metadata is deliberately not fabricated as an image-derived score."
+      }
+    },
+    {
+      "timestamp": "2026-07-24T11:39:23.658866+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.83,
+        "formDetail": 0.82,
+        "materialSurface": 0.81,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "complete-multi-angle-volume",
+          "score": 0.83,
+          "visible": true,
+          "notes": "The reviewed contact evidence exposes front, right, rear, left, three-quarter, grazing, roof, and underside construction on the optimized output."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": false,
+          "notes": "Budget acceptance is numeric inspector/build evidence: 1,640 triangles, 2 primitives, 2 materials, 32,884 bytes, zero embedded textures, animations, and skins."
+        }
+      ],
+      "action": "continue",
+      "summary": "The optimized two-primitive shipping GLB preserves complete multi-angle construction and all identity-critical cues within the measured asset budget.",
+      "matched": [
+        "Front, sides, rear, roof, underside, braces, and floor contact survive optimization",
+        "Optimized and raw silhouettes are visually equivalent",
+        "Service face, cobalt roof, stone foot, and gold accents remain readable on the shipping output"
+      ],
+      "mismatches": [
+        "Shipping model uses fewer decorative roof and facade facets than the generated turnaround",
+        "Fine painted wear remains atlas/vertex-color detail rather than micro geometry"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/reference-vs-optimized-contact.png",
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/optimized-contact.png",
+        "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/raw-contact.png",
+        "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/optimization-pass-comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+        "renderScreenshot": "docs/screenshots/eastbrook-vale-rebuild/polish/assets/ravenpost-mailbox/reference-vs-optimized-contact.png",
+        "comparisonImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reviews/optimization-pass-comparison.png",
+        "cameraView": "multi-angle-contact",
+        "notes": "The single reviewed contact artifact contains the complete accepted multi-angle optimized set.",
+        "aiVisionNotes": "The optimized contact evidence remains coherent from every required angle and at grazing incidence. Simplification is concentrated in secondary ornament, not silhouette, service identity, or grounding."
+      }
+    }
+  ],
+  "risks": [
+    "Generated panels may disagree on tiny fastener placement; the front view and this fixed component contract are canonical.",
+    "Baked studio highlights are not exact PBR evidence; only palette families and visible relief are admitted."
+  ],
+  "assumptions": [
+    "One model unit equals one world yard.",
+    "Runtime preserves the existing mailbox interaction and unread-state behavior.",
+    "The Eastbrook shared atlas and vertex-color pipeline remain available on every graphics tier."
+  ]
+}

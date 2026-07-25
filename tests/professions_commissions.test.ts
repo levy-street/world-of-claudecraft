@@ -105,7 +105,7 @@ function standInWilds(sim: Sim, pid: number): void {
   const e = sim.ctx.entities.get(pid)!;
   e.pos.x = 99999;
   e.pos.z = 99999;
-  expect(isAtAnyStation(e.pos)).toBe(false);
+  expect(isAtAnyStation(STATIONS, e.pos)).toBe(false);
 }
 
 function setCopper(sim: Sim, pid: number, c: number): void {
@@ -480,7 +480,7 @@ describe('unbind fee ladder (the resolved tier-scaled ruling)', () => {
     standAtStation(sim, pid);
     setCopper(sim, pid, 50000);
     const r = sim.ctx.resolve(pid)!;
-    const result = resolveUnbind(r.meta, r.e.pos, SWORD);
+    const result = resolveUnbind(STATIONS, r.meta, r.e.pos, SWORD);
     expect(result.ok).toBe(true);
     expect(result.fee).toBe(2500); // the common-def sword, not the epic payload
   });
@@ -1092,7 +1092,7 @@ describe('bound holder lifecycle: every non-transfer right survives the bond', (
     mintBound(sim, pid);
     sim.equipItem(SWORD, pid);
     setCopper(sim, pid, 50000);
-    const result = resolveUnbind(meta, STATIONS[0].pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, STATIONS[0].pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_not_bound' });
     expect(copperOf(sim, pid)).toBe(50000);
   });
@@ -1323,7 +1323,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);
     standInWilds(sim, pid);
     setCopper(sim, pid, 0);
-    const result = resolveUnbind(meta, sim.ctx.entities.get(pid)!.pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, sim.ctx.entities.get(pid)!.pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_out_of_range', fee: 2500 });
   });
 
@@ -1333,7 +1333,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     const meta = sim.players.get(pid)!;
     sim.addItem(POTION, 1, pid);
     setCopper(sim, pid, 50000);
-    const result = resolveUnbind(meta, STATIONS[0].pos, POTION);
+    const result = resolveUnbind(STATIONS, meta, STATIONS[0].pos, POTION);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_not_eligible' });
   });
 
@@ -1342,7 +1342,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     const pid = sim.playerId;
     const meta = sim.players.get(pid)!;
     setCopper(sim, pid, 50000);
-    const result = resolveUnbind(meta, STATIONS[0].pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, STATIONS[0].pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_not_bound' });
   });
 
@@ -1360,7 +1360,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     expect(strictlyInsideAny, 'the edge probe sits on the boundary, not inside a neighbor').toBe(
       false,
     );
-    expect(isAtAnyStation(atEdge)).toBe(true);
+    expect(isAtAnyStation(STATIONS, atEdge)).toBe(true);
 
     const beyond = [
       { dx: 1, dz: 0 },
@@ -1380,7 +1380,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
         }),
       );
     expect(beyond, 'a just-beyond probe position clear of every station').toBeDefined();
-    expect(isAtAnyStation(beyond!)).toBe(false);
+    expect(isAtAnyStation(STATIONS, beyond!)).toBe(false);
   });
 
   it('an ACTIVE mobile station under the player never satisfies the unbind gate', () => {
@@ -1390,13 +1390,13 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     const p = sim.ctx.entities.get(pid)!;
     p.pos.x = 0;
     p.pos.z = 150;
-    expect(isAtAnyStation(p.pos)).toBe(false);
+    expect(isAtAnyStation(STATIONS, p.pos)).toBe(false);
     meta.craftSkills.alchemy = 75; // specialized: mobile placement is gated on it
     setCopper(sim, pid, 50000);
     sim.placeMobileStation('alchemy', pid);
     expect(meta.mobileStation?.craftId).toBe('alchemy');
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);
-    const result = resolveUnbind(meta, p.pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, p.pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_out_of_range' });
     expect(copperOf(sim, pid)).toBe(50000);
   });

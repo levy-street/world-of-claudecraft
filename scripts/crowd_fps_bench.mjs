@@ -26,6 +26,7 @@ import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { evaluateCrowdRun, parseCeilingEnv } from './lib/bench_gate.mjs';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 // Stream every sampled row to a file immediately, so a kill/timeout (the render
 // client + dozens of bots can outrun a foreground budget) never loses results.
@@ -132,7 +133,7 @@ class Bot {
       this.ws = new WebSocket(`${WS_BASE}/ws`, { headers: { 'X-Forwarded-For': xff } });
       const to = setTimeout(() => reject(new Error('join timeout')), 12000);
       this.ws.on('open', () =>
-        this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId })),
+        this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId))),
       );
       this.ws.on('message', (data) => {
         const msg = JSON.parse(String(data));

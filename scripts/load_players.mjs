@@ -14,6 +14,7 @@
 import { randomBytes } from 'node:crypto';
 import pg from 'pg';
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 try {
   process.loadEnvFile?.();
@@ -275,7 +276,7 @@ class LoadBot {
         ws.close();
       }, 10_000);
       ws.on('open', () => {
-        ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.characterId }));
+        ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));
       });
       ws.on('message', (buf) => {
         let msg;

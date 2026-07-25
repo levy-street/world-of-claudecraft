@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "id": "eastbrook-surface-atlas",
+  "source": {
+    "path": "docs/screenshots/eastbrook-vale-rebuild/materials/eastbrook-surface-atlas-source.png",
+    "sha256": "abec3036f8887e9c94972dab52aea664f18a74696db6b6d24cc48a4cfbe22b7d",
+    "width": 1254,
+    "height": 1254,
+    "format": "png"
+  },
+  "shipping": {
+    "path": "public/textures/eastbrook_surface_atlas.webp",
+    "url": "/textures/eastbrook_surface_atlas.webp",
+    "sha256": "d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b",
+    "width": 512,
+    "height": 512,
+    "format": "webp",
+    "byteCeiling": 262144
+  },
+  "preview": {
+    "path": "docs/screenshots/eastbrook-vale-rebuild/materials/eastbrook-surface-atlas-comparison.png",
+    "sha256": "ea6ba64e200f305f079cc858a4daf5d28dc8c240acd83895729237c521d26576",
+    "width": 1072,
+    "height": 544,
+    "format": "png"
+  },
+  "usage": {
+    "role": "high-key-grayscale-detail-multiplier",
+    "colorSpace": "none",
+    "paletteAuthority": "vertex-color",
+    "channelRange": [192, 255],
+    "embeddedInGlbs": false
+  },
+  "processing": {
+    "grid": {
+      "columns": 4,
+      "rows": 4,
+      "sourceInsetPixels": 2,
+      "partition": "rounded-equal-quarters"
+    },
+    "outputCellPixels": 128,
+    "luminance": {
+      "red": 54,
+      "green": 183,
+      "blue": 19,
+      "divisor": 256
+    },
+    "normalization": {
+      "lowPercentile": 0.02,
+      "highPercentile": 0.98,
+      "outputMin": 192,
+      "outputMax": 255
+    },
+    "resizeKernel": "lanczos3",
+    "webp": {
+      "lossless": true,
+      "effort": 6
+    }
+  },
+  "semantics": [
+    {
+      "index": 0,
+      "id": "dark-stone-blocks",
+      "row": 0,
+      "column": 0,
+      "centerUvTopLeft": [0.125, 0.125],
+      "centerUvBottomLeft": [0.125, 0.875]
+    },
+    {
+      "index": 1,
+      "id": "light-stone-blocks",
+      "row": 0,
+      "column": 1,
+      "centerUvTopLeft": [0.375, 0.125],
+      "centerUvBottomLeft": [0.375, 0.875]
+    },
+    {
+      "index": 2,
+      "id": "warm-plaster",
+      "row": 0,
+      "column": 2,
+      "centerUvTopLeft": [0.625, 0.125],
+      "centerUvBottomLeft": [0.625, 0.875]
+    },
+    {
+      "index": 3,
+      "id": "vertical-dark-timber",
+      "row": 0,
+      "column": 3,
+      "centerUvTopLeft": [0.875, 0.125],
+      "centerUvBottomLeft": [0.875, 0.875]
+    },
+    {
+      "index": 4,
+      "id": "cobalt-roof-shingles",
+      "row": 1,
+      "column": 0,
+      "centerUvTopLeft": [0.125, 0.375],
+      "centerUvBottomLeft": [0.125, 0.625]
+    },
+    {
+      "index": 5,
+      "id": "dark-forged-metal",
+      "row": 1,
+      "column": 1,
+      "centerUvTopLeft": [0.375, 0.375],
+      "centerUvBottomLeft": [0.375, 0.625]
+    },
+    {
+      "index": 6,
+      "id": "warm-gold-metal",
+      "row": 1,
+      "column": 2,
+      "centerUvTopLeft": [0.625, 0.375],
+      "centerUvBottomLeft": [0.625, 0.625]
+    },
+    {
+      "index": 7,
+      "id": "horizontal-warm-timber",
+      "row": 1,
+      "column": 3,
+      "centerUvTopLeft": [0.875, 0.375],
+      "centerUvBottomLeft": [0.875, 0.625]
+    },
+    {
+      "index": 8,
+      "id": "blue-cream-canvas",
+      "row": 2,
+      "column": 0,
+      "centerUvTopLeft": [0.125, 0.625],
+      "centerUvBottomLeft": [0.125, 0.375]
+    },
+    {
+      "index": 9,
+      "id": "red-cream-canvas",
+      "row": 2,
+      "column": 1,
+      "centerUvTopLeft": [0.375, 0.625],
+      "centerUvBottomLeft": [0.375, 0.375]
+    },
+    {
+      "index": 10,
+      "id": "dark-brown-leather",
+      "row": 2,
+      "column": 2,
+      "centerUvTopLeft": [0.625, 0.625],
+      "centerUvBottomLeft": [0.625, 0.375]
+    },
+    {
+      "index": 11,
+      "id": "irregular-dark-stone",
+      "row": 2,
+      "column": 3,
+      "centerUvTopLeft": [0.875, 0.625],
+      "centerUvBottomLeft": [0.875, 0.375]
+    },
+    {
+      "index": 12,
+      "id": "cyan-crystal",
+      "row": 3,
+      "column": 0,
+      "centerUvTopLeft": [0.125, 0.875],
+      "centerUvBottomLeft": [0.125, 0.125]
+    },
+    {
+      "index": 13,
+      "id": "cobalt-painted-planks",
+      "row": 3,
+      "column": 1,
+      "centerUvTopLeft": [0.375, 0.875],
+      "centerUvBottomLeft": [0.375, 0.125]
+    },
+    {
+      "index": 14,
+      "id": "light-gray-stone",
+      "row": 3,
+      "column": 2,
+      "centerUvTopLeft": [0.625, 0.875],
+      "centerUvBottomLeft": [0.625, 0.125]
+    },
+    {
+      "index": 15,
+      "id": "medium-gray-stone",
+      "row": 3,
+      "column": 3,
+      "centerUvTopLeft": [0.875, 0.875],
+      "centerUvBottomLeft": [0.875, 0.125]
+    }
+  ]
+}

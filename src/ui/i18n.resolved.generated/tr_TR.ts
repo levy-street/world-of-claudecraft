@@ -38,6 +38,14 @@ export const tr_TR: EnTranslations = {
     "filterLabel": "Komutları filtrele",
     "filterPlaceholder": "Bu kategoride ara",
     "noMatches": "Eşleşen komut yok.",
+    "itemSearchPlaceholder": "Ada veya kimliğe göre ara",
+    "itemResultsAria": "Eşleşen öğeler",
+    "itemNoMatches": "Eşleşen öğe yok.",
+    "itemMore": "{total} sonuçtan {shown} tanesi gösteriliyor. Daraltmak için yazmaya devam edin.",
+    "itemChosen": "Seçildi: {name}",
+    "itemUnknown": "O kimliğe sahip öğe yok.",
+    "itemHeroicTag": "Kahramanca",
+    "kitCurrentSpec": "Mevcut uzmanlık",
     "serverRequirement": "Sunucu hileleri için yine de ALLOW_DEV_COMMANDS=1 gerekir.",
     "invalidValues": "Bu komutu çalıştırmadan önce geçerli değerler seç.",
     "sent": "Gönderildi: {command}",
@@ -55,7 +63,8 @@ export const tr_TR: EnTranslations = {
       "z": "Z",
       "dungeon": "Zindan",
       "difficulty": "Zorluk",
-      "name": "Ad"
+      "name": "Ad",
+      "spec": "Uzmanlık"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const tr_TR: EnTranslations = {
       "give": {
         "label": "Öğe ver",
         "description": "Oyuncu envanterine bir öğe ekle."
+      },
+      "kit": {
+        "label": "Taze 20 takımını kuşan",
+        "description": "Uzmanlık için Sanctum öncesi 20. seviye setini kuşandır, önce çantalara. Yalnızca teçhizat."
       },
       "gold": {
         "label": "Altın ekle",
@@ -1049,6 +1062,7 @@ export const tr_TR: EnTranslations = {
       "walkByAutoloot": "Yanından Geçerken Otomatik Yağma",
       "groundReticle": "Yer hedefleme halkası",
       "mouseoverCast": "Grup Çerçevelerinde İmleçle Büyü Yapma",
+      "stickyTarget": "Yere Tıklayınca Hedefi Koru",
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
@@ -1461,8 +1475,8 @@ export const tr_TR: EnTranslations = {
         "claw": "Pençe",
         "horn": "Boynuz",
         "tusk": "Azı Dişi",
-        "meat": "Meat",
-        "cloth": "Cloth"
+        "meat": "Et",
+        "cloth": "Kumaş"
       }
     },
     "townFocus": {
@@ -1529,6 +1543,8 @@ export const tr_TR: EnTranslations = {
       "dragDestroyHint": "Yok etmek için dünyaya sürükle",
       "reorderNeedsRecent": "Çantalarını yeniden düzenlemek için filtreyi temizle ve Son Eklenen sıralama seçeneğini kullan",
       "itemAriaInstanced": "{item}, adet {count}, ustaişareti kopyası",
+      "itemAriaEnchanted": "{item}, adet {count}, büyülü kopya",
+      "itemAriaBound": "{item}, adet {count}, bağlı kopya",
       "itemAriaMasterwork": "{item}, adet {count}, şaheser",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
@@ -1753,7 +1769,19 @@ export const tr_TR: EnTranslations = {
       "label": "Çerçeve Konumlarını Sıfırla"
     },
     "itemTooltip": {
-      "requiresLevel": "Gereken Seviye {level}"
+      "requiresLevel": "Gereken Seviye {level}",
+      "statEnchanted": "+{value} {stat} (Büyülü)",
+      "enchantedFallback": "Büyülü"
+    },
+    "materialHint": {
+      "arcaneDust": "Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.",
+      "arcaneEssence": "Nadir eşyalardan büyü bozularak elde edilen büyü malzemesi.",
+      "arcaneShard": "Destansı ve efsanevi eşyalardan büyü bozularak elde edilen büyü malzemesi.",
+      "resonantThread": "Nadir ve üstü kumaş zırhlardan büyü bozularak elde edilen büyü malzemesi.",
+      "resonantHide": "Nadir ve üstü deri zırhlardan büyü bozularak elde edilen büyü malzemesi.",
+      "resonantLinks": "Nadir ve üstü zincir zırhlardan büyü bozularak elde edilen büyü malzemesi.",
+      "resonantSteel": "Nadir ve üstü yakın dövüş silahlarından büyü bozularak elde edilen büyü malzemesi.",
+      "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi."
     },
     "discord": {
       "title": "Discord",
@@ -1994,6 +2022,13 @@ export const tr_TR: EnTranslations = {
         "takeParcelsFirst": "Mektubu atmadan önce paketleri çıkar."
       }
     },
+    "marketIndicator": {
+      "aria": "Dünya Pazarı toplaması bekliyor",
+      "tip": "Tüccar'da senin için bekleyen altın ya da eşyalar var."
+    },
+    "noticeboard": {
+      "empty": "Görünüşe göre hiçbir şey asılmamış."
+    },
     "bank": {
       "title": "Banka",
       "subtitle": "Yaldızlı Kasa",
@@ -2110,7 +2145,19 @@ export const tr_TR: EnTranslations = {
       "onlineHeader": "Çevrimiçi ({n})",
       "offlineHeader": "Çevrimdışı ({n})",
       "hideOffline": "Çevrimdışıları gizle",
-      "hideOfflineTitle": "Çevrimdışı lonca üyelerini gizle"
+      "hideOfflineTitle": "Çevrimdışı lonca üyelerini gizle",
+      "billboard": {
+        "label": "Lonca Panosu",
+        "empty": "Panoda henüz bir şey yok.",
+        "setBy": "Ayarlayan: {name}",
+        "save": "Kaydet",
+        "placeholder": "Lonca için bir mesaj yaz",
+        "inputLabel": "Lonca panosu mesajı",
+        "result": {
+          "set": "Lonca panosu güncellendi.",
+          "notOfficer": "Panoyu yalnızca subaylar ve Lonca Üstadı düzenleyebilir."
+        }
+      }
     },
     "gathering": {
       "title": "Toplama",
@@ -2135,9 +2182,9 @@ export const tr_TR: EnTranslations = {
         "herbalism": "{tier}. kademe bitkicilik orakı gerektirir"
       },
       "requiresTool": {
-        "mining": "Requires a mining pick",
-        "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle"
+        "mining": "Madenci kazması gerektirir",
+        "logging": "Oduncu baltası gerektirir",
+        "herbalism": "Otçu orağı gerektirir"
       },
       "toolTierUnmet": {
         "mining": "Bu damarı işlemek için {tier}. kademe madenci kazmasına ihtiyacınız var.",
@@ -2145,39 +2192,39 @@ export const tr_TR: EnTranslations = {
         "herbalism": "Bu tarlayı toplamak için {tier}. kademe bitkicilik orakına ihtiyacınız var."
       },
       "toolRequired": {
-        "mining": "You need a mining pick to harvest this vein.",
-        "logging": "You need a logging axe to fell this stand.",
-        "herbalism": "You need a herbalism sickle to gather this patch.",
-        "fishing": "You need a fishing pole to cast a line."
+        "mining": "Bu cevher damarını kazmak için bir madenci kazmasına ihtiyacınız var.",
+        "logging": "Bu ağaç kümesini devirmek için bir oduncu baltasına ihtiyacınız var.",
+        "herbalism": "Bu ot öbeğini toplamak için bir otçu orağına ihtiyacınız var.",
+        "fishing": "Balık tutmak için bir olta kamışına ihtiyacınız var."
       },
       "noNodeNearby": {
-        "mining": "There is no ore vein within reach.",
-        "logging": "There is no timber stand within reach.",
-        "herbalism": "There is no herb patch within reach."
+        "mining": "Erişebileceğiniz bir cevher damarı yok.",
+        "logging": "Erişebileceğiniz bir ağaç kümesi yok.",
+        "herbalism": "Erişebileceğiniz bir ot öbeği yok."
       },
       "toolTierUnmetCorpse": "En iyi malzemeleri kurtarmak için {tier}. kademe toplama aracına ihtiyacınız var.",
       "toolTooltip": {
         "kind": {
-          "mining": "Mining tool (tier {tier})",
-          "logging": "Logging tool (tier {tier})",
-          "herbalism": "Herbalism tool (tier {tier})",
-          "fishing": "Fishing rod (tier {tier})"
+          "mining": "Madencilik aleti (kademe {tier})",
+          "logging": "Odun kesimi aleti (kademe {tier})",
+          "herbalism": "Otçuluk aleti (kademe {tier})",
+          "fishing": "Olta kamışı (kademe {tier})"
         },
         "unlocks": {
-          "mining": "Required to mine ore veins up to tier {tier}.",
-          "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "mining": "Kademe {tier} ve altındaki cevher damarlarını kazmak için gereklidir.",
+          "logging": "Kademe {tier} ve altındaki ağaç kümelerini devirmek için gereklidir.",
+          "herbalism": "Kademe {tier} ve altındaki ot öbeklerini toplamak için gereklidir."
         },
         "use": {
-          "mining": "Use: Mine a nearby ore vein.",
-          "logging": "Use: Fell a nearby timber stand.",
-          "herbalism": "Use: Gather from a nearby herb patch."
+          "mining": "Kullanım: Yakındaki bir cevher damarını kazar.",
+          "logging": "Kullanım: Yakındaki bir ağaç kümesini devirir.",
+          "herbalism": "Kullanım: Yakındaki bir ot öbeğini toplar."
         },
-        "speed": "Gathers faster at nodes below tier {tier}.",
-        "rodRequired": "Required to fish.",
-        "rodBite": "Fish bite up to {seconds}s sooner.",
-        "rodReel": "Extends the reel window by {seconds}s.",
-        "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
+        "speed": "Kademe {tier} altındaki düğümlerde daha hızlı toplar.",
+        "rodRequired": "Balık tutmak için gereklidir.",
+        "rodBite": "Balıklar {seconds} sn'ye kadar daha erken oltaya vurur.",
+        "rodReel": "Olta çekme süresini {seconds} sn uzatır.",
+        "rodBand": "Balıkçılık becerisi {skill} ve üzerinde daha zengin av listelerinin kilidini açar."
       },
       "downgradeMark": "Çantalar dolu: bulgu, toplayıcı işareti olmadan saklandı.",
       "downgradeFind": "Çantalar dolu: pırıl pırıl bir bulgu kayboldu gitti.",
@@ -2354,7 +2401,7 @@ export const tr_TR: EnTranslations = {
       },
       "throttled": "Çok hızlı üretiyorsun. Bir an bekle ve tekrar dene.",
       "recipeNotLearned": "Bu tarifi henüz öğrenmedin.",
-      "noBagSpace": "You do not have room for the crafted item.",
+      "noBagSpace": "Çantanızda üretilen eşya için yer yok.",
       "skillReqLine": "{craft} {skill} gerektirir",
       "difficultyFull": "Tam beceri kazanımı",
       "difficultyReduced": "Azaltılmış beceri kazanımı",
@@ -2380,7 +2427,6 @@ export const tr_TR: EnTranslations = {
       "makersMark": "{name} tarafından hazırlanmıştır",
       "gatheredBy": "{name} tarafından toplandı",
       "masterworkSeal": "Şaheser",
-      "enchantedLine": "Büyülü",
       "commissionToggle": "Sipariş parçası",
       "commissionToggleHint": "Ticaret yoluyla alan ilk karaktere bağlanır.",
       "commissionUnbound": "Sipariş parçası: ilk alıcıya bağlanır",
@@ -2406,9 +2452,9 @@ export const tr_TR: EnTranslations = {
       "enchantWrongSlot": "Bu büyü o eşyaya uygulanamaz.",
       "enchantUnknown": "O büyü mevcut değil.",
       "enchantInsufficient": "O büyü için malzemeniz yok.",
-      "disenchantNoSpace": "You do not have room for the arcane materials.",
-      "salvageNoSpace": "You do not have room for the salvaged materials.",
-      "enchantNoSpace": "You do not have room for the enchanted item.",
+      "disenchantNoSpace": "Çantanızda gizemli malzemeler için yer yok.",
+      "salvageNoSpace": "Çantanızda parçalamadan çıkan malzemeler için yer yok.",
+      "enchantNoSpace": "Çantanızda büyülü eşya için yer yok.",
       "disenchantConfirmTitle": "{item} büyüsü bozulsun mu?",
       "disenchantConfirmBody": "{item} yok edilir ve arkanik malzeme verir. Bu geri alınamaz.",
       "disenchantConfirmBodySpecial": "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve arkanik malzeme verir. Bu geri alınamaz.",
@@ -2418,7 +2464,26 @@ export const tr_TR: EnTranslations = {
       "pickerTitle": "Büyü Uygula",
       "targetTitle": "Büyülenecek eşya seçin",
       "noEnchants": "Hiçbir büyü bu malzemeyi kullanmıyor.",
-      "noTargets": "Büyülenecek uygun eşya yok."
+      "noTargets": "Büyülenecek uygun eşya yok.",
+      "wornTag": "Kuşanılı ({slot})",
+      "tier": {
+        "base": "Temel Büyüler",
+        "runed": "Runlu Büyüler",
+        "greater": "Daha İyi Büyüler"
+      },
+      "yieldHeader": "Beklenen malzemeler:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} ile {max} arası {item}",
+      "alreadyEnchanted": "O eşya zaten büyülü.",
+      "sameEnchant": "O eşyada zaten bu büyü var.",
+      "replaceTag": "{enchant} yerine geçer",
+      "sameEnchantTag": "Zaten uygulandı",
+      "replaceConfirmTitle": "{item} üzerindeki büyü değiştirilsin mi?",
+      "replaceConfirmBody": "{item} üzerindeki {old} büyüsü {new} ile değiştirilir.",
+      "replaceConfirmNoRefund": "Eski büyü yok edilir. Malzemeleri iade edilmez. Bu geri alınamaz.",
+      "replaceConfirmCost": "Maliyet: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Değiştir"
     },
     "training": {
       "title": "Eğitim: {name}",
@@ -2428,10 +2493,10 @@ export const tr_TR: EnTranslations = {
       "stateKnown": "Bilinen",
       "stateTeachable": "Mevcut",
       "stateLocked": "Kilitli",
-      "statePending": "Learning",
+      "statePending": "Öğreniliyor",
       "requirement": "{craft} {skill}'da okudu",
       "trainAria": "{fee} için {name}'yi öğrenin",
-      "pendingAria": "Learning {name}",
+      "pendingAria": "{name} öğreniliyor",
       "dialogOption": "Eğitim",
       "dialogOptionAria": "{name}'deki eğitime göz atın",
       "learned": "Öğrenilen tarif: {recipe}",
@@ -2459,7 +2524,7 @@ export const tr_TR: EnTranslations = {
       "notBound": "O eşya bağlı değil.",
       "cannotAfford": "Çözüm ücretini karşılayamazsınız.",
       "outOfRange": "Bağ çözmek için bir zanaat tezgahında olmanız gerekir.",
-      "noSpace": "You do not have room for the unbound copy."
+      "noSpace": "Çantanızda bağı çözülmüş kopya için yer yok."
     },
     "finder": {
       "title": "Zindan Bulucu",
@@ -3816,7 +3881,7 @@ export const tr_TR: EnTranslations = {
           "levelingHeading": "Büyüleme nasıl seviye kazanır",
           "levelingBody": "İki eylem beceriyi hareket ettirir: bir parça büyüsünü bozmak ve büyü uygulamak. Her başarı, işin ciddiyetine göre ölçeklenen en fazla bir puana değer: kırdığınız parçanın nadirliği veya uyguladığınız büyünün bileşen kademesi. Sıradan büyü bozmaları ve yalnızca toz içeren büyüler sıradan iş olarak sayılır; sıradan dışı büyü bozmaları ve öz büyüler sıradan dışı olarak; nadir büyü bozmaları ve her Runeli veya Gelişmiş büyü nadir olarak; destansı ve efsanevi büyü bozmaları daha da yüksek olarak sayılır.\n\nTanıdık ustalık solması 25 puanlı kademelerde uygulanır; sıradan kalite iş beceri 75'te griye döner, sıradan dışı iş 100'de ve nadir kademeli iş tam olarak 125 tavanında. Büyülemenin kendine özgü bir lütfu da vardır: arketip tavanınızın üzerindeki girdi sıfırlanmak yerine o tavana yuvarlanır; dolayısıyla uyum sağlamadan önce destansı bir büyü bozma yalnızca nadir olarak sayılır, hiçbir şey öğretmez demez. Büyüleme başka bir kimliğin ardında eylemsiz kalırsa, her şey sıradan iş olarak sayılır ve tırmanış 75'te durakslar; hobi olarak tutarsanız nadir kademeli iş yine öder, sadece 75 sonrasında daha yavaş.",
           "marketHeading": "Büyülenmiş kopyalar, köken ve pazar",
-          "marketBody": "Bir büyü uygulamak, çantalanmış ve takılı olmayan bir eşya kopyası ile bileşenleri tüketir ve karşılığında ayrı bir büyülenmiş kopya teslim eder; onu takın ve bonus o parçayı takılmadan çıkarmalar, banka gezileri ve takas yoluyla sonsuza kadar izler. Parça başına bir büyü: büyülenmiş bir kopya bir daha büyülenemez ya da büyüsü bozulamaz; satmak, atmak ve büyü bozmak sade kopyaları önce tercih eder, bu yüzden bitmiş parçanız kazara yutulmaz. Aynı şekilde büyülenmiş kopyalar hatta çantalarınızda bir arada yığılabilir.\n\nŞaheser teçhizat ve büyüleme dosttur: şaheser bir parça tamamen büyülenebilir kalır ve büyü, şaheser bonusunu veya yapımcının imzasını bozmadan üstüne eklenir. Her kaynağı yığarak, Gelişmiş büyü taşıyan imzalı bir şaheser, üretilmiş bir parçanın ulaşabileceği en iyisidir; ve yine de tasarım gereği akın ganimetinin altında kalır.\n\nPazarda Dünya Pazarı yalnızca sade, değiştirilmemiş stoğu aracılık eder; bu yüzden büyülenmiş ve imzalı parçalar takas penceresi aracılığıyla yüz yüze el değiştirir. Malzemeler zanaatın pazarlanabilir yarısıdır: Toz, Öz ve Parçalar serbestçe listelenir, listeleme ücretsizdir ve Satıcı yalnızca tamamlanan satışın yüzde 5'ini alır. Bu, iki klasik büyücü gelirini oluşturur: pazarda malzeme satmak ve bir müşterinin parçasını takasla alıp büyüleyerek geri vermek."
+          "marketBody": "Bir büyü uygulamak bileşenleri tüketir ve eşyanın belirli bir kopyasını işaretler. Çantadaki bir kopyaya uygularsanız ayrı bir büyülenmiş kopya alırsınız; zaten takılı bir parçaya uygularsanız parça yerinde büyülenir, çıkarıp yeniden takmak gerekmez. Her iki durumda da bonus o parçayı çıkarmalar, banka gezileri ve takaslar boyunca sonsuza kadar izler. Parça başına bir büyü: büyülenmiş bir kopyaya farklı bir büyü uygulamak önce onay ister, sonra eski büyüyü doğrudan değiştirir; eski büyü, malzemeleri iade edilmeden yok edilir. Satmak, atmak ve büyü bozmak sade kopyaları önce tercih eder, bu yüzden bitmiş parçanız kazara yutulmaz. Aynı şekilde büyülenmiş kopyalar hatta çantalarınızda bir arada yığılabilir.\n\nŞaheser teçhizat ve büyüleme dosttur: şaheser bir parça tamamen büyülenebilir kalır ve büyü, şaheser bonusunu veya yapımcının imzasını bozmadan üstüne eklenir. Her kaynağı yığarak, Gelişmiş büyü taşıyan imzalı bir şaheser, üretilmiş bir parçanın ulaşabileceği en iyisidir; ve yine de tasarım gereği akın ganimetinin altında kalır.\n\nPazarda Dünya Pazarı yalnızca sade, değiştirilmemiş stoğu aracılık eder; bu yüzden büyülenmiş ve imzalı parçalar takas penceresi aracılığıyla yüz yüze el değiştirir. Malzemeler zanaatın pazarlanabilir yarısıdır: Toz, Öz ve Parçalar serbestçe listelenir, listeleme ücretsizdir ve Satıcı yalnızca tamamlanan satışın yüzde 5'ini alır. Bu, iki klasik büyücü gelirini oluşturur: pazarda malzeme satmak ve bir müşterinin parçasını takasla alıp büyüleyerek geri vermek."
         }
       },
       "howHeading": "Üretim nasıl çalışır",
@@ -3855,9 +3920,9 @@ export const tr_TR: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Madencilik cevheri doğrudan dünyanın kayasından çıkarır: Doğudere Vadisi'nde bakır, Mirefen Bataklığı'nda demir ve Dikenzirve Yükseklikleri'nde osmiyum; ocak zanaat dallarını besler. 1. seviyeden itibaren herkese açık, hiçbir engel yok, 100 tavanına kadar kendi sayacında takip edilir.",
-        "logging": "Odun Kesimi her üç bölgedeki ağaç kümelerinden kereste keser: Doğudere Vadisi'nde demir kabuklular, Mirefen Bataklığı'nda dişbudak ve Dikenzirve Yükseklikleri'nde yüksekçam; sap, asa ve mühendis tezgahı için ham malzeme. 1. seviyeden itibaren herkese açık, 100 tavanına kadar kendi sayacında takip edilir.",
-        "herbalism": "Otçuluk doğada yetişenleri toplar: Doğudere Vadisi'nde parlakyaprak, Mirefen Bataklığı'nda altın yaprak ve Dikenzirve Yükseklikleri'nde güneş yaprağı; eczane mesleklerini kaynatan yaprak ve sap. 1. seviyeden itibaren herkese açık, 100 tavanına kadar kendi sayacında takip edilir.",
+        "mining": "Madencilik cevheri doğrudan dünyanın kayasından çıkarır: Doğudere Vadisi'nde bakır, Mirefen Bataklığı'nda demir ve Dikenzirve Tepeleri'nde osmiyum; ocak zanaat dallarını besler. 1. seviyeden itibaren herkese açık: tek gereken çantanda bir madenci kazması, her bölge merkezinde 20 bakır. 100 tavanına kadar kendi sayacında takip edilir.",
+        "logging": "Odun Kesimi her üç bölgedeki ağaç kümelerinden kereste keser: Doğudere Vadisi'nde demir kabuklular, Mirefen Bataklığı'nda dişbudak ve Dikenzirve Tepeleri'nde yüksekçam; sap, asa ve mühendis tezgahı için ham malzeme. Çantanda bir oduncu baltasıyla (her bölge merkezinde 20 bakır) 1. seviyeden itibaren herkese açık, 100 tavanına kadar kendi sayacında takip edilir.",
+        "herbalism": "Otçuluk doğada yetişenleri toplar: Doğudere Vadisi'nde parlakyaprak, Mirefen Bataklığı'nda altın yaprak ve Dikenzirve Tepeleri'nde güneş yaprağı; eczane mesleklerini kaynatan yaprak ve sap. Çantanda bir otçu orağıyla (her bölge merkezinde 20 bakır) 1. seviyeden itibaren herkese açık, 100 tavanına kadar kendi sayacında takip edilir.",
         "fishing": "Balık Tutma, toplama meslekleri arasında en sıra dışı ve en derin olanıdır: gerçek bir balık tutma ve çekme minigame'i, her bölgede kendine özgü av tabloları ve diğerlerinin iki katı olan 200 yetkinlik tavanı. Bir olta al, açık suyun önünde dur ve at."
       },
       "rhythmHeading": "Toplama ritmi",
@@ -3866,7 +3931,7 @@ export const tr_TR: EnTranslations = {
       "nodesHeading": "Bölgeye göre düğümler",
       "nodesNote": "Düğümlerin nerede olduğu, kademeleri, hangi aleti gerektirdikleri ve ne verdikleri. Her düğüm, kendi hasatının {respawn} saniye sonra senin için yeniden oluşur; bu zamanlayıcı yalnızca senindir: aynı düğümde çalışan başka bir toplayıcı seni asla geciktirmez, bu yüzden düğüm yarışması ve bekleme yoktur. Merdivende yukarı çıkan her bölge, daha sert araziden daha iyi malzeme çıkarır.",
       "toolsHeading": "Aletler",
-      "toolsNote": "Çıplak eller kademe 1 alet sayılır; bu nedenle oyundaki her kademe 1 düğüm hiç alet gerektirmez. Satıcı merdiveni kademe 1'den 3'e kadar uzanır; bir aletin yalnızca çantanda olması yeterlidir, ekipman yuvası veya dayanıklılık yoktur; bu nedenle her biri tek seferlik bir satın alımdır. Kapıya yalnızca kademe önemlidir: aletin nadirlik rengi kozmetiktir.\n\nSatıcı merdiveninin üzerinde, kademe 4 ve kademe 5 olmak üzere iki üretilmiş alet vardır; bunlar mühendisler tarafından alet atölyesinde yapılır ve hiçbir NPC tarafından satılmaz. Bugün hiçbir düğüm kademe 3'ten fazlasını gerektirmez; bu nedenle şu anki değerleri hızdır: üst düzey bir alet çekimi daha düşük düğümlerdeki tabanında sabitler ve daha yüksek kademeli arazi geldiğinde giriş bileti olacak.",
+      "toolsNote": "Her düğüm, kademe 1 dahil, o mesleğin aletinin çantanda olmasını ister: kazma yoksa cevher de yok, olta kamışı yoksa balık da yok. Satıcı merdiveni kademe 1'den 3'e kadar uzanır ve her bölge merkezinde bulunur; bir aletin yalnızca çantanda olması yeterlidir, ekipman yuvası veya dayanıklılık yoktur; bu nedenle her biri tek seferlik bir satın alımdır. Geçiş için yalnızca kademe önemlidir: aletin nadirlik rengi kozmetiktir.\n\nSatıcı merdiveninin üzerinde, kademe 4 ve kademe 5 olmak üzere iki üretilmiş alet vardır; bunlar mühendisler tarafından alet atölyesinde yapılır ve hiçbir NPC tarafından satılmaz. Bugün hiçbir düğüm kademe 3'ten fazlasını gerektirmez; bu nedenle şu anki değerleri hızdır: üst düzey bir alet, daha düşük kademeli düğümlerde toplama süresini tabanına sabitler ve daha yüksek kademeli arazi geldiğinde giriş bileti olacak.",
       "toolCrafted": "Üretilmiş ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Satılmaz",
@@ -5571,9 +5636,10 @@ export const tr_TR: EnTranslations = {
     "reconnectingNow": "Bağlantı kesildi. Şimdi yeniden bağlanılıyor... ({attempt}/{maxAttempts}'yi deneyin)",
     "slowConnection": "Bu normalden daha uzun sürüyor. İnternet bağlantınızı kontrol edin.",
     "connectionRejected": "Sunucu bağlantıyı kapattı.",
+    "incompatibleWorldVersion": "Oyun ve sunucu sürümleri uyumsuz. Yeniden yükleyin veya güncelleyin, ardından tekrar deneyin.",
     "realmFull": "Bu dünya şu an dolu. Lütfen birkaç dakika sonra tekrar dene.",
     "tooManyConnections": "Ağından bu dünyaya çok fazla bağlantı geliyor. Lütfen fazladan oyun pencerelerini kapat ya da birkaç dakika sonra tekrar dene.",
-    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
+    "messageRateExceeded": "Eylemleri çok hızlı gönderdiğiniz için bağlantınız kesildi. Lütfen biraz bekleyip tekrar giriş yapın.",
     "tips": {
       "classes": "İpucu: 9 sınıfın her biri farklı oynanır. Birine bağlanmadan önce birkaçını dene.",
       "talents": "İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.",
@@ -5644,10 +5710,10 @@ export const tr_TR: EnTranslations = {
     "dismiss": "Kapat"
   },
   "perfNudge": {
-    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
-    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
-    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
-    "dismiss": "Dismiss"
+    "integratedGpu": "Oyun, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda bir oyun ekran kartı da varsa, Windows'ta Ayarlar > Sistem > Ekran > Grafikler bölümünden tarayıcınızı “Yüksek performans” olarak ayarlayın, ardından tarayıcıyı yeniden başlatın. Masaüstü uygulaması oyun ekran kartını otomatik olarak seçer.",
+    "hardwareAccelerationDesktop": "Oyun, GPU hızlandırması olmadan çalışıyor ve bu yüzden çok yavaş. Ekran kartı sürücülerinizi güncelleyin, ardından oyunu yeniden başlatın. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler bölümünden oyunu “Yüksek performans” olarak ayarlayın.",
+    "hardwareAccelerationWeb": "Oyun, GPU hızlandırması olmadan çalışıyor ve bu yüzden çok yavaş. Tarayıcı ayarlarınızdan donanım hızlandırmayı açın, ekran kartı sürücülerinizi güncelleyin, ardından tarayıcınızı yeniden başlatın.",
+    "dismiss": "Kapat"
   },
   "realm": {
     "noRealms": "Mevcut dünya yok.",
@@ -6074,7 +6140,7 @@ export const tr_TR: EnTranslations = {
       "auraGain": "{name} kazandın.",
       "auraFade": "{name} üzerinden kayboluyor.",
       "auraAfflicted": "{target}, {name} etkisine maruz kaldı.",
-      "auraGainOther": "{target} gains {name}."
+      "auraGainOther": "{target}, {name} etkisini kazandı."
     },
     "system": {
       "playerDeath": "Öldün.",
@@ -6177,6 +6243,7 @@ export const tr_TR: EnTranslations = {
       "arenaJoin": "Kül Koliseumu sırasına katıldın. Layık bir rakip için bekle...",
       "arenaLeave": "Kül Koliseumu sırasından ayrıldın.",
       "arenaSands": "Kül Koliseumu'nun kumlarına adım atıyorsun.",
+      "arenaSandsDrowned": "Boğulmuş Avlu'nun su basmış taşlarına adım atıyorsun.",
       "tradeRequestSent": "{name} ile takas yapmak için istek gönderdin.",
       "tradeOpened": "Takas penceresi açıldı.",
       "tradeComplete": "Takas tamamlandı.",
@@ -6345,6 +6412,11 @@ export const tr_TR: EnTranslations = {
       "playerLevelClassTitle": "{name} - Sv {level} {className}",
       "noChallengers": "Henüz sıralanmış meydan okuyan yok - ilk sen ol.",
       "matchInProgress": "{name} ile maç sürüyor.",
+      "mapName": "Harita: {name}",
+      "map": {
+        "coliseum": "Kül Kolezyumu",
+        "drownedCourt": "Boğulmuş Avlu"
+      },
       "leaveQueue": "Sıradan Çık",
       "searching": "Bir rakip aranıyor... (sırada {count})",
       "enterQueue": "Sıraya Gir",
@@ -6637,6 +6709,7 @@ export const tr_TR: EnTranslations = {
       "pageNextAria": "Sonraki pazar sayfası",
       "pageStatus": "Sayfa {current} / {total}",
       "filters": "Pazar filtreleri",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Tür",
       "filterTypeAll": "Tüm türler",
       "filterTypeWeapon": "Silahlar",
@@ -6647,8 +6720,15 @@ export const tr_TR: EnTranslations = {
       "filterTypeOther": "Diğer",
       "filterArmorType": "Zırh türü",
       "filterArmorAll": "Tüm zırhlar",
+      "filterArmorSlot": "Zırh yuvası",
+      "filterArmorClassAll": "Tüm zırh türleri",
+      "armorCloth": "Kumaş",
+      "armorLeather": "Deri",
+      "armorMail": "Zincir",
       "filterWeaponType": "Silah türü",
       "filterWeaponAll": "Tüm silahlar",
+      "filterPrimaryStat": "Birincil nitelik",
+      "filterPrimaryStatAll": "Herhangi bir birincil nitelik",
       "filterRarity": "Nadirlik",
       "filterRarityAll": "Tüm nadirlikler",
       "weaponSword": "Kılıçlar",
@@ -6910,43 +6990,43 @@ export const tr_TR: EnTranslations = {
         "description": "Yanında savaşması, hedefine Su Okları fırlatması ve Su Jeti yönlendirmesi için bir Su Elementali çağır. (Ayaz)"
       },
       "ice_lance": {
-        "name": "Ice Lance",
+        "name": "Buz Mızrağı",
         "description": "Bir buz kıymığı fırlatarak {damage} Don hasarı verir; donmuş hedefe karşı üç kat etkilidir. Donmuş Parmaklar'ı veya Kışın Üşümesi'nin bir yükünü harcayarak hedefi donmuş gibi değerlendirir. (Don)"
       },
       "flurry": {
-        "name": "Winterlash",
+        "name": "Kış Kırbacı",
         "description": "Her biri {damage} Frost hasarı veren üç buz mermisi fırlatın ve hedefe Winter's Chill'i uygulayın: sonraki 2 uyumlu büyü hedefi donmuş sayar. Brain Freeze, Winterlash'yi anında yapar ve bekleme süresini atlar. (Don)"
       },
       "frozen_orb": {
-        "name": "Frozen Orb",
+        "name": "Donmuş Küre",
         "description": "8 saniye boyunca ileri doğru sürüklenen, dönen bir buz küresi salarak yakındaki düşmanlara her saniye {damage} Frost hasarı verir ve onları %30 yavaşlatır. Her çarpan darbe bir Buz Saçağı üretir. (Don)"
       },
       "blizzard": {
-        "name": "Blizzard",
+        "name": "Kar Fırtınası",
         "description": "Hedef alana 6 saniye boyunca buz fırtınası çağırır, her saniye {damage} Don hasarı verir ve düşmanları %40 yavaşlatır. Vurulan her düşman Donmuş Küre'nin süresini 0,5 saniye azaltır (kullanım başına en fazla 3 saniye). (Don)"
       },
       "glacial_spike": {
-        "name": "Glacial Spike",
+        "name": "Buzul Dikeni",
         "description": "Devasa bir buz dikeni çağırarak 5 Buz Parçası tüketir, {damage} Don hasarı verir ve hedefi 4 saniye olduğu yere dondurur. (Don)"
       },
       "glacial_front": {
-        "name": "Glacial Front",
+        "name": "Buzul Cephesi",
         "description": "Genişleyen bir don cephesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan tüm düşmanlar 4 saniye boyunca %50 yavaşlar. Azami şarj ayrıca onları 1 saniye kökler. (Don)"
       },
       "dragons_breath": {
-        "name": "Dragon's Breath",
+        "name": "Ejderha Nefesi",
         "description": "Genişleyen bir alev nefesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan düşmanlar yönelim kaybeder; hasar bu etkiyi bozar. Azami şarj her zaman kritik vurur ve Sıcak Seri için bir kez sayılır. (Ateş)"
       },
       "fingers_of_frost": {
-        "name": "Fingers of Frost",
+        "name": "Don Parmakları",
         "description": "Ayaz Mızrağı'nın 2 yüke kadar Donmuş Parmaklar kazandırma ihtimali %15'tir: bir sonraki Ice Lance hedefi donmuş gibi değerlendirir. (Don)"
       },
       "brain_freeze": {
-        "name": "Brain Freeze",
+        "name": "Beyin Donması",
         "description": "Ayaz Mızrağı'nin bir sonraki Winterlash'nizi anında ve bekleme süresinden kurtulması için %20 şansı vardır. (Don)"
       },
       "shatter": {
-        "name": "Brittle Ruin",
+        "name": "Kırılgan Yıkım",
         "description": "Büyüleriniz donmuş hedeflere karşı %50 kritik vuruş şansı kazanır. Fingers of Frost ve Kış Soğuğu donmuş sayılır. (Don)"
       },
       "conjure_water": {
@@ -7026,7 +7106,7 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefe %250 silah hasarı artı {damage} ile pusu kur. Gizlenmiş ve hedefin arkasında olmalısın. Bir hançer gerektirir. 1 kombo puanı kazandırır."
       },
       "stealth": {
-        "name": "Duskveil",
+        "name": "Alaca Örtüsü",
         "description": "Seni gölgelerde gizler: düşmanlar seni güçlükle fark eder, ancak %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Duskveil'i bozar. Çıkmak için tekrar kullan."
       },
       "adrenaline_rush": {
@@ -7258,7 +7338,7 @@ export const tr_TR: EnTranslations = {
         "description": "Silahını kavrayan ayazla güçlendirir: her vuruş 5 dakika boyunca {damage} ek hasar verir."
       },
       "ghost_wolf": {
-        "name": "Shadewolf",
+        "name": "Gölge Kurdu",
         "description": "Seni bir Shadewolf'a dönüştürür ve hareket hızını 10 dakika boyunca %40 artırır."
       },
       "stormstrike": {
@@ -7314,7 +7394,7 @@ export const tr_TR: EnTranslations = {
         "description": "Dost bir hedefi {damage} iyileştirir."
       },
       "mark_of_the_wild": {
-        "name": "Wildward",
+        "name": "Yaban Siperi",
         "description": "Dost bir hedefe Wildward'ı yerleştirir ve zırhını 30 dakika boyunca {buff} artırır."
       },
       "moonfire": {
@@ -7686,7 +7766,7 @@ export const tr_TR: EnTranslations = {
         "description": "30 m içindeki müttefikleri vahşi güçle cesaretlendirir, saldırı güçlerini 45 ve saldırı hızlarını 5 dk. boyunca %5 artırır. (Avcı yeteneği)"
       },
       "avatar": {
-        "name": "Avatar",
+        "name": "Savaş Timsali",
         "description": "20 sn boyunca bir devcüsseye dönüşür, üzerindeki tüm kontrol etkilerini kırar ve verdiğin hasarı %20 artırırsın."
       },
       "avenging_wrath": {
@@ -11781,6 +11861,7 @@ export const tr_TR: EnTranslations = {
     "delveRiteShrineCandleInteract": "Mum Sunağı: Dokunmak için F'ye bas",
     "delveRiteShrineReedInteract": "Saz Sunağı: Dokunmak için F'ye bas",
     "delveRiteShrineSkullInteract": "Kafatası Sunağı: Dokunmak için F'ye bas",
-    "mailboxName": "Posta Kutusu"
+    "mailboxName": "Posta Kutusu",
+    "noticeboardName": "İlan Tahtası"
   }
 };

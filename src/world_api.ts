@@ -106,6 +106,18 @@ export type {
   OverheadEmoteId,
 } from './sim/types';
 
+// Online world-layout compatibility is encoded in the first WebSocket frame's
+// discriminator. Changing the authoritative town layout requires a new epoch:
+// the strict discriminator makes both rolling-deploy directions fail closed
+// before either binary loads a character into a differently shaped world.
+export const ONLINE_WORLD_LAYOUT_VERSION = 3 as const;
+export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
+// The one wire literal both sides emit for a layout-epoch mismatch. The server
+// rejects with it, the client synthesizes it for pre-epoch servers, and the UI
+// matcher re-localizes it, so all three must stay byte-identical.
+export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE =
+  'Game and server versions are incompatible. Reload or update, then try again.' as const;
+
 // Snapshot timer wire capability shared by the browser mirror and authoritative
 // server. Keep the version exact so rolling deploys can negotiate fail-closed.
 export const STABLE_TIMER_WIRE_VERSION = 2 as const;
@@ -180,6 +192,7 @@ export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/pa
 export type {
   CraftingIdentityView,
   CraftResultView,
+  DisenchantResultView,
   PlayerProfessionsView,
   RecipeDef,
 } from './world_api/professions';
@@ -454,6 +467,9 @@ export const COMMAND_NAMES = [
   // tier-scaled gold fee (Sim.unbindItem via src/sim/professions/
   // commission.ts).
   'unbind_item',
+  // Guild billboard: set (or clear, with '') the officer-editable message
+  // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
+  'guild_set_motd',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -644,6 +660,7 @@ export const COMMAND_FACETS = {
   guild_disband: 'IWorldSocialGraph',
   guild_event_create: 'IWorldSocialGraph',
   guild_event_remove: 'IWorldSocialGraph',
+  guild_set_motd: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',

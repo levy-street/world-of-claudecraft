@@ -140,6 +140,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     infernoTimer: 0,
     infernoRemaining: 0,
     infernoPulsesFired: 0,
+    infernoGatesFired: 0,
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,

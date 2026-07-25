@@ -38,6 +38,14 @@ export const zh_TW: EnTranslations = {
     "filterLabel": "篩選指令",
     "filterPlaceholder": "搜尋此類別",
     "noMatches": "沒有符合的指令。",
+    "itemSearchPlaceholder": "依名稱或 ID 搜尋",
+    "itemResultsAria": "符合的物品",
+    "itemNoMatches": "沒有符合的物品。",
+    "itemMore": "顯示 {total} 個相符項目中的 {shown} 個。請繼續輸入以縮小範圍。",
+    "itemChosen": "已選擇：{name}",
+    "itemUnknown": "沒有該 ID 的物品。",
+    "itemHeroicTag": "英雄",
+    "kitCurrentSpec": "目前專精",
     "serverRequirement": "伺服器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
     "invalidValues": "執行此指令前請選擇有效值。",
     "sent": "已傳送：{command}",
@@ -55,7 +63,8 @@ export const zh_TW: EnTranslations = {
       "z": "Z",
       "dungeon": "地城",
       "difficulty": "難度",
-      "name": "名稱"
+      "name": "名稱",
+      "spec": "專精"
     },
     "difficulty": {
       "normal": "普通",
@@ -113,6 +122,10 @@ export const zh_TW: EnTranslations = {
       "give": {
         "label": "給予物品",
         "description": "將一件物品加入玩家物品欄。"
+      },
+      "kit": {
+        "label": "裝備新手20級套裝",
+        "description": "為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。"
       },
       "gold": {
         "label": "新增金幣",
@@ -1049,6 +1062,7 @@ export const zh_TW: EnTranslations = {
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
       "mouseoverCast": "對隊伍框架滑鼠指向施法",
+      "stickyTarget": "點擊地面時保留目標",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
@@ -1461,7 +1475,7 @@ export const zh_TW: EnTranslations = {
         "claw": "爪",
         "horn": "角",
         "tusk": "獠牙",
-        "meat": "Meat",
+        "meat": "獸肉",
         "cloth": "布"
       }
     },
@@ -1529,6 +1543,8 @@ export const zh_TW: EnTranslations = {
       "dragDestroyHint": "拖曳到世界中以銷毀",
       "reorderNeedsRecent": "清除篩選並按「最近」排序即可整理背包",
       "itemAriaInstanced": "{item}，數量 {count}，帶工匠印記的物品",
+      "itemAriaEnchanted": "{item}，數量 {count}，已附魔的副本",
+      "itemAriaBound": "{item}，數量 {count}，已綁定的副本",
       "itemAriaMasterwork": "{item}，數量 {count}，傑作",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
@@ -1753,7 +1769,19 @@ export const zh_TW: EnTranslations = {
       "label": "重置框體位置"
     },
     "itemTooltip": {
-      "requiresLevel": "需要等級 {level}"
+      "requiresLevel": "需要等級 {level}",
+      "statEnchanted": "+{value} {stat}（附魔）",
+      "enchantedFallback": "已附魔"
+    },
+    "materialHint": {
+      "arcaneDust": "附魔材料。分解普通和優秀品質的裝備可得。",
+      "arcaneEssence": "附魔材料。分解精良品質的裝備可得。",
+      "arcaneShard": "附魔材料。分解史詩和傳說品質的裝備可得。",
+      "resonantThread": "附魔材料。分解精良及以上品質的布甲可得。",
+      "resonantHide": "附魔材料。分解精良及以上品質的皮甲可得。",
+      "resonantLinks": "附魔材料。分解精良及以上品質的鎖甲可得。",
+      "resonantSteel": "附魔材料。分解精良及以上品質的近戰武器可得。",
+      "resonantTimber": "附魔材料。分解精良及以上品質的法杖、魔杖、弓和弩可得。"
     },
     "discord": {
       "title": "Discord",
@@ -1994,6 +2022,13 @@ export const zh_TW: EnTranslations = {
         "takeParcelsFirst": "請先取出包裹再丟棄信件。"
       }
     },
+    "marketIndicator": {
+      "aria": "世界市場待領取物品",
+      "tip": "有金幣或物品正在商人處等待你領取。"
+    },
+    "noticeboard": {
+      "empty": "看起來沒有張貼任何內容。"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "鍍金保險箱",
@@ -2110,7 +2145,19 @@ export const zh_TW: EnTranslations = {
       "onlineHeader": "在線 ({n})",
       "offlineHeader": "離線 ({n})",
       "hideOffline": "隱藏離線",
-      "hideOfflineTitle": "隱藏離線公會成員"
+      "hideOfflineTitle": "隱藏離線公會成員",
+      "billboard": {
+        "label": "公會公告板",
+        "empty": "公告板上還沒有內容。",
+        "setBy": "由 {name} 設定",
+        "save": "儲存",
+        "placeholder": "給公會寫一則訊息",
+        "inputLabel": "公會公告板訊息",
+        "result": {
+          "set": "公會公告板已更新。",
+          "notOfficer": "只有幹部和會長可以編輯公告板。"
+        }
+      }
     },
     "gathering": {
       "title": "採集",
@@ -2380,7 +2427,6 @@ export const zh_TW: EnTranslations = {
       "makersMark": "製作者：{name}",
       "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
-      "enchantedLine": "已附魔",
       "commissionToggle": "委託製品",
       "commissionToggleHint": "將綁定給交易中第一個收到它的角色。",
       "commissionUnbound": "委託製品：將綁定給第一位收貨人",
@@ -2418,7 +2464,26 @@ export const zh_TW: EnTranslations = {
       "pickerTitle": "施加附魔",
       "targetTitle": "選擇要附魔的物品",
       "noEnchants": "沒有附魔會用到此材料。",
-      "noTargets": "沒有可附魔的合適物品。"
+      "noTargets": "沒有可附魔的合適物品。",
+      "wornTag": "已裝備（{slot}）",
+      "tier": {
+        "base": "基礎附魔",
+        "runed": "符文附魔",
+        "greater": "強效附魔"
+      },
+      "yieldHeader": "預計產出材料：",
+      "yieldLineExact": "{item} {count} 個",
+      "yieldLineRange": "{item} {min} 至 {max} 個",
+      "alreadyEnchanted": "那件物品已經附魔。",
+      "sameEnchant": "那件物品已經擁有該附魔。",
+      "replaceTag": "替換{enchant}",
+      "sameEnchantTag": "已施加",
+      "replaceConfirmTitle": "替換 {item} 上的附魔？",
+      "replaceConfirmBody": "這會將 {item} 上的 {old} 替換為 {new}。",
+      "replaceConfirmNoRefund": "舊附魔將被摧毀，材料不予退還。此操作無法復原。",
+      "replaceConfirmCost": "費用：{cost}",
+      "replaceConfirmCostItem": "{name} {count} 個",
+      "replaceConfirmAccept": "替換"
     },
     "training": {
       "title": "訓練：{name}",
@@ -3816,7 +3881,7 @@ export const zh_TW: EnTranslations = {
           "levelingHeading": "附魔如何升級",
           "levelingBody": "兩種行動推動技能：分解與施加附魔，每次成功最多一點，按工作的分量折算：普通分解與純粉塵附魔算普通活；優秀分解與精華附魔算優秀活；精良分解與所有Runed或Greater附魔算精良活；史詩與傳說分解更高。熟悉的精通衰減按25點層級作用：普通活在技能75變灰，優秀活在100，精良活恰在125上限。附魔另有一份仁慈：高於命途上限的輸入向下取整而非歸零，宣誓前史詩分解按精良計而非一無所獲；若附魔淪為休眠，一切按普通活計，爬升停在75；作為愛好則精良活仍有收益，只是75之後變慢。",
           "marketHeading": "附魔副本、出處與市場",
-          "marketBody": "施加附魔消耗背包中未裝備的一件副本加材料，交還一件獨立的附魔副本；穿上它，加成永遠跟隨。一件一附魔：附魔副本不能再附魔也不能分解，出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。世界市場只經手無標記的普通貨，附魔與署名件都面對面交易；材料才是可上市的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。"
+          "marketBody": "施加附魔消耗材料並標記特定的一件副本。用在背包中的副本上，交還一件獨立的附魔副本；用在已穿戴的裝備上，則就地附魔，無需脫下再穿上。無論哪種，加成都永遠跟隨。一件一附魔：對附魔副本施加另一個附魔會先要求確認，然後直接替換舊附魔，舊附魔被摧毀且不退還材料；出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。世界市場只經手無標記的普通貨，附魔與署名件都面對面交易；材料才是可上市的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。"
         }
       },
       "howHeading": "製作流程",
@@ -3855,9 +3920,9 @@ export const zh_TW: EnTranslations = {
         "bonusFmt": "+{value}{stat}"
       },
       "gatherIntro": {
-        "mining": "採礦在三大區域的礦脈中開採礦石，供給鍛造類行業，上限為100。",
-        "logging": "伐木在三大區域的林地中砍伐木材，供給武器柄材與工具，上限為100。",
-        "herbalism": "藥草學在三大區域採集草藥，供給鍊金術與烹飪，上限為100。",
+        "mining": "採礦直接從世界的岩層中開採礦石：東溪谷產銅礦，泥沼濕地產鐵礦，荊峰高地產鋨礦，供給鍛造類行業。從1級起人人皆可採集：只需背包中備有一把採礦鎬，各區域主城均售20銅幣。以獨立計數器追蹤，上限為100。",
+        "logging": "伐木在三大區域的林地中砍伐木材：東溪谷產鐵皮木，泥沼濕地產梣木，荊峰高地產高松，供給武器柄材、法杖與工程師工坊。從1級起人人皆可伐木，只需背包中備有一把伐木斧（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
+        "herbalism": "藥草學採集野地所生的草藥：東溪谷產潤光葉，泥沼濕地產金葉，荊峰高地產日瓣草，這些葉與莖讓藥劑類行業得以持續調製。從1級起人人皆可採集，只需背包中備有一把草藥鐮（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
         "fishing": "釣魚通過咬鉤與收線的節奏，在每個區域的開闊水面垂釣，上限為200。"
       },
       "rhythmHeading": "採集節奏",
@@ -3866,7 +3931,7 @@ export const zh_TW: EnTranslations = {
       "nodesHeading": "各區域節點",
       "nodesNote": "節點的位置、階級、所需工具與產出；每個節點在你採集後{respawn}秒才會為你本人重生。",
       "toolsHeading": "工具",
-      "toolsNote": "工具階梯與確切的商人售價；4階與5階工具只能製作，無法購買。",
+      "toolsNote": "每一處節點都需要背包中備有對應行業的工具，1階節點也不例外：沒有採礦鎬就採不到礦石，沒有魚竿就釣不上魚。商人階梯涵蓋1階到3階，各區域主城皆有備貨；工具只要放在背包裡即可，沒有裝備欄位，也沒有耐久度，因此每件都只需購買一次。門檻只看階級：工具的稀有度顏色純屬外觀。\n\n商人階梯之上還有兩件製作工具，4階與5階，由工程師在工坊打造，任何NPC都不販售。目前沒有任何節點需要超過3階的工具，因此它們現階段的價值在於速度：頂階工具能把低階節點的施法時間壓到下限；等更高階的地域開放時，它們便是入場券。",
       "toolCrafted": "製作獲得（{craft}）",
       "toolVendor": "{name}（{hub}）",
       "toolUnavailable": "無販售",
@@ -5571,6 +5636,7 @@ export const zh_TW: EnTranslations = {
     "reconnectingNow": "連線已中斷，正在重新連線...（第 {attempt}/{maxAttempts} 次嘗試）",
     "slowConnection": "載入時間比平常長。請檢查您的網路連線。",
     "connectionRejected": "伺服器已關閉連線。",
+    "incompatibleWorldVersion": "遊戲與伺服器版本不相容。請重新整理或更新後再試一次。",
     "realmFull": "這個世界目前已滿，請於幾分鐘後再試。",
     "tooManyConnections": "您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。",
     "messageRateExceeded": "由於發送操作過快，您已中斷連線。請稍候片刻後重新登入。",
@@ -6177,6 +6243,7 @@ export const zh_TW: EnTranslations = {
       "arenaJoin": "你加入了灰燼競技場佇列。等待一位值得一戰的對手...",
       "arenaLeave": "你離開了灰燼競技場佇列。",
       "arenaSands": "你踏上了灰燼競技場的沙地。",
+      "arenaSandsDrowned": "你踏上了沉沒王庭的水淹石地。",
       "tradeRequestSent": "你已請求與 {name} 交易。",
       "tradeOpened": "交易視窗已開啟。",
       "tradeComplete": "交易完成。",
@@ -6345,6 +6412,11 @@ export const zh_TW: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level} 級 {className}",
       "noChallengers": "還沒有已排名的挑戰者 - 成為第一個。",
       "matchInProgress": "正在對戰 {name}。",
+      "mapName": "地圖：{name}",
+      "map": {
+        "coliseum": "灰燼競技場",
+        "drownedCourt": "沉沒王庭"
+      },
       "leaveQueue": "離開佇列",
       "searching": "正在尋找對手...（佇列中 {count} 人）",
       "enterQueue": "加入佇列",
@@ -6637,6 +6709,7 @@ export const zh_TW: EnTranslations = {
       "pageNextAria": "下一頁市場商品",
       "pageStatus": "第 {current} 頁，共 {total} 頁",
       "filters": "市場篩選",
+      "filterValueAria": "{label}：{value}",
       "filterType": "類型",
       "filterTypeAll": "全部類型",
       "filterTypeWeapon": "武器",
@@ -6647,8 +6720,15 @@ export const zh_TW: EnTranslations = {
       "filterTypeOther": "其他",
       "filterArmorType": "護甲類型",
       "filterArmorAll": "全部護甲",
+      "filterArmorSlot": "護甲部位",
+      "filterArmorClassAll": "所有護甲類型",
+      "armorCloth": "布甲",
+      "armorLeather": "皮甲",
+      "armorMail": "鎖甲",
       "filterWeaponType": "武器類型",
       "filterWeaponAll": "全部武器",
+      "filterPrimaryStat": "主要屬性",
+      "filterPrimaryStatAll": "任意主要屬性",
       "filterRarity": "稀有度",
       "filterRarityAll": "全部稀有度",
       "weaponSword": "劍",
@@ -11781,6 +11861,7 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineCandleInteract": "燭火神龕：按 F 觸碰",
     "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
     "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
-    "mailboxName": "郵箱"
+    "mailboxName": "郵箱",
+    "noticeboardName": "告示板"
   }
 };

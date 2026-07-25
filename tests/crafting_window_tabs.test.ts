@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, STATIONS } from '../src/sim/data';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
 import {
   buildCraftingView,
@@ -205,7 +205,7 @@ describe('renderCraftingWindow tab strip', () => {
     const stationType = stationTypeForCraft('weaponcrafting');
     expect(stationType).toBeDefined();
     if (!stationType) return;
-    const station = stationsOfType(stationType)[0];
+    const station = stationsOfType(STATIONS, stationType)[0];
     expect(station).toBeDefined();
     const hint = { stationType, masterNpcId: station.masterNpcId };
     const deps = craftingDeps();

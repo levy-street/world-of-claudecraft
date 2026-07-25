@@ -32,7 +32,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 |---|---|
 | `main.ts` | HTTP server + the prefix-ladder dispatch (`routeHttpRequest` sends `/api` `/admin/api` `/oauth` `/internal` to four flag-gated entries) + the RETAINED legacy handler ladder, WS `/ws` upgrade wiring (builds the `createWsAuth` deps bag), boot/shutdown, leaderboard cache. Migrated routes live in per-domain `RouteDef` modules behind `server/http/` (see `server/http/CLAUDE.md`), NOT in a route table here |
 | `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file; extract beside it, never grow it** (Module-first above) |
-| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): first-frame `{t:'auth'}` check, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
+| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): strict first-frame `ONLINE_WORLD_AUTH_TYPE` check before credential or DB work, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
 | `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
 | `msg_rate_limit.ts` / `msg_lanes.ts` / `list_read_guard.ts` | the inbound WS flood defense: the pre-parse gate (frame + byte buckets and the shared abuse window that kicks), the post-parse per-class lanes, and the ignore/block list-readout meter (see "Inbound WS flood defense") |
 | `linkdead.ts` | pure session-lifecycle decision core: `planJoin` (resume/reject/join) + `LINKDEAD_GRACE_MS` (see Persistence) |
@@ -78,7 +78,9 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   method, keep that guarding when you add a command.
 - **Wire protocol lockstep with `src/net/online.ts`.** Server sends `hello` /
   `snap` (with `self`/`ents`/`keep`) / `events` / `social` / `censor` / `error`; client
-  first sends `{t:'auth',token,character}`. Any wire change must land in both files together.
+  first sends `{ t: ONLINE_WORLD_AUTH_TYPE, token, character }`. The versioned discriminator
+  rejects mixed built-in world layouts in both rolling-deploy directions before admission.
+  Any wire change must land in both files together.
 - **No browser/render/ui imports.** This bundles for Node, import only from
   `src/sim/`, `src/world_api.ts`, and `node:*`. Never from `render/`/`ui/`/`game/`/`net/`.
 - **SQL lives only in `db.ts` and `*_db.ts`.** Logic modules (`game.ts`,

@@ -17,11 +17,12 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type {
-  DeedsLeaderboardEntry,
-  DeedsLeaderboardSelf,
-  GuildLeaderboardEntry,
-  LeaderboardEntry,
+import {
+  type DeedsLeaderboardEntry,
+  type DeedsLeaderboardSelf,
+  type GuildLeaderboardEntry,
+  type LeaderboardEntry,
+  ONLINE_WORLD_AUTH_TYPE,
 } from '../src/world_api';
 import {
   configureAccountRuntime,
@@ -1874,6 +1875,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
+        // The /dev GUI capability advert. NOT hardcoded like steam.enabled above:
+        // the dev_* cheats ride the websocket dispatcher, which this arm serves
+        // exactly as the migrated one does, so advertising the real env here
+        // strands nobody. Dual-arm edit: the migrated statusHandler
+        // (server/leaderboard.ts) carries the same dev_commands field. Read live
+        // per request, mirroring the /api/perf gate just below.
+        dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load
@@ -3006,7 +3014,7 @@ export async function startServer(): Promise<http.Server> {
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
-    console.log(`  WS:   /ws, then first message {t:"auth",token,character}`);
+    console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
 
   // Off-peak batched retention. The sweep self-clocks once per UTC day behind a

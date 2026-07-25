@@ -36,8 +36,13 @@ export interface DungeonLayout {
   zMin: number;
   /** back wall centreline (boss end) */
   zMax: number;
-  /** side-wall collider slab (matches the legacy hand-authored extents) */
+  /** side-wall collider slab: z CENTRELINE of the slab's run (matches the
+   *  legacy hand-authored extents) */
   sideWallZ: number;
+  /** side-wall collider slab: z half-DEPTH of the slab's run. Despite the
+   *  similar name this is a z extent, not an x one: the slab's |x| position
+   *  comes from wallX / DUNGEON_WALL_X. A room can grow its sideWallHd (a
+   *  longer wall) while its wallX stays frozen. */
   sideWallHd: number;
   /** centre-aisle pillar obstacles; torches mount on these */
   pillars: GridPoint[];
@@ -164,54 +169,156 @@ export const TEMPLE_LAYOUT: DungeonLayout = (() => {
   };
 })();
 
-// The Ashen Coliseum (interior 'arena'): a compact, fully-enclosed square pit
-// — no door, no aisle (combatants are teleported in by matchmaking). Side
-// walls at |x|=23 like the crypt so the KayKit wall modules fit unchanged;
-// four corner pillars carry the arena's warm torches. The dais marker only
-// drives the central floor glow (the renderer skips its platform for the
-// arena), so it stays a flat, obstacle-free fighting ring.
+// The Ashen Coliseum (interior 'arena'): a fully-enclosed pit, no door, no
+// aisle (combatants are teleported in by matchmaking). Side walls stay at
+// |x|=23 like the crypt so the KayKit wall modules fit unchanged; the pit
+// grows along z only, tuned for 1v1/2v2 (deliberately NOT large). The dais
+// marker only drives the central floor glow (the renderer skips its platform
+// for the arena), so the ring itself stays flat.
+// Cover intent: an approach screen in front of each spawn breaks line of
+// sight for caster openers, the centre diamond gives fighters a post to
+// orbit around mid-bout, and the side-lane walls cover flanking runs. Every
+// obstacle is mirror-symmetric about BOTH x=0 and z=2 so neither side is
+// favoured; each approach screen's outer end is capped by a mid-field post
+// (the sub-player gap between them is sealed, they read as one L-shaped
+// cover piece).
 export const ARENA_LAYOUT: DungeonLayout = {
-  zMin: -20,
-  zMax: 24,
+  zMin: -24,
+  zMax: 28,
   sideWallZ: 2,
-  sideWallHd: 23,
+  // z half-DEPTH of the side-wall slabs (26 spans zMin..zMax exactly); their
+  // |x| stays the frozen DUNGEON_WALL_X = 23, a different axis entirely.
+  sideWallHd: 26,
   pillars: [
-    { x: -14, z: -10 },
-    { x: 14, z: -10 },
-    { x: -14, z: 14 },
-    { x: 14, z: 14 },
-    // Cover/parkour posts, mirrored about the centre line (z=2) so neither side
-    // is favoured. They give the Fiesta something to juke around (and ranked a
-    // little cover too) without crowding the spawns at z=-14 / z=18.
+    // corner pillars anchoring the four quadrants (every pillar mounts a torch)
+    { x: -14, z: -14 },
+    { x: 14, z: -14 },
+    { x: -14, z: 18 },
+    { x: 14, z: 18 },
+    // mid-field posts capping the approach screens' outer ends
+    { x: -9, z: -8 },
+    { x: 9, z: -8 },
+    { x: -9, z: 12 },
+    { x: 9, z: 12 },
+    // centre diamond around the dais glow, for centre orbiting
     { x: 0, z: -4 },
     { x: 0, z: 8 },
-    { x: -9, z: -10 },
-    { x: 9, z: -10 },
-    { x: -9, z: 14 },
-    { x: 9, z: 14 },
+    { x: -6, z: 2 },
+    { x: 6, z: 2 },
   ],
   tombs: [],
-  // Narrow flanking cover walls along the side lanes, mirrored about z=2.
   stubs: [
-    { x: -11, z: 2, hw: 0.6, hd: 4 },
-    { x: 11, z: 2, hw: 0.6, hd: 4 },
+    // narrow flanking cover walls along the side lanes, mirrored about z=2
+    { x: -11, z: 2, hw: 0.6, hd: 5 },
+    { x: 11, z: 2, hw: 0.6, hd: 5 },
+    // approach screens: LoS breakers between each spawn and the centre
+    { x: -5, z: -10, hw: 3, hd: 0.6 },
+    { x: 5, z: -10, hw: 3, hd: 0.6 },
+    { x: -5, z: 14, hw: 3, hd: 0.6 },
+    { x: 5, z: 14, hw: 3, hd: 0.6 },
   ],
   dais: { x: 0, z: 2, r: 8 },
 };
 
-// Combatant spawn points (instance-local), at opposite ends facing each other.
-export const ARENA_SPAWN_A = { x: 0, z: -14, facing: 0 }; // faces +z toward B
-export const ARENA_SPAWN_B = { x: 0, z: 18, facing: Math.PI }; // faces -z toward A
+// The Drowned Court (interior 'arena', ODD slots): the second arena map, a
+// flooded-temple counterpart to the Coliseum. Identical bounds and the same
+// frozen |x|=23 walls, but a completely different cover grammar: two straight
+// colonnades of five pillars each form a centre nave and two side aisles
+// (lane-and-LoS chess, deliberately distinct from the Coliseum's scattered
+// screens), with a reliquary block midway along each aisle as the only extra
+// cover. No stubs; the dais is a smaller moonlit glow. Mirror-symmetric about
+// BOTH x=0 and z=2, like the Coliseum.
+export const DROWNED_COURT_LAYOUT: DungeonLayout = {
+  zMin: -24,
+  zMax: 28,
+  sideWallZ: 2,
+  sideWallHd: 26,
+  // two colonnades at x=-8/8, z stepped by 8 and centred on the z=2 mirror
+  pillars: grid(-14, 18, 8, [-8, 8]),
+  // reliquary altars midway along each aisle, mirrored about both axes
+  tombs: [
+    { x: -16, z: -8 },
+    { x: 16, z: -8 },
+    { x: -16, z: 12 },
+    { x: 16, z: 12 },
+  ],
+  stubs: [],
+  dais: { x: 0, z: 2, r: 6 },
+};
+
+// Combatant spawn points (instance-local), at opposite ends facing each other,
+// each behind its team's approach screen with a clear zone around it.
+export const ARENA_SPAWN_A = { x: 0, z: -18, facing: 0 }; // faces +z toward B
+export const ARENA_SPAWN_B = { x: 0, z: 22, facing: Math.PI }; // faces -z toward A
 
 // 2v2: two fighters per side, spread along x.
 export const ARENA_SPAWNS_A_2v2 = [
-  { x: -7, z: -14, facing: 0 },
-  { x: 7, z: -14, facing: 0 },
+  { x: -7, z: -18, facing: 0 },
+  { x: 7, z: -18, facing: 0 },
 ];
 export const ARENA_SPAWNS_B_2v2 = [
-  { x: -7, z: 18, facing: Math.PI },
-  { x: 7, z: 18, facing: Math.PI },
+  { x: -7, z: 22, facing: Math.PI },
+  { x: 7, z: 22, facing: Math.PI },
 ];
+
+// ---------------------------------------------------------------------------
+// Arena maps: each world arena slot hosts one FIXED map, selected by slot
+// parity (EVEN slots = Ashen Coliseum, ODD slots = The Drowned Court). The
+// mapping is static at boot: colliders and render geometry per slot never
+// change, and no selection here ever touches rng. Spawns are plumbed per map
+// (not shared constants) so future maps can place them differently.
+// ---------------------------------------------------------------------------
+
+export type ArenaMapId = 'coliseum' | 'drowned_court';
+
+export interface ArenaSpawnPoint {
+  x: number;
+  z: number;
+  facing: number;
+}
+
+export interface ArenaMapDef {
+  id: ArenaMapId;
+  layout: DungeonLayout;
+  spawnA: ArenaSpawnPoint;
+  spawnB: ArenaSpawnPoint;
+  spawnsA2v2: ArenaSpawnPoint[];
+  spawnsB2v2: ArenaSpawnPoint[];
+}
+
+// The Drowned Court's 2v2 spread is +-5 (narrower than the Coliseum's +-7):
+// the colonnade pillars at (+-8, -14/18) sit closer to the spawn line, and
+// +-5 keeps the 4yd spawn clear zone the layout tests pin.
+const DROWNED_COURT_MAP: ArenaMapDef = {
+  id: 'drowned_court',
+  layout: DROWNED_COURT_LAYOUT,
+  spawnA: { x: 0, z: -18, facing: 0 },
+  spawnB: { x: 0, z: 22, facing: Math.PI },
+  spawnsA2v2: [
+    { x: -5, z: -18, facing: 0 },
+    { x: 5, z: -18, facing: 0 },
+  ],
+  spawnsB2v2: [
+    { x: -5, z: 22, facing: Math.PI },
+    { x: 5, z: 22, facing: Math.PI },
+  ],
+};
+
+const COLISEUM_MAP: ArenaMapDef = {
+  id: 'coliseum',
+  layout: ARENA_LAYOUT,
+  spawnA: ARENA_SPAWN_A,
+  spawnB: ARENA_SPAWN_B,
+  spawnsA2v2: ARENA_SPAWNS_A_2v2,
+  spawnsB2v2: ARENA_SPAWNS_B_2v2,
+};
+
+/** index = slot parity: even slots Coliseum, odd slots Drowned Court. */
+export const ARENA_MAPS: readonly [ArenaMapDef, ArenaMapDef] = [COLISEUM_MAP, DROWNED_COURT_MAP];
+
+export function arenaMapForSlot(slot: number): ArenaMapDef {
+  return ARENA_MAPS[((slot % 2) + 2) % 2];
+}
 
 /** Interior collision set for a layout, in instance-local coordinates. */
 export function layoutColliders(layout: DungeonLayout): Collider[] {

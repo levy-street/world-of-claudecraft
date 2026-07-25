@@ -74,6 +74,11 @@ describe('Grave Inferno (Korzul channel)', () => {
       radius: 14,
       name: 'Grave Inferno',
       school: 'fire',
+      // 2026-07-26: one 50% hp gate, so the channel fires at least once per
+      // kill on both difficulties even when the group out-paces the 30s
+      // cadence; it sits above the 30% enrage so the burn phase never stacks
+      // on enraged melee.
+      atHpPct: [0.5],
     });
   });
 
@@ -151,5 +156,57 @@ describe('Grave Inferno (Korzul channel)', () => {
     for (let i = 0; i < tankHits.length; i++) {
       expect(tankHits[i].event.amount).toBe(nakedHits[i].event.amount);
     }
+  });
+});
+
+describe('Grave Inferno 50% hp gate', () => {
+  it('arms the channel immediately at 50%, then the cadence reseeds from the gate', () => {
+    const { sim, boss, tank } = setup(15);
+    const before = run(sim, 5, [tank]);
+    expect(infernoHits(before, boss.id)).toHaveLength(0); // cadence alone: first channel at 30s
+    boss.hp = boss.maxHp * 0.49;
+    const rows = run(sim, 42, [tank]);
+    const hits = infernoHits(rows, boss.id);
+    // The gate channel fires all four pulses right away (first pulse ~2s
+    // after the gate is consumed on the next engaged melee tick), long
+    // before the 30s cadence would have...
+    const gateChannel = hits.filter((h) => h.at < 20);
+    expect(gateChannel).toHaveLength(4);
+    expect(hits[0].at).toBeGreaterThan(5);
+    expect(hits[0].at).toBeLessThan(10);
+    gateChannel.forEach((h, i) => {
+      const k = i + 1;
+      expect(h.event.amount).toBeGreaterThanOrEqual(7 * k * 15);
+      expect(h.event.amount).toBeLessThanOrEqual(9 * k * 15);
+    });
+    // ...and the cadence reseeds from the gate arm (the countdown freezes
+    // while a channel is live, so the follow-up lands ~38s later), rather
+    // than a second gate-fired channel chaining instantly.
+    expect(hits.length).toBeGreaterThan(4);
+    expect(hits[4].at - hits[0].at).toBeGreaterThan(25);
+  });
+
+  it('a gate crossed during a live channel is served by it, never chained back-to-back', () => {
+    const { sim, boss, tank } = setup(15);
+    boss.infernoTimer = 0.1; // force a cadence channel on the first tick
+    run(sim, 3, [tank]);
+    boss.hp = boss.maxHp * 0.45; // cross the gate MID-channel
+    const rows = run(sim, 22, [tank]);
+    const hits = infernoHits(rows, boss.id);
+    // Only the pulses of the one live channel: the mid-channel gate is
+    // consumed by it instead of instantly re-arming a second 8s root.
+    expect(hits.length).toBeLessThanOrEqual(4);
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('the gate fires once: hp hovering across the line does not re-arm', () => {
+    const { sim, boss, tank } = setup(15);
+    boss.hp = boss.maxHp * 0.49;
+    run(sim, 12, [tank]); // gate channel runs to completion
+    boss.hp = boss.maxHp * 0.8; // "heal" back over the line...
+    run(sim, 2, [tank]);
+    boss.hp = boss.maxHp * 0.49; // ...and cross it again
+    const rows = run(sim, 12, [tank]);
+    expect(infernoHits(rows, boss.id)).toHaveLength(0); // consumed; only the cadence remains
   });
 });

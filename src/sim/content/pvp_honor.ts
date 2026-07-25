@@ -13,6 +13,7 @@
 // Quartermaster. The budget rule + the badge-comparison guard live in
 // tests/pvp_honor_gear.test.ts.
 
+import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../eastbrook_layout';
 import type { ItemDef, NpcDef } from '../types';
 
 export const FURY_NPC_ID = 'fury';
@@ -637,8 +638,8 @@ export const FURY_NPC: NpcDef = {
   id: FURY_NPC_ID,
   name: 'FURY',
   title: 'Honor Quartermaster',
-  pos: { x: -11, z: 1 },
-  facing: Math.PI / 2,
+  pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.fury.position },
+  facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fury.facing,
   color: 0xb52a2a,
   questIds: [],
   vendorItems: [...FURY_STOCK],

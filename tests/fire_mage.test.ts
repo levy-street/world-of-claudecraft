@@ -4,7 +4,7 @@
 // and the frost mage's Water Elemental. Follows the mage_choice_rows harness.
 
 import { describe, expect, it } from 'vitest';
-import { fireGuaranteedCrit, HOT_STREAK_BUILDERS } from '../src/sim/combat/fire_mage';
+import { applyIgnite, fireGuaranteedCrit, HOT_STREAK_BUILDERS } from '../src/sim/combat/fire_mage';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { ROW_TREES } from '../src/sim/content/talent_rows';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
@@ -117,6 +117,76 @@ describe('guaranteed crits and Ignition', () => {
     expect(second).toBeGreaterThan(first); // the burn banked on top
   });
 
+  it('a re-bank FOLDS the unpaid remainder forward, never re-extends it free (balance 2026-07-24)', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim);
+    const ctx = (sim as unknown as { ctx: Parameters<typeof applyIgnite>[0] }).ctx;
+    // Bank 300: a third per 2s tick over the 6s window.
+    applyIgnite(ctx, p, mob, 300);
+    const ignite = mob.auras.find((a) => a.id === 'ignite');
+    expect(ignite?.value).toBe(100);
+    if (!ignite) throw new Error('ignite missing');
+    // Pin the clock mid-window: exactly two ticks (of 100) still owed.
+    ignite.remaining = 4;
+    ignite.tickTimer = 2;
+    // Re-bank 90: the 200 outstanding folds into the fresh window with it.
+    applyIgnite(ctx, p, mob, 90);
+    expect(ignite.value).toBe(97); // round((2*100 + 90) / 3), NOT 100 + 30
+    expect(ignite.remaining).toBe(6);
+    // The fresh window pays exactly the folded bank: 3 ticks of 97.
+    const paid = collect(sim, 10)
+      .filter(
+        (e): e is Extract<SimEvent, { type: 'damage' }> =>
+          e.type === 'damage' && e.ability === 'Ignite' && e.targetId === mob.id,
+      )
+      .reduce((sum, e) => sum + e.amount, 0);
+    expect(paid).toBe(291);
+    expect(mob.auras.some((a) => a.id === 'ignite')).toBe(false); // fully paid out
+  });
+
+  it('the bank pays out ONCE: ticks skip source damage buffs (review finding 2026-07-25)', () => {
+    // The bank copies RESOLVED damage, which already ate Rune of Power /
+    // Convergence style multipliers. Pre-fix, each tick then went through
+    // dealDamage's buff_dmg_done block AGAIN: a 300 bank paid 330 under a
+    // +10% buff and 360 under +20%. Now the aura's finalDamage flag routes
+    // ticks through alreadyFinal and the payout equals the bank, exactly.
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim);
+    const ctx = (sim as unknown as { ctx: Parameters<typeof applyIgnite>[0] }).ctx;
+    p.auras.push({
+      id: 'test_dmg_buff',
+      name: 'TestBuff',
+      kind: 'buff_dmg_done',
+      value: 0.2,
+      remaining: 60,
+      duration: 60,
+      sourceId: p.id,
+      school: 'arcane',
+    });
+    applyIgnite(ctx, p, mob, 300);
+    const paid = collect(sim, 10)
+      .filter(
+        (e): e is Extract<SimEvent, { type: 'damage' }> =>
+          e.type === 'damage' && e.ability === 'Ignite' && e.targetId === mob.id,
+      )
+      .reduce((sum, e) => sum + e.amount, 0);
+    expect(paid).toBe(300); // NOT 360: the +20% buff must not double-dip the bank
+  });
+
+  it('a re-bank on an expiring Ignite (no ticks left) starts a fresh bank only', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim);
+    const ctx = (sim as unknown as { ctx: Parameters<typeof applyIgnite>[0] }).ctx;
+    applyIgnite(ctx, p, mob, 300);
+    const ignite = mob.auras.find((a) => a.id === 'ignite');
+    if (!ignite) throw new Error('ignite missing');
+    // The clock has less time left than the tick timer: nothing more would pay.
+    ignite.remaining = 1.5;
+    ignite.tickTimer = 2;
+    applyIgnite(ctx, p, mob, 90);
+    expect(ignite.value).toBe(30); // round(90 / 3): no phantom remainder folded
+  });
+
   it('Scorch always crits only against targets at or below 30% health', () => {
     const { sim, p } = mageWithSpec('fire');
     const mob = addDummy(sim);
@@ -191,6 +261,32 @@ describe('Hot Streak', () => {
   });
 });
 
+describe('Phoenix Trance restokes the bank (designer rule 2026-07-25)', () => {
+  it('finishes the charge currently recharging: the schedule advances, the bank does not grow', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim);
+    sim.castAbility('fire_blast'); // drain the whole bank back to back (off-GCD)
+    sim.castAbility('fire_blast');
+    sim.castAbility('fire_blast');
+    const bank = p.abilityCharges?.fire_blast;
+    expect(bank?.charges).toBe(0);
+    expect(bank?.recharges?.length).toBe(3); // three parallel recharge timers running
+    expect(p.cooldowns.get('fire_blast')).toBeGreaterThan(0); // the empty-bank swirl
+    sim.castAbility('combustion');
+    expect(bank?.charges).toBe(1); // the Trance window opens with a charge
+    expect(bank?.recharges?.length).toBe(2); // the soonest timer retired: no bonus charge
+    expect(p.cooldowns.get('fire_blast')).toBeUndefined(); // the swirl cleared
+  });
+
+  it('is a no-op at a full, untouched bank (the pre-pull opener case)', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim);
+    sim.castAbility('combustion');
+    // The charge state never even materializes: the full bank is implicit.
+    expect(p.abilityCharges?.fire_blast).toBeUndefined();
+  });
+});
+
 describe('playtest round four (owner hotfixes)', () => {
   it('Combustion is off the GCD', () => {
     const { sim, p } = mageWithSpec('fire');
@@ -246,6 +342,26 @@ describe('playtest round four (owner hotfixes)', () => {
     expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(false);
   });
 
+  it('Fire Blast lands instantly without disturbing a Fireball already being cast', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim, 18);
+    sim.castAbility('fireball');
+    collect(sim, 0.5);
+    const remainingBefore = p.castRemaining;
+    const castTargetBefore = p.castTargetId;
+    const hpBefore = mob.hp;
+    sim.drainEvents();
+
+    sim.castAbility('fire_blast');
+
+    const events = sim.drainEvents();
+    expect(mob.hp).toBeLessThan(hpBefore);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(false);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBe(remainingBefore);
+    expect(p.castTargetId).toBe(castTargetBefore);
+  });
+
   it('Scorch casts on the move', () => {
     const { sim, p } = mageWithSpec('fire');
     addDummy(sim, 10);
@@ -281,7 +397,7 @@ describe('Pyroblast as a builder (owner rule)', () => {
     sim.castAbility('fire_blast'); // crit 1 (instant)
     collect(sim, 0.3);
     gcdReset(p);
-    sim.castAbility('fire_blast'); // crit 2: Hot Streak armed
+    sim.castAbility('fire_blast'); // crit 2: Hot Streak armed (charge 2, no GCD)
     collect(sim, 0.3);
     expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(true);
     gcdReset(p);
@@ -365,6 +481,22 @@ describe('playtest round five (owner hotfixes)', () => {
     expect(p.castingAbility).toBeNull(); // instant under the streak
     expect(p.resource).toBe(mana0); // and free
     expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(false); // spent
+  });
+
+  it('Flamestrike has no cooldown and can be cast again after its GCD', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim);
+
+    expect(ABILITIES.flamestrike.cooldown).toBe(0);
+    sim.castAbilityAt('flamestrike', { x: mob.pos.x, z: mob.pos.z });
+    expect(p.castingAbility).toBe('flamestrike');
+    while (p.castingAbility) collect(sim, 0.05);
+    expect(p.cooldowns.has('flamestrike')).toBe(false);
+
+    gcdReset(p);
+    p.resource = p.maxResource;
+    sim.castAbilityAt('flamestrike', { x: mob.pos.x, z: mob.pos.z });
+    expect(p.castingAbility).toBe('flamestrike');
   });
 
   it('Rune of Power is a deliberate cast now', () => {

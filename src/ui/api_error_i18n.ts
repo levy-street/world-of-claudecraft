@@ -329,6 +329,11 @@ export function userFacingApiError(err: unknown): string {
   // network' is a byte-exact wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
   if (normalized === 'too many connections from your network')
     return t('loading.tooManyConnections');
+  // A rolling deploy paired client and server binaries whose authoritative
+  // world layouts disagree. The wire literal remains actionable to legacy
+  // clients that lack this matcher; current clients render the localized form.
+  if (normalized === 'game and server versions are incompatible. reload or update, then try again.')
+    return t('loading.incompatibleWorldVersion');
   // NOTE: protocol/transport diagnostics ('bad auth message', 'authentication timed out',
   // etc.) are intentionally NOT translated, they are developer/diagnostic errors and must
   // stay English so browser logs and support reports match the server source.

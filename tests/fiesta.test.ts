@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { groundHeight } from '../src/sim/world';
+import {
+  AUGMENTS,
+  AUGMENTS_BY_ID,
+  eligibleAugments,
+  tierForWave,
+} from '../src/sim/content/augments';
 import { arenaOrigin } from '../src/sim/data';
-import { AUGMENTS, AUGMENTS_BY_ID, eligibleAugments, tierForWave } from '../src/sim/content/augments';
+import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -11,7 +16,8 @@ function makeWorld() {
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
   const e = sim.entities.get(pid)!;
-  e.pos.x = x; e.pos.z = z;
+  e.pos.x = x;
+  e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
   (sim as any).rebucket(e);
@@ -22,8 +28,12 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 function startFiesta(classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest']) {
   const sim = makeWorld();
   const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
-  pids.forEach((p, i) => teleport(sim, p, i * 4, -40));
-  pids.forEach((p) => sim.arenaQueueJoin(p, 'fiesta'));
+  pids.forEach((p, i) => {
+    teleport(sim, p, i * 4, -40);
+  });
+  pids.forEach((p) => {
+    sim.arenaQueueJoin(p, 'fiesta');
+  });
   sim.tick(); // matchmake
   for (let i = 0; i < 20 * 8; i++) {
     sim.tick();
@@ -69,11 +79,39 @@ describe('fiesta: scoring & respawn', () => {
     expect(victim.dead).toBe(true);
 
     // The victim should NOT be permanently eliminated — they revive on their timer.
+    // The respawn reset is a clean slate: a held selection does not survive it
+    // (only the countdown-end fight-start reset retains a valid target).
+    victim.targetId = killerPid;
     const downedFor = match.fiesta!.respawn.get(victimPid)!;
     for (let i = 0; i < Math.ceil(downedFor * 20) + 5; i++) sim.tick();
     expect(match.fiesta!.respawn.has(victimPid)).toBe(false);
     expect(sim.entities.get(victimPid)!.dead).toBe(false);
     expect(sim.entities.get(victimPid)!.hp).toBeGreaterThan(0);
+    expect(sim.entities.get(victimPid)!.targetId).toBe(null);
+  });
+
+  it('keeps a cross-team target selected during the countdown when the fiesta goes live', () => {
+    const sim = makeWorld();
+    const classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest'];
+    const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
+    pids.forEach((p, i) => {
+      teleport(sim, p, i * 4, -40);
+    });
+    pids.forEach((p) => {
+      sim.arenaQueueJoin(p, 'fiesta');
+    });
+    sim.tick(); // matchmake
+    const match = sim.arenaMatchFor(pids[0])!;
+    expect(match.state).toBe('countdown');
+    const me = match.teamA[0];
+    const opp = match.teamB[0];
+    sim.targetEntity(opp, me);
+    expect(sim.entities.get(me)!.targetId).toBe(opp);
+
+    for (let i = 0; i < 20 * 8 && match.state !== 'active'; i++) sim.tick();
+
+    expect(match.state).toBe('active');
+    expect(sim.entities.get(me)!.targetId).toBe(opp);
   });
 
   it('respawn timers grow with each death', () => {
@@ -186,11 +224,17 @@ describe('fiesta: augments', () => {
 
   it('standardizes every fighter to level 20 with a balanced build, restoring after', () => {
     const sim = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
-    const pids = (['warrior', 'mage', 'rogue', 'priest'] as const).map((c, i) => sim.addPlayer(c, `P${i}`));
+    const pids = (['warrior', 'mage', 'rogue', 'priest'] as const).map((c, i) =>
+      sim.addPlayer(c, `P${i}`),
+    );
     // Pretend everyone walked in at level 8.
     for (const p of pids) sim.setPlayerLevel(8, p);
-    pids.forEach((p) => teleport(sim, p, pids.indexOf(p) * 4, -40));
-    pids.forEach((p) => sim.arenaQueueJoin(p, 'fiesta'));
+    pids.forEach((p) => {
+      teleport(sim, p, pids.indexOf(p) * 4, -40);
+    });
+    pids.forEach((p) => {
+      sim.arenaQueueJoin(p, 'fiesta');
+    });
     sim.tick();
     for (const p of pids) expect(sim.entities.get(p)!.level).toBe(20);
     // Persistence safety: serialize must report the ORIGINAL level, not 20.
@@ -274,7 +318,10 @@ describe('fiesta: offline practice vs bots', () => {
     const run = () => {
       const sim = new Sim({ seed: 11, playerClass: 'mage' });
       sim.startFiestaPractice();
-      for (let i = 0; i < 20 * 30; i++) { sim.updateFiestaBots(); sim.tick(); }
+      for (let i = 0; i < 20 * 30; i++) {
+        sim.updateFiestaBots();
+        sim.tick();
+      }
       const m = sim.arenaMatchFor(sim.playerId);
       return m?.fiesta ? [m.fiesta.scoreA, m.fiesta.scoreB] : null;
     };
@@ -292,7 +339,17 @@ describe('fiesta: augment catalog integrity', () => {
   });
 
   it('every class can be offered three augments at every tier', () => {
-    const classes: PlayerClass[] = ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'];
+    const classes: PlayerClass[] = [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ];
     for (const cls of classes) {
       for (const tier of ['silver', 'gold', 'prismatic'] as const) {
         // role null is the worst case (healer-only augments excluded)

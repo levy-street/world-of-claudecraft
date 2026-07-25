@@ -14,7 +14,10 @@ import {
   compactAuraDuration,
   createAurasView,
   DEBUFF_AURA_KINDS,
+  EXPIRING_BLINK_FRAC,
+  EXPIRING_BLINK_SEC,
   isAuraDebuff,
+  isAuraExpiring,
 } from '../src/ui/auras_view';
 import { assertAllocationStable } from './util/alloc_probe';
 
@@ -342,6 +345,46 @@ describe('createAurasView: derivation per mode', () => {
       return state.slots.slice(0, state.count).map((s) => ({ ...s }));
     };
     expect(build()).toEqual(build());
+  });
+});
+
+describe('isAuraExpiring + the expiring slot flag (the QoL blink threshold)', () => {
+  it('blinks inside min(10s, 30% of duration) and never on missing/zero duration', () => {
+    // Short 12s DoT: threshold is 3.6s (30%), not the flat 10s.
+    expect(isAuraExpiring(3.5, 12)).toBe(true);
+    expect(isAuraExpiring(3.7, 12)).toBe(false);
+    // Long buff: threshold caps at the flat 10s.
+    expect(isAuraExpiring(9, 1800)).toBe(true);
+    expect(isAuraExpiring(11, 1800)).toBe(false);
+    // Exactly at the boundary blinks (<=).
+    expect(isAuraExpiring(EXPIRING_BLINK_SEC, 1800)).toBe(true);
+    expect(isAuraExpiring(12 * EXPIRING_BLINK_FRAC, 12)).toBe(true);
+    // A missing/zero duration (an old server) or an already-expired aura never blinks.
+    expect(isAuraExpiring(2, undefined)).toBe(false);
+    expect(isAuraExpiring(2, 0)).toBe(false);
+    expect(isAuraExpiring(0, 12)).toBe(false);
+  });
+
+  it('sets slot.expiring for a dying DoT and clears it on refresh, never on toggles', () => {
+    const view = createAurasView('all', deps());
+    const dying = view.tick(
+      entity([
+        aura({ id: 'rend', kind: 'dot', remaining: 2, duration: 12 }),
+        aura({ id: 'might', kind: 'buff_ap', remaining: 300, duration: 600 }),
+        // A toggle shows no countdown, so it must never blink even at 1s left.
+        aura({ id: 'bear', kind: 'form_bear', remaining: 1, duration: 3600 }),
+      ]),
+    );
+    expect(dying.slots.slice(0, 3).map((s) => [s.key, s.expiring])).toEqual([
+      ['rend', true],
+      ['might', false],
+      ['bear', false],
+    ]);
+    // The same pooled slot clears the flag when the aura is refreshed.
+    const refreshed = view.tick(
+      entity([aura({ id: 'rend', kind: 'dot', remaining: 12, duration: 12 })]),
+    );
+    expect(refreshed.slots[0].expiring).toBe(false);
   });
 });
 

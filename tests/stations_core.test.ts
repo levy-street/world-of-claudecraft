@@ -11,7 +11,7 @@ import { STATIONS } from '../src/sim/data';
 
 describe('stationPropPlacements (the pure placement core)', () => {
   it('covers every STATIONS record', () => {
-    const placedIds = new Set(stationPropPlacements().map((p) => p.stationId));
+    const placedIds = new Set(stationPropPlacements(STATIONS).map((p) => p.stationId));
     for (const station of STATIONS) {
       expect(placedIds.has(station.id), station.id).toBe(true);
     }
@@ -23,7 +23,7 @@ describe('stationPropPlacements (the pure placement core)', () => {
       const cluster = STATION_PROP_CLUSTERS[station.type];
       const anchors = cluster.filter((prop) => prop.dx === 0 && prop.dz === 0);
       expect(anchors, `${station.type} cluster anchor count`).toHaveLength(1);
-      const placements = stationPropPlacements().filter((p) => p.stationId === station.id);
+      const placements = stationPropPlacements(STATIONS).filter((p) => p.stationId === station.id);
       const anchorPlacement = placements.find(
         (p) => p.x === station.pos.x && p.z === station.pos.z,
       );
@@ -34,7 +34,7 @@ describe('stationPropPlacements (the pure placement core)', () => {
 
   it('every placement kind resolves to a preloadable asset and a target height', () => {
     const { assetUrl, targetHeight } = stationsPreloadInternalsForTest;
-    for (const placement of stationPropPlacements()) {
+    for (const placement of stationPropPlacements(STATIONS)) {
       expect(assetUrl[placement.kind], placement.kind).toBeDefined();
       expect(targetHeight[placement.kind], placement.kind).toBeGreaterThan(0);
     }
@@ -51,6 +51,10 @@ describe('stationPropPlacements (the pure placement core)', () => {
   });
 
   it('is deterministic: two flattens are deep-equal', () => {
-    expect(stationPropPlacements()).toEqual(stationPropPlacements());
+    expect(stationPropPlacements(STATIONS)).toEqual(stationPropPlacements(STATIONS));
+  });
+
+  it('emits no fixed town props when the active world exposes no stations', () => {
+    expect(stationPropPlacements([])).toEqual([]);
   });
 });

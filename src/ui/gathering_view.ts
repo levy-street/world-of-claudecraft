@@ -160,6 +160,22 @@ export function gatherDowngradeLineKey(lost: 'mark' | 'find'): TranslationKey {
     : 'hudChrome.gathering.downgradeMark';
 }
 
+/** Which layered rarity stinger (if any) a gather's loot event should play on
+ *  top of the node-type impact cue. A rare event forces at least the epic
+ *  stinger regardless of the rolled material rarity (a rare event is rarer
+ *  than a legendary material roll at every proficiency level:
+ *  GATHER_RARE_EVENT_CHANCE is a flat 1/90 draw, gather_events.ts); otherwise
+ *  the stinger tracks the rolled tier 1:1. common/uncommon get no stinger. */
+export function gatherRareTierFor(
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary',
+  rareEvent: unknown,
+): 'rare' | 'epic' | 'legendary' | null {
+  if (rarity === 'legendary') return 'legendary';
+  if (rarity === 'epic' || rareEvent !== null) return 'epic';
+  if (rarity === 'rare') return 'rare';
+  return null;
+}
+
 /** One row of the gathering-proficiency display: a profession id plus its
  *  current point value, in the fixed GATHERING_PROFESSION_IDS order. `value`
  *  is the raw, possibly fractional proficiency (the repaint-signature input,

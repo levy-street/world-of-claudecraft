@@ -49,8 +49,8 @@ function placeAt(sim: Sim, pid: number, pos: { x: number; z: number }) {
   entity.prevPos = { ...entity.pos };
 }
 
-const toolworks = stationsOfType('toolworks')[0];
-const tannery = stationsOfType('tannery')[0];
+const toolworks = stationsOfType(STATIONS, 'toolworks')[0];
+const tannery = stationsOfType(STATIONS, 'tannery')[0];
 
 // A spot guaranteed outside EVERY station circle (far off the playfield).
 const NOWHERE = { x: 5000, z: 5000 };
@@ -113,7 +113,10 @@ describe('station content', () => {
     const ringIds = new Set(CRAFT_RING.map((c) => c.id));
     for (const [craftId, type] of Object.entries(STATION_TYPE_BY_CRAFT)) {
       expect(ringIds.has(craftId), `${craftId} must be a ring craft`).toBe(true);
-      expect(stationsOfType(type).length, `${type} needs a physical station`).toBeGreaterThan(0);
+      expect(
+        stationsOfType(STATIONS, type).length,
+        `${type} needs a physical station`,
+      ).toBeGreaterThan(0);
     }
     // The three station-less crafts stay station-less (no station-bound
     // content exists for them today).
@@ -163,19 +166,27 @@ describe('station content', () => {
 
 describe('isAtStation geometry (squared-distance, per type)', () => {
   it('is true at the station center and on the radius boundary, false one step past', () => {
-    expect(isAtStation(toolworks.pos, 'toolworks')).toBe(true);
+    expect(isAtStation(STATIONS, toolworks.pos, 'toolworks')).toBe(true);
     expect(
-      isAtStation({ x: toolworks.pos.x + STATION_RADIUS, z: toolworks.pos.z }, 'toolworks'),
+      isAtStation(
+        STATIONS,
+        { x: toolworks.pos.x + STATION_RADIUS, z: toolworks.pos.z },
+        'toolworks',
+      ),
     ).toBe(true);
     expect(
-      isAtStation({ x: toolworks.pos.x + STATION_RADIUS + 1, z: toolworks.pos.z }, 'toolworks'),
+      isAtStation(
+        STATIONS,
+        { x: toolworks.pos.x + STATION_RADIUS + 1, z: toolworks.pos.z },
+        'toolworks',
+      ),
     ).toBe(false);
   });
 
   it('discriminates per type: standing at the tannery is not being at the toolworks', () => {
-    expect(isAtStation(tannery.pos, 'tannery')).toBe(true);
-    expect(isAtStation(tannery.pos, 'toolworks')).toBe(false);
-    expect(isAtStation(NOWHERE, 'tannery')).toBe(false);
+    expect(isAtStation(STATIONS, tannery.pos, 'tannery')).toBe(true);
+    expect(isAtStation(STATIONS, tannery.pos, 'toolworks')).toBe(false);
+    expect(isAtStation(STATIONS, NOWHERE, 'tannery')).toBe(false);
   });
 });
 

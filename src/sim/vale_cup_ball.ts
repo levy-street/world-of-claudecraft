@@ -130,6 +130,20 @@ function reflectOffWall(b: VcBallKinematics, w: VcWallSegment): boolean {
   return true;
 }
 
+// The crossbar and the solid goal frame above it: a ball crossing the goal line
+// between the posts ABOVE the crossbar (an over-charged, ballooned shot) must
+// bank back into play off the frame, never escape through the otherwise-open
+// goal mouth. Analytic reflection off the vertical goal-line plane, matching
+// reflectOffWall: mirror the center back inside, flip the outward (x) component
+// and scale the tangential (z) component by the board restitution. The vertical
+// velocity is left untouched (a vertical plane), so gravity still carries the
+// ball down into the pitch.
+function reflectOffGoalFrame(b: VcBallKinematics, goalLineX: number): void {
+  b.x = 2 * goalLineX - b.x;
+  b.vx = -b.vx * VC_BALL_WALL_RESTITUTION;
+  b.vz *= VC_BALL_WALL_RESTITUTION;
+}
+
 // One 20 Hz physics step while the ball is IN PLAY (inside the boards).
 // Integrates gravity + ground bounce, rolling friction, the speed cap, then the
 // goal planes and the board reflections. Returns the SCORING team when the
@@ -147,17 +161,26 @@ export function stepBallPhysics(b: VcBallKinematics, groundY: number): 'A' | 'B'
 
   // Goal planes first: a center crossing between the posts (inclusive at the
   // post line), UNDER the crossbar, is a score and must NOT bank off the
-  // flanking board segments. A ball crossing above the bar height sails over.
+  // flanking board segments. A ball crossing above the bar height is over the
+  // bar: it still does NOT score (the accuracy cost of an over-powered charged
+  // shot), but the crossbar / goal frame is solid, so it banks back into play
+  // instead of escaping through the open mouth.
   if (px >= GOAL_LINE_WEST_X && b.x < GOAL_LINE_WEST_X) {
     const t = (px - GOAL_LINE_WEST_X) / Math.max(1e-9, px - b.x);
     const zc = pz + (b.z - pz) * t;
     const yc = py + (b.y - py) * t;
-    if (zc >= GOAL_Z_MIN && zc <= GOAL_Z_MAX && yc - groundY < GOAL_HEIGHT) return 'B';
+    if (zc >= GOAL_Z_MIN && zc <= GOAL_Z_MAX) {
+      if (yc - groundY < GOAL_HEIGHT) return 'B';
+      reflectOffGoalFrame(b, GOAL_LINE_WEST_X);
+    }
   } else if (px <= GOAL_LINE_EAST_X && b.x > GOAL_LINE_EAST_X) {
     const t = (GOAL_LINE_EAST_X - px) / Math.max(1e-9, b.x - px);
     const zc = pz + (b.z - pz) * t;
     const yc = py + (b.y - py) * t;
-    if (zc >= GOAL_Z_MIN && zc <= GOAL_Z_MAX && yc - groundY < GOAL_HEIGHT) return 'A';
+    if (zc >= GOAL_Z_MIN && zc <= GOAL_Z_MAX) {
+      if (yc - groundY < GOAL_HEIGHT) return 'A';
+      reflectOffGoalFrame(b, GOAL_LINE_EAST_X);
+    }
   }
 
   for (const w of PITCH_WALLS) reflectOffWall(b, w);

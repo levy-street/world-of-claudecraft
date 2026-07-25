@@ -52,8 +52,8 @@ export const GCD = 1.5; // seconds
 // never collapses to nothing. The base GCD is divided by spellHasteMult at cast time.
 export const MIN_GCD = 0.75; // seconds
 // Combat ratings are gear-facing stats converted to fractions in recalcPlayerStats.
-export const HASTE_RATING_PER_PCT = 10; // 10 haste rating = 1% faster
-export const CRIT_RATING_PER_PCT = 10; // 10 crit rating = +1% crit chance
+export const HASTE_RATING_PER_PCT = 20; // 20 haste rating = 1% faster
+export const CRIT_RATING_PER_PCT = 20; // 20 crit rating = +1% crit chance
 export const HIT_RATING_PER_PCT = 10; // 10 hit rating = +1% hit (less miss/resist)
 export function hasteFractionFromRating(rating: number): number {
   return rating / (HASTE_RATING_PER_PCT * 100);
@@ -488,6 +488,11 @@ export interface Aura {
   // the per-application maxBonus cap holds across channel ticks.
   extendedBy?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
+  // dot only: the per-tick value was copied from ALREADY-RESOLVED damage (Ignite's
+  // 40%-of-the-crit bank), so ticks pass dealDamage's alreadyFinal and skip the
+  // source-output multipliers a second application would double-dip (PR #2360
+  // review finding: a 300 bank paid 330 under a +10% damage buff).
+  finalDamage?: boolean;
   // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
   // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
   // 15% AoE conversion), true = a Cascada temporal group echo (13% ST / 6% AoE).
@@ -1142,6 +1147,11 @@ export interface MobTemplate {
   // firing `pulses` evenly-spaced unmitigated AoE pulses whose damage
   // ESCALATES per pulse (pulse k rolls range(min, max) x k, then the
   // per-entity mechanicDamageMult). Uninterruptible: pair with ccImmune.
+  // Optional atHpPct thresholds (mirroring summonAdds) ALSO arm the channel
+  // the first time hp falls to each fraction, so every group sees the burn
+  // phase even when the boss dies inside the first cadence window; a
+  // threshold crossed while a channel is already live is served by that
+  // channel (no back-to-back re-arm).
   infernoChannel?: {
     every: number;
     duration: number;
@@ -1151,6 +1161,7 @@ export interface MobTemplate {
     radius: number;
     name: string;
     school?: string;
+    atHpPct?: number[];
   };
   // Boss mechanic: a periodic telegraphed HARDCAST. Unlike the instant aoePulse,
   // the mob shows a real cast bar (the entity casting fields carry castId) for
@@ -2278,6 +2289,10 @@ export interface AbilityDef {
   exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
+  // The ability cannot be activated while physically inside a claimed dungeon or
+  // raid instance. Toggle buffs may still be cancelled there to avoid trapping the
+  // player in an action-locking form.
+  requiresOutsideInstance?: boolean;
   // Usable only while the caster wears an aura of this kind (Victory Rush's
   // on-kill window); runEffects consumes the enabling aura on a successful cast.
   requiresAuraKind?: AuraKind;
@@ -2430,19 +2445,60 @@ export interface ZoneDef {
 
 export interface BuildingDef {
   kind: 'house' | 'inn' | 'chapel';
+  /** Stable authored placement identity for focused landmark renderers. */
+  id?: string;
+  /** Runtime asset URL. Absent keeps the legacy procedural prop path. */
+  assetId?: string;
+  landmark?: 'eastbrook_grand_armoury';
   x: number;
   z: number;
   w: number;
   d: number;
   rot: number;
+  /** Authored height above grade for camera collision. */
+  height?: number;
+}
+
+export interface StaticObbPropDef {
+  id: string;
+  assetId: string;
+  x: number;
+  z: number;
+  w: number;
+  d: number;
+  rot: number;
+  height: number;
+  /** False when a merged mesh cannot hide this placement independently. */
+  camGhost?: boolean;
 }
 
 // Static prop placement per zone — the renderer builds meshes from these and
 // the collider grid blocks movement against them, so they must stay in sync.
 export interface ZonePropsDef {
   buildings: BuildingDef[];
-  wells: { x: number; z: number; r: number }[];
-  stalls: { x: number; z: number; rot: number; r: number; smithy?: true }[];
+  wells: {
+    id?: string;
+    assetId?: string;
+    x: number;
+    z: number;
+    r: number;
+    height?: number;
+    camGhost?: boolean;
+  }[];
+  stalls: {
+    id?: string;
+    assetId?: string;
+    x: number;
+    z: number;
+    rot: number;
+    r: number;
+    w?: number;
+    d?: number;
+    height?: number;
+    canopyVariant?: string;
+    smithy?: true;
+    camGhost?: boolean;
+  }[];
   // moundOffset/moundRadius override the collider's default backward offset
   // and radius (colliders.ts) for the rock mound behind the timber portal,
   // for a mine entry whose (x, z) doubles as a real interactable's trigger
@@ -2462,7 +2518,20 @@ export interface ZonePropsDef {
   campfires: [number, number][];
   mudHuts: [number, number][];
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
-  fences: { x1: number; z1: number; x2: number; z2: number }[];
+  fences: {
+    id?: string;
+    assetId?: string;
+    x1: number;
+    z1: number;
+    x2: number;
+    z2: number;
+    width?: number;
+    height?: number;
+  }[];
+  /** Small authored solid OBB props, currently civic benches. */
+  benches?: StaticObbPropDef[];
+  /** Full-height wall OBBs. Gate openings are the gaps between these records. */
+  walls?: StaticObbPropDef[];
   graveyards: { x: number; z: number }[]; // 6-headstone cluster anchor
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
@@ -2482,6 +2551,8 @@ export function emptyZoneProps(): ZonePropsDef {
     mudHuts: [],
     ruinRings: [],
     fences: [],
+    benches: [],
+    walls: [],
     graveyards: [],
   };
 }
@@ -2586,6 +2657,11 @@ export interface Consuming {
   hpPer2s: number;
   manaPer2s: number;
   remaining: number;
+  // Counts real 2s regen ticks (updateRegen, combat/auras.ts), starting at 0 and
+  // incrementing every tick regardless of whether hp/mana was still missing.
+  // Drives the eat/drink bite/gulp sound cadence (see consume_sfx.ts); never
+  // read for anything else.
+  ticksElapsed: number;
 }
 
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {
@@ -2886,6 +2962,7 @@ export interface Entity {
   infernoTimer: number; // infernoChannel cadence countdown
   infernoRemaining: number; // seconds left in a live inferno channel (0 = not channeling)
   infernoPulsesFired: number; // pulses already fired this channel
+  infernoGatesFired: number; // infernoChannel.atHpPct thresholds already consumed
   yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown
@@ -3139,6 +3216,10 @@ export type CalendarResultCode =
   | 'calendarFull'
   | 'eventGone';
 
+// Guild billboard command outcomes (mirrors server/social.ts MotdResultCode;
+// `set` is the success, the rest refusals).
+export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
+
 // An in-flight party/raid ready check (social/ready_check.ts). Keyed on Sim by party
 // id. Each member is 'pending' until they answer; anyone still 'pending' when the
 // timeout fires is counted as "no response" (there is no separate afk state).
@@ -3178,26 +3259,47 @@ export type SimEvent = { pid?: number } & (
       // one-shot animation already began at projectile launch.
       attackAnimationStarted?: true;
     }
-  | { type: 'heal'; targetId: number; amount: number }
+  | {
+      type: 'heal';
+      targetId: number;
+      amount: number;
+      // Set only by a potion quaff (items.ts) or an eat/drink regen tick
+      // (combat/auras.ts); every other heal source (leech, second wind,
+      // companion heals, ...) leaves this undefined, so hud.ts's existing
+      // generic heal_impact cue is untouched everywhere else.
+      source?: 'potion' | 'food' | 'drink';
+      // Eat/drink only: true on the specific tick that should make a sound
+      // (see shouldFireConsumeTickSfx, consume_sfx.ts), independent of amount
+      // (a full-health/mana character eating still makes a sound, and a
+      // healing tick that ISN'T a sound tick still shows its FCT number
+      // silently). A potion quaff is always a one-shot, so it never sets this.
+      sfxTick?: boolean;
+    }
   | { type: 'death'; entityId: number; killerId: number }
   | { type: 'xp'; amount: number; rested?: number }
   | { type: 'honor'; amount: number; reason: HonorReason }
   | { type: 'levelup'; level: number }
+  // opt-in post-cap rank reset (always personal: emitted with pid), fired by
+  // prestige() in src/sim/progression/xp.ts alongside the 'log' chat line. The
+  // rank itself rides every self snapshot, so this exists to tell an open
+  // character sheet WHEN to repaint, the same job the honor event does for the
+  // Honor row. Text-free: the chat line is the 'log' event.
+  | { type: 'prestige'; rank: number }
   // post-cap cosmetic progression (Max-Level XP Overflow): crossing a virtual
   // level past the cap (milestone unlocks ride the deedUnlocked event since
   // the milestone unification; the legacy milestoneUnlocked emit is gone)
   | { type: 'virtualLevelUp'; level: number }
-  // Cosmetic prestige (prestige(), src/sim/progression/xp.ts): fired alongside
-  // the 'log' chat line so the client can repaint an already-open character
-  // sheet's prestige rank without waiting for an unrelated repaint trigger
-  // (closing/reopening the window). Text-free: the chat line is the 'log' event.
-  | { type: 'prestige'; rank: number }
   // Book of Deeds unlock (always personal: emitted with pid). Carries the deed
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
   | { type: 'learnAbility'; abilityId: string; rank: number }
-  | { type: 'loot'; text: string }
+  // silent: true suppresses only the client's default loot audio cue (the
+  // "You receive: X" text line still prints as normal); a caller with its
+  // own dedicated cue for the same grant (gathering/crafting/enchanting) sets
+  // this so the generic ding doesn't stack on top of it. See Sim.addItem/
+  // addItemInstance's opts param, the one place this gets set.
+  | { type: 'loot'; text: string; silent?: boolean }
   | {
       type: 'lootRoll';
       rollId: number;
@@ -3231,7 +3333,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
   | { type: 'aura'; targetId: number; name: string; gained: boolean; auraKind?: AuraKind }
-  | { type: 'castStart'; entityId: number; ability: string; time: number }
+  | {
+      type: 'castStart';
+      entityId: number;
+      ability: string;
+      time: number;
+      // Only set for GATHER_CAST_ID, so the client can play a per-node-type
+      // tool-out cue (audio.gatherCast in src/game/audio.ts) instead of one
+      // flat sound for every profession. Every other cast omits it.
+      gatherNodeType?: GatherNodeType;
+    }
   | { type: 'castStop'; entityId: number; success: boolean }
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }
@@ -3251,12 +3362,19 @@ export type SimEvent = { pid?: number } & (
   // Structured data only (pid supplied by the union intersection); the client
   // builds every visible string, the mailbox precedent.
   | { type: 'bank' }
+  // Interacting with a town noticeboard. Structured and personal: the client
+  // owns localized feedback, and online routing sends it only to the reader.
+  | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
   // Guild calendar outcome. Emitted only by the server's SocialService (the
   // sim never books guild events); declared here so the one client event
   // switch stays exhaustively typed.
   | { type: 'calendarResult'; code: CalendarResultCode }
+  // Guild billboard outcome. Emitted only by the server's SocialService (the
+  // sim never edits the billboard); declared here, like calendarResult, so the
+  // one client event switch stays exhaustively typed.
+  | { type: 'motdResult'; code: MotdResultCode }
   // A guildmate's or followed friend's marquee deed unlock. Emitted only by
   // the server's SocialService (the sim never sees other players' social
   // graphs); declared here, like calendarResult, so the one client event
@@ -3467,6 +3585,22 @@ export type SimEvent = { pid?: number } & (
       amount: number;
       crit: boolean;
       ability: string;
+      // Set only by a HoT's periodic tick (auras.ts), never a direct cast or the
+      // one-shot application emit below: the client uses this to silence the
+      // repeated per-tick sound (see hud.ts), since a HoT fires this every couple
+      // seconds for its whole duration and the full heal_impact hit read as spam.
+      hot?: boolean;
+      // The aura's ability id (Aura.id), set on both the per-tick emit and the
+      // one-shot application emit (Sim.applyAura) so the client can except one
+      // specific HoT (Frenzied Regeneration) from the tick-silencing above.
+      abilityId?: string;
+      // True ONLY on the one-shot application emit (Sim.applyAura): this event
+      // carries no real healing (amount is always 0) and exists purely to
+      // drive the client-side sound cue. Non-audio consumers (combat meters,
+      // combat log, FCT, heal-glow VFX) must ignore it rather than infer the
+      // same thing from amount === 0, since a genuine direct heal (applyHeal)
+      // can also legitimately land at amount 0 (full HP, fully absorbed).
+      cueOnly?: boolean;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
@@ -3695,7 +3829,11 @@ export type SimEvent = { pid?: number } & (
         | 'not_held'
         | 'insufficient_materials'
         | 'throttled'
-        | 'no_bag_space';
+        | 'no_bag_space'
+        // #2415: already-enchanted target without the confirmReplace flag,
+        // and the identical-enchant-id re-apply denied on every arm.
+        | 'already_enchanted'
+        | 'same_enchant';
     }
   | {
       type: 'salvageResult';
@@ -3982,6 +4120,126 @@ export interface BiomePaint {
   ids: number[]; // length cols*rows; 0/1/2 = biome, 255 = unpainted
 }
 
+export type StationType = 'forge' | 'kitchens' | 'apothecary' | 'tannery' | 'loom' | 'toolworks';
+
+export interface StationDef {
+  id: string;
+  type: StationType;
+  zoneId: string;
+  pos: { x: number; z: number };
+  masterNpcId: string;
+}
+
+export interface MailboxDef {
+  x: number;
+  z: number;
+}
+
+// Noticeboards currently have one complete cross-platform implementation. Keep
+// the world-content shape closed over that renderer/collider contract instead
+// of implying that custom assets or dimensions are supported.
+export const EASTBROOK_NOTICEBOARD_TEMPLATE_ID = 'noticeboard_eastbrook' as const;
+export const EASTBROOK_NOTICEBOARD_ASSET_ID = '/models/props/eastbrook_noticeboard.glb' as const;
+export const EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS = Object.freeze({
+  width: 2.4,
+  depth: 0.6,
+  height: 2.6,
+} as const);
+export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
+// Static world services use their own namespace above the sequential allocator
+// and the reserved 1_000_000_000/1_000_000_001 singleton NPC ids.
+export const STATIC_WORLD_SERVICE_ENTITY_ID_MIN = 2_000_000_001;
+
+/** The one static, interactable noticeboard contract supported by every host. */
+export interface NoticeboardDef {
+  id: string;
+  /** Stable id at or above STATIC_WORLD_SERVICE_ENTITY_ID_MIN. */
+  entityId: number;
+  templateId: typeof EASTBROOK_NOTICEBOARD_TEMPLATE_ID;
+  assetId: typeof EASTBROOK_NOTICEBOARD_ASSET_ID;
+  name: string;
+  x: number;
+  z: number;
+  rotation: number;
+  width: (typeof EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS)['width'];
+  depth: (typeof EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS)['depth'];
+  height: (typeof EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS)['height'];
+  interactionRadius: typeof EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS;
+  frontStandingPoint: { x: number; z: number };
+}
+
+function invalidNoticeboardField(field: string): never {
+  throw new Error(`Invalid canonical Eastbrook noticeboard ${field}`);
+}
+
+function isNoticeboardRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function assertFiniteNoticeboardNumber(
+  record: Readonly<Record<string, unknown>>,
+  key: string,
+  field = key,
+): void {
+  const value = record[key];
+  if (typeof value !== 'number' || !Number.isFinite(value)) invalidNoticeboardField(field);
+}
+
+/** Fail closed at runtime for editor/JSON content that bypasses TypeScript. */
+export function assertCanonicalEastbrookNoticeboardDef(
+  value: unknown,
+): asserts value is NoticeboardDef {
+  if (!isNoticeboardRecord(value)) invalidNoticeboardField('definition');
+  if (value.templateId !== EASTBROOK_NOTICEBOARD_TEMPLATE_ID) {
+    invalidNoticeboardField('templateId');
+  }
+  if (value.assetId !== EASTBROOK_NOTICEBOARD_ASSET_ID) invalidNoticeboardField('assetId');
+  if (value.width !== EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS.width) {
+    invalidNoticeboardField('width');
+  }
+  if (value.depth !== EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS.depth) {
+    invalidNoticeboardField('depth');
+  }
+  if (value.height !== EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS.height) {
+    invalidNoticeboardField('height');
+  }
+  if (value.interactionRadius !== EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS) {
+    invalidNoticeboardField('interactionRadius');
+  }
+  if (typeof value.id !== 'string' || value.id.length === 0) invalidNoticeboardField('id');
+  if (
+    typeof value.entityId !== 'number' ||
+    !Number.isSafeInteger(value.entityId) ||
+    value.entityId < STATIC_WORLD_SERVICE_ENTITY_ID_MIN
+  ) {
+    invalidNoticeboardField('entityId');
+  }
+  if (typeof value.name !== 'string' || value.name.length === 0) invalidNoticeboardField('name');
+  assertFiniteNoticeboardNumber(value, 'x');
+  assertFiniteNoticeboardNumber(value, 'z');
+  assertFiniteNoticeboardNumber(value, 'rotation');
+  if (!isNoticeboardRecord(value.frontStandingPoint)) {
+    invalidNoticeboardField('frontStandingPoint');
+  }
+  assertFiniteNoticeboardNumber(value.frontStandingPoint, 'x', 'frontStandingPoint.x');
+  assertFiniteNoticeboardNumber(value.frontStandingPoint, 'z', 'frontStandingPoint.z');
+}
+
+export interface GraveyardDef {
+  id: string;
+  name: string;
+  x: number;
+  z: number;
+}
+
+/** Optional static gameplay anchors supplied by a world definition. */
+export interface WorldServicesDef {
+  stations?: readonly StationDef[];
+  mailboxes?: readonly MailboxDef[];
+  noticeboards?: readonly NoticeboardDef[];
+  graveyards?: readonly GraveyardDef[];
+}
+
 // A swappable world definition: the spatial + content data the terrain function
 // and the Sim spawn loop derive a playable world from. The built-in 3-zone world
 // is one of these (data.ts BUILTIN_WORLD); the map editor produces custom ones for
@@ -3997,6 +4255,9 @@ export interface WorldContent {
   roads: { x: number; z: number }[][];
   props: ZonePropsDef;
   playerStart: { x: number; z: number };
+  // Optional by design: active custom maps that omit services must not inherit
+  // built-in stations, mailboxes, noticeboards, or graveyards.
+  services?: WorldServicesDef;
   // Heightfield edits applied inside terrainHeight(). Absent/empty for the
   // built-in world, so its heightfield stays byte-identical.
   terrainEdits?: HeightStamp[];

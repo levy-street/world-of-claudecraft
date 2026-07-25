@@ -499,6 +499,53 @@ describe('apply-enchant capacity gate (#2350)', () => {
     expect(sim.countItem('arcane_dust', pid)).toBe(0);
     expect(m.inventory.length).toBe(16);
   });
+
+  // The #2415 replace arm's gate, same #2350/#2139 discipline: the scratch
+  // model consumes the SAME pinned enchanted victim the live path does
+  // (consumeEnchantedVictim on both sides), so the freed slot is modeled and a
+  // full pack still replaces; only a surviving multi-unit victim stack that
+  // frees nothing can genuinely deny.
+  it('replace succeeds with COMPLETELY full bags: the consumed victim frees the home the mint lands in', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const m = setBags(sim, pid, 15);
+    m.inventory.push({
+      itemId: SWORD,
+      count: 1,
+      instance: { enchant: 'enchant_weapon_agility', rolled: { stats: { agi: 2 } } },
+    });
+    m.inventory.push({ itemId: 'arcane_dust', count: 5 }); // exactly the cost: slot frees
+    expect(m.inventory.length).toBe(17); // > the 16-slot budget: zero headroom
+    const result = resolveApplyEnchant(sim.ctx, pid, SWORD, ENCHANT, undefined, true);
+    expect(result.ok).toBe(true);
+    const replaced = m.inventory.find((s) => s.itemId === SWORD);
+    expect(replaced?.instance?.enchant).toBe(ENCHANT);
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+  });
+
+  it('replace denies no_bag_space when the victim leaves a SURVIVING stack and nothing frees a home', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const m = setBags(sim, pid, 14);
+    // A legacy-overstack style slot: two identical enchanted units share one
+    // slot, so consuming one unit frees NOTHING, and the replaced copy (a
+    // different payload) cannot merge back into it.
+    m.inventory.push({
+      itemId: SWORD,
+      count: 2,
+      instance: { enchant: 'enchant_weapon_agility', rolled: { stats: { agi: 2 } } },
+    });
+    m.inventory.push({ itemId: 'arcane_dust', count: 10 }); // 5 remain: keeps its slot
+    const result = resolveApplyEnchant(sim.ctx, pid, SWORD, ENCHANT, undefined, true);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('no_bag_space');
+    // Zero side effects on the deny: stack, reagents, and slots untouched.
+    expect(sim.countItem(SWORD, pid)).toBe(2);
+    expect(sim.countItem('arcane_dust', pid)).toBe(10);
+    expect(m.inventory.length).toBe(16);
+    const stack = m.inventory.find((s) => s.itemId === SWORD);
+    expect(stack?.instance?.enchant).toBe('enchant_weapon_agility');
+  });
 });
 
 describe('unbind split capacity gate (#2350)', () => {

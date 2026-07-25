@@ -424,6 +424,81 @@ describe('taunt and growl', () => {
     expect(wolf.aggroTargetId).toBe(tank.id);
   });
 
+  it('keeps a taunted mob focused through higher-threat pull-over attempts', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const tank = sim.entities.get(sim.addPlayer('warrior', 'Tank'))!;
+    const dps = sim.entities.get(sim.addPlayer('rogue', 'Dps'))!;
+    sim.setPlayerLevel(10, tank.id);
+    sim.setPlayerLevel(10, dps.id);
+    const wolf = nearestMob(sim, 'forest_wolf', tank);
+    beefUp(wolf);
+    teleport(sim, tank, wolf.pos.x + 2, wolf.pos.z);
+    teleport(sim, dps, wolf.pos.x + 3, wolf.pos.z);
+    wolf.threat.set(dps.id, 500);
+    wolf.aggroTargetId = dps.id;
+    wolf.aiState = 'attack';
+    wolf.inCombat = true;
+
+    sim.targetEntity(wolf.id, tank.id);
+    tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
+    sim.castAbility('taunt', tank.id);
+    wolf.threat.set(dps.id, (wolf.threat.get(tank.id) ?? 0) * 3);
+
+    for (let i = 0; i < 20 * 2; i++) {
+      sim.tick();
+      expect(wolf.aggroTargetId).toBe(tank.id);
+      expect(wolf.forcedTargetId).toBe(tank.id);
+    }
+
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+    expect(wolf.forcedTargetId).toBe(null);
+    expect(wolf.aggroTargetId).toBe(dps.id);
+  });
+
+  it('level 5 Warrior Goad locks Deeprock Digger focus and expires back to threat', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const tank = sim.player;
+    const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
+    sim.setPlayerLevel(5, tank.id);
+    sim.setPlayerLevel(5, dps.id);
+    tank.maxHp = 5000;
+    tank.hp = tank.maxHp;
+    dps.maxHp = 5000;
+    dps.hp = dps.maxHp;
+    const digger = sim.entities.get(85);
+    if (!digger || digger.kind !== 'mob' || digger.templateId !== 'tunnel_rat') {
+      throw new Error('expected Deeprock Digger id 85');
+    }
+    beefUp(digger);
+    teleport(sim, tank, digger.pos.x + 2, digger.pos.z);
+    teleport(sim, dps, digger.pos.x + 3, digger.pos.z);
+    digger.threat.set(dps.id, 500);
+    digger.aggroTargetId = dps.id;
+    digger.aiState = 'attack';
+    digger.inCombat = true;
+
+    sim.targetEntity(digger.id, tank.id);
+    tank.facing = Math.atan2(digger.pos.x - tank.pos.x, digger.pos.z - tank.pos.z);
+    sim.castAbility('taunt', tank.id);
+
+    expect(digger.forcedTargetId).toBe(tank.id);
+    expect(digger.forcedTargetTimer).toBeGreaterThan(0);
+    expect(digger.aggroTargetId).toBe(tank.id);
+    expect(digger.threat.get(tank.id)).toBe(500);
+
+    digger.threat.set(dps.id, 5000);
+    for (let i = 0; i < 20 * 2; i++) {
+      sim.tick();
+      expect(digger.forcedTargetId).toBe(tank.id);
+      expect(digger.aggroTargetId).toBe(tank.id);
+    }
+
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+    expect(digger.forcedTargetId).toBe(null);
+    expect(digger.forcedTargetTimer).toBeLessThanOrEqual(0);
+    expect(digger.aggroTargetId).toBe(dps.id);
+  });
+
   it('level 10 paladins know Sacred Goad and taunt at 30 yards', () => {
     expect(abilitiesKnownAt('paladin', 10).some((a) => a.def.id === 'holy_taunt')).toBe(true);
 
@@ -657,6 +732,19 @@ describe('hunter pets', () => {
     return { sim, wolf: pet, originalWolfId };
   }
 
+  function activePetDuel() {
+    const { sim, wolf: pet } = tamedSetup();
+    const rogueId = sim.addPlayer('rogue', 'Sneak', { autoEquip: true });
+    const rogue = sim.entities.get(rogueId)!;
+    sim.setPlayerLevel(10, rogue.id);
+    teleport(sim, rogue, sim.player.pos.x + 3, sim.player.pos.z);
+    sim.duelRequest(rogue.id, sim.playerId);
+    sim.duelAccept(rogue.id);
+    for (let i = 0; i < 20 * 5 && sim.duelFor(sim.playerId)?.state !== 'active'; i++) sim.tick();
+    expect(sim.duelFor(sim.playerId)?.state).toBe('active');
+    return { sim, pet, rogue };
+  }
+
   it('tame beast creates a loyal pet copy and temporarily despawns the wild target', () => {
     const { sim, wolf, originalWolfId } = tamedSetup();
     expect(wolf.ownerId).toBe(sim.playerId);
@@ -670,6 +758,37 @@ describe('hunter pets', () => {
         (e) => e.kind === 'mob' && e.ownerId === null && e.templateId === 'forest_wolf',
       ),
     ).toBe(true);
+  });
+
+  it('drops a stale enemy player target when that player stealths out of detection', () => {
+    const { sim, pet, rogue } = activePetDuel();
+    teleport(sim, sim.player, 0, 0);
+    teleport(sim, pet, 1, 0);
+    teleport(sim, rogue, 30, 0);
+    pet.aggroTargetId = rogue.id;
+    pet.inCombat = true;
+
+    sim.castAbility('stealth', rogue.id);
+    expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    sim.tick();
+
+    expect(pet.aggroTargetId).toBe(null);
+    expect(pet.inCombat).toBe(false);
+  });
+
+  it('blocks hunter pet damage against an undetected stealthed enemy player', () => {
+    const { sim, pet, rogue } = activePetDuel();
+    teleport(sim, pet, 0, 0);
+    teleport(sim, rogue, 30, 0);
+    sim.castAbility('stealth', rogue.id);
+    const stealthedHp = rogue.hp;
+
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBe(stealthedHp);
+
+    teleport(sim, rogue, 2, 0);
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBeLessThan(stealthedHp);
   });
 
   it('friendly target spells can affect controlled pets', () => {

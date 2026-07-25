@@ -1,11 +1,15 @@
 import { dist2d, type Entity, type GatherNodeDef, INTERACT_RANGE } from '../sim/types';
-import { corpseLootAvailability } from './corpse_loot_availability';
+import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { type GatherNodeToolGate, handleGatherNodeInteract } from './gather_node_interact';
 import type { InteractionOutcome } from './interaction_autorun';
+import { objectInteractionRange } from './interactions';
 
 export interface NearbyInteractionWorld {
   player: Entity;
   playerId?: number;
+  // Local party roster for the corpse rights check (IWorld.partyInfo satisfies
+  // this structurally); optional so party-less fixtures stay valid.
+  partyInfo?: { members: readonly { pid: number }[] } | null;
   entities: ReadonlyMap<number, Entity>;
   lootCorpse(id: number): InteractionOutcome;
   // Fire-and-forget half of the unified corpse press; omitting the
@@ -47,6 +51,7 @@ export function tryNearbyInteraction(
 ): InteractionOutcome {
   const player = world.player;
   const playerId = world.playerId ?? player.id;
+  const partyIds = localPartyMemberIds(world.partyInfo);
   let bestCorpse: number | null = null;
   let bestCorpseDistance = INTERACT_RANGE;
   let bestObject: number | null = null;
@@ -79,7 +84,7 @@ export function tryNearbyInteraction(
       entity.kind === 'mob' &&
       entity.dead &&
       entity.lootable &&
-      corpseLootAvailability(entity, playerId, harvestStateReliable).canOpen &&
+      corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).canOpen &&
       distance < bestCorpseDistance
     ) {
       bestCorpse = entity.id;
@@ -91,7 +96,7 @@ export function tryNearbyInteraction(
         bestDelveDistance = distance;
       }
     } else if (!player.dead && entity.kind === 'object' && entity.lootable) {
-      if (distance < bestObjectDistance) {
+      if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
         bestObject = entity.id;
         bestObjectDistance = distance;
       }
@@ -114,7 +119,7 @@ export function tryNearbyInteraction(
     // Each half is gated on the availability predicate so a claimed or
     // emptied half is never dispatched (no denial-toast spam); the server
     // still revalidates both authoritatively.
-    const availability = corpseLootAvailability(corpse, playerId, harvestStateReliable);
+    const availability = corpseLootAvailability(corpse, playerId, harvestStateReliable, partyIds);
     if (availability.harvestable) world.harvestCorpse(bestCorpse);
     if (availability.hasLoot) return world.lootCorpse(bestCorpse);
     return availability.harvestable;

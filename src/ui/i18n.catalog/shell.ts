@@ -49,6 +49,8 @@ export const shellStrings = {
       reconnectingNow: 'Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})',
       slowConnection: 'This is taking longer than usual. Check your internet connection.',
       connectionRejected: 'The server closed the connection.',
+      incompatibleWorldVersion:
+        'Game and server versions are incompatible. Reload or update, then try again.',
       realmFull: 'This world is full right now. Please try again in a few minutes.',
       tooManyConnections:
         'Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.',
