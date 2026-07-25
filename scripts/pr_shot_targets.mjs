@@ -2719,8 +2719,10 @@ export const TARGETS = [
       },
     ],
     async capture(page, variant) {
+      // The DEF name, not the id-shaped guess: militia_vest displays as
+      // "Militia Chainvest", and the cell lookup keys on the accessible name.
       await openBagsWithInstance(page, 'militia_vest', variant.instance);
-      await focusBagCell(page, 'Militia Vest');
+      await focusBagCell(page, 'Militia Chainvest');
       await pollForSize(page, '#tooltip');
       await wait(300);
       return { clip: '#ui' };
@@ -2813,15 +2815,19 @@ async function focusBagCell(page, name) {
     document.querySelector('.camera-prompt-confirm')?.click();
     const banner = document.querySelector('#banner');
     if (banner) banner.style.opacity = '0';
-    const cell = [...document.querySelectorAll('#bags .bag-item:not(.empty)')].find((b) =>
-      (b.getAttribute('aria-label') ?? '').includes(wanted),
-    );
+    const cells = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+    // Match on the accessible name, but fall back to the LAST occupied square:
+    // the staged stack is the most recently granted one, so a display-name
+    // rename cannot silently turn this target into a no-shot.
+    const cell =
+      cells.find((b) => (b.getAttribute('aria-label') ?? '').includes(wanted)) ??
+      cells[cells.length - 1];
     if (!cell) return false;
     cell.scrollIntoView({ block: 'center' });
     cell.focus();
     return true;
   }, name);
-  if (!found) throw new Error(`no bag cell named ${name}`);
+  if (!found) throw new Error(`no occupied bag cell to focus (wanted ${name})`);
 }
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).
