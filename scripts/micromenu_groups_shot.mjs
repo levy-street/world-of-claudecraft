@@ -55,7 +55,26 @@ await page.setViewport({ ...DESKTOP, deviceScaleFactor: 1 });
 let entered = false;
 for (let attempt = 1; attempt <= 3 && !entered; attempt++) {
   try {
-    await page.goto(URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    // domcontentloaded, not networkidle2: against a dev server with no game
+    // server behind it the /api polls keep retrying, so the network never goes
+    // idle and the load never resolves. Generous timeout because a COLD vite
+    // dev server transforms the whole module graph on the first load, which
+    // takes far longer than a warm one.
+    await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    // #btn-offline ships in the static HTML, so it is present long before the
+    // module graph finishes and attaches its listener. A single click can land
+    // in that window and be lost, which is what made this harness fail
+    // intermittently (enterOfflineGame then timed out on the class card, since
+    // the offline panel had never opened). Click until the panel is really up.
+    await page.waitForSelector('#btn-offline', { timeout: 60000 });
+    await page.waitForFunction(
+      () => {
+        document.querySelector('#btn-offline')?.click();
+        const card = document.querySelector('#offline-select .mini-class[data-class="warrior"]');
+        return !!card && card.getBoundingClientRect().width > 0;
+      },
+      { timeout: 60000, polling: 500 },
+    );
     await enterOfflineGame(page, { settleMs: 2000 });
     entered = true;
   } catch (err) {
@@ -88,10 +107,29 @@ async function setMetrics({ width, height, dsf, mobile = false }) {
 // sections, which is not legible in a 1x capture.
 await setMetrics({ ...DESKTOP, dsf: 2 });
 
+// The headless GPU-acceleration warning is a dismissible banner that must
+// never appear in a captured screenshot (repo rule). enterOfflineGame clears
+// the intro / tutorial / camera overlays; this one can arrive after it.
+async function dismissBanners() {
+  await page.evaluate(() => {
+    for (const b of document.querySelectorAll('button')) {
+      if (b.textContent?.trim() === 'Dismiss') b.click();
+    }
+  });
+}
+
 // Clip to the rail plus a margin, so the sections and their keylines are
 // legible instead of lost in a full-HUD shot.
-async function shotRail(name) {
+//
+// `prepare` runs LAST, immediately before the capture, and is deliberately not
+// followed by a settle: the HUD re-asserts #mm-town-focus visibility from the
+// live zone check on its slow tier, so a state forced a few hundred ms earlier
+// is simply undone before the shutter (which is how an earlier version of this
+// harness produced a "conditionals shown" shot identical to the default one).
+async function shotRail(name, prepare) {
+  await dismissBanners();
   await sleep(350);
+  if (prepare) await page.evaluate(prepare);
   const box = await page.evaluate(() => {
     const el = document.getElementById('side-buttons');
     if (!el) return null;
@@ -112,20 +150,25 @@ async function shotRail(name) {
   console.log('wrote', out);
 }
 
-// Default boot state.
+// Default boot state. On a Discord-enabled build (the dev default) #mm-discord
+// is already unhidden here, so this is also the "Discord visible" arm.
 await shotRail('rail');
 
-// Every conditional launcher visible. Both mechanisms are driven so this works
-// on the pre-change markup too (inline display:none) and on the new one.
-await page.evaluate(() => {
-  for (const id of ['mm-town-focus', 'mm-discord']) {
-    const el = document.getElementById(id);
-    if (!el) continue;
-    el.hidden = false;
-    el.style.display = '';
-  }
+// There is deliberately NO "force #mm-town-focus visible" arm: the HUD
+// re-derives that button from a live zone check on its slow tier, so a forced
+// state is undone before the shutter and the shot comes out indistinguishable
+// from the default one. Showing it honestly needs the player actually standing
+// in a town hub, which is a world-state setup this harness does not do; the
+// section-collapse behavior it would illustrate is covered by the rewards arm
+// below and asserted directly in tests/browser/micromenu_groups.browser.test.ts.
+
+// Discord hidden (a build with the integration off). Its section also holds
+// Friends & Guild and Emotes, so the section itself survives: the point of this
+// arm is that hiding one entry closes up cleanly and shifts no keyline.
+await shotRail('rail-discord-hidden', () => {
+  const el = document.getElementById('mm-discord');
+  if (el) el.hidden = true;
 });
-await shotRail('rail-all');
 
 // The rewards section emptied: its only entry is #daily-rewards-button, which
 // the HUD hides on a build with daily rewards off. The section and its keyline
@@ -203,8 +246,19 @@ const railOnPhone = await page.evaluate(() => {
 });
 console.log('mobile #side-buttons computed display:', railOnPhone);
 
+await dismissBanners();
+await sleep(300);
 const mobileOut = path.join(OUT_DIR, `${PREFIX}-mobile.png`);
-await page.screenshot({ path: mobileOut });
+// Clip explicitly: CDP captures the WINDOW, not the emulated viewport, so an
+// unclipped shot pads the phone frame with dead black space.
+await page.screenshot({
+  path: mobileOut,
+  clip: { x: 0, y: 0, width: PHONE.width, height: PHONE.height },
+});
 console.log('wrote', mobileOut);
 
 await browser.close();
+// Headless Chromium occasionally leaves a handle open after close(), which
+// hangs the process long after every shot is on disk. Everything is written
+// by here, so exit deliberately rather than waiting on the event loop.
+process.exit(0);
