@@ -57,6 +57,11 @@ describe('backGripFor', () => {
     expect(quatLength(l.quaternion)).toBeCloseTo(1, 12);
   });
 
+  it('carries the authored open spellbook like the tuned book family', () => {
+    expect(backGripFor('Spellbook_open', 'r')).toEqual(backGripFor('VAR_BOOK', 'r'));
+    expect(backGripFor('Spellbook_open', 'l')).toEqual(backGripFor('VAR_BOOK', 'l'));
+  });
+
   it('every declared family yields a unit quaternion', () => {
     for (const fam of [
       '1H_Sword',
