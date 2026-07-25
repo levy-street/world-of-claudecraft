@@ -875,6 +875,9 @@ function localRenderDiagnosticsEnabled(): boolean {
   );
 }
 
+// Diagnostics-only label (the census buckets and the renderTrace walker read
+// it); NEVER a behavior or visibility gate, so tagging an actionable object
+// (team rings, corpse beacon) can never become a graphics-fairness break.
 function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCategory): void {
   obj.userData.renderCategory = category;
 }
@@ -1035,9 +1038,18 @@ export class Renderer {
   // Last completed frame's draw delta (what perfStats serves on composer tiers).
   private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
   // Hitch correlation (scene_census_core): fed per frame only while the ?perf
-  // overlay has it enabled, so the fleet pays nothing for it.
+  // overlay has it enabled, so the fleet pays nothing for it. The sample is a
+  // reused scratch object so the per-frame path stays allocation-free.
   private readonly hitchTracker = createHitchTracker();
   private hitchLogEnabled = false;
+  private readonly hitchFrameScratch = {
+    atMs: 0,
+    frameMs: 0,
+    submitMs: 0,
+    programs: 0,
+    textures: 0,
+    createdViews: 0,
+  };
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
@@ -1611,7 +1623,7 @@ export class Renderer {
     setRenderCategory(this.valeCupStadium.practiceGroup, 'props');
     this.scene.add(this.valeCupStadium.practiceGroup);
     // The practice skybox (camera-centred; shown only while practicing, driven
-    // in updateAmbience). Category 'sky' so the FX governor treats it like the dome.
+    // in updateAmbience). Category 'sky' groups it with the dome in diagnostics.
     setRenderCategory(this.valeCupSky.mesh, 'sky');
     this.scene.add(this.valeCupSky.mesh);
     for (const light of this.valeCupStadium.lights) {
@@ -3088,13 +3100,14 @@ export class Renderer {
     return Math.max(0, this.webgl.info.memory.textures - before);
   }
 
-  // Composer tiers only: drop an out-of-band render (prewarm pass, screenshot)
-  // from the draw-stats accumulator and zero the WebGL counters so the next
-  // sync() delta covers in-band work only. No-op on every other profile, where
-  // three's per-render auto-reset already isolates passes.
+  // Drop an out-of-band render burst (prewarm pass, screenshot, scene census)
+  // from the perf counters. The zeroing runs on EVERY profile so a synchronous
+  // perfStats() read right after the burst never serves a stale out-of-band
+  // pass (on auto-reset profiles the next live render would also clear it, but
+  // the census harness reads in the same task). The accumulator hand-off is
+  // composer-tiers-only, where the counters run monotonically.
   private discardOutOfBandDraws(): void {
-    if (!this.drawStats) return;
-    this.drawStats.noteOutOfBand(this.webgl.info.render);
+    if (this.drawStats) this.drawStats.noteOutOfBand(this.webgl.info.render);
     this.webgl.info.reset();
   }
 
@@ -6431,14 +6444,14 @@ export class Renderer {
       visibleViews,
     };
     if (this.hitchLogEnabled) {
-      this.hitchTracker.frame({
-        atMs: afterSubmit,
-        frameMs: Math.min(250, Math.max(0, dt * 1000)),
-        submitMs: framePhaseMs.submit,
-        programs: this.webgl.info.programs?.length ?? 0,
-        textures: this.webgl.info.memory.textures,
-        createdViews,
-      });
+      const sample = this.hitchFrameScratch;
+      sample.atMs = afterSubmit;
+      sample.frameMs = Math.min(250, Math.max(0, dt * 1000));
+      sample.submitMs = framePhaseMs.submit;
+      sample.programs = this.webgl.info.programs?.length ?? 0;
+      sample.textures = this.webgl.info.memory.textures;
+      sample.createdViews = createdViews;
+      this.hitchTracker.frame(sample);
     }
     this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000));
   }

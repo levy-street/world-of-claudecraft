@@ -33,6 +33,7 @@ interface FakeHost {
     discards(): number;
     autoReset(): boolean;
     shadowAuto(): boolean;
+    autoResetDuringRenders(): boolean[];
   };
 }
 
@@ -51,6 +52,7 @@ function makeHost(
   let shadowAuto = true;
   let renders = 0;
   let discards = 0;
+  const autoResetDuringRenders: boolean[] = [];
   const host: SceneCensusHost = {
     children: () =>
       children.map((c) => ({
@@ -65,12 +67,21 @@ function makeHost(
     render: () => {
       renders++;
       if (opts.throwOnRender === renders) throw new Error('boom');
+      autoResetDuringRenders.push(autoReset);
+      // three r165 semantics: the shadow pass draws FIRST; with autoReset on,
+      // render() then calls info.reset() before the scene pass, so a
+      // post-render read drops the shadow draws. The census must therefore
+      // hold the counters in manual-reset mode or its shadow share reads 0.
+      if (shadowsEnabled && shadowAuto) {
+        for (const c of children) {
+          if (c.visible) counters.calls += c.shadowCalls;
+        }
+      }
       if (autoReset) counters = zero();
       for (const c of children) {
         if (!c.visible) continue;
         counters.calls += c.calls;
         counters.triangles += c.triangles;
-        if (shadowsEnabled && shadowAuto) counters.calls += c.shadowCalls;
       }
       counters.calls += postCalls;
       counters.triangles += postCalls;
@@ -102,6 +113,7 @@ function makeHost(
       discards: () => discards,
       autoReset: () => autoReset,
       shadowAuto: () => shadowAuto,
+      autoResetDuringRenders: () => autoResetDuringRenders.slice(),
     },
   };
 }
@@ -160,6 +172,30 @@ describe('captureSceneCensus', () => {
     expect(report.renders).toBe(5);
     expect(report.tier).toBe('ultra');
     expect(report.atMs).toBe(123);
+    expect(state.discards()).toBe(1);
+  });
+
+  it('holds the counters in manual-reset mode for every measurement render', () => {
+    const children = worldChildren();
+    const { host, state } = makeHost(children, { postCalls: 4 });
+    const report = captureSceneCensus(host, META);
+    const during = state.autoResetDuringRenders();
+    // 5 measurement renders in manual mode, then the trailing restore render
+    // after the mode has been handed back.
+    expect(during).toEqual([false, false, false, false, false, true]);
+    // Decisive: with three's auto-reset semantics the post-render read drops
+    // the shadow pass, so this nonzero share exists only because of the
+    // manual mode (the fake models the reset-after-shadow-pass ordering).
+    expect(report.shadow.calls).toBe(12);
+  });
+
+  it('presents a trailing restored frame and keeps it out of the measurements', () => {
+    const children = worldChildren();
+    const { host, state } = makeHost(children, { postCalls: 4 });
+    const report = captureSceneCensus(host, META);
+    // baseline + shadow + 3 buckets measured, plus the restore render
+    expect(report.renders).toBe(5);
+    expect(state.renders()).toBe(6);
     expect(state.discards()).toBe(1);
   });
 

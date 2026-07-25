@@ -206,6 +206,10 @@ export function captureSceneCensus(
     });
     host.setShadowAutoUpdate(savedShadowAuto);
     host.setCountersAutoReset(savedAutoReset);
+    // One trailing render with everything restored: the burst runs inside a
+    // single task, so without this the frame the browser presents would be
+    // the last bucket-hidden pass until the next live sync().
+    host.render();
     host.discardOutOfBand();
   }
 }
@@ -315,15 +319,19 @@ export function createHitchTracker(
   };
   let programGrowthFrames = 0;
   let programsAdded = 0;
-  let last: { programs: number; textures: number } | null = null;
+  // Scalars, not an object: this runs per frame while the overlay is up, and
+  // the per-frame path stays allocation-free outside actual hitch events.
+  let lastPrograms = -1;
+  let lastTextures = -1;
   let recent: HitchEvent[] = [];
   return {
     frame(sample: HitchFrameSample): HitchEvent | null {
       frames++;
       // First sample only establishes the baseline: a delta needs two reads.
-      const programDelta = last ? sample.programs - last.programs : 0;
-      const textureDelta = last ? sample.textures - last.textures : 0;
-      last = { programs: sample.programs, textures: sample.textures };
+      const programDelta = lastPrograms >= 0 ? sample.programs - lastPrograms : 0;
+      const textureDelta = lastTextures >= 0 ? sample.textures - lastTextures : 0;
+      lastPrograms = sample.programs;
+      lastTextures = sample.textures;
       if (programDelta > 0) {
         programGrowthFrames++;
         programsAdded += programDelta;
@@ -360,7 +368,8 @@ export function createHitchTracker(
       byCause = { 'shader-compile': 0, 'texture-upload': 0, 'view-create': 0, other: 0 };
       programGrowthFrames = 0;
       programsAdded = 0;
-      last = null;
+      lastPrograms = -1;
+      lastTextures = -1;
       recent = [];
     },
   };

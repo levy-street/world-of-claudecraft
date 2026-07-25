@@ -369,6 +369,8 @@ export class PerfMonitor {
   private overlay: HTMLDivElement | null = null;
   private overlayText: HTMLDivElement | null = null;
   private lastCensus: SceneCensusReport | null = null;
+  // Rendered once per census run, not on every 1 Hz overlay repaint.
+  private lastCensusLines: string[] = [];
   private startedAt = performance.now();
   private lastOverlayAt = 0;
   private frames = 0;
@@ -866,6 +868,7 @@ export class PerfMonitor {
     if (!this.renderer) return null;
     const report = this.renderer.captureSceneCensus();
     this.lastCensus = report;
+    this.lastCensusLines = censusTableLines(report);
     console.info('World of Claudecraft scene census:', JSON.stringify(report, null, 2));
     if (this.enabled) this.renderOverlay(this.lastSnapshot ?? this.snapshot());
     return report;
@@ -974,7 +977,7 @@ export class PerfMonitor {
     const hitchLine = h
       ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} view ${h.byCause['view-create']} other ${h.byCause.other})  prog +${h.programsAdded}`
       : null;
-    const censusLines = this.lastCensus ? censusTableLines(this.lastCensus) : [];
+    const censusLines = this.lastCensusLines;
     this.overlayText.textContent = [
       `fps ${s.fps}  p95 ${s.frameMs.p95}ms  >50 ${s.frameMs.long50}`,
       `10s fps ${s.windows.last10s.fps}  p95 ${s.windows.last10s.frameMs.p95}ms  >50 ${s.windows.last10s.frameMs.long50}`,
