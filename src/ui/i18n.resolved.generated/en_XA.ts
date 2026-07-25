@@ -316,6 +316,9 @@ export const en_XA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "sourceCave": {
+      "progressPercent": "[{label}: {percent}%]"
+    },
     "spectate": {
       "banner": "[Šþéçţáţíñĝ {name}]"
     },
@@ -5572,6 +5575,28 @@ export const en_XA: EnTranslations = {
       "toolSlips": "[Ţĥáţ ţóóļ šļíþš óƒƒ ţĥíš ļóçķ.]",
       "lockJammed": "[Ţĥé ļóçķ íš ĵáɱɱéð ƀéýóñð þíçķíñĝ. Çļéáŕ ţĥé ðéļʋé áĝáíñ ƒóŕ áñóţĥéŕ áţţéɱþţ.]",
       "lastPickSnaps": "[Ţĥé ļášţ þíçķ šñáþš. Ţĥé ļóçķ ĵáɱš. Ţĥé çĥéšţ íš ļóšţ úñļéšš ýóú çļéáŕ ţĥé ðéļʋé áĝáíñ.]"
+    },
+    "dungeon": {
+      "levelRequired": "[Ýóú ɱúšţ ŕéáçĥ ļéʋéļ {level} ţó éñţéŕ {name}.]"
+    },
+    "sourceCave": {
+      "locked": "[Ýóú áŕé ļóçķéð óúţ óƒ {name}.]",
+      "enter": "[Ýóú šţéþ íñţó ţĥé Šóúŕçé Çáʋé.]",
+      "leave": "[Ýóú ļéáʋé ţĥé Šóúŕçé Çáʋé.]",
+      "rebootConfirm": "[Áŕé ýóú šúŕé ýóú ŵáñţ ţó þŕóçééð? Éñšúŕé ýóú ĝáţĥéŕ ýóúŕ ŕéšóúŕçéš ƀéƒóŕé ýóú þúšĥ.]",
+      "killProgress": "[{name} ĥáš ƒáļļéñ. ({killed} óƒ {total} ðéƒéáţéð íñ ţĥé Šóúŕçé Çáʋé)]",
+      "cleared": "[Ţĥé Šóúŕçé Çáʋé ĥáš ƀééñ çļéáŕéð.]",
+      "accessDenied": "[Áççéšš ðéñíéð.]",
+      "wellBanter1": "[Íţ'š á ŵéļļ. Íţ ĥóļðš ŵáţéŕ. Ɱóʋé áļóñĝ.]",
+      "wellBanter2": "[Ŵĥý áŕé ýóú ļóóķíñĝ áţ ɱý ƀŕíçķš ļíķé ţĥáţ?]",
+      "wellBanter3": "[Í'ɱ áñ óŕðíñáŕý ŵéļļ! Ļóóķ, Í éʋéñ ĥáʋé á ƀúçķéţ!]",
+      "wellBanter4": "[Šţíļļ ĵúšţ á ŵéļļ. Ñóţĥíñĝ ɱáĝíçáļ ţó šéé.]",
+      "wellBanter5": "[Ŵĥó ţóļð ýóú áƀóúţ ţĥé šóúŕçé? Ŵáš íţ Çļáúðé?]",
+      "wellBanter6": "[Óĥ, ýóú ðéƒíñíţéļý ðóñ'ţ ŵáñţ ţó ĝó ðóŵñ ţĥéŕé.]",
+      "wellBanter7": "[Šéçúŕíţý! Ţĥé þļáýéŕ íš ţŕýíñĝ ţó ƀŕéáķ íñţó ţĥé šóúŕçé çóðé!]",
+      "wellBanter8": "[Ţĥáţ'š á šóúŕçé óƒ çóñƒļíçţ ðóŵñ ţĥéŕé, ýóú ķñóŵ.]",
+      "wellBanter9": "[Íƒ Í óþéñ, ŵíļļ ýóú ƒíñáļļý ļéáʋé ɱé áļóñé?]",
+      "wellBanter10": "[Áļŕíĝĥţ, šţéþ íñšíðé. Ŵíþé ýóúŕ ƀóóţš ƒíŕšţ.]"
     }
   },
   "lockpickUi": {
@@ -10439,6 +10464,27 @@ export const en_XA: EnTranslations = {
       "wyrmshadow_talongrips": {
         "name": "[Ñíĝĥţƒáñĝ Ţáļóñĝŕíþš]"
       },
+      "source_cave_mantle": {
+        "name": "[Ɱáñţļé óƒ ţĥé Šóúŕçé]"
+      },
+      "conflictbreaker_breastplate": {
+        "name": "[Çóñƒļíçţƀŕéáķéŕ Ɓŕéášţþļáţé]"
+      },
+      "cherry_pickers_gauntlets": {
+        "name": "[Çĥéŕŕý-Þíçķéŕ'š Ĝáúñţļéţš]"
+      },
+      "maintainers_crown": {
+        "name": "[Ɱáíñţáíñéŕ'š Çŕóŵñ]"
+      },
+      "commit_blade": {
+        "name": "[Çóɱɱíţ Ɓļáðé]"
+      },
+      "bug_squasher": {
+        "name": "[Ţĥé Ɓúĝ Šɋúášĥéŕ]"
+      },
+      "mech_keyboard": {
+        "name": "[Ţĥé Ķéýšţŕóķé]"
+      },
       "reliquary_plate_chest": {
         "name": "[Ŕéļíɋúáŕý Ĝúáŕð Ĥáúƀéŕķ]"
       },
@@ -14547,6 +14593,11 @@ export const en_XA: EnTranslations = {
         "enterText": "[Ýóú šţéþ íñţó ţĥé çóļð, šíļéñţ ĥáļļš óƒ ţĥé Ļášţ Ķééþ.]",
         "leaveText": "[Ýóú þúļļ ţĥé ķééþ ðóóŕ šĥúţ áñð šţéþ ƀáçķ íñţó ţĥé Ðŕáķéļáñðš ŵíñð.]"
       },
+      "source_cave": {
+        "name": "[Ţĥé Šóúŕçé Çáʋé]",
+        "enterText": "[Ýóú šţéþ íñţó ţĥé Šóúŕçé Çáʋé.]",
+        "leaveText": "[Ýóú ļéáʋé ţĥé Šóúŕçé Çáʋé.]"
+      },
       "drowned_temple": {
         "name": "[Ţĥé Ðŕóŵñéð Ţéɱþļé]",
         "enterText": "[Ýóú šţéþ ţĥŕóúĝĥ ţĥé ɱóóñĝáţé — ţĥé áíŕ ţúŕñš ţó çóļð ŵáţéŕ áñð þáļé ļíĝĥţ, áñð ţĥé šíñĝíñĝ çļóšéš óʋéŕ ýóúŕ ĥéáð.]",
@@ -14818,6 +14869,19 @@ export const en_XA: EnTranslations = {
     "delveRiteShrineReedInteract": "[Ŕééð Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "delveRiteShrineSkullInteract": "[Šķúļļ Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "mailboxName": "[Ɱáíļƀóẋ]",
-    "noticeboardName": "[Ñóţíçé Ɓóáŕð]"
+    "noticeboardName": "[Ñóţíçé Ɓóáŕð]",
+    "sourceCaveWellName": "[Ţĥé Óþéñ Šóúŕçé]",
+    "sourceCaveExitDenied": "[ÁÇÇÉŠŠ ÐÉÑÍÉÐ]",
+    "sourceCaveReboot": "[Ðó ñóţ þúšĥ ţĥé ƀúţţóñ]",
+    "sourceCaveRebootYell": "[Ŵĥáţ ĥáʋé ýóú ðóñé?!]",
+    "sourceCaveRebootYellWhatsGoingOn": "[Ĥéý, ŵĥáţ'š ĝóíñĝ óñ?]",
+    "sourceCaveRebootYellServerDown": "[Ĝúýš, ţĥé šéŕʋéŕ íš ðóŵñ!]",
+    "sourceCaveBanterIssue": "[Þļéášé çŕéáţé áñ íššúé.]",
+    "sourceCaveBanterPullRequest": "[Ðóñ'ţ ĥéšíţáţé ţó çŕéáţé á þúļļ ŕéɋúéšţ.]",
+    "sourceCaveBanterConflicts": "[Í ĥáţé çóñƒļíçţš...]",
+    "sourceCaveBanterContribute": "[Ýéš, óƒ çóúŕšé ýóú çáñ çóñţŕíƀúţé ţó ţĥíš þŕóĵéçţ!]",
+    "sourceCaveBanterFocused": "[Šóŕŕý, ƀúţ Í'ɱ ƒóçúšéð ŕíĝĥţ ñóŵ.]",
+    "sourceCaveBanterNextRelease": "[Ţĥé ñéẋţ ŕéļéášé ŵíļļ ƀé áŵéšóɱé!]",
+    "sourceCaveBanterRefresh": "[Ĥɱɱ? Ţŕý ŕéƒŕéšĥíñĝ.]"
   }
 };

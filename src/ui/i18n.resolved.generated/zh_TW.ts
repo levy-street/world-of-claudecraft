@@ -316,6 +316,9 @@ export const zh_TW: EnTranslations = {
     }
   },
   "hudChrome": {
+    "sourceCave": {
+      "progressPercent": "{label}: {percent}%"
+    },
     "spectate": {
       "banner": "正在觀察 {name}"
     },
@@ -5572,6 +5575,28 @@ export const zh_TW: EnTranslations = {
       "toolSlips": "那件工具從這道鎖上滑開了。",
       "lockJammed": "這道鎖已卡死到無法撬開，再次通關秘探以獲得另一次嘗試。",
       "lastPickSnaps": "最後一根撬棒折斷了。鎖卡死了，除非你再次通關這場秘探，否則寶箱將就此失去。"
+    },
+    "dungeon": {
+      "levelRequired": "你必須達到等級 {level} 才能進入 {name}。"
+    },
+    "sourceCave": {
+      "locked": "你已被鎖定，無法進入{name}。",
+      "enter": "你走進源初洞穴。",
+      "leave": "你離開了源初洞穴。",
+      "rebootConfirm": "你確定要繼續嗎？按下之前，確保你已集結好所需的資源。",
+      "killProgress": "{name}倒下了。（已在源初洞穴擊敗 {killed}/{total}）",
+      "cleared": "源初洞穴已被清空。",
+      "accessDenied": "存取被拒絕。",
+      "wellBanter1": "這只是一口井，裝水用的。走吧走吧。",
+      "wellBanter2": "你幹嘛這樣盯著我的磚頭看？",
+      "wellBanter3": "我就是一口普通的井！你看，我還有個水桶呢！",
+      "wellBanter4": "還是那句話，就是一口井。沒什麼好看的魔法。",
+      "wellBanter5": "是誰跟你說起「源」的事的？是Claude嗎？",
+      "wellBanter6": "喔，你絕對不會想下去那裡的。",
+      "wellBanter7": "保全！這個玩家想闖入原始碼！",
+      "wellBanter8": "跟你說，那下面可是個爭議的源頭。",
+      "wellBanter9": "如果我打開了，你能不能終於別煩我了？",
+      "wellBanter10": "好吧，進來吧。先把靴子擦乾淨。"
     }
   },
   "lockpickUi": {
@@ -10439,6 +10464,27 @@ export const zh_TW: EnTranslations = {
       "wyrmshadow_talongrips": {
         "name": "夜牙利爪握套"
       },
+      "source_cave_mantle": {
+        "name": "源之披風"
+      },
+      "conflictbreaker_breastplate": {
+        "name": "衝突終結者胸甲"
+      },
+      "cherry_pickers_gauntlets": {
+        "name": "揀選者護手"
+      },
+      "maintainers_crown": {
+        "name": "維護者之冠"
+      },
+      "commit_blade": {
+        "name": "提交之刃"
+      },
+      "bug_squasher": {
+        "name": "除蟲大錘"
+      },
+      "mech_keyboard": {
+        "name": "擊鍵"
+      },
       "reliquary_plate_chest": {
         "name": "聖物庫守衛鎖甲"
       },
@@ -14547,6 +14593,11 @@ export const zh_TW: EnTranslations = {
         "enterText": "你踏入最後的堡壘那冰冷而寂靜的大廳。",
         "leaveText": "你帶上堡門，重新走進龍裔荒原的寒風中。"
       },
+      "source_cave": {
+        "name": "源初洞穴",
+        "enterText": "你走進源初洞穴。",
+        "leaveText": "你離開了源初洞穴。"
+      },
       "drowned_temple": {
         "name": "溺亡神殿",
         "enterText": "你踏過月門——空氣化作冰冷的水與蒼白的光，歌聲在你頭頂之上闔攏。",
@@ -14818,6 +14869,19 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
     "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
     "mailboxName": "郵箱",
-    "noticeboardName": "告示板"
+    "noticeboardName": "告示板",
+    "sourceCaveWellName": "開放之源",
+    "sourceCaveExitDenied": "ACCESS DENIED",
+    "sourceCaveReboot": "不要按這個按鈕",
+    "sourceCaveRebootYell": "你都幹了什麼？！",
+    "sourceCaveRebootYellWhatsGoingOn": "嘿，發生什麼事了？",
+    "sourceCaveRebootYellServerDown": "各位，伺服器當機了！",
+    "sourceCaveBanterIssue": "拜託，開個 issue 吧。",
+    "sourceCaveBanterPullRequest": "別猶豫，歡迎提交 pull request。",
+    "sourceCaveBanterConflicts": "我討厭衝突……",
+    "sourceCaveBanterContribute": "當然，你完全可以為這個專案做貢獻！",
+    "sourceCaveBanterFocused": "抱歉，我現在得專心工作",
+    "sourceCaveBanterNextRelease": "下個版本會超棒的！",
+    "sourceCaveBanterRefresh": "嗯？重新整理試試"
   }
 };

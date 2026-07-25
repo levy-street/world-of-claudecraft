@@ -316,6 +316,9 @@ export const ru_RU: EnTranslations = {
     }
   },
   "hudChrome": {
+    "sourceCave": {
+      "progressPercent": "{label}: {percent}%"
+    },
     "spectate": {
       "banner": "Наблюдение за {name}"
     },
@@ -5572,6 +5575,28 @@ export const ru_RU: EnTranslations = {
       "toolSlips": "Этот инструмент соскальзывает с этого замка.",
       "lockJammed": "Замок заклинило, его не вскрыть: пройдите вылазку снова ради новой попытки.",
       "lastPickSnaps": "Последняя отмычка ломается. Замок заклинивает: сундук потерян, пока вы снова не пройдёте вылазку."
+    },
+    "dungeon": {
+      "levelRequired": "Чтобы войти в {name}, нужно достичь уровня {level}."
+    },
+    "sourceCave": {
+      "locked": "Вход в {name} для вас заблокирован.",
+      "enter": "Вы входите в Пещеру Истока.",
+      "leave": "Вы покидаете Пещеру Истока.",
+      "rebootConfirm": "Вы уверены, что хотите продолжить? Прежде чем нажать, убедитесь, что собрали все необходимые ресурсы.",
+      "killProgress": "{name} повержен. (Побеждено {killed} из {total} в Пещере Истока)",
+      "cleared": "Пещера Истока зачищена.",
+      "accessDenied": "Доступ запрещен.",
+      "wellBanter1": "Это просто колодец. В нём хранится вода. Иди своей дорогой.",
+      "wellBanter2": "Почему ты так смотришь на мои кирпичи?",
+      "wellBanter3": "Я самый обычный колодец! Смотри, у меня даже есть ведро!",
+      "wellBanter4": "Всё ещё просто колодец. Никакой магии тут нет.",
+      "wellBanter5": "Кто рассказал тебе об истоке? Уж не Клод ли?",
+      "wellBanter6": "О, тебе точно не захочется спускаться туда.",
+      "wellBanter7": "Охрана! Игрок пытается вломиться в исходный код!",
+      "wellBanter8": "Знаешь, там внизу источник конфликтов.",
+      "wellBanter9": "Если я открою, ты наконец оставишь меня в покое?",
+      "wellBanter10": "Ладно, заходи. Только сначала вытри сапоги."
     }
   },
   "lockpickUi": {
@@ -10439,6 +10464,27 @@ export const ru_RU: EnTranslations = {
       "wyrmshadow_talongrips": {
         "name": "Захваты когтя Ночного Клыка"
       },
+      "source_cave_mantle": {
+        "name": "Мантия Источника"
+      },
+      "conflictbreaker_breastplate": {
+        "name": "Кираса разрушителя конфликтов"
+      },
+      "cherry_pickers_gauntlets": {
+        "name": "Рукавицы выборщика коммитов"
+      },
+      "maintainers_crown": {
+        "name": "Корона мейнтейнера"
+      },
+      "commit_blade": {
+        "name": "Клинок коммита"
+      },
+      "bug_squasher": {
+        "name": "Багодав"
+      },
+      "mech_keyboard": {
+        "name": "Нажатие клавиши"
+      },
       "reliquary_plate_chest": {
         "name": "Хауберк стражи реликвария"
       },
@@ -14547,6 +14593,11 @@ export const ru_RU: EnTranslations = {
         "enterText": "Вы входите в холодные безмолвные залы Последнего оплота.",
         "leaveText": "Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов."
       },
+      "source_cave": {
+        "name": "Пещера Истока",
+        "enterText": "Вы входите в Пещеру Истока.",
+        "leaveText": "Вы покидаете Пещеру Истока."
+      },
       "drowned_temple": {
         "name": "Утонувший храм",
         "enterText": "Ты проходишь сквозь лунные врата — воздух обращается в холодную воду и бледный свет, и пение смыкается над твоей головой.",
@@ -14818,6 +14869,19 @@ export const ru_RU: EnTranslations = {
     "delveRiteShrineReedInteract": "Святилище тростника: нажмите F, чтобы коснуться",
     "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться",
     "mailboxName": "Почтовый ящик",
-    "noticeboardName": "Доска объявлений"
+    "noticeboardName": "Доска объявлений",
+    "sourceCaveWellName": "Открытый Исток",
+    "sourceCaveExitDenied": "ACCESS DENIED",
+    "sourceCaveReboot": "Не нажимайте эту кнопку",
+    "sourceCaveRebootYell": "Что вы наделали?!",
+    "sourceCaveRebootYellWhatsGoingOn": "Эй, что происходит?",
+    "sourceCaveRebootYellServerDown": "Ребята, сервер упал!",
+    "sourceCaveBanterIssue": "Пожалуйста, создайте issue.",
+    "sourceCaveBanterPullRequest": "Не стесняйтесь создавать pull request.",
+    "sourceCaveBanterConflicts": "Ненавижу конфликты...",
+    "sourceCaveBanterContribute": "Да, конечно, вы можете внести вклад в этот проект!",
+    "sourceCaveBanterFocused": "Извини, я сейчас сосредоточен",
+    "sourceCaveBanterNextRelease": "Следующий релиз будет потрясающим!",
+    "sourceCaveBanterRefresh": "Хм? Попробуйте обновить страницу"
   }
 };

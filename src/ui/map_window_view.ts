@@ -15,7 +15,14 @@
 // Markers carry the identity (zoneId / poiIndex / dungeonId / cls)
 // the painter needs to resolve their localized text, never the resolved string.
 
-import { DUNGEON_LIST, isDelvePos, STRIP_MAX_X, STRIP_MIN_X, type ZoneDef } from '../sim/data';
+import {
+  DUNGEON_LIST,
+  DUNGEONS,
+  isDelvePos,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  type ZoneDef,
+} from '../sim/data';
 import {
   type MapQuestMarkerKind,
   type QuestObjectiveRef,
@@ -437,6 +444,24 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     if (!inZone(portal.x, portal.z) || !inView(portal.x, portal.z)) continue;
     const { mx, my } = toMap(portal.x, portal.z);
     portals.push({ mx, my, dungeonId: portal.id });
+  }
+
+  // Runtime dungeons (built once at Sim ctor time, e.g. the Source Cave:
+  // src/sim/source_cave/runtime.ts) never enter the frozen DUNGEONS/DUNGEON_LIST
+  // registry, so they get no entry from overworldDungeonPortals above. Their door
+  // is still a normal 'dungeon_door' ground object like any static dungeon's, so
+  // discover it the same generic way the minimap radar already does
+  // (minimap_markers.ts's world.entities scan for templateId 'dungeon_door'):
+  // this only adds entries whose dungeonId is NOT in the static registry, so it
+  // can never duplicate a portal the static path above already emitted (including
+  // a raid variant that deliberately shares its parent's door and spawns no
+  // second door entity, see overworldDungeonPortals' own header comment).
+  for (const e of world.entities.values()) {
+    if (e.kind !== 'object' || e.templateId !== 'dungeon_door') continue;
+    if (!e.dungeonId || DUNGEONS[e.dungeonId]) continue;
+    if (e.pos.z < zone.zMin || e.pos.z >= zone.zMax) continue;
+    const { mx, my } = toMap(e.pos.x, e.pos.z);
+    portals.push({ mx, my, dungeonId: e.dungeonId });
   }
 
   // Quest-giver glyphs, resolved from the static NPCS content table (like the

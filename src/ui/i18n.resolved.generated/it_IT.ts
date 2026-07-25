@@ -316,6 +316,9 @@ export const it_IT: EnTranslations = {
     }
   },
   "hudChrome": {
+    "sourceCave": {
+      "progressPercent": "{label}: {percent}%"
+    },
     "spectate": {
       "banner": "Stai osservando {name}"
     },
@@ -5572,6 +5575,28 @@ export const it_IT: EnTranslations = {
       "toolSlips": "Quello strumento scivola via da questa serratura.",
       "lockJammed": "La serratura è inceppata oltre ogni possibilità di scasso: completa di nuovo l'incursione per un altro tentativo.",
       "lastPickSnaps": "L'ultimo grimaldello si spezza. La serratura si inceppa: lo scrigno è perduto, a meno che tu non completi di nuovo l'incursione."
+    },
+    "dungeon": {
+      "levelRequired": "You must reach level {level} to enter {name}."
+    },
+    "sourceCave": {
+      "locked": "You are locked out of {name}.",
+      "enter": "You step into the Source Cave.",
+      "leave": "You leave the Source Cave.",
+      "rebootConfirm": "Are you sure you want to proceed? Ensure you gather your resources before you push.",
+      "killProgress": "{name} has fallen. ({killed} of {total} defeated in the Source Cave)",
+      "cleared": "The Source Cave has been cleared.",
+      "accessDenied": "Access denied.",
+      "wellBanter1": "It's a well. It holds water. Move along.",
+      "wellBanter2": "Why are you looking at my bricks like that?",
+      "wellBanter3": "I'm an ordinary well! Look, I even have a bucket!",
+      "wellBanter4": "Still just a well. Nothing magical to see.",
+      "wellBanter5": "Who told you about the source? Was it Claude?",
+      "wellBanter6": "Oh, you definitely don't want to go down there.",
+      "wellBanter7": "Security! The player is trying to break into the source code!",
+      "wellBanter8": "That's a source of conflict down there, you know.",
+      "wellBanter9": "If I open, will you finally leave me alone?",
+      "wellBanter10": "Alright, step inside. Wipe your boots first."
     }
   },
   "lockpickUi": {
@@ -10439,6 +10464,27 @@ export const it_IT: EnTranslations = {
       "wyrmshadow_talongrips": {
         "name": "Prese Artiglio Nightfang"
       },
+      "source_cave_mantle": {
+        "name": "Mantle of the Source"
+      },
+      "conflictbreaker_breastplate": {
+        "name": "Conflictbreaker Breastplate"
+      },
+      "cherry_pickers_gauntlets": {
+        "name": "Cherry-Picker's Gauntlets"
+      },
+      "maintainers_crown": {
+        "name": "Maintainer's Crown"
+      },
+      "commit_blade": {
+        "name": "Commit Blade"
+      },
+      "bug_squasher": {
+        "name": "The Bug Squasher"
+      },
+      "mech_keyboard": {
+        "name": "The Keystroke"
+      },
       "reliquary_plate_chest": {
         "name": "Usbergo della guardia del reliquiario"
       },
@@ -14547,6 +14593,11 @@ export const it_IT: EnTranslations = {
         "enterText": "Metti piede nelle sale fredde e silenziose della Ultima Rocca.",
         "leaveText": "Chiudi il portone della rocca e torni nel vento delle Drakelands."
       },
+      "source_cave": {
+        "name": "The Source Cave",
+        "enterText": "You step into the Source Cave.",
+        "leaveText": "You leave the Source Cave."
+      },
       "drowned_temple": {
         "name": "Il Tempio Annegato",
         "enterText": "Attraversi il cancello lunare — l'aria si fa acqua gelida e luce pallida, e il canto si richiude sopra la tua testa.",
@@ -14818,6 +14869,19 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuario delle Canne: premi F per toccarlo",
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
     "mailboxName": "Cassetta postale",
-    "noticeboardName": "Bacheca degli annunci"
+    "noticeboardName": "Bacheca degli annunci",
+    "sourceCaveWellName": "The Open Source",
+    "sourceCaveExitDenied": "ACCESS DENIED",
+    "sourceCaveReboot": "Do not push the button",
+    "sourceCaveRebootYell": "What have you done?!",
+    "sourceCaveRebootYellWhatsGoingOn": "Hey, what's going on?",
+    "sourceCaveRebootYellServerDown": "Guys, the server is down!",
+    "sourceCaveBanterIssue": "Please create an issue.",
+    "sourceCaveBanterPullRequest": "Don't hesitate to create a pull request.",
+    "sourceCaveBanterConflicts": "I hate conflicts...",
+    "sourceCaveBanterContribute": "Yes, of course you can contribute to this project!",
+    "sourceCaveBanterFocused": "Sorry, but I'm focused right now.",
+    "sourceCaveBanterNextRelease": "The next release will be awesome!",
+    "sourceCaveBanterRefresh": "Hmm? Try refreshing."
   }
 };

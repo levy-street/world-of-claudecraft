@@ -9,6 +9,7 @@ import {
   isAttackHoverTarget,
   shouldApproachPickedEntity,
 } from '../src/game/interactions';
+import { isSourceCaveGatedObject, sourceCaveOrigin } from '../src/sim/source_cave';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
 function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -80,6 +81,36 @@ function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Ent
     ...partial,
   } as Entity;
 }
+
+describe('isSourceCaveGatedObject', () => {
+  it('covers the cave door, reboot button, and both reward-chest states', () => {
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 1, kind: 'object', templateId: 'source_cave_reboot' }),
+      ),
+    ).toBe(true);
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 2, kind: 'object', templateId: 'source_cave_chest' }),
+      ),
+    ).toBe(true);
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 3, kind: 'object', templateId: 'source_cave_chest_sealed' }),
+      ),
+    ).toBe(true);
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 4, kind: 'object', templateId: 'dungeon_door', dungeonId: 'source_cave' }),
+      ),
+    ).toBe(true);
+    expect(
+      isSourceCaveGatedObject(
+        stubEntity({ id: 5, kind: 'object', templateId: 'dungeon_door', dungeonId: 'deadmines' }),
+      ),
+    ).toBe(false);
+  });
+});
 
 describe('hoverCursorKind', () => {
   it('returns attack for living hostile mobs', () => {
@@ -607,6 +638,113 @@ describe('handlePickedEntity', () => {
 
     expect(targetId).toBe(2);
     expect(attacks).toBe(1);
+  });
+});
+
+describe('handlePickedEntity: dungeon door click routing', () => {
+  // Regression: a player could click straight through the Source Cave well's
+  // banter gate (well_banter.ts) because this client handler used to call
+  // enterDungeon() directly for every dungeon door, bypassing the server-side
+  // interact() dispatch entirely. Only source_cave must route through the
+  // generic interact() command; every other dungeon door keeps entering
+  // immediately on click.
+  function doorRig(dungeonId: string) {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const door = stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId,
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const calls: string[] = [];
+    const world: any = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, door],
+      ]),
+      duelInfo: null,
+      arenaInfo: null,
+      targetEntity: () => {},
+      enterDungeon: (id: string) => calls.push(`enterDungeon:${id}`),
+      interact: () => calls.push('interact'),
+      leaveDungeon: () => {},
+      pickUpObject: () => {},
+      startAutoAttack: () => {},
+    };
+    const hud = {
+      openLoot: () => {},
+      openQuestDialog: () => {},
+      openDelveBoard: () => {},
+      openMailbox: () => {},
+      showError: () => {},
+      closeContextMenu: () => {},
+      requestSpiritHealerResurrect: () => {},
+    };
+    return { world, hud, calls };
+  }
+
+  it('the Source Cave well sends the generic interact command, on both click buttons', () => {
+    const { world, hud, calls } = doorRig('source_cave');
+    handlePickedEntity(world, hud, 2, 2, 10, 20); // right-click
+    handlePickedEntity(world, hud, 2, 0, 10, 20); // left-click
+    expect(calls).toEqual(['interact', 'interact']);
+  });
+
+  it('the Source Cave reboot button sends the generic interact command on both click buttons', () => {
+    const { world, hud, calls } = doorRig('source_cave');
+    world.entities.get(2).templateId = 'source_cave_reboot';
+    world.entities.get(2).dungeonId = null;
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).toEqual(['interact', 'interact']);
+  });
+
+  it('the Source Cave reward chest (sealed AND armed) sends the generic interact command', () => {
+    // Regression: the chest used to fall into pickUpObject (a silent no-op, it
+    // has no objectItemId), so a sealed-chest click never produced the server's
+    // "Access denied." toast.
+    for (const templateId of ['source_cave_chest_sealed', 'source_cave_chest']) {
+      const { world, hud, calls } = doorRig('source_cave');
+      world.entities.get(2).templateId = templateId;
+      world.entities.get(2).dungeonId = null;
+      handlePickedEntity(world, hud, 2, 2, 10, 20);
+      handlePickedEntity(world, hud, 2, 0, 10, 20);
+      expect(calls, templateId).toEqual(['interact', 'interact']);
+    }
+  });
+
+  it('a friendly Source Cave contributor answers to both click buttons via interact', () => {
+    // A live friendly mob standing in the cave x-band: both clicks route to the
+    // generic interact command, which banters server-side. The x comes from the
+    // cave's own origin, never a literal: the instance plane has moved twice.
+    const caveX = sourceCaveOrigin(0).x;
+    const { world, hud, calls } = doorRig('source_cave');
+    const mob = world.entities.get(2);
+    mob.kind = 'mob';
+    mob.templateId = 'source_cave_octocat';
+    mob.dungeonId = null;
+    mob.lootable = false;
+    mob.hostile = false;
+    mob.pos = { x: caveX, y: 0, z: 0 };
+    world.player.pos = { x: caveX - 1, y: 0, z: 0 };
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).toEqual(['interact', 'interact']);
+    // Once hostile (post-reboot), clicks stop routing to interact.
+    mob.hostile = true;
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).toEqual(['interact', 'interact']);
+  });
+
+  it('every other dungeon door still enters immediately on click', () => {
+    const { world, hud, calls } = doorRig('nythraxis_crypt');
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).toEqual(['enterDungeon:nythraxis_crypt', 'enterDungeon:nythraxis_crypt']);
   });
 });
 

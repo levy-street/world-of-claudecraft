@@ -782,6 +782,42 @@ export const en = {
       lastPickSnaps:
         'The last pick snaps. The lock jams. The chest is lost unless you clear the delve again.',
     },
+    // Generic dungeon-door gate text (DungeonDef.minLevel), shared by every dungeon
+    // that sets a level gate, not just the Source Cave.
+    dungeon: {
+      levelRequired: 'You must reach level {level} to enter {name}.',
+    },
+    // Source Cave (Phase 3 access rules): daily lockout + enter/leave. The
+    // busy-instance deny is already handled by the generic hud-local dungeon-busy
+    // arm (worldContent.dungeonInstanceBusy), so it needs no key here.
+    sourceCave: {
+      locked: 'You are locked out of {name}.',
+      enter: 'You step into the Source Cave.',
+      leave: 'You leave the Source Cave.',
+      rebootConfirm:
+        'Are you sure you want to proceed? Ensure you gather your resources before you push.',
+      // {name} is a contributor login, spliced verbatim (D7); {killed}/{total} count
+      // the cave's cleared mobs. Emitted on every cave-mob kill; the clear line follows
+      // on the last one.
+      killProgress: '{name} has fallen. ({killed} of {total} defeated in the Source Cave)',
+      cleared: 'The Source Cave has been cleared.',
+      // The always-present reward chest denies interaction until the clear
+      // (source_cave/clear.ts trySourceCaveChestDeny), EXACT-matched in sim_i18n.ts.
+      accessDenied: 'Access denied.',
+      // The well's banter gate (source_cave/well_banter.ts): one line per
+      // interaction, in order, before it finally opens on the interaction past
+      // the last line. Placeholder-free literals, EXACT-matched in sim_i18n.ts.
+      wellBanter1: "It's a well. It holds water. Move along.",
+      wellBanter2: 'Why are you looking at my bricks like that?',
+      wellBanter3: "I'm an ordinary well! Look, I even have a bucket!",
+      wellBanter4: 'Still just a well. Nothing magical to see.',
+      wellBanter5: 'Who told you about the source? Was it Claude?',
+      wellBanter6: "Oh, you definitely don't want to go down there.",
+      wellBanter7: 'Security! The player is trying to break into the source code!',
+      wellBanter8: "That's a source of conflict down there, you know.",
+      wellBanter9: 'If I open, will you finally leave me alone?',
+      wellBanter10: 'Alright, step inside. Wipe your boots first.',
+    },
   },
   // Lockpicking minigame ("Tumbler's Path") panel chrome. Rendered through t()
   // from hud.ts; the pure lockpick_panel.ts view returns stable discriminators
@@ -1304,6 +1340,21 @@ export const en = {
       ...itemNames.en.entities.items,
       ...mergeEntities.en.items,
       ...mergeExtra.en.items,
+      // The Source Cave reward-chest themed rare (working-title name pending user
+      // sign-off, docs/the-source-cave/state.md OPEN O2). English-only add; the
+      // maintainer fills locales at release.
+      source_cave_mantle: { name: 'Mantle of the Source' },
+      conflictbreaker_breastplate: { name: 'Conflictbreaker Breastplate' },
+      cherry_pickers_gauntlets: { name: "Cherry-Picker's Gauntlets" },
+      maintainers_crown: { name: "Maintainer's Crown" },
+      // The Source Cave dev-themed weapons: held by the contributor mobs and
+      // the clear chest's epic chase drops (source_cave/loot.ts). English-only
+      // adds, same maintainer-fills-later rule. mech_keyboard was renamed
+      // 'Clacking Keyboard' to 'The Keystroke' for the epic pass, with its five
+      // required non-Latin fills refreshed in the same change.
+      commit_blade: { name: 'Commit Blade' },
+      bug_squasher: { name: 'The Bug Squasher' },
+      mech_keyboard: { name: 'The Keystroke' },
       // Delve items, Collapsed Reliquary loot and Marks vendor stock.
       reliquary_plate_chest: { name: 'Reliquary Guard Hauberk' },
       reliquary_leather_chest: { name: 'Dustwarden Jerkin' },

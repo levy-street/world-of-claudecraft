@@ -1,4 +1,5 @@
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
+import { isSourceCaveBanterTarget, isSourceCaveGatedObject } from '../sim/source_cave';
 import {
   dist2d,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
@@ -29,6 +30,7 @@ export interface PickInteractionWorld {
   targetEntity(id: number | null): void;
   interact(): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
+  interact(): void;
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
   startAutoAttack(): void;
@@ -209,6 +211,17 @@ export function handlePickedEntity(
         hud.showError(t('questUi.errors.tooFar'));
         return false;
       }
+      // The Source Cave's well gates entry behind a banter sequence
+      // (source_cave/well_banter.ts), a server decision: send the generic
+      // interact command and let interaction.ts's dispatch decide, rather than
+      // assuming "click the well -> enter" here. Every other dungeon door keeps
+      // entering immediately on click.
+      // The reward chest is server-gated too: sealed denies with a toast, while
+      // armed loots. pickUpObject would silently no-op on either form.
+      if (isSourceCaveGatedObject(e)) {
+        world.interact();
+        return true;
+      }
       if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
       if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
       if (e.templateId === 'mailbox') {
@@ -277,6 +290,15 @@ export function handlePickedEntity(
       const verdict = decideEscortPress(world.player.pos, world.entities, world.questLog);
       if (verdict.kind === 'none') return false;
       return handleEscortPress(world, hud, verdict, t('questUi.errors.escortAway'));
+    } else if (e.kind === 'mob' && isSourceCaveBanterTarget(e)) {
+      // Friendly Source Cave contributors chat back when spoken to; the sim
+      // command resolves the actual line (source_cave/mob_banter.ts).
+      if (d <= INTERACT_RANGE + 1) {
+        world.interact();
+        return true;
+      }
+      hud.showError(t('questUi.errors.tooFar'));
+      return false;
     } else if (
       isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
     ) {
@@ -297,6 +319,12 @@ export function handlePickedEntity(
       }
       const d = dist2d(world.player.pos, e.pos);
       if (d > objectInteractionRange(e)) return false;
+      // See the right-click branch above: the well's entry and the cave
+      // chest/button are server-gated interactions.
+      if (isSourceCaveGatedObject(e)) {
+        world.interact();
+        return true;
+      }
       if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
       if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
       if (e.templateId === 'mailbox') {
@@ -321,6 +349,14 @@ export function handlePickedEntity(
         )
           return false;
         hud.openLoot(id, screenX, screenY);
+        return true;
+      }
+    } else if (e.kind === 'mob' && isSourceCaveBanterTarget(e)) {
+      // Left-click talks to a friendly contributor too (mirrors the NPC arm:
+      // out of range it just targets, no error spam while exploring).
+      const d = dist2d(world.player.pos, e.pos);
+      if (d <= INTERACT_RANGE + 1) {
+        world.interact();
         return true;
       }
     } else if (e.kind === 'npc') {

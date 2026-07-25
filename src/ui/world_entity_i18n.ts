@@ -8,6 +8,10 @@ import {
   WELCOME_LETTER,
 } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
+// Import the runtime leaf, not the source_cave barrel: the barrel re-exports the
+// cave's sim controllers, and this localizer is in the /wiki guide's module graph
+// (tests/guide.test.ts chunk-color containment).
+import { SOURCE_CAVE_DEF } from '../sim/source_cave/runtime';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
 //
@@ -568,6 +572,12 @@ const DUNGEON_IDS = [
   'nythraxis_boss_arena',
   'wildheart_basin',
   'the_last_keep',
+  // The Source Cave: a runtime dungeon built once in the Sim ctor, deliberately
+  // never added to the frozen DUNGEONS/DUNGEON_LIST registry (see
+  // src/sim/source_cave/runtime.ts and docs/the-source-cave/state.md). Sourced
+  // from DUNGEON_SOURCES below (DUNGEONS merged with SOURCE_CAVE_DEF), not
+  // DUNGEONS directly.
+  'source_cave',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter
@@ -642,6 +652,10 @@ type DungeonTranslations = Record<
   DungeonId,
   { name: string; enterText: string; leaveText: string }
 >;
+// The shared shape DUNGEONS (DungeonDef, many more fields) and SOURCE_CAVE_DEF
+// (SourceCaveRuntimeDef, a small runtime-only def) both satisfy structurally, so
+// the two can merge into one source table for the loop below.
+type DungeonNameSource = { id: string; name: string; enterText: string; leaveText: string };
 type DelveTranslations = Record<DelveId, { name: string; enterText: string; leaveText: string }>;
 type LetterTranslations = Record<LetterId, { sender: string; subject: string; body: string }>;
 
@@ -661,6 +675,29 @@ type WorldEntityTranslations = {
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
     noticeboardName: string;
+    // The Source Cave's overworld entrance well (render/door_portal.ts), a fixed
+    // landmark name, not the dungeon's own name (entities.dungeons.source_cave.name):
+    // shown only when the viewer stands right next to the well (very close), never
+    // at normal nameplate range. See docs/the-source-cave/state.md.
+    sourceCaveWellName: string;
+    /** Red call-out above the Source Cave's exit portal while the encounter seals it. */
+    sourceCaveExitDenied: string;
+    /** Interaction-range label above the Source Cave's centre reboot button. */
+    sourceCaveReboot: string;
+    /** Highest-ranked contributor's reaction when the reboot button is pressed. */
+    sourceCaveRebootYell: string;
+    /** Second-strongest contributor's staggered reaction to the reboot. */
+    sourceCaveRebootYellWhatsGoingOn: string;
+    /** Third-strongest contributor's staggered reaction to the reboot. */
+    sourceCaveRebootYellServerDown: string;
+    /** Friendly-phase contributor banter (random pick on interaction). */
+    sourceCaveBanterIssue: string;
+    sourceCaveBanterPullRequest: string;
+    sourceCaveBanterConflicts: string;
+    sourceCaveBanterContribute: string;
+    sourceCaveBanterFocused: string;
+    sourceCaveBanterNextRelease: string;
+    sourceCaveBanterRefresh: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -730,8 +767,15 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     };
   });
 
+  // DUNGEONS is the frozen static registry (does not carry the Source Cave); merge in
+  // SOURCE_CAVE_DEF (same name/enterText/leaveText shape) so the one runtime dungeon
+  // localizes through the identical path as every static one.
+  const dungeonSources: Record<string, DungeonNameSource> = {
+    ...DUNGEONS,
+    source_cave: SOURCE_CAVE_DEF,
+  };
   const dungeons = {} as DungeonTranslations;
-  orderedValues(DUNGEON_IDS, DUNGEONS).forEach((dungeon) => {
+  orderedValues(DUNGEON_IDS, dungeonSources).forEach((dungeon) => {
     dungeons[dungeon.id as DungeonId] = {
       name: dungeon.name,
       enterText: normalizeSourceText(dungeon.enterText),
@@ -783,6 +827,19 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
       noticeboardName: 'Notice Board',
+      sourceCaveWellName: 'The Open Source',
+      sourceCaveExitDenied: 'ACCESS DENIED',
+      sourceCaveReboot: 'Do not push the button',
+      sourceCaveRebootYell: 'What have you done?!',
+      sourceCaveRebootYellWhatsGoingOn: "Hey, what's going on?",
+      sourceCaveRebootYellServerDown: 'Guys, the server is down!',
+      sourceCaveBanterIssue: 'Please create an issue.',
+      sourceCaveBanterPullRequest: "Don't hesitate to create a pull request.",
+      sourceCaveBanterConflicts: 'I hate conflicts...',
+      sourceCaveBanterContribute: 'Yes, of course you can contribute to this project!',
+      sourceCaveBanterFocused: "Sorry, but I'm focused right now.",
+      sourceCaveBanterNextRelease: 'The next release will be awesome!',
+      sourceCaveBanterRefresh: 'Hmm? Try refreshing.',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

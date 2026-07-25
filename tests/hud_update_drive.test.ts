@@ -281,6 +281,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the daily-rewards launcher button state (not the window)',
   },
   {
+    call: 'this.updateSourceCaveProgressBanner',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the Source Cave kill-progress flash on the shared quest-progress banner',
+  },
+  {
     call: 'this.maybeRestoreActionBarLayout',
     band: 'frame',
     gate: '',
@@ -1422,7 +1429,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 72, none: 15 });
+    ).toEqual({ window: 41, chrome: 73, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

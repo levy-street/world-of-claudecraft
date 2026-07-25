@@ -7,6 +7,7 @@ import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i1
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
+import { SOURCE_CAVE_WELL_BANTER_LINES } from '../src/sim/source_cave';
 import type { SimEvent } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
@@ -87,6 +88,55 @@ const ph = (s: string) =>
     .map((m) => m[1])
     .sort()
     .join(',');
+
+// The well's banter gate (source_cave/well_banter.ts) emits via `ctx.emit({...,
+// text: line})` with `line` pulled from an array: a variable-routed emit the S3
+// guard's literal-only scan cannot see (this file's own file-scan list only
+// proves well_banter.ts's *source* is included, not that every string in it has
+// a matcher). This is the actual decisive coverage: each of the 10 lines must
+// resolve through a real sim_i18n rule in every language, and must not stay raw
+// English in the 5 M16-required non-Latin locales.
+describe('Source Cave well banter: variable-routed emits are actually localized', () => {
+  it('every banter line resolves via a real sim_i18n rule in every supported language', () => {
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      for (const line of SOURCE_CAVE_WELL_BANTER_LINES) {
+        expect(localizeSimText(line), `${lang}: "${line}"`).not.toBeNull();
+      }
+    }
+    setLanguage('en');
+  });
+
+  it('is genuinely translated (not left English) in the 5 M16 non-Latin locales', () => {
+    const m16 = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+    for (const lang of m16) {
+      setLanguage(lang);
+      for (const line of SOURCE_CAVE_WELL_BANTER_LINES) {
+        expect(localizeSimText(line), `${lang}: "${line}"`).not.toBe(line);
+      }
+    }
+    setLanguage('en');
+  });
+
+  it('resolves to the exact catalog value for each numbered key', () => {
+    setLanguage('en');
+    const keys = [
+      'sim.sourceCave.wellBanter1',
+      'sim.sourceCave.wellBanter2',
+      'sim.sourceCave.wellBanter3',
+      'sim.sourceCave.wellBanter4',
+      'sim.sourceCave.wellBanter5',
+      'sim.sourceCave.wellBanter6',
+      'sim.sourceCave.wellBanter7',
+      'sim.sourceCave.wellBanter8',
+      'sim.sourceCave.wellBanter9',
+      'sim.sourceCave.wellBanter10',
+    ] as const;
+    SOURCE_CAVE_WELL_BANTER_LINES.forEach((line, i) => {
+      expect(localizeSimText(line)).toBe(t(keys[i]));
+    });
+  });
+});
 
 // --- The copied-English and v0.7-slash allow-lists are VIEWS over the
 // generated status registry (src/ui/i18n.status.json, written by
@@ -956,6 +1006,15 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/fatigue.ts'), 'utf8'),
+    // Source Cave (Phase 3): the runtime dungeon's own enter gate (level/lockout
+    // deny literals) lives outside the static dungeon engine, in its own controller.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/source_cave/dungeon.ts'), 'utf8'),
+    // Source Cave (Phase 4 clear): the kill-progress + clear emit literals live in the
+    // clear-detection controller (onSourceCaveMobKilled), outside sim.ts.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/source_cave/clear.ts'), 'utf8'),
+    // Source Cave (well banter gate): the 10 well-interaction lines live in their
+    // own controller, outside sim.ts and dungeon.ts.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/source_cave/well_banter.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
     // DL1: Drowned Litany boss/rite/rooms emit surfaces.

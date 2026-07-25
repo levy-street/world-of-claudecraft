@@ -79,7 +79,10 @@ function focusClick(el: HTMLElement, selector: string): HTMLElement {
 
 beforeEach(() => {
   document.body.innerHTML = '';
-  localStorage.clear();
+  // Optional-chained: on Node >= 23 the experimental webstorage global shadows
+  // jsdom's localStorage with undefined unless --localstorage-file is set; the
+  // window under test already tolerates absent storage (DeedsWindow try/catch).
+  window.localStorage?.clear();
 });
 
 describe('DeedsWindow: focus survives rebuilds', () => {

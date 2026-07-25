@@ -673,7 +673,10 @@ describe('client HTML shell', () => {
     // and the combo pip `on` toggle (now on the PLAYER frame: combo points are
     // character-bound) through toggleClass. No raw classList/style write on either
     // frame survives (those silently collapse the hot-DOM skip rate).
-    expect(hudTs).toContain('const targetRank = targetRankView(targetTemplate);');
+    // The rank resolution flows through targetRankView; the branch's cave-aware
+    // arm (source_cave_mob_core) sits in front of it, so pin the fallback call,
+    // not the whole declaration.
+    expect(hudTs).toContain(': targetRankView(targetTemplate);');
     // Written into the reused target descriptor rather than a per-frame object
     // literal; the routing this test guards is unchanged.
     expect(hudTs).toContain('targetFrame.levelText = String(target.level);');

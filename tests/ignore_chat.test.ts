@@ -263,34 +263,32 @@ describe('ignore/block commands survive the chat pipeline gates', () => {
     expect(muter.chatCooldownUntil).toBe(0);
   });
 
-  it.each([
-    '/ignore Bob',
-    '/unignore Bob',
-    '/block Bob',
-    '/unblock Bob',
-  ])('an exhausted chat bucket REFUSES the write command %s', (text) => {
-    // Charging a token is not the security property; REFUSING once the bucket is
-    // empty is. Each of these INSERT/DELETEs and then pushes a full social
-    // snapshot, so they are the most expensive commands on the chat path and
-    // must not be the one thing on it an attacker can spin for free.
-    const server = new GameServer();
-    const fa = fakeWs();
-    const session = joinServer(server, fa, 1, 'Player');
-    const social = (server as any).social;
-    const spies = [
-      vi.spyOn(social, 'ignoreAdd').mockResolvedValue(undefined),
-      vi.spyOn(social, 'ignoreRemove').mockResolvedValue(undefined),
-      vi.spyOn(social, 'blockAdd').mockResolvedValue(undefined),
-      vi.spyOn(social, 'blockRemove').mockResolvedValue(undefined),
-    ];
+  it.each(['/ignore Bob', '/unignore Bob', '/block Bob', '/unblock Bob'])(
+    'an exhausted chat bucket REFUSES the write command %s',
+    (text) => {
+      // Charging a token is not the security property; REFUSING once the bucket is
+      // empty is. Each of these INSERT/DELETEs and then pushes a full social
+      // snapshot, so they are the most expensive commands on the chat path and
+      // must not be the one thing on it an attacker can spin for free.
+      const server = new GameServer();
+      const fa = fakeWs();
+      const session = joinServer(server, fa, 1, 'Player');
+      const social = (server as any).social;
+      const spies = [
+        vi.spyOn(social, 'ignoreAdd').mockResolvedValue(undefined),
+        vi.spyOn(social, 'ignoreRemove').mockResolvedValue(undefined),
+        vi.spyOn(social, 'blockAdd').mockResolvedValue(undefined),
+        vi.spyOn(social, 'blockRemove').mockResolvedValue(undefined),
+      ];
 
-    // CHAT_RATE_BURST is 5; send well past it in one go
-    for (let i = 0; i < 40; i++) cmd(server, session, { cmd: 'chat', text });
+      // CHAT_RATE_BURST is 5; send well past it in one go
+      for (let i = 0; i < 40; i++) cmd(server, session, { cmd: 'chat', text });
 
-    const total = spies.reduce((n, s) => n + s.mock.calls.length, 0);
-    expect(total).toBeGreaterThan(0);
-    expect(total).toBeLessThanOrEqual(5);
-  });
+      const total = spies.reduce((n, s) => n + s.mock.calls.length, 0);
+      expect(total).toBeGreaterThan(0);
+      expect(total).toBeLessThanOrEqual(5);
+    },
+  );
 
   it('a muted player goes quiet through the REAL command, not a hand-planted set', async () => {
     // Everything above plants session.ignoredIds directly. This drives the actual

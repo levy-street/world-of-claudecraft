@@ -19,6 +19,8 @@ import {
   QUESTS,
   ZONES,
 } from '../sim/data';
+// The runtime leaf, not the source_cave barrel: see world_entity_i18n.ts (guide graph).
+import { SOURCE_CAVE_DEF, SOURCE_CAVE_DUNGEON_ID } from '../sim/source_cave/runtime';
 import type { ItemDef, PlayerClass } from '../sim/types';
 import {
   en,
@@ -288,7 +290,15 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
       return zone?.pois[request.poiIndex]?.label ?? `${request.zoneId}.pois.${request.poiIndex}`;
     }
     case 'dungeon': {
-      const dungeon = DUNGEONS[request.id];
+      // DUNGEONS is the frozen static registry; the Source Cave is a runtime
+      // dungeon deliberately never added to it (src/sim/source_cave/runtime.ts),
+      // so it needs its own fallback here (this arm only runs when the resolved
+      // i18n table lacks the key, e.g. before a build; the normal path resolves
+      // entities.dungeons.source_cave.* from world_entity_i18n.ts like any other
+      // dungeon).
+      const dungeon =
+        DUNGEONS[request.id] ??
+        (request.id === SOURCE_CAVE_DUNGEON_ID ? SOURCE_CAVE_DEF : undefined);
       if (!dungeon) return request.id;
       if (request.field === 'enterText') return dungeon.enterText;
       if (request.field === 'leaveText') return dungeon.leaveText;

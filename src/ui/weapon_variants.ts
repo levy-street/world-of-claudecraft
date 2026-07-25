@@ -25,6 +25,9 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   kingsbane_last_oath: 'sword_f', // LEGENDARY: the flaming blade (exclusive)
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
+  // Source Cave drops: dedicated generated models (scripts/asset_pipeline, CREDITS.md)
+  commit_blade: 'commit_blade_sword',
+  mech_keyboard: 'keyboard_sword',
   highwatch_warblade: 'adv_sword_1handed',
   eastbrook_greatsword: 'adv_sword_2handed',
   highwatch_greatsword: 'adv_sword_2handed',
@@ -106,6 +109,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   scepter_of_the_deathless_court: 'adv_wand', // EPIC: Nythraxis raid scepter
 
   // ---- maces (only 4 hammer models for ~9 maces) -----------------------------
+  bug_squasher: 'bug_squasher_hammer', // Source Cave drop, dedicated generated model
   training_mace: 'hammer_a',
   bronzework_mace: 'hammer_a',
   copper_flanged_mace: 'hammer_a', // crafted (weaponcrafting tier 1)
