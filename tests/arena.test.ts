@@ -221,6 +221,17 @@ describe('arena: a full bout', () => {
     expect(sim.entities.get(a)!.autoAttack).toBe(false);
   });
 
+  it('a self-target made during the countdown also survives the fight-start reset', () => {
+    const { sim, a } = queueDuo();
+    sim.targetEntity(a, a);
+    expect(sim.entities.get(a)!.targetId).toBe(a);
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(a)!.state).toBe('active');
+    expect(sim.entities.get(a)!.targetId).toBe(a);
+  });
+
   it('resets a target pointing outside the match to null at fight start', () => {
     const { sim, a } = queueDuo();
     const outsider = sim.addPlayer('rogue', 'Gimel');

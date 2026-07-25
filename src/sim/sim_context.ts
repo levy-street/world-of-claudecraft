@@ -334,6 +334,8 @@ export interface SimContextCallbacks {
   updateFiestaActive(match: ArenaMatch): void;
   fiestaRestoreChar(meta: PlayerMeta, e: Entity): void;
   clearFiestaAugments(meta: PlayerMeta, e: Entity): void;
+  // Deliberately narrower than the module function, which also takes
+  // keepValidTargetPids (fight-start target retention); no ctx caller needs it.
   readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void;
   resetForArena(e: Entity): void;
   isArenaTeamWiped(match: ArenaMatch, team: 'A' | 'B'): boolean;

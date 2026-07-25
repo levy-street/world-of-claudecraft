@@ -4,6 +4,9 @@
 // order, the matchmaking guard loops, the ~28-field fighter reset, and the
 // player-facing emit literals are preserved EXACTLY (the parity gate's full-state
 // trace + rng draw-order log proves it).
+// Post-move sanctioned deviation: readyArenaFighter's targetId reset is
+// conditional at the countdown-end call site (keepValidTargetPids); see the
+// comment at that field.
 //
 // Arena/duel state stays on Sim and is reached through SimContext live views
 // (`arenaMatches` from E1; `arenaQueue1v1`/`arenaQueue2v2`/`arenaQueueFiesta`/
@@ -911,6 +914,9 @@ export function readyArenaFighter(
   // keepValidTargetPids, so a selection made during prep survives the gates
   // opening iff it points at a current fighter of this match. Every other
   // reset (match creation, Fiesta/Yumi respawns) still clears the selection.
+  // Retention is by player pid only (a Protect Yumi cat familiar is
+  // deliberately out of scope), and a kept target can never be dead: every
+  // kept pid is a fighter revived by this same countdown-end loop.
   e.targetId =
     e.targetId !== null && opts.keepValidTargetPids?.includes(e.targetId) ? e.targetId : null;
   e.autoAttack = false;
