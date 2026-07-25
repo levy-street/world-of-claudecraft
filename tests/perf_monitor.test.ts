@@ -24,6 +24,7 @@ function installBrowserGlobals(search = ''): void {
     createElement: () => ({
       style: {},
       addEventListener: () => {},
+      appendChild: () => {},
     }),
   };
   Object.defineProperty(globalThis, 'navigator', {

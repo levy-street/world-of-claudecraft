@@ -36,10 +36,26 @@ const STYLES: Record<Precip, PrecipStyle> = {
   // approaching a yard stays huge on screen even far off and looks like flying
   // snowballs. Kept just above the ambient motes (0.5) so it still registers
   // against bright snowfields.
-  snow: { color: 0xffffff, size: 0.45, fall: 6.5, fallVar: 2.5, sway: 1.6, target: 0.95, texture: 'flake' },
+  snow: {
+    color: 0xffffff,
+    size: 0.45,
+    fall: 6.5,
+    fallVar: 2.5,
+    sway: 1.6,
+    target: 0.95,
+    texture: 'flake',
+  },
   // fast, near-vertical streaks with a faint cool tint; a touch taller than a
   // flake so the streak still reads, but nowhere near the old yard-long drops.
-  rain: { color: 0x9fc4e0, size: 0.6, fall: 52, fallVar: 14, sway: 0.5, target: 0.7, texture: 'streak' },
+  rain: {
+    color: 0x9fc4e0,
+    size: 0.6,
+    fall: 52,
+    fallVar: 14,
+    sway: 0.5,
+    target: 0.7,
+    texture: 'streak',
+  },
 };
 
 // Tiny deterministic RNG (mulberry32) so particle seeding never reaches for
@@ -149,6 +165,7 @@ export class Weather {
     this.points.frustumCulled = false;
     this.points.renderOrder = 3; // after the world, before nameplates
     this.points.visible = false;
+    this.points.userData.renderCategory = 'weather';
     scene.add(this.points);
   }
 
@@ -173,7 +190,13 @@ export class Weather {
   update(cam: THREE.Vector3, dt: number, biome: BiomeId | null): void {
     // peaks -> snow, marsh -> rain, everything else clears
     const want: Precip | null =
-      !this.enabled || biome === null ? null : biome === 'peaks' ? 'snow' : biome === 'marsh' ? 'rain' : null;
+      !this.enabled || biome === null
+        ? null
+        : biome === 'peaks'
+          ? 'snow'
+          : biome === 'marsh'
+            ? 'rain'
+            : null;
 
     // While the visible type still differs from what we want, drive opacity to
     // zero first; once faded out, swap the material and let it climb again.
@@ -209,12 +232,15 @@ export class Weather {
       pos[j] += Math.sin(this.time * 0.8 + this.phase[i]) * s.sway * dt;
 
       // wrap each axis into the camera-relative box so the field is endless
-      let rx = pos[j] - cam.x;
-      if (rx > HX) pos[j] -= HX * 2; else if (rx < -HX) pos[j] += HX * 2;
-      let rz = pos[j + 2] - cam.z;
-      if (rz > HZ) pos[j + 2] -= HZ * 2; else if (rz < -HZ) pos[j + 2] += HZ * 2;
+      const rx = pos[j] - cam.x;
+      if (rx > HX) pos[j] -= HX * 2;
+      else if (rx < -HX) pos[j] += HX * 2;
+      const rz = pos[j + 2] - cam.z;
+      if (rz > HZ) pos[j + 2] -= HZ * 2;
+      else if (rz < -HZ) pos[j + 2] += HZ * 2;
       const ry = pos[j + 1] - cam.y;
-      if (ry < -HY) pos[j + 1] += HY * 2; // fell out the bottom -> back to the top
+      if (ry < -HY)
+        pos[j + 1] += HY * 2; // fell out the bottom -> back to the top
       else if (ry > HY) pos[j + 1] -= HY * 2;
     }
     (this.points.geometry.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
