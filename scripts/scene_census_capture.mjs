@@ -103,8 +103,10 @@ async function captureRun(tier, spotId) {
     await sleep(Math.max(0, idleSec - 12) * 1000);
     const result = await page.evaluate(() => {
       const g = window.__game;
-      const census = g.perf.runSceneCensus();
+      // Live stats FIRST: the census burst ends by zeroing the draw counters,
+      // so a synchronous post-census read would report an empty live frame.
       const report = g.perf.report();
+      const census = g.perf.runSceneCensus();
       const r = report.renderer;
       return {
         census,
