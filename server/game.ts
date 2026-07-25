@@ -4722,6 +4722,17 @@ export class GameServer {
         if (typeof msg.id === 'number')
           void this.social.guildEventRemove(this.actorFor(session), msg.id).catch(logSocialErr);
         break;
+      case 'guild_set_motd':
+        // Guild billboard: player text, so it flows through the same mute +
+        // rate + hard-word gates as chat (the guild_event_create stack) before
+        // the service applies its own officer/clamp validation.
+        if (typeof msg.text === 'string') {
+          if (this.isChatMuted(session)) break;
+          if (!this.consumeChatToken(session)) break;
+          if (this.enforceChatPolicy(session, msg.text)) break;
+          void this.social.guildSetMotd(this.actorFor(session), msg.text).catch(logSocialErr);
+        }
+        break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
         const fmt =

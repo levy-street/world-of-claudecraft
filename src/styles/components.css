@@ -7250,6 +7250,60 @@
     color: var(--color-text-muted);
     font-size: 11px;
   }
+  /* Guild billboard: the officer-set message pinned between the guild head and
+     the roster. Plain escaped text only (player-controlled, never linkified).
+     Raw hex matches the surrounding .soc-* palette; tokenizing that palette is
+     deferred (see the .soc-sugg-item note above). */
+  .soc-billboard {
+    grid-column: 1 / -1;
+    margin: 0 4px 6px;
+    padding: 7px 9px;
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+  }
+  .soc-billboard-label {
+    font-family: var(--title-font);
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 3px;
+  }
+  .soc-billboard-msg {
+    font-size: 12px;
+    color: #f0ead8;
+    overflow-wrap: anywhere;
+  }
+  .soc-billboard-msg.empty {
+    color: #887c5c;
+  }
+  .soc-billboard-by {
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .soc-billboard-edit {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .soc-billboard-edit input {
+    flex: 1;
+    min-width: 0;
+    background: #120f0c;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    color: #f0ead8;
+    padding: 5px 7px;
+    font-size: 12px;
+  }
+  .soc-billboard-edit input:disabled {
+    color: #887c5c;
+  }
+  .soc-billboard-edit .btn {
+    margin: 0;
+    padding: 5px 12px;
+    font-size: 11px;
+  }
   /* Guild roster: the persisted "hide offline" toggle (an aria-pressed button with a
      checkbox-like indicator) and the online/offline group sub-headers. */
   .soc-hide-offline {
