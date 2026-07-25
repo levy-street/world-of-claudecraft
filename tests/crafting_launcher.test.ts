@@ -120,7 +120,7 @@ describe('side rail height budget', () => {
   const DAILY_CHEST_BLOCK_PX = 128;
   // Each column is now split into .micro-group sections, and every boundary
   // between two VISIBLE sections costs the keyline plus its breathing room
-  // (margin-bottom: 3px + padding-bottom: 3px + a 1px border). Counted
+  // (margin-top: 3px + padding-top: 3px + a 1px border). Counted
   // separately from the per-button arithmetic so adding a section shows up in
   // this budget instead of hiding inside it. Deliberately NOT compacted by the
   // max-height rescue: at a 1px in-section gap it is the only thing left
