@@ -84,7 +84,9 @@ async function captureRun(tier, spotId) {
       } catch {}
     });
     await page.goto(`${GAME_URL}/?perf&gfx=${tier}`, { waitUntil: 'domcontentloaded' });
-    const booted = await enterOfflineGame(page, { settleMs: 3000 });
+    // Generous boot timeout: a loaded machine (parallel vitest runs) can push
+    // the offline world entry well past the 30 s default.
+    const booted = await enterOfflineGame(page, { settleMs: 3000, gameBootTimeoutMs: 90000 });
     if (!booted) throw new Error(`world boot timed out (tier ${tier}, spot ${spotId})`);
 
     // Teleport and stage the camera, then let streaming/view-building settle.
