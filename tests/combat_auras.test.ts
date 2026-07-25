@@ -177,6 +177,37 @@ describe('auras: updateAuras expiry / HoT / top guard', () => {
     expect(mob.hp).toBeGreaterThan(500);
   });
 
+  it('a HoT tick emits heal2 with hot:true and the aura id as abilityId', () => {
+    const sim = makeSim();
+    const mob = spawnMob(sim, 1000);
+    mob.hp = 500;
+    mob.auras.push(aura('hot', 100, { id: 'rejuvenation', tickInterval: DT }));
+    sim.drainEvents(); // discard anything queued by spawnMob/setup
+    updateAuras(sim.ctx, mob);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({ hot: true, abilityId: 'rejuvenation', amount: 100 });
+  });
+
+  it('applying a hot-kind aura emits one sound-only heal2 (amount:0) at the same moment, distinct from a later tick', () => {
+    const sim = makeSim();
+    const mob = spawnMob(sim, 1000);
+    mob.hp = 500; // below max, or the tick heals for 0 and never emits
+    sim.drainEvents();
+    sim.ctx.applyAura(mob, aura('hot', 40, { id: 'renew', tickInterval: DT }));
+    const onApply = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(onApply).toHaveLength(1);
+    expect(onApply[0]).toMatchObject({ amount: 0, crit: false, abilityId: 'renew' });
+    expect(onApply[0].hot).toBeUndefined(); // never flagged as a tick
+
+    // A real tick later still fires its own, separate heal2 with hot:true.
+    updateAuras(sim.ctx, mob);
+    const onTick = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(onTick).toHaveLength(1);
+    expect(onTick[0]).toMatchObject({ hot: true, abilityId: 'renew' });
+    expect(onTick[0].amount).toBeGreaterThan(0);
+  });
+
   it('the top guard skips a dead entity entirely (auras untouched)', () => {
     const sim = makeSim();
     const mob = spawnMob(sim, 1000);

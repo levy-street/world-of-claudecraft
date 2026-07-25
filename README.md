@@ -352,14 +352,6 @@ Every player-visible string resolves through `t()`, and the game ships in **22 l
 
 Contributions of every kind are welcome: code, translations, bug reports, and documentation. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for setup, read the [Code of Conduct](CODE_OF_CONDUCT.md), and check [SECURITY.md](SECURITY.md) before reporting a vulnerability. New here? Look for issues labeled [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), open an [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), or say hello on [Discord](https://discord.com/invite/worldofclaudecraft).
 
-<div align="center">
-
-![World of Claude](worldofclaude.png)
-
-![World of ClaudeCraft community](woc_community.png)
-
-</div>
-
 ## License
 
 **The code is [MIT licensed](LICENSE), so fork it, remix it, and host your own world.** That is the whole point, and nothing else on this page or on our website takes it back.

@@ -8712,6 +8712,20 @@ export class Hud {
         // companion heals, ...), which falls through to heal_impact unchanged.
         const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
         if (ev.type === 'heal' && ev.source && !cue) return; // eat/drink tick, not a sound tick
+        // A HoT tick fires this every couple seconds for its whole duration; the
+        // one-shot application cue (Sim.applyAura) now covers the "heal landed"
+        // moment instead, so ticks stay silent. Frenzied Regeneration is fully
+        // exempt from this change (a Bear Form self-heal, never aimed at anyone
+        // else, so the repeat doesn't read as spammy the way a party HoT does):
+        // it keeps its old, unchanged tick-only sound, so the one-shot
+        // application emit is skipped for it too, or it would gain an extra pop
+        // on top of its untouched ticking. Confirmed in-game on Priest (Renew)
+        // and Druid (Rejuvenation, Regrowth, Frenzied Regeneration): the others
+        // land once on application and stay silent for the rest of their
+        // duration; Frenzied Regeneration keeps ticking exactly as before.
+        const isHot = ev.type === 'heal2' && ev.hot === true;
+        const isFrenziedRegen = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
+        if (isHot ? !isFrenziedRegen : isFrenziedRegen) return;
         this.combat(cue ?? 'heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
         return;
       }

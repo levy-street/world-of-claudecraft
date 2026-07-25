@@ -308,6 +308,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               amount: healed,
               crit: false,
               ability: a.name,
+              hot: true,
+              abilityId: a.id,
             });
             const src = ctx.entities.get(a.sourceId);
             if (src) ctx.healingThreat(src, e, healed);

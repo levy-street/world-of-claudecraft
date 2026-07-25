@@ -5387,6 +5387,25 @@ export class Sim {
     if (aura.kind === 'stealth') target.stealthed = true; // keep the cache live without waiting for updateAuras
     this.applyNonPlayerStatAura(target, aura, 1);
     this.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: true });
+    if (aura.kind === 'hot') {
+      // A HoT's periodic ticks (combat/auras.ts) no longer carry the sound: the
+      // client plays a single heal_impact right here, at the moment it lands,
+      // instead of once per tick for the whole duration. amount:0 keeps this
+      // sound-only (FCT/combat log/heal meters/heal-glow VFX all gate on
+      // amount > 0 or crit, so this never double-counts real ticks). Confirmed
+      // in-game on Priest and Druid, Frenzied Regeneration included (see the
+      // hud.ts heal2 case for the one exception this feeds into).
+      this.emit({
+        type: 'heal2',
+        sourceId: aura.sourceId,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        ability: aura.name,
+        abilityId: aura.id,
+        cueOnly: true,
+      });
+    }
     const source = this.entities.get(aura.sourceId);
     this.refreshMobLeashFromAction(source ?? null, target);
     if (target.kind === 'player') {
