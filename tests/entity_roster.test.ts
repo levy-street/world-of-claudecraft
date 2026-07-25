@@ -61,6 +61,7 @@ function makeCtx() {
     nextRiftInstanceId: 1,
     riftPortalNextAt: 120,
     riftPortalSpawnCount: 0,
+    riftPortalsEnabled: false,
     get rng() {
       return rng;
     },

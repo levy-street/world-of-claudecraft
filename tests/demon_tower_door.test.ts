@@ -25,6 +25,10 @@ function makeSim() {
     playerClass: 'warrior',
     autoEquip: true,
     devCommands: true,
+    // The door is rift world content, so it is minted only where the rift
+    // scheduler runs. Worlds that opt out (the parity gate, the RL env) must
+    // stay door-free, or spawning one shifts every later entity id.
+    riftPortals: true,
     world: TOWER_WORLD,
   });
   sim.setPlayerLevel(20);

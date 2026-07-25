@@ -1027,8 +1027,11 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
   if (ctx.riftPortalIds === null) {
     // The Demon Tower's door is a permanent landmark rather than a scheduled
     // event, so it is minted here, once, before the portal cache is built (which
-    // then contains it and is what keeps this from running twice).
-    spawnDemonTowerDoor(ctx);
+    // then contains it and is what keeps this from running twice). Gated on the
+    // same flag as the portal scheduler: a world that opted out of rift content
+    // (tests, the parity gate, the RL env) must not gain a door, because
+    // spawning one consumes an entity id and shifts every later id in the run.
+    if (ctx.riftPortalsEnabled) spawnDemonTowerDoor(ctx);
     ctx.riftPortalIds = [];
     for (const e of ctx.entities.values()) {
       if (e.templateId === 'rift_portal') ctx.riftPortalIds.push(e.id);

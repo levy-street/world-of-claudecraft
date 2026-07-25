@@ -137,6 +137,12 @@ export interface SimContextPrimitives {
   // Natural-portal spawn ordinal: seeds each spawn's dedicated Rng and paces the
   // sim-time cadence. Read-write (the scheduler increments it).
   riftPortalSpawnCount: number;
+  /** Whether this world runs the rift world-portal scheduler (SimConfig.riftPortals).
+   * Read by rift/runs.ts to decide whether the permanent Demon Tower landmark is
+   * minted: a world that opted OUT of rift content (tests, the parity gate, the RL
+   * env) must not gain a tower door, because spawning one consumes an entity id and
+   * shifts every later id in the run. */
+  riftPortalsEnabled: boolean;
   // Deterministically sampled next scheduler deadline (sim seconds).
   riftPortalNextAt: number;
   // live arena bouts keyed by every participant pid (A2); release-spirit early-bails
@@ -1017,6 +1023,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get naturalRiftPortals() {
       return host.naturalRiftPortals;
+    },
+    get riftPortalsEnabled() {
+      return host.riftPortalsEnabled;
     },
     get riftPortalSpawnCount() {
       return host.riftPortalSpawnCount;

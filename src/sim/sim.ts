@@ -4077,6 +4077,9 @@ export class Sim {
       set riftPortalNextAt(v: number) {
         sim.riftPortalNextAt = v;
       },
+      get riftPortalsEnabled() {
+        return sim.cfg.riftPortals ?? false;
+      },
       get riftPortalIds() {
         return sim.riftPortalIds;
       },
