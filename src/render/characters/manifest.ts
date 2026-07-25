@@ -1097,6 +1097,81 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // Five bespoke Orkadia specialists, kept effectively untinted so their
   // authored armor, warpaint, fel runes, and rank silhouettes remain distinct.
+  // -- The Demon Tower (rift/tower.ts): the eight wave demons plus the two
+  // bosses, all Tripo creature-lane rigs on the shared generated clip vocabulary.
+  // Heights are the world-unit values they were generated and QA'd at. Tint is
+  // deliberately weak: unlike a procedural rift, the tower is a fixed landmark,
+  // so its demons keep one authored look on every visit.
+  mob_tower_imp: {
+    url: `${CREATURES}/tower_imp.glb`,
+    height: 1.4,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_hellhound: {
+    url: `${CREATURES}/tower_hellhound.glb`,
+    height: 1.3,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_pact_reaver: {
+    url: `${CREATURES}/tower_pact_reaver.glb`,
+    height: 2.1,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_brimstone_zealot: {
+    url: `${CREATURES}/tower_brimstone_zealot.glb`,
+    height: 2.0,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_soulbinder: {
+    url: `${CREATURES}/tower_soulbinder.glb`,
+    height: 2.0,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_iron_defiler: {
+    url: `${CREATURES}/tower_iron_defiler.glb`,
+    height: 2.6,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_abyss_knight: {
+    url: `${CREATURES}/tower_abyss_knight.glb`,
+    height: 2.8,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_dread_harbinger: {
+    url: `${CREATURES}/tower_dread_harbinger.glb`,
+    height: 2.9,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_boss_gatekeeper: {
+    url: `${CREATURES}/tower_boss_gatekeeper.glb`,
+    height: 3.4,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_tower_boss_demon_lord: {
+    url: `${CREATURES}/tower_boss_demon_lord.glb`,
+    height: 4.2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
   mob_orkadia_axethrower: {
     url: `${CREATURES}/orkadia_axethrower.glb`,
     height: 2.4,
@@ -1642,6 +1717,17 @@ export const VISUALS: Record<string, VisualDef> = {
 
 const MOB_KEYS: Record<string, string> = {
   // Orkadia orc war-camp: each orc template renders its own Tripo GLB.
+  // The Demon Tower roster (content/rift/tower_mobs.ts).
+  tower_imp: 'mob_tower_imp',
+  tower_hellhound: 'mob_tower_hellhound',
+  tower_pact_reaver: 'mob_tower_pact_reaver',
+  tower_brimstone_zealot: 'mob_tower_brimstone_zealot',
+  tower_soulbinder: 'mob_tower_soulbinder',
+  tower_iron_defiler: 'mob_tower_iron_defiler',
+  tower_abyss_knight: 'mob_tower_abyss_knight',
+  tower_dread_harbinger: 'mob_tower_dread_harbinger',
+  tower_boss_gatekeeper: 'mob_tower_boss_gatekeeper',
+  tower_boss_demon_lord: 'mob_tower_boss_demon_lord',
   orkadia_grunt: 'mob_orc_grunt',
   orkadia_marauder: 'mob_orc_marauder',
   orkadia_warlord: 'mob_orc_warlord',
