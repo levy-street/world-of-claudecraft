@@ -293,6 +293,48 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
   });
 });
 
+describe('item level: the Source Cave chest items read the raid tier', () => {
+  it('the three guaranteed rares are raid-sourced and exactly match their slot budgets', () => {
+    const expected = new Map([
+      ['conflictbreaker_breastplate', 15],
+      ['cherry_pickers_gauntlets', 10],
+      ['maintainers_crown', 12],
+    ]);
+    for (const [id, budget] of expected) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(item.quality, id).toBe('rare');
+      expect(itemSourceLevel(id), `${id} source`).toBe(20);
+      expect(itemFromRaid(id), `${id} raid source`).toBe(true);
+      expect(itemLevel(item), `${id} ilvl`).toBe(26);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+      expect(primaryStatSum(item), id).toBe(budget);
+    }
+  });
+
+  it('the three epic weapons are raid-sourced at item level 29 with the exact 20-point budget', () => {
+    for (const id of ['commit_blade', 'bug_squasher', 'mech_keyboard']) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(item.quality, id).toBe('epic');
+      expect(itemSourceLevel(id), `${id} source`).toBe(20);
+      expect(itemFromRaid(id), `${id} raid source`).toBe(true);
+      expect(itemLevel(item), `${id} ilvl`).toBe(29); // 20 + raid 3 + epic 6
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+      expect(primaryStatSum(item), id).toBe(20);
+    }
+  });
+
+  it('the rare mantle is raid-sourced at item level 26 with its 11-point shoulder budget', () => {
+    const item = ITEMS.source_cave_mantle;
+    expect(itemSourceLevel('source_cave_mantle')).toBe(20);
+    expect(itemFromRaid('source_cave_mantle')).toBe(true);
+    expect(itemLevel(item)).toBe(26); // 20 + raid 3 + rare 3
+    expect(primaryStatSum(item)).toBe(expectedStatBudget(item));
+    expect(primaryStatSum(item)).toBe(11);
+  });
+});
+
 describe('item level: every level-20 item is balanced to budget', () => {
   it('all level-20 gear carries exactly its item-level stat budget', () => {
     const offBudget: string[] = [];

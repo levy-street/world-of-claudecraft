@@ -471,6 +471,105 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 72, str: 5, sta: 4 },
     sellValue: 390,
   },
+  // The Source Cave (daily runtime dungeon) reward-chest themed rare. Stats and
+  // sellValue are copied VERBATIM from gravewyrm_mantle above (same level-20 band,
+  // same shoulder/mail/rare shape); only the id and name differ, so the numbers trace
+  // to a cited existing item (no invented stats). Name is a WORKING TITLE pending user
+  // sign-off (see docs/the-source-cave/state.md OPEN O2).
+  source_cave_mantle: {
+    id: 'source_cave_mantle',
+    name: 'Mantle of the Source',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'shoulder',
+    quality: 'rare',
+    // Item level 26 (level-20 raid source + rare bump, item_level.ts): the
+    // 11-point shoulder budget, one over its gravewyrm_mantle template.
+    stats: { armor: 82, agi: 8, sta: 3 },
+    sellValue: 410,
+  },
+  // The Source Cave's guaranteed rare group. These replace the unrelated
+  // Gravewyrm uncommon chest pieces with one themed item per reward archetype.
+  // All three are registered as level-20 raid drops in item_level.ts, so their
+  // primary stats exactly match the item-level 26 budget for their own slot.
+  conflictbreaker_breastplate: {
+    id: 'conflictbreaker_breastplate',
+    name: 'Conflictbreaker Breastplate',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'rare',
+    stats: { armor: 230, str: 9, sta: 6 },
+    sellValue: 3000,
+  },
+  cherry_pickers_gauntlets: {
+    id: 'cherry_pickers_gauntlets',
+    name: "Cherry-Picker's Gauntlets",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'gloves',
+    quality: 'rare',
+    stats: { armor: 110, agi: 7, sta: 3 },
+    sellValue: 3000,
+  },
+  maintainers_crown: {
+    id: 'maintainers_crown',
+    name: "Maintainer's Crown",
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'helmet',
+    quality: 'rare',
+    stats: { armor: 76, int: 8, spi: 4 },
+    sellValue: 3000,
+  },
+  // The Source Cave themed weapons (models generated via scripts/asset_pipeline,
+  // see CREDITS.md), the cave's epic chest chase items (source_cave/loot.ts).
+  // Sized against the game's epic-mainhand ladder rather than invented: the cave
+  // is a level-20 raid source (suggestedPlayers 10, registered in item_level.ts),
+  // so they read item level 29 (20 + raid 3 + epic 6): 20 stat points
+  // (29 x STAT_PER_ILVL x mainhand mult 1.0) and ~16.2 dps, one notch above the
+  // Korzul dungeon epics (item level 26, ~14-15 dps, 18 pts, zone3.ts) and under
+  // the heroic tier (item level 31). No requiredClass: the cave clears as a
+  // mixed group. All three share dps within rounding; speed carries identity
+  // (heavy mace, standard sword, fast blade), stats pick the audience.
+  commit_blade: {
+    id: 'commit_blade',
+    name: 'Commit Blade',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    requiredLevel: 20,
+    weapon: { min: 31, max: 47, speed: 2.4 },
+    stats: { str: 12, sta: 8 },
+    // The v0.29 tier ladder: every ilvl-29 epic carries exactly one 20-point
+    // rating (tests/combat_rating.test.ts); hit is the raid-defining stat.
+    hitRating: 20,
+    sellValue: 8000,
+  },
+  bug_squasher: {
+    id: 'bug_squasher',
+    name: 'The Bug Squasher',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    requiredLevel: 20,
+    weapon: { min: 34, max: 50, speed: 2.6 },
+    stats: { str: 10, sta: 10 },
+    critRating: 20,
+    sellValue: 8000,
+  },
+  mech_keyboard: {
+    id: 'mech_keyboard',
+    name: 'The Keystroke',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    requiredLevel: 20,
+    weapon: { min: 29, max: 43, speed: 2.2 },
+    stats: { agi: 12, sta: 8 },
+    hasteRating: 20,
+    sellValue: 8000,
+  },
   // --- bags (kind:'bag', equip into one of the 4 bag sockets for +bagSlots
   // pooled inventory capacity; the 16-slot backpack is implicit). Tiered by
   // quality: common bags are vendor goods, uncommon drops from beasts, rare

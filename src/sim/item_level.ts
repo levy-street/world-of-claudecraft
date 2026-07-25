@@ -51,6 +51,11 @@ import {
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
 } from './item_budget';
+import {
+  SOURCE_CAVE_EPIC_WEAPON_POOL,
+  SOURCE_CAVE_GUARANTEED_RARE_POOL,
+  SOURCE_CAVE_RARE_ITEM_ID,
+} from './source_cave/loot';
 import type { ItemDef } from './types';
 
 export {
@@ -106,6 +111,10 @@ export const RIFT_CLEAR_LOOT_SOURCE_LEVEL = HEROIC_LOOT_SOURCE_LEVEL; // 25
 // times a day server-wide. They are NOT flagged as raid drops (itemFromRaid stays
 // false); only the source level is shared.
 export const RIFT_LEGENDARY_LOOT_SOURCE_LEVEL = NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL; // 27
+
+// The source level of the Source Cave's clear chest (a level-20 raid, see
+// buildSourceIndex's Source Cave block).
+export const SOURCE_CAVE_SOURCE_LEVEL = 20;
 
 // itemScore weights: how many armor points and how much weapon DPS count as one
 // primary-stat point, so a single comparable number can span gear types.
@@ -208,6 +217,17 @@ function buildSourceIndex(): Map<string, ItemSource> {
       if (entry.itemId) bump(entry.itemId, src, false);
     }
   }
+  // Source Cave clear chest: a runtime dungeon, so its exclusive rewards appear
+  // in no static loot table. The cave is level-20 raid content (suggestedPlayers
+  // 10, source_cave/runtime.ts), so its themed items read the raid tier: the
+  // epic weapons land at item level 29 (20 + raid 3 + epic 6), while the themed
+  // guaranteed rares and bonus mantle land at 26. SOURCE_CAVE_SOURCE_LEVEL mirrors
+  // the cave's fixed level band rather than importing the runtime def (keeps this a
+  // content-table leaf).
+  for (const itemId of SOURCE_CAVE_EPIC_WEAPON_POOL) bump(itemId, SOURCE_CAVE_SOURCE_LEVEL, true);
+  for (const itemId of SOURCE_CAVE_GUARANTEED_RARE_POOL)
+    bump(itemId, SOURCE_CAVE_SOURCE_LEVEL, true);
+  bump(SOURCE_CAVE_RARE_ITEM_ID, SOURCE_CAVE_SOURCE_LEVEL, true);
   // Heroic upgraded drop variants (content/heroic_variants.ts): the "Heroic X"
   // copies of base dungeon drops read one tier up (source 22), so their epics land
   // at item level 28 and rares at 25. Registered here so a variant's tooltip level
