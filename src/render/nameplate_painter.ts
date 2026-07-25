@@ -7,6 +7,12 @@ import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
+  isSourceCaveMobEntity,
+  SOURCE_CAVE_REBOOT_TEMPLATE,
+  type SourceCaveMobRankEntry,
+  sourceCaveMobRankForTemplate,
+} from '../sim/source_cave';
+import {
   npcQuestMarkerKind,
   type QuestMarkerKind,
   strongerQuestMarker,
@@ -138,6 +144,11 @@ export class NameplatePainter {
     questsDone: ReadonlySet<string>;
     cadenceBlocked: ReadonlySet<string> | undefined;
   } | null = null;
+  // The Source Cave roster, resolved lazily only when a visible cave mob needs
+  // it and retained for the rest of the pass (sourceCaveInfo() rebuilds the
+  // roster on the offline Sim). Dropped at every full pass like the quest
+  // markers above, so a cave reboot's re-ranked roster reaches the plates.
+  private sourceCaveMobsCtx: { mobs: readonly SourceCaveMobRankEntry[] | undefined } | null = null;
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -171,10 +182,17 @@ export class NameplatePainter {
     const showNameplates = this.showNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
+    // Resolve the roster lazily only if a visible cave mob needs it, then retain
+    // it for the rest of this pass. Offline sourceCaveInfo() rebuilds the roster.
+    let sourceCaveMobs: readonly SourceCaveMobRankEntry[] | undefined;
+    let sourceCaveMobsRead = false;
     const showPlayerNameplates = this.showPlayerNameplates();
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
-    if (fullPass) this.questMarkerCtx = null;
+    if (fullPass) {
+      this.questMarkerCtx = null;
+      this.sourceCaveMobsCtx = null;
+    }
 
     for (const [id, view] of this.views) {
       const entity = world.entities.get(id);
@@ -311,6 +329,7 @@ export class NameplatePainter {
     state.emoteIconUrl = '';
     state.emoteLabel = '';
     state.friendlyPet = false;
+    state.warning = false;
 
     const raidMark = this.world.markerFor(entity.id);
     if (raidMark !== null) state.raidMarkerUrl = raidMarkerDataUrl(raidMark);
@@ -332,7 +351,19 @@ export class NameplatePainter {
     if (entity.kind === 'object') {
       state.badges.length = 0;
       state.name = objectDisplayName(entity);
-      state.nameColor = '#c084ff';
+      // Dungeon doorways announce themselves in the object purple. The Source
+      // Cave reboot button reads in the hostile red (reaction.ts's
+      // 3+-levels-above con color) and takes the oversized outlined warning
+      // treatment instead, so the call-out is legible at interaction range
+      // (user report: unreadable at 12px). The cave's sealed exit portal
+      // (nameplate_view unhides it only while sealed) carries the same.
+      const isRebootButton = entity.templateId === SOURCE_CAVE_REBOOT_TEMPLATE;
+      const isSealedCaveExit =
+        entity.templateId === 'dungeon_exit' &&
+        entity.dungeonId === 'source_cave' &&
+        !entity.lootable;
+      state.warning = isRebootButton || isSealedCaveExit;
+      state.nameColor = state.warning ? '#ff4444' : '#c084ff';
       return;
     }
 
@@ -413,11 +444,27 @@ export class NameplatePainter {
       return;
     }
 
-    const template = MOBS[entity.templateId];
-    const elite = !!template?.elite;
-    const boss = !!template?.boss;
+    // Source Cave contributor mobs can carry custom display names, but their
+    // synthetic template id still anchors the GitHub login. The shared resolver
+    // correlates it against the same roster the cave HUD reads.
+    let elite: boolean;
+    let boss: boolean;
+    let mobName: string;
+    if (isSourceCaveMobEntity(entity)) {
+      if (!this.sourceCaveMobsCtx) {
+        this.sourceCaveMobsCtx = { mobs: this.world.sourceCaveInfo()?.mobs };
+      }
+      const rank = sourceCaveMobRankForTemplate(entity.templateId, this.sourceCaveMobsCtx.mobs);
+      elite = rank.elite;
+      boss = rank.boss;
+      mobName = entity.name;
+    } else {
+      const template = MOBS[entity.templateId];
+      elite = !!template?.elite;
+      boss = !!template?.boss;
+      mobName = entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
+    }
     state.friendlyPet = isFriendlyPet(entity, this.world.entities, this.isHostilePlayer);
-    const mobName = entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
     state.name = entity.dead ? t('worldContent.corpseName', { name: mobName }) : mobName;
     state.nameColor = '#fff';
     state.level = entity.dead

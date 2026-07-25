@@ -10,6 +10,7 @@ import {
   nameplatePlanInto,
   newNameplatePlan,
 } from '../src/render/nameplate_view';
+import { INTERACT_RANGE } from '../src/sim/types';
 
 // The nameplate_view core: the pure DOM/Three/i18n-free decision model the
 // NameplatePainter consumes. These pin the exact visibility / anchor / urgent /
@@ -114,6 +115,111 @@ describe('nameplate_view - visibility', () => {
       plan(ent({ kind: 'object', templateId: 'delve_reward_chest', pos: { x: 0, y: 0, z: 30 } }))
         .hidden,
     ).toBe(true);
+    // the ARMED Source Cave reward chest (outside the delve_ prefix) follows the
+    // same rule; the SEALED template never labels (asserted separately below).
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'source_cave_chest',
+          lootable: true,
+          pos: { x: 0, y: 0, z: 1 },
+        }),
+      ).hidden,
+    ).toBe(false);
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'source_cave_chest',
+          lootable: true,
+          pos: { x: 0, y: 0, z: 30 },
+        }),
+      ).hidden,
+    ).toBe(true);
+    // The unpressed reboot button advertises itself above the model only when approached.
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'source_cave_reboot',
+          lootable: true,
+          pos: { x: 0, y: 0, z: 1 },
+        }),
+      ).hidden,
+    ).toBe(false);
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'source_cave_reboot',
+          lootable: true,
+          pos: { x: 0, y: 0, z: 30 },
+        }),
+      ).hidden,
+    ).toBe(true);
+  });
+
+  it('other dungeon exits still announce themselves', () => {
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'dungeon_exit',
+          dungeonId: 'gravewyrm_sanctum',
+          lootable: true,
+          pos: { x: 0, y: 0, z: 1 },
+        }),
+      ).hidden,
+    ).toBe(false);
+  });
+
+  it('hides the label on inert Source Cave furniture (pressed button, emptied chest), even near', () => {
+    // Both stay visible in the world as room dressing (the renderer keeps their
+    // views), but a non-lootable one no longer advertises an interaction label.
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'source_cave_reboot',
+          lootable: false,
+          pos: { x: 0, y: 0, z: 1 },
+        }),
+      ).hidden,
+    ).toBe(true);
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'source_cave_chest',
+          lootable: false,
+          pos: { x: 0, y: 0, z: 1 },
+        }),
+      ).hidden,
+    ).toBe(true);
+    // The SEALED chest template never labels, even near and lootable: the deny
+    // is a toast on interaction, not an advertised affordance (user decision).
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'source_cave_chest_sealed',
+          lootable: true,
+          pos: { x: 0, y: 0, z: 1 },
+        }),
+      ).hidden,
+    ).toBe(true);
+    // The ARMED chest labels near (the normal claim-spoils affordance).
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'source_cave_chest',
+          lootable: true,
+          pos: { x: 0, y: 0, z: 1 },
+        }),
+      ).hidden,
+    ).toBe(false);
   });
 
   it('shows every marsh puzzle interactable (and its spent variant) near, hides it far', () => {
@@ -153,6 +259,83 @@ describe('nameplate_view - visibility', () => {
       plan(ent({ kind: 'object', templateId: 'dungeon_door', dungeonId: 'nythraxis_boss_arena' }))
         .hidden,
     ).toBe(true);
+  });
+
+  it('shows the Source Cave well only very close, unlike every other dungeon door', () => {
+    // A regular door labels at the full 55u NAMEPLATE_RANGE (the crypt case above);
+    // the cave's well is a landmark name that should read as a discovery up close,
+    // not a billboard visible across the field.
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'dungeon_door',
+          dungeonId: 'source_cave',
+          pos: { x: 0, y: 0, z: 1 },
+        }),
+      ).hidden,
+    ).toBe(false);
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'dungeon_door',
+          dungeonId: 'source_cave',
+          pos: { x: 0, y: 0, z: 30 },
+        }),
+      ).hidden,
+    ).toBe(true);
+    // A regular dungeon door at that same far distance still labels: the gating
+    // is specific to the cave's well, not a change to door visibility generally.
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'dungeon_door',
+          dungeonId: 'crypt',
+          pos: { x: 0, y: 0, z: 30 },
+        }),
+      ).hidden,
+    ).toBe(false);
+  });
+
+  it('never labels the OPEN Source Cave interior exit portal, near or far (user decision)', () => {
+    // The arch by the door reads by itself; the generic "{name} Exit"
+    // billboard was noise. (This replaces the earlier rule where the exit kept
+    // the normal unconditional door range.)
+    for (const z of [2, 30]) {
+      expect(
+        plan(
+          ent({
+            kind: 'object',
+            templateId: 'dungeon_exit',
+            dungeonId: 'source_cave',
+            lootable: true,
+            pos: { x: 0, y: 0, z },
+          }),
+        ).hidden,
+      ).toBe(true);
+    }
+  });
+
+  it('labels the SEALED Source Cave exit portal only at approach range', () => {
+    // While the encounter seals the exit (lootable false mirrors the seal on the
+    // wire), the portal stays in the world and announces the denial up close,
+    // the same near gate as the well and the delve interactables, never as a
+    // room-wide billboard.
+    const sealed = (z: number) =>
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'dungeon_exit',
+          dungeonId: 'source_cave',
+          lootable: false,
+          pos: { x: 0, y: 0, z },
+        }),
+      ).hidden;
+    expect(sealed(2)).toBe(false);
+    expect(sealed(INTERACT_RANGE + 2)).toBe(true);
+    expect(sealed(30)).toBe(true);
   });
 
   it('hides the Vale Cup boarball plate even with nameplates on and up close', () => {
@@ -343,6 +526,7 @@ describe('nameplate_view - import absence (two-controller + purity, source scan)
     const froms = [...code.matchAll(/\bimport\b[^;]*\bfrom\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
     // unique modules, robust to biome merging/splitting the type vs value sim import
     expect([...new Set(froms)].sort()).toEqual([
+      '../sim/source_cave',
       '../sim/types',
       './nameplate_combo',
       './nameplate_threat',

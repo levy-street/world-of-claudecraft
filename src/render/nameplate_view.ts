@@ -18,6 +18,7 @@
 // garbage on the hot path), mirroring the speedStreaksInto / cameraSpace out-param
 // idiom elsewhere in src/render.
 
+import { SOURCE_CAVE_CHEST_TEMPLATE, SOURCE_CAVE_REBOOT_TEMPLATE } from '../sim/source_cave';
 import type { Entity } from '../sim/types';
 import { INTERACT_RANGE } from '../sim/types';
 import { comboPipsFor } from './nameplate_combo';
@@ -125,14 +126,42 @@ export function nameplatePlanInto(
     e.templateId === 'delve_corpse_candle' ||
     e.templateId === 'delve_corpse_candle_lit' ||
     e.templateId === 'delve_bell_rope' ||
-    e.templateId === 'delve_bell_rope_pulled';
+    e.templateId === 'delve_bell_rope_pulled' ||
+    // The Source Cave's reward chest: same lootable-chest precedent as
+    // delve_reward_chest, but outside the delve_ prefix (a plain ground object).
+    e.templateId === SOURCE_CAVE_CHEST_TEMPLATE ||
+    // The room-centre reboot button advertises itself only at interaction range.
+    e.templateId === SOURCE_CAVE_REBOOT_TEMPLATE;
+  // Inert Source Cave furniture (the pressed button, the emptied chest) keeps
+  // its view as room dressing but stops advertising an interaction label.
+  const isInertCaveFurniture =
+    !e.lootable &&
+    (e.templateId === SOURCE_CAVE_REBOOT_TEMPLATE || e.templateId === SOURCE_CAVE_CHEST_TEMPLATE);
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+  // The Source Cave's interior exit portal carries no floating label at all
+  // (user decision: the arch by the door reads by itself; the generic
+  // "{name} Exit" billboard was noise), EXCEPT while the encounter seals it
+  // (lootable false mirrors the seal on the wire): the sealed portal announces
+  // the red ACCESS DENIED call-out so a locked exit reads as locked, not gone.
+  // The call-out shows only at approach range (the well/delve near gate below),
+  // not as a room-wide billboard.
+  const isSourceCaveExit = e.templateId === 'dungeon_exit' && e.dungeonId === 'source_cave';
+  const sealedCaveExitNear =
+    isSourceCaveExit && !e.lootable && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+  // The Source Cave's overworld entrance well carries its own landmark name
+  // (entity_labels.ts), not the dungeon's name, and reads better as something you
+  // discover up close than as a billboard visible from the normal 55u door range.
+  const isSourceCaveWell = e.templateId === 'dungeon_door' && e.dungeonId === 'source_cave';
+  const sourceCaveWellNear = isSourceCaveWell && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
     d2 > NAMEPLATE_RANGE_SQ ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
+    (isSourceCaveExit && !sealedCaveExitNear) ||
+    isInertCaveFurniture ||
+    (isSourceCaveWell && !sourceCaveWellNear) ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     e.templateId === UNLABELED_MOB_TEMPLATE_ID ||
     (!showNameplates && e.kind === 'mob' && !e.dead) ||

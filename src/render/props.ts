@@ -159,6 +159,10 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   anvil: { url: '/models/props/anvil.glb', kit: 'qprops' },
   weaponStand: { url: '/models/props/weapon_stand.glb', kit: 'qprops' },
   lanternWall: { url: '/models/props/lantern_wall.glb', kit: 'qprops' },
+  // Source Cave interior one-offs, generated via scripts/asset_pipeline (CREDITS.md);
+  // mounted by dungeon.ts's library dressing, not by the outdoor buildProps pass.
+  sourceServerRack: { url: '/models/props/source_server_rack.glb', kit: 'sourcecave' },
+  devCodeDesk: { url: '/models/props/dev_code_desk.glb', kit: 'sourcecave' },
   // Meshy-generated portal door used as the overworld Reliquary Hill marker;
   // has its own backing slab so the animated shader plane sits on the front face.
   // No yaw here: the geometry is CACHED and shared by every delve marker, so a
@@ -692,9 +696,13 @@ function convertMaterial(
   return mat;
 }
 
-/** parts of a loaded asset, world-baked (incl. yaw), origin centered at the
- *  footprint center with min-y at 0, materials converted + deduped */
-function propAsset(key: PropKey): PropAsset {
+/**
+ * Parts of a loaded asset, world-baked (incl. yaw), origin centered at the
+ * footprint center with min-y at 0, materials converted + deduped. Exported so
+ * door_portal.ts can build the Source Cave well entrance from the same
+ * preloaded 'well' asset the town wells use below, instead of loading it again.
+ */
+export function propAsset(key: PropKey): PropAsset {
   const cached = extractCache.get(key);
   if (cached) return cached;
   const def = PROP_ASSET_DEFS[key];

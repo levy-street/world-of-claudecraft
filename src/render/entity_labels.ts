@@ -4,6 +4,7 @@
 // both the renderer and the NameplatePainter can share objectDisplayName without
 // a renderer <-> painter import cycle.
 
+import { SOURCE_CAVE_CHEST_TEMPLATE, SOURCE_CAVE_REBOOT_TEMPLATE } from '../sim/source_cave';
 import type { Entity } from '../sim/types';
 import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
 import { t } from '../ui/i18n';
@@ -17,6 +18,9 @@ export function npcDisplayName(npcId: string): string {
 }
 
 export function objectDisplayName(entity: Entity): string {
+  if (entity.templateId === SOURCE_CAVE_REBOOT_TEMPLATE) {
+    return t('worldContent.sourceCaveReboot');
+  }
   if (entity.templateId === 'mailbox') {
     return t('worldContent.mailboxName');
   }
@@ -26,7 +30,13 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');
   }
-  if (entity.templateId === 'delve_reward_chest') {
+  // The Source Cave's own reward chest reuses the delve reward-chest interact
+  // label verbatim (same lootable-chest precedent; outside the delve_ prefix
+  // since it is a plain ground object, not a delve interactable).
+  if (
+    entity.templateId === 'delve_reward_chest' ||
+    entity.templateId === SOURCE_CAVE_CHEST_TEMPLATE
+  ) {
     return t('worldContent.delveRewardChestInteract');
   }
   if (entity.templateId === 'delve_surface_exit') {
@@ -66,6 +76,17 @@ export function objectDisplayName(entity: Entity): string {
     return t('delveUi.object.corpse_candle');
   if (entity.templateId === 'delve_bell_rope' || entity.templateId === 'delve_bell_rope_pulled') {
     return t('delveUi.object.bell_rope');
+  }
+  // The Source Cave's overworld entrance is a well with its own landmark name
+  // (shown only very close, see nameplate_view.ts), not the dungeon's own name
+  // like every other door.
+  if (entity.templateId === 'dungeon_door' && entity.dungeonId === 'source_cave') {
+    return t('worldContent.sourceCaveWellName');
+  }
+  // The Source Cave's exit portal only ever labels while the encounter seals it
+  // (nameplate_view hides the open one entirely), so its one label is the denial.
+  if (entity.templateId === 'dungeon_exit' && entity.dungeonId === 'source_cave') {
+    return t('worldContent.sourceCaveExitDenied');
   }
   if (
     (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&

@@ -34,6 +34,12 @@ import {
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
+import {
+  isSourceCavePos,
+  SOURCE_CAVE_CHEST_SEALED_TEMPLATE,
+  SOURCE_CAVE_CHEST_TEMPLATE,
+  SOURCE_CAVE_REBOOT_TEMPLATE,
+} from '../sim/source_cave';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
@@ -330,6 +336,8 @@ import {
   type SkyView,
 } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
+import { SourceCaveInteriors } from './source_cave_interior';
+import { buildSourceCaveRebootButton } from './source_cave_reboot';
 import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
@@ -605,6 +613,20 @@ const DAY_HEMI_GROUND_WARMTH = 0.13;
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 // character rim glow scales up underground so silhouettes split from the murk
 const DUNGEON_RIM_BOOST = 2.4;
+// The Source Cave server hall (updateSourceCaveMains): fully lit off the mains
+// until the reboot button is pressed, then a torch-carried backup gloom. The
+// fog baseline pair below mirrors updateAmbience's 'delve' arm; keep them in
+// sync if that arm is retuned.
+const DELVE_FOG_COLOR = 0x0e0705;
+const DELVE_FOG_FAR = 74;
+const SOURCE_CAVE_MAINS_HEMI = 0.85;
+const SOURCE_CAVE_MAINS_ENV = 0.35;
+const SOURCE_CAVE_MAINS_FOG_COLOR = 0x2a241c;
+const SOURCE_CAVE_MAINS_FOG_FAR = 200;
+const SOURCE_CAVE_BACKUP_HEMI = 0.1;
+const SOURCE_CAVE_BACKUP_ENV = 0.02;
+const SOURCE_CAVE_BACKUP_FOG_COLOR = 0x070302;
+const SOURCE_CAVE_BACKUP_FOG_FAR = 58;
 // The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
 // plus a healthy hemisphere keep the whole competitive space readable, with
 // the braziers/torches adding warmth rather than carrying the scene alone.
@@ -1500,6 +1522,9 @@ export class Renderer {
   private fixedLowDayBiome: BiomeId | null = null;
   private dnColorScratch = new THREE.Color();
   private dnMoonScratch = new THREE.Color();
+  // scratch pair for the Source Cave mains blend (updateSourceCaveMains)
+  private tmpColor = new THREE.Color();
+  private tmpColor2 = new THREE.Color();
   private flames: THREE.Mesh[];
   private flamePerceptualStates = new WeakMap<THREE.Mesh, FlamePerceptualState>();
   private windmillFans: THREE.Object3D[] = [];
@@ -6704,7 +6729,9 @@ export class Renderer {
         buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
       portal = built.portal;
-      height = 4.6;
+      // Only the door builder ever carries a bespoke height (the Source Cave's
+      // well stands shorter than the generic arch); the gate leaves it unset.
+      height = built.height ?? 4.6;
       objectMesh = built.body;
       // World-spawned ranked portals carry their rank as a big floating badge
       // (colour square + letter) so the tier reads from across the zone.
@@ -6765,11 +6792,31 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body!;
-    } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
-      // Delve interactables: skip the object pool (each is unique/stateful) and
-      // build a dedicated procedural mesh that matches the crypt aesthetic.
+    } else if (e.kind === 'object' && e.templateId === SOURCE_CAVE_REBOOT_TEMPLATE) {
+      const built = buildSourceCaveRebootButton();
+      body = built.group;
+      height = built.height;
+      objectMesh = body;
+    } else if (
+      e.kind === 'object' &&
+      (e.templateId?.startsWith('delve_') ||
+        e.templateId === SOURCE_CAVE_CHEST_TEMPLATE ||
+        e.templateId === SOURCE_CAVE_CHEST_SEALED_TEMPLATE)
+    ) {
+      // Delve interactables, plus the Source Cave's own reward chest (a plain
+      // ground object outside the delve_ prefix): skip the object pool (each is
+      // unique/stateful) and build a dedicated procedural mesh. The cave chest
+      // reuses the delve reward-chest visual VERBATIM (same lootable-chest
+      // precedent, not a bespoke mesh), by remapping just the builder lookup key;
+      // the SEALED chest shares that mesh but stays quiet (no sparkle below),
+      // and the sim's sealed->armed template swap rebuilds this view.
       objectPoolKey = null;
-      const built = buildDelveInteractable(e.templateId, e.id);
+      const interactableId =
+        e.templateId === SOURCE_CAVE_CHEST_TEMPLATE ||
+        e.templateId === SOURCE_CAVE_CHEST_SEALED_TEMPLATE
+          ? 'delve_reward_chest'
+          : e.templateId;
+      const built = buildDelveInteractable(interactableId, e.id);
       body = built.group;
       height = built.height;
       objectMesh = built.group;
@@ -6784,7 +6831,9 @@ export class Renderer {
         // pulled (unlike the flush walk-on plates above).
         e.templateId !== 'delve_bell_rope_pulled' &&
         e.templateId !== 'delve_locked_door' &&
-        e.templateId !== 'delve_destructible_wall'
+        e.templateId !== 'delve_destructible_wall' &&
+        // The sealed Source Cave chest deliberately does not advertise itself.
+        e.templateId !== SOURCE_CAVE_CHEST_SEALED_TEMPLATE
       ) {
         if (!this.sparkleMat) {
           this.sparkleMat = new THREE.SpriteMaterial({
@@ -7334,6 +7383,9 @@ export class Renderer {
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
+  // The Source Cave has no DelveRun-shaped IWorld member (world.sourceCaveInfo()
+  // instead), so it owns its own small build/dedupe tracker; see source_cave_interior.ts.
+  private readonly sourceCaveInteriors = new SourceCaveInteriors(this.scene);
   private fogState:
     | 'outdoor'
     | 'dungeon'
@@ -7606,6 +7658,19 @@ export class Renderer {
     this.buildAllDelveModules(delve.id, slot, origin, modules);
   }
 
+  // The Source Cave lives in the same delve x-band (reserved index 5) but is not a
+  // real DelveRun, so it is not reachable through ensureDelveInteriorsNear above
+  // (delveAt() only knows the real DELVE_LIST entries); this is its own cheap,
+  // per-frame near-check, no-op outside the cave's own sub-band or once the module
+  // stack there is already built.
+  private ensureSourceCaveInteriorsNear(px: number, pz: number): void {
+    if (!isSourceCavePos(px)) return;
+    const info = this.sim.sourceCaveInfo();
+    if (!info?.modules.length) return;
+    this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
+    this.sourceCaveInteriors.ensureNear(this.dungeons, px, pz, info.modules, info);
+  }
+
   // Which futuristic sky this practice bout flies: hashed off the match id so it
   // feels random and stays stable for the whole bout (a new bout, a new sky).
   private practiceSkyVariant(): number {
@@ -7671,6 +7736,7 @@ export class Renderer {
     }
     if (isDelvePos(px) && !inPractice) {
       this.ensureDelveInteriorsNear(px, pz);
+      this.ensureSourceCaveInteriorsNear(px, pz);
     } else if (inside && isYumiMazePos(px)) {
       // build the Protect Yumi maze copy the player was matched into; the
       // update() call each frame lives in sync() (beacon anchors)
@@ -8046,6 +8112,89 @@ export class Renderer {
       this.hemi.intensity +=
         (hemiOutdoorIntensity() * g.lightScale * (light.hemiScale ?? 1) - this.hemi.intensity) * k;
     }
+    if (desired === 'delve') this.updateSourceCaveMains(px, dt, fog);
+  }
+
+  // The Source Cave server hall runs fully lit off the mains until the reboot
+  // button is pressed; then the room drops to torch-lit backup power. Applied as
+  // a per-frame blend over the shared delve ambience (hemi / env / fog): `mix`
+  // eases toward 1 only while the player stands in the cave's own band (a real
+  // delve keeps the plain baseline as mix returns to 0), and `power` tracks the
+  // live button state (a fast fall, a slower recovery, so the cut reads as a
+  // breaker snapping). Cosmetic only: the sim never reads any of this.
+  private caveMainsMix = 0;
+  private caveMainsPower = 1;
+  // Cached reboot-button entity id so the per-frame power check is a map get,
+  // not an entity scan; re-scanned only when the cached id stops resolving
+  // (fresh claim, interest churn online).
+  private caveRebootButtonId: number | null = null;
+
+  private updateSourceCaveMains(px: number, dt: number, fog: THREE.Fog): void {
+    const inCave = isSourceCavePos(px);
+    if (!inCave && this.caveMainsMix < 0.01) {
+      if (this.caveMainsMix !== 0) {
+        this.caveMainsMix = 0;
+        this.caveMainsPower = 1;
+      }
+      return;
+    }
+    if (inCave) {
+      let button =
+        this.caveRebootButtonId !== null
+          ? this.sim.entities.get(this.caveRebootButtonId)
+          : undefined;
+      if (!button || button.templateId !== SOURCE_CAVE_REBOOT_TEMPLATE) {
+        button = undefined;
+        this.caveRebootButtonId = null;
+        for (const e of this.sim.entities.values()) {
+          if (e.kind === 'object' && e.templateId === SOURCE_CAVE_REBOOT_TEMPLATE) {
+            button = e;
+            this.caveRebootButtonId = e.id;
+            break;
+          }
+        }
+      }
+      // No button resolved (an online snapshot gap): keep the hall lit rather
+      // than flickering to backup on missing data.
+      const powered = button ? button.lootable : true;
+      const kPower = 1 - Math.exp(-dt * (powered ? 2.2 : 9));
+      this.caveMainsPower += ((powered ? 1 : 0) - this.caveMainsPower) * kPower;
+    }
+    const kMix = 1 - Math.exp(-dt * 3);
+    this.caveMainsMix += ((inCave ? 1 : 0) - this.caveMainsMix) * kMix;
+
+    const mix = this.caveMainsMix;
+    const power = this.caveMainsPower;
+    // Anchors: the shared delve baseline (updateAmbience's 'delve' arm), the lit
+    // server hall, and the near-dark backup state (torches carry the room).
+    const hemi =
+      DUNGEON_HEMI_INTENSITY +
+      (SOURCE_CAVE_BACKUP_HEMI +
+        (SOURCE_CAVE_MAINS_HEMI - SOURCE_CAVE_BACKUP_HEMI) * power -
+        DUNGEON_HEMI_INTENSITY) *
+        mix;
+    const env =
+      DUNGEON_ENV_INTENSITY +
+      (SOURCE_CAVE_BACKUP_ENV +
+        (SOURCE_CAVE_MAINS_ENV - SOURCE_CAVE_BACKUP_ENV) * power -
+        DUNGEON_ENV_INTENSITY) *
+        mix;
+    if (!this.lowGfx) {
+      this.hemi.intensity = hemi;
+      this.scene.environmentIntensity = env;
+    }
+    const fogFar =
+      DELVE_FOG_FAR +
+      (SOURCE_CAVE_BACKUP_FOG_FAR +
+        (SOURCE_CAVE_MAINS_FOG_FAR - SOURCE_CAVE_BACKUP_FOG_FAR) * power -
+        DELVE_FOG_FAR) *
+        mix;
+    fog.far = fogFar;
+    this.fogScratch.setHex(DELVE_FOG_COLOR);
+    this.tmpColor
+      .setHex(SOURCE_CAVE_BACKUP_FOG_COLOR)
+      .lerp(this.tmpColor2.setHex(SOURCE_CAVE_MAINS_FOG_COLOR), power);
+    fog.color.copy(this.fogScratch.lerp(this.tmpColor, mix));
   }
 
   // Hand the prefiltered environment map to the dominant eased sky biome.
@@ -8593,10 +8742,19 @@ export class Renderer {
           v.compilePending,
           !isPortalObject || d2 <= this.entityViewCreateRangeSq,
         );
+        if (e.templateId === SOURCE_CAVE_REBOOT_TEMPLATE && v.objectMesh) {
+          // A pressed button reads as pressed: squash the mushroom cap down.
+          // baseScaleY is stamped by buildSourceCaveRebootButton on its group.
+          const baseScaleY = v.objectMesh.userData.baseScaleY as number | undefined;
+          if (baseScaleY !== undefined) {
+            v.objectMesh.scale.y = baseScaleY * (e.lootable ? 1 : 0.45);
+          }
+        }
         if (v.sparkle && vis) {
           // sub-pixel beyond ~45u but still a full transparent draw each
           // (d2 is this entity's player distance, computed once above)
-          v.sparkle.visible = d2 < SPARKLE_DRAW_RANGE_SQ;
+          // An inert cave-furniture object keeps its view but drops the sparkle.
+          v.sparkle.visible = e.lootable && d2 < SPARKLE_DRAW_RANGE_SQ;
           const pulse = 0.75 + Math.sin(this.time * 3 + e.id) * 0.25;
           v.sparkle.scale.set(pulse, pulse, 1);
           v.sparkle.material.rotation = this.time * 0.8;

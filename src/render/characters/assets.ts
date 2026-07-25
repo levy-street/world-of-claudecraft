@@ -46,6 +46,7 @@ import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
+import { flattenWeaponAttachmentScene, flattenWeaponScene } from './weapon_scene';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
@@ -110,6 +111,9 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   wand_a: 'VAR_WAND',
   wand_b: 'VAR_WAND',
   adv_wand: 'VAR_WAND',
+  commit_blade_sword: 'VAR_SWORD',
+  bug_squasher_hammer: 'VAR_AXE',
+  keyboard_sword: 'VAR_SWORD',
   emberfang_sword: 'VAR_SWORD',
   redskull_sword: 'VAR_SWORD',
   redskull_dagger: 'VAR_DAGGER',
@@ -279,19 +283,6 @@ function applyHandGrip(
   payload.scale.setScalar(grip.scale);
 }
 
-function flattenWeaponScene(src: THREE.Object3D): THREE.Object3D {
-  if (src.children.length !== 1) return src;
-  const holder = new THREE.Group();
-  const child = src.children[0];
-  holder.scale.copy(child.scale);
-  child.scale.set(1, 1, 1);
-  child.position.set(0, 0, 0);
-  child.rotation.set(0, 0, 0);
-  src.remove(child);
-  holder.add(child);
-  return holder;
-}
-
 // Mainhand and actual offhand holders have separate replacement cycles, so a
 // mainhand cosmetic swap cannot remove or reskin a shield or second weapon.
 const SWAP_WEAPON_TAG = 'swapWeaponHolder';
@@ -346,7 +337,14 @@ function attachProp(
   swapKind: 'mainhand' | 'offhand' | null = null,
   stowed = false,
 ): THREE.Object3D {
-  const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
+  const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
+  // Variant and pipeline GLBs carry their origin-at-grip offset on the root
+  // node. Preserve it; generic KayKit accessories keep the legacy centered
+  // attachment convention used by their authored hand grips.
+  const payload = flattenWeaponAttachmentScene(
+    cloneSkinned(resolvedGltf(att.url).scene),
+    variantGrip,
+  );
   primeSkinnedSortSpheres(payload);
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
@@ -359,7 +357,6 @@ function attachProp(
     payload.userData.heldSlot = 1;
   }
   payload.userData[HELD_PROP_TAG] = true;
-  const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
   if (variantGrip) {
     applyVariantGrip(payload, att.bone, variantGrip, att.url);
   } else if (att.position || att.rotationY !== undefined) {

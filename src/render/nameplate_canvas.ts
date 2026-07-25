@@ -23,6 +23,7 @@ export interface NameplateCanvasState {
   markerTone: NameplateMarkerTone;
   hpVisible: boolean;
   hpFill: number;
+  warning: boolean;
   castVisible: boolean;
   castFill: number;
   castChannel: boolean;
@@ -58,6 +59,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     markerTone: 'none',
     hpVisible: false,
     hpFill: 1,
+    warning: false,
     castVisible: false,
     castFill: 0,
     castChannel: false,
@@ -108,6 +110,15 @@ const TARGET_NAME_STYLE: TextSpriteStyle = {
   fill: '#fff',
   stroke: '#000',
   lineWidth: 3,
+};
+// The Source Cave call-out plates (reboot button, sealed exit): oversized and
+// heavily outlined so the red warning reads at interaction range, where the
+// 12px name did not. Outranks the target size, since the warning is the point.
+const WARNING_NAME_STYLE: TextSpriteStyle = {
+  font: `700 18px ${TITLE_FONT}`,
+  fill: '#fff',
+  stroke: '#000',
+  lineWidth: 5,
 };
 const LEVEL_STYLE: TextSpriteStyle = {
   font: `700 19px ${TITLE_FONT}`,
@@ -270,6 +281,7 @@ export class NameplateCanvasSurface {
   private readonly targetNameStyle: TextSpriteStyle = { ...TARGET_NAME_STYLE };
   private readonly devNameStyle: TextSpriteStyle = { ...NAME_STYLE };
   private readonly targetDevNameStyle: TextSpriteStyle = { ...TARGET_NAME_STYLE };
+  private readonly warningNameStyle: TextSpriteStyle = { ...WARNING_NAME_STYLE };
   private readonly levelStyle: TextSpriteStyle = { ...LEVEL_STYLE };
   private readonly aiStyle: TextSpriteStyle = { ...AI_STYLE };
   private readonly titleStyle: TextSpriteStyle = { ...TITLE_STYLE };
@@ -471,14 +483,18 @@ export class NameplateCanvasSurface {
   };
 
   private nameRowHeight(state: NameplateCanvasState): number {
-    let height = state.currentTarget ? 18 : 16;
+    let height = state.warning ? 22 : state.currentTarget ? 18 : 16;
     for (const badge of state.badges) height = Math.max(height, badge.size);
     return height;
   }
 
   private drawNameRow(state: NameplateCanvasState, screenX: number, bottomY: number): number {
     const rowHeight = this.nameRowHeight(state);
-    const nameStyle = state.currentTarget ? this.targetNameStyle : this.nameStyle;
+    const nameStyle = state.warning
+      ? this.warningNameStyle
+      : state.currentTarget
+        ? this.targetNameStyle
+        : this.nameStyle;
     const nameColor = state.deadEnemy ? '#bbb' : state.hostile ? '#ff5555' : state.nameColor;
     this.configureTextStyle(nameStyle, nameColor);
     this.configureTextStyle(this.levelStyle, state.levelColor);

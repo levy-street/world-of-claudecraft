@@ -4,6 +4,7 @@ import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { propAsset } from './props';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { applyWornStone } from './worn_stone';
 
@@ -63,6 +64,12 @@ export const doorPortalPreloadInternalsForTest = {
 // Additive boost applied to the portal shimmer on non-low tiers so it blooms on
 // the composer.
 const PORTAL_BOOST = 2;
+
+// The Source Cave's overworld entrance is a well, not the generic arch: reuses
+// the SAME preloaded 'well' GLB and footprint scale as the town wells
+// (props.ts's wells loop), so it reads as the same object, just placed as a
+// dungeon entrance instead of a decoration.
+const SOURCE_CAVE_WELL_SCALE: [number, number, number] = [2.6, 3.6, 2.9];
 
 let stoneMat: THREE.Material | null = null;
 let archGeo: THREE.BufferGeometry | null = null;
@@ -507,7 +514,10 @@ function flameClone(height: number, color: number): THREE.Group {
 export function buildRiftGateBody(
   lowGfx: boolean,
   tier: RiftTier = 'A',
-): { body: THREE.Group; portal?: THREE.Mesh } | null {
+  // `height` is never set here: the gate keeps the caller's default. It is
+  // declared so both portal-body builders share one result shape, which is what
+  // lets the renderer read `built.height` off either arm.
+): { body: THREE.Group; portal?: THREE.Mesh; height?: number } | null {
   if (!riftGateGltf) return null;
   const body = new THREE.Group();
   const gate = riftGateGltf.scene.clone(true);
@@ -964,22 +974,53 @@ export function buildRiftPuzzleProp(
   return { body };
 }
 
+// The Source Cave's overworld entrance well: same preloaded 'well' asset and
+// footprint scale as the town wells (props.ts's wells loop), built directly
+// from its parts (not props.ts's buildProps()-local addParts closure, which
+// isn't exported) so it reads as the same object, just standing in for a
+// dungeon door instead of a decoration.
+function buildWellBody(): THREE.Group {
+  const asset = propAsset('well');
+  const holder = new THREE.Group();
+  for (const p of asset.parts) holder.add(new THREE.Mesh(p.geo, p.mat));
+  holder.scale.set(
+    SOURCE_CAVE_WELL_SCALE[0] / asset.size.x,
+    SOURCE_CAVE_WELL_SCALE[1] / asset.size.y,
+    SOURCE_CAVE_WELL_SCALE[2] / asset.size.z,
+  );
+  holder.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh) {
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+    }
+  });
+  return holder;
+}
+
 // Build a dungeon-door (entering) or dungeon-exit (leaving) body: a stone arch +
 // keystone + plinths framing an additive portal swirl. The Nythraxis crypt door
 // is a bespoke invisible click-box instead (the visible arch is baked into that
-// dungeon's geometry). Returns the portal mesh separately so the renderer can
-// animate its swirl per frame.
+// dungeon's geometry); the Source Cave's door is a well instead (no portal
+// swirl, no arch). Returns the portal mesh separately so the renderer can
+// animate its swirl per frame, and an optional height override for callers
+// whose visual isn't the default arch's height (used for nameplate/FCT anchor
+// and frustum-cull sizing).
 export function buildDoorBody(
   entering: boolean,
   dungeonId: string | null | undefined,
   lowGfx: boolean,
-): { body: THREE.Group; portal?: THREE.Mesh } {
+): { body: THREE.Group; portal?: THREE.Mesh; height?: number } {
   const body = new THREE.Group();
   if (entering && dungeonId === 'nythraxis_crypt') {
     const clickBox = new THREE.Mesh(doorNythraxisClickGeometry(), doorNythraxisClickMaterial());
     clickBox.position.y = 2.1;
     body.add(clickBox);
     return { body };
+  }
+  if (entering && dungeonId === 'source_cave') {
+    body.add(buildWellBody());
+    return { body, height: SOURCE_CAVE_WELL_SCALE[1] };
   }
 
   const isWildheart = dungeonId === 'wildheart_basin';

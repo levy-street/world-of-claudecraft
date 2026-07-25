@@ -11,6 +11,9 @@ const DELVE_MODULE_VARIANT: Record<DelveModuleId, DungeonInteriorVariant> = {
   reliquary_bell_niche: 'delve_bell',
   reliquary_saintless_hall: 'delve_hall',
   reliquary_finale: 'delve_finale',
+  // The Source Cave is a single arena room, dressed as a true library with
+  // bookcases against the boundary walls (see src/sim/source_cave/spec.ts).
+  source_cave_arena: 'source_cave_library',
   // Drowned Litany (Phase 2): marsh-ruin dressing. The six trash modules light
   // with sickly bog-green flame (delve_marsh, ossuary-style wet shelves over
   // cracked flags); the apse is the raised boss stage under a colder corpse-glow.

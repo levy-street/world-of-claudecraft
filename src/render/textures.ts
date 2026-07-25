@@ -1444,3 +1444,108 @@ export function sparkleTexture(): THREE.CanvasTexture {
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
+
+let sourceCaveSealMapsCache: SurfaceMaps | null = null;
+
+/** Dark radial-cut stone for the Source Cave seal, with deterministic PBR relief. */
+export function sourceCaveSealStoneMaps(): SurfaceMaps {
+  if (sourceCaveSealMapsCache) return sourceCaveSealMapsCache;
+  const size = 512;
+  let localSeed = 0x5ca1ab1e;
+  const random = (): number => {
+    localSeed = (Math.imul(localSeed, 1664525) + 1013904223) >>> 0;
+    return localSeed / 0x1_0000_0000;
+  };
+  const mapCanvas = makeRawCanvas(size, (ctx, s) => {
+    const centre = s / 2;
+    const gradient = ctx.createRadialGradient(centre, centre, 0, centre, centre, centre);
+    gradient.addColorStop(0, '#29313a');
+    gradient.addColorStop(0.56, '#202832');
+    gradient.addColorStop(1, '#111820');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 11_000; i++) {
+      const value = 34 + Math.floor(random() * 58);
+      ctx.fillStyle = `rgba(${value},${value + 5},${value + 11},${0.025 + random() * 0.08})`;
+      const grain = 0.4 + random() * 1.8;
+      ctx.fillRect(random() * s, random() * s, grain, grain);
+    }
+    ctx.save();
+    ctx.translate(centre, centre);
+    ctx.strokeStyle = 'rgba(5,9,13,0.76)';
+    ctx.lineWidth = 2.2;
+    for (const radius of [0.24, 0.49, 0.74, 0.955]) {
+      ctx.beginPath();
+      ctx.arc(0, 0, centre * radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(128,145,157,0.11)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 24; i++) {
+      const angle = (i / 24) * Math.PI * 2;
+      const inner = centre * (i % 2 === 0 ? 0.24 : 0.49);
+      const outer = centre * (i % 3 === 0 ? 0.955 : 0.74);
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+      ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
+      ctx.stroke();
+    }
+    ctx.restore();
+    for (let i = 0; i < 34; i++) {
+      const angle = random() * Math.PI * 2;
+      const radius = (0.15 + random() * 0.75) * centre;
+      let x = centre + Math.cos(angle) * radius;
+      let y = centre + Math.sin(angle) * radius;
+      ctx.strokeStyle = `rgba(3,6,9,${0.18 + random() * 0.24})`;
+      ctx.lineWidth = 0.45 + random() * 0.7;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      for (let step = 0; step < 3 + Math.floor(random() * 5); step++) {
+        x += (random() - 0.5) * 25;
+        y += (random() - 0.5) * 25;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+  });
+  const map = new THREE.CanvasTexture(mapCanvas);
+  map.colorSpace = THREE.SRGBColorSpace;
+  map.anisotropy = 8;
+
+  localSeed = 0x19c0ffee;
+  const height = makeRawCanvas(size, (ctx, s) => {
+    ctx.fillStyle = '#9a9a9a';
+    ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 9000; i++) {
+      const value = 115 + Math.floor(random() * 75);
+      ctx.fillStyle = `rgba(${value},${value},${value},${0.08 + random() * 0.18})`;
+      const grain = 0.5 + random() * 2.2;
+      ctx.fillRect(random() * s, random() * s, grain, grain);
+    }
+    const centre = s / 2;
+    ctx.save();
+    ctx.translate(centre, centre);
+    ctx.strokeStyle = '#252525';
+    ctx.lineWidth = 3.5;
+    for (const radius of [0.24, 0.49, 0.74, 0.955]) {
+      ctx.beginPath();
+      ctx.arc(0, 0, centre * radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = '#696969';
+    ctx.lineWidth = 1.8;
+    for (let i = 0; i < 24; i++) {
+      const angle = (i / 24) * Math.PI * 2;
+      const inner = centre * (i % 2 === 0 ? 0.24 : 0.49);
+      const outer = centre * (i % 3 === 0 ? 0.955 : 0.74);
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+      ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
+      ctx.stroke();
+    }
+    ctx.restore();
+  });
+  sourceCaveSealMapsCache = { map, normalMap: heightToNormal(height, 3.2) };
+  sourceCaveSealMapsCache.normalMap.anisotropy = 8;
+  return sourceCaveSealMapsCache;
+}

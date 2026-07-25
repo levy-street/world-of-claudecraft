@@ -2,9 +2,23 @@
 // Geometry/material shape, shared-resource tagging, and the Nythraxis click-box
 // special case. Three.js runs headless in Node (no WebGL needed for geometry).
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { buildDoorBody } from '../src/render/door_portal';
 import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resource';
+
+// The Source Cave well entrance reads the SAME preloaded prop asset the town
+// wells use (props.ts's propAsset('well')), which only resolves after the real
+// browser preload gate runs (never in plain Node/Vitest - the same reason
+// GLB-dependent render builders like delve_interiors.ts have no direct unit
+// coverage elsewhere in this suite). Mock it here so door_portal.ts's OWN logic
+// (scale math, no-portal, height override, entering-only gating) still gets
+// real regression coverage without a live asset load.
+vi.mock('../src/render/props', () => ({
+  propAsset: vi.fn(() => ({
+    parts: [{ geo: new THREE.BoxGeometry(1, 1, 1), mat: new THREE.MeshBasicMaterial() }],
+    size: new THREE.Vector3(2, 3, 2.5),
+  })),
+}));
 
 const meshes = (body: THREE.Group): THREE.Mesh[] =>
   body.children.filter((c): c is THREE.Mesh => (c as THREE.Mesh).isMesh);
@@ -70,6 +84,41 @@ describe('shared-resource tagging (disposal guard contract)', () => {
     const archB = meshes(b.body)[0];
     // same shared geometry object, not a fresh allocation per door
     expect(archA.geometry).toBe(archB.geometry);
+  });
+});
+
+describe('buildDoorBody: Source Cave well entrance', () => {
+  it('an entering source_cave door is the well asset, not the arch, with no portal', () => {
+    const { body, portal, height } = buildDoorBody(true, 'source_cave', false);
+    expect(portal).toBeUndefined();
+    expect(height).toBeCloseTo(3.6);
+    expect(body.children.length).toBe(1);
+    const holder = body.children[0] as THREE.Group;
+    expect(holder.children.length).toBe(1);
+    expect((holder.children[0] as THREE.Mesh).isMesh).toBe(true);
+  });
+
+  it('scales the well to the same footprint as the town wells (2.6 x 3.6 x 2.9 / native size)', () => {
+    const { body } = buildDoorBody(true, 'source_cave', false);
+    const holder = body.children[0] as THREE.Group;
+    expect(holder.scale.x).toBeCloseTo(2.6 / 2);
+    expect(holder.scale.y).toBeCloseTo(3.6 / 3);
+    expect(holder.scale.z).toBeCloseTo(2.9 / 2.5);
+  });
+
+  it('casts and receives shadows like the arch stone', () => {
+    const { body } = buildDoorBody(true, 'source_cave', false);
+    const holder = body.children[0] as THREE.Group;
+    const mesh = holder.children[0] as THREE.Mesh;
+    expect(mesh.castShadow).toBe(true);
+    expect(mesh.receiveShadow).toBe(true);
+  });
+
+  it('the special-case only applies when entering (an exit uses the normal arch)', () => {
+    const { body, portal, height } = buildDoorBody(false, 'source_cave', false);
+    expect(meshes(body).length).toBe(5);
+    expect(portal).toBeDefined();
+    expect(height).toBeUndefined();
   });
 });
 
