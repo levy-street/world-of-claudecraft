@@ -755,13 +755,16 @@ export const es: EnTranslations = {
       "targetLabel": "Tu objetivo",
       "targetAnnounce": "Objetivo: {name}",
       "targetOfTargetLabel": "Objetivo del objetivo",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Tu grupo",
       "partyChip": "Grupo",
       "partyGroup": "Grupo {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Vista previa del modelo del personaje"
@@ -1056,7 +1059,10 @@ export const es: EnTranslations = {
       "uiScale": "Escala de la interfaz",
       "playerFrameScale": "Escala del marco del jugador",
       "targetFrameScale": "Escala del marco del objetivo",
-      "aurasOnPlayerFrame": "Beneficios en el marco del jugador",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Mostrar el objetivo del objetivo",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
       "walkByAutoloot": "Saqueo automático al pasar",
@@ -1068,7 +1074,6 @@ export const es: EnTranslations = {
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
       "showThirdActionBar": "Mostrar tercera barra de acción",
-      "showTargetOfTarget": "Mostrar el objetivo del objetivo",
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",

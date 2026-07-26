@@ -755,13 +755,16 @@ export const pt_BR: EnTranslations = {
       "targetLabel": "Seu alvo",
       "targetAnnounce": "Alvo: {name}",
       "targetOfTargetLabel": "Alvo do alvo",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Seu grupo",
       "partyChip": "Grupo",
       "partyGroup": "Grupo {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Prévia do modelo do personagem"
@@ -1056,7 +1059,10 @@ export const pt_BR: EnTranslations = {
       "uiScale": "Escala da interface",
       "playerFrameScale": "Escala do Quadro do Jogador",
       "targetFrameScale": "Escala do Quadro do Alvo",
-      "aurasOnPlayerFrame": "Benefícios no Quadro do Jogador",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Mostrar Alvo do Alvo",
       "highContrastBackground": "Fundo de alto contraste",
       "startAttackOnAbility": "Ataque Automático ao Usar Habilidade",
       "walkByAutoloot": "Saque Automático ao Passar",
@@ -1068,7 +1074,6 @@ export const pt_BR: EnTranslations = {
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
       "showThirdActionBar": "Mostrar terceira barra de ação",
-      "showTargetOfTarget": "Mostrar Alvo do Alvo",
       "showAttackButton": "Exibir Botão de Ataque",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
       "mobileCameraJoystick": "Joystick da câmera",

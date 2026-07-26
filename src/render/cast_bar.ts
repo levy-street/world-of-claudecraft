@@ -5,6 +5,8 @@
 // i18n. Fishing shows a constant full waiting bar (the bite is signaled by
 // the bobber + cue, never by the bar); the gather cast fills like any
 // hardcast and its label rides `label` + castDisplayName.
+import { ABILITIES } from '../sim/data';
+import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../sim/mob/healer_channel';
 import { CONSUME_DURATION, type Consuming, type Entity, FISHING_CAST_ID } from '../sim/types';
 
 export interface CastBarState {
@@ -22,9 +24,25 @@ export interface CastBarState {
   label: string;
   /** the cast is the fishing channel → renderer shows the localized fishing label */
   fishing: boolean;
+  /** false for physical, protected, unknown, and fishing casts. */
+  interruptible: boolean;
 }
 
-const HIDDEN: CastBarState = { visible: false, channel: false, fill: 0, label: '', fishing: false };
+const HIDDEN: CastBarState = {
+  visible: false,
+  channel: false,
+  fill: 0,
+  label: '',
+  fishing: false,
+  interruptible: false,
+};
+
+/** Mirror the authoritative interrupt predicate for presentation. */
+export function castIsInterruptible(castId: string): boolean {
+  const def = ABILITIES[castId];
+  if (def) return def.school !== 'physical' && !def.uninterruptible;
+  return SCRIPTED_INTERRUPTIBLE_CHANNELS[castId] !== undefined;
+}
 
 /**
  * Whether the overhead cast bar shows at all. Split out so callers that only
@@ -50,6 +68,7 @@ export function castBarState(e: Entity): CastBarState {
     fill,
     label: e.castingAbility,
     fishing: e.castingAbility === FISHING_CAST_ID,
+    interruptible: castIsInterruptible(e.castingAbility),
   };
 }
 

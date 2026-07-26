@@ -1261,51 +1261,8 @@
   body.mobile-touch.mobile-fullscreen-window-open #bottom-bar {
     display: none;
   }
-  body.mobile-touch #xpbar {
-    display: none;
-  }
-  body.mobile-touch #player-frame {
-    --xp-ring-start: 210deg;
-    --xp-ring-arc: 360deg;
-  }
-  body.mobile-touch #player-frame::before {
-    content: "";
-    position: absolute;
-    left: -5px;
-    top: -5px;
-    width: 73px;
-    height: 73px;
-    z-index: 2;
-    opacity: 0.96;
-    pointer-events: none;
-    border-radius: 50%;
-    background: conic-gradient(
-      from var(--xp-ring-start),
-      #b85eff 0deg calc(var(--xp-fill, 0) * 360deg),
-      rgba(125, 88, 158, 0.34) calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
-      transparent var(--xp-ring-arc) 360deg
-    );
-    box-shadow: 0 0 8px rgba(184, 94, 255, 0.28);
-    -webkit-mask: radial-gradient(
-      farthest-side,
-      transparent calc(100% - 7px),
-      #000 calc(100% - 6px)
-    );
-    mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
-  }
-  body.mobile-touch #player-frame:has(#xpbar.overflow)::before {
-    background: conic-gradient(
-      from var(--xp-ring-start),
-      #ffe27a 0deg calc(var(--xp-fill, 0) * 360deg),
-      rgba(184, 144, 42, 0.34) calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
-      transparent var(--xp-ring-arc) 360deg
-    );
-    box-shadow: 0 0 9px rgba(245, 200, 67, 0.34);
-  }
-  body.mobile-touch #xpbar .fill,
-  body.mobile-touch #xpbar .ticks {
-    display: none;
-  }
+  /* The shared desktop/mobile XP perimeter now lives inside .portrait-wrap.
+     Touch keeps the exact same plate, but suppresses the hover-only tooltip. */
   body.mobile-touch #xpbar .label {
     display: none;
   }
@@ -1707,8 +1664,7 @@
      from center to check them. justify-content stays flex-start (not
      centered): the container itself is centered on screen via left/transform,
      but internally the portrait must stay flush at the container's own
-     origin, since the XP ring (#player-frame::before) is positioned relative
-     to that origin, not to the portrait element. */
+     origin, keeping the portrait plate and its XP perimeter flush together. */
   body.mobile-touch #player-frame {
     position: fixed;
     left: 50%;
@@ -1725,6 +1681,32 @@
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;
   }
+  /* Frame-attached auras stay with the bottom-center HP frame on touch. These
+     declarations override the legacy screen-edge seats later in this sheet;
+     the parent frame supplies the one mobile scale, so the rows must not add a
+     second landscape transform. */
+  body.mobile-touch #player-frame > #buff-bar,
+  body.mobile-touch #player-frame > #debuff-bar {
+    position: absolute;
+    right: auto;
+    left: 80px;
+    top: auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: calc(100% - 80px);
+    transform: none;
+    transform-origin: left bottom;
+  }
+  body.mobile-touch #player-frame > #debuff-bar {
+    bottom: calc(100% + 8px);
+  }
+  body.mobile-touch #player-frame > #buff-bar {
+    bottom: calc(100% + 56px);
+  }
+  body.mobile-touch #player-frame:has(> #debuff-bar:empty) > #buff-bar {
+    bottom: calc(100% + 8px);
+  }
   body.mobile-touch #player-frame .uf-bars {
     position: relative;
     z-index: 1;
@@ -1735,20 +1717,13 @@
   body.mobile-touch #target-frame {
     left: max(20px, calc(env(safe-area-inset-left) + 10px));
     top: calc(max(8px, env(safe-area-inset-top)) + 72px);
+    bottom: auto;
     transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
   }
-  /* Target of Target on mobile: a DELIBERATE placement, not fallthrough.
-     showTargetOfTarget is a user-chosen HUD option (reachable from the mobile
-     options sheet; graphics-settings fairness does not apply to user options),
-     so the mini stays visible and keeps the desktop beside-the-frame anchor,
-     inheriting the target frame's 0.82 mobile transform. Verified at 844x390
-     landscape: the band right of the target frame is free (the chip row ends
-     above it, the aura strip wraps below the frame, party frames stack under
-     the strip), so the mini fits without contesting any touch surface. */
-  body.mobile-touch #target-frame > #totarget-frame {
-    left: calc(100% + 18px / (0.74 * var(--target-frame-scale, 1)));
-    top: 0;
+  body.mobile-touch .tf-target-target {
+    left: calc(100% - 2px);
+    width: 116px;
   }
   /* Issue 1577 (1): party frames used to stack in a single column no matter the
      size, so a full party ate more vertical space than a landscape phone can
@@ -1788,20 +1763,14 @@
     overscroll-behavior: contain;
     scrollbar-width: thin;
   }
-  /* A real raid must not inherit the party-only two-row column flow: with nine
-     visible allies that would create five columns and run off a portrait phone.
-     Raid presentation fills two bounded columns top-to-bottom instead. */
-  body.mobile-touch #party-frames.party-style-raid .party-rows {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(2, minmax(0, calc(112px * var(--mobile-chrome-scale, 1))));
-    grid-template-rows: none;
+  /* Ten-player raids use the same five-across icon grid as desktop. At 44px the
+     tiles preserve the mobile touch floor while all nine allies fit in two rows. */
+  body.mobile-touch #party-frames.party-style-raid {
+    --party-raid-tile-size: max(40px, calc(44px * var(--mobile-chrome-scale, 1)));
   }
-  /* A real raid must not inherit the party-only two-row column flow: with nine
-     visible allies that would create five columns and run off a portrait phone.
-     Raid presentation fills two bounded columns top-to-bottom instead. */
   body.mobile-touch #party-frames.party-style-raid .party-rows {
     grid-auto-flow: row;
-    grid-template-columns: repeat(2, minmax(0, calc(112px * var(--mobile-chrome-scale, 1))));
+    grid-template-columns: repeat(5, var(--party-raid-tile-size));
     grid-template-rows: none;
   }
   body.mobile-touch #party-frames.below-target {
@@ -1913,30 +1882,46 @@
     height: 5px;
     margin-top: 1px;
   }
-  /* The desktop .pfm-auras is an absolute bottom-right corner overlay (right:2px,
-     bottom:2px, overflow:hidden). On the compact ~40px mobile member row the 16px
-     desktop icons crowd the name/HP, so shrink them and cap the strip to a small
-     corner cluster that stays clear of the member name. Overflow:hidden and the
-     absolute positioning are inherited from the desktop rule. */
+  /* Classic mobile party auras retain their dedicated lane above HP. Shrink the
+     desktop icons without collapsing that separation or the exact timer label. */
   body.mobile-touch #party-frames .party-frame .pfm-auras {
+    min-height: 13px;
     max-width: 60%;
+    margin-left: auto;
     gap: 1px;
   }
   body.mobile-touch #party-frames .pfm-auras .buff {
+    flex-basis: 13px;
     width: 13px;
     height: 13px;
   }
+  body.mobile-touch #party-frames.party-style-raid .party-frame .pfm-auras {
+    max-width: calc(100% - 8px);
+    gap: 5px;
+  }
   body.mobile-touch #party-frames.party-style-raid .party-frame {
-    height: max(40px, var(--party-frame-height, 42px));
-    min-height: 40px;
+    width: var(--party-raid-tile-size);
+    height: var(--party-raid-tile-size);
+    min-height: var(--party-raid-tile-size);
     padding: 0;
+    margin-top: 0;
+    border-radius: 5px;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame .pfm-id {
+    display: block;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame .pfm-crest {
+    inset: 2px;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    margin: 0;
   }
   body.mobile-touch #party-frames.party-style-raid .party-frame .bar.hp {
-    height: auto;
+    height: 9px;
     margin: 0;
   }
   body.mobile-touch #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
-    height: 3px;
+    height: 2px;
     margin: 0;
   }
   /* The mobile-only collapse chip (a "Party" disclosure header) the party painter
@@ -4824,21 +4809,6 @@
       right: calc(max(20px, env(safe-area-inset-right)) + 164px);
       bottom: calc(57px + env(safe-area-inset-bottom));
     }
-    body.mobile-touch #xpbar {
-      display: none;
-    }
-    body.mobile-touch #player-frame::before {
-      left: -5px;
-      top: -5px;
-      width: 73px;
-      height: 73px;
-      -webkit-mask: radial-gradient(
-        farthest-side,
-        transparent calc(100% - 7px),
-        #000 calc(100% - 6px)
-      );
-      mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
-    }
     body.mobile-touch #castbar {
       /* Centred above the bottom-centre player frame like the base rule, one
          notch lower to match the shorter landscape frame band. Width matches
@@ -4935,6 +4905,18 @@
       width: calc(100px * var(--mobile-chrome-scale, 1));
       min-height: 40px;
       padding: 2px 5px;
+    }
+    /* Keep the icon grid stable in landscape; the former 126px raid cells were
+       visibly larger than the five-player 100px rows and obscured the world. */
+    body.mobile-touch #party-frames.party-style-raid .party-rows {
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      grid-template-columns: repeat(5, var(--party-raid-tile-size));
+      grid-template-rows: none;
+    }
+    body.mobile-touch #party-frames.party-style-raid .party-frame {
+      box-sizing: border-box;
+      width: var(--party-raid-tile-size);
     }
     body.mobile-touch #party-frames .party-frame .pfm-name {
       min-height: 12px;

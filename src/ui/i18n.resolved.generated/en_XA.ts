@@ -755,13 +755,16 @@ export const en_XA: EnTranslations = {
       "targetLabel": "[Ýóúŕ Ɱáŕķ]",
       "targetAnnounce": "[Ɱáŕķ {name}]",
       "targetOfTargetLabel": "[Ɱáŕķ'š Ɱáŕķ]",
+      "targetOfTargetNamedLabel": "[Ɱáŕķ'š Ɱáŕķ: {name}]",
       "partyLabel": "[Ýóúŕ Ɓáñð]",
       "partyChip": "[Þáŕţý]",
       "partyGroup": "[Ĝŕóúþ {n}]",
       "durationUnitSeconds": "[š]",
       "durationUnitMinutes": "[ɱ]",
       "durationUnitHours": "[ĥ]",
-      "durationUnitDays": "[ð]"
+      "durationUnitDays": "[ð]",
+      "auraOverflowShort": "[+{count}]",
+      "auraOverflowLabel": "[Áððíţíóñáļ ƀúƒƒš: {count}]"
     },
     "character": {
       "modelPreview": "[Çĥáŕáçţéŕ Ɱóðéļ Þŕéʋíéŵ]"
@@ -1056,7 +1059,10 @@ export const en_XA: EnTranslations = {
       "uiScale": "[ÚÍ Šçáļé]",
       "playerFrameScale": "[Þļáýéŕ Ƒŕáɱé Šçáļé]",
       "targetFrameScale": "[Ţáŕĝéţ Ƒŕáɱé Šçáļé]",
-      "aurasOnPlayerFrame": "[Ɓúƒƒš óñ ţĥé Þļáýéŕ Ƒŕáɱé]",
+      "unitFrameHealthText": "[Úñíţ Ƒŕáɱé Ĥéáļţĥ Ţéẋţ]",
+      "unitFrameDamageTrail": "[Ðéļáýéð Ðáɱáĝé Ţŕáíļ]",
+      "unitFramePortraitEffects": "[Þóŕţŕáíţ Ŕéáçţíóñš]",
+      "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
       "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]",
       "startAttackOnAbility": "[Áúţó-Áţţáçķ óñ Áƀíļíţý Úšé]",
       "walkByAutoloot": "[Ŵáļķ-ƀý Áúţóļóóţ]",
@@ -1068,7 +1074,6 @@ export const en_XA: EnTranslations = {
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
       "showThirdActionBar": "[Šĥóŵ Ţĥíŕð Áçţíóñ Ɓáŕ]",
-      "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",
       "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
       "mobileCameraJoystick": "[Çáɱéŕá ĵóýšţíçķ]",

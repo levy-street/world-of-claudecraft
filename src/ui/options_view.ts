@@ -434,6 +434,14 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     ...tag('frames', [
       slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
       slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),
+      choice(s, 'unitFrameHealthText', 'hudChrome.options.unitFrameHealthText', [
+        { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
+        { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
+        { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
+        { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
+      ]),
+      boolToggle(s, 'unitFrameDamageTrail', 'hudChrome.options.unitFrameDamageTrail'),
+      boolToggle(s, 'unitFramePortraitEffects', 'hudChrome.options.unitFramePortraitEffects'),
       choice(s, 'partyFrameStyle', 'hudChrome.partyFrames.style', [
         { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
         { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
@@ -459,7 +467,6 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'partyFrameShowAbsorbs', 'hudChrome.partyFrames.showAbsorbs'),
       boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
-      boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
     ]),
     ...tag('chat', [

@@ -755,13 +755,16 @@ export const ja_JP: EnTranslations = {
       "targetLabel": "あなたのターゲット",
       "targetAnnounce": "ターゲット：{name}",
       "targetOfTargetLabel": "ターゲットのターゲット",
+      "targetOfTargetNamedLabel": "ターゲットのターゲット：{name}",
       "partyLabel": "あなたのパーティ",
       "partyChip": "パーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "時",
-      "durationUnitDays": "日"
+      "durationUnitDays": "日",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "追加のバフ {count} 件"
     },
     "character": {
       "modelPreview": "キャラクターモデルプレビュー"
@@ -1056,7 +1059,10 @@ export const ja_JP: EnTranslations = {
       "uiScale": "UIスケール",
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
-      "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
+      "unitFrameHealthText": "ユニットフレームの体力表示",
+      "unitFrameDamageTrail": "遅延ダメージ表示",
+      "unitFramePortraitEffects": "ポートレートの反応",
+      "showTargetOfTarget": "ターゲットのターゲットを表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "walkByAutoloot": "通りがかり自動ルート",
@@ -1068,7 +1074,6 @@ export const ja_JP: EnTranslations = {
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showThirdActionBar": "3本目のアクションバーを表示",
-      "showTargetOfTarget": "ターゲットのターゲットを表示",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",

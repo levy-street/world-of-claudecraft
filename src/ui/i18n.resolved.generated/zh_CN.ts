@@ -755,13 +755,16 @@ export const zh_CN: EnTranslations = {
       "targetLabel": "你的目标",
       "targetAnnounce": "目标：{name}",
       "targetOfTargetLabel": "目标的目标",
+      "targetOfTargetNamedLabel": "目标的目标：{name}",
       "partyLabel": "你的队伍",
       "partyChip": "小队",
       "partyGroup": "小队 {n}",
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "时",
-      "durationUnitDays": "天"
+      "durationUnitDays": "天",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "另外 {count} 个增益效果"
     },
     "character": {
       "modelPreview": "角色模型预览"
@@ -1056,7 +1059,10 @@ export const zh_CN: EnTranslations = {
       "uiScale": "界面缩放",
       "playerFrameScale": "玩家框缩放",
       "targetFrameScale": "目标框缩放",
-      "aurasOnPlayerFrame": "增益显示在玩家框",
+      "unitFrameHealthText": "单位框架生命值文本",
+      "unitFrameDamageTrail": "延迟伤害轨迹",
+      "unitFramePortraitEffects": "头像反馈",
+      "showTargetOfTarget": "显示目标的目标",
       "highContrastBackground": "高对比度背景",
       "startAttackOnAbility": "使用技能时自动攻击",
       "walkByAutoloot": "路过自动拾取",
@@ -1068,7 +1074,6 @@ export const zh_CN: EnTranslations = {
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
       "showThirdActionBar": "显示第三动作条",
-      "showTargetOfTarget": "显示目标的目标",
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",

@@ -755,13 +755,16 @@ export const vi_VN: EnTranslations = {
       "targetLabel": "Mục Tiêu Của Bạn",
       "targetAnnounce": "Đánh Dấu {name}",
       "targetOfTargetLabel": "Mục Tiêu Của Mục Tiêu",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Đội Của Bạn",
       "partyChip": "Tổ Đội",
       "partyGroup": "Nhóm {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "ph",
       "durationUnitHours": "g",
-      "durationUnitDays": "ng"
+      "durationUnitDays": "ng",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Xem Trước Mô Hình Nhân Vật"
@@ -1056,7 +1059,10 @@ export const vi_VN: EnTranslations = {
       "uiScale": "Tỷ Lệ Giao Diện",
       "playerFrameScale": "Tỷ Lệ Khung Người Chơi",
       "targetFrameScale": "Tỷ Lệ Khung Mục Tiêu",
-      "aurasOnPlayerFrame": "Hiệu Ứng Có Lợi Trên Khung Người Chơi",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
       "walkByAutoloot": "Tự Nhặt Đồ Khi Đi Ngang",
@@ -1068,7 +1074,6 @@ export const vi_VN: EnTranslations = {
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
       "showThirdActionBar": "Hiển thị thanh hành động thứ ba",
-      "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",

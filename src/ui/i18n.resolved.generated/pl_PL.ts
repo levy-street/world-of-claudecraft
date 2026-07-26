@@ -755,13 +755,16 @@ export const pl_PL: EnTranslations = {
       "targetLabel": "Twój cel",
       "targetAnnounce": "Oznacz {name}",
       "targetOfTargetLabel": "Cel celu",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Twoja drużyna",
       "partyChip": "Drużyna",
       "partyGroup": "Grupa {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Podgląd modelu postaci"
@@ -1056,7 +1059,10 @@ export const pl_PL: EnTranslations = {
       "uiScale": "Skala interfejsu",
       "playerFrameScale": "Skala ramki gracza",
       "targetFrameScale": "Skala ramki celu",
-      "aurasOnPlayerFrame": "Wzmocnienia na ramce gracza",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Pokaż cel celu",
       "highContrastBackground": "Tło o wysokim kontraście",
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
       "walkByAutoloot": "Automatyczny łup w przelocie",
@@ -1068,7 +1074,6 @@ export const pl_PL: EnTranslations = {
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
       "showThirdActionBar": "Pokaż trzeci pasek akcji",
-      "showTargetOfTarget": "Pokaż cel celu",
       "showAttackButton": "Pokaż Przycisk Ataku",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
       "mobileCameraJoystick": "Joystick aparatu",

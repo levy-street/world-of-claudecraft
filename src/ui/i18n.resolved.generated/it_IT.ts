@@ -755,13 +755,16 @@ export const it_IT: EnTranslations = {
       "targetLabel": "Il tuo bersaglio",
       "targetAnnounce": "Bersaglio: {name}",
       "targetOfTargetLabel": "Il bersaglio del bersaglio",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Il tuo gruppo",
       "partyChip": "Gruppo",
       "partyGroup": "Gruppo {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "g"
+      "durationUnitDays": "g",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Anteprima del modello del personaggio"
@@ -1056,7 +1059,10 @@ export const it_IT: EnTranslations = {
       "uiScale": "Scala dell'interfaccia",
       "playerFrameScale": "Scala del riquadro del giocatore",
       "targetFrameScale": "Scala del riquadro del bersaglio",
-      "aurasOnPlayerFrame": "Buff sul riquadro del giocatore",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
       "highContrastBackground": "Sfondo a contrasto elevato",
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
       "walkByAutoloot": "Raccolta automatica al passaggio",
@@ -1068,7 +1074,6 @@ export const it_IT: EnTranslations = {
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
       "showThirdActionBar": "Mostra la terza barra delle azioni",
-      "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
       "showAttackButton": "Mostra Pulsante Attacco",
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
       "mobileCameraJoystick": "Joystick della fotocamera",

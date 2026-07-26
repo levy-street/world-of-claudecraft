@@ -1,16 +1,16 @@
 // ---------------------------------------------------------------------------
 // Unit-frame portrait painter
 //
-// Paints the circular portrait shared by the player frame and the target frame:
+// Paints the portrait plate shared by the player frame and the target frame:
 // a procedural crest (mob family / NPC / class fallback) or a 3D-headshot data
-// URL, blitted into the small <canvas> that CSS clips to a circle.
+// URL, blitted into the small <canvas> that CSS clips to a rounded rectangle.
 //
 // Extracted from hud.ts so the player and target frames share one correct,
-// HiDPI-crisp, disc-filling implementation. The pure geometry it relies on
+// HiDPI-crisp, plate-filling implementation. The pure geometry it relies on
 // lives in unit_portrait.ts (and is unit-tested there).
 // ---------------------------------------------------------------------------
 
-import { playerPortraitDataUrl } from '../render/characters/portrait';
+import { playerPortraitDataUrl, visualPortraitDataUrl } from '../render/characters/portrait';
 import type { PlayerClass } from '../sim/types';
 import { iconCanvas } from './icons';
 import {
@@ -68,7 +68,7 @@ export class UnitPortraitPainter {
     return { ctx, size };
   }
 
-  /** Paint a procedural crest, overscanned so the emblem fills the circle.
+  /** Paint a procedural crest, overscanned so the emblem fills the plate.
    *  Also clears any pending headshot decode for this canvas (a late `load`
    *  checks `dataset.portrait` and bails) so it can't repaint over the crest. */
   drawCrest(canvas: HTMLCanvasElement, crestId: string): void {
@@ -114,5 +114,17 @@ export class UnitPortraitPainter {
     const url = playerPortraitDataUrl(cls, skin);
     if (url) this.drawHeadshot(canvas, url);
     else this.drawCrest(canvas, `class_${cls}`);
+  }
+
+  /** Paint any contextual player visual, with the class crest as its stable fallback. */
+  drawVisual(
+    canvas: HTMLCanvasElement,
+    visualKey: string,
+    skin: number,
+    fallbackClass: PlayerClass,
+  ): void {
+    const url = visualPortraitDataUrl(visualKey, skin);
+    if (url) this.drawHeadshot(canvas, url, () => this.drawCrest(canvas, `class_${fallbackClass}`));
+    else this.drawCrest(canvas, `class_${fallbackClass}`);
   }
 }

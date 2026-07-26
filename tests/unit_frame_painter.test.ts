@@ -1,6 +1,6 @@
 // Routing + no-magic-values guard for the unit_frame painter.
 // A recording facet captures every writer call so we can assert the painter drives
-// the SIX elided writers with byte-identical values (the Top-risk-1 guard against a
+// the SEVEN elided writers with byte-identical values (the Top-risk-1 guard against a
 // non-byte-identical cache key), including the FOLDED absorb transform + overshield
 // toggle and the resource-type class that replaced the raw updateAbsorb /
 // `className` writes. A source scan proves it makes NO raw DOM write and carries no
@@ -52,8 +52,12 @@ function recordingFacet() {
 const FRAME = { tag: 'frame' } as unknown as HTMLElement;
 const NAME = { tag: 'name' } as unknown as HTMLElement;
 const LEVEL = { tag: 'level' } as unknown as HTMLElement;
+const HP_BAR = { tag: 'hpBar' } as unknown as HTMLElement;
+const HP_TRAIL = { tag: 'hpTrail' } as unknown as HTMLElement;
 const HP_FILL = { tag: 'hpFill' } as unknown as HTMLElement;
+const HP_PREDICTION = { tag: 'hpPrediction' } as unknown as HTMLElement;
 const HP_TEXT = { tag: 'hpText' } as unknown as HTMLElement;
+const HP_PERCENT = { tag: 'hpPercent' } as unknown as HTMLElement;
 const ABSORB = { tag: 'absorb' } as unknown as HTMLElement;
 const RES_CONTAINER = { tag: 'resContainer' } as unknown as HTMLElement;
 const RES_FILL = { tag: 'resFill' } as unknown as HTMLElement;
@@ -104,7 +108,7 @@ function paint(
 describe('UnitFramePainter: the player instance routes every write through the elided writers', () => {
   it('paints level, hp, absorb, resource type/fill/text and NOTHING else (byte-faithful)', () => {
     const calls = paint(playerDescriptor());
-    // absorb { hp: 300, maxHp: 600, auras: [] } -> fillFrac = 300/600 = 0.5 (no shield).
+    // No shield: the segment starts at current HP but has zero width.
     // No setDisplay (CSS owns it), no name (static, set at login), no dead/oor
     // (player frame never carries them): exactly the inline block + the absorb /
     // resource-type folds.
@@ -112,7 +116,8 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'setText', args: [LEVEL, '60'] },
       { m: 'setTransform', args: [HP_FILL, 'scaleX(0.5)'] },
       { m: 'setText', args: [HP_TEXT, '300 / 600'] },
-      { m: 'setTransform', args: [ABSORB, 'scaleX(0.5)'] },
+      { m: 'setStyleProp', args: [ABSORB, '--absorb-start', '50.0%'] },
+      { m: 'setTransform', args: [ABSORB, 'scaleX(0)'] },
       { m: 'toggleClass', args: [ABSORB, 'overshield', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'rage', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
@@ -138,7 +143,7 @@ describe('UnitFramePainter: the player instance routes every write through the e
   });
 
   it('folds the absorb overshield toggle onto the elided writers', () => {
-    // hp 590 + shield 50 over 600 -> overshield, fillFrac clamped to 1.
+    // hp 590 + shield 50 over 600 -> a right-aligned 50/600 overshield segment.
     const calls = paint(
       playerDescriptor({
         absorb: {
@@ -159,7 +164,14 @@ describe('UnitFramePainter: the player instance routes every write through the e
         },
       }),
     );
-    expect(calls).toContainEqual({ m: 'setTransform', args: [ABSORB, 'scaleX(1)'] });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [ABSORB, '--absorb-start', '91.7%'],
+    });
+    expect(calls).toContainEqual({
+      m: 'setTransform',
+      args: [ABSORB, 'scaleX(0.08333333333333333)'],
+    });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [ABSORB, 'overshield', true] });
   });
 });
@@ -296,6 +308,90 @@ describe('UnitFramePainter: the portrait repaint gate (lastPortraitTarget path)'
     const first = calls.length;
     painter.paint(unitFrameView(playerDescriptor({ portraitKey: 'k2' })));
     expect(calls.length - first).toBe(first); // the changing key added nothing
+  });
+});
+
+describe('UnitFramePainter: AAA health feedback and animated presence', () => {
+  const FEEDBACK_ELEMENTS: UnitFrameElements = {
+    ...FULL_ELEMENTS,
+    hpBar: HP_BAR,
+    hpTrail: HP_TRAIL,
+    hpPrediction: HP_PREDICTION,
+    hpPercent: HP_PERCENT,
+  };
+
+  it('writes semantic progress, a delayed trail, alternating change cues, and danger state', () => {
+    const { calls, writers } = recordingFacet();
+    const painter = new UnitFramePainter(writers, FEEDBACK_ELEMENTS, { healthFeedback: true });
+    painter.paint(unitFrameView(playerDescriptor({ hpFrac: 0.5 })));
+    expect(calls).toContainEqual({ m: 'setAttr', args: [HP_BAR, 'aria-valuenow', '50'] });
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [HP_BAR, 'aria-valuetext', '300 / 600'],
+    });
+    expect(calls).toContainEqual({ m: 'setTransform', args: [HP_TRAIL, 'scaleX(0.5)'] });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [HP_PREDICTION, '--incoming-start', '50.0%'],
+    });
+    expect(calls).toContainEqual({ m: 'setWidth', args: [HP_PREDICTION, '0.0%'] });
+    expect(calls).toContainEqual({ m: 'setText', args: [HP_PERCENT, ''] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [FRAME, 'health-wounded', true] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [FRAME, 'health-danger', false] });
+
+    calls.length = 0;
+    painter.paint(unitFrameView(playerDescriptor({ hpFrac: 0.2, hpText: '120 / 600' })));
+    expect(calls).toContainEqual({
+      m: 'toggleClass',
+      args: [HP_BAR, 'health-damage-heavy-a', true],
+    });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [FRAME, 'health-critical', true] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [FRAME, 'health-danger', true] });
+
+    calls.length = 0;
+    painter.paint(unitFrameView(playerDescriptor({ hpFrac: 0.3, hpText: '180 / 600' })));
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [HP_BAR, 'health-heal-b', true] });
+    expect(calls).toContainEqual({
+      m: 'toggleClass',
+      args: [HP_BAR, 'health-damage-heavy-a', false],
+    });
+  });
+
+  it('applies one contextual portrait state class when the instance owns a portrait', () => {
+    const calls = paint(playerDescriptor({ portraitState: 'ghost' }), FEEDBACK_ELEMENTS, {
+      portraitStateClasses: true,
+    });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [FRAME, 'portrait-ghost', true] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [FRAME, 'portrait-normal', false] });
+  });
+
+  it('paints localized percent text and the clamped incoming-heal segment', () => {
+    const calls = paint(
+      playerDescriptor({
+        hpFrac: 0.6,
+        hpPercentText: '60 %',
+        incomingHealFrac: 0.25,
+      }),
+      FEEDBACK_ELEMENTS,
+      { healthFeedback: true },
+    );
+    expect(calls).toContainEqual({ m: 'setText', args: [HP_PERCENT, '60 %'] });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [HP_PREDICTION, '--incoming-start', '60.0%'],
+    });
+    expect(calls).toContainEqual({ m: 'setWidth', args: [HP_PREDICTION, '25.0%'] });
+  });
+
+  it('keeps an absent animated frame measurable while hiding it from sight and AT', () => {
+    const calls = paint(playerDescriptor({ present: false }), FEEDBACK_ELEMENTS, {
+      animatedPresence: true,
+      healthFeedback: true,
+    });
+    expect(calls).toEqual([
+      { m: 'toggleClass', args: [FRAME, 'unitframe-absent', true] },
+      { m: 'setAttr', args: [FRAME, 'aria-hidden', 'true'] },
+    ]);
   });
 });
 

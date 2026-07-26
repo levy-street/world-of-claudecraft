@@ -19,18 +19,19 @@ export function mobPortraitBackgroundSvg(family, size) {
   const center = FAMILY_CENTER_COLORS[family] ?? NEUTRAL_CENTER_COLOR;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
-      <radialGradient id="v" cx="50%" cy="38%" r="68%">
-        <stop offset="0" stop-color="${center}"/>
-        <stop offset="0.58" stop-color="#30343a"/>
+      <linearGradient id="v" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#343a43"/>
+        <stop offset="0.46" stop-color="${center}"/>
         <stop offset="1" stop-color="#11131a"/>
-      </radialGradient>
+      </linearGradient>
       <linearGradient id="s" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#ffffff" stop-opacity="0.14"/>
-        <stop offset="0.48" stop-color="#ffffff" stop-opacity="0"/>
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+        <stop offset="0.38" stop-color="#ffffff" stop-opacity="0.02"/>
+        <stop offset="0.7" stop-color="#000000" stop-opacity="0.06"/>
+        <stop offset="1" stop-color="#000000" stop-opacity="0.28"/>
       </linearGradient>
     </defs>
     <rect width="${size}" height="${size}" fill="url(#v)"/>
-    <circle cx="${size / 2}" cy="${size / 2}" r="${size * 0.43}" fill="none" stroke="#d7bd78" stroke-opacity="0.22" stroke-width="${Math.max(1, size * 0.018)}"/>
     <rect width="${size}" height="${size}" fill="url(#s)"/>
   </svg>`;
 }

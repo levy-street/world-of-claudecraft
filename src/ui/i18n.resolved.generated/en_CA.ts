@@ -755,13 +755,16 @@ export const en_CA: EnTranslations = {
       "targetLabel": "Your Mark",
       "targetAnnounce": "Mark {name}",
       "targetOfTargetLabel": "Mark's Mark",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Your Band",
       "partyChip": "Party",
       "partyGroup": "Group {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Character Model Preview"
@@ -1056,7 +1059,10 @@ export const en_CA: EnTranslations = {
       "uiScale": "UI Scale",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
-      "aurasOnPlayerFrame": "Buffs on the Player Frame",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Show Target of Target",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -1068,7 +1074,6 @@ export const en_CA: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
       "showThirdActionBar": "Show Third Action Bar",
-      "showTargetOfTarget": "Show Target of Target",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",

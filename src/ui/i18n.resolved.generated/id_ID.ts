@@ -755,13 +755,16 @@ export const id_ID: EnTranslations = {
       "targetLabel": "Sasaran Anda",
       "targetAnnounce": "Tandai {name}",
       "targetOfTargetLabel": "Sasaran dari Sasaran",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Kelompok Anda",
       "partyChip": "Kelompok",
       "partyGroup": "Grup {n}",
       "durationUnitSeconds": "d",
       "durationUnitMinutes": "m",
       "durationUnitHours": "j",
-      "durationUnitDays": "h"
+      "durationUnitDays": "h",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Pratinjau Model Karakter"
@@ -1056,7 +1059,10 @@ export const id_ID: EnTranslations = {
       "uiScale": "Skala UI",
       "playerFrameScale": "Skala Bingkai Pemain",
       "targetFrameScale": "Skala Bingkai Sasaran",
-      "aurasOnPlayerFrame": "Buff pada Bingkai Pemain",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "highContrastBackground": "Latar Kontras Tinggi",
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
       "walkByAutoloot": "Jarah Otomatis Sambil Lewat",
@@ -1068,7 +1074,6 @@ export const id_ID: EnTranslations = {
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
       "showThirdActionBar": "Tampilkan Bilah Tindakan Ketiga",
-      "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",

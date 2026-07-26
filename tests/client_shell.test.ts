@@ -375,7 +375,55 @@ describe('client HTML shell', () => {
     // locks the attribute order + the exact i18n key across entries.
     for (const entry of [html, playHtml]) {
       expect(entry).toContain(
-        'id="target-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel"',
+        'id="target-frame" class="unitframe unitframe-absent" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel"',
+      );
+    }
+  });
+
+  it('ships separate target buff and debuff attachment rows in BOTH entries', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('class="uf-auras uf-target-buffs" id="tf-buffs"');
+      expect(entry).toContain('class="uf-auras uf-target-debuffs" id="tf-debuffs"');
+    }
+    expect(hudTs).toContain(
+      "private readonly targetBuffsView = createAurasView('buffs', this.aurasViewDeps, {",
+    );
+    expect(hudTs).toContain(
+      "private readonly targetDebuffsView = createAurasView('debuffs', this.aurasViewDeps, {",
+    );
+    expect(hudTs).toContain('this.targetBuffsPainter.paint(this.targetBuffsView.tick(target));');
+  });
+
+  it('ships a clickable target-of-target chip in BOTH game entries', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="tf-target-target" class="tf-target-target" type="button"');
+      expect(entry).toContain('id="tf-tot-portrait" width="58" height="58"');
+      expect(entry).toContain('class="tf-tot-name" id="tf-tot-name"');
+      expect(entry).toContain('class="tf-tot-hp-fill" id="tf-tot-hp"');
+    }
+  });
+
+  it('ships semantic player and target HP rails with a delayed damage layer', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain(
+        'id="pf-hpbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"',
+      );
+      expect(entry).toContain('class="bar-health-trail" id="pf-hp-trail"');
+      expect(entry).toContain(
+        'id="tf-hpbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"',
+      );
+      expect(entry).toContain('class="bar-health-trail" id="tf-hp-trail"');
+    }
+  });
+
+  it('docks warrior stances inside the player portrait in BOTH entries', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('<div class="rest-indicator" id="pf-rest"');
+      expect(entry).toContain(
+        '<div id="stancebar"></div>\n            </div>\n            <div class="uf-bars">',
+      );
+      expect(entry).not.toContain(
+        '<div id="petbar" class="panel"></div>\n          <div id="stancebar"></div>',
       );
     }
   });
@@ -1259,17 +1307,21 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('renders the mobile XP bar as a ring around the top-left class circle', () => {
-    expect(hudMobileCss).toContain('body.mobile-touch #xpbar {\n    display: none;\n  }');
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #player-frame {\n    --xp-ring-start: 210deg;\n    --xp-ring-arc: 360deg;',
-    );
-    expect(hudMobileCss).toContain('body.mobile-touch #player-frame::before {\n    content: "";');
-    expect(hudMobileCss).toContain('width: 73px;\n    height: 73px;');
-    expect(hudMobileCss).toContain('z-index: 2;');
-    expect(hudMobileCss).toContain('conic-gradient(\n      from var(--xp-ring-start),');
-    expect(hudMobileCss).toContain('calc(var(--xp-fill, 0) * 360deg)');
-    expect(hudMobileCss).toContain('transparent var(--xp-ring-arc) 360deg');
+  it('renders one shared XP perimeter around the square player portrait', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry.match(/id="xpbar"/g)).toHaveLength(1);
+      expect(entry).toMatch(
+        /<div class="portrait-wrap">[\s\S]*?<div class="portrait"><canvas id="pf-portrait"[\s\S]*?<div id="xpbar" role="progressbar"/,
+      );
+    }
+    expect(hudCss).toMatch(/\.portrait \{[\s\S]*?border-radius: 10px;/);
+    expect(hudCss).toContain('#player-frame .portrait-wrap #xpbar {');
+    expect(hudCss).toContain('width: 74px;\n    height: 74px;');
+    expect(hudCss).toContain('conic-gradient(\n      from -45deg,');
+    expect(hudCss).toContain('calc(var(--xp-rested-end, 0) * 1turn)');
+    expect(hudCss).toContain('-webkit-mask-composite: xor;');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #player-frame::before');
+    expect(hudMobileCss).toContain('body.mobile-touch #xpbar .label {\n    display: none;\n  }');
     // Own HP/mana lives bottom-center (the one part of the screen every
     // other mobile element deliberately leaves empty), not top-left.
     expect(hudMobileCss).toContain(
@@ -1280,15 +1332,6 @@ describe('client HTML shell', () => {
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #player-frame .uf-bars {\n    position: relative;\n    z-index: 1;',
-    );
-    expect(hudMobileCss).toContain(
-      '-webkit-mask: radial-gradient(\n      farthest-side,\n      transparent calc(100% - 7px),\n      #000 calc(100% - 6px)\n    );',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #xpbar .fill,\n  body.mobile-touch #xpbar .ticks {\n    display: none;\n  }',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #player-frame::before {\n      left: -5px;\n      top: -5px;\n      width: 73px;\n      height: 73px;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #target-frame {\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 72px);',
@@ -1320,10 +1363,8 @@ describe('client HTML shell', () => {
       /body\.mobile-touch #party-frames \{[^}]*display: flex;[^}]*flex-direction: column;/,
     );
     expect(hudMobileCss).not.toContain('body.mobile-touch #party-frames #party-leave');
-    // The mobile double-stack keeps its own two-row column grid. On desktop the
-    // .party-rows wrapper now drives the configurable party layout: a column grid
-    // sized by the --party-frame-columns / --party-frame-width / --party-frame-spacing
-    // custom properties (columns default to 1, i.e. the classic single stack).
+    // Classic mobile parties retain the two-row flow. Raids switch to five-across
+    // square icon tiles on every layout, with their HP as an overlaid strip.
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-rows {\n    display: grid;\n    zoom: 1;\n    grid-template-columns: none;\n    grid-auto-flow: column;\n    grid-template-rows: repeat(2, auto);',
     );
@@ -1334,8 +1375,35 @@ describe('client HTML shell', () => {
     expect(hudCss).toContain(
       '#party-frames .party-rows {\n    display: grid;\n    grid-template-columns: repeat(var(--party-frame-columns, 1), var(--party-frame-width, 170px));',
     );
+    expect(hudCss).toContain(
+      '#party-frames.party-style-raid .party-rows {\n    grid-template-columns: repeat(5, var(--party-raid-tile-size));',
+    );
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame \.pfm-crest \{[\s\S]*?display: block;[\s\S]*?object-fit: cover;/,
+    );
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame \.bar\.hp \{[\s\S]*?height: 9px;/,
+    );
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame \.pfm-auras \{[\s\S]*?bottom: 13px;[\s\S]*?align-items: flex-end;/,
+    );
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame \.pfm-auras \.buff:not\(\.debuff\) \{[\s\S]*?width: 9px;[\s\S]*?height: 9px;/,
+    );
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame \.pfm-auras \.buff\.debuff \{[\s\S]*?width: 14px;[\s\S]*?height: 14px;/,
+    );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame {\n      width: calc(100px * var(--mobile-chrome-scale, 1));\n      min-height: 40px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames.party-style-raid .party-rows {\n      grid-auto-flow: row;\n      grid-auto-columns: auto;\n      grid-template-columns: repeat(5, var(--party-raid-tile-size));\n      grid-template-rows: none;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames.party-style-raid .party-frame {\n      box-sizing: border-box;\n      width: var(--party-raid-tile-size);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames.party-style-raid .party-frame .pfm-crest {\n    inset: 2px;\n    width: calc(100% - 4px);\n    height: calc(100% - 4px);',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #target-frame {\n      left: max(6px, env(safe-area-inset-left));\n      top: calc(max(6px, env(safe-area-inset-top)) + 56px);',
@@ -1347,15 +1415,17 @@ describe('client HTML shell', () => {
       'top: calc(var(--party-below-target-bottom, calc(max(6px, env(safe-area-inset-top)) + 97px)) + 8px);',
     );
     expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-left-handed #xpbar,');
-    // The XP fill fraction is mirrored into --xp-fill on BOTH the #xpbar and the
-    // #player-frame (the mobile ring around the class circle reads it). The painter
-    // owns those writes now: it caches the #player-frame ref and drives --xp-fill on
-    // the bar and the player frame through the elided setStyleProp.
+    // The painter drives both the earned-XP endpoint and the rested-XP endpoint
+    // used by the shared portrait perimeter. The legacy player-frame mirror is
+    // retained for compatibility with saved/custom HUD CSS.
     expect(hudTs).toContain("private playerFrameEl = $('#player-frame');");
     expect(hudTs).toContain('this.playerFrameEl,');
     expect(xpBarPainterTs).toContain("const XP_FILL_PROP = '--xp-fill';");
     expect(xpBarPainterTs).toContain(
       'this.writers.setStyleProp(this.bar, XP_FILL_PROP, fillFrac4);',
+    );
+    expect(xpBarPainterTs).toContain(
+      'this.writers.setStyleProp(this.bar, XP_RESTED_END_PROP, restedEndFrac4);',
     );
     expect(xpBarPainterTs).toContain(
       'this.writers.setStyleProp(this.playerFrame, XP_FILL_PROP, fillFrac4);',

@@ -2,8 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const crestCanvas = {} as HTMLCanvasElement;
 vi.mock('../src/ui/icons', () => ({ iconCanvas: vi.fn(() => crestCanvas) }));
-vi.mock('../src/render/characters/portrait', () => ({ playerPortraitDataUrl: vi.fn() }));
+vi.mock('../src/render/characters/portrait', () => ({
+  playerPortraitDataUrl: vi.fn(),
+  visualPortraitDataUrl: vi.fn(),
+}));
 
+import { visualPortraitDataUrl } from '../src/render/characters/portrait';
+import { CREST_OVERSCAN, overscanRect, PORTRAIT_CSS_SIZE } from '../src/ui/unit_portrait';
 import { UnitPortraitPainter } from '../src/ui/unit_portrait_painter';
 
 type ImageListener = () => void;
@@ -49,6 +54,7 @@ describe('UnitPortraitPainter', () => {
   beforeEach(() => {
     FakeImage.instances = [];
     vi.stubGlobal('Image', FakeImage);
+    vi.mocked(visualPortraitDataUrl).mockReset();
   });
 
   it('invokes the current portrait fallback when a headshot fails to load', () => {
@@ -61,13 +67,8 @@ describe('UnitPortraitPainter', () => {
 
     expect(fallback).toHaveBeenCalledOnce();
     expect(canvas.dataset.portrait).toBe('');
-    expect(context.drawImage).toHaveBeenCalledWith(
-      crestCanvas,
-      -4.859999999999999,
-      -4.859999999999999,
-      63.72,
-      63.72,
-    );
+    const rect = overscanRect(PORTRAIT_CSS_SIZE, CREST_OVERSCAN);
+    expect(context.drawImage).toHaveBeenCalledWith(crestCanvas, rect.dx, rect.dy, rect.dw, rect.dh);
   });
 
   it('ignores a late error after the canvas has been assigned another portrait', () => {
@@ -92,7 +93,13 @@ describe('UnitPortraitPainter', () => {
     FakeImage.instances[0].naturalWidth = 128;
     FakeImage.instances[0].dispatch('load');
 
-    expect(context.drawImage).toHaveBeenCalledWith(FakeImage.instances[0], 0, 0, 54, 54);
+    expect(context.drawImage).toHaveBeenCalledWith(
+      FakeImage.instances[0],
+      0,
+      0,
+      PORTRAIT_CSS_SIZE,
+      PORTRAIT_CSS_SIZE,
+    );
   });
 
   it('bounds decoded headshot retention with least-recently-used eviction', () => {
@@ -105,5 +112,16 @@ describe('UnitPortraitPainter', () => {
     painter.drawHeadshot(canvas, '/mob-0.webp');
 
     expect(FakeImage.instances).toHaveLength(34);
+  });
+
+  it('paints contextual form and mech visuals through the shared headshot path', () => {
+    const { canvas } = fakeCanvas();
+    const painter = new UnitPortraitPainter(() => 1);
+    vi.mocked(visualPortraitDataUrl).mockReturnValue('/form-bear.png');
+
+    painter.drawVisual(canvas, 'form_bear', 0, 'druid');
+
+    expect(visualPortraitDataUrl).toHaveBeenCalledWith('form_bear', 0);
+    expect(canvas.dataset.portrait).toBe('/form-bear.png');
   });
 });

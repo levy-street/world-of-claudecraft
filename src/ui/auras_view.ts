@@ -1,5 +1,5 @@
-// Pure derivation of the aura strip (the #buff-bar player buffs/debuffs and the
-// #tf-debuffs target debuffs).
+// Pure derivation of the four aura strips (#buff-bar / #debuff-bar for the player,
+// #tf-buffs / #tf-debuffs for the target).
 //
 // This is the per-frame HOT core: hud.update() rendered each entity's auras every
 // frame. The old renderAuras used an ad-hoc `__sig` cache + an innerHTML wipe; this
@@ -12,8 +12,7 @@
 // deps) preallocates a per-aura slot pool ONCE and returns a tick(entity) that mutates
 // it IN PLACE and returns the SAME { slots, count } container every call, so a correct
 // frame allocates no new array/object garbage (the reused-reference allocation proxy,
-// tests/util/alloc_probe.ts). Two modes yield two independent views (the buff bar and
-// the target debuffs are two instances, not a code fork).
+// tests/util/alloc_probe.ts). Each row gets an independent view, not a code fork.
 //
 // The DEBUFF allowlist lives in the host-agnostic sim/aura_classify leaf shared by
 // the view, chat readouts, and player cancellation. This core stays DOM-free and
@@ -39,8 +38,8 @@ export { DEBUFF_AURA_KINDS };
 // Toggle auras (cast again to cancel: stealth, the druid forms, stances, Ghost
 // Wolf) read as MODES, not timed effects: WoW shows no countdown under them, so
 // neither do we, even though the sim backs each with a long finite duration
-// (3600s). Every other aura shows a compact WoW-style remaining label (20s /
-// 5m / 1h / 2d) via compactAuraDuration below.
+// (3600s). Every other aura shows a compact remaining label (20s / 1:39 /
+// 10m / 1h / 2d) via compactAuraDuration below.
 const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
   'stealth',
   'form_bear',
@@ -70,14 +69,20 @@ export interface DurationUnits {
   d: string;
 }
 
-/** WoW-style compact remaining-duration label: seconds round UP (a dot about to
- *  fall still reads 1s, never 0s), minutes/hours/days round to nearest, and a
- *  rounded value that would print a full next unit promotes instead (3599s is
- *  "1h", never "60m"). A non-finite remaining reads as permanent (no label).
- *  Pure; exported for tests. */
+/** Compact remaining-duration label: seconds round UP (a dot about to fall still
+ *  reads 1s, never 0s), the first ten minutes use an exact m:ss countdown, and
+ *  longer minutes/hours/days round to nearest. A rounded value that would print
+ *  a full next unit promotes instead (3599s is "1h", never "60m"). A non-finite
+ *  remaining reads as permanent (no label). Pure; exported for tests. */
 export function compactAuraDuration(remaining: number, units: DurationUnits): string {
   if (!Number.isFinite(remaining)) return '';
-  if (remaining < 60) return `${Math.ceil(remaining)}${units.s}`;
+  const totalSeconds = Math.ceil(remaining);
+  if (totalSeconds < 60) return `${totalSeconds}${units.s}`;
+  if (totalSeconds < 600) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+  }
   const m = Math.round(remaining / 60);
   if (m < 60) return `${m}${units.m}`;
   const h = Math.round(remaining / 3600);
@@ -181,6 +186,10 @@ export interface AuraSlotState {
   school: string;
   /** The remaining-duration label, or '' when effectively permanent. */
   durationText: string;
+  /** Remaining fraction of the original duration, 0..1, for the radial sweep. */
+  durationProgress: number;
+  /** True only for a timed aura with 0 < remaining <= 5 seconds. */
+  expiring: boolean;
   /** The stack-count label, or '' when the aura does not stack past 1. */
   stacksText: string;
   /** The localized aura name, for the tooltip (read live by the pooled closure). */
@@ -196,9 +205,6 @@ export interface AuraSlotState {
   /** Whether the LOCAL player cast this aura (ownFirst views only, false elsewhere):
    *  drives the `own` class (bigger icon) and the own-first slot order. */
   own: boolean;
-  /** Whether the aura is about to run out (drives the `expiring` blink class). Always
-   *  false for toggles/permanents, which show no countdown either. */
-  expiring: boolean;
 }
 
 /** The whole strip's derived state: the reused slot pool plus the active count. Both
@@ -252,13 +258,14 @@ function makeSlotState(): AuraSlotState {
     isDebuff: false,
     school: '',
     durationText: '',
+    durationProgress: 1,
+    expiring: false,
     stacksText: '',
     name: '',
     remaining: 0,
     cancelable: false,
     effectHtml: '',
     own: false,
-    expiring: false,
   };
 }
 
@@ -266,8 +273,8 @@ function makeSlotState(): AuraSlotState {
  * Build an aura view bound to one mode. The slot pool is preallocated lazily and grows
  * only to the high-water aura count (amortized zero allocation in steady state);
  * tick() mutates it in place and returns the SAME { slots, count } container every
- * call. Each createAurasView yields an INDEPENDENT view: the buff bar and
- * the target debuffs never share a pool.
+ * call. Each createAurasView yields an INDEPENDENT view: no player/target row
+ * shares a pool.
  *
  * opts.ownFirst (the target strip): the LOCAL player's own auras (deps.isOwn, the
  * dots/hots you are maintaining) fill the leading slots and carry `own: true`, so
@@ -311,10 +318,17 @@ export function createAurasView(
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
-        const toggle = (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id);
-        slot.durationText = toggle ? '' : compactAuraDuration(a.remaining, units);
-        // Toggles show no countdown, so they never blink either.
-        slot.expiring = !toggle && isAuraExpiring(a.remaining, a.duration);
+        slot.durationText =
+          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id)
+            ? ''
+            : compactAuraDuration(a.remaining, units);
+        const timed = slot.durationText !== '';
+        const duration =
+          Number.isFinite(a.duration) && (a.duration ?? 0) > 0
+            ? (a.duration as number)
+            : Math.max(1, a.remaining);
+        slot.durationProgress = timed ? Math.max(0, Math.min(1, a.remaining / duration)) : 1;
+        slot.expiring = timed && a.remaining > 0 && a.remaining <= 5;
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
         // badge shows a stack count, and only when it stacks past 1.
         slot.stacksText =

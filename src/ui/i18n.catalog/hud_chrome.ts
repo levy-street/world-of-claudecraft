@@ -353,6 +353,7 @@ export const hudChromeStrings = {
     // locale does not trip the M16 untranslated-leak guard, reusing the frame's own
     // term for the target ("Mark", from targetLabel): your mark's mark.
     targetOfTargetLabel: "Mark's Mark",
+    targetOfTargetNamedLabel: "Mark's Mark: {name}",
     // partyLabel names the #party-frames region (a group of tappable / focusable
     // party member buttons, each named by its visible member name). Kept short and
     // non-wordy (no run of four+ lowercase) so an English-filled non-Latin locale
@@ -378,7 +379,7 @@ export const hudChromeStrings = {
     // (M16 is per-word consecutive-lowercase, not word count).
     partyGroup: 'Group {n}',
     // The unit suffixes appended to an aura's compact remaining-duration label on the
-    // buff/debuff strips (e.g. "20s", "5m", "1h", "2d"). The auras core (auras_view.ts)
+    // buff/debuff strips (e.g. "20s", "1:39", "10m", "1h", "2d"). The auras core (auras_view.ts)
     // renders them via the injected durationUnits() dep so an in-game language switch
     // lands next tick. Single chars (non-wordy: no four-plus consecutive-lowercase run),
     // so an English-filled non-Latin overlay does not trip the M16 untranslated-leak
@@ -387,6 +388,8 @@ export const hudChromeStrings = {
     durationUnitMinutes: 'm',
     durationUnitHours: 'h',
     durationUnitDays: 'd',
+    auraOverflowShort: '+{count}',
+    auraOverflowLabel: 'Additional buffs: {count}',
   },
   // Character sheet (#char-window) accessible names. modelPreview names the role=img 3D
   // turntable HOST distinctly from the title's level/class subtitle (the canvas pixels
@@ -860,11 +863,10 @@ export const hudChromeStrings = {
     // (wordy, M16: the five non-Latin fills land in the same change as each).
     playerFrameScale: 'Player Frame Scale',
     targetFrameScale: 'Target Frame Scale',
-    // Interface panel toggle: anchor the player's own buff row to the movable
-    // player frame (the debuff row then slides up beside the minimap) instead
-    // of the classic two-row top-right corner (wordy, M16: the five non-Latin
-    // fills land in this same change).
-    aurasOnPlayerFrame: 'Buffs on the Player Frame',
+    unitFrameHealthText: 'Unit Frame Health Text',
+    unitFrameDamageTrail: 'Delayed Damage Trail',
+    unitFramePortraitEffects: 'Portrait Reactions',
+    showTargetOfTarget: 'Show Target of Target',
     highContrastBackground: 'High-Contrast Background',
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
@@ -889,10 +891,6 @@ export const hudChromeStrings = {
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
-    // Interface panel toggle for the classic "target of target" mini-frame (off by
-    // default): a small unit frame under the target frame showing who your target
-    // is targeting.
-    showTargetOfTarget: 'Show Target of Target',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.

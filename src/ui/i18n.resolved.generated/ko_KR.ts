@@ -755,13 +755,16 @@ export const ko_KR: EnTranslations = {
       "targetLabel": "내 대상",
       "targetAnnounce": "대상: {name}",
       "targetOfTargetLabel": "대상의 대상",
+      "targetOfTargetNamedLabel": "대상의 대상: {name}",
       "partyLabel": "내 파티",
       "partyChip": "파티",
       "partyGroup": "{n}번 그룹",
       "durationUnitSeconds": "초",
       "durationUnitMinutes": "분",
       "durationUnitHours": "시",
-      "durationUnitDays": "일"
+      "durationUnitDays": "일",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "추가 강화 효과 {count}개"
     },
     "character": {
       "modelPreview": "캐릭터 모델 미리보기"
@@ -1056,7 +1059,10 @@ export const ko_KR: EnTranslations = {
       "uiScale": "UI 배율",
       "playerFrameScale": "플레이어 프레임 크기",
       "targetFrameScale": "대상 프레임 크기",
-      "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
+      "unitFrameHealthText": "유닛 프레임 생명력 텍스트",
+      "unitFrameDamageTrail": "지연 피해 흔적",
+      "unitFramePortraitEffects": "초상화 반응",
+      "showTargetOfTarget": "대상의 대상 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "walkByAutoloot": "지나가며 자동 획득",
@@ -1068,7 +1074,6 @@ export const ko_KR: EnTranslations = {
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
-      "showTargetOfTarget": "대상의 대상 표시",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",

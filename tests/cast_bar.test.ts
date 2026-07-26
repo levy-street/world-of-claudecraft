@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { castBarState, consumeBarState } from '../src/render/cast_bar';
+import { castBarState, castIsInterruptible, consumeBarState } from '../src/render/cast_bar';
 import { CONSUME_DURATION, type Consuming, type Entity } from '../src/sim/types';
 
 // castBarState reads only a handful of cast fields, so a minimal partial entity
@@ -38,6 +38,7 @@ describe('overhead cast bar', () => {
     // localizes it. So we assert the stable discriminator, not display text.
     expect(mid.label).toBe('fireball');
     expect(mid.fishing).toBe(false);
+    expect(mid.interruptible).toBe(true);
   });
 
   it('drains a channel downward as it ticks', () => {
@@ -59,9 +60,18 @@ describe('overhead cast bar', () => {
     const fish = castBarState(caster({ castingAbility: 'fishing' }));
     expect(fish.fishing).toBe(true);
     expect(fish.label).toBe('fishing');
+    expect(fish.interruptible).toBe(false);
     const unknown = castBarState(caster({ castingAbility: 'made_up_spell' }));
     expect(unknown.fishing).toBe(false);
     expect(unknown.label).toBe('made_up_spell');
+    expect(unknown.interruptible).toBe(false);
+  });
+
+  it('distinguishes magical and scripted interruptible casts from protected casts', () => {
+    expect(castIsInterruptible('fireball')).toBe(true);
+    expect(castIsInterruptible('aimed_shot')).toBe(false);
+    expect(castIsInterruptible('nythraxis_spirit_mending')).toBe(true);
+    expect(castIsInterruptible('unknown_boss_ritual')).toBe(false);
   });
 
   it('renders fishing as a CONSTANT full waiting bar and the gather cast as a normal fill', () => {

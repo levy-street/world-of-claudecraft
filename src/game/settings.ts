@@ -122,6 +122,8 @@ export const SETTING_RANGES = {
   // The target frame's twin of playerFrameScale, via --target-frame-scale.
   // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
   targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
+  // Main player/target health text: 0 hidden, 1 percent, 2 current, 3 current/max.
+  unitFrameHealthText: { min: 0, max: 3, def: 3 },
   // WoW-style party/raid frame profile. Width/height are CSS pixels before the
   // independent scale; columns and spacing let raids grow across rather than
   // covering the whole left edge. style: 0 automatic, 1 classic, 2 raid frames.
@@ -190,19 +192,15 @@ export const BOOL_SETTINGS = {
   // casting. Touch keeps the instant target-feet fallback because there is no
   // persistent cursor to preview.
   groundReticle: { def: true },
-  // off by default: anchor the player's own BUFF row to the movable player
-  // frame instead of the classic top-right corner. hud.ts reparents the buff
-  // bar into #player-frame (above it while docked over the action bars, below
-  // it once the frame is moved), so it follows the frame's spot and scale; the
-  // debuff row stays put in the DOM and slides up beside the minimap (the
-  // vacated top spot) so incoming debuffs keep one glanceable classic corner.
-  // Desktop only; the mobile layout keeps its own aura placement.
-  aurasOnPlayerFrame: { def: false },
   // on by default: Clique-style mouseover casting. Pressing an action-bar key
   // for a friendly (heal/buff) ability while the cursor is over a party frame
   // casts it on the hovered member without touching the current target (read
   // live by Hud.castSlot). Off restores the classic target-else-self routing.
   mouseoverCast: { def: true },
+  // Premium unit-frame feedback is individually optional without hiding any
+  // actionable health, threat, cast, or aura information.
+  unitFrameDamageTrail: { def: true },
+  unitFramePortraitEffects: { def: true },
   // Party/raid frame display profile. Health is always visible; these switches
   // choose the supporting information layered around it.
   partyFrameShowResource: { def: true },
@@ -309,7 +307,7 @@ export const BOOL_SETTINGS = {
   // targeting (a mob's aggro target, a player's selected target). Purely a display
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
-  showTargetOfTarget: { def: false },
+  showTargetOfTarget: { def: true },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },

@@ -3,11 +3,11 @@
 // v0.24.1 reverted it; frame positions dragged against the overhaul layout
 // replay verbatim against the restored classic layout, leaving the player
 // frame detached in a stale spot. The stored {left,top} carries no version or
-// timestamp, so a targeted clear is impossible: v0.24.1 therefore clears BOTH
-// unit-frame position keys once per client, keyed by an epoch marker. Bump
-// LAYOUT_RESET_EPOCH if another forced layout reset is ever needed.
+// timestamp, so a targeted clear is impossible: v0.24.1 therefore cleared BOTH
+// unit-frame position keys once per client, keyed by an epoch marker. Epoch 2
+// re-homes them for the paired bottom-center unit-frame layout.
 
-export const LAYOUT_RESET_EPOCH = 1;
+export const LAYOUT_RESET_EPOCH = 2;
 export const LAYOUT_RESET_EPOCH_KEY = 'woc_layout_reset_epoch';
 // The MovableFrame storage keys hud.ts wires up; hud.ts imports these so the
 // reset and the movers can never drift apart.

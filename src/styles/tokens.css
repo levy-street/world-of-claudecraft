@@ -27,6 +27,7 @@
     --font-display: "Cinzel", "Palatino Linotype", Palatino, Georgia, serif;
     --font-ui: "Alegreya Sans", "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
     --font-serif: "Alegreya", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-label: var(--font-display);
     --title-font: var(--font-display);
     --font-heading: var(--font-display);
     --ui-font: var(--font-ui);
@@ -46,7 +47,10 @@
     --color-energy: #e4c531;
     --color-hostile: #ff6b5e;
     --color-friendly: #9fdc7f;
-    --color-buff: #3a6ea8;
+    --color-accent-glint: color-mix(in srgb, var(--gold) 58%, white);
+    --color-health-damage: #ff594d;
+    --color-health-heal: #fff4d6;
+    --color-buff: #3f9f5f;
     --color-debuff: #c0392b;
     /* Protect Yumi team identity (blue team A / red team B), driven by the
        yumi match HUD + arena window; never hardcoded in painter TS. */
@@ -210,6 +214,10 @@
 
     --transition-speed: 0.25s;
     --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-fast: 120ms;
+    --dur-press: 150ms;
+    --dur-panel: 240ms;
+    --dur-frame: 150ms;
 
     /* Custom scrollbar tokens */
     --scrollbar-thumb: #5c4722;

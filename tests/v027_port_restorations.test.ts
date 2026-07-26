@@ -35,7 +35,7 @@ import { directHealBonus } from '../src/sim/spell_scaling';
 import { stunDrCategory } from '../src/sim/stun_dr';
 import type { Aura } from '../src/sim/types';
 import { AVATAR_SCALE, SPELL_AOE_COEFF_MULT } from '../src/sim/types';
-import { targetOfTargetId } from '../src/ui/target_of_target';
+import { targetOfTargetId } from '../src/ui/target_of_target_view';
 
 describe('rogue starting dual wield (classes.ts startOffhand)', () => {
   it('starts rogues with a rusty dagger in BOTH hands', () => {
@@ -415,9 +415,9 @@ function bareClient(pid: number): ClientWorld {
 }
 
 describe('mouseover cast settings + server target routing (game.ts case cast)', () => {
-  it('defaults mouseoverCast on and showTargetOfTarget off', () => {
+  it('defaults mouseoverCast and the premium target-of-target satellite on', () => {
     expect(BOOL_SETTINGS.mouseoverCast.def).toBe(true);
-    expect(BOOL_SETTINGS.showTargetOfTarget.def).toBe(false);
+    expect(BOOL_SETTINGS.showTargetOfTarget.def).toBe(true);
   });
 
   it('routes a numeric msg.target to castAbilityOn and falls back without one', () => {

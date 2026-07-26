@@ -19,11 +19,11 @@ function fakeStorage(seed: Record<string, string> = {}) {
 }
 
 describe('resetFramePositionsOnce', () => {
-  it('pins the storage keys the v0.24.1 reset clears', () => {
+  it('pins the storage keys and current paired-frame layout epoch', () => {
     // Load-bearing wire tokens: these must match the MovableFrame keys in hud.ts.
     expect(FRAME_POS_RESET_KEYS).toEqual(['woc_player_frame_pos', 'woc_target_frame_pos']);
     expect(LAYOUT_RESET_EPOCH_KEY).toBe('woc_layout_reset_epoch');
-    expect(LAYOUT_RESET_EPOCH).toBe(1);
+    expect(LAYOUT_RESET_EPOCH).toBe(2);
   });
 
   it('clears both frame positions and stamps the epoch on a first run', () => {

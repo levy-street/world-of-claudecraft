@@ -2149,7 +2149,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Ramah',
   'hudChrome.mobTooltip.hostile': 'Bermusuhan',
   'hudChrome.mobTooltip.levelFamily': '{family} Level {level}',
-  'hudChrome.options.aurasOnPlayerFrame': 'Buff pada Bingkai Pemain',
   'hudChrome.options.playerFrameScale': 'Skala Bingkai Pemain',
   'hudChrome.options.showDailyRewardsChest': 'Tampilkan Peti Hadiah Harian',
   'hudChrome.options.showOwnNameplate': 'Tampilkan Papan Namaku',

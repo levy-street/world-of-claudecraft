@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  BOOL_SETTINGS,
   clickMoveButtonLabel,
   normalizeClickMoveButton,
   SETTING_RANGES,
@@ -83,8 +84,12 @@ describe('Settings', () => {
     // both unit frames ship at their stock size; the scale sliders are opt-in tuning.
     expect(s.get('playerFrameScale')).toBe(1);
     expect(s.get('targetFrameScale')).toBe(1);
-    // the classic top-right aura corner stays the default; frame-anchoring is opt-in.
-    expect(s.get('aurasOnPlayerFrame')).toBe(false);
+    expect(s.get('unitFrameHealthText')).toBe(3);
+    expect(s.get('unitFrameDamageTrail')).toBe(true);
+    expect(s.get('unitFramePortraitEffects')).toBe(true);
+    expect(s.get('showTargetOfTarget')).toBe(true);
+    // Aura placement is structural, not a persisted preference that can silently no-op.
+    expect('aurasOnPlayerFrame' in BOOL_SETTINGS).toBe(false);
     expect(s.get('joystickDeadzone')).toBe(SETTING_RANGES.joystickDeadzone.def);
     // Interface Mode defaults to Auto (0): detect desktop vs touch from the device.
     expect(s.get('interfaceMode')).toBe(SETTING_RANGES.interfaceMode.def);

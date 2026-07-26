@@ -67,7 +67,15 @@ const PLAYER_OPTS: CastBarOptions = {
 const TARGET_OPTS: CastBarOptions = { resolveCastLabel: (s) => s.label };
 
 function castState(over: Partial<CastBarState> = {}): CastBarState {
-  return { visible: true, channel: false, fill: 0.8, label: 'fireball', fishing: false, ...over };
+  return {
+    visible: true,
+    channel: false,
+    fill: 0.8,
+    label: 'fireball',
+    fishing: false,
+    interruptible: true,
+    ...over,
+  };
 }
 function consumeState(over: Partial<ConsumeBarState> = {}): ConsumeBarState {
   return { visible: true, fill: 0.5, mode: 'eat', remaining: 9, ...over };
@@ -78,6 +86,7 @@ const HIDDEN_CAST: CastBarState = {
   fill: 0,
   label: '',
   fishing: false,
+  interruptible: false,
 };
 
 function paint(input: CastBarPaintInput, opts: CastBarOptions): Call[] {
@@ -97,6 +106,8 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(calls).toEqual([
       { m: 'setDisplay', args: [BAR, 'block'] },
       { m: 'toggleClass', args: [BAR, 'channel', false] },
+      { m: 'toggleClass', args: [BAR, 'interruptible', true] },
+      { m: 'toggleClass', args: [BAR, 'uninterruptible', false] },
       { m: 'setWidth', args: [FILL, '80.0%'] },
       { m: 'setText', args: [LABEL, 'LOC:fireball'] },
       { m: 'setText', args: [TIMER, timer(0.5)] },
@@ -116,6 +127,15 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(calls).toContainEqual({ m: 'setText', args: [LABEL, 'LOC:arcane_missiles'] });
   });
 
+  it('uses mutually exclusive structural interruptibility classes', () => {
+    const calls = paint(
+      { cast: castState({ interruptible: false }), castRemaining: 1 },
+      TARGET_OPTS,
+    );
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'interruptible', false] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'uninterruptible', true] });
+  });
+
   it('paints the eat/drink overlay from the mode discriminator via t(), channel on', () => {
     const eat = paint(
       { cast: HIDDEN_CAST, castRemaining: 0, consume: consumeState() },
@@ -124,6 +144,8 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(eat).toEqual([
       { m: 'setDisplay', args: [BAR, 'block'] },
       { m: 'toggleClass', args: [BAR, 'channel', true] },
+      { m: 'toggleClass', args: [BAR, 'interruptible', false] },
+      { m: 'toggleClass', args: [BAR, 'uninterruptible', false] },
       { m: 'setWidth', args: [FILL, '50.0%'] },
       { m: 'setText', args: [LABEL, t('hud.core.eating')] },
       { m: 'setText', args: [TIMER, timer(9)] },
@@ -159,6 +181,8 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(calls).toEqual([
       { m: 'setDisplay', args: [BAR, 'none'] },
       { m: 'toggleClass', args: [BAR, 'channel', false] },
+      { m: 'toggleClass', args: [BAR, 'interruptible', false] },
+      { m: 'toggleClass', args: [BAR, 'uninterruptible', false] },
       { m: 'setWidth', args: [FILL, '0%'] },
       { m: 'setText', args: [LABEL, ''] },
       { m: 'setText', args: [TIMER, ''] },
@@ -178,6 +202,8 @@ describe('CastBarPainter: the target instance (raw label, no eat/drink, display-
     expect(calls).toEqual([
       { m: 'setDisplay', args: [BAR, 'block'] },
       { m: 'toggleClass', args: [BAR, 'channel', false] },
+      { m: 'toggleClass', args: [BAR, 'interruptible', true] },
+      { m: 'toggleClass', args: [BAR, 'uninterruptible', false] },
       { m: 'setWidth', args: [FILL, '50.0%'] },
       { m: 'setText', args: [LABEL, 'nythraxis_deathless_rage'] },
       { m: 'setText', args: [TIMER, timer(5)] },

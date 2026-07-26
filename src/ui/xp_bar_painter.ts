@@ -12,6 +12,9 @@ import type { XpBarView } from './xp_bar';
 // The custom property the fill fraction is mirrored into (read by the bar's CSS,
 // and by the player frame's portrait ring). A driven value, never a color literal.
 const XP_FILL_PROP = '--xp-fill';
+// The square portrait perimeter paints rested XP as a second segment after the
+// earned-XP segment, so CSS needs the combined endpoint rather than two widths.
+const XP_RESTED_END_PROP = '--xp-rested-end';
 // The rested-overlay geometry: a standard property each, driven via setStyleProp so
 // the one .rested element can hold both in the multi-slot cache.
 const RESTED_LEFT_PROP = 'left';
@@ -35,8 +38,12 @@ export class XpBarPainter {
   paint(view: XpBarView): void {
     const fillPct = `${(view.fillFrac * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`;
     const fillFrac4 = view.fillFrac.toFixed(XP_FILL_FRACTION_DIGITS);
+    const restedEndFrac4 = Math.min(1, view.fillFrac + view.restedFrac).toFixed(
+      XP_FILL_FRACTION_DIGITS,
+    );
     this.writers.setWidth(this.fill, fillPct);
     this.writers.setStyleProp(this.bar, XP_FILL_PROP, fillFrac4);
+    this.writers.setStyleProp(this.bar, XP_RESTED_END_PROP, restedEndFrac4);
     this.writers.setStyleProp(this.playerFrame, XP_FILL_PROP, fillFrac4);
     // Rested overlay sits ahead of the fill (classic inn-rested bonus preview).
     this.writers.setStyleProp(this.rested, RESTED_LEFT_PROP, fillPct);
@@ -46,6 +53,8 @@ export class XpBarPainter {
       `${(view.restedFrac * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`,
     );
     this.writers.setText(this.label, view.label);
+    this.writers.setAttr(this.bar, 'aria-valuenow', String(Math.round(view.fillFrac * 100)));
+    this.writers.setAttr(this.bar, 'aria-valuetext', view.label);
     this.writers.toggleClass(this.bar, XP_OVERFLOW_CLASS, view.postCap);
     this.writers.toggleClass(this.bar, XP_RESTED_CLASS, view.restedFrac > 0);
   }

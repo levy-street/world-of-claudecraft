@@ -20,6 +20,12 @@ export interface PortraitFrameParams {
   extentFrac: number;
 }
 
+export interface PortraitAimPoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
 const HEADSHOT: PortraitFrameParams = {
   fov: 26,
   // look lower so the head/shoulders sit higher in the frame
@@ -41,4 +47,20 @@ const BODY: PortraitFrameParams = {
  *  model's own bounding-box height. Pure, no THREE/DOM dependency. */
 export function portraitFrameParams(framing: PortraitFraming): PortraitFrameParams {
   return framing === 'body' ? BODY : HEADSHOT;
+}
+
+/** Aim from the normalized character-body axis, not the complete scene bounds.
+ *  Held weapons and asymmetric accessories belong in the render but must not
+ *  pull the face away from the optical centre of a portrait. */
+export function portraitAimPoint(
+  framing: PortraitFraming,
+  bodyHeight: number,
+  bodyFloorY = 0,
+): PortraitAimPoint {
+  const height = Math.max(0.001, bodyHeight);
+  return {
+    x: 0,
+    y: bodyFloorY + portraitFrameParams(framing).targetYFromFeetFrac * height,
+    z: 0,
+  };
 }

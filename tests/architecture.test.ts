@@ -219,6 +219,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/target_of_target_view.ts',
   'src/ui/stance_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_layout_core.ts',

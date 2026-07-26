@@ -119,6 +119,9 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
   });
 
   it('keeps a full raid roster reachable inside the landscape viewport', () => {
+    // The compact HUD applies --mobile-chrome-scale: 0.85. Raid tiles must clamp
+    // after that scale so their interactive row never falls below the touch floor.
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const frames = el('div', {
       id: 'party-frames',
       class: 'party-expanded party-style-raid',
@@ -134,12 +137,22 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     frames.append(chip, rows);
     document.body.appendChild(frames);
 
+    expectAtLeastFloor(rows.firstElementChild as HTMLElement, 'compact raid party-frame');
+
     const rect = rows.getBoundingClientRect();
     expect(rect.right).toBeLessThanOrEqual(window.innerWidth + EPSILON);
     expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight + EPSILON);
-    expect(rows.scrollHeight).toBeGreaterThan(rows.clientHeight);
-    rows.scrollTop = rows.scrollHeight;
-    expect(rows.scrollTop).toBeGreaterThan(0);
+    // Landscape raids stay clear of the movement joystick by using two rows.
+    // At smaller automatic HUD scales the whole roster can fit; otherwise the
+    // same strip must expose the remainder through horizontal scrolling.
+    const last = rows.lastElementChild as HTMLElement;
+    if (rows.scrollWidth > rows.clientWidth) {
+      rows.scrollLeft = rows.scrollWidth;
+      expect(rows.scrollLeft).toBeGreaterThan(0);
+      expect(last.getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth + EPSILON);
+    } else {
+      expect(last.getBoundingClientRect().right).toBeLessThanOrEqual(rect.right + EPSILON);
+    }
   });
 
   it('the Leave Party context-menu action', () => {

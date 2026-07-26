@@ -343,12 +343,13 @@ describe('below-target CSS derives from the measured bottom', () => {
     expect(rule).toContain('margin: calc(-1 * var(--party-rows-frame-pad));');
   });
 
-  it('strip box owns its hanging timer text (wrap row gap + last-row padding)', () => {
-    // The wrap row gap reserves the 13px .buff .dur overhang between rows and
-    // the bottom padding folds the last row's timers into the measured box.
-    const strip = hudCss.match(/#target-frame > #tf-debuffs \{([^}]*)\}/)?.[1] ?? '';
-    expect(strip).toContain('gap: 17px 4px;');
-    expect(strip).toContain('padding-bottom: 13px;');
+  it('premium target aura rows stay above the frame with inset timers', () => {
+    const debuffs = hudCss.match(/#target-frame > #tf-debuffs \{([^}]*)\}/)?.[1] ?? '';
+    const buffs = hudCss.match(/#target-frame > #tf-buffs \{([^}]*)\}/)?.[1] ?? '';
+    expect(debuffs).toContain('bottom: calc(100% + 8px);');
+    expect(buffs).toContain('bottom: calc(100% + 52px);');
+    expect(hudCss).toContain('.buff .dur {');
+    expect(hudCss).not.toContain('padding-bottom: 13px;');
   });
 
   it('mobile base tier: var-driven top and a measured joystick-clearing rows bound', () => {

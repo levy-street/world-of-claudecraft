@@ -755,13 +755,16 @@ export const nl_NL: EnTranslations = {
       "targetLabel": "Je Doelwit",
       "targetAnnounce": "Markeer {name}",
       "targetOfTargetLabel": "Doelwit van het doelwit",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Je Bende",
       "partyChip": "Groep",
       "partyGroup": "Groep {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "u",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Voorbeeld van Personagemodel"
@@ -1056,7 +1059,10 @@ export const nl_NL: EnTranslations = {
       "uiScale": "UI-schaal",
       "playerFrameScale": "Schaal spelerframe",
       "targetFrameScale": "Schaal doelwitframe",
-      "aurasOnPlayerFrame": "Buffs op het spelerframe",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Doelwit van doelwit tonen",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
       "walkByAutoloot": "Buit oprapen in het voorbijgaan",
@@ -1068,7 +1074,6 @@ export const nl_NL: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showThirdActionBar": "Derde actiebalk tonen",
-      "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",

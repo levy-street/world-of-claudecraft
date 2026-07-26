@@ -47,6 +47,11 @@ import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
+import {
+  applyHudVisualQaScenario,
+  hudVisualQaDesktop,
+  hudVisualQaPartySize,
+} from './game/hud_visual_qa';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
@@ -591,7 +596,14 @@ function syncCommunityMenuMode(): void {
 
 // Honor a persisted Interface Mode override before the first layout paint, so a
 // tablet+keyboard player who chose Desktop never flashes the touch UI on load.
-setInterfaceMode(interfaceModeFromSetting(new Settings().get('interfaceMode')));
+const hudQaPartySizeAtBoot = import.meta.env.DEV
+  ? hudVisualQaPartySize(window.location.search)
+  : null;
+const hudQaDesktopAtBoot = import.meta.env.DEV ? hudVisualQaDesktop(window.location.search) : false;
+const hudQaForcesTouch = hudQaPartySizeAtBoot !== null && !hudQaDesktopAtBoot;
+setInterfaceMode(
+  hudQaForcesTouch ? 'touch' : interfaceModeFromSetting(new Settings().get('interfaceMode')),
+);
 syncAppViewport();
 syncBuildInfo();
 scheduleNativeUpdateCheck(__APP_VERSION__);
@@ -1219,6 +1231,12 @@ async function startGame(
   // through IWorld). Private instanced practice works online AND offline, so the
   // button is always available.
   hud.setVcupPracticeAvailable(true);
+
+  // Dev-only visual matrix: real responsive HUD screenshots for 3/5-player
+  // parties and a 10-player raid. Inert in production and in normal dev play.
+  if (offlineSim && hudQaPartySizeAtBoot !== null) {
+    console.info('[hud-qa]', applyHudVisualQaScenario(offlineSim, hud, hudQaPartySizeAtBoot));
+  }
 
   const chatInput = $('#chat-input') as unknown as HTMLTextAreaElement;
   const clickMoveMarker = $('#click-move-marker') as HTMLDivElement;
@@ -2048,7 +2066,7 @@ async function startGame(
         // Desktop/touch override: update the resolver, then re-apply the layout
         // (body class, stable viewport) and the on-screen controls live so the
         // switch takes effect without a reload.
-        setInterfaceMode(interfaceModeFromSetting(v));
+        setInterfaceMode(hudQaForcesTouch ? 'touch' : interfaceModeFromSetting(v));
         syncPhoneTouchClass();
         syncAppViewport();
         mobileControls.refreshInterfaceMode();
@@ -2089,6 +2107,15 @@ async function startGame(
       case 'targetFrameScale':
         document.documentElement.style.setProperty('--target-frame-scale', String(v));
         break;
+      case 'unitFrameHealthText':
+        // Read live by Hud.update; persistence above is the only page-level work needed.
+        break;
+      case 'unitFrameDamageTrail':
+        document.body.classList.toggle('unit-frame-damage-trail-off', !v);
+        break;
+      case 'unitFramePortraitEffects':
+        document.body.classList.toggle('unit-frame-portrait-effects-off', !v);
+        break;
       case 'partyFrameScale':
         document.documentElement.style.setProperty('--party-frame-scale', String(v));
         break;
@@ -2109,9 +2136,6 @@ async function startGame(
       case 'partyFrameStyle':
         // Read live by Hud.updatePartyFrames; persistence above is the only
         // page-level work needed.
-        break;
-      case 'aurasOnPlayerFrame':
-        hud.setAurasOnPlayerFrame(!!v);
         break;
       // Graphics-tier HUD effects follow the STATIC preset + the advanced
       // effectsQuality slider. The 3D renderer tier is resolved at renderer

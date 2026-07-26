@@ -234,43 +234,30 @@
       <span class="ctm-arrow ctm-s"></span>
       <span class="ctm-arrow ctm-w"></span>
     </div>
-    <div id="target-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel" aria-label="Your Mark">
+    <div id="target-frame" class="unitframe unitframe-absent" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel" aria-label="Your Mark" aria-hidden="true">
       <div class="portrait-wrap">
-        <div class="portrait"><canvas id="tf-portrait" width="54" height="54"></canvas></div>
+        <div class="portrait"><canvas id="tf-portrait" width="58" height="58"></canvas></div>
         <div class="level-chip" id="tf-level"></div>
         <div id="tf-elite-tag" data-i18n="hud.core.elite">ELITE</div>
+        <div class="uf-status-strip" aria-hidden="true"><span class="uf-status-icon quest"></span><span class="uf-status-icon disconnected"></span></div>
       </div>
       <div class="uf-bars">
         <div class="uf-name" id="tf-name"></div>
-        <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
+        <span id="tf-threat-indicator" class="tf-threat-indicator" role="img" aria-hidden="true"></span>
+        <div class="bar hp" id="tf-hpbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar-health-trail" id="tf-hp-trail"></div><div class="bar-fill" id="tf-hp"></div><div class="bar-health-prediction" id="tf-hp-prediction"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div><div class="bar-percent" id="tf-hp-percent" aria-hidden="true"></div></div>
         <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
         <div class="uf-discord" id="tf-discord"></div>
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
       </div>
-      <div class="uf-buffs" id="tf-debuffs"></div>
-      <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
-           who the current target is targeting. A #target-frame child that hides with the
-           whole frame when there is no target; hud.css anchors it BESIDE the frame's
-           right edge (the below-frame band belongs to the #tf-debuffs strip) and
-           compounds the target frame scale into its own mini zoom. Its own unit_frame
-           painter toggles it flex/none when the target-of-target is known/unknown.
-           Portrait + name + hp bar only (no resource/cast/debuffs). -->
-      <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark">
-        <div class="portrait-wrap">
-          <div class="portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
-          <div class="level-chip" id="totf-level"></div>
-        </div>
-        <div class="uf-bars">
-          <div class="uf-name" id="totf-name"></div>
-          <div class="bar hp"><div class="bar-fill" id="totf-hp"></div><div class="bar-text" id="totf-hp-text"></div></div>
-        </div>
-      </div>
+      <div class="uf-auras uf-target-buffs" id="tf-buffs"></div>
+      <div class="uf-auras uf-target-debuffs" id="tf-debuffs"></div>
+      <button id="tf-target-target" class="tf-target-target" type="button" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark" aria-hidden="true" tabindex="-1">
+        <span class="tf-tot-portrait" aria-hidden="true"><canvas id="tf-tot-portrait" width="58" height="58"></canvas></span>
+        <span class="tf-tot-copy"><span class="tf-tot-name" id="tf-tot-name"></span><span class="tf-tot-hp" aria-hidden="true"><span class="tf-tot-hp-fill" id="tf-tot-hp"></span></span></span>
+      </button>
     </div>
 
     <div id="party-frames" role="group" data-i18n-aria="hudChrome.unitFrame.partyLabel" aria-label="Your Band"></div>
-
-    <div id="buff-bar"></div>
-    <div id="debuff-bar"></div>
 
     <div id="ctx-menu" class="panel"></div>
     <div id="prompt-stack"></div>
@@ -343,24 +330,26 @@
         <div id="actionbar-stack">
           <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
             <div class="portrait-wrap">
-              <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+              <div class="portrait"><canvas id="pf-portrait" width="58" height="58"></canvas></div>
+              <div id="xpbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria="game.xp.suffix" aria-label="XP" tabindex="0"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
               <div class="level-chip" id="pf-level">1</div>
-              <div class="combat-flash" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat">⚔</div>
+              <div class="combat-flash" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"></div>
               <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
+              <div id="stancebar"></div>
             </div>
             <div class="uf-bars">
               <div class="uf-name" id="pf-name"></div>
               <div class="combo-row" id="combo-row"></div>
-              <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
+              <div class="bar hp" id="pf-hpbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="bar-health-trail" id="pf-hp-trail"></div><div class="bar-fill" id="pf-hp"></div><div class="bar-health-prediction" id="pf-hp-prediction"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div><div class="bar-percent" id="pf-hp-percent" aria-hidden="true">100%</div></div>
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
             </div>
+            <div id="buff-bar"></div>
+            <div id="debuff-bar"></div>
           </div>
           <div id="petbar" class="panel"></div>
-          <div id="stancebar"></div>
           <div id="actionbar3" class="panel"></div>
           <div id="actionbar2" class="panel"></div>
           <div id="actionbar" class="panel"></div>
-          <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
         </div>
         <div id="meters-window" class="panel">
           <div class="panel-title">

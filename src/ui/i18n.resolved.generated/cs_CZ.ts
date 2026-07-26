@@ -755,13 +755,16 @@ export const cs_CZ: EnTranslations = {
       "targetLabel": "Tvoje značka",
       "targetAnnounce": "Označit {name}",
       "targetOfTargetLabel": "Značka tvé značky",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Tvoje družina",
       "partyChip": "Skupina",
       "partyGroup": "Skupina {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "min",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Náhled modelu postavy"
@@ -1056,7 +1059,10 @@ export const cs_CZ: EnTranslations = {
       "uiScale": "Měřítko UI",
       "playerFrameScale": "Měřítko rámu hráče",
       "targetFrameScale": "Měřítko rámu cíle",
-      "aurasOnPlayerFrame": "Buffy na rámu hráče",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Zobrazit cíl cíle",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
       "walkByAutoloot": "Automatická kořist při průchodu",
@@ -1068,7 +1074,6 @@ export const cs_CZ: EnTranslations = {
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showThirdActionBar": "Zobrazit třetí panel akcí",
-      "showTargetOfTarget": "Zobrazit cíl cíle",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",

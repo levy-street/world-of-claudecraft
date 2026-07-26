@@ -548,6 +548,7 @@
 
   /* ---------- unit frames ---------- */
   .unitframe {
+    --unit-accent: var(--border);
     position: absolute;
     top: 12px;
     display: flex;
@@ -557,12 +558,23 @@
   #player-frame {
     position: relative;
     top: auto;
-    left: auto;
-    width: 612px;
-    margin: 0 auto 6px;
+    /* The player and target live in different containing blocks so they can
+       still be moved independently. These paired defaults compensate for the
+       unequal frame widths: together they form a centered 590px cluster with
+       a deliberate 12px visual gap and one shared top edge. */
+    left: 0;
+    width: 304px;
+    margin: 0 auto 8px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    transition: left var(--dur-fast) ease-out;
+  }
+  /* No target uses the centred base position above. When a target is present,
+     the same short transition opens the paired 12px-gap layout. */
+  body:not(.mobile-touch) #ui:has(#target-frame:not(.unitframe-absent))
+    #player-frame:not(.pf-detached) {
+    left: -143px;
   }
   /* Player Frame Scale (--player-frame-scale, playerFrameScale setting): zoom
      like the global --ui-scale, so portrait, bars, and pips shrink or grow
@@ -574,10 +586,10 @@
     zoom: var(--player-frame-scale, 1);
   }
   #player-frame .uf-bars {
-    flex: 1;
-    width: auto;
+    flex: none;
+    width: 232px;
     min-width: 0;
-    max-width: 520px;
+    max-width: 232px;
   }
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
@@ -596,13 +608,34 @@
   }
   #player-frame.pf-detached .uf-bars {
     flex: none;
-    width: 190px;
+    width: 232px;
   }
   #target-frame {
-    left: 12px;
-    top: 12px;
-    display: none;
+    left: calc(50% + 18px);
+    top: auto;
+    bottom: 76px;
+    display: flex;
     z-index: 6;
+    opacity: 1;
+    visibility: visible;
+    scale: 1;
+    transition:
+      opacity var(--dur-fast) ease-out,
+      scale var(--dur-fast) ease-out,
+      visibility 0s;
+  }
+  body.show-actionbar2 #target-frame {
+    bottom: 134px;
+  }
+  #target-frame.unitframe-absent {
+    opacity: 0;
+    visibility: hidden;
+    scale: 0.98;
+    pointer-events: none;
+    transition:
+      opacity var(--dur-fast) ease-in,
+      scale var(--dur-fast) ease-in,
+      visibility 0s var(--dur-fast);
   }
   /* Target Frame Scale (--target-frame-scale, targetFrameScale setting): the
      player frame's twin. Children only, never the drag-positioned frame itself
@@ -611,77 +644,161 @@
   #target-frame > :not(.tf-move-btn) {
     zoom: var(--target-frame-scale, 1);
   }
-  /* The target's debuff strip hangs BELOW the frame (WoW-style) instead of
-     living inside the uf-bars panel, where every fresh debuff used to stretch
-     the frame taller. A direct #target-frame child (index.html), absolutely
-     anchored under the frame, wrapping left-to-right from its left edge, and
-     sharing the children-zoom scale above. */
-  #target-frame > #tf-debuffs {
+  /* Target auras hang above the frame without resizing it or colliding with the
+     XP/action bars below. Harmful effects stay closest; quieter buffs sit above. */
+  #target-frame > .uf-auras {
     position: absolute;
-    top: calc(100% + 6px);
     left: 0;
     display: flex;
     flex-wrap: wrap;
-    /* Each icon's duration text hangs 13px BELOW it, out of flow (.buff .dur,
-       bottom: -13px), so the wrap row gap reserves that height (13px + the 4px
-       visual gap) or a wrapped row paints over the previous row's timers, and
-       the bottom padding folds the LAST row's timers into the strip's own box,
-       so the measured below-target bottom (party_below_target_painter.ts)
-       covers them too. */
-    gap: 17px 4px;
-    padding-bottom: 13px;
+    align-items: center;
+    gap: 4px;
     max-width: 100%;
     pointer-events: auto;
   }
-  /* Target of Target (showTargetOfTarget option): a smaller twin of the target
-     frame, a #target-frame child anchored BESIDE the frame's right edge, top
-     aligned, so the whole below-frame band belongs to the #tf-debuffs strip (the
-     old below-right anchor shared that band and collided with the strip's first
-     wrapped row at real aura counts). The gap clears the unscaled 24px
-     .tf-move-btn that overhangs the frame corner by 10px. The extra #target-frame
-     id in the selector outranks the children-zoom rule above so the mini zoom
-     actually applies; it compounds --target-frame-scale explicitly to stay
-     proportional at any scale. Percentage offsets resolve against the unzoomed
-     containing block but px lengths are multiplied by the element's zoom, so the
-     gap divides by the same factor to stay a true 18px (clear of the button) at
-     every scale. Shown by its own unit_frame painter only when the
-     target-of-target is known. Portrait + name + hp bar only: no resource rail,
-     cast bar, elite tag, or level chip. A far-right-dragged target frame can push
-     the mini offscreen, the same clipping the debuff strip accepts in extreme
-     drag positions. */
-  #target-frame > #totarget-frame {
+  #target-frame > #tf-debuffs {
+    top: auto;
+    bottom: calc(100% + 8px);
+  }
+  #target-frame > #tf-buffs {
+    top: auto;
+    bottom: calc(100% + 52px);
+  }
+  #target-frame:has(> #tf-debuffs:empty) > #tf-buffs {
+    bottom: calc(100% + 8px);
+  }
+  /* Target-of-target is a compact satellite on the open side of the target
+     frame. That keeps it clear of both the action bar below and aura rows above. */
+  .tf-target-target {
+    --tot-accent: var(--color-friendly);
     position: absolute;
-    left: calc(100% + 18px / (0.74 * var(--target-frame-scale, 1)));
-    top: 0;
-    z-index: 7;
-    zoom: calc(0.74 * var(--target-frame-scale, 1));
+    left: calc(100% + 7px);
+    top: 29px;
     display: none;
-  }
-  /* Boss-ranked target: the boss chrome moves the move button further outside
-     the corner (top: -18px; right: -30px, below) and the dragon emblem
-     overhangs the portrait side by 15px at children-zoom, so the beside-gap
-     widens to a true 36px to clear both. */
-  #target-frame.boss > #totarget-frame {
-    left: calc(100% + 36px / (0.74 * var(--target-frame-scale, 1)));
-  }
-  /* Standard portrait-left orientation: the old right-edge hug flipped the mini
-     bars-first; beside the frame it reads like every other unit frame. The
-     #target-frame prefix outranks the LATER #target-frame .portrait-wrap /
-     .uf-bars mirror rules below, which otherwise win the same-specificity tie
-     on source order and mirror the mini too. */
-  #target-frame > #totarget-frame .portrait-wrap {
-    order: 1;
-  }
-  #target-frame > #totarget-frame .uf-bars {
-    order: 2;
+    align-items: center;
     width: 132px;
-    margin-left: -16px;
-    margin-right: 0;
-    border-radius: 11px 6px 6px 11px;
-    padding: 4px 8px 4px 22px;
+    height: 36px;
+    padding: 3px 7px 3px 3px;
+    border: 1px solid color-mix(in srgb, var(--tot-accent) 58%, var(--border));
+    border-radius: 7px;
+    background:
+      linear-gradient(
+        105deg,
+        color-mix(in srgb, var(--tot-accent) 13%, transparent),
+        transparent 62%
+      ),
+      linear-gradient(180deg, #171b23f2, #090b10f2);
+    color: var(--color-text);
+    box-shadow:
+      0 3px 10px #000b,
+      inset 0 1px 0 color-mix(in srgb, var(--tot-accent) 22%, transparent);
+    cursor: var(--cursor-point);
+    z-index: 5;
   }
-  #totarget-frame .level-chip {
-    display: none;
+  .tf-target-target::before {
+    content: "";
+    position: absolute;
+    top: 17px;
+    right: 100%;
+    width: 8px;
+    height: 1px;
+    background: color-mix(in srgb, var(--tot-accent) 62%, var(--border));
+    box-shadow: 0 1px 2px #000b;
+  }
+  .tf-target-target::after {
+    content: "";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 5px;
+    height: 5px;
+    border: 1px solid color-mix(in srgb, var(--tot-accent) 76%, #fff);
+    background: color-mix(in srgb, var(--tot-accent) 72%, transparent);
+    opacity: 0.68;
+    transform: rotate(45deg);
+  }
+  .tf-tot-portrait {
+    position: relative;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--tot-accent) 68%, var(--border));
+    border-radius: 5px;
+    background: var(--color-bg-dark);
+    box-shadow: inset 0 0 7px #0009;
+  }
+  .tf-tot-portrait canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: saturate(1.04) contrast(1.04);
+  }
+  .tf-tot-copy {
+    min-width: 0;
+    flex: 1;
+    margin-left: 6px;
+  }
+  .tf-tot-name {
+    display: block;
+    overflow: hidden;
+    padding-right: 7px;
+    color: color-mix(in srgb, var(--tot-accent) 38%, var(--color-text));
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: left;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px #000;
+    white-space: nowrap;
+  }
+  .tf-tot-hp {
+    position: relative;
+    display: block;
+    height: 5px;
+    overflow: hidden;
+    border: 1px solid #05070a;
+    border-radius: 2px;
+    background: #080b0d;
+    box-shadow: inset 0 1px 2px #000d;
+  }
+  .tf-tot-hp-fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #47c95f, #16782b);
+    box-shadow: inset 0 1px 0 #b9ffc55c;
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  .tf-target-target.health-danger .tf-tot-hp-fill {
+    background: linear-gradient(180deg, #ef5b4f, #9d241d);
+  }
+  .tf-target-target.is-dead {
+    filter: grayscale(0.74);
+    opacity: 0.72;
+  }
+  .tf-target-target.is-self {
+    --tot-accent: var(--gold);
+    border-color: var(--gold);
+    box-shadow:
+      0 3px 10px #000c,
+      0 0 calc(7px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 34%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--gold) 30%, transparent);
+  }
+  .tf-target-target.is-self .tf-tot-name {
+    color: #fff0b0;
+    text-shadow:
+      0 1px 2px #000,
+      0 0 5px color-mix(in srgb, var(--gold) 26%, transparent);
+  }
+  .tf-target-target:hover {
+    border-color: color-mix(in srgb, var(--tot-accent) 82%, #fff);
+    translate: 1px 0;
+  }
+  .tf-target-target:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   /* Movable unit frames: the small corner toggle (built by MovableFrame in
      movable_frame.ts) that unlocks
@@ -701,7 +818,7 @@
     background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
     color: var(--color-text-muted);
     cursor: var(--cursor-point);
-    opacity: 0.6;
+    opacity: 0.14;
     z-index: 7;
     box-shadow:
       inset 0 1px 0 #ffffff14,
@@ -710,6 +827,9 @@
       opacity 0.12s ease,
       border-color 0.12s ease,
       color 0.12s ease;
+  }
+  .unitframe:hover .tf-move-btn {
+    opacity: 0.62;
   }
   .unitframe .tf-move-btn::before {
     content: "";
@@ -765,20 +885,25 @@
   }
   .portrait-wrap {
     position: relative;
-    width: 64px;
-    height: 64px;
+    width: 68px;
+    height: 68px;
     z-index: 2;
+    isolation: isolate;
   }
   .portrait {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid var(--border);
-    outline: 1px solid #000;
-    background: radial-gradient(circle at 35% 30%, #3a3a4e, #14141c);
+    position: relative;
+    width: 64px;
+    height: 64px;
+    z-index: 1;
+    border-radius: 10px;
+    border: 3px solid color-mix(in srgb, var(--unit-accent) 72%, var(--border));
+    outline: 2px solid var(--color-bg-dark);
+    background: linear-gradient(145deg, #343a46 0%, #1b2029 48%, var(--color-bg-dark) 100%);
     box-shadow:
-      0 2px 8px #000c,
-      inset 0 0 12px #0009;
+      0 3px 12px #000c,
+      0 0 calc(7px * var(--fx-shadow, 1)) color-mix(in srgb, var(--unit-accent) 28%, transparent),
+      inset 0 0 0 1px var(--color-accent-glint),
+      inset 0 0 14px #0009;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -789,14 +914,206 @@
     width: 100%;
     height: 100%;
     display: block;
-    border-radius: 50%;
+    border-radius: 7px;
+    background:
+      radial-gradient(
+        circle at 48% 32%,
+        color-mix(in srgb, var(--unit-accent) 22%, #303745) 0,
+        transparent 48%
+      ),
+      linear-gradient(155deg, #202631, #080b10 76%);
+    filter: saturate(1.08) contrast(1.04);
+  }
+  .portrait::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border: 1px solid color-mix(in srgb, var(--unit-accent) 44%, transparent);
+    border-radius: 14px;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-bg-dark) 72%, transparent);
+    pointer-events: none;
+  }
+  .portrait::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border: 1px solid color-mix(in srgb, var(--color-accent-glint) 72%, transparent);
+    border-radius: 7px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .unitframe.portrait-dead .portrait canvas {
+    filter: grayscale(1) contrast(0.88) brightness(0.54);
+  }
+  .unitframe.portrait-ghost .portrait canvas {
+    filter: grayscale(0.72) sepia(0.16) hue-rotate(168deg) brightness(1.08);
+    opacity: 0.78;
+  }
+  .unitframe.portrait-form .portrait,
+  .unitframe.portrait-polymorph .portrait {
+    border-radius: 13px 7px 13px 7px;
+  }
+  .unitframe.portrait-mech .portrait::after {
+    border-radius: 3px;
+    box-shadow: inset 0 0 7px color-mix(in srgb, var(--color-mana) 36%, transparent);
+  }
+  .unitframe.portrait-transformed .portrait::after {
+    box-shadow:
+      inset 0 0 9px color-mix(in srgb, #9f72ff 42%, transparent),
+      0 0 calc(6px * var(--fx-shadow, 1)) color-mix(in srgb, #9f72ff 34%, transparent);
+  }
+  .uf-status-strip {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    z-index: 5;
+    display: flex;
+    gap: 3px;
+    pointer-events: none;
+  }
+  .uf-status-icon {
+    position: relative;
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: #10141bf2;
+    box-shadow: 0 2px 5px #000b;
+  }
+  #target-frame.target-quest .uf-status-icon.quest {
+    display: grid;
+    place-items: center;
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  #target-frame.target-quest .uf-status-icon.quest::before {
+    content: "!";
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 16px;
+  }
+  #target-frame.target-disconnected .uf-status-icon.disconnected {
+    display: block;
+    border-color: color-mix(in srgb, var(--color-text-muted) 72%, var(--border));
+    color: var(--color-text-muted);
+  }
+  #target-frame.target-disconnected .uf-status-icon.disconnected::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    margin: 3px;
+    background: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7.8%2015.2H6a4%204%200%200%201%200-8h3v2H6a2%202%200%201%200%200%204h1.8v2Zm8.4-6.4H18a4%204%200%200%201%200%208h-3v-2h3a2%202%200%201%200%200-4h-1.8v-2ZM8%2011h8v2H8v-2Zm-4.7-8.7%2018.4%2018.4-1.4%201.4L1.9%203.7l1.4-1.4Z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7.8%2015.2H6a4%204%200%200%201%200-8h3v2H6a2%202%200%201%200%200%204h1.8v2Zm8.4-6.4H18a4%204%200%200%201%200%208h-3v-2h3a2%202%200%201%200%200-4h-1.8v-2ZM8%2011h8v2H8v-2Zm-4.7-8.7%2018.4%2018.4-1.4%201.4L1.9%203.7l1.4-1.4Z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  /* XP is a structural perimeter around the player's portrait plate, not a
+     second horizontal bar competing with health, resource, and the hotbar.
+     The portrait-wrap owns the geometry, so the track follows frame scale and
+     remains attached when the player frame is moved. */
+  #player-frame .portrait-wrap #xpbar {
+    --xp-fill: 0;
+    --xp-rested-end: 0;
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    width: 74px;
+    height: 74px;
+    margin: 0;
+    z-index: 0;
+    border: 0;
+    outline: 0;
+    border-radius: 15px;
+    background: transparent;
+    overflow: visible;
+    cursor: help;
+  }
+  #player-frame .portrait-wrap #xpbar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 3px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from -45deg,
+      #f6e3a1 0turn calc(var(--xp-fill, 0) * 1turn),
+      #68b7ee calc(var(--xp-fill, 0) * 1turn) calc(var(--xp-rested-end, 0) * 1turn),
+      #333a46 calc(var(--xp-rested-end, 0) * 1turn) 1turn
+    );
+    box-shadow:
+      0 0 calc(8px * var(--fx-shadow, 1)) #e8c76540,
+      inset 0 0 0 1px #fff2b426;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  #player-frame .portrait-wrap #xpbar.rested::before {
+    box-shadow:
+      0 0 calc(9px * var(--fx-shadow, 1)) #68b7ee52,
+      inset 0 0 0 1px #d9f0ff30;
+  }
+  #player-frame .portrait-wrap #xpbar.overflow::before {
+    background: conic-gradient(
+      from -45deg,
+      #fff1a6 0turn calc(var(--xp-fill, 0) * 1turn),
+      #574619 calc(var(--xp-fill, 0) * 1turn) 1turn
+    );
+    box-shadow:
+      0 0 calc(10px * var(--fx-shadow, 1)) #f5c84366,
+      inset 0 0 0 1px #fff7c33d;
+  }
+  #player-frame .portrait-wrap #xpbar .fill,
+  #player-frame .portrait-wrap #xpbar .rested,
+  #player-frame .portrait-wrap #xpbar .ticks {
+    display: none;
+  }
+  #player-frame .portrait-wrap #xpbar .label {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 7px);
+    width: max-content;
+    max-width: 280px;
+    padding: 4px 8px;
+    border: 1px solid color-mix(in srgb, var(--gold-dim) 72%, #29303b);
+    border-radius: 4px;
+    background: linear-gradient(180deg, #191b22f5, #090b10f5);
+    color: var(--color-text);
+    font-size: 10px;
+    line-height: 1.35;
+    text-align: center;
+    text-shadow: 0 1px 1px #000;
+    white-space: nowrap;
+    opacity: 0;
+    translate: -50% 3px;
+    transition:
+      opacity var(--dur-fast) ease-out,
+      translate var(--dur-fast) ease-out;
+    pointer-events: none;
+    z-index: 8;
+  }
+  #player-frame .portrait-wrap #xpbar:hover .label,
+  #player-frame .portrait-wrap #xpbar:focus-visible .label {
+    opacity: 1;
+    translate: -50% 0;
+  }
+  #player-frame .portrait-wrap #xpbar:focus-visible::before {
+    filter: drop-shadow(0 0 3px var(--color-border-focus));
   }
   .level-chip {
     position: absolute;
-    bottom: -3px;
-    left: -3px;
-    width: 24px;
-    height: 24px;
+    bottom: -2px;
+    left: -2px;
+    width: 22px;
+    height: 22px;
     background: radial-gradient(circle at 40% 35%, #4a3a14, #241c08);
     border: 2px solid var(--gold-dim);
     border-radius: 50%;
@@ -820,13 +1137,23 @@
     align-items: center;
     justify-content: center;
     color: #ff5040;
-    font-size: 15px;
-    line-height: 1;
     z-index: 4;
     pointer-events: none;
     text-shadow:
       0 0 4px #000,
       0 0 6px #ff5040;
+  }
+  .combat-flash::before {
+    content: "";
+    width: 15px;
+    height: 15px;
+    background: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Cpath%20d='M2%201.5h2l4.1%204.1%204.1-4.1h2v2l-4.1%204.1%201.4%201.4%201.2-.4%202.1%202.1-1.1%201.1.7.7-1.4%201.4-.7-.7-1.1%201.1-2.1-2.1.4-1.2L8.1%209.7%206.7%2011l.4%201.2L5%2014.3l-1.1-1.1-.7.7-1.4-1.4.7-.7-1.1-1.1%202.1-2.1%201.2.4%201.4-1.4L2%203.5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Cpath%20d='M2%201.5h2l4.1%204.1%204.1-4.1h2v2l-4.1%204.1%201.4%201.4%201.2-.4%202.1%202.1-1.1%201.1.7.7-1.4%201.4-.7-.7-1.1%201.1-2.1-2.1.4-1.2L8.1%209.7%206.7%2011l.4%201.2L5%2014.3l-1.1-1.1-.7.7-1.4-1.4.7-.7-1.1-1.1%202.1-2.1%201.2.4%201.4-1.4L2%203.5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
   }
   #player-frame.combat .combat-flash {
     display: flex;
@@ -844,32 +1171,248 @@
       0 0 calc(8px * var(--fx-shadow, 1)) #e74c3c99,
       inset 0 0 12px #0009;
   }
+  #player-frame.combat .uf-bars {
+    border-color: color-mix(in srgb, var(--gold-dim) 68%, #253a56);
+    box-shadow:
+      0 3px 12px #000b,
+      inset 0 1px 0 color-mix(in srgb, var(--gold) 24%, transparent),
+      inset 0 0 10px color-mix(in srgb, var(--color-health-damage) 13%, transparent);
+  }
+  #player-frame.resting .portrait {
+    border-color: color-mix(in srgb, var(--color-mana) 58%, var(--border));
+  }
+  #player-frame.resting .uf-bars {
+    border-color: color-mix(in srgb, var(--color-mana) 42%, var(--border));
+  }
   .uf-bars {
-    width: 190px;
-    margin-left: -8px;
-    padding: 5px 8px 5px 14px;
+    position: relative;
+    width: 232px;
+    margin-left: -10px;
+    padding: 6px 9px 6px 16px;
     background: var(--panel-bg);
     border: 2px solid var(--border);
-    outline: 1px solid #000;
-    border-radius: 0 6px 6px 0;
-    box-shadow: 0 2px 10px #000a;
+    outline: 1px solid var(--color-bg-dark);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    box-shadow:
+      0 3px 12px #000b,
+      inset 0 1px 0 color-mix(in srgb, var(--color-accent-glint) 30%, transparent);
+  }
+  #player-frame .uf-bars {
+    border-color: color-mix(in srgb, var(--gold-dim) 64%, #263a55);
+    background:
+      linear-gradient(
+        102deg,
+        color-mix(in srgb, var(--color-mana) 14%, transparent),
+        transparent 44%
+      ),
+      var(--panel-bg);
+    box-shadow:
+      0 4px 14px #000c,
+      inset 0 1px 0 color-mix(in srgb, var(--gold) 24%, transparent),
+      inset -10px 0 18px color-mix(in srgb, var(--color-mana) 7%, transparent);
+  }
+  #player-frame .uf-bars::before,
+  #target-frame .uf-bars::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 8px;
+    left: 8px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--gold-dim) 34%,
+      var(--gold) 58%,
+      transparent
+    );
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  #player-frame .uf-bars::after,
+  #target-frame .uf-bars::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    right: 3px;
+    width: 2px;
+    height: 20px;
+    border-radius: 2px;
+    background: var(--gold-dim);
+    box-shadow: 0 0 calc(5px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 45%, transparent);
+    opacity: 0.78;
+    pointer-events: none;
+  }
+  /* Self is still the active gameplay target, but is represented once. The
+     gold edge and small diamond are a restrained, non-color-only selection cue. */
+  #player-frame.self-targeted .uf-bars {
+    border-color: var(--gold);
+    box-shadow:
+      0 4px 14px #000c,
+      0 0 calc(8px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 32%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--gold) 30%, transparent),
+      inset -10px 0 18px color-mix(in srgb, var(--color-mana) 7%, transparent);
+  }
+  #player-frame.self-targeted .uf-bars::after {
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: var(--gold);
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 58%, transparent);
+    opacity: 1;
+    transform: rotate(45deg);
   }
   #target-frame .portrait-wrap {
     order: 2;
   }
-  /* The disc sits as a medallion over the bar's right end: enough overlap that
-     the circle covers the bar's (rounded) seam-side corners (no poke, no crescent
-     gap), with extra right padding so the HP bar/text never slips under the disc. */
+  /* The portrait plate locks over the bar's right end, matching the player's
+     left-hand plate while keeping HP text clear of the seam. */
   #target-frame .uf-bars {
     order: 1;
+    width: 232px;
     margin-left: 0;
-    margin-right: -18px;
-    border-radius: 6px 11px 11px 6px;
-    padding: 5px 26px 5px 8px;
+    margin-right: -20px;
+    border-radius: var(--radius-sm) 12px 12px var(--radius-sm);
+    padding: 6px 28px 6px 9px;
   }
   #target-frame .level-chip {
     left: auto;
-    right: -3px;
+    right: -2px;
+  }
+  #target-frame.hostile .uf-bars {
+    border-color: color-mix(in srgb, var(--color-hostile) 72%, #4a241f);
+    background:
+      linear-gradient(
+        258deg,
+        color-mix(in srgb, var(--color-hostile) 15%, transparent),
+        transparent 48%
+      ),
+      linear-gradient(170deg, #191315f2 0%, #0d0a0cf2 66%, #090708f2 100%);
+    box-shadow:
+      0 4px 14px #000c,
+      inset 0 1px 0 color-mix(in srgb, var(--color-hostile) 26%, transparent),
+      inset 10px 0 18px color-mix(in srgb, var(--color-hostile) 8%, transparent);
+  }
+  #target-frame.hostile .uf-bars::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--color-hostile) 78%, #9d391f) 38%,
+      var(--color-hostile) 64%,
+      transparent
+    );
+  }
+  #target-frame.hostile .uf-bars::after {
+    right: auto;
+    left: 3px;
+    background: var(--color-hostile);
+    box-shadow: 0 0 calc(7px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-hostile) 56%, transparent);
+  }
+  #target-frame.hostile .uf-name {
+    position: relative;
+    padding-left: 13px;
+    text-shadow:
+      0 1px 2px var(--color-bg-dark),
+      0 0 7px color-mix(in srgb, var(--color-hostile) 34%, transparent);
+  }
+  #target-frame.hostile .uf-name::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 2px;
+    width: 6px;
+    height: 6px;
+    background: var(--color-hostile);
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-hostile) 56%, transparent);
+    transform: rotate(45deg);
+  }
+  #player-frame .portrait::before {
+    border-color: transparent;
+    box-shadow: none;
+  }
+  #target-frame.hostile .portrait::before {
+    border-color: color-mix(in srgb, var(--color-hostile) 68%, transparent);
+  }
+  #target-frame.hostile .level-chip {
+    background: radial-gradient(circle at 40% 35%, #4a211b, #1c0b0a);
+    border-color: color-mix(in srgb, var(--color-hostile) 78%, #8f382b);
+    color: #ffd9d3;
+    box-shadow:
+      0 2px 6px #000c,
+      inset 0 1px 0 #ffffff1c;
+  }
+  #target-frame.friendly .uf-bars {
+    border-color: var(--border);
+  }
+  .tf-threat-indicator {
+    position: absolute;
+    top: 8px;
+    right: 31px;
+    z-index: 4;
+    display: none;
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    filter: drop-shadow(0 0 calc(3px * var(--fx-shadow, 1)) currentColor);
+    pointer-events: none;
+  }
+  .tf-threat-indicator::before,
+  .tf-threat-indicator::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    clip-path: inherit;
+  }
+  .tf-threat-indicator::before {
+    right: 8px;
+  }
+  .tf-threat-indicator::after {
+    right: 16px;
+  }
+  #target-frame.threat-building .tf-threat-indicator,
+  #target-frame.threat-high .tf-threat-indicator,
+  #target-frame.threat-aggro .tf-threat-indicator {
+    display: block;
+  }
+  #target-frame.threat-building .tf-threat-indicator {
+    color: var(--color-energy);
+  }
+  #target-frame.threat-building .tf-threat-indicator::before,
+  #target-frame.threat-building .tf-threat-indicator::after,
+  #target-frame.threat-high .tf-threat-indicator::after {
+    display: none;
+  }
+  #target-frame.threat-high .tf-threat-indicator {
+    color: #ff9a43;
+  }
+  #target-frame.threat-high .uf-bars {
+    border-color: color-mix(in srgb, #ff9a43 72%, var(--border));
+  }
+  #target-frame.threat-aggro .tf-threat-indicator {
+    color: var(--color-health-damage);
+    animation: target-threat-pulse calc(720ms * var(--motion-scale, 1)) ease-in-out infinite;
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  #target-frame.threat-aggro .uf-bars {
+    border-color: var(--color-health-damage);
+    box-shadow:
+      0 4px 14px #000c,
+      0 0 calc(9px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-health-damage) 40%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-health-damage) 28%, transparent);
+  }
+  @keyframes target-threat-pulse {
+    50% {
+      opacity: 0.52;
+    }
   }
   /* The target's power bar rail is ALWAYS present (classic WoW look): a
      resource-less target (a plain beast) keeps every type class off, its fill
@@ -918,10 +1461,14 @@
     }
   }
   .uf-name {
-    font-size: 13px;
-    font-weight: bold;
-    font-family: var(--title-font);
+    min-height: 17px;
+    font-size: 15px;
+    line-height: 17px;
+    font-weight: 700;
+    font-family: var(--font-label);
     color: var(--gold);
+    font-variant: small-caps;
+    letter-spacing: 0.045em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -939,11 +1486,29 @@
   .bar {
     position: relative;
     height: 15px;
-    background: #1a1a1a;
-    border: 1px solid #000;
+    background: color-mix(in srgb, var(--color-bg-dark) 88%, var(--panel-base));
+    border: 1px solid var(--color-bg-dark);
+    outline: 1px solid color-mix(in srgb, var(--border) 52%, transparent);
     margin-top: 3px;
     border-radius: 2px;
     overflow: hidden;
+  }
+  .unitframe .hp {
+    height: 18px;
+    border-color: color-mix(in srgb, var(--color-bg-dark) 88%, black);
+    outline-color: color-mix(in srgb, var(--border) 70%, transparent);
+    border-radius: 3px;
+    background:
+      linear-gradient(to bottom, #ffffff0a, transparent 30%),
+      color-mix(in srgb, var(--color-bg-dark) 92%, var(--panel-base));
+    box-shadow:
+      inset 0 1px 0 #ffffff12,
+      inset 0 -1px 0 #000b,
+      0 1px 3px #0008;
+  }
+  .unitframe .bar:not(.hp) {
+    height: 12px;
+    margin-top: 3px;
   }
   .bar-fill {
     position: absolute;
@@ -951,10 +1516,248 @@
     width: 100%;
     transform-origin: left;
     background-image: linear-gradient(
-      rgba(255, 255, 255, 0.25),
-      rgba(255, 255, 255, 0.02) 45%,
-      rgba(0, 0, 0, 0.15)
+      rgba(255, 255, 255, 0.32),
+      rgba(255, 255, 255, 0.05) 42%,
+      rgba(0, 0, 0, 0.22)
     );
+  }
+  .unitframe .hp .bar-fill {
+    --hp-state-color: var(--color-hp);
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--hp-state-color) 66%, white) 0 1px,
+      color-mix(in srgb, var(--hp-state-color) 94%, white) 1px 42%,
+      color-mix(in srgb, var(--hp-state-color) 76%, black) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 #ffffff36,
+      inset 0 -1px 0 #0008;
+  }
+  .unitframe.health-wounded .hp .bar-fill {
+    --hp-state-color: color-mix(in srgb, var(--color-energy) 76%, var(--color-health-damage));
+  }
+  .unitframe.health-critical .hp .bar-fill {
+    --hp-state-color: var(--color-health-damage);
+  }
+  #target-frame.hostile.health-healthy .hp .bar-fill,
+  #target-frame.hostile.health-full .hp .bar-fill {
+    --hp-state-color: color-mix(in srgb, var(--color-hostile) 82%, #a51f1f);
+  }
+  #target-frame.hostile.health-wounded .hp .bar-fill {
+    --hp-state-color: color-mix(in srgb, var(--color-hostile) 58%, var(--color-energy));
+  }
+  #target-frame.hostile.health-critical .hp .bar-fill {
+    --hp-state-color: color-mix(in srgb, var(--color-health-damage) 78%, white);
+  }
+  .unitframe .hp .bar-fill {
+    z-index: 2;
+    transition: transform var(--dur-frame) cubic-bezier(0.2, 0.72, 0.2, 1);
+  }
+  .bar-health-trail {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-health-damage) 84%, white),
+      var(--color-health-damage)
+    );
+    transition: transform 420ms cubic-bezier(0.18, 0.68, 0.2, 1) 180ms;
+  }
+  .bar-health-prediction {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--incoming-start, 0%);
+    z-index: 3;
+    width: 0;
+    background: repeating-linear-gradient(
+      115deg,
+      color-mix(in srgb, var(--color-hp) 64%, white) 0 4px,
+      color-mix(in srgb, var(--color-health-heal) 64%, transparent) 4px 8px
+    );
+    border-right: 1px solid color-mix(in srgb, var(--color-health-heal) 74%, transparent);
+    box-shadow: inset 0 0 5px color-mix(in srgb, var(--color-health-heal) 44%, transparent);
+    opacity: 0.82;
+    pointer-events: none;
+    animation: unit-heal-prediction calc(900ms * var(--motion-scale, 1)) linear infinite;
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  @keyframes unit-heal-prediction {
+    to {
+      background-position: 16px 0;
+    }
+  }
+  .unitframe .hp::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: 5;
+    background-image: linear-gradient(
+      to right,
+      transparent calc(100% - 1px),
+      color-mix(in srgb, var(--color-bg-dark) 48%, transparent) calc(100% - 1px)
+    );
+    background-size: 10% 100%;
+    opacity: 0.62;
+    pointer-events: none;
+  }
+  .hp.health-heal-a .bar-health-trail,
+  .hp.health-heal-b .bar-health-trail {
+    transition: transform var(--dur-fast) ease-out;
+  }
+  .unitframe .hp::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hp.health-damage-a::after {
+    animation: unit-health-damage-a var(--dur-panel) ease-out;
+  }
+  .hp.health-damage-b::after {
+    animation: unit-health-damage-b var(--dur-panel) ease-out;
+  }
+  .hp.health-damage-heavy-a::after {
+    animation: unit-health-damage-heavy-a var(--dur-panel) ease-out;
+  }
+  .hp.health-damage-heavy-b::after {
+    animation: unit-health-damage-heavy-b var(--dur-panel) ease-out;
+  }
+  .hp.health-heal-a::after {
+    animation: unit-health-heal-a var(--dur-panel) ease-out;
+  }
+  .hp.health-heal-b::after {
+    animation: unit-health-heal-b var(--dur-panel) ease-out;
+  }
+  @keyframes unit-health-damage-a {
+    from {
+      opacity: 0.95;
+      box-shadow: inset 0 0 8px 2px var(--color-health-damage);
+    }
+    to {
+      opacity: 0;
+      box-shadow: inset 0 0 1px 0 transparent;
+    }
+  }
+  @keyframes unit-health-damage-b {
+    from {
+      opacity: 0.95;
+      box-shadow: inset 0 0 8px 2px var(--color-health-damage);
+    }
+    to {
+      opacity: 0;
+      box-shadow: inset 0 0 1px 0 transparent;
+    }
+  }
+  @keyframes unit-health-damage-heavy-a {
+    from {
+      opacity: 1;
+      background: color-mix(in srgb, var(--color-health-damage) 36%, transparent);
+      box-shadow: inset 0 0 13px 3px var(--color-health-damage);
+    }
+    to {
+      opacity: 0;
+      background: transparent;
+      box-shadow: inset 0 0 1px 0 transparent;
+    }
+  }
+  @keyframes unit-health-damage-heavy-b {
+    from {
+      opacity: 1;
+      background: color-mix(in srgb, var(--color-health-damage) 36%, transparent);
+      box-shadow: inset 0 0 13px 3px var(--color-health-damage);
+    }
+    to {
+      opacity: 0;
+      background: transparent;
+      box-shadow: inset 0 0 1px 0 transparent;
+    }
+  }
+  @keyframes unit-health-heal-a {
+    from {
+      opacity: 0.42;
+      background-image: linear-gradient(
+        100deg,
+        transparent 0 40%,
+        color-mix(in srgb, var(--color-hp) 42%, transparent) 48%,
+        color-mix(in srgb, var(--color-health-heal) 54%, transparent) 51%,
+        transparent 59% 100%
+      );
+      background-position: 100% 0;
+      background-size: 220% 100%;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-hp) 30%, transparent);
+    }
+    to {
+      opacity: 0;
+      background-position: -100% 0;
+      box-shadow: inset 0 0 0 1px transparent;
+    }
+  }
+  @keyframes unit-health-heal-b {
+    from {
+      opacity: 0.42;
+      background-image: linear-gradient(
+        100deg,
+        transparent 0 40%,
+        color-mix(in srgb, var(--color-hp) 42%, transparent) 48%,
+        color-mix(in srgb, var(--color-health-heal) 54%, transparent) 51%,
+        transparent 59% 100%
+      );
+      background-position: 100% 0;
+      background-size: 220% 100%;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-hp) 30%, transparent);
+    }
+    to {
+      opacity: 0;
+      background-position: -100% 0;
+      box-shadow: inset 0 0 0 1px transparent;
+    }
+  }
+  .unitframe:has(.hp.health-damage-a) .portrait,
+  .unitframe:has(.hp.health-damage-b) .portrait {
+    animation: unit-portrait-damage var(--dur-fast) ease-out;
+  }
+  .unitframe:has(.hp.health-damage-heavy-a) .portrait,
+  .unitframe:has(.hp.health-damage-heavy-b) .portrait {
+    animation: unit-portrait-heavy-hit var(--dur-panel) cubic-bezier(0.18, 0.78, 0.24, 1);
+  }
+  .unitframe:has(.hp.health-heal-a) .portrait::after,
+  .unitframe:has(.hp.health-heal-b) .portrait::after {
+    animation: unit-portrait-heal var(--dur-panel) ease-out;
+  }
+  @keyframes unit-portrait-damage {
+    35% {
+      translate: -1px 0;
+      filter: brightness(1.16) saturate(1.12);
+    }
+  }
+  @keyframes unit-portrait-heavy-hit {
+    22% {
+      translate: -2px 0;
+      filter: brightness(1.26) saturate(1.2);
+    }
+    46% {
+      translate: 1px 0;
+    }
+  }
+  @keyframes unit-portrait-heal {
+    from {
+      border-color: color-mix(in srgb, var(--color-hp) 42%, var(--unit-accent));
+      box-shadow: inset 0 0 7px color-mix(in srgb, var(--color-hp) 30%, transparent);
+    }
+  }
+  body.unit-frame-damage-trail-off .unitframe .bar-health-trail {
+    display: none;
+  }
+  body.unit-frame-portrait-effects-off .unitframe .portrait,
+  body.unit-frame-portrait-effects-off .unitframe .portrait::after {
+    animation: none !important;
   }
   .bar-text {
     position: absolute;
@@ -962,9 +1765,49 @@
     text-align: center;
     font-size: 11px;
     line-height: 15px;
-    color: #fff;
-    text-shadow: 1px 1px 1px #000;
+    z-index: 7;
+    color: var(--color-text-light);
+    text-shadow:
+      0 1px 1px var(--color-bg-dark),
+      0 0 3px var(--color-bg-dark);
     font-weight: bold;
+    font-variant-numeric: tabular-nums;
+  }
+  .unitframe .hp .bar-text {
+    inset: 0 40px 0 5px;
+    line-height: 18px;
+    text-align: center;
+    letter-spacing: 0.015em;
+  }
+  .unitframe .bar:not(.hp) .bar-text {
+    line-height: 12px;
+    font-size: 9px;
+  }
+  .bar-percent {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    z-index: 8;
+    min-width: 34px;
+    height: 12px;
+    padding: 0 3px;
+    border-left: 1px solid #ffffff24;
+    border-radius: 2px;
+    background: #05050870;
+    color: color-mix(in srgb, var(--color-text-light) 88%, var(--color-text-muted));
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 12px;
+    text-align: right;
+    text-shadow: 0 1px 1px var(--color-bg-dark);
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+  }
+  #target-frame.hostile .bar-percent {
+    border-left-color: color-mix(in srgb, var(--color-hostile) 54%, transparent);
+    background: color-mix(in srgb, #180908 78%, transparent);
+    color: #ffe1dc;
   }
   .hp .bar-fill {
     background-color: var(--color-hp);
@@ -982,7 +1825,9 @@
      translucent segment laid over the health bar, extending past current health. */
   .bar-absorb {
     position: absolute;
-    inset: 0;
+    top: 0;
+    bottom: 0;
+    left: var(--absorb-start, 0%);
     width: 100%;
     transform-origin: left;
     transform: scaleX(0);
@@ -993,7 +1838,32 @@
     );
     box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.4);
     pointer-events: none;
-    transition: transform 0.12s linear;
+    z-index: 4;
+    transition: transform var(--dur-fast) linear;
+  }
+  .unitframe.health-full .hp {
+    outline-color: color-mix(in srgb, var(--color-hp) 52%, var(--border));
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      inset 0 -1px 0 #000b,
+      0 0 calc(5px * var(--fx-shadow, 1)) color-mix(in srgb, var(--color-hp) 26%, transparent);
+  }
+  #target-frame.hostile.health-full .hp {
+    outline-color: color-mix(in srgb, var(--color-hostile) 55%, var(--border));
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      inset 0 -1px 0 #000b,
+      0 0 calc(5px * var(--fx-shadow, 1)) color-mix(in srgb, var(--color-hostile) 28%, transparent);
+  }
+  #target-frame.dead .portrait canvas {
+    filter: grayscale(1) contrast(0.88) brightness(0.52);
+  }
+  #target-frame.dead .uf-bars {
+    border-color: color-mix(in srgb, var(--color-text-muted) 42%, var(--border));
+    filter: saturate(0.38);
+  }
+  #target-frame.dead .bar-percent {
+    display: none;
   }
   .bar-absorb.overshield {
     background: repeating-linear-gradient(
@@ -1002,6 +1872,29 @@
       rgba(255, 214, 90, 0.24) 5px 10px
     );
     box-shadow: inset 0 0 7px rgba(255, 225, 140, 0.6);
+  }
+  .unitframe.health-danger .uf-bars {
+    border-color: color-mix(in srgb, var(--color-health-damage) 66%, var(--border));
+    animation: unit-frame-danger calc(920ms * var(--motion-scale, 1)) ease-in-out infinite;
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  .unitframe.health-danger .portrait {
+    border-color: color-mix(in srgb, var(--color-health-damage) 70%, var(--border));
+  }
+  #player-frame.health-danger .uf-bars {
+    border-color: color-mix(in srgb, var(--gold-dim) 64%, var(--color-health-damage));
+  }
+  @keyframes unit-frame-danger {
+    0%,
+    100% {
+      box-shadow: 0 3px 12px #000b;
+    }
+    50% {
+      box-shadow:
+        0 3px 12px #000b,
+        0 0 calc(10px * var(--fx-shadow, 1))
+        color-mix(in srgb, var(--color-health-damage) 48%, transparent);
+    }
   }
   /* Low-mana/energy warning: the resource fill pulses brighter and a short
      caption appears at the end of the bar. Driven by --lr-opacity / --lr-pulse
@@ -1053,6 +1946,29 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
+    #player-frame {
+      transition: none;
+    }
+    .unitframe .hp .bar-fill,
+    .bar-health-trail,
+    .bar-health-prediction {
+      transition: none;
+    }
+    .bar-health-prediction {
+      animation: none;
+    }
+    .hp.health-damage-a::after,
+    .hp.health-damage-b::after,
+    .hp.health-damage-heavy-a::after,
+    .hp.health-damage-heavy-b::after,
+    .hp.health-heal-a::after,
+    .hp.health-heal-b::after,
+    .unitframe.health-danger .uf-bars,
+    .unitframe .portrait,
+    .unitframe .portrait::after,
+    #target-frame.threat-aggro .tf-threat-indicator {
+      animation: none;
+    }
     .bar.low .bar-fill,
     .low-resource-label {
       animation: none;
@@ -1107,59 +2023,124 @@
     max-width: 320px;
     pointer-events: auto;
   }
-  /* Buffs on the Player Frame (aurasOnPlayerFrame): hud.ts reparents the BUFF
-     row into #player-frame, where it inherits its position and children-zoom
-     scale. Docked, the row sits ABOVE the frame (the xp/action bars live
-     below); moved (pf-detached), it sits BELOW it, reading like the target
-     frame's debuff strip. The row runs left-to-right from the frame's left edge. */
-  #player-frame > #buff-bar {
+  /* Premium player aura hierarchy. Debuffs are the priority row closest to the
+     frame; buffs sit above it at lower visual weight. Both are direct children,
+     so they follow frame movement and player-frame scale. */
+  #player-frame > #buff-bar,
+  #player-frame > #debuff-bar {
     right: auto;
-    left: 0;
+    /* Start over the HP rail, after a four-pixel seam from the widest
+       three-button stance dock in the portrait column. */
+    left: 80px;
     top: auto;
-    bottom: calc(100% + 8px);
     flex-direction: row;
-    max-width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 199px;
   }
-  #player-frame.pf-detached > #buff-bar {
-    bottom: auto;
-    top: calc(100% + 8px);
+  #player-frame > #debuff-bar {
+    bottom: calc(100% + 8px);
+    gap: 5px;
+    padding: 4px 5px;
+    border: 1px solid color-mix(in srgb, var(--color-debuff) 58%, #281316);
+    border-radius: 7px;
+    background: linear-gradient(180deg, #321316e8, #13090bea);
+    box-shadow:
+      0 3px 10px #000b,
+      inset 0 1px 0 color-mix(in srgb, var(--color-debuff) 18%, transparent);
   }
-  /* With the buff row anchored to the frame, the player's own debuffs slide up
-     beside the minimap into the vacated top spot (classic WoW's debuff corner),
-     keeping the right-to-left stacking and wrapping downward from there. */
-  body.auras-on-frame #debuff-bar {
-    top: 14px;
+  #player-frame > #buff-bar {
+    bottom: calc(100% + 56px);
+    gap: 3px;
+    padding: 3px 4px;
+    border: 1px solid color-mix(in srgb, var(--color-buff) 50%, var(--panel-base));
+    border-radius: 6px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-buff) 19%, var(--panel-base)),
+      color-mix(in srgb, var(--color-buff) 7%, var(--panel-base))
+    );
+    box-shadow:
+      0 3px 9px #0009,
+      inset 0 1px 0 color-mix(in srgb, var(--color-buff) 18%, transparent);
   }
-  /* Party member mini aura strip: overlay the compact icons so gaining or losing
-     an aura never changes frame height or shifts the surrounding raid grid. */
+  #player-frame:has(> #debuff-bar:empty) > #buff-bar {
+    bottom: calc(100% + 8px);
+  }
+  #player-frame > #buff-bar:empty,
+  #player-frame > #debuff-bar:empty {
+    display: none;
+  }
+  #player-frame > #buff-bar .buff {
+    width: 24px;
+    height: 24px;
+    border-color: color-mix(in srgb, var(--color-buff) 66%, #4b4e50);
+    opacity: 0.86;
+    filter: saturate(0.86);
+  }
+  #player-frame > #debuff-bar .buff {
+    width: 36px;
+    height: 36px;
+    opacity: 1;
+  }
+  #player-frame > #buff-bar .buff.own {
+    width: 26px;
+    height: 26px;
+  }
+  #player-frame > #debuff-bar .buff.own {
+    width: 38px;
+    height: 38px;
+  }
+  /* Classic party member auras own a compact lane above the HP rail. Keep the
+     lane reserved so effects never cover health/resource information and rows
+     do not jump as effects appear. Raid tiles override this into an overlay. */
   .party-frame .pfm-auras {
-    position: absolute;
-    right: 2px;
-    bottom: 2px;
+    position: relative;
     z-index: 5;
     display: flex;
     flex-wrap: nowrap;
-    max-width: calc(100% - 4px);
-    overflow: hidden;
+    justify-content: flex-end;
+    width: 100%;
+    min-height: 16px;
+    overflow: visible;
     gap: 2px;
-    margin: 0;
+    margin: 2px 0 0;
     pointer-events: auto;
   }
   .pfm-auras .buff {
+    flex: 0 0 16px;
     width: 16px;
     height: 16px;
   }
   .pfm-auras .buff .dur {
     display: block;
-    font-size: 8px;
-    line-height: 1;
+    right: auto;
+    left: 50%;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: calc(100% + 2px);
+    padding: 0 1px;
+    transform: translateX(-50%);
+    font-size: 7px;
+    line-height: 8px;
+    letter-spacing: -0.35px;
+    white-space: nowrap;
+  }
+  .pfm-auras .aura-overflow {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    font-size: 7px;
   }
   .pfm-auras .buff .stacks {
     display: none;
   }
   .buff {
+    --aura-progress: 1;
     width: 28px;
     height: 28px;
+    box-sizing: border-box;
     border: 1px solid var(--color-buff);
     border-radius: 4px;
     position: relative;
@@ -1168,6 +2149,22 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    overflow: visible;
+    isolation: isolate;
+  }
+  /* A conic mask darkens only elapsed time while leaving the remaining arc clear. */
+  .buff.timed::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: 2;
+    border-radius: 2px;
+    background: conic-gradient(
+      from -90deg,
+      transparent 0turn calc(var(--aura-progress, 1) * 1turn),
+      #05070aa8 calc(var(--aura-progress, 1) * 1turn) 1turn
+    );
+    pointer-events: none;
   }
   /* QoL: an aura in its final seconds (auras_view isAuraExpiring) blinks so an
      expiring DoT/buff reads at a glance on the status panels. Opacity floors at
@@ -1240,18 +2237,28 @@
   }
   .buff .dur {
     position: absolute;
-    bottom: -13px;
-    left: 0;
-    right: 0;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
+    z-index: 3;
+    min-height: 10px;
+    border-radius: 0 0 2px 2px;
+    background: linear-gradient(180deg, transparent, #020306e8 52%);
     text-align: center;
-    font-size: 10px;
-    color: #eee;
-    text-shadow: 1px 1px 1px #000;
+    font: 800 9px / 10px var(--body-font);
+    color: #f7f1df;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 2px #000;
+    pointer-events: none;
+  }
+  .buff .dur:empty {
+    display: none;
   }
   .buff .stacks {
     position: absolute;
     top: -4px;
     right: -3px;
+    z-index: 4;
     min-width: 13px;
     height: 13px;
     padding: 0 2px;
@@ -1262,6 +2269,101 @@
     background: rgba(8, 8, 12, 0.92);
     border: 1px solid var(--color-debuff);
     border-radius: 7px;
+  }
+  .buff.expiring {
+    animation-name: aura-expiring-pulse;
+    animation-duration: calc(1.2s * var(--motion-scale, 1));
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  @keyframes aura-expiring-pulse {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+    50% {
+      filter: brightness(1.12)
+        drop-shadow(0 0 3px color-mix(in srgb, var(--color-debuff) 58%, transparent));
+    }
+  }
+  .aura-overflow {
+    width: 28px;
+    height: 28px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--gold-dim) 58%, #26231d);
+    border-radius: 5px;
+    background: linear-gradient(180deg, #25231fe8, #0d0c0bea);
+    box-shadow: inset 0 1px 0 #ffffff12;
+    color: #e8d6a4;
+    font: 800 10px / 1 var(--body-font);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 2px #000;
+  }
+  #player-frame > #buff-bar .aura-overflow,
+  #target-frame > #tf-buffs .aura-overflow {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* The target's own beneficial effects stay quiet; harmful effects get their
+     own red-backed strip closest to the frame. */
+  #target-frame > #tf-debuffs {
+    gap: 5px;
+    padding: 4px 5px;
+    border: 1px solid color-mix(in srgb, var(--color-debuff) 54%, #281316);
+    border-radius: 7px;
+    background: linear-gradient(180deg, #301215e8, #12080aea);
+    box-shadow: 0 3px 10px #000b;
+  }
+  #target-frame > #tf-buffs {
+    gap: 3px;
+    padding: 3px 4px;
+    border: 1px solid color-mix(in srgb, var(--color-buff) 46%, var(--panel-base));
+    border-radius: 6px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-buff) 17%, var(--panel-base)),
+      color-mix(in srgb, var(--color-buff) 6%, var(--panel-base))
+    );
+    box-shadow: 0 3px 9px #0009;
+  }
+  #target-frame > #tf-buffs:empty,
+  #target-frame > #tf-debuffs:empty {
+    display: none;
+  }
+  #target-frame > #tf-buffs .buff {
+    width: 24px;
+    height: 24px;
+    opacity: 0.84;
+    filter: saturate(0.84);
+  }
+  #target-frame > #tf-debuffs .buff {
+    width: 34px;
+    height: 34px;
+  }
+  #target-frame > #tf-buffs .buff.own {
+    width: 27px;
+    height: 27px;
+    opacity: 1;
+  }
+  #target-frame > #tf-debuffs .buff.own {
+    width: 38px;
+    height: 38px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .buff.expiring {
+      animation: none;
+      outline: 1px solid color-mix(in srgb, var(--color-debuff) 50%, transparent);
+    }
+  }
+  body.reduce-motion .buff.expiring {
+    animation: none;
+    outline: 1px solid color-mix(in srgb, var(--color-debuff) 50%, transparent);
   }
 
   /* ---------- cast bar ---------- */
@@ -1285,6 +2387,39 @@
     background: linear-gradient(#ffe48a, #c9941a 60%, #9a6f12);
     box-shadow: inset 0 1px 0 #fff5;
   }
+  #castbar.interruptible::before,
+  #castbar.uninterruptible::before,
+  #tf-castbar.interruptible::before,
+  #tf-castbar.uninterruptible::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 5px;
+    z-index: 4;
+    width: 14px;
+    height: 14px;
+    background: currentColor;
+  }
+  #castbar.interruptible::before,
+  #tf-castbar.interruptible::before {
+    color: #fff0b0;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M13.2%202%206%2013h5l-1%209%208-12h-5l.2-8Z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M13.2%202%206%2013h5l-1%209%208-12h-5l.2-8Z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  #castbar.uninterruptible::before,
+  #tf-castbar.uninterruptible::before {
+    color: #d7e0eb;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='m12%202%208%203v6c0%205.2-3.4%209.5-8%2011-4.6-1.5-8-5.8-8-11V5l8-3Zm0%203.1L7%207v4c0%203.5%202%206.5%205%207.8%203-1.3%205-4.3%205-7.8V7l-5-1.9Z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='m12%202%208%203v6c0%205.2-3.4%209.5-8%2011-4.6-1.5-8-5.8-8-11V5l8-3Zm0%203.1L7%207v4c0%203.5%202%206.5%205%207.8%203-1.3%205-4.3%205-7.8V7l-5-1.9Z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
   #castbar.channel .fill {
     background: linear-gradient(#8ad4ff, #1a74c9 60%, #125a9a);
   }
@@ -1297,6 +2432,7 @@
     color: #fff;
     text-shadow: 1px 1px 2px #000;
     font-family: var(--title-font);
+    padding: 0 26px;
   }
   #castbar .timer {
     position: absolute;
@@ -1340,6 +2476,7 @@
     color: #fff;
     text-shadow: 1px 1px 2px #000;
     font-family: var(--title-font);
+    padding: 0 24px;
   }
   #tf-castbar .timer {
     position: absolute;
@@ -1396,67 +2533,10 @@
     bottom: 6px;
     text-align: center;
   }
-  #xpbar {
-    width: 612px;
-    height: 10px;
-    background: #14101e;
-    border: 1px solid #000;
-    outline: 1px solid #3a3148;
-    margin: 4px auto 0;
-    position: relative;
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  #xpbar .fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(#b85eff, #6a1bb0);
-    transition: background 0.3s;
-  }
-  /* Rested XP overlay (classic inn-rested bonus): a blue segment ahead of the fill. */
-  #xpbar .rested {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    left: 0;
-    width: 0%;
-    background: linear-gradient(#5fb0ff, #2b6fd0);
-    opacity: 0.5;
-  }
-  #xpbar.rested {
-    outline-color: #2b6fd0;
-    box-shadow: 0 0 6px #4a9eff55;
-  }
-  #xpbar .ticks {
-    position: absolute;
-    inset: 0;
-    display: flex;
-  }
-  #xpbar .ticks i {
-    flex: 1;
-    border-right: 1px solid #00000055;
-  }
-  #xpbar .label {
-    position: absolute;
-    inset: 0;
-    font-size: 10px;
-    color: #fff;
-    text-align: center;
-    line-height: 10px;
-    text-shadow: 1px 1px 1px #000;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  #xpbar:hover .label {
-    opacity: 1;
-  }
-  /* Post-cap overflow bar (Max-Level XP Overflow): gold/prestige tint. */
-  #xpbar.overflow {
-    outline-color: #b8902a;
-    box-shadow: 0 0 6px #f5c84355;
-  }
-  #xpbar.overflow .fill {
-    background: linear-gradient(#ffe27a, #d99a1c);
+  /* Screenshot-matrix sessions isolate the persistent combat HUD under review.
+     Normal play never receives this development-only body class. */
+  body.hud-visual-qa #chatlog-wrap {
+    display: none;
   }
   #actionbar-row {
     display: flex;
@@ -1573,24 +2653,39 @@
     font-weight: bold;
     pointer-events: none;
   }
-  /* Warrior stance bar: a small in-flow row of stance toggles above the action
-     bars, only for warriors (JS flips display to flex; hidden by default). */
-  #stancebar {
+  /* Warrior stance dock: reserve the portrait column in the priority-aura band.
+     The dock is lifted to the vertical centre of the debuff row while the aura
+     rows begin over the HP rail, so up to three selectors and the player's
+     effects can share the band without covering one another. */
+  #player-frame #stancebar {
     display: none;
-    margin: 2px 0 0 0;
-    padding: 0;
+    position: absolute;
+    top: auto;
+    bottom: calc(100% + 16px);
+    left: 50%;
+    z-index: 7;
+    margin: 0;
+    padding: 2px;
+    border: 1px solid color-mix(in srgb, var(--gold-dim) 48%, #17140d);
+    border-radius: 6px;
+    background: linear-gradient(180deg, #201d17ed, #090807f2);
+    box-shadow:
+      0 2px 5px #000b,
+      inset 0 1px 0 #ffffff12;
+    transform: translateX(-50%);
   }
   .stancebar-group {
     display: flex;
-    gap: 4px;
+    gap: 3px;
   }
   .stance-btn {
-    width: 40px;
-    height: 40px;
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
     padding: 0;
     position: relative;
-    border: 2px solid #4a3d1d;
-    border-radius: 6px;
+    border: 1px solid #514a3a;
+    border-radius: 4px;
     background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
     color: #f3df9a;
     cursor: var(--cursor-point);
@@ -1599,12 +2694,12 @@
     user-select: none;
     box-shadow:
       inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
+      0 1px 3px #000b;
   }
   .stance-btn .icon-label {
     position: absolute;
     inset: 1px;
-    border-radius: 4px;
+    border-radius: 2px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -1612,6 +2707,8 @@
   }
   .stance-btn:hover {
     border-color: var(--gold);
+    filter: none;
+    opacity: 1;
   }
   .stance-btn:focus-visible {
     outline: 2px solid var(--gold);
@@ -1621,7 +2718,11 @@
     border-color: var(--gold);
     box-shadow:
       inset 0 0 0 1px #ffd10066,
-      0 0 6px #ffd10033;
+      0 0 5px #ffd10052;
+  }
+  .stance-btn:not(.active) {
+    opacity: 0.72;
+    filter: saturate(0.72) brightness(0.84);
   }
   /* A third action row adds 58px to the stack. Lift the cast and swing timers
      by the same amount so 720p layouts keep both timers clear of the stack. */
@@ -4749,58 +5850,115 @@
       opacity 0.2s ease,
       box-shadow 0.2s ease;
   }
-  /* Compact WoW-style raid presentation. The existing pooled row and painter remain
-     unchanged: this profile only rearranges their stable DOM, so mouseover casts,
-     absorbs, incoming healing, threat, Rewind, and auras share one implementation. */
+  /* Compact raid presentation: five class-icon tiles per row. Health remains a
+     proper horizontal strip over each icon rather than turning the entire cell into
+     one oversized bar. The pooled row/painter stays shared with classic parties, so
+     targeting, mouseover casts, absorbs, incoming healing, Rewind, and auras retain
+     the same behavior. */
+  #party-frames.party-style-raid {
+    --party-raid-tile-size: clamp(42px, var(--party-frame-height, 42px), 56px);
+  }
+  #party-frames.party-style-raid .party-rows {
+    grid-template-columns: repeat(5, var(--party-raid-tile-size));
+  }
   #party-frames.party-style-raid .party-frame {
-    height: var(--party-frame-height, 42px);
-    min-height: var(--party-frame-height, 42px);
+    width: var(--party-raid-tile-size);
+    height: var(--party-raid-tile-size);
+    min-height: var(--party-raid-tile-size);
     padding: 0;
     overflow: hidden;
-    border: 1px solid #050505;
-    border-radius: 2px;
-    background: #101010;
-    box-shadow: inset 0 0 0 1px #ffffff14;
+    border: 1px solid color-mix(in srgb, var(--cls) 52%, #050505);
+    border-radius: 5px;
+    background: #090b0f;
+    box-shadow:
+      0 2px 6px #000a,
+      inset 0 0 0 1px #ffffff12;
   }
   #party-frames.party-style-raid .party-frame .pfm-name {
     position: absolute;
-    inset: 2px 4px 5px;
+    inset: 0;
     z-index: 4;
+    display: block;
     min-width: 0;
     pointer-events: none;
   }
-  #party-frames.party-style-raid .party-frame .pfm-name-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
-  }
-  /* Compact raid cells read HP from the bar fill (WoW-style), so the centered
-     percent text is dropped here: in a narrow cell (e.g. landscape phone) it
-     collided with the member name. The bar still conveys HP, so no actionable
-     information is lost. */
-  #party-frames.party-style-raid .party-frame .pfm-hp-text {
-    display: none;
-  }
   #party-frames.party-style-raid .party-frame .pfm-id {
+    position: absolute;
+    inset: 0;
+    display: block;
     min-width: 0;
     color: #fff;
   }
   #party-frames.party-style-raid .party-frame .pfm-crest {
+    position: absolute;
+    inset: 2px;
+    display: block;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    margin: 0;
+    border-radius: 3px;
+    object-fit: cover;
+    opacity: 0.72;
+    filter: saturate(0.86) contrast(1.08) brightness(0.82);
+  }
+  #party-frames.party-style-raid .party-frame .pfm-name-text {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    left: 2px;
+    z-index: 2;
+    overflow: hidden;
+    padding: 1px 2px 5px;
+    background: linear-gradient(180deg, #020306d9 0%, #0203069e 62%, transparent 100%);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 10px;
+    text-align: left;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px #000;
+    white-space: nowrap;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-meta {
+    position: absolute;
+    top: 13px;
+    right: 2px;
+    z-index: 5;
+    gap: 1px;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-meta .lead {
     display: none;
   }
   #party-frames.party-style-raid .party-frame .bar.hp {
     position: absolute;
-    inset: 0 0 3px;
-    height: auto;
+    right: 3px;
+    bottom: 3px;
+    left: 3px;
+    z-index: 7;
+    width: auto;
+    height: 9px;
     margin: 0;
-    border: 0;
-    border-radius: 1px 1px 0 0;
-    background: #171717;
+    overflow: hidden;
+    border: 1px solid #020303;
+    border-radius: 2px;
+    background: #101419e8;
+    box-shadow:
+      0 1px 3px #000d,
+      inset 0 1px 1px #000b;
   }
   #party-frames.party-style-raid .party-frame .bar.hp .bar-fill {
     background-color: var(--cls);
-    filter: saturate(0.82) brightness(0.82);
+    filter: saturate(0.94) brightness(0.96);
+  }
+  #party-frames.party-style-raid .party-frame .pfm-hp-text {
+    display: flex;
+    font-size: 7px;
+    font-weight: 900;
+    line-height: 7px;
+    text-shadow:
+      0 1px 1px #000,
+      1px 0 1px #000,
+      -1px 0 1px #000;
   }
   #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
     position: absolute;
@@ -4809,27 +5967,55 @@
     bottom: 0;
     z-index: 4;
     width: auto;
-    height: 3px;
+    height: 2px;
     margin: 0;
     border: 0;
     border-radius: 0 0 1px 1px;
   }
   #party-frames.party-style-raid .party-frame.pf-hide-resource .bar.hp {
-    bottom: 0;
-    border-radius: 1px;
+    bottom: 3px;
+    border-radius: 2px;
   }
   #party-frames.party-style-raid .party-frame .pfm-auras {
+    position: absolute;
     left: auto;
-    right: 2px;
+    right: 4px;
     top: auto;
-    bottom: 4px;
+    bottom: 13px;
+    width: auto;
+    min-height: 0;
+    margin: 0;
     translate: none;
+    align-items: flex-end;
+    justify-content: flex-start;
+    overflow: visible;
+    gap: 5px;
   }
-  #party-frames.party-style-raid .party-frame .pfm-auras .buff {
-    flex: 0 0 12px;
-    width: 12px;
-    height: 12px;
+  /* Helpful effects stay small and green while harmful effects retain a larger
+     red silhouette. Keep both immediately above the HP rail so the icons read
+     as health context without hiding the class crest or growing the raid grid. */
+  #party-frames.party-style-raid .party-frame .pfm-auras .buff:not(.debuff) {
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
     box-shadow: 0 1px 2px #000;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-auras .buff.debuff {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    box-shadow:
+      0 1px 3px #000,
+      0 0 4px color-mix(in srgb, var(--color-debuff) 28%, transparent);
+  }
+  #party-frames.party-style-raid .party-frame .pfm-auras .aura-overflow {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    font-size: 6px;
   }
   .party-loot {
     width: 170px;
@@ -5481,6 +6667,9 @@
       0 0 12px #ffd10066,
       0 2px 8px #000c;
   }
+  #target-frame.elite .portrait::before {
+    border-color: color-mix(in srgb, var(--gold) 62%, transparent);
+  }
   #tf-elite-tag {
     font-size: 9px;
     color: var(--gold);
@@ -5513,6 +6702,10 @@
     background: transparent;
     box-shadow: none;
   }
+  #target-frame.boss .portrait::before,
+  #target-frame.boss .portrait::after {
+    display: none;
+  }
   #target-frame.boss .level-chip {
     left: 50%;
     right: auto;
@@ -5539,12 +6732,6 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-  }
-
-  #tf-debuffs {
-    display: flex;
-    gap: 3px;
-    margin-top: 3px;
   }
 
   /* ---------- moderator spectate badge ---------- */

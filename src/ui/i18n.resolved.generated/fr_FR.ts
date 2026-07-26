@@ -755,13 +755,16 @@ export const fr_FR: EnTranslations = {
       "targetLabel": "Votre cible",
       "targetAnnounce": "Cible : {name}",
       "targetOfTargetLabel": "Cible de la cible",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Votre groupe",
       "partyChip": "Groupe",
       "partyGroup": "Groupe {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "min",
       "durationUnitHours": "h",
-      "durationUnitDays": "j"
+      "durationUnitDays": "j",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Aperçu du modèle du personnage"
@@ -1056,7 +1059,10 @@ export const fr_FR: EnTranslations = {
       "uiScale": "Échelle de l’interface",
       "playerFrameScale": "Échelle du cadre du joueur",
       "targetFrameScale": "Échelle du cadre de la cible",
-      "aurasOnPlayerFrame": "Améliorations sur le cadre du joueur",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Afficher la cible de la cible",
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
       "walkByAutoloot": "Ramassage auto au passage",
@@ -1068,7 +1074,6 @@ export const fr_FR: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
       "showThirdActionBar": "Afficher la troisième barre d'action",
-      "showTargetOfTarget": "Afficher la cible de la cible",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",

@@ -2,13 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { mobPortraitBackgroundSvg } from '../scripts/lib/mob_portrait_background.mjs';
 
 describe('mobPortraitBackgroundSvg', () => {
-  it('builds a bounded opaque vignette with a family-specific center color', () => {
+  it('builds a bounded opaque plate with a family-specific center color', () => {
     const undead = mobPortraitBackgroundSvg('undead', 128);
     const beast = mobPortraitBackgroundSvg('beast', 128);
 
     expect(undead).toContain('width="128" height="128"');
     expect(undead).toContain('#65527a');
     expect(undead).toContain('#11131a');
+    expect(undead).toContain('<linearGradient id="v"');
+    expect(undead).not.toContain('<circle');
     expect(undead).not.toBe(beast);
   });
 

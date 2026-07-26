@@ -3956,7 +3956,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.sources.gear': 'Vybavené předměty: {value}',
   'hudChrome.statInfo.sources.header': 'Skládá se z:',
   'hudChrome.statInfo.sources.talents': 'Talenty a efekty: {value}',
-  'hudChrome.options.aurasOnPlayerFrame': 'Buffy na rámu hráče',
   'hudChrome.options.browserEffects': 'Efekty prohlížeče',
   'hudChrome.options.browserEffectsAuto': 'Automaticky',
   'hudChrome.options.browserEffectsFull': 'Plné',

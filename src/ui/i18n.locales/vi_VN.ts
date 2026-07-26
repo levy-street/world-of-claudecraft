@@ -2229,7 +2229,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{family} cấp {level}',
   'hudChrome.mobile.hotbarPage': 'Kỹ Năng',
   'hudChrome.mobile.hotbarPageAria': 'Hiện bộ kỹ năng tiếp theo',
-  'hudChrome.options.aurasOnPlayerFrame': 'Hiệu Ứng Có Lợi Trên Khung Người Chơi',
   'hudChrome.options.playerFrameScale': 'Tỷ Lệ Khung Người Chơi',
   'hudChrome.options.showDailyRewardsChest': 'Hiện Rương Phần Thưởng Hằng Ngày',
   'hudChrome.options.showOwnNameplate': 'Hiện Bảng Tên Của Tôi',

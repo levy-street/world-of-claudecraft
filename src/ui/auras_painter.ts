@@ -3,8 +3,7 @@
 // attachTooltip (state.md Top risk 3) with a persistent per-aura node pool: one node
 // per aura key (the aura id), reused across frames, its tooltip attached ONCE and
 // reading a LIVE mutable record, data updated IN PLACE through the host's elided
-// writers. Same painter, two instances: the player buff bar
-// (#buff-bar) and the target strip (#tf-debuffs, mode 'all': buffs AND debuffs).
+// writers. The same painter drives the separate player and target buff/debuff rows.
 //
 // TOP RISK 3 (the load-bearing correctness rule): the pooled record is a MUTABLE
 // object. The tooltip closure attaches ONCE per node and reads `rec.name` / `rec.remaining`
@@ -42,10 +41,9 @@ const CANCELABLE_CLASS = 'cancelable';
 // stylesheet renders it larger so your dots/hots read at a glance among other
 // casters'. Toggled per frame so a recycled node never keeps stale prominence.
 const OWN_CLASS = 'own';
-// Marks an aura in its final seconds (auras_view isAuraExpiring): the stylesheet
-// blinks the icon so an expiring DoT/buff reads at a glance, with a steady
-// brightness fallback under prefers-reduced-motion. Toggled per frame so a
-// recycled node never keeps a stale blink.
+const TIMED_CLASS = 'timed';
+// Marks an aura in its final seconds. Toggled per frame so a recycled node never
+// keeps stale timing or pulse state.
 const EXPIRING_CLASS = 'expiring';
 // Carries the debuff's magic school so the stylesheet tints the border per school
 // (WoW-style poison/magic/curse reads); '' on a buff, so no school selector matches.
@@ -53,6 +51,8 @@ const SCHOOL_ATTR = 'data-school';
 const DUR_CLASS = 'dur';
 const STACKS_CLASS = 'stacks';
 const BACKGROUND_IMAGE_PROP = 'background-image';
+const AURA_PROGRESS_PROP = '--aura-progress';
+const OVERFLOW_CLASS = 'aura-overflow';
 // Pool-key separator for same-id auras. The core keys a slot by the aura id, but one
 // entity can legitimately carry several auras with the SAME id from different sources
 // (the sim dedups by id+sourceId, sim.ts), and the online wire zeroes sourceId, so the
@@ -78,6 +78,10 @@ export interface AurasPainterDeps {
    *  tt-title/tt-sub markup with esc + tPlural). Called lazily on hover, reading the
    *  pooled record's current fields. */
   renderTooltip(name: string, remaining: number, effectHtml: string): string;
+  /** Format the compact visible overflow marker through the active locale. */
+  overflowText(count: number): string;
+  /** Localized accessible description for the buffs summarized by the marker. */
+  overflowLabel(count: number): string;
   /** Attach a lazily-built tooltip to a node (host: Hud.attachTooltip). Called ONCE per
    *  pooled node; the closure reads the live record. */
   attachTooltip(el: HTMLElement, html: () => string): void;
@@ -130,6 +134,10 @@ export class AurasPainter {
   // Monotonic frame stamp for the detach sweep (cheaper than building a key Set each
   // frame). Wraps harmlessly: a record's stamp is rewritten every frame it is active.
   private frame = 0;
+  // One persistent sibling outside the keyed pool. It is inserted on first use,
+  // reconciled last, and hidden rather than destroyed when overflow clears.
+  private readonly overflowEl: HTMLElement;
+  private overflowAttached = false;
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -141,11 +149,14 @@ export class AurasPainter {
     // governor). Read per paint to cap the visible aura count on low. Defaults to the
     // full tier so a painter built without it is untiered (uncapped, byte-faithful).
     private readonly getFxTier: () => UiEffectsTier = () => 'ultra',
-  ) {}
+  ) {
+    this.overflowEl = this.doc.createElement('div');
+    this.overflowEl.className = OVERFLOW_CLASS;
+  }
 
   /** Reconcile the pool to this frame's active auras and repaint each in place. Runs
    *  every frame; the elided writers make an unchanged frame cost no DOM mutation. */
-  paint(state: AurasState): void {
+  paint(state: AurasState, componentVisibleCap = Number.POSITIVE_INFINITY): void {
     this.frame++;
     const { slots, count } = state;
     // On low, cap the number of rendered auras; auras beyond the cap are
@@ -169,12 +180,19 @@ export class AurasPainter {
     // because the wire carries its negative value (server/game.ts sends it sparsely,
     // src/net/online.ts decodes it), so no sap can ride the low buff budget on either host.
     // See auras_view.isAuraDebuff.)
-    const cap = auraVisibleCap(this.getFxTier());
+    const normalizedComponentCap = Number.isNaN(componentVisibleCap)
+      ? Number.POSITIVE_INFINITY
+      : Math.max(0, Math.trunc(componentVisibleCap));
+    const cap = Math.min(auraVisibleCap(this.getFxTier()), normalizedComponentCap);
     this.ordered.length = 0;
     let rendered = 0;
+    let omitted = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
-      if (!s.isDebuff && rendered >= cap) continue; // shed buff overflow; never a debuff
+      if (!s.isDebuff && rendered >= cap) {
+        omitted++;
+        continue; // summarize buff overflow; never shed a debuff
+      }
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a
@@ -219,7 +237,13 @@ export class AurasPainter {
       this.writers.setAttr(rec.el, SCHOOL_ATTR, s.school);
       this.writers.toggleClass(rec.el, CANCELABLE_CLASS, rec.cancelable);
       this.writers.toggleClass(rec.el, OWN_CLASS, s.own);
+      this.writers.toggleClass(rec.el, TIMED_CLASS, s.durationText !== '');
       this.writers.toggleClass(rec.el, EXPIRING_CLASS, s.expiring);
+      this.writers.setStyleProp(
+        rec.el,
+        AURA_PROGRESS_PROP,
+        String(Math.round(s.durationProgress * 1000) / 1000),
+      );
       this.writers.setText(rec.dur, s.durationText);
       const hasStacks = s.stacksText !== '';
       this.writers.setDisplay(rec.stacks, hasStacks ? STACKS_SHOWN : STACKS_HIDDEN);
@@ -238,7 +262,21 @@ export class AurasPainter {
         this.pool.delete(rec.key);
       }
     }
+    this.paintOverflow(omitted);
     this.reconcileOrder();
+  }
+
+  /** Summarize only the buffs hidden by the low-tier cap. Debuffs are never omitted,
+   *  so +N always means “N additional beneficial effects”, not missing danger. */
+  private paintOverflow(omitted: number): void {
+    if (omitted <= 0) {
+      if (this.overflowAttached) this.writers.setDisplay(this.overflowEl, STACKS_HIDDEN);
+      return;
+    }
+    this.writers.setText(this.overflowEl, this.deps.overflowText(omitted));
+    this.writers.setAttr(this.overflowEl, 'aria-label', this.deps.overflowLabel(omitted));
+    this.writers.setDisplay(this.overflowEl, STACKS_SHOWN);
+    this.overflowAttached = true;
   }
 
   /** Build one aura node (.buff > .dur + .stacks) and attach its tooltip ONCE. The
@@ -291,6 +329,12 @@ export class AurasPainter {
       } else {
         this.container.insertBefore(rec.el, ref);
       }
+    }
+    if (!this.overflowAttached) return;
+    if (this.overflowEl === ref) {
+      ref = ref.nextSibling;
+    } else {
+      this.container.insertBefore(this.overflowEl, ref);
     }
   }
 }

@@ -44,6 +44,7 @@ function aura(over: Partial<AuraInput> & { id: string }): AuraInput {
     name: over.id,
     kind: 'buff_ap',
     remaining: 10,
+    duration: 10,
     value: 1,
     ...over,
   };
@@ -164,7 +165,7 @@ describe('createAurasView: derivation per mode', () => {
     expect(state.slots.slice(0, 2).map((s) => s.name)).toEqual(['name:A', 'name:B']);
   });
 
-  it('derives icon key, debuff flag, duration text, stacks text, name, and remaining', () => {
+  it('derives icon key, debuff flag, duration sweep, expiry state, stacks, name, and remaining', () => {
     const state = createAurasView('all', deps()).tick(
       entity([
         aura({
@@ -172,6 +173,7 @@ describe('createAurasView: derivation per mode', () => {
           name: 'Gaping Wounds',
           kind: 'dot',
           remaining: 4.2,
+          duration: 10,
           value: 5,
           stacks: 5,
         }),
@@ -182,6 +184,8 @@ describe('createAurasView: derivation per mode', () => {
     expect(s.iconKey).toBe('deep_wounds');
     expect(s.isDebuff).toBe(true);
     expect(s.durationText).toBe('5s'); // ceil(4.2) = 5
+    expect(s.durationProgress).toBeCloseTo(0.42);
+    expect(s.expiring).toBe(true);
     expect(s.stacksText).toBe('5');
     expect(s.name).toBe('name:Gaping Wounds');
     expect(s.remaining).toBe(4.2);
@@ -222,6 +226,22 @@ describe('createAurasView: derivation per mode', () => {
     expect(slot.effectHtml).toBe('hudChrome.auraEffect.elementalConvergencePrimed');
   });
 
+  it('pulses only timed auras at five seconds or less and keeps toggles quiet', () => {
+    const v = createAurasView('all', deps());
+    expect(
+      v.tick(entity([aura({ id: 'steady', remaining: 5.01, duration: 10 })])).slots[0].expiring,
+    ).toBe(false);
+    expect(
+      v.tick(entity([aura({ id: 'urgent', remaining: 5, duration: 10 })])).slots[0].expiring,
+    ).toBe(true);
+    const toggle = v.tick(
+      entity([aura({ id: 'stealth', kind: 'stealth', remaining: 4, duration: 3600 })]),
+    ).slots[0];
+    expect(toggle.durationText).toBe('');
+    expect(toggle.durationProgress).toBe(1);
+    expect(toggle.expiring).toBe(false);
+  });
+
   it('derives the debuff school for the border tint (physical fallback; buffs carry none)', () => {
     const state = createAurasView('all', deps()).tick(
       entity([
@@ -245,16 +265,23 @@ describe('createAurasView: derivation per mode', () => {
     expect(v.tick(entity([aura({ id: 'a', remaining: 4.2 })])).slots[0].durationText).toBe(
       '5 sec', // ceil(4.2)=5 + injected suffix
     );
-    expect(v.tick(entity([aura({ id: 'a', remaining: 300 })])).slots[0].durationText).toBe('5 min');
+    expect(v.tick(entity([aura({ id: 'a', remaining: 99 })])).slots[0].durationText).toBe('1:39');
+    expect(v.tick(entity([aura({ id: 'a', remaining: 600 })])).slots[0].durationText).toBe(
+      '10 min',
+    );
   });
 
-  it('renders the WoW-style compact duration per magnitude (20s / 5m / 1h / 2d)', () => {
+  it('renders exact m:ss below ten minutes and compact units for longer durations', () => {
     const v = createAurasView('all', deps());
     const text = (remaining: number) =>
       v.tick(entity([aura({ id: 'a', remaining })])).slots[0].durationText;
     expect(text(20)).toBe('20s');
     expect(text(4.2)).toBe('5s'); // seconds round UP: never a premature 0s
-    expect(text(300)).toBe('5m');
+    expect(text(60)).toBe('1:00');
+    expect(text(99)).toBe('1:39');
+    expect(text(307)).toBe('5:07');
+    expect(text(599)).toBe('9:59');
+    expect(text(600)).toBe('10m');
     expect(text(1800)).toBe('30m'); // a long food/scroll buff finally reads its minutes
     expect(text(3600)).toBe('1h'); // Devotion Aura reads 1h, never 3600s
     expect(text(2 * 86400)).toBe('2d');
@@ -299,11 +326,14 @@ describe('createAurasView: derivation per mode', () => {
     ).toBe('20s');
   });
 
-  it('compactAuraDuration boundaries: seconds round UP, larger units to nearest', () => {
+  it('compactAuraDuration boundaries: seconds round up, short minutes stay exact', () => {
     const U = { s: 's', m: 'm', h: 'h', d: 'd' };
-    expect(compactAuraDuration(59.9, U)).toBe('60s');
-    expect(compactAuraDuration(60, U)).toBe('1m');
-    expect(compactAuraDuration(90, U)).toBe('2m'); // nearest, so half rounds up
+    expect(compactAuraDuration(59, U)).toBe('59s');
+    expect(compactAuraDuration(59.9, U)).toBe('1:00');
+    expect(compactAuraDuration(60, U)).toBe('1:00');
+    expect(compactAuraDuration(90, U)).toBe('1:30');
+    expect(compactAuraDuration(599, U)).toBe('9:59');
+    expect(compactAuraDuration(599.1, U)).toBe('10m');
     expect(compactAuraDuration(3599, U)).toBe('1h'); // 60m promotes, never prints
     expect(compactAuraDuration(5400, U)).toBe('2h');
     expect(compactAuraDuration(86399, U)).toBe('1d'); // 24h promotes the same way

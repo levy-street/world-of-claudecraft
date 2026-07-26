@@ -31,6 +31,8 @@ import type { PainterHostWriters } from './painter_host';
 // The channel class drives the draining (vs filling) fill color via CSS; a channel,
 // a fishing channel, and the eat/drink overlay all use it.
 const CHANNEL_CLASS = 'channel';
+const INTERRUPTIBLE_CLASS = 'interruptible';
+const UNINTERRUPTIBLE_CLASS = 'uninterruptible';
 // The display value when the bar is shown, and the hidden value.
 const SHOWN_DISPLAY = 'block';
 const HIDDEN_DISPLAY = 'none';
@@ -96,6 +98,7 @@ export class CastBarPainter {
         input.cast.fill,
         this.opts.resolveCastLabel(input.cast),
         input.castRemaining,
+        input.cast.interruptible,
       );
     } else if (input.consume?.visible) {
       // PLAYER-ONLY: the consume overlay uses the channel styling and the localized
@@ -105,11 +108,14 @@ export class CastBarPainter {
         input.consume.fill,
         t(CONSUME_LABEL_KEYS[input.consume.mode]),
         input.consume.remaining,
+        null,
       );
     } else {
       this.writers.setDisplay(this.el.bar, HIDDEN_DISPLAY);
       if (this.opts.clearOnHide) {
         this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, false);
+        this.writers.toggleClass(this.el.bar, INTERRUPTIBLE_CLASS, false);
+        this.writers.toggleClass(this.el.bar, UNINTERRUPTIBLE_CLASS, false);
         this.writers.setWidth(this.el.fill, EMPTY_FILL);
         this.writers.setText(this.el.label, '');
         this.writers.setText(this.el.timer, '');
@@ -120,9 +126,17 @@ export class CastBarPainter {
   // Show the bar with a fill/label/timer, in the exact write order of the inline
   // blocks (display, channel, width, label, timer) so the elided-writer cache keys
   // line up byte-for-byte and the skip-rate accounting is unchanged.
-  private paintBar(channel: boolean, fill: number, label: string, remaining: number): void {
+  private paintBar(
+    channel: boolean,
+    fill: number,
+    label: string,
+    remaining: number,
+    interruptible: boolean | null,
+  ): void {
     this.writers.setDisplay(this.el.bar, SHOWN_DISPLAY);
     this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, channel);
+    this.writers.toggleClass(this.el.bar, INTERRUPTIBLE_CLASS, interruptible === true);
+    this.writers.toggleClass(this.el.bar, UNINTERRUPTIBLE_CLASS, interruptible === false);
     this.writers.setWidth(this.el.fill, `${(fill * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`);
     this.writers.setText(this.el.label, label);
     this.writers.setText(this.el.timer, this.timerText(remaining));

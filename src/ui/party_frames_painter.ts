@@ -73,6 +73,9 @@ const ARIA_FALSE = 'false';
 // forced-colors (where the combat box-shadow is dropped).
 const BADGE_SHOWN = '';
 const BADGE_HIDDEN = 'none';
+// A raid tile has room for two quiet beneficial icons. The aura painter never
+// culls a debuff and summarizes additional buffs with its localized +N marker.
+const PARTY_RAID_BUFF_VISIBLE_CAP = 2;
 
 /** What the pool needs from the Hud: the class-color resolver and the row actions. */
 export interface PartyFramesPainterDeps {
@@ -376,6 +379,7 @@ export class PartyFramesPainter {
         hpText: partyFrameHealthText(m.hp, m.mhp, config?.healthText ?? 1, (value, percent) =>
           formatNumber(value, percent ? { style: 'percent', maximumFractionDigits: 0 } : undefined),
         ),
+        incomingHealFrac: (m.incomingHeal ?? 0) / Math.max(1, m.mhp),
         resourceKind: m.rtype,
         resFrac: m.res / Math.max(1, m.mres),
         resText: '',
@@ -392,12 +396,6 @@ export class PartyFramesPainter {
     const rewindFrac = Math.max(0, Math.min(1 - hpFrac, (m.rewind ?? 0) / Math.max(1, m.mhp)));
     this.writers.setStyleProp(row.rewind, '--rewind-start', `${(hpFrac * 100).toFixed(1)}%`);
     this.writers.setWidth(row.rewind, `${(rewindFrac * 100).toFixed(1)}%`);
-    const incomingFrac = Math.max(
-      0,
-      Math.min(1 - hpFrac, (m.incomingHeal ?? 0) / Math.max(1, m.mhp)),
-    );
-    this.writers.setStyleProp(row.incoming, '--incoming-start', `${(hpFrac * 100).toFixed(1)}%`);
-    this.writers.setWidth(row.incoming, `${(incomingFrac * 100).toFixed(1)}%`);
     // The leader star (aria-hidden, decorative) and the visually-hidden raid-group label,
     // both per-frame text routed through the elided writer (no raw write on the hot path);
     // each is cached, so a steady-state tick re-writes neither.
@@ -411,7 +409,10 @@ export class PartyFramesPainter {
     this.writers.setDisplay(row.badges.offline, m.connected === 0 ? BADGE_SHOWN : BADGE_HIDDEN);
     // The member's mini aura strip: the row's own keyed aura pool (writes elided
     // inside it). Signature-gated like the rest of this sync, never per frame.
-    row.paintAuras(config?.showAuras === false ? [] : (m.auras ?? []));
+    row.paintAuras(
+      config?.showAuras === false ? [] : (m.auras ?? []),
+      raid ? PARTY_RAID_BUFF_VISIBLE_CAP : Number.POSITIVE_INFINITY,
+    );
   }
 
   /** The localized "Group n" raid cue for a member, or '' outside raid. The group number

@@ -60,10 +60,13 @@ describe('XpBarPainter: routes every write through the elided writers', () => {
     expect(calls).toEqual([
       { m: 'setWidth', args: [FILL, '50.0%'] },
       { m: 'setStyleProp', args: [BAR, '--xp-fill', '0.5000'] },
+      { m: 'setStyleProp', args: [BAR, '--xp-rested-end', '0.6000'] },
       { m: 'setStyleProp', args: [PF, '--xp-fill', '0.5000'] },
       { m: 'setStyleProp', args: [RESTED, 'left', '50.0%'] },
       { m: 'setStyleProp', args: [RESTED, 'width', '10.0%'] },
       { m: 'setText', args: [LABEL, 'XP 1 / 2'] },
+      { m: 'setAttr', args: [BAR, 'aria-valuenow', '50'] },
+      { m: 'setAttr', args: [BAR, 'aria-valuetext', 'XP 1 / 2'] },
       { m: 'toggleClass', args: [BAR, 'overflow', false] },
       { m: 'toggleClass', args: [BAR, 'rested', true] },
     ]);
@@ -74,10 +77,13 @@ describe('XpBarPainter: routes every write through the elided writers', () => {
     expect(calls).toEqual([
       { m: 'setWidth', args: [FILL, '100.0%'] },
       { m: 'setStyleProp', args: [BAR, '--xp-fill', '1.0000'] },
+      { m: 'setStyleProp', args: [BAR, '--xp-rested-end', '1.0000'] },
       { m: 'setStyleProp', args: [PF, '--xp-fill', '1.0000'] },
       { m: 'setStyleProp', args: [RESTED, 'left', '100.0%'] },
       { m: 'setStyleProp', args: [RESTED, 'width', '0.0%'] },
       { m: 'setText', args: [LABEL, 'Lv 20 (+7)'] },
+      { m: 'setAttr', args: [BAR, 'aria-valuenow', '100'] },
+      { m: 'setAttr', args: [BAR, 'aria-valuetext', 'Lv 20 (+7)'] },
       { m: 'toggleClass', args: [BAR, 'overflow', true] },
       { m: 'toggleClass', args: [BAR, 'rested', false] },
     ]);

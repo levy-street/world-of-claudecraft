@@ -755,13 +755,16 @@ export const de_DE: EnTranslations = {
       "targetLabel": "Euer Ziel",
       "targetAnnounce": "Ziel: {name}",
       "targetOfTargetLabel": "Ziel des Ziels",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Eure Gruppe",
       "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "Min",
       "durationUnitHours": "Std",
-      "durationUnitDays": "T"
+      "durationUnitDays": "T",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Charaktermodell-Vorschau"
@@ -1056,7 +1059,10 @@ export const de_DE: EnTranslations = {
       "uiScale": "UI-Skalierung",
       "playerFrameScale": "Skalierung des Spielerfensters",
       "targetFrameScale": "Skalierung des Zielfensters",
-      "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Ziel des Ziels anzeigen",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
       "walkByAutoloot": "Plündern im Vorbeigehen",
@@ -1068,7 +1074,6 @@ export const de_DE: EnTranslations = {
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
       "showThirdActionBar": "Dritte Aktionsleiste anzeigen",
-      "showTargetOfTarget": "Ziel des Ziels anzeigen",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",

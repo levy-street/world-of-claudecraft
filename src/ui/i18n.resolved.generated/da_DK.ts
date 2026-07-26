@@ -755,13 +755,16 @@ export const da_DK: EnTranslations = {
       "targetLabel": "Dit mål",
       "targetAnnounce": "Markér {name}",
       "targetOfTargetLabel": "Målets Mål",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Dit følge",
       "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "t",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Forhåndsvisning af karaktermodel"
@@ -1056,7 +1059,10 @@ export const da_DK: EnTranslations = {
       "uiScale": "UI-skala",
       "playerFrameScale": "Spillerrammens skala",
       "targetFrameScale": "Målrammens skala",
-      "aurasOnPlayerFrame": "Buffs på spillerrammen",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Vis målets mål",
       "highContrastBackground": "Baggrund med høj kontrast",
       "startAttackOnAbility": "Autoangreb ved brug af evne",
       "walkByAutoloot": "Auto-plyndring i forbifarten",
@@ -1068,7 +1074,6 @@ export const da_DK: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
       "showThirdActionBar": "Vis tredje handlingslinje",
-      "showTargetOfTarget": "Vis målets mål",
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",

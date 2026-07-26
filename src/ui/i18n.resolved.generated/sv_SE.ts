@@ -755,13 +755,16 @@ export const sv_SE: EnTranslations = {
       "targetLabel": "Ditt mål",
       "targetAnnounce": "Markera {name}",
       "targetOfTargetLabel": "Målets mål",
+      "targetOfTargetNamedLabel": "Mark's Mark: {name}",
       "partyLabel": "Ditt följe",
       "partyChip": "Grupp",
       "partyGroup": "Grupp {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "t",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "auraOverflowShort": "+{count}",
+      "auraOverflowLabel": "Additional buffs: {count}"
     },
     "character": {
       "modelPreview": "Förhandsvisning av karaktärsmodell"
@@ -1056,7 +1059,10 @@ export const sv_SE: EnTranslations = {
       "uiScale": "Gränssnittsskala",
       "playerFrameScale": "Spelarramens skala",
       "targetFrameScale": "Målramens skala",
-      "aurasOnPlayerFrame": "Förstärkningar på spelarramen",
+      "unitFrameHealthText": "Unit Frame Health Text",
+      "unitFrameDamageTrail": "Delayed Damage Trail",
+      "unitFramePortraitEffects": "Portrait Reactions",
+      "showTargetOfTarget": "Visa målets mål",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
       "walkByAutoloot": "Automatisk plundring i förbifarten",
@@ -1068,7 +1074,6 @@ export const sv_SE: EnTranslations = {
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
-      "showTargetOfTarget": "Visa målets mål",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",

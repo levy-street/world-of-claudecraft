@@ -3,7 +3,7 @@ import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
 import { VISUALS } from './manifest';
-import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
+import { type PortraitFraming, portraitAimPoint, portraitFrameParams } from './portrait_framing';
 import { CharacterVisual } from './visual';
 
 export type { PortraitFraming } from './portrait_framing';
@@ -94,6 +94,11 @@ function ensureRig(): void {
   const fill = new THREE.DirectionalLight(0xffffff, 0.7);
   fill.position.set(-3, 2, -2);
   scene.add(fill);
+  // A restrained warm back light separates helmets, ears, and shoulders from
+  // the dark painted plate without flattening skin tones.
+  const rim = new THREE.DirectionalLight(0xffc77a, 0.82);
+  rim.position.set(-2.5, 3.2, -4);
+  scene.add(rim);
 }
 
 /**
@@ -159,14 +164,18 @@ export function visualPortraitDataUrl(
       scratchBox.getCenter(scratchCenter);
       scratchBox.getSize(scratchSize);
     }
-    const h = scratchSize.y || 1.8;
-    const { fov, targetYFromFeetFrac, extentFrac } = portraitFrameParams(framing);
+    const { fov, extentFrac } = portraitFrameParams(framing);
     camera!.fov = fov;
-    const targetY = scratchBox.min.y + targetYFromFeetFrac * h;
-    const extent = extentFrac * h;
+    // The complete bounds include held weapons and asymmetric accessories.
+    // They must remain visible, but centring the camera on those bounds pushes
+    // the character's face off-axis. Aim at the normalized body instead: every
+    // prepared visual is scaled to defH with its feet at the hover offset.
+    const bodyFloorY = VISUALS[visualKey]?.hover ?? 0;
+    const aim = portraitAimPoint(framing, defH, bodyFloorY);
+    const extent = extentFrac * defH;
     const dist = extent / 2 / Math.tan((fov * Math.PI) / 180 / 2);
-    camera!.position.set(scratchCenter.x + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
-    camera!.lookAt(scratchCenter.x, targetY, scratchCenter.z);
+    camera!.position.set(aim.x, aim.y + 0.02 * defH, scratchBox.max.z + dist);
+    camera!.lookAt(aim.x, aim.y, aim.z);
     camera!.updateProjectionMatrix();
 
     renderer!.render(scene!, camera!);

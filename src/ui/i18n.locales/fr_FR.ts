@@ -2542,7 +2542,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Amical',
   'hudChrome.mobTooltip.hostile': 'Hostile',
   'hudChrome.mobTooltip.levelFamily': '{family} niveau {level}',
-  'hudChrome.options.aurasOnPlayerFrame': 'Améliorations sur le cadre du joueur',
   'hudChrome.options.playerFrameScale': 'Échelle du cadre du joueur',
   'hudChrome.options.showDailyRewardsChest': 'Afficher le coffre des récompenses quotidiennes',
   'hudChrome.options.showOwnNameplate': 'Afficher ma plaque de nom',

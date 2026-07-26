@@ -498,7 +498,8 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
-import { targetOfTargetId } from './target_of_target';
+import { TargetOfTargetPainter } from './target_of_target_painter';
+import { targetOfTargetSubject, targetOfTargetView } from './target_of_target_view';
 import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
@@ -510,9 +511,16 @@ import { renderTownFocusWindow } from './town_focus_window';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
-import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
+import {
+  type UnitFrameDescriptor,
+  type UnitFrameHealthTextMode,
+  unitFrameHealthText,
+  unitFrameView,
+  unitTargetPresentation,
+  unitThreatState,
+} from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
-import { crestIdForEntity } from './unit_portrait';
+import { crestIdForEntity, UnitPortraitPlanCache } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { ValeCupBetting } from './vale_cup_betting';
 import { buildVcupBettingView } from './vale_cup_betting_view';
@@ -1145,8 +1153,12 @@ export class Hud {
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
   private pfLevelEl = $('#pf-level');
+  private pfHpBarEl = $('#pf-hpbar');
+  private pfHpTrailEl = $('#pf-hp-trail');
   private pfHpEl = $('#pf-hp');
+  private pfHpPredictionEl = $('#pf-hp-prediction');
   private pfHpTextEl = $('#pf-hp-text');
+  private pfHpPercentEl = $('#pf-hp-percent');
   private pfResEl = $('#pf-res');
   private pfResTextEl = $('#pf-res-text');
   private pfResourceEl = $('#pf-resource');
@@ -1156,6 +1168,7 @@ export class Hud {
   private targetFrameEl = $('#target-frame');
   private targetEliteTagEl = $('#tf-elite-tag');
   private targetNameEl = $('#tf-name');
+  private targetThreatIndicatorEl = $('#tf-threat-indicator');
   // The target name line splits into three inline children (pre-decoration,
   // name text, post-decoration) so the painter can write the Book of Deeds
   // title in its own muted-gold spans without setText clobbering them, while
@@ -1170,8 +1183,12 @@ export class Hud {
   // Diff key for the target-frame Discord line, so its per-frame update only rebuilds
   // innerHTML (and re-attaches the avatar fallback) when the Discord content changes.
   private targetDiscordSig = '';
+  private targetHpBarEl = $('#tf-hpbar');
+  private targetHpTrailEl = $('#tf-hp-trail');
   private targetHpEl = $('#tf-hp');
+  private targetHpPredictionEl = $('#tf-hp-prediction');
   private targetHpTextEl = $('#tf-hp-text');
+  private targetHpPercentEl = $('#tf-hp-percent');
   private targetPortraitEl = $('#tf-portrait') as unknown as HTMLCanvasElement;
   // The target absorb-shield overlay node, resolved ONCE here instead of the old
   // per-frame updateAbsorb document query by hardcoded selector (per-frame
@@ -1185,22 +1202,17 @@ export class Hud {
   private targetResourceEl = $('#tf-resource');
   private targetResEl = $('#tf-res');
   private targetResTextEl = $('#tf-res-text');
+  private targetBuffsEl = $('#tf-buffs');
   private targetDebuffsEl = $('#tf-debuffs');
-  // Target of Target (showTargetOfTarget option): element refs for the #totarget-frame
-  // mini-frame, resolved ONCE like the target refs above (never per-frame queried). The
-  // frame is a THIRD instance of the unit_frame family (totFramePainter below).
-  private totFrameEl = $('#totarget-frame');
-  private totNameEl = $('#totf-name');
-  private totLevelEl = $('#totf-level');
-  private totHpEl = $('#totf-hp');
-  private totHpTextEl = $('#totf-hp-text');
-  private totPortraitEl = $('#totf-portrait') as unknown as HTMLCanvasElement;
-  // The subject the tot painter's portrait gate redraws this frame (mirrors
-  // targetPortraitSubject); set just before the paint() call that fires the gate.
-  private totPortraitSubject: Entity | null = null;
-  // Cached showTargetOfTarget preference (set from main.ts applySetting via
-  // setShowTargetOfTarget); when off, the frame is painted hidden every frame.
-  private showTargetOfTarget = false;
+  private targetOfTargetEl = $('#tf-target-target') as HTMLButtonElement;
+  private targetOfTargetNameEl = $('#tf-tot-name');
+  private targetOfTargetHpEl = $('#tf-tot-hp');
+  private targetOfTargetPortraitEl = $('#tf-tot-portrait') as unknown as HTMLCanvasElement;
+  private targetOfTargetEntityId: number | null = null;
+  private targetOfTargetPortraitSubject: Entity | null = null;
+  // Cached fallback for hosts without settings hooks. main.ts also updates this
+  // immediately when the display option changes.
+  private showTargetOfTarget = true;
   // The target whose portrait the family painter's repaint gate redraws this frame.
   // The gate fires synchronously inside the targetFramePainter.paint() call below,
   // so this holds the subject for that one call (the old inline block read `target`
@@ -1413,6 +1425,8 @@ export class Hud {
   private castLoopIds = new Set<number>();
   private lastNythraxisCombatEventAt = 0;
   private lastResting = false;
+  private readonly unitFrameIncomingHeals = new Map<number, number>();
+  private mediumPartyInfo: PartyInfo | null = null;
   private lastZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
@@ -1468,10 +1482,6 @@ export class Hud {
   private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
-  // Target-of-target frame throttle + identity tracking, the non-self cadence twins
-  // of the target frame's fields above (see the showTargetOfTarget paint block).
-  private lastTotFramePaintAt = 0;
-  private lastTotFrameId: number | null = null;
   // Title resolve elision for the target frame (the lastIcon pattern): the
   // pattern-key composition re-runs only when the (language, title id)
   // signature changes; every steady frame reuses the cached decoration and
@@ -1788,13 +1798,14 @@ export class Hud {
       this.claudiumWindow.onWalletChanged();
     });
     $('#pf-name').textContent = sim.player.name;
+    this.setStyleProp(this.playerFrameEl, '--unit-accent', classCss(sim.cfg.playerClass));
     this.drawPlayerFramePortrait();
     // Character GLBs preload after the HUD mounts; once the real 3D portraits are
     // ready, upgrade the player frame and force the target frame to redraw.
     onPortraitsReady(() => {
       this.drawPlayerFramePortrait();
       this.targetFramePainter.invalidatePortrait();
-      this.totFramePainter.invalidatePortrait();
+      this.targetOfTargetPainter.invalidatePortrait();
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
@@ -1958,6 +1969,15 @@ export class Hud {
     $('#target-frame').addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
       this.openTargetFrameMenuAt((ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
+    });
+    // The compact target-of-target satellite is actionable: selecting it promotes
+    // that unit to the main target without allowing the click to leak into the
+    // surrounding target-frame interaction surface.
+    this.targetOfTargetEl.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (this.targetOfTargetEntityId === null) return;
+      this.sim.targetEntity(this.targetOfTargetEntityId);
     });
     // Touch has no right-click, so a double-tap on the target frame opens the same
     // unit menu (slop-guarded, so dragging the movable frame never triggers it).
@@ -2839,9 +2859,6 @@ export class Hud {
     // position applies, and detaches the player frame, at construction).
     resetFramePositionsOnce(localStorage);
     const isMobileLayout = () => this.isMobileLayout();
-    // A live desktop-to-mobile viewport flip must re-home the anchored aura
-    // bars (mobile owns its own aura placement), and the flip back re-anchors.
-    window.addEventListener('resize', () => this.applyAuraAnchor());
     if (this.targetFrameEl) {
       this.targetFrameMover = new MovableFrame({
         frame: this.targetFrameEl,
@@ -2856,7 +2873,7 @@ export class Hud {
     if (this.playerFrameEl) {
       // Classic self-target: clicking the player frame body targets yourself.
       // The corner move button stops its own propagation; buttons inside the
-      // frame and the anchored aura rows (aurasOnPlayerFrame) never self-target,
+      // frame and the anchored aura rows never self-target,
       // so a buff right-click-cancel or a stray icon click stays what it was.
       this.playerFrameEl.addEventListener('click', (ev) => {
         const clicked = ev.target as HTMLElement | null;
@@ -2917,40 +2934,6 @@ export class Hud {
     } else {
       const stack = $('#actionbar-stack');
       if (frame.parentElement !== stack) stack.insertBefore(frame, stack.firstChild);
-    }
-  }
-
-  // Buffs on the Player Frame (aurasOnPlayerFrame): reparent the player's own
-  // BUFF row into #player-frame, where CSS anchors it to the frame (above it
-  // while docked over the action bars, below it once moved) and the frame's
-  // children-zoom scale applies. The DEBUFF row never rides the frame: with the
-  // option on it slides up beside the minimap into the spot the buff row
-  // vacated (body.auras-on-frame, hud.css), classic WoW's debuff corner, so
-  // incoming debuffs stay in one glanceable place. Off (or the mobile layout,
-  // which owns its stock aura placement) restores the classic two-row corner;
-  // the aura painters' element refs are live nodes, so they survive the moves.
-  private aurasOnPlayerFrame = false;
-  private buffBarHome: { parent: ParentNode; next: Node | null } | null = null;
-
-  setAurasOnPlayerFrame(on: boolean): void {
-    this.aurasOnPlayerFrame = on;
-    this.applyAuraAnchor();
-  }
-
-  private applyAuraAnchor(): void {
-    const on = this.aurasOnPlayerFrame && !this.isMobileLayout();
-    document.body.classList.toggle('auras-on-frame', on);
-    const frame = this.playerFrameEl;
-    // The buff bar's stock home: right before its sibling debuff bar (which
-    // stays put in the DOM; only its CSS spot shifts with the body class).
-    this.buffBarHome ??= {
-      parent: this.buffBarEl.parentNode as ParentNode,
-      next: this.debuffBarEl,
-    };
-    if (on) {
-      if (this.buffBarEl.parentElement !== frame) frame.appendChild(this.buffBarEl);
-    } else if (this.buffBarEl.parentElement === frame) {
-      this.buffBarHome.parent.insertBefore(this.buffBarEl, this.buffBarHome.next);
     }
   }
 
@@ -3236,10 +3219,11 @@ export class Hud {
   // Portraits, icons, tooltips, money
   // -------------------------------------------------------------------------
 
-  // Player- and target-frame circular portraits. The DPI-aware backing store +
+  // Player- and target-frame portrait plates. The DPI-aware backing store +
   // crest overscan live in UnitPortraitPainter (unit_portrait_painter.ts); the
   // HUD just routes the framed unit (class headshot vs mob/NPC crest) to it.
   private readonly portraits = new UnitPortraitPainter();
+  private readonly portraitPlans = new UnitPortraitPlanCache();
 
   // PainterHost facets (painter_host.ts). The write-elision facet binds the six
   // private hot writers as closures over the SAME caches + counters (no visibility
@@ -3327,16 +3311,28 @@ export class Hud {
   // exactly, so the player path stays byte-faithful: no `name` (the player name is
   // static, set once at login, not on the hot path); no `stateClasses` (the player
   // frame never carries dead/out-of-range, those are party-only); no `shownDisplay`
-  // (the frame is always visible via CSS, never toggled); no `repaintPortrait` (its
-  // portrait is drawn at character setup, drawPlayerFramePortrait, not per frame).
-  private readonly playerFramePainter = new UnitFramePainter(this.writerFacet, {
-    frame: this.playerFrameEl,
-    level: this.pfLevelEl,
-    hpFill: this.pfHpEl,
-    hpText: this.pfHpTextEl,
-    absorb: this.pfAbsorbEl,
-    resource: { container: this.pfResourceEl, fill: this.pfResEl, text: this.pfResTextEl },
-  });
+  // (the frame is always visible via CSS, never toggled). Its repaint gate now
+  // follows form, ghost, mech, and transformation identity changes.
+  private readonly playerFramePainter = new UnitFramePainter(
+    this.writerFacet,
+    {
+      frame: this.playerFrameEl,
+      level: this.pfLevelEl,
+      hpBar: this.pfHpBarEl,
+      hpTrail: this.pfHpTrailEl,
+      hpFill: this.pfHpEl,
+      hpPrediction: this.pfHpPredictionEl,
+      hpText: this.pfHpTextEl,
+      hpPercent: this.pfHpPercentEl,
+      absorb: this.pfAbsorbEl,
+      resource: { container: this.pfResourceEl, fill: this.pfResEl, text: this.pfResTextEl },
+    },
+    {
+      healthFeedback: true,
+      portraitStateClasses: true,
+      repaintPortrait: () => this.drawPlayerFramePortrait(),
+    },
+  );
   // The two cast bars are ONE instance-parameterized painter, over the
   // castBarState core. The PLAYER instance localizes the cast id (castDisplayName),
   // layers the eat/drink overlay (consumeBarState, player-only), and clears the bar
@@ -3385,8 +3381,12 @@ export class Hud {
       titlePre: this.targetTitlePreEl,
       titlePost: this.targetTitlePostEl,
       level: this.targetLevelEl,
+      hpBar: this.targetHpBarEl,
+      hpTrail: this.targetHpTrailEl,
       hpFill: this.targetHpEl,
+      hpPrediction: this.targetHpPredictionEl,
       hpText: this.targetHpTextEl,
+      hpPercent: this.targetHpPercentEl,
       absorb: this.targetAbsorbEl,
       resource: {
         container: this.targetResourceEl,
@@ -3395,27 +3395,38 @@ export class Hud {
       },
     },
     {
-      shownDisplay: 'flex',
+      animatedPresence: true,
+      healthFeedback: true,
+      portraitStateClasses: true,
+      stateClasses: true,
       repaintPortrait: () => this.drawTargetPortrait(),
     },
   );
-  // The target-of-target frame is the THIRD instance of the unit_frame family (after
-  // the player and target). It carries name + level + hp (no absorb, no resource
-  // group: the mini-frame has no shield overlay or power rail), toggles flex/none via
-  // shownDisplay, and owns its own portrait repaint gate. It is painted only when the
-  // showTargetOfTarget option is on and the target-of-target entity is known.
-  private readonly totFramePainter = new UnitFramePainter(
+  // The compact target-of-target satellite is another member of the shared
+  // unit-frame family. Its adapter owns only the accent and interactive label;
+  // presence, health state, and portrait invalidation stay in UnitFramePainter.
+  private readonly targetOfTargetPainter = new TargetOfTargetPainter(
     this.writerFacet,
     {
-      frame: this.totFrameEl,
-      name: this.totNameEl,
-      level: this.totLevelEl,
-      hpFill: this.totHpEl,
-      hpText: this.totHpTextEl,
+      frame: this.targetOfTargetEl,
+      name: this.targetOfTargetNameEl,
+      hpFill: this.targetOfTargetHpEl,
     },
     {
-      shownDisplay: 'flex',
-      repaintPortrait: () => this.drawTargetOfTargetPortrait(),
+      resolveAccent: (accent, classId) =>
+        accent === 'self'
+          ? 'var(--gold)'
+          : accent === 'hostile'
+            ? 'var(--color-hostile)'
+            : accent === 'player'
+              ? classCss(classId)
+              : 'var(--color-friendly)',
+      repaintPortrait: (entityId) => {
+        const subject = this.targetOfTargetPortraitSubject;
+        if (subject?.id === entityId) {
+          this.drawUnitPortrait(this.targetOfTargetPortraitEl, subject);
+        }
+      },
     },
   );
   // Deferred "Auto-Attack on Ability Use" for TIMED casts: set by castSlot when
@@ -3444,6 +3455,14 @@ export class Hud {
     painter: {
       resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
       renderTooltip: (name) => `<div class="tt-title">${esc(name)}</div>`,
+      overflowText: (count) =>
+        t('hudChrome.unitFrame.auraOverflowShort', {
+          count: formatNumber(count, { maximumFractionDigits: 0 }),
+        }),
+      overflowLabel: (count) =>
+        t('hudChrome.unitFrame.auraOverflowLabel', {
+          count: formatNumber(count, { maximumFractionDigits: 0 }),
+        }),
       attachTooltip: (el, html) => this.attachTooltip(el, html),
     },
   };
@@ -3497,10 +3516,8 @@ export class Hud {
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
   // the cached whole-world decorations; redraws from the mediumHud band while open.
   private readonly mapPainter = new MapWindowPainter();
-  // The aura strips are the keyed-pool aura painter, two instances of the
-  // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
-  // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
-  // debuffs, classic target-frame behavior). The shared deps fire
+  // The aura strips are keyed-pool view/painter pairs for player buffs/debuffs
+  // and target buffs/debuffs. The shared deps fire
   // the i18n lookups every frame (so a language switch lands on the next tick) and the
   // painter's tooltip closure reads the pool's LIVE record (Top risk 3, never a captured
   // aura). All closures are lazy, so these field initializers are safe.
@@ -3531,21 +3548,29 @@ export class Hud {
     resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
     renderTooltip: (name, remaining, effectHtml) =>
       `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
+    overflowText: (count) =>
+      t('hudChrome.unitFrame.auraOverflowShort', {
+        count: formatNumber(count, { maximumFractionDigits: 0 }),
+      }),
+    overflowLabel: (count) =>
+      t('hudChrome.unitFrame.auraOverflowLabel', {
+        count: formatNumber(count, { maximumFractionDigits: 0 }),
+      }),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
   // Player auras split across two rows (classic layout): buffs in #buff-bar, debuffs in
   // #debuff-bar, so a fresh debuff is never buried under a wall of long-lived buffs.
   private readonly buffBarView = createAurasView('buffs', this.aurasViewDeps);
   private readonly debuffBarView = createAurasView('debuffs', this.aurasViewDeps);
-  // The target strip shows EVERY aura (classic target-frame behavior): a friendly
-  // target's buffs (the shield you just cast on an ally) alongside its debuffs, and
-  // an enemy's buffs (a mob's frenzy) alongside the DoTs you keep on it. The element
-  // keeps its historical #tf-debuffs id; only the view mode widened.
-  // ownFirst: YOUR dots/hots on the target lead the strip and render larger (the
+  // Target buffs and debuffs remain complete but use separate visual rows. ownFirst:
+  // YOUR effects lead their respective row and render larger (the
   // painter's `own` class), so what you are maintaining reads at a glance among
   // other casters' auras. Extra prominence only, never less information, so every
   // graphics tier keeps it (gameplay-neutral-graphics invariant).
-  private readonly targetDebuffsView = createAurasView('all', this.aurasViewDeps, {
+  private readonly targetBuffsView = createAurasView('buffs', this.aurasViewDeps, {
+    ownFirst: true,
+  });
+  private readonly targetDebuffsView = createAurasView('debuffs', this.aurasViewDeps, {
     ownFirst: true,
   });
   // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
@@ -3582,6 +3607,13 @@ export class Hud {
   private readonly targetDebuffsPainter = new AurasPainter(
     this.writerFacet,
     this.targetDebuffsEl,
+    this.aurasPainterDeps,
+    document,
+    () => this.fxTier(),
+  );
+  private readonly targetBuffsPainter = new AurasPainter(
+    this.writerFacet,
+    this.targetBuffsEl,
     this.aurasPainterDeps,
     document,
     () => this.fxTier(),
@@ -4217,11 +4249,55 @@ export class Hud {
   });
 
   private drawPlayerFramePortrait(): void {
-    this.portraits.drawClass(
-      $('#pf-portrait') as unknown as HTMLCanvasElement,
-      this.sim.cfg.playerClass,
-      this.sim.player.skin ?? 0,
+    this.drawUnitPortrait($('#pf-portrait') as unknown as HTMLCanvasElement, this.sim.player);
+  }
+
+  private paintTargetOfTarget(target: Entity | null, playerId: number): void {
+    const shown = this.optionsHooks?.settings.get('showTargetOfTarget') ?? this.showTargetOfTarget;
+    const subject = shown
+      ? targetOfTargetSubject(target, (entityId) => this.sim.entities.get(entityId))
+      : null;
+    this.targetOfTargetEntityId = subject?.id ?? null;
+    this.targetOfTargetPortraitSubject = subject;
+    const portrait = subject ? this.portraitPlans.plan(subject) : null;
+    const name = subject ? entityDisplayName(subject) : '';
+    this.targetOfTargetPainter.paint(
+      targetOfTargetView(
+        subject,
+        playerId,
+        subject
+          ? {
+              name,
+              accessibleLabel: t('hudChrome.unitFrame.targetOfTargetNamedLabel', { name }),
+              portraitKey: `${subject.id}:${portrait?.identityKey ?? 'base'}`,
+            }
+          : null,
+      ),
     );
+  }
+
+  private drawUnitPortrait(canvas: HTMLCanvasElement, target: Entity): void {
+    if (target.kind === 'player') {
+      const plan = this.portraitPlans.plan(target);
+      if (plan) {
+        this.portraits.drawVisual(
+          canvas,
+          plan.visualKey,
+          plan.skin,
+          target.templateId as PlayerClass,
+        );
+      }
+      return;
+    }
+    const template = MOBS[target.templateId];
+    const faceUrl = targetPortraitUrl(target.templateId, Boolean(template));
+    if (faceUrl) {
+      this.portraits.drawHeadshot(canvas, faceUrl, () => {
+        this.portraits.drawCrest(canvas, crestIdForEntity(target.kind, template?.family));
+      });
+      return;
+    }
+    this.portraits.drawCrest(canvas, crestIdForEntity(target.kind, template?.family));
   }
 
   // Redraw the target portrait canvas. Called by the unit_frame painter's repaint
@@ -4232,51 +4308,13 @@ export class Hud {
   private drawTargetPortrait(): void {
     const target = this.targetPortraitSubject;
     if (!target) return;
-    if (target.kind === 'player') {
-      this.portraits.drawClass(
-        this.targetPortraitEl,
-        target.templateId as PlayerClass,
-        target.skin ?? 0,
-      );
-    } else {
-      const template = MOBS[target.templateId];
-      const faceUrl = targetPortraitUrl(target.templateId, Boolean(template));
-      if (faceUrl) {
-        this.portraits.drawHeadshot(this.targetPortraitEl, faceUrl, () => {
-          this.portraits.drawCrest(
-            this.targetPortraitEl,
-            crestIdForEntity(target.kind, template?.family),
-          );
-        });
-      } else {
-        this.portraits.drawCrest(
-          this.targetPortraitEl,
-          crestIdForEntity(target.kind, template?.family),
-        );
-      }
-    }
+    this.drawUnitPortrait(this.targetPortraitEl, target);
   }
 
-  // Redraw the target-of-target portrait canvas, the twin of drawTargetPortrait for
-  // the #totarget-frame. Called by the tot painter's repaint gate only on identity
-  // change (or after invalidatePortrait), reading the subject set just before paint().
-  private drawTargetOfTargetPortrait(): void {
-    const tot = this.totPortraitSubject;
-    if (!tot) return;
-    if (tot.kind === 'player') {
-      this.portraits.drawClass(this.totPortraitEl, tot.templateId as PlayerClass, tot.skin ?? 0);
-    } else {
-      this.portraits.drawCrest(
-        this.totPortraitEl,
-        crestIdForEntity(tot.kind, MOBS[tot.templateId]?.family),
-      );
-    }
-  }
-
-  // Toggle the target-of-target mini-frame (showTargetOfTarget option), driven from
-  // main.ts applySetting. When off, the per-frame update paints the frame hidden.
+  // Toggle the compact target-of-target satellite, driven from main.ts applySetting.
   setShowTargetOfTarget(on: boolean): void {
     this.showTargetOfTarget = on;
+    if (!on) this.paintTargetOfTarget(null, this.sim.playerId);
   }
 
   private itemIcon(item: ItemDef): string {
@@ -6577,8 +6615,8 @@ export class Hud {
     return null;
   }
 
-  // The warrior stance bar: a small row of stance toggles stacked above the
-  // action bars, shown only for warriors and only for the stances valid for the
+  // The warrior stance dock: a compact row anchored to the portrait's top edge,
+  // shown only for warriors and only for the stances valid for the
   // current spec (Battle + Guarded for Arms/Prot, Berserker for Fury, Battle only
   // for no spec). Rebuilds only when the known-stance set or the active stance
   // changes (sig elision, like the pet bar).
@@ -7124,6 +7162,15 @@ export class Hud {
     }
     const mediumHud = now - this.lastHudMediumAt >= 250;
     if (mediumHud) this.lastHudMediumAt = now;
+    if (mediumHud) {
+      this.mediumPartyInfo = sim.partyInfo;
+      this.unitFrameIncomingHeals.clear();
+      for (const member of this.mediumPartyInfo?.members ?? []) {
+        if ((member.incomingHeal ?? 0) > 0) {
+          this.unitFrameIncomingHeals.set(member.pid, member.incomingHeal ?? 0);
+        }
+      }
+    }
     const slowHud = now - this.lastHudSlowAt >= 500;
     if (slowHud) this.lastHudSlowAt = now;
 
@@ -7185,18 +7232,37 @@ export class Hud {
     // className swap on the player hot path). updateLowHealthVignette +
     // updateLowResource are player-only side effects with their own cores and stay
     // here, OUT of the shared family (target/party must not inherit them).
+    const playerHpFrac = p.hp / Math.max(1, p.maxHp);
+    const unitFrameTextMode = Math.round(
+      this.optionsHooks?.settings.get('unitFrameHealthText') ?? 3,
+    ) as UnitFrameHealthTextMode;
+    const playerHpPercentText = formatNumber(playerHpFrac, {
+      style: 'percent',
+      maximumFractionDigits: 0,
+    });
+    const playerHealthText = unitFrameHealthText(
+      formatNumber(p.hp, { maximumFractionDigits: 0 }),
+      formatNumber(p.maxHp, { maximumFractionDigits: 0 }),
+      playerHpPercentText,
+      null,
+      unitFrameTextMode,
+    );
+    const playerPortrait = this.portraitPlans.plan(p);
     this.playerFramePainter.paint(
       unitFrameView({
         present: true,
-        hpFrac: p.hp / Math.max(1, p.maxHp),
-        hpText: `${p.hp} / ${p.maxHp}`,
+        hpFrac: playerHpFrac,
+        hpText: playerHealthText.primary,
+        hpPercentText: playerHealthText.secondaryPercent,
+        incomingHealFrac: (this.unitFrameIncomingHeals.get(p.id) ?? 0) / Math.max(1, p.maxHp),
         showAbsorbText: true,
         resourceKind: p.resourceType,
         resFrac: p.resource / Math.max(1, p.maxResource),
-        resText: `${Math.round(p.resource)} / ${p.maxResource}`,
+        resText: `${formatNumber(p.resource, { maximumFractionDigits: 0 })} / ${formatNumber(p.maxResource, { maximumFractionDigits: 0 })}`,
         levelText: String(p.level),
         name: p.name,
-        portraitKey: PLAYER_PORTRAIT_KEY,
+        portraitKey: playerPortrait?.identityKey ?? PLAYER_PORTRAIT_KEY,
+        portraitState: playerPortrait?.context ?? 'normal',
         absorb: p,
         dead: false,
         outOfRange: false,
@@ -7248,7 +7314,12 @@ export class Hud {
     // debuffs + cast bar CONSUME the existing auras paint + the cast_bar
     // target instance. (Targeting a world object hides the frame, like no target.)
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
-    if (target && target.kind !== 'object') {
+    const targetPresentation = unitTargetPresentation(target, p.id);
+    // Self-targeting remains live for friendly casts and action resolution, but
+    // the HUD represents it once: a quiet cue on the player frame replaces the
+    // redundant second copy of the same portrait, name, HP, and resource bars.
+    this.toggleClass(this.playerFrameEl, 'self-targeted', targetPresentation === 'self');
+    if (target && targetPresentation === 'unit') {
       const targetTemplate = MOBS[target.templateId];
       const targetRank = targetRankView(targetTemplate);
       // The portrait gate fires inside paint(); hand it the subject to redraw.
@@ -7291,11 +7362,27 @@ export class Hud {
           this.lastTargetTitleSig = titleSig;
           this.targetTitleDecoration = titledNameDecoration(target.title ?? null);
         }
+        const targetHpFrac = target.hp / Math.max(1, target.maxHp);
+        const targetHpPercentText = formatNumber(targetHpFrac, {
+          style: 'percent',
+          maximumFractionDigits: 0,
+        });
+        const targetHealthText = unitFrameHealthText(
+          formatNumber(target.hp, { maximumFractionDigits: 0 }),
+          formatNumber(target.maxHp, { maximumFractionDigits: 0 }),
+          targetHpPercentText,
+          target.dead ? t('hud.core.dead') : null,
+          unitFrameTextMode,
+        );
+        const targetPortrait = this.portraitPlans.plan(target);
         this.targetFramePainter.paint(
           unitFrameView({
             present: true,
-            hpFrac: target.hp / Math.max(1, target.maxHp),
-            hpText: target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`,
+            hpFrac: targetHpFrac,
+            hpText: targetHealthText.primary,
+            hpPercentText: targetHealthText.secondaryPercent,
+            incomingHealFrac:
+              (this.unitFrameIncomingHeals.get(target.id) ?? 0) / Math.max(1, target.maxHp),
             showAbsorbText: !target.dead,
             // The target's power bar (classic target frame): players and caster
             // mobs show their mana/rage/energy; a resource-less target (a plain
@@ -7311,25 +7398,69 @@ export class Hud {
             resText:
               target.dead || !target.resourceType
                 ? ''
-                : `${Math.round(target.resource)} / ${target.maxResource}`,
+                : `${formatNumber(target.resource, { maximumFractionDigits: 0 })} / ${formatNumber(target.maxResource, { maximumFractionDigits: 0 })}`,
             levelText: String(target.level),
             name: entityDisplayName(target),
             titlePre: this.targetTitleDecoration.pre,
             titlePost: this.targetTitleDecoration.post,
             // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
             // the painter resets it on hide so an id reused by a new mob still redraws.
-            portraitKey: String(target.id),
+            portraitKey: `${target.id}:${targetPortrait?.identityKey ?? 'base'}`,
+            portraitState: targetPortrait?.context ?? (target.dead ? 'dead' : 'normal'),
             absorb: target.dead ? null : target,
-            dead: false,
+            dead: target.dead,
             outOfRange: false,
           }),
         );
       }
+      this.paintTargetOfTarget(target, p.id);
       // Target-only sub-parts the family frame does not express, each routed through
       // the elided writers (the elite class + name color are the two writes the four
       // original writers cannot express, hence the toggleClass / setStyleProp).
       this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));
       this.toggleClass(this.targetFrameEl, 'boss', targetRank === 'boss');
+      this.toggleClass(this.targetFrameEl, 'hostile', target.hostile);
+      this.toggleClass(this.targetFrameEl, 'friendly', !target.hostile);
+      const threatState = unitThreatState(target, p.id);
+      this.toggleClass(this.targetFrameEl, 'threat-building', threatState === 'building');
+      this.toggleClass(this.targetFrameEl, 'threat-high', threatState === 'high');
+      this.toggleClass(this.targetFrameEl, 'threat-aggro', threatState === 'aggro');
+      this.writerFacet.setAttr(
+        this.targetThreatIndicatorEl,
+        'aria-hidden',
+        threatState === 'none' ? 'true' : 'false',
+      );
+      if (threatState !== 'none') {
+        this.writerFacet.setAttr(
+          this.targetThreatIndicatorEl,
+          'aria-label',
+          t('hud.meters.threat'),
+        );
+      }
+      if (targetChanged || slowHud) {
+        const hasQuestObjective =
+          target.kind === 'mob' &&
+          questObjectivesForMob(sim.questLog, target.templateId).length > 0;
+        const targetPartyMember =
+          target.kind === 'player'
+            ? sim.partyInfo?.members.find((member) => member.pid === target.id)
+            : undefined;
+        this.toggleClass(this.targetFrameEl, 'target-quest', hasQuestObjective);
+        this.toggleClass(
+          this.targetFrameEl,
+          'target-disconnected',
+          targetPartyMember?.connected === 0,
+        );
+      }
+      this.setStyleProp(
+        this.targetFrameEl,
+        '--unit-accent',
+        target.kind === 'player'
+          ? classCss(target.templateId)
+          : target.hostile
+            ? 'var(--color-hostile)'
+            : 'var(--color-friendly)',
+      );
       this.setText(
         this.targetEliteTagEl,
         targetRank === 'boss' ? t('hud.core.boss') : t('hud.core.elite'),
@@ -7349,7 +7480,7 @@ export class Hud {
       // elided toggleClass writer so the per-frame hot path stays write-elided. Normal
       // mode is unaffected (the rule lives only inside @media (forced-colors: active)).
       this.toggleClass(this.targetNameEl, 'hostile', target.hostile);
-      // Tier the target-debuff refresh (tick) granularity like the buff
+      // Tier both target-aura rows' refresh (tick) granularity like the buff
       // bar. A target SWAP (targetChanged) forces an immediate repaint so the strip never
       // shows the previous target's debuffs while throttled on low; otherwise the full
       // tiers repaint every frame and low coarsens to ~4Hz.
@@ -7362,6 +7493,7 @@ export class Hud {
         )
       ) {
         this.lastTargetDebuffsPaintAt = now;
+        this.targetBuffsPainter.paint(this.targetBuffsView.tick(target));
         this.targetDebuffsPainter.paint(this.targetDebuffsView.tick(target));
       }
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
@@ -7371,50 +7503,6 @@ export class Hud {
         cast: castBarState(target),
         castRemaining: target.castRemaining,
       });
-      // Target of Target (showTargetOfTarget): resolve who the target is targeting (a
-      // mob/pet's aggro target, a player's selected target) and paint the mini-frame.
-      // The id already rides the wire (aggro for mobs, tgt for players), but the ENTITY
-      // is only known when it is inside the player's ~120yd interest bubble, so an
-      // unknown (out of range) or world-object target-of-target hides the frame
-      // gracefully. Gated on the setting: off keeps the frame hidden every frame. A
-      // non-self frame, throttled like the target frame; a tot SWAP bypasses the throttle.
-      const totId = targetOfTargetId(target);
-      const tot = this.showTargetOfTarget && totId !== null ? sim.entities.get(totId) : undefined;
-      if (tot && tot.kind !== 'object') {
-        this.totPortraitSubject = tot;
-        const totChanged = tot.id !== this.lastTotFrameId;
-        if (
-          nonSelfRepaintDue(
-            totChanged,
-            this.lastTotFramePaintAt,
-            now,
-            targetFrameNonSelfIntervalMs(fxTier),
-          )
-        ) {
-          this.lastTotFramePaintAt = now;
-          this.lastTotFrameId = tot.id;
-          this.totFramePainter.paint(
-            unitFrameView({
-              present: true,
-              hpFrac: tot.hp / Math.max(1, tot.maxHp),
-              hpText: tot.dead ? t('hud.core.dead') : `${tot.hp} / ${tot.maxHp}`,
-              showAbsorbText: false,
-              resourceKind: 'none',
-              resFrac: 0,
-              resText: '',
-              levelText: null,
-              name: entityDisplayName(tot),
-              portraitKey: String(tot.id),
-              absorb: null,
-              dead: false,
-              outOfRange: false,
-            }),
-          );
-        }
-      } else {
-        this.lastTotFrameId = null;
-        this.totFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
-      }
     } else {
       // No target (or a world object): hide the frame. The painter also resets its
       // portrait gate here, so re-acquiring a target repaints (the old -999 reset). Reset
@@ -7433,11 +7521,7 @@ export class Hud {
         this.lastAnnouncedTargetId = null;
       }
       this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
-      // Hide the target-of-target frame too. Its parent (#target-frame) is already
-      // display:none, but paint hidden anyway to reset the painter's portrait gate +
-      // cadence id so re-acquiring a target repaints the mini-frame immediately.
-      this.lastTotFrameId = null;
-      this.totFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      this.paintTargetOfTarget(null, p.id);
     }
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
@@ -7667,6 +7751,7 @@ export class Hud {
       const rest = restView({ sitting: !!p.sitting, eating: !!p.eating, drinking: !!p.drinking });
       if (rest.resting !== this.lastResting) {
         this.lastResting = rest.resting;
+        this.toggleClass(this.playerFrameEl, 'resting', rest.resting);
         const restEl = $('#pf-rest');
         restEl.classList.toggle('on', rest.resting);
         restEl.title = rest.labelKey ? t(rest.labelKey) : '';
@@ -13062,7 +13147,7 @@ export class Hud {
   private updatePartyFrames(): void {
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
-    const info = this.sim.partyInfo;
+    const info = this.mediumPartyInfo;
     // Drop the frames below the target frame only when the measured target
     // stack (frame + #tf-debuffs strip) actually overlaps their column: the
     // painter keeps --party-below-target-bottom current (measuring only when

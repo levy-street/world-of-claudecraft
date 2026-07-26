@@ -2181,7 +2181,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Przyjazny',
   'hudChrome.mobTooltip.hostile': 'Wrogi',
   'hudChrome.mobTooltip.levelFamily': 'Poziom {level}: {family}',
-  'hudChrome.options.aurasOnPlayerFrame': 'Wzmocnienia na ramce gracza',
   'hudChrome.options.playerFrameScale': 'Skala ramki gracza',
   'hudChrome.options.showDailyRewardsChest': 'Pokaż skrzynię codziennych nagród',
   'hudChrome.options.showOwnNameplate': 'Pokaż moją plakietkę',

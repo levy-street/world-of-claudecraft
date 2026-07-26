@@ -14,7 +14,18 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Aura } from '../src/sim/types';
-import { type UnitFrameDescriptor, unitFrameView, unitResourceClass } from '../src/ui/unit_frame';
+import {
+  UNIT_FRAME_DANGER_FRAC,
+  UNIT_FRAME_HEAVY_HIT_FRAC,
+  type UnitFrameDescriptor,
+  unitFrameHealthText,
+  unitFrameView,
+  unitHealthImpact,
+  unitHealthTrend,
+  unitResourceClass,
+  unitTargetPresentation,
+  unitThreatState,
+} from '../src/ui/unit_frame';
 
 function shield(value: number): Aura {
   return {
@@ -69,6 +80,13 @@ describe('unitFrameView: the present / hidden gate', () => {
     expect(v).toEqual({
       present: false,
       hpFrac: 0,
+      hpPercent: 0,
+      hpPercentText: '',
+      hpDanger: false,
+      hpFull: false,
+      hpState: 'empty',
+      healPredictionStartFrac: 0,
+      healPredictionSizeFrac: 0,
       hpText: '',
       resClass: 'none',
       resFrac: 0,
@@ -78,6 +96,7 @@ describe('unitFrameView: the present / hidden gate', () => {
       titlePre: '',
       titlePost: '',
       portraitKey: '',
+      portraitState: 'normal',
       absorbFrac: 0,
       absorbStartFrac: 0,
       absorbSizeFrac: 0,
@@ -85,6 +104,121 @@ describe('unitFrameView: the present / hidden gate', () => {
       dead: false,
       outOfRange: false,
     });
+  });
+});
+
+describe('unit health feedback derivation', () => {
+  it('classifies damage, healing, and unchanged samples', () => {
+    expect(unitHealthTrend(null, 0.8)).toBe('stable');
+    expect(unitHealthTrend(0.8, 0.6)).toBe('damage');
+    expect(unitHealthTrend(0.6, 0.75)).toBe('heal');
+    expect(unitHealthTrend(0.75, 0.75)).toBe('stable');
+  });
+
+  it('gives large losses one stronger capped impact tier', () => {
+    expect(unitHealthImpact(null, 0.4)).toBe('stable');
+    expect(unitHealthImpact(0.8, 0.7)).toBe('damage');
+    expect(unitHealthImpact(0.8, 0.8 - UNIT_FRAME_HEAVY_HIT_FRAC)).toBe('damage-heavy');
+    expect(unitHealthImpact(0.4, 0.75)).toBe('heal');
+  });
+
+  it('clamps progress semantics and marks only living critical health as danger', () => {
+    expect(unitFrameView(playerDescriptor({ hpFrac: 1.4 })).hpPercent).toBe(100);
+    expect(unitFrameView(playerDescriptor({ hpFrac: -0.2 })).hpPercent).toBe(0);
+    expect(unitFrameView(playerDescriptor({ hpFrac: UNIT_FRAME_DANGER_FRAC })).hpDanger).toBe(true);
+    expect(unitFrameView(playerDescriptor({ hpFrac: 0 })).hpDanger).toBe(false);
+  });
+
+  it('derives readable full, healthy, wounded, critical, and dead states', () => {
+    expect(unitFrameView(playerDescriptor({ hpFrac: 1 })).hpFull).toBe(true);
+    expect(unitFrameView(playerDescriptor({ hpFrac: 0.8 })).hpState).toBe('healthy');
+    expect(unitFrameView(playerDescriptor({ hpFrac: 0.5 })).hpState).toBe('wounded');
+    expect(unitFrameView(playerDescriptor({ hpFrac: 0.25 })).hpState).toBe('critical');
+    expect(unitFrameView(playerDescriptor({ hpFrac: 0, dead: true })).hpState).toBe('dead');
+  });
+
+  it('clamps incoming healing to the missing-health segment and preserves localized percent text', () => {
+    const v = unitFrameView(
+      playerDescriptor({
+        hpFrac: 0.72,
+        hpPercentText: '72 %',
+        incomingHealFrac: 0.4,
+      }),
+    );
+    expect(v.hpPercentText).toBe('72 %');
+    expect(v.healPredictionStartFrac).toBe(0.72);
+    expect(v.healPredictionSizeFrac).toBeCloseTo(0.28);
+
+    const dead = unitFrameView(playerDescriptor({ hpFrac: 0, dead: true, incomingHealFrac: 0.5 }));
+    expect(dead.healPredictionSizeFrac).toBe(0);
+  });
+});
+
+describe('unitFrameHealthText: main-frame numeric modes', () => {
+  const text = (mode: 0 | 1 | 2 | 3) => unitFrameHealthText('750', '1,000', '75%', null, mode);
+
+  it('supports hidden, percent, current, and current/max without duplicate percentages', () => {
+    expect(text(0)).toEqual({ primary: '', secondaryPercent: '' });
+    expect(text(1)).toEqual({ primary: '75%', secondaryPercent: '' });
+    expect(text(2)).toEqual({ primary: '750', secondaryPercent: '' });
+    expect(text(3)).toEqual({ primary: '750 / 1,000', secondaryPercent: '75%' });
+  });
+
+  it('keeps the dead state readable even when numbers are hidden', () => {
+    expect(unitFrameHealthText('0', '1,000', '0%', 'Dead', 0)).toEqual({
+      primary: 'Dead',
+      secondaryPercent: '',
+    });
+  });
+});
+
+describe('unitThreatState: target-frame threat hierarchy', () => {
+  const target = (over: Partial<Parameters<typeof unitThreatState>[0]> = {}) => ({
+    kind: 'mob',
+    hostile: true,
+    dead: false,
+    aggroTargetId: 2,
+    threat: new Map<number, number>([
+      [1, 50],
+      [2, 100],
+    ]),
+    ...over,
+  });
+
+  it('distinguishes building, high, and active aggro from the authoritative table', () => {
+    expect(unitThreatState(target(), 1)).toBe('building');
+    expect(
+      unitThreatState(
+        target({
+          threat: new Map([
+            [1, 90],
+            [2, 100],
+          ]),
+        }),
+        1,
+      ),
+    ).toBe('high');
+    expect(unitThreatState(target({ aggroTargetId: 1 }), 1)).toBe('aggro');
+  });
+
+  it('stays quiet for friendly, dead, non-mob, or absent player threat', () => {
+    expect(unitThreatState(target({ hostile: false }), 1)).toBe('none');
+    expect(unitThreatState(target({ dead: true }), 1)).toBe('none');
+    expect(unitThreatState(target({ kind: 'player' }), 1)).toBe('none');
+    expect(unitThreatState(target({ threat: new Map([[2, 100]]) }), 1)).toBe('none');
+  });
+});
+
+describe('unitTargetPresentation: self-target deduplication', () => {
+  it('preserves self-target semantics without rendering a duplicate target frame', () => {
+    expect(unitTargetPresentation({ id: 7, kind: 'player' }, 7)).toBe('self');
+  });
+
+  it('shows other units and hides missing or world-object targets', () => {
+    expect(unitTargetPresentation({ id: 8, kind: 'player' }, 7)).toBe('unit');
+    expect(unitTargetPresentation({ id: 9, kind: 'mob' }, 7)).toBe('unit');
+    expect(unitTargetPresentation({ id: 10, kind: 'object' }, 7)).toBe('none');
+    expect(unitTargetPresentation(null, 7)).toBe('none');
   });
 });
 
