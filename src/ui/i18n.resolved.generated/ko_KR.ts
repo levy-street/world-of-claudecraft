@@ -2776,6 +2776,14 @@ export const ko_KR: EnTranslations = {
       "lbEmpty": "아직 순위에 오른 연대기 작가가 없습니다.",
       "broadcastsLabel": "업적 달성을 길드와 친구에게 공유",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "세계 지도",
+      "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
+      "toWorld": "세계 지도",
+      "toZone": "Zone map",
+      "toggleAria": "세계 지도와 지역 지도 전환",
+      "levels": "레벨 {min}부터 {max}까지"
     }
   },
   "gatherEvent": {

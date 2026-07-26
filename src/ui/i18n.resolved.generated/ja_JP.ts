@@ -2776,6 +2776,14 @@ export const ja_JP: EnTranslations = {
       "lbEmpty": "ランク入りした年代記作家はまだいません。",
       "broadcastsLabel": "功績の達成をギルドとフレンドに共有する",
       "titledName": "{name}【{title}】"
+    },
+    "continentMap": {
+      "title": "ワールドマップ",
+      "summary": "ワールドマップ。地域を選ぶとその地図が開きます。",
+      "toWorld": "ワールドマップ",
+      "toZone": "Zone map",
+      "toggleAria": "ワールドマップとゾーンマップを切り替える",
+      "levels": "レベル {min} から {max}"
     }
   },
   "gatherEvent": {

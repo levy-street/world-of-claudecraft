@@ -10567,4 +10567,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '해당 ID를 가진 아이템이 없습니다.',
   'devCommand.kitCurrentSpec': '현재 전문화',
   'hudChrome.enchanting.wornTag': '착용 중 ({slot})',
+  'hudChrome.continentMap.title': '세계 지도',
+  'hudChrome.continentMap.summary': '세계 지도. 지역을 선택하면 해당 지도가 열립니다.',
+  'hudChrome.continentMap.toWorld': '세계 지도',
+  'hudChrome.continentMap.toggleAria': '세계 지도와 지역 지도 전환',
+  'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
 };

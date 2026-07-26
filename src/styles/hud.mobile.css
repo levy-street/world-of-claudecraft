@@ -4359,6 +4359,12 @@
     min-height: 40px;
     box-sizing: border-box;
   }
+  /* the continent level toggle is the touch way to reach the world overview
+     (no right-click on touch); raise it to the 40x40 floor. */
+  body.mobile-touch #map-level-toggle {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
   body.mobile-touch #controls-hint {
     max-width: min(360px, 92vw);
     margin-top: 18px;

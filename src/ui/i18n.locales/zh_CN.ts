@@ -10101,4 +10101,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '没有该 ID 对应的物品。',
   'devCommand.kitCurrentSpec': '当前专精',
   'hudChrome.enchanting.wornTag': '已装备（{slot}）',
+  'hudChrome.continentMap.title': '世界地图',
+  'hudChrome.continentMap.summary': '世界地图。选择一个地区以打开其地图。',
+  'hudChrome.continentMap.toWorld': '世界地图',
+  'hudChrome.continentMap.toggleAria': '在世界地图和地区地图之间切换',
+  'hudChrome.continentMap.levels': '等级 {min} 到 {max}',
 };

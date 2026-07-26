@@ -2776,6 +2776,14 @@ export const nl_NL: EnTranslations = {
       "lbEmpty": "Nog geen kroniekschrijvers op de ranglijst.",
       "broadcastsLabel": "Deel behaalde daden met je gilde en vrienden",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "World Map",
+      "summary": "World map. Choose a zone to open its map.",
+      "toWorld": "World map",
+      "toZone": "Zone map",
+      "toggleAria": "Switch between the world map and the zone map",
+      "levels": "Levels {min} to {max}"
     }
   },
   "gatherEvent": {

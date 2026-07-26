@@ -309,6 +309,7 @@ const HOT_PAINTERS: ReadonlyArray<{
 // of silently escaping the scan. (Render-resident painters under src/render, e.g. the
 // cadence-throttled nameplate_painter, are intentionally outside this HUD-painter file.)
 const CANVAS_PAINTERS: ReadonlyArray<string> = [
+  'continent_map_painter.ts',
   'hud/delve/delve_map_painter.ts',
   'map_window_painter.ts',
   'minimap_painter.ts',

@@ -2776,6 +2776,14 @@ export const es_ES: EnTranslations = {
       "lbEmpty": "Aún no hay cronistas clasificados.",
       "broadcastsLabel": "Compartir las gestas conseguidas con la hermandad y los amigos",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "World Map",
+      "summary": "World map. Choose a zone to open its map.",
+      "toWorld": "World map",
+      "toZone": "Zone map",
+      "toggleAria": "Switch between the world map and the zone map",
+      "levels": "Levels {min} to {max}"
     }
   },
   "gatherEvent": {

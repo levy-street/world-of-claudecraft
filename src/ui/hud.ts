@@ -177,6 +177,8 @@ import {
   spellFxCue,
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
+import { ContinentMapPainter } from './continent_map_painter';
+import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
 import { formatMinimapCoords } from './coords';
 import {
   buildCraftCelebrationPlan,
@@ -1504,6 +1506,13 @@ export class Hud {
   // The quest-giver glyphs of the last overworld map paint, for the hover
   // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
   private mapNpcMarkers: MapNpcMarker[] = [];
+  // World-map level: the per-zone detail map, or the WoW-style continent overview
+  // reached by right-click / the level-toggle button. Reset to 'zone' on open.
+  private mapLevel: 'zone' | 'continent' = 'zone';
+  // The zone id under the cursor on the continent overview (drives the highlight
+  // + hover tooltip), and the last paint's clickable zone regions for hit-testing.
+  private mapHoverZone: string | null = null;
+  private continentRegions: ContinentZoneRegion[] = [];
   private windowDragController: WindowDragController | null = null;
   private readonly chatGeometry: ChatGeometryController;
   private readonly chatWindow: ChatWindowController;
@@ -2194,6 +2203,7 @@ export class Hud {
       'wheel',
       (ev) => {
         ev.preventDefault();
+        if (this.mapLevel !== 'zone') return; // no per-zone zoom on the overview
         this.zoomMap((ev as WheelEvent).deltaY < 0 ? 1.2 : 1 / 1.2);
       },
       { passive: false },
@@ -2272,6 +2282,7 @@ export class Hud {
       return true;
     };
     mapCanvas.addEventListener('pointermove', (ev) => {
+      if (this.mapLevel !== 'zone') return; // continent hover is handled below
       if (ev.pointerType !== 'mouse' || this.mapDrag) {
         hideMapAreaTip();
         return;
@@ -2306,6 +2317,63 @@ export class Hud {
     };
     mapCanvas.addEventListener('pointerup', endMapTap);
     mapCanvas.addEventListener('pointercancel', endMapTap);
+
+    // Continent overview interactions. These are separate from the per-zone
+    // pan/zoom/tooltip handlers above, which early-return at the continent level.
+    // Right-click (or the level-toggle button) zooms out to the overview; a mouse
+    // hover highlights the zone under the cursor and shows its name + level band;
+    // a left-click / tap on a region opens that zone's detail map.
+    const canvasPoint = (clientX: number, clientY: number): { cx: number; cy: number } => {
+      const rect = mapCanvas.getBoundingClientRect();
+      return {
+        cx: ((clientX - rect.left) * mapCanvas.width) / rect.width,
+        cy: ((clientY - rect.top) * mapCanvas.height) / rect.height,
+      };
+    };
+    let continentTipShown = false;
+    const hideContinentTip = (): void => {
+      if (!continentTipShown) return;
+      continentTipShown = false;
+      this.hideTooltip();
+    };
+    mapCanvas.addEventListener('contextmenu', (ev) => {
+      ev.preventDefault(); // suppress the browser menu; right-click changes level
+      this.toggleMapLevel();
+    });
+    mapCanvas.addEventListener('click', (ev) => {
+      if (this.mapLevel !== 'continent') return;
+      const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
+      const zoneId = continentZoneAt(this.continentRegions, cx, cy);
+      if (zoneId) {
+        hideContinentTip();
+        this.openZoneFromContinent(zoneId);
+      }
+    });
+    mapCanvas.addEventListener('pointermove', (ev) => {
+      if (this.mapLevel !== 'continent' || ev.pointerType !== 'mouse') return;
+      const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
+      const zoneId = continentZoneAt(this.continentRegions, cx, cy);
+      if (zoneId !== this.mapHoverZone) {
+        this.mapHoverZone = zoneId; // repaint the highlight (+ cursor via updateMapWindow)
+        this.updateMapWindow();
+      }
+      if (zoneId) {
+        this.paintTooltipAt(this.continentZoneTooltipHtml(zoneId), ev.clientX, ev.clientY);
+        continentTipShown = true;
+      } else {
+        hideContinentTip();
+      }
+    });
+    mapCanvas.addEventListener('pointerleave', (ev) => {
+      if (ev.pointerType !== 'mouse') return;
+      hideContinentTip();
+      if (this.mapLevel === 'continent' && this.mapHoverZone !== null) {
+        this.mapHoverZone = null;
+        this.updateMapWindow();
+      }
+    });
+    $('#map-level-toggle').addEventListener('click', () => this.toggleMapLevel());
+
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
     $('#mm-crafting').addEventListener('click', () => this.toggleCrafting());
     // Drop an equipped piece dragged out of the paperdoll onto the bags window.
@@ -3605,6 +3673,10 @@ export class Hud {
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
   // the cached current-zone decorations; redraws from the mediumHud band while open.
   private readonly mapPainter = new MapWindowPainter();
+  // Continent overview painter (the world map's "zoom out to the whole world"
+  // level). Loads the painted world_overview plate once; redraws from the
+  // mediumHud band like the per-zone map.
+  private readonly continentPainter = new ContinentMapPainter();
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
   // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
@@ -8857,9 +8929,41 @@ export class Hud {
     this.mapCenter = null;
     this.mapPing = null;
     this.mapZoneOverride = null;
+    this.mapLevel = 'zone'; // always open on the per-zone detail map
+    this.mapHoverZone = null;
     el.style.display = 'block';
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
+  }
+
+  // Toggle the world map between the per-zone detail level and the continent
+  // overview (WoW-style right-click zoom out / the level-toggle button). Not
+  // available in a delve, whose map is the schematic branch.
+  private toggleMapLevel(): void {
+    if (mapWindowMode(this.sim) === 'delve') return;
+    this.setMapLevel(this.mapLevel === 'continent' ? 'zone' : 'continent');
+  }
+
+  private setMapLevel(level: 'zone' | 'continent'): void {
+    if (this.mapLevel === level) return;
+    this.mapLevel = level;
+    this.mapHoverZone = null;
+    this.mapDrag = null;
+    this.hideTooltip();
+    if ($('#map-window').style.display === 'block') this.updateMapWindow();
+  }
+
+  // Open a specific zone's detail map from the continent overview (a left-click on
+  // its region). Reuses the Show-on-Map override; never teleports the player.
+  private openZoneFromContinent(zoneId: string): void {
+    this.mapZoneOverride = zoneId;
+    this.mapZoom = MAP_OPEN_ZOOM;
+    this.mapCenter = null;
+    this.mapPing = null;
+    this.mapHoverZone = null;
+    this.hideTooltip();
+    this.mapLevel = 'zone';
+    this.updateMapWindow();
   }
 
   // Dungeon Finder "Show on Map": open the world map on the entrance's zone
@@ -8900,17 +9004,51 @@ export class Hud {
     const p = this.sim.player;
     const summaryEl = $('#map-summary');
 
-    if (mapWindowMode(this.sim) === 'delve') {
+    const inDelve = mapWindowMode(this.sim) === 'delve';
+    // The continent overview only applies to the overworld; a delve forces the
+    // schematic branch and hides the level toggle. The per-zone +/- zoom controls
+    // are meaningless on the continent overview, so hide them there.
+    this.setDisplay($('#map-level-toggle'), inDelve ? 'none' : 'block');
+    this.setDisplay($('#map-zoom'), this.mapLevel === 'continent' && !inDelve ? 'none' : 'flex');
+    if (inDelve) {
       // The delve painter owns the full world-map schematic render (the area
       // title is drawn on-canvas, since the world map has no DOM zone label).
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
+      this.continentRegions = [];
       this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const run = this.sim.delveRun;
       const area = run ? delveDisplayName(run.delveId) : '';
       this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
       return;
     }
+
+    // Update the level-toggle button's visible text (its accessible name) to the
+    // action it performs from the current level. The generic aria/title is static.
+    this.setText(
+      $('#map-level-toggle'),
+      t(
+        this.mapLevel === 'continent'
+          ? 'hudChrome.continentMap.toZone'
+          : 'hudChrome.continentMap.toWorld',
+      ),
+    );
+
+    if (this.mapLevel === 'continent') {
+      // The continent overview: a painted world plate with clickable zone regions.
+      this.mapQuestAreas = [];
+      this.mapNpcMarkers = [];
+      this.mapView = null; // panning/zoom belong to the per-zone level only
+      const result = this.continentPainter.paintContinent(ctx, this.sim, {
+        canvasSize: S,
+        hoveredZoneId: this.mapHoverZone,
+      });
+      this.continentRegions = result.regions;
+      canvas.style.cursor = this.mapHoverZone ? 'pointer' : 'default';
+      this.setText(summaryEl, t('hudChrome.continentMap.summary'));
+      return;
+    }
+    this.continentRegions = [];
 
     // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
     // the instance x-band layout); outdoors, follow the committed zone so
@@ -8945,6 +9083,22 @@ export class Hud {
     this.mapNpcMarkers = result.npcs;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
+  }
+
+  // Tooltip body for a hovered zone region on the continent overview: the zone's
+  // localized name plus its suggested level band (from the region's levelRange).
+  private continentZoneTooltipHtml(zoneId: string): string {
+    const region = this.continentRegions.find((r) => r.zoneId === zoneId);
+    let html = `<div class="tt-title">${esc(zoneDisplayName(zoneId))}</div>`;
+    if (region) {
+      html += `<div class="tt-quest-req">${esc(
+        t('hudChrome.continentMap.levels', {
+          min: this.questNumber(region.levelMin),
+          max: this.questNumber(region.levelMax),
+        }),
+      )}</div>`;
+    }
+    return html;
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest

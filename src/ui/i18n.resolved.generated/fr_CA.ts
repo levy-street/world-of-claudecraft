@@ -2776,6 +2776,14 @@ export const fr_CA: EnTranslations = {
       "lbEmpty": "Aucun chroniqueur classé pour le moment.",
       "broadcastsLabel": "Partager les hauts faits accomplis avec la guilde et les amis",
       "titledName": "{name} « {title} »"
+    },
+    "continentMap": {
+      "title": "World Map",
+      "summary": "World map. Choose a zone to open its map.",
+      "toWorld": "World map",
+      "toZone": "Zone map",
+      "toggleAria": "Switch between the world map and the zone map",
+      "levels": "Levels {min} to {max}"
     }
   },
   "gatherEvent": {

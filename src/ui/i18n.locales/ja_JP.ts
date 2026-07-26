@@ -10579,4 +10579,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'そのIDのアイテムはありません。',
   'devCommand.kitCurrentSpec': '現在のスペック',
   'hudChrome.enchanting.wornTag': '装備中 ({slot})',
+  'hudChrome.continentMap.title': 'ワールドマップ',
+  'hudChrome.continentMap.summary': 'ワールドマップ。地域を選ぶとその地図が開きます。',
+  'hudChrome.continentMap.toWorld': 'ワールドマップ',
+  'hudChrome.continentMap.toggleAria': 'ワールドマップとゾーンマップを切り替える',
+  'hudChrome.continentMap.levels': 'レベル {min} から {max}',
 };

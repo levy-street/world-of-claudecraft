@@ -2776,6 +2776,14 @@ export const en_XA: EnTranslations = {
       "lbEmpty": "[Ñó ŕáñķéð çĥŕóñíçļéŕš ýéţ.]",
       "broadcastsLabel": "[Šĥáŕé ðééð úñļóçķš ŵíţĥ ĝúíļð áñð ƒŕíéñðš]",
       "titledName": "[{name} [{title}]]"
+    },
+    "continentMap": {
+      "title": "[Ŵóŕļð Ɱáþ]",
+      "summary": "[Ŵóŕļð ɱáþ. Çĥóóšé á žóñé ţó óþéñ íţš ɱáþ.]",
+      "toWorld": "[Ŵóŕļð ɱáþ]",
+      "toZone": "[Žóñé ɱáþ]",
+      "toggleAria": "[Šŵíţçĥ ƀéţŵééñ ţĥé ŵóŕļð ɱáþ áñð ţĥé žóñé ɱáþ]",
+      "levels": "[Ļéʋéļš {min} ţó {max}]"
     }
   },
   "gatherEvent": {

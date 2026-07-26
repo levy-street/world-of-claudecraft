@@ -2776,6 +2776,14 @@ export const id_ID: EnTranslations = {
       "lbEmpty": "Belum ada nama yang tercatat di peringkat.",
       "broadcastsLabel": "Bagikan jasa yang diraih kepada guild dan teman",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "World Map",
+      "summary": "World map. Choose a zone to open its map.",
+      "toWorld": "World map",
+      "toZone": "Zone map",
+      "toggleAria": "Switch between the world map and the zone map",
+      "levels": "Levels {min} to {max}"
     }
   },
   "gatherEvent": {

@@ -189,6 +189,7 @@ const UI_PURE_CORES = [
   'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/map_window_view.ts',
+  'src/ui/continent_map_view.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
   'src/ui/dungeon_finder_view.ts',

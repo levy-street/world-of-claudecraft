@@ -10763,4 +10763,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
   'devCommand.kitCurrentSpec': 'Текущая специализация',
   'hudChrome.enchanting.wornTag': 'Надето ({slot})',
+  'hudChrome.continentMap.title': 'Карта мира',
+  'hudChrome.continentMap.summary': 'Карта мира. Выберите зону, чтобы открыть её карту.',
+  'hudChrome.continentMap.toWorld': 'Карта мира',
+  'hudChrome.continentMap.toggleAria': 'Переключение между картой мира и картой региона',
+  'hudChrome.continentMap.levels': 'Уровни {min} до {max}',
 };

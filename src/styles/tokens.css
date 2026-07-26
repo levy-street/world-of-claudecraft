@@ -167,6 +167,13 @@
     --color-map-graveyard: #8a929c;
     --color-map-mudhut: #7a6a4a;
     --color-map-campfire: #ff9a3c;
+    /* continent overview: clickable zone regions (resolved by
+       continent_map_painter.ts). Idle border, hovered fill + border, and the
+       current-zone border, all drawn over the painted world_overview plate. */
+    --color-map-region-stroke: rgba(255, 233, 160, 0.35);
+    --color-map-region-hover-fill: rgba(255, 233, 160, 0.18);
+    --color-map-region-hover-stroke: #ffe9a0;
+    --color-map-region-current-stroke: #ffd100;
 
     /* overworld minimap markers (resolved by minimap_painter.ts via getComputedStyle:
        a 2D canvas context cannot read a CSS var directly). Exact pre-existing values

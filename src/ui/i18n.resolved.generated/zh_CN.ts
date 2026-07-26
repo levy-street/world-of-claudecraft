@@ -2776,6 +2776,14 @@ export const zh_CN: EnTranslations = {
       "lbEmpty": "暂无上榜的编年史家。",
       "broadcastsLabel": "与公会和好友分享功绩达成",
       "titledName": "{name}【{title}】"
+    },
+    "continentMap": {
+      "title": "世界地图",
+      "summary": "世界地图。选择一个地区以打开其地图。",
+      "toWorld": "世界地图",
+      "toZone": "Zone map",
+      "toggleAria": "在世界地图和地区地图之间切换",
+      "levels": "等级 {min} 到 {max}"
     }
   },
   "gatherEvent": {

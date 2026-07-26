@@ -3190,4 +3190,18 @@ export const hudChromeStrings = {
     // after placeholder strip, so no forced non-Latin fills.
     titledName: '{name} [{title}]',
   },
+  // World map continent overview (right-click the map, or the level-toggle
+  // button, to zoom out to the whole world; click a region to open its zone map).
+  continentMap: {
+    title: 'World Map',
+    // aria-live summary announced when the overview opens.
+    summary: 'World map. Choose a zone to open its map.',
+    // Level-toggle button visible text per level (the accessible name too). The
+    // static aria/title is generic so it never needs a per-level setAttribute.
+    toWorld: 'World map',
+    toZone: 'Zone map',
+    toggleAria: 'Switch between the world map and the zone map',
+    // Hover tooltip over a zone region: its name plus the suggested level band.
+    levels: 'Levels {min} to {max}',
+  },
 };

@@ -7666,6 +7666,30 @@
     top: 8px;
     z-index: 2;
   }
+  /* continent overview level toggle (top-left; close is top-right). Matches the
+     zoom controls' micro-menu look but is a labelled pill (World / Zone). */
+  #map-level-toggle {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    z-index: 2;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1;
+    border: 2px solid #4a3d1d;
+    border-radius: 5px;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+  }
+  #map-level-toggle:hover {
+    border-color: var(--gold);
+    color: #fff;
+  }
 
   /* ---------- Dungeon Finder ---------- */
   /* Closed by default: this @layer components rule outranks `.window { display: none }`

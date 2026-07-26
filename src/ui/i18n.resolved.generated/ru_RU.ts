@@ -2776,6 +2776,14 @@ export const ru_RU: EnTranslations = {
       "lbEmpty": "В рейтинге пока нет летописцев.",
       "broadcastsLabel": "Делиться деяниями с гильдией и друзьями",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Карта мира",
+      "summary": "Карта мира. Выберите зону, чтобы открыть её карту.",
+      "toWorld": "Карта мира",
+      "toZone": "Zone map",
+      "toggleAria": "Переключение между картой мира и картой региона",
+      "levels": "Уровни {min} до {max}"
     }
   },
   "gatherEvent": {
