@@ -342,6 +342,26 @@ describe('playtest round four (owner hotfixes)', () => {
     expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(false);
   });
 
+  it('Fire Blast lands instantly without disturbing a Fireball already being cast', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim, 18);
+    sim.castAbility('fireball');
+    collect(sim, 0.5);
+    const remainingBefore = p.castRemaining;
+    const castTargetBefore = p.castTargetId;
+    const hpBefore = mob.hp;
+    sim.drainEvents();
+
+    sim.castAbility('fire_blast');
+
+    const events = sim.drainEvents();
+    expect(mob.hp).toBeLessThan(hpBefore);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(false);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBe(remainingBefore);
+    expect(p.castTargetId).toBe(castTargetBefore);
+  });
+
   it('Scorch casts on the move', () => {
     const { sim, p } = mageWithSpec('fire');
     addDummy(sim, 10);
@@ -461,6 +481,22 @@ describe('playtest round five (owner hotfixes)', () => {
     expect(p.castingAbility).toBeNull(); // instant under the streak
     expect(p.resource).toBe(mana0); // and free
     expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(false); // spent
+  });
+
+  it('Flamestrike has no cooldown and can be cast again after its GCD', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim);
+
+    expect(ABILITIES.flamestrike.cooldown).toBe(0);
+    sim.castAbilityAt('flamestrike', { x: mob.pos.x, z: mob.pos.z });
+    expect(p.castingAbility).toBe('flamestrike');
+    while (p.castingAbility) collect(sim, 0.05);
+    expect(p.cooldowns.has('flamestrike')).toBe(false);
+
+    gcdReset(p);
+    p.resource = p.maxResource;
+    sim.castAbilityAt('flamestrike', { x: mob.pos.x, z: mob.pos.z });
+    expect(p.castingAbility).toBe('flamestrike');
   });
 
   it('Rune of Power is a deliberate cast now', () => {

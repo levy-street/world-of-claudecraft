@@ -614,6 +614,12 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
  * Steam link UI (dual-arm edit: the legacy main.ts twin carries the same field).
  * players_cap is the configured realm player cap (0 when disabled), also a dual-arm
  * edit: the legacy main.ts twin carries the same field with the same semantics.
+ * dev_commands is the capability advert for the /dev GUI: the dev_* cheats ride the
+ * WEBSOCKET dispatcher, which both ladders serve identically, so unlike steam.enabled
+ * this one reports the real env on BOTH arms (dual-arm edit: the legacy main.ts twin
+ * carries the same field). Read live per request, mirroring the /api/perf gate. It
+ * advertises only; every cheat is still re-gated server-side on each message, so a
+ * forged true buys a client nothing.
  */
 async function statusHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -623,6 +629,7 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     players_online: rt.playersOnline(),
     players_cap: rt.playersCap(),
     steam: { enabled: steamEnabled() },
+    dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
   });
 }
 

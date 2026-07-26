@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.29.1",
+  "version": "0.30.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -61,6 +61,7 @@
     "asset:budget": "node scripts/asset_budget.mjs",
     "assets:items": "node scripts/convert_item_icons_webp.mjs",
     "assets:skills": "node scripts/convert_skill_icons_webp.mjs",
+    "assets:chrome": "node scripts/convert_chrome_icons_webp.mjs",
     "assets:deeds": "node scripts/convert_deed_icons_webp.mjs",
     "assets:professions": "node scripts/convert_profession_icons_webp.mjs",
     "build:env": "esbuild headless/env_server.ts --bundle --platform=node --format=cjs --outfile=dist-env/env_server.cjs",

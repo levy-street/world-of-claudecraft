@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import {
   closeSync,
   existsSync,
@@ -15,6 +16,7 @@ import { PROCEDURAL_LEGENDARY_POWERS } from '../src/sim/content/procedural_legen
 import { PROCEDURAL_ITEM_BASES } from '../src/sim/content/procedural_loot';
 import { ITEMS } from '../src/sim/data';
 import { ITEM_IMAGE_IDS, iconDataUrl, itemImageUrl, UI_ITEM_IMAGE_IDS } from '../src/ui/icons';
+import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // Gate for the committed WebP item icons (mirror of tests/skill_icons.test.ts). Art under
 // public/ui/items/<id>.webp is the source of truth (WebP only), served by itemImageUrl for
@@ -30,6 +32,8 @@ import { ITEM_IMAGE_IDS, iconDataUrl, itemImageUrl, UI_ITEM_IMAGE_IDS } from '..
 //      and every UI pseudo-item id is deliberately NOT an item (the two sets stay disjoint);
 //   E) the whole bag family (the 5 equippable bags + the implicit backpack) is image-backed,
 //      so the bag bar never mixes painted art with a procedural fallback.
+//   H) every real non-weapon item is image-backed, so the legacy procedural compositor is
+//      reserved for UI fallbacks and future development only.
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(repoRoot, 'public');
 const itemsDir = path.join(publicDir, 'ui/items');
@@ -177,8 +181,15 @@ type Mapping = {
     itemId: string;
     name: string;
     sourcePack: string;
-    sourceFile: string;
+    sourceFile?: string;
     license?: string;
+  }[];
+  generatedBatches?: {
+    source: string;
+    license: string;
+    styleReference: string;
+    commonPrompt: string;
+    itemIds: string[];
   }[];
 };
 const mapping = (): Mapping =>
@@ -231,7 +242,7 @@ describe('item webp icons', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
   });
 
-  it('A) every image-backed item id resolves to a committed, valid .webp', () => {
+  it('A) every image-backed item id resolves to a committed, decodable .webp', async () => {
     const broken: string[] = [];
     for (const id of [...ITEM_IMAGE_IDS, ...UI_ITEM_IMAGE_IDS]) {
       const url = itemImageUrl(id);
@@ -239,6 +250,13 @@ describe('item webp icons', () => {
       const file = path.join(publicDir, (url as string).replace(/^\//, ''));
       if (!existsSync(file)) broken.push(`${id} -> ${url} (missing file)`);
       else if (!isValidWebp(file)) broken.push(`${id} -> ${url} (not a valid webp)`);
+      else {
+        try {
+          await sharp(file).raw().toBuffer();
+        } catch {
+          broken.push(`${id} -> ${url} (webp payload cannot be decoded)`);
+        }
+      }
     }
     expect(broken).toEqual([]);
   });
@@ -324,7 +342,13 @@ describe('item webp icons', () => {
   it('F) every committed icon has a provenance entry in mapping.json, and vice versa', () => {
     const m = mapping();
     const files = topLevelWebpFiles().map((f) => path.basename(f, '.webp'));
-    const listed = m.entries.map((e) => e.itemId);
+    const curated = m.entries.map((e) => e.itemId);
+    const generated = (m.generatedBatches ?? []).flatMap((batch) => batch.itemIds);
+    const listed = [...curated, ...generated];
+    expect(
+      listed.filter((id, index) => listed.indexOf(id) !== index),
+      'an icon must have exactly one provenance owner',
+    ).toEqual([]);
     expect(
       files.filter((id) => !listed.includes(id)),
       'art without provenance: add its entry (source + license) to mapping.json',
@@ -333,6 +357,17 @@ describe('item webp icons', () => {
       listed.filter((id) => !files.includes(id)),
       'mapping.json lists art that is not committed: drop the stale entry',
     ).toEqual([]);
+    for (const entry of m.entries) {
+      expect(entry.name, `${entry.itemId} must name its source asset`).toBeTruthy();
+      expect(entry.sourcePack, `${entry.itemId} must identify its source pack`).toBeTruthy();
+    }
+    expect(m.generatedBatches, 'generated art must retain its batch provenance').not.toEqual([]);
+    for (const batch of m.generatedBatches ?? []) {
+      expect(batch.source).toBeTruthy();
+      expect(batch.license).toContain('project asset');
+      expect(batch.styleReference).toBeTruthy();
+      expect(batch.commonPrompt).toBeTruthy();
+    }
     // The bag family is project-owned art, so each of its entries overrides the file-level
     // CraftPix license. A bag icon silently inheriting the pack license would misattribute it.
     for (const id of [...BAG_IDS, 'backpack']) {
@@ -413,6 +448,7 @@ describe('item webp icons', () => {
     }
     expect(wrong, 'run `npm run assets:items`; item art is served at one fixed square').toEqual([]);
   });
+
   it('H) mapping.json declares the exact Procedural Loot v1 provenance contract', () => {
     const sets = mapping().proceduralSets;
     expect(sets, 'mapping.json must carry one scalable proceduralSets record').toHaveLength(1);
@@ -486,6 +522,27 @@ describe('item webp icons', () => {
     );
   });
 
+  it('H5) gives all 191 nested rarity and Legendary states unique decoded RGBA art', async () => {
+    const nestedPaths = expectedNestedProceduralPaths();
+    expect(nestedPaths).toHaveLength(191);
+    const byPixelHash = new Map<string, string[]>();
+    for (const relative of nestedPaths) {
+      const { data, info } = await sharp(path.join(itemsDir, relative))
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      expect(info).toMatchObject({ width: 128, height: 128, channels: 4 });
+      const hash = createHash('sha256').update(data).digest('hex');
+      const paths = byPixelHash.get(hash) ?? [];
+      paths.push(relative);
+      byPixelHash.set(hash, paths);
+    }
+    expect(
+      [...byPixelHash.values()].filter((paths) => paths.length > 1),
+      'rarity and named Legendary states must remain visually distinct after decoding',
+    ).toEqual([]);
+  });
+
   it('I) recursively discovers nested converter inputs', () => {
     const source = readFileSync(path.join(repoRoot, 'scripts/convert_item_icons_webp.mjs'), 'utf8');
     expect(source).toMatch(/function sourceImages\(dir\)/);
@@ -493,5 +550,80 @@ describe('item webp icons', () => {
       /if \(ent\.isDirectory\(\)\)\s*sources\.push\(\.\.\.sourceImages\(candidate\)\)/,
     );
     expect(source).toMatch(/const sources = sourceImages\(itemsDir\)\.sort\(\)/);
+  });
+
+  it('J) every non-weapon item resolves to committed painted art', () => {
+    const expected = Object.values(ITEMS)
+      .filter((item) => item.kind !== 'weapon')
+      .map((item) => item.id)
+      .sort();
+    const actual = [...ITEM_IMAGE_IDS].filter((id) => ITEMS[id]?.kind !== 'weapon').sort();
+    expect(
+      actual,
+      'non-weapon items must never fall back to the legacy procedural compositor',
+    ).toEqual(expected);
+    for (const id of expected) {
+      expect(iconDataUrl('item', id), `${id} must serve its committed WebP`).toBe(
+        `/ui/items/${id}.webp`,
+      );
+    }
+  });
+
+  it('K) every top-level item icon has distinct committed artwork', () => {
+    const byHash = new Map<string, string[]>();
+    for (const file of topLevelWebpFiles()) {
+      const hash = createHash('sha256').update(readFileSync(file)).digest('hex');
+      const ids = byHash.get(hash) ?? [];
+      ids.push(path.basename(file, '.webp'));
+      byHash.set(hash, ids);
+    }
+    expect(
+      [...byHash.values()].filter((ids) => ids.length > 1),
+      'different item ids must not ship byte-identical top-level placeholder art',
+    ).toEqual([]);
+  });
+
+  it('L) each procedural alias deliberately mirrors its matching common state', () => {
+    const mismatches: string[] = [];
+    for (const baseId of canonicalProceduralBaseIds()) {
+      const alias = readFileSync(path.join(itemsDir, `${baseId}.webp`));
+      const common = readFileSync(path.join(itemsDir, PROCEDURAL_SET_ROOT, baseId, 'common.webp'));
+      if (!alias.equals(common)) mismatches.push(baseId);
+    }
+    expect(mismatches).toEqual([]);
+  });
+
+  it('M) mapped weapons keep thumbnails except for the nine painted procedural bases', () => {
+    const weaponIds = new Set(
+      Object.values(ITEMS)
+        .filter((item) => item.kind === 'weapon')
+        .map((item) => item.id),
+    );
+    const paintedProceduralWeapons = new Set([
+      'ashwood_staff',
+      'gravecaller_wand',
+      'iron_broadsword',
+      'mirefen_dirk',
+      'mirefen_hunting_bow',
+      'thornpeak_crossbow',
+      'iron_flanged_mace',
+      'thornpeak_polearm',
+      'thornpeak_war_axe',
+    ]);
+    expect([...paintedProceduralWeapons].sort()).toEqual(
+      Object.keys(PROCEDURAL_ITEM_BASES)
+        .filter((id) => ITEMS[id]?.kind === 'weapon')
+        .sort(),
+    );
+    const strayMappings = Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !weaponIds.has(id));
+    expect(strayMappings, 'thumbnail mappings must only target real weapons').toEqual([]);
+    for (const id of Object.keys(ITEM_WEAPON_VARIANTS)) {
+      const expected = paintedProceduralWeapons.has(id)
+        ? `/ui/items/${id}.webp`
+        : `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`;
+      expect(iconDataUrl('item', id), `${id} must resolve to its approved weapon art`).toBe(
+        expected,
+      );
+    }
   });
 });

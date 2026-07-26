@@ -38,6 +38,14 @@ export const id_ID: EnTranslations = {
     "filterLabel": "Saring perintah",
     "filterPlaceholder": "Cari dalam kategori ini",
     "noMatches": "Tidak ada perintah yang cocok.",
+    "itemSearchPlaceholder": "Cari berdasarkan nama atau id",
+    "itemResultsAria": "Barang yang cocok",
+    "itemNoMatches": "Tidak ada barang yang cocok.",
+    "itemMore": "Menampilkan {shown} dari {total}. Terus mengetik untuk mempersempit.",
+    "itemChosen": "Dipilih: {name}",
+    "itemUnknown": "Tidak ada barang dengan id itu.",
+    "itemHeroicTag": "Heroik",
+    "kitCurrentSpec": "Spesialisasi saat ini",
     "serverRequirement": "Perintah curang server tetap memerlukan ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Pilih nilai yang valid sebelum menjalankan perintah ini.",
     "sent": "Terkirim: {command}",
@@ -55,7 +63,8 @@ export const id_ID: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Tingkat kesulitan",
-      "name": "Nama"
+      "name": "Nama",
+      "spec": "Spesialisasi"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const id_ID: EnTranslations = {
       "give": {
         "label": "Berikan barang",
         "description": "Tambahkan barang ke inventaris pemain."
+      },
+      "kit": {
+        "label": "Kenakan kit level 20 baru",
+        "description": "Kenakan preset level 20 pra-Sanktum untuk sebuah spesialisasi, tas dahulu. Hanya perlengkapan."
       },
       "gold": {
         "label": "Tambah emas",
@@ -1049,6 +1062,7 @@ export const id_ID: EnTranslations = {
       "walkByAutoloot": "Jarah Otomatis Sambil Lewat",
       "groundReticle": "Retikel bidik darat",
       "mouseoverCast": "Rapal Saat Menyorot Bingkai Kelompok",
+      "stickyTarget": "Pertahankan Sasaran Saat Klik Tanah",
       "showItemLevel": "Tampilkan Level Item",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
@@ -1529,8 +1543,14 @@ export const id_ID: EnTranslations = {
       "dragDestroyHint": "Seret ke dunia untuk menghancurkan",
       "reorderNeedsRecent": "Hapus filter dan urutkan berdasarkan Terbaru untuk mengatur ulang tasmu",
       "itemAriaInstanced": "{item}, jumlah {count}, salinan bermerek pembuat",
+      "itemAriaEnchanted": "{item}, jumlah {count}, salinan dimantrai",
+      "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
       "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, item level {level}, quantity {count}, masterwork",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, item level {level}, quantity {count}, enchanted copy",
+      "itemAriaProceduralSigned": "{item}, {rarity}, item level {level}, quantity {count}, maker-marked copy",
+      "itemAriaProceduralBound": "{item}, {rarity}, item level {level}, quantity {count}, bound copy",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -1754,7 +1774,19 @@ export const id_ID: EnTranslations = {
       "label": "Atur Ulang Posisi Bingkai"
     },
     "itemTooltip": {
-      "requiresLevel": "Membutuhkan Level {level}"
+      "requiresLevel": "Membutuhkan Level {level}",
+      "statEnchanted": "+{value} {stat} (Dimantrai)",
+      "enchantedFallback": "Dimantrai"
+    },
+    "materialHint": {
+      "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
+      "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
+      "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",
+      "resonantThread": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah kain langka atau lebih baik.",
+      "resonantHide": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah kulit langka atau lebih baik.",
+      "resonantLinks": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah rantai langka atau lebih baik.",
+      "resonantSteel": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan senjata jarak dekat langka atau lebih baik.",
+      "resonantTimber": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan staf, tongkat sihir, busur, dan busur silang langka atau lebih baik."
     },
     "discord": {
       "title": "Discord",
@@ -1995,6 +2027,10 @@ export const id_ID: EnTranslations = {
         "takeParcelsFirst": "Keluarkan bingkisannya dulu sebelum membuang surat itu."
       }
     },
+    "marketIndicator": {
+      "aria": "Pengambilan Pasar Dunia menanti",
+      "tip": "Emas atau barang menantimu di Sang Pedagang."
+    },
     "noticeboard": {
       "empty": "Sepertinya tidak ada yang ditempel."
     },
@@ -2114,7 +2150,19 @@ export const id_ID: EnTranslations = {
       "onlineHeader": "Daring ({n})",
       "offlineHeader": "Luring ({n})",
       "hideOffline": "Sembunyikan yang luring",
-      "hideOfflineTitle": "Sembunyikan anggota serikat yang sedang luring"
+      "hideOfflineTitle": "Sembunyikan anggota serikat yang sedang luring",
+      "billboard": {
+        "label": "Papan Pengumuman Serikat",
+        "empty": "Belum ada apa pun di papan pengumuman.",
+        "setBy": "Ditetapkan oleh {name}",
+        "save": "Simpan",
+        "placeholder": "Tulis pesan untuk serikat",
+        "inputLabel": "Pesan papan pengumuman serikat",
+        "result": {
+          "set": "Papan pengumuman serikat telah diperbarui.",
+          "notOfficer": "Hanya perwira dan Pemimpin Serikat yang boleh mengedit papan pengumuman."
+        }
+      }
     },
     "gathering": {
       "title": "Pengumpulan",
@@ -2384,7 +2432,6 @@ export const id_ID: EnTranslations = {
       "makersMark": "Dibuat oleh {name}",
       "gatheredBy": "Dikumpulkan oleh {name}",
       "masterworkSeal": "Karya besar",
-      "enchantedLine": "Terpesona",
       "commissionToggle": "Karya pesanan",
       "commissionToggleHint": "Terikat pada karakter pertama yang menerimanya dalam perdagangan.",
       "commissionUnbound": "Karya pesanan: terikat pada penerima pertama",
@@ -2422,7 +2469,26 @@ export const id_ID: EnTranslations = {
       "pickerTitle": "Terapkan Mantrai",
       "targetTitle": "Pilih barang untuk dimantrai",
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
-      "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai."
+      "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai.",
+      "wornTag": "Dipakai ({slot})",
+      "tier": {
+        "base": "Mantra Dasar",
+        "runed": "Mantra Bersura",
+        "greater": "Mantra Unggul"
+      },
+      "yieldHeader": "Bahan yang diharapkan:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} hingga {max} {item}",
+      "alreadyEnchanted": "Barang itu sudah dimantrai.",
+      "sameEnchant": "Barang itu sudah memiliki mantra itu.",
+      "replaceTag": "Menggantikan {enchant}",
+      "sameEnchantTag": "Sudah diterapkan",
+      "replaceConfirmTitle": "Ganti mantra pada {item}?",
+      "replaceConfirmBody": "Ini mengganti {old} pada {item} dengan {new}.",
+      "replaceConfirmNoRefund": "Mantra lama dihancurkan. Bahannya tidak dikembalikan. Tindakan ini tidak dapat dibatalkan.",
+      "replaceConfirmCost": "Biaya: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Ganti"
     },
     "training": {
       "title": "Pelatihan: {name}",
@@ -3820,7 +3886,7 @@ export const id_ID: EnTranslations = {
           "levelingHeading": "Cara mempesona naik level",
           "levelingBody": "Dua tindakan menggerakkan keahlian: membongkar sebuah potongan, dan menerapkan pesona. Setiap keberhasilan bernilai hingga satu poin, diskalakan berdasarkan betapa seriusnya pekerjaan: kelangkaan potongan yang kamu hancurkan, atau tingkat reagen pesona yang kamu terapkan. Pembongkaran biasa dan pesona hanya-debu bernilai sebagai pekerjaan biasa; pembongkaran tidak umum dan pesona esensi sebagai tidak umum; pembongkaran langka dan setiap pesona Berukir atau Lebih Besar sebagai langka; pembongkaran epik dan legendaris lebih tinggi lagi.\n\nPudarnya penguasaan yang umum berlaku pada tingkat 25 poin, sehingga pekerjaan tingkat biasa menjadi abu-abu pada keahlian 75, pekerjaan tidak umum pada 100, dan pekerjaan tingkat langka tepat di batas 125. Mempesona juga memiliki satu kebaikan tersendiri: masukan di atas plafon arketipmu dibulatkan ke bawah hingga plafon itu daripada dikurangi menjadi nol, sehingga sebelum kamu selaras, pembongkaran epik hanya bernilai sebagai langka daripada tidak mengajarkan apa pun. Jika Mempesona berakhir dormant di balik identitas lain, semua hal bernilai sebagai pekerjaan biasa dan pendakian mandeg di 75; pertahankan sebagai hobimu dan pekerjaan tingkat langka masih membayar, hanya lebih lambat setelah 75.",
           "marketHeading": "Salinan yang dipesona, asal-usul, dan pasar",
-          "marketBody": "Menerapkan pesona mengonsumsi salinan barang yang dikemas dan tidak dikenakan ditambah reagen, dan mengembalikan salinan yang dipesona tersendiri; kenakan dan bonusnya mengikuti potongan selamanya, melalui pelepasan, perjalanan bank, dan perdagangan. Satu pesona per potongan: salinan yang dipesona tidak bisa dipesona lagi atau dibongkar, dan menjual, membuang, dan membongkar lebih memilih salinan polos terlebih dahulu, sehingga potongan jadimu tidak termakan secara tidak sengaja. Salinan yang dipesona dengan identik bahkan bertumpuk bersama dalam tasmu.\n\nPerlengkapan karya besar dan mempesona adalah teman: potongan karya besar tetap sepenuhnya bisa dipesona, dan pesona ditambahkan di atas bonus karya besar tanpa mengganggunya atau tanda tangan pembuat. Menumpuk setiap sumber, karya besar bertanda tangan yang membawa pesona Lebih Besar adalah yang terbaik yang bisa diperoleh potongan buatan, dan ia masih berada di bawah jarahan raid sesuai desain.\n\nDi pasar, World Market hanya memerantarai stok polos dan tidak dimodifikasi, sehingga potongan yang dipesona dan ditandatangani berpindah tangan langsung melalui jendela perdagangan. Materialnya adalah setengah kerajinan yang bisa dipasarkan: Debu, Esensi, dan Serpihan terdaftar bebas, biaya pendaftaran nol, dan Pedagang mengambil 5 persen dari penjualan yang selesai saja. Itu membuat dua pendapatan klasik penyihir pesona adalah menjual material di pasar, dan mengambil potongan pelanggan dalam perdagangan, mempesonanya, dan mengembalikannya."
+          "marketBody": "Menerapkan pesona mengonsumsi reagen dan menandai satu salinan barang tertentu. Arahkan ke salinan di tas dan kamu mendapat salinan terpesona tersendiri; arahkan ke potongan yang sedang dikenakan dan potongan itu dipesona di tempat, tanpa melepas dan memakai ulang. Bagaimanapun bonusnya mengikuti potongan selamanya, melalui pelepasan, perjalanan bank, dan perdagangan. Satu pesona per potongan: menerapkan pesona berbeda pada salinan yang dipesona meminta konfirmasi dulu, lalu langsung menggantikan pesona lama; pesona lama dihancurkan tanpa pengembalian materialnya. Menjual, membuang, dan membongkar lebih memilih salinan polos terlebih dahulu, sehingga potongan jadimu tidak termakan secara tidak sengaja. Salinan yang dipesona dengan identik bahkan bertumpuk bersama dalam tasmu.\n\nPerlengkapan karya besar dan mempesona adalah teman: potongan karya besar tetap sepenuhnya bisa dipesona, dan pesona ditambahkan di atas bonus karya besar tanpa mengganggunya atau tanda tangan pembuat. Menumpuk setiap sumber, karya besar bertanda tangan yang membawa pesona Lebih Besar adalah yang terbaik yang bisa diperoleh potongan buatan, dan ia masih berada di bawah jarahan raid sesuai desain.\n\nDi pasar, World Market hanya memerantarai stok polos dan tidak dimodifikasi, sehingga potongan yang dipesona dan ditandatangani berpindah tangan langsung melalui jendela perdagangan. Materialnya adalah setengah kerajinan yang bisa dipasarkan: Debu, Esensi, dan Serpihan terdaftar bebas, biaya pendaftaran nol, dan Pedagang mengambil 5 persen dari penjualan yang selesai saja. Itu membuat dua pendapatan klasik penyihir pesona adalah menjual material di pasar, dan mengambil potongan pelanggan dalam perdagangan, mempesonanya, dan mengembalikannya."
         }
       },
       "howHeading": "Cara kerja kerajinan",
@@ -6182,6 +6248,7 @@ export const id_ID: EnTranslations = {
       "arenaJoin": "Kamu bergabung ke antrean Ashen Coliseum. Bersiaplah untuk lawan yang setara...",
       "arenaLeave": "Kamu meninggalkan antrean Ashen Coliseum.",
       "arenaSands": "Kamu melangkah ke atas pasir Ashen Coliseum.",
+      "arenaSandsDrowned": "Kamu melangkah ke atas bebatuan tergenang di Istana Tenggelam.",
       "tradeRequestSent": "Kamu telah meminta untuk berdagang dengan {name}.",
       "tradeOpened": "Jendela perdagangan dibuka.",
       "tradeComplete": "Perdagangan selesai.",
@@ -6342,7 +6409,7 @@ export const id_ID: EnTranslations = {
       "cancel": "Batal"
     },
     "arena": {
-      "title": "Ashen Coliseum",
+      "title": "Koloseum Berabu",
       "subtitle": "Berperingkat 1v1",
       "close": "Tutup arena",
       "offlineNote": "Ashen Coliseum adalah arena 1v1 berperingkat untuk dunia langsung. Mainkan secara daring untuk masuk antrean dan menaiki tangga peringkat.",
@@ -6350,6 +6417,11 @@ export const id_ID: EnTranslations = {
       "playerLevelClassTitle": "{name} - Lv {level} {className}",
       "noChallengers": "Belum ada penantang berperingkat - jadilah yang pertama.",
       "matchInProgress": "Pertandingan berlangsung melawan {name}.",
+      "mapName": "Peta: {name}",
+      "map": {
+        "coliseum": "Koloseum Berabu",
+        "drownedCourt": "Istana Tenggelam"
+      },
       "leaveQueue": "Tinggalkan Antrean",
       "searching": "Mencari lawan... ({count} dalam antrean)",
       "enterQueue": "Masuk Antrean",
@@ -6748,6 +6820,7 @@ export const id_ID: EnTranslations = {
       "pageNextAria": "Halaman pasar berikutnya",
       "pageStatus": "Halaman {current} dari {total}",
       "filters": "Saringan pasar",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Jenis",
       "filterTypeAll": "Semua jenis",
       "filterTypeWeapon": "Senjata",
@@ -6758,8 +6831,15 @@ export const id_ID: EnTranslations = {
       "filterTypeOther": "Lainnya",
       "filterArmorType": "Jenis zirah",
       "filterArmorAll": "Semua zirah",
+      "filterArmorSlot": "Slot zirah",
+      "filterArmorClassAll": "Semua jenis zirah",
+      "armorCloth": "Kain",
+      "armorLeather": "Kulit",
+      "armorMail": "Rantai",
       "filterWeaponType": "Jenis senjata",
       "filterWeaponAll": "Semua senjata",
+      "filterPrimaryStat": "Stat utama",
+      "filterPrimaryStatAll": "Stat utama apa pun",
       "filterRarity": "Kelangkaan",
       "filterRarityAll": "Semua kelangkaan",
       "weaponSword": "Pedang",

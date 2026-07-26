@@ -34,6 +34,62 @@ export type BaseState =
 const DEFAULT_WALK_REF = 2.2;
 const DEFAULT_RUN_REF = 7;
 
+export const SWIM_ENTER_FEET_DEPTH = 0.5;
+export const SWIM_EXIT_FEET_DEPTH = 0.25;
+const SWIM_ENTER_FLOOR_DEPTH = 0.8;
+const SWIM_EXIT_FLOOR_DEPTH = 0.6;
+
+/** Stable waterline latch. Separate enter/exit depths prevent pose flicker. */
+export function isSwimmingAtDepth(
+  previous: boolean,
+  dead: boolean,
+  feetDepth: number,
+  floorDepth: number,
+): boolean {
+  if (dead || !Number.isFinite(feetDepth) || !Number.isFinite(floorDepth)) return false;
+  const minFeetDepth = previous ? SWIM_EXIT_FEET_DEPTH : SWIM_ENTER_FEET_DEPTH;
+  const minFloorDepth = previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
+  return feetDepth >= minFeetDepth && floorDepth >= minFloorDepth;
+}
+
+/**
+ * Frame-rate-independent swim transition. Both pitch and vertical lift consume
+ * this blend so entering or leaving water cannot pop the model by a full unit.
+ */
+export function advanceSwimBlend(current: number, swimming: boolean, dt: number): number {
+  const safeCurrent = clamp(current, 0, 1);
+  const target = swimming ? 1 : 0;
+  const response = swimming ? 8 : 6;
+  return target + (safeCurrent - target) * Math.exp(-response * Math.max(0, dt));
+}
+
+/** One impact for a fresh contact, a landing, or the wade-to-swim transition. */
+export function shouldTriggerWaterImpact(
+  contactActive: boolean,
+  wasAirborne: boolean,
+  airborne: boolean,
+  wasSwimming: boolean,
+  swimming: boolean,
+): boolean {
+  return !contactActive || (wasAirborne && !airborne) || (!wasSwimming && swimming);
+}
+
+export type WaterContactFrameMode = 'forget' | 'seed' | 'track';
+
+/**
+ * Culling is presentation state, not a physical water exit. Hidden contacts
+ * are forgotten and seeded silently when they become visible again, avoiding
+ * both off-screen solver work and a synthetic re-entry splash.
+ */
+export function waterContactFrameMode(
+  editorCamera: boolean,
+  visible: boolean,
+  contactSeen: boolean,
+): WaterContactFrameMode {
+  if (editorCamera || !visible) return 'forget';
+  return contactSeen ? 'track' : 'seed';
+}
+
 export function desiredBaseState(s: AnimState, hasWalkBackClip: boolean): BaseState {
   if (s.swimming) return 'swim';
   if (s.airborne) return 'jump';

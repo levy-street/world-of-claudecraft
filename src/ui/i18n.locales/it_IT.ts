@@ -214,7 +214,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Copie incantate, provenienza e il mercato',
   'guide.profPages.craftProse.enchanting.marketBody':
-    "Applicare un incantamento consuma una copia insacchettata e non equipaggiata dell'oggetto piu i reagenti, e restituisce una copia distinta incantata; equipaggiarla e il bonus segue il pezzo per sempre, attraverso rimozioni, viaggi in banca e scambi. Un incantamento per pezzo: una copia incantata non puo mai essere incantata di nuovo o disincantata, e vendere, scartare e disincantare preferiscono sempre prima le copie semplici, cosi il tuo pezzo finito non viene consumato per errore. Le copie incantate in modo identico si accumulano persino insieme nelle borse.\n\nL'equipaggiamento capolavoro e l'incantamento vanno d'accordo: un pezzo capolavoro rimane completamente incantabile, e l'incantamento si aggiunge in cima al bonus del capolavoro senza disturbarlo o la firma del produttore. Sommando ogni fonte, un capolavoro firmato con un incantamento Superiore e il meglio che un pezzo artigianale possa ottenere, e rimane comunque al di sotto del bottino delle incursioni per scelta di design.\n\nSul mercato, il Mercato Mondiale intermedia solo merce semplice e non modificata, quindi i pezzi incantati e firmati cambiano mano faccia a faccia attraverso la finestra di scambio. I materiali sono la meta commerciabile del mestiere: Polvere, Essenza e Frammenti si elencano liberamente, l'inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita completata. Questo rende i due classici guadagni dell'incantatore: vendere materiali sul mercato, e prendere il pezzo di un cliente in scambio, incantarlo e restituirglielo.",
+    "Applicare un incantamento consuma i reagenti e contrassegna una copia specifica dell'oggetto. Puntalo su una copia nelle borse e ricevi una copia incantata distinta; puntalo su un pezzo che indossi gia e viene incantato sul posto, senza toglierlo e rimetterlo. In ogni caso il bonus segue il pezzo per sempre, attraverso rimozioni, viaggi in banca e scambi. Un incantamento per pezzo: applicare un incantamento diverso a una copia incantata chiede prima conferma e poi sostituisce direttamente il vecchio incantamento, che viene distrutto senza rimborso dei materiali. Vendere, scartare e disincantare preferiscono sempre prima le copie semplici, cosi il tuo pezzo finito non viene consumato per errore. Le copie incantate in modo identico si accumulano persino insieme nelle borse.\n\nL'equipaggiamento capolavoro e l'incantamento vanno d'accordo: un pezzo capolavoro rimane completamente incantabile, e l'incantamento si aggiunge in cima al bonus del capolavoro senza disturbarlo o la firma del produttore. Sommando ogni fonte, un capolavoro firmato con un incantamento Superiore e il meglio che un pezzo artigianale possa ottenere, e rimane comunque al di sotto del bottino delle incursioni per scelta di design.\n\nSul mercato, il Mercato Mondiale intermedia solo merce semplice e non modificata, quindi i pezzi incantati e firmati cambiano mano faccia a faccia attraverso la finestra di scambio. I materiali sono la meta commerciabile del mestiere: Polvere, Essenza e Frammenti si elencano liberamente, l'inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita completata. Questo rende i due classici guadagni dell'incantatore: vendere materiali sul mercato, e prendere il pezzo di un cliente in scambio, incantarlo e restituirglielo.",
   'guide.profPages.howHeading': 'Come funziona la fabbricazione',
   'guide.profPages.howBody':
     "Apri la finestra di fabbricazione (tasto predefinito T) e ogni ricetta che conosci e elencata con i materiali necessari e quelli che hai a disposizione. Le ricette legate alla stazione richiedono di trovarsi entro 20 yard dalla stazione giusta in citta, le ricette da campo si lavorano ovunque, e l'Incantamento non ha mai bisogno di una stazione. Non c'e tiro di fallimento: una fabbricazione con i materiali in mano riesce sempre.\n\nDue piccoli attriti mantengono l'economia onesta. Ogni fabbricazione riuscita paga una commissione di 2 rame per punto del budget di statistiche dell'oggetto, e le azioni di tipo fabbricazione condividono un ritmo: al massimo 10 fabbricazioni, disincanti, incantamenti o smantellaggi in qualsiasi 60 secondi. Nessuno dei due disturba una sessione normale; entrambi impediscono a uno specialista al massimo di inondare il mercato.",
@@ -9180,7 +9180,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Guadagno completo di abilità',
   'hudChrome.crafting.difficultyNone': 'Nessun guadagno di abilità',
   'hudChrome.crafting.difficultyReduced': 'Guadagno di abilità ridotto',
-  'hudChrome.crafting.enchantedLine': 'Incantato',
   'hudChrome.crafting.makersMark': 'Realizzato da {name}',
   'hudChrome.crafting.masterworkSeal': 'Capolavoro',
   'hudChrome.crafting.masterworkToast': 'Capolavoro! {name}',
@@ -9398,4 +9397,79 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornpeak_mail_sabatons.name': 'Calzari di maglia di Thornpeak',
   'entities.items.thornpeak_polearm.name': 'Arma in asta di Thornpeak',
   'entities.items.thornpeak_war_axe.name': 'Ascia da guerra di Thornpeak',
+  'hud.arena.map.coliseum': 'Colosseo Cinereo',
+  'hud.arena.map.drownedCourt': 'La Corte Annegata',
+  'hud.arena.mapName': 'Mappa: {name}',
+  'hud.logs.arenaSandsDrowned': 'Metti piede sulle pietre allagate della Corte Annegata.',
+  'itemUi.market.armorCloth': 'Stoffa',
+  'itemUi.market.armorLeather': 'Cuoio',
+  'itemUi.market.armorMail': 'Maglia',
+  'itemUi.market.filterArmorClassAll': 'Tutti i tipi di armatura',
+  'itemUi.market.filterArmorSlot': 'Slot armatura',
+  'itemUi.market.filterPrimaryStat': 'Statistica principale',
+  'itemUi.market.filterPrimaryStatAll': 'Qualsiasi statistica principale',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Equipaggia il preset di livello 20 pre-Santuario per una specializzazione, prima le borse. Solo equipaggiamento.',
+  'devCommand.actions.kit.label': 'Equipaggia kit livello 20',
+  'devCommand.fields.spec': 'Specializzazione',
+  'devCommand.itemChosen': 'Selezionato: {name}',
+  'devCommand.itemHeroicTag': 'Eroico',
+  'devCommand.itemMore':
+    'Mostrati {shown} di {total}. Continua a digitare per restringere la ricerca.',
+  'devCommand.itemNoMatches': 'Nessun oggetto corrispondente.',
+  'devCommand.itemResultsAria': 'Oggetti corrispondenti',
+  'devCommand.itemSearchPlaceholder': 'Cerca per nome o ID',
+  'devCommand.itemUnknown': "Nessun oggetto ha quell'ID.",
+  'devCommand.kitCurrentSpec': 'Specializzazione attuale',
+  'hudChrome.bags.itemAriaBound': '{item}, quantita {count}, copia vincolata',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, quantita {count}, copia incantata',
+  'hudChrome.enchanting.tier.base': 'Incanti Base',
+  'hudChrome.enchanting.tier.greater': 'Incanti Superiori',
+  'hudChrome.enchanting.tier.runed': 'Incanti Runici',
+  'hudChrome.enchanting.wornTag': 'Indossato ({slot})',
+  'hudChrome.enchanting.yieldHeader': 'Materiali previsti:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': 'Da {min} a {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Incantato',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Incantato)',
+  'hudChrome.marketIndicator.aria': 'Ritiro in attesa dal Mercato Mondiale',
+  'hudChrome.marketIndicator.tip': 'Oro o oggetti ti aspettano al Mercante.',
+  'hudChrome.materialHint.arcaneDust':
+    "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
+  'hudChrome.materialHint.arcaneEssence':
+    "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento raro.",
+  'hudChrome.materialHint.arcaneShard':
+    "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento epico e leggendario.",
+  'hudChrome.materialHint.resonantHide':
+    "Reagente dell'incantamento. Si ottiene disincantando armatura di cuoio rara o superiore.",
+  'hudChrome.materialHint.resonantLinks':
+    "Reagente dell'incantamento. Si ottiene disincantando armatura di maglia rara o superiore.",
+  'hudChrome.materialHint.resonantSteel':
+    "Reagente dell'incantamento. Si ottiene disincantando armi da mischia rare o superiori.",
+  'hudChrome.materialHint.resonantThread':
+    "Reagente dell'incantamento. Si ottiene disincantando armatura di stoffa rara o superiore.",
+  'hudChrome.materialHint.resonantTimber':
+    "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori.",
+  'hudChrome.options.stickyTarget': 'Mantieni il bersaglio al clic a terra',
+  'hudChrome.social.billboard.empty': "Non c'è ancora nulla sulla bacheca.",
+  'hudChrome.social.billboard.inputLabel': 'Messaggio della bacheca della gilda',
+  'hudChrome.social.billboard.label': 'Bacheca della Gilda',
+  'hudChrome.social.billboard.placeholder': 'Scrivi un messaggio per la gilda',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Solo gli ufficiali e il capo gilda possono modificare la bacheca.',
+  'hudChrome.social.billboard.result.set': 'La bacheca della gilda è stata aggiornata.',
+  'hudChrome.social.billboard.save': 'Salva',
+  'hudChrome.social.billboard.setBy': 'Impostato da {name}',
+  'hudChrome.enchanting.alreadyEnchanted': "Quell'oggetto è già incantato.",
+  'hudChrome.enchanting.replaceConfirmAccept': 'Sostituisci',
+  'hudChrome.enchanting.replaceConfirmBody': 'Questo sostituisce {old} su {item} con {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Costo: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    "Il vecchio incantesimo viene distrutto. I suoi materiali non vengono rimborsati. L'azione non può essere annullata.",
+  'hudChrome.enchanting.replaceConfirmTitle': "Sostituisci l'incantesimo su {item}?",
+  'hudChrome.enchanting.replaceTag': 'Sostituisce {enchant}',
+  'hudChrome.enchanting.sameEnchant': "Quell'oggetto ha già quell'incantesimo.",
+  'hudChrome.enchanting.sameEnchantTag': 'Già applicato',
 };

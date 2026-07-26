@@ -10,7 +10,7 @@
 
 import { ABILITIES, ITEMS } from '../sim/data';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
-import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
+import { professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
 export { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
@@ -3963,12 +3963,14 @@ export function abilityImageUrl(id: string): string | null {
 }
 
 // Item ids with committed painted art under /ui/items/<id>.webp (curated from the CraftPix
-// resource/consumable and armor/equipment packs, plus project-owned profession materials;
-// provenance + license in public/ui/items/mapping.json). Served for kind 'item' (bags,
-// tooltips, loot, vendor, the /wiki guide). Most weapons keep their rendered-model thumbnails
-// via WEAPON_ICON_DIR; the 34 Procedural Loot v1 bases deliberately use project-owned art.
-// Items not listed fall through to the
-// procedural ITEM_RECIPES below.
+// resource/consumable and armor/equipment packs, the project-owned profession materials, and
+// the generated icon rebrand batches; provenance + license in public/ui/items/mapping.json).
+// Served for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Every real non-weapon
+// item must ship a WebP: the derive loop below adds every non-weapon ITEMS id, so a new item
+// without art reds the gate instead of regressing to the procedural compositor. Weapons keep
+// their rendered-model thumbnails via WEAPON_ICON_DIR, except the 34 Procedural Loot v1 bases,
+// which deliberately prefer project-owned rarity and Legendary art. Procedural item recipes
+// remain available only for UI fallbacks and development-time unknown ids.
 // For armor the icon is purely cosmetic (rarity colour still comes from item.quality), and the
 // flashier icons are reserved for higher-rarity pieces. WebP only, like the skill icons. Add
 // art via `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
@@ -4328,6 +4330,13 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'sanctum_key_shard',
   'unknown_alien_weaponry',
 ]);
+
+// The grouped literals above preserve the curated catalog's provenance history. Derive the
+// complete runtime set from live content so a newly added non-weapon item immediately enters the
+// filesystem and provenance gates instead of silently regressing to a procedural placeholder.
+for (const item of Object.values(ITEMS)) {
+  if (item.kind !== 'weapon') ITEM_IMAGE_IDS.add(item.id);
+}
 
 // UI-only icon ids that ship painted art under /ui/items/<id>.webp but are NOT ITEMS
 // records. `backpack` is the implicit 16-slot bag the bag bar draws first: it can never be

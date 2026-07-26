@@ -197,7 +197,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Fortryldte kopier, oprindelse og markedet',
   'guide.profPages.craftProse.enchanting.marketBody':
-    'At anvende en fortryllelse forbruger en tasket, ikke-iført kopi af genstanden plus reagenserne, og giver en distinkt fortrylt kopi tilbage; ikvær den og bonussen følger stykket for evigt, gennem afikørster, bankture og handler. En fortryllelse per stykke: en fortrylt kopi kan aldrig fortrylle igen eller affortrylle, og salg, kassering og affortrylning foretrækker alle slette kopier først, så dit færdige stykke ikke spises ved et uheld. Identisk fortrylede kopier stakker endda sammen i dine tasker.\n\nMesterværksudstyr og fortryllelse er venner: et mesterværksstykke forbliver fuldt fortryllbart, og fortryllelsen lægges oven på mesterværksbonussen uden at forstyrre den eller håndværkerens signatur. Stakket alle kilder, er et signeret mesterværk med en Stor-fortryllelse det bedste et fremstillet stykke kan opnå, og det sidder stadig under raid-bytte af design.\n\nPå markedet formidler Verdensmarkedet kun slette, umodificerede lagervarer, så fortryldte og signerede stykker skifter hænder ansigt til ansigt via handelsvinduet i stedet. Materialerne er den omsættelige halvdel af håndværket: Støv, Essens og Skår listes frit, listing koster ingenting, og Handlende tager 5 procent af et fuldført salg kun. Det giver de to klassiske fortryllerindtægter: salg af materialer på markedet, og at tage en kundes stykke i handel, fortryde det, og sende det tilbage.',
+    'At anvende en fortryllelse forbruger reagenserne og markerer en bestemt kopi af genstanden. Peger du på en kopi i tasken, får du en distinkt fortrylt kopi tilbage; peger du på et stykke du allerede har på, fortrylles det på stedet, uden at tage det af og på igen. Uanset hvad følger bonussen stykket for evigt, gennem aftagninger, bankture og handler. En fortryllelse per stykke: at anvende en anden fortryllelse på en fortrylt kopi beder først om bekræftelse og erstatter så den gamle fortryllelse direkte; den ødelægges uden refusion af materialerne. Salg, kassering og affortrylning foretrækker alle slette kopier først, så dit færdige stykke ikke spises ved et uheld. Identisk fortrylede kopier stakker endda sammen i dine tasker.\n\nMesterværksudstyr og fortryllelse er venner: et mesterværksstykke forbliver fuldt fortryllbart, og fortryllelsen lægges oven på mesterværksbonussen uden at forstyrre den eller håndværkerens signatur. Stakket alle kilder, er et signeret mesterværk med en Stor-fortryllelse det bedste et fremstillet stykke kan opnå, og det sidder stadig under raid-bytte af design.\n\nPå markedet formidler Verdensmarkedet kun slette, umodificerede lagervarer, så fortryldte og signerede stykker skifter hænder ansigt til ansigt via handelsvinduet i stedet. Materialerne er den omsættelige halvdel af håndværket: Støv, Essens og Skår listes frit, listing koster ingenting, og Handlende tager 5 procent af et fuldført salg kun. Det giver de to klassiske fortryllerindtægter: salg af materialer på markedet, og at tage en kundes stykke i handel, fortryde det, og sende det tilbage.',
   'guide.profPages.howHeading': 'Sådan fungerer håndværk',
   'guide.profPages.howBody':
     'Åbn håndværksvinduet (standard-tast T) og enhver opskrift, du kender, er oplistet med hvad den kræver, og hvad du har ved hånden. Stationsbundne opskrifter beder dig stå inden for 20 yards fra den rette station i byen, markopskrifter fremstilles overalt, og Fortryllelse behøver aldrig en station overhovedet. Der er ingen fejlchance: en fremstilling med materialerne ved hånden lykkes altid.\n\nTo små friktioner holder økonomien ærlig. Enhver vellykket fremstilling betaler et gebyr på 2 kobber pr. point af genstandens statistikbudget, og fremstillingshandlinger deler ét tempo: højst 10 fremstillinger, affortrylle, fortryllelser eller ophug i et givet 60 sekunder. Ingen af dem vil genere en normal session; begge stopper en maksimeret specialist i at oversvømme markedet.',
@@ -9000,7 +9000,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimal færdighedsgevinst',
   'hudChrome.crafting.difficultyNone': 'Ingen færdighedsforøgelse',
   'hudChrome.crafting.difficultyReduced': 'Reduceret færdighedsforøgelse',
-  'hudChrome.crafting.enchantedLine': 'Fortryllet',
   'hudChrome.crafting.gatheredBy': 'Indsamlet af {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} ved {station} kan lære dig flere {craft}-opskrifter.',
@@ -9229,4 +9228,79 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornpeak_mail_sabatons.name': 'Thornpeak-ringsabatons',
   'entities.items.thornpeak_polearm.name': 'Thornpeak-stangvåben',
   'entities.items.thornpeak_war_axe.name': 'Thornpeak-krigsøkse',
+  'hud.arena.map.coliseum': 'Askegrå Colosseum',
+  'hud.arena.map.drownedCourt': 'Den Druknede Gård',
+  'hud.arena.mapName': 'Kort: {name}',
+  'hud.logs.arenaSandsDrowned': 'Du træder ud på de oversvømmede sten i Den Druknede Gård.',
+  'itemUi.market.armorCloth': 'Stof',
+  'itemUi.market.armorLeather': 'Læder',
+  'itemUi.market.armorMail': 'Ringbrynje',
+  'itemUi.market.filterArmorClassAll': 'Alle rustningstyper',
+  'itemUi.market.filterArmorSlot': 'Rustningsplads',
+  'itemUi.market.filterPrimaryStat': 'Primær statistik',
+  'itemUi.market.filterPrimaryStatAll': 'Alle primære statistikker',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Ifør den forudindstillede niveau 20-opsætning fra før Sanctum til en specialisering, tasker først. Kun udstyr.',
+  'devCommand.actions.kit.label': 'Udrust frisk 20-sæt',
+  'devCommand.fields.spec': 'Specialisering',
+  'devCommand.itemChosen': 'Valgt: {name}',
+  'devCommand.itemHeroicTag': 'Heroisk',
+  'devCommand.itemMore':
+    'Viser {shown} af {total}. Bliv ved med at skrive for at indsnævre søgningen.',
+  'devCommand.itemNoMatches': 'Ingen genstande matcher.',
+  'devCommand.itemResultsAria': 'Matchende genstande',
+  'devCommand.itemSearchPlaceholder': 'Søg efter navn eller id',
+  'devCommand.itemUnknown': 'Ingen genstand har det id.',
+  'devCommand.kitCurrentSpec': 'Nuværende specialisering',
+  'hudChrome.bags.itemAriaBound': '{item}, antal {count}, bundet kopi',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, antal {count}, fortryllet kopi',
+  'hudChrome.enchanting.tier.base': 'Basisfortryllelser',
+  'hudChrome.enchanting.tier.greater': 'Større Fortryllelser',
+  'hudChrome.enchanting.tier.runed': 'Runede Fortryllelser',
+  'hudChrome.enchanting.wornTag': 'Båret ({slot})',
+  'hudChrome.enchanting.yieldHeader': 'Forventede materialer:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} til {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Fortryllet',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Fortryllet)',
+  'hudChrome.marketIndicator.aria': 'Afhentning fra Verdensmarkedet venter',
+  'hudChrome.marketIndicator.tip': 'Guld eller genstande venter på dig hos Købmanden.',
+  'hudChrome.materialHint.arcaneDust':
+    'Fortryllelsesreagens. Fås ved affortryllelse af almindeligt og ualmindeligt udstyr.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Fortryllelsesreagens. Fås ved affortryllelse af sjældent udstyr.',
+  'hudChrome.materialHint.arcaneShard':
+    'Fortryllelsesreagens. Fås ved affortryllelse af episk og legendarisk udstyr.',
+  'hudChrome.materialHint.resonantHide':
+    'Fortryllelsesreagens. Fås ved affortryllelse af læderrustning af sjælden kvalitet eller bedre.',
+  'hudChrome.materialHint.resonantLinks':
+    'Fortryllelsesreagens. Fås ved affortryllelse af ringbrynje af sjælden kvalitet eller bedre.',
+  'hudChrome.materialHint.resonantSteel':
+    'Fortryllelsesreagens. Fås ved affortryllelse af nærkampsvåben af sjælden kvalitet eller bedre.',
+  'hudChrome.materialHint.resonantThread':
+    'Fortryllelsesreagens. Fås ved affortryllelse af stofrustning af sjælden kvalitet eller bedre.',
+  'hudChrome.materialHint.resonantTimber':
+    'Fortryllelsesreagens. Fås ved affortryllelse af stave, tryllestave, buer og armbrøster af sjælden kvalitet eller bedre.',
+  'hudChrome.options.stickyTarget': 'Bevar mål ved jordklik',
+  'hudChrome.social.billboard.empty': 'Der er intet på opslagstavlen endnu.',
+  'hudChrome.social.billboard.inputLabel': 'Besked til laugsopslagstavlen',
+  'hudChrome.social.billboard.label': 'Laugsopslagstavle',
+  'hudChrome.social.billboard.placeholder': 'Skriv en besked til lauget',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Kun officerer og lavsmesteren kan redigere opslagstavlen.',
+  'hudChrome.social.billboard.result.set': 'Laugsopslagstavlen blev opdateret.',
+  'hudChrome.social.billboard.save': 'Gem',
+  'hudChrome.social.billboard.setBy': 'Sat af {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'Den genstand er allerede fortryllet.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Erstat',
+  'hudChrome.enchanting.replaceConfirmBody': 'Dette erstatter {old} på {item} med {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Pris: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'Den gamle fortryllelse ødelægges. Dens materialer refunderes ikke. Dette kan ikke fortrydes.',
+  'hudChrome.enchanting.replaceConfirmTitle': 'Erstat fortryllelsen på {item}?',
+  'hudChrome.enchanting.replaceTag': 'Erstatter {enchant}',
+  'hudChrome.enchanting.sameEnchant': 'Den genstand har allerede den fortryllelse.',
+  'hudChrome.enchanting.sameEnchantTag': 'Allerede anvendt',
 };

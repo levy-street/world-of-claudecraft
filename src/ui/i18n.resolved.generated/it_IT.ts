@@ -38,6 +38,14 @@ export const it_IT: EnTranslations = {
     "filterLabel": "Filtra comandi",
     "filterPlaceholder": "Cerca in questa categoria",
     "noMatches": "Nessun comando corrispondente.",
+    "itemSearchPlaceholder": "Cerca per nome o ID",
+    "itemResultsAria": "Oggetti corrispondenti",
+    "itemNoMatches": "Nessun oggetto corrispondente.",
+    "itemMore": "Mostrati {shown} di {total}. Continua a digitare per restringere la ricerca.",
+    "itemChosen": "Selezionato: {name}",
+    "itemUnknown": "Nessun oggetto ha quell'ID.",
+    "itemHeroicTag": "Eroico",
+    "kitCurrentSpec": "Specializzazione attuale",
     "serverRequirement": "I trucchi del server richiedono comunque ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Scegli valori validi prima di eseguire questo comando.",
     "sent": "Inviato: {command}",
@@ -55,7 +63,8 @@ export const it_IT: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Difficoltà",
-      "name": "Nome"
+      "name": "Nome",
+      "spec": "Specializzazione"
     },
     "difficulty": {
       "normal": "Normale",
@@ -113,6 +122,10 @@ export const it_IT: EnTranslations = {
       "give": {
         "label": "Dai oggetto",
         "description": "Aggiunge un oggetto all’inventario del giocatore."
+      },
+      "kit": {
+        "label": "Equipaggia kit livello 20",
+        "description": "Equipaggia il preset di livello 20 pre-Santuario per una specializzazione, prima le borse. Solo equipaggiamento."
       },
       "gold": {
         "label": "Aggiungi oro",
@@ -1049,6 +1062,7 @@ export const it_IT: EnTranslations = {
       "walkByAutoloot": "Raccolta automatica al passaggio",
       "groundReticle": "Reticolo di puntamento a terra",
       "mouseoverCast": "Lancio al passaggio del mouse sui riquadri del gruppo",
+      "stickyTarget": "Mantieni il bersaglio al clic a terra",
       "showItemLevel": "Mostra livello oggetto",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
@@ -1529,8 +1543,14 @@ export const it_IT: EnTranslations = {
       "dragDestroyHint": "Trascina nel mondo per distruggere",
       "reorderNeedsRecent": "Rimuovi il filtro e ordina per Recenti per riorganizzare le borse",
       "itemAriaInstanced": "{item}, quantita {count}, copia con marchio del creatore",
+      "itemAriaEnchanted": "{item}, quantita {count}, copia incantata",
+      "itemAriaBound": "{item}, quantita {count}, copia vincolata",
       "itemAriaMasterwork": "{item}, quantita {count}, capolavoro",
       "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, item level {level}, quantity {count}, masterwork",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, item level {level}, quantity {count}, enchanted copy",
+      "itemAriaProceduralSigned": "{item}, {rarity}, item level {level}, quantity {count}, maker-marked copy",
+      "itemAriaProceduralBound": "{item}, {rarity}, item level {level}, quantity {count}, bound copy",
       "filterGroupAria": "Filtra le borse per categoria",
       "filterAll": "Tutti",
       "filterWeapon": "Armi",
@@ -1754,7 +1774,19 @@ export const it_IT: EnTranslations = {
       "label": "Ripristina le posizioni dei riquadri"
     },
     "itemTooltip": {
-      "requiresLevel": "Richiede livello {level}"
+      "requiresLevel": "Richiede livello {level}",
+      "statEnchanted": "+{value} {stat} (Incantato)",
+      "enchantedFallback": "Incantato"
+    },
+    "materialHint": {
+      "arcaneDust": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
+      "arcaneEssence": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento raro.",
+      "arcaneShard": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento epico e leggendario.",
+      "resonantThread": "Reagente dell'incantamento. Si ottiene disincantando armatura di stoffa rara o superiore.",
+      "resonantHide": "Reagente dell'incantamento. Si ottiene disincantando armatura di cuoio rara o superiore.",
+      "resonantLinks": "Reagente dell'incantamento. Si ottiene disincantando armatura di maglia rara o superiore.",
+      "resonantSteel": "Reagente dell'incantamento. Si ottiene disincantando armi da mischia rare o superiori.",
+      "resonantTimber": "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori."
     },
     "discord": {
       "title": "Discord",
@@ -1995,6 +2027,10 @@ export const it_IT: EnTranslations = {
         "takeParcelsFirst": "Ritira i pacchi prima di scartare la lettera."
       }
     },
+    "marketIndicator": {
+      "aria": "Ritiro in attesa dal Mercato Mondiale",
+      "tip": "Oro o oggetti ti aspettano al Mercante."
+    },
     "noticeboard": {
       "empty": "Non sembra esserci nulla di affisso."
     },
@@ -2114,7 +2150,19 @@ export const it_IT: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Nascondi offline",
-      "hideOfflineTitle": "Nascondi i membri della gilda offline"
+      "hideOfflineTitle": "Nascondi i membri della gilda offline",
+      "billboard": {
+        "label": "Bacheca della Gilda",
+        "empty": "Non c'è ancora nulla sulla bacheca.",
+        "setBy": "Impostato da {name}",
+        "save": "Salva",
+        "placeholder": "Scrivi un messaggio per la gilda",
+        "inputLabel": "Messaggio della bacheca della gilda",
+        "result": {
+          "set": "La bacheca della gilda è stata aggiornata.",
+          "notOfficer": "Solo gli ufficiali e il capo gilda possono modificare la bacheca."
+        }
+      }
     },
     "gathering": {
       "title": "Raccolta",
@@ -2384,7 +2432,6 @@ export const it_IT: EnTranslations = {
       "makersMark": "Realizzato da {name}",
       "gatheredBy": "Raccolto da {name}",
       "masterworkSeal": "Capolavoro",
-      "enchantedLine": "Incantato",
       "commissionToggle": "Pezzo su commissione",
       "commissionToggleHint": "Si lega al primo personaggio che lo riceve in uno scambio.",
       "commissionUnbound": "Pezzo su commissione: si lega al primo destinatario",
@@ -2422,7 +2469,26 @@ export const it_IT: EnTranslations = {
       "pickerTitle": "Applica Incantesimo",
       "targetTitle": "Scegli un oggetto da incantare",
       "noEnchants": "Nessun incantesimo utilizza questo reagente.",
-      "noTargets": "Nessun oggetto idoneo da incantare."
+      "noTargets": "Nessun oggetto idoneo da incantare.",
+      "wornTag": "Indossato ({slot})",
+      "tier": {
+        "base": "Incanti Base",
+        "runed": "Incanti Runici",
+        "greater": "Incanti Superiori"
+      },
+      "yieldHeader": "Materiali previsti:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "Da {min} a {max} {item}",
+      "alreadyEnchanted": "Quell'oggetto è già incantato.",
+      "sameEnchant": "Quell'oggetto ha già quell'incantesimo.",
+      "replaceTag": "Sostituisce {enchant}",
+      "sameEnchantTag": "Già applicato",
+      "replaceConfirmTitle": "Sostituisci l'incantesimo su {item}?",
+      "replaceConfirmBody": "Questo sostituisce {old} su {item} con {new}.",
+      "replaceConfirmNoRefund": "Il vecchio incantesimo viene distrutto. I suoi materiali non vengono rimborsati. L'azione non può essere annullata.",
+      "replaceConfirmCost": "Costo: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Sostituisci"
     },
     "training": {
       "title": "Formazione: {name}",
@@ -3820,7 +3886,7 @@ export const it_IT: EnTranslations = {
           "levelingHeading": "Come avanza l'incantamento",
           "levelingBody": "Due azioni fanno avanzare la competenza: disincantare un pezzo e applicare un incantamento. Ogni successo vale fino a un punto, scalato in base alla seriosita del lavoro: la rarita del pezzo che scomponi, o il livello dei reagenti dell'incantamento che applichi. I disincanti comuni e gli incantamenti solo con polvere contano come lavoro comune; i disincanti non comuni e gli incantamenti con essenza come non comuni; i disincanti rari e ogni incantamento Runato o Superiore come rari; i disincanti epici e leggendari ancora di piu.\n\nLa familiare diminuzione della maestria si applica per fasce di 25 punti, quindi il lavoro di grado comune diventa grigio alla competenza 75, il lavoro non comune a 100, e il lavoro di grado raro esattamente al limite di 125. L'incantamento ha anche una gentilezza tutta sua: gli input superiori al soffitto del tuo archetipo vengono arrotondati verso il basso a quel soffitto invece di azzerarsi, quindi prima della sintonizzazione un disincanto epico conta semplicemente come raro invece di non insegnare nulla. Se l'Incantamento finisce dormiente dietro un'altra identita, tutto conta come lavoro comune e la scalata si blocca a 75; tienilo come passatempo e il lavoro di grado raro paga ancora, solo piu lentamente oltre il 75.",
           "marketHeading": "Copie incantate, provenienza e il mercato",
-          "marketBody": "Applicare un incantamento consuma una copia insacchettata e non equipaggiata dell'oggetto piu i reagenti, e restituisce una copia distinta incantata; equipaggiarla e il bonus segue il pezzo per sempre, attraverso rimozioni, viaggi in banca e scambi. Un incantamento per pezzo: una copia incantata non puo mai essere incantata di nuovo o disincantata, e vendere, scartare e disincantare preferiscono sempre prima le copie semplici, cosi il tuo pezzo finito non viene consumato per errore. Le copie incantate in modo identico si accumulano persino insieme nelle borse.\n\nL'equipaggiamento capolavoro e l'incantamento vanno d'accordo: un pezzo capolavoro rimane completamente incantabile, e l'incantamento si aggiunge in cima al bonus del capolavoro senza disturbarlo o la firma del produttore. Sommando ogni fonte, un capolavoro firmato con un incantamento Superiore e il meglio che un pezzo artigianale possa ottenere, e rimane comunque al di sotto del bottino delle incursioni per scelta di design.\n\nSul mercato, il Mercato Mondiale intermedia solo merce semplice e non modificata, quindi i pezzi incantati e firmati cambiano mano faccia a faccia attraverso la finestra di scambio. I materiali sono la meta commerciabile del mestiere: Polvere, Essenza e Frammenti si elencano liberamente, l'inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita completata. Questo rende i due classici guadagni dell'incantatore: vendere materiali sul mercato, e prendere il pezzo di un cliente in scambio, incantarlo e restituirglielo."
+          "marketBody": "Applicare un incantamento consuma i reagenti e contrassegna una copia specifica dell'oggetto. Puntalo su una copia nelle borse e ricevi una copia incantata distinta; puntalo su un pezzo che indossi gia e viene incantato sul posto, senza toglierlo e rimetterlo. In ogni caso il bonus segue il pezzo per sempre, attraverso rimozioni, viaggi in banca e scambi. Un incantamento per pezzo: applicare un incantamento diverso a una copia incantata chiede prima conferma e poi sostituisce direttamente il vecchio incantamento, che viene distrutto senza rimborso dei materiali. Vendere, scartare e disincantare preferiscono sempre prima le copie semplici, cosi il tuo pezzo finito non viene consumato per errore. Le copie incantate in modo identico si accumulano persino insieme nelle borse.\n\nL'equipaggiamento capolavoro e l'incantamento vanno d'accordo: un pezzo capolavoro rimane completamente incantabile, e l'incantamento si aggiunge in cima al bonus del capolavoro senza disturbarlo o la firma del produttore. Sommando ogni fonte, un capolavoro firmato con un incantamento Superiore e il meglio che un pezzo artigianale possa ottenere, e rimane comunque al di sotto del bottino delle incursioni per scelta di design.\n\nSul mercato, il Mercato Mondiale intermedia solo merce semplice e non modificata, quindi i pezzi incantati e firmati cambiano mano faccia a faccia attraverso la finestra di scambio. I materiali sono la meta commerciabile del mestiere: Polvere, Essenza e Frammenti si elencano liberamente, l'inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita completata. Questo rende i due classici guadagni dell'incantatore: vendere materiali sul mercato, e prendere il pezzo di un cliente in scambio, incantarlo e restituirglielo."
         }
       },
       "howHeading": "Come funziona la fabbricazione",
@@ -6182,6 +6248,7 @@ export const it_IT: EnTranslations = {
       "arenaJoin": "Ti unisci alla coda del Colosseo Cinereo. Attendi un avversario degno...",
       "arenaLeave": "Esci dalla coda del Colosseo Cinereo.",
       "arenaSands": "Metti piede sulle sabbie del Colosseo Cinereo.",
+      "arenaSandsDrowned": "Metti piede sulle pietre allagate della Corte Annegata.",
       "tradeRequestSent": "Hai richiesto uno scambio con {name}.",
       "tradeOpened": "Finestra di scambio aperta.",
       "tradeComplete": "Scambio completato.",
@@ -6350,6 +6417,11 @@ export const it_IT: EnTranslations = {
       "playerLevelClassTitle": "{name} - Liv {level} {className}",
       "noChallengers": "Nessun contendente in classifica - sii il primo.",
       "matchInProgress": "Incontro in corso contro {name}.",
+      "mapName": "Mappa: {name}",
+      "map": {
+        "coliseum": "Colosseo Cinereo",
+        "drownedCourt": "La Corte Annegata"
+      },
       "leaveQueue": "Lascia coda",
       "searching": "Ricerca avversario... ({count} in coda)",
       "enterQueue": "Entra in coda",
@@ -6748,6 +6820,7 @@ export const it_IT: EnTranslations = {
       "pageNextAria": "Pagina successiva del mercato",
       "pageStatus": "Pagina {current} di {total}",
       "filters": "Filtri del mercato",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Tipo",
       "filterTypeAll": "Tutti i tipi",
       "filterTypeWeapon": "Armi",
@@ -6758,8 +6831,15 @@ export const it_IT: EnTranslations = {
       "filterTypeOther": "Altro",
       "filterArmorType": "Tipo armatura",
       "filterArmorAll": "Tutte le armature",
+      "filterArmorSlot": "Slot armatura",
+      "filterArmorClassAll": "Tutti i tipi di armatura",
+      "armorCloth": "Stoffa",
+      "armorLeather": "Cuoio",
+      "armorMail": "Maglia",
       "filterWeaponType": "Tipo arma",
       "filterWeaponAll": "Tutte le armi",
+      "filterPrimaryStat": "Statistica principale",
+      "filterPrimaryStatAll": "Qualsiasi statistica principale",
       "filterRarity": "Rarità",
       "filterRarityAll": "Tutte le rarità",
       "weaponSword": "Spade",

@@ -11,6 +11,10 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -86,6 +90,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -161,6 +169,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -236,6 +248,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -312,6 +328,10 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -387,6 +407,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -460,36 +484,16 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.stats.weaponMax",
     "itemUi.stats.weaponMin"
   ],
-  "zh_CN": [
-    "itemUi.procedural.legendaryLimit",
-    "itemUi.procedural.powerRollMilliseconds",
-    "itemUi.procedural.powerRollNumber",
-    "itemUi.procedural.powerRollPercent",
-    "itemUi.procedural.powerRollResource"
-  ],
-  "zh_TW": [
-    "itemUi.procedural.legendaryLimit",
-    "itemUi.procedural.powerRollMilliseconds",
-    "itemUi.procedural.powerRollNumber",
-    "itemUi.procedural.powerRollPercent",
-    "itemUi.procedural.powerRollResource"
-  ],
-  "ko_KR": [
-    "itemUi.procedural.legendaryLimit",
-    "itemUi.procedural.powerRollMilliseconds",
-    "itemUi.procedural.powerRollNumber",
-    "itemUi.procedural.powerRollPercent",
-    "itemUi.procedural.powerRollResource"
-  ],
-  "ja_JP": [
-    "itemUi.procedural.legendaryLimit",
-    "itemUi.procedural.powerRollMilliseconds",
-    "itemUi.procedural.powerRollNumber",
-    "itemUi.procedural.powerRollPercent",
-    "itemUi.procedural.powerRollResource"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -563,15 +567,13 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.stats.weaponMax",
     "itemUi.stats.weaponMin"
   ],
-  "ru_RU": [
-    "itemUi.procedural.legendaryLimit",
-    "itemUi.procedural.powerRollMilliseconds",
-    "itemUi.procedural.powerRollNumber",
-    "itemUi.procedural.powerRollPercent",
-    "itemUi.procedural.powerRollResource"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -647,6 +649,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -722,6 +728,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -797,6 +807,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -872,6 +886,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -947,6 +965,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -1022,6 +1044,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",
@@ -1097,6 +1123,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "hudChrome.bags.itemAriaProcedural",
+    "hudChrome.bags.itemAriaProceduralBound",
+    "hudChrome.bags.itemAriaProceduralEnchanted",
+    "hudChrome.bags.itemAriaProceduralMasterwork",
+    "hudChrome.bags.itemAriaProceduralSigned",
     "itemUi.procedural.advancedDetailsHint",
     "itemUi.procedural.legendary.ashbinders_seal.description",
     "itemUi.procedural.legendary.ashbinders_seal.name",

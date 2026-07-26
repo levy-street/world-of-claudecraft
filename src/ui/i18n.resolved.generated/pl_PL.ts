@@ -38,6 +38,14 @@ export const pl_PL: EnTranslations = {
     "filterLabel": "Filtruj polecenia",
     "filterPlaceholder": "Przeszukaj tę kategorię",
     "noMatches": "Brak pasujących poleceń.",
+    "itemSearchPlaceholder": "Szukaj po nazwie lub identyfikatorze",
+    "itemResultsAria": "Pasujące przedmioty",
+    "itemNoMatches": "Brak pasujących przedmiotów.",
+    "itemMore": "Wyświetlono {shown} z {total}. Pisz dalej, aby zawęzić wyniki.",
+    "itemChosen": "Wybrano: {name}",
+    "itemUnknown": "Żaden przedmiot nie ma takiego identyfikatora.",
+    "itemHeroicTag": "Heroiczny",
+    "kitCurrentSpec": "Obecna specjalizacja",
     "serverRequirement": "Cheaty serwera nadal wymagają ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Wybierz prawidłowe wartości przed uruchomieniem tego polecenia.",
     "sent": "Wysłano: {command}",
@@ -55,7 +63,8 @@ export const pl_PL: EnTranslations = {
       "z": "Z",
       "dungeon": "Loch",
       "difficulty": "Poziom trudności",
-      "name": "Nazwa"
+      "name": "Nazwa",
+      "spec": "Specjalizacja"
     },
     "difficulty": {
       "normal": "Normalny",
@@ -113,6 +122,10 @@ export const pl_PL: EnTranslations = {
       "give": {
         "label": "Daj przedmiot",
         "description": "Dodaj przedmiot do ekwipunku gracza."
+      },
+      "kit": {
+        "label": "Załóż zestaw na 20. poziom",
+        "description": "Załóż zestaw sprzed Sanktuarium na 20. poziom dla wybranej specjalizacji, najpierw torby. Tylko ekwipunek."
       },
       "gold": {
         "label": "Dodaj złoto",
@@ -1049,6 +1062,7 @@ export const pl_PL: EnTranslations = {
       "walkByAutoloot": "Automatyczny łup w przelocie",
       "groundReticle": "Celownik naziemny",
       "mouseoverCast": "Rzucanie po najechaniu na ramki drużyny",
+      "stickyTarget": "Zachowaj cel po kliknięciu w ziemię",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
@@ -1529,8 +1543,14 @@ export const pl_PL: EnTranslations = {
       "dragDestroyHint": "Przeciągnij poza okno, aby zniszczyć",
       "reorderNeedsRecent": "Wyczyść filtr i posortuj według Ostatnich, aby zmienić kolejność w torbach",
       "itemAriaInstanced": "{item}, ilość {count}, oznaczona kopia",
+      "itemAriaEnchanted": "{item}, ilość {count}, zaklęta kopia",
+      "itemAriaBound": "{item}, ilość {count}, związana kopia",
       "itemAriaMasterwork": "{item}, ilość {count}, arcydzieło",
       "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, item level {level}, quantity {count}, masterwork",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, item level {level}, quantity {count}, enchanted copy",
+      "itemAriaProceduralSigned": "{item}, {rarity}, item level {level}, quantity {count}, maker-marked copy",
+      "itemAriaProceduralBound": "{item}, {rarity}, item level {level}, quantity {count}, bound copy",
       "filterGroupAria": "Filtruj torby według kategorii",
       "filterAll": "Wszystko",
       "filterWeapon": "Bronie",
@@ -1754,7 +1774,19 @@ export const pl_PL: EnTranslations = {
       "label": "Resetuj pozycje ramek"
     },
     "itemTooltip": {
-      "requiresLevel": "Wymaga poziomu {level}"
+      "requiresLevel": "Wymaga poziomu {level}",
+      "statEnchanted": "+{value} {stat} (Zaklęty)",
+      "enchantedFallback": "Zaklęty"
+    },
+    "materialHint": {
+      "arcaneDust": "Składnik do zaklinania. Pozyskiwany z rozbrajania pospolitego i niezwykłego ekwipunku.",
+      "arcaneEssence": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiego ekwipunku.",
+      "arcaneShard": "Składnik do zaklinania. Pozyskiwany z rozbrajania epickiego i legendarnego ekwipunku.",
+      "resonantThread": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej zbroi materiałowej.",
+      "resonantHide": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej zbroi skórzanej.",
+      "resonantLinks": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej kolczugi.",
+      "resonantSteel": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiej i lepszej broni do walki wręcz.",
+      "resonantTimber": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkich i lepszych kosturów, różdżek, łuków i kusz."
     },
     "discord": {
       "title": "Discord",
@@ -1995,6 +2027,10 @@ export const pl_PL: EnTranslations = {
         "takeParcelsFirst": "Wyjmij paczki, zanim wyrzucisz list."
       }
     },
+    "marketIndicator": {
+      "aria": "Oczekujący odbiór z Rynku Świata",
+      "tip": "Złoto lub przedmioty czekają na ciebie u Kupca."
+    },
     "noticeboard": {
       "empty": "Wygląda na to, że nic tu nie wywieszono."
     },
@@ -2114,7 +2150,19 @@ export const pl_PL: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Ukryj offline",
-      "hideOfflineTitle": "Ukryj offline członków gildii"
+      "hideOfflineTitle": "Ukryj offline członków gildii",
+      "billboard": {
+        "label": "Tablica ogłoszeń gildii",
+        "empty": "Na tablicy ogłoszeń nic jeszcze nie ma.",
+        "setBy": "Ustawione przez {name}",
+        "save": "Zapisz",
+        "placeholder": "Napisz wiadomość dla gildii",
+        "inputLabel": "Wiadomość na tablicy ogłoszeń gildii",
+        "result": {
+          "set": "Tablica ogłoszeń gildii została zaktualizowana.",
+          "notOfficer": "Tylko oficerowie i mistrz gildii mogą edytować tablicę ogłoszeń."
+        }
+      }
     },
     "gathering": {
       "title": "Zbieractwo",
@@ -2384,7 +2432,6 @@ export const pl_PL: EnTranslations = {
       "makersMark": "Stworzone przez {name}",
       "gatheredBy": "Zebrane przez {name}",
       "masterworkSeal": "Arcydzieło",
-      "enchantedLine": "Zaczarowany",
       "commissionToggle": "Wyrób na zamówienie",
       "commissionToggleHint": "Przywiązuje się do pierwszej postaci, która go otrzyma w transakcji.",
       "commissionUnbound": "Wyrób na zamówienie: przywiązuje się do pierwszego odbiorcy",
@@ -2422,7 +2469,26 @@ export const pl_PL: EnTranslations = {
       "pickerTitle": "Zastosuj zaklinanie",
       "targetTitle": "Wybierz przedmiot do zaklinania",
       "noEnchants": "Brak zaklinania używającego tego składnika.",
-      "noTargets": "Brak kwalifikującego się przedmiotu do zaklinania."
+      "noTargets": "Brak kwalifikującego się przedmiotu do zaklinania.",
+      "wornTag": "Założone ({slot})",
+      "tier": {
+        "base": "Zaklęcia podstawowe",
+        "runed": "Zaklęcia runiczne",
+        "greater": "Zaklęcia wyższe"
+      },
+      "yieldHeader": "Oczekiwane materiały:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "od {min} do {max} {item}",
+      "alreadyEnchanted": "Ten przedmiot jest już zaklęty.",
+      "sameEnchant": "Ten przedmiot już ma to zaklęcie.",
+      "replaceTag": "Zastępuje {enchant}",
+      "sameEnchantTag": "Już zastosowane",
+      "replaceConfirmTitle": "Zastąpić zaklęcie na {item}?",
+      "replaceConfirmBody": "Zastępuje {old} na {item} zaklęciem {new}.",
+      "replaceConfirmNoRefund": "Stare zaklęcie zostaje zniszczone. Jego materiały nie są zwracane. Nie można tego cofnąć.",
+      "replaceConfirmCost": "Koszt: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Zastąp"
     },
     "training": {
       "title": "Szkolenie: {name}",
@@ -3820,7 +3886,7 @@ export const pl_PL: EnTranslations = {
           "levelingHeading": "Jak Zaklinanie się poziomuje",
           "levelingBody": "Dwie czynności przesuwają umiejętność: rozbrojenie elementu i nałożenie zaklęcia. Każdy sukces jest wart do jednego punktu, skalowanego przez powagę pracy: rzadkość rozbijanego elementu lub poziom reagenta nakładanego zaklęcia. Pospolite rozbrojenia i zaklęcia tylko na pył punktują jako robota pospolita; niepospolite rozbrojenia i zaklęcia esencji jako niepospolita; rzadkie rozbrojenia i każde zaklęcie Runiczne lub Wyższe jako rzadkie; epickie i legendarne rozbrojenia jeszcze wyżej.\n\nZnajome zanikanie mistrzostwa stosuje się na 25-punktowych poziomach, więc robota pospolitego stopnia staje się szarą przy umiejętności 75, niepospolita przy 100, a rzadkiego poziomu dokładnie przy pułapie 125. Zaklinanie ma też jeden własny przywilej: wkład powyżej pułapu twojego archetypu jest zaokrąglany w dół do tego pułapu zamiast zerowania, więc przed dostrojeniem epickie rozbrojenie po prostu punktuje jako rzadkie zamiast niczego nie uczyć. Jeśli Zaklinanie stanie się uśpione za inną tożsamością, wszystko punktuje jako robota pospolita i wspinaczka zatrzyma się przy 75; zachowaj je jako swoje hobby, a robota rzadkiego poziomu wciąż płaci, tylko wolniej po 75.",
           "marketHeading": "Zaczarowane kopie, proweniencja i rynek",
-          "marketBody": "Nałożenie zaklęcia zużywa zapakowaną, niezałożoną kopię przedmiotu oraz reagenty i oddaje odrębną zaczarowaną kopię; załóż ją, a premia podąża za elementem na zawsze, przez zdejmowanie, wizyty w banku i handlowanie. Jedno zaklęcie na element: zaczarowanej kopii nie można już nigdy zaczarować ani rozbroić, a sprzedaż, wyrzucanie i rozbrajanie preferują najpierw zwykłe kopie, więc twój ukończony element nie zostanie przypadkowo pochłonięty. Identycznie zaczarowane kopie nawet się na siebie układają w twoich torbach.\n\nEkwipunek arcydzieła i zaklinanie to przyjaciele: element arcydzieła pozostaje w pełni czarowalny, a zaklęcie dodaje się na wierzch premii arcydzieła bez naruszania jej ani podpisu wytwórcy. Łącząc każde źródło, sygnowane arcydzieło noszące wyższe zaklęcie to szczyt dla wytwarzanego elementu, który wciąż jest poniżej łupów z rajdu z projektu.\n\nNa rynku Rynek Świata pośredniczy tylko w zwykłym, niezmodyfikowanym towarem, więc zaczarowane i sygnowane elementy zmieniają właściciela twarzą w twarz przez okno handlowe. Materiały to zbywalny element fachu: Pył, Esencja i Odłamki wystawiają się swobodnie, wystawienie nic nie kosztuje, a Kupiec bierze tylko 5 procent ukończonej sprzedaży. To sprawia, że dwa klasyczne dochody zaklinacza to sprzedaż materiałów na rynku oraz wzięcie elementu klienta w handel, zaczarowanie go i oddanie z powrotem."
+          "marketBody": "Nałożenie zaklęcia zużywa reagenty i oznacza jedną konkretną kopię przedmiotu. Wskaż kopię w torbie, a otrzymasz odrębną zaczarowaną kopię; wskaż element, który już nosisz, a zostanie zaczarowany na miejscu, bez zdejmowania i ponownego zakładania. Tak czy inaczej premia podąża za elementem na zawsze, przez zdejmowanie, wizyty w banku i handlowanie. Jedno zaklęcie na element: nałożenie innego zaklęcia na zaczarowaną kopię najpierw prosi o potwierdzenie, a potem wprost zastępuje stare zaklęcie, niszcząc je bez zwrotu materiałów. Sprzedaż, wyrzucanie i rozbrajanie preferują najpierw zwykłe kopie, więc twój ukończony element nie zostanie przypadkowo pochłonięty. Identycznie zaczarowane kopie nawet się na siebie układają w twoich torbach.\n\nEkwipunek arcydzieła i zaklinanie to przyjaciele: element arcydzieła pozostaje w pełni czarowalny, a zaklęcie dodaje się na wierzch premii arcydzieła bez naruszania jej ani podpisu wytwórcy. Łącząc każde źródło, sygnowane arcydzieło noszące wyższe zaklęcie to szczyt dla wytwarzanego elementu, który wciąż jest poniżej łupów z rajdu z projektu.\n\nNa rynku Rynek Świata pośredniczy tylko w zwykłym, niezmodyfikowanym towarem, więc zaczarowane i sygnowane elementy zmieniają właściciela twarzą w twarz przez okno handlowe. Materiały to zbywalny element fachu: Pył, Esencja i Odłamki wystawiają się swobodnie, wystawienie nic nie kosztuje, a Kupiec bierze tylko 5 procent ukończonej sprzedaży. To sprawia, że dwa klasyczne dochody zaklinacza to sprzedaż materiałów na rynku oraz wzięcie elementu klienta w handel, zaczarowanie go i oddanie z powrotem."
         }
       },
       "howHeading": "Jak działa wytwarzanie",
@@ -6182,6 +6248,7 @@ export const pl_PL: EnTranslations = {
       "arenaJoin": "Dołączasz do kolejki Popielnego Koloseum. Czekaj na godnego przeciwnika...",
       "arenaLeave": "Opuszczasz kolejkę Popielnego Koloseum.",
       "arenaSands": "Wkraczasz na piaski Popielnego Koloseum.",
+      "arenaSandsDrowned": "Wkraczasz na zalane kamienie Zatopionego Dziedzińca.",
       "tradeRequestSent": "Poprosiłeś {name} o wymianę.",
       "tradeOpened": "Otwarto okno wymiany.",
       "tradeComplete": "Wymiana zakończona.",
@@ -6350,6 +6417,11 @@ export const pl_PL: EnTranslations = {
       "playerLevelClassTitle": "{name} - poz. {level} {className}",
       "noChallengers": "Nikt jeszcze nie wszedł do rankingu - bądź pierwszy.",
       "matchInProgress": "Pojedynek w toku przeciwko {name}.",
+      "mapName": "Mapa: {name}",
+      "map": {
+        "coliseum": "Popielne Koloseum",
+        "drownedCourt": "Zatopiony Dziedziniec"
+      },
       "leaveQueue": "Opuść kolejkę",
       "searching": "Szukanie przeciwnika... ({count} w kolejce)",
       "enterQueue": "Dołącz do kolejki",
@@ -6748,6 +6820,7 @@ export const pl_PL: EnTranslations = {
       "pageNextAria": "Następna strona rynku",
       "pageStatus": "Strona {current} z {total}",
       "filters": "Filtry rynku",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Rodzaj",
       "filterTypeAll": "Wszystkie rodzaje",
       "filterTypeWeapon": "Bronie",
@@ -6758,8 +6831,15 @@ export const pl_PL: EnTranslations = {
       "filterTypeOther": "Inne",
       "filterArmorType": "Rodzaj pancerza",
       "filterArmorAll": "Cały pancerz",
+      "filterArmorSlot": "Slot pancerza",
+      "filterArmorClassAll": "Wszystkie rodzaje pancerza",
+      "armorCloth": "Tkanina",
+      "armorLeather": "Skóra",
+      "armorMail": "Kolczuga",
       "filterWeaponType": "Rodzaj broni",
       "filterWeaponAll": "Wszystkie bronie",
+      "filterPrimaryStat": "Główny atrybut",
+      "filterPrimaryStatAll": "Dowolny główny atrybut",
       "filterRarity": "Rzadkość",
       "filterRarityAll": "Wszystkie rzadkości",
       "weaponSword": "Miecze",

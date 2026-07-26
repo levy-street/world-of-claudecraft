@@ -161,8 +161,12 @@ failure, kept as stable English that `main.ts` re-localizes.
 - Never mutate game state authoritatively here or "predict" an OUTCOME: no
   client-side anticipation of combat, casts, resources, loot, aggro, or anything
   else the server resolves. The only sanctioned optimism inside `net/` is the
-  trivial local UI nudges already present (`targetEntity` setting `targetId`;
-  `pendingQuestCommands`); keep that scope.
+  trivial local UI nudges already present (`targetEntity` setting `targetId`,
+  shielded from stale in-flight snapshots by `pendingTargetEcho`;
+  `pendingQuestCommands`); keep that scope. Both follow the same
+  reconcile-on-snapshot contract: display-only, and the server's value always
+  wins within a bounded window (`tests/target_echo_client.test.ts` pins the
+  target one).
 - **Display-layer locomotion anticipation is the one sanctioned prediction**, and
   it lives OUTSIDE `net/` (`src/render/self_motion.ts`): a visual-only pose for
   the LOCAL player that is (a) bounded by measured latency with a hard cap,

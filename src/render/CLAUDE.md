@@ -18,16 +18,21 @@ Everything else is a sibling module in one of these families:
 - **World subsystems** export a `build*()` returning a `*View` the renderer
   owns: `terrain.ts` (chunked LOD + PBR splat), `props.ts`/`foliage.ts`/
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
-  shore-depth core in `water_core.ts`), `sky.ts`. Event/minigame scenes follow
+  shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
+  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
   the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
-  Performance) and `crowd_lod.ts` (pure crowd policy: pulls character
-  shadow/anim cadence in as rig counts climb; cosmetic-only, exempts what a
-  player reacts to).
+  Performance) and `crowd_lod.ts` (pure character LOD policy: the band plan
+  `characterLodBands` returns, which pulls shadow/anim cadence in as rig counts
+  climb and holds an animated far band, articulated rig at a low cadence, before
+  the frozen single-draw far mesh takes over. Its extension eases out on the
+  crowd knee, the per-tier `GFX.farCharacterAnimScale` ceiling, and live budget
+  pressure; cosmetic-only, and `showsStaticFarMesh` keeps anything a player
+  reacts to out of the frozen mesh inside the uncrowded base range).
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).
@@ -61,8 +66,11 @@ combo; allocation-free: `nameplatePlanInto` fills a caller-owned `NameplatePlan`
 `nameplate_painter.ts` does the Three projection, DOM writes, and ALL the
 localization (per-tier cadence via `ui_tier_knobs.nameplateIntervalSec`); the
 significant-contributor name glow lives there too. Narrow helpers:
-`nameplate_combo/threat/projection/declutter.ts` plus `entity_labels.ts`
-(shared localized display names). Drive changes from `tests/nameplate_*.test.ts`.
+`nameplate_combo/threat/projection/declutter.ts` (the last one is the
+classic-style vertical stacking pass: plates only ever move UP from their own
+anchor, the current target is pinned, and separation follows each plate's real
+height from `nameplate_extent_core.ts`) plus `entity_labels.ts` (shared
+localized display names). Drive changes from `tests/nameplate_*.test.ts`.
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives

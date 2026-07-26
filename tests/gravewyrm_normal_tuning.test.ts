@@ -1,15 +1,16 @@
 // Gravewyrm Sanctum NORMAL retune: the v0.29 economy floors (200 trash / 420
 // bosses / 150 adds) made normal Sanctum unclearable for its actual audience,
-// freshly-capped groups: bosses landed 41-54% of a fresh tank's pool PER
-// SWING and the Monte Carlo survival bench
-// (scripts/sanctum_fresh_montecarlo.ts) recorded a tank death in every run,
-// even against lone bosses with a healer. v0.30 keeps the DOUBLED health (the
-// anti-solo economy lever is clear time) and re-floors damage for the fresh
-// group instead, with boss mechanics scaled by the same per-mob factor.
-// Heroic reads the same base templates on its OWN calibration
-// (tests/heroic_difficulty_floors.test.ts), so this file also pins the heroic
-// transform literals: a base-template edit cannot slip through either
-// difficulty unnoticed.
+// freshly-capped groups. v0.30 keeps the DOUBLED health (the anti-solo
+// economy lever is clear time) and re-floors damage for the fresh group
+// instead; the 2026-07-26 pressure pass then raised the floors again after a
+// fresh THREE-player group cleared the first calibration without pressure
+// (its bench had priced the floors so a worst-case autopilot healer barely
+// survived). Boss mechanics scale by the same per-mob factor unless
+// mechanicDamageMultiplierByMob overrides one (Korzul's avoidable Grave
+// Inferno prices off the tank-swing line). Heroic reads the same base
+// templates on its OWN calibration (tests/heroic_difficulty_floors.test.ts),
+// so this file also pins the heroic transform literals: a base-template edit
+// cannot slip through either difficulty unnoticed.
 //
 // Reference warrior (the "fully geared" mitigation ceiling): level-20 prot
 // warrior in the max-armor kit (full heroic plate + shield, prot mastery),
@@ -35,20 +36,24 @@ import { armorReduction } from '../src/sim/types';
 const SANCTUM = 'gravewyrm_sanctum';
 const REF_ARMOR = 2861; // max-armor BiS prot warrior, level 20 (see header)
 const DEFENSIVE_STANCE_TAKEN = 0.9; // dealDamage: Defensive Stance takes 10% less
-// v0.30 fresh-group retune: normal Sanctum serves freshly-capped groups in
-// quest greens/blues (1371-1752 hp / 1439-2361 armor across the three
-// committed tanks), for whom even the 200/420 floors meant 21-24% (trash) and
-// 41-54% (bosses) of the pool per swing. Trash 90; bosses 200 (Korgath and
-// Korzul land ~245, an average swing of ~25% of the fresh pool, the same
-// audience-pool share the heroic and Nythraxis boss calibrations use; tanks
-// are crit-immune since v0.29.1 so there is no spike tail above the 1.25x
-// roll cap. Velkhar sits at the 200 line, ~20.5%, because he swings at 2.0s
-// and layers his bonewalker waves on top); and the summoned bonewalkers 50
-// (three spawn at once: wave pressure, not extra bosses). The DOUBLED health
-// stays. Accepted trade (2026-07-25): a best-in-slot self-healing tank can
-// out-heal these bosses again, so clear TIME, not lethality, is what keeps
-// solo farming unprofitable.
-const TRASH_FLOOR = 90;
+// v0.30 pressure pass (2026-07-26): normal Sanctum serves freshly-capped
+// groups in quest greens/blues (1371-1752 hp / 1439-2361 armor across the
+// three committed tanks). The first v0.30 floors (90/200/50) let a fresh
+// 3-man clear without pressure, so Korgath and Korzul rise to MEET Velkhar,
+// the existing peak fight (Korgath 301 / Korzul 280 on the 200 boss floor,
+// ~29-31% of a fresh tank pool per average swing; Velkhar is UNCHANGED at
+// the 200 line, ~21%, because he swings at 2.0s and layers his bonewalker
+// waves on top) and trash rises to 100 (lands 103+). Boss dtps on a fresh
+// tank runs ~179-193, pressed above a fresh healer's sustain so the tank
+// loses ground without cooldowns; tanks are crit-immune since v0.29.1 so no
+// swing spikes past the 1.25x roll cap. Korzul's melee multiplier sits below
+// Korgath's because he also carries the gate-guaranteed inferno channel on
+// top of his 30% enrage. The summoned bonewalkers stay
+// at 50 (three spawn at once: wave pressure, not extra bosses), and the
+// DOUBLED health stays. Solo note: a best-in-slot self-healing tank still
+// out-heals these floors, so clear TIME is what keeps solo farming
+// unprofitable.
+const TRASH_FLOOR = 100;
 const BOSS_FLOOR = 200;
 const ADD_FLOOR = 50;
 
@@ -92,18 +97,28 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       if (summoned) spawnIds.add(summoned);
     }
     expect([...spawnIds].sort()).toEqual(Object.keys(tuning.damageMultiplierByMob).sort());
+    // The mechanic override map may only re-price mobs the melee map covers.
+    for (const id of Object.keys(tuning.mechanicDamageMultiplierByMob ?? {})) {
+      expect(tuning.damageMultiplierByMob, `${id} missing a melee factor`).toHaveProperty(id);
+    }
   });
 
   it('pins the retune multipliers to exact literals', () => {
     const tuning = sanctumTuning();
     expect(tuning.healthMultiplier).toBe(2.0);
     expect(tuning.damageMultiplierByMob).toEqual({
-      sanctum_boneguard: 3.4,
-      sanctum_drakonid: 3.3,
+      sanctum_boneguard: 3.8,
+      sanctum_drakonid: 3.7,
       raised_bonewalker: 3.75,
-      korgath_the_bound: 7.75,
+      korgath_the_bound: 9.5,
       grand_necromancer_velkhar: 6.6,
-      korzul_the_gravewyrm: 7.5,
+      korzul_the_gravewyrm: 8.5,
+    });
+    // Korzul's avoidable Grave Inferno prices off the tank-swing line: 15x
+    // makes standing all four pulses (raw 1050-1350) lethal to a ~1000hp
+    // fresh melee pool while his melee stays on the boss calibration above.
+    expect(tuning.mechanicDamageMultiplierByMob).toEqual({
+      korzul_the_gravewyrm: 15,
     });
   });
 });
@@ -132,7 +147,7 @@ describe('normal Gravewyrm Sanctum melee floors vs the reference warrior', () =>
     }
   });
 
-  it('every trash swing lands for at least 90 at every spawnable level', () => {
+  it('every trash swing lands for at least 100 at every spawnable level', () => {
     for (const id of TRASH_IDS) {
       const { minLevel, maxLevel } = MOBS[id];
       for (let level = minLevel; level <= maxLevel; level++) {
@@ -158,16 +173,23 @@ describe('normal Gravewyrm Sanctum melee floors vs the reference warrior', () =>
 });
 
 describe('normal Gravewyrm Sanctum mechanic scaling', () => {
-  it('spawned normal mobs carry the per-mob mechanic multiplier', () => {
+  it('spawned normal mobs carry the per-mob mechanic multiplier, override first', () => {
     const tuning = sanctumTuning();
     for (const id of [...TRASH_IDS, ...BOSS_IDS]) {
       const mob = createMob(1, MOBS[id], MOBS[id].minLevel, { x: 0, y: 0, z: 0 });
       applyDungeonMobTuning(mob, SANCTUM, 'normal');
-      expect(mob.mechanicDamageMult, id).toBe(tuning.damageMultiplierByMob[id]);
+      const expected =
+        tuning.mechanicDamageMultiplierByMob?.[id] ?? tuning.damageMultiplierByMob[id];
+      expect(mob.mechanicDamageMult, id).toBe(expected);
     }
+    // The one live override, asserted concretely: Korzul's entity mechanics
+    // run at 15x while his melee template transform stays at 8.5x.
+    const korzul = createMob(1, MOBS.korzul_the_gravewyrm, 20, { x: 0, y: 0, z: 0 });
+    applyDungeonMobTuning(korzul, SANCTUM, 'normal');
+    expect(korzul.mechanicDamageMult).toBe(15);
   });
 
-  it('scales Korzul Grave Inferno and Korgath stomp with their melee factors', () => {
+  it('scales Grave Inferno by the mechanic override and Korgath stomp by his melee factor', () => {
     const tuning = sanctumTuning();
     // Korzul's aoePulse is GONE (2026-07): Grave Inferno replaced it, a
     // stationary 8s channel with four escalating avoidable pulses.
@@ -179,11 +201,13 @@ describe('normal Gravewyrm Sanctum mechanic scaling', () => {
     if (!inferno || korgathStomp?.min === undefined || korgathStomp.max === undefined) return;
     // Raw (unmitigated) mechanic damage after the per-mob multiplier: the
     // FOURTH (largest) inferno pulse on normal, and the stomp band.
-    const mult = tuning.damageMultiplierByMob.korzul_the_gravewyrm;
-    expect(inferno.min * inferno.pulses * mult).toBe(210);
-    expect(inferno.max * inferno.pulses * mult).toBe(270);
-    expect(korgathStomp.min * tuning.damageMultiplierByMob.korgath_the_bound).toBe(155);
-    expect(korgathStomp.max * tuning.damageMultiplierByMob.korgath_the_bound).toBe(232.5);
+    const mult = tuning.mechanicDamageMultiplierByMob?.korzul_the_gravewyrm;
+    expect(mult).toBe(15);
+    if (mult === undefined) return;
+    expect(inferno.min * inferno.pulses * mult).toBe(420);
+    expect(inferno.max * inferno.pulses * mult).toBe(540);
+    expect(korgathStomp.min * tuning.damageMultiplierByMob.korgath_the_bound).toBe(190);
+    expect(korgathStomp.max * tuning.damageMultiplierByMob.korgath_the_bound).toBe(285);
   });
 
   it('leaves untuned normal dungeons untouched', () => {

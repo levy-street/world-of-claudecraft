@@ -103,6 +103,21 @@
     --color-craft-minimal: #1eff00;
     --color-craft-none: #9d9d9d;
 
+    /* The bonus-stat green the item tooltip's own gain lines speak in
+       (icons.ts QUALITY_COLOR.uncommon, the same value #tooltip .tt-green
+       carries): one token for the surfaces that must agree with those lines,
+       today the Apply Enchant picker's effect line and the enchanted bag glyph. */
+    --color-stat-bonus: #1eff00;
+    /* Bag-grid per-copy corner glyphs (components.css .bag-item .bi-glyph-*,
+       painted by bags_window.ts as a class, never an inline color). Enchanted
+       borrows the bonus-stat green above (the enchant color language); signed
+       rides the house gold like the maker's mark; bound takes a cool steel-blue
+       so the three read apart at 12px even before the shapes resolve. The shape
+       is the primary signal, the tint a redundant one (fairness). */
+    --color-bag-glyph-enchanted: var(--color-stat-bonus);
+    --color-bag-glyph-signed: var(--color-accent);
+    --color-bag-glyph-bound: #7fb0e6;
+
     /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
        no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.
        Exact pre-existing values. */

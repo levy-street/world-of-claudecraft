@@ -38,6 +38,14 @@ export const da_DK: EnTranslations = {
     "filterLabel": "Filtrér kommandoer",
     "filterPlaceholder": "Søg i denne kategori",
     "noMatches": "Ingen matchende kommandoer.",
+    "itemSearchPlaceholder": "Søg efter navn eller id",
+    "itemResultsAria": "Matchende genstande",
+    "itemNoMatches": "Ingen genstande matcher.",
+    "itemMore": "Viser {shown} af {total}. Bliv ved med at skrive for at indsnævre søgningen.",
+    "itemChosen": "Valgt: {name}",
+    "itemUnknown": "Ingen genstand har det id.",
+    "itemHeroicTag": "Heroisk",
+    "kitCurrentSpec": "Nuværende specialisering",
     "serverRequirement": "Serverfusk kræver stadig ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Vælg gyldige værdier, før du kører kommandoen.",
     "sent": "Sendt: {command}",
@@ -55,7 +63,8 @@ export const da_DK: EnTranslations = {
       "z": "Z",
       "dungeon": "Fangekælder",
       "difficulty": "Sværhedsgrad",
-      "name": "Navn"
+      "name": "Navn",
+      "spec": "Specialisering"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const da_DK: EnTranslations = {
       "give": {
         "label": "Giv genstand",
         "description": "Føj en genstand til spillerens inventar."
+      },
+      "kit": {
+        "label": "Udrust frisk 20-sæt",
+        "description": "Ifør den forudindstillede niveau 20-opsætning fra før Sanctum til en specialisering, tasker først. Kun udstyr."
       },
       "gold": {
         "label": "Tilføj guld",
@@ -1049,6 +1062,7 @@ export const da_DK: EnTranslations = {
       "walkByAutoloot": "Auto-plyndring i forbifarten",
       "groundReticle": "Jordsigte-retikel",
       "mouseoverCast": "Museover-kast på grupperammer",
+      "stickyTarget": "Bevar mål ved jordklik",
       "showItemLevel": "Vis genstandsniveau",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
@@ -1529,8 +1543,14 @@ export const da_DK: EnTranslations = {
       "dragDestroyHint": "Træk ud i verden for at ødelægge",
       "reorderNeedsRecent": "Ryd filteret og sortér efter Seneste for at omarrangere dine tasker",
       "itemAriaInstanced": "{item}, antal {count}, signeret kopi",
+      "itemAriaEnchanted": "{item}, antal {count}, fortryllet kopi",
+      "itemAriaBound": "{item}, antal {count}, bundet kopi",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
       "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, item level {level}, quantity {count}, masterwork",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, item level {level}, quantity {count}, enchanted copy",
+      "itemAriaProceduralSigned": "{item}, {rarity}, item level {level}, quantity {count}, maker-marked copy",
+      "itemAriaProceduralBound": "{item}, {rarity}, item level {level}, quantity {count}, bound copy",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -1754,7 +1774,19 @@ export const da_DK: EnTranslations = {
       "label": "Nulstil rammepositioner"
     },
     "itemTooltip": {
-      "requiresLevel": "Kræver niveau {level}"
+      "requiresLevel": "Kræver niveau {level}",
+      "statEnchanted": "+{value} {stat} (Fortryllet)",
+      "enchantedFallback": "Fortryllet"
+    },
+    "materialHint": {
+      "arcaneDust": "Fortryllelsesreagens. Fås ved affortryllelse af almindeligt og ualmindeligt udstyr.",
+      "arcaneEssence": "Fortryllelsesreagens. Fås ved affortryllelse af sjældent udstyr.",
+      "arcaneShard": "Fortryllelsesreagens. Fås ved affortryllelse af episk og legendarisk udstyr.",
+      "resonantThread": "Fortryllelsesreagens. Fås ved affortryllelse af stofrustning af sjælden kvalitet eller bedre.",
+      "resonantHide": "Fortryllelsesreagens. Fås ved affortryllelse af læderrustning af sjælden kvalitet eller bedre.",
+      "resonantLinks": "Fortryllelsesreagens. Fås ved affortryllelse af ringbrynje af sjælden kvalitet eller bedre.",
+      "resonantSteel": "Fortryllelsesreagens. Fås ved affortryllelse af nærkampsvåben af sjælden kvalitet eller bedre.",
+      "resonantTimber": "Fortryllelsesreagens. Fås ved affortryllelse af stave, tryllestave, buer og armbrøster af sjælden kvalitet eller bedre."
     },
     "discord": {
       "title": "Discord",
@@ -1995,6 +2027,10 @@ export const da_DK: EnTranslations = {
         "takeParcelsFirst": "Tag pakkerne ud, før du kasserer brevet."
       }
     },
+    "marketIndicator": {
+      "aria": "Afhentning fra Verdensmarkedet venter",
+      "tip": "Guld eller genstande venter på dig hos Købmanden."
+    },
     "noticeboard": {
       "empty": "Der ser ikke ud til at være slået noget op."
     },
@@ -2114,7 +2150,19 @@ export const da_DK: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Skjul offline",
-      "hideOfflineTitle": "Skjul offline gildemedlemmer"
+      "hideOfflineTitle": "Skjul offline gildemedlemmer",
+      "billboard": {
+        "label": "Laugsopslagstavle",
+        "empty": "Der er intet på opslagstavlen endnu.",
+        "setBy": "Sat af {name}",
+        "save": "Gem",
+        "placeholder": "Skriv en besked til lauget",
+        "inputLabel": "Besked til laugsopslagstavlen",
+        "result": {
+          "set": "Laugsopslagstavlen blev opdateret.",
+          "notOfficer": "Kun officerer og lavsmesteren kan redigere opslagstavlen."
+        }
+      }
     },
     "gathering": {
       "title": "Indsamling",
@@ -2384,7 +2432,6 @@ export const da_DK: EnTranslations = {
       "makersMark": "Udformet af {name}",
       "gatheredBy": "Indsamlet af {name}",
       "masterworkSeal": "Mesterværk",
-      "enchantedLine": "Fortryllet",
       "commissionToggle": "Kommissionsstykke",
       "commissionToggleHint": "Bindes til den første karakter, der modtager det i en handel.",
       "commissionUnbound": "Kommissionsstykke: bindes til den første modtager",
@@ -2422,7 +2469,26 @@ export const da_DK: EnTranslations = {
       "pickerTitle": "Anvend fortryllelse",
       "targetTitle": "Vælg en genstand at fortryle",
       "noEnchants": "Ingen fortryllelse bruger dette reagens.",
-      "noTargets": "Ingen berettiget genstand at fortryle."
+      "noTargets": "Ingen berettiget genstand at fortryle.",
+      "wornTag": "Båret ({slot})",
+      "tier": {
+        "base": "Basisfortryllelser",
+        "runed": "Runede Fortryllelser",
+        "greater": "Større Fortryllelser"
+      },
+      "yieldHeader": "Forventede materialer:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} til {max} {item}",
+      "alreadyEnchanted": "Den genstand er allerede fortryllet.",
+      "sameEnchant": "Den genstand har allerede den fortryllelse.",
+      "replaceTag": "Erstatter {enchant}",
+      "sameEnchantTag": "Allerede anvendt",
+      "replaceConfirmTitle": "Erstat fortryllelsen på {item}?",
+      "replaceConfirmBody": "Dette erstatter {old} på {item} med {new}.",
+      "replaceConfirmNoRefund": "Den gamle fortryllelse ødelægges. Dens materialer refunderes ikke. Dette kan ikke fortrydes.",
+      "replaceConfirmCost": "Pris: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Erstat"
     },
     "training": {
       "title": "Træning: {name}",
@@ -3820,7 +3886,7 @@ export const da_DK: EnTranslations = {
           "levelingHeading": "Sådan avancerer fortryllelse",
           "levelingBody": "To handlinger flytter færdigheden: at affortryle et stykke, og at anvende en fortryllelse. Hvert lykkedes forsøg er op til et point, skaleret efter hvor seriøst arbejdet er: sjældenhed af det stykke du nedbryder, eller reagensniveauet af den fortryllelse du anvender. Almindelige affortrylninger og støv-kun-fortryllelser scorers som almindeligt arbejde; ualmindelige affortrylninger og essence-fortryllelser som ualmindelige; sjældne affortrylninger og alle Rune- eller Stor-fortryllelser som sjældne; episke og legendariske affortrylninger endnu højere.\n\nDen velkendte mesterydelse-udblanding gælder i 25-points-trin, så fælles-klasses arbejde grå-uder ved færdighed 75, ualmindeligt arbejde ved 100, og sjælden-niveauets arbejde præcis ved 125-loftet. Fortryllelse har også en egen venlighed: input over dit arketypeloft afrundes ned til det loft i stedet for at nulstilles, så før du indstiller dig, scorer en episk affortrylning simpelthen som sjælden frem for ikke at lære noget. Hvis Fortryllelse ender inaktiv bag en anden identitet, scorer alt som almindeligt arbejde og klatringen stagnerer ved 75; behold det som din hobby og sjælden-niveauets arbejde betaler stadig, bare langsommere efter 75.",
           "marketHeading": "Fortryldte kopier, oprindelse og markedet",
-          "marketBody": "At anvende en fortryllelse forbruger en tasket, ikke-iført kopi af genstanden plus reagenserne, og giver en distinkt fortrylt kopi tilbage; ikvær den og bonussen følger stykket for evigt, gennem afikørster, bankture og handler. En fortryllelse per stykke: en fortrylt kopi kan aldrig fortrylle igen eller affortrylle, og salg, kassering og affortrylning foretrækker alle slette kopier først, så dit færdige stykke ikke spises ved et uheld. Identisk fortrylede kopier stakker endda sammen i dine tasker.\n\nMesterværksudstyr og fortryllelse er venner: et mesterværksstykke forbliver fuldt fortryllbart, og fortryllelsen lægges oven på mesterværksbonussen uden at forstyrre den eller håndværkerens signatur. Stakket alle kilder, er et signeret mesterværk med en Stor-fortryllelse det bedste et fremstillet stykke kan opnå, og det sidder stadig under raid-bytte af design.\n\nPå markedet formidler Verdensmarkedet kun slette, umodificerede lagervarer, så fortryldte og signerede stykker skifter hænder ansigt til ansigt via handelsvinduet i stedet. Materialerne er den omsættelige halvdel af håndværket: Støv, Essens og Skår listes frit, listing koster ingenting, og Handlende tager 5 procent af et fuldført salg kun. Det giver de to klassiske fortryllerindtægter: salg af materialer på markedet, og at tage en kundes stykke i handel, fortryde det, og sende det tilbage."
+          "marketBody": "At anvende en fortryllelse forbruger reagenserne og markerer en bestemt kopi af genstanden. Peger du på en kopi i tasken, får du en distinkt fortrylt kopi tilbage; peger du på et stykke du allerede har på, fortrylles det på stedet, uden at tage det af og på igen. Uanset hvad følger bonussen stykket for evigt, gennem aftagninger, bankture og handler. En fortryllelse per stykke: at anvende en anden fortryllelse på en fortrylt kopi beder først om bekræftelse og erstatter så den gamle fortryllelse direkte; den ødelægges uden refusion af materialerne. Salg, kassering og affortrylning foretrækker alle slette kopier først, så dit færdige stykke ikke spises ved et uheld. Identisk fortrylede kopier stakker endda sammen i dine tasker.\n\nMesterværksudstyr og fortryllelse er venner: et mesterværksstykke forbliver fuldt fortryllbart, og fortryllelsen lægges oven på mesterværksbonussen uden at forstyrre den eller håndværkerens signatur. Stakket alle kilder, er et signeret mesterværk med en Stor-fortryllelse det bedste et fremstillet stykke kan opnå, og det sidder stadig under raid-bytte af design.\n\nPå markedet formidler Verdensmarkedet kun slette, umodificerede lagervarer, så fortryldte og signerede stykker skifter hænder ansigt til ansigt via handelsvinduet i stedet. Materialerne er den omsættelige halvdel af håndværket: Støv, Essens og Skår listes frit, listing koster ingenting, og Handlende tager 5 procent af et fuldført salg kun. Det giver de to klassiske fortryllerindtægter: salg af materialer på markedet, og at tage en kundes stykke i handel, fortryde det, og sende det tilbage."
         }
       },
       "howHeading": "Sådan fungerer håndværk",
@@ -6182,6 +6248,7 @@ export const da_DK: EnTranslations = {
       "arenaJoin": "Du tilslutter dig køen til Ashen Coliseum. Vent på en værdig modstander...",
       "arenaLeave": "Du forlader køen til Ashen Coliseum.",
       "arenaSands": "Du træder ud på sandet i Ashen Coliseum.",
+      "arenaSandsDrowned": "Du træder ud på de oversvømmede sten i Den Druknede Gård.",
       "tradeRequestSent": "Du har anmodet om at handle med {name}.",
       "tradeOpened": "Handelsvindue åbnet.",
       "tradeComplete": "Handel fuldført.",
@@ -6350,6 +6417,11 @@ export const da_DK: EnTranslations = {
       "playerLevelClassTitle": "{name} - Niv {level} {className}",
       "noChallengers": "Ingen udfordrere rangeret endnu - vær den første.",
       "matchInProgress": "Kamp i gang mod {name}.",
+      "mapName": "Kort: {name}",
+      "map": {
+        "coliseum": "Askegrå Colosseum",
+        "drownedCourt": "Den Druknede Gård"
+      },
       "leaveQueue": "Forlad Køen",
       "searching": "Søger efter en modstander... ({count} i kø)",
       "enterQueue": "Stil dig i Køen",
@@ -6748,6 +6820,7 @@ export const da_DK: EnTranslations = {
       "pageNextAria": "Næste markedsside",
       "pageStatus": "Side {current} af {total}",
       "filters": "Markedsfiltre",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Type",
       "filterTypeAll": "Alle typer",
       "filterTypeWeapon": "Våben",
@@ -6758,8 +6831,15 @@ export const da_DK: EnTranslations = {
       "filterTypeOther": "Andet",
       "filterArmorType": "Rustningstype",
       "filterArmorAll": "Al rustning",
+      "filterArmorSlot": "Rustningsplads",
+      "filterArmorClassAll": "Alle rustningstyper",
+      "armorCloth": "Stof",
+      "armorLeather": "Læder",
+      "armorMail": "Ringbrynje",
       "filterWeaponType": "Våbentype",
       "filterWeaponAll": "Alle våben",
+      "filterPrimaryStat": "Primær statistik",
+      "filterPrimaryStatAll": "Alle primære statistikker",
       "filterRarity": "Sjældenhed",
       "filterRarityAll": "Alle sjældenheder",
       "weaponSword": "Sværd",

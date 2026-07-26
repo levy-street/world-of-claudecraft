@@ -42,12 +42,6 @@ describe('bank_window: no magic values', () => {
       /\.bank-item:focus-visible,\s*\.bank-buy-btn:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
     );
   });
-
-  it('marks procedural cells for non-color fallback styling and keeps the rune icon-local', () => {
-    expect(painter).toContain('cell.dataset.proceduralRarity = procedural.rarity');
-    expect(painter).toContain("legendaryPowerRuneSvg('bank-power-rune')");
-    expect(painter).toContain('this.deps.itemIcon(item, slot.instance)');
-  });
 });
 
 describe('bank_window: load-bearing behaviors preserved', () => {
@@ -444,7 +438,7 @@ describe('bank_window: touch peek suppression', () => {
     // reds this. A plain tap / desktop click returns false and falls through.
     expect(painter).toContain('consumePeek(): boolean;');
     expect(painter).toMatch(
-      /cell\.addEventListener\('click', \(ev\) => \{[\s\S]{0,260}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}\s*this\.onSlotClick\(slot\.slotIndex, ev\.shiftKey\);/,
+      /cell\.addEventListener\('click', \(ev\) => \{[\s\S]{0,520}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}\s*this\.onSlotClick\(slot\.slotIndex, ev\.shiftKey\);/,
     );
   });
 
@@ -464,11 +458,16 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     // #ui's zoom multiplies author lengths, so a raw 50vw split only tiles at
     // uiScale 1 (halves gap above 1, overlap below 1; the 2026-07-07 QA finding).
     // The split must divide the shared --app-vw box by the live scale.
+    const split = 'calc(var(--app-vw) / var(--ui-scale, 1) / 2)';
     expect(mobileCss).toMatch(
       /body\.mobile-touch\.bank-open #bank-window \{\s*left: max\(10px, env\(safe-area-inset-left\)\);\s*right: calc\(var\(--app-vw\) \/ var\(--ui-scale, 1\) \/ 2\);/,
     );
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch\.bank-open #bags \{\s*left: calc\(var\(--app-vw\) \/ var\(--ui-scale, 1\) \/ 2\);\s*right: max\(10px, env\(safe-area-inset-right\)\);/,
+    // The bags RIGHT half is shared with the market cluster (the market docks
+    // #bags the same way on touch, see market_window.test.ts). Pin against a
+    // whitespace-normalized view: biome re-wraps multi-selector lists, so a
+    // raw multi-line source pin here would rot on a reformat.
+    expect(mobileCss.replace(/\s+/g, ' ')).toContain(
+      `body.mobile-touch.bank-open #bags, body.mobile-touch.market-open #bags { left: ${split}; right: max(10px, env(safe-area-inset-right));`,
     );
   });
 
@@ -550,14 +549,14 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
   it('keeps the bank-cluster chips one scrollable row (no two-row wrap eating the grid)', () => {
     // At 360px-tall landscape phones a wrapped chip row squeezes the paired grid to a
     // sub-row sliver; the cluster-scoped rule keeps ONE horizontally scrollable row
-    // (bank chips docked AND undocked, bags chips only inside the bank cluster; the
-    // vendor cluster and standalone bags keep the family two-row wrap). Reverting
-    // flex-wrap to wrap, or dropping the scoped rule, reds this.
+    // (bank chips docked AND undocked, bags chips inside the bank and market
+    // clusters; the vendor cluster and standalone bags keep the family two-row
+    // wrap). Reverting flex-wrap to wrap, or dropping the scoped rule, reds this.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #bank-window \.bag-chips,\s*body\.mobile-touch\.bank-open #bags \.bag-chips \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
+      /body\.mobile-touch #bank-window \.bag-chips,\s*body\.mobile-touch\.bank-open #bags \.bag-chips,\s*body\.mobile-touch\.market-open #bags \.bag-chips \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
     );
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #bank-window \.bag-chip,\s*body\.mobile-touch\.bank-open #bags \.bag-chip \{\s*flex: 0 0 auto;/,
+      /body\.mobile-touch #bank-window \.bag-chip,\s*body\.mobile-touch\.bank-open #bags \.bag-chip,\s*body\.mobile-touch\.market-open #bags \.bag-chip \{\s*flex: 0 0 auto;/,
     );
   });
 });

@@ -495,6 +495,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // Geddon-style stationary channel: 8s rooted, no melee, four escalating
     // fire pulses (base x1/2/3/4 x the per-mob mechanic multiplier), 14yd.
     // Moving out at the windup eats the small first pulse or nothing.
+    // The 50% hp gate (2026-07-26) guarantees the channel fires once per kill
+    // on BOTH difficulties: a group out-pacing the 30s cadence used to skip
+    // the mechanic entirely. One gate only, and it lands before the 30% enrage
+    // so the burn phase never stacks on enraged melee.
     infernoChannel: {
       every: 30,
       duration: 8,
@@ -504,6 +508,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       radius: 14,
       name: 'Grave Inferno',
       school: 'fire',
+      atHpPct: [0.5],
     },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [

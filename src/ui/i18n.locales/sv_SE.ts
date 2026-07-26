@@ -197,7 +197,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Förtrollade kopior, ursprung och marknaden',
   'guide.profPages.craftProse.enchanting.marketBody':
-    'Att applicera en förtrollning förbrukar en inpackad, oikhopjämd kopia av föremålet plus reagenserna och överlämnar tillbaka en distinkt förtrollad kopia; utrusta den och bonusen följer pjäsen för evigt, genom avutrustning, bankturer och handlar. En förtrollning per pjäs: en förtrollad kopia kan aldrig förtrollas igen eller sönderförtrollas, och att sälja, kassera och sönderförtolla föredrar alla vanliga kopior först, så din färdiga pjäs råkar inte bli äten av misstag. Identiskt förtrollade kopior kan till och med staplas ihop i dina väskor.\n\nMästverksutrusting och förtrollning är vänner: en mästerverkspjäs förblir fullt förtrollningsbar och förtrollningen adderas ovanpå mästverksbonus utan att störa den eller tillverkarens signatur. Staplar man varje källa är ett signerat mästerverk med en Stor förtrollning det bästa en tillverkad pjäs kan bli, och den sitter ändå under raidloot av design.\n\nPå marknaden hanterar Världsmarknadens mäklare bara omodifierat standardlager, så förtrollade och signerade pjäser byter ägare öga mot öga genom handelsfönstret i stället. Materialen är den marknadsmässiga halvan av hantverket: Stoft, Essens och Skärvor listas fritt, listning kostar ingenting och Köpmannen tar 5 procent av en fullföljd försäljning. Det ger de två klassiska förtrollareinkomsterna: att sälja material på marknaden och att ta en kunds pjäs i handel, förtjana den och lämna tillbaka den.',
+    'Att applicera en förtrollning förbrukar reagenserna och markerar en specifik kopia av föremålet. Riktar du den mot en kopia i väskan får du tillbaka en distinkt förtrollad kopia; riktar du den mot en pjäs du redan bär förtrollas den på plats, utan att ta av och sätta på igen. Hur som helst följer bonusen pjäsen för evigt, genom avutrustning, bankturer och handlar. En förtrollning per pjäs: att lägga en annan förtrollning på en förtrollad kopia ber först om bekräftelse och ersätter sedan den gamla förtrollningen direkt; den förstörs utan att materialen återbetalas. Att sälja, kassera och sönderförtolla föredrar alla vanliga kopior först, så din färdiga pjäs råkar inte bli äten av misstag. Identiskt förtrollade kopior kan till och med staplas ihop i dina väskor.\n\nMästverksutrusting och förtrollning är vänner: en mästerverkspjäs förblir fullt förtrollningsbar och förtrollningen adderas ovanpå mästverksbonus utan att störa den eller tillverkarens signatur. Staplar man varje källa är ett signerat mästerverk med en Stor förtrollning det bästa en tillverkad pjäs kan bli, och den sitter ändå under raidloot av design.\n\nPå marknaden hanterar Världsmarknadens mäklare bara omodifierat standardlager, så förtrollade och signerade pjäser byter ägare öga mot öga genom handelsfönstret i stället. Materialen är den marknadsmässiga halvan av hantverket: Stoft, Essens och Skärvor listas fritt, listning kostar ingenting och Köpmannen tar 5 procent av en fullföljd försäljning. Det ger de två klassiska förtrollareinkomsterna: att sälja material på marknaden och att ta en kunds pjäs i handel, förtjana den och lämna tillbaka den.',
   'guide.profPages.howHeading': 'Hur hantverkande fungerar',
   'guide.profPages.howBody':
     'Öppna hantverksfönstret (standardtangent T) och alla recept du kan listas med vad de kräver och vad du har till hands. Stationsbundna recept kräver att du står inom 20 yard från rätt station i staden, fältrecept hantveras var som helst, och Förtrollning behöver aldrig en station alls. Det finns inget misslyckandekast: ett hantverk med materialen till hands lyckas alltid.\n\nTvå små friktioner håller ekonomin ärlig. Varje lyckat hantverk betalar en avgift på 2 koppar per poäng av föremålets statistikbudget, och hantverkstypsåtgärder delar ett tempo: högst 10 hantverk, avförtrollningar, förtrollningar eller demonteringar under valfria 60 sekunder. Inget av detta stör en normal session; båda stoppar en maximerad specialist från att översvämma marknaden.',
@@ -8922,7 +8922,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimal skicklighetsvinst',
   'hudChrome.crafting.difficultyNone': 'Ingen färdighetsvinst',
   'hudChrome.crafting.difficultyReduced': 'Minskad färdighetsvinst',
-  'hudChrome.crafting.enchantedLine': 'Förtrollad',
   'hudChrome.crafting.gatheredBy': 'Samlat av {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} vid {station} kan lära dig fler {craft}-recept.',
@@ -9240,4 +9239,78 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornpeak_mail_sabatons.name': 'Thornpeak-ringsabatonger',
   'entities.items.thornpeak_polearm.name': 'Thornpeak-stångvapen',
   'entities.items.thornpeak_war_axe.name': 'Thornpeak-stridsyxa',
+  'hud.arena.map.coliseum': 'Askgrå kolosseum',
+  'hud.arena.map.drownedCourt': 'Det dränkta hovet',
+  'hud.arena.mapName': 'Karta: {name}',
+  'hud.logs.arenaSandsDrowned': 'Du kliver ut på de översvämmade stenarna i Det dränkta hovet.',
+  'itemUi.market.armorCloth': 'Tyg',
+  'itemUi.market.armorLeather': 'Läder',
+  'itemUi.market.armorMail': 'Ringbrynja',
+  'itemUi.market.filterArmorClassAll': 'Alla rustningstyper',
+  'itemUi.market.filterArmorSlot': 'Rustningsplats',
+  'itemUi.market.filterPrimaryStat': 'Primärt attribut',
+  'itemUi.market.filterPrimaryStatAll': 'Alla primära attribut',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Ta på nivå 20-förvalet före Sanctum för en specialisering, väskor först. Endast utrustning.',
+  'devCommand.actions.kit.label': 'Utrusta nivå 20-kit',
+  'devCommand.fields.spec': 'Specialisering',
+  'devCommand.itemChosen': 'Vald: {name}',
+  'devCommand.itemHeroicTag': 'Heroisk',
+  'devCommand.itemMore': 'Visar {shown} av {total}. Fortsätt skriva för att smalna av urvalet.',
+  'devCommand.itemNoMatches': 'Inga föremål matchar.',
+  'devCommand.itemResultsAria': 'Matchande föremål',
+  'devCommand.itemSearchPlaceholder': 'Sök efter namn eller id',
+  'devCommand.itemUnknown': 'Inget föremål har detta id.',
+  'devCommand.kitCurrentSpec': 'Aktuell specialisering',
+  'hudChrome.bags.itemAriaBound': '{item}, antal {count}, bunden kopia',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, antal {count}, förtrollad kopia',
+  'hudChrome.enchanting.tier.base': 'Basförtrollningar',
+  'hudChrome.enchanting.tier.greater': 'Högre förtrollningar',
+  'hudChrome.enchanting.tier.runed': 'Runristade förtrollningar',
+  'hudChrome.enchanting.wornTag': 'Buren ({slot})',
+  'hudChrome.enchanting.yieldHeader': 'Förväntade material:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} till {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Förtrollad',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Förtrollad)',
+  'hudChrome.marketIndicator.aria': 'Hämtning väntar vid Världsmarknaden',
+  'hudChrome.marketIndicator.tip': 'Guld eller föremål väntar på dig hos Köpmannen.',
+  'hudChrome.materialHint.arcaneDust':
+    'Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynt utrustning.',
+  'hudChrome.materialHint.arcaneShard':
+    'Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.',
+  'hudChrome.materialHint.resonantHide':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre läderrustning.',
+  'hudChrome.materialHint.resonantLinks':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre ringbrynja.',
+  'hudChrome.materialHint.resonantSteel':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre närstridsvapen.',
+  'hudChrome.materialHint.resonantThread':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre tygrustning.',
+  'hudChrome.materialHint.resonantTimber':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst.',
+  'hudChrome.options.stickyTarget': 'Behåll mål vid markklick',
+  'hudChrome.social.billboard.empty': 'Inget på anslagstavlan än.',
+  'hudChrome.social.billboard.inputLabel': 'Meddelande på gillets anslagstavla',
+  'hudChrome.social.billboard.label': 'Gillets anslagstavla',
+  'hudChrome.social.billboard.placeholder': 'Skriv ett meddelande till gillet',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Endast officerare och Gillesmästaren får redigera anslagstavlan.',
+  'hudChrome.social.billboard.result.set': 'Gillets anslagstavla har uppdaterats.',
+  'hudChrome.social.billboard.save': 'Spara',
+  'hudChrome.social.billboard.setBy': 'Skriven av {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'Det föremålet är redan förtrollat.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Ersätt',
+  'hudChrome.enchanting.replaceConfirmBody': 'Detta ersätter {old} på {item} med {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Kostnad: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'Den gamla förtrollningen förstörs. Dess material återbetalas inte. Det kan inte ångras.',
+  'hudChrome.enchanting.replaceConfirmTitle': 'Ersätt förtrollningen på {item}?',
+  'hudChrome.enchanting.replaceTag': 'Ersätter {enchant}',
+  'hudChrome.enchanting.sameEnchant': 'Det föremålet har redan den förtrollningen.',
+  'hudChrome.enchanting.sameEnchantTag': 'Redan applicerad',
 };

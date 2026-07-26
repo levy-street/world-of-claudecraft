@@ -313,20 +313,32 @@ describe('prestige', () => {
     expect(sim.prestigeRank).toBe(0);
   });
 
-  it('emits a dedicated prestige event carrying the new rank (issue #2137)', () => {
-    // Regression: the character sheet only repaints on a small explicit set of
-    // triggers, and prestige used to emit only a chat 'log' line, so an
-    // already-open sheet kept showing the stale rank. A dedicated event lets
-    // the HUD repaint the sheet the moment prestige lands.
+  // Regression (issue #2137): the character sheet only repaints on a small
+  // explicit set of triggers, and prestige used to emit only a chat 'log' line,
+  // so an already-open sheet kept showing the stale rank. The rank rides every
+  // self snapshot, so the client always HAS the new value; what it lacked was a
+  // signal telling it when to repaint. This event is that signal (the 'honor'
+  // precedent), so a successful prestige must emit exactly one carrying the new
+  // rank, and a refused one must emit none.
+  it('emits a personal prestige event carrying the new rank (issue #2137)', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     sim.grantXp(PRESTIGE_XP_PER_RANK);
-    sim.events.length = 0;
+    sim.drainEvents();
+
     expect(sim.prestige()).toBe(true);
-    const prestigeEvents = sim.events.filter((e) => e.type === 'prestige');
-    expect(prestigeEvents).toHaveLength(1);
-    expect((prestigeEvents[0] as any).rank).toBe(1);
+    const events = sim.drainEvents().filter((e) => e.type === 'prestige');
+    expect(events).toEqual([{ type: 'prestige', pid: sim.playerId, rank: 1 }]);
     expect(sim.prestigeRank).toBe(1);
+  });
+
+  it('emits no prestige event when the gate refuses', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(10);
+    sim.drainEvents();
+
+    expect(sim.prestige()).toBe(false);
+    expect(sim.drainEvents().filter((e) => e.type === 'prestige')).toEqual([]);
   });
 });
 

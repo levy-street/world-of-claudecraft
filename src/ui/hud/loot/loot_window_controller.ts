@@ -62,7 +62,7 @@ export class LootWindowController {
     const world = this.deps.world();
     const mob = world.entities.get(mobId);
     if (!mob) return;
-    const { componentTags, harvestable, visibleItems, hasLoot, canOpen } =
+    const { componentTags, harvestable, visibleItems, visibleCopper, hasLoot, canOpen } =
       this.deps.corpseAvailability(mob);
     if (!canOpen) return;
 
@@ -70,8 +70,10 @@ export class LootWindowController {
     this.mobId = mobId;
     this.chestId = null;
     let html = this.titleHtml(this.deps.entityName(mob));
-    if (mob.loot && mob.loot.copper > 0) {
-      html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(mob.loot.copper)}</span></div>`;
+    // visibleCopper, not mob.loot.copper: coin is shared (tap-owned) loot, so
+    // the popup must not advertise a stranger's copper the take would deny.
+    if (visibleCopper > 0) {
+      html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(visibleCopper)}</span></div>`;
     }
     html += visibleItems.map((stack, index) => this.itemRowHtml(stack, index)).join('');
     this.deps.element.innerHTML = html;

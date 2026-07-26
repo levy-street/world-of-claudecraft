@@ -38,6 +38,14 @@ export const sv_SE: EnTranslations = {
     "filterLabel": "Filtrera kommandon",
     "filterPlaceholder": "Sök i den här kategorin",
     "noMatches": "Inga matchande kommandon.",
+    "itemSearchPlaceholder": "Sök efter namn eller id",
+    "itemResultsAria": "Matchande föremål",
+    "itemNoMatches": "Inga föremål matchar.",
+    "itemMore": "Visar {shown} av {total}. Fortsätt skriva för att smalna av urvalet.",
+    "itemChosen": "Vald: {name}",
+    "itemUnknown": "Inget föremål har detta id.",
+    "itemHeroicTag": "Heroisk",
+    "kitCurrentSpec": "Aktuell specialisering",
     "serverRequirement": "Serverfusk kräver fortfarande ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Välj giltiga värden innan du kör kommandot.",
     "sent": "Skickat: {command}",
@@ -55,7 +63,8 @@ export const sv_SE: EnTranslations = {
       "z": "Z",
       "dungeon": "Fängelsehåla",
       "difficulty": "Svårighetsgrad",
-      "name": "Namn"
+      "name": "Namn",
+      "spec": "Specialisering"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const sv_SE: EnTranslations = {
       "give": {
         "label": "Ge föremål",
         "description": "Lägg till ett föremål i spelarens inventarium."
+      },
+      "kit": {
+        "label": "Utrusta nivå 20-kit",
+        "description": "Ta på nivå 20-förvalet före Sanctum för en specialisering, väskor först. Endast utrustning."
       },
       "gold": {
         "label": "Lägg till guld",
@@ -1049,6 +1062,7 @@ export const sv_SE: EnTranslations = {
       "walkByAutoloot": "Automatisk plundring i förbifarten",
       "groundReticle": "Markriktmedel",
       "mouseoverCast": "Kasta via muspekaren på gruppramarna",
+      "stickyTarget": "Behåll mål vid markklick",
       "showItemLevel": "Visa föremålsnivå",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
@@ -1529,8 +1543,14 @@ export const sv_SE: EnTranslations = {
       "dragDestroyHint": "Dra ut i världen för att förstöra",
       "reorderNeedsRecent": "Rensa filtret och sortera efter Nyliga för att ordna om dina väskor",
       "itemAriaInstanced": "{item}, antal {count}, tillverkarmärkt kopia",
+      "itemAriaEnchanted": "{item}, antal {count}, förtrollad kopia",
+      "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
       "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, item level {level}, quantity {count}, masterwork",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, item level {level}, quantity {count}, enchanted copy",
+      "itemAriaProceduralSigned": "{item}, {rarity}, item level {level}, quantity {count}, maker-marked copy",
+      "itemAriaProceduralBound": "{item}, {rarity}, item level {level}, quantity {count}, bound copy",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -1754,7 +1774,19 @@ export const sv_SE: EnTranslations = {
       "label": "Återställ ramarnas positioner"
     },
     "itemTooltip": {
-      "requiresLevel": "Kräver nivå {level}"
+      "requiresLevel": "Kräver nivå {level}",
+      "statEnchanted": "+{value} {stat} (Förtrollad)",
+      "enchantedFallback": "Förtrollad"
+    },
+    "materialHint": {
+      "arcaneDust": "Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.",
+      "arcaneEssence": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt utrustning.",
+      "arcaneShard": "Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.",
+      "resonantThread": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre tygrustning.",
+      "resonantHide": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre läderrustning.",
+      "resonantLinks": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre ringbrynja.",
+      "resonantSteel": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre närstridsvapen.",
+      "resonantTimber": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst."
     },
     "discord": {
       "title": "Discord",
@@ -1995,6 +2027,10 @@ export const sv_SE: EnTranslations = {
         "takeParcelsFirst": "Ta ut paketen innan du kastar brevet."
       }
     },
+    "marketIndicator": {
+      "aria": "Hämtning väntar vid Världsmarknaden",
+      "tip": "Guld eller föremål väntar på dig hos Köpmannen."
+    },
     "noticeboard": {
       "empty": "Inget verkar vara uppsatt."
     },
@@ -2114,7 +2150,19 @@ export const sv_SE: EnTranslations = {
       "onlineHeader": "Anslutna ({n})",
       "offlineHeader": "Frånkopplade ({n})",
       "hideOffline": "Dölj frånkopplade",
-      "hideOfflineTitle": "Dölj frånkopplade gillesmedlemmar"
+      "hideOfflineTitle": "Dölj frånkopplade gillesmedlemmar",
+      "billboard": {
+        "label": "Gillets anslagstavla",
+        "empty": "Inget på anslagstavlan än.",
+        "setBy": "Skriven av {name}",
+        "save": "Spara",
+        "placeholder": "Skriv ett meddelande till gillet",
+        "inputLabel": "Meddelande på gillets anslagstavla",
+        "result": {
+          "set": "Gillets anslagstavla har uppdaterats.",
+          "notOfficer": "Endast officerare och Gillesmästaren får redigera anslagstavlan."
+        }
+      }
     },
     "gathering": {
       "title": "Insamling",
@@ -2384,7 +2432,6 @@ export const sv_SE: EnTranslations = {
       "makersMark": "Skapad av {name}",
       "gatheredBy": "Samlat av {name}",
       "masterworkSeal": "Mästerverk",
-      "enchantedLine": "Förtrollad",
       "commissionToggle": "Beställningsstycke",
       "commissionToggleHint": "Binds till den första karaktären som tar emot det i en handel.",
       "commissionUnbound": "Beställningsstycke: binds till den första mottagaren",
@@ -2422,7 +2469,26 @@ export const sv_SE: EnTranslations = {
       "pickerTitle": "Applicera förtrollning",
       "targetTitle": "Välj ett föremål att förtrylla",
       "noEnchants": "Inget förtrollning använder det reagnset.",
-      "noTargets": "Inget behörigt föremål att förtrylla."
+      "noTargets": "Inget behörigt föremål att förtrylla.",
+      "wornTag": "Buren ({slot})",
+      "tier": {
+        "base": "Basförtrollningar",
+        "runed": "Runristade förtrollningar",
+        "greater": "Högre förtrollningar"
+      },
+      "yieldHeader": "Förväntade material:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} till {max} {item}",
+      "alreadyEnchanted": "Det föremålet är redan förtrollat.",
+      "sameEnchant": "Det föremålet har redan den förtrollningen.",
+      "replaceTag": "Ersätter {enchant}",
+      "sameEnchantTag": "Redan applicerad",
+      "replaceConfirmTitle": "Ersätt förtrollningen på {item}?",
+      "replaceConfirmBody": "Detta ersätter {old} på {item} med {new}.",
+      "replaceConfirmNoRefund": "Den gamla förtrollningen förstörs. Dess material återbetalas inte. Det kan inte ångras.",
+      "replaceConfirmCost": "Kostnad: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Ersätt"
     },
     "training": {
       "title": "Utbildning: {name}",
@@ -3820,7 +3886,7 @@ export const sv_SE: EnTranslations = {
           "levelingHeading": "Hur förtrollning levlar",
           "levelingBody": "Två handlingar höjer skickligheten: att sönderförtolla en pjäs och att applicera en förtrollning. Varje framgång är värd upp till ett poäng, skalat efter hur seriöst arbetet är: sällsyntheten på pjäsen du bryter, eller reagensnivån på förtrollningen du applicerar. Vanliga sönderförtrollningar och enbart-stoft-förtrollningar räknas som vanligt arbete; ovanliga sönderförtrollningar och essensförtrollningar som ovanliga; sällsynta sönderförtrollningar och alla Runiska eller Stora förtrollningar som sällsynta; episka och legendariska sönderförtrollningar ännu högre.\n\nDen välkända mästerskapsavmattningen gäller på 25-poängsnivåer, så vanliggradig arbete grå ut vid skicklighet 75, ovanligt arbete vid 100 och sällsyntnivå-arbete exakt vid 125-taket. Förtrollning har också en egen välgärenhet: indata över ditt arketyptak avrundas ner till det taket i stället för att nollsättas, så innan du anpassar dig ger en episk sönderförtrollning bara poäng som sällsynt i stället för att lära ut ingenting. Hamnar Förtrollning vilande bakom en annan identitet räknas allt som vanligt arbete och klättringen stannar vid 75; håll det som din hobby och sällsyntnivå-arbete ger fortfarande utdelning, bara långsammare förbi 75.",
           "marketHeading": "Förtrollade kopior, ursprung och marknaden",
-          "marketBody": "Att applicera en förtrollning förbrukar en inpackad, oikhopjämd kopia av föremålet plus reagenserna och överlämnar tillbaka en distinkt förtrollad kopia; utrusta den och bonusen följer pjäsen för evigt, genom avutrustning, bankturer och handlar. En förtrollning per pjäs: en förtrollad kopia kan aldrig förtrollas igen eller sönderförtrollas, och att sälja, kassera och sönderförtolla föredrar alla vanliga kopior först, så din färdiga pjäs råkar inte bli äten av misstag. Identiskt förtrollade kopior kan till och med staplas ihop i dina väskor.\n\nMästverksutrusting och förtrollning är vänner: en mästerverkspjäs förblir fullt förtrollningsbar och förtrollningen adderas ovanpå mästverksbonus utan att störa den eller tillverkarens signatur. Staplar man varje källa är ett signerat mästerverk med en Stor förtrollning det bästa en tillverkad pjäs kan bli, och den sitter ändå under raidloot av design.\n\nPå marknaden hanterar Världsmarknadens mäklare bara omodifierat standardlager, så förtrollade och signerade pjäser byter ägare öga mot öga genom handelsfönstret i stället. Materialen är den marknadsmässiga halvan av hantverket: Stoft, Essens och Skärvor listas fritt, listning kostar ingenting och Köpmannen tar 5 procent av en fullföljd försäljning. Det ger de två klassiska förtrollareinkomsterna: att sälja material på marknaden och att ta en kunds pjäs i handel, förtjana den och lämna tillbaka den."
+          "marketBody": "Att applicera en förtrollning förbrukar reagenserna och markerar en specifik kopia av föremålet. Riktar du den mot en kopia i väskan får du tillbaka en distinkt förtrollad kopia; riktar du den mot en pjäs du redan bär förtrollas den på plats, utan att ta av och sätta på igen. Hur som helst följer bonusen pjäsen för evigt, genom avutrustning, bankturer och handlar. En förtrollning per pjäs: att lägga en annan förtrollning på en förtrollad kopia ber först om bekräftelse och ersätter sedan den gamla förtrollningen direkt; den förstörs utan att materialen återbetalas. Att sälja, kassera och sönderförtolla föredrar alla vanliga kopior först, så din färdiga pjäs råkar inte bli äten av misstag. Identiskt förtrollade kopior kan till och med staplas ihop i dina väskor.\n\nMästverksutrusting och förtrollning är vänner: en mästerverkspjäs förblir fullt förtrollningsbar och förtrollningen adderas ovanpå mästverksbonus utan att störa den eller tillverkarens signatur. Staplar man varje källa är ett signerat mästerverk med en Stor förtrollning det bästa en tillverkad pjäs kan bli, och den sitter ändå under raidloot av design.\n\nPå marknaden hanterar Världsmarknadens mäklare bara omodifierat standardlager, så förtrollade och signerade pjäser byter ägare öga mot öga genom handelsfönstret i stället. Materialen är den marknadsmässiga halvan av hantverket: Stoft, Essens och Skärvor listas fritt, listning kostar ingenting och Köpmannen tar 5 procent av en fullföljd försäljning. Det ger de två klassiska förtrollareinkomsterna: att sälja material på marknaden och att ta en kunds pjäs i handel, förtjana den och lämna tillbaka den."
         }
       },
       "howHeading": "Hur hantverkande fungerar",
@@ -6182,6 +6248,7 @@ export const sv_SE: EnTranslations = {
       "arenaJoin": "Du går med i kön till Askgrå kolosseum. Vänta på en värdig motståndare...",
       "arenaLeave": "Du lämnar kön till Askgrå kolosseum.",
       "arenaSands": "Du kliver ut på sanden i Askgrå kolosseum.",
+      "arenaSandsDrowned": "Du kliver ut på de översvämmade stenarna i Det dränkta hovet.",
       "tradeRequestSent": "Du har begärt att handla med {name}.",
       "tradeOpened": "Handelsfönster öppnat.",
       "tradeComplete": "Handeln slutförd.",
@@ -6350,6 +6417,11 @@ export const sv_SE: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nivå {level} {className}",
       "noChallengers": "Inga utmanare rankade än - var den första.",
       "matchInProgress": "Match pågår mot {name}.",
+      "mapName": "Karta: {name}",
+      "map": {
+        "coliseum": "Askgrå kolosseum",
+        "drownedCourt": "Det dränkta hovet"
+      },
       "leaveQueue": "Lämna kön",
       "searching": "Söker efter en motståndare... ({count} i kön)",
       "enterQueue": "Gå med i kön",
@@ -6748,6 +6820,7 @@ export const sv_SE: EnTranslations = {
       "pageNextAria": "Nästa marknadssida",
       "pageStatus": "Sida {current} av {total}",
       "filters": "Marknadsfilter",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Typ",
       "filterTypeAll": "Alla typer",
       "filterTypeWeapon": "Vapen",
@@ -6758,8 +6831,15 @@ export const sv_SE: EnTranslations = {
       "filterTypeOther": "Övrigt",
       "filterArmorType": "Rustningstyp",
       "filterArmorAll": "All rustning",
+      "filterArmorSlot": "Rustningsplats",
+      "filterArmorClassAll": "Alla rustningstyper",
+      "armorCloth": "Tyg",
+      "armorLeather": "Läder",
+      "armorMail": "Ringbrynja",
       "filterWeaponType": "Vapentyp",
       "filterWeaponAll": "Alla vapen",
+      "filterPrimaryStat": "Primärt attribut",
+      "filterPrimaryStatAll": "Alla primära attribut",
       "filterRarity": "Sällsynthet",
       "filterRarityAll": "Alla sällsyntheter",
       "weaponSword": "Svärd",

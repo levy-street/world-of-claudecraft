@@ -39,7 +39,11 @@ export interface ApplyEnchantResultEvent {
     | 'not_held'
     | 'insufficient_materials'
     | 'throttled'
-    | 'no_bag_space';
+    | 'no_bag_space'
+    // #2415: the honest already-enchanted deny (no confirm flag), and the
+    // identical-enchant-id re-apply denied on every arm.
+    | 'already_enchanted'
+    | 'same_enchant';
 }
 
 /** The toast for one disenchantResult event. Success is a chat line ({ item });
@@ -90,6 +94,12 @@ export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): Enchanting
       return { key: 'hudChrome.enchanting.enchantInsufficient', sink: 'error' };
     case 'no_bag_space':
       return { key: 'hudChrome.enchanting.enchantNoSpace', sink: 'error' };
+    // #2415: the two dedicated already-enchanted denies, each naming the real
+    // cause instead of the old misleading "You do not have that item.".
+    case 'already_enchanted':
+      return { key: 'hudChrome.enchanting.alreadyEnchanted', sink: 'error' };
+    case 'same_enchant':
+      return { key: 'hudChrome.enchanting.sameEnchant', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }

@@ -180,7 +180,7 @@ function setup() {
   const client = bareClient(session.pid);
   (server as any).broadcastSnapshots();
   (client as any).applySnapshot(lastSnap(fc.sent));
-  expect(client.consumeInventoryChanged()).toBe(true); // negative control
+  expect(client.consumeInventoryChanged()).toBe(true); // fixture control, see above
   fc.sent.length = 0;
   return { server, fc, session, sim, meta, client };
 }
@@ -360,6 +360,103 @@ describe('bag purse-freshness wiring (source pins)', () => {
     // this only guards that adding the purse probe did not displace any of them.
     const crafting = hud.match(/this\.refreshOpenCraftingIfReagentsChanged\(\);/g) ?? [];
     expect(crafting).toHaveLength(3);
+  });
+});
+
+describe('async balance reads repaint the FOOTER, not the whole window', () => {
+  // Both $WOC and Claudium balances resolve on their own schedule with no user action
+  // behind them, and both used to call the HUD's full renderBags() from a promise
+  // resolve. That tore the window down under a player who was mid-drag, hovering a
+  // tooltip, or typing in bag search, and it defeated the narrow money-row rewrite the
+  // purse probe was built around (the Claudium read is 30s-throttled, so an open bag
+  // with a moving purse hit it roughly twice a minute). Pinned per SITE, because a
+  // whole-file assertion would be satisfied by either one alone.
+
+  it('the wallet UI change listener repaints only the money row', () => {
+    expect(hud).toMatch(/onWalletUiChange\(\(\) => \{[^}]*this\.bagsWindow\.refreshMoneyRow\(\);/);
+    // ONLY. A toMatch on the new call says nothing about the old one: re-adding
+    // `this.renderBags();` on the next line satisfies every affirmative pin here
+    // while restoring the exact teardown this block is named after. Scoped to the
+    // block, not the file, because ~7 other sites call renderBags() legitimately.
+    expect(hud).not.toMatch(/onWalletUiChange\(\(\) => \{[^}]*this\.renderBags\(\);/);
+  });
+
+  // The Claudium balance itself no longer lives here to be pattern-matched. Its
+  // state, its 30s read, the in-flight and stale-response guards and the changed-only
+  // converge moved to src/ui/claudium_launcher_balance_core.ts (issues #2411, #2414),
+  // where tests/claudium_launcher_balance.test.ts EXECUTES all of them: the elision on
+  // an unchanged read, the re-entry guard on both paths (the in-flight flag inside a
+  // resolve, the stamp-before-converge ordering on a direct write), the seq drop and
+  // the throttle arithmetic. tests/bags_money_row_paint.test.ts then composes that
+  // module with the real painter and counts paints. What is left for source text is
+  // only the HUD's wiring: where the converge lands, and that nothing bypasses it.
+
+  it('the Claudium balance converge repaints only the money row', () => {
+    expect(hud).toMatch(
+      /onChanged: \(\) => \{[^}]*if \(bagsWindowShown\(\$\('#bags'\)\.style\.display\)\) this\.bagsWindow\.refreshMoneyRow\(\);/,
+    );
+    // ONLY. A toMatch on the new call says nothing about the old one: re-adding
+    // `this.renderBags();` on the next line satisfies every affirmative pin here
+    // while restoring the exact teardown this block is named after.
+    expect(hud).not.toMatch(/onChanged: \(\) => \{[^}]*this\.renderBags\(\);/);
+  });
+
+  it('routes every balance write through that one converging seam (#2414)', () => {
+    // Three writes arrive without a launcher read: the WOC Store snapshot, a store
+    // spend, and the Claudium window's snapshot. Each used to update a private field
+    // and stop there, which is what left an open bag showing the pre-spend number.
+    // Counted rather than merely matched, because the regression shape is a FOURTH
+    // surface hand-wired around the seam; a new balance write goes through set() and
+    // moves this number deliberately.
+    const writes = hud.match(/this\.claudiumBalance\.set\(/g) ?? [];
+    expect(writes).toHaveLength(3);
+    // And no shadow copy survived the extraction. A balance the HUD assigned itself
+    // would render from state the converge and the changed compare never see, which
+    // is both bugs back in one line.
+    expect(hud).not.toMatch(/this\.claudiumLauncherBalance/);
+  });
+
+  it('writes the balance each of those surfaces actually reported', () => {
+    // The count above says three writers exist; it says nothing about WHAT they write.
+    // Swapping an argument for the balance already held typechecks (the getter is
+    // `number | null`) and quietly re-opens #2414 for that one surface while every
+    // other pin in this file stays green, so slice each closure and name its argument.
+    const between = (from: string, to: string): string => {
+      const start = hud.indexOf(from);
+      expect(start, `anchor missing: ${from}`).toBeGreaterThan(-1);
+      const end = hud.indexOf(to, start);
+      expect(end, `anchor missing: ${to}`).toBeGreaterThan(start);
+      return hud.slice(start, end);
+    };
+    expect(between('storeSnapshot: async () => {', 'spendStoreItem:')).toContain(
+      'this.claudiumBalance.set(snapshot.balance);',
+    );
+    expect(between('spendStoreItem: async (', 'openClaudium:')).toContain(
+      'this.claudiumBalance.set(result.balance);',
+    );
+    expect(between('new ClaudiumWindow({', 'buy: (rail, sku)')).toContain(
+      'this.claudiumBalance.set(snapshot.balance);',
+    );
+  });
+
+  it('keeps the launcher label starting the throttled read it renders from', () => {
+    // The label paint IS the poll: nothing else drives an unforced read, so dropping
+    // this call would freeze the number at whatever the last forced read left.
+    expect(hud).toMatch(
+      /claudiumLauncherHtml\(\): string \{[^}]*this\.claudiumBalance\.refresh\(\);/,
+    );
+  });
+
+  it('neither async path is left on the cold-load-unsafe raw display compare', () => {
+    // `!== 'none'` reads a never-opened window as shown (#1538), so the old form
+    // would paint a window the player has never opened on every balance read.
+    const sites = hud.match(/this\.bagsWindow\.refreshMoneyRow\(\);/g) ?? [];
+    expect(sites).toHaveLength(2);
+    const guarded =
+      hud.match(
+        /if \(bagsWindowShown\(\$\('#bags'\)\.style\.display\)\) this\.bagsWindow\.refreshMoneyRow\(\);/g,
+      ) ?? [];
+    expect(guarded).toHaveLength(2);
   });
 });
 

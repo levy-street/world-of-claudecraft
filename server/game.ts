@@ -41,6 +41,7 @@ import {
   jailGateTeleport,
 } from '../src/sim/jail';
 import type { PickAction } from '../src/sim/lockpick';
+import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
@@ -154,6 +155,7 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
@@ -621,6 +623,15 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   // mirror goes stale until the staggered refresh. Also refreshes the purse
   // for the fee debit.
   'unbindResult',
+  // Apply-enchant, for the same reason as unbindResult above: the WORN arm
+  // (src/sim/professions/enchanting.ts resolveApplyEnchantWorn) enchants in
+  // place, so it only REMOVES reagents and emits no loot event. Without this the
+  // enchant itself would show at once (it rides the `eqi` identity diff, which
+  // recalcPlayerStats rebuilds) while the spent reagents lingered in the bag
+  // mirror until the staggered refresh, and re-opening the picker could still
+  // offer an enchant the player can no longer afford. The bagged arm's loot
+  // event already covered it; this makes both arms explicit.
+  'enchantResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -1081,6 +1092,8 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
+  if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;
+  if (e.forcedTargetTimer > 0) out.ftm = round2(e.forcedTargetTimer);
   // A player's/bot's SELECTED target (mobs use aggroTargetId above): rides so the
   // client can render the target-of-target frame for a PLAYER target, exactly as
   // `aggro` already enables it for a mob/pet target. Emitted only for an entity that
@@ -1091,6 +1104,11 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // corpse harvest claim (single-use, first-come): the online corpse picker
   // must stop offering a corpse another player already harvested
   if (e.harvestClaimedBy !== null) out.hcb = e.harvestClaimedBy;
+  // loot owner-lock lapse (FFA): the online corpse picker must offer a
+  // stranger's aged-out corpse again for a deliberate manual loot, the same
+  // reliability contract hcb gives harvest claims. Flips once per corpse, so
+  // the per-entity dyn cache re-serializes exactly one changed record.
+  if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;
@@ -4319,15 +4337,43 @@ export class GameServer {
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
       // from the client); the outcome reaches this client as the pid-scoped
       // disenchantResult/enchantResult/salvageResult event plus the denc/ench/salv
-      // self-delta. A successful action emits a `loot` event (a HEAVY_SELF_EVENTS
-      // member) via the inventory hub, so the self inventory refreshes exactly like
-      // a craft; no explicit dirty-marking is needed here.
+      // self-delta. A successful disenchant/salvage, and a bagged apply, emit a
+      // `loot` event (a HEAVY_SELF_EVENTS member) via the inventory hub, so the self
+      // inventory refreshes exactly like a craft; no explicit dirty-marking is needed
+      // here. The WORN apply arm mints nothing and so emits no loot event, which is
+      // why `enchantResult` is itself a HEAVY_SELF_EVENTS member (the unbindResult
+      // precedent): otherwise the spent reagents would linger in the bag mirror.
       case 'disenchant_item':
         if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
         break;
       case 'apply_enchant':
-        if (typeof msg.item === 'string' && typeof msg.enchant === 'string')
-          sim.applyEnchant(msg.item, msg.enchant, pid);
+        if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
+          // The optional worn target (the in-place enchant arm) is accepted only
+          // when it names a real equipment key, the same untrusted-input rule the
+          // 'equip' case above applies to its aimed slot; anything else falls back
+          // to undefined, which is the bagged arm. The sim then re-validates that
+          // the named slot is actually wearing this item id and, without the
+          // confirm flag below, that the worn copy is not already enchanted.
+          const worn =
+            typeof msg.slot === 'string' &&
+            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+              ? (msg.slot as EquipSlot)
+              : undefined;
+          // `confirm` (#2415): the explicit consent to replace an existing
+          // enchant. A strict boolean-true check (the dispatch type-guard
+          // rule, the craft_item `commission` precedent); anything else reads
+          // as false. The sim re-validates the target and picks the pinned
+          // victim itself, so nothing here trusts client data: the flag can
+          // only ever unlock the dedicated replace arm, never aim it.
+          // Note the two tokens are independent: an unrecognized `slot` falls
+          // back to undefined ABOVE, so a hand-crafted {slot: bogus, confirm:
+          // true} becomes a confirmed BAGGED replace rather than being
+          // rejected. Harmless by construction (the victim is still the sim's
+          // own pin over the SENDER's inventory, so the worst case is that
+          // sender destroying one of their own enchants), and an honest client
+          // never emits an invalid slot.
+          sim.applyEnchant(msg.item, msg.enchant, worn, msg.confirm === true, pid);
+        }
         break;
       case 'salvage_item':
         if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
@@ -4751,6 +4797,17 @@ export class GameServer {
         if (typeof msg.id === 'number')
           void this.social.guildEventRemove(this.actorFor(session), msg.id).catch(logSocialErr);
         break;
+      case 'guild_set_motd':
+        // Guild billboard: player text, so it flows through the same mute +
+        // rate + hard-word gates as chat (the guild_event_create stack) before
+        // the service applies its own officer/clamp validation.
+        if (typeof msg.text === 'string') {
+          if (this.isChatMuted(session)) break;
+          if (!this.consumeChatToken(session)) break;
+          if (this.enforceChatPolicy(session, msg.text)) break;
+          void this.social.guildSetMotd(this.actorFor(session), msg.text).catch(logSocialErr);
+        }
+        break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
         const fmt =
@@ -4764,10 +4821,19 @@ export class GameServer {
                   ? 'yumi5'
                   : '1v1';
         sim.arenaQueueJoin(pid, fmt);
+        // ARENA_WIRE_HZ throttles the `arena` self key to once per 10s (the
+        // #940 perf fix for the uncached arenaLadder() sort), so without this
+        // the Arena window would keep showing the stale Queue button for up to
+        // 10s after the player just clicked it. Force the next snapshot to
+        // carry fresh arenaInfo, same reset used at the spectate transitions.
+        session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
         break;
       }
       case 'arena_leave':
         sim.arenaQueueLeave(pid);
+        // Same staleness fix as arena_queue above: surface the cleared queue
+        // state immediately instead of on the next throttled tick.
+        session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
         break;
       case 'arena_augment': {
         if (typeof msg.augment === 'string' && msg.augment.length <= 64)
@@ -4935,6 +5001,8 @@ export class GameServer {
             search: typeof msg.q === 'string' ? msg.q : '',
             itemType: msg.itemType,
             subtype: msg.subtype,
+            armorClass: msg.armorClass,
+            primaryStat: msg.primaryStat,
             rarity: msg.rarity,
             page: typeof msg.page === 'number' ? msg.page : 0,
           }),
@@ -5928,6 +5996,9 @@ export class GameServer {
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    // the lightweight collect-indicator bit streams ALWAYS (the mailU pattern),
+    // so the minimap badge lights anywhere while proceeds/items wait
+    maybe('mktU', this.sim.marketCollectPendingFor(anchorSession.pid) ? 1 : 0);
     maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     // bank info is null unless the player is standing at a banker, so it only
@@ -6479,10 +6550,12 @@ export class GameServer {
           anchorPid = target.pid;
           anchorPos = targetEntity.pos;
         }
+        const anchorParty = this.sim.partyOf(anchorPid);
         const mine: string[] = [];
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
           if (suppressedInvites?.has(ev)) continue;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
@@ -6531,6 +6604,11 @@ export class GameServer {
               // a sim-driven change to a heavy self field (loot, level-up, quest
               // credit, ...) refreshes those fields on the next snapshot
               if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
+              // A match concluding (win, loss, draw, or forfeit) changes rating
+              // and standings on the throttled `arena` self key (ARENA_WIRE_HZ):
+              // force it fresh next snapshot instead of leaving the Arena
+              // window showing the pre-match rating for up to 10s.
+              if (ev.type === 'arenaEnd') session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
               if (

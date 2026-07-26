@@ -11,6 +11,7 @@ const componentsCss = readFileSync(
   new URL('../src/styles/components.css', import.meta.url),
   'utf8',
 );
+const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
 
 describe('social_window: .soc-body layout never uses CSS multicol', () => {
   // Regression for a review finding on the wide-landscape relayout: `.soc-body` is a
@@ -190,5 +191,63 @@ describe('social_window: Book of Deeds title spans (both roster surfaces)', () =
     expect(painter).toContain(
       '${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}',
     );
+  });
+});
+
+describe('social_window: guild billboard', () => {
+  // The billboard is player-controlled text on a phishing/XSS surface, so the
+  // render arm is pinned: the message goes through esc() as plain text, never
+  // through any linkifier or raw-HTML path (deliberate; do not "improve" it).
+  it('renders the message + attribution through esc() only (plain escaped text)', () => {
+    expect(painter).toContain('${esc(g.motd)}');
+    const section = painter.slice(
+      painter.indexOf('private billboardHtml'),
+      painter.indexOf('private guildMemberRowHtml'),
+    );
+    expect(section.length).toBeGreaterThan(0);
+    expect(section).not.toContain('<a ');
+    expect(section).not.toContain('innerHTML');
+  });
+
+  it('renders the edit row (input + save) only for editors, never a disabled duplicate', () => {
+    // The message div is the read view; a member must not get a grayed-out
+    // copy of it in an input. UX only: the server enforces the real rank gate.
+    expect(painter).toContain('const edit = g.canEditMotd');
+    expect(painter).toContain('data-act="gmotd-save"');
+    expect(painter).not.toContain("' disabled'");
+  });
+
+  it('renders no billboard box at all for a member when no message is set', () => {
+    // With no motd there is nothing to read; only editors keep the box (the
+    // empty-state line + input) so the first message can be written.
+    expect(painter).toContain("if (!g.motd && !g.canEditMotd) return '';");
+  });
+
+  it('names the input cap after the server clamp instead of a bare literal', () => {
+    expect(painter).toContain('const GUILD_MOTD_MAX = 240;');
+    expect(painter).toContain('maxlength="${GUILD_MOTD_MAX}"');
+  });
+
+  it('preserves an in-progress draft across the refreshList innerHTML swap', () => {
+    // The panel repaints on the slow-HUD divider whenever any social/party
+    // content changes; the draft capture keys off defaultValue (the motd
+    // rendered at the last paint) so an untouched input takes server updates
+    // while a touched or focused one survives the swap.
+    expect(painter).toContain('prevMotd.value !== prevMotd.defaultValue');
+    expect(painter).toContain('document.activeElement === prevMotd');
+    expect(painter).toContain('next.setSelectionRange(draft.selStart, draft.selEnd)');
+  });
+
+  it('dispatches the save through the delegated body handlers (click + Enter), no per-row handler', () => {
+    expect(painter).toContain("if (node.dataset.act === 'gmotd-save') {");
+    expect(painter).toContain(`input[data-field="gmotd"]`);
+    expect(painter).toContain('this.saveBillboard()');
+  });
+
+  it('the edit input joins the mobile 40px touch floor (with .soc-add input)', () => {
+    // The mobile min-height/16px group in hud.mobile.css covers the footer
+    // inputs; the billboard edit input lives in the body and must be listed
+    // there too or it renders ~28px tall under coarse pointers.
+    expect(mobileCss).toContain('body.mobile-touch .soc-billboard-edit input');
   });
 });

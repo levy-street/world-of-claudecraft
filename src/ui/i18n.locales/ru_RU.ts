@@ -709,6 +709,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.offlineHeader': 'Не в сети ({n})',
   'hudChrome.social.hideOffline': 'Скрыть офлайн',
   'hudChrome.social.hideOfflineTitle': 'Скрыть офлайн участников гильдии',
+  'hudChrome.social.billboard.label': 'Доска объявлений гильдии',
+  'hudChrome.social.billboard.empty': 'На доске объявлений пока пусто.',
+  'hudChrome.social.billboard.setBy': 'Разместил(а): {name}',
+  'hudChrome.social.billboard.save': 'Сохранить',
+  'hudChrome.social.billboard.placeholder': 'Напишите сообщение для гильдии',
+  'hudChrome.social.billboard.inputLabel': 'Сообщение на доске объявлений гильдии',
+  'hudChrome.social.billboard.result.set': 'Доска объявлений гильдии обновлена.',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Редактировать доску объявлений могут только офицеры и глава гильдии.',
   'hudChrome.party.promoteLeader': 'Назначить лидером',
   'hudChrome.party.inviteUsage': 'Кого пригласить? Использование: /invite <имя>.',
   'hudChrome.masterLoot.thresholdLabel': 'Порог качества',
@@ -2015,6 +2024,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы вступаете в очередь Пепельного Колизея. Ожидайте достойного соперника...',
   'hud.logs.arenaLeave': 'Вы покидаете очередь Пепельного Колизея.',
   'hud.logs.arenaSands': 'Вы выходите на песок Пепельного Колизея.',
+  'hud.logs.arenaSandsDrowned': 'Вы ступаете на затопленные камни Затонувшего Двора.',
   'hud.logs.tradeRequestSent': 'Вы запросили обмен с {name}.',
   'hud.logs.tradeOpened': 'Окно обмена открыто.',
   'hud.logs.tradeComplete': 'Обмен завершен.',
@@ -2132,6 +2142,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.trade.accept': 'Принять обмен',
   'hud.trade.waiting': 'Ожидание...',
   'hud.trade.cancel': 'Отмена',
+  'hud.arena.mapName': 'Карта: {name}',
+  'hud.arena.map.coliseum': 'Пепельный Колизей',
+  'hud.arena.map.drownedCourt': 'Затонувший Двор',
   'hud.arena.title': 'Пепельный Колизей',
   'hud.arena.subtitle': 'Рейтинговый 1 на 1',
   'hud.arena.close': 'Закрыть арену',
@@ -2393,6 +2406,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageNextAria': 'Следующая страница рынка',
   'itemUi.market.pageStatus': 'Страница {current} из {total}',
   'itemUi.market.filters': 'Фильтры рынка',
+  'itemUi.market.filterValueAria': '{label}: {value}',
   'itemUi.market.filterType': 'Тип',
   'itemUi.market.filterTypeAll': 'Все типы',
   'itemUi.market.filterTypeWeapon': 'Оружие',
@@ -2403,6 +2417,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterTypeOther': 'Другое',
   'itemUi.market.filterArmorType': 'Тип брони',
   'itemUi.market.filterArmorAll': 'Вся броня',
+  'itemUi.market.filterArmorSlot': 'Слот брони',
+  'itemUi.market.filterArmorClassAll': 'Все типы брони',
+  'itemUi.market.armorCloth': 'Ткань',
+  'itemUi.market.armorLeather': 'Кожа',
+  'itemUi.market.armorMail': 'Кольчуга',
+  'itemUi.market.filterPrimaryStat': 'Основная характеристика',
+  'itemUi.market.filterPrimaryStatAll': 'Любая основная характеристика',
   'itemUi.market.filterWeaponType': 'Тип оружия',
   'itemUi.market.filterWeaponAll': 'Все оружие',
   'itemUi.market.filterRarity': 'Редкость',
@@ -7188,6 +7209,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.indicatorAria': 'Непрочитанных писем: {count}',
   'hudChrome.mailbox.indicatorTip':
     'У вас {count} непрочитанных писем. Загляните в почтовый ящик, чтобы прочитать их.',
+  'hudChrome.marketIndicator.aria': 'Ожидает получения на Мировом рынке',
+  'hudChrome.marketIndicator.tip': 'Золото или предметы ждут вас у Торговца.',
   'hudChrome.mailbox.clickAttach': 'Нажмите, чтобы приложить к письму.',
   'hudChrome.mailbox.cannotMail': 'Это нельзя отправить почтой.',
   'hudChrome.mailbox.result.sent': 'Ворон унёс ваше письмо для {name} (сбор {postage}).',
@@ -7474,7 +7497,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaMasterwork': '{item}, количество {count}, шедевр',
   'hudChrome.crafting.gatheredBy': 'Сборщик: {name}',
   'hudChrome.crafting.masterworkSeal': 'Шедевр',
-  'hudChrome.crafting.enchantedLine': 'Зачаровано',
   'hudChrome.crafting.stationRequired': 'Для изготовления нужно находиться у станции "{station}".',
   'hudChrome.crafting.stationOutOfRangeNamed':
     'Подойдите к станции "{station}", чтобы изготовить это.',
@@ -8418,6 +8440,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '{target} парирует ваш {ability}.',
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
+  'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',
   'hudChrome.mobile.professions': 'Профессии',
   'hudChrome.professions.title': 'Профессии',
@@ -9230,7 +9253,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Зачарованные копии, происхождение и рынок',
   'guide.profPages.craftProse.enchanting.marketBody':
-    'Наложение чар потребляет упакованную, не надетую копию вещи плюс реагенты и возвращает отдельную зачарованную копию; наденьте ее, и бонус следует за вещью вечно, через снятия, походы в банк и обмены. Одни чары на вещь: зачарованную копию нельзя ни зачаровать снова, ни разобрать, а продажа, выброс и разбор все предпочитают сначала простые копии, так что ваша готовая вещь не съедается по случайности. Одинаково зачарованные копии даже складываются вместе в ваших сумках.\n\nСнаряжение-шедевр и enchanting дружат: вещь-шедевр остается полностью зачаровываемой, а чары добавляются поверх бонуса шедевра, не тревожа ни его, ни подпись мастера. Складывая все источники, подписанный шедевр с чарами Greater, это лучшее, что бывает у крафтовой вещи, и он все равно сидит ниже рейдовой добычи по замыслу.\n\nНа рынке Мировой рынок посредничает только простым, неизмененным товаром, так что зачарованные и подписанные вещи переходят из рук в руки лицом к лицу через окно обмена. Материалы, это продаваемая половина ремесла: Dust, Essence и Shards выставляются свободно, выставление ничего не стоит, а Торговец берет 5 процентов только с завершенной продажи. Это делает два классических дохода enchanter продажей материалов на рынке и приемом вещи клиента в обмен, зачаровыванием ее и возвратом.',
+    'Наложение чар потребляет реагенты и помечает одну конкретную копию вещи. Направьте их на копию в сумке, и вы получите отдельную зачарованную копию; направьте на уже надетую вещь, и она зачаровывается на месте, без снятия и повторного надевания. В любом случае бонус следует за вещью вечно, через снятия, походы в банк и обмены. Одни чары на вещь: наложение других чар на зачарованную копию сначала просит подтверждения, а затем прямо заменяет старые чары, уничтожая их без возврата материалов. Продажа, выброс и разбор все предпочитают сначала простые копии, так что ваша готовая вещь не съедается по случайности. Одинаково зачарованные копии даже складываются вместе в ваших сумках.\n\nСнаряжение-шедевр и enchanting дружат: вещь-шедевр остается полностью зачаровываемой, а чары добавляются поверх бонуса шедевра, не тревожа ни его, ни подпись мастера. Складывая все источники, подписанный шедевр с чарами Greater, это лучшее, что бывает у крафтовой вещи, и он все равно сидит ниже рейдовой добычи по замыслу.\n\nНа рынке Мировой рынок посредничает только простым, неизмененным товаром, так что зачарованные и подписанные вещи переходят из рук в руки лицом к лицу через окно обмена. Материалы, это продаваемая половина ремесла: Dust, Essence и Shards выставляются свободно, выставление ничего не стоит, а Торговец берет 5 процентов только с завершенной продажи. Это делает два классических дохода enchanter продажей материалов на рынке и приемом вещи клиента в обмен, зачаровыванием ее и возвратом.',
   'guide.profPages.yieldsHeading': 'Что дает сбор',
   'guide.profPages.yieldsBody':
     'Каждый сбор катит качество для того, что он дает, и ваше мастерство, это вся история этого броска. Совсем новый собиратель всегда тянет обычный материал; каждое очко навыка стабильно переносит вес из обычного в высшие сорта и никогда назад, пока на пределе в 100 обычный сорт не исчезнет совсем: 60 процентов необычного, 30 процентов редкого, 8 процентов эпического и 2 процента легендарного, каждый раз.\n\nКачество означает и количество: обычный бросок дает 1 единицу, необычный и редкий дают 2, эпический 3, а легендарный 4. Любая редкая, эпическая или легендарная добыча приходит подписанным экземпляром с клеймом Gathered by you: на пределе это четыре сбора из десяти несут ваше имя, а правила происхождения на странице Crafting Economy объясняют, почему ремесленники платят сверху ровно за такие стопки.',
@@ -9261,6 +9284,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.meat': 'Мясо',
   'hudChrome.bags.itemAriaProcedural':
     '{item}, {rarity}, уровень предмета {level}, количество {count}',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}, шедевр',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}, зачарованный экземпляр',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}, экземпляр с подписью мастера',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}, привязанный экземпляр',
   'itemUi.stats.weaponMin': 'Минимальный урон оружия',
   'itemUi.stats.weaponMax': 'Максимальный урон оружия',
   'itemUi.stats.weaponDps': 'Урон оружия в секунду',
@@ -9270,7 +9301,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.procedural.rollRangeAria': 'Возможное значение от {min} до {max}',
   'itemUi.procedural.advancedDetailsHint':
     'Удерживайте {key}, чтобы показать диапазоны возможных значений.',
+  'itemUi.procedural.powerRollPercent': 'Значение свойства: {value}%',
+  'itemUi.procedural.powerRollMilliseconds': 'Значение свойства: {value} мс',
+  'itemUi.procedural.powerRollResource': 'Значение свойства: {value} ресурса',
+  'itemUi.procedural.powerRollNumber': 'Значение свойства: {value}',
   'itemUi.procedural.legendaryPower': 'Легендарное свойство',
+  'itemUi.procedural.legendaryLimit': 'Уникально экипировано: {count} легендарное свойство',
   'itemUi.procedural.rarity.common': 'Обычный',
   'itemUi.procedural.rarity.magic': 'Магический',
   'itemUi.procedural.rarity.rare': 'Редкий',
@@ -9375,4 +9411,54 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornpeak_mail_sabatons.name': 'Кольчужные сабатоны Шипастого пика',
   'entities.items.thornpeak_polearm.name': 'Древковое оружие Шипастого пика',
   'entities.items.thornpeak_war_axe.name': 'Боевой топор Шипастого пика',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (зачаровано)',
+  'hudChrome.materialHint.arcaneDust':
+    'Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Реагент для наложения чар. Выпадает при распылении редкого снаряжения.',
+  'hudChrome.materialHint.arcaneShard':
+    'Реагент для наложения чар. Выпадает при распылении эпического и легендарного снаряжения.',
+  'hudChrome.materialHint.resonantThread':
+    'Реагент для наложения чар. Выпадает при распылении тканевой брони редкого качества и выше.',
+  'hudChrome.materialHint.resonantHide':
+    'Реагент для наложения чар. Выпадает при распылении кожаной брони редкого качества и выше.',
+  'hudChrome.materialHint.resonantLinks':
+    'Реагент для наложения чар. Выпадает при распылении кольчужной брони редкого качества и выше.',
+  'hudChrome.materialHint.resonantSteel':
+    'Реагент для наложения чар. Выпадает при распылении оружия ближнего боя редкого качества и выше.',
+  'hudChrome.materialHint.resonantTimber':
+    'Реагент для наложения чар. Выпадает при распылении посохов, жезлов, луков и арбалетов редкого качества и выше.',
+  'hudChrome.enchanting.tier.base': 'Базовые чары',
+  'hudChrome.enchanting.tier.runed': 'Рунные чары',
+  'hudChrome.enchanting.tier.greater': 'Высшие чары',
+  'hudChrome.enchanting.yieldHeader': 'Ожидаемые материалы:',
+  'hudChrome.enchanting.yieldLineExact': '{item}: {count}',
+  'hudChrome.enchanting.yieldLineRange': '{item}: {min}-{max}',
+  'hudChrome.enchanting.alreadyEnchanted': 'Этот предмет уже зачарован.',
+  'hudChrome.enchanting.sameEnchant': 'На этом предмете уже есть эти чары.',
+  'hudChrome.enchanting.replaceTag': 'Заменяет «{enchant}»',
+  'hudChrome.enchanting.sameEnchantTag': 'Уже наложено',
+  'hudChrome.enchanting.replaceConfirmTitle': 'Заменить чары на {item}?',
+  'hudChrome.enchanting.replaceConfirmBody': 'Чары «{old}» на {item} будут заменены на «{new}».',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'Старые чары уничтожаются, их материалы не возвращаются. Это действие нельзя отменить.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Стоимость: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name}: {count}',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Заменить',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, количество {count}, зачарованный экземпляр',
+  'hudChrome.bags.itemAriaBound': '{item}, количество {count}, привязанный экземпляр',
+  'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
+  'devCommand.actions.kit.description':
+    'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
+  'devCommand.actions.kit.label': 'Экипировать комплект свежего 20 уровня',
+  'devCommand.fields.spec': 'Специализация',
+  'devCommand.itemChosen': 'Выбрано: {name}',
+  'devCommand.itemHeroicTag': 'Героический',
+  'devCommand.itemMore': 'Показано {shown} из {total}. Продолжайте вводить, чтобы сузить список.',
+  'devCommand.itemNoMatches': 'Нет подходящих предметов.',
+  'devCommand.itemResultsAria': 'Подходящие предметы',
+  'devCommand.itemSearchPlaceholder': 'Поиск по названию или идентификатору',
+  'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
+  'devCommand.kitCurrentSpec': 'Текущая специализация',
+  'hudChrome.enchanting.wornTag': 'Надето ({slot})',
 };

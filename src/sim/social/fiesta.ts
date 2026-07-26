@@ -38,7 +38,7 @@ import {
 } from '../content/talents';
 import { abilitiesKnownAt, arenaOrigin } from '../data';
 import * as deedsMod from '../deeds';
-import { ARENA_SPAWNS_A_2v2, ARENA_SPAWNS_B_2v2 } from '../dungeon_layout';
+import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
 import { awardFiestaKillHonor } from '../pvp';
 import { Rng } from '../rng';
@@ -61,7 +61,7 @@ export const FIESTA_RESPAWN_PER_MINUTE = 1.5; // and the bout dragging on length
 export const FIESTA_RESPAWN_MAX = 14; // cap so it never feels hopeless
 export const FIESTA_RING_CX = 0; // ring centre (instance-local) — the arena dais
 export const FIESTA_RING_CZ = 2;
-export const FIESTA_RING_START = 22; // radius covering both teams' spawns
+export const FIESTA_RING_START = 26; // radius covering the pit's full z extent and both teams' spawns
 export const FIESTA_RING_MIN = 6; // fully-closed radius
 export const FIESTA_RING_DPS_PCT = 0.06; // max-hp fraction per second taken outside the ring
 export const FIESTA_RING_SHRINK_RATE = 0.6; // yards/s the radius eases toward its target
@@ -415,7 +415,10 @@ export function fiestaRevive(ctx: SimContext, match: ArenaMatch, e: Entity): voi
   const team = ctx.arenaTeamOf(match, e.id);
   if (!team) return;
   const origin = arenaOrigin(match.slot);
-  const spawns = team === 'A' ? ARENA_SPAWNS_A_2v2 : ARENA_SPAWNS_B_2v2;
+  // Fiesta is pinned to even (Coliseum) slots, so this always resolves the
+  // Coliseum spawns; the per-slot lookup keeps it correct regardless.
+  const map = arenaMapForSlot(match.slot);
+  const spawns = team === 'A' ? map.spawnsA2v2 : map.spawnsB2v2;
   const teamPids = team === 'A' ? match.teamA : match.teamB;
   const idx = Math.max(0, teamPids.indexOf(e.id));
   arenaMod.placeInArena(ctx, e, origin, spawns[idx] ?? spawns[0]);

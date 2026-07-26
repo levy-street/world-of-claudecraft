@@ -1193,6 +1193,11 @@ export interface MobTemplate {
   // firing `pulses` evenly-spaced unmitigated AoE pulses whose damage
   // ESCALATES per pulse (pulse k rolls range(min, max) x k, then the
   // per-entity mechanicDamageMult). Uninterruptible: pair with ccImmune.
+  // Optional atHpPct thresholds (mirroring summonAdds) ALSO arm the channel
+  // the first time hp falls to each fraction, so every group sees the burn
+  // phase even when the boss dies inside the first cadence window; a
+  // threshold crossed while a channel is already live is served by that
+  // channel (no back-to-back re-arm).
   infernoChannel?: {
     every: number;
     duration: number;
@@ -1202,6 +1207,7 @@ export interface MobTemplate {
     radius: number;
     name: string;
     school?: string;
+    atHpPct?: number[];
   };
   // Boss mechanic: a periodic telegraphed HARDCAST. Unlike the instant aoePulse,
   // the mob shows a real cast bar (the entity casting fields carry castId) for
@@ -2329,6 +2335,10 @@ export interface AbilityDef {
   exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
+  // The ability cannot be activated while physically inside a claimed dungeon or
+  // raid instance. Toggle buffs may still be cancelled there to avoid trapping the
+  // player in an action-locking form.
+  requiresOutsideInstance?: boolean;
   // Usable only while the caster wears an aura of this kind (Victory Rush's
   // on-kill window); runEffects consumes the enabling aura on a successful cast.
   requiresAuraKind?: AuraKind;
@@ -2693,6 +2703,11 @@ export interface Consuming {
   hpPer2s: number;
   manaPer2s: number;
   remaining: number;
+  // Counts real 2s regen ticks (updateRegen, combat/auras.ts), starting at 0 and
+  // incrementing every tick regardless of whether hp/mana was still missing.
+  // Drives the eat/drink bite/gulp sound cadence (see consume_sfx.ts); never
+  // read for anything else.
+  ticksElapsed: number;
 }
 
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {
@@ -2993,6 +3008,7 @@ export interface Entity {
   infernoTimer: number; // infernoChannel cadence countdown
   infernoRemaining: number; // seconds left in a live inferno channel (0 = not channeling)
   infernoPulsesFired: number; // pulses already fired this channel
+  infernoGatesFired: number; // infernoChannel.atHpPct thresholds already consumed
   yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown
@@ -3246,6 +3262,10 @@ export type CalendarResultCode =
   | 'calendarFull'
   | 'eventGone';
 
+// Guild billboard command outcomes (mirrors server/social.ts MotdResultCode;
+// `set` is the success, the rest refusals).
+export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
+
 // An in-flight party/raid ready check (social/ready_check.ts). Keyed on Sim by party
 // id. Each member is 'pending' until they answer; anyone still 'pending' when the
 // timeout fires is counted as "no response" (there is no separate afk state).
@@ -3285,26 +3305,47 @@ export type SimEvent = { pid?: number } & (
       // one-shot animation already began at projectile launch.
       attackAnimationStarted?: true;
     }
-  | { type: 'heal'; targetId: number; amount: number }
+  | {
+      type: 'heal';
+      targetId: number;
+      amount: number;
+      // Set only by a potion quaff (items.ts) or an eat/drink regen tick
+      // (combat/auras.ts); every other heal source (leech, second wind,
+      // companion heals, ...) leaves this undefined, so hud.ts's existing
+      // generic heal_impact cue is untouched everywhere else.
+      source?: 'potion' | 'food' | 'drink';
+      // Eat/drink only: true on the specific tick that should make a sound
+      // (see shouldFireConsumeTickSfx, consume_sfx.ts), independent of amount
+      // (a full-health/mana character eating still makes a sound, and a
+      // healing tick that ISN'T a sound tick still shows its FCT number
+      // silently). A potion quaff is always a one-shot, so it never sets this.
+      sfxTick?: boolean;
+    }
   | { type: 'death'; entityId: number; killerId: number }
   | { type: 'xp'; amount: number; rested?: number }
   | { type: 'honor'; amount: number; reason: HonorReason }
   | { type: 'levelup'; level: number }
+  // opt-in post-cap rank reset (always personal: emitted with pid), fired by
+  // prestige() in src/sim/progression/xp.ts alongside the 'log' chat line. The
+  // rank itself rides every self snapshot, so this exists to tell an open
+  // character sheet WHEN to repaint, the same job the honor event does for the
+  // Honor row. Text-free: the chat line is the 'log' event.
+  | { type: 'prestige'; rank: number }
   // post-cap cosmetic progression (Max-Level XP Overflow): crossing a virtual
   // level past the cap (milestone unlocks ride the deedUnlocked event since
   // the milestone unification; the legacy milestoneUnlocked emit is gone)
   | { type: 'virtualLevelUp'; level: number }
-  // Cosmetic prestige (prestige(), src/sim/progression/xp.ts): fired alongside
-  // the 'log' chat line so the client can repaint an already-open character
-  // sheet's prestige rank without waiting for an unrelated repaint trigger
-  // (closing/reopening the window). Text-free: the chat line is the 'log' event.
-  | { type: 'prestige'; rank: number }
   // Book of Deeds unlock (always personal: emitted with pid). Carries the deed
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
   | { type: 'learnAbility'; abilityId: string; rank: number }
-  | { type: 'loot'; text: string }
+  // silent: true suppresses only the client's default loot audio cue (the
+  // "You receive: X" text line still prints as normal); a caller with its
+  // own dedicated cue for the same grant (gathering/crafting/enchanting) sets
+  // this so the generic ding doesn't stack on top of it. See Sim.addItem/
+  // addItemInstance's opts param, the one place this gets set.
+  | { type: 'loot'; text: string; silent?: boolean }
   | {
       type: 'lootRoll';
       rollId: number;
@@ -3340,7 +3381,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
   | { type: 'aura'; targetId: number; name: string; gained: boolean; auraKind?: AuraKind }
-  | { type: 'castStart'; entityId: number; ability: string; time: number }
+  | {
+      type: 'castStart';
+      entityId: number;
+      ability: string;
+      time: number;
+      // Only set for GATHER_CAST_ID, so the client can play a per-node-type
+      // tool-out cue (audio.gatherCast in src/game/audio.ts) instead of one
+      // flat sound for every profession. Every other cast omits it.
+      gatherNodeType?: GatherNodeType;
+    }
   | { type: 'castStop'; entityId: number; success: boolean }
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }
@@ -3369,6 +3419,10 @@ export type SimEvent = { pid?: number } & (
   // sim never books guild events); declared here so the one client event
   // switch stays exhaustively typed.
   | { type: 'calendarResult'; code: CalendarResultCode }
+  // Guild billboard outcome. Emitted only by the server's SocialService (the
+  // sim never edits the billboard); declared here, like calendarResult, so the
+  // one client event switch stays exhaustively typed.
+  | { type: 'motdResult'; code: MotdResultCode }
   // A guildmate's or followed friend's marquee deed unlock. Emitted only by
   // the server's SocialService (the sim never sees other players' social
   // graphs); declared here, like calendarResult, so the one client event
@@ -3579,6 +3633,22 @@ export type SimEvent = { pid?: number } & (
       amount: number;
       crit: boolean;
       ability: string;
+      // Set only by a HoT's periodic tick (auras.ts), never a direct cast or the
+      // one-shot application emit below: the client uses this to silence the
+      // repeated per-tick sound (see hud.ts), since a HoT fires this every couple
+      // seconds for its whole duration and the full heal_impact hit read as spam.
+      hot?: boolean;
+      // The aura's ability id (Aura.id), set on both the per-tick emit and the
+      // one-shot application emit (Sim.applyAura) so the client can except one
+      // specific HoT (Frenzied Regeneration) from the tick-silencing above.
+      abilityId?: string;
+      // True ONLY on the one-shot application emit (Sim.applyAura): this event
+      // carries no real healing (amount is always 0) and exists purely to
+      // drive the client-side sound cue. Non-audio consumers (combat meters,
+      // combat log, FCT, heal-glow VFX) must ignore it rather than infer the
+      // same thing from amount === 0, since a genuine direct heal (applyHeal)
+      // can also legitimately land at amount 0 (full HP, fully absorbed).
+      cueOnly?: boolean;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
@@ -3807,7 +3877,11 @@ export type SimEvent = { pid?: number } & (
         | 'not_held'
         | 'insufficient_materials'
         | 'throttled'
-        | 'no_bag_space';
+        | 'no_bag_space'
+        // #2415: already-enchanted target without the confirmReplace flag,
+        // and the identical-enchant-id re-apply denied on every arm.
+        | 'already_enchanted'
+        | 'same_enchant';
     }
   | {
       type: 'salvageResult';

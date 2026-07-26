@@ -40,7 +40,13 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `enchanting.ts` / `disenchant_reagents.ts` / `salvage.ts`: disenchant
   (universal ladder + typed rare+ secondaries, bindOnTrade-armed), apply an
   enchant onto a SPECIFIC instanced copy (`ItemInstancePayload`), break items
-  back into materials; all off-wheel, ungated, on the shared throttle.
+  back into materials; all off-wheel, ungated, on the shared throttle. An
+  already-enchanted copy is REPLACEABLE only behind the explicit
+  confirmReplace flag (#2415: old enchant destroyed, no refund, surgical swap
+  via `replacedEnchantPayloadFor`); without it the deny is the dedicated
+  `already_enchanted` reason on both arms. The identical-id re-apply denies
+  `same_enchant` on both arms WITH the flag; unconfirmed it reads
+  `already_enchanted`, because the flag check precedes the id compare.
 - `commission.ts`: the Maker's Bond (commission opt-in mints `bindOnTrade`,
   `resolveUnbind` + the quality-tier fee ladder).
 - `action_throttle.ts`: the ONE shared action window for crafting,

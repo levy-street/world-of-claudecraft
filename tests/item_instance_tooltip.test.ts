@@ -1,9 +1,10 @@
 // Pins the per-copy instance tooltip lines (Professions 2.0): every
 // ItemInstancePayload variant renders its exact line set, so a regression in
-// any arm (seal, enchanted marker, bonus stats, maker's mark, the legacy
-// shapes) fails a decisive assertion. The module is the pure string-builder
-// side of hud.itemTooltip's instance composition.
+// any arm (seal, bonus stats and their enchant attribution, maker's mark, the
+// legacy shapes) fails a decisive assertion. The module is the pure
+// string-builder side of hud.itemTooltip's instance composition.
 import { describe, expect, it } from 'vitest';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import {
   HARVEST_COMPONENT_ITEMS,
   HARVEST_COMPONENT_SPECIMENS,
@@ -37,27 +38,20 @@ describe('item_instance_tooltip', () => {
     expect(html).not.toContain('Enchanted');
   });
 
-  it('enchant-marker copy gets the enchanted marker and no seal', () => {
-    const html = instanceBadgeLines({ enchant: 'ench_firepower' });
-    expect(html).toContain('Enchanted');
-    expect(html).not.toContain('Masterwork');
-  });
-
-  it('legacy enchanted copy (bare rolled.stats, no masterwork flag) reads as enchanted', () => {
-    const html = instanceBadgeLines({ rolled: { stats: { int: 3 } } });
-    expect(html).toContain('Enchanted');
-    expect(html).not.toContain('Masterwork');
-  });
-
-  it('masterwork plus enchant renders both badges, seal first', () => {
-    const html = instanceBadgeLines({
-      enchant: 'ench_firepower',
+  // The standalone enchanted badge was retired: the fact rides the bonus stat
+  // lines it caused instead (the attribution suite below). No payload shape may
+  // resurrect a marker line here.
+  it('no instance shape renders a standalone enchanted badge any more', () => {
+    expect(instanceBadgeLines({ enchant: 'enchant_chest_stamina' })).toBe('');
+    expect(instanceBadgeLines({ rolled: { stats: { int: 3 } } })).toBe('');
+    const both = instanceBadgeLines({
+      enchant: 'enchant_chest_stamina',
       rolled: { masterwork: true, stats: { str: 1 } },
     });
-    const seal = html.indexOf('Masterwork');
-    const ench = html.indexOf('Enchanted');
-    expect(seal).toBeGreaterThanOrEqual(0);
-    expect(ench).toBeGreaterThan(seal);
+    expect(both).toContain('Masterwork');
+    expect(both).not.toContain('Enchanted');
+    // Exactly one badge line survives on a masterwork+enchant copy.
+    expect((both.match(/<div/g) ?? []).length).toBe(1);
   });
 
   it('legacy signed copy (signer only) renders the mark alone, no badges, no throw', () => {
@@ -75,8 +69,127 @@ describe('item_instance_tooltip', () => {
     expect(html).toContain(itemStatName('sta'));
   });
 
-  it('zero-valued baked stats are skipped', () => {
-    expect(instanceBonusStatLines({ rolled: { stats: { str: 0 } } })).toBe('');
+  it('zero-valued baked stats render no stat line', () => {
+    // A zero-stat masterwork copy is silent, exactly as before. A zero-stat
+    // bare-stats copy still reads as enchanted to the sim (isEnchantedInstance),
+    // and its bag corner paints the enchant glyph, so the fallback keeps the
+    // tooltip saying so rather than going blank.
+    expect(instanceBonusStatLines({ rolled: { masterwork: true, stats: { str: 0 } } })).toBe('');
+    const bare = instanceBonusStatLines({ rolled: { stats: { str: 0 } } });
+    expect(bare).not.toContain('tt-instance-bonus');
+    expect(bare).toContain('Enchanted');
+  });
+
+  // The attribution matrix: which bonus stat lines carry the "(Enchanted)"
+  // suffix, per payload shape. `enchant_chest_stamina` is a live enchant
+  // granting exactly sta 4 (content/enchants.ts), so the split below is read
+  // off real content, not a fixture.
+  describe('bonus stat attribution', () => {
+    const ENCHANT_ID = 'enchant_chest_stamina';
+    const SHARE = ENCHANTS[ENCHANT_ID].statBonus.sta as number;
+
+    it('the fixture enchant still grants the stamina this suite splits on', () => {
+      expect(SHARE).toBeGreaterThan(0);
+      expect(Object.keys(ENCHANTS[ENCHANT_ID].statBonus)).toEqual(['sta']);
+    });
+
+    it('a marker copy attributes exactly the enchant share and leaves no remainder', () => {
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { stats: { sta: SHARE } },
+      });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(SHARE)} ${itemStatName('sta')} (Enchanted)`);
+    });
+
+    it('an enchanted MASTERWORK copy splits the stat: enchant share suffixed, bake plain', () => {
+      const bake = 3;
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { masterwork: true, stats: { sta: SHARE + bake } },
+      });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(2);
+      const suffixed = `+${itemNumber(SHARE)} ${itemStatName('sta')} (Enchanted)`;
+      const plain = `+${itemNumber(bake)} ${itemStatName('sta')}<`;
+      expect(html).toContain(suffixed);
+      expect(html).toContain(plain);
+      // The enchant share leads; the remainder follows it.
+      expect(html.indexOf(plain)).toBeGreaterThan(html.indexOf(suffixed));
+      // The suffix is its own key, never concatenated onto the plain line.
+      expect(html).not.toContain(`+${itemNumber(SHARE + bake)}`);
+    });
+
+    it('a stat the enchant does not touch stays entirely plain on a marker copy', () => {
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { masterwork: true, stats: { str: 2 } },
+      });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(2)} ${itemStatName('str')}<`);
+      expect(html).not.toContain('(Enchanted)');
+    });
+
+    it('a LEGACY enchanted copy (no enchant field) suffixes every bonus line', () => {
+      const html = instanceBonusStatLines({ rolled: { stats: { int: 3, spi: 2 } } });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(2);
+      expect(html).toContain(`+${itemNumber(3)} ${itemStatName('int')} (Enchanted)`);
+      expect(html).toContain(`+${itemNumber(2)} ${itemStatName('spi')} (Enchanted)`);
+    });
+
+    it('a masterwork-only copy is untouched: every line stays plain', () => {
+      const html = instanceBonusStatLines({
+        rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
+      });
+      expect(html).not.toContain('(Enchanted)');
+      expect(html).toContain(`+${itemNumber(2)} ${itemStatName('str')}<`);
+      expect(html).toContain(`+${itemNumber(1)} ${itemStatName('sta')}<`);
+    });
+
+    it('an unknown enchant id keeps its stat line plain but still states the enchant', () => {
+      // Reachable mid-rollout: an older client resolving an id its own ENCHANTS
+      // table lacks. The share is unknowable, so the stat stays unattributed,
+      // but the copy must not go silent about being enchanted (its bag corner
+      // already paints the enchant glyph).
+      const html = instanceBonusStatLines({
+        enchant: 'not_a_real_enchant',
+        rolled: { stats: { sta: 4 } },
+      });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(4)} ${itemStatName('sta')}<`);
+      expect(html).not.toContain('(Enchanted)');
+      expect(html).toContain('Enchanted');
+    });
+
+    it('a marker copy with no baked stats at all still states the enchant', () => {
+      const html = instanceBonusStatLines({ enchant: ENCHANT_ID });
+      expect(html).toContain('Enchanted');
+      expect(html).not.toContain('tt-instance-bonus');
+    });
+
+    it('the fallback never doubles up beside an attributed line', () => {
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { stats: { sta: SHARE } },
+      });
+      expect((html.match(/Enchanted/g) ?? []).length).toBe(1);
+    });
+
+    it('a masterwork-only copy never triggers the enchanted fallback', () => {
+      const html = instanceBonusStatLines({ rolled: { masterwork: true, stats: { str: 2 } } });
+      expect(html).not.toContain('Enchanted');
+    });
+
+    it('a share larger than the baked stat never renders a negative remainder', () => {
+      // Guards a later ENCHANTS retune against an already-minted copy: the
+      // remainder is clamped away rather than rendered as "+-2 Stamina".
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { stats: { sta: 1 } },
+      });
+      expect(html).not.toContain('+-');
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(1)} ${itemStatName('sta')} (Enchanted)`);
+    });
   });
 
   it("maker's mark escapes the signer name", () => {

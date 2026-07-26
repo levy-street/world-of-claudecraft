@@ -114,11 +114,13 @@ export interface MarketViewInput {
   sellHave: number;
 }
 
-/** True when any of the type/subtype/rarity dropdowns is narrowing the browse. */
+/** True when any dropdown is narrowing the browse. */
 function filtersActive(filters: MarketFilters): boolean {
   return (
     filters.itemType !== 'all' ||
     (filters.subtype !== undefined && filters.subtype !== 'all') ||
+    (filters.armorClass !== undefined && filters.armorClass !== 'all') ||
+    (filters.primaryStat !== undefined && filters.primaryStat !== 'all') ||
     filters.rarity !== 'all'
   );
 }
@@ -232,4 +234,18 @@ export function buildMarketView(input: MarketViewInput): MarketView {
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
   return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
+}
+
+/** The minimap-corner collect indicator (the mailIndicatorView pattern). */
+export interface MarketCollectIndicatorView {
+  visible: boolean;
+}
+
+/**
+ * Driven by the always-streamed IWorld.marketCollectPending bit, NOT by
+ * marketInfo (null away from the Merchant), so the badge lights anywhere in
+ * the world while sale proceeds or returned items wait.
+ */
+export function marketCollectIndicatorView(pending: boolean): MarketCollectIndicatorView {
+  return { visible: pending === true };
 }

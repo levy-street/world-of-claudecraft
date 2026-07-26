@@ -50,6 +50,7 @@ import type {
   DelveRun,
   DungeonDifficulty,
   Entity,
+  EquipSlot,
   ErrorReason,
   GatherNodeDef,
   ItemInstancePayload,
@@ -338,6 +339,8 @@ export interface SimContextCallbacks {
   updateFiestaActive(match: ArenaMatch): void;
   fiestaRestoreChar(meta: PlayerMeta, e: Entity): void;
   clearFiestaAugments(meta: PlayerMeta, e: Entity): void;
+  // Deliberately narrower than the module function, which also takes
+  // keepValidTargetPids (fight-start target retention); no ctx caller needs it.
   readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void;
   resetForArena(e: Entity): void;
   isArenaTeamWiped(match: ArenaMatch, team: 'A' | 'B'): boolean;
@@ -641,7 +644,16 @@ export interface SimContextCallbacks {
   // I2b lockpick controller (abandonLockpick/tickLockpickTimeout), and the I2c companion
   // AI (spawnDelveCompanion/despawnDelveCompanion/maybeCompanionBark).
   partyMembersForKey(key: string): number[];
-  addItem(itemId: string, count: number, pid?: number): void;
+  // opts.silent: see Sim.addItem's matching param, same contract (suppress
+  // only the client's default loot audio cue, the text line still prints).
+  addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void;
+  // Equip passthroughs for the /dev kit presets (src/sim/dev_kit.ts), which equip
+  // bags before gear so pooled bag capacity exists before the pieces land. Plain
+  // delegations to the Sim inventory hub; every validation (class, level, slot,
+  // spec-aware dual wield) still happens there.
+  equipBag(itemId: string, socket?: number, pid?: number): void;
+  equipItem(itemId: string, pid?: number): void;
+  unequipItem(slot: EquipSlot, pid?: number): boolean;
   // #1145 signed materials: grants a single non-fungible item copy carrying an
   // instance payload (signer/charges/rolled/boundTo, #1165), never merged into a
   // plain fungible stack. Used by corpse harvest to stamp a rare+ monster
@@ -651,6 +663,7 @@ export interface SimContextCallbacks {
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
+    opts?: { silent?: boolean },
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
@@ -1228,6 +1241,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     partyMembersForKey: host.partyMembersForKey,
     addItem: host.addItem,
     addItemInstance: host.addItemInstance,
+    equipBag: host.equipBag,
+    equipItem: host.equipItem,
+    unequipItem: host.unequipItem,
     // removeItem passed through above (P1b inventory-hub helper) - deduped, not re-added.
     spawnBossAdds: host.spawnBossAdds,
     tradeFor: host.tradeFor,

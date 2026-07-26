@@ -197,7 +197,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "İki eylem beceriyi hareket ettirir: bir parça büyüsünü bozmak ve büyü uygulamak. Her başarı, işin ciddiyetine göre ölçeklenen en fazla bir puana değer: kırdığınız parçanın nadirliği veya uyguladığınız büyünün bileşen kademesi. Sıradan büyü bozmaları ve yalnızca toz içeren büyüler sıradan iş olarak sayılır; sıradan dışı büyü bozmaları ve öz büyüler sıradan dışı olarak; nadir büyü bozmaları ve her Runeli veya Gelişmiş büyü nadir olarak; destansı ve efsanevi büyü bozmaları daha da yüksek olarak sayılır.\n\nTanıdık ustalık solması 25 puanlı kademelerde uygulanır; sıradan kalite iş beceri 75'te griye döner, sıradan dışı iş 100'de ve nadir kademeli iş tam olarak 125 tavanında. Büyülemenin kendine özgü bir lütfu da vardır: arketip tavanınızın üzerindeki girdi sıfırlanmak yerine o tavana yuvarlanır; dolayısıyla uyum sağlamadan önce destansı bir büyü bozma yalnızca nadir olarak sayılır, hiçbir şey öğretmez demez. Büyüleme başka bir kimliğin ardında eylemsiz kalırsa, her şey sıradan iş olarak sayılır ve tırmanış 75'te durakslar; hobi olarak tutarsanız nadir kademeli iş yine öder, sadece 75 sonrasında daha yavaş.",
   'guide.profPages.craftProse.enchanting.marketHeading': 'Büyülenmiş kopyalar, köken ve pazar',
   'guide.profPages.craftProse.enchanting.marketBody':
-    "Bir büyü uygulamak, çantalanmış ve takılı olmayan bir eşya kopyası ile bileşenleri tüketir ve karşılığında ayrı bir büyülenmiş kopya teslim eder; onu takın ve bonus o parçayı takılmadan çıkarmalar, banka gezileri ve takas yoluyla sonsuza kadar izler. Parça başına bir büyü: büyülenmiş bir kopya bir daha büyülenemez ya da büyüsü bozulamaz; satmak, atmak ve büyü bozmak sade kopyaları önce tercih eder, bu yüzden bitmiş parçanız kazara yutulmaz. Aynı şekilde büyülenmiş kopyalar hatta çantalarınızda bir arada yığılabilir.\n\nŞaheser teçhizat ve büyüleme dosttur: şaheser bir parça tamamen büyülenebilir kalır ve büyü, şaheser bonusunu veya yapımcının imzasını bozmadan üstüne eklenir. Her kaynağı yığarak, Gelişmiş büyü taşıyan imzalı bir şaheser, üretilmiş bir parçanın ulaşabileceği en iyisidir; ve yine de tasarım gereği akın ganimetinin altında kalır.\n\nPazarda Dünya Pazarı yalnızca sade, değiştirilmemiş stoğu aracılık eder; bu yüzden büyülenmiş ve imzalı parçalar takas penceresi aracılığıyla yüz yüze el değiştirir. Malzemeler zanaatın pazarlanabilir yarısıdır: Toz, Öz ve Parçalar serbestçe listelenir, listeleme ücretsizdir ve Satıcı yalnızca tamamlanan satışın yüzde 5'ini alır. Bu, iki klasik büyücü gelirini oluşturur: pazarda malzeme satmak ve bir müşterinin parçasını takasla alıp büyüleyerek geri vermek.",
+    "Bir büyü uygulamak bileşenleri tüketir ve eşyanın belirli bir kopyasını işaretler. Çantadaki bir kopyaya uygularsanız ayrı bir büyülenmiş kopya alırsınız; zaten takılı bir parçaya uygularsanız parça yerinde büyülenir, çıkarıp yeniden takmak gerekmez. Her iki durumda da bonus o parçayı çıkarmalar, banka gezileri ve takaslar boyunca sonsuza kadar izler. Parça başına bir büyü: büyülenmiş bir kopyaya farklı bir büyü uygulamak önce onay ister, sonra eski büyüyü doğrudan değiştirir; eski büyü, malzemeleri iade edilmeden yok edilir. Satmak, atmak ve büyü bozmak sade kopyaları önce tercih eder, bu yüzden bitmiş parçanız kazara yutulmaz. Aynı şekilde büyülenmiş kopyalar hatta çantalarınızda bir arada yığılabilir.\n\nŞaheser teçhizat ve büyüleme dosttur: şaheser bir parça tamamen büyülenebilir kalır ve büyü, şaheser bonusunu veya yapımcının imzasını bozmadan üstüne eklenir. Her kaynağı yığarak, Gelişmiş büyü taşıyan imzalı bir şaheser, üretilmiş bir parçanın ulaşabileceği en iyisidir; ve yine de tasarım gereği akın ganimetinin altında kalır.\n\nPazarda Dünya Pazarı yalnızca sade, değiştirilmemiş stoğu aracılık eder; bu yüzden büyülenmiş ve imzalı parçalar takas penceresi aracılığıyla yüz yüze el değiştirir. Malzemeler zanaatın pazarlanabilir yarısıdır: Toz, Öz ve Parçalar serbestçe listelenir, listeleme ücretsizdir ve Satıcı yalnızca tamamlanan satışın yüzde 5'ini alır. Bu, iki klasik büyücü gelirini oluşturur: pazarda malzeme satmak ve bir müşterinin parçasını takasla alıp büyüleyerek geri vermek.",
   'guide.profPages.howHeading': 'Üretim nasıl çalışır',
   'guide.profPages.howBody':
     'Zanaat penceresini aç (varsayılan tuş T) ve bildiğin her tarifin ne gerektirdiği ve elinde ne olduğuyla birlikte listelendiğini görürsün. İstasyona bağlı tarifler kasabadaki doğru istasyonun 20 yardası içinde durmanı gerektirir, saha tarifleri her yerde yapılabilir ve Büyüleme için hiçbir istasyon gerekmez. Başarısızlık zarı yoktur: elinde malzemeler varken bir tarif her zaman başarılı olur.\n\nEkonomiyi dürüst tutan iki küçük sürtünme var. Her başarılı üretim, eşyanın istatistik bütçesinin her puanı için 2 bakır ücret öder ve üretim türü eylemler bir hızı paylaşır: herhangi bir 60 saniyede en fazla 10 üretim, parçalama, büyü yazımı veya hurda işlemi yapılabilir. İkisi de normal bir oturumu rahatsız etmez; her ikisi de maksimum uzmanın piyasayı doldurmasını engeller.',
@@ -8942,7 +8942,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Tam beceri kazanımı',
   'hudChrome.crafting.difficultyNone': 'Beceri kazanımı yok',
   'hudChrome.crafting.difficultyReduced': 'Azaltılmış beceri kazanımı',
-  'hudChrome.crafting.enchantedLine': 'Büyülü',
   'hudChrome.crafting.makersMark': '{name} tarafından hazırlanmıştır',
   'hudChrome.crafting.masterworkSeal': 'Şaheser',
   'hudChrome.crafting.masterworkToast': 'Şaheser! {name}',
@@ -9250,4 +9249,80 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornpeak_mail_sabatons.name': 'Thornpeak zincir sabatonları',
   'entities.items.thornpeak_polearm.name': 'Thornpeak sırıklı silahı',
   'entities.items.thornpeak_war_axe.name': 'Thornpeak savaş baltası',
+  'hud.arena.map.coliseum': 'Kül Kolezyumu',
+  'hud.arena.map.drownedCourt': 'Boğulmuş Avlu',
+  'hud.arena.mapName': 'Harita: {name}',
+  'hud.logs.arenaSandsDrowned': "Boğulmuş Avlu'nun su basmış taşlarına adım atıyorsun.",
+  'itemUi.market.armorCloth': 'Kumaş',
+  'itemUi.market.armorLeather': 'Deri',
+  'itemUi.market.armorMail': 'Zincir',
+  'itemUi.market.filterArmorClassAll': 'Tüm zırh türleri',
+  'itemUi.market.filterArmorSlot': 'Zırh yuvası',
+  'itemUi.market.filterPrimaryStat': 'Birincil nitelik',
+  'itemUi.market.filterPrimaryStatAll': 'Herhangi bir birincil nitelik',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Uzmanlık için Sanctum öncesi 20. seviye setini kuşandır, önce çantalara. Yalnızca teçhizat.',
+  'devCommand.actions.kit.label': 'Taze 20 takımını kuşan',
+  'devCommand.fields.spec': 'Uzmanlık',
+  'devCommand.itemChosen': 'Seçildi: {name}',
+  'devCommand.itemHeroicTag': 'Kahramanca',
+  'devCommand.itemMore':
+    '{total} sonuçtan {shown} tanesi gösteriliyor. Daraltmak için yazmaya devam edin.',
+  'devCommand.itemNoMatches': 'Eşleşen öğe yok.',
+  'devCommand.itemResultsAria': 'Eşleşen öğeler',
+  'devCommand.itemSearchPlaceholder': 'Ada veya kimliğe göre ara',
+  'devCommand.itemUnknown': 'O kimliğe sahip öğe yok.',
+  'devCommand.kitCurrentSpec': 'Mevcut uzmanlık',
+  'hudChrome.bags.itemAriaBound': '{item}, adet {count}, bağlı kopya',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, adet {count}, büyülü kopya',
+  'hudChrome.enchanting.tier.base': 'Temel Büyüler',
+  'hudChrome.enchanting.tier.greater': 'Daha İyi Büyüler',
+  'hudChrome.enchanting.tier.runed': 'Runlu Büyüler',
+  'hudChrome.enchanting.wornTag': 'Kuşanılı ({slot})',
+  'hudChrome.enchanting.yieldHeader': 'Beklenen malzemeler:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} ile {max} arası {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Büyülü',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Büyülü)',
+  'hudChrome.marketIndicator.aria': 'Dünya Pazarı toplaması bekliyor',
+  'hudChrome.marketIndicator.tip': "Tüccar'da senin için bekleyen altın ya da eşyalar var.",
+  'hudChrome.materialHint.arcaneDust':
+    'Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Nadir eşyalardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.arcaneShard':
+    'Destansı ve efsanevi eşyalardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantHide':
+    'Nadir ve üstü deri zırhlardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantLinks':
+    'Nadir ve üstü zincir zırhlardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantSteel':
+    'Nadir ve üstü yakın dövüş silahlarından büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantThread':
+    'Nadir ve üstü kumaş zırhlardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantTimber':
+    'Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.options.stickyTarget': 'Yere Tıklayınca Hedefi Koru',
+  'hudChrome.social.billboard.empty': 'Panoda henüz bir şey yok.',
+  'hudChrome.social.billboard.inputLabel': 'Lonca panosu mesajı',
+  'hudChrome.social.billboard.label': 'Lonca Panosu',
+  'hudChrome.social.billboard.placeholder': 'Lonca için bir mesaj yaz',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Panoyu yalnızca subaylar ve Lonca Üstadı düzenleyebilir.',
+  'hudChrome.social.billboard.result.set': 'Lonca panosu güncellendi.',
+  'hudChrome.social.billboard.save': 'Kaydet',
+  'hudChrome.social.billboard.setBy': 'Ayarlayan: {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'O eşya zaten büyülü.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Değiştir',
+  'hudChrome.enchanting.replaceConfirmBody':
+    '{item} üzerindeki {old} büyüsü {new} ile değiştirilir.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Maliyet: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'Eski büyü yok edilir. Malzemeleri iade edilmez. Bu geri alınamaz.',
+  'hudChrome.enchanting.replaceConfirmTitle': '{item} üzerindeki büyü değiştirilsin mi?',
+  'hudChrome.enchanting.replaceTag': '{enchant} yerine geçer',
+  'hudChrome.enchanting.sameEnchant': 'O eşyada zaten bu büyü var.',
+  'hudChrome.enchanting.sameEnchantTag': 'Zaten uygulandı',
 };

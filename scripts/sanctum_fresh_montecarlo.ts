@@ -72,6 +72,12 @@ const ARENA = { x: -2000, z: 3000 };
 // best-in-slot fire mage sustains ~233 dps (healing MC raid bench); fresh
 // greens/blues players land well under half that.
 const GROUP_DPS = 240;
+// Three-player composition (2026-07-26): tank + healer + ONE dps at the same
+// modeled 80 per head (the tank's own swings are real sim damage on top).
+// The 2026-07-26 pressure pass exists because a real fresh 3-man cleared the
+// first v0.30 floors without pressure; this bench keeps that composition
+// honest instead of only pricing the 5-man drain.
+const GROUP_DPS_3MAN = 80;
 // The strongest solo archetype's sustained self-heal (the solo economy line
 // documented in tests/gravewyrm_normal_tuning.test.ts).
 const SOLO_SELF_HEAL_CEILING = 140;
@@ -441,7 +447,12 @@ type SurvivalRun = {
 // spawns sit in no instance, so the sim's own spawnBossAdds path would mint
 // UNTUNED adds; the bench pre-fires his thresholds and spawns the waves
 // itself through the normal-Sanctum transform.
-function runSurvival(spec: Spec, encounter: Encounter, seed: number): SurvivalRun {
+function runSurvival(
+  spec: Spec,
+  encounter: Encounter,
+  seed: number,
+  groupDps: number = GROUP_DPS,
+): SurvivalRun {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
   const { pid: tankPid, tank } = setupTank(sim, spec, 'fresh', false);
   const healerPid = addTierPlayer(sim, FRESH_HEALER, 'Healer', 'fresh');
@@ -467,7 +478,7 @@ function runSurvival(spec: Spec, encounter: Encounter, seed: number): SurvivalRu
     }
     const adds = alive.filter((m) => m.templateId === 'raised_bonewalker');
     const killTarget = adds[0] ?? alive[0];
-    killTarget.hp -= GROUP_DPS / 20;
+    killTarget.hp -= groupDps / 20;
     if (killTarget.hp <= 0) {
       killTarget.hp = 0;
       killTarget.dead = true;
@@ -492,6 +503,30 @@ function runSurvival(spec: Spec, encounter: Encounter, seed: number): SurvivalRu
       }
     }
     for (const mob of mobs) if (!mob.dead) pinThreat(mob, tank);
+    // Grave Inferno counterplay: the intended play is to walk out of the
+    // true-radius ring while the boss channels (he is rooted and not
+    // meleeing), so the bench tank does exactly that, at RUN speed from
+    // melee range, which usually costs the small first pulse; the mobs walk
+    // the tank back into contact after. Standing the full channel is the
+    // failure case the mechanic multiplier exists to punish, not the
+    // survival baseline.
+    const channeler = mobs.find((m) => !m.dead && m.infernoRemaining > 0);
+    if (channeler) {
+      const ring = (MOBS[channeler.templateId]?.infernoChannel?.radius ?? 14) + 2;
+      const dx = tank.pos.x - channeler.pos.x;
+      const dz = tank.pos.z - channeler.pos.z;
+      const d = Math.hypot(dx, dz);
+      if (d < ring) {
+        const out = Math.min(ring, d + 7 / 20); // player RUN_SPEED per tick
+        const scale = out / Math.max(0.5, d);
+        tank.pos = {
+          x: channeler.pos.x + dx * scale,
+          y: tank.pos.y,
+          z: channeler.pos.z + dz * scale,
+        };
+        tank.prevPos = { ...tank.pos };
+      }
+    }
     sim.startAutoAttack(tankPid);
     if (tank.hp < tank.maxHp) {
       healTick(sim, healerPid, tank, FRESH_HEALER, FRESH_HEALER.healPriority ?? []);
@@ -612,30 +647,39 @@ function main() {
     ),
   );
   const survival: Record<string, Record<string, unknown>> = {};
-  for (const spec of TANK_SPECS) {
-    for (const encounter of survivalEncounters) {
-      const runs: SurvivalRun[] = [];
-      for (let r = 0; r < RUNS; r++) {
-        runs.push(runSurvival(spec, encounter, BASE_SEED + r * 15485863));
+  const survival3man: Record<string, Record<string, unknown>> = {};
+  const comps: { label: string; dps: number; into: Record<string, Record<string, unknown>> }[] = [
+    { label: 'B ', dps: GROUP_DPS, into: survival },
+    { label: 'B3', dps: GROUP_DPS_3MAN, into: survival3man },
+  ];
+  for (const comp of comps) {
+    for (const spec of TANK_SPECS) {
+      for (const encounter of survivalEncounters) {
+        const runs: SurvivalRun[] = [];
+        for (let r = 0; r < RUNS; r++) {
+          runs.push(runSurvival(spec, encounter, BASE_SEED + r * 15485863, comp.dps));
+        }
+        const clearedPct = round1((100 * runs.filter((r) => r.cleared).length) / runs.length);
+        const deaths = runs.filter((r) => r.tankDeathSeconds !== null);
+        const deathTimes = summarize(
+          deaths.map((r) => must(r.tankDeathSeconds, 'tankDeathSeconds')),
+        );
+        const clearTimes = summarize(
+          runs.filter((r) => r.clearSeconds !== null).map((r) => must(r.clearSeconds, 'clear')),
+        );
+        const minHp = summarize(runs.map((r) => r.minTankHpFrac * 100));
+        comp.into[`${spec.key}__${encounter.key}`] = {
+          clearedPct,
+          tankDeaths: deaths.length,
+          tankDeathSeconds: deathTimes,
+          clearSeconds: clearTimes,
+          minTankHpPct: minHp,
+        };
+        console.log(
+          `${comp.label} ${spec.key.padEnd(20)} ${encounter.key.padEnd(28)} cleared ${String(clearedPct).padStart(5)}% ` +
+            `deaths ${deaths.length}/${runs.length} clear p50 ${clearTimes.p50}s minHp p10 ${minHp.p10}%`,
+        );
       }
-      const clearedPct = round1((100 * runs.filter((r) => r.cleared).length) / runs.length);
-      const deaths = runs.filter((r) => r.tankDeathSeconds !== null);
-      const deathTimes = summarize(deaths.map((r) => must(r.tankDeathSeconds, 'tankDeathSeconds')));
-      const clearTimes = summarize(
-        runs.filter((r) => r.clearSeconds !== null).map((r) => must(r.clearSeconds, 'clear')),
-      );
-      const minHp = summarize(runs.map((r) => r.minTankHpFrac * 100));
-      survival[`${spec.key}__${encounter.key}`] = {
-        clearedPct,
-        tankDeaths: deaths.length,
-        tankDeathSeconds: deathTimes,
-        clearSeconds: clearTimes,
-        minTankHpPct: minHp,
-      };
-      console.log(
-        `B ${spec.key.padEnd(20)} ${encounter.key.padEnd(28)} cleared ${String(clearedPct).padStart(5)}% ` +
-          `deaths ${deaths.length}/${runs.length} clear p50 ${clearTimes.p50}s minHp p10 ${minHp.p10}%`,
-      );
     }
   }
 
@@ -673,11 +717,13 @@ function main() {
       intakeSeconds: INTAKE_SECONDS,
       survivalCapSeconds: SURVIVAL_CAP_SECONDS,
       groupDps: GROUP_DPS,
+      groupDps3man: GROUP_DPS_3MAN,
       baseSeed: BASE_SEED,
     },
     profiles,
     intake,
     survival,
+    survival3man,
     solo,
   };
   mkdirSync('tmp/sanctum_mc', { recursive: true });
