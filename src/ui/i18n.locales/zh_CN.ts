@@ -6757,6 +6757,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noRecipient': '这里没有叫这个名字的邮箱主人。',
   'hudChrome.mailbox.result.tooManyParcels': '一封信最多可携带 {count} 个包裹。',
   'hudChrome.mailbox.result.noMailQuestItems': '你不能邮寄任务物品。',
+  'hudChrome.mailbox.result.noMailBound': '该物品已绑定，无法邮寄。',
   'hudChrome.mailbox.result.notEnoughItems': '你没有那么多可寄送的物品。',
   'hudChrome.mailbox.result.cantAffordPostage': '你付不起邮资。',
   'hudChrome.mailbox.result.recipientBoxFull': '对方的邮箱已满。',

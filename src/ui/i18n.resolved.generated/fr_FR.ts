@@ -2015,6 +2015,7 @@ export const fr_FR: EnTranslations = {
         "noRecipient": "Personne de ce nom ne possède de boîte aux lettres ici.",
         "tooManyParcels": "Une lettre transporte au plus {count} colis.",
         "noMailQuestItems": "Vous ne pouvez pas envoyer d'objets de quête par courrier.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Vous n'en avez pas autant à envoyer.",
         "cantAffordPostage": "Vous n'avez pas de quoi payer l'affranchissement.",
         "recipientBoxFull": "Sa boîte aux lettres est pleine.",

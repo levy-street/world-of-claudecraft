@@ -2015,6 +2015,7 @@ export const de_DE: EnTranslations = {
         "noRecipient": "Niemand mit diesem Namen unterhält hier einen Briefkasten.",
         "tooManyParcels": "Ein Brief trägt höchstens {count} Pakete.",
         "noMailQuestItems": "Questgegenstände können nicht verschickt werden.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "So viele davon hast du nicht zum Versenden.",
         "cantAffordPostage": "Du kannst dir das Porto nicht leisten.",
         "recipientBoxFull": "Der Briefkasten des Empfängers ist voll.",

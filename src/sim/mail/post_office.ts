@@ -16,6 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
+import { bagCapacity, canGrantItemInstance, instancedCountCap } from '../bags';
 import {
   HEROIC_MARK_LETTER,
   type LetterDef,
@@ -23,9 +24,24 @@ import {
   WELCOME_LETTER,
 } from '../content/letters';
 import { ITEMS } from '../data';
+import { itemInstancePayloadsEqual } from '../item_instance_merge';
+import {
+  countMatchingUnlocked,
+  isTransferLockedInstance,
+  publicInstanceView,
+  removeMatchingInstance,
+  sanitizeEscrowSlot,
+} from '../item_instance_transfer';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, type MailResultCode } from '../types';
+import {
+  cloneInvSlot,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  type MailResultCode,
+} from '../types';
 
 const MAIL_RANGE = INTERACT_RANGE + 2; // you must stand at a raven pillar to tend your post
 export const MAIL_POSTAGE = 30; // copper per letter
@@ -363,6 +379,7 @@ export class PostOffice {
       return;
     }
     const wanted = new Map<string, number>();
+    const instancedWanted: { itemId: string; instance: NonNullable<InvSlot['instance']> }[] = [];
     for (const s of items) {
       const def = ITEMS[s.itemId];
       const count = Math.floor(s.count);
@@ -375,14 +392,43 @@ export class PostOffice {
         this.result(meta.entityId, 'noMailQuestItems');
         return;
       }
-      wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
+      if (s.instance && typeof s.instance === 'object') {
+        // Instanced parcels (the #1165 completion): single-copy by design (the
+        // qty stepper stays fungible-only), named by payload so a bag reshuffle
+        // can never redirect the escrow. A count other than exactly 1 is a
+        // malformed request and refuses like any other malformed entry, never
+        // silently truncates. Transfer-locked copies (bindOnTrade armed or
+        // boundTo bound, the shared market rule) never ride a raven: a
+        // bind-on-trade windfall must not be mail-launderable.
+        if (count !== 1) return;
+        if (isTransferLockedInstance(s.instance)) {
+          this.result(meta.entityId, 'noMailBound');
+          return;
+        }
+        instancedWanted.push({ itemId: s.itemId, instance: s.instance });
+      } else {
+        wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
+      }
     }
     for (const [itemId, count] of wanted) {
-      // Count only the fungible stock (#1165): an instanced copy (signer/charges/
-      // rolled/boundTo) is never swept into a letter, exactly as the World Market
-      // validates against countFungibleItem. A player whose only copies are
-      // instanced gets notEnoughItems, just like on the market.
+      // Count only the fungible stock for plain entries: a plain attachment is
+      // never covered by an instanced copy, exactly as the World Market
+      // validates against countFungibleItem.
       if (this.ctx.countFungibleItem(itemId, meta.entityId) < count) {
+        this.result(meta.entityId, 'notEnoughItems');
+        return;
+      }
+    }
+    // Each instanced entry needs a matching UNLOCKED held copy, counting every
+    // entry that names the same payload (byte-equal copies are interchangeable;
+    // a stripped-lock forgery simply fails to match and lands here too).
+    for (const w of instancedWanted) {
+      let need = 0;
+      for (const other of instancedWanted) {
+        if (other.itemId === w.itemId && itemInstancePayloadsEqual(other.instance, w.instance))
+          need += 1;
+      }
+      if (countMatchingUnlocked(meta, w.itemId, w.instance) < need) {
         this.result(meta.entityId, 'notEnoughItems');
         return;
       }
@@ -395,13 +441,22 @@ export class PostOffice {
       this.result(meta.entityId, 'recipientBoxFull');
       return;
     }
-    // Escrow: coin and goods leave the sender now, ride with the raven. Remove
-    // the fungible stock only (#1165), matching the countFungibleItem check above
-    // so an instanced copy can never be consumed as a plain stack member and come
-    // back later as a generic copy.
+    // Escrow: coin and goods leave the sender now, ride with the raven. A plain
+    // entry removes fungible stock only (an instanced copy is never consumed as
+    // a plain stack member); an instanced entry escrows the ACTUAL matching
+    // copy, whose payload (removeMatchingInstance's contract, never the wire
+    // needle) is what the letter carries.
     meta.copper -= coin + MAIL_POSTAGE;
-    for (const s of items)
-      this.ctx.removeFungibleItem(s.itemId, Math.floor(s.count), meta.entityId);
+    const parcels: InvSlot[] = [];
+    for (const s of items) {
+      if (s.instance && typeof s.instance === 'object') {
+        const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
+        if (escrowed) parcels.push({ itemId: s.itemId, count: 1, instance: escrowed });
+      } else {
+        this.ctx.removeFungibleItem(s.itemId, Math.floor(s.count), meta.entityId);
+        parcels.push({ itemId: s.itemId, count: Math.floor(s.count) });
+      }
+    }
     this.book({
       recipientKey: recipient.key,
       recipientName: recipient.name,
@@ -410,7 +465,7 @@ export class PostOffice {
       subject: cleanSubject,
       body: cleanBody,
       copper: coin,
-      items: items.map((s) => ({ itemId: s.itemId, count: Math.floor(s.count) })),
+      items: parcels,
       delaySeconds: MAIL_DELIVERY_SECONDS,
     });
     this.result(meta.entityId, 'sent', { name: recipient.name, value: MAIL_POSTAGE });
@@ -447,8 +502,21 @@ export class PostOffice {
     // against the live inventory, so cumulative capacity is honoured.
     const kept: InvSlot[] = [];
     for (const s of m.items) {
-      if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
-        this.ctx.addItem(s.itemId, s.count, meta.entityId);
+      // Payload-aware on both arms (#2139: the capacity model must match the
+      // grant): an instanced parcel needs instanced room and lands through
+      // addItemInstance so its payload survives delivery.
+      const fits = s.instance
+        ? canGrantItemInstance(
+            meta.inventory,
+            bagCapacity(meta.bags),
+            s.itemId,
+            s.instance,
+            s.count,
+          )
+        : this.ctx.canAddItem(s.itemId, s.count, meta.entityId);
+      if (fits) {
+        if (s.instance) this.ctx.addItemInstance(s.itemId, s.instance, meta.entityId, s.count);
+        else this.ctx.addItem(s.itemId, s.count, meta.entityId);
       } else {
         kept.push(s);
       }
@@ -615,7 +683,12 @@ export class PostOffice {
         subject: m.subject,
         body: m.body,
         copper: m.copper,
-        items: m.items.map((s) => ({ ...s })),
+        // Display projection (publicInstanceView: signer/enchant/rolled only):
+        // the chip tooltip needs the enchant line and maker's mark; the full
+        // payload stays in the book and arrives with mailTake.
+        items: m.items.map((s) =>
+          s.instance ? { ...s, instance: publicInstanceView(s.instance) } : { ...s },
+        ),
         read: m.read,
       })),
       totalCount: mine.length,
@@ -665,7 +738,9 @@ export class PostOffice {
         subject: m.subject,
         body: m.body,
         copper: m.copper,
-        items: m.items.map((s) => ({ ...s })),
+        // cloneInvSlot, not a shallow spread: an instanced parcel's payload
+        // must not alias between the live book and the serialized blob.
+        items: m.items.map(cloneInvSlot),
         deliverIn: Math.max(0, Math.round(m.deliverAt - now)),
         secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
         read: m.read,
@@ -692,9 +767,11 @@ export class PostOffice {
       if (!m || typeof m.recipientKey !== 'string') continue;
       // Keep letters whose attached item id is no longer in ITEMS (a content
       // edit): dormant, recoverable data, exactly like market listings.
+      // sanitizeEscrowSlot preserves an instanced parcel's payload and clamps
+      // its count to the identical-payload merge cap (the character-load rule).
       const items = (m.items ?? [])
         .filter((s) => s && typeof s.itemId === 'string')
-        .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) }));
+        .map((s) => sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)));
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');

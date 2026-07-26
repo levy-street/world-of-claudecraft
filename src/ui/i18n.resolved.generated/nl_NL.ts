@@ -2015,6 +2015,7 @@ export const nl_NL: EnTranslations = {
         "noRecipient": "Niemand met die naam heeft hier een brievenbus.",
         "tooManyParcels": "Een brief draagt hoogstens {count} pakketten.",
         "noMailQuestItems": "Je kunt geen opdrachtvoorwerpen versturen.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Zoveel heb je er niet om te versturen.",
         "cantAffordPostage": "Je kunt de porto niet betalen.",
         "recipientBoxFull": "Hun brievenbus is vol.",

@@ -2015,6 +2015,7 @@ export const pl_PL: EnTranslations = {
         "noRecipient": "Nikt o tym imieniu nie ma tu skrzynki pocztowej.",
         "tooManyParcels": "List mieści najwyżej {count} paczek.",
         "noMailQuestItems": "Nie możesz wysyłać pocztą przedmiotów zadań.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Nie masz aż tylu do wysłania.",
         "cantAffordPostage": "Nie stać cię na opłatę pocztową.",
         "recipientBoxFull": "Skrzynka odbiorcy jest pełna.",

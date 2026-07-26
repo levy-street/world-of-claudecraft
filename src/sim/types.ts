@@ -3202,6 +3202,7 @@ export type MailResultCode =
   | 'tooManyParcels'
   | 'noMailQuestItems'
   | 'noMailSoulbound'
+  | 'noMailBound'
   | 'notEnoughItems'
   | 'cantAffordPostage'
   | 'recipientBoxFull'

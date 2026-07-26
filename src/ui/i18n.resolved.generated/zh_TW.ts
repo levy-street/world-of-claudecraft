@@ -2015,6 +2015,7 @@ export const zh_TW: EnTranslations = {
         "noRecipient": "這裡沒有叫這個名字的郵箱主人。",
         "tooManyParcels": "一封信最多可攜帶 {count} 個包裹。",
         "noMailQuestItems": "你不能郵寄任務物品。",
+        "noMailBound": "該物品已綁定，無法郵寄。",
         "notEnoughItems": "你沒有那麼多可寄送的物品。",
         "cantAffordPostage": "你付不起郵資。",
         "recipientBoxFull": "對方的郵箱已滿。",

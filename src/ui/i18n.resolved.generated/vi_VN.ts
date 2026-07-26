@@ -2015,6 +2015,7 @@ export const vi_VN: EnTranslations = {
         "noRecipient": "Không ai mang tên đó có hòm thư ở đây.",
         "tooManyParcels": "Một lá thư chở tối đa {count} bưu kiện.",
         "noMailQuestItems": "Bạn không thể gửi vật phẩm nhiệm vụ qua thư.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Bạn không có đủ số lượng đó để gửi.",
         "cantAffordPostage": "Bạn không đủ tiền trả bưu phí.",
         "recipientBoxFull": "Hòm thư của người nhận đã đầy.",

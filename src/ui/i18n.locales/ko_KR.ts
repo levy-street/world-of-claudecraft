@@ -7088,6 +7088,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.tooManyParcels':
     '편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.',
   'hudChrome.mailbox.result.noMailQuestItems': '퀘스트 아이템은 우편으로 보낼 수 없습니다.',
+  'hudChrome.mailbox.result.noMailBound': '그 아이템은 귀속되어 우편으로 보낼 수 없습니다.',
   'hudChrome.mailbox.result.notEnoughItems': '보낼 수 있는 수량이 부족합니다.',
   'hudChrome.mailbox.result.cantAffordPostage': '우편 요금을 낼 수 없습니다.',
   'hudChrome.mailbox.result.recipientBoxFull': '상대의 우편함이 가득 찼습니다.',

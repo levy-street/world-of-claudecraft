@@ -772,6 +772,7 @@ const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
   noRecipient: 'hudChrome.mailbox.result.noRecipient',
   tooManyParcels: 'hudChrome.mailbox.result.tooManyParcels',
   noMailQuestItems: 'hudChrome.mailbox.result.noMailQuestItems',
+  noMailBound: 'hudChrome.mailbox.result.noMailBound',
   noMailSoulbound: 'hudChrome.itemSoulbound',
   notEnoughItems: 'hudChrome.mailbox.result.notEnoughItems',
   cantAffordPostage: 'hudChrome.mailbox.result.cantAffordPostage',
@@ -3688,7 +3689,7 @@ export class Hud {
     onClosed: () => this.onBagsClosed(),
     addItemToTrade: (itemId) => this.addItemToTrade(itemId),
     stageMarketSell: (itemId, instance) => this.marketWindow.stageSell(itemId, instance),
-    stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
+    stageMailParcel: (itemId, instance) => this.mailboxWindow.stageParcel(itemId, instance),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {

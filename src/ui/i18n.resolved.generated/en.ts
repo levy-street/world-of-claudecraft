@@ -2015,6 +2015,7 @@ export const en: EnTranslations = {
         "noRecipient": "No one by that name holds a mailbox here.",
         "tooManyParcels": "A letter carries at most {count} parcels.",
         "noMailQuestItems": "You cannot mail quest items.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "You do not have that many to send.",
         "cantAffordPostage": "You cannot afford the postage.",
         "recipientBoxFull": "Their mailbox is full.",

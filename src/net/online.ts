@@ -3980,7 +3980,13 @@ export class ClientWorld implements IWorld {
       subject,
       body,
       copper,
-      items: items.map((s) => ({ itemId: s.itemId, count: s.count })),
+      items: items.map((s) => ({
+        itemId: s.itemId,
+        count: s.count,
+        // The payload is a SELECTOR (the market_list_instance rule): the
+        // server re-resolves it against the sender's own bags.
+        ...(s.instance ? { instance: s.instance } : {}),
+      })),
     });
   }
   mailTake(mailId: number): void {

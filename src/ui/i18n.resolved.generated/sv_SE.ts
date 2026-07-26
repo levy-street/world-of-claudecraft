@@ -2015,6 +2015,7 @@ export const sv_SE: EnTranslations = {
         "noRecipient": "Ingen med det namnet har en brevlåda här.",
         "tooManyParcels": "Ett brev rymmer högst {count} paket.",
         "noMailQuestItems": "Du kan inte skicka uppdragsföremål med post.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Du har inte så många att skicka.",
         "cantAffordPostage": "Du har inte råd med portot.",
         "recipientBoxFull": "Mottagarens brevlåda är full.",

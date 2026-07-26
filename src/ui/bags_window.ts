@@ -184,8 +184,9 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
    *  as ITSELF (single-copy listing), a plain stack stages fungibly. */
   stageMarketSell(itemId: string, instance?: ItemInstancePayload): void;
-  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab). */
-  stageMailParcel(itemId: string): void;
+  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab).
+   *  `instance` mirrors stageMarketSell: an instanced copy stages as itself. */
+  stageMailParcel(itemId: string, instance?: ItemInstancePayload): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
   showError(text: string): void;
@@ -891,7 +892,7 @@ export class BagsWindow {
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
       case 'mailAttach':
-        this.deps.stageMailParcel(s.itemId);
+        this.deps.stageMailParcel(s.itemId, s.instance);
         break;
       case 'marketSellBlockedQuest':
         this.deps.showError(t('itemUi.errors.noQuestItems'));

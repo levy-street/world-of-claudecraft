@@ -6137,6 +6137,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.mailbox.result.collected'
   | 'hudChrome.mailbox.result.letterGone'
   | 'hudChrome.mailbox.result.needRecipient'
+  | 'hudChrome.mailbox.result.noMailBound'
   | 'hudChrome.mailbox.result.noMailQuestItems'
   | 'hudChrome.mailbox.result.noRecipient'
   | 'hudChrome.mailbox.result.notEnoughItems'

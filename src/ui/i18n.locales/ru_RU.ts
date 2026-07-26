@@ -7224,6 +7224,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noRecipient': 'Здесь нет почтового ящика на это имя.',
   'hudChrome.mailbox.result.tooManyParcels': 'Одно письмо вмещает не более {count} посылок.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Нельзя отправлять почтой квестовые предметы.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Этот предмет привязан и не может быть отправлен по почте.',
   'hudChrome.mailbox.result.notEnoughItems': 'У вас нет столько предметов для отправки.',
   'hudChrome.mailbox.result.cantAffordPostage': 'Вам не хватает на почтовый сбор.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Почтовый ящик получателя переполнен.',

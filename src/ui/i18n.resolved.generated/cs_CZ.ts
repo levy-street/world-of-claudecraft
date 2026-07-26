@@ -2015,6 +2015,7 @@ export const cs_CZ: EnTranslations = {
         "noRecipient": "Nikdo s tímto jménem zde poštovní schránku nemá.",
         "tooManyParcels": "Dopis unese nejvýše {count} balíků.",
         "noMailQuestItems": "Úkolové předměty nelze posílat poštou.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Nemáš tolik kusů k odeslání.",
         "cantAffordPostage": "Nemůžeš si dovolit poštovné.",
         "recipientBoxFull": "Jejich poštovní schránka je plná.",

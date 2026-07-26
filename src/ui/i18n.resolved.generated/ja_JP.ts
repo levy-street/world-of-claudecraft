@@ -2015,6 +2015,7 @@ export const ja_JP: EnTranslations = {
         "noRecipient": "その名前のメールボックスの持ち主はいません。",
         "tooManyParcels": "1通の手紙に添付できる小包は最大{count}個です。",
         "noMailQuestItems": "クエストアイテムは郵送できません。",
+        "noMailBound": "そのアイテムはバインドされているため郵送できません。",
         "notEnoughItems": "送るのに十分な数を持っていません。",
         "cantAffordPostage": "郵送料を支払えません。",
         "recipientBoxFull": "相手のメールボックスは満杯です。",

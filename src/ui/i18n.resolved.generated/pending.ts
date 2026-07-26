@@ -25,7 +25,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "es_ES": [
     "hud.errors.marketListBound",
@@ -43,7 +44,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "fr_FR": [
     "hud.errors.marketListBound",
@@ -61,7 +63,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "fr_CA": [
     "hud.errors.marketListBound",
@@ -79,7 +82,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "en_CA": [],
   "it_IT": [
@@ -98,7 +102,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "de_DE": [
     "hud.errors.marketListBound",
@@ -116,7 +121,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -138,7 +144,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -157,7 +164,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "nl_NL": [
     "hud.errors.marketListBound",
@@ -175,7 +183,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "pl_PL": [
     "hud.errors.marketListBound",
@@ -193,7 +202,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "id_ID": [
     "hud.errors.marketListBound",
@@ -211,7 +221,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "tr_TR": [
     "hud.errors.marketListBound",
@@ -229,7 +240,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "sv_SE": [
     "hud.errors.marketListBound",
@@ -247,7 +259,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "vi_VN": [
     "hud.errors.marketListBound",
@@ -265,7 +278,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "da_DK": [
     "hud.errors.marketListBound",
@@ -283,6 +297,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.mailbox.result.noMailBound"
   ]
 };

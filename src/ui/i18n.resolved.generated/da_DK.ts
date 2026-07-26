@@ -2015,6 +2015,7 @@ export const da_DK: EnTranslations = {
         "noRecipient": "Ingen med det navn har en postkasse her.",
         "tooManyParcels": "Et brev kan højst rumme {count} pakker.",
         "noMailQuestItems": "Du kan ikke sende opgavegenstande med posten.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Du har ikke så mange at sende.",
         "cantAffordPostage": "Du har ikke råd til portoen.",
         "recipientBoxFull": "Modtagerens postkasse er fuld.",

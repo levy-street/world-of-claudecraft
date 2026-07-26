@@ -7109,6 +7109,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noRecipient': 'その名前のメールボックスの持ち主はいません。',
   'hudChrome.mailbox.result.tooManyParcels': '1通の手紙に添付できる小包は最大{count}個です。',
   'hudChrome.mailbox.result.noMailQuestItems': 'クエストアイテムは郵送できません。',
+  'hudChrome.mailbox.result.noMailBound': 'そのアイテムはバインドされているため郵送できません。',
   'hudChrome.mailbox.result.notEnoughItems': '送るのに十分な数を持っていません。',
   'hudChrome.mailbox.result.cantAffordPostage': '郵送料を支払えません。',
   'hudChrome.mailbox.result.recipientBoxFull': '相手のメールボックスは満杯です。',

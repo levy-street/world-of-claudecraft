@@ -2015,6 +2015,7 @@ export const es: EnTranslations = {
         "noRecipient": "Nadie con ese nombre tiene buzón aquí.",
         "tooManyParcels": "Una carta lleva como máximo {count} paquetes.",
         "noMailQuestItems": "No puedes enviar objetos de misión por correo.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "No tienes tantos para enviar.",
         "cantAffordPostage": "No puedes costear el franqueo.",
         "recipientBoxFull": "Su buzón está lleno.",

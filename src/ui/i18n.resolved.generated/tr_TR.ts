@@ -2015,6 +2015,7 @@ export const tr_TR: EnTranslations = {
         "noRecipient": "Burada bu isimde posta kutusu olan kimse yok.",
         "tooManyParcels": "Bir mektup en fazla {count} paket taşır.",
         "noMailQuestItems": "Görev eşyalarını postayla gönderemezsin.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Gönderecek o kadar tane yok.",
         "cantAffordPostage": "Posta ücretini karşılayamazsın.",
         "recipientBoxFull": "Alıcının posta kutusu dolu.",

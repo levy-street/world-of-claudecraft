@@ -5035,10 +5035,10 @@ export class GameServer {
           msg.items.length > 3 // MAIL_MAX_ATTACHMENTS; the Sim re-validates
         )
           break;
-        const items: { itemId: string; count: number }[] = [];
+        const items: { itemId: string; count: number; instance?: ItemInstancePayload }[] = [];
         let itemsOk = true;
         for (const raw of msg.items as unknown[]) {
-          const slot = raw as { itemId?: unknown; count?: unknown } | null;
+          const slot = raw as { itemId?: unknown; count?: unknown; instance?: unknown } | null;
           if (
             !slot ||
             typeof slot.itemId !== 'string' ||
@@ -5048,7 +5048,20 @@ export class GameServer {
             itemsOk = false;
             break;
           }
-          items.push({ itemId: slot.itemId, count: Math.floor(slot.count) });
+          // The instance is only an equality needle (the market_list_instance
+          // rule): the sim re-resolves it against the sender's own bags and
+          // escrows the actual held copy's payload.
+          const instance =
+            slot.instance !== null &&
+            typeof slot.instance === 'object' &&
+            !Array.isArray(slot.instance)
+              ? (slot.instance as ItemInstancePayload)
+              : undefined;
+          items.push({
+            itemId: slot.itemId,
+            count: Math.floor(slot.count),
+            ...(instance ? { instance } : {}),
+          });
         }
         if (!itemsOk) break;
         // Player-written subject/body flow through the same gates as chat

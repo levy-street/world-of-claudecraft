@@ -2015,6 +2015,7 @@ export const en_XA: EnTranslations = {
         "noRecipient": "[Ñó óñé ƀý ţĥáţ ñáɱé ĥóļðš á ɱáíļƀóẋ ĥéŕé.]",
         "tooManyParcels": "[Á ļéţţéŕ çáŕŕíéš áţ ɱóšţ {count} þáŕçéļš.]",
         "noMailQuestItems": "[Ýóú çáññóţ ɱáíļ ɋúéšţ íţéɱš.]",
+        "noMailBound": "[Ţĥáţ íţéɱ íš ƀóúñð áñð çáññóţ ƀé ɱáíļéð.]",
         "notEnoughItems": "[Ýóú ðó ñóţ ĥáʋé ţĥáţ ɱáñý ţó šéñð.]",
         "cantAffordPostage": "[Ýóú çáññóţ áƒƒóŕð ţĥé þóšţáĝé.]",
         "recipientBoxFull": "[Ţĥéíŕ ɱáíļƀóẋ íš ƒúļļ.]",

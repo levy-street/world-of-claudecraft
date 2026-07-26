@@ -148,7 +148,9 @@ describe('mailbox_window: parcel quantity stepper (#1444, PR #1695 review)', () 
     expect(painter).toContain('focusKey');
     expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:minus`/);
     expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:plus`/);
-    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:remove`/);
+    // Remove keys on the per-chip key (issue 1165): a plain stack and an
+    // instanced copy of one item id are distinct chips.
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{chipKey\}:remove`/);
   });
 });
 

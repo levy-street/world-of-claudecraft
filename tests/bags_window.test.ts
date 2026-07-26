@@ -239,8 +239,12 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     const start = painter.indexOf('private runBagAction(');
     const body = painter.slice(start, painter.indexOf('\n  }\n', start));
     expect(body).toMatch(/case 'trade':\s*this\.deps\.addItemToTrade\(s\.itemId\);/);
-    expect(body).toMatch(/case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId\);/);
-    expect(body).toMatch(/case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId\);/);
+    expect(body).toMatch(
+      /case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId, s\.instance\);/,
+    );
+    expect(body).toMatch(
+      /case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId, s\.instance\);/,
+    );
     expect(body).toMatch(/case 'bankDeposit': \{/);
     expect(body).toMatch(/case 'petFeed':\s*this\.deps\.world\(\)\.feedPet\(s\.itemId\);/);
     // The 'use' case tries the gathering-tool routing first (#2343) and only
