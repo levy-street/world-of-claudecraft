@@ -9256,7 +9256,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "c8541b6e",
+      "state": "4131fe6c",
       "events": "90b86b6a",
       "rng": {
         "draws": 3027,
@@ -10147,40 +10147,40 @@
                     "affixes": [
                       {
                         "affixId": "stalwart",
-                        "budget": 5,
+                        "budget": 7,
                         "family": "primary.stamina",
                         "position": "prefix",
                         "ranges": {
                           "sta": {
-                            "max": 7,
-                            "min": 4
+                            "max": 24,
+                            "min": 7
                           }
                         },
                         "revision": 1,
-                        "tier": 3,
+                        "tier": 5,
                         "values": {
-                          "sta": 5
+                          "sta": 7
                         }
                       },
                       {
                         "affixId": "deft",
-                        "budget": 6,
+                        "budget": 8,
                         "family": "primary.agility",
                         "position": "prefix",
                         "ranges": {
                           "agi": {
-                            "max": 6,
+                            "max": 10,
                             "min": 4
                           }
                         },
                         "revision": 1,
                         "tier": 3,
                         "values": {
-                          "agi": 6
+                          "agi": 8
                         }
                       }
                     ],
-                    "baseId": "iron_flanged_mace",
+                    "baseId": "thornpeak_war_axe",
                     "dropContext": {
                       "source": "dungeon",
                       "sourceEntityId": 420,
@@ -10193,7 +10193,7 @@
                       "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
                     },
                     "generatedName": {
-                      "baseId": "iron_flanged_mace",
+                      "baseId": "thornpeak_war_axe",
                       "prefixId": "procedural.name.deft"
                     },
                     "itemLevel": 21,
@@ -10203,7 +10203,7 @@
                     "version": 1
                   }
                 },
-                "itemId": "iron_flanged_mace"
+                "itemId": "thornpeak_war_axe"
               }
             ]
           },
@@ -10585,7 +10585,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "1958f87c",
+      "state": "f73d4ff2",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10596,7 +10596,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "a53b3b94",
+      "state": "77a4095a",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10607,7 +10607,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "b6235e3c",
+      "state": "775625de",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10618,7 +10618,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "b4fdd9f0",
+      "state": "1c5e6aca",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10629,7 +10629,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "4c8d1abc",
+      "state": "a778933a",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10640,7 +10640,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "c69d8074",
+      "state": "86f7225a",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10651,7 +10651,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "0b83b242",
+      "state": "12914bbc",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -11542,40 +11542,40 @@
                     "affixes": [
                       {
                         "affixId": "stalwart",
-                        "budget": 5,
+                        "budget": 7,
                         "family": "primary.stamina",
                         "position": "prefix",
                         "ranges": {
                           "sta": {
-                            "max": 7,
-                            "min": 4
+                            "max": 24,
+                            "min": 7
                           }
                         },
                         "revision": 1,
-                        "tier": 3,
+                        "tier": 5,
                         "values": {
-                          "sta": 5
+                          "sta": 7
                         }
                       },
                       {
                         "affixId": "deft",
-                        "budget": 6,
+                        "budget": 8,
                         "family": "primary.agility",
                         "position": "prefix",
                         "ranges": {
                           "agi": {
-                            "max": 6,
+                            "max": 10,
                             "min": 4
                           }
                         },
                         "revision": 1,
                         "tier": 3,
                         "values": {
-                          "agi": 6
+                          "agi": 8
                         }
                       }
                     ],
-                    "baseId": "iron_flanged_mace",
+                    "baseId": "thornpeak_war_axe",
                     "dropContext": {
                       "source": "dungeon",
                       "sourceEntityId": 420,
@@ -11588,7 +11588,7 @@
                       "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
                     },
                     "generatedName": {
-                      "baseId": "iron_flanged_mace",
+                      "baseId": "thornpeak_war_axe",
                       "prefixId": "procedural.name.deft"
                     },
                     "itemLevel": 21,
@@ -11598,7 +11598,7 @@
                     "version": 1
                   }
                 },
-                "itemId": "iron_flanged_mace"
+                "itemId": "thornpeak_war_axe"
               }
             ]
           },

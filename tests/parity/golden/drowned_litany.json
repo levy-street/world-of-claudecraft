@@ -739,7 +739,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 449,
-      "state": "f46a8e45",
+      "state": "faf876cc",
       "events": "077a83da",
       "rng": {
         "draws": 2024,
@@ -750,7 +750,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 449,
-      "state": "be8c83f1",
+      "state": "c093b2a4",
       "events": "0d0af5a0",
       "rng": {
         "draws": 2088,
@@ -761,7 +761,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 449,
-      "state": "7f6b582a",
+      "state": "2ea9b135",
       "events": "15f527af",
       "rng": {
         "draws": 2133,
@@ -772,7 +772,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 449,
-      "state": "eb176654",
+      "state": "807ce4ab",
       "events": "f398378a",
       "rng": {
         "draws": 2190,
@@ -783,7 +783,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 449,
-      "state": "db390e53",
+      "state": "fdbed5aa",
       "events": "6efb0f6a",
       "rng": {
         "draws": 2221,
@@ -794,7 +794,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 449,
-      "state": "566c10ae",
+      "state": "d8b0b181",
       "events": "6efb0f6a",
       "rng": {
         "draws": 2273,
@@ -805,7 +805,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 449,
-      "state": "2f6b1ba3",
+      "state": "d98eff0e",
       "events": "7a232164",
       "rng": {
         "draws": 2315,
@@ -816,7 +816,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 449,
-      "state": "859a5391",
+      "state": "55759b88",
       "events": "15f010fc",
       "rng": {
         "draws": 2370,
@@ -827,7 +827,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 449,
-      "state": "3358d7f7",
+      "state": "79c30d02",
       "events": "ae67468d",
       "rng": {
         "draws": 2424,
@@ -838,7 +838,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 449,
-      "state": "4745be69",
+      "state": "4ae4a3c0",
       "events": "c7185058",
       "rng": {
         "draws": 2491,
@@ -849,7 +849,7 @@
       "tick": 505,
       "time": 25.25,
       "nextId": 449,
-      "state": "39ee15e4",
+      "state": "cdba72ef",
       "events": "6efb0f6a",
       "rng": {
         "draws": 2511,
@@ -1035,87 +1035,87 @@
                     "affixes": [
                       {
                         "affixId": "stalwart",
-                        "budget": 9,
+                        "budget": 5,
                         "family": "primary.stamina",
                         "position": "prefix",
                         "ranges": {
                           "sta": {
-                            "max": 10,
-                            "min": 7
-                          }
-                        },
-                        "revision": 1,
-                        "tier": 4,
-                        "values": {
-                          "sta": 9
-                        }
-                      },
-                      {
-                        "affixId": "alacrity",
-                        "budget": 4.2,
-                        "family": "rating.haste",
-                        "position": "suffix",
-                        "ranges": {
-                          "hasteRating": {
-                            "max": 19,
-                            "min": 13
-                          }
-                        },
-                        "revision": 1,
-                        "tier": 4,
-                        "values": {
-                          "hasteRating": 15
-                        }
-                      },
-                      {
-                        "affixId": "deft",
-                        "budget": 3,
-                        "family": "primary.agility",
-                        "position": "prefix",
-                        "ranges": {
-                          "agi": {
-                            "max": 4,
+                            "max": 6,
                             "min": 2
                           }
                         },
                         "revision": 1,
                         "tier": 2,
                         "values": {
-                          "agi": 3
+                          "sta": 5
+                        }
+                      },
+                      {
+                        "affixId": "alacrity",
+                        "budget": 4.48,
+                        "family": "rating.haste",
+                        "position": "suffix",
+                        "ranges": {
+                          "hasteRating": {
+                            "max": 21,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 2,
+                        "values": {
+                          "hasteRating": 16
+                        }
+                      },
+                      {
+                        "affixId": "deft",
+                        "budget": 4,
+                        "family": "primary.agility",
+                        "position": "prefix",
+                        "ranges": {
+                          "agi": {
+                            "max": 6,
+                            "min": 2
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 2,
+                        "values": {
+                          "agi": 4
                         }
                       },
                       {
                         "affixId": "mighty",
-                        "budget": 2,
+                        "budget": 4,
                         "family": "primary.strength",
                         "position": "prefix",
                         "ranges": {
                           "str": {
-                            "max": 2,
-                            "min": 1
+                            "max": 6,
+                            "min": 2
                           }
                         },
                         "revision": 1,
-                        "tier": 1,
+                        "tier": 2,
                         "values": {
-                          "str": 2
+                          "str": 4
                         }
                       },
                       {
                         "affixId": "striking",
-                        "budget": 4.25,
+                        "budget": 6,
                         "family": "rating.crit",
                         "position": "suffix",
                         "ranges": {
                           "critRating": {
-                            "max": 20,
-                            "min": 14
+                            "max": 40,
+                            "min": 8
                           }
                         },
                         "revision": 1,
-                        "tier": 4,
+                        "tier": 3,
                         "values": {
-                          "critRating": 17
+                          "critRating": 24
                         }
                       }
                     ],
@@ -1199,7 +1199,7 @@
       "tick": 507,
       "time": 25.35,
       "nextId": 449,
-      "state": "cb04c6b4",
+      "state": "952ba1d7",
       "events": "741638a5",
       "rng": {
         "draws": 2521,
@@ -1385,87 +1385,87 @@
                     "affixes": [
                       {
                         "affixId": "stalwart",
-                        "budget": 9,
+                        "budget": 5,
                         "family": "primary.stamina",
                         "position": "prefix",
                         "ranges": {
                           "sta": {
-                            "max": 10,
-                            "min": 7
-                          }
-                        },
-                        "revision": 1,
-                        "tier": 4,
-                        "values": {
-                          "sta": 9
-                        }
-                      },
-                      {
-                        "affixId": "alacrity",
-                        "budget": 4.2,
-                        "family": "rating.haste",
-                        "position": "suffix",
-                        "ranges": {
-                          "hasteRating": {
-                            "max": 19,
-                            "min": 13
-                          }
-                        },
-                        "revision": 1,
-                        "tier": 4,
-                        "values": {
-                          "hasteRating": 15
-                        }
-                      },
-                      {
-                        "affixId": "deft",
-                        "budget": 3,
-                        "family": "primary.agility",
-                        "position": "prefix",
-                        "ranges": {
-                          "agi": {
-                            "max": 4,
+                            "max": 6,
                             "min": 2
                           }
                         },
                         "revision": 1,
                         "tier": 2,
                         "values": {
-                          "agi": 3
+                          "sta": 5
+                        }
+                      },
+                      {
+                        "affixId": "alacrity",
+                        "budget": 4.48,
+                        "family": "rating.haste",
+                        "position": "suffix",
+                        "ranges": {
+                          "hasteRating": {
+                            "max": 21,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 2,
+                        "values": {
+                          "hasteRating": 16
+                        }
+                      },
+                      {
+                        "affixId": "deft",
+                        "budget": 4,
+                        "family": "primary.agility",
+                        "position": "prefix",
+                        "ranges": {
+                          "agi": {
+                            "max": 6,
+                            "min": 2
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 2,
+                        "values": {
+                          "agi": 4
                         }
                       },
                       {
                         "affixId": "mighty",
-                        "budget": 2,
+                        "budget": 4,
                         "family": "primary.strength",
                         "position": "prefix",
                         "ranges": {
                           "str": {
-                            "max": 2,
-                            "min": 1
+                            "max": 6,
+                            "min": 2
                           }
                         },
                         "revision": 1,
-                        "tier": 1,
+                        "tier": 2,
                         "values": {
-                          "str": 2
+                          "str": 4
                         }
                       },
                       {
                         "affixId": "striking",
-                        "budget": 4.25,
+                        "budget": 6,
                         "family": "rating.crit",
                         "position": "suffix",
                         "ranges": {
                           "critRating": {
-                            "max": 20,
-                            "min": 14
+                            "max": 40,
+                            "min": 8
                           }
                         },
                         "revision": 1,
-                        "tier": 4,
+                        "tier": 3,
                         "values": {
-                          "critRating": 17
+                          "critRating": 24
                         }
                       }
                     ],
