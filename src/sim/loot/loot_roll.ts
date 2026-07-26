@@ -33,6 +33,7 @@ import {
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { canEquipItem } from '../equipment_rules';
 import { formatMoney } from '../format_money';
+import { dungeonFinalBossInstance } from '../instances/dungeons';
 import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
 import { proceduralQuality } from '../procedural_item';
@@ -387,19 +388,21 @@ export function appendLiveProceduralDrop(
     ...(sourceInstance && { dungeonId: sourceInstance.dungeonId }),
     ...(sourceInstance && { dungeonDifficulty: sourceInstance.difficulty }),
   };
+  const finalBoss = dungeonFinalBossInstance(ctx, mob) !== null;
   // A dungeon/raid final boss's smart-loot roster is every permanent damage/heal
-  // contributor, unioned with the death snapshot. A contributor who steps out of
+  // contributor. A contributor who steps out of
   // XP range at the last second cannot remove their class from the signature
   // table, while an entered AFK player cannot manipulate it merely by zoning in.
   const lootClassRecipients = new Map<number, PlayerMeta>();
-  if (sourceInstance) {
+  if (finalBoss) {
     for (const entityId of mob.bossDamagers) {
       const recipient = ctx.players.get(entityId);
       if (recipient) lootClassRecipients.set(entityId, recipient);
     }
-  }
-  for (const recipient of eligibleRecipients) {
-    lootClassRecipients.set(recipient.entityId, recipient);
+  } else {
+    for (const recipient of eligibleRecipients) {
+      lootClassRecipients.set(recipient.entityId, recipient);
+    }
   }
   const lootRecipientClasses = [...lootClassRecipients.values()]
     .sort((a, b) => a.entityId - b.entityId)

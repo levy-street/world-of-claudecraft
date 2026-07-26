@@ -3687,8 +3687,8 @@ export class Hud {
     markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
     dropOnEquipSlot: (itemId, slot, instanceUid) =>
       this.charWindow.dropOnEquipSlot(itemId, slot, instanceUid),
-    openItemActionMenu: (def, itemId, x, y, runDefault) =>
-      this.bagItemActionMenu.open(def, itemId, x, y, runDefault),
+    openItemActionMenu: (def, itemId, x, y, runDefault, instance) =>
+      this.bagItemActionMenu.open(def, itemId, x, y, runDefault, instance),
   });
   // Bag-item action menu (Professions 2.0): the right-click / touch
   // menu that surfaces Disenchant / Salvage / Apply Enchant on a bag stack.
@@ -11382,8 +11382,11 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onUnbind: (itemId, feeCopper) => {
+        onUnbind: (itemId, feeCopper, instanceUid) => {
           const item = ITEMS[itemId];
+          const unbind = instanceUid
+            ? () => this.sim.unbindItem(itemId, instanceUid)
+            : () => this.sim.unbindItem(itemId);
           this.confirmDialog(
             t('hudChrome.unbind.confirmTitle'),
             t('hudChrome.unbind.confirmBody', {
@@ -11392,7 +11395,7 @@ export class Hud {
             }),
             t('hudChrome.unbind.confirmOk'),
             t('hudChrome.unbind.confirmCancel'),
-            () => this.sim.unbindItem(itemId),
+            unbind,
           );
         },
         onClose: () => this.closeUnbind(),

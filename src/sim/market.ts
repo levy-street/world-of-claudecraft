@@ -80,6 +80,10 @@ export class Market {
   marketListings: MarketListing[] = [];
   private marketCollections = new Map<string, MarketCollection>();
   private nextListingId = 1;
+  // Monotonic, process-local marker for successful player market commands.
+  // The server samples it around synchronous commands and persists only when
+  // the character/escrow pair really changed.
+  private commandMutationRevision = 0;
   // Entity ids of every NPC with `market: true`, assigned by the Sim ctor during NPC
   // placement (the NPC loop stays on Sim). The World Market is a single shared book;
   // any of these merchants is a valid place to stand and deal, so a player can use the
@@ -87,6 +91,10 @@ export class Market {
   merchantIds: number[] = [];
 
   constructor(private readonly ctx: SimContext) {}
+
+  get persistenceMutationRevision(): number {
+    return this.commandMutationRevision;
+  }
 
   // Public ctor-seed entry: the Sim ctor calls this right after the NPC loop sets
   // `merchantId`, replacing the inline `this.seedHouseListings()`.
@@ -288,6 +296,7 @@ export class Market {
       expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
       house: false,
     });
+    this.commandMutationRevision++;
     this.ctx.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -348,6 +357,7 @@ export class Market {
         });
       }
     }
+    this.commandMutationRevision++;
     this.ctx.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -378,6 +388,7 @@ export class Market {
     }
     this.marketListings.splice(idx, 1);
     this.ctx.addItem(listing.itemId, listing.count, meta.entityId);
+    this.commandMutationRevision++;
     const def = ITEMS[listing.itemId];
     this.ctx.emit({
       type: 'loot',
@@ -402,6 +413,7 @@ export class Market {
       this.ctx.error(meta.entityId, 'You have nothing to collect.');
       return;
     }
+    let changed = false;
     if (col.copper > 0) {
       meta.copper += col.copper;
       this.ctx.emit({
@@ -412,6 +424,7 @@ export class Market {
       // Collection copper is exclusively sale proceeds, so all of it counts.
       this.ctx.bumpDeedStat(meta, 'marketSaleCopper', col.copper);
       col.copper = 0;
+      changed = true;
     }
     // Capacity gate: items that don't fit stay in the collection box (never
     // destroyed); the gold above is always collected.
@@ -419,16 +432,19 @@ export class Market {
     for (const s of col.items) {
       if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
         this.ctx.addItem(s.itemId, s.count, meta.entityId);
+        changed = true;
       } else {
         kept.push(s);
       }
     }
     if (kept.length > 0) {
       col.items = kept;
+      if (changed) this.commandMutationRevision++;
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
     this.marketCollections.delete(this.marketSellerKey(meta));
+    if (changed) this.commandMutationRevision++;
   }
 
   // Once a second: return expired player listings to their seller's collection.

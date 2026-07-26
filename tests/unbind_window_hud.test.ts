@@ -123,7 +123,8 @@ describe('hud.ts unbind window wiring (source pins)', () => {
     expect(hudSource).toContain('openUnbind: (npcId) => this.openUnbind(npcId)');
     expect(hudSource).toContain("this.closeOtherWindows('#unbind-window')");
     expect(hudSource).toContain("t('hudChrome.unbind.confirmTitle')");
-    expect(hudSource).toContain('() => this.sim.unbindItem(itemId),');
+    expect(hudSource).toContain(': () => this.sim.unbindItem(itemId);');
+    expect(hudSource).toContain('() => this.sim.unbindItem(itemId, instanceUid)');
   });
 });
 

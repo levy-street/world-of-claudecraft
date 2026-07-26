@@ -20,7 +20,7 @@
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, InvSlot, ItemDef } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   BAG_CATEGORIES,
@@ -234,6 +234,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     x: number,
     y: number,
     runDefault: () => void,
+    instance?: ItemInstancePayload,
   ): void;
 }
 
@@ -1089,7 +1090,14 @@ export class BagsWindow {
     const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
-    this.deps.openItemActionMenu(item, s.itemId, x, y, () => this.runBagAction(item, s, ev));
+    this.deps.openItemActionMenu(
+      item,
+      s.itemId,
+      x,
+      y,
+      () => this.runBagAction(item, s, ev),
+      s.instance,
+    );
   }
 
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {

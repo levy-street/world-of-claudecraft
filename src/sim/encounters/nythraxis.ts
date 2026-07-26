@@ -638,26 +638,28 @@ export function grantNythraxisLockout(
     if (lockedUntil > 0 && !alreadyLocked) meta.raidLockouts.delete(lockId);
     if (!alreadyLocked && credited) {
       let paid = false;
-      if (presentIds.has(meta.entityId)) {
-        ctx.addItem(DEATHLESS_FRAGMENT_ITEM_ID, profile.fragmentsPerParticipant, meta.entityId);
-        if (marks > 0) ctx.addItem(HEROIC_MARK_ITEM_ID, marks, meta.entityId);
-        paid = true;
-      } else if (inst?.enteredBy.has(meta.entityId) && participantIds.has(meta.entityId)) {
-        if (marks > 0) {
-          ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, marks, [
-            {
-              itemId: DEATHLESS_FRAGMENT_ITEM_ID,
-              count: profile.fragmentsPerParticipant,
-            },
-          ]);
-        } else {
-          ctx.mailHeroicMarks(
-            meta.entityId,
-            DEATHLESS_FRAGMENT_ITEM_ID,
-            profile.fragmentsPerParticipant,
-          );
+      if (participantIds.has(meta.entityId)) {
+        if (presentIds.has(meta.entityId)) {
+          ctx.addItem(DEATHLESS_FRAGMENT_ITEM_ID, profile.fragmentsPerParticipant, meta.entityId);
+          if (marks > 0) ctx.addItem(HEROIC_MARK_ITEM_ID, marks, meta.entityId);
+          paid = true;
+        } else if (inst?.enteredBy.has(meta.entityId)) {
+          if (marks > 0) {
+            ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, marks, [
+              {
+                itemId: DEATHLESS_FRAGMENT_ITEM_ID,
+                count: profile.fragmentsPerParticipant,
+              },
+            ]);
+          } else {
+            ctx.mailHeroicMarks(
+              meta.entityId,
+              DEATHLESS_FRAGMENT_ITEM_ID,
+              profile.fragmentsPerParticipant,
+            );
+          }
+          paid = true;
         }
-        paid = true;
       }
       if (paid && heroic) {
         if (meta.heroicDaily.date !== rewardWindow) {

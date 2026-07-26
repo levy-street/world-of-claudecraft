@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
+import { generateProceduralItem } from '../src/sim/loot/procedural';
+import { proceduralItemContentName } from '../src/sim/procedural_item_name';
 import { Sim } from '../src/sim/sim';
 
 function makeWorld() {
@@ -46,6 +49,35 @@ describe('/bags command', () => {
     );
   });
 
+  it('sorts a generated legendary by its real rarity and shows its generated name', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Aleph');
+    const meta = sim.players.get(pid)!;
+    meta.inventory.length = 0;
+    sim.addItem('minor_healing_potion', 1, pid);
+    const drop = generateProceduralItem({
+      seed: 7711,
+      uid: 'pi1:bags-command:7711',
+      context: {
+        source: 'dungeon',
+        sourceEntityId: 77,
+        sourceSpawnSequence: 11,
+        lootSlotIndex: 0,
+      },
+      basePoolId: 'initial_dungeon_boss',
+      rarityTableId: 'initial_dungeon_boss',
+      sourceItemLevel: 20,
+      forcedBaseId: 'iron_broadsword',
+      forcedRarity: 'legendary',
+    });
+    sim.addItemInstance(drop.itemId, drop.instance, pid);
+
+    sim.chat('/bags', pid);
+    const generatedName = proceduralItemContentName(ITEMS[drop.itemId], drop.instance);
+    expect(lastReadout(sim, pid)).toBe(
+      `Bags (2): ${generatedName}, Minor Healing Potion. Purse: 0c.`,
+    );
+  });
   it('works through the /inv and /inventory aliases', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Aleph');

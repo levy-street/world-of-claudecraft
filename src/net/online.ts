@@ -3418,8 +3418,8 @@ export class ClientWorld implements IWorld {
   // never predicted. The server re-validates ownership/eligibility/throttle in
   // the sim resolvers and answers with the personal disenchantResult/
   // enchantResult/salvageResult event plus the denc/ench/salv self-delta.
-  disenchantItem(itemId: string): void {
-    this.cmd({ cmd: 'disenchant_item', item: itemId });
+  disenchantItem(itemId: string, instanceUid?: string): void {
+    this.cmd({ cmd: 'disenchant_item', item: itemId, uid: instanceUid });
   }
   // `slot` rides only when the target is a WORN piece (the in-place arm); a
   // bagged target sends a message byte-identical to the pre-feature form. The
@@ -3434,23 +3434,31 @@ export class ClientWorld implements IWorld {
     enchantId: string,
     slot?: EquipSlot,
     confirmReplace?: boolean,
+    instanceUid?: string,
   ): void {
     if (confirmReplace === true) {
-      this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot, confirm: true });
+      this.cmd({
+        cmd: 'apply_enchant',
+        item: itemId,
+        enchant: enchantId,
+        slot,
+        confirm: true,
+        uid: instanceUid,
+      });
     } else {
-      this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot });
+      this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot, uid: instanceUid });
     }
   }
-  salvageItem(itemId: string): void {
-    this.cmd({ cmd: 'salvage_item', item: itemId });
+  salvageItem(itemId: string, instanceUid?: string): void {
+    this.cmd({ cmd: 'salvage_item', item: itemId, uid: instanceUid });
   }
   // Maker's Bond unbind service (Professions 2.0): command only,
   // never predicted. The server re-validates eligibility/bound-ness/station
   // range/fee in src/sim/professions/commission.ts and answers with the
   // personal unbindResult event; the cleared payload mirrors back via the
   // self inv delta.
-  unbindItem(itemId: string): void {
-    this.cmd({ cmd: 'unbind_item', item: itemId });
+  unbindItem(itemId: string, instanceUid?: string): void {
+    this.cmd({ cmd: 'unbind_item', item: itemId, uid: instanceUid });
   }
   sellItem(itemId: string, count?: number, instanceUid?: string): void {
     this.cmd({ cmd: 'sell', item: itemId, count, uid: instanceUid });

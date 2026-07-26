@@ -156,20 +156,31 @@ function executeCommand(
       return;
     case 'apply_silence':
       if (target && !target.dead) {
+        const requested =
+          command.magnitude === undefined
+            ? durationSeconds(command)
+            : Math.max(0.05, command.magnitude / 1000);
+        const duration = ctx.diminishedCrowdControlDuration(actor, target, 'lockout', requested);
+        if (duration === null) return;
         const aura = commandAura(command, name, 'silence', 1);
-        if (command.magnitude !== undefined) {
-          aura.remaining = Math.max(0.05, command.magnitude / 1000);
-          aura.duration = aura.remaining;
-        }
+        aura.remaining = duration;
+        aura.duration = duration;
         ctx.applyAura(target, aura);
       }
       return;
     case 'area_damage': {
       const center = target?.pos ?? actor.pos;
-      for (const victim of capped(
-        ctx.hostilesInRadius(actor, center, command.radius ?? 5).filter((entry) => entry.hp > 0),
-        command.maxTargets,
-      )) {
+      const victims = ctx
+        .hostilesInRadius(actor, center, command.radius ?? 5)
+        .filter((entry) => entry.hp > 0 && ctx.hasLineOfSight(actor, entry))
+        .sort((a, b) => {
+          if (a.id === target?.id) return b.id === target.id ? 0 : -1;
+          if (b.id === target?.id) return 1;
+          const aDist = (a.pos.x - center.x) ** 2 + (a.pos.z - center.z) ** 2;
+          const bDist = (b.pos.x - center.x) ** 2 + (b.pos.z - center.z) ** 2;
+          return aDist - bDist || a.id - b.id;
+        });
+      for (const victim of capped(victims, command.maxTargets)) {
         ctx.dealDamage(
           actor,
           victim,
@@ -182,7 +193,7 @@ function executeCommand(
           undefined,
           false,
           false,
-          false,
+          true,
           command.sourcePowerId,
           true,
           command.procDepth,
@@ -192,10 +203,22 @@ function executeCommand(
     }
     case 'area_heal': {
       const center = target?.pos ?? actor.pos;
-      for (const ally of capped(
-        ctx.friendliesInRadius(actor, center, command.radius ?? 5),
-        command.maxTargets,
-      )) {
+      const allies = ctx
+        .friendliesInRadius(actor, center, command.radius ?? 5)
+        .filter(
+          (ally) =>
+            !ally.dead && ally.hp > 0 && ally.hp < ally.maxHp && ctx.hasLineOfSight(actor, ally),
+        )
+        .sort((a, b) => {
+          if (a.id === target?.id) return b.id === target.id ? 0 : -1;
+          if (b.id === target?.id) return 1;
+          const healthOrder = a.hp / a.maxHp - b.hp / b.maxHp;
+          if (healthOrder !== 0) return healthOrder;
+          const aDist = (a.pos.x - center.x) ** 2 + (a.pos.z - center.z) ** 2;
+          const bDist = (b.pos.x - center.x) ** 2 + (b.pos.z - center.z) ** 2;
+          return aDist - bDist || a.id - b.id;
+        });
+      for (const ally of capped(allies, command.maxTargets)) {
         ctx.applyHeal(
           actor,
           ally,
@@ -213,7 +236,14 @@ function executeCommand(
       if (!target) return;
       const victims = ctx
         .hostilesInRadius(actor, target.pos, command.radius ?? 8)
-        .filter((victim) => victim.id !== target.id && victim.hp > 0);
+        .filter(
+          (victim) => victim.id !== target.id && victim.hp > 0 && ctx.hasLineOfSight(actor, victim),
+        )
+        .sort((a, b) => {
+          const aDist = (a.pos.x - target.pos.x) ** 2 + (a.pos.z - target.pos.z) ** 2;
+          const bDist = (b.pos.x - target.pos.x) ** 2 + (b.pos.z - target.pos.z) ** 2;
+          return aDist - bDist || a.id - b.id;
+        });
       for (const victim of capped(victims, command.maxTargets)) {
         ctx.dealDamage(
           actor,
@@ -255,6 +285,7 @@ function executeCommand(
           equipmentAllyHeal: {
             amount: scaledAmount(actor, event, command),
             maxTargets: command.maxTargets,
+            primaryTargetId: target?.id,
             powerId: command.sourcePowerId,
             procDepth: command.procDepth,
           },
@@ -303,6 +334,10 @@ function executeCommand(
 export class EquipmentEffectsController {
   private readonly runtime: EquipmentEffectRuntime;
   private readonly active = new Map<number, ActiveEquipmentPower | null>();
+  // Damage fans out once per victim, but Bell cadence is per damaging cast.
+  // One player cannot complete the same ability twice in one sim tick, so this
+  // authoritative tick+ability key collapses AoE victims without client input.
+  private readonly lastSpellDamageCast = new Map<number, { tick: number; abilityId: string }>();
 
   constructor(random: () => number) {
     this.runtime = new EquipmentEffectRuntime(PROCEDURAL_LEGENDARY_POWERS, random);
@@ -318,6 +353,7 @@ export class EquipmentEffectsController {
 
   clearActor(actorId: number, remove = false): void {
     this.runtime.clearActor(actorId);
+    this.lastSpellDamageCast.delete(actorId);
     if (remove) this.active.delete(actorId);
   }
 
@@ -325,6 +361,12 @@ export class EquipmentEffectsController {
     if (actor.kind !== 'player' || actor.dead) return;
     const meta = ctx.players.get(actor.id);
     if (!meta) return;
+    if (event.kind === 'spell_damage') {
+      const abilityId = event.abilityId ?? '';
+      const previous = this.lastSpellDamageCast.get(actor.id);
+      if (previous?.tick === ctx.tickCount && previous.abilityId === abilityId) return;
+      this.lastSpellDamageCast.set(actor.id, { tick: ctx.tickCount, abilityId });
+    }
     const active = this.active.get(actor.id) ?? null;
     const evaluation = this.runtime.evaluate(active, {
       ...event,

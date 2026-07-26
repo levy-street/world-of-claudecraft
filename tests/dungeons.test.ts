@@ -1144,6 +1144,8 @@ describe('dungeons: heroic marks', () => {
       count: 1,
     }));
 
+    // Both players must actually contribute to the boss; proximity alone is not reward eligibility.
+    (sim as any).dealDamage(me, morthen, 1, false, 'physical', null, 'hit');
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     expect(morthen.dead).toBe(true);
@@ -1520,6 +1522,33 @@ describe('dungeons: heroic daily lockouts', () => {
     expect(parkedMeta.heroicDaily.marked.has('hollow_crypt')).toBe(false);
   });
 
+  it('locks a nearby AFK player without Marks or a Forge receipt', () => {
+    const sim = makeSim(5);
+    const leader = sim.addPlayer('warrior', 'Lead');
+    const parked = sim.addPlayer('mage', 'NearbyParked');
+    sim.partyInvite(parked, leader);
+    sim.partyAccept(parked);
+    sim.setDungeonDifficulty('heroic', leader);
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    enterDungeon(sim.ctx, 'hollow_crypt', parked);
+    const inst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
+    const morthen = mobInInstance(sim, inst, 'morthen');
+    const leaderEntity = sim.entities.get(leader) as AnyEntity;
+    const parkedEntity = sim.entities.get(parked) as AnyEntity;
+    teleport(sim, leaderEntity, morthen.pos.x + 1, morthen.pos.z);
+    teleport(sim, parkedEntity, morthen.pos.x - 1, morthen.pos.z);
+
+    (sim as any).dealDamage(leaderEntity, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
+
+    const parkedMeta = sim.players.get(parked)!;
+    expect(morthen.lootRecipientIds).toContain(parked);
+    expect(morthen.bossDamagers.has(parked)).toBe(false);
+    expect(parkedMeta.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, parked)).toBe(0);
+    expect(mailedMarksTo(sim, parked)).toBe(0);
+    expect(parkedMeta.heroicDaily.marked.has('hollow_crypt')).toBe(false);
+  });
+
   it("uses a released participant's corpse position for loot and Heroic Mark eligibility", () => {
     const sim = makeSim(5);
     const leader = sim.addPlayer('warrior', 'Lead');
@@ -1543,6 +1572,7 @@ describe('dungeons: heroic daily lockouts', () => {
     expect(sim.instanceSlotAt(me.pos)).toBeNull();
     expect(me.corpseInstanceId).toBe(inst.exitId);
 
+    morthen.bossDamagers.add(member);
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     expect(new Set(morthen.lootRecipientIds)).toEqual(new Set([leader, member]));
@@ -1955,6 +1985,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
     raiders.forEach((pid, i) => {
       teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
+      boss.bossDamagers.add(pid);
     });
 
     (sim as any).dealDamage(
@@ -1993,6 +2024,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
     raiders.forEach((pid, i) => {
       teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
+      boss.bossDamagers.add(pid);
     });
 
     (sim as any).dealDamage(
@@ -2013,6 +2045,43 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(false);
     }
   });
+
+  it.each(['normal', 'heroic'] as const)(
+    'locks a nearby nonparticipant without %s Nythraxis income or Forge authorization',
+    (difficulty) => {
+      const { sim, raiders, inst } = raidSetup(difficulty);
+      const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
+      const parked = raiders.at(-1)!;
+      raiders.forEach((pid, index) => {
+        teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + index, boss.pos.z - 4);
+        if (pid !== parked) boss.bossDamagers.add(pid);
+      });
+
+      (sim as any).dealDamage(
+        sim.entities.get(raiders[0]),
+        boss,
+        boss.hp + 100,
+        false,
+        'physical',
+        null,
+        'hit',
+      );
+
+      const parkedMeta = sim.players.get(parked)!;
+      expect(boss.lootRecipientIds).toContain(parked);
+      expect(boss.bossDamagers.has(parked)).toBe(false);
+      expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, parked)).toBe(0);
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, parked)).toBe(0);
+      expect(mailedItemTo(sim, parked, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(0);
+      expect(mailedItemTo(sim, parked, HEROIC_MARK_ITEM_ID)).toBe(0);
+      expect(parkedMeta.heroicDaily.marked.has('nythraxis_boss_arena')).toBe(false);
+      expect(
+        parkedMeta.raidLockouts.has(
+          difficulty === 'heroic' ? 'nythraxis_boss_arena:heroic' : 'nythraxis_boss_arena',
+        ),
+      ).toBe(true);
+    },
+  );
 
   it('locks an owning-roster camper but never turns membership alone into raid income', () => {
     const { sim, tank, raiders, inst } = raidSetup('heroic');

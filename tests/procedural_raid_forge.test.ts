@@ -23,8 +23,13 @@ import { resolveProceduralItemIcon } from '../src/ui/procedural_item_art';
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
-function setup(cls: PlayerClass = 'warrior') {
-  const sim = new Sim({ seed: 70_031, playerClass: cls, noPlayer: true }) as AnySim;
+function setup(cls: PlayerClass = 'warrior', proceduralLootSecret = '') {
+  const sim = new Sim({
+    seed: 70_031,
+    playerClass: cls,
+    noPlayer: true,
+    proceduralLootSecret,
+  }) as AnySim;
   const pid = sim.addPlayer(cls, `Forge${cls}`);
   const p = sim.entities.get(pid) as AnyEntity;
   const quartermaster = NPCS.heroic_quartermaster.pos;
@@ -122,6 +127,32 @@ describe('Nythraxis forge offer authority', () => {
       slots[1].instance?.procedural?.affixes,
     );
     expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(0);
+  });
+
+  it('keys live Forge outcomes with the private server secret, not predictable public state', () => {
+    const secretA = '000102030405060708090a0b0c0d0e0f';
+    const secretB = 'f0e0d0c0b0a090807060504030201000';
+    const first = setup('warrior', secretA);
+    const replay = setup('warrior', secretA);
+    const rotated = setup('warrior', secretB);
+
+    for (const fixture of [first, replay, rotated]) {
+      addCurrency(fixture.sim, fixture.pid, 20, 0);
+      forgeNythraxisReward(fixture.sim.ctx, 'normal:iron_broadsword', fixture.pid);
+    }
+
+    const firstProcedural = proceduralSlots(first.sim, first.pid, 'iron_broadsword')[0].instance!
+      .procedural!;
+    const replayProcedural = proceduralSlots(replay.sim, replay.pid, 'iron_broadsword')[0].instance!
+      .procedural!;
+    const rotatedProcedural = proceduralSlots(rotated.sim, rotated.pid, 'iron_broadsword')[0]
+      .instance!.procedural!;
+
+    // Same public world seed, player id, offer and monotonic UID in every arm.
+    expect(replayProcedural).toEqual(firstProcedural);
+    expect(rotatedProcedural.uid).toBe(firstProcedural.uid);
+    // Rotating only the server secret must make the private roll unpredictable.
+    expect(rotatedProcedural.seed).not.toBe(firstProcedural.seed);
   });
 
   it('resolves every one of the 34 raid bases at both procedural tiers', () => {
@@ -346,6 +377,41 @@ describe('Nythraxis forge offer authority', () => {
 });
 
 describe('exact-copy Nythraxis Legendary tuning', () => {
+  it('keys tuning candidates and replacement identity with the private server secret', () => {
+    const first = setup('paladin');
+    const rotated = setup('paladin');
+    const forgeCost = NYTHRAXIS_FORGE_COSTS.raidForgedSignature;
+    for (const fixture of [first, rotated]) {
+      unlockHeroic(fixture.sim, fixture.pid);
+      addCurrency(fixture.sim, fixture.pid, forgeCost.fragments, forgeCost.heroicMarks);
+      forgeNythraxisReward(
+        fixture.sim.ctx,
+        'signature:dawnward_signet:gravecaller_ring',
+        fixture.pid,
+      );
+    }
+    const firstUid = proceduralSlots(first.sim, first.pid, 'gravecaller_ring')[0].instance!
+      .procedural!.uid;
+    const rotatedUid = proceduralSlots(rotated.sim, rotated.pid, 'gravecaller_ring')[0].instance!
+      .procedural!.uid;
+    expect(rotatedUid).toBe(firstUid);
+
+    first.sim.ctx.cfg.proceduralLootSecret = '000102030405060708090a0b0c0d0e0f';
+    rotated.sim.ctx.cfg.proceduralLootSecret = 'f0e0d0c0b0a090807060504030201000';
+    const tuneCost = NYTHRAXIS_FORGE_COSTS.legendaryPowerTune;
+    for (const fixture of [first, rotated]) {
+      addCurrency(fixture.sim, fixture.pid, tuneCost.fragments, tuneCost.heroicMarks);
+      tuneNythraxisLegendary(fixture.sim.ctx, firstUid, fixture.pid);
+    }
+
+    const firstAfter = proceduralSlots(first.sim, first.pid, 'gravecaller_ring')[0].instance!
+      .procedural!;
+    const rotatedAfter = proceduralSlots(rotated.sim, rotated.pid, 'gravecaller_ring')[0].instance!
+      .procedural!;
+    expect(rotatedAfter.uid).toBe(firstAfter.uid);
+    expect(rotatedAfter.seed).not.toBe(firstAfter.seed);
+  });
+
   it('mints a new UID, never lowers power, and preserves every locked identity field', () => {
     const { sim, pid, meta } = setup('paladin');
     unlockHeroic(sim, pid);

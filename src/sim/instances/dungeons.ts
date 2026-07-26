@@ -821,12 +821,14 @@ export function awardHeroicMarks(
     const alreadyLocked = isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId));
     if (!alreadyLocked && credited) {
       let paid = false;
-      if (presentIds.has(meta.entityId)) {
-        ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
-        paid = true;
-      } else if (inst.enteredBy.has(meta.entityId) && participantIds.has(meta.entityId)) {
-        ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant);
-        paid = true;
+      if (participantIds.has(meta.entityId)) {
+        if (presentIds.has(meta.entityId)) {
+          ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
+          paid = true;
+        } else if (inst.enteredBy.has(meta.entityId)) {
+          ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant);
+          paid = true;
+        }
       }
       // The Book of Deeds daily circuit observes successful rewards, but it is
       // telemetry only: the realm-reset lockout above remains the income gate.

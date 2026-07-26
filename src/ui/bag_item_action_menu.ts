@@ -23,12 +23,13 @@
 
 import { ENCHANTS } from '../sim/content/enchants';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, ItemDef, ItemSlot } from '../sim/types';
+import type { EquipSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   type BagItemContextActionId,
   bagItemContextActions,
   destroyConsumesSpecialCopy,
+  isSpecialCopy,
 } from './bag_item_context_menu';
 import { disenchantYieldLines } from './disenchant_yield_view';
 import {
@@ -42,6 +43,7 @@ import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { t } from './i18n';
 import { itemNumber, itemStatName } from './item_instance_tooltip';
+import { itemPresentationName } from './procedural_item_presentation';
 
 /** Modifier class the picker states set on the shared #ctx-menu element: the
  *  Apply Enchant pickers size differently from every other menu in the family
@@ -99,7 +101,14 @@ export class BagItemActionMenu {
   /** Open the action menu for a bag stack. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row is
    *  byte-identical to a plain click. */
-  open(def: ItemDef, itemId: string, x: number, y: number, runDefault: () => void): void {
+  open(
+    def: ItemDef,
+    itemId: string,
+    x: number,
+    y: number,
+    runDefault: () => void,
+    instance?: ItemInstancePayload,
+  ): void {
     const rows = bagItemContextActions(def, itemId).map((action) => ({
       act: action.id,
       html: esc(t(action.labelKey)),
@@ -107,8 +116,8 @@ export class BagItemActionMenu {
     this.paint(rows, x, y, (act) => {
       const id = act as BagItemContextActionId;
       if (id === 'default') runDefault();
-      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId);
-      else if (id === 'salvage') this.confirmDestroy('salvage', itemId);
+      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, instance);
+      else if (id === 'salvage') this.confirmDestroy('salvage', itemId, instance);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
     });
   }
@@ -116,12 +125,19 @@ export class BagItemActionMenu {
   // Disenchant / Salvage: both route through the one confirm-dialog family, with
   // the stronger warning body when the copy that would actually be consumed is
   // special (signed / masterwork / enchanted). The OK label reuses the menu verb.
-  private confirmDestroy(action: 'disenchant' | 'salvage', itemId: string): void {
+  private confirmDestroy(
+    action: 'disenchant' | 'salvage',
+    itemId: string,
+    instance?: ItemInstancePayload,
+  ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
-    const name = def ? itemDisplayName(def) : itemId;
+    const name = def ? itemPresentationName({ name: itemDisplayName(def) }, instance) : itemId;
     const copies = world.inventory.filter((slot) => slot.itemId === itemId);
-    const special = destroyConsumesSpecialCopy(action, copies);
+    const instanceUid = instance?.procedural?.uid;
+    const special = instanceUid
+      ? isSpecialCopy(instance)
+      : destroyConsumesSpecialCopy(action, copies);
     const c =
       action === 'disenchant'
         ? {
@@ -142,7 +158,7 @@ export class BagItemActionMenu {
     // yield functions, via the pure view core), so an irreversible action is
     // not a blind trade. Salvage keeps its existing body: its generic yield is
     // a separate system (professions/salvage.ts).
-    const yieldLines = action === 'disenchant' ? disenchantYieldLines(def) : [];
+    const yieldLines = action === 'disenchant' ? disenchantYieldLines(def, instance) : [];
     const body = [t(c.body, { item: name }), ...yieldLines].join('\n');
     this.deps.confirmDialog(
       t(c.title, { item: name }),
@@ -150,8 +166,8 @@ export class BagItemActionMenu {
       t(c.ok),
       t('hud.chat.context.cancel'),
       () => {
-        if (action === 'disenchant') world.disenchantItem(itemId);
-        else world.salvageItem(itemId);
+        if (action === 'disenchant') world.disenchantItem(itemId, instanceUid);
+        else world.salvageItem(itemId, instanceUid);
         this.deps.afterAction();
       },
     );
@@ -255,10 +271,11 @@ export class BagItemActionMenu {
     enchantId: string,
     replace: EnchantReplaceTargetInfo,
     slot?: EquipSlot,
+    instance?: ItemInstancePayload,
   ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
-    const name = def ? itemDisplayName(def) : itemId;
+    const name = def ? itemPresentationName({ name: itemDisplayName(def) }, instance) : itemId;
     const oldText = this.replacedEnchantText(replace);
     const newText = t(enchantNameKey(enchantId));
     const costText = (ENCHANTS[enchantId]?.reagents ?? [])
@@ -283,7 +300,7 @@ export class BagItemActionMenu {
       t('hudChrome.enchanting.replaceConfirmAccept'),
       t('hud.chat.context.cancel'),
       () => {
-        world.applyEnchant(itemId, enchantId, slot, true);
+        world.applyEnchant(itemId, enchantId, slot, true, instance?.procedural?.uid);
         this.deps.afterAction();
       },
     );
@@ -323,9 +340,9 @@ export class BagItemActionMenu {
       );
       return;
     }
-    const nameOf = (itemId: string): string => {
+    const nameOf = (itemId: string, instance?: ItemInstancePayload): string => {
       const def = ITEMS[itemId];
-      return esc(def ? itemDisplayName(def) : itemId);
+      return esc(def ? itemPresentationName({ name: itemDisplayName(def) }, instance) : itemId);
     };
     const replaceMeta = (replace: EnchantReplaceTargetInfo): string =>
       `<span class="ctx-item-meta">${esc(
@@ -335,7 +352,7 @@ export class BagItemActionMenu {
       )}</span>`;
     const rows = [
       ...worn.map((target) => {
-        const html = `${nameOf(target.itemId)}<span class="ctx-item-meta">${esc(
+        const html = `${nameOf(target.itemId, target.instance)}<span class="ctx-item-meta">${esc(
           t('hudChrome.enchanting.wornTag', { slot: this.deps.slotName(target.slot) }),
         )}</span>${target.replace ? replaceMeta(target.replace) : ''}`;
         return target.replace?.sameEnchant
@@ -343,11 +360,16 @@ export class BagItemActionMenu {
           : { act: `worn:${target.slot}`, html };
       }),
       ...targets.map((target) => {
-        if (!target.replace) return { act: `target:${target.itemId}`, html: nameOf(target.itemId) };
-        const html = `${nameOf(target.itemId)}${replaceMeta(target.replace)}`;
+        const selector = target.instanceUid
+          ? `@${encodeURIComponent(target.instanceUid)}`
+          : target.itemId;
+        if (!target.replace) {
+          return { act: `target:${selector}`, html: nameOf(target.itemId, target.instance) };
+        }
+        const html = `${nameOf(target.itemId, target.instance)}${replaceMeta(target.replace)}`;
         return target.replace.sameEnchant
           ? { html, disabled: true }
-          : { act: `replace:${target.itemId}`, html };
+          : { act: `replace:${selector}`, html };
       }),
     ];
     this.paint(
@@ -362,19 +384,39 @@ export class BagItemActionMenu {
           const slot = act.slice('worn:'.length) as EquipSlot;
           const target = worn.find((row) => row.slot === slot);
           if (target?.replace) {
-            this.confirmReplace(target.itemId, enchantId, target.replace, slot);
+            this.confirmReplace(target.itemId, enchantId, target.replace, slot, target.instance);
             return;
           }
-          if (target) world.applyEnchant(target.itemId, enchantId, slot);
+          if (target) {
+            world.applyEnchant(target.itemId, enchantId, slot, undefined, target.instanceUid);
+          }
         } else if (act.startsWith('replace:')) {
-          const itemId = act.slice('replace:'.length);
-          const target = targets.find((row) => row.itemId === itemId && row.replace);
+          const selector = act.slice('replace:'.length);
+          const target = selector.startsWith('@')
+            ? targets.find(
+                (row) => row.replace && row.instanceUid === decodeURIComponent(selector.slice(1)),
+              )
+            : targets.find((row) => row.replace && row.itemId === selector);
           if (target?.replace) {
-            this.confirmReplace(itemId, enchantId, target.replace);
+            this.confirmReplace(
+              target.itemId,
+              enchantId,
+              target.replace,
+              undefined,
+              target.instance,
+            );
             return;
           }
         } else {
-          world.applyEnchant(act.slice('target:'.length), enchantId);
+          const selector = act.slice('target:'.length);
+          const target = selector.startsWith('@')
+            ? targets.find(
+                (row) => !row.replace && row.instanceUid === decodeURIComponent(selector.slice(1)),
+              )
+            : targets.find((row) => !row.replace && row.itemId === selector);
+          if (target) {
+            world.applyEnchant(target.itemId, enchantId, undefined, undefined, target.instanceUid);
+          }
         }
         this.deps.afterAction();
       },

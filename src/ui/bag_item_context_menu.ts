@@ -8,10 +8,10 @@
 // paints the rows and dispatches; this mirrors the player_context_menu.ts
 // family shape (state in, action list out) beside the bags_view.ts pure core.
 //
-// Eligibility is DEF-based (isDisenchantable / isSalvageable / an enchant
-// reagent id), matching the sim's own itemId-keyed command resolution: the
-// commands consume a PREFERRED copy (never the exact clicked slot), so the
-// menu reasons about the item, not one stack.
+// Action eligibility is definition-based (isDisenchantable / isSalvageable /
+// an enchant reagent id). Destructive dispatch also carries the clicked
+// generated copy's server-issued UID, so the sim re-resolves and consumes that
+// exact unique item; legacy fungible copies retain the established preference.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
@@ -94,13 +94,17 @@ export interface BagCopy {
   instance?: ItemInstancePayload;
 }
 
-/** Whether destroying this specific copy loses something irreplaceable: it was
- *  signed/crafted, is a masterwork proc, or is enchanted (isEnchantedInstance:
- *  the explicit marker or a legacy bare rolled.stats without masterwork). A
- *  plain fungible copy is never special. */
+/** Whether destroying this specific copy loses something irreplaceable: every
+ *  procedurally generated copy is unique, and signed, masterwork, or enchanted
+ *  legacy copies are special too. A plain fungible copy is never special. */
 export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolean {
   if (!instance) return false;
-  return !!instance.signer || !!instance.rolled?.masterwork || isEnchantedInstance(instance);
+  return (
+    instance.procedural !== undefined ||
+    !!instance.signer ||
+    !!instance.rolled?.masterwork ||
+    isEnchantedInstance(instance)
+  );
 }
 
 /** Whether the copy the destructive action WOULD consume is special, so the

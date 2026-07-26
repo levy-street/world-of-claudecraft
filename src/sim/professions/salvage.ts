@@ -16,12 +16,17 @@
 
 import { bagCapacity, canAddItem, consumeOneScratch } from '../bags';
 import { ITEMS } from '../data';
-import { requiredLevelFor } from '../item_level_req';
 import { removePreferFungible } from '../items';
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import type { ItemDef } from '../types';
 import { recordAction, withinActionThrottle } from './action_throttle';
+import {
+  consumeInventoryUnitAt,
+  exactInventoryIndex,
+  professionItemLevel,
+  professionItemQuality,
+} from './item_instance';
 
 const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'poor',
@@ -46,14 +51,14 @@ export const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
   legendary: 'spider_leg',
 };
 
-/** Eligible for salvage: an equippable weapon or armor piece, at least
- *  `common` quality (a `poor`/undefined-quality piece has nothing worth
- *  reclaiming). Ineligible items (consumables, quest items, poor-quality
- *  junk, unknown ids) are never salvageable. */
+/** Eligible for salvage: an equippable weapon, armor, or held off-hand piece,
+ *  at least `common` quality (a `poor`/undefined-quality piece has nothing
+ *  worth reclaiming). Consumables, quest items, junk, and unknown ids remain
+ *  ineligible. */
 export function isSalvageable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
-    (def.kind === 'weapon' || def.kind === 'armor') &&
+    (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
     def.quality !== 'poor'
   );
@@ -62,9 +67,9 @@ export function isSalvageable(def: ItemDef | undefined): boolean {
 /** The rarity/tier-scaled base yield the rng bonus rides on: the shared term
  *  of salvageYield and maxSalvageYield, so the #2350 capacity gate's worst
  *  case can never drift from the rolled grant. */
-function baseSalvageYield(def: ItemDef): number {
-  const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
-  const tierBonus = Math.floor(requiredLevelFor(def) / 10);
+function baseSalvageYield(def: ItemDef, instance?: import('../types').ItemInstancePayload): number {
+  const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(professionItemQuality(def, instance)));
+  const tierBonus = Math.floor(professionItemLevel(def, instance) / 10);
   return qualityIdx + tierBonus + 1;
 }
 
@@ -76,16 +81,23 @@ function baseSalvageYield(def: ItemDef): number {
  * uses Rng"), so identical salvages of the same item are not perfectly
  * deterministic. Pure aside from the rng draw.
  */
-export function salvageYield(def: ItemDef, rng: Rng): number {
+export function salvageYield(
+  def: ItemDef,
+  rng: Rng,
+  instance?: import('../types').ItemInstancePayload,
+): number {
   const bonus = rng.next() < 0.5 ? 0 : 1;
-  return baseSalvageYield(def) + bonus;
+  return baseSalvageYield(def, instance) + bonus;
 }
 
 /** The largest yield salvageYield can roll (the +1 bonus arm): the count the
  *  #2350 capacity gate pre-fits, so a denial never draws rng and a granted
  *  roll can never exceed what was checked. */
-export function maxSalvageYield(def: ItemDef): number {
-  return baseSalvageYield(def) + 1;
+export function maxSalvageYield(
+  def: ItemDef,
+  instance?: import('../types').ItemInstancePayload,
+): number {
+  return baseSalvageYield(def, instance) + 1;
 }
 
 export interface SalvageResult {
@@ -97,47 +109,61 @@ export interface SalvageResult {
 }
 
 /**
- * Resolve one salvage attempt: denies (no side effect) if the item id is
- * unknown, ineligible, or the player does not hold a copy. On success
- * consumes exactly one copy of the item and grants the rolled material yield.
+ * Resolve one salvage attempt. A supplied server-issued UID is re-resolved
+ * against live inventory, and that exact copy's rarity and level determine
+ * the yield; stale or forged selectors deny without side effects. Legacy
+ * callers without a UID retain the established fungible-first behavior.
  */
-export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): SalvageResult {
+export function resolveSalvage(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  instanceUid?: string,
+): SalvageResult {
   const def = ITEMS[itemId];
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
-  if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
   const meta = ctx.players.get(pid);
-  // Shared action throttle (action_throttle.ts): salvage draws
-  // from the same 10-per-60s budget as crafting, checked (no side effect
-  // beyond the window's own natural rollover) before anything is consumed.
+  const exactIndex =
+    instanceUid !== undefined && meta
+      ? exactInventoryIndex(meta.inventory, itemId, instanceUid)
+      : -1;
+  if (
+    (instanceUid !== undefined && exactIndex < 0) ||
+    (instanceUid === undefined && ctx.countItem(itemId, pid) < 1)
+  ) {
+    return { ok: false, itemId, reason: 'not_held' };
+  }
+  const victim = exactIndex >= 0 ? meta?.inventory[exactIndex]?.instance : undefined;
   if (meta && !withinActionThrottle(meta, ctx.time)) {
     return { ok: false, itemId, reason: 'throttled' };
   }
-  const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
-  // #2350 capacity gate: the materials must fit AFTER the salvaged copy
-  // leaves, so consume it on a scratch copy (consumeOneScratch mirrors
-  // removePreferFungible's victim order) and pre-fit the WORST-CASE yield
-  // (the +1 rng bonus arm): the denial draws nothing, and a granted roll can
-  // never exceed what was checked. Denies with no side effect, like every
-  // other arm above.
+  const quality = professionItemQuality(def, victim);
+  const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[quality] ?? 'bone_fragments';
   if (meta) {
-    const scratch = meta.inventory.map((s) => ({ ...s }));
-    consumeOneScratch(scratch, itemId);
-    if (!canAddItem(scratch, bagCapacity(meta.bags), materialItemId, maxSalvageYield(def))) {
+    const scratch = meta.inventory.map((slot) => ({ ...slot }));
+    if (instanceUid !== undefined) {
+      const scratchIndex = exactInventoryIndex(scratch, itemId, instanceUid);
+      consumeInventoryUnitAt(scratch, scratchIndex);
+    } else {
+      consumeOneScratch(scratch, itemId);
+    }
+    if (
+      !canAddItem(scratch, bagCapacity(meta.bags), materialItemId, maxSalvageYield(def, victim))
+    ) {
       return { ok: false, itemId, reason: 'no_bag_space' };
     }
   }
-  removePreferFungible(ctx, itemId, 1, pid);
-  const count = salvageYield(def, ctx.rng);
-  // silent: the salvageResult event fires its own dedicated cue
-  // (audio.salvage in src/game/audio.ts); the generic loot ding would
-  // otherwise stack on top of it for every salvage.
+  if (instanceUid !== undefined && meta) {
+    consumeInventoryUnitAt(meta.inventory, exactIndex);
+    ctx.onInventoryChangedForQuests(meta);
+  } else {
+    removePreferFungible(ctx, itemId, 1, pid);
+  }
+  const count = salvageYield(def, ctx.rng, victim);
   ctx.addItem(materialItemId, count, pid, { silent: true });
   if (meta) {
     recordAction(meta);
-    // The lifetime salvage counter (soc_first_salvage /
-    // soc_salvage_50). Bumped strictly AFTER the single salvageYield rng
-    // draw above; the bump itself draws nothing.
     ctx.bumpDeedStat(meta, 'salvagesPerformed', 1);
   }
   return { ok: true, itemId, materialItemId, count };
@@ -147,8 +173,13 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
  *  craftItem's shape exactly: resolves the caller's own player entity via
  *  ctx.resolve, then delegates to resolveSalvage. Runs on the deterministic
  *  tick the command arrives on, never off-tick. */
-export function salvageItem(ctx: SimContext, itemId: string, pid?: number): SalvageResult {
+export function salvageItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  instanceUid?: string,
+): SalvageResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, reason: 'unknown_item' };
-  return resolveSalvage(ctx, r.meta.entityId, itemId);
+  return resolveSalvage(ctx, r.meta.entityId, itemId, instanceUid);
 }

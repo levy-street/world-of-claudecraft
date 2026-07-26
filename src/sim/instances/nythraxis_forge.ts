@@ -18,7 +18,7 @@ import {
 import { ITEMS } from '../data';
 import { canEquipItem } from '../equipment_rules';
 import { generateProceduralItem } from '../loot/procedural/generate';
-import { hash32Parts } from '../loot/procedural/item_seed';
+import { deriveSecretSeed32, hash32Parts } from '../loot/procedural/item_seed';
 import { sanitizeItemInstancePayload } from '../procedural_item_validation';
 import { assertProceduralUidAvailable } from '../procedural_persistence';
 import type { PlayerMeta } from '../sim';
@@ -56,6 +56,14 @@ interface ExactBaggedProceduralItem {
 }
 
 const NYTHRAXIS_SIGNATURES = new Set(proceduralBossLegendarySignatures(NYTHRAXIS_RAID_BOSS_ID));
+
+function nythraxisPrivateSeed(ctx: SimContext, ...parts: (number | string)[]): number {
+  // The live server supplies a private 128-bit key. Offline tools and parity
+  // fixtures intentionally retain the historic public hash when no key exists.
+  return ctx.cfg.proceduralLootSecret
+    ? deriveSecretSeed32(ctx.cfg.proceduralLootSecret, parts)
+    : hash32Parts(...parts);
+}
 
 function proceduralOffer(
   kind: Extract<NythraxisForgeOfferKind, 'normal_procedural_epic' | 'heroic_procedural_epic'>,
@@ -206,7 +214,7 @@ function generatedForgePayload(
   const legendary = offer.kind === 'raid_forged_signature';
   return {
     ...generateProceduralItem({
-      seed: hash32Parts('nythraxis-forge-v1', ctx.cfg.seed, offerId, uid),
+      seed: nythraxisPrivateSeed(ctx, 'nythraxis-forge-v1', ctx.cfg.seed, offerId, uid),
       uid,
       context: forgedContext(meta, offerId, offer.heroic, uid),
       basePoolId: 'nythraxis_raid',
@@ -299,7 +307,14 @@ function tunedLegendaryRolls(
   const candidateRolls = ['a', 'b'].map(
     (candidate) =>
       generateProceduralItem({
-        seed: hash32Parts('nythraxis-tune-v1', ctx.cfg.seed, procedural.uid, newUid, candidate),
+        seed: nythraxisPrivateSeed(
+          ctx,
+          'nythraxis-tune-v1',
+          ctx.cfg.seed,
+          procedural.uid,
+          newUid,
+          candidate,
+        ),
         uid: newUid,
         context: procedural.dropContext!,
         basePoolId: 'nythraxis_raid',
@@ -360,7 +375,13 @@ export function tuneNythraxisLegendary(ctx: SimContext, instanceUid: string, pid
   replacement.procedural = {
     ...procedural,
     uid: newUid,
-    seed: hash32Parts('nythraxis-tune-result-v1', ctx.cfg.seed, procedural.uid, newUid),
+    seed: nythraxisPrivateSeed(
+      ctx,
+      'nythraxis-tune-result-v1',
+      ctx.cfg.seed,
+      procedural.uid,
+      newUid,
+    ),
     legendaryRolls: tunedLegendaryRolls(ctx, meta, selected, newUid),
     reforgeCount: Math.min(99, (procedural.reforgeCount ?? 0) + 1),
   };

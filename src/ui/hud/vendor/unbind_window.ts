@@ -17,18 +17,21 @@ import { esc } from '../../esc';
 import { formatMoney, formatNumber, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
+import { itemPresentationName, itemPresentationQuality } from '../../procedural_item_presentation';
 import { qualityGlowShadow } from '../../quality_glow';
 import { svgIcon } from '../../ui_icons';
 import type { UnbindRow, UnbindView } from './unbind_view';
 
 export interface UnbindWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
-  onUnbind(itemId: string, feeCopper: number): void;
+  onUnbind(itemId: string, feeCopper: number, instanceUid?: string): void;
   onClose(): void;
 }
 
 function rowName(row: UnbindRow): string {
-  return row.item ? itemDisplayName(row.item) : row.itemId;
+  return row.item
+    ? itemPresentationName({ name: itemDisplayName(row.item) }, row.instance)
+    : row.itemId;
 }
 
 /** Paint the unbind panel from a prepared view. */
@@ -71,13 +74,17 @@ export function renderUnbindWindow(
       row.boundCount > 1 ? ` x${formatNumber(row.boundCount, { maximumFractionDigits: 0 })}` : '';
     // Quality-glow socket and fee treatment: the train_window idiom (gold
     // action chip when affordable, plain error-tint price when not).
-    const glow = row.item?.quality ? qualityGlowShadow(QUALITY_COLOR[row.item.quality]) : '';
+    const quality = row.item ? itemPresentationQuality(row.item, row.instance) : undefined;
+    const glow = quality ? qualityGlowShadow(QUALITY_COLOR[quality]) : '';
     const iconHtml = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item) : ''}</span>`;
     const feeHtml = row.affordable
       ? `<span class="vi-price-chip">${esc(fee)}</span>`
       : `<span class="vi-price unaffordable">${esc(fee)}</span>`;
     button.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}${esc(countSuffix)}<span class="vi-sub">${esc(t('hudChrome.unbind.rowSub'))}</span></span>${feeHtml}`;
-    button.addEventListener('click', () => deps.onUnbind(row.itemId, row.feeCopper));
+    button.addEventListener('click', () => {
+      if (row.instanceUid) deps.onUnbind(row.itemId, row.feeCopper, row.instanceUid);
+      else deps.onUnbind(row.itemId, row.feeCopper);
+    });
     if (row.item) {
       const item = row.item;
       deps.attachTooltip(button, () => deps.itemTooltip(item, row.instance));

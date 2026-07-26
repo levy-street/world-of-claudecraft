@@ -158,6 +158,56 @@ describe('ws auth character load lease', () => {
     expect(releaseSpy).not.toHaveBeenCalled();
   });
 
+  it('joins from the authoritative post-acquire character row, never the ownership pre-read', async () => {
+    const { deps, joinSpy } = makeDeps();
+    const stale = {
+      id: 7,
+      name: 'Vaultkeeper',
+      class: 'warrior',
+      state: { level: 7, copper: 10 },
+      hotbar_layout: { slots: [{ slot: 0, action: 'attack' }] },
+      is_gm: false,
+      force_rename: false,
+    };
+    const durable = {
+      ...stale,
+      state: { level: 7, copper: 99 },
+      hotbar_layout: { slots: [{ slot: 0, action: 'charge' }] },
+    };
+    deps.getCharacter.mockResolvedValueOnce(stale).mockResolvedValueOnce(durable);
+    const { ws } = fakeWs();
+
+    await createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq());
+
+    expect(deps.getCharacter).toHaveBeenCalledTimes(2);
+    expect(joinSpy.mock.calls[0][5]).toEqual(durable.state);
+    expect((joinSpy.mock.calls[0][7] as any).hotbarLayout).toEqual(durable.hotbar_layout);
+  });
+
+  it('releases the acquired nonce when the post-acquire character reload fails', async () => {
+    const { deps, acquireSpy, releaseSpy, joinSpy } = makeDeps();
+    // Preserve the ownership pre-read, then reject only the authoritative reload.
+    deps.getCharacter.mockReset();
+    deps.getCharacter.mockResolvedValueOnce({
+      id: 7,
+      name: 'Vaultkeeper',
+      class: 'warrior',
+      state: null,
+      is_gm: false,
+      force_rename: false,
+    });
+    deps.getCharacter.mockRejectedValueOnce(new Error('reload failed'));
+    const { ws } = fakeWs();
+
+    await expect(
+      createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq()),
+    ).rejects.toThrow('reload failed');
+
+    const nonce = acquireSpy.mock.calls[0][2];
+    expect(releaseSpy).toHaveBeenCalledWith(7, nonce);
+    expect(joinSpy).not.toHaveBeenCalled();
+  });
+
   it('awaits a nonce-fenced release when join refuses and no session owns it', async () => {
     const { deps, acquireSpy, releaseSpy } = makeDeps({
       joinResult: { error: 'too many characters on this account are already in the world' },

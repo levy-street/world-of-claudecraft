@@ -244,6 +244,7 @@ describe('legendary equipment integration', () => {
 
     for (let i = 0; i < 2; i++) {
       sim.ctx.dealDamage(sim.player, victims[0], 10, false, 'arcane', 'Arcane Test', 'hit');
+      sim.tick();
     }
 
     const totalDamage = victims.reduce((sum, victim) => sum + (victim.maxHp - victim.hp), 0);
@@ -251,6 +252,162 @@ describe('legendary equipment integration', () => {
     expect(victims.map((victim) => victim.maxHp - victim.hp)).toEqual([23, 3, 3, 3]);
   });
 
+  it('counts one Bell cadence step per direct spell, not per AoE victim or DoT tick', () => {
+    const sim = makeSim('mage');
+    equipPower(sim, 'bell_of_the_ninth_peal', 'mainhand', 'ashwood_staff');
+    const victims = Array.from({ length: 8 }, (_, index) => hostile(sim, 2 + index * 0.25));
+
+    for (const victim of victims) {
+      sim.ctx.dealDamage(sim.player, victim, 10, false, 'arcane', 'Arcane Barrage', 'hit');
+    }
+    expect(
+      sim
+        .drainEvents()
+        .filter((event) => event.type === 'damage' && event.ability === 'Bell of the Ninth Peal'),
+    ).toHaveLength(0);
+
+    sim.tick();
+    sim.ctx.dealDamage(
+      sim.player,
+      victims[0],
+      10,
+      false,
+      'arcane',
+      'Periodic Test',
+      'hit',
+      false,
+      undefined,
+      false,
+    );
+    sim.tick();
+    sim.ctx.dealDamage(sim.player, victims[0], 10, false, 'arcane', 'Arcane Test', 'hit');
+    expect(
+      sim
+        .drainEvents()
+        .filter((event) => event.type === 'damage' && event.ability === 'Bell of the Ninth Peal'),
+    ).toHaveLength(5);
+  });
+
+  it('does not apply source output multipliers twice to Bell replay damage', () => {
+    const sim = makeSim('mage');
+    equipPower(sim, 'bell_of_the_ninth_peal', 'mainhand', 'ashwood_staff');
+    const primary = hostile(sim, 2);
+    const secondary = hostile(sim, 3);
+    sim.player.auras.push({
+      id: 'test_damage_done',
+      name: 'Test Damage Done',
+      kind: 'buff_dmg_done',
+      value: 1,
+      remaining: 60,
+      duration: 60,
+      sourceId: sim.player.id,
+      school: 'arcane',
+    });
+
+    sim.ctx.dealDamage(sim.player, primary, 100, false, 'arcane', 'Arcane Test', 'hit');
+    sim.tick();
+    sim.ctx.dealDamage(sim.player, primary, 100, false, 'arcane', 'Arcane Test', 'hit');
+
+    // The second 200 effective hit produces a 25% Bell replay (=50). Reapplying
+    // the +100% source aura would incorrectly make the secondary take 100.
+    expect(secondary.maxHp - secondary.hp).toBe(50);
+  });
+
+  it('requires LoS and prioritizes the primary target before the Bell target cap', () => {
+    const sim = makeSim('mage');
+    equipPower(sim, 'bell_of_the_ninth_peal', 'mainhand', 'ashwood_staff');
+    const victims = Array.from({ length: 7 }, (_, index) => hostile(sim, 2 + index * 0.2));
+    const primary = victims[6];
+    const blocked = victims[0];
+    vi.spyOn(sim.ctx, 'hasLineOfSight').mockImplementation(
+      (_source, target) => target.id !== blocked.id,
+    );
+
+    sim.ctx.dealDamage(sim.player, primary, 20, false, 'arcane', 'Arcane Test', 'hit');
+    sim.tick();
+    sim.ctx.dealDamage(sim.player, primary, 20, false, 'arcane', 'Arcane Test', 'hit');
+
+    const bellVictims = sim
+      .drainEvents()
+      .flatMap((event) =>
+        event.type === 'damage' && event.ability === 'Bell of the Ninth Peal'
+          ? [event.targetId]
+          : [],
+      );
+    expect(bellVictims).toHaveLength(5);
+    expect(bellVictims).toContain(primary.id);
+    expect(bellVictims).not.toContain(blocked.id);
+  });
+
+  it('routes Hushwood silence through lockout DR and respects immunity', () => {
+    const sim = makeSim('hunter');
+    equipPower(sim, 'hushwood_longbow');
+    const target = hostile(sim, 2);
+    const dr = vi.spyOn(sim.ctx, 'diminishedCrowdControlDuration').mockReturnValue(null);
+    vi.spyOn(sim.rng, 'next').mockReturnValue(0);
+
+    sim.ctx.triggerEquipmentEffects(sim.player, {
+      kind: 'ability_hit',
+      abilityId: 'aimed_shot',
+      targetId: target.id,
+    });
+
+    expect(dr).toHaveBeenCalledWith(sim.player, target, 'lockout', expect.any(Number));
+    expect(target.auras.some((a) => a.kind === 'silence')).toBe(false);
+  });
+
+  it('scopes Ashbinder vulnerability to Shadow damage', () => {
+    const sim = makeSim('warlock');
+    equipPower(sim, 'ashbinders_seal');
+    const target = hostile(sim, 2);
+    for (let i = 0; i < 4; i++) onCastCompleted(sim.ctx, sim.player, 'shadow_bolt', target);
+
+    const damageFor = (school: 'shadow' | 'fire' | 'physical') => {
+      target.hp = target.maxHp;
+      sim.ctx.dealDamage(sim.player, target, 100, false, school, 'School Probe', 'hit');
+      return target.maxHp - target.hp;
+    };
+    expect(damageFor('shadow')).toBe(115);
+    expect(damageFor('fire')).toBe(100);
+    expect(damageFor('physical')).toBe(100);
+  });
+
+  it('fills Ysolei healing slots with injured allies and prioritizes the trigger target', () => {
+    const sim = makeSim('priest');
+    equipPower(sim, 'ysoleis_vigil');
+    const full: Entity[] = [];
+    const injured: Entity[] = [];
+    for (let index = 0; index < 6; index++) {
+      const pid = sim.addPlayer('warrior', `Full${index}`);
+      const ally = sim.entities.get(pid)!;
+      ally.pos = { ...sim.player.pos, x: sim.player.pos.x + 1 + index * 0.1 };
+      ally.prevPos = { ...ally.pos };
+      sim.rebucket(ally);
+      full.push(ally);
+    }
+    for (let index = 0; index < 6; index++) {
+      const pid = sim.addPlayer('warrior', `Injured${index}`);
+      const ally = sim.entities.get(pid)!;
+      ally.pos = { ...sim.player.pos, x: sim.player.pos.x + 2 + index * 0.1 };
+      ally.prevPos = { ...ally.pos };
+      ally.hp = Math.max(1, ally.maxHp - 100 - index);
+      sim.rebucket(ally);
+      injured.push(ally);
+    }
+    const before = new Map(injured.map((ally) => [ally.id, ally.hp]));
+
+    sim.ctx.triggerEquipmentEffects(sim.player, {
+      kind: 'heal',
+      targetId: injured[5].id,
+      critical: true,
+      amount: 100,
+    });
+    for (let tick = 0; tick < 21; tick++) sim.tick();
+
+    expect(full.every((ally) => ally.hp === ally.maxHp)).toBe(true);
+    expect(injured[5].hp).toBeGreaterThan(before.get(injured[5].id)!);
+    expect(injured.filter((ally) => ally.hp > before.get(ally.id)!).length).toBe(5);
+  });
   it('routes real health crossing and accumulated movement events into defensive buffs', () => {
     const mantle = makeSim('mage');
     equipPower(mantle, 'mantle_of_borrowed_time');

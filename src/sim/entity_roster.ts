@@ -55,6 +55,7 @@ export type GroundAoE = {
   equipmentAllyHeal?: {
     amount: number;
     maxTargets?: number;
+    primaryTargetId?: number;
     powerId: string;
     procDepth: number;
   };

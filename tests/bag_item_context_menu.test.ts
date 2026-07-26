@@ -41,9 +41,13 @@ describe('bag_item_context_menu: enchant reagent detection', () => {
 });
 
 describe('bag_item_context_menu: action eligibility', () => {
-  it('offers Disenchant AND Salvage on a common+ weapon or armor', () => {
+  it('offers Disenchant AND Salvage on common+ weapons, armor, and held off-hands', () => {
     expect(bagItemNewActions(def('weapon', 'common'), 'sword')).toEqual(['disenchant', 'salvage']);
     expect(bagItemNewActions(def('armor', 'rare'), 'plate')).toEqual(['disenchant', 'salvage']);
+    expect(bagItemNewActions(def('held_offhand', 'common'), 'focus')).toEqual([
+      'disenchant',
+      'salvage',
+    ]);
   });
   it('offers nothing on a poor-quality or non-gear item', () => {
     expect(bagItemNewActions(def('weapon', 'poor'), 'stick')).toEqual([]);
@@ -74,6 +78,7 @@ describe('bag_item_context_menu: special-copy classification', () => {
     expect(isSpecialCopy({ signer: 'Alice' } as ItemInstancePayload)).toBe(true);
     expect(isSpecialCopy({ rolled: { masterwork: true } } as ItemInstancePayload)).toBe(true);
     expect(isSpecialCopy({ enchant: 'enchant_weapon_might' } as ItemInstancePayload)).toBe(true);
+    expect(isSpecialCopy({ procedural: {} } as ItemInstancePayload)).toBe(true);
     // Legacy enchanted marker: bare rolled.stats without masterwork.
     expect(isSpecialCopy({ rolled: { stats: { str: 5 } } } as ItemInstancePayload)).toBe(true);
     // A legacy rolled.quality-only copy is NOT special (never signed/mw/enchanted).

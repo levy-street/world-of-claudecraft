@@ -2809,12 +2809,14 @@ export async function saveCharacterState(
           JSON.stringify(cleanState),
         ])
       : query(
-          `UPDATE characters SET level = $2, state = $3, updated_at = now()
+          `WITH held_lease AS MATERIALIZED (
+             SELECT character_id FROM character_leases
+              WHERE character_id = $1 AND holder = $4 AND nonce = $5
+              FOR UPDATE
+           )
+           UPDATE characters SET level = $2, state = $3, updated_at = now()
             WHERE id = $1
-              AND EXISTS (
-                SELECT 1 FROM character_leases
-                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
-              )`,
+              AND EXISTS (SELECT 1 FROM held_lease)`,
           [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
         ),
   );
@@ -2834,8 +2836,8 @@ export async function saveCharacterAndMarketState(
   characterId: number,
   level: number,
   state: CharacterState,
-  market: MarketSave,
-  mail: MailSave,
+  market: MarketSave | null,
+  mail: MailSave | null,
   leaseNonce?: string,
   peer?:
     | {
@@ -2854,7 +2856,7 @@ export async function saveCharacterAndMarketState(
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
   // has confirmed the marker and opened the gate. Checked before any pool work.
-  assertMarketWriteGateOpen();
+  if (market !== null) assertMarketWriteGateOpen();
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const peers = peer === undefined ? [] : Array.isArray(peer) ? [...peer] : [peer];
   const cleanPeers = peers.map((candidate) => ({
@@ -2868,6 +2870,9 @@ export async function saveCharacterAndMarketState(
     }
     characterIds.add(candidate.characterId);
   }
+  const candidates = [{ characterId, level, state: cleanState, leaseNonce }, ...cleanPeers].sort(
+    (a, b) => a.characterId - b.characterId,
+  );
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -2876,6 +2881,39 @@ export async function saveCharacterAndMarketState(
     // raise this transaction to the heavy allowance; still bounded so shutdown
     // cannot hang past the container stop grace. SET LOCAL reverts at COMMIT.
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
+    // Acquire every supplied lease row in stable character-id order and keep
+    // those locks through COMMIT. Without this, a same-account takeover could
+    // rotate a nonce after an UPDATE sampled it but before the remaining
+    // character/world writes became durable.
+    const fenced = candidates.filter(
+      (candidate): candidate is typeof candidate & { leaseNonce: string } =>
+        candidate.leaseNonce !== undefined,
+    );
+    if (fenced.length > 0) {
+      const locked = await client.query(
+        `SELECT character_id, holder, nonce
+           FROM character_leases
+          WHERE character_id = ANY($1::int[])
+          ORDER BY character_id
+          FOR UPDATE`,
+        [fenced.map((candidate) => candidate.characterId)],
+      );
+      const held = new Map(
+        locked.rows.map((row) => [
+          Number(row.character_id),
+          { holder: String(row.holder), nonce: String(row.nonce) },
+        ]),
+      );
+      if (
+        fenced.some((candidate) => {
+          const lease = held.get(candidate.characterId);
+          return lease?.holder !== PROCESS_LEASE_HOLDER || lease.nonce !== candidate.leaseNonce;
+        })
+      ) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+    }
     // Fence the bag half on the current lease holder+nonce when one is given (same
     // in-statement fence as saveCharacterState). If a same-account takeover rotated
     // the nonce out from under this displaced session, the character UPDATE matches
@@ -2928,19 +2966,21 @@ export async function saveCharacterAndMarketState(
         return false;
       }
     }
-    await client.query(
-      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-      // Same realm-scoped key loadMarketState/saveMarketState use: the leave
-      // flush must land where the market is read back, or the escrowed listing
-      // is written to a key nothing loads and the item is stranded on next boot.
-      [marketStateKey(REALM), JSON.stringify(market)],
-    );
-    await client.query(
-      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-      [mailStateKey(REALM), JSON.stringify(mail)],
-    );
+    if (market !== null) {
+      await client.query(
+        `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+        // Same realm-scoped key loadMarketState/saveMarketState use.
+        [marketStateKey(REALM), JSON.stringify(market)],
+      );
+    }
+    if (mail !== null) {
+      await client.query(
+        `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+        [mailStateKey(REALM), JSON.stringify(mail)],
+      );
+    }
     await client.query('COMMIT');
     return true;
   } catch (err) {

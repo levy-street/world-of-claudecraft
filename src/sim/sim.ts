@@ -5221,7 +5221,20 @@ export class Sim {
     });
     if (effect.equipmentAllyHeal) {
       const heal = effect.equipmentAllyHeal;
-      const allies = this.friendliesInRadius(source, effect.pos, effect.radius);
+      const allies = this.friendliesInRadius(source, effect.pos, effect.radius)
+        .filter(
+          (ally) =>
+            !ally.dead && ally.hp > 0 && ally.hp < ally.maxHp && this.hasLineOfSight(source, ally),
+        )
+        .sort((a, b) => {
+          if (a.id === heal.primaryTargetId) return b.id === heal.primaryTargetId ? 0 : -1;
+          if (b.id === heal.primaryTargetId) return 1;
+          const healthOrder = a.hp / a.maxHp - b.hp / b.maxHp;
+          if (healthOrder !== 0) return healthOrder;
+          const aDist = (a.pos.x - effect.pos.x) ** 2 + (a.pos.z - effect.pos.z) ** 2;
+          const bDist = (b.pos.x - effect.pos.x) ** 2 + (b.pos.z - effect.pos.z) ** 2;
+          return aDist - bDist || a.id - b.id;
+        });
       const targets =
         heal.maxTargets === undefined ? allies : allies.slice(0, Math.max(0, heal.maxTargets));
       for (const ally of targets) {
@@ -7040,7 +7053,7 @@ export class Sim {
     }
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
     // the static def quality for the quality-first marks.
-    deedsMod.markItemDiscovered(this.ctx, meta, itemId, grantedInstance.rolled?.quality);
+    deedsMod.markItemDiscovered(this.ctx, meta, itemId, grantedInstance);
     this.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -7385,9 +7398,11 @@ export class Sim {
   // single-surface doctrine: no ctx.error toast, or the deny would print
   // twice); the payload change itself converges through the self inventory
   // mirror in both hosts.
-  unbindItem(itemId: string, pid?: number): void {
-    const result = unbindItemImpl(this.ctx, itemId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
+  unbindItem(itemId: string, instanceUidOrPid?: string | number, pid?: number): void {
+    const instanceUid = typeof instanceUidOrPid === 'string' ? instanceUidOrPid : undefined;
+    const resolvedPid = typeof instanceUidOrPid === 'number' ? instanceUidOrPid : pid;
+    const result = unbindItemImpl(this.ctx, itemId, resolvedPid, instanceUid);
+    const meta = this.players.get(resolvedPid ?? this.primaryId);
     this.emit({
       type: 'unbindResult',
       ok: result.ok,
@@ -7433,9 +7448,11 @@ export class Sim {
   // src/sim/professions/salvage.ts, resolved on the deterministic tick the
   // command arrives on, same shape as craftItem above. Stashes the outcome
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
-  salvageItem(itemId: string, pid?: number): void {
-    const result = salvageItemImpl(this.ctx, itemId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
+  salvageItem(itemId: string, instanceUidOrPid?: string | number, pid?: number): void {
+    const instanceUid = typeof instanceUidOrPid === 'string' ? instanceUidOrPid : undefined;
+    const resolvedPid = typeof instanceUidOrPid === 'number' ? instanceUidOrPid : pid;
+    const result = salvageItemImpl(this.ctx, itemId, resolvedPid, instanceUid);
+    const meta = this.players.get(resolvedPid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
     // Emit the pid-scoped, text-free outcome, same immediacy arm as
     // craftItem's craftResult: the online client mirrors it into lastSalvageResult
@@ -7466,9 +7483,11 @@ export class Sim {
 
   // Enchanting profession commands (IWorldProfessions): same thin-
   // delegate/stash-result/emit shape as salvageItem/craftItem above.
-  disenchantItem(itemId: string, pid?: number): void {
-    const result = disenchantItemImpl(this.ctx, itemId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
+  disenchantItem(itemId: string, instanceUidOrPid?: string | number, pid?: number): void {
+    const instanceUid = typeof instanceUidOrPid === 'string' ? instanceUidOrPid : undefined;
+    const resolvedPid = typeof instanceUidOrPid === 'number' ? instanceUidOrPid : pid;
+    const result = disenchantItemImpl(this.ctx, itemId, resolvedPid, instanceUid);
+    const meta = this.players.get(resolvedPid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
     this.emit({
       type: 'disenchantResult',
@@ -7502,10 +7521,21 @@ export class Sim {
     enchantId: string,
     slot?: EquipSlot,
     confirmReplace?: boolean,
+    instanceUidOrPid?: string | number,
     pid?: number,
   ): void {
-    const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
-    const meta = this.players.get(pid ?? this.primaryId);
+    const instanceUid = typeof instanceUidOrPid === 'string' ? instanceUidOrPid : undefined;
+    const resolvedPid = typeof instanceUidOrPid === 'number' ? instanceUidOrPid : pid;
+    const result = applyEnchantImpl(
+      this.ctx,
+      itemId,
+      enchantId,
+      resolvedPid,
+      slot,
+      confirmReplace,
+      instanceUid,
+    );
+    const meta = this.players.get(resolvedPid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
     this.emit({
       type: 'enchantResult',

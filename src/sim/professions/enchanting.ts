@@ -59,7 +59,6 @@ import { bagCapacity, consumeOneScratch, countFit, fitsAll, removeStacked } from
 import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { requiredLevelFor } from '../item_level_req';
 import type { Rng } from '../rng';
 // Type-only import (the crafting.ts/commission.ts idiom): PlayerMeta is a
 // shape, never the Sim class, so this module stays host-agnostic.
@@ -75,6 +74,12 @@ import {
 import { recordAction, withinActionThrottle } from './action_throttle';
 import { enchantingGainMultiplier } from './archetype';
 import { typedSecondaryFor } from './disenchant_reagents';
+import {
+  consumeInventoryUnitAt,
+  exactInventoryIndex,
+  professionItemLevel,
+  professionItemQuality,
+} from './item_instance';
 import { gainCraftSkill } from './wheel';
 
 // #1712 round-3 review: neither action previously called gainCraftSkill, so
@@ -191,11 +196,11 @@ export function consumeEnchantedVictim(
 }
 
 /** Eligible for disenchant: same eligibility as plain salvage (an equippable
- *  weapon or armor piece, at least `common` quality). */
+ *  weapon, armor, or held off-hand piece, at least `common` quality). */
 export function isDisenchantable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
-    (def.kind === 'weapon' || def.kind === 'armor') &&
+    (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
     def.quality !== 'poor'
   );
@@ -206,9 +211,9 @@ export function isDisenchantable(def: ItemDef | undefined): boolean {
  *  worst case can never drift from the rolled grant. Exported so the UI's
  *  disenchant-confirm yield preview (src/ui/disenchant_yield_view.ts) reads the
  *  LOW end of the sub-rare range from this same term instead of restating it. */
-export function baseDisenchantYield(def: ItemDef): number {
-  const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
-  const tierBonus = Math.floor(requiredLevelFor(def) / 10);
+export function baseDisenchantYield(def: ItemDef, instance?: ItemInstancePayload): number {
+  const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(professionItemQuality(def, instance)));
+  const tierBonus = Math.floor(professionItemLevel(def, instance) / 10);
   return qualityIdx + tierBonus + 1;
 }
 
@@ -217,16 +222,16 @@ export function baseDisenchantYield(def: ItemDef): number {
  *  bonus unit, but the material itself is the dedicated, more valuable
  *  Enchanting tier (see DISENCHANT_MATERIAL_BY_QUALITY), not a generic junk
  *  item. Pure aside from the rng draw. */
-export function disenchantYield(def: ItemDef, rng: Rng): number {
+export function disenchantYield(def: ItemDef, rng: Rng, instance?: ItemInstancePayload): number {
   const bonus = rng.next() < 0.5 ? 0 : 1;
-  return baseDisenchantYield(def) + bonus;
+  return baseDisenchantYield(def, instance) + bonus;
 }
 
 /** The largest yield disenchantYield can roll (the +1 bonus arm): the count
  *  the #2350 capacity gate pre-fits on the sub-rare arm, so a denial never
  *  draws rng and a granted roll can never exceed what was checked. */
-export function maxDisenchantYield(def: ItemDef): number {
-  return baseDisenchantYield(def) + 1;
+export function maxDisenchantYield(def: ItemDef, instance?: ItemInstancePayload): number {
+  return baseDisenchantYield(def, instance) + 1;
 }
 
 /** The gain tier of one enchant for the apply arm: EnchantDef carries no
@@ -288,48 +293,51 @@ export interface DisenchantResult {
   reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
 }
 
-/** Resolve one disenchant attempt: denies (no side effect) if the item id is
- *  unknown, ineligible, or the player holds no copy of it at all. Consumes
- *  exactly one held copy on success, preferring the least special first: a
- *  plain fungible copy, then an instanced copy that has NOT itself been
- *  enchanted (e.g. crafting.ts's single-copy rare+ craft grant; see
- *  removeEnchantableItem), and only when every held copy is already enchanted
- *  one of those, destroying the piece enchant and all (issue #2340: the
- *  enchanted-copy exclusion protects apply-enchant from silently overwriting
- *  an enchant, but disenchant destroys the item anyway, so gating on it here
- *  only denied a held item with a wrong "not held" message). Grants the
- *  rolled arcane material yield. */
-export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string): DisenchantResult {
+/** Resolve one disenchant attempt. A supplied server-issued UID is re-resolved
+ *  against live inventory, and that exact copy's rarity and level determine
+ *  the rewards; stale or forged selectors deny without side effects. Legacy
+ *  callers without a UID keep the established least-special-first removal.
+ *  The selected piece and any enchant on it are destroyed, then the
+ *  authoritative rarity-scaled materials are granted. */
+export function resolveDisenchant(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  instanceUid?: string,
+): DisenchantResult {
   const def = ITEMS[itemId];
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isDisenchantable(def)) return { ok: false, itemId, reason: 'not_disenchantable' };
-  if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
   const meta = ctx.players.get(pid);
-  // Shared action throttle (action_throttle.ts): disenchant draws
-  // from the same 10-per-60s budget as crafting, checked (no side effect
-  // beyond the window's own natural rollover) before anything is consumed.
+  const exactIndex =
+    instanceUid !== undefined && meta
+      ? exactInventoryIndex(meta.inventory, itemId, instanceUid)
+      : -1;
+  if (
+    (instanceUid !== undefined && exactIndex < 0) ||
+    (instanceUid === undefined && ctx.countItem(itemId, pid) < 1)
+  ) {
+    return { ok: false, itemId, reason: 'not_held' };
+  }
+  const victim = exactIndex >= 0 ? meta?.inventory[exactIndex]?.instance : undefined;
   if (meta && !withinActionThrottle(meta, ctx.time)) {
     return { ok: false, itemId, reason: 'throttled' };
   }
-  // The yield plan (pure def lookups, no rng): hoisted above the capacity
-  // gate so the gate can model the exact grants the success path mints below.
-  const quality = def.quality ?? 'common';
+  const quality = professionItemQuality(def, victim);
   const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[quality] ?? 'arcane_dust';
   const isRarePlus = quality === 'rare' || quality === 'epic' || quality === 'legendary';
-  const secondaryItemId = typedSecondaryFor(def);
-  // #2350 capacity gate: the materials must fit AFTER the disenchanted copy
-  // leaves, so consume it on a scratch copy (consumeOneScratch with the
-  // isEnchantedInstance exclusion mirrors the countEnchantableItem-split
-  // victim order below) and pre-fit the WORST-CASE grants: the +1 rng bonus
-  // arm on the sub-rare yield, and two secondaries on an epic/legendary
-  // piece. The denial draws nothing and has no side effect, like every other
-  // arm above; a granted roll can never exceed what was checked.
+  const secondaryItemId = typedSecondaryFor(def, quality);
   if (meta) {
-    const scratch = meta.inventory.map((s) => ({ ...s }));
-    consumeOneScratch(scratch, itemId, isEnchantedInstance);
+    const scratch = meta.inventory.map((slot) => ({ ...slot }));
+    if (instanceUid !== undefined) {
+      const scratchIndex = exactInventoryIndex(scratch, itemId, instanceUid);
+      consumeInventoryUnitAt(scratch, scratchIndex);
+    } else {
+      consumeOneScratch(scratch, itemId, isEnchantedInstance);
+    }
     const adds: InvSlot[] = isRarePlus
       ? [{ itemId: materialItemId, count: 1 }]
-      : [{ itemId: materialItemId, count: maxDisenchantYield(def) }];
+      : [{ itemId: materialItemId, count: maxDisenchantYield(def, victim) }];
     if (isRarePlus && secondaryItemId) {
       adds.push({
         itemId: secondaryItemId,
@@ -341,24 +349,14 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
       return { ok: false, itemId, reason: 'no_bag_space' };
     }
   }
-  // Preference order unchanged from before: plain fungible first, then an
-  // unenchanted instanced copy (removeEnchantableItem). The fallback arm is
-  // the #2340 fix: with only enchanted copies left, take the highest-index
-  // one (removeItem order; the UI confirm predicate in
-  // src/ui/bag_item_context_menu.ts mirrors this victim choice).
-  if (ctx.countEnchantableItem(itemId, pid) >= 1) ctx.removeEnchantableItem(itemId, 1, pid);
-  else ctx.removeItem(itemId, 1, pid);
-  // Yield model: sub-rare (common/uncommon) stays byte-identical to
-  // today, a single rng draw (disenchantYield's +0/+1 bonus) over a rolled
-  // count of the universal ladder material, and NO secondary. Rare+ shifts to a
-  // FIXED single primary plus a typed, bind-on-trade secondary
-  // (disenchant_reagents.ts typedSecondaryFor): rare grants exactly one
-  // secondary with NO rng draw; epic/legendary grants one or two via ONE draw
-  // (the existing next() < 0.5 ? bonus idiom). The secondary rides
-  // ctx.addItemInstance with a { bindOnTrade: true } payload so a disenchant
-  // windfall cannot be freely resold; the universal primary stays a plain
-  // ctx.addItem (dust/essence/shard never bind). A rare+ piece with no typed
-  // material (jewelry: no armor class) yields only the primary and draws no rng.
+  if (instanceUid !== undefined && meta) {
+    consumeInventoryUnitAt(meta.inventory, exactIndex);
+    ctx.onInventoryChangedForQuests(meta);
+  } else if (ctx.countEnchantableItem(itemId, pid) >= 1) {
+    ctx.removeEnchantableItem(itemId, 1, pid);
+  } else {
+    ctx.removeItem(itemId, 1, pid);
+  }
   let count: number;
   let secondaryCount: number | undefined;
   if (isRarePlus) {
@@ -367,18 +365,14 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
       secondaryCount = quality === 'rare' ? 1 : ctx.rng.next() < 0.5 ? 1 : 2;
     }
   } else {
-    count = disenchantYield(def, ctx.rng);
+    count = disenchantYield(def, ctx.rng, victim);
   }
-  // silent on both grants below: the disenchantResult event fires its own
-  // dedicated cue (audio.disenchant in src/game/audio.ts); the generic loot
-  // ding would otherwise stack on top of it for every disenchant.
   ctx.addItem(materialItemId, count, pid, { silent: true });
   if (secondaryItemId && secondaryCount) {
     for (let i = 0; i < secondaryCount; i++) {
       ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid, 1, { silent: true });
     }
   }
-  // Quality-tiered gain: the disenchanted item's def quality is the input tier.
   if (meta) grantEnchantingSkill(ctx, meta, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
   const result: DisenchantResult = { ok: true, itemId, materialItemId, count };
   if (secondaryItemId && secondaryCount) {
@@ -392,10 +386,15 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
  *  exactly: resolves the caller's own player entity via ctx.resolve, then
  *  delegates to resolveDisenchant. Runs on the deterministic tick the
  *  command arrives on, never off-tick. */
-export function disenchantItem(ctx: SimContext, itemId: string, pid?: number): DisenchantResult {
+export function disenchantItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  instanceUid?: string,
+): DisenchantResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, reason: 'unknown_item' };
-  return resolveDisenchant(ctx, r.meta.entityId, itemId);
+  return resolveDisenchant(ctx, r.meta.entityId, itemId, instanceUid);
 }
 
 export interface ApplyEnchantResult {
@@ -534,6 +533,7 @@ function resolveApplyEnchantWorn(
   enchant: EnchantDef,
   slot: EquipSlot,
   confirmReplace?: boolean,
+  instanceUid?: string,
 ): ApplyEnchantResult {
   const enchantId = enchant.id;
   const r = ctx.resolve(pid);
@@ -554,6 +554,9 @@ function resolveApplyEnchantWorn(
   // the plain arm; the slot discriminator means the player named this exact
   // copy, so the flag never has to pick a victim here.
   const worn = meta.equipmentInstance?.[slot];
+  if (instanceUid !== undefined && worn?.procedural?.uid !== instanceUid) {
+    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  }
   const replacing = worn !== undefined && isEnchantedInstance(worn);
   if (replacing) {
     // Strict boolean-true, the same house rule the dispatch and the bagged
@@ -633,6 +636,7 @@ function resolveReplaceEnchantBagged(
   pid: number,
   itemId: string,
   enchant: EnchantDef,
+  instanceUid?: string,
 ): ApplyEnchantResult {
   const enchantId = enchant.id;
   // ctx.resolve, NOT ctx.players.get: this arm splices meta.inventory directly
@@ -645,11 +649,17 @@ function resolveReplaceEnchantBagged(
   // resolveApplyEnchant is exported and called with a raw pid by tests and any
   // future host.
   const meta = ctx.resolve(pid)?.meta;
-  const victimIdx = meta ? replaceVictimIndex(meta.inventory, itemId) : -1;
+  const victimIdx = meta
+    ? instanceUid !== undefined
+      ? exactInventoryIndex(meta.inventory, itemId, instanceUid)
+      : replaceVictimIndex(meta.inventory, itemId)
+    : -1;
   const victim = meta && victimIdx >= 0 ? meta.inventory[victimIdx].instance : undefined;
   // Unreachable (the caller proved an enchanted copy is held), kept as the
   // honest deny for a torn intermediate state rather than a crash.
-  if (!meta || !victim) return { ok: false, itemId, enchantId, reason: 'not_held' };
+  if (!meta || !victim || !isEnchantedInstance(victim)) {
+    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  }
   // Re-applying the identical enchant id is denied outright rather than
   // confirmed: its accept would be pure reagent loss with zero state change.
   // A legacy pre-marker victim has no id to compare, so it never denies here.
@@ -683,7 +693,11 @@ function resolveReplaceEnchantBagged(
   // the array the peek above found the victim in) and deliberately kept as the
   // safe direction: were it ever taken, the gate would model the mint without
   // modeling the removal, which under-counts free space and denies MORE.
-  const scratchVictim = consumeEnchantedVictim(scratch, itemId) ?? victim;
+  const scratchVictim =
+    instanceUid !== undefined
+      ? (consumeInventoryUnitAt(scratch, exactInventoryIndex(scratch, itemId, instanceUid)) ??
+        victim)
+      : (consumeEnchantedVictim(scratch, itemId) ?? victim);
   for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
   if (
     countFit(
@@ -696,7 +710,10 @@ function resolveReplaceEnchantBagged(
   ) {
     return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
   }
-  const consumed = consumeEnchantedVictim(meta.inventory, itemId);
+  const consumed =
+    instanceUid !== undefined
+      ? consumeInventoryUnitAt(meta.inventory, victimIdx)
+      : consumeEnchantedVictim(meta.inventory, itemId);
   // Deny rather than mint when nothing was consumed. Note what this does and
   // does NOT cover: consumeEnchantedVictim returns undefined ONLY from its
   // no-victim-found arm, which is before it touches the array, so today this
@@ -770,6 +787,7 @@ export function resolveApplyEnchant(
   enchantId: string,
   slot?: EquipSlot,
   confirmReplace?: boolean,
+  instanceUid?: string,
 ): ApplyEnchantResult {
   const itemDef = ITEMS[itemId];
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
@@ -781,31 +799,49 @@ export function resolveApplyEnchant(
   if (itemDef.slot !== enchant.itemSlot) {
     return { ok: false, itemId, enchantId, reason: 'wrong_slot' };
   }
-  if (slot) return resolveApplyEnchantWorn(ctx, pid, itemId, enchant, slot, confirmReplace);
-  // The bagged eligibility split (#2415): countItem sees every bagged copy,
-  // countEnchantableItem only the not-yet-enchanted ones, so the difference
-  // is the enchanted holding. Confirmed replace targets that holding; the
-  // no-flag deny names the real cause (already_enchanted vs not_held) instead
-  // of collapsing both into the old misleading not_held.
-  const enchantableHeld = ctx.countEnchantableItem(itemId, pid);
-  const enchantedHeld = ctx.countItem(itemId, pid) - enchantableHeld;
-  if (confirmReplace === true && enchantedHeld >= 1) {
-    return resolveReplaceEnchantBagged(ctx, pid, itemId, enchant);
+  if (slot) {
+    return resolveApplyEnchantWorn(ctx, pid, itemId, enchant, slot, confirmReplace, instanceUid);
   }
-  if (enchantableHeld < 1) {
-    return {
-      ok: false,
-      itemId,
-      enchantId,
-      reason: enchantedHeld >= 1 ? 'already_enchanted' : 'not_held',
-    };
+  // A generated target is selected by its opaque server-issued UID. The sim
+  // re-resolves that UID against live inventory and reads every payload fact
+  // from the matching slot; a stale or forged selector is a side-effect-free
+  // not_held denial. Legacy callers without a UID keep the established
+  // fungible/enchanted victim ordering.
+  const meta = ctx.players.get(pid);
+  const exactIndex =
+    instanceUid !== undefined && meta
+      ? exactInventoryIndex(meta.inventory, itemId, instanceUid)
+      : -1;
+  if (instanceUid !== undefined) {
+    if (exactIndex < 0) return { ok: false, itemId, enchantId, reason: 'not_held' };
+    const exact = meta?.inventory[exactIndex]?.instance;
+    const exactEnchanted = exact !== undefined && isEnchantedInstance(exact);
+    if (confirmReplace === true && exactEnchanted) {
+      return resolveReplaceEnchantBagged(ctx, pid, itemId, enchant, instanceUid);
+    }
+    if (exactEnchanted) {
+      return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
+    }
+  } else {
+    const enchantableHeld = ctx.countEnchantableItem(itemId, pid);
+    const enchantedHeld = ctx.countItem(itemId, pid) - enchantableHeld;
+    if (confirmReplace === true && enchantedHeld >= 1) {
+      return resolveReplaceEnchantBagged(ctx, pid, itemId, enchant);
+    }
+    if (enchantableHeld < 1) {
+      return {
+        ok: false,
+        itemId,
+        enchantId,
+        reason: enchantedHeld >= 1 ? 'already_enchanted' : 'not_held',
+      };
+    }
   }
   for (const reagent of enchant.reagents) {
     if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
       return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
     }
   }
-  const meta = ctx.players.get(pid);
   // Shared action throttle (action_throttle.ts): enchant-apply
   // draws from the same 10-per-60s budget as crafting, checked (no side
   // effect beyond the window's own natural rollover) before anything is
@@ -823,7 +859,10 @@ export function resolveApplyEnchant(
   // counts as fitting. Denies with no side effect and draws nothing.
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    const victim = consumeOneScratch(scratch, itemId, isEnchantedInstance);
+    const victim =
+      instanceUid !== undefined
+        ? consumeInventoryUnitAt(scratch, exactInventoryIndex(scratch, itemId, instanceUid))
+        : consumeOneScratch(scratch, itemId, isEnchantedInstance);
     for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
     if (
       countFit(scratch, bagCapacity(meta.bags), itemId, 1, enchantedPayloadFor(victim, enchant)) < 1
@@ -831,7 +870,11 @@ export function resolveApplyEnchant(
       return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
     }
   }
-  const [consumed] = ctx.removeEnchantableItem(itemId, 1, pid);
+  const consumed =
+    instanceUid !== undefined && meta
+      ? consumeInventoryUnitAt(meta.inventory, exactIndex)
+      : ctx.removeEnchantableItem(itemId, 1, pid)[0];
+  if (instanceUid !== undefined && meta) ctx.onInventoryChangedForQuests(meta);
   for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
   // The minted payload: the consumed copy's markers plus the enchant's
   // additive bonus and marker (enchantedPayloadFor above, shared with the
@@ -857,8 +900,17 @@ export function applyEnchant(
   pid?: number,
   slot?: EquipSlot,
   confirmReplace?: boolean,
+  instanceUid?: string,
 ): ApplyEnchantResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
-  return resolveApplyEnchant(ctx, r.meta.entityId, itemId, enchantId, slot, confirmReplace);
+  return resolveApplyEnchant(
+    ctx,
+    r.meta.entityId,
+    itemId,
+    enchantId,
+    slot,
+    confirmReplace,
+    instanceUid,
+  );
 }

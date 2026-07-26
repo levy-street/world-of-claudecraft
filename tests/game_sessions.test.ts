@@ -59,7 +59,7 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
-import { saveCharacterAndMarketState, saveCharacterState } from '../server/db';
+import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import {
   MSG_ABUSE_SECOND_DROP_FLOOR,
@@ -334,11 +334,11 @@ describe('GameServer sessions', () => {
     const slowSave = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(first, 'test');
     await vi.waitFor(() => {
-      expect(saveCharacterAndMarketState).toHaveBeenCalled();
+      expect(saveCharacterState).toHaveBeenCalled();
     });
 
     expect((server as any).sessionByCharacterId(101)).toBe(first);
@@ -368,12 +368,12 @@ describe('GameServer sessions', () => {
     const slowSave = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
-    const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
+    const savesBefore = vi.mocked(saveCharacterState).mock.calls.length;
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
-      expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(savesBefore + 1);
+      expect(saveCharacterState).toHaveBeenCalledTimes(savesBefore + 1);
     });
 
     // The counterparty must not be able to complete a non-escrowed trade after
@@ -400,12 +400,12 @@ describe('GameServer sessions', () => {
     const slowSave = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
-    const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
+    const savesBefore = vi.mocked(saveCharacterState).mock.calls.length;
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
-      expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(savesBefore + 1);
+      expect(saveCharacterState).toHaveBeenCalledTimes(savesBefore + 1);
     });
 
     server.handleMessage(leaver, JSON.stringify({ t: 'cmd', cmd: 'trade_req', id: stayer.pid }));
@@ -458,12 +458,12 @@ describe('GameServer sessions', () => {
     const slowSave = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
-    const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
+    const savesBefore = vi.mocked(saveCharacterState).mock.calls.length;
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
-      expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(savesBefore + 1);
+      expect(saveCharacterState).toHaveBeenCalledTimes(savesBefore + 1);
     });
 
     // Resolve the roll while leave() is parked on its first persistence await.
@@ -562,12 +562,12 @@ describe('GameServer sessions', () => {
     const slowSave = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
-    const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
+    const savesBefore = vi.mocked(saveCharacterState).mock.calls.length;
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
-      expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(savesBefore + 1);
+      expect(saveCharacterState).toHaveBeenCalledTimes(savesBefore + 1);
     });
 
     // A queued DoT tick from the departing player must not reacquire the tap
@@ -626,12 +626,12 @@ describe('GameServer sessions', () => {
     const slowSave = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
-    const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
+    const savesBefore = vi.mocked(saveCharacterState).mock.calls.length;
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
-      expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(savesBefore + 1);
+      expect(saveCharacterState).toHaveBeenCalledTimes(savesBefore + 1);
     });
 
     (server.sim as any).dealDamage(
@@ -659,7 +659,9 @@ describe('GameServer sessions', () => {
     expect(result).toEqual({
       bossDead: true,
       recipients: [stayer.pid],
-      stayerMarks: 1,
+      // Delegating stale kill credit preserves completion/lockout, but the idle
+      // survivor still did not damage or heal the boss and earns no AFK reward.
+      stayerMarks: 0,
       leaverMarks: 0,
       stayerLocked: true,
       leaverLocked: false,
@@ -668,8 +670,8 @@ describe('GameServer sessions', () => {
 
   it('retries failed disconnect saves before releasing the character for rejoin', async () => {
     vi.useFakeTimers();
-    vi.mocked(saveCharacterAndMarketState).mockReset();
-    vi.mocked(saveCharacterAndMarketState)
+    vi.mocked(saveCharacterState).mockReset();
+    vi.mocked(saveCharacterState)
       .mockRejectedValueOnce(new Error('temporary database outage'))
       .mockRejectedValueOnce(new Error('temporary database outage'))
       .mockResolvedValueOnce(true);
@@ -680,7 +682,7 @@ describe('GameServer sessions', () => {
       const leaving = server.leave(session, 'test');
 
       await vi.waitFor(() => {
-        expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
+        expect(saveCharacterState).toHaveBeenCalledTimes(1);
       });
       expect(server.join(fakeWs(), 12, 101, 'Indexa', 'warrior', null)).toEqual({
         error: 'character already in world',
@@ -688,13 +690,13 @@ describe('GameServer sessions', () => {
 
       await vi.runOnlyPendingTimersAsync();
       await vi.waitFor(() => {
-        expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(2);
+        expect(saveCharacterState).toHaveBeenCalledTimes(2);
       });
 
       await vi.runOnlyPendingTimersAsync();
       await leaving;
 
-      expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(3);
+      expect(saveCharacterState).toHaveBeenCalledTimes(3);
       expect((server as any).sessionByCharacterId(101)).toBeNull();
     } finally {
       vi.useRealTimers();

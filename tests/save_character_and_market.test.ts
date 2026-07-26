@@ -15,6 +15,7 @@ vi.mock('pg', () => ({
 import {
   closeMarketWriteGateForTests,
   openMarketWriteGate,
+  PROCESS_LEASE_HOLDER,
   saveCharacterAndMarketState,
 } from '../server/db';
 import { REALM } from '../server/realm';
@@ -35,6 +36,17 @@ function clientStub() {
   return { query, release };
 }
 
+function heldLeaseRows(values: unknown[] | undefined, nonces: ReadonlyMap<number, string>) {
+  const ids = (values?.[0] ?? []) as number[];
+  const rows = ids.flatMap((characterId) => {
+    const nonce = nonces.get(characterId);
+    return nonce === undefined
+      ? []
+      : [{ character_id: characterId, holder: PROCESS_LEASE_HOLDER, nonce }];
+  });
+  return { rows, rowCount: rows.length } as any;
+}
+
 const STATE = {
   level: 7,
   questLog: [],
@@ -47,11 +59,20 @@ const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
 describe('saveCharacterAndMarketState', () => {
   it('lease-fences both trade participants before either realm blob commits', async () => {
     const client = clientStub();
-    client.query.mockImplementation(async (sql: string) =>
-      /UPDATE characters/i.test(sql)
+    client.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+      if (/FROM character_leases[\s\S]*FOR UPDATE/i.test(sql)) {
+        return heldLeaseRows(
+          values,
+          new Map([
+            [42, 'nonce-a'],
+            [84, 'nonce-b'],
+          ]),
+        );
+      }
+      return /UPDATE characters/i.test(sql)
         ? ({ rows: [], rowCount: 1 } as any)
-        : ({ rows: [], rowCount: 0 } as any),
-    );
+        : ({ rows: [], rowCount: 0 } as any);
+    });
     dbMock.connect.mockResolvedValueOnce(client as any);
 
     const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-a', {
@@ -63,7 +84,10 @@ describe('saveCharacterAndMarketState', () => {
 
     expect(ok).toBe(true);
     const calls = client.query.mock.calls;
+    const lockCall = calls.find((call) => /FOR UPDATE/i.test(String(call[0])));
+    expect(lockCall?.[1]).toEqual([[42, 84]]);
     const characterCalls = calls.filter((call) => /UPDATE characters/i.test(String(call[0])));
+    expect(calls.indexOf(lockCall!)).toBeLessThan(calls.indexOf(characterCalls[0]!));
     expect(characterCalls).toHaveLength(2);
     expect(characterCalls[0]?.[1]).toEqual([
       42,
@@ -87,11 +111,21 @@ describe('saveCharacterAndMarketState', () => {
 
   it('persists a multi-recipient reward batch before either realm blob commits', async () => {
     const client = clientStub();
-    client.query.mockImplementation(async (sql: string) =>
-      /UPDATE characters/i.test(sql)
+    client.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+      if (/FROM character_leases[\s\S]*FOR UPDATE/i.test(sql)) {
+        return heldLeaseRows(
+          values,
+          new Map([
+            [42, 'nonce-a'],
+            [84, 'nonce-b'],
+            [126, 'nonce-c'],
+          ]),
+        );
+      }
+      return /UPDATE characters/i.test(sql)
         ? ({ rows: [], rowCount: 1 } as any)
-        : ({ rows: [], rowCount: 0 } as any),
-    );
+        : ({ rows: [], rowCount: 0 } as any);
+    });
     dbMock.connect.mockResolvedValueOnce(client as any);
 
     const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-a', [
@@ -121,13 +155,19 @@ describe('saveCharacterAndMarketState', () => {
 
   it('rolls back both character writes when the peer lease fence rejects', async () => {
     const client = clientStub();
-    let characterUpdate = 0;
-    client.query.mockImplementation(async (sql: string) => {
-      if (/UPDATE characters/i.test(sql)) {
-        characterUpdate++;
-        return { rows: [], rowCount: characterUpdate === 1 ? 1 : 0 } as any;
+    client.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+      if (/FROM character_leases[\s\S]*FOR UPDATE/i.test(sql)) {
+        return heldLeaseRows(
+          values,
+          new Map([
+            [42, 'nonce-a'],
+            [84, 'replacement-b'],
+          ]),
+        );
       }
-      return { rows: [], rowCount: 0 } as any;
+      return /UPDATE characters/i.test(sql)
+        ? ({ rows: [], rowCount: 1 } as any)
+        : ({ rows: [], rowCount: 0 } as any);
     });
     dbMock.connect.mockResolvedValueOnce(client as any);
 
@@ -140,7 +180,7 @@ describe('saveCharacterAndMarketState', () => {
 
     expect(ok).toBe(false);
     const sqls = client.query.mock.calls.map((call) => String(call[0]));
-    expect(sqls.filter((sql) => /UPDATE characters/i.test(sql))).toHaveLength(2);
+    expect(sqls.filter((sql) => /UPDATE characters/i.test(sql))).toHaveLength(0);
     expect(sqls.some((sql) => /world_state/i.test(sql))).toBe(false);
     expect(sqls.at(-1)).toMatch(/^ROLLBACK/);
     expect(sqls.some((sql) => /^COMMIT/.test(sql))).toBe(false);
@@ -179,6 +219,25 @@ describe('saveCharacterAndMarketState', () => {
     // 'market' row, or the escrow lands in a key nothing reads back on next boot.
     expect(worldCalls.map((c) => c[1][0])).toEqual([`market:${REALM}`, `mail:${REALM}`]);
     for (const call of worldCalls) expect(call[1]).not.toContain('market');
+  });
+
+  it('writes only the requested realm domain and does not require the Market gate for mail', async () => {
+    closeMarketWriteGateForTests();
+    const mailClient = clientStub();
+    dbMock.connect.mockResolvedValueOnce(mailClient as any);
+
+    expect(await saveCharacterAndMarketState(42, 7, STATE, null, MAIL)).toBe(true);
+    const mailWorldCalls = mailClient.query.mock.calls.filter((call) =>
+      /world_state/i.test(String(call[0])),
+    );
+    expect(mailWorldCalls.map((call) => call[1][0])).toEqual([`mail:${REALM}`]);
+
+    const characterOnlyClient = clientStub();
+    dbMock.connect.mockResolvedValueOnce(characterOnlyClient as any);
+    expect(await saveCharacterAndMarketState(42, 7, STATE, null, null)).toBe(true);
+    expect(
+      characterOnlyClient.query.mock.calls.some((call) => /world_state/i.test(String(call[0]))),
+    ).toBe(false);
   });
 
   it('rolls back and rethrows if the character write fails, leaving no half-commit', async () => {

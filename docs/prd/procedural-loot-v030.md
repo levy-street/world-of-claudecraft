@@ -143,6 +143,35 @@ from the source, never the player. Legendary effect magnitudes scale by
 This keeps leveling signatures exciting without making low-level bosses an
 endgame-strength farm.
 
+## Deployment, persistence, and rollback
+
+This rollout becomes **forward-only after the first procedural item is minted**.
+Generated copies persist fields that a pre-v0.30 binary does not understand
+(`procedural`, UID, exact affixes, source context, and Legendary state). Running
+an older writer after that point can normalize those fields away on its next
+character, bank, buyback, mail, or trade save, silently turning unique gear into
+its static base. A binary rollback is therefore prohibited once minting is live.
+
+Production procedure:
+
+1. Drain character/economy writes and take a verified database backup before
+   enabling a build that can mint procedural items.
+2. Deploy the authority servers as one compatibility cohort; do not run mixed
+   old/new writers after minting begins.
+3. Verify exact-instance save/reload, duplicate-UID rejection, lease fencing,
+   and atomic trade/mail persistence before opening traffic.
+4. If code must be rolled back before the first mint, redeploy the prior build.
+   After the first mint, roll forward with a hotfix. If an older build is the
+   only recovery option, stop all writers and restore the pre-deploy backup
+   first; accepting loss of all post-backup progress is an explicit incident
+   decision, never an automatic rollback.
+
+Procedural payload `version: 1` and the `pi1:` UID namespace are the persisted
+format markers for this release. Any future incompatible reader or writer must
+add a new version and migration rather than reinterpret version 1. Raid reward
+persistence remains one atomic character-plus-mail transaction; the shipped
+raid roster is hard-capped at 10 players (`RAID_MAX`), so a settlement cannot
+expand into an unbounded realm-sized write.
 ## Delivery slices
 
 ### Slice 1: schema and deterministic generator

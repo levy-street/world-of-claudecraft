@@ -230,7 +230,7 @@ export function dealDamage(
   if (source && amount > 0) {
     let sourceVulnerability = 0;
     for (const aura of target.auras) {
-      if (aura.kind === 'vuln_source' && aura.sourceId === source.id) {
+      if (aura.kind === 'vuln_source' && aura.sourceId === source.id && aura.school === school) {
         sourceVulnerability += aura.value;
       }
     }
@@ -719,6 +719,7 @@ export function dealDamage(
   if (
     canTriggerEquipmentEffects &&
     effectiveDamage > 0 &&
+    direct &&
     source?.kind === 'player' &&
     school !== 'physical'
   ) {

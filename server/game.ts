@@ -265,6 +265,10 @@ const LOCKPICK_ACTIONS = new Set<PickAction>(['hardSet', 'set', 'steady', 'ease'
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
 const LEAVE_SAVE_RETRY_BASE_MS = 250;
 const LEAVE_SAVE_RETRY_MAX_MS = 4000;
+// Hard retention bound for full economy snapshots. Player commands admit only
+// at depth zero; the larger ceiling is reserved for system reward settlements
+// that can complete while a database write is already in flight.
+const MAX_ATOMIC_ECONOMY_TRANSACTIONS_PENDING = 32;
 // Usage notices for the two PLAYER chat-suppression tiers. Kept as constants
 // because the S3 localization guard scans sendChatNotice literals, and
 // src/ui/server_i18n.ts carries the matching rules. (A "mute" is the ADMIN
@@ -3055,7 +3059,7 @@ export class GameServer {
     const meta = this.sim.meta(session.pid);
     if (meta) Object.assign(meta.moveInput, emptyMoveInput());
     // Safety flush so a process crash during the grace window loses nothing.
-    void this.saveCharacter(session, { withMarket: true }).catch((err) =>
+    void this.saveCharacter(session).catch((err) =>
       console.error(`linkdead save failed for ${session.name}:`, err),
     );
     return true;
@@ -3187,12 +3191,11 @@ export class GameServer {
   private async saveCharacterOnLeave(session: ClientSession): Promise<void> {
     for (let attempt = 1; attempt <= LEAVE_SAVE_MAX_ATTEMPTS; attempt++) {
       try {
-        // Flush the character AND the World Market together: a Market escrow
-        // straddles both (item out of bags, into a listing), and the autosave
-        // timer only persists the market every 30s. Without this, a crash right
-        // after the leave-flush of bags would tear the escrow in half (item lost
-        // or duplicated). saveCharacter(withMarket) writes both in one transaction.
-        await this.saveCharacter(session, { withMarket: true });
+        // Player market mutations commit their character + escrow immediately.
+        // A leave flush therefore writes only this character; publishing the
+        // current global books here could make an unrelated player's dirty
+        // half durable without that player's matching character state.
+        await this.saveCharacter(session);
         return;
       } catch (err) {
         if (attempt === LEAVE_SAVE_MAX_ATTEMPTS) {
@@ -3312,29 +3315,39 @@ export class GameServer {
 
   private queueAtomicEconomyPersistence(
     sessions: readonly ClientSession[],
-    quarantineMailOnFailure: boolean,
+    resources: { market?: boolean; mail?: boolean },
     label: string,
-  ): void {
+  ): boolean {
     const unique = [...new Map(sessions.map((session) => [session.characterId, session])).values()];
     if (unique.length < 1) {
       throw new Error(`${label} persistence requires at least one character`);
+    }
+    if (this.atomicEconomyTransactionsPending >= MAX_ATOMIC_ECONOMY_TRANSACTIONS_PENDING) {
+      if (resources.market) this.marketPersistenceQuarantined = true;
+      if (resources.mail) this.mailPersistenceQuarantined = true;
+      this.quarantinePersistenceSessions(unique, `${label} persistence queue full`);
+      console.error(`${label} atomic persistence rejected: queue capacity exhausted`);
+      return false;
     }
     const captures = unique.map((session) => ({
       session,
       captured: this.captureCharacterPersistence(session),
     }));
     if (captures.some(({ captured }) => captured === null)) {
-      this.marketPersistenceQuarantined = true;
-      if (quarantineMailOnFailure) this.mailPersistenceQuarantined = true;
+      if (resources.market) this.marketPersistenceQuarantined = true;
+      if (resources.mail) this.mailPersistenceQuarantined = true;
       this.quarantinePersistenceSessions(unique, `${label} snapshot failed`);
-      return;
+      return false;
     }
-    const market = this.sim.serializeMarket();
-    const mail = this.sim.serializeMail();
+    const market = resources.market ? this.sim.serializeMarket() : null;
+    const mail = resources.mail ? this.sim.serializeMail() : null;
 
     const write = async (): Promise<void> => {
       try {
-        if (this.marketPersistenceQuarantined || this.mailPersistenceQuarantined) {
+        if (
+          (resources.market && this.marketPersistenceQuarantined) ||
+          (resources.mail && this.mailPersistenceQuarantined)
+        ) {
           throw new Error('realm economy persistence is quarantined');
         }
         if (unique.some((session) => this.persistenceQuarantinedSessions.has(session))) {
@@ -3370,26 +3383,33 @@ export class GameServer {
         // back, publishing that later Market mutation would externalize value
         // derived from an item the durable old owner still has. Freeze the
         // global Market on every economy failure until it is reloaded.
-        this.marketPersistenceQuarantined = true;
+        if (resources.market) this.marketPersistenceQuarantined = true;
         // A failed mail transaction leaves the live realm book ahead of its
         // durable row. Freeze every later Ravenpost/combined write until restart
         // so no unrelated autosave can publish that rolled-back escrow half.
-        if (quarantineMailOnFailure) this.mailPersistenceQuarantined = true;
+        if (resources.mail) this.mailPersistenceQuarantined = true;
         this.quarantinePersistenceSessions(unique, `${label} persistence failed`);
         throw err;
       }
     };
     this.atomicEconomyTransactionsPending++;
-    void this.enqueuePersistenceWrite(unique, true, write)
+    void this.enqueuePersistenceWrite(unique, Boolean(resources.market || resources.mail), write)
       .catch((err) => console.error(`${label} atomic persistence failed:`, err))
       .finally(() => {
         this.atomicEconomyTransactionsPending--;
       });
+    return true;
   }
 
   private persistMailMutationIfChanged(session: ClientSession, beforeRevision: number): void {
     if (this.sim.postOffice.persistenceMutationRevision !== beforeRevision) {
-      this.queueAtomicEconomyPersistence([session], true, 'mail transfer');
+      this.queueAtomicEconomyPersistence([session], { mail: true }, 'mail transfer');
+    }
+  }
+
+  private persistMarketMutationIfChanged(session: ClientSession, beforeRevision: number): void {
+    if (this.sim.market.persistenceMutationRevision !== beforeRevision) {
+      this.queueAtomicEconomyPersistence([session], { market: true }, 'market transfer');
     }
   }
 
@@ -3400,7 +3420,6 @@ export class GameServer {
     for (const pid of recipientIds) {
       const session = this.clients.get(pid);
       if (!session || session.left) {
-        this.marketPersistenceQuarantined = true;
         this.mailPersistenceQuarantined = true;
         this.quarantinePersistenceSessions(sessions, 'system reward recipient disappeared');
         console.error(`system reward mail has no live persistence session for player ${pid}`);
@@ -3408,7 +3427,7 @@ export class GameServer {
       }
       sessions.push(session);
     }
-    this.queueAtomicEconomyPersistence(sessions, true, 'system reward mail');
+    this.queueAtomicEconomyPersistence(sessions, { mail: true }, 'system reward mail');
   }
 
   async saveCharacter(session: ClientSession, opts: { withMarket?: boolean } = {}): Promise<void> {
@@ -3417,8 +3436,6 @@ export class GameServer {
     if (!captured) return;
     const { state, deedRecords } = captured;
     const market = opts.withMarket ? this.sim.serializeMarket() : null;
-    const mail =
-      opts.withMarket && !this.mailPersistenceQuarantined ? this.sim.serializeMail() : null;
     await this.enqueuePersistenceWrite([session], opts.withMarket === true, async () => {
       if (this.persistenceQuarantinedSessions.has(session)) return;
       // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
@@ -3426,21 +3443,21 @@ export class GameServer {
       // character-list/leaderboard `level` column never reflects the temp state.
       let saved: boolean;
       if (opts.withMarket) {
-        // Atomic on the leave path so a logout bag-flush can never tear away
-        // from the global Market escrow (see saveCharacterAndMarketState). Run
-        // through the shared realm queue with the snapshots captured above so
-        // this commit can't clobber a newer one. If either realm store failed,
-        // fall back to the lease-fenced character write: persisting a default
-        // empty mail snapshot would destroy the rejected realm book.
+        // Compatibility/maintenance path for callers that intentionally own
+        // both this character and the current Market snapshot. Normal player
+        // market commands use queueAtomicEconomyPersistence at mutation time;
+        // linkdead/leave saves are character-only so they cannot publish some
+        // other player's dirty escrow half. If the Market store is quarantined,
+        // fall back to the lease-fenced character write.
         saved =
-          this.marketPersistenceQuarantined || this.mailPersistenceQuarantined || !market || !mail
+          this.marketPersistenceQuarantined || !market
             ? await saveCharacterState(session.characterId, state.level, state, session.leaseNonce)
             : await saveCharacterAndMarketState(
                 session.characterId,
                 state.level,
                 state,
                 market,
-                mail,
+                null,
                 session.leaseNonce,
               );
       } else {
@@ -4544,7 +4561,11 @@ export class GameServer {
       // why `enchantResult` is itself a HEAVY_SELF_EVENTS member (the unbindResult
       // precedent): otherwise the spent reagents would linger in the bag mirror.
       case 'disenchant_item':
-        if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const uid = optionalInstanceUid(msg.uid);
+          if (uid === null) break;
+          sim.disenchantItem(msg.item, uid, pid);
+        }
         break;
       case 'apply_enchant':
         if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
@@ -4559,6 +4580,8 @@ export class GameServer {
             (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
               ? (msg.slot as EquipSlot)
               : undefined;
+          const uid = optionalInstanceUid(msg.uid);
+          if (uid === null) break;
           // `confirm` (#2415): the explicit consent to replace an existing
           // enchant. A strict boolean-true check (the dispatch type-guard
           // rule, the craft_item `commission` precedent); anything else reads
@@ -4572,11 +4595,15 @@ export class GameServer {
           // own pin over the SENDER's inventory, so the worst case is that
           // sender destroying one of their own enchants), and an honest client
           // never emits an invalid slot.
-          sim.applyEnchant(msg.item, msg.enchant, worn, msg.confirm === true, pid);
+          sim.applyEnchant(msg.item, msg.enchant, worn, msg.confirm === true, uid, pid);
         }
         break;
       case 'salvage_item':
-        if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const uid = optionalInstanceUid(msg.uid);
+          if (uid === null) break;
+          sim.salvageItem(msg.item, uid, pid);
+        }
         break;
       case 'unbind_item':
         // Maker's Bond unbind service (Professions 2.0): the sim
@@ -4585,7 +4612,11 @@ export class GameServer {
         // as the pid-scoped text-free unbindResult event, a HEAVY_SELF_EVENTS
         // member so the cleared payload and the fee debit re-diff the self
         // inv/purse mirrors on the next snapshot.
-        if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const uid = optionalInstanceUid(msg.uid);
+          if (uid === null) break;
+          sim.unbindItem(msg.item, uid, pid);
+        }
         break;
       case 'place_mobile_station':
         if (typeof msg.craft === 'string') sim.placeMobileStation(msg.craft, pid);
@@ -4885,6 +4916,7 @@ export class GameServer {
         if (Array.isArray(msg.items)) sim.tradeSetOffer(msg.items, Number(msg.copper) || 0, pid);
         break;
       case 'trade_confirm':
+        if (this.atomicEconomyTransactionsPending > 0) break;
         if (
           this.marketPersistenceQuarantined ||
           this.mailPersistenceQuarantined ||
@@ -4906,7 +4938,7 @@ export class GameServer {
             console.error('completed trade had no live persistence session for both participants');
             break;
           }
-          this.queueAtomicEconomyPersistence([first, second], false, 'direct trade');
+          this.queueAtomicEconomyPersistence([first, second], {}, 'direct trade');
         }
         break;
       case 'trade_cancel':
@@ -5231,7 +5263,7 @@ export class GameServer {
           pid,
         );
         break;
-      case 'market_list':
+      case 'market_list': {
         if (
           this.atomicEconomyTransactionsPending > 0 ||
           this.marketPersistenceQuarantined ||
@@ -5246,10 +5278,13 @@ export class GameServer {
           typeof msg.price === 'number' &&
           Number.isFinite(msg.price)
         ) {
+          const beforeRevision = sim.market.persistenceMutationRevision;
           sim.marketList(msg.item, msg.count, msg.price, pid);
+          this.persistMarketMutationIfChanged(session, beforeRevision);
         }
         break;
-      case 'market_buy':
+      }
+      case 'market_buy': {
         if (
           this.atomicEconomyTransactionsPending > 0 ||
           this.marketPersistenceQuarantined ||
@@ -5257,9 +5292,12 @@ export class GameServer {
         ) {
           break;
         }
+        const beforeRevision = sim.market.persistenceMutationRevision;
         if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid);
+        this.persistMarketMutationIfChanged(session, beforeRevision);
         break;
-      case 'market_cancel':
+      }
+      case 'market_cancel': {
         if (
           this.atomicEconomyTransactionsPending > 0 ||
           this.marketPersistenceQuarantined ||
@@ -5267,9 +5305,12 @@ export class GameServer {
         ) {
           break;
         }
+        const beforeRevision = sim.market.persistenceMutationRevision;
         if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);
+        this.persistMarketMutationIfChanged(session, beforeRevision);
         break;
-      case 'market_collect':
+      }
+      case 'market_collect': {
         if (
           this.atomicEconomyTransactionsPending > 0 ||
           this.marketPersistenceQuarantined ||
@@ -5277,10 +5318,14 @@ export class GameServer {
         ) {
           break;
         }
+        const beforeRevision = sim.market.persistenceMutationRevision;
         sim.marketCollect(pid);
+        this.persistMarketMutationIfChanged(session, beforeRevision);
         break;
+      }
       case 'mail_send': {
         if (
+          this.atomicEconomyTransactionsPending > 0 ||
           this.marketPersistenceQuarantined ||
           this.mailPersistenceQuarantined ||
           this.persistenceQuarantinedSessions.has(session)
@@ -5378,6 +5423,7 @@ export class GameServer {
           .then(async (target) => {
             if (
               this.clients.get(pid) !== session ||
+              this.atomicEconomyTransactionsPending > 0 ||
               this.marketPersistenceQuarantined ||
               this.mailPersistenceQuarantined ||
               this.persistenceQuarantinedSessions.has(session)
@@ -5396,6 +5442,7 @@ export class GameServer {
             const blockedBy = await this.socialDb.blockedIds(target.id);
             if (
               this.clients.get(pid) !== session ||
+              this.atomicEconomyTransactionsPending > 0 ||
               this.marketPersistenceQuarantined ||
               this.mailPersistenceQuarantined ||
               this.persistenceQuarantinedSessions.has(session)
@@ -5425,6 +5472,7 @@ export class GameServer {
       }
       case 'mail_take': {
         if (
+          this.atomicEconomyTransactionsPending > 0 ||
           this.marketPersistenceQuarantined ||
           this.mailPersistenceQuarantined ||
           this.persistenceQuarantinedSessions.has(session)
@@ -5438,6 +5486,7 @@ export class GameServer {
       }
       case 'mail_delete': {
         if (
+          this.atomicEconomyTransactionsPending > 0 ||
           this.marketPersistenceQuarantined ||
           this.mailPersistenceQuarantined ||
           this.persistenceQuarantinedSessions.has(session)
@@ -5451,6 +5500,7 @@ export class GameServer {
       }
       case 'mail_read': {
         if (
+          this.atomicEconomyTransactionsPending > 0 ||
           this.marketPersistenceQuarantined ||
           this.mailPersistenceQuarantined ||
           this.persistenceQuarantinedSessions.has(session)

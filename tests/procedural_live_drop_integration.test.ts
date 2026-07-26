@@ -251,6 +251,12 @@ describe('live procedural loot roll integration', () => {
       procedural: { ...drop.procedural, uid: 'stable' },
     }));
     expect(enteredAfk).toEqual(neverEntered);
+
+    const nearbyAfk = run(true, false, true).map((drop: any) => ({
+      ...drop,
+      procedural: { ...drop.procedural, uid: 'stable' },
+    }));
+    expect(nearbyAfk).toEqual(neverEntered);
   });
 
   it('raises caster-only base frequency when a caster shares loot eligibility', () => {

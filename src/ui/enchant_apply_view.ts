@@ -233,6 +233,9 @@ function replaceInfoFor(
 
 export interface EnchantTargetRow {
   itemId: string;
+  /** Exact generated-copy selector and payload for honest name/dispatch. */
+  instanceUid?: string;
+  instance?: ItemInstancePayload;
   /** How many eligible copies are held: enchantable copies for a plain row,
    *  already-enchanted copies for a replace row. */
   count: number;
@@ -252,39 +255,70 @@ export interface EnchantTargetRow {
  *  Already-enchanted copies surface as FLAGGED replace rows (#2415) appended
  *  after the plain rows, each describing the pinned victim the sim would
  *  consume (replaceVictimIndex, the same function the sim's replace arm
- *  walks). Grouped by item id (the apply command is itemId-keyed), each family
- *  in first-seen inventory order. */
+ *  walks). Generated copies are separate UID-addressed rows; legacy fungible
+ *  copies remain grouped by item id, all in first-seen inventory order. */
 export function enchantTargets(
   inventory: readonly InvSlot[],
   enchantId: string,
 ): EnchantTargetRow[] {
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
-  const byItem = new Map<string, number>();
-  const enchantedByItem = new Map<string, number>();
+  const rows: EnchantTargetRow[] = [];
+  const plainLegacy = new Map<string, EnchantTargetRow>();
+  const enchantedLegacy = new Map<string, number>();
   for (const slot of inventory) {
     const def = ITEMS[slot.itemId];
     if (!def || def.slot !== enchant.itemSlot) continue;
-    if (slot.instance && isEnchantedInstance(slot.instance)) {
-      enchantedByItem.set(slot.itemId, (enchantedByItem.get(slot.itemId) ?? 0) + slot.count);
+    const instanceUid = slot.instance?.procedural?.uid;
+    const enchanted = !!slot.instance && isEnchantedInstance(slot.instance);
+    if (instanceUid && slot.instance) {
+      if (enchanted) {
+        const replace = replaceInfoFor(slot.instance, enchantId);
+        if (replace) {
+          rows.push({
+            itemId: slot.itemId,
+            count: 1,
+            instanceUid,
+            instance: slot.instance,
+            replace,
+          });
+        }
+      } else {
+        rows.push({
+          itemId: slot.itemId,
+          count: 1,
+          instanceUid,
+          instance: slot.instance,
+        });
+      }
       continue;
     }
-    byItem.set(slot.itemId, (byItem.get(slot.itemId) ?? 0) + slot.count);
+    if (enchanted) {
+      enchantedLegacy.set(slot.itemId, (enchantedLegacy.get(slot.itemId) ?? 0) + slot.count);
+      continue;
+    }
+    const existing = plainLegacy.get(slot.itemId);
+    if (existing) existing.count += slot.count;
+    else {
+      const row = { itemId: slot.itemId, count: slot.count };
+      plainLegacy.set(slot.itemId, row);
+      rows.push(row);
+    }
   }
-  const rows: EnchantTargetRow[] = [...byItem].map(([itemId, count]) => ({ itemId, count }));
-  for (const [itemId, count] of enchantedByItem) {
+  for (const [itemId, count] of enchantedLegacy) {
     const victimIdx = replaceVictimIndex(inventory, itemId);
     const victim = victimIdx >= 0 ? inventory[victimIdx].instance : undefined;
     if (!victim) continue;
     const replace = replaceInfoFor(victim, enchantId);
-    if (!replace) continue;
-    rows.push({ itemId, count, replace });
+    if (replace) rows.push({ itemId, count, replace });
   }
   return rows;
 }
 
 export interface WornEnchantTargetRow {
   itemId: string;
+  instanceUid?: string;
+  instance?: ItemInstancePayload;
   /** The exact equipment key this copy is worn in, and the discriminator the
    *  apply command carries: ring1/ring2 and mainhand/offhand can be wearing
    *  identical copies of one item id, so the id alone cannot name the target. */
@@ -325,10 +359,19 @@ export function wornEnchantTargets(
     const instance = equippedInstances[slot];
     if (instance && isEnchantedInstance(instance)) {
       const replace = replaceInfoFor(instance, enchantId);
-      if (replace) rows.push({ itemId, slot, replace });
+      if (replace) {
+        const instanceUid = instance.procedural?.uid;
+        rows.push({
+          itemId,
+          slot,
+          ...(instanceUid && { instanceUid, instance }),
+          replace,
+        });
+      }
       continue;
     }
-    rows.push({ itemId, slot });
+    const instanceUid = instance?.procedural?.uid;
+    rows.push({ itemId, slot, ...(instanceUid && { instanceUid, instance }) });
   }
   return rows;
 }

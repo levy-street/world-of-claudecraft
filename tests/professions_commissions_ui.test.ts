@@ -11,6 +11,7 @@ import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { generateProceduralItem } from '../src/sim/loot/procedural';
 import type { InvSlot } from '../src/sim/types';
 import { buildCraftingView } from '../src/ui/crafting_view';
 import { renderCraftingWindow } from '../src/ui/crafting_window';
@@ -21,6 +22,31 @@ const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
 const SWORD = 'eastbrook_arming_sword';
 const VESTMENTS = 'eastbrook_ritual_vestments';
 const POTION_RECIPE = 'recipe_minor_healing_potion';
+const PROCEDURAL_SWORD = 'iron_broadsword';
+
+function generatedBoundSword(uid: string, rarity: 'common' | 'legendary'): InvSlot {
+  const generated = generateProceduralItem({
+    seed: rarity === 'legendary' ? 9202 : 9201,
+    uid,
+    context: {
+      source: 'dungeon',
+      sourceEntityId: 92,
+      sourceSpawnSequence: 1,
+      lootSlotIndex: rarity === 'legendary' ? 1 : 0,
+    },
+    basePoolId: 'initial_dungeon_boss',
+    rarityTableId: 'initial_dungeon_boss',
+    sourceItemLevel: 40,
+    forcedItemLevel: 40,
+    forcedBaseId: PROCEDURAL_SWORD,
+    forcedRarity: rarity,
+  });
+  return {
+    itemId: generated.itemId,
+    count: 1,
+    instance: { ...generated.instance, bindOnTrade: true, boundTo: 5 },
+  };
+}
 
 function recipeRows(recipeIds: string[]) {
   return ALL_RECIPES.filter((r) => recipeIds.includes(r.id));
@@ -193,6 +219,17 @@ describe('buildUnbindView (the service rows mirror the resolver)', () => {
     // will actually unbind).
     expect(view.rows[0].instance).toEqual({ bindOnTrade: true, boundTo: 5 });
   });
+
+  it('separates generated copies by UID and prices each authoritative rarity', () => {
+    const common = generatedBoundSword('pi1:unbind-ui:common', 'common');
+    const legendary = generatedBoundSword('pi1:unbind-ui:legendary', 'legendary');
+    const view = buildUnbindView({ inventory: [common, legendary], copper: 50000, items: ITEMS });
+    expect(view.rows).toHaveLength(2);
+    expect(view.rows.map(({ instanceUid, feeCopper }) => ({ instanceUid, feeCopper }))).toEqual([
+      { instanceUid: 'pi1:unbind-ui:common', feeCopper: 2500 },
+      { instanceUid: 'pi1:unbind-ui:legendary', feeCopper: 40000 },
+    ]);
+  });
 });
 
 describe('renderUnbindWindow painter', () => {
@@ -217,6 +254,19 @@ describe('renderUnbindWindow painter', () => {
     expect(row.querySelector('.crafting-recipe-socket')).not.toBeNull();
     row.click();
     expect(deps.onUnbind).toHaveBeenCalledWith(SWORD, 2500);
+  });
+
+  it('reports the exact generated UID when a procedural row is clicked', () => {
+    const el = document.createElement('div');
+    const deps = unbindDeps();
+    const view = buildUnbindView({
+      inventory: [generatedBoundSword('pi1:unbind-ui:exact', 'legendary')],
+      copper: 50000,
+      items: ITEMS,
+    });
+    renderUnbindWindow(el, 'Forgemistress Darva', view, deps);
+    (el.querySelector('.unbind-row') as HTMLButtonElement).click();
+    expect(deps.onUnbind).toHaveBeenCalledWith(PROCEDURAL_SWORD, 40000, 'pi1:unbind-ui:exact');
   });
 
   it('disables an unaffordable row, paints the empty state, and routes the close click', () => {

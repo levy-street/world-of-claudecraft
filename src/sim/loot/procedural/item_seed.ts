@@ -101,25 +101,26 @@ function sipHash24(secretHex: string, message: string): bigint {
   return (state[0] ^ state[1] ^ state[2] ^ state[3]) & U64_MASK;
 }
 
+export function deriveSecretSeed32(secretHex: string, parts: readonly (number | string)[]): number {
+  const keyed = sipHash24(secretHex, JSON.stringify(parts));
+  const seed = Number(keyed & 0xffff_ffffn) >>> 0;
+  return seed === 0 ? 0x9e3779b9 : seed;
+}
+
 export function deriveSecretProceduralItemSeed(
   secretHex: string,
   worldSeed: number,
   context: ItemDropContext,
 ): number {
-  const keyed = sipHash24(
-    secretHex,
-    JSON.stringify([
-      'procedural-item-v2',
-      worldSeed,
-      context.source,
-      context.sourceEntityId,
-      context.sourceSpawnSequence,
-      context.lootSlotIndex,
-      context.recipientId ?? 0,
-    ]),
-  );
-  const seed = Number(keyed & 0xffff_ffffn) >>> 0;
-  return seed === 0 ? 0x9e3779b9 : seed;
+  return deriveSecretSeed32(secretHex, [
+    'procedural-item-v2',
+    worldSeed,
+    context.source,
+    context.sourceEntityId,
+    context.sourceSpawnSequence,
+    context.lootSlotIndex,
+    context.recipientId ?? 0,
+  ]);
 }
 
 function normalizeSerial(serial: number | string): string {

@@ -177,6 +177,8 @@ describe('atomic direct-transfer persistence', () => {
       | { characterId: number; leaseNonce?: string; state: CharacterState }
       | undefined;
     expect(call?.[0]).toBe(alice.characterId);
+    expect(call?.[3]).toBeNull();
+    expect(call?.[4]).toBeNull();
     expect(call?.[5]).toBe(alice.leaseNonce);
     expect(peer?.characterId).toBe(bob.characterId);
     expect(peer?.leaseNonce).toBe(bob.leaseNonce);
@@ -278,6 +280,78 @@ describe('atomic direct-transfer persistence', () => {
     expect(server.sim.serializeMarket().listings).toHaveLength(1);
   });
 
+  it('rejects additional trade and mail mutations before sim state changes while a write is pending', async () => {
+    const server = new GameServer();
+    const alice = join(server, 5181, 'BackpressureAlice');
+    const bob = join(server, 5182, 'BackpressureBob');
+    const carol = join(server, 5183, 'BackpressureCarol');
+    const dave = join(server, 5184, 'BackpressureDave');
+    openProceduralTrade(server, alice, bob);
+
+    const carolMeta = server.sim.meta(carol.pid);
+    const daveMeta = server.sim.meta(dave.pid);
+    if (!carolMeta || !daveMeta) throw new Error('missing backpressure trade players');
+    carolMeta.copper = 100;
+    daveMeta.copper = 100;
+    placeTogether(server, carol.pid, dave.pid);
+    cmd(server, carol, { cmd: 'trade_req', id: dave.pid });
+    cmd(server, dave, { cmd: 'trade_accept' });
+    cmd(server, carol, { cmd: 'trade_offer', items: [], copper: 1 });
+    cmd(server, carol, { cmd: 'trade_confirm' });
+
+    moveToMailbox(server, carol.pid);
+    server.sim.postOffice.mailHeroicMarks(carol.pid, HEROIC_MARK_ITEM_ID, 1);
+    const letter = server.sim.postOffice.mail.find((mail) => mail.recipientName === carol.name);
+    if (!letter) throw new Error('missing backpressure mail');
+
+    const atomic = deferred<boolean>();
+    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => atomic.promise);
+    cmd(server, bob, { cmd: 'trade_confirm' });
+    await vi.waitFor(() => expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1));
+
+    cmd(server, dave, { cmd: 'trade_confirm' });
+    cmd(server, carol, { cmd: 'mail_read', id: letter.id });
+    expect(carolMeta.copper).toBe(100);
+    expect(daveMeta.copper).toBe(100);
+    expect(letter.read).toBe(false);
+    expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
+
+    atomic.resolve(true);
+    const internals = server as unknown as { atomicEconomyTransactionsPending: number };
+    await vi.waitFor(() => expect(internals.atomicEconomyTransactionsPending).toBe(0));
+    cmd(server, dave, { cmd: 'trade_confirm' });
+    await vi.waitFor(() => expect(internals.atomicEconomyTransactionsPending).toBe(0));
+    expect(carolMeta.copper).toBe(99);
+    expect(daveMeta.copper).toBe(101);
+
+    cmd(server, carol, { cmd: 'mail_read', id: letter.id });
+    await vi.waitFor(() => expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(3));
+    expect(letter.read).toBe(true);
+    expect(vi.mocked(saveCharacterAndMarketState).mock.calls[2]?.[3]).toBeNull();
+  });
+
+  it('persists each successful market mutation with only its character and Market blob', async () => {
+    const server = new GameServer();
+    const seller = join(server, 519, 'AtomicMarketSeller');
+    const meta = server.sim.meta(seller.pid);
+    if (!meta) throw new Error('missing market seller');
+    meta.inventory = [];
+    server.sim.addItem('roasted_boar', 1, seller.pid);
+    moveToMerchant(server, seller.pid);
+
+    cmd(server, seller, { cmd: 'market_list', item: 'roasted_boar', count: 1, price: 10 });
+
+    await vi.waitFor(() => expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1));
+    const call = vi.mocked(saveCharacterAndMarketState).mock.calls[0];
+    if (!call) throw new Error('expected atomic market persistence');
+    expect(call[0]).toBe(seller.characterId);
+    expect((call[2] as CharacterState).inventory).not.toContainEqual(
+      expect.objectContaining({ itemId: 'roasted_boar' }),
+    );
+    expect((call[3] as { listings: unknown[] }).listings).toHaveLength(1);
+    expect(call[4]).toBeNull();
+  });
+
   it.each(['db error', 'lease fence'] as const)(
     'quarantines and disconnects both trade participants on %s without leave saves',
     async (failure) => {
@@ -312,47 +386,39 @@ describe('atomic direct-transfer persistence', () => {
         await server.saveCharacter(bob);
         await server.saveMarket();
         expect(saveCharacterState).not.toHaveBeenCalled();
-        expect(saveMarketState).not.toHaveBeenCalled();
+        expect(saveMarketState).toHaveBeenCalledTimes(1);
       } finally {
         log.mockRestore();
       }
     },
   );
 
-  it('suppresses a market save already queued behind a trade that later rolls back', async () => {
+  it('keeps unrelated market persistence independent from a failed direct trade', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const server = new GameServer();
       const alice = join(server, 526, 'MarketRaceAlice');
       const bob = join(server, 527, 'MarketRaceBob');
-      const charlie = join(server, 528, 'MarketRaceCharlie');
       openProceduralTrade(server, alice, bob);
       const atomic = deferred<boolean>();
       vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => atomic.promise);
 
       cmd(server, bob, { cmd: 'trade_confirm' });
-      const laterMarketSave = server.saveMarket();
-      const laterCombinedSave = server.saveCharacter(charlie, { withMarket: true });
       await vi.waitFor(() => expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1));
-      expect(saveMarketState).not.toHaveBeenCalled();
+
+      // A characters-only trade owns no realm FIFO and cannot quarantine a clean
+      // Market domain when it later fails.
+      await server.saveMarket();
+      expect(saveMarketState).toHaveBeenCalledTimes(1);
 
       atomic.reject(new Error('rolled back'));
-      await laterMarketSave;
-      await laterCombinedSave;
       await vi.waitFor(() => expect(alice.left && bob.left).toBe(true));
-      expect(saveMarketState).not.toHaveBeenCalled();
-      expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
-      expect(saveCharacterState).toHaveBeenCalledWith(
-        charlie.characterId,
-        expect.any(Number),
-        expect.any(Object),
-        charlie.leaseNonce,
-      );
+      await server.saveMarket();
+      expect(saveMarketState).toHaveBeenCalledTimes(2);
     } finally {
       log.mockRestore();
     }
   });
-
   it('orders pre-mail save, atomic procedural send, and later realm save', async () => {
     const server = new GameServer();
     const alice = join(server, 531, 'MailOrderAlice');
