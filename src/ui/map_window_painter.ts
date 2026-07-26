@@ -284,9 +284,14 @@ export class MapWindowPainter {
     }
 
     // Quest-giver glyphs ('?' turn-in ready, '!' available). Color + font are
-    // loop-invariant, so set them once before the loop, not per glyph (assigning
-    // ctx.font re-parses the font string each time). The next text-drawing layer
-    // (allies) sets its own font/fillStyle, so the carried-over portal-name font
+    // loop-invariant, so set them once before the loop rather than per glyph. Note the
+    // hoist is hygiene, NOT a perf fix: assigning ctx.font does not merely re-parse a
+    // font string, every canvas text entry point re-resolves font state against the
+    // document, so hoisting measures no better than leaving it inside (see the measured
+    // numbers in src/ui/CLAUDE.md). Getting off the text API is the fix, which is why
+    // minimap_painter rasterizes its glyphs to sprites; this painter is a cold on-open
+    // path on the ~4Hz band, so it has not needed it (issue 2476). The next text-drawing
+    // layer (allies) sets its own font/fillStyle, so the carried-over portal-name font
     // is never read by a draw in between (pixel-identical to the inline original).
     ctx.fillStyle = colors.npcQuest;
     ctx.font = NPC_GLYPH_FONT;

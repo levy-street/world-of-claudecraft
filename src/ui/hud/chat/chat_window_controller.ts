@@ -1,7 +1,7 @@
 import { CTX_MENU_PICKER_CLASS } from '../../bag_item_action_menu';
 import { esc } from '../../esc';
 import { type TranslationKey, t } from '../../i18n';
-import { encodeItemLink, encodeQuestLink } from '../quest/quest_link';
+import { tryEncodeItemLink, tryEncodeQuestLink } from '../quest/quest_link';
 import {
   CHANNEL_LABEL_KEYS,
   CHAT_TAB_CHANNELS,
@@ -142,14 +142,22 @@ export class ChatWindowController {
     return composeChatLine(target, withLinks);
   }
 
+  // Both draft inserts drop the link rather than draft a token the chat parser
+  // will not match, which would reach every recipient as literal "[[q:...]]"
+  // source text. An unlinkable id is the same class of failure as an item the
+  // client cannot name, so it takes the same silent early return: no draft
+  // text, no new copy, and the player's typed line is left alone.
   insertQuestLink(questId: string): void {
-    this.insertLink(`[${this.deps.questTitle(questId)}]`, encodeQuestLink(questId));
+    const token = tryEncodeQuestLink(questId);
+    if (token === null) return;
+    this.insertLink(`[${this.deps.questTitle(questId)}]`, token);
   }
 
   insertItemLink(itemId: string): void {
     const displayName = this.deps.itemDisplayName(itemId);
-    if (displayName === null) return;
-    this.insertLink(`[${displayName}]`, encodeItemLink(itemId));
+    const token = tryEncodeItemLink(itemId);
+    if (displayName === null || token === null) return;
+    this.insertLink(`[${displayName}]`, token);
   }
 
   clearPendingLinks(): void {
@@ -163,7 +171,17 @@ export class ChatWindowController {
       this.deps.showError(t('hudChrome.questShare.noQuestSelected'));
       return true;
     }
-    this.deps.sendChat(`/p ${encodeQuestLink(questId)}`);
+    const token = tryEncodeQuestLink(questId);
+    if (token === null) {
+      // `/share` consumes the keystroke, so unlike the draft inserts it cannot
+      // just fall silent. To the player a quest the link parser cannot encode
+      // is simply a quest that can't be shared, which is the sentence the sim
+      // already sends for its own unshareable cases, so one outcome keeps one
+      // string (and no new key to fill in 21 locales).
+      this.deps.showError(t('hudChrome.questShare.notShareable'));
+      return true;
+    }
+    this.deps.sendChat(`/p ${token}`);
     return true;
   }
 

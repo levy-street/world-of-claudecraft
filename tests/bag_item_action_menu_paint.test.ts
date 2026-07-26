@@ -13,13 +13,20 @@ import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
 import { isDisenchantable } from '../src/sim/professions/enchanting';
 import type { InvSlot, ItemDef } from '../src/sim/types';
-import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from '../src/ui/bag_item_action_menu';
+import {
+  BagItemActionMenu,
+  CTX_ITEM_DANGER_CLASS,
+  CTX_MENU_PICKER_CLASS,
+} from '../src/ui/bag_item_action_menu';
 import { disenchantYieldLines } from '../src/ui/disenchant_yield_view';
 import { enchantSectionsForReagent } from '../src/ui/enchant_apply_view';
 import type { IWorld } from '../src/world_api';
 
 const DUST = 'arcane_dust';
 const ESSENCE = 'arcane_essence';
+/** The base meta sub-line class every picker tag shares; the #2421 destructive
+ *  modifier is the second class on a replace flag alone. */
+const CTX_ITEM_META_CLASS = 'ctx-item-meta';
 
 /** A live disenchantable def of the requested quality, so the confirm's yield
  *  preview is exercised against real content. */
@@ -110,6 +117,13 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
     [...el.querySelectorAll('.ctx-item')].map((row) => ({
       act: row.getAttribute('data-act'),
       text: row.textContent ?? '',
+      // The meta sub-lines with their modifier classes, for the #2421
+      // destructive-vs-informational split: textContent alone cannot tell a
+      // warning-styled tag from a muted one.
+      metas: [...row.querySelectorAll('.ctx-item-meta')].map((meta) => ({
+        text: meta.textContent ?? '',
+        classes: [...meta.classList],
+      })),
     }));
   const click = (act: string) => {
     if (!activate) throw new Error('bind never called');
@@ -638,5 +652,247 @@ describe('BagItemActionMenu target step: replace rows (#2415)', () => {
     expect(h.applied).toEqual([
       { itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: undefined, confirmReplace: undefined },
     ]);
+  });
+});
+
+// #2421: the three places the replace path under-communicated. A destructive
+// row now carries a destructive modifier, the confirm states what SURVIVES as
+// well as what dies, and the plain twin of a mixed holding says so, so the pair
+// no longer differs only by one row HAVING a sub-line.
+describe('BagItemActionMenu target step: destructive-path communication (#2421)', () => {
+  const SWORD = 'eastbrook_arming_sword';
+  const WEAPON_ENCHANT = 'enchant_weapon_might';
+  const AGILITY = 'enchant_weapon_agility';
+
+  it('flags the replace tag as destructive and leaves the informational tags plain', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1, instance: { enchant: AGILITY, rolled: { stats: { agi: 2 } } } },
+      ],
+      equipment: { mainhand: SWORD },
+      equippedInstances: { mainhand: { enchant: AGILITY, rolled: { stats: { agi: 2 } } } },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const [worn, bagged] = h.rows();
+    // The worn row carries BOTH kinds of sub-line, which is the whole point:
+    // "Worn (mainhand)" is informational and must stay muted, while the replace
+    // flag beside it promises to destroy an enchant.
+    expect(worn.metas.map((meta) => meta.text)).toEqual([
+      'Worn (mainhand)',
+      'Replaces Enchant Weapon - Agility',
+    ]);
+    expect(worn.metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
+    expect(worn.metas[1].classes).toEqual([CTX_ITEM_META_CLASS, CTX_ITEM_DANGER_CLASS]);
+    // The bagged replace row takes the same modifier.
+    expect(bagged.metas.map((meta) => meta.classes)).toEqual([
+      [CTX_ITEM_META_CLASS, CTX_ITEM_DANGER_CLASS],
+    ]);
+  });
+
+  it('does NOT flag the already-applied tag: an inert row destroys nothing', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        {
+          itemId: SWORD,
+          count: 1,
+          instance: { enchant: WEAPON_ENCHANT, rolled: { stats: { str: 2 } } },
+        },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const [row] = h.rows();
+    expect(row.act).toBeNull();
+    expect(row.metas.map((meta) => meta.text)).toEqual(['Already applied']);
+    expect(row.metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
+  });
+
+  it('tags the plain twin of a mixed holding, so the two rows never share a name', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+        { itemId: SWORD, count: 1, instance: { enchant: AGILITY, rolled: { stats: { agi: 2 } } } },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual([`target:${SWORD}`, `replace:${SWORD}`]);
+    // The accessible name of a role=button .ctx-item is computed from its
+    // contents, so these strings are what FEEDS it (accname inserts whitespace
+    // around the block-level sub-line, so AT reads them spaced). Pinned whole,
+    // not by toContain: the requirement is that they DIFFER, and that each
+    // states its own state rather than one of them staying silent.
+    expect(rows[0].text).toBe('Eastbrook Arming SwordNot enchanted');
+    expect(rows[1].text).toBe('Eastbrook Arming SwordReplaces Enchant Weapon - Agility');
+    // Both rows carry a sub-line now, so the distinction no longer rests on one
+    // of them having none.
+    expect(rows.map((row) => row.metas.length)).toEqual([1, 1]);
+    // The plain tag is INFORMATIONAL and must stay muted: "not enchanted"
+    // promises no destruction, and letting it take the danger modifier would
+    // spend the warning treatment on the safe row.
+    expect(rows[0].metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
+    expect(rows[1].metas[0].classes).toEqual([CTX_ITEM_META_CLASS, CTX_ITEM_DANGER_CLASS]);
+  });
+
+  it('tags the bagged plain twin when the enchanted copy is WORN, not bagged', () => {
+    // The cross-family holding: one list, two rows, one item name, and the
+    // enchanted copy happens to be on the body. Nothing about that changes what
+    // the bare bagged row fails to say.
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+      equipment: { mainhand: SWORD },
+      equippedInstances: { mainhand: { enchant: AGILITY, rolled: { stats: { agi: 2 } } } },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual(['worn:mainhand', `target:${SWORD}`]);
+    expect(rows[0].text).toBe(
+      'Eastbrook Arming SwordWorn (mainhand)Replaces Enchant Weapon - Agility',
+    );
+    expect(rows[1].text).toBe('Eastbrook Arming SwordNot enchanted');
+    expect(rows[1].metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
+  });
+
+  it('leaves the bagged plain row bare when the worn twin is ALSO plain', () => {
+    // The accepted limit: both copies are unenchanted, so "Not enchanted" would
+    // not tell them apart, and the worn row already states where it is.
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+      equipment: { mainhand: SWORD },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual(['worn:mainhand', `target:${SWORD}`]);
+    expect(rows[1].metas).toEqual([]);
+  });
+
+  it('leaves an UNAMBIGUOUS plain row tag-free: the tag is disambiguation, not decoration', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const [row] = h.rows();
+    expect(row.text).toBe('Eastbrook Arming Sword');
+    expect(row.metas).toEqual([]);
+  });
+
+  it('states what SURVIVES the swap, in order, above the price', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        {
+          itemId: SWORD,
+          count: 1,
+          instance: {
+            enchant: AGILITY,
+            signer: 'Tester',
+            rolled: { masterwork: true, stats: { agi: 2 } },
+            boundTo: 3,
+          },
+        },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    h.click(`replace:${SWORD}`);
+    const lines = h.confirms[0].body.split('\n');
+    // The signed masterwork piece the issue names. ORDER is load-bearing twice
+    // over: the kept line sits between the destroy warning and the cost, and
+    // the traits inside it print signature, masterwork, bind.
+    expect(lines[1]).toContain('not refunded');
+    expect(lines[2]).toBe("Kept: Maker's mark, Masterwork bonus, Commission bond");
+    expect(lines[3]).toBe('Cost: Chime Dust x5');
+  });
+
+  it('says NOTHING about survivors when the victim carries none', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1, instance: { enchant: AGILITY, rolled: { stats: { agi: 2 } } } },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    h.click(`replace:${SWORD}`);
+    const body = h.confirms[0].body;
+    // A plain copy must never be told its signature is safe, and the line must
+    // not degrade to a bare "Kept:" either.
+    expect(body).not.toContain('Kept');
+    expect(body.split('\n')).toHaveLength(3);
+  });
+
+  it('names the bond once for an ARMED lock too, in the same commission wording', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        {
+          itemId: SWORD,
+          count: 1,
+          instance: { enchant: AGILITY, rolled: { stats: { agi: 2 } }, bindOnTrade: true },
+        },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    h.click(`replace:${SWORD}`);
+    const lines = h.confirms[0].body.split('\n');
+    // One label for both bind states, and it is the mechanic's player-facing
+    // name, never the raw ItemInstancePayload field.
+    expect(lines[2]).toBe('Kept: Commission bond');
+    expect(lines[2].toLowerCase()).not.toContain('bindontrade');
+  });
+
+  it('the WORN confirm states signature and masterwork but claims no bind state', () => {
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { mainhand: SWORD },
+      equippedInstances: {
+        mainhand: {
+          enchant: AGILITY,
+          signer: 'Tester',
+          rolled: { masterwork: true, stats: { agi: 2 } },
+          // Offline the self entity holds this; the online eqi mirror never
+          // does. The dialog has to read the same on both hosts.
+          boundTo: 3,
+        },
+      },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    h.click('worn:mainhand');
+    const lines = h.confirms[0].body.split('\n');
+    expect(lines[2]).toBe("Kept: Maker's mark, Masterwork bonus");
+    // Named against the label this dialog ACTUALLY emits. An earlier draft
+    // asserted a string no catalog row carries, which could never have failed.
+    expect(h.confirms[0].body).not.toContain('Commission bond');
+  });
+
+  it('states survivors on a LEGACY victim too, whose stat lines name what dies', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        {
+          itemId: SWORD,
+          count: 1,
+          instance: { signer: 'Tester', rolled: { stats: { str: 5 } } },
+        },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    h.click(`replace:${SWORD}`);
+    const lines = h.confirms[0].body.split('\n');
+    expect(lines[0]).toContain('+5 Strength');
+    expect(lines[2]).toBe("Kept: Maker's mark");
+    expect(lines[3]).toBe('Cost: Chime Dust x5');
+    // A legacy copy is enchanted precisely BECAUSE it carries no masterwork
+    // flag, so that trait can never appear on this arm.
+    expect(lines[2]).not.toContain('Masterwork');
   });
 });

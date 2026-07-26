@@ -21,7 +21,15 @@
 import { ITEMS } from '../sim/data';
 import type { ItemDef } from '../sim/types';
 import type { MarketInfo, MarketListingView } from '../world_api';
-import { MARKET_PAGE_SIZE, type MarketFilters } from './market_filters';
+import {
+  MARKET_ARMOR_TYPE_FILTERS,
+  MARKET_BAG_SIZE_FILTERS,
+  MARKET_PAGE_SIZE,
+  MARKET_WEAPON_TYPE_FILTERS,
+  type MarketFilters,
+  type MarketItemTypeFilter,
+  type MarketSubtypeFilter,
+} from './market_filters';
 
 export type MarketTab = 'browse' | 'sell' | 'collect';
 
@@ -225,6 +233,61 @@ export function buildMarketView(input: MarketViewInput): MarketView {
     };
   }
   return { kind: 'collect', body: buildMarketCollect(info) };
+}
+
+/**
+ * What axis the subtype menu narrows by. The painter switches its caption and its
+ * option labels on THIS, never on the item type again: the two are decided together
+ * here, so an item type that gains a subtype axis cannot get its options from one
+ * place and its wording from another.
+ */
+export type MarketSubtypeKind = 'armorSlot' | 'weaponFamily' | 'bagCapacity';
+
+/** Which secondary browse menus an item type shows, and the subtype menu's options. */
+export interface MarketFilterMenus {
+  /** The subtype menu's option list, or null when this type has no subtype axis. */
+  subtype: readonly MarketSubtypeFilter[] | null;
+  /** What those options MEAN, for the painter's caption and per-option wording. */
+  subtypeKind: MarketSubtypeKind | null;
+  /** True when the armor-class (cloth / leather / mail) menu applies. */
+  armorClass: boolean;
+  /** True when the primary-stat menu applies. */
+  primaryStat: boolean;
+}
+
+/**
+ * Which secondary menus an item type can actually narrow by.
+ *
+ * Bags get a capacity menu but NOT a primary-stat menu: bags carry no str/agi/int
+ * and `itemMatchesPrimaryStat` ignores the filter outside armor/weapon, so a stat
+ * menu on bags would be a live-looking control that can never change the result.
+ * Lives here, not on the painter, because the decision is pure: it is a function of
+ * the item type alone, so a Node test drives it directly instead of grepping the
+ * painter's source for the gate.
+ */
+export function marketFilterMenus(itemType: MarketItemTypeFilter): MarketFilterMenus {
+  if (itemType === 'armor')
+    return {
+      subtype: MARKET_ARMOR_TYPE_FILTERS,
+      subtypeKind: 'armorSlot',
+      armorClass: true,
+      primaryStat: true,
+    };
+  if (itemType === 'weapon')
+    return {
+      subtype: MARKET_WEAPON_TYPE_FILTERS,
+      subtypeKind: 'weaponFamily',
+      armorClass: false,
+      primaryStat: true,
+    };
+  if (itemType === 'bag')
+    return {
+      subtype: MARKET_BAG_SIZE_FILTERS,
+      subtypeKind: 'bagCapacity',
+      armorClass: false,
+      primaryStat: false,
+    };
+  return { subtype: null, subtypeKind: null, armorClass: false, primaryStat: false };
 }
 
 /**

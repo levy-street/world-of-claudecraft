@@ -114,9 +114,17 @@ The contract above is the WHAT; reach for the matching one when you build a hot 
   by what it depends on (zone+seed, module id), then `drawImage`-blit it each redraw; only the
   dynamic markers re-stroke per frame (`delve_map_painter`, the per-zone `mapBgCache`, the
   `minimapBg` terrain canvas).
-- **Set loop-invariant canvas state once.** Assigning `ctx.font` re-parses the font string every
-  time, so set `font` / `fillStyle` / `lineWidth` before a draw loop, not per glyph
-  (`map_window_painter`).
+- **Set loop-invariant canvas state once**, and for TEXT go further. Hoisting `fillStyle` /
+  `lineWidth` above a draw loop is ordinary hygiene, but hoisting `ctx.font` does NOT fix a hot
+  text loop and the "font string re-parsing" story is wrong. Measured (17 iterations, dirty style
+  tree): bare `ctx.font` 0.033ms, `fillText` with the font already set 0.037ms, `measureText`
+  0.0368ms, `drawImage` 0.0062ms; hoisted-vs-inline `ctx.font` is 0.0385 vs 0.036, i.e. no
+  better. EVERY canvas text entry point (the `font` setter, `fillText`, `measureText`) re-resolves
+  font state against the document, so the cost tracks how dirty the style tree is, not the font
+  string. The only fix for a per-item text loop is to leave the text API: rasterize each distinct
+  (glyph, color) ONCE into an offscreen sprite and `drawImage` it, with the destination
+  `Math.round`ed (a fractional blit destination is resampled, and unrounded it silently depends on
+  whoever last set `imageSmoothingEnabled`). Reference: `minimap_painter` NPC glyphs.
 - **DPR backing store only where it must be crisp.** A HiDPI canvas sizes its backing store to
   `devicePixelRatio` and reassigns `width`/`height` only when the DPR changes (assignment clears
   the canvas); portraits are DPR-scaled (`unit_portrait_painter`), the minimap/map/delve are 1:1.

@@ -1597,6 +1597,7 @@ export const ZONE1_PROPS: ZonePropsDef = {
     [-78, 54],
     [-69, 55],
   ],
+  marshReeds: [],
   ruinRings: [
     { x: 80, z: 78, ringR: 7, columns: 7 },
     { x: -5, z: -60, ringR: 8, columns: 6 },

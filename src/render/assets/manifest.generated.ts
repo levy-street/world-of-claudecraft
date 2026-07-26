@@ -672,6 +672,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/mushroom_red.glb": "/media/models/props/mushroom_red.19e8e69c9304.glb",
   "models/props/mushroom_tan.glb": "/media/models/props/mushroom_tan.b90661fb9c17.glb",
   "models/props/ore_rocks.glb": "/media/models/props/ore_rocks.ecc1b1c488c9.glb",
+  "models/props/reeds.glb": "/media/models/props/reeds.8aebdb300451.glb",
   "models/props/rock_large_d.glb": "/media/models/props/rock_large_d.9287df4629a5.glb",
   "models/props/rock_large_f.glb": "/media/models/props/rock_large_f.0b65e6ff6061.glb",
   "models/props/rock_tall_a.glb": "/media/models/props/rock_tall_a.300efd9a16b9.glb",

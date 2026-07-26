@@ -53,10 +53,12 @@ import {
   harvestTierQuantity,
   isHarvestableCorpse,
   isSignableMaterialRarity,
+  type MaterialRarity,
   resolveCorpseFocusHarvest,
   resolveCorpseHarvest,
   rollCorpseMaterialRarity,
 } from './professions/gathering';
+import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
 import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
@@ -307,6 +309,14 @@ export function harvestCorpse(
   // higher-tier corpse families compose with.
   const bestAny = bestOwnedAnyGatherToolTier(meta.inventory, ITEMS);
   let toolDeniedEmitted = false;
+  // #2457: the yield ledger the single harvestResult event below carries. Every
+  // grant in this function passes { silent: true, callerLogs: true } from here
+  // on, so the hub's own per-grant "You receive:" line and generic ding stand
+  // down (the #2430 contract) and this ledger becomes the harvest's ONLY chat
+  // feedback. Recorded beside each grant as it LANDS rather than from the roll
+  // loop, so a full-bag downgrade reports the plain top-up it actually became
+  // and a refused specimen contributes no entry at all.
+  const granted: HarvestYield[] = [];
   // #1145: a rare-or-better monster material is stamped with the harvester's
   // name (a non-fungible instance slot); anything below that rarity stays a
   // plain fungible grant, same as before this issue. One rarity roll per
@@ -327,7 +337,16 @@ export function harvestCorpse(
   // plain grant past capacity). The rarity rolls stay in this first loop, in
   // yield order, so the draw sequence is byte-identical to the single-pass
   // shape (pinned by the parity goldens); only the grants are reordered.
-  const signedGrants: { itemId: string; specimen: boolean; plainQty: number }[] = [];
+  // `rarity` rides along purely so the deferred grants below can record their
+  // ledger entry with the roll that produced them (#2457): the line color is
+  // the ROLLED material rarity, and by the time a signed grant lands its own
+  // loop iteration is long past.
+  const signedGrants: {
+    itemId: string;
+    specimen: boolean;
+    plainQty: number;
+    rarity: MaterialRarity;
+  }[] = [];
   for (const y of yields) {
     const itemId = HARVEST_COMPONENT_ITEMS[y.component];
     if (!itemId) continue;
@@ -351,7 +370,8 @@ export function harvestCorpse(
       isSignableMaterialRarity(rarity) &&
       !canHarvestMonsterMaterial(bestAny, monsterMaterialTierFor(y.component))
     ) {
-      ctx.addItem(itemId, qty, meta.entityId);
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
       if (!toolDeniedEmitted) {
         toolDeniedEmitted = true;
         ctx.emit({
@@ -367,12 +387,14 @@ export function harvestCorpse(
       ? HARVEST_COMPONENT_SPECIMENS[y.component]
       : undefined;
     if (specimenId !== undefined) {
-      ctx.addItem(itemId, qty, meta.entityId);
-      signedGrants.push({ itemId: specimenId, specimen: true, plainQty: 0 });
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
+      signedGrants.push({ itemId: specimenId, specimen: true, plainQty: 0, rarity });
     } else if (isSignableMaterialRarity(rarity)) {
-      signedGrants.push({ itemId, specimen: false, plainQty: qty });
+      signedGrants.push({ itemId, specimen: false, plainQty: qty, rarity });
     } else {
-      ctx.addItem(itemId, qty, meta.entityId);
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
     }
   }
   // Signed-family components first: their plain FALLBACK still owns
@@ -393,9 +415,29 @@ export function harvestCorpse(
     if (grant.specimen) continue;
     const payload = { signer: meta.name };
     if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
-      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
+      // The explicit count 1 is the shipped default spelled out so the opts
+      // argument can follow it; the units granted are unchanged.
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId, 1, {
+        silent: true,
+        callerLogs: true,
+      });
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: 1,
+        rarity: grant.rarity,
+        kind: 'signed',
+      });
     } else {
-      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId);
+      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId, { silent: true, callerLogs: true });
+      // Recorded 'plain', not 'signed': the ledger reports what LANDED, and
+      // this arm landed an unsigned top-up. The gatherDowngrade toast below
+      // still tells the player the mark was the thing that got away.
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: grant.plainQty,
+        rarity: grant.rarity,
+        kind: 'plain',
+      });
       if (!downgradeEmitted) {
         downgradeEmitted = true;
         ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'mark' });
@@ -406,17 +448,37 @@ export function harvestCorpse(
     if (!grant.specimen) continue;
     const payload = { signer: meta.name };
     if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
-      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
+      // Explicit count 1 for the opts argument, see the matching call above.
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId, 1, {
+        silent: true,
+        callerLogs: true,
+      });
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: 1,
+        rarity: grant.rarity,
+        kind: 'specimen',
+      });
       // The perfect-specimen find mark (col_perfect_specimen), on
       // the LANDED jackpot only (a truncated find got away, like a fish with
       // no bag room). Every rarity draw happened in the roll loop above, so
       // this mark write cannot perturb the pinned draw sequence.
       ctx.markVisited(meta, 'gather_event:perfect_specimen');
     } else if (!downgradeEmitted) {
+      // A truncated specimen contributes NO ledger entry: nothing landed, so
+      // no line claims it did. The 'find' toast is the whole feedback.
       downgradeEmitted = true;
       ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'find' });
     }
   }
+  // #2457: one result event for the whole command, after every grant has
+  // landed, so the client prints one line per distinct granted item and plays
+  // exactly one cue instead of the per-grant burst the hub used to produce.
+  // Skipped entirely on a harvest that landed nothing (a corpse whose only
+  // tags map to no item, the gatherResult "granted path only" rule), so the
+  // client never renders a cue for a no-op. Draws no rng and reads no world
+  // state, so it cannot perturb the pinned draw sequence or the grant order.
+  if (granted.length > 0) ctx.emit({ type: 'harvestResult', pid: meta.entityId, yields: granted });
   // Lifecycle decoupling, the harvested half: with the claim spent
   // the corpse owes nobody a harvest window anymore, so exhausted loot
   // collapses it on the prune's fast arm while remaining loot keeps only a

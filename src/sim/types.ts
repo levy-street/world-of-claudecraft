@@ -4,6 +4,7 @@ import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { ProceduralItemUidLease } from './procedural_item_uid';
+import type { HarvestYield } from './professions/harvest_yields';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -2561,6 +2562,7 @@ export interface ZonePropsDef {
     hutLocal: { x: number; z: number; hw: number; hd: number };
   }[];
   tents: { x: number; z: number; rot: number; scale: number }[];
+  marshReeds: [number, number][];
   crates: [number, number][];
   campfires: [number, number][];
   mudHuts: [number, number][];
@@ -2601,6 +2603,7 @@ export function emptyZoneProps(): ZonePropsDef {
     benches: [],
     walls: [],
     graveyards: [],
+    marshReeds: [],
   };
 }
 
@@ -3341,12 +3344,18 @@ export type SimEvent = { pid?: number } & (
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
   | { type: 'learnAbility'; abilityId: string; rank: number }
-  // silent: true suppresses only the client's default loot audio cue (the
-  // "You receive: X" text line still prints as normal); a caller with its
-  // own dedicated cue for the same grant (gathering/crafting/enchanting) sets
-  // this so the generic ding doesn't stack on top of it. See Sim.addItem/
-  // addItemInstance's opts param, the one place this gets set.
-  | { type: 'loot'; text: string; silent?: boolean }
+  // The hub grant event. Two independent stand-down flags, both set only from
+  // Sim.addItem/addItemInstance's opts param (the one place either gets set):
+  // - silent: true suppresses the client's default loot AUDIO cue; a caller with
+  //   its own dedicated cue for the same grant (gathering/crafting/enchanting)
+  //   sets it so the generic ding doesn't stack on top of it.
+  // - callerLogs: true suppresses the client's default "You receive: X" TEXT
+  //   line, because the caller owns the player-visible line for this grant and
+  //   renders a richer one (rolled quality color, quantity, clickable item
+  //   link) off its own result event. Without it a profession action printed
+  //   two lines for one grant (#2430). Everything else the client does on a
+  //   loot event (bag refresh, loot-roll close) still runs.
+  | { type: 'loot'; text: string; silent?: boolean; callerLogs?: boolean }
   | {
       type: 'lootRoll';
       rollId: number;
@@ -4021,6 +4030,31 @@ export type SimEvent = { pid?: number } & (
       pid: number;
       surface: 'node' | 'corpse';
       lost: 'mark' | 'find';
+    }
+  // Corpse-harvest outcome (#2457): what one harvestCorpse command actually
+  // granted. Personal (pid = the harvester) and text-free on purpose (the
+  // gatherResult idiom above): ids, counts and enum arms only, so the sim and
+  // the server stay language-agnostic and no i18n matcher rule is needed.
+  //
+  // The ONE result event carrying a LIST, because corpse harvest is the one
+  // profession flow whose single command grants several DISTINCT items (one
+  // per focused component tag, plus a Pristine specimen on a rare-or-better
+  // roll). The client renders one line per entry, which is the #2430 contract
+  // (one line per distinct granted item, never one per internal grant call)
+  // restated for a multi-item command, and plays exactly ONE cue for the whole
+  // command. Every grant behind this event stands the hub's own line and ding
+  // down (silent + callerLogs, src/sim/interaction.ts harvestCorpse), so these
+  // entries are the harvest's only chat feedback.
+  //
+  // `yields` is never empty: the emit is skipped entirely when a harvest
+  // landed nothing (the gatherResult "granted path only" rule), so the client
+  // never renders a cue for a no-op. Entries record what LANDED, so a
+  // downgraded signed grant appears as 'plain' and a refused specimen does not
+  // appear at all; the gatherDowngrade toast above still owns that half.
+  | {
+      type: 'harvestResult';
+      pid: number;
+      yields: HarvestYield[];
     }
   // Fishing catch outcome (Professions 2.0): a landed catch emits
   // this so the client can log the reel-in feedback line for the acting

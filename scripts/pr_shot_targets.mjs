@@ -26,6 +26,29 @@ async function pollForSize(page, selector, attempts = 20, intervalMs = 500) {
   return false;
 }
 
+// Teleport onto the Merchant's stall (zone1, {0, 11.5}) so marketOpen's proximity gate
+// passes, then open the Browse tab. Shared by the market filter-chrome targets below.
+//
+// Two deliberate display writes, mirroring the market-window target: #market-window is
+// forced hidden FIRST so pollForSize cannot pass on a window that was already up (only
+// openMarket's own display:flex clears it), and #bags is hidden because the market docks
+// its companion alongside and, on mobile, over the top of it.
+async function openMarketBrowse(page) {
+  await page.evaluate(() => {
+    const p = window.__game?.sim?.player;
+    if (p?.pos) {
+      p.pos.x = 0;
+      p.pos.z = 11.5;
+    }
+    const el = document.querySelector('#market-window');
+    if (el) el.style.display = 'none';
+    window.__game?.hud?.openMarket?.();
+    const bags = document.querySelector('#bags');
+    if (bags) bags.style.display = 'none';
+  });
+  return pollForSize(page, '#market-window');
+}
+
 export const TARGETS = [
   {
     key: 'player-tooltip',
@@ -312,6 +335,167 @@ export const TARGETS = [
         window.dispatchEvent(up);
       });
       await wait(900);
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'profession-grant-lines',
+    label: 'Chat log: one line per profession grant (#2430)',
+    when: ['ui/grant_line_view', 'ui/enchanting_view', 'sim/professions'],
+    // Runs four profession actions back to back through the REAL sim commands
+    // (craft, salvage, disenchant, apply enchant) and clips the chat log, so
+    // the before/after pair shows the same four actions producing eight grant
+    // lines versus four. The whole set runs TWICE: the first pass burns the
+    // once-ever deed unlocks and the profession nudge, which would otherwise
+    // push the oldest line out of the fixed-height log, and the shot is taken
+    // on the second pass with a cleared log so every line fits. Eight actions
+    // stay under the shared 10-per-60s action throttle. Deliberately not a
+    // harvest: a gather is a 2.5s cast needing a node underfoot and a matching
+    // tool, and these four already cover every line family the change touches.
+    // The mobile variant is the same chat log at the touch layout's width,
+    // where the longer yield-naming lines have the least room to sit.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const pid = sim?.playerId;
+        if (!sim || pid === undefined) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim.players?.get(pid)) return { ok: false, reason: 'player meta is unavailable' };
+        // Two swords broken down per pass (one salvaged, one disenchanted)
+        // plus one enchanted per pass; apply-enchant prefers an UNENCHANTED
+        // copy, so the second pass takes a fresh one rather than tripping the
+        // same-enchant deny. Reagents cover both passes.
+        sim.addItem('eastbrook_arming_sword', 6, pid);
+        sim.addItem('arcane_dust', 40, pid);
+        sim.addItem('spider_leg', 8, pid);
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(400);
+      const runPass = () =>
+        page.evaluate(() => {
+          const sim = window.__game?.sim;
+          const pid = sim?.playerId;
+          if (!sim || pid === undefined) return { ok: false, reason: 'world went away' };
+          sim.craftItem?.('recipe_tough_jerky', false, pid);
+          sim.salvageItem?.('eastbrook_arming_sword', pid);
+          sim.disenchantItem?.('eastbrook_arming_sword', pid);
+          sim.applyEnchant?.('eastbrook_arming_sword', 'enchant_weapon_might');
+          return { ok: true };
+        });
+      const warmup = await runPass();
+      if (!warmup.ok) throw new Error(warmup.reason);
+      // The commands resolve on the tick they arrive on, but the events reach
+      // the HUD through the live 20 Hz drain, so give the loop real time.
+      await wait(1500);
+      // Clear the log so the shot holds ONLY the second pass's four actions.
+      await page.evaluate(() => {
+        document.querySelector('#chatlog')?.replaceChildren();
+      });
+      const shot = await runPass();
+      if (!shot.ok) throw new Error(shot.reason);
+      await wait(1500);
+      if (variant?.mobile) {
+        // The touch layout parks the chat panel behind its own button; without
+        // this the clip target is not visible and the shot silently falls back
+        // to the whole HUD.
+        await page.evaluate(() => {
+          document
+            .getElementById('mobile-chat')
+            ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+        });
+        await wait(700);
+      }
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'corpse-harvest-lines',
+    label: 'Chat log: one line and one cue per corpse harvest (#2457)',
+    when: ['sim/interaction', 'professions/harvest_yields', 'ui/grant_line_view'],
+    // Corpse harvest is the sibling of the profession-grant-lines target above:
+    // it was the last flow still logging through the grant hub, so it printed a
+    // flat "You receive:" line and a generic ding PER COMPONENT. It is a
+    // separate entry rather than a variant of that one because the bring-up is
+    // completely different (a dead corpse underfoot, not four bag commands).
+    //
+    // Two forest_wolf corpses are harvested back to back: that template carries
+    // hide and fang, the two-component everyday case, so the pair shows four
+    // grant lines from two keypresses. The shared rng stream is pinned to a
+    // fixed value immediately before the harvests, so the before and after
+    // shots differ ONLY by this change; without it the tier and rarity rolls
+    // land differently in each run and the quantities would not line up.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        const pid = sim?.playerId;
+        if (!sim || !player || pid === undefined) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        const wolves = [...sim.entities.values()]
+          .filter((e) => e.kind === 'mob' && e.templateId === 'forest_wolf')
+          .slice(0, 2);
+        if (wolves.length < 2) return { ok: false, reason: 'fewer than two forest_wolf spawns' };
+        for (const wolf of wolves) {
+          wolf.pos.x = player.pos.x;
+          wolf.pos.y = player.pos.y;
+          wolf.pos.z = player.pos.z;
+          wolf.dead = true;
+          wolf.aiState = 'dead';
+          wolf.corpseTimer = 9999;
+          wolf.respawnTimer = 9999;
+          wolf.harvestClaimedBy = null;
+          // Harvest only: corpse LOOT is a different flow with its own lines,
+          // and leaving it on would put unrelated "You receive:" lines in the
+          // shot that look like the bug this change fixes.
+          wolf.lootable = false;
+          wolf.loot = null;
+        }
+        return { ok: true, ids: wolves.map((wolf) => wolf.id) };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(400);
+      const harvested = await page.evaluate((ids) => {
+        const sim = window.__game?.sim;
+        const pid = sim?.playerId;
+        if (!sim || pid === undefined) return { ok: false, reason: 'world went away' };
+        // Clear first so the shot holds only these two harvests.
+        document.querySelector('#chatlog')?.replaceChildren();
+        // Pin the shared stream. `s` is TypeScript-private, which is compile
+        // time only, and both harvests run inside this one evaluate so no tick
+        // draws between them: the two commands consume the same draws in the
+        // same order on either branch.
+        sim.rng.s = 20457;
+        for (const id of ids) sim.harvestCorpse(id, undefined, pid);
+        return { ok: true };
+      }, staged.ids);
+      if (!harvested.ok) throw new Error(harvested.reason);
+      // The commands resolve on arrival but the events reach the HUD through
+      // the live 20 Hz drain, so give the loop real time.
+      await wait(1500);
+      if (variant?.mobile) {
+        // The touch layout parks the chat panel behind its own button; without
+        // this the clip target is not visible and the shot silently falls back
+        // to the whole HUD.
+        await page.evaluate(() => {
+          document
+            .getElementById('mobile-chat')
+            ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+        });
+        await wait(700);
+      }
       return { clip: '#chatlog-wrap' };
     },
   },
@@ -801,6 +985,55 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#market-window');
       return open ? { clip: '#market-window' } : {};
+    },
+  },
+  // The market-window target above shoots the browse grid with every dropdown CLOSED, so
+  // it is blind to the filter vocabulary itself. These two open the menus. Keyed on the
+  // shared query module (which holds the option lists) plus the view core (which decides
+  // WHICH menus a type raises), and deliberately NOT on ui/market_window, so an unrelated
+  // painter layout change does not drag them along.
+  {
+    key: 'market-type-filter-list',
+    label: 'World Market item-type filter list (open)',
+    when: ['sim/market_query', 'ui/market_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      if (!(await openMarketBrowse(page))) return {};
+      const opened = await page.evaluate(() => {
+        const menu = document.querySelector('[data-market-filter-menu="itemType"]');
+        const btn = menu?.querySelector('.mkt-select-btn');
+        if (!btn) return false;
+        btn.click();
+        return true;
+      });
+      if (!opened) return {};
+      await wait(250);
+      return { clip: '#market-window' };
+    },
+  },
+  {
+    key: 'market-bag-size-filter',
+    label: 'World Market bag capacity filter (Bags selected, sizes open)',
+    when: ['sim/market_query', 'ui/market_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // Skip rather than clip a selector that never appeared, matching the sibling
+      // market-window target: a shot of the whole page is worse than no shot.
+      if (!(await openMarketBrowse(page))) return {};
+      // On the BASE commit there is no 'bag' option, so this is a no-op and the shot
+      // is the plain browse tab: exactly the "before" this change is contrasted with.
+      await page.evaluate(() => {
+        document
+          .querySelector('[data-market-filter-menu="itemType"] [data-market-filter-option="bag"]')
+          ?.click();
+      });
+      await wait(250);
+      await page.evaluate(() => {
+        const menu = document.querySelector('[data-market-filter-menu="subtype"]');
+        menu?.querySelector('.mkt-select-btn')?.click();
+      });
+      await wait(250);
+      return { clip: '#market-window' };
     },
   },
   {
@@ -2897,6 +3130,17 @@ export const TARGETS = [
       { key: 'targets-replace', targets: true, replace: true },
       { key: 'targets-replace-mobile', targets: true, replace: true, mobile: true },
       { key: 'replace-confirm', targets: true, replace: true, replaceConfirm: true },
+      // The confirm on touch: this dialog carries the most copy of any state
+      // here (what dies, the no-refund ruling, what survives, the price), so
+      // the narrow landscape viewport is where it is most likely to wrap or
+      // clip, and it needs its own capture rather than a desktop stand-in.
+      {
+        key: 'replace-confirm-mobile',
+        targets: true,
+        replace: true,
+        replaceConfirm: true,
+        mobile: true,
+      },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -2916,6 +3160,15 @@ export const TARGETS = [
             // one on screen), and a plain bagged copy (the classic target), so
             // the target step paints all three families at once. Real ids
             // only, never hand-written display strings.
+            //
+            // The bagged victim carries ALL THREE surviving facts (#2421): the
+            // signature, a masterwork bake (str, distinct from the int the
+            // enchant contributes, so the confirm's kept line and the tooltip's
+            // own attribution split agree), and an armed bind-on-trade lock.
+            // That is what puts a full "Kept: ..." line on screen; the worn
+            // copy stays plain-enchanted, so the same shot also shows the arm
+            // that deliberately claims no bind state. The bagged plain copy of
+            // the SAME item id is the mixed holding whose twin now says so.
             sim.addItemInstance('eastbrook_arming_sword', {
               enchant: 'enchant_weapon_agility',
               rolled: { stats: { agi: 2 } },
@@ -2924,7 +3177,8 @@ export const TARGETS = [
             sim.addItemInstance('eastbrook_arming_sword', {
               signer: 'Aldric',
               enchant: 'enchant_weapon_intellect',
-              rolled: { stats: { int: 2 } },
+              rolled: { masterwork: true, stats: { int: 2, str: 3 } },
+              bindOnTrade: true,
             });
             sim.addItem('eastbrook_arming_sword', 1);
             sim.addItem('arcane_dust', 6);

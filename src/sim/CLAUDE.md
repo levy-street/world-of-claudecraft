@@ -124,6 +124,8 @@ legality), `cooldown_persist.ts` (cooldown save/load), `tab_target.ts`/`assist.t
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`
 (the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
+`market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus
+the load-time reissue that keeps one row per id),
 `vendor_stack.ts`, `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
 HUD), `resurrection.ts` (sickness rules shared by every death site), and the combat
 leaves `spell_resist.ts`/`ranged_shot.ts`/`aura_stacking.ts`/`aura_cancel.ts`/
@@ -218,7 +220,7 @@ persistence (`serializeCharacter`/`addPlayer`), the shared entry points above, a
   `localizeLootText` arm: `parseSimMoney` reverses the `"Ng Ns Nc"` fragment back to copper,
   then the i18n `formatMoney` formats it. Don't reach for the i18n `formatMoney`/`formatNumber`
   here, and don't hand-format with a separator a locale would change.
-- **Dev-channel text stays English.** The sim's only non-player text is a couple of
+- **Dev-channel text stays English.** The sim's only non-player text is a few
   `console.warn` diagnostics (no user-surfaced `throw`s); they are never matched. If a
   string would ever feed both a diagnostic log and a player-visible `SimEvent`, split it
   so only the player arm (`error`/`notice`) is registered in `sim_i18n.ts`.

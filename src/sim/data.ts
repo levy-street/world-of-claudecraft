@@ -288,6 +288,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     mines: sets.flatMap((s) => s.mines),
     docks: sets.flatMap((s) => s.docks),
     tents: sets.flatMap((s) => s.tents),
+    marshReeds: sets.flatMap((s) => s.marshReeds),
     crates: sets.flatMap((s) => s.crates),
     campfires: sets.flatMap((s) => s.campfires),
     mudHuts: sets.flatMap((s) => s.mudHuts),

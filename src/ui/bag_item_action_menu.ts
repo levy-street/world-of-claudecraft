@@ -16,7 +16,12 @@
 //     place), then world.applyEnchant. enchant_apply_view.ts models both steps.
 //     An already-enchanted target is a flagged REPLACE row (#2415): it routes
 //     through the same destroy-confirm family before sending, and only that
-//     dialog's OK sends the apply with the explicit confirm flag.
+//     dialog's OK sends the apply with the explicit confirm flag. That row
+//     paints as DESTRUCTIVE rather than informational, its confirm states what
+//     the swap KEEPS as well as what it destroys, and the plain twin of a mixed
+//     holding (an enchanted copy of the same id in the bags OR on the body)
+//     states its own state so the pair never differs by a sub-line alone
+//     (#2421); the pure core decides all three.
 //
 // The pure decisions live in the two view cores; this owns only DOM + dispatch,
 // talks to the world exclusively through IWorld, and never decides an outcome.
@@ -37,6 +42,7 @@ import {
   enchantNameKey,
   enchantSectionsForReagent,
   enchantTargets,
+  preservedTraitKey,
   wornEnchantTargets,
 } from './enchant_apply_view';
 import { itemDisplayName } from './entity_i18n';
@@ -51,6 +57,13 @@ import { itemPresentationName } from './procedural_item_presentation';
  *  class alone and every plain paint site clears it (the player/chat menus and
  *  the plain bag action menu render exactly as before). */
 export const CTX_MENU_PICKER_CLASS = 'ctx-menu-picker';
+
+/** Modifier class on a picker meta sub-line whose row is DESTRUCTIVE (#2421):
+ *  the replace flag, which promises to destroy an enchant, versus the purely
+ *  informational Worn / Not enchanted tags that render in the same muted style.
+ *  Styled in hud.css from the picker's existing warning token, with a
+ *  forced-colors arm that swaps the tint for a non-color cue. */
+export const CTX_ITEM_DANGER_CLASS = 'ctx-item-danger';
 
 /** The desktop CSS cap for a picker menu (hud.css #ctx-menu.ctx-menu-picker
  *  max-height: min(60vh, 560px)), mirrored so placement can reserve the real
@@ -289,9 +302,18 @@ export class BagItemActionMenu {
         }),
       )
       .join(', ');
+    // What the swap does NOT destroy (#2421), between the destroy warning and
+    // the price. The pure core decided WHICH traits the pinned victim actually
+    // carries (and, on the worn arm, which the online wire can honestly speak
+    // for), so an ordinary copy is never told its signature is safe: an empty
+    // list drops the line entirely rather than printing "Kept: ".
+    const keptText = (replace.preserved ?? [])
+      .map((trait) => t(preservedTraitKey(trait)))
+      .join(', ');
     const body = [
       t('hudChrome.enchanting.replaceConfirmBody', { item: name, old: oldText, new: newText }),
       t('hudChrome.enchanting.replaceConfirmNoRefund'),
+      ...(keptText ? [t('hudChrome.enchanting.replaceConfirmKeeps', { kept: keptText })] : []),
       t('hudChrome.enchanting.replaceConfirmCost', { cost: costText }),
     ].join('\n');
     this.deps.confirmDialog(
@@ -320,7 +342,6 @@ export class BagItemActionMenu {
   // never offered).
   private openTargetPicker(enchantId: string, x: number, y: number): void {
     const world = this.deps.world();
-    const targets = enchantTargets(world.inventory, enchantId);
     // The self entity mirror carries equippedInstances in BOTH worlds (offline
     // Sim and online ClientWorld), the same read the paperdoll tooltip uses.
     const worn = wornEnchantTargets(
@@ -328,6 +349,11 @@ export class BagItemActionMenu {
       world.entities.get(world.playerId)?.equippedInstances ?? {},
       enchantId,
     );
+    // Worn FIRST, because the bagged family needs it: an enchanted copy on the
+    // body leaves a bagged plain copy of the same id just as ambiguous as an
+    // enchanted bagged one would (#2421), and both paint into the one list a
+    // player reads. enchantTargets owns that decision; this only supplies it.
+    const targets = enchantTargets(world.inventory, enchantId, worn);
     const title = esc(t('hudChrome.enchanting.targetTitle'));
     if (targets.length === 0 && worn.length === 0) {
       this.paint(
@@ -344,12 +370,32 @@ export class BagItemActionMenu {
       const def = ITEMS[itemId];
       return esc(def ? itemPresentationName({ name: itemDisplayName(def) }, instance) : itemId);
     };
+    // A row that will DESTROY an enchant must not read like the purely
+    // informational Worn tag beside it (#2421), so the replace flag takes the
+    // picker's own warning modifier (CTX_ITEM_DANGER_CLASS, the .ctx-reagent
+    // .unsat token next door). The tint stays a redundant hint: the tag names
+    // the doomed enchant in words either way. The already-applied tag is NOT
+    // destructive (that row is inert) and keeps the plain meta style.
     const replaceMeta = (replace: EnchantReplaceTargetInfo): string =>
-      `<span class="ctx-item-meta">${esc(
-        replace.sameEnchant
-          ? t('hudChrome.enchanting.sameEnchantTag')
-          : t('hudChrome.enchanting.replaceTag', { enchant: this.replacedEnchantText(replace) }),
-      )}</span>`;
+      replace.sameEnchant
+        ? `<span class="ctx-item-meta">${esc(t('hudChrome.enchanting.sameEnchantTag'))}</span>`
+        : `<span class="ctx-item-meta ${CTX_ITEM_DANGER_CLASS}">${esc(
+            t('hudChrome.enchanting.replaceTag', { enchant: this.replacedEnchantText(replace) }),
+          )}</span>`;
+    // The plain twin of a MIXED HOLDING (#2421) states its own state, so the
+    // two rows sharing one item name differ by what each SAYS rather than by
+    // one of them carrying a sub-line and the other carrying none, which is all
+    // an assistive-tech user or a quick scan had to go on. The enchanted twin
+    // counts from EITHER family, bags or body, since this list shows both. Only
+    // on that twin: an unambiguous plain row stays tag-free (enchant_apply_view
+    // mixedHolding). Scoped to the ONE-ITEM-ID pair that flag describes, not to
+    // every possible duplicate name: a base item and its heroic variant share a
+    // display name across two ids (#2466), and two rings of one id both label
+    // "Worn (Finger)". Both predate this change and neither is claimed fixed
+    // here. A function, not a const string, so an ordinary target list with no
+    // mixed holding pays no t() call at all.
+    const plainMeta = (): string =>
+      `<span class="ctx-item-meta">${esc(t('hudChrome.enchanting.plainTag'))}</span>`;
     const rows = [
       ...worn.map((target) => {
         const html = `${nameOf(target.itemId, target.instance)}<span class="ctx-item-meta">${esc(
@@ -364,7 +410,10 @@ export class BagItemActionMenu {
           ? `@${encodeURIComponent(target.instanceUid)}`
           : target.itemId;
         if (!target.replace) {
-          return { act: `target:${selector}`, html: nameOf(target.itemId, target.instance) };
+          const html = `${nameOf(target.itemId, target.instance)}${
+            target.mixedHolding ? plainMeta() : ''
+          }`;
+          return { act: `target:${selector}`, html };
         }
         const html = `${nameOf(target.itemId, target.instance)}${replaceMeta(target.replace)}`;
         return target.replace.sameEnchant

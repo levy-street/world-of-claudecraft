@@ -6961,13 +6961,30 @@ export class Sim {
   // rewards) can't destroy items. Capacity is enforced by canAddItem pre-checks
   // at the command boundaries instead.
   // opts.silent suppresses only the client's default loot audio cue for this
-  // grant (the "You receive:" text line still prints); a caller with its own
-  // dedicated cue for the same grant (gathering/crafting/enchanting) sets
-  // this so the generic ding doesn't stack on top of it. Professions 2.0's
-  // later phases add new grant sites here (Phase 4 rare-event jackpot yields,
-  // Phase 13's disenchant UI wiring): pass { silent: true } from those too,
-  // or the new grants will double-ding the same way the original ones did.
-  addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void {
+  // grant; a caller with its own dedicated cue for the same grant
+  // (gathering/crafting/enchanting) sets this so the generic ding doesn't
+  // stack on top of it. opts.callerLogs is the text half of the same idea:
+  // the caller owns the player-visible line for this grant and renders a
+  // richer one off its own result event, so the hub's "You receive:" line
+  // stands down instead of printing a second line for the one grant (#2430).
+  // The two are independent by design, so set exactly the halves the caller
+  // owns: a profession grant whose result event carries BOTH its own cue and
+  // its own line sets both (gather/craft/disenchant/salvage/enchant/fishing),
+  // while a caller that owns only the line sets only callerLogs (the Maker's
+  // Bond unbind peel in professions/commission.ts, which has no cue of its
+  // own). A grant with no result event behind it sets NEITHER, or it goes
+  // invisible: the once-ever Codfather quest catch (professions/fishing.ts)
+  // returns before its emit, so the hub line and ding are its only feedback.
+  // Professions 2.0's later phases
+  // add new grant sites here (Phase 4 rare-event jackpot yields, Phase 13's
+  // disenchant UI wiring): pass the same opts from those too, or the new
+  // grants will double-ding and double-log the way the original ones did.
+  addItem(
+    itemId: string,
+    count: number,
+    pid?: number,
+    opts?: { silent?: boolean; callerLogs?: boolean },
+  ): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
@@ -6986,6 +7003,7 @@ export class Sim {
       // (the canonicalizer keeps `undefined` keys, tests/parity/trace.ts),
       // dragging goldens with no professions content into every regen.
       ...(opts?.silent ? { silent: true } : {}),
+      ...(opts?.callerLogs ? { callerLogs: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
     if (
@@ -7005,13 +7023,14 @@ export class Sim {
   // grant (a rare-event windfall) emits ONE loot line with the xN suffix
   // instead of one line and cue per unit; discovery and quest hooks fire once
   // per grant, matching addItem's per-call semantics.
-  // opts.silent: see addItem's matching param above, same contract.
+  // opts.silent / opts.callerLogs: see addItem's matching params above, same
+  // contract.
   addItemInstance(
     itemId: string,
     instance: ItemInstancePayload,
     pid?: number,
     count = 1,
-    opts?: { silent?: boolean },
+    opts?: { silent?: boolean; callerLogs?: boolean },
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -7061,6 +7080,7 @@ export class Sim {
       pid: meta.entityId,
       // Conditional, see the matching comment in addItem above.
       ...(opts?.silent ? { silent: true } : {}),
+      ...(opts?.callerLogs ? { callerLogs: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
   }
