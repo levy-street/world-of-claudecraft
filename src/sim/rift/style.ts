@@ -41,6 +41,7 @@ export interface StyleSource {
   wallTint?: number;
   floorTint?: number;
   daisRaised?: boolean;
+  lighting?: { sun: number; hemi: number; env: number; rim: number };
 }
 
 /** Per-run re-grade of a theme: identical on every host for a given rng stream. */
@@ -60,5 +61,6 @@ export function buildStyle(rng: Rng, theme: StyleSource): InteriorStyle {
     wallTint: theme.wallTint !== undefined ? jitterColor(rng, theme.wallTint, 0.06) : undefined,
     floorTint: theme.floorTint !== undefined ? jitterColor(rng, theme.floorTint, 0.06) : undefined,
     daisRaised: theme.daisRaised ?? false,
+    ...(theme.lighting ? { lighting: theme.lighting } : {}),
   };
 }

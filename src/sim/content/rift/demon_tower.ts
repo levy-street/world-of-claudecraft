@@ -76,6 +76,13 @@ export const DEMON_TOWER_STYLE: StyleSource = {
   wallTint: 0x8a5f6b,
   floorTint: 0x6b4550,
   daisRaised: false,
+  // The tower's OWN grade. It deliberately does not inherit the Infernal
+  // Citadel's, which pairs very dim fill (sun 0.48) with a heavy rim (2.15): on
+  // the citadel's uniformly blood-red models that reads as drama, but the tower
+  // fights sixteen differently-coloured demons and the same grade washed every
+  // one of them out to a pale rim-lit silhouette. More key and ambient light so
+  // the generated textures actually read, and a gentler rim.
+  lighting: { sun: 1.15, hemi: 0.85, env: 0.5, rim: 1.15 },
 };
 
 /** How many points the arena circle is sampled at. High enough that the wall

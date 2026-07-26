@@ -24,6 +24,12 @@ const MOBILE = { width: 430, height: 932, deviceScaleFactor: 2, isMobile: true, 
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/** Wait until the game global is actually live. A fixed sleep raced: the tower
+ * pulls in 35 GLBs, so first paint is slower than it used to be. */
+async function waitForGame(page) {
+  await page.waitForFunction(() => !!window.__game?.sim, { timeout: 90000, polling: 500 });
+}
+
 /** Put the player at the tower door and settle the camera. */
 async function gotoTowerDoor(page) {
   return page.evaluate(() => {
@@ -132,7 +138,8 @@ async function run(label, viewport, floors) {
   page.on('pageerror', (e) => console.log(`  [pageerror] ${e.message}`));
   await page.goto(GAME_URL, { waitUntil: 'networkidle2', timeout: 90000 });
   await enterOfflineGame(page, {});
-  await sleep(2500);
+  await waitForGame(page);
+  await sleep(1500);
 
   const door = await gotoTowerDoor(page);
   console.log(`${label} door:`, JSON.stringify(door));
@@ -143,7 +150,8 @@ async function run(label, viewport, floors) {
   for (const floor of floors) {
     await page.reload({ waitUntil: 'networkidle2', timeout: 90000 });
     await enterOfflineGame(page, {});
-    await sleep(2200);
+    await waitForGame(page);
+    await sleep(1500);
     const info = await enterTowerFloor(page, floor - 1);
     console.log(`${label} floor${floor}:`, JSON.stringify(info));
     await shoot(page, `after-${label}-floor${floor}`);

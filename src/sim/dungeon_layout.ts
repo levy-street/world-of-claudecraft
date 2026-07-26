@@ -113,6 +113,11 @@ export interface InteriorStyle {
   floorTint?: number;
   /** Whether the boss dais is a raised platform (as sanctum/temple) or flush. */
   daisRaised?: boolean;
+  /** Per-floor lighting grade. Without it an authored floor inherits the
+   * Infernal Citadel's grade, which pairs very dim fill with a strong rim: that
+   * reads as drama on the citadel's blood-red models and as WASHED-OUT on any
+   * other palette. A floor with its own look sets its own numbers here. */
+  lighting?: { sun: number; hemi: number; env: number; rim: number };
 }
 
 function grid(zFrom: number, zTo: number, zStep: number, xs: readonly number[]): GridPoint[] {

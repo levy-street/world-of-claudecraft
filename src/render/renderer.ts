@@ -5549,6 +5549,10 @@ export class Renderer {
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
+  /** The active rift floor's own lighting grade, or null to inherit the
+   * authored/procedural default. Cached like riftFogAuthored, because the
+   * style is only read when the floor key changes. */
+  private riftFogLighting: { sun: number; hemi: number; env: number; rim: number } | null = null;
   private fogState:
     | 'outdoor'
     | 'dungeon'
@@ -5929,6 +5933,7 @@ export class Renderer {
         );
         this.riftFogAuthored = floor.authored === true;
         const style = floor.style;
+        this.riftFogLighting = style.lighting ?? null;
         fog.color.setHex(style.fog.color);
         fog.near = style.fog.near;
         fog.far = style.fog.far;
@@ -5936,10 +5941,31 @@ export class Renderer {
       this.fogState = 'rift';
       if (!this.lowGfx) {
         const authored = this.riftFogAuthored;
-        this.sun.intensity = authored ? INFERNAL_SUN_INTENSITY : DUNGEON_SUN_INTENSITY;
-        this.hemi.intensity = authored ? INFERNAL_HEMI_INTENSITY : DUNGEON_HEMI_INTENSITY;
-        this.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
-        sharedUniforms.uRimBoost.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
+        // A floor may carry its OWN grade (InteriorStyle.lighting). Without one an
+        // authored floor falls back to the Infernal Citadel's, which is very dim
+        // fill plus a strong rim: dramatic on the citadel's blood-red models,
+        // washed-out on any other palette.
+        const grade = this.riftFogLighting;
+        this.sun.intensity = grade
+          ? grade.sun
+          : authored
+            ? INFERNAL_SUN_INTENSITY
+            : DUNGEON_SUN_INTENSITY;
+        this.hemi.intensity = grade
+          ? grade.hemi
+          : authored
+            ? INFERNAL_HEMI_INTENSITY
+            : DUNGEON_HEMI_INTENSITY;
+        this.scene.environmentIntensity = grade
+          ? grade.env
+          : authored
+            ? INFERNAL_ENV_INTENSITY
+            : DUNGEON_ENV_INTENSITY;
+        sharedUniforms.uRimBoost.value = grade
+          ? grade.rim
+          : authored
+            ? INFERNAL_RIM_BOOST
+            : DUNGEON_RIM_BOOST;
       }
       return;
     }

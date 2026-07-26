@@ -57,7 +57,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 15,
     loot: demonLoot(70),
-    scale: 0.8,
+    scale: 1.32,
     color: 0xd94f2a,
   },
   tower_hellhound: {
@@ -75,7 +75,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 8.6,
     aggroRadius: 16,
     loot: demonLoot(90),
-    scale: 1.05,
+    scale: 1.73,
     color: 0x8f2417,
     bleed: { chance: 0.3, perTick: 6, interval: 2, duration: 8, name: 'Rending Fangs' },
   },
@@ -95,7 +95,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 14,
     loot: demonLoot(120),
-    scale: 1.2,
+    scale: 1.98,
     color: 0xb03a1e,
     // Punishes a stacked raid: spread or eat the sweep.
     cleave: { radius: 7, mult: 0.55, name: 'Reaving Sweep' },
@@ -116,7 +116,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 6.6,
     aggroRadius: 22,
     loot: demonLoot(130),
-    scale: 1.1,
+    scale: 1.81,
     color: 0xe0742a,
     // Marks its target so the rest of the wave hits harder: the first demon that
     // makes the raid care which one it is standing next to.
@@ -139,7 +139,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 18,
     loot: demonLoot(150),
-    scale: 1.15,
+    scale: 1.9,
     color: 0x7d2ad9,
     // The wave will not die until this one does: the first real target-priority
     // demand the tower makes of a raid.
@@ -161,7 +161,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 6.2,
     aggroRadius: 15,
     loot: demonLoot(180),
-    scale: 1.45,
+    scale: 2.39,
     color: 0x6b6f78,
     // A wall: heavily armored, and it hardens further mid-wave.
     stoneskin: { amount: 420, every: 14, duration: 6, name: 'Iron Rite' },
@@ -182,7 +182,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 7.2,
     aggroRadius: 17,
     loot: demonLoot(220),
-    scale: 1.55,
+    scale: 2.56,
     color: 0x3b2a6b,
     cleave: { radius: 8, mult: 0.6, name: 'Abyssal Arc' },
     // Breaks a formation apart right when the arena is at its tightest.
@@ -204,7 +204,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 20,
     loot: demonLoot(260),
-    scale: 1.6,
+    scale: 2.64,
     color: 0x9b1f4d,
     soulrot: { chance: 0.3, perTick: 11, interval: 2, duration: 10, name: 'Withering Dread' },
     terrify: { every: 18, radius: 10, duration: 2, name: 'Toll of Dread' },
@@ -227,7 +227,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 8.8,
     aggroRadius: 16,
     loot: demonLoot(60),
-    scale: 0.75,
+    scale: 1.24,
     color: 0x7b5bd6,
   },
   tower_cinder_crawler: {
@@ -245,7 +245,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 14,
     loot: demonLoot(80),
-    scale: 0.95,
+    scale: 1.57,
     color: 0xd2691e,
     smolder: { chance: 0.28, perTick: 6, interval: 2, duration: 8, name: 'Ember Bite' },
   },
@@ -265,7 +265,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 16,
     loot: demonLoot(110),
-    scale: 1.05,
+    scale: 1.73,
     color: 0xcfc6a8,
     // Drains the tank's healing window: the first "watch the debuff" demon.
     healAbsorb: { chance: 0.22, amount: 120, duration: 8, name: 'Censer Rot' },
@@ -286,7 +286,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 8.4,
     aggroRadius: 18,
     loot: demonLoot(140),
-    scale: 1.1,
+    scale: 1.81,
     color: 0x2f2a45,
     // Fast and bleeds: punishes ignoring the loose adds at the back.
     bleed: { chance: 0.35, perTick: 9, interval: 2, duration: 8, name: 'Twin Fangs' },
@@ -307,7 +307,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 18,
     loot: demonLoot(160),
-    scale: 1.2,
+    scale: 1.98,
     color: 0xff7a1a,
     // Buffs the pack around it, so it is a second priority target after the
     // Soulbinder: kill order starts to matter from here up.
@@ -329,7 +329,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 6.4,
     aggroRadius: 15,
     loot: demonLoot(200),
-    scale: 1.5,
+    scale: 2.47,
     color: 0x6f8f4a,
     cleave: { radius: 7.5, mult: 0.55, name: 'Putrid Sweep' },
     // Bursts on death: the raid cannot simply melt it while stacked on it.
@@ -351,7 +351,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 7.2,
     aggroRadius: 19,
     loot: demonLoot(230),
-    scale: 1.4,
+    scale: 2.31,
     color: 0x8e1230,
     // Heals itself off the raid: a damage race the healers feel.
     lifeleech: { healFrac: 0.35, chance: 0.4, name: 'Crimson Draught' },
@@ -373,7 +373,7 @@ const WAVE_DEMONS: Record<string, MobTemplate> = {
     moveSpeed: 6.8,
     aggroRadius: 18,
     loot: demonLoot(250),
-    scale: 1.7,
+    scale: 2.8,
     color: 0x4a3a7a,
     stoneskin: { amount: 520, every: 15, duration: 7, name: 'Sealed Form' },
     knockback: { chance: 0.24, distance: 7, name: 'Null Pulse' },
@@ -406,7 +406,7 @@ const TOWER_BOSSES: Record<string, MobTemplate> = {
       { itemId: 'pactbound_vestments', chance: 0.18 },
       { itemId: RIFT_ESSENCE_ITEM_ID, chance: 1 },
     ],
-    scale: 2.4,
+    scale: 3.96,
     color: 0x9a8f7a,
     summonAdds: { mobId: 'tower_gloom_bat', count: 4, atHpPct: [0.7, 0.4] },
     mendAlly: { healMin: 90, healMax: 140, radius: 20, every: 7, name: 'Graft Flesh' },
@@ -440,7 +440,7 @@ const TOWER_BOSSES: Record<string, MobTemplate> = {
       { itemId: RIFT_ESSENCE_ITEM_ID, chance: 1 },
       { itemId: RIFT_ESSENCE_ITEM_ID, chance: 0.8 },
     ],
-    scale: 3.0,
+    scale: 4.95,
     color: 0xff5a1e,
     bigCast: {
       castId: 'tower_ashfall',
@@ -494,7 +494,7 @@ const TOWER_BOSSES: Record<string, MobTemplate> = {
       { itemId: RIFT_ESSENCE_ITEM_ID, chance: 1 },
       { itemId: RIFT_ESSENCE_ITEM_ID, chance: 0.6 },
     ],
-    scale: 2.7,
+    scale: 4.46,
     color: 0xc2431a,
     stomp: { radius: 11, every: 12, duration: 1.4, min: 20, max: 30, name: 'Warden the Gate' },
     aoePulse: {
@@ -543,7 +543,7 @@ const TOWER_BOSSES: Record<string, MobTemplate> = {
       { itemId: RIFT_ESSENCE_ITEM_ID, chance: 1 },
       { itemId: RIFT_ESSENCE_ITEM_ID, chance: 1 },
     ],
-    scale: 3.3,
+    scale: 5.44,
     color: 0xff2d6a,
     bigCast: {
       castId: 'tower_unmaking',
