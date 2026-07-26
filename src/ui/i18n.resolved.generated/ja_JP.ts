@@ -2576,8 +2576,6 @@ export const ja_JP: EnTranslations = {
       "raidSharedDrop": "最後の死体には、レイド全員でロールする共有の手続き生成アイテムが1個追加されます。",
       "raidRarityLine": "レア {rare}% · エピック {epic}% · レジェンダリー {legendary}%",
       "raidItemLevels": "アイテムレベル：レア {rare} · エピック {epic} · レジェンダリー {legendary}",
-      "raidCurrenciesNormal": "参加者1人につき不死の欠片 +{fragments}個",
-      "raidCurrenciesHeroic": "参加者1人につき不死の欠片 +{fragments}個、英雄の証 +{marks}個",
       "raidSignatures": "固有レジェンダリー威力：{signatures}",
       "raidForgedLegendary": "英雄レジェンダリーの威力はレイド鍛造となり、設定されたロール範囲の上半分が保証されます。",
       "entrance": "入口：{zone}",
@@ -5200,52 +5198,7 @@ export const ja_JP: EnTranslations = {
     "buyConfirmTitle": "購入の確認",
     "buyConfirmBody": "英雄の証{marks}個で{item}を購入しますか？証での購入は返金できません。",
     "buyConfirmAccept": "購入",
-    "buyConfirmCancel": "キャンセル",
-    "tabsAria": "補給将校のサービス",
-    "fragmentBalance": "不死の欠片：{count}",
-    "tab": {
-      "gear": "英雄級装備",
-      "forge": "不死の鍛造所",
-      "tune": "レジェンダリー調整"
-    },
-    "gearIntro": "英雄の証を使って、補給将校の既存商品を購入します。",
-    "forgeIntro": "報酬の系統とベースアイテムを選択します。正確なオファーと支払いが検証された後にのみ、レルムがランダムな特性を決定します。",
-    "tuneIntro": "バッグ内のニスラクシス製レジェンダリーを1個選択します。レルムは置換候補を2回ロールし、最良の結果を残します。威力は低下しませんが、変化しない場合があります。",
-    "tuneEmpty": "バッグ内に調整可能なニスラクシス製レジェンダリーがありません。",
-    "heroicClearReady": "現在のデイリーロックアウトで英雄級ニスラクシスの討伐を確認済みです。",
-    "heroicClearNeeded": "英雄級の対象には、現在のデイリーロックアウトでニスラクシスを討伐する必要があります。",
-    "itemLevel": "アイテムレベル {level}",
-    "cost": "不死の欠片 {fragments}個 · 英雄の証 {marks}個",
-    "randomAffixes": "ランダムな特性と数値",
-    "deterministicStats": "設計済み固定報酬",
-    "raidForgedGuarantee": "レイド鍛造威力、上半分のロールを保証",
-    "raidForged": "レイド鍛造",
-    "raidDrop": "ニスラクシスのレイド・レジェンダリー",
-    "reforgeCount": "調整回数：{count}",
-    "forgeKind": {
-      "normal_procedural": "通常級の手続き生成エピック",
-      "heroic_procedural": "英雄級の手続き生成エピック",
-      "signature": "英雄級固有レジェンダリー",
-      "authored": "設計済み対象報酬"
-    },
-    "blocked": {
-      "class": "あなたのクラスでは使用できません",
-      "heroic_clear": "現在の英雄級ニスラクシス討伐が必要です",
-      "fragments": "不死の欠片が足りません",
-      "marks": "英雄の証が足りません"
-    },
-    "forgeConfirmTitle": "鍛造の確認",
-    "forgeConfirmBody": "{item}を不死の欠片{fragments}個と英雄の証{marks}個で鍛造しますか？レルムは支払いを検証した後にアイテムをロールします。",
-    "forgeConfirmAccept": "鍛造",
-    "tuneConfirmTitle": "レジェンダリー調整の確認",
-    "tuneConfirmBody": "{item}のこの個体を、不死の欠片{fragments}個と英雄の証{marks}個で調整しますか？2回のうち最良のロールが残り、威力は低下しませんが変化しない場合があります。",
-    "tuneConfirmAccept": "調整",
-    "status": {
-      "pending": "レルムからの応答を待っています……",
-      "gear": "購入が完了し、残高を更新しました。",
-      "forge": "鍛造が完了し、新しい報酬がバッグに入りました。",
-      "tune": "調整が完了し、対象の個体と残高を更新しました。"
-    }
+    "buyConfirmCancel": "キャンセル"
   },
   "cardDuel": {
     "title": "カードデュエル",
@@ -9918,9 +9871,6 @@ export const ja_JP: EnTranslations = {
       "heroic_mark": {
         "name": "英雄の証"
       },
-      "deathless_fragment": {
-        "name": "不死の欠片"
-      },
       "eastbrook_buckler": {
         "name": "イーストブルックのバックラー"
       },
@@ -11923,11 +11873,6 @@ export const ja_JP: EnTranslations = {
         "sender": "英雄級補給官",
         "subject": "あなたの英雄の印",
         "body": "あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官"
-      },
-      "nythraxis_rewards": {
-        "sender": "不死者の補給官",
-        "subject": "不死の財宝からの取り分",
-        "body": "あなたの戦団は不死王を打ち破りました。あなたが側面で戦っていた時も、地に倒れていた時も、墓地から戻る長い道の途中にいた時もです。あなたの日次受領権も仲間と同時に記録されたため、獲得した個人戦利品は失われず、ここへ届けられます。報酬を形作る準備ができたら、欠片を英雄級補給官へ持ってきてください。\n\n- 不死者の補給官"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "製作ギルド",

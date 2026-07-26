@@ -429,8 +429,7 @@ export const COMMAND_NAMES = [
   'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
-  'nythraxis_forge',
-  'nythraxis_tune',
+
   'vcup_queue',
   'vcup_leave',
   'vcup_role',
@@ -688,8 +687,7 @@ export const COMMAND_FACETS = {
   leave_dungeon: 'IWorldDungeons',
   set_dungeon_difficulty: 'IWorldDungeons',
   heroic_buy: 'IWorldDungeons',
-  nythraxis_forge: 'IWorldDungeons',
-  nythraxis_tune: 'IWorldDungeons',
+
   // IWorldDelves: delve enter/leave + interact + companion upgrade + Marks-vendor buy
   // + lockpick lifecycle + chest collect. Note the wire-name skew: delveBuyShopItem
   // sends `delve_buy`, so the tag is keyed on the WIRE string `delve_buy`. The reads

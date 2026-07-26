@@ -16,52 +16,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.raidRewards': '니스락시스 보상 미리 보기',
   'hudChrome.finder.raidRarityLine': '희귀 {rare}% · 영웅 {epic}% · 전설 {legendary}%',
   'hudChrome.finder.raidItemLevels': '아이템 레벨: 희귀 {rare} · 영웅 {epic} · 전설 {legendary}',
-  'hudChrome.finder.raidCurrenciesNormal': '참가자당 불멸의 파편 +{fragments}개',
-  'hudChrome.finder.raidCurrenciesHeroic':
-    '참가자당 불멸의 파편 +{fragments}개와 영웅의 징표 +{marks}개',
   'hudChrome.finder.raidSignatures': '고유 전설 위력: {signatures}',
-  'heroicShop.tabsAria': '병참장교 서비스',
-  'heroicShop.fragmentBalance': '불멸의 파편: {count}',
-  'heroicShop.tab.gear': '영웅 난이도 장비',
-  'heroicShop.tab.forge': '불멸의 대장간',
-  'heroicShop.tab.tune': '전설 조율',
-  'heroicShop.gearIntro': '영웅의 징표로 병참장교의 기존 물품을 구매합니다.',
-  'heroicShop.tuneEmpty': '가방에 조율할 수 있는 니스락시스 전설 아이템이 없습니다.',
-  'heroicShop.heroicClearReady': '현재 일일 잠금에서 영웅 난이도 니스락시스 처치를 확인했습니다.',
-  'heroicShop.heroicClearNeeded':
-    '영웅 난이도 대상에는 현재 일일 잠금에서 니스락시스를 처치한 기록이 필요합니다.',
-  'heroicShop.itemLevel': '아이템 레벨 {level}',
-  'heroicShop.cost': '불멸의 파편 {fragments}개 · 영웅의 징표 {marks}개',
-  'heroicShop.randomAffixes': '무작위 속성과 수치',
-  'heroicShop.deterministicStats': '고정 설계 보상',
-  'heroicShop.raidForgedGuarantee': '공격대 제련 위력, 상위 절반 수치 보장',
-  'heroicShop.raidForged': '공격대 제련',
-  'heroicShop.raidDrop': '니스락시스 공격대 전설 아이템',
-  'heroicShop.reforgeCount': '조율 횟수: {count}',
-  'heroicShop.forgeKind.normal_procedural': '일반 난이도 절차 생성 영웅 아이템',
-  'heroicShop.forgeKind.heroic_procedural': '영웅 난이도 절차 생성 영웅 아이템',
-  'heroicShop.forgeKind.signature': '영웅 난이도 고유 전설',
-  'heroicShop.forgeKind.authored': '고정 설계 대상 보상',
-  'heroicShop.blocked.class': '현재 직업과 호환되지 않습니다',
-  'heroicShop.blocked.heroic_clear': '현재 영웅 난이도 니스락시스 처치가 필요합니다',
-  'heroicShop.blocked.fragments': '불멸의 파편이 부족합니다',
-  'heroicShop.blocked.marks': '영웅의 징표가 부족합니다',
-  'heroicShop.forgeConfirmTitle': '제련 확인',
-  'heroicShop.forgeConfirmBody':
-    '{item}을(를) 불멸의 파편 {fragments}개와 영웅의 징표 {marks}개로 제련하시겠습니까? 서버가 비용을 검증한 뒤 아이템을 생성합니다.',
-  'heroicShop.forgeConfirmAccept': '제련',
-  'heroicShop.tuneConfirmTitle': '전설 조율 확인',
-  'heroicShop.tuneConfirmAccept': '조율',
-  'heroicShop.status.pending': '서버 응답을 기다리는 중입니다……',
-  'heroicShop.status.gear': '구매가 완료되어 잔액을 갱신했습니다.',
-  'heroicShop.status.forge': '제련이 완료되어 새 보상이 가방에 들어갔습니다.',
-  'heroicShop.status.tune': '조율이 완료되어 해당 개체와 잔액을 갱신했습니다.',
-  'heroicShop.forgeIntro':
-    '보상 계열과 기본 아이템을 선택하세요. 서버는 정확한 제안과 비용을 검증한 뒤에만 무작위 속성을 결정합니다.',
-  'heroicShop.tuneIntro':
-    '가방에 있는 니스락시스 전설 아이템 한 개를 정확히 선택하세요. 서버가 대체 위력을 두 번 굴려 더 좋은 결과를 유지합니다. 위력은 낮아지지 않지만 변화가 없을 수 있습니다.',
-  'heroicShop.tuneConfirmBody':
-    '이 {item} 개체를 불멸의 파편 {fragments}개와 영웅의 징표 {marks}개로 조율하시겠습니까? 두 번 중 더 좋은 결과를 유지하며, 위력은 낮아지지 않지만 그대로일 수 있습니다.',
   'hudChrome.finder.raidSharedDrop':
     '마지막 시체에 공격대가 함께 주사위를 굴릴 절차 생성 아이템 한 개가 추가됩니다.',
   'hudChrome.finder.raidForgedLegendary':
@@ -4055,7 +4010,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.kings_signet.name': '왕의 인장 반지',
   'entities.items.event_skin_token.name': '신비한 외형 상자',
   'entities.items.heroic_mark.name': '영웅의 징표',
-  'entities.items.deathless_fragment.name': '불멸의 파편',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
   'entities.items.morthens_cryptforged_hauberk.name': '모르텐의 묘지주조 사슬갑옷',
@@ -7171,10 +7125,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': '당신의 영웅의 징표',
   'entities.letters.heroic_marks_reward.body':
     '당신이 후방에서, 혹은 쓰러진 채로 싸우는 동안 당신의 부대가 영웅 시련을 돌파했습니다. 잠금은 똑같이 적용되었으니, 당신 몫의 영웅의 징표는 사라지지 않고 이곳으로 날아왔습니다. 잘 쓰십시오.\n\n- 영웅 병참장교',
-  'entities.letters.nythraxis_rewards.sender': '불멸 병참장교',
-  'entities.letters.nythraxis_rewards.subject': '불멸의 보물에서 얻은 당신의 몫',
-  'entities.letters.nythraxis_rewards.body':
-    '당신의 전투단이 불멸왕을 쓰러뜨렸습니다. 당신이 측면에서 싸우고 있었거나, 땅에 쓰러져 있었거나, 묘지에서 돌아오는 긴 길 위에 있었더라도 말입니다. 당신의 일일 보상 권리도 동료들과 함께 기록되었으므로, 획득한 개인 전리품은 사라지지 않고 이곳으로 배달됩니다. 보상을 빚을 준비가 되면 파편을 영웅 병참장교에게 가져오십시오.\n\n- 불멸 병참장교',
   'entities.letters.guild_trend_engineering_alchemy.sender': '제작 길드',
   'entities.letters.guild_trend_engineering_alchemy.subject': '기계공학과 연금술 솜씨에 관하여',
   'entities.letters.guild_trend_engineering_alchemy.body':

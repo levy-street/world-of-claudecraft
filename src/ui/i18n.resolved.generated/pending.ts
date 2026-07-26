@@ -10,10 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -31,10 +27,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "es_ES": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -52,10 +44,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "fr_FR": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -73,10 +61,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "fr_CA": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -95,10 +79,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -116,10 +96,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "de_DE": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -141,10 +117,6 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -163,10 +135,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -184,10 +152,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "nl_NL": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -205,10 +169,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "pl_PL": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -226,10 +186,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "id_ID": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -247,10 +203,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "tr_TR": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -268,10 +220,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "sv_SE": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -289,10 +237,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "vi_VN": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -310,10 +254,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "da_DK": [
-    "entities.items.deathless_fragment.name",
-    "entities.letters.nythraxis_rewards.body",
-    "entities.letters.nythraxis_rewards.sender",
-    "entities.letters.nythraxis_rewards.subject",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",

@@ -2576,8 +2576,6 @@ export const pt_BR: EnTranslations = {
       "raidSharedDrop": "O cadáver do chefe final adiciona um item procedural compartilhado para a raide disputar em uma rolagem.",
       "raidRarityLine": "Raro {rare}% · Épico {epic}% · Lendário {legendary}%",
       "raidItemLevels": "Nível do item: Raro {rare} · Épico {epic} · Lendário {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Fragmento Imortal por participante",
-      "raidCurrenciesHeroic": "+{fragments} Fragmentos Imortais e +{marks} Marcas Heroicas por participante",
       "raidSignatures": "Poderes Lendários distintivos: {signatures}",
       "raidForgedLegendary": "Os poderes Lendários Heroicos são forjados em raide e têm rolagem garantida na metade superior do intervalo definido.",
       "entrance": "Entrada: {zone}",
@@ -5200,52 +5198,7 @@ export const pt_BR: EnTranslations = {
     "buyConfirmTitle": "Confirmar compra",
     "buyConfirmBody": "Comprar {item} por {marks} Marcas Heroicas? As compras de marcas não podem ser reembolsadas.",
     "buyConfirmAccept": "Comprar",
-    "buyConfirmCancel": "Cancelar",
-    "tabsAria": "Serviços do Intendente",
-    "fragmentBalance": "Fragmentos Imortais: {count}",
-    "tab": {
-      "gear": "Equipamento Heroico",
-      "forge": "Forja Imortal",
-      "tune": "Recalibragem Lendária"
-    },
-    "gearIntro": "Gaste Marcas Heroicas no estoque habitual do Intendente.",
-    "forgeIntro": "Escolha a família de recompensa e o item-base. O reino só realiza a rolagem aleatória dos afixos procedurais depois de validar a oferta exata e o pagamento.",
-    "tuneIntro": "Escolha um Lendário de Nythraxis específico nas suas bolsas. O reino faz duas novas rolagens de poder e mantém o melhor resultado. O poder nunca diminui, mas uma recalibragem pode não produzir alteração.",
-    "tuneEmpty": "Não há nenhum Lendário de Nythraxis elegível nas suas bolsas.",
-    "heroicClearReady": "Conclusão de Nythraxis no modo Heroico verificada para este bloqueio diário.",
-    "heroicClearNeeded": "As recompensas Heroicas exigem a conclusão de Nythraxis no modo Heroico durante o bloqueio atual.",
-    "itemLevel": "Nível do item {level}",
-    "cost": "{fragments} Fragmentos · {marks} Marcas Heroicas",
-    "randomAffixes": "Afixos e valores aleatórios",
-    "deterministicStats": "Recompensa fixa predefinida",
-    "raidForgedGuarantee": "Poder forjado em raide, com rolagem garantida na metade superior",
-    "raidForged": "Forjado em raide",
-    "raidDrop": "Lendário da raide de Nythraxis",
-    "reforgeCount": "Recalibragens: {count}",
-    "forgeKind": {
-      "normal_procedural": "Épico procedural Normal",
-      "heroic_procedural": "Épico procedural Heroico",
-      "signature": "Lendário distintivo Heroico",
-      "authored": "Recompensa-alvo predefinida"
-    },
-    "blocked": {
-      "class": "Não compatível com sua classe",
-      "heroic_clear": "Requer a conclusão de Nythraxis no modo Heroico durante o bloqueio atual",
-      "fragments": "Fragmentos Imortais insuficientes",
-      "marks": "Marcas Heroicas insuficientes"
-    },
-    "forgeConfirmTitle": "Confirmar forja",
-    "forgeConfirmBody": "Forjar {item} por {fragments} Fragmentos Imortais e {marks} Marcas Heroicas? O reino realiza a rolagem do item após validar o pagamento.",
-    "forgeConfirmAccept": "Forjar",
-    "tuneConfirmTitle": "Confirmar Recalibragem Lendária",
-    "tuneConfirmBody": "Recalibrar esta cópia exata de {item} por {fragments} Fragmentos Imortais e {marks} Marcas Heroicas? O melhor de duas rolagens será mantido; o poder não pode diminuir, mas pode permanecer inalterado.",
-    "tuneConfirmAccept": "Recalibrar",
-    "status": {
-      "pending": "Aguardando o reino...",
-      "gear": "Compra concluída. Saldos atualizados.",
-      "forge": "Forja concluída. A nova recompensa está nas suas bolsas.",
-      "tune": "Recalibragem concluída. A cópia exata e os saldos foram atualizados."
-    }
+    "buyConfirmCancel": "Cancelar"
   },
   "cardDuel": {
     "title": "Duelo de Cartas",
@@ -9918,9 +9871,6 @@ export const pt_BR: EnTranslations = {
       "heroic_mark": {
         "name": "Marca Heroica"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Broquel de Eastbrook"
       },
@@ -11923,11 +11873,6 @@ export const pt_BR: EnTranslations = {
         "sender": "Intendente heroico",
         "subject": "Suas Marcas heroicas",
         "body": "Seu grupo venceu a provação heroica enquanto você lutava na retaguarda ou jazia caído. Seu vínculo também foi registrado, então sua parte das Marcas heroicas chegou aqui em vez de se perder. Use-as bem.\n\n- Intendente heroico"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "A Guilda de Artesanato",

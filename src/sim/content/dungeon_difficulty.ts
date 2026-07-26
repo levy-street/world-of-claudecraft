@@ -254,6 +254,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     },
     armorMultiplier: 1.2,
     finalBossId: 'nythraxis_scourge_of_thornpeak',
-    marksPerParticipant: 3,
+    // Raid progression is the shared corpse drop only.
+    marksPerParticipant: 0,
   },
 };

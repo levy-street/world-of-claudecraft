@@ -2576,8 +2576,6 @@ export const da_DK: EnTranslations = {
       "raidSharedDrop": "Slutbossens lig tilføjer én fælles procedurel genstand, som raidet kan rulle om.",
       "raidRarityLine": "Sjælden {rare}% · Episk {epic}% · Legendarisk {legendary}%",
       "raidItemLevels": "Genstandsniveau: Sjælden {rare} · Episk {epic} · Legendarisk {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Dødsløst Fragment pr. deltager",
-      "raidCurrenciesHeroic": "+{fragments} Dødsløse Fragmenter og +{marks} Heroiske Mærker pr. deltager",
       "raidSignatures": "Legendariske signaturkræfter: {signatures}",
       "raidForgedLegendary": "Heroiske legendariske kræfter er raidsmedede og garanteres et rul i den øverste halvdel af deres fastlagte interval.",
       "entrance": "Indgang: {zone}",
@@ -5200,52 +5198,7 @@ export const da_DK: EnTranslations = {
     "buyConfirmTitle": "Bekræft køb",
     "buyConfirmBody": "Køb {item} for {marks} Heroiske Mærker? Køb med mærker kan ikke refunderes.",
     "buyConfirmAccept": "Køb",
-    "buyConfirmCancel": "Annuller",
-    "tabsAria": "Kvartermesterens tjenester",
-    "fragmentBalance": "Dødsløse Fragmenter: {count}",
-    "tab": {
-      "gear": "Heroisk Udstyr",
-      "forge": "Dødsløs Smedje",
-      "tune": "Legendarisk Finjustering"
-    },
-    "gearIntro": "Brug Heroiske Mærker på kvartermesterens faste varesortiment.",
-    "forgeIntro": "Vælg belønningsfamilien og basisgenstanden. Riget ruller først tilfældige procedurelle affikser, efter det præcise tilbud og betalingen er valideret.",
-    "tuneIntro": "Vælg én specifik legendarisk Nythraxis-genstand fra dine tasker. Riget ruller to erstatningsværdier for kraften og beholder det bedste resultat. Kraften falder aldrig, men en finjustering kan ende uden ændring.",
-    "tuneEmpty": "Der er ingen legendarisk Nythraxis-genstand i dine tasker, som kan finjusteres.",
-    "heroicClearReady": "Heroisk sejr over Nythraxis bekræftet for denne daglige låsning.",
-    "heroicClearNeeded": "Heroiske mål kræver en aktuel heroisk sejr over Nythraxis.",
-    "itemLevel": "Genstandsniveau {level}",
-    "cost": "{fragments} Fragmenter · {marks} Heroiske Mærker",
-    "randomAffixes": "Tilfældige affikser og værdier",
-    "deterministicStats": "Fast udformet belønning",
-    "raidForgedGuarantee": "Raidsmedet kraft, garanteret rul i den øverste halvdel",
-    "raidForged": "Raidsmedet",
-    "raidDrop": "Legendarisk Nythraxis-raidbytte",
-    "reforgeCount": "Finjusteringer: {count}",
-    "forgeKind": {
-      "normal_procedural": "Normal procedurel episk genstand",
-      "heroic_procedural": "Heroisk procedurel episk genstand",
-      "signature": "Heroisk signatur, legendarisk",
-      "authored": "Fast udformet målbelønning"
-    },
-    "blocked": {
-      "class": "Ikke kompatibel med din klasse",
-      "heroic_clear": "Kræver en aktuel heroisk sejr over Nythraxis",
-      "fragments": "Ikke nok Dødsløse Fragmenter",
-      "marks": "Ikke nok Heroiske Mærker"
-    },
-    "forgeConfirmTitle": "Bekræft smedning",
-    "forgeConfirmBody": "Smed {item} for {fragments} Dødsløse Fragmenter og {marks} Heroiske Mærker? Riget ruller genstanden, efter betalingen er valideret.",
-    "forgeConfirmAccept": "Smed",
-    "tuneConfirmTitle": "Bekræft legendarisk finjustering",
-    "tuneConfirmBody": "Finjuster dette præcise eksemplar af {item} for {fragments} Dødsløse Fragmenter og {marks} Heroiske Mærker? Det bedste af to rul beholdes; kraften kan ikke falde, men den kan forblive uændret.",
-    "tuneConfirmAccept": "Finjuster",
-    "status": {
-      "pending": "Venter på riget...",
-      "gear": "Køb fuldført. Saldi opdateret.",
-      "forge": "Smedning fuldført. Den nye belønning ligger i dine tasker.",
-      "tune": "Finjustering fuldført. Det præcise eksemplar og dine saldi blev opdateret."
-    }
+    "buyConfirmCancel": "Annuller"
   },
   "cardDuel": {
     "title": "Kortduel",
@@ -9918,9 +9871,6 @@ export const da_DK: EnTranslations = {
       "heroic_mark": {
         "name": "Heroisk Mærke"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Østbæk Rundskjold"
       },
@@ -11923,11 +11873,6 @@ export const da_DK: EnTranslations = {
         "sender": "Heroisk kvartermester",
         "subject": "Dine heroiske mærker",
         "body": "Din gruppe klarede den heroiske prøve, mens du kæmpede i bagtroppen eller lå faldet. Din låsning blev også registreret, så din andel af de heroiske mærker blev sendt hertil i stedet for at gå tabt. Brug dem godt.\n\n- Heroisk kvartermester"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Håndværkerlauget",

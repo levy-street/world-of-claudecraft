@@ -2576,8 +2576,6 @@ export const nl_NL: EnTranslations = {
       "raidSharedDrop": "Het lijk van de eindbaas voegt één gedeeld procedureel voorwerp toe waarop de raid kan rollen.",
       "raidRarityLine": "Zeldzaam {rare}% · Episch {epic}% · Legendarisch {legendary}%",
       "raidItemLevels": "Itemniveau: Zeldzaam {rare} · Episch {epic} · Legendarisch {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Dodeloos Fragment per deelnemer",
-      "raidCurrenciesHeroic": "+{fragments} Dodeloze Fragmenten en +{marks} Heroïsche Merken per deelnemer",
       "raidSignatures": "Kenmerkende legendarische krachten: {signatures}",
       "raidForgedLegendary": "Heroïsche legendarische krachten zijn raid-gesmeed en vallen gegarandeerd in de bovenste helft van hun vooraf bepaalde worpbereik.",
       "entrance": "Ingang: {zone}",
@@ -5200,52 +5198,7 @@ export const nl_NL: EnTranslations = {
     "buyConfirmTitle": "Bevestig aankoop",
     "buyConfirmBody": "{item} kopen voor {marks} Heroïsche Merken? Aankopen met merken kunnen niet worden terugbetaald.",
     "buyConfirmAccept": "Kopen",
-    "buyConfirmCancel": "Annuleren",
-    "tabsAria": "Diensten van de kwartiermeester",
-    "fragmentBalance": "Dodeloze Fragmenten: {count}",
-    "tab": {
-      "gear": "Heroïsche Uitrusting",
-      "forge": "Dodeloze Smederij",
-      "tune": "Legendarische Afstemming"
-    },
-    "gearIntro": "Besteed Heroïsche Merken aan het vaste assortiment van de kwartiermeester.",
-    "forgeIntro": "Kies de beloningsfamilie en het basisvoorwerp. Het rijk rolt pas willekeurige procedurele affixen nadat het exacte aanbod en de betaling zijn gevalideerd.",
-    "tuneIntro": "Kies één specifiek legendarisch Nythraxis-voorwerp uit je tassen. Het rijk rolt twee vervangende krachtswaarden en behoudt het beste resultaat. De kracht neemt nooit af, maar een afstemming kan geen verandering opleveren.",
-    "tuneEmpty": "Er zit geen geschikt legendarisch Nythraxis-voorwerp in je tassen.",
-    "heroicClearReady": "Heroïsche overwinning op Nythraxis bevestigd voor deze dagelijkse vergrendeling.",
-    "heroicClearNeeded": "Heroïsche doelen vereisen een actuele heroïsche overwinning op Nythraxis.",
-    "itemLevel": "Itemniveau {level}",
-    "cost": "{fragments} Fragmenten · {marks} Heroïsche Merken",
-    "randomAffixes": "Willekeurige affixen en waarden",
-    "deterministicStats": "Vaste, vooraf ontworpen beloning",
-    "raidForgedGuarantee": "Raid-gesmede kracht, gegarandeerd een worp in de bovenste helft",
-    "raidForged": "Raid-gesmeed",
-    "raidDrop": "Legendarische Nythraxis-raidbuit",
-    "reforgeCount": "Afstemmingen: {count}",
-    "forgeKind": {
-      "normal_procedural": "Normaal procedureel episch voorwerp",
-      "heroic_procedural": "Heroïsch procedureel episch voorwerp",
-      "signature": "Kenmerkend heroïsch legendarisch voorwerp",
-      "authored": "Vooraf ontworpen doelbeloning"
-    },
-    "blocked": {
-      "class": "Niet geschikt voor je klasse",
-      "heroic_clear": "Vereist een actuele heroïsche overwinning op Nythraxis",
-      "fragments": "Niet genoeg Dodeloze Fragmenten",
-      "marks": "Niet genoeg Heroïsche Merken"
-    },
-    "forgeConfirmTitle": "Smeden bevestigen",
-    "forgeConfirmBody": "Smeed {item} voor {fragments} Dodeloze Fragmenten en {marks} Heroïsche Merken? Het rijk rolt het voorwerp nadat de betaling is gevalideerd.",
-    "forgeConfirmAccept": "Smeden",
-    "tuneConfirmTitle": "Legendarische afstemming bevestigen",
-    "tuneConfirmBody": "Stem dit exacte exemplaar van {item} af voor {fragments} Dodeloze Fragmenten en {marks} Heroïsche Merken? De beste van twee worpen wordt behouden; de kracht kan niet afnemen, maar kan ongewijzigd blijven.",
-    "tuneConfirmAccept": "Afstemmen",
-    "status": {
-      "pending": "Wachten op het rijk...",
-      "gear": "Aankoop voltooid. Saldi bijgewerkt.",
-      "forge": "Smeden voltooid. De nieuwe beloning zit in je tassen.",
-      "tune": "Afstemming voltooid. Het exacte exemplaar en de saldi zijn bijgewerkt."
-    }
+    "buyConfirmCancel": "Annuleren"
   },
   "cardDuel": {
     "title": "Kaartduel",
@@ -9918,9 +9871,6 @@ export const nl_NL: EnTranslations = {
       "heroic_mark": {
         "name": "Heroïsch Merk"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Oostbeek-Beukelaar"
       },
@@ -11923,11 +11873,6 @@ export const nl_NL: EnTranslations = {
         "sender": "Heroïsche kwartiermeester",
         "subject": "Je heroïsche marken",
         "body": "Je groep heeft de heroïsche beproeving doorstaan terwijl jij in de achterhoede vocht of verslagen op de grond lag. Ook jouw binding is vastgelegd, dus je aandeel heroïsche marken is hierheen gestuurd in plaats van verloren te gaan. Gebruik ze goed.\n\n- Heroïsche kwartiermeester"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Het Ambachtsgilde",

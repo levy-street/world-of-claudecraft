@@ -9520,52 +9520,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Wapenschade per seconde',
   'itemUi.stats.weaponMax': 'Maximale wapenschade',
   'itemUi.stats.weaponMin': 'Minimale wapenschade',
-  'heroicShop.blocked.class': 'Niet geschikt voor je klasse',
-  'heroicShop.blocked.fragments': 'Niet genoeg Dodeloze Fragmenten',
-  'heroicShop.blocked.heroic_clear': 'Vereist een actuele heroïsche overwinning op Nythraxis',
-  'heroicShop.blocked.marks': 'Niet genoeg Heroïsche Merken',
-  'heroicShop.cost': '{fragments} Fragmenten · {marks} Heroïsche Merken',
-  'heroicShop.deterministicStats': 'Vaste, vooraf ontworpen beloning',
-  'heroicShop.forgeConfirmAccept': 'Smeden',
-  'heroicShop.forgeConfirmBody':
-    'Smeed {item} voor {fragments} Dodeloze Fragmenten en {marks} Heroïsche Merken? Het rijk rolt het voorwerp nadat de betaling is gevalideerd.',
-  'heroicShop.forgeConfirmTitle': 'Smeden bevestigen',
-  'heroicShop.forgeIntro':
-    'Kies de beloningsfamilie en het basisvoorwerp. Het rijk rolt pas willekeurige procedurele affixen nadat het exacte aanbod en de betaling zijn gevalideerd.',
-  'heroicShop.forgeKind.authored': 'Vooraf ontworpen doelbeloning',
-  'heroicShop.forgeKind.heroic_procedural': 'Heroïsch procedureel episch voorwerp',
-  'heroicShop.forgeKind.normal_procedural': 'Normaal procedureel episch voorwerp',
-  'heroicShop.forgeKind.signature': 'Kenmerkend heroïsch legendarisch voorwerp',
-  'heroicShop.fragmentBalance': 'Dodeloze Fragmenten: {count}',
-  'heroicShop.gearIntro':
-    'Besteed Heroïsche Merken aan het vaste assortiment van de kwartiermeester.',
-  'heroicShop.heroicClearNeeded':
-    'Heroïsche doelen vereisen een actuele heroïsche overwinning op Nythraxis.',
-  'heroicShop.heroicClearReady':
-    'Heroïsche overwinning op Nythraxis bevestigd voor deze dagelijkse vergrendeling.',
-  'heroicShop.itemLevel': 'Itemniveau {level}',
-  'heroicShop.raidDrop': 'Legendarische Nythraxis-raidbuit',
-  'heroicShop.raidForged': 'Raid-gesmeed',
-  'heroicShop.raidForgedGuarantee':
-    'Raid-gesmede kracht, gegarandeerd een worp in de bovenste helft',
-  'heroicShop.randomAffixes': 'Willekeurige affixen en waarden',
-  'heroicShop.reforgeCount': 'Afstemmingen: {count}',
-  'heroicShop.status.forge': 'Smeden voltooid. De nieuwe beloning zit in je tassen.',
-  'heroicShop.status.gear': 'Aankoop voltooid. Saldi bijgewerkt.',
-  'heroicShop.status.pending': 'Wachten op het rijk...',
-  'heroicShop.status.tune':
-    'Afstemming voltooid. Het exacte exemplaar en de saldi zijn bijgewerkt.',
-  'heroicShop.tab.forge': 'Dodeloze Smederij',
-  'heroicShop.tab.gear': 'Heroïsche Uitrusting',
-  'heroicShop.tab.tune': 'Legendarische Afstemming',
-  'heroicShop.tabsAria': 'Diensten van de kwartiermeester',
-  'heroicShop.tuneConfirmAccept': 'Afstemmen',
-  'heroicShop.tuneConfirmBody':
-    'Stem dit exacte exemplaar van {item} af voor {fragments} Dodeloze Fragmenten en {marks} Heroïsche Merken? De beste van twee worpen wordt behouden; de kracht kan niet afnemen, maar kan ongewijzigd blijven.',
-  'heroicShop.tuneConfirmTitle': 'Legendarische afstemming bevestigen',
-  'heroicShop.tuneEmpty': 'Er zit geen geschikt legendarisch Nythraxis-voorwerp in je tassen.',
-  'heroicShop.tuneIntro':
-    'Kies één specifiek legendarisch Nythraxis-voorwerp uit je tassen. Het rijk rolt twee vervangende krachtswaarden en behoudt het beste resultaat. De kracht neemt nooit af, maar een afstemming kan geen verandering opleveren.',
   'hudChrome.bags.itemAriaProcedural': '{item}, {rarity}, itemniveau {level}, aantal {count}',
   'hudChrome.bags.itemAriaProceduralBound':
     '{item}, {rarity}, itemniveau {level}, aantal {count}, gebonden exemplaar',
@@ -9575,9 +9529,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     '{item}, {rarity}, itemniveau {level}, aantal {count}, meesterwerk',
   'hudChrome.bags.itemAriaProceduralSigned':
     '{item}, {rarity}, itemniveau {level}, aantal {count}, door maker gemerkt exemplaar',
-  'hudChrome.finder.raidCurrenciesHeroic':
-    '+{fragments} Dodeloze Fragmenten en +{marks} Heroïsche Merken per deelnemer',
-  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Dodeloos Fragment per deelnemer',
   'hudChrome.finder.raidForgedLegendary':
     'Heroïsche legendarische krachten zijn raid-gesmeed en vallen gegarandeerd in de bovenste helft van hun vooraf bepaalde worpbereik.',
   'hudChrome.finder.raidItemLevels':

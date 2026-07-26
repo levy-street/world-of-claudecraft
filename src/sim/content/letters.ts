@@ -61,22 +61,6 @@ export const HEROIC_MARK_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
-// Nythraxis personal-progress fallback. The settlement fills the attachments
-// with Deathless Fragments and, on Heroic, Heroic Marks from the same kill.
-export const NYTHRAXIS_REWARD_LETTER: LetterDef = {
-  letterId: 'nythraxis_rewards',
-  senderName: 'The Deathless Quartermaster',
-  subject: 'Your share of the Deathless hoard',
-  body:
-    'Your warband broke the Deathless King while you fought from the wings, ' +
-    'from the dirt, or on the long road back from the graveyard. Your daily ' +
-    'claim was struck with theirs, so the personal spoils you earned fly to ' +
-    'you here rather than being lost. Bring the fragments to the Heroic ' +
-    'Quartermaster when you are ready to shape a reward.\n\n' +
-    '- The Deathless Quartermaster',
-  delaySeconds: 0,
-};
-
 // The one-time mastery reset notice (Professions 2.0): sent by the
 // tick mail phase to every pre-curve character whose load-time normalize just
 // zeroed their craft skills and gathering proficiencies (see

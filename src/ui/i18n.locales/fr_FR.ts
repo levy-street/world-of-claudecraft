@@ -9282,54 +9282,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'heroicShop.buyConfirmBody':
     'Acheter {item} pour {marks} Marques héroïques ? Les achats de marques ne peuvent pas être remboursés.',
   'heroicShop.buyConfirmCancel': 'Annuler',
-  'heroicShop.blocked.class': 'Incompatible avec votre classe',
-  'heroicShop.blocked.fragments': 'Pas assez de Fragments immortels',
-  'heroicShop.blocked.heroic_clear':
-    "Nécessite d'avoir terminé Nythraxis en mode héroïque pendant le verrouillage actuel",
-  'heroicShop.blocked.marks': 'Pas assez de Marques héroïques',
-  'heroicShop.cost': '{fragments} Fragments · {marks} Marques héroïques',
-  'heroicShop.deterministicStats': 'Récompense fixe prédéfinie',
-  'heroicShop.forgeConfirmAccept': 'Forger',
-  'heroicShop.forgeConfirmBody':
-    "Forger {item} contre {fragments} Fragments immortels et {marks} Marques héroïques ? Le royaume effectue le jet de l'objet après validation du paiement.",
-  'heroicShop.forgeConfirmTitle': 'Confirmer la forge',
-  'heroicShop.forgeIntro':
-    "Choisissez la famille de récompense et l'objet de base. Le royaume ne détermine aléatoirement les affixes procéduraux qu'après avoir validé l'offre exacte et le paiement.",
-  'heroicShop.forgeKind.authored': 'Récompense cible prédéfinie',
-  'heroicShop.forgeKind.heroic_procedural': 'Objet épique procédural héroïque',
-  'heroicShop.forgeKind.normal_procedural': 'Objet épique procédural normal',
-  'heroicShop.forgeKind.signature': 'Objet légendaire emblématique héroïque',
-  'heroicShop.fragmentBalance': 'Fragments immortels : {count}',
-  'heroicShop.gearIntro':
-    "Dépensez vos Marques héroïques dans l'assortiment habituel de l'Intendant.",
-  'heroicShop.heroicClearNeeded':
-    "Les cibles héroïques nécessitent d'avoir terminé Nythraxis en mode héroïque pendant le verrouillage actuel.",
-  'heroicShop.heroicClearReady':
-    'Victoire contre Nythraxis en mode héroïque vérifiée pour ce verrouillage quotidien.',
-  'heroicShop.itemLevel': "Niveau d'objet {level}",
-  'heroicShop.raidDrop': 'Objet légendaire du raid de Nythraxis',
-  'heroicShop.raidForged': 'Forgé en raid',
-  'heroicShop.raidForgedGuarantee':
-    'Pouvoir forgé en raid, avec un jet garanti dans la moitié supérieure',
-  'heroicShop.randomAffixes': 'Affixes et valeurs aléatoires',
-  'heroicShop.reforgeCount': 'Affinages : {count}',
-  'heroicShop.status.forge': 'Forge terminée. La nouvelle récompense se trouve dans vos sacs.',
-  'heroicShop.status.gear': 'Achat terminé. Soldes actualisés.',
-  'heroicShop.status.pending': 'En attente du royaume...',
-  'heroicShop.status.tune':
-    "Affinage terminé. L'exemplaire exact et les soldes ont été actualisés.",
-  'heroicShop.tab.forge': 'Forge immortelle',
-  'heroicShop.tab.gear': 'Équipement héroïque',
-  'heroicShop.tab.tune': 'Affinage légendaire',
-  'heroicShop.tabsAria': "Services de l'Intendant",
-  'heroicShop.tuneConfirmAccept': 'Affiner',
-  'heroicShop.tuneConfirmBody':
-    'Affiner cet exemplaire précis de {item} contre {fragments} Fragments immortels et {marks} Marques héroïques ? Le meilleur des deux jets est conservé ; la puissance ne peut pas diminuer, mais elle peut rester inchangée.',
-  'heroicShop.tuneConfirmTitle': "Confirmer l'affinage légendaire",
-  'heroicShop.tuneEmpty':
-    'Aucun objet légendaire de Nythraxis admissible ne se trouve dans vos sacs.',
-  'heroicShop.tuneIntro':
-    'Choisissez un objet légendaire de Nythraxis précis dans vos sacs. Le royaume effectue deux nouveaux jets de puissance et conserve le meilleur résultat. La puissance ne diminue jamais, mais un affinage peut ne produire aucun changement.',
   'hudChrome.bags.itemAriaProcedural': "{item}, {rarity}, niveau d'objet {level}, quantité {count}",
   'hudChrome.bags.itemAriaProceduralBound':
     "{item}, {rarity}, niveau d'objet {level}, quantité {count}, copie liée",
@@ -9339,9 +9291,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "{item}, {rarity}, niveau d'objet {level}, quantité {count}, chef-d'œuvre",
   'hudChrome.bags.itemAriaProceduralSigned':
     "{item}, {rarity}, niveau d'objet {level}, quantité {count}, copie marquée par le fabricant",
-  'hudChrome.finder.raidCurrenciesHeroic':
-    '+{fragments} Fragments immortels et +{marks} Marques héroïques par participant',
-  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Fragment immortel par participant',
   'hudChrome.finder.raidForgedLegendary':
     'Les pouvoirs légendaires héroïques sont forgés en raid et leur jet est garanti dans la moitié supérieure de la plage définie.',
   'hudChrome.finder.raidItemLevels':

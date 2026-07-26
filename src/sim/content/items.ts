@@ -775,18 +775,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
   },
-  deathless_fragment: {
-    id: 'deathless_fragment',
-    name: 'Deathless Fragment',
-    kind: 'tool',
-    quality: 'epic',
-    // Personal Nythraxis progress. Four per day means a 100-stack holds
-    // twenty-five full Normal plus Heroic clear cycles.
-    stackSize: 100,
-    sellValue: 0,
-    soulbound: true,
-    noDiscard: true,
-  },
+
   raw_mirror_trout: {
     id: 'raw_mirror_trout',
     name: 'Raw Mirror Trout',

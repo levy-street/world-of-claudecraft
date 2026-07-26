@@ -18,53 +18,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'レア {rare}% · エピック {epic}% · レジェンダリー {legendary}%',
   'hudChrome.finder.raidItemLevels':
     'アイテムレベル：レア {rare} · エピック {epic} · レジェンダリー {legendary}',
-  'hudChrome.finder.raidCurrenciesNormal': '参加者1人につき不死の欠片 +{fragments}個',
-  'hudChrome.finder.raidCurrenciesHeroic':
-    '参加者1人につき不死の欠片 +{fragments}個、英雄の証 +{marks}個',
   'hudChrome.finder.raidSignatures': '固有レジェンダリー威力：{signatures}',
-  'heroicShop.tabsAria': '補給将校のサービス',
-  'heroicShop.fragmentBalance': '不死の欠片：{count}',
-  'heroicShop.tab.gear': '英雄級装備',
-  'heroicShop.tab.forge': '不死の鍛造所',
-  'heroicShop.tab.tune': 'レジェンダリー調整',
-  'heroicShop.gearIntro': '英雄の証を使って、補給将校の既存商品を購入します。',
-  'heroicShop.tuneEmpty': 'バッグ内に調整可能なニスラクシス製レジェンダリーがありません。',
-  'heroicShop.heroicClearReady':
-    '現在のデイリーロックアウトで英雄級ニスラクシスの討伐を確認済みです。',
-  'heroicShop.heroicClearNeeded':
-    '英雄級の対象には、現在のデイリーロックアウトでニスラクシスを討伐する必要があります。',
-  'heroicShop.itemLevel': 'アイテムレベル {level}',
-  'heroicShop.cost': '不死の欠片 {fragments}個 · 英雄の証 {marks}個',
-  'heroicShop.randomAffixes': 'ランダムな特性と数値',
-  'heroicShop.deterministicStats': '設計済み固定報酬',
-  'heroicShop.raidForgedGuarantee': 'レイド鍛造威力、上半分のロールを保証',
-  'heroicShop.raidForged': 'レイド鍛造',
-  'heroicShop.raidDrop': 'ニスラクシスのレイド・レジェンダリー',
-  'heroicShop.reforgeCount': '調整回数：{count}',
-  'heroicShop.forgeKind.normal_procedural': '通常級の手続き生成エピック',
-  'heroicShop.forgeKind.heroic_procedural': '英雄級の手続き生成エピック',
-  'heroicShop.forgeKind.signature': '英雄級固有レジェンダリー',
-  'heroicShop.forgeKind.authored': '設計済み対象報酬',
-  'heroicShop.blocked.class': 'あなたのクラスでは使用できません',
-  'heroicShop.blocked.heroic_clear': '現在の英雄級ニスラクシス討伐が必要です',
-  'heroicShop.blocked.fragments': '不死の欠片が足りません',
-  'heroicShop.blocked.marks': '英雄の証が足りません',
-  'heroicShop.forgeConfirmTitle': '鍛造の確認',
-  'heroicShop.forgeConfirmBody':
-    '{item}を不死の欠片{fragments}個と英雄の証{marks}個で鍛造しますか？レルムは支払いを検証した後にアイテムをロールします。',
-  'heroicShop.forgeConfirmAccept': '鍛造',
-  'heroicShop.tuneConfirmTitle': 'レジェンダリー調整の確認',
-  'heroicShop.tuneConfirmAccept': '調整',
-  'heroicShop.status.pending': 'レルムからの応答を待っています……',
-  'heroicShop.status.gear': '購入が完了し、残高を更新しました。',
-  'heroicShop.status.forge': '鍛造が完了し、新しい報酬がバッグに入りました。',
-  'heroicShop.status.tune': '調整が完了し、対象の個体と残高を更新しました。',
-  'heroicShop.forgeIntro':
-    '報酬の系統とベースアイテムを選択します。正確なオファーと支払いが検証された後にのみ、レルムがランダムな特性を決定します。',
-  'heroicShop.tuneIntro':
-    'バッグ内のニスラクシス製レジェンダリーを1個選択します。レルムは置換候補を2回ロールし、最良の結果を残します。威力は低下しませんが、変化しない場合があります。',
-  'heroicShop.tuneConfirmBody':
-    '{item}のこの個体を、不死の欠片{fragments}個と英雄の証{marks}個で調整しますか？2回のうち最良のロールが残り、威力は低下しませんが変化しない場合があります。',
   'hudChrome.finder.raidSharedDrop':
     '最後の死体には、レイド全員でロールする共有の手続き生成アイテムが1個追加されます。',
   'hudChrome.finder.raidForgedLegendary':
@@ -4074,7 +4028,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.kings_signet.name': '王の印章指輪',
   'entities.items.event_skin_token.name': '謎めいた装いの宝箱',
   'entities.items.heroic_mark.name': '英雄の証',
-  'entities.items.deathless_fragment.name': '不死の欠片',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
   'entities.items.morthens_cryptforged_hauberk.name': 'モルセンの墓鋳ホーバーク',
@@ -7195,10 +7148,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': 'あなたの英雄の印',
   'entities.letters.heroic_marks_reward.body':
     'あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官',
-  'entities.letters.nythraxis_rewards.sender': '不死者の補給官',
-  'entities.letters.nythraxis_rewards.subject': '不死の財宝からの取り分',
-  'entities.letters.nythraxis_rewards.body':
-    'あなたの戦団は不死王を打ち破りました。あなたが側面で戦っていた時も、地に倒れていた時も、墓地から戻る長い道の途中にいた時もです。あなたの日次受領権も仲間と同時に記録されたため、獲得した個人戦利品は失われず、ここへ届けられます。報酬を形作る準備ができたら、欠片を英雄級補給官へ持ってきてください。\n\n- 不死者の補給官',
   'entities.letters.guild_trend_engineering_alchemy.sender': '製作ギルド',
   'entities.letters.guild_trend_engineering_alchemy.subject': '工作と錬金術の腕前について',
   'entities.letters.guild_trend_engineering_alchemy.body':

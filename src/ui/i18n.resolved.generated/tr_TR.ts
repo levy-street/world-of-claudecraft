@@ -2576,8 +2576,6 @@ export const tr_TR: EnTranslations = {
       "raidSharedDrop": "Son ceset, akının zar atması için bir ortak yöntemsel eşya ekler.",
       "raidRarityLine": "Nadir %{rare} · Destansı %{epic} · Efsanevi %{legendary}",
       "raidItemLevels": "Eşya seviyesi: Nadir {rare} · Destansı {epic} · Efsanevi {legendary}",
-      "raidCurrenciesNormal": "Katılımcı başına +{fragments} Ölümsüz Parçası",
-      "raidCurrenciesHeroic": "Katılımcı başına +{fragments} Ölümsüz Parçası ve +{marks} Kahramanca Nişan",
       "raidSignatures": "Özgün Efsanevi güçler: {signatures}",
       "raidForgedLegendary": "Kahramanca Efsanevi güçler akında dövülür ve tasarlanmış sonuç aralıklarının üst yarısında olacağı garantidir.",
       "entrance": "Giriş: {zone}",
@@ -5200,52 +5198,7 @@ export const tr_TR: EnTranslations = {
     "buyConfirmTitle": "Satın Alma İşlemini Onayla",
     "buyConfirmBody": "{marks} Heroic Marks için {item} satın mı alacaksınız? Mark satın alımları iade edilemez.",
     "buyConfirmAccept": "Satın almak",
-    "buyConfirmCancel": "İptal etmek",
-    "tabsAria": "Levazımcı hizmetleri",
-    "fragmentBalance": "Ölümsüz Parçaları: {count}",
-    "tab": {
-      "gear": "Kahramanca Teçhizat",
-      "forge": "Ölümsüz Ocağı",
-      "tune": "Efsanevi Eşya Ayarlama"
-    },
-    "gearIntro": "Kahramanca Nişanları levazımcının yerleşik stoğunda harca.",
-    "forgeIntro": "Ödül ailesini ve temel eşyayı seç. Diyar, rastgele yöntemsel özellikleri yalnızca kesin teklifi ve ödemeyi doğruladıktan sonra oluşturur.",
-    "tuneIntro": "Çantalarından birebir bir Nythraxis Efsanevi eşya kopyası seç. Diyar iki yedek güç oluşturur ve daha iyi sonucu korur. Güç asla azalmaz ama ayarlama hiçbir şeyi değiştirmeyebilir.",
-    "tuneEmpty": "Çantalarında uygun bir Nythraxis Efsanevi eşyası yok.",
-    "heroicClearReady": "Kahramanca Nythraxis tamamlaması bu günlük kilit için doğrulandı.",
-    "heroicClearNeeded": "Kahramanca hedefler, mevcut dönemde Kahramanca Nythraxis tamamlaması gerektirir.",
-    "itemLevel": "Eşya seviyesi {level}",
-    "cost": "{fragments} Parça · {marks} Kahramanca Nişan",
-    "randomAffixes": "Rastgele özellikler ve değerler",
-    "deterministicStats": "Tasarlanmış sabit ödül",
-    "raidForgedGuarantee": "Akında dövülmüş güç, üst yarıdan sonuç garantili",
-    "raidForged": "Akında dövülmüş",
-    "raidDrop": "Nythraxis akını Efsanevi eşyası",
-    "reforgeCount": "Ayarlamalar: {count}",
-    "forgeKind": {
-      "normal_procedural": "Normal yöntemsel Destansı eşya",
-      "heroic_procedural": "Kahramanca yöntemsel Destansı eşya",
-      "signature": "Kahramanca özgün Efsanevi eşya",
-      "authored": "Tasarlanmış hedef ödül"
-    },
-    "blocked": {
-      "class": "Sınıfınla uyumlu değil",
-      "heroic_clear": "Mevcut dönemde Kahramanca Nythraxis tamamlaması gerektirir",
-      "fragments": "Yeterli Ölümsüz Parçası yok",
-      "marks": "Yeterli Kahramanca Nişan yok"
-    },
-    "forgeConfirmTitle": "Dövmeyi Onayla",
-    "forgeConfirmBody": "{item}, {fragments} Ölümsüz Parçası ve {marks} Kahramanca Nişan karşılığında dövülsün mü? Diyar, ödeme doğrulandıktan sonra eşyayı oluşturur.",
-    "forgeConfirmAccept": "Döv",
-    "tuneConfirmTitle": "Efsanevi Eşya Ayarlamasını Onayla",
-    "tuneConfirmBody": "Bu birebir {item} kopyası, {fragments} Ölümsüz Parçası ve {marks} Kahramanca Nişan karşılığında ayarlansın mı? İki sonuçtan iyisi korunur; güç azalmaz ama aynı kalabilir.",
-    "tuneConfirmAccept": "Ayarla",
-    "status": {
-      "pending": "Diyar bekleniyor...",
-      "gear": "Satın alma tamamlandı. Bakiyeler yenilendi.",
-      "forge": "Dövme tamamlandı. Yeni ödül çantalarında.",
-      "tune": "Ayarlama tamamlandı. Birebir kopya ve bakiyeler yenilendi."
-    }
+    "buyConfirmCancel": "İptal etmek"
   },
   "cardDuel": {
     "title": "Kart Düellosu",
@@ -9918,9 +9871,6 @@ export const tr_TR: EnTranslations = {
       "heroic_mark": {
         "name": "Kahramanca Nişan"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Doğudere Kalkanı"
       },
@@ -11923,11 +11873,6 @@ export const tr_TR: EnTranslations = {
         "sender": "Kahraman levazım subayı",
         "subject": "Kahramanlık Nişanların",
         "body": "Birliğin kahramanlık sınavını temizlerken sen arka saflarda savaşıyor ya da yerde yatıyordun. Kilidin yine de kaydedildi, bu yüzden Kahramanlık Nişanlarından payın kaybolmak yerine buraya gönderildi. Onları iyi kullan.\n\n- Kahraman levazım subayı"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Üretim Loncası",

@@ -166,7 +166,6 @@ const UI_PURE_CORES = [
   'src/ui/options_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
-  'src/ui/hud/vendor/heroic_vendor_pending_core.ts',
   'src/ui/hud/vendor/train_view.ts',
   'src/ui/hud/vendor/train_learn_core.ts',
   'src/ui/hud/vendor/unbind_view.ts',

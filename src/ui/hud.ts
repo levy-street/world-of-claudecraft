@@ -1480,8 +1480,6 @@ export class Hud {
         return !!npc && dist2d(this.sim.player.pos, npc.pos) <= range;
       },
       inventory: () => this.sim.inventory,
-      playerClass: () => this.sim.cfg.playerClass,
-      raidLockoutIds: () => this.sim.raidLockouts().map((lockout) => lockout.id),
       stock: HEROIC_VENDOR_STOCK,
       items: ITEMS,
       presentation: this.presentationBag,
@@ -1497,8 +1495,6 @@ export class Hud {
       confirm: (title, body, okText, cancelText, onOk) =>
         this.confirmDialog(title, body, okText, cancelText, onOk),
       buy: (itemId) => this.sim.buyHeroicVendorItem(itemId),
-      forge: (offerId) => this.sim.forgeNythraxisReward(offerId),
-      tune: (instanceUid) => this.sim.tuneNythraxisLegendary(instanceUid),
     });
     this.meters = new Meters(sim);
     this.actionBarController = new ActionBarController({

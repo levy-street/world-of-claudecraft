@@ -718,8 +718,8 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   },
 };
 
-// The heroic-mark daily circuit reads the four launch heroics, PINNED (the
-// Nythraxis arena also pays marks but is deliberately not required).
+// The heroic-mark daily circuit reads the four launch heroics. Nythraxis is
+// loot-only and deliberately outside this circuit.
 const MARK_CIRCUIT_DUNGEONS = [
   'hollow_crypt',
   'sunken_bastion',

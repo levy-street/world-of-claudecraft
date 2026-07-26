@@ -789,7 +789,7 @@ export function heroicRewardWindowToken(lockedUntil: number): string {
 // straight to bags, while a prior final-boss damage or effective-heal contributor
 // who is absent from that snapshot receives them through Ravenpost. Entering the
 // claim alone is never participation, so a zoned-in AFK player takes the lockout
-// with no pay and no Forge-authorizing daily receipt. A recipient already locked
+// with no pay. A recipient already locked
 // for this reset is not paid again.
 // An uncredited death (no tap and no killer credit resolves, so the death-time
 // snapshot is empty) pays nobody, bags or mail, while the lockout still strikes.

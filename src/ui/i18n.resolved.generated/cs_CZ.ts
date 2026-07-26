@@ -2576,8 +2576,6 @@ export const cs_CZ: EnTranslations = {
       "raidSharedDrop": "Závěrečná mrtvola přidá jeden společný procedurální předmět, o který bude nájezd losovat.",
       "raidRarityLine": "Vzácný {rare} % · epický {epic} % · legendární {legendary} %",
       "raidItemLevels": "Úroveň předmětu: vzácný {rare} · epický {epic} · legendární {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Úlomek Nesmrtelného pro každého účastníka",
-      "raidCurrenciesHeroic": "+{fragments} Úlomků Nesmrtelného a +{marks} Hrdinských známek pro každého účastníka",
       "raidSignatures": "Charakteristické legendární síly: {signatures}",
       "raidForgedLegendary": "Síly hrdinských legendárních předmětů jsou vykované v nájezdu a zaručeně leží v horní polovině svého navrženého rozsahu.",
       "entrance": "Vstup: {zone}",
@@ -5200,52 +5198,7 @@ export const cs_CZ: EnTranslations = {
     "buyConfirmTitle": "Potvrdit nákup",
     "buyConfirmBody": "Koupit {item} za {marks} Hrdinských známek? Nákupy za známky nelze vrátit.",
     "buyConfirmAccept": "Nakoupit",
-    "buyConfirmCancel": "Zrušit",
-    "tabsAria": "Služby intendanta",
-    "fragmentBalance": "Úlomky Nesmrtelného: {count}",
-    "tab": {
-      "gear": "Hrdinská výbava",
-      "forge": "Výheň Nesmrtelného",
-      "tune": "Ladění legendárních předmětů"
-    },
-    "gearIntro": "Utrať Hrdinské známky za zavedenou nabídku intendanta.",
-    "forgeIntro": "Vyber rodinu odměny a základní předmět. Říše náhodně vygeneruje procedurální vlastnosti až po ověření přesné nabídky a platby.",
-    "tuneIntro": "Vyber jednu přesnou kopii legendárního předmětu z Nythraxis ve svých brašnách. Říše vygeneruje dvě náhradní síly a zachová lepší výsledek. Síla nikdy neklesne, ale ladění nemusí nic změnit.",
-    "tuneEmpty": "V brašnách nemáš žádný vhodný legendární předmět z Nythraxis.",
-    "heroicClearReady": "Dokončení Nythraxis na hrdinské obtížnosti je pro tento denní limit ověřeno.",
-    "heroicClearNeeded": "Hrdinské cíle vyžadují aktuální dokončení Nythraxis na hrdinské obtížnosti.",
-    "itemLevel": "Úroveň předmětu {level}",
-    "cost": "{fragments} úlomků · {marks} Hrdinských známek",
-    "randomAffixes": "Náhodné vlastnosti a hodnoty",
-    "deterministicStats": "Pevně navržená odměna",
-    "raidForgedGuarantee": "Síla vykovaná v nájezdu, zaručený hod v horní polovině rozsahu",
-    "raidForged": "Vykováno v nájezdu",
-    "raidDrop": "Legendární předmět z nájezdu Nythraxis",
-    "reforgeCount": "Vyladění: {count}",
-    "forgeKind": {
-      "normal_procedural": "Normální procedurální epický předmět",
-      "heroic_procedural": "Hrdinský procedurální epický předmět",
-      "signature": "Hrdinský charakteristický legendární předmět",
-      "authored": "Pevně navržená cílová odměna"
-    },
-    "blocked": {
-      "class": "Není kompatibilní s tvou třídou",
-      "heroic_clear": "Vyžaduje aktuální dokončení Nythraxis na hrdinské obtížnosti",
-      "fragments": "Nedostatek Úlomků Nesmrtelného",
-      "marks": "Nedostatek Hrdinských známek"
-    },
-    "forgeConfirmTitle": "Potvrdit kování",
-    "forgeConfirmBody": "Ukovat {item} za {fragments} Úlomků Nesmrtelného a {marks} Hrdinských známek? Říše vygeneruje předmět až po ověření platby.",
-    "forgeConfirmAccept": "Ukovat",
-    "tuneConfirmTitle": "Potvrdit ladění legendárního předmětu",
-    "tuneConfirmBody": "Vyladit tuto přesnou kopii předmětu {item} za {fragments} Úlomků Nesmrtelného a {marks} Hrdinských známek? Zachová se lepší ze dvou hodů; síla nemůže klesnout, ale může zůstat beze změny.",
-    "tuneConfirmAccept": "Vyladit",
-    "status": {
-      "pending": "Čeká se na říši...",
-      "gear": "Nákup dokončen. Zůstatky byly obnoveny.",
-      "forge": "Kování dokončeno. Nová odměna je v tvých brašnách.",
-      "tune": "Ladění dokončeno. Přesná kopie i zůstatky byly obnoveny."
-    }
+    "buyConfirmCancel": "Zrušit"
   },
   "cardDuel": {
     "title": "Karetní souboj",
@@ -9918,9 +9871,6 @@ export const cs_CZ: EnTranslations = {
       "heroic_mark": {
         "name": "Hrdinská značka"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Eastbrookský pukléř"
       },
@@ -11923,11 +11873,6 @@ export const cs_CZ: EnTranslations = {
         "sender": "Hrdinský zásobovač",
         "subject": "Vaše hrdinské marky",
         "body": "Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Řemeslnický cech",

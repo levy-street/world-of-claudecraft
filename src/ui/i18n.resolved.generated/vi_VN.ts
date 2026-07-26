@@ -2576,8 +2576,6 @@ export const vi_VN: EnTranslations = {
       "raidSharedDrop": "Xác cuối cùng thêm một vật phẩm theo thủ tục dùng chung để cả nhóm đột kích cùng gieo xúc xắc.",
       "raidRarityLine": "Hiếm {rare}% · Sử Thi {epic}% · Huyền Thoại {legendary}%",
       "raidItemLevels": "Cấp vật phẩm: Hiếm {rare} · Sử Thi {epic} · Huyền Thoại {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Mảnh Vỡ Bất Tử cho mỗi người tham gia",
-      "raidCurrenciesHeroic": "+{fragments} Mảnh Vỡ Bất Tử và +{marks} Dấu Ấn Anh Hùng cho mỗi người tham gia",
       "raidSignatures": "Sức mạnh Huyền Thoại đặc trưng: {signatures}",
       "raidForgedLegendary": "Sức mạnh Huyền Thoại Anh Hùng được rèn trong đột kích và bảo đảm nằm ở nửa trên của khoảng kết quả được thiết kế.",
       "entrance": "Lối vào: {zone}",
@@ -5200,52 +5198,7 @@ export const vi_VN: EnTranslations = {
     "buyConfirmTitle": "Xác nhận mua hàng",
     "buyConfirmBody": "Mua {item} để lấy Dấu ấn Anh hùng {marks}? Việc mua điểm không thể được hoàn lại.",
     "buyConfirmAccept": "Mua",
-    "buyConfirmCancel": "Hủy bỏ",
-    "tabsAria": "Dịch vụ quân nhu trưởng",
-    "fragmentBalance": "Mảnh Vỡ Bất Tử: {count}",
-    "tab": {
-      "gear": "Trang Bị Anh Hùng",
-      "forge": "Lò Rèn Bất Tử",
-      "tune": "Tinh Chỉnh Vật Phẩm Huyền Thoại"
-    },
-    "gearIntro": "Dùng Dấu Ấn Anh Hùng để mua hàng có sẵn của quân nhu trưởng.",
-    "forgeIntro": "Chọn nhóm phần thưởng và vật phẩm cơ sở. Máy chủ chỉ tạo ngẫu nhiên các thuộc tính theo thủ tục sau khi xác thực chính xác đề nghị và thanh toán.",
-    "tuneIntro": "Chọn đúng một bản sao vật phẩm Huyền Thoại Nythraxis trong túi. Máy chủ tạo hai sức mạnh thay thế và giữ kết quả tốt hơn. Sức mạnh không bao giờ giảm, nhưng lần tinh chỉnh có thể không thay đổi gì.",
-    "tuneEmpty": "Không có vật phẩm Huyền Thoại Nythraxis phù hợp trong túi của bạn.",
-    "heroicClearReady": "Lần hoàn thành Nythraxis Anh Hùng đã được xác minh cho khóa ngày này.",
-    "heroicClearNeeded": "Mục tiêu Anh Hùng yêu cầu hoàn thành Nythraxis Anh Hùng trong kỳ hiện tại.",
-    "itemLevel": "Cấp vật phẩm {level}",
-    "cost": "{fragments} Mảnh Vỡ · {marks} Dấu Ấn Anh Hùng",
-    "randomAffixes": "Thuộc tính và giá trị ngẫu nhiên",
-    "deterministicStats": "Phần thưởng cố định được thiết kế sẵn",
-    "raidForgedGuarantee": "Sức mạnh rèn trong đột kích, bảo đảm kết quả ở nửa trên",
-    "raidForged": "Được rèn trong đột kích",
-    "raidDrop": "Vật phẩm Huyền Thoại từ Đột Kích Nythraxis",
-    "reforgeCount": "Số lần tinh chỉnh: {count}",
-    "forgeKind": {
-      "normal_procedural": "Vật phẩm Sử Thi theo thủ tục Thường",
-      "heroic_procedural": "Vật phẩm Sử Thi theo thủ tục Anh Hùng",
-      "signature": "Vật phẩm Huyền Thoại đặc trưng Anh Hùng",
-      "authored": "Phần thưởng mục tiêu được thiết kế sẵn"
-    },
-    "blocked": {
-      "class": "Không tương thích với lớp của bạn",
-      "heroic_clear": "Yêu cầu hoàn thành Nythraxis Anh Hùng trong kỳ hiện tại",
-      "fragments": "Không đủ Mảnh Vỡ Bất Tử",
-      "marks": "Không đủ Dấu Ấn Anh Hùng"
-    },
-    "forgeConfirmTitle": "Xác Nhận Rèn",
-    "forgeConfirmBody": "Rèn {item} với {fragments} Mảnh Vỡ Bất Tử và {marks} Dấu Ấn Anh Hùng? Máy chủ sẽ tạo vật phẩm sau khi xác thực thanh toán.",
-    "forgeConfirmAccept": "Rèn",
-    "tuneConfirmTitle": "Xác Nhận Tinh Chỉnh Vật Phẩm Huyền Thoại",
-    "tuneConfirmBody": "Tinh chỉnh đúng bản sao {item} này với {fragments} Mảnh Vỡ Bất Tử và {marks} Dấu Ấn Anh Hùng? Kết quả tốt hơn trong hai lần sẽ được giữ lại; sức mạnh không thể giảm nhưng có thể không đổi.",
-    "tuneConfirmAccept": "Tinh Chỉnh",
-    "status": {
-      "pending": "Đang chờ máy chủ...",
-      "gear": "Đã mua xong. Số dư đã được cập nhật.",
-      "forge": "Đã rèn xong. Phần thưởng mới đang ở trong túi của bạn.",
-      "tune": "Đã tinh chỉnh xong. Bản sao chính xác và số dư đã được cập nhật."
-    }
+    "buyConfirmCancel": "Hủy bỏ"
   },
   "cardDuel": {
     "title": "Đấu Bài",
@@ -9918,9 +9871,6 @@ export const vi_VN: EnTranslations = {
       "heroic_mark": {
         "name": "Dấu Ấn Anh Hùng"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Khiên Nhỏ Đông Khê"
       },
@@ -11923,11 +11873,6 @@ export const vi_VN: EnTranslations = {
         "sender": "Quân nhu Anh Hùng",
         "subject": "Dấu Ấn Anh Hùng của bạn",
         "body": "Đội của bạn đã vượt qua thử thách Anh Hùng khi bạn chiến đấu ở hậu tuyến hoặc đã ngã xuống. Khóa lượt của bạn vẫn được ghi nhận, vì vậy phần Dấu Ấn Anh Hùng của bạn được gửi đến đây thay vì thất lạc. Hãy sử dụng chúng thật tốt.\n\n- Quân nhu Anh Hùng"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Hội chế tạo",

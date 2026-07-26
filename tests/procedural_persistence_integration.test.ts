@@ -52,8 +52,6 @@ function raidForgedGenerated(uid = 'pi1:persist:7002', seed = 702): ItemInstance
     legendaryMagnitudeFloor: 0.5,
     raidForgedLegendary: true,
   }).instance;
-  if (!instance.procedural) throw new Error('missing Raid-forged fixture');
-  instance.procedural.reforgeCount = 7;
   return instance;
 }
 
@@ -107,11 +105,9 @@ describe('procedural persistence boundaries', () => {
 
     expect(loadedLegacy).toEqual(legacy.procedural);
     expect(loadedLegacy?.raidForged).toBeUndefined();
-    expect(loadedLegacy?.reforgeCount).toBeUndefined();
     expect(loadedAscendant).toEqual(ascendant.procedural);
     expect(loadedAscendant).toMatchObject({
       raidForged: true,
-      reforgeCount: 7,
       legendaryPowerId: 'dawnward_signet',
       itemLevel: 36,
     });

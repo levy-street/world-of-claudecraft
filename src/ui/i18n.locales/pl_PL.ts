@@ -9458,51 +9458,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Obrażenia broni na sekundę',
   'itemUi.stats.weaponMax': 'Maksymalne obrażenia broni',
   'itemUi.stats.weaponMin': 'Minimalne obrażenia broni',
-  'heroicShop.blocked.class': 'Nie jest zgodne z twoją klasą',
-  'heroicShop.blocked.fragments': 'Za mało Fragmentów Nieśmiertelnego',
-  'heroicShop.blocked.heroic_clear': 'Wymaga aktualnego ukończenia Nythraxis w trybie heroicznym',
-  'heroicShop.blocked.marks': 'Za mało Heroicznych Znaków',
-  'heroicShop.cost': '{fragments} fragmentów · {marks} Heroicznych Znaków',
-  'heroicShop.deterministicStats': 'Ręcznie zaprojektowana stała nagroda',
-  'heroicShop.forgeConfirmAccept': 'Wykuj',
-  'heroicShop.forgeConfirmBody':
-    'Wykuć {item} za {fragments} Fragmentów Nieśmiertelnego i {marks} Heroicznych Znaków? Kraina wylosuje przedmiot po zatwierdzeniu płatności.',
-  'heroicShop.forgeConfirmTitle': 'Potwierdź wykucie',
-  'heroicShop.forgeIntro':
-    'Wybierz rodzinę nagrody i przedmiot bazowy. Kraina losuje proceduralne właściwości dopiero po sprawdzeniu dokładnej oferty i płatności.',
-  'heroicShop.forgeKind.authored': 'Ręcznie zaprojektowana nagroda docelowa',
-  'heroicShop.forgeKind.heroic_procedural': 'Heroiczny proceduralny przedmiot epicki',
-  'heroicShop.forgeKind.normal_procedural': 'Normalny proceduralny przedmiot epicki',
-  'heroicShop.forgeKind.signature': 'Heroiczny charakterystyczny przedmiot legendarny',
-  'heroicShop.fragmentBalance': 'Fragmenty Nieśmiertelnego: {count}',
-  'heroicShop.gearIntro': 'Wydaj Heroiczne Znaki na stały asortyment kwatermistrza.',
-  'heroicShop.heroicClearNeeded':
-    'Heroiczne cele wymagają aktualnego ukończenia Nythraxis w trybie heroicznym.',
-  'heroicShop.heroicClearReady':
-    'Ukończenie Nythraxis w trybie heroicznym potwierdzono dla tej dziennej blokady.',
-  'heroicShop.itemLevel': 'Poziom przedmiotu {level}',
-  'heroicShop.raidDrop': 'Legendarny przedmiot z rajdu Nythraxis',
-  'heroicShop.raidForged': 'Wykuty w rajdzie',
-  'heroicShop.raidForgedGuarantee':
-    'Moc wykuta w rajdzie, gwarantowany wynik w górnej połowie zakresu',
-  'heroicShop.randomAffixes': 'Losowe właściwości i wartości',
-  'heroicShop.reforgeCount': 'Dostrojenia: {count}',
-  'heroicShop.status.forge': 'Kucie zakończone. Nowa nagroda jest w twoich torbach.',
-  'heroicShop.status.gear': 'Zakup zakończony. Salda zostały odświeżone.',
-  'heroicShop.status.pending': 'Oczekiwanie na krainę...',
-  'heroicShop.status.tune': 'Dostrajanie zakończone. Dokładna kopia i salda zostały odświeżone.',
-  'heroicShop.tab.forge': 'Kuźnia Nieśmiertelnego',
-  'heroicShop.tab.gear': 'Heroiczny ekwipunek',
-  'heroicShop.tab.tune': 'Dostrajanie przedmiotów legendarnych',
-  'heroicShop.tabsAria': 'Usługi kwatermistrza',
-  'heroicShop.tuneConfirmAccept': 'Dostrój',
-  'heroicShop.tuneConfirmBody':
-    'Dostroić tę dokładną kopię przedmiotu {item} za {fragments} Fragmentów Nieśmiertelnego i {marks} Heroicznych Znaków? Zachowany zostanie lepszy z dwóch wyników; moc nie może spaść, ale może pozostać bez zmian.',
-  'heroicShop.tuneConfirmTitle': 'Potwierdź dostrajanie przedmiotu legendarnego',
-  'heroicShop.tuneEmpty':
-    'W twoich torbach nie ma odpowiedniego legendarnego przedmiotu z Nythraxis.',
-  'heroicShop.tuneIntro':
-    'Wybierz jedną dokładną kopię legendarnego przedmiotu z Nythraxis w swoich torbach. Kraina wylosuje dwie moce zastępcze i zachowa lepszy wynik. Moc nigdy nie maleje, ale dostrojenie może niczego nie zmienić.',
   'hudChrome.bags.itemAriaProcedural':
     '{item}, {rarity}, poziom przedmiotu {level}, liczba {count}',
   'hudChrome.bags.itemAriaProceduralBound':
@@ -9513,9 +9468,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     '{item}, {rarity}, poziom przedmiotu {level}, liczba {count}, arcydzieło',
   'hudChrome.bags.itemAriaProceduralSigned':
     '{item}, {rarity}, poziom przedmiotu {level}, liczba {count}, kopia ze znakiem twórcy',
-  'hudChrome.finder.raidCurrenciesHeroic':
-    '+{fragments} Fragmentów Nieśmiertelnego i +{marks} Heroicznych Znaków na uczestnika',
-  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Fragment Nieśmiertelnego na uczestnika',
   'hudChrome.finder.raidForgedLegendary':
     'Moce heroicznych przedmiotów legendarnych są wykute w rajdzie i gwarantowane w górnej połowie ich zaprojektowanego zakresu.',
   'hudChrome.finder.raidItemLevels':

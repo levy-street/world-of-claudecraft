@@ -9256,8 +9256,8 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "75b83fdb",
-      "events": "8c4ef35f",
+      "state": "e6f16ed6",
+      "events": "90b86b6a",
       "rng": {
         "draws": 3027,
         "digest": "f551924e"
@@ -9298,22 +9298,14 @@
             },
             "itemsDiscovered": [
               "baked_bread",
-              "deathless_fragment",
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
-              ""
-            ],
-            [
-              "col_first_epic",
               ""
             ],
             [
@@ -9376,10 +9368,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -10638,7 +10626,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "d3ebcd17",
+      "state": "f7e68312",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10649,7 +10637,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "b16ca7b9",
+      "state": "f47ac650",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10660,7 +10648,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "580e3e15",
+      "state": "7680641c",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10671,7 +10659,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "b264e3e7",
+      "state": "9d6bf462",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10682,7 +10670,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "c1d84b77",
+      "state": "ea513332",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10693,7 +10681,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "e08725fd",
+      "state": "5e2c6e34",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10704,7 +10692,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "25bb72b5",
+      "state": "4cbfcc7c",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -10746,22 +10734,14 @@
             },
             "itemsDiscovered": [
               "baked_bread",
-              "deathless_fragment",
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
-              ""
-            ],
-            [
-              "col_first_epic",
               ""
             ],
             [
@@ -10824,10 +10804,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,

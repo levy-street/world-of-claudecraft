@@ -18,7 +18,7 @@ the existing authored loot roll. It does not replace normal, Heroic, quest, or
 profession items. Ordinary enemies provide a very low-frequency chase, rare
 enemies provide a reliable upgrade stream, and repeatable dungeon and delve
 bosses provide the generic Legendary path. Nythraxis has a dedicated Normal
-and Heroic raid table plus personal deterministic progression, documented in
+and Heroic raid table with one shared corpse drop, documented in
 `docs/balance/nythraxis-endgame-loot-v030.md`.
 
 The launch catalog contains 34 base families:
@@ -146,10 +146,7 @@ kills is:
 
 This creates a meaningful long-tail chase while making bosses much more useful
 than ordinary farming. It also means an unlucky player can exceed any of these
-kill counts. Natural drops have no pity counter. Nythraxis instead awards
-personal Deathless progression currency, with an exact Heroic signature capped
-at 15 resets when both difficulties are cleared or 20 Heroic-only resets. The
-Forge is a deterministic purchase path, not a forced natural drop.
+kill counts. Natural drops have no pity counter, including Nythraxis.
 
 Heroic Nythraxis uses 5% instead: `1 - 0.95^n`. It reaches 51.233% by 14
 kills, 90.056% by 45, 95.151% by 59, and 99.011% by 90.
@@ -223,7 +220,7 @@ magnitudes. Trigger cadence, proc chance, internal cooldown, and the one-power
 cap do not change. Item levels 20 and above receive the full authored power; a
 level-5 source's item-level 6 through 8 Legendary receives 30% through 40% of
 that magnitude. The tooltip shows this effective scaled value and range, while
-the raw quantized roll remains persisted for deterministic tuning and save/load.
+the raw quantized roll remains persisted for save/load.
 
 Live drops have an outer source-level gate of 5. Development-only forced item
 levels are truncated and clamped to 1 through 40, but they still have to reach
@@ -484,9 +481,7 @@ does not replace it.
 
 ## Known limitations
 
-- Natural drops have no pity counter or bad-luck protection. Nythraxis has a
-  separate deterministic Deathless Forge path without changing the natural
-  drop result.
+- Natural drops have no pity counter or bad-luck protection.
 - Boss signatures improve targetability but are deliberately not exclusive.
 - The three 100,000-entry reports measure generation, not combat encounter
   balance or player behavior.

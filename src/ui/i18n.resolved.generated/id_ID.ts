@@ -2576,8 +2576,6 @@ export const id_ID: EnTranslations = {
       "raidSharedDrop": "Mayat terakhir menambahkan satu item prosedural bersama untuk diperebutkan dalam raid.",
       "raidRarityLine": "Langka {rare}% · Epik {epic}% · Legendaris {legendary}%",
       "raidItemLevels": "Level item: Langka {rare} · Epik {epic} · Legendaris {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Fragmen Abadi per peserta",
-      "raidCurrenciesHeroic": "+{fragments} Fragmen Abadi dan +{marks} Tanda Heroik per peserta",
       "raidSignatures": "Kekuatan Legendaris khas: {signatures}",
       "raidForgedLegendary": "Kekuatan Legendaris Heroik ditempa dalam raid dan dijamin berada di separuh atas rentang hasil rancangannya.",
       "entrance": "Pintu masuk: {zone}",
@@ -5200,52 +5198,7 @@ export const id_ID: EnTranslations = {
     "buyConfirmTitle": "Konfirmasi Pembelian",
     "buyConfirmBody": "Beli {item} untuk Tanda Heroik {marks}? Pembelian merek tidak dapat dikembalikan.",
     "buyConfirmAccept": "Membeli",
-    "buyConfirmCancel": "Membatalkan",
-    "tabsAria": "Layanan intendan",
-    "fragmentBalance": "Fragmen Abadi: {count}",
-    "tab": {
-      "gear": "Perlengkapan Heroik",
-      "forge": "Penempaan Abadi",
-      "tune": "Penyetelan Item Legendaris"
-    },
-    "gearIntro": "Belanjakan Tanda Heroik untuk stok tetap intendan.",
-    "forgeIntro": "Pilih keluarga hadiah dan item dasar. Dunia baru mengacak afiks prosedural setelah tawaran dan pembayaran yang tepat divalidasi.",
-    "tuneIntro": "Pilih satu salinan tepat item Legendaris Nythraxis dari tasmu. Dunia mengacak dua kekuatan pengganti dan menyimpan hasil terbaik. Kekuatan tidak pernah berkurang, tetapi penyetelan mungkin tidak mengubah apa pun.",
-    "tuneEmpty": "Tidak ada item Legendaris Nythraxis yang memenuhi syarat di tasmu.",
-    "heroicClearReady": "Penyelesaian Heroik Nythraxis telah diverifikasi untuk penguncian harian ini.",
-    "heroicClearNeeded": "Sasaran Heroik memerlukan penyelesaian Heroik Nythraxis pada periode saat ini.",
-    "itemLevel": "Level item {level}",
-    "cost": "{fragments} Fragmen · {marks} Tanda Heroik",
-    "randomAffixes": "Afiks dan nilai acak",
-    "deterministicStats": "Hadiah tetap rancangan khusus",
-    "raidForgedGuarantee": "Kekuatan tempaan raid, dijamin berada di separuh atas hasil acak",
-    "raidForged": "Ditempa dalam raid",
-    "raidDrop": "Item Legendaris dari raid Nythraxis",
-    "reforgeCount": "Penyetelan: {count}",
-    "forgeKind": {
-      "normal_procedural": "Item Epik prosedural Normal",
-      "heroic_procedural": "Item Epik prosedural Heroik",
-      "signature": "Item Legendaris khas Heroik",
-      "authored": "Hadiah sasaran rancangan khusus"
-    },
-    "blocked": {
-      "class": "Tidak cocok dengan kelasmu",
-      "heroic_clear": "Memerlukan penyelesaian Heroik Nythraxis pada periode saat ini",
-      "fragments": "Fragmen Abadi tidak cukup",
-      "marks": "Tanda Heroik tidak cukup"
-    },
-    "forgeConfirmTitle": "Konfirmasi Penempaan",
-    "forgeConfirmBody": "Tempa {item} dengan {fragments} Fragmen Abadi dan {marks} Tanda Heroik? Dunia akan mengacak item setelah pembayaran divalidasi.",
-    "forgeConfirmAccept": "Tempa",
-    "tuneConfirmTitle": "Konfirmasi Penyetelan Item Legendaris",
-    "tuneConfirmBody": "Setel salinan tepat {item} ini dengan {fragments} Fragmen Abadi dan {marks} Tanda Heroik? Hasil terbaik dari dua pengacakan akan disimpan; kekuatan tidak dapat berkurang, tetapi mungkin tetap sama.",
-    "tuneConfirmAccept": "Setel",
-    "status": {
-      "pending": "Menunggu dunia...",
-      "gear": "Pembelian selesai. Saldo telah diperbarui.",
-      "forge": "Penempaan selesai. Hadiah baru ada di tasmu.",
-      "tune": "Penyetelan selesai. Salinan yang tepat dan saldo telah diperbarui."
-    }
+    "buyConfirmCancel": "Membatalkan"
   },
   "cardDuel": {
     "title": "Duel Kartu",
@@ -9918,9 +9871,6 @@ export const id_ID: EnTranslations = {
       "heroic_mark": {
         "name": "Tanda Heroik"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Perisai Kecil Eastbrook"
       },
@@ -11923,11 +11873,6 @@ export const id_ID: EnTranslations = {
         "sender": "Perbekal heroik",
         "subject": "Tanda Heroik milikmu",
         "body": "Kelompokmu menuntaskan ujian heroik saat kamu bertempur di barisan belakang atau telah tumbang. Penguncianmu juga tercatat, jadi bagian Tanda Heroik milikmu dikirim ke sini alih-alih hilang. Gunakan dengan baik.\n\n- Perbekal heroik"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Persatuan Perajin",

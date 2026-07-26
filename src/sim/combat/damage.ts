@@ -1196,8 +1196,7 @@ export function handleDeath(
     // clearThreat below, exactly like worldBossContribs.
     const rareContribs =
       !template?.worldBoss && template?.rare ? worldBossLootContributors(ctx, e) : null;
-    const nythraxisContribs =
-      e.templateId === NYTHRAXIS_BOSS_ID ? worldBossLootContributors(ctx, e) : null;
+
     const finalBossInstance = dungeonFinalBossInstance(ctx, e);
     const heroicFinalBossContribs =
       finalBossInstance?.difficulty === 'heroic' ? worldBossLootContributors(ctx, e) : null;
@@ -1378,12 +1377,10 @@ export function handleDeath(
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
     }
-    // Settle the heroic reward and its realm-reset lockout together. This runs
-    // even without player credit so the owning group cannot dodge the lockout;
-    // only the participation snapshot above receives marks.
+    // Settle the realm-reset lockout even without player credit so the owning
+    // group cannot dodge it. Nythraxis progression comes only from corpse loot.
     lockNormalDungeonResetOnBossKill(ctx, e);
-    if (e.templateId === NYTHRAXIS_BOSS_ID)
-      ctx.grantNythraxisLockout(e, heroicRewardRecipients, nythraxisContribs ?? []);
+    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e, heroicRewardRecipients);
     else ctx.awardHeroicMarks(e, heroicRewardRecipients, heroicFinalBossContribs ?? []);
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.

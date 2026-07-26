@@ -58,7 +58,7 @@ function quantizedMidpoint(range: { min: number; max: number; step?: number }): 
 }
 
 describe('Nythraxis procedural raid loot', () => {
-  it('pins the authoritative Normal and Heroic rarity, item-level, magnitude and fragment profiles', () => {
+  it('pins the authoritative Normal and Heroic rarity, item-level, and magnitude profiles', () => {
     expect(PROCEDURAL_RARITY_TABLES.nythraxis_raid_normal.weights).toEqual({
       rare: 0.65,
       epic: 0.33,
@@ -75,14 +75,12 @@ describe('Nythraxis procedural raid loot', () => {
         rarityTableId: 'nythraxis_raid_normal',
         itemLevels: { rare: 27, epic: 28, legendary: 32 },
         legendaryMagnitudeFloor: 0,
-        fragmentsPerParticipant: 1,
       },
       heroic: {
         difficulty: 'heroic',
         rarityTableId: 'nythraxis_raid_heroic',
         itemLevels: { rare: 31, epic: 32, legendary: 36 },
         legendaryMagnitudeFloor: 0.5,
-        fragmentsPerParticipant: 3,
       },
     });
     for (const tableId of ['nythraxis_raid_normal', 'nythraxis_raid_heroic']) {

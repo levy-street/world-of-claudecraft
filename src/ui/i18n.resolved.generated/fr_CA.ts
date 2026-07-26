@@ -2576,8 +2576,6 @@ export const fr_CA: EnTranslations = {
       "raidSharedDrop": "Le cadavre du boss final ajoute un objet procédural partagé pour lequel le raid peut effectuer un jet.",
       "raidRarityLine": "Rare {rare}% · Épique {epic}% · Légendaire {legendary}%",
       "raidItemLevels": "Niveau d'objet : Rare {rare} · Épique {epic} · Légendaire {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Fragment immortel par participant",
-      "raidCurrenciesHeroic": "+{fragments} Fragments immortels et +{marks} Marques héroïques par participant",
       "raidSignatures": "Pouvoirs légendaires emblématiques : {signatures}",
       "raidForgedLegendary": "Les pouvoirs légendaires héroïques sont forgés en raid et leur jet est garanti dans la moitié supérieure de la plage définie.",
       "entrance": "Entrée: {zone}",
@@ -5200,52 +5198,7 @@ export const fr_CA: EnTranslations = {
     "buyConfirmTitle": "Confirmer l'achat",
     "buyConfirmBody": "Acheter {item} pour {marks} Marques héroïques ? Les achats de marques ne peuvent pas être remboursés.",
     "buyConfirmAccept": "Acheter",
-    "buyConfirmCancel": "Annuler",
-    "tabsAria": "Services de l'Intendant",
-    "fragmentBalance": "Fragments immortels : {count}",
-    "tab": {
-      "gear": "Équipement héroïque",
-      "forge": "Forge immortelle",
-      "tune": "Affinage légendaire"
-    },
-    "gearIntro": "Dépensez vos Marques héroïques dans l'assortiment habituel de l'Intendant.",
-    "forgeIntro": "Choisissez la famille de récompense et l'objet de base. Le royaume ne détermine aléatoirement les affixes procéduraux qu'après avoir validé l'offre exacte et le paiement.",
-    "tuneIntro": "Choisissez un objet légendaire de Nythraxis précis dans vos sacs. Le royaume effectue deux nouveaux jets de puissance et conserve le meilleur résultat. La puissance ne diminue jamais, mais un affinage peut ne produire aucun changement.",
-    "tuneEmpty": "Aucun objet légendaire de Nythraxis admissible ne se trouve dans vos sacs.",
-    "heroicClearReady": "Victoire contre Nythraxis en mode héroïque vérifiée pour ce verrouillage quotidien.",
-    "heroicClearNeeded": "Les cibles héroïques nécessitent d'avoir terminé Nythraxis en mode héroïque pendant le verrouillage actuel.",
-    "itemLevel": "Niveau d'objet {level}",
-    "cost": "{fragments} Fragments · {marks} Marques héroïques",
-    "randomAffixes": "Affixes et valeurs aléatoires",
-    "deterministicStats": "Récompense fixe prédéfinie",
-    "raidForgedGuarantee": "Pouvoir forgé en raid, avec un jet garanti dans la moitié supérieure",
-    "raidForged": "Forgé en raid",
-    "raidDrop": "Objet légendaire du raid de Nythraxis",
-    "reforgeCount": "Affinages : {count}",
-    "forgeKind": {
-      "normal_procedural": "Objet épique procédural normal",
-      "heroic_procedural": "Objet épique procédural héroïque",
-      "signature": "Objet légendaire emblématique héroïque",
-      "authored": "Récompense cible prédéfinie"
-    },
-    "blocked": {
-      "class": "Incompatible avec votre classe",
-      "heroic_clear": "Nécessite d'avoir terminé Nythraxis en mode héroïque pendant le verrouillage actuel",
-      "fragments": "Pas assez de Fragments immortels",
-      "marks": "Pas assez de Marques héroïques"
-    },
-    "forgeConfirmTitle": "Confirmer la forge",
-    "forgeConfirmBody": "Forger {item} contre {fragments} Fragments immortels et {marks} Marques héroïques ? Le royaume effectue le jet de l'objet après validation du paiement.",
-    "forgeConfirmAccept": "Forger",
-    "tuneConfirmTitle": "Confirmer l'affinage légendaire",
-    "tuneConfirmBody": "Affiner cet exemplaire précis de {item} contre {fragments} Fragments immortels et {marks} Marques héroïques ? Le meilleur des deux jets est conservé ; la puissance ne peut pas diminuer, mais elle peut rester inchangée.",
-    "tuneConfirmAccept": "Affiner",
-    "status": {
-      "pending": "En attente du royaume...",
-      "gear": "Achat terminé. Soldes actualisés.",
-      "forge": "Forge terminée. La nouvelle récompense se trouve dans vos sacs.",
-      "tune": "Affinage terminé. L'exemplaire exact et les soldes ont été actualisés."
-    }
+    "buyConfirmCancel": "Annuler"
   },
   "cardDuel": {
     "title": "Duel de cartes",
@@ -9918,9 +9871,6 @@ export const fr_CA: EnTranslations = {
       "heroic_mark": {
         "name": "Marque héroïque"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Rondache d'Eastbrook"
       },
@@ -11923,11 +11873,6 @@ export const fr_CA: EnTranslations = {
         "sender": "Intendant héroïque",
         "subject": "Vos Marques héroïques",
         "body": "Votre groupe a triomphé de l’épreuve héroïque pendant que vous combattiez à l’arrière ou gisiez à terre. Votre verrouillage a tout de même été enregistré, alors votre part de Marques héroïques vous est envoyée ici au lieu d’être perdue. Faites-en bon usage.\n\n- Intendant héroïque"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "La guilde des artisans",

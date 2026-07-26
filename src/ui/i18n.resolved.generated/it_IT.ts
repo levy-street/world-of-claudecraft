@@ -2576,8 +2576,6 @@ export const it_IT: EnTranslations = {
       "raidSharedDrop": "Il cadavere finale aggiunge un oggetto procedurale condiviso per cui l'incursione può effettuare un tiro.",
       "raidRarityLine": "Raro {rare}% · Epico {epic}% · Leggendario {legendary}%",
       "raidItemLevels": "Livello oggetto: Raro {rare} · Epico {epic} · Leggendario {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Frammento senza morte per partecipante",
-      "raidCurrenciesHeroic": "+{fragments} Frammenti senza morte e +{marks} Marchi Eroici per partecipante",
       "raidSignatures": "Poteri Leggendari caratteristici: {signatures}",
       "raidForgedLegendary": "I poteri Leggendari eroici vengono forgiati in incursione e garantiscono un tiro nella metà superiore dell'intervallo definito.",
       "entrance": "Ingresso: {zone}",
@@ -5200,52 +5198,7 @@ export const it_IT: EnTranslations = {
     "buyConfirmTitle": "Conferma acquisto",
     "buyConfirmBody": "Acquista {item} per {marks} Marchi eroici? Gli acquisti di Marchi non possono essere rimborsati.",
     "buyConfirmAccept": "Acquista",
-    "buyConfirmCancel": "Annulla",
-    "tabsAria": "Servizi del Quartiermastro",
-    "fragmentBalance": "Frammenti senza morte: {count}",
-    "tab": {
-      "gear": "Equipaggiamento Eroico",
-      "forge": "Forgia Senza Morte",
-      "tune": "Ricalibratura Leggendaria"
-    },
-    "gearIntro": "Spendi Marchi Eroici nell'assortimento abituale del Quartiermastro.",
-    "forgeIntro": "Scegli la famiglia di ricompense e l'oggetto base. Il reame esegue il tiro casuale degli affissi procedurali solo dopo aver convalidato l'offerta esatta e il pagamento.",
-    "tuneIntro": "Scegli un esemplare specifico di un Leggendario di Nythraxis dalle tue borse. Il reame esegue due nuovi tiri di potere e conserva il risultato migliore. Il potere non diminuisce mai, ma una ricalibratura può non produrre cambiamenti.",
-    "tuneEmpty": "Nelle tue borse non ci sono Leggendari di Nythraxis idonei.",
-    "heroicClearReady": "Vittoria su Nythraxis in modalità eroica verificata per questo blocco giornaliero.",
-    "heroicClearNeeded": "Le ricompense eroiche richiedono di aver completato Nythraxis in modalità eroica durante il blocco attuale.",
-    "itemLevel": "Livello oggetto {level}",
-    "cost": "{fragments} Frammenti · {marks} Marchi Eroici",
-    "randomAffixes": "Affissi e valori casuali",
-    "deterministicStats": "Ricompensa fissa predefinita",
-    "raidForgedGuarantee": "Potere forgiato in incursione, con tiro garantito nella metà superiore",
-    "raidForged": "Forgiato in incursione",
-    "raidDrop": "Leggendario dell'incursione di Nythraxis",
-    "reforgeCount": "Ricalibrature: {count}",
-    "forgeKind": {
-      "normal_procedural": "Epico procedurale normale",
-      "heroic_procedural": "Epico procedurale eroico",
-      "signature": "Leggendario caratteristico eroico",
-      "authored": "Ricompensa obiettivo predefinita"
-    },
-    "blocked": {
-      "class": "Non compatibile con la tua classe",
-      "heroic_clear": "Richiede di aver completato Nythraxis in modalità eroica durante il blocco attuale",
-      "fragments": "Non hai abbastanza Frammenti senza morte",
-      "marks": "Non hai abbastanza Marchi Eroici"
-    },
-    "forgeConfirmTitle": "Conferma forgiatura",
-    "forgeConfirmBody": "Forgiare {item} per {fragments} Frammenti senza morte e {marks} Marchi Eroici? Il reame esegue il tiro dell'oggetto dopo aver convalidato il pagamento.",
-    "forgeConfirmAccept": "Forgia",
-    "tuneConfirmTitle": "Conferma Ricalibratura Leggendaria",
-    "tuneConfirmBody": "Ricalibrare questa copia esatta di {item} per {fragments} Frammenti senza morte e {marks} Marchi Eroici? Viene conservato il migliore di due tiri; il potere non può diminuire, ma può rimanere invariato.",
-    "tuneConfirmAccept": "Ricalibra",
-    "status": {
-      "pending": "In attesa del reame...",
-      "gear": "Acquisto completato. Saldi aggiornati.",
-      "forge": "Forgiatura completata. La nuova ricompensa è nelle tue borse.",
-      "tune": "Ricalibratura completata. La copia esatta e i saldi sono stati aggiornati."
-    }
+    "buyConfirmCancel": "Annulla"
   },
   "cardDuel": {
     "title": "Duello di Carte",
@@ -9918,9 +9871,6 @@ export const it_IT: EnTranslations = {
       "heroic_mark": {
         "name": "Marchio Eroico"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Brocchiero di Eastbrook"
       },
@@ -11923,11 +11873,6 @@ export const it_IT: EnTranslations = {
         "sender": "Quartiermastro eroico",
         "subject": "I tuoi Marchi eroici",
         "body": "Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "La Gilda degli Artigiani",

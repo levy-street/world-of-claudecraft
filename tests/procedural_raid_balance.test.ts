@@ -19,7 +19,7 @@ describe('procedural Nythraxis raid balance campaign', () => {
     expect(first.deterministicFingerprint).toMatch(/^[0-9a-f]{8}$/);
   });
 
-  it('pins natural Legendary tails and deterministic acquisition caps', () => {
+  it('pins natural Legendary tails', () => {
     const report = simulateProceduralRaidBalance({ samplesPerDifficulty: 100, seed: 9 });
 
     expect(report.naturalLegendaryChanceByKills.normal).toContainEqual({
@@ -33,22 +33,6 @@ describe('procedural Nythraxis raid balance campaign', () => {
     expect(report.naturalLegendaryChanceByKills.heroic).toContainEqual({
       kills: 90,
       chancePct: 99.011,
-    });
-    expect(report.acquisition).toContainEqual({
-      reward: 'Exact Raid-forged signature',
-      fragments: 60,
-      heroicMarks: 45,
-      normalOnlyResets: null,
-      heroicOnlyResets: 20,
-      bothDifficultyResets: 15,
-    });
-    expect(report.acquisition).toContainEqual({
-      reward: 'Legendary power tune',
-      fragments: 6,
-      heroicMarks: 6,
-      normalOnlyResets: null,
-      heroicOnlyResets: 2,
-      bothDifficultyResets: 2,
     });
   });
 

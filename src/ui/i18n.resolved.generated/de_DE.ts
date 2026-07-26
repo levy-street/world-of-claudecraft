@@ -2576,8 +2576,6 @@ export const de_DE: EnTranslations = {
       "raidSharedDrop": "Die Leiche des Endgegners fügt einen gemeinsam auszuwürfelnden prozeduralen Gegenstand für den Schlachtzug hinzu.",
       "raidRarityLine": "Selten {rare}% · Episch {epic}% · Legendär {legendary}%",
       "raidItemLevels": "Gegenstandsstufe: Selten {rare} · Episch {epic} · Legendär {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Todloses Fragment pro Teilnehmer",
-      "raidCurrenciesHeroic": "+{fragments} Todlose Fragmente und +{marks} Heroische Marken pro Teilnehmer",
       "raidSignatures": "Legendäre Signaturmächte: {signatures}",
       "raidForgedLegendary": "Heroische legendäre Mächte sind schlachtzuggeschmiedet und liegen garantiert in der oberen Hälfte ihres vorgegebenen Wertebereichs.",
       "entrance": "Eingang: {zone}",
@@ -5200,52 +5198,7 @@ export const de_DE: EnTranslations = {
     "buyConfirmTitle": "Kauf bestätigen",
     "buyConfirmBody": "{item} für {marks} Heroische Marken kaufen? Käufe mit Marken können nicht erstattet werden.",
     "buyConfirmAccept": "Kaufen",
-    "buyConfirmCancel": "Abbrechen",
-    "tabsAria": "Dienste des Quartiermeisters",
-    "fragmentBalance": "Todlose Fragmente: {count}",
-    "tab": {
-      "gear": "Heroische Ausrüstung",
-      "forge": "Todlose Schmiede",
-      "tune": "Legendäre Feinabstimmung"
-    },
-    "gearIntro": "Gib Heroische Marken für das feste Sortiment des Quartiermeisters aus.",
-    "forgeIntro": "Wähle die Belohnungsfamilie und den Basisgegenstand. Das Reich würfelt zufällige prozedurale Affixe erst, nachdem es das genaue Angebot und die Zahlung bestätigt hat.",
-    "tuneIntro": "Wähle ein bestimmtes legendäres Nythraxis-Exemplar aus deinen Taschen. Das Reich würfelt zwei Ersatzwerte für die Macht und übernimmt das bessere Ergebnis. Die Macht sinkt nie, doch eine Feinabstimmung kann ohne Änderung bleiben.",
-    "tuneEmpty": "In deinen Taschen befindet sich kein geeignetes legendäres Nythraxis-Exemplar.",
-    "heroicClearReady": "Sieg über Nythraxis auf Heroisch für diese Tagessperre bestätigt.",
-    "heroicClearNeeded": "Heroische Ziele erfordern einen aktuellen Sieg über Nythraxis auf Heroisch.",
-    "itemLevel": "Gegenstandsstufe {level}",
-    "cost": "{fragments} Fragmente · {marks} Heroische Marken",
-    "randomAffixes": "Zufällige Affixe und Werte",
-    "deterministicStats": "Fest vorgegebene Belohnung",
-    "raidForgedGuarantee": "Schlachtzuggeschmiedete Macht, Wurf in der oberen Hälfte garantiert",
-    "raidForged": "Schlachtzuggeschmiedet",
-    "raidDrop": "Legendärer Schlachtzugsfund von Nythraxis",
-    "reforgeCount": "Feinabstimmungen: {count}",
-    "forgeKind": {
-      "normal_procedural": "Normaler prozeduraler epischer Gegenstand",
-      "heroic_procedural": "Heroischer prozeduraler epischer Gegenstand",
-      "signature": "Heroischer Signaturgegenstand, legendär",
-      "authored": "Vorgegebene Zielbelohnung"
-    },
-    "blocked": {
-      "class": "Nicht mit deiner Klasse kompatibel",
-      "heroic_clear": "Erfordert einen aktuellen Sieg über Nythraxis auf Heroisch",
-      "fragments": "Nicht genügend Todlose Fragmente",
-      "marks": "Nicht genügend Heroische Marken"
-    },
-    "forgeConfirmTitle": "Schmieden bestätigen",
-    "forgeConfirmBody": "{item} für {fragments} Todlose Fragmente und {marks} Heroische Marken schmieden? Das Reich würfelt den Gegenstand aus, nachdem die Zahlung bestätigt wurde.",
-    "forgeConfirmAccept": "Schmieden",
-    "tuneConfirmTitle": "Legendäre Feinabstimmung bestätigen",
-    "tuneConfirmBody": "Dieses genaue Exemplar von {item} für {fragments} Todlose Fragmente und {marks} Heroische Marken feinabstimmen? Der bessere von zwei Würfen wird übernommen; die Macht kann nicht sinken, aber sie kann unverändert bleiben.",
-    "tuneConfirmAccept": "Feinabstimmen",
-    "status": {
-      "pending": "Warten auf das Reich...",
-      "gear": "Kauf abgeschlossen. Bestände aktualisiert.",
-      "forge": "Schmieden abgeschlossen. Die neue Belohnung befindet sich in deinen Taschen.",
-      "tune": "Feinabstimmung abgeschlossen. Das genaue Exemplar und die Bestände wurden aktualisiert."
-    }
+    "buyConfirmCancel": "Abbrechen"
   },
   "cardDuel": {
     "title": "Kartenkampf",
@@ -9918,9 +9871,6 @@ export const de_DE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroische Marke"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Eastbrook-Faustschild"
       },
@@ -11923,11 +11873,6 @@ export const de_DE: EnTranslations = {
         "sender": "Heroischer Quartiermeister",
         "subject": "Deine heroischen Marken",
         "body": "Deine Gruppe hat die heroische Prüfung gemeistert, während du in der Nachhut gekämpft hast oder bereits am Boden lagst. Auch deine Instanzbindung wurde aktiviert, daher ist dein Anteil an heroischen Marken hier angekommen, statt verloren zu gehen. Setze sie klug ein.\n\n- Heroischer Quartiermeister"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Die Handwerksgilde",

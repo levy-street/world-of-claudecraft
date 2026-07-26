@@ -18,7 +18,6 @@ export interface PublicProceduralItemView {
   powerRevision?: number;
   legendaryRolls?: Record<string, number>;
   raidForged?: true;
-  reforgeCount?: number;
   generatedName: GeneratedItemName;
 }
 
@@ -54,9 +53,6 @@ export function publicProceduralItemView(item: ProceduralItemInstance): PublicPr
     }),
     ...(item.raidForged && {
       raidForged: true,
-    }),
-    ...(item.reforgeCount !== undefined && {
-      reforgeCount: item.reforgeCount,
     }),
     generatedName: {
       ...item.generatedName,

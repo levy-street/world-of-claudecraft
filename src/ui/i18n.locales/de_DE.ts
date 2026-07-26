@@ -9603,53 +9603,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Waffenschaden pro Sekunde',
   'itemUi.stats.weaponMax': 'Maximaler Waffenschaden',
   'itemUi.stats.weaponMin': 'Minimaler Waffenschaden',
-  'heroicShop.blocked.class': 'Nicht mit deiner Klasse kompatibel',
-  'heroicShop.blocked.fragments': 'Nicht genügend Todlose Fragmente',
-  'heroicShop.blocked.heroic_clear': 'Erfordert einen aktuellen Sieg über Nythraxis auf Heroisch',
-  'heroicShop.blocked.marks': 'Nicht genügend Heroische Marken',
-  'heroicShop.cost': '{fragments} Fragmente · {marks} Heroische Marken',
-  'heroicShop.deterministicStats': 'Fest vorgegebene Belohnung',
-  'heroicShop.forgeConfirmAccept': 'Schmieden',
-  'heroicShop.forgeConfirmBody':
-    '{item} für {fragments} Todlose Fragmente und {marks} Heroische Marken schmieden? Das Reich würfelt den Gegenstand aus, nachdem die Zahlung bestätigt wurde.',
-  'heroicShop.forgeConfirmTitle': 'Schmieden bestätigen',
-  'heroicShop.forgeIntro':
-    'Wähle die Belohnungsfamilie und den Basisgegenstand. Das Reich würfelt zufällige prozedurale Affixe erst, nachdem es das genaue Angebot und die Zahlung bestätigt hat.',
-  'heroicShop.forgeKind.authored': 'Vorgegebene Zielbelohnung',
-  'heroicShop.forgeKind.heroic_procedural': 'Heroischer prozeduraler epischer Gegenstand',
-  'heroicShop.forgeKind.normal_procedural': 'Normaler prozeduraler epischer Gegenstand',
-  'heroicShop.forgeKind.signature': 'Heroischer Signaturgegenstand, legendär',
-  'heroicShop.fragmentBalance': 'Todlose Fragmente: {count}',
-  'heroicShop.gearIntro': 'Gib Heroische Marken für das feste Sortiment des Quartiermeisters aus.',
-  'heroicShop.heroicClearNeeded':
-    'Heroische Ziele erfordern einen aktuellen Sieg über Nythraxis auf Heroisch.',
-  'heroicShop.heroicClearReady':
-    'Sieg über Nythraxis auf Heroisch für diese Tagessperre bestätigt.',
-  'heroicShop.itemLevel': 'Gegenstandsstufe {level}',
-  'heroicShop.raidDrop': 'Legendärer Schlachtzugsfund von Nythraxis',
-  'heroicShop.raidForged': 'Schlachtzuggeschmiedet',
-  'heroicShop.raidForgedGuarantee':
-    'Schlachtzuggeschmiedete Macht, Wurf in der oberen Hälfte garantiert',
-  'heroicShop.randomAffixes': 'Zufällige Affixe und Werte',
-  'heroicShop.reforgeCount': 'Feinabstimmungen: {count}',
-  'heroicShop.status.forge':
-    'Schmieden abgeschlossen. Die neue Belohnung befindet sich in deinen Taschen.',
-  'heroicShop.status.gear': 'Kauf abgeschlossen. Bestände aktualisiert.',
-  'heroicShop.status.pending': 'Warten auf das Reich...',
-  'heroicShop.status.tune':
-    'Feinabstimmung abgeschlossen. Das genaue Exemplar und die Bestände wurden aktualisiert.',
-  'heroicShop.tab.forge': 'Todlose Schmiede',
-  'heroicShop.tab.gear': 'Heroische Ausrüstung',
-  'heroicShop.tab.tune': 'Legendäre Feinabstimmung',
-  'heroicShop.tabsAria': 'Dienste des Quartiermeisters',
-  'heroicShop.tuneConfirmAccept': 'Feinabstimmen',
-  'heroicShop.tuneConfirmBody':
-    'Dieses genaue Exemplar von {item} für {fragments} Todlose Fragmente und {marks} Heroische Marken feinabstimmen? Der bessere von zwei Würfen wird übernommen; die Macht kann nicht sinken, aber sie kann unverändert bleiben.',
-  'heroicShop.tuneConfirmTitle': 'Legendäre Feinabstimmung bestätigen',
-  'heroicShop.tuneEmpty':
-    'In deinen Taschen befindet sich kein geeignetes legendäres Nythraxis-Exemplar.',
-  'heroicShop.tuneIntro':
-    'Wähle ein bestimmtes legendäres Nythraxis-Exemplar aus deinen Taschen. Das Reich würfelt zwei Ersatzwerte für die Macht und übernimmt das bessere Ergebnis. Die Macht sinkt nie, doch eine Feinabstimmung kann ohne Änderung bleiben.',
   'hudChrome.bags.itemAriaProcedural': '{item}, {rarity}, Gegenstandsstufe {level}, Menge {count}',
   'hudChrome.bags.itemAriaProceduralBound':
     '{item}, {rarity}, Gegenstandsstufe {level}, Menge {count}, gebundenes Exemplar',
@@ -9659,9 +9612,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     '{item}, {rarity}, Gegenstandsstufe {level}, Menge {count}, Meisterwerk',
   'hudChrome.bags.itemAriaProceduralSigned':
     '{item}, {rarity}, Gegenstandsstufe {level}, Menge {count}, herstellermarkiertes Exemplar',
-  'hudChrome.finder.raidCurrenciesHeroic':
-    '+{fragments} Todlose Fragmente und +{marks} Heroische Marken pro Teilnehmer',
-  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Todloses Fragment pro Teilnehmer',
   'hudChrome.finder.raidForgedLegendary':
     'Heroische legendäre Mächte sind schlachtzuggeschmiedet und liegen garantiert in der oberen Hälfte ihres vorgegebenen Wertebereichs.',
   'hudChrome.finder.raidItemLevels':

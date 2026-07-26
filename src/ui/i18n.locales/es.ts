@@ -9070,52 +9070,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     '¿Comprar {item} para {marks} Marcas heroicas? Las compras de marcas no se pueden reembolsar.',
   'heroicShop.buyConfirmCancel': 'Cancelar',
   'heroicShop.buyConfirmTitle': 'Confirmar compra',
-  'heroicShop.blocked.class': 'No compatible con tu clase',
-  'heroicShop.blocked.fragments': 'No tienes suficientes Fragmentos Imperecederos',
-  'heroicShop.blocked.heroic_clear':
-    'Requiere haber completado Nythraxis en modo heroico durante el bloqueo actual',
-  'heroicShop.blocked.marks': 'No tienes suficientes Marcas Heroicas',
-  'heroicShop.cost': '{fragments} Fragmentos · {marks} Marcas Heroicas',
-  'heroicShop.deterministicStats': 'Recompensa fija prediseñada',
-  'heroicShop.forgeConfirmAccept': 'Forjar',
-  'heroicShop.forgeConfirmBody':
-    '¿Forjar {item} por {fragments} Fragmentos Imperecederos y {marks} Marcas Heroicas? El reino realiza la tirada del objeto después de validar el pago.',
-  'heroicShop.forgeConfirmTitle': 'Confirmar forja',
-  'heroicShop.forgeIntro':
-    'Elige la familia de recompensa y el objeto base. El reino solo realiza la tirada aleatoria de afijos procedimentales después de validar la oferta y el pago exactos.',
-  'heroicShop.forgeKind.authored': 'Recompensa objetivo prediseñada',
-  'heroicShop.forgeKind.heroic_procedural': 'Épico procedimental heroico',
-  'heroicShop.forgeKind.normal_procedural': 'Épico procedimental normal',
-  'heroicShop.forgeKind.signature': 'Legendario distintivo heroico',
-  'heroicShop.fragmentBalance': 'Fragmentos Imperecederos: {count}',
-  'heroicShop.gearIntro': 'Gasta Marcas Heroicas en el inventario habitual del Intendente.',
-  'heroicShop.heroicClearNeeded':
-    'Las recompensas heroicas requieren haber completado Nythraxis en modo heroico durante el bloqueo actual.',
-  'heroicShop.heroicClearReady':
-    'Victoria sobre Nythraxis en modo heroico verificada para este bloqueo diario.',
-  'heroicShop.itemLevel': 'Nivel de objeto {level}',
-  'heroicShop.raidDrop': 'Legendario de la banda de Nythraxis',
-  'heroicShop.raidForged': 'Forjado en banda',
-  'heroicShop.raidForgedGuarantee':
-    'Poder forjado en banda, con una tirada garantizada en la mitad superior',
-  'heroicShop.randomAffixes': 'Afijos y valores aleatorios',
-  'heroicShop.reforgeCount': 'Afinaciones: {count}',
-  'heroicShop.status.forge': 'Forja completada. La nueva recompensa está en tus bolsas.',
-  'heroicShop.status.gear': 'Compra completada. Saldos actualizados.',
-  'heroicShop.status.pending': 'Esperando al reino...',
-  'heroicShop.status.tune':
-    'Afinación completada. Se han actualizado la copia exacta y los saldos.',
-  'heroicShop.tab.forge': 'Forja Imperecedera',
-  'heroicShop.tab.gear': 'Equipo Heroico',
-  'heroicShop.tab.tune': 'Afinación Legendaria',
-  'heroicShop.tabsAria': 'Servicios del Intendente',
-  'heroicShop.tuneConfirmAccept': 'Afinar',
-  'heroicShop.tuneConfirmBody':
-    '¿Afinar esta copia exacta de {item} por {fragments} Fragmentos Imperecederos y {marks} Marcas Heroicas? Se conserva la mejor de dos tiradas; el poder no puede disminuir, pero puede permanecer sin cambios.',
-  'heroicShop.tuneConfirmTitle': 'Confirmar Afinación Legendaria',
-  'heroicShop.tuneEmpty': 'No tienes ningún Legendario de Nythraxis apto en tus bolsas.',
-  'heroicShop.tuneIntro':
-    'Elige un Legendario de Nythraxis concreto de tus bolsas. El reino realiza dos tiradas de poder sustitutivas y conserva el mejor resultado. El poder nunca disminuye, pero una afinación puede no producir cambios.',
   'hudChrome.bags.itemAriaProcedural':
     '{item}, {rarity}, nivel de objeto {level}, cantidad {count}',
   'hudChrome.bags.itemAriaProceduralBound':
@@ -9126,9 +9080,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     '{item}, {rarity}, nivel de objeto {level}, cantidad {count}, obra maestra',
   'hudChrome.bags.itemAriaProceduralSigned':
     '{item}, {rarity}, nivel de objeto {level}, cantidad {count}, copia marcada por el creador',
-  'hudChrome.finder.raidCurrenciesHeroic':
-    '+{fragments} Fragmentos Imperecederos y +{marks} Marcas Heroicas por participante',
-  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Fragmento Imperecedero por participante',
   'hudChrome.finder.raidForgedLegendary':
     'Los poderes Legendarios heroicos se forjan en banda y tienen garantizada una tirada en la mitad superior del rango definido.',
   'hudChrome.finder.raidItemLevels':

@@ -8,10 +8,9 @@ import { resolvePosition } from '../src/sim/colliders';
 import { applyHeal } from '../src/sim/combat/heal';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
-import { HEROIC_MARK_LETTER, NYTHRAXIS_REWARD_LETTER } from '../src/sim/content/letters';
-import { DEATHLESS_FRAGMENT_ITEM_ID } from '../src/sim/content/procedural_raid_loot';
+import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
-import { grantNythraxisLockout, spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
+import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import {
   awardHeroicMarks,
   enterDungeon,
@@ -81,6 +80,12 @@ function mailedItemTo(sim: AnySim, pid: number, itemId: string): number {
     .flatMap((m) => m.items as { itemId: string; count: number }[])
     .filter((slot) => slot.itemId === itemId)
     .reduce((total, slot) => total + slot.count, 0);
+}
+
+function mailboxCountTo(sim: AnySim, pid: number): number {
+  const name = sim.players.get(pid)!.name;
+  return ((sim.postOffice as any).mail as any[]).filter((mail) => mail.recipientName === name)
+    .length;
 }
 
 function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
@@ -1496,7 +1501,7 @@ describe('dungeons: heroic daily lockouts', () => {
     expect(mailedMarksTo(sim, healer)).toBe(1);
   });
 
-  it('locks an entered AFK player without Marks or a Forge receipt', () => {
+  it('locks an entered AFK player without Marks', () => {
     const sim = makeSim(5);
     const leader = sim.addPlayer('warrior', 'Lead');
     const parked = sim.addPlayer('mage', 'Parked');
@@ -1522,7 +1527,7 @@ describe('dungeons: heroic daily lockouts', () => {
     expect(parkedMeta.heroicDaily.marked.has('hollow_crypt')).toBe(false);
   });
 
-  it('locks a nearby AFK player without Marks or a Forge receipt', () => {
+  it('locks a nearby AFK player without Marks', () => {
     const sim = makeSim(5);
     const leader = sim.addPlayer('warrior', 'Lead');
     const parked = sim.addPlayer('mage', 'NearbyParked');
@@ -1970,84 +1975,79 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     }
   });
 
-  it('a normal raid claim carries the normal retune; a heroic kill pays marks to every raider', () => {
-    const normal = raidSetup('normal');
-    const nBoss = mobInInstance(normal.sim, normal.inst, NYTHRAXIS_BOSS_ID);
-    // Normal Nythraxis rides NORMAL_DUNGEON_TUNING (economy retune): doubled
-    // health (was 60000) and the 5x per-mob multiplier stamped for mechanics.
-    expect(nBoss.maxHp).toBe(120000);
-    expect(nBoss.mechanicDamageMult).toBe(5);
-    spawnNythraxisAdds(normal.sim.ctx, nBoss);
-    const nAdd = normal.sim.entities.get((nBoss.summonedIds as number[])[0]) as AnyEntity;
-    expect(nAdd.mechanicDamageMult).toBe(5);
+  it.each(['normal', 'heroic'] as const)(
+    'grants the %s raid lockout and one shared procedural corpse drop without currency',
+    (difficulty) => {
+      const { sim, raiders, inst } = raidSetup(difficulty);
+      const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
+      const mailboxCounts = new Map(raiders.map((pid) => [pid, mailboxCountTo(sim, pid)]));
+      if (difficulty === 'normal') {
+        // Normal Nythraxis keeps the normal encounter retune.
+        expect(boss.maxHp).toBe(120000);
+        expect(boss.mechanicDamageMult).toBe(5);
+        spawnNythraxisAdds(sim.ctx, boss);
+        const add = sim.entities.get((boss.summonedIds as number[])[0]) as AnyEntity;
+        expect(add.mechanicDamageMult).toBe(5);
+      }
+      raiders.forEach((pid, index) => {
+        teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + index - 2, boss.pos.z - 4);
+        boss.bossDamagers.add(pid);
+      });
 
-    const { sim, raiders, inst } = raidSetup('heroic');
-    const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
-    raiders.forEach((pid, i) => {
-      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
-      boss.bossDamagers.add(pid);
-    });
+      (sim as any).dealDamage(
+        sim.entities.get(raiders[0]),
+        boss,
+        boss.hp + 100,
+        false,
+        'physical',
+        null,
+        'hit',
+      );
 
-    (sim as any).dealDamage(
-      sim.entities.get(raiders[0]),
-      boss,
-      boss.hp + 100,
-      false,
-      'physical',
-      null,
-      'hit',
-    );
+      expect(boss.dead).toBe(true);
+      const lootItems = (boss.loot?.items ?? []) as any[];
+      const proceduralSlots = lootItems.filter((slot) => slot.instance?.procedural);
+      expect(proceduralSlots).toHaveLength(1);
+      const proceduralUid = proceduralSlots[0].instance.procedural.uid;
+      expect(proceduralUid).toEqual(expect.any(String));
+      expect(lootItems.map((slot) => slot.itemId)).not.toContain(HEROIC_MARK_ITEM_ID);
+      expect(lootItems.map((slot) => slot.itemId)).not.toContain('deathless_fragment');
+      expect(ITEMS).not.toHaveProperty('deathless_fragment');
+      for (const pid of raiders) {
+        expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(0);
+        expect(mailedItemTo(sim, pid, HEROIC_MARK_ITEM_ID)).toBe(0);
+        expect(mailboxCountTo(sim, pid)).toBe(mailboxCounts.get(pid));
+        expect(
+          sim.players
+            .get(pid)!
+            .raidLockouts.has(
+              difficulty === 'heroic' ? 'nythraxis_boss_arena:heroic' : 'nythraxis_boss_arena',
+            ),
+        ).toBe(true);
+      }
 
-    expect(boss.dead).toBe(true);
-    for (const pid of raiders) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(3);
-      expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(3);
-      expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
-      expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena')).toBe(false);
-    }
-    grantNythraxisLockout(
-      sim.ctx,
-      boss,
-      raiders.map((pid) => sim.players.get(pid)!),
-    );
-    for (const pid of raiders) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(3);
-      expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(3);
-    }
-    expect(((boss.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID)).toBe(
-      false,
-    );
-  });
-
-  it('pays one personal fragment on Normal while keeping both raid lockouts independent', () => {
-    const { sim, raiders, inst } = raidSetup('normal');
-    const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
-    raiders.forEach((pid, i) => {
-      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
-      boss.bossDamagers.add(pid);
-    });
-
-    (sim as any).dealDamage(
-      sim.entities.get(raiders[0]),
-      boss,
-      boss.hp + 100,
-      false,
-      'physical',
-      null,
-      'hit',
-    );
-
-    expect(boss.dead).toBe(true);
-    for (const pid of raiders) {
-      expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(1);
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(0);
-      expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
-      expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(false);
-    }
-  });
+      sim.events.length = 0;
+      expect(sim.lootCorpse(boss.id, raiders[0])).toBe(true);
+      const prompts = sim.events.filter(
+        (event: any) => event.type === 'lootRoll' && event.instance?.procedural,
+      ) as any[];
+      expect(prompts).toHaveLength(raiders.length);
+      const needPrompt = prompts.find((event: any) => event.canNeed);
+      if (!needPrompt) throw new Error('expected one raider to be eligible to Need');
+      for (const pid of raiders) {
+        sim.submitLootRoll(needPrompt.rollId, pid === needPrompt.pid ? 'need' : 'pass', pid);
+      }
+      const owners = raiders.filter((pid) =>
+        sim.players
+          .get(pid)!
+          .inventory.some((slot: any) => slot.instance?.procedural?.uid === proceduralUid),
+      );
+      expect(owners).toEqual([needPrompt.pid]);
+    },
+  );
 
   it.each(['normal', 'heroic'] as const)(
-    'locks a nearby nonparticipant without %s Nythraxis income or Forge authorization',
+    'locks a nearby nonparticipant on %s without creating raid currency',
     (difficulty) => {
       const { sim, raiders, inst } = raidSetup(difficulty);
       const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
@@ -2067,23 +2067,21 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
         'hit',
       );
 
-      const parkedMeta = sim.players.get(parked)!;
       expect(boss.lootRecipientIds).toContain(parked);
       expect(boss.bossDamagers.has(parked)).toBe(false);
-      expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, parked)).toBe(0);
       expect(sim.countItem(HEROIC_MARK_ITEM_ID, parked)).toBe(0);
-      expect(mailedItemTo(sim, parked, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(0);
       expect(mailedItemTo(sim, parked, HEROIC_MARK_ITEM_ID)).toBe(0);
-      expect(parkedMeta.heroicDaily.marked.has('nythraxis_boss_arena')).toBe(false);
       expect(
-        parkedMeta.raidLockouts.has(
-          difficulty === 'heroic' ? 'nythraxis_boss_arena:heroic' : 'nythraxis_boss_arena',
-        ),
+        sim.players
+          .get(parked)!
+          .raidLockouts.has(
+            difficulty === 'heroic' ? 'nythraxis_boss_arena:heroic' : 'nythraxis_boss_arena',
+          ),
       ).toBe(true);
     },
   );
 
-  it('locks an owning-roster camper but never turns membership alone into raid income', () => {
+  it('locks an owning-roster camper without creating raid currency or reward mail', () => {
     const { sim, tank, raiders, inst } = raidSetup('heroic');
     const camper = sim.addPlayer('priest', 'DoorCamper');
     sim.players.get(camper)!.questsDone.add('q_nythraxis_bound_guardian');
@@ -2091,8 +2089,8 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     sim.partyAccept(camper);
     teleport(sim, sim.entities.get(camper) as AnyEntity, 0, 0);
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
-    raiders.forEach((pid, i) => {
-      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
+    raiders.forEach((pid, index) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + index - 2, boss.pos.z - 4);
     });
 
     (sim as any).dealDamage(
@@ -2105,96 +2103,11 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       'hit',
     );
 
-    expect(boss.dead).toBe(true);
     expect(inst.enteredBy.has(camper)).toBe(false);
     expect(sim.players.get(camper)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, camper)).toBe(0);
-    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, camper)).toBe(0);
     expect(mailedItemTo(sim, camper, HEROIC_MARK_ITEM_ID)).toBe(0);
-    expect(mailedItemTo(sim, camper, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(0);
   });
-
-  it('mails the marks to a raider locked from far back, so lockout never outruns reward', () => {
-    const { sim, raiders, inst } = raidSetup('heroic');
-    const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
-    // The melee stack takes the kill at the boss; the back-line healer holds
-    // well past PARTY_XP_RANGE, but is still a raid member inside the instance.
-    raiders.slice(0, 4).forEach((pid, i) => {
-      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
-    });
-    const healer = raiders[4];
-    // The healer contributed earlier in the pull. Permanent participant tracking
-    // survives moving out of kill range and is what authorizes absence mail.
-    boss.bossDamagers.add(healer);
-    teleport(sim, sim.entities.get(healer) as AnyEntity, boss.pos.x, boss.pos.z + 140);
-    expect(dist2d(sim.entities.get(healer)!.pos, boss.pos)).toBeGreaterThan(PARTY_XP_RANGE);
-
-    (sim as any).dealDamage(
-      sim.entities.get(raiders[0]),
-      boss,
-      boss.hp + 100,
-      false,
-      'physical',
-      null,
-      'hit',
-    );
-    expect(boss.dead).toBe(true);
-
-    // The whole raid takes the daily lockout, the far healer included...
-    expect(sim.players.get(healer)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
-    // ...so the marks must reach them too. Not present at the corpse to loot, so
-    // they ride the Ravenpost instead of dropping into a distant player's bags.
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(0);
-    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, healer)).toBe(0);
-    expect(mailedItemTo(sim, healer, HEROIC_MARK_ITEM_ID)).toBe(3);
-    expect(mailedItemTo(sim, healer, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(3);
-    const rewardLetter = ((sim.postOffice as any).mail as any[]).find(
-      (mail) =>
-        mail.recipientName === sim.players.get(healer)!.name &&
-        mail.letterId === NYTHRAXIS_REWARD_LETTER.letterId,
-    );
-    expect(rewardLetter?.items).toEqual([
-      { itemId: HEROIC_MARK_ITEM_ID, count: 3 },
-      { itemId: DEATHLESS_FRAGMENT_ITEM_ID, count: 3 },
-    ]);
-
-    grantNythraxisLockout(
-      sim.ctx,
-      boss,
-      raiders.slice(0, 4).map((pid) => sim.players.get(pid)!),
-      [sim.players.get(healer)!],
-    );
-    expect(mailedItemTo(sim, healer, HEROIC_MARK_ITEM_ID)).toBe(3);
-    expect(mailedItemTo(sim, healer, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(3);
-  });
-
-  it('does not mail full raid rewards to an entered player who never participated', () => {
-    const { sim, raiders, inst } = raidSetup('heroic');
-    const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
-    raiders.slice(0, 4).forEach((pid, index) => {
-      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + index, boss.pos.z - 4);
-    });
-    const parked = raiders[4];
-    teleport(sim, sim.entities.get(parked) as AnyEntity, boss.pos.x, boss.pos.z + 140);
-    expect(inst.enteredBy.has(parked)).toBe(true);
-
-    (sim as any).dealDamage(
-      sim.entities.get(raiders[0]),
-      boss,
-      boss.hp + 100,
-      false,
-      'physical',
-      null,
-      'hit',
-    );
-
-    expect(sim.players.get(parked)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, parked)).toBe(0);
-    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, parked)).toBe(0);
-    expect(mailedItemTo(sim, parked, HEROIC_MARK_ITEM_ID)).toBe(0);
-    expect(mailedItemTo(sim, parked, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(0);
-  });
-
   it('lets a locked ghost return to its defeated heroic raid instance for loot', () => {
     const { sim, tank, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);

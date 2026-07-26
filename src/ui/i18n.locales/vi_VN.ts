@@ -9438,49 +9438,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Sát thương vũ khí mỗi giây',
   'itemUi.stats.weaponMax': 'Sát thương vũ khí tối đa',
   'itemUi.stats.weaponMin': 'Sát thương vũ khí tối thiểu',
-  'heroicShop.blocked.class': 'Không tương thích với lớp của bạn',
-  'heroicShop.blocked.fragments': 'Không đủ Mảnh Vỡ Bất Tử',
-  'heroicShop.blocked.heroic_clear': 'Yêu cầu hoàn thành Nythraxis Anh Hùng trong kỳ hiện tại',
-  'heroicShop.blocked.marks': 'Không đủ Dấu Ấn Anh Hùng',
-  'heroicShop.cost': '{fragments} Mảnh Vỡ · {marks} Dấu Ấn Anh Hùng',
-  'heroicShop.deterministicStats': 'Phần thưởng cố định được thiết kế sẵn',
-  'heroicShop.forgeConfirmAccept': 'Rèn',
-  'heroicShop.forgeConfirmBody':
-    'Rèn {item} với {fragments} Mảnh Vỡ Bất Tử và {marks} Dấu Ấn Anh Hùng? Máy chủ sẽ tạo vật phẩm sau khi xác thực thanh toán.',
-  'heroicShop.forgeConfirmTitle': 'Xác Nhận Rèn',
-  'heroicShop.forgeIntro':
-    'Chọn nhóm phần thưởng và vật phẩm cơ sở. Máy chủ chỉ tạo ngẫu nhiên các thuộc tính theo thủ tục sau khi xác thực chính xác đề nghị và thanh toán.',
-  'heroicShop.forgeKind.authored': 'Phần thưởng mục tiêu được thiết kế sẵn',
-  'heroicShop.forgeKind.heroic_procedural': 'Vật phẩm Sử Thi theo thủ tục Anh Hùng',
-  'heroicShop.forgeKind.normal_procedural': 'Vật phẩm Sử Thi theo thủ tục Thường',
-  'heroicShop.forgeKind.signature': 'Vật phẩm Huyền Thoại đặc trưng Anh Hùng',
-  'heroicShop.fragmentBalance': 'Mảnh Vỡ Bất Tử: {count}',
-  'heroicShop.gearIntro': 'Dùng Dấu Ấn Anh Hùng để mua hàng có sẵn của quân nhu trưởng.',
-  'heroicShop.heroicClearNeeded':
-    'Mục tiêu Anh Hùng yêu cầu hoàn thành Nythraxis Anh Hùng trong kỳ hiện tại.',
-  'heroicShop.heroicClearReady':
-    'Lần hoàn thành Nythraxis Anh Hùng đã được xác minh cho khóa ngày này.',
-  'heroicShop.itemLevel': 'Cấp vật phẩm {level}',
-  'heroicShop.raidDrop': 'Vật phẩm Huyền Thoại từ Đột Kích Nythraxis',
-  'heroicShop.raidForged': 'Được rèn trong đột kích',
-  'heroicShop.raidForgedGuarantee': 'Sức mạnh rèn trong đột kích, bảo đảm kết quả ở nửa trên',
-  'heroicShop.randomAffixes': 'Thuộc tính và giá trị ngẫu nhiên',
-  'heroicShop.reforgeCount': 'Số lần tinh chỉnh: {count}',
-  'heroicShop.status.forge': 'Đã rèn xong. Phần thưởng mới đang ở trong túi của bạn.',
-  'heroicShop.status.gear': 'Đã mua xong. Số dư đã được cập nhật.',
-  'heroicShop.status.pending': 'Đang chờ máy chủ...',
-  'heroicShop.status.tune': 'Đã tinh chỉnh xong. Bản sao chính xác và số dư đã được cập nhật.',
-  'heroicShop.tab.forge': 'Lò Rèn Bất Tử',
-  'heroicShop.tab.gear': 'Trang Bị Anh Hùng',
-  'heroicShop.tab.tune': 'Tinh Chỉnh Vật Phẩm Huyền Thoại',
-  'heroicShop.tabsAria': 'Dịch vụ quân nhu trưởng',
-  'heroicShop.tuneConfirmAccept': 'Tinh Chỉnh',
-  'heroicShop.tuneConfirmBody':
-    'Tinh chỉnh đúng bản sao {item} này với {fragments} Mảnh Vỡ Bất Tử và {marks} Dấu Ấn Anh Hùng? Kết quả tốt hơn trong hai lần sẽ được giữ lại; sức mạnh không thể giảm nhưng có thể không đổi.',
-  'heroicShop.tuneConfirmTitle': 'Xác Nhận Tinh Chỉnh Vật Phẩm Huyền Thoại',
-  'heroicShop.tuneEmpty': 'Không có vật phẩm Huyền Thoại Nythraxis phù hợp trong túi của bạn.',
-  'heroicShop.tuneIntro':
-    'Chọn đúng một bản sao vật phẩm Huyền Thoại Nythraxis trong túi. Máy chủ tạo hai sức mạnh thay thế và giữ kết quả tốt hơn. Sức mạnh không bao giờ giảm, nhưng lần tinh chỉnh có thể không thay đổi gì.',
   'hudChrome.bags.itemAriaProcedural': '{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}',
   'hudChrome.bags.itemAriaProceduralBound':
     '{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}, bản sao đã khóa',
@@ -9490,9 +9447,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     '{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}, kiệt tác',
   'hudChrome.bags.itemAriaProceduralSigned':
     '{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}, bản sao có dấu người chế tác',
-  'hudChrome.finder.raidCurrenciesHeroic':
-    '+{fragments} Mảnh Vỡ Bất Tử và +{marks} Dấu Ấn Anh Hùng cho mỗi người tham gia',
-  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Mảnh Vỡ Bất Tử cho mỗi người tham gia',
   'hudChrome.finder.raidForgedLegendary':
     'Sức mạnh Huyền Thoại Anh Hùng được rèn trong đột kích và bảo đảm nằm ở nửa trên của khoảng kết quả được thiết kế.',
   'hudChrome.finder.raidItemLevels':

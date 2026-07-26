@@ -21,7 +21,6 @@ import { bagCapacity, canGrantItemInstance, instancedCountCap } from '../bags';
 import {
   HEROIC_MARK_LETTER,
   type LetterDef,
-  NYTHRAXIS_REWARD_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
 } from '../content/letters';
@@ -688,20 +687,12 @@ export class PostOffice {
     this.sendLetter(this.mailKeyFor(meta), meta.name, WELCOME_LETTER, 'system');
   }
 
-  // System reward-mail hook. The original Heroic Marks caller supplies one
-  // stack; Nythraxis may append its personal fragment stack so one atomic boss
-  // settlement produces one accurate letter instead of two unrelated parcels.
-  mailHeroicMarks(
-    pid: number,
-    itemId: string,
-    count: number,
-    additionalItems: InvSlot[] = [],
-  ): void {
+  // System reward-mail hook for the existing five-player Heroic Marks flow.
+  mailHeroicMarks(pid: number, itemId: string, count: number): void {
     const meta = this.ctx.players.get(pid);
     if (!meta || count <= 0) return;
-    const items = [{ itemId, count }, ...additionalItems.map((slot) => ({ ...slot }))];
-    const nythraxisReward = items.some((slot) => slot.itemId === 'deathless_fragment');
-    const letter = nythraxisReward ? NYTHRAXIS_REWARD_LETTER : HEROIC_MARK_LETTER;
+    const items = [{ itemId, count }];
+    const letter = HEROIC_MARK_LETTER;
     const recipientKey = this.mailKeyFor(meta);
     // Reward attachments are fungible counters, so accumulate them into the
     // recipient's one durable letter per reward stream. Without this, permanent

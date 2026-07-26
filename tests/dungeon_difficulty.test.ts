@@ -61,7 +61,7 @@ describe('heroic tuning data contract', () => {
       expect(MOBS[tuning.finalBossId], `${tuning.id} finalBossId is a real mob`).toBeTruthy();
     }
     expect(ITEMS[HEROIC_MARK_ITEM_ID]).toBeTruthy();
-    // The five-mans pay one mark per participant; the raid pays three.
+    // The five-mans pay one mark per participant; the raid is corpse loot only.
     expect(
       Object.fromEntries(
         Object.values(HEROIC_DUNGEON_TUNING).map((t) => [t.id, t.marksPerParticipant]),
@@ -71,7 +71,7 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: 1,
       drowned_temple: 1,
       gravewyrm_sanctum: 1,
-      nythraxis_boss_arena: 3,
+      nythraxis_boss_arena: 0,
     });
   });
 

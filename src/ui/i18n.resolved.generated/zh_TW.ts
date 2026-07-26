@@ -2576,8 +2576,6 @@ export const zh_TW: EnTranslations = {
       "raidSharedDrop": "最終首領的屍體會額外提供一件由整個團隊共同擲骰的隨機生成物品。",
       "raidRarityLine": "稀有 {rare}% · 史詩 {epic}% · 傳奇 {legendary}%",
       "raidItemLevels": "物品等級：稀有 {rare} · 史詩 {epic} · 傳奇 {legendary}",
-      "raidCurrenciesNormal": "每位參與者 +{fragments} 個不死碎片",
-      "raidCurrenciesHeroic": "每位參與者 +{fragments} 個不死碎片和 +{marks} 個英雄徽記",
       "raidSignatures": "專屬傳奇威能：{signatures}",
       "raidForgedLegendary": "英雄難度的傳奇威能必定為團隊鍛造，其數值保證位於設計範圍的上半區。",
       "entrance": "入口：{zone}",
@@ -5200,52 +5198,7 @@ export const zh_TW: EnTranslations = {
     "buyConfirmTitle": "確認購買",
     "buyConfirmBody": "用{marks}枚英雄徽記購買{item}？徽記購買後無法退款。",
     "buyConfirmAccept": "購買",
-    "buyConfirmCancel": "取消",
-    "tabsAria": "軍需官服務",
-    "fragmentBalance": "不死碎片：{count}",
-    "tab": {
-      "gear": "英雄裝備",
-      "forge": "不死鍛爐",
-      "tune": "傳奇調校"
-    },
-    "gearIntro": "使用英雄徽記購買軍需官現有庫存。",
-    "forgeIntro": "選擇獎勵類別和基礎物品。伺服器只會在驗證指定兌換項目和付款後，才隨機產生詞綴與數值。",
-    "tuneIntro": "從背包中選擇一件指定的尼瑟拉克西斯傳奇物品。伺服器會產生兩次替換威能並保留較佳結果。威能不會降低，但也可能沒有變化。",
-    "tuneEmpty": "背包中沒有可調校的尼瑟拉克西斯傳奇物品。",
-    "heroicClearReady": "已確認本次每日鎖定週期內完成英雄難度尼瑟拉克西斯。",
-    "heroicClearNeeded": "英雄目標需要在目前每日鎖定週期內完成英雄難度尼瑟拉克西斯。",
-    "itemLevel": "物品等級 {level}",
-    "cost": "{fragments} 個不死碎片 · {marks} 個英雄徽記",
-    "randomAffixes": "隨機詞綴和數值",
-    "deterministicStats": "固定設計獎勵",
-    "raidForgedGuarantee": "團隊鍛造威能，保證上半區數值",
-    "raidForged": "團隊鍛造",
-    "raidDrop": "尼瑟拉克西斯團隊傳奇物品",
-    "reforgeCount": "調校次數：{count}",
-    "forgeKind": {
-      "normal_procedural": "普通難度隨機生成史詩",
-      "heroic_procedural": "英雄難度隨機生成史詩",
-      "signature": "英雄難度專屬傳奇",
-      "authored": "固定設計目標獎勵"
-    },
-    "blocked": {
-      "class": "與你的職業不相容",
-      "heroic_clear": "需要目前英雄難度尼瑟拉克西斯通關",
-      "fragments": "不死碎片不足",
-      "marks": "英雄徽記不足"
-    },
-    "forgeConfirmTitle": "確認鍛造",
-    "forgeConfirmBody": "要花費 {fragments} 個不死碎片和 {marks} 個英雄徽記鍛造 {item} 嗎？伺服器會在驗證付款後隨機生成該物品。",
-    "forgeConfirmAccept": "鍛造",
-    "tuneConfirmTitle": "確認傳奇調校",
-    "tuneConfirmBody": "要花費{fragments}個不死碎片和{marks}個英雄徽記調校這件指定的{item}嗎？系統會保留兩次結果中較好的一次；威能不會降低，但可能維持不變。",
-    "tuneConfirmAccept": "調校",
-    "status": {
-      "pending": "正在等待伺服器……",
-      "gear": "購買完成，餘額已重新整理。",
-      "forge": "鍛造完成，新獎勵已放入背包。",
-      "tune": "調校完成，指定物品和餘額已重新整理。"
-    }
+    "buyConfirmCancel": "取消"
   },
   "cardDuel": {
     "title": "紙牌對決",
@@ -9918,9 +9871,6 @@ export const zh_TW: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽記"
       },
-      "deathless_fragment": {
-        "name": "不死碎片"
-      },
       "eastbrook_buckler": {
         "name": "東溪小圓盾"
       },
@@ -11923,11 +11873,6 @@ export const zh_TW: EnTranslations = {
         "sender": "英勇軍需官",
         "subject": "你的英勇印記",
         "body": "你的部隊清剿了英勇試煉，而你在後排作戰，或已倒在塵土之中。你的鎖定同樣已經生效，因此你那一份英勇印記飛到了這裡，而非就此遺失。好好使用它們。\n\n- 英勇軍需官"
-      },
-      "nythraxis_rewards": {
-        "sender": "不死軍需官",
-        "subject": "你應得的不死寶藏",
-        "body": "你的戰團擊敗了不死之王，而你當時正在側翼作戰、倒在塵土中，或仍在從墓地返回的漫長路上。你的每日領取資格與他們一同記錄，因此你贏得的個人戰利品會由信鴉送來，而不會遺失。準備好塑造獎勵時，請把碎片帶給英勇軍需官。\n\n- 不死軍需官"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "工匠公會",

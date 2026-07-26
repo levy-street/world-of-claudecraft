@@ -19,10 +19,4 @@ export interface IWorldDungeons {
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),
   // paying its Heroic Marks price from the buyer's bags. Server-validated.
   buyHeroicVendorItem(itemId: string): void;
-  // Create an authoritative Normal, Heroic, signature, or authored Nythraxis
-  // reward from its stable offer id. The client never supplies rolled stats.
-  forgeNythraxisReward(offerId: string): void;
-  // Improve one exact bagged Nythraxis Legendary selected by its opaque UID.
-  // Identity fields are preserved and the result can never roll downward.
-  tuneNythraxisLegendary(instanceUid: string): void;
 }

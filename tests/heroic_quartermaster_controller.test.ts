@@ -11,8 +11,6 @@ import {
 interface Confirmation {
   title: string;
   body: string;
-  okText: string;
-  cancelText: string;
   onOk: () => void;
 }
 
@@ -20,7 +18,7 @@ function harness() {
   const element = { style: { display: 'none' } } as HTMLElement;
   const opener = { id: 'opener' } as HTMLElement;
   const confirmations: Confirmation[] = [];
-  const renders: Array<{ name: string; status: string | null; pending: boolean }> = [];
+  const renders: Array<{ name: string; balance: number }> = [];
   const closeOtherWindows = vi.fn();
   const closeBank = vi.fn();
   const closeCopperVendor = vi.fn();
@@ -28,16 +26,12 @@ function harness() {
   const captureFocus = vi.fn(() => opener);
   const restoreFocus = vi.fn();
   const buy = vi.fn();
-  const forge = vi.fn();
-  const tune = vi.fn();
   let inRange = true;
   const deps: HeroicQuartermasterControllerDeps = {
     element: () => element,
     npcName: () => 'Quartermaster Vex',
     npcInRange: () => inRange,
     inventory: () => [{ itemId: HEROIC_MARK_ITEM_ID, count: 999 }],
-    playerClass: () => 'warrior',
-    raidLockoutIds: () => [],
     stock: HEROIC_VENDOR_STOCK,
     items: ITEMS,
     presentation: {
@@ -46,21 +40,19 @@ function harness() {
       itemTooltip: (item) => item.name,
       attachTooltip: () => {},
     },
-    renderWindow: (target, name, _view, renderDeps) => {
+    renderWindow: (target, name, view) => {
       target.style.display = 'block';
-      renders.push({ name, status: renderDeps.status, pending: renderDeps.pending });
+      renders.push({ name, balance: view.balance });
     },
     focus: { captureFocus, restoreFocus },
     closeOtherWindows,
     closeBank,
     closeCopperVendor,
     hideTooltip,
-    confirm: (title, body, okText, cancelText, onOk) => {
-      confirmations.push({ title, body, okText, cancelText, onOk });
+    confirm: (title, body, _okText, _cancelText, onOk) => {
+      confirmations.push({ title, body, onOk });
     },
     buy,
-    forge,
-    tune,
   };
   return {
     controller: new HeroicQuartermasterController(deps),
@@ -85,9 +77,8 @@ const stockOffer = HEROIC_VENDOR_STOCK[0];
 if (!stockOffer) throw new Error('heroic vendor stock fixture not found');
 
 describe('HeroicQuartermasterController', () => {
-  it('owns open/close exclusivity, rendering, and focus return', () => {
+  it('owns open/close exclusivity, gear rendering, and focus return', () => {
     const h = harness();
-
     h.controller.open(42);
 
     expect(h.controller.isOpen).toBe(true);
@@ -96,7 +87,7 @@ describe('HeroicQuartermasterController', () => {
     expect(h.closeCopperVendor).toHaveBeenCalledOnce();
     expect(h.captureFocus).toHaveBeenCalledOnce();
     expect(h.element.style.display).toBe('block');
-    expect(h.renders.at(-1)?.name).toBe('Quartermaster Vex');
+    expect(h.renders.at(-1)).toEqual({ name: 'Quartermaster Vex', balance: 999 });
 
     h.controller.close();
 
@@ -106,10 +97,9 @@ describe('HeroicQuartermasterController', () => {
     expect(h.restoreFocus).toHaveBeenCalledExactlyOnceWith(h.opener);
   });
 
-  it('confirms purchases, blocks duplicate submission, and recovers from failure', () => {
+  it('confirms an existing Heroic gear purchase before sending it', () => {
     const h = harness();
     h.controller.open(42);
-
     h.controller.requestPurchase(stockOffer.itemId);
 
     expect(h.buy).not.toHaveBeenCalled();
@@ -120,27 +110,15 @@ describe('HeroicQuartermasterController', () => {
 
     h.confirmations[0].onOk();
     expect(h.buy).toHaveBeenCalledExactlyOnceWith(stockOffer.itemId);
-    expect(h.renders.at(-1)?.pending).toBe(true);
-
-    h.controller.requestPurchase(stockOffer.itemId);
-    expect(h.confirmations).toHaveLength(1);
-
-    expect(h.controller.onError('The forge rejected the request.')).toBe(true);
-    expect(h.renders.at(-1)?.status).toBe('The forge rejected the request.');
-    h.controller.requestPurchase(stockOffer.itemId);
-    expect(h.confirmations).toHaveLength(2);
   });
 
-  it('resolves a pending vendor result and closes when the NPC leaves range', () => {
+  it('refreshes after a vendor result and closes when the NPC leaves range', () => {
     const h = harness();
     h.controller.open(42);
-    h.controller.requestPurchase(stockOffer.itemId);
-    h.confirmations[0].onOk();
+    const renderCount = h.renders.length;
 
     h.controller.onVendorResult();
-
-    expect(h.renders.at(-1)?.status).not.toBe('');
-    expect(h.renders.at(-1)?.pending).toBe(false);
+    expect(h.renders).toHaveLength(renderCount + 1);
 
     h.setInRange(false);
     h.controller.updateProximity();
@@ -165,13 +143,10 @@ describe('Hud architecture boundary', () => {
     expect(hud).toContain('this.heroicQuartermaster.close();');
   });
 
-  it('delegates Quartermaster state and procedural item presentation', () => {
+  it('delegates the ordinary Heroic gear shop without raid Forge commands', () => {
     expect(hud).toContain('new HeroicQuartermasterController({');
     expect(hud).toContain('this.heroicQuartermaster.onVendorResult()');
-    expect(hud).toContain('this.itemPresentation.tooltip(item, compare, instance)');
-    expect(hud).not.toContain('HeroicVendorOperationState');
-    expect(hud).not.toContain('buildHeroicQuartermasterView');
-    expect(hud).not.toContain('proceduralAffixPresentations');
-    expect(hud).not.toContain('requestNythraxisForge');
+    expect(hud).not.toContain('forgeNythraxisReward');
+    expect(hud).not.toContain('tuneNythraxisLegendary');
   });
 });

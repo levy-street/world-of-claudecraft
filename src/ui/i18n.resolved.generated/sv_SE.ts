@@ -2576,8 +2576,6 @@ export const sv_SE: EnTranslations = {
       "raidSharedDrop": "Slutbossens lik lägger till ett delat procedurellt föremål som raiden får slå om.",
       "raidRarityLine": "Sällsynt {rare}% · Episk {epic}% · Legendarisk {legendary}%",
       "raidItemLevels": "Föremålsnivå: Sällsynt {rare} · Episk {epic} · Legendarisk {legendary}",
-      "raidCurrenciesNormal": "+{fragments} dödslöst fragment per deltagare",
-      "raidCurrenciesHeroic": "+{fragments} dödslösa fragment och +{marks} heroiska märken per deltagare",
       "raidSignatures": "Legendariska signaturkrafter: {signatures}",
       "raidForgedLegendary": "Heroiska legendariska krafter är raidsmidda och garanteras ett slag i den övre halvan av sitt fastställda intervall.",
       "entrance": "Ingång: {zone}",
@@ -5200,52 +5198,7 @@ export const sv_SE: EnTranslations = {
     "buyConfirmTitle": "Bekräfta köp",
     "buyConfirmBody": "Köp {item} för {marks} heroiska märken? Köp med märken kan inte återbetalas.",
     "buyConfirmAccept": "Köp",
-    "buyConfirmCancel": "Avbryt",
-    "tabsAria": "Kvartersmästarens tjänster",
-    "fragmentBalance": "Dödslösa fragment: {count}",
-    "tab": {
-      "gear": "Heroisk utrustning",
-      "forge": "Dödslösa smedjan",
-      "tune": "Legendarisk finjustering"
-    },
-    "gearIntro": "Spendera heroiska märken på kvartersmästarens ordinarie lager.",
-    "forgeIntro": "Välj belöningsfamilj och basföremål. Riket slår fram slumpmässiga procedurella affix först efter att det exakta erbjudandet och betalningen har validerats.",
-    "tuneIntro": "Välj ett specifikt legendariskt Nythraxis-föremål ur dina väskor. Riket slår fram två nya kraftvärden och behåller det bästa resultatet. Kraften minskar aldrig, men en finjustering kan bli utan ändring.",
-    "tuneEmpty": "Du har inget legendariskt Nythraxis-föremål i dina väskor som kan finjusteras.",
-    "heroicClearReady": "Heroisk seger över Nythraxis bekräftad för denna dagliga spärr.",
-    "heroicClearNeeded": "Heroiska mål kräver en aktuell heroisk seger över Nythraxis.",
-    "itemLevel": "Föremålsnivå {level}",
-    "cost": "{fragments} fragment · {marks} heroiska märken",
-    "randomAffixes": "Slumpmässiga affix och värden",
-    "deterministicStats": "Fast utformad belöning",
-    "raidForgedGuarantee": "Raidsmidd kraft, slag i den övre halvan garanterat",
-    "raidForged": "Raidsmidd",
-    "raidDrop": "Legendariskt Nythraxis-raidbyte",
-    "reforgeCount": "Finjusteringar: {count}",
-    "forgeKind": {
-      "normal_procedural": "Normalt procedurellt episkt föremål",
-      "heroic_procedural": "Heroiskt procedurellt episkt föremål",
-      "signature": "Heroisk signatur, legendarisk",
-      "authored": "Fast utformad målbelöning"
-    },
-    "blocked": {
-      "class": "Inte kompatibelt med din klass",
-      "heroic_clear": "Kräver en aktuell heroisk seger över Nythraxis",
-      "fragments": "Inte tillräckligt med dödslösa fragment",
-      "marks": "Inte tillräckligt med heroiska märken"
-    },
-    "forgeConfirmTitle": "Bekräfta smide",
-    "forgeConfirmBody": "Smid {item} för {fragments} dödslösa fragment och {marks} heroiska märken? Riket slår fram föremålet efter att betalningen har validerats.",
-    "forgeConfirmAccept": "Smid",
-    "tuneConfirmTitle": "Bekräfta legendarisk finjustering",
-    "tuneConfirmBody": "Finjustera just detta exemplar av {item} för {fragments} dödslösa fragment och {marks} heroiska märken? Det bästa av två slag behålls; kraften kan inte minska men kan förbli oförändrad.",
-    "tuneConfirmAccept": "Finjustera",
-    "status": {
-      "pending": "Väntar på riket...",
-      "gear": "Köpet är klart. Saldona har uppdaterats.",
-      "forge": "Smidet är klart. Den nya belöningen finns i dina väskor.",
-      "tune": "Finjusteringen är klar. Det exakta exemplaret och saldona har uppdaterats."
-    }
+    "buyConfirmCancel": "Avbryt"
   },
   "cardDuel": {
     "title": "Kortduell",
@@ -9918,9 +9871,6 @@ export const sv_SE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroiskt märke"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Östbäcks rundsköld"
       },
@@ -11923,11 +11873,6 @@ export const sv_SE: EnTranslations = {
         "sender": "Heroisk kvartermästare",
         "subject": "Dina heroiska märken",
         "body": "Din grupp klarade den heroiska prövningen medan du kämpade i eftertruppen eller låg fallen. Din låsning registrerades ändå, så din andel heroiska märken skickades hit i stället för att gå förlorad. Använd dem väl.\n\n- Heroisk kvartermästare"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Hantverksgillet",

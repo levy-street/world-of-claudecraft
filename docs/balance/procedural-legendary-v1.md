@@ -27,11 +27,9 @@ guarantees its power magnitude to the authored upper half.
 The drop is a shared corpse entry under the existing party-loot rules. It is
 not a personal 2% roll for every group member.
 
-Nythraxis also awards personal Deathless currency on each eligible clear. The
-Deathless Forge provides a deterministic exact-signature path at 60 Fragments
-and 45 Heroic Marks, capped at 15 resets when Normal and Heroic are both
-cleared or 20 Heroic-only resets. This does not alter or pity the shared
-natural drop. Exact raid behavior is specified in
+Nythraxis adds one shared procedural item to the final corpse on both
+difficulties. It has no personal currency, purchase path, or pity counter.
+Exact raid behavior is specified in
 `docs/balance/nythraxis-endgame-loot-v030.md`.
 
 Outdoor rares use a 0.2% Legendary weight on a guaranteed procedural entry.
@@ -89,7 +87,7 @@ giving players a clear boss to farm.
 
 Every generated Legendary persists its power ID, power revision, and quantized
 roll. The roll does not change when the item is looted, traded, banked,
-reconnected, or loaded after tuning.
+reconnected, or loaded.
 
 | Power | Required class | Compatible bases | Trigger and effect | Persisted roll |
 | --- | --- | --- | --- | --- |
@@ -165,7 +163,7 @@ worse than a high roll.
 
 The normal tooltip shows the effective item-level-scaled power roll. The
 alternate detail view shows the effective scaled range. The raw roll remains
-persisted for deterministic tuning and save/load. This supports immediate
+persisted for save/load. This supports immediate
 readability, prevents a low-level copy from masquerading as an endgame one, and
 preserves the chase for a better copy of a familiar power.
 
@@ -363,9 +361,7 @@ level, more useful affix mix, and higher power roll.
 
 ## Honest limitations
 
-- Natural drops have no pity counter or forced result. Nythraxis separately
-  provides a deterministic Forge purchase path whose selected signature still
-  rolls variable affixes and power magnitude.
+- Natural drops have no pity counter or forced result.
 - A 2% shared-corpse drop is not a 2% personal roll for each party member.
 - Signature targeting is probabilistic and compatibility-dependent.
 - The contribution harness is not a full encounter simulator.

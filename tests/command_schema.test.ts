@@ -3,7 +3,12 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/world_api';
+import {
+  COMMAND_FACETS,
+  COMMAND_NAMES,
+  type CommandName,
+  DISPATCH_ONLY_COMMANDS,
+} from '../src/world_api';
 
 // W0b boundary gate: the command-schema lockstep invariant (00-SHARED-CONVENTIONS
 // #2). Every command ClientWorld sends (`cmd:'X'` through the private cmd()
@@ -31,8 +36,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), and unbind_item (the
 // Maker's Bond unbind service).
-const EXPECTED_SEND_COUNT = 166;
-const EXPECTED_DISPATCH_COUNT = 175;
+const EXPECTED_SEND_COUNT = 164;
+const EXPECTED_DISPATCH_COUNT = 173;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -101,6 +106,7 @@ const sendSet = scanSendSet(readSource('src/net/online.ts'));
 const dispatchSet = scanDispatchSet(readSource('server/game.ts'));
 const tableSet = new Set<CommandName>(COMMAND_NAMES);
 const allowlistSet = new Set<CommandName>(DISPATCH_ONLY_COMMANDS);
+const REMOVED_NYTHRAXIS_COMMANDS = ['nythraxis_forge', 'nythraxis_tune'] as const;
 
 describe('command schema parity (W0b)', () => {
   it('re-derives the verified set sizes from source', () => {
@@ -116,6 +122,15 @@ describe('command schema parity (W0b)', () => {
     // handshake) but is dispatched server-side, so it must count.
     expect(sendSet.has('challengeResponse')).toBe(true);
     expect(dispatchSet.has('challengeResponse')).toBe(true);
+  });
+
+  it('keeps removed Nythraxis Forge commands absent from every wire registry', () => {
+    for (const cmd of REMOVED_NYTHRAXIS_COMMANDS) {
+      expect(sendSet.has(cmd)).toBe(false);
+      expect(dispatchSet.has(cmd)).toBe(false);
+      expect(tableSet.has(cmd as CommandName)).toBe(false);
+      expect(cmd in COMMAND_FACETS).toBe(false);
+    }
   });
 
   it('every ClientWorld send has a matching server dispatch case (send-set is a subset)', () => {

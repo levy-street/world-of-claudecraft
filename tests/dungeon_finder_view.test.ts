@@ -106,7 +106,7 @@ describe('dungeon finder view core', () => {
     expect(picked.detail?.id).toBe('nythraxis_boss_arena_heroic');
     expect(picked.detail?.composition).toEqual({ tank: 2, healer: 2, dps: 6 });
     expect(picked.detail?.attunementQuestId).toBe('q_nythraxis_bound_guardian');
-    expect(picked.detail?.heroicMarks).toBe(3);
+    expect(picked.detail?.heroicMarks).toBe(0);
   });
 
   it('derives exact Normal and Heroic Nythraxis reward previews from balance constants', () => {
@@ -122,8 +122,7 @@ describe('dungeon finder view core', () => {
     expect(normal).toEqual({
       rarity: { rare: 0.65, epic: 0.33, legendary: 0.02 },
       itemLevels: { rare: 27, epic: 28, legendary: 32 },
-      fragments: 1,
-      heroicMarks: 0,
+
       raidForgedLegendary: false,
       legendaryMagnitudeFloor: 0,
       signaturePowerIds: ['dawnward_signet', 'feral_moonclasp'],
@@ -141,8 +140,7 @@ describe('dungeon finder view core', () => {
     expect(heroic).toEqual({
       rarity: { rare: 0.4, epic: 0.55, legendary: 0.05 },
       itemLevels: { rare: 31, epic: 32, legendary: 36 },
-      fragments: 3,
-      heroicMarks: 3,
+
       raidForgedLegendary: true,
       legendaryMagnitudeFloor: 0.5,
       signaturePowerIds: ['dawnward_signet', 'feral_moonclasp'],

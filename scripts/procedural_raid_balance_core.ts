@@ -4,7 +4,6 @@ import {
 } from '../src/sim/content/procedural_legendary_powers';
 import { PROCEDURAL_RARITY_TABLES } from '../src/sim/content/procedural_loot';
 import {
-  NYTHRAXIS_FORGE_COSTS,
   NYTHRAXIS_PROCEDURAL_RAID_PROFILES,
   NYTHRAXIS_RAID_BOSS_ID,
   NYTHRAXIS_RAID_DUNGEON_ID,
@@ -49,15 +48,6 @@ export interface RaidDifficultyBalance {
   violations: string[];
 }
 
-export interface RaidAcquisitionRow {
-  reward: string;
-  fragments: number;
-  heroicMarks: number;
-  normalOnlyResets: number | null;
-  heroicOnlyResets: number | null;
-  bothDifficultyResets: number | null;
-}
-
 export interface ProceduralRaidBalanceReport {
   campaign: 'nythraxis-raid-loot-v1';
   seed: number;
@@ -65,7 +55,7 @@ export interface ProceduralRaidBalanceReport {
   totalGeneratedItems: number;
   rosterClasses: readonly PlayerClass[];
   naturalLegendaryChanceByKills: Record<Difficulty, Array<{ kills: number; chancePct: number }>>;
-  acquisition: RaidAcquisitionRow[];
+
   difficulties: RaidDifficultyBalance[];
   sampleFloorMet: boolean;
   gateFailures: string[];
@@ -79,32 +69,6 @@ function midpoint(range: { min: number; max: number; step?: number }): number {
   return Number(
     (Math.round((range.min + (range.max - range.min) * 0.5) / step) * step).toFixed(digits),
   );
-}
-
-function resetCount(
-  fragments: number,
-  marks: number,
-  fragmentIncome: number,
-  markIncome: number,
-): number | null {
-  if ((fragments > 0 && fragmentIncome === 0) || (marks > 0 && markIncome === 0)) return null;
-  return Math.max(
-    fragments > 0 ? Math.ceil(fragments / fragmentIncome) : 0,
-    marks > 0 ? Math.ceil(marks / markIncome) : 0,
-  );
-}
-
-function acquisitionRow(
-  reward: string,
-  cost: { fragments: number; heroicMarks: number },
-): RaidAcquisitionRow {
-  return {
-    reward,
-    ...cost,
-    normalOnlyResets: resetCount(cost.fragments, cost.heroicMarks, 1, 0),
-    heroicOnlyResets: resetCount(cost.fragments, cost.heroicMarks, 3, 3),
-    bothDifficultyResets: resetCount(cost.fragments, cost.heroicMarks, 4, 3),
-  };
 }
 
 function legendaryChance(p: number, kills: number): number {
@@ -248,20 +212,12 @@ export function simulateProceduralRaidBalance(options: {
     ),
   ];
   const kills = [1, 5, 10, 20, 25, 45, 50, 59, 90, 100];
-  const acquisition = [
-    acquisitionRow('Normal procedural Epic', NYTHRAXIS_FORGE_COSTS.normalProceduralEpic),
-    acquisitionRow('Heroic procedural Epic', NYTHRAXIS_FORGE_COSTS.heroicProceduralEpic),
-    acquisitionRow('Authored Heroic Epic', NYTHRAXIS_FORGE_COSTS.heroicAuthoredEpic),
-    acquisitionRow('Authored Heroic Legendary', NYTHRAXIS_FORGE_COSTS.heroicAuthoredLegendary),
-    acquisitionRow('Exact Raid-forged signature', NYTHRAXIS_FORGE_COSTS.raidForgedSignature),
-    acquisitionRow('Legendary power tune', NYTHRAXIS_FORGE_COSTS.legendaryPowerTune),
-  ];
+
   const fingerprint = hash32Parts(
     'procedural-raid-balance-v1',
     options.seed,
     options.samplesPerDifficulty,
     JSON.stringify(difficulties),
-    JSON.stringify(acquisition),
   )
     .toString(16)
     .padStart(8, '0');
@@ -275,7 +231,7 @@ export function simulateProceduralRaidBalance(options: {
       normal: kills.map((count) => ({ kills: count, chancePct: legendaryChance(0.02, count) })),
       heroic: kills.map((count) => ({ kills: count, chancePct: legendaryChance(0.05, count) })),
     },
-    acquisition,
+
     difficulties,
     sampleFloorMet,
     gateFailures,

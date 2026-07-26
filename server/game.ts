@@ -5649,17 +5649,7 @@ export class GameServer {
         if (typeof msg.itemId === 'string') sim.buyHeroicVendorItem(msg.itemId, pid);
         break;
       }
-      case 'nythraxis_forge': {
-        // The stable offer id is a selector only. Costs, class, clear, range,
-        // bag space, item level, affixes, and binding all resolve in the sim.
-        if (typeof msg.offerId === 'string') sim.forgeNythraxisReward(msg.offerId, pid);
-        break;
-      }
-      case 'nythraxis_tune': {
-        // The UID selects one authoritative bag copy; no item fields cross the wire.
-        if (typeof msg.instanceUid === 'string') sim.tuneNythraxisLegendary(msg.instanceUid, pid);
-        break;
-      }
+
       case 'enter_delve': {
         if (typeof msg.delveId !== 'string' || typeof msg.tierId !== 'string') break;
         const e = sim.entities.get(pid);

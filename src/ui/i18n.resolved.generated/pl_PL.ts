@@ -2576,8 +2576,6 @@ export const pl_PL: EnTranslations = {
       "raidSharedDrop": "Zwłoki ostatniego bossa dodają jeden wspólny przedmiot proceduralny, o który rajd może rzucić kośćmi.",
       "raidRarityLine": "Rzadki {rare}% · epicki {epic}% · legendarny {legendary}%",
       "raidItemLevels": "Poziom przedmiotu: rzadki {rare} · epicki {epic} · legendarny {legendary}",
-      "raidCurrenciesNormal": "+{fragments} Fragment Nieśmiertelnego na uczestnika",
-      "raidCurrenciesHeroic": "+{fragments} Fragmentów Nieśmiertelnego i +{marks} Heroicznych Znaków na uczestnika",
       "raidSignatures": "Charakterystyczne moce legendarne: {signatures}",
       "raidForgedLegendary": "Moce heroicznych przedmiotów legendarnych są wykute w rajdzie i gwarantowane w górnej połowie ich zaprojektowanego zakresu.",
       "entrance": "Wejście: {zone}",
@@ -5200,52 +5198,7 @@ export const pl_PL: EnTranslations = {
     "buyConfirmTitle": "Potwierdź zakup",
     "buyConfirmBody": "Kupić {item} za {marks} Heroiczne Znaki? Zakupy znaków nie podlegają zwrotowi.",
     "buyConfirmAccept": "Kupić",
-    "buyConfirmCancel": "Anulować",
-    "tabsAria": "Usługi kwatermistrza",
-    "fragmentBalance": "Fragmenty Nieśmiertelnego: {count}",
-    "tab": {
-      "gear": "Heroiczny ekwipunek",
-      "forge": "Kuźnia Nieśmiertelnego",
-      "tune": "Dostrajanie przedmiotów legendarnych"
-    },
-    "gearIntro": "Wydaj Heroiczne Znaki na stały asortyment kwatermistrza.",
-    "forgeIntro": "Wybierz rodzinę nagrody i przedmiot bazowy. Kraina losuje proceduralne właściwości dopiero po sprawdzeniu dokładnej oferty i płatności.",
-    "tuneIntro": "Wybierz jedną dokładną kopię legendarnego przedmiotu z Nythraxis w swoich torbach. Kraina wylosuje dwie moce zastępcze i zachowa lepszy wynik. Moc nigdy nie maleje, ale dostrojenie może niczego nie zmienić.",
-    "tuneEmpty": "W twoich torbach nie ma odpowiedniego legendarnego przedmiotu z Nythraxis.",
-    "heroicClearReady": "Ukończenie Nythraxis w trybie heroicznym potwierdzono dla tej dziennej blokady.",
-    "heroicClearNeeded": "Heroiczne cele wymagają aktualnego ukończenia Nythraxis w trybie heroicznym.",
-    "itemLevel": "Poziom przedmiotu {level}",
-    "cost": "{fragments} fragmentów · {marks} Heroicznych Znaków",
-    "randomAffixes": "Losowe właściwości i wartości",
-    "deterministicStats": "Ręcznie zaprojektowana stała nagroda",
-    "raidForgedGuarantee": "Moc wykuta w rajdzie, gwarantowany wynik w górnej połowie zakresu",
-    "raidForged": "Wykuty w rajdzie",
-    "raidDrop": "Legendarny przedmiot z rajdu Nythraxis",
-    "reforgeCount": "Dostrojenia: {count}",
-    "forgeKind": {
-      "normal_procedural": "Normalny proceduralny przedmiot epicki",
-      "heroic_procedural": "Heroiczny proceduralny przedmiot epicki",
-      "signature": "Heroiczny charakterystyczny przedmiot legendarny",
-      "authored": "Ręcznie zaprojektowana nagroda docelowa"
-    },
-    "blocked": {
-      "class": "Nie jest zgodne z twoją klasą",
-      "heroic_clear": "Wymaga aktualnego ukończenia Nythraxis w trybie heroicznym",
-      "fragments": "Za mało Fragmentów Nieśmiertelnego",
-      "marks": "Za mało Heroicznych Znaków"
-    },
-    "forgeConfirmTitle": "Potwierdź wykucie",
-    "forgeConfirmBody": "Wykuć {item} za {fragments} Fragmentów Nieśmiertelnego i {marks} Heroicznych Znaków? Kraina wylosuje przedmiot po zatwierdzeniu płatności.",
-    "forgeConfirmAccept": "Wykuj",
-    "tuneConfirmTitle": "Potwierdź dostrajanie przedmiotu legendarnego",
-    "tuneConfirmBody": "Dostroić tę dokładną kopię przedmiotu {item} za {fragments} Fragmentów Nieśmiertelnego i {marks} Heroicznych Znaków? Zachowany zostanie lepszy z dwóch wyników; moc nie może spaść, ale może pozostać bez zmian.",
-    "tuneConfirmAccept": "Dostrój",
-    "status": {
-      "pending": "Oczekiwanie na krainę...",
-      "gear": "Zakup zakończony. Salda zostały odświeżone.",
-      "forge": "Kucie zakończone. Nowa nagroda jest w twoich torbach.",
-      "tune": "Dostrajanie zakończone. Dokładna kopia i salda zostały odświeżone."
-    }
+    "buyConfirmCancel": "Anulować"
   },
   "cardDuel": {
     "title": "Pojedynek Karciany",
@@ -9918,9 +9871,6 @@ export const pl_PL: EnTranslations = {
       "heroic_mark": {
         "name": "Znak heroiczny"
       },
-      "deathless_fragment": {
-        "name": "Deathless Fragment"
-      },
       "eastbrook_buckler": {
         "name": "Puklerz ze Wschodniego Strumienia"
       },
@@ -11923,11 +11873,6 @@ export const pl_PL: EnTranslations = {
         "sender": "Heroiczny kwatermistrz",
         "subject": "Twoje heroiczne znaki",
         "body": "Twoja grupa pokonała heroiczną próbę, gdy walczyłeś na tyłach lub leżałeś pokonany. Twoja blokada również została zapisana, dlatego należna część heroicznych znaków trafiła tutaj, zamiast przepaść. Dobrze je wykorzystaj.\n\n- Heroiczny kwatermistrz"
-      },
-      "nythraxis_rewards": {
-        "sender": "The Deathless Quartermaster",
-        "subject": "Your share of the Deathless hoard",
-        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Gildia Rzemieślnicza",

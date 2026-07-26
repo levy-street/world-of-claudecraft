@@ -125,8 +125,7 @@ export interface FinderActivityDetailView {
 export interface FinderProceduralRaidRewardView {
   rarity: { rare: number; epic: number; legendary: number };
   itemLevels: { rare: number; epic: number; legendary: number };
-  fragments: number;
-  heroicMarks: number;
+
   raidForgedLegendary: boolean;
   legendaryMagnitudeFloor: number;
   signaturePowerIds: string[];
@@ -312,7 +311,6 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
 
 function buildProceduralRaidRewards(
   activity: FinderActivity,
-  heroicMarks: number,
 ): FinderProceduralRaidRewardView | null {
   if (activity.dungeonId !== NYTHRAXIS_RAID_DUNGEON_ID) return null;
   const profile = NYTHRAXIS_PROCEDURAL_RAID_PROFILES[activity.difficulty];
@@ -324,8 +322,6 @@ function buildProceduralRaidRewards(
       legendary: table.weights.legendary ?? 0,
     },
     itemLevels: { ...profile.itemLevels },
-    fragments: profile.fragmentsPerParticipant,
-    heroicMarks,
     raidForgedLegendary: profile.legendaryMagnitudeFloor >= 0.5,
     legendaryMagnitudeFloor: profile.legendaryMagnitudeFloor,
     signaturePowerIds: [...proceduralBossLegendarySignatures(NYTHRAXIS_RAID_BOSS_ID)],
@@ -357,7 +353,7 @@ function buildDetail(
     lockedMinutes: lockoutMinutesFor(activity, lockouts),
     attunementQuestId: activity.attunementQuestId ?? null,
     heroicMarks,
-    proceduralRaid: buildProceduralRaidRewards(activity, heroicMarks),
+    proceduralRaid: buildProceduralRaidRewards(activity),
     eligible: blocked === null,
     blocked,
     encounters: buildEncounters(activity),

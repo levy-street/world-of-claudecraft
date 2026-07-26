@@ -26,20 +26,12 @@
 // through the seam.
 
 import { isStunned, isUnbreakableControlAura } from '../combat/cc';
-import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
-import {
-  DEATHLESS_FRAGMENT_ITEM_ID,
-  NYTHRAXIS_PROCEDURAL_RAID_PROFILES,
-} from '../content/procedural_raid_loot';
+
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
 import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
-import {
-  heroicLockoutId,
-  heroicRewardWindowToken,
-  instanceLockoutMetas,
-} from '../instances/dungeons';
+import { heroicLockoutId, instanceLockoutMetas } from '../instances/dungeons';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat, SUMMONED_ADD_THREAT_SEED, threatEntries } from '../threat';
@@ -596,15 +588,12 @@ export function grantNythraxisLockout(
   ctx: SimContext,
   boss: Entity,
   recipients: PlayerMeta[] = [],
-  participants: PlayerMeta[] = [],
 ): void {
   // Daily raid reset: lock until the next reset boundary the host supplies through the
   // lockout seam (the authoritative server uses its realm-local 3 AM daily reset, so a
   // realm's raids share one boundary; offline/headless fall back to a flat 24h day).
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   const heroic = inst?.difficulty === 'heroic';
-  const difficulty = heroic ? 'heroic' : 'normal';
-  const profile = NYTHRAXIS_PROCEDURAL_RAID_PROFILES[difficulty];
   const now = ctx.lockoutNowMs();
   const until = ctx.raidResetMs(now);
   // Difficulty-scoped: a heroic kill locks the :heroic key only, so the raid
@@ -618,7 +607,7 @@ export function grantNythraxisLockout(
   // because the arena interior is WIDER than the generic 120-yd footprint
   // (walls at roughly +/-230 local x): a raider who left the raid while parked
   // in a side wing sits outside both claim arms yet can still hold the tap and
-  // its rewards, so the 260-yd boss room must keep locking them.
+  // its loot, so the 260-yd boss room must keep locking them.
   const roomMetas = nythraxisRoomMetas(ctx, boss);
   const lockoutMetas = new Map<number, PlayerMeta>();
   for (const meta of roomMetas) lockoutMetas.set(meta.entityId, meta);
@@ -626,49 +615,12 @@ export function grantNythraxisLockout(
     for (const meta of instanceLockoutMetas(ctx, inst)) lockoutMetas.set(meta.entityId, meta);
   }
   for (const meta of recipients) lockoutMetas.set(meta.entityId, meta);
-  const credited = recipients.length > 0;
-  const presentIds = new Set(recipients.map((meta) => meta.entityId));
-  const participantIds = new Set(participants.map((meta) => meta.entityId));
-  const marks = heroic ? (HEROIC_DUNGEON_TUNING.nythraxis_boss_arena?.marksPerParticipant ?? 0) : 0;
-  const rewardWindow = heroicRewardWindowToken(until);
 
   for (const meta of lockoutMetas.values()) {
     const lockedUntil = meta.raidLockouts.get(lockId) ?? 0;
     const alreadyLocked = lockedUntil > now;
     if (lockedUntil > 0 && !alreadyLocked) meta.raidLockouts.delete(lockId);
-    if (!alreadyLocked && credited) {
-      let paid = false;
-      if (participantIds.has(meta.entityId)) {
-        if (presentIds.has(meta.entityId)) {
-          ctx.addItem(DEATHLESS_FRAGMENT_ITEM_ID, profile.fragmentsPerParticipant, meta.entityId);
-          if (marks > 0) ctx.addItem(HEROIC_MARK_ITEM_ID, marks, meta.entityId);
-          paid = true;
-        } else if (inst?.enteredBy.has(meta.entityId)) {
-          if (marks > 0) {
-            ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, marks, [
-              {
-                itemId: DEATHLESS_FRAGMENT_ITEM_ID,
-                count: profile.fragmentsPerParticipant,
-              },
-            ]);
-          } else {
-            ctx.mailHeroicMarks(
-              meta.entityId,
-              DEATHLESS_FRAGMENT_ITEM_ID,
-              profile.fragmentsPerParticipant,
-            );
-          }
-          paid = true;
-        }
-      }
-      if (paid && heroic) {
-        if (meta.heroicDaily.date !== rewardWindow) {
-          meta.heroicDaily = { date: rewardWindow, marked: new Set() };
-        }
-        meta.heroicDaily.marked.add('nythraxis_boss_arena');
-        ctx.markDeedsDirty(meta.entityId);
-      }
-    }
+
     if (!alreadyLocked && heroic) inst?.clearedBy.add(meta.entityId);
     meta.raidLockouts.set(lockId, until);
   }
