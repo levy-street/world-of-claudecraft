@@ -9256,8 +9256,8 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "80fb007e",
-      "events": "ee9c762b",
+      "state": "75b83fdb",
+      "events": "8c4ef35f",
       "rng": {
         "draws": 3027,
         "digest": "f551924e"
@@ -9433,19 +9433,11 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
-              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ],
             [
               "dgn_nythraxis",
               ""
@@ -9505,10 +9497,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -9557,19 +9545,11 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
-              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ],
             [
               "dgn_nythraxis",
               ""
@@ -9629,10 +9609,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -9682,19 +9658,11 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
-              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ],
             [
               "dgn_nythraxis",
               ""
@@ -9754,10 +9722,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -9807,19 +9771,11 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
-              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ],
             [
               "dgn_nythraxis",
               ""
@@ -9879,10 +9835,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -10277,7 +10229,7 @@
                         }
                       }
                     ],
-                    "baseId": "mirefen_dirk",
+                    "baseId": "thornpeak_war_axe",
                     "dropContext": {
                       "source": "raid",
                       "sourceEntityId": 420,
@@ -10291,7 +10243,7 @@
                       "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
                     },
                     "generatedName": {
-                      "baseId": "mirefen_dirk",
+                      "baseId": "thornpeak_war_axe",
                       "rareWordIds": [
                         "procedural.rare.doom",
                         "procedural.rare.promise"
@@ -10304,7 +10256,7 @@
                     "version": 1
                   }
                 },
-                "itemId": "mirefen_dirk"
+                "itemId": "thornpeak_war_axe"
               }
             ]
           },
@@ -10686,7 +10638,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "f435389e",
+      "state": "d3ebcd17",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10697,7 +10649,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "9c6edad8",
+      "state": "b16ca7b9",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10708,7 +10660,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "1ec0efe8",
+      "state": "580e3e15",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10719,7 +10671,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "4b397cda",
+      "state": "b264e3e7",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10730,7 +10682,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "9e3bbade",
+      "state": "c1d84b77",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10741,7 +10693,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "48442094",
+      "state": "e08725fd",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10752,7 +10704,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "ef286194",
+      "state": "25bb72b5",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -10929,19 +10881,11 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
-              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ],
             [
               "dgn_nythraxis",
               ""
@@ -11001,10 +10945,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -11053,19 +10993,11 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
-              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ],
             [
               "dgn_nythraxis",
               ""
@@ -11125,10 +11057,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -11178,19 +11106,11 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
-              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ],
             [
               "dgn_nythraxis",
               ""
@@ -11250,10 +11170,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -11303,19 +11219,11 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
-              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ],
             [
               "dgn_nythraxis",
               ""
@@ -11375,10 +11283,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -11773,7 +11677,7 @@
                         }
                       }
                     ],
-                    "baseId": "mirefen_dirk",
+                    "baseId": "thornpeak_war_axe",
                     "dropContext": {
                       "source": "raid",
                       "sourceEntityId": 420,
@@ -11787,7 +11691,7 @@
                       "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
                     },
                     "generatedName": {
-                      "baseId": "mirefen_dirk",
+                      "baseId": "thornpeak_war_axe",
                       "rareWordIds": [
                         "procedural.rare.doom",
                         "procedural.rare.promise"
@@ -11800,7 +11704,7 @@
                     "version": 1
                   }
                 },
-                "itemId": "mirefen_dirk"
+                "itemId": "thornpeak_war_axe"
               }
             ]
           },
