@@ -28,8 +28,8 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 418,
-      "state": "af0ee286",
-      "events": "10c8d55b",
+      "state": "8979f44b",
+      "events": "3b070801",
       "rng": {
         "draws": 2,
         "digest": "c05535b8"
@@ -114,7 +114,7 @@
             null
           ],
           "bank": {},
-          "cls": "mage",
+          "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
@@ -125,10 +125,9 @@
             },
             "dungeonClears": {},
             "itemsDiscovered": [
-              "apprentice_robe",
               "baked_bread",
-              "gnarled_staff",
-              "spring_water"
+              "footpad_jerkin",
+              "rusty_dagger"
             ]
           },
           "deedsEarned": [
@@ -141,8 +140,9 @@
           "delveDaily": {},
           "entityId": 416,
           "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -151,10 +151,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "mailWelcomed": true,
@@ -233,22 +229,30 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 10,
+          "attackPower": 42,
           "combatTimer": 99.15,
           "comboUntil": -1,
-          "critChance": 0.056,
+          "critChance": 0.0625,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
+          "dodgeChance": 0.0625,
+          "dualWielding": true,
           "fallStartY": 0.639595,
           "fiveSecondRule": 99.15,
-          "hp": 54,
+          "hp": 62,
           "id": 416,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
+          "maxHp": 62,
+          "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -258,27 +262,28 @@
             "z": 20
           },
           "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "energy",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 6,
           "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
           },
-          "templateId": "mage",
+          "templateId": "rogue",
           "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
           }
         },
         {

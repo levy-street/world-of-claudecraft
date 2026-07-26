@@ -9256,8 +9256,8 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "4131fe6c",
-      "events": "90b86b6a",
+      "state": "eb078655",
+      "events": "ee9c762b",
       "rng": {
         "draws": 3027,
         "digest": "f551924e"
@@ -9298,14 +9298,22 @@
             },
             "itemsDiscovered": [
               "baked_bread",
+              "deathless_fragment",
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_epic",
               ""
             ],
             [
@@ -9368,6 +9376,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -9421,11 +9433,19 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
+              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -9485,6 +9505,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -9533,11 +9557,19 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
+              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -9597,6 +9629,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -9646,11 +9682,19 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
+              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -9710,6 +9754,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -9759,11 +9807,19 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
+              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -9823,6 +9879,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -10146,25 +10206,42 @@
                   "procedural": {
                     "affixes": [
                       {
-                        "affixId": "stalwart",
-                        "budget": 7,
-                        "family": "primary.stamina",
-                        "position": "prefix",
+                        "affixId": "reaping",
+                        "budget": 8.5,
+                        "family": "resource.health_on_kill",
+                        "position": "suffix",
                         "ranges": {
-                          "sta": {
-                            "max": 24,
+                          "healthOnKill": {
+                            "max": 32,
                             "min": 7
                           }
                         },
                         "revision": 1,
-                        "tier": 5,
+                        "tier": 4,
                         "values": {
-                          "sta": 7
+                          "healthOnKill": 17
+                        }
+                      },
+                      {
+                        "affixId": "stalwart",
+                        "budget": 9,
+                        "family": "primary.stamina",
+                        "position": "prefix",
+                        "ranges": {
+                          "sta": {
+                            "max": 10,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "sta": 9
                         }
                       },
                       {
                         "affixId": "deft",
-                        "budget": 8,
+                        "budget": 9,
                         "family": "primary.agility",
                         "position": "prefix",
                         "ranges": {
@@ -10176,34 +10253,55 @@
                         "revision": 1,
                         "tier": 3,
                         "values": {
-                          "agi": 8
+                          "agi": 9
+                        }
+                      },
+                      {
+                        "affixId": "alacrity",
+                        "budget": 7.56,
+                        "family": "rating.haste",
+                        "position": "suffix",
+                        "ranges": {
+                          "hasteRating": {
+                            "max": 35,
+                            "min": 8
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "hasteRating": 27
                         }
                       }
                     ],
-                    "baseId": "thornpeak_war_axe",
+                    "baseId": "mirefen_dirk",
                     "dropContext": {
-                      "source": "dungeon",
+                      "source": "raid",
                       "sourceEntityId": 420,
                       "sourceTags": [
                         "undead",
-                        "dungeon",
+                        "raid",
+                        "normal",
                         "elite",
                         "boss"
                       ],
                       "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
                     },
                     "generatedName": {
-                      "baseId": "thornpeak_war_axe",
-                      "prefixId": "procedural.name.deft"
+                      "baseId": "mirefen_dirk",
+                      "rareWordIds": [
+                        "procedural.rare.doom",
+                        "procedural.rare.promise"
+                      ]
                     },
-                    "itemLevel": 21,
-                    "rarity": "magic",
-                    "seed": 953634688,
+                    "itemLevel": 28,
+                    "rarity": "epic",
+                    "seed": 2997339309,
                     "uid": "pi1:offline_1031:1",
                     "version": 1
                   }
                 },
-                "itemId": "thornpeak_war_axe"
+                "itemId": "mirefen_dirk"
               }
             ]
           },
@@ -10585,7 +10683,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "f73d4ff2",
+      "state": "ffa3411b",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10596,7 +10694,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "77a4095a",
+      "state": "38e1f08b",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10607,7 +10705,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "775625de",
+      "state": "59173d5b",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10618,7 +10716,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "1c5e6aca",
+      "state": "a4acbbff",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10629,7 +10727,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "a778933a",
+      "state": "c4c08173",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10640,7 +10738,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "86f7225a",
+      "state": "9c9571db",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10651,7 +10749,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "12914bbc",
+      "state": "2a436ff9",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -10693,14 +10791,22 @@
             },
             "itemsDiscovered": [
               "baked_bread",
+              "deathless_fragment",
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
             [
               "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_epic",
               ""
             ],
             [
@@ -10763,6 +10869,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -10816,11 +10926,19 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
+              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -10880,6 +10998,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -10928,11 +11050,19 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
+              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -10992,6 +11122,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -11041,11 +11175,19 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
+              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -11105,6 +11247,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -11154,11 +11300,19 @@
             "itemsDiscovered": [
               "apprentice_robe",
               "baked_bread",
+              "deathless_fragment",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -11218,6 +11372,10 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "deathless_fragment"
             }
           ],
           "lifetimeXp": 167449,
@@ -11541,25 +11699,42 @@
                   "procedural": {
                     "affixes": [
                       {
-                        "affixId": "stalwart",
-                        "budget": 7,
-                        "family": "primary.stamina",
-                        "position": "prefix",
+                        "affixId": "reaping",
+                        "budget": 8.5,
+                        "family": "resource.health_on_kill",
+                        "position": "suffix",
                         "ranges": {
-                          "sta": {
-                            "max": 24,
+                          "healthOnKill": {
+                            "max": 32,
                             "min": 7
                           }
                         },
                         "revision": 1,
-                        "tier": 5,
+                        "tier": 4,
                         "values": {
-                          "sta": 7
+                          "healthOnKill": 17
+                        }
+                      },
+                      {
+                        "affixId": "stalwart",
+                        "budget": 9,
+                        "family": "primary.stamina",
+                        "position": "prefix",
+                        "ranges": {
+                          "sta": {
+                            "max": 10,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "sta": 9
                         }
                       },
                       {
                         "affixId": "deft",
-                        "budget": 8,
+                        "budget": 9,
                         "family": "primary.agility",
                         "position": "prefix",
                         "ranges": {
@@ -11571,34 +11746,55 @@
                         "revision": 1,
                         "tier": 3,
                         "values": {
-                          "agi": 8
+                          "agi": 9
+                        }
+                      },
+                      {
+                        "affixId": "alacrity",
+                        "budget": 7.56,
+                        "family": "rating.haste",
+                        "position": "suffix",
+                        "ranges": {
+                          "hasteRating": {
+                            "max": 35,
+                            "min": 8
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "hasteRating": 27
                         }
                       }
                     ],
-                    "baseId": "thornpeak_war_axe",
+                    "baseId": "mirefen_dirk",
                     "dropContext": {
-                      "source": "dungeon",
+                      "source": "raid",
                       "sourceEntityId": 420,
                       "sourceTags": [
                         "undead",
-                        "dungeon",
+                        "raid",
+                        "normal",
                         "elite",
                         "boss"
                       ],
                       "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
                     },
                     "generatedName": {
-                      "baseId": "thornpeak_war_axe",
-                      "prefixId": "procedural.name.deft"
+                      "baseId": "mirefen_dirk",
+                      "rareWordIds": [
+                        "procedural.rare.doom",
+                        "procedural.rare.promise"
+                      ]
                     },
-                    "itemLevel": 21,
-                    "rarity": "magic",
-                    "seed": 953634688,
+                    "itemLevel": 28,
+                    "rarity": "epic",
+                    "seed": 2997339309,
                     "uid": "pi1:offline_1031:1",
                     "version": 1
                   }
                 },
-                "itemId": "thornpeak_war_axe"
+                "itemId": "mirefen_dirk"
               }
             ]
           },
