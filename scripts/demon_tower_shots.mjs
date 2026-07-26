@@ -93,7 +93,10 @@ async function enterTowerFloor(page, floorIndex) {
     for (let i = 0; i < 26; i++) sim.tick();
     const core = inst.towerCoreId != null ? sim.entities.get(inst.towerCoreId) : null;
     if (core) {
-      p.pos = { x: core.pos.x, y: core.pos.y, z: core.pos.z - 13 };
+      // 8 yards, not 13: the chase camera owns its own yaw (p.facing does not
+      // steer it), and at 13 the core drifted out of frame on some runs. At 8 the
+      // centrepiece is reliably in shot with the wave ring still visible behind it.
+      p.pos = { x: core.pos.x, y: core.pos.y, z: core.pos.z - 8 };
       p.prevPos = { ...p.pos };
       p.facing = 0; // north, toward the core
     }
