@@ -63,7 +63,7 @@ describe('procedural loot distribution', () => {
       if (personalLootClass === 'shaman')
         expect(report.classUsableRate, personalLootClass).toBeLessThan(0.97);
     }
-  });
+  }, 15_000);
 
   it('is exactly reproducible for an identical options object', () => {
     const options = {

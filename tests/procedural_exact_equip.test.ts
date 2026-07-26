@@ -30,11 +30,11 @@ function intellectRing(uid: string, intellect: number, itemLevel = 18): ItemInst
         affixId: 'sages',
         family: 'primary.intellect',
         position: 'prefix',
-        tier: 4,
+        tier: 5,
         revision: 1,
         budget: intellect,
         values: { int: intellect },
-        ranges: { int: { min: 6, max: 9 } },
+        ranges: { int: { min: 6, max: 24 } },
       },
     ],
     generatedName: {
@@ -73,8 +73,8 @@ function proceduralUids(sim: InspectableSim, pid: number): string[] {
 describe('exact procedural instance equip', () => {
   it('equips the requested UID when two copies share one base ID', () => {
     const { sim, pid } = makeSim();
-    sim.addItemInstance(BASE_ID, intellectRing(LOW_UID, 6), pid);
-    sim.addItemInstance(BASE_ID, intellectRing(HIGH_UID, 9), pid);
+    sim.addItemInstance(BASE_ID, intellectRing(LOW_UID, 7), pid);
+    sim.addItemInstance(BASE_ID, intellectRing(HIGH_UID, 8), pid);
 
     sim.equipItemToSlot(BASE_ID, 'ring1', pid, LOW_UID);
 
@@ -86,21 +86,21 @@ describe('exact procedural instance equip', () => {
     const { sim, pid } = makeSim();
     const baseInt = sim.entities.get(pid)?.stats.int;
     if (baseInt === undefined) throw new Error('missing player entity');
-    sim.addItemInstance(BASE_ID, intellectRing(LOW_UID, 6), pid);
-    sim.addItemInstance(BASE_ID, intellectRing(HIGH_UID, 9), pid);
+    sim.addItemInstance(BASE_ID, intellectRing(LOW_UID, 7), pid);
+    sim.addItemInstance(BASE_ID, intellectRing(HIGH_UID, 8), pid);
 
     sim.equipItemToSlot(BASE_ID, 'ring1', pid, LOW_UID);
-    expect(sim.entities.get(pid)?.stats.int).toBe(baseInt + 6);
+    expect(sim.entities.get(pid)?.stats.int).toBe(baseInt + 7);
 
     sim.equipItemToSlot(BASE_ID, 'ring1', pid, HIGH_UID);
-    expect(sim.entities.get(pid)?.stats.int).toBe(baseInt + 9);
+    expect(sim.entities.get(pid)?.stats.int).toBe(baseInt + 8);
     expect(meta(sim, pid).equipmentInstance.ring1?.procedural?.uid).toBe(HIGH_UID);
     expect(proceduralUids(sim, pid)).toEqual([LOW_UID]);
   });
 
   it('rejects a stale or mismatched UID without equipping another copy', () => {
     const { sim, pid } = makeSim();
-    sim.addItemInstance(BASE_ID, intellectRing(LOW_UID, 6), pid);
+    sim.addItemInstance(BASE_ID, intellectRing(LOW_UID, 7), pid);
     sim.equipItemToSlot(BASE_ID, 'ring1', pid, 'pi1:test:999');
 
     expect(sim.equipment.ring1).toBeUndefined();
@@ -119,8 +119,8 @@ describe('exact procedural instance equip', () => {
 
   it('preserves exact worn and bag UIDs through save and reconnect', () => {
     const { sim, pid } = makeSim();
-    sim.addItemInstance(BASE_ID, intellectRing(LOW_UID, 6), pid);
-    sim.addItemInstance(BASE_ID, intellectRing(HIGH_UID, 9), pid);
+    sim.addItemInstance(BASE_ID, intellectRing(LOW_UID, 7), pid);
+    sim.addItemInstance(BASE_ID, intellectRing(HIGH_UID, 8), pid);
     sim.equipItemToSlot(BASE_ID, 'ring1', pid, HIGH_UID);
     const state = sim.serializeCharacter(pid);
     if (!state) throw new Error('failed to serialize character');

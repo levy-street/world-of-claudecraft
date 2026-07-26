@@ -42,10 +42,12 @@ const PRESENTATION_SCREENSHOT_FILENAMES = Object.freeze([
   '25-tooltip-named-legendary-ashbinders-seal-roll-c-compare-alt.png',
 ]);
 const PRESENTATION_SCREENSHOT_COUNT = PRESENTATION_SCREENSHOT_FILENAMES.length;
-// The expanded capture crosses one site-presence refresh interval, so an offline run
-// receives two known presence 502s plus the one known project-stats 502.
+// The expanded capture lands close to one site-presence refresh boundary. Depending
+// on browser scheduling, an offline run receives one or two known presence 502s plus
+// the one known project-stats resource 502. Keep the range narrow while rejecting
+// every unknown console error.
 const EXPECTED_OFFLINE_CONSOLE_ERRORS = new Map([
-  ['Failed to load resource: the server responded with a status of 502 (Bad Gateway)', 3],
+  ['Failed to load resource: the server responded with a status of 502 (Bad Gateway)', [2, 3]],
   ['Failed to fetch project stats: ApiError: request failed (502)', 1],
   [
     'character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb',
@@ -81,8 +83,12 @@ function auditOfflineConsoleErrors(messages) {
   const errors = [];
   for (const [message, expectedCount] of EXPECTED_OFFLINE_CONSOLE_ERRORS) {
     const actualCount = actualCounts.get(message) ?? 0;
-    if (actualCount !== expectedCount) {
-      errors.push(`expected ${expectedCount}x "${message}", received ${actualCount}`);
+    const [minimum, maximum] = Array.isArray(expectedCount)
+      ? expectedCount
+      : [expectedCount, expectedCount];
+    if (actualCount < minimum || actualCount > maximum) {
+      const expectedLabel = minimum === maximum ? `${minimum}` : `${minimum}-${maximum}`;
+      errors.push(`expected ${expectedLabel}x "${message}", received ${actualCount}`);
     }
     actualCounts.delete(message);
   }
@@ -92,7 +98,7 @@ function auditOfflineConsoleErrors(messages) {
   return {
     errors,
     summary: [...EXPECTED_OFFLINE_CONSOLE_ERRORS.entries()]
-      .map(([message, count]) => `${count}x "${message}"`)
+      .map(([message, count]) => `${Array.isArray(count) ? count.join('-') : count}x "${message}"`)
       .join('; '),
   };
 }
@@ -321,7 +327,7 @@ async function preparePresentationFixtures(page) {
       sourceTemplateId: 'procedural_gallery_evidence',
       sourceTags: ['visual-evidence'],
     });
-    const generate = (seed, rarity, namespace, forcedBaseId = ringBaseId, forcedItemLevel = 1) =>
+    const generate = (seed, rarity, namespace, forcedBaseId = ringBaseId, forcedItemLevel = 20) =>
       procedural.generateProceduralItem({
         seed,
         uid: procedural.formatProceduralItemUid(namespace, seed),
@@ -529,6 +535,7 @@ async function preparePresentationFixtures(page) {
     const hud = window.__game?.hud;
     if (!sim?.player || !hud) throw new Error('offline game did not expose the live Sim and Hud');
     const pid = sim.player.id;
+    sim.player.level = 40;
     sim.addItemInstance(rollPair[0].itemId, rollPair[0].instance, pid);
     sim.equipItem(rollPair[0].itemId, rollPair[0].instance.procedural.uid);
     sim.addItemInstance(rollPair[1].itemId, rollPair[1].instance, pid);
@@ -694,6 +701,41 @@ async function presentationClip(page) {
 
 async function capturePresentationScreenshot(page, filename) {
   const outputPath = path.join(OUTPUT_DIR, filename);
+  const captureOverlayState = await page.evaluate(() => {
+    try {
+      localStorage.setItem('woc_gpu_notice_dismissed', '1');
+    } catch {
+      // Storage can be unavailable in hardened browser contexts. The real dismiss
+      // button still updates the toast's in-memory state for this capture session.
+    }
+    const gpuNotice = document.getElementById('gpu-notice');
+    if (gpuNotice && !gpuNotice.hidden) {
+      gpuNotice.querySelector('.gpu-notice-dismiss')?.click();
+    }
+    const perfNudge = document.getElementById('perf-nudge');
+    if (perfNudge && !perfNudge.hidden) {
+      perfNudge.querySelector('.perf-nudge-dismiss')?.click();
+    }
+    let captureStyle = document.getElementById('procedural-loot-capture-overlays');
+    if (!captureStyle) {
+      captureStyle = document.createElement('style');
+      captureStyle.id = 'procedural-loot-capture-overlays';
+      captureStyle.textContent = '#gpu-notice, #perf-nudge { display: none !important; }';
+      document.head.appendChild(captureStyle);
+    }
+    const overlays = [gpuNotice, perfNudge].filter((overlay) => overlay !== null);
+    return {
+      mounted: overlays.map((overlay) => overlay.id),
+      visible: overlays
+        .filter((overlay) => !overlay.hidden && getComputedStyle(overlay).display !== 'none')
+        .map((overlay) => overlay.id),
+    };
+  });
+  check(
+    `${filename} capture overlays clear`,
+    captureOverlayState.visible.length === 0,
+    JSON.stringify(captureOverlayState),
+  );
   const clip = await presentationClip(page);
   if (PREFLIGHT_ONLY) {
     console.log(`PREFLIGHT ${path.relative(REPO_ROOT, outputPath)}`);

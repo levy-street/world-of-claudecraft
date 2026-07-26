@@ -18,7 +18,7 @@ describe('procedural legendary balance campaign', () => {
       new Set(LEGENDARY_BUILD_PROFILES.map((profile) => profile.id)),
     );
     expect(report.fullCoverage).toBe(true);
-    expect(report.totalRows).toBe(160);
+    expect(report.totalRows).toBe(165);
     expect(report.rows.every((row) => row.samplesPerRollEdge === 250)).toBe(true);
   });
 

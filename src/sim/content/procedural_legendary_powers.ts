@@ -210,7 +210,11 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
       {
         kind: 'area_damage',
         target: 'area_around_target',
-        magnitude: { rollKey: 'potencyPct', rollScale: 0.01 },
+        magnitude: {
+          rollKey: 'potencyPct',
+          rollScale: 0.01,
+          classMultipliers: { paladin: 2.2 },
+        },
         radius: 5,
         maxTargets: 5,
         tag: 'arcane',

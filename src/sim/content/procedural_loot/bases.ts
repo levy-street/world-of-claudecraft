@@ -3,7 +3,7 @@ import type { ProceduralItemBase } from './types';
 
 const MARTIAL_CLASSES: PlayerClass[] = ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'];
 const ROGUE_CLASSES: PlayerClass[] = ['rogue', 'hunter'];
-const CASTER_CLASSES: PlayerClass[] = ['mage', 'priest', 'warlock', 'shaman', 'druid'];
+const CASTER_CLASSES: PlayerClass[] = ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'];
 const MARTIAL_TWO_HAND_CLASSES: PlayerClass[] = ['warrior', 'paladin', 'hunter', 'shaman'];
 const HUNTER_CLASSES: PlayerClass[] = ['hunter'];
 const MAIL_CLASSES: PlayerClass[] = ['warrior', 'paladin', 'shaman'];

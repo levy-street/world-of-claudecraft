@@ -80,6 +80,11 @@ describe('procedural legendary power content', () => {
         expect(effect.intervalMs ?? 0).toBeGreaterThanOrEqual(0);
         expect(effect.radius ?? 0).toBeGreaterThanOrEqual(0);
         expect(effect.maxTargets ?? 0).toBeGreaterThanOrEqual(0);
+        for (const multiplier of Object.values(effect.magnitude?.classMultipliers ?? {})) {
+          expect(Number.isFinite(multiplier)).toBe(true);
+          expect(multiplier).toBeGreaterThan(0);
+          expect(multiplier).toBeLessThanOrEqual(4);
+        }
       }
     }
   });
@@ -99,6 +104,7 @@ describe('procedural legendary power content', () => {
     expect(
       proceduralLegendaryPowerCompatibleWithBase(bell, PROCEDURAL_ITEM_BASES.iron_broadsword),
     ).toBe(false);
+    expect(bell.effects[0].magnitude.classMultipliers).toEqual({ paladin: 2.2 });
   });
 
   it('pins every one of the 408 power and base compatibility decisions', () => {

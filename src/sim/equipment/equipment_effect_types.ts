@@ -58,6 +58,7 @@ export interface EquipmentPowerMagnitude {
   itemLevelScale?: number;
   rollKey?: string;
   rollScale?: number;
+  classMultipliers?: Readonly<Partial<Record<PlayerClass, number>>>;
   minimum?: number;
   maximum?: number;
 }

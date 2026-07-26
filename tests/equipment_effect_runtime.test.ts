@@ -297,6 +297,48 @@ describe('equipment effect cadence and command projection', () => {
     });
   });
 
+  it('applies authored class magnitude multipliers only to the matching class', () => {
+    const definition = PROCEDURAL_LEGENDARY_POWERS.bell_of_the_ninth_peal;
+    const mageRuntime = new EquipmentEffectRuntime(PROCEDURAL_LEGENDARY_POWERS, () => 0);
+    const paladinRuntime = new EquipmentEffectRuntime(PROCEDURAL_LEGENDARY_POWERS, () => 0);
+
+    const mage = triggerPower(
+      mageRuntime,
+      definition,
+      matchingEvent(definition, { actorClass: 'mage' }),
+    );
+    const paladin = triggerPower(
+      paladinRuntime,
+      definition,
+      matchingEvent(definition, { actorClass: 'paladin' }),
+    );
+
+    expect(mage.commands[0]?.magnitude).toBe(0.27);
+    expect(paladin.commands[0]?.magnitude).toBeCloseTo(0.594);
+  });
+
+  it('fails closed on an invalid authored class magnitude multiplier', () => {
+    const definition: EquipmentPowerDefinition = {
+      ...PROCEDURAL_LEGENDARY_POWERS.bell_of_the_ninth_peal,
+      id: 'invalid_class_multiplier',
+      effects: [
+        {
+          ...PROCEDURAL_LEGENDARY_POWERS.bell_of_the_ninth_peal.effects[0],
+          magnitude: {
+            rollKey: 'potencyPct',
+            rollScale: 0.01,
+            classMultipliers: { paladin: Number.NaN },
+          },
+        },
+      ],
+    };
+    const runtime = new EquipmentEffectRuntime({ [definition.id]: definition }, () => 0);
+
+    expect(() =>
+      triggerPower(runtime, definition, matchingEvent(definition, { actorClass: 'paladin' })),
+    ).toThrow('invalid paladin magnitude multiplier');
+  });
+
   it('throws when a persisted roll required by an effect is absent', () => {
     const runtime = new EquipmentEffectRuntime(PROCEDURAL_LEGENDARY_POWERS, () => 0);
     const definition = PROCEDURAL_LEGENDARY_POWERS.greyjaws_edge;

@@ -92,7 +92,8 @@
     "wiki:seed": "node scripts/mediawiki/build_seed.mjs",
     "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts",
     "sim:healing": "tsx scripts/healing_montecarlo.ts",
-    "loot:balance": "tsx scripts/procedural_legendary_balance.ts"
+    "loot:balance": "tsx scripts/procedural_legendary_balance.ts --enforce",
+    "loot:balance:report": "tsx scripts/procedural_legendary_balance.ts"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1084.0",

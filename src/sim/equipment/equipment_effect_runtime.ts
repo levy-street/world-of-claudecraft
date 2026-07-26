@@ -32,6 +32,7 @@ function finiteOrZero(value: number | undefined): number {
 function resolveMagnitude(
   magnitude: EquipmentPowerMagnitude | undefined,
   power: ActiveEquipmentPower,
+  actorClass: EquipmentEffectEvent['actorClass'],
 ): number | undefined {
   if (!magnitude) return undefined;
 
@@ -46,6 +47,13 @@ function resolveMagnitude(
     }
     value += roll * (magnitude.rollScale ?? 1);
   }
+  const classMultiplier = magnitude.classMultipliers?.[actorClass] ?? 1;
+  if (!Number.isFinite(classMultiplier) || classMultiplier <= 0 || classMultiplier > 4) {
+    throw new Error(
+      `Equipment power ${power.powerId} has invalid ${actorClass} magnitude multiplier`,
+    );
+  }
+  value *= classMultiplier;
   if (magnitude.minimum !== undefined) value = Math.max(value, magnitude.minimum);
   if (magnitude.maximum !== undefined) value = Math.min(value, magnitude.maximum);
   return value;
@@ -186,7 +194,7 @@ export class EquipmentEffectRuntime {
       sourceActorId: event.actorId,
       targetId: targetIdFor(effect.target, event),
       target: effect.target,
-      magnitude: resolveMagnitude(effect.magnitude, power),
+      magnitude: resolveMagnitude(effect.magnitude, power, event.actorClass),
       durationMs: effect.durationMs,
       intervalMs: effect.intervalMs,
       radius: effect.radius,
