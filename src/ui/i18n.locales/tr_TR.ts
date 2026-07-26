@@ -9434,4 +9434,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.raidSharedDrop':
     'Son ceset, akının zar atması için bir ortak yöntemsel eşya ekler.',
   'hudChrome.finder.raidSignatures': 'Özgün Efsanevi güçler: {signatures}',
+  'hudChrome.crafting.craftedToastQty': 'Üretildi: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Ayrıca {material} elde edersiniz.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Ayrıca {material} x{qty} elde edersiniz.',
+  'hudChrome.enchanting.disenchantedYield': '{item} büyüsünü bozarak {material} elde edersiniz.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    '{item} büyüsünü bozarak {material} x{qty} elde edersiniz.',
+  'hudChrome.enchanting.plainTag': 'Büyülenmemiş',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Korunan: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Sipariş bağı',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Ustalık eseri bonusu',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Üreticinin işareti',
+  'hudChrome.enchanting.salvagedYield': '{item} parçalayarak {material} elde edersiniz.',
+  'hudChrome.enchanting.salvagedYieldQty': '{item} parçalayarak {material} x{qty} elde edersiniz.',
+  'hudChrome.gathering.harvestLine': 'Hasat ettiniz: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Hasat ettiniz: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Ayrıca {name} elde edersiniz.',
 };

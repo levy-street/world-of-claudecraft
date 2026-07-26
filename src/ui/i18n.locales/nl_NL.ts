@@ -9539,4 +9539,20 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.raidSharedDrop':
     'Het lijk van de eindbaas voegt één gedeeld procedureel voorwerp toe waarop de raid kan rollen.',
   'hudChrome.finder.raidSignatures': 'Kenmerkende legendarische krachten: {signatures}',
+  'hudChrome.crafting.craftedToastQty': 'Gemaakt: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Je krijgt ook {material} terug.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Je krijgt ook {material} x{qty} terug.',
+  'hudChrome.enchanting.disenchantedYield': 'Je onttovert {item} en verkrijgt {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Je onttovert {item} en verkrijgt {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Niet betoverd',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Behouden: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Opdrachtbinding',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Meesterwerkbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Makersmerk',
+  'hudChrome.enchanting.salvagedYield': 'Je ontmantelt {item} tot {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Je ontmantelt {item} tot {material} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Je oogst: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Je oogst: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Je krijgt ook {name}.',
 };

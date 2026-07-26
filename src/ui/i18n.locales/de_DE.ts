@@ -9621,4 +9621,21 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.raidSharedDrop':
     'Die Leiche des Endgegners fügt einen gemeinsam auszuwürfelnden prozeduralen Gegenstand für den Schlachtzug hinzu.',
   'hudChrome.finder.raidSignatures': 'Legendäre Signaturmächte: {signatures}',
+  'hudChrome.crafting.craftedToastQty': 'Hergestellt: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Du erhältst außerdem {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du erhältst außerdem {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield': 'Beim Entzaubern von {item} erhältst du {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Beim Entzaubern von {item} erhältst du {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Nicht verzaubert',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Erhalten: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Auftragsbindung',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Meisterwerkbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Herstellermarke',
+  'hudChrome.enchanting.salvagedYield': 'Beim Zerlegen von {item} erhältst du {material}.',
+  'hudChrome.enchanting.salvagedYieldQty':
+    'Beim Zerlegen von {item} erhältst du {material} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Du erntest: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Du erntest: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Du erhältst außerdem {name}.',
 };

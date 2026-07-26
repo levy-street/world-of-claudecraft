@@ -1,21 +1,8 @@
 import {
-  proceduralLegendaryPower,
-  proceduralLegendaryPowerCompatibleWithBase,
-} from './content/procedural_legendary_powers';
-import {
-  baseEligibleForAffix,
-  PROCEDURAL_AFFIXES,
-  PROCEDURAL_ITEM_BASES,
-  PROCEDURAL_RARE_FIRST_WORD_IDS,
-  PROCEDURAL_RARE_SECOND_WORD_IDS,
-  PROCEDURAL_RARITIES,
-  PROCEDURAL_STAT_BUDGET_COST,
-} from './content/procedural_loot';
-import {
-  calculateProceduralBudget,
-  minimumValueForRollFloor,
-  proceduralBudgetTolerance,
-} from './loot/procedural/budget';
+  LEGACY_PROCEDURAL_DEFINITION_MIGRATION_ORDER,
+  type ProceduralItemDefinitionSnapshot,
+  proceduralItemDefinitionSnapshot,
+} from './content/procedural_loot/definition_revisions';
 import {
   cloneProceduralItemInstance,
   type GeneratedItemName,
@@ -44,8 +31,9 @@ const DROP_SOURCES = new Set<ItemDropContext['source']>([
   'dev',
 ]);
 const LEGACY_ROLLED_STAT_KEY = /^[A-Za-z][A-Za-z0-9_]{0,31}$/;
-const RARE_FIRST_IDS = new Set<string>(PROCEDURAL_RARE_FIRST_WORD_IDS);
-const RARE_SECOND_IDS = new Set<string>(PROCEDURAL_RARE_SECOND_WORD_IDS);
+
+type DefinitionAffix = ProceduralItemDefinitionSnapshot['affixes'][string];
+type DefinitionBase = ProceduralItemDefinitionSnapshot['bases'][string];
 
 export interface ValidationSuccess<T> {
   ok: true;
@@ -78,6 +66,7 @@ function finiteNumber(value: unknown, min: number, max: number): value is number
 function boundedString(value: unknown, max = MAX_PAYLOAD_STRING): value is string {
   return typeof value === 'string' && value.length > 0 && value.length <= max;
 }
+
 function sameStringKeys(actual: readonly string[], expected: readonly string[]): boolean {
   return [...actual].sort().join('\0') === [...expected].sort().join('\0');
 }
@@ -131,17 +120,31 @@ function sanitizeDropContext(value: unknown): ItemDropContext | null {
   };
 }
 
+function baseEligibleForAffix(base: DefinitionBase, affix: DefinitionAffix): boolean {
+  const tags = new Set(base.tags);
+  if (!affix.tags.some((tag) => tags.has(tag))) return false;
+  return !affix.excludedTags?.some((tag) => tags.has(tag));
+}
+
+function minimumValueForRollFloor(
+  range: { readonly min: number; readonly max: number },
+  rollFloor: number,
+): number {
+  return range.min + (range.max - range.min) * rollFloor;
+}
+
 function sanitizeRolledAffix(
   value: unknown,
   baseId: string,
   itemLevel: number,
   rarity: Exclude<ProceduralRarity, 'mythic'>,
+  definitions: ProceduralItemDefinitionSnapshot,
 ): ValidationResult<RolledAffix> {
   if (!isRecord(value)) return failure('affix must be an object');
   if (!boundedString(value.affixId, 64)) return failure('invalid affix id');
-  const definition = PROCEDURAL_AFFIXES[value.affixId];
+  const definition = definitions.affixes[value.affixId];
   if (!definition) return failure(`unknown affix ${value.affixId}`);
-  const base = PROCEDURAL_ITEM_BASES[baseId];
+  const base = definitions.bases[baseId];
   if (!baseEligibleForAffix(base, definition))
     return failure(`affix ${definition.id} is incompatible with base ${baseId}`);
   if (
@@ -186,19 +189,19 @@ function sanitizeRolledAffix(
     if (!isRecord(range)) return failure(`affix ${definition.id} has no range for ${stat}`);
     if (
       !finiteNumber(range.min, -MAX_NUMERIC_MAGNITUDE, MAX_NUMERIC_MAGNITUDE) ||
-      !finiteNumber(range.max, -MAX_NUMERIC_MAGNITUDE, MAX_NUMERIC_MAGNITUDE) ||
-      range.min !== authoredRange.min ||
-      range.max !== authoredRange.max
+      !finiteNumber(range.max, -MAX_NUMERIC_MAGNITUDE, MAX_NUMERIC_MAGNITUDE)
     )
+      return failure(`affix ${definition.id} has invalid range for ${stat}`);
+    if (range.min !== authoredRange.min || range.max !== authoredRange.max)
       return failure(`affix ${definition.id} range does not match tier for ${stat}`);
     if (numericValue < authoredRange.min || numericValue > authoredRange.max)
       return failure(`affix ${definition.id} has invalid value for ${stat}`);
     if (!quantizedToStep(numericValue, authoredRange.step ?? 1))
       return failure(`affix ${definition.id} value for ${stat} is not quantized`);
-    const rollFloor = PROCEDURAL_RARITIES[rarity].rollFloor;
+    const rollFloor = definitions.rarities[rarity].rollFloor;
     if (numericValue + 1e-8 < minimumValueForRollFloor(authoredRange, rollFloor))
       return failure(`affix ${definition.id} value for ${stat} is below the ${rarity} roll floor`);
-    const budgetCost = PROCEDURAL_STAT_BUDGET_COST[stat];
+    const budgetCost = definitions.statBudgetCost[stat];
     if (budgetCost === undefined)
       return failure(`affix ${definition.id} has no budget cost for ${stat}`);
     values[stat] = numericValue;
@@ -226,25 +229,37 @@ function sanitizeGeneratedName(
   baseId: string,
   rarity: ProceduralRarity,
   affixes: readonly RolledAffix[],
+  definitions: ProceduralItemDefinitionSnapshot,
 ): GeneratedItemName | null {
   if (!isRecord(value) || value.baseId !== baseId) return null;
   const fragmentIds = new Set(
     affixes
-      .map((affix) => PROCEDURAL_AFFIXES[affix.affixId]?.nameFragmentId)
+      .map((affix) => definitions.affixes[affix.affixId]?.nameFragmentId)
       .filter((id): id is string => Boolean(id)),
   );
-  if (value.prefixId !== undefined && !fragmentIds.has(value.prefixId as string)) return null;
-  if (value.suffixId !== undefined && !fragmentIds.has(value.suffixId as string)) return null;
+  if (
+    value.prefixId !== undefined &&
+    (typeof value.prefixId !== 'string' || !fragmentIds.has(value.prefixId))
+  )
+    return null;
+  if (
+    value.suffixId !== undefined &&
+    (typeof value.suffixId !== 'string' || !fragmentIds.has(value.suffixId))
+  )
+    return null;
   let rareWordIds: [string, string] | undefined;
   if (value.rareWordIds !== undefined) {
+    if (!Array.isArray(value.rareWordIds) || value.rareWordIds.length !== 2) return null;
+    const first = value.rareWordIds[0];
+    const second = value.rareWordIds[1];
     if (
-      !Array.isArray(value.rareWordIds) ||
-      value.rareWordIds.length !== 2 ||
-      !RARE_FIRST_IDS.has(value.rareWordIds[0]) ||
-      !RARE_SECOND_IDS.has(value.rareWordIds[1])
+      typeof first !== 'string' ||
+      typeof second !== 'string' ||
+      !definitions.rareFirstWordIds.includes(first) ||
+      !definitions.rareSecondWordIds.includes(second)
     )
       return null;
-    rareWordIds = [value.rareWordIds[0], value.rareWordIds[1]];
+    rareWordIds = [first, second];
   }
   if ((rarity === 'rare' || rarity === 'epic') && !rareWordIds) return null;
   if (rarity === 'magic' && !value.prefixId && !value.suffixId) return null;
@@ -264,23 +279,26 @@ function sanitizeGeneratedName(
   };
 }
 
-export function sanitizeProceduralItemInstance(
-  value: unknown,
-  expectedBaseId?: string,
+function sanitizeProceduralItemInstanceForDefinitions(
+  value: Record<string, unknown>,
+  expectedBaseId: string | undefined,
+  definitions: ProceduralItemDefinitionSnapshot,
 ): ValidationResult<ProceduralItemInstance> {
-  if (!isRecord(value)) return failure('procedural item must be an object');
   if (value.version !== 1) return failure('unsupported procedural item version');
   if (!boundedString(value.uid, 64) || !UID_PATTERN.test(value.uid))
     return failure('invalid procedural item uid');
-  if (!boundedString(value.baseId, 64) || !PROCEDURAL_ITEM_BASES[value.baseId])
+  if (!boundedString(value.baseId, 64) || !definitions.bases[value.baseId])
     return failure('unknown procedural base');
-  if (expectedBaseId !== undefined && value.baseId !== expectedBaseId)
+  const baseId = value.baseId;
+  if (expectedBaseId !== undefined && baseId !== expectedBaseId)
     return failure('procedural base does not match container item id');
   if (!integer(value.itemLevel, 1, 40)) return failure('invalid procedural item level');
+  const itemLevel = value.itemLevel;
   if (!ACTIVE_RARITIES.has(value.rarity as ProceduralRarity))
     return failure('invalid procedural rarity');
   const rarity = value.rarity as Exclude<ProceduralRarity, 'mythic'>;
   if (!integer(value.seed, 1, 0xffffffff)) return failure('invalid procedural seed');
+  const seed = value.seed;
   if (!Array.isArray(value.affixes) || value.affixes.length > MAX_AFFIXES)
     return failure('invalid procedural affix count');
   if (
@@ -295,10 +313,10 @@ export function sanitizeProceduralItemInstance(
   const families = new Set<string>();
   const exclusiveGroups = new Set<string>();
   for (const entry of value.affixes) {
-    const result = sanitizeRolledAffix(entry, value.baseId, value.itemLevel, rarity);
+    const result = sanitizeRolledAffix(entry, baseId, itemLevel, rarity, definitions);
     if (!result.ok) return result;
     if (families.has(result.value.family)) return failure('duplicate procedural affix family');
-    const definition = PROCEDURAL_AFFIXES[result.value.affixId];
+    const definition = definitions.affixes[result.value.affixId];
     for (const group of definition.exclusiveGroups ?? []) {
       if (exclusiveGroups.has(group))
         return failure(`duplicate procedural affix exclusive group ${group}`);
@@ -307,36 +325,37 @@ export function sanitizeProceduralItemInstance(
     families.add(result.value.family);
     affixes.push(result.value);
   }
-  const allowedCounts: number[] = PROCEDURAL_RARITIES[rarity].affixCounts.map(
-    (entry) => entry.count,
-  );
+  const allowedCounts = definitions.rarities[rarity].affixCounts.map((entry) => entry.count);
   if (!allowedCounts.includes(affixes.length))
     return failure('affix count does not match procedural rarity');
-  if (rarity !== 'common') {
-    const canonicalBudget = calculateProceduralBudget(
-      PROCEDURAL_ITEM_BASES[value.baseId],
-      value.itemLevel,
-      rarity,
+  if (rarity !== 'common' && definitions.validationMode === 'strict-v1') {
+    const base = definitions.bases[baseId];
+    const canonicalBudget = Number(
+      (itemLevel * definitions.rarities[rarity].budgetMultiplier * base.slotMultiplier).toFixed(3),
     );
     const realizedBudget = affixes.reduce((sum, affix) => sum + affix.budget, 0);
-    if (
-      Math.abs(realizedBudget - canonicalBudget) >
-      proceduralBudgetTolerance(canonicalBudget) + 1e-8
-    )
+    const tolerance = Math.max(1, canonicalBudget * 0.15);
+    if (Math.abs(realizedBudget - canonicalBudget) > tolerance + 1e-8)
       return failure('procedural affix total exceeds canonical budget tolerance');
   }
-  const generatedName = sanitizeGeneratedName(value.generatedName, value.baseId, rarity, affixes);
+  const generatedName = sanitizeGeneratedName(
+    value.generatedName,
+    baseId,
+    rarity,
+    affixes,
+    definitions,
+  );
   if (!generatedName) return failure('invalid generated item name');
   let legendaryPowerId: string | undefined;
-  let powerRevision: 1 | undefined;
+  let powerRevision: number | undefined;
   let legendaryRolls: Record<string, number> | undefined;
   if (rarity === 'legendary') {
     if (!boundedString(value.legendaryPowerId, 64)) return failure('invalid legendary power id');
-    const power = proceduralLegendaryPower(value.legendaryPowerId);
+    const power = definitions.powers[value.legendaryPowerId];
     if (!power) return failure('unknown legendary power');
     if (value.powerRevision !== power.revision)
       return failure('unsupported legendary power revision');
-    if (!proceduralLegendaryPowerCompatibleWithBase(power, PROCEDURAL_ITEM_BASES[value.baseId]))
+    if (!power.compatibleBaseIds.includes(baseId))
       return failure('legendary power is incompatible with base');
     if (!isRecord(value.legendaryRolls)) return failure('invalid legendary rolls');
     const expectedRollKeys = Object.keys(power.rolls).sort();
@@ -348,7 +367,7 @@ export function sanitizeProceduralItemInstance(
       const range = power.rolls[key];
       if (!finiteNumber(roll, range.min, range.max))
         return failure(`invalid legendary roll ${key}`);
-      const steps = (roll - range.min) / range.step;
+      const steps = (roll - range.min) / (range.step ?? 1);
       if (Math.abs(steps - Math.round(steps)) > 1e-8)
         return failure(`legendary roll ${key} is not quantized`);
       legendaryRolls[key] = roll;
@@ -383,9 +402,10 @@ export function sanitizeProceduralItemInstance(
 
   const item: ProceduralItemInstance = {
     version: 1,
+    definitionRevision: definitions.revision,
     uid: value.uid,
-    baseId: value.baseId,
-    itemLevel: value.itemLevel,
+    baseId,
+    itemLevel,
     rarity,
     affixes,
     ...(legendaryPowerId && {
@@ -395,12 +415,33 @@ export function sanitizeProceduralItemInstance(
     }),
     ...(raidForged && { raidForged }),
     generatedName,
-    seed: value.seed,
+    seed,
     ...(dropContext && { dropContext }),
   };
   return success(cloneProceduralItemInstance(item));
 }
 
+export function sanitizeProceduralItemInstance(
+  value: unknown,
+  expectedBaseId?: string,
+): ValidationResult<ProceduralItemInstance> {
+  if (!isRecord(value)) return failure('procedural item must be an object');
+  if (value.definitionRevision !== undefined) {
+    const definitions = proceduralItemDefinitionSnapshot(value.definitionRevision);
+    if (!definitions) return failure('unsupported procedural item definition revision');
+    return sanitizeProceduralItemInstanceForDefinitions(value, expectedBaseId, definitions);
+  }
+
+  let currentFailure: ValidationFailure | undefined;
+  for (const revision of LEGACY_PROCEDURAL_DEFINITION_MIGRATION_ORDER) {
+    const definitions = proceduralItemDefinitionSnapshot(revision);
+    if (!definitions) continue;
+    const result = sanitizeProceduralItemInstanceForDefinitions(value, expectedBaseId, definitions);
+    if (result.ok) return result;
+    currentFailure ??= result;
+  }
+  return currentFailure ?? failure('unsupported procedural item definition revision');
+}
 function sanitizeNumberRecord(
   value: unknown,
   keys: ReadonlySet<string> | null,

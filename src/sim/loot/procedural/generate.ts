@@ -14,6 +14,7 @@ import {
   PROCEDURAL_AFFIXES,
   PROCEDURAL_BASE_POOLS,
   PROCEDURAL_ITEM_BASES,
+  PROCEDURAL_LOOT_CONTENT_REVISION,
   PROCEDURAL_RARE_FIRST_WORD_IDS,
   PROCEDURAL_RARE_SECOND_WORD_IDS,
   PROCEDURAL_RARITIES,
@@ -417,6 +418,7 @@ export function generateProceduralItem(
 
   const procedural: ProceduralItemInstance = {
     version: 1,
+    definitionRevision: PROCEDURAL_LOOT_CONTENT_REVISION,
     uid: input.uid,
     baseId: base.id,
     itemLevel,

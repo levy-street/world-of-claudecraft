@@ -1,6 +1,7 @@
 import {
   cloneRolledAffix,
   type GeneratedItemName,
+  type ProceduralItemDefinitionRevision,
   type ProceduralItemInstance,
   type ProceduralRarity,
   type RolledAffix,
@@ -9,6 +10,7 @@ import type { ItemInstancePayload } from './types';
 
 export interface PublicProceduralItemView {
   version: 1;
+  definitionRevision?: ProceduralItemDefinitionRevision;
   baseId: string;
   itemLevel: number;
   rarity: ProceduralRarity;
@@ -37,6 +39,9 @@ export interface PublicItemInstanceView {
 export function publicProceduralItemView(item: ProceduralItemInstance): PublicProceduralItemView {
   return {
     version: 1,
+    ...(item.definitionRevision !== undefined && {
+      definitionRevision: item.definitionRevision,
+    }),
     baseId: item.baseId,
     itemLevel: item.itemLevel,
     rarity: item.rarity,

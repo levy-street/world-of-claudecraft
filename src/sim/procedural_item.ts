@@ -2,6 +2,8 @@ import type { ItemDef, ItemInstancePayload } from './types';
 
 export type ProceduralRarity = 'common' | 'magic' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
+export type ProceduralItemDefinitionRevision = 1 | 2 | 3;
+
 export type ItemTag =
   | 'weapon'
   | 'armor'
@@ -57,6 +59,8 @@ export interface ItemDropContext {
 
 export interface ProceduralItemInstance {
   version: 1;
+  /** Absent only on legacy payloads written before definition snapshots existed. */
+  definitionRevision?: ProceduralItemDefinitionRevision;
   uid: string;
   baseId: string;
   itemLevel: number;

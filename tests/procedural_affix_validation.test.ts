@@ -185,7 +185,7 @@ describe('persisted procedural affix validation', () => {
     }
     expect(payload).toBeDefined();
   });
-  it('enforces both authored minimum and maximum item levels', () => {
+  it('enforces authored item-level bounds from the immutable definition revision', () => {
     const belowMinimum = magicPrecisionAtLevelTen();
     procedural(belowMinimum).itemLevel = 9;
     expect(sanitizeItemInstancePayload(belowMinimum, 'gravecaller_ring')).toEqual({
@@ -194,14 +194,13 @@ describe('persisted procedural affix validation', () => {
     });
 
     const aboveMaximum = generatedPayload(504);
-    const affix = firstAffix(aboveMaximum);
     const definition = definitionFor(aboveMaximum);
     const originalMaximum = definition.maxItemLevel;
     definition.maxItemLevel = procedural(aboveMaximum).itemLevel - 1;
     try {
       expect(sanitizeItemInstancePayload(aboveMaximum, procedural(aboveMaximum).baseId)).toEqual({
-        ok: false,
-        error: `affix ${affix.affixId} is outside its item level range`,
+        ok: true,
+        value: aboveMaximum,
       });
     } finally {
       if (originalMaximum === undefined) delete definition.maxItemLevel;
@@ -215,20 +214,16 @@ describe('persisted procedural affix validation', () => {
     const definition = definitionFor(payload);
     const tier = definition.tiers.find((entry) => entry.tier === affix.tier);
     if (!tier) throw new Error('missing generated affix tier');
-    const originalRolls = tier.rolls;
-    const extraStat = Object.hasOwn(originalRolls, 'sta') ? 'int' : 'sta';
-    tier.rolls = { ...originalRolls, [extraStat]: { min: 1, max: 2 } };
-    try {
-      expect(sanitizeItemInstancePayload(payload, procedural(payload).baseId)).toEqual({
-        ok: false,
-        error: `affix ${affix.affixId} stat keys do not match tier`,
-      });
-    } finally {
-      tier.rolls = originalRolls;
-    }
+    const extraStat = Object.hasOwn(tier.rolls, 'sta') ? 'int' : 'sta';
+    affix.values[extraStat] = 1;
+    affix.ranges[extraStat] = { min: 1, max: 2 };
+    expect(sanitizeItemInstancePayload(payload, procedural(payload).baseId)).toEqual({
+      ok: false,
+      error: `affix ${affix.affixId} stat keys do not match tier`,
+    });
   });
 
-  it('rejects two otherwise valid affixes that share an exclusive group', () => {
+  it('does not let runtime definition mutations rewrite a persisted definition revision', () => {
     const payload = generatedPayload(506);
     const [first, second] = procedural(payload).affixes;
     if (!first || !second) throw new Error('expected at least two generated affixes');
@@ -240,8 +235,8 @@ describe('persisted procedural affix validation', () => {
     secondDefinition.exclusiveGroups = [...(secondGroups ?? []), 'test.persisted_exclusion'];
     try {
       expect(sanitizeItemInstancePayload(payload, procedural(payload).baseId)).toEqual({
-        ok: false,
-        error: 'duplicate procedural affix exclusive group test.persisted_exclusion',
+        ok: true,
+        value: payload,
       });
     } finally {
       if (firstGroups === undefined) delete firstDefinition.exclusiveGroups;

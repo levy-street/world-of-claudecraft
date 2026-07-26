@@ -34,7 +34,7 @@ function armorBase(input: {
   };
 }
 
-export const PROCEDURAL_LOOT_CONTENT_REVISION = 2;
+export const PROCEDURAL_LOOT_CONTENT_REVISION = 3;
 
 export const PROCEDURAL_ITEM_BASES: Record<string, ProceduralItemBase> = {
   // Keep the original six ids first so forced-base saves and the authored first-slice

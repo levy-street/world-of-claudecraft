@@ -37,6 +37,8 @@ import {
   saveMailState,
 } from '../server/db';
 import { GameServer } from '../server/game';
+import { generateProceduralItem } from '../src/sim/loot/procedural';
+import { type CharacterState, Sim } from '../src/sim/sim';
 
 function fakeWs() {
   const sent: any[] = [];
@@ -89,6 +91,46 @@ beforeEach(() => {
 });
 
 describe('character load lease, GameServer wiring', () => {
+  it('rolls back a partially added player when persisted item validation rejects the join', () => {
+    const fixture = new Sim({ seed: 90, playerClass: 'warrior', noPlayer: true });
+    const fixturePid = fixture.addPlayer('warrior', 'Corrupt');
+    const state = structuredClone(fixture.serializeCharacter(fixturePid)) as CharacterState;
+    const generated = generateProceduralItem({
+      seed: 701,
+      uid: 'pi1:join-rollback:1',
+      context: {
+        source: 'dungeon',
+        sourceEntityId: 40,
+        sourceSpawnSequence: 2,
+        lootSlotIndex: 0,
+      },
+      basePoolId: 'initial_dungeon_boss',
+      rarityTableId: 'initial_dungeon_boss',
+      sourceItemLevel: 20,
+      forcedBaseId: 'gravecaller_ring',
+      forcedRarity: 'magic',
+    }).instance;
+    if (!generated.procedural) throw new Error('missing procedural fixture');
+    generated.procedural.seed = 0;
+    state.inventory.push({ itemId: 'gravecaller_ring', count: 1, instance: generated });
+
+    const server = new GameServer();
+    const beforeEntityIds = [...server.sim.entities.keys()];
+    const beforePrimaryId = server.sim.primaryId;
+
+    expect(() =>
+      server.join(fakeWs().ws as any, 100, 7, 'Corrupt', 'warrior', state, false, {
+        leaseNonce: 'nonce-corrupt',
+      }),
+    ).toThrow('Invalid persisted item instance at inventory');
+
+    expect(server.clients.size).toBe(0);
+    expect(server.hasSessionForCharacter(7)).toBe(false);
+    expect([...server.sim.players.values()].some((meta) => meta.name === 'Corrupt')).toBe(false);
+    expect([...server.sim.entities.keys()]).toEqual(beforeEntityIds);
+    expect(server.sim.primaryId).toBe(beforePrimaryId);
+  });
+
   it('quarantines mail writes after a failed load', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {

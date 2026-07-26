@@ -2175,6 +2175,44 @@ export class Sim {
       autoEquip?: boolean;
       state?: CharacterState;
       characterId?: number;
+      bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+    },
+  ): number {
+    const playerIdsBefore = new Set(this.players.keys());
+    const entityIdsBefore = new Set(this.entities.keys());
+    const primaryIdBefore = this.primaryId;
+    const eventCountBefore = this.events.length;
+    try {
+      return this.addPlayerUnchecked(cls, name, opts);
+    } catch (error) {
+      // Persisted-state validation happens after the entity and PlayerMeta are
+      // created. Treat the whole add as a transaction so a rejected save never
+      // leaves a ghost player, pet, queued event, or changed primary player.
+      for (const pid of [...this.players.keys()]) {
+        if (playerIdsBefore.has(pid)) continue;
+        try {
+          this.removePlayer(pid);
+        } catch {
+          this.players.delete(pid);
+          if (this.entities.has(pid)) this.dropEntity(pid);
+        }
+      }
+      for (const id of [...this.entities.keys()]) {
+        if (!entityIdsBefore.has(id)) this.dropEntity(id);
+      }
+      this.primaryId = primaryIdBefore;
+      this.events.length = eventCountBefore;
+      throw error;
+    }
+  }
+
+  private addPlayerUnchecked(
+    cls: PlayerClass,
+    name: string,
+    opts?: {
+      autoEquip?: boolean;
+      state?: CharacterState;
+      characterId?: number;
       // Server-stamped bank bonus slots, recomputed from account facts at every
       // join (email/Discord/wallet/referrals). Overrides the persisted value so
       // unlinking lowers capacity at the next login; a shrink below the used slot

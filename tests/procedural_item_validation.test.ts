@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { PROCEDURAL_LEGENDARY_POWERS } from '../src/sim/content/procedural_legendary_powers';
 import {
+  PROCEDURAL_AFFIXES,
+  PROCEDURAL_ITEM_BASES,
+  PROCEDURAL_ITEM_DEFINITION_REVISIONS,
+  PROCEDURAL_RARE_FIRST_WORD_IDS,
+  PROCEDURAL_RARE_SECOND_WORD_IDS,
+  PROCEDURAL_RARITIES,
+  PROCEDURAL_STAT_BUDGET_COST,
+} from '../src/sim/content/procedural_loot';
+import {
   deriveProceduralItemSeed,
   formatProceduralItemUid,
   generateProceduralItem,
@@ -49,6 +58,59 @@ function validLegendaryPayload(baseId = 'gravecaller_ring') {
   }).instance;
 }
 
+function legacyRevisionOnePayload(): ReturnType<typeof validPayload> {
+  return {
+    procedural: {
+      version: 1,
+      uid: 'pi1:legacy-v1:1',
+      baseId: 'gravecaller_cloth_hood',
+      itemLevel: 22,
+      rarity: 'legendary',
+      affixes: [
+        {
+          affixId: 'warded',
+          family: 'defense.armor',
+          position: 'prefix',
+          tier: 4,
+          revision: 1,
+          budget: 2.88,
+          values: { armor: 36 },
+          ranges: { armor: { min: 28, max: 42 } },
+        },
+        {
+          affixId: 'focused',
+          family: 'offense.spell_power',
+          position: 'suffix',
+          tier: 4,
+          revision: 1,
+          budget: 8.45,
+          values: { spellPower: 13 },
+          ranges: { spellPower: { min: 10, max: 15 } },
+        },
+        {
+          affixId: 'remembrance',
+          family: 'resource.mana_on_kill',
+          position: 'suffix',
+          tier: 3,
+          revision: 1,
+          budget: 3.5,
+          values: { manaOnKill: 7 },
+          ranges: { manaOnKill: { min: 4, max: 7 } },
+        },
+      ],
+      legendaryPowerId: 'bell_of_the_ninth_peal',
+      powerRevision: 1,
+      legendaryRolls: { potencyPct: 25 },
+      generatedName: {
+        baseId: 'gravecaller_cloth_hood',
+        legendaryNameId: 'bell_of_the_ninth_peal',
+      },
+      seed: 199,
+      dropContext: DROP_CONTEXT,
+    },
+  } as ReturnType<typeof validPayload>;
+}
+
 function mutatedFixture(index: number): unknown {
   const payload = structuredClone(validPayload()) as unknown as {
     procedural: Record<string, unknown> & {
@@ -89,6 +151,122 @@ describe('procedural item validation', () => {
     expect(result.value).toEqual(payload);
     expect(result.value).not.toBe(payload);
     expect(result.value.procedural).not.toBe(payload.procedural);
+  });
+
+  it('stamps new drops with the current item-definition revision', () => {
+    const payload = validPayload();
+    expect(
+      (payload.procedural as unknown as { definitionRevision?: number }).definitionRevision,
+    ).toBe(3);
+  });
+
+  it('keeps the current snapshot in lockstep with live generation definitions', () => {
+    const live = {
+      revision: 3,
+      validationMode: 'strict-v1',
+      bases: Object.fromEntries(
+        Object.entries(PROCEDURAL_ITEM_BASES).map(([id, base]) => [
+          id,
+          { tags: base.tags, slotMultiplier: base.slotMultiplier },
+        ]),
+      ),
+      affixes: Object.fromEntries(
+        Object.entries(PROCEDURAL_AFFIXES).map(([id, affix]) => [
+          id,
+          {
+            id: affix.id,
+            family: affix.family,
+            position: affix.position,
+            ...(affix.nameFragmentId && { nameFragmentId: affix.nameFragmentId }),
+            tags: affix.tags,
+            ...(affix.excludedTags && { excludedTags: affix.excludedTags }),
+            minItemLevel: affix.minItemLevel,
+            ...(affix.maxItemLevel !== undefined && { maxItemLevel: affix.maxItemLevel }),
+            tiers: affix.tiers,
+            ...(affix.exclusiveGroups && { exclusiveGroups: affix.exclusiveGroups }),
+          },
+        ]),
+      ),
+      rarities: Object.fromEntries(
+        Object.entries(PROCEDURAL_RARITIES).map(([id, rarity]) => [
+          id,
+          {
+            id: rarity.id,
+            affixCounts: rarity.affixCounts,
+            budgetMultiplier: rarity.budgetMultiplier,
+            rollFloor: rarity.rollFloor,
+          },
+        ]),
+      ),
+      statBudgetCost: PROCEDURAL_STAT_BUDGET_COST,
+      rareFirstWordIds: PROCEDURAL_RARE_FIRST_WORD_IDS,
+      rareSecondWordIds: PROCEDURAL_RARE_SECOND_WORD_IDS,
+      powers: Object.fromEntries(
+        Object.entries(PROCEDURAL_LEGENDARY_POWERS).map(([id, power]) => [
+          id,
+          {
+            id: power.id,
+            revision: power.revision,
+            compatibleBaseIds: power.compatibleBaseIds,
+            rolls: power.rolls,
+          },
+        ]),
+      ),
+    };
+
+    expect(PROCEDURAL_ITEM_DEFINITION_REVISIONS[3]).toEqual(live);
+  });
+
+  it('migrates an unversioned revision-1 legendary against its historical definitions', () => {
+    const legacy = legacyRevisionOnePayload();
+    const explicitlyRevisionOne = structuredClone(legacy);
+    explicitlyRevisionOne.procedural.definitionRevision = 1;
+    const historical = sanitizeItemInstancePayload(explicitlyRevisionOne, 'gravecaller_cloth_hood');
+    expect(historical.ok, historical.ok ? undefined : historical.error).toBe(true);
+
+    const migrated = sanitizeItemInstancePayload(legacy, 'gravecaller_cloth_hood');
+    expect(migrated.ok, migrated.ok ? undefined : migrated.error).toBe(true);
+    if (!migrated.ok) return;
+    expect(
+      (migrated.value.procedural as unknown as { definitionRevision: number }).definitionRevision,
+    ).toBe(1);
+
+    const currentHood = validLegendaryPayload('gravecaller_cloth_hood');
+    currentHood.procedural.legendaryPowerId = 'bell_of_the_ninth_peal';
+    currentHood.procedural.powerRevision = 1;
+    currentHood.procedural.legendaryRolls = { potencyPct: 25 };
+    currentHood.procedural.generatedName.legendaryNameId = 'bell_of_the_ninth_peal';
+    expect(sanitizeItemInstancePayload(currentHood, 'gravecaller_cloth_hood')).toEqual({
+      ok: false,
+      error: 'legendary power is incompatible with base',
+    });
+  });
+
+  it('does not let unversioned items downgrade into lax historical validation', () => {
+    const explicit = legacyRevisionOnePayload();
+    explicit.procedural.definitionRevision = 1;
+    const firstAffix = explicit.procedural.affixes[0];
+    const armorRange = firstAffix.ranges.armor;
+    firstAffix.ranges.armor = { min: armorRange.min - 100, max: armorRange.max + 100 };
+
+    const explicitResult = sanitizeItemInstancePayload(explicit, 'gravecaller_cloth_hood');
+    expect(explicitResult.ok).toBe(false);
+    if (explicitResult.ok) return;
+    expect(explicitResult.error).toBe('affix warded range does not match tier for armor');
+
+    const unversioned = structuredClone(explicit);
+    delete unversioned.procedural.definitionRevision;
+    const migrationResult = sanitizeItemInstancePayload(unversioned, 'gravecaller_cloth_hood');
+    expect(migrationResult.ok).toBe(false);
+  });
+
+  it('rejects an unknown item-definition revision', () => {
+    const payload = validPayload();
+    (payload.procedural as unknown as { definitionRevision: number }).definitionRevision = 999;
+    expect(sanitizeItemInstancePayload(payload, 'gravecaller_ring')).toEqual({
+      ok: false,
+      error: 'unsupported procedural item definition revision',
+    });
   });
 
   it('rejects a procedural base that disagrees with its container item id', () => {

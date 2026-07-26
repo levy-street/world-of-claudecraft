@@ -9532,4 +9532,21 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.raidSharedDrop':
     'Mayat terakhir menambahkan satu item prosedural bersama untuk diperebutkan dalam raid.',
   'hudChrome.finder.raidSignatures': 'Kekuatan Legendaris khas: {signatures}',
+  'hudChrome.crafting.craftedToastQty': 'Dibuat: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Kamu juga memperoleh kembali {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Kamu juga memperoleh kembali {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield':
+    'Kamu menghancurkan pemantraan {item} menjadi {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Kamu menghancurkan pemantraan {item} menjadi {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Belum dimantrai',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Dipertahankan: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ikatan pesanan',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus mahakarya',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tanda pembuat',
+  'hudChrome.enchanting.salvagedYield': 'Kamu membongkar {item} menjadi {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Kamu membongkar {item} menjadi {material} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Kamu memanen: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Kamu memanen: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Kamu juga memperoleh {name}.',
 };

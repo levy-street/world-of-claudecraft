@@ -426,21 +426,32 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             leaseNonce = undefined;
             throw err;
           }
-          result = game.join(
-            ws,
-            accountId,
-            activeCharacter.id,
-            activeCharacter.name,
-            activeCharacter.class,
-            activeCharacter.state,
-            activeCharacter.is_gm,
-            {
-              ...joinMeta,
-              hotbarLayout: activeCharacter.hotbar_layout ?? null,
-              leaseNonce,
-              bankBonus,
-            },
-          );
+          try {
+            result = game.join(
+              ws,
+              accountId,
+              activeCharacter.id,
+              activeCharacter.name,
+              activeCharacter.class,
+              activeCharacter.state,
+              activeCharacter.is_gm,
+              {
+                ...joinMeta,
+                hotbarLayout: activeCharacter.hotbar_layout ?? null,
+                leaseNonce,
+                bankBonus,
+              },
+            );
+          } catch (err) {
+            // addPlayer validates persisted state during join and can throw. The
+            // lease already belongs to this handshake, so release it before the
+            // error escapes to onConnection's classified retryable rejection.
+            await releaseCharacterLease(character.id, leaseNonce).catch((releaseErr) =>
+              console.error('lease release failed:', releaseErr),
+            );
+            leaseNonce = undefined;
+            throw err;
+          }
         } finally {
           // Decrement on every fresh-arm exit path (join completed, lease refused,
           // or a thrown DB error): a successful join is now counted by
