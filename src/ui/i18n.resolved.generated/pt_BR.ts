@@ -6242,7 +6242,8 @@ export const pt_BR: EnTranslations = {
       "tradeTooFar": "O alvo está longe demais para trocar.",
       "tradeExpired": "A solicitação de troca expirou.",
       "tradeFailed": "Troca falhou: itens ou dinheiro não estão mais disponíveis.",
-      "tradeBound": "Esse item está vinculado e não pode ser negociado."
+      "tradeBound": "Esse item está vinculado e não pode ser negociado.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Você se levanta.",

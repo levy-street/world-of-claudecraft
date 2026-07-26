@@ -6242,7 +6242,8 @@ export const en_CA: EnTranslations = {
       "tradeTooFar": "Target is too far away to trade.",
       "tradeExpired": "The trade request has expired.",
       "tradeFailed": "Trade failed: items or money no longer available.",
-      "tradeBound": "That item is bound and cannot be traded."
+      "tradeBound": "That item is bound and cannot be traded.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "You stand up.",

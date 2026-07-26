@@ -6242,7 +6242,8 @@ export const de_DE: EnTranslations = {
       "tradeTooFar": "Das Ziel ist zu weit entfernt zum Handeln.",
       "tradeExpired": "Die Handelsanfrage ist abgelaufen.",
       "tradeFailed": "Handel fehlgeschlagen: Gegenstände oder Geld sind nicht mehr verfügbar.",
-      "tradeBound": "Dieser Gegenstand ist gebunden und kann nicht gehandelt werden."
+      "tradeBound": "Dieser Gegenstand ist gebunden und kann nicht gehandelt werden.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Ihr steht auf.",

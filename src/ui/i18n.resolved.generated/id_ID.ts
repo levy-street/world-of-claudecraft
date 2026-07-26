@@ -6242,7 +6242,8 @@ export const id_ID: EnTranslations = {
       "tradeTooFar": "Sasaran terlalu jauh untuk berdagang.",
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
-      "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan."
+      "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Kamu berdiri.",

@@ -4616,6 +4616,7 @@ export type TranslationKeyFlat =
   | 'hud.errors.inCombat'
   | 'hud.errors.invalidAttackTarget'
   | 'hud.errors.invitationExpired'
+  | 'hud.errors.marketListBound'
   | 'hud.errors.noPet'
   | 'hud.errors.noRecentWhisper'
   | 'hud.errors.noSeal'

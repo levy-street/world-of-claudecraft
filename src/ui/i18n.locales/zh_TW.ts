@@ -8085,6 +8085,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': '共鳴鋼材',
   'entities.items.resonant_timber.name': '共鳴木材',
   'hud.errors.tradeBound': '該物品已綁定，無法交易。',
+  'hud.errors.marketListBound': '該物品已綁定，無法上架。',
   'hudChrome.enchantName.enchant_weapon_might': '附魔武器 - 威力',
   'hudChrome.enchantName.enchant_weapon_intellect': '附魔武器 - 法術強度',
   'hudChrome.enchantName.enchant_helmet_fortitude': '附魔頭部 - 堅韌',

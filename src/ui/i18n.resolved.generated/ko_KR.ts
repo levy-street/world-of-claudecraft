@@ -6242,7 +6242,8 @@ export const ko_KR: EnTranslations = {
       "tradeTooFar": "대상이 너무 멀어 거래할 수 없습니다.",
       "tradeExpired": "거래 요청이 만료되었습니다.",
       "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
-      "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다."
+      "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다.",
+      "marketListBound": "그 아이템은 귀속되어 등록할 수 없습니다."
     },
     "logs": {
       "standUp": "일어섰습니다.",

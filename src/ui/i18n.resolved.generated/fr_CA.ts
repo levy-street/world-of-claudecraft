@@ -6242,7 +6242,8 @@ export const fr_CA: EnTranslations = {
       "tradeTooFar": "La cible est trop éloignée pour échanger.",
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
-      "tradeBound": "Cet objet est lié et ne peut pas être échangé."
+      "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Vous vous levez.",

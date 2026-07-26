@@ -6242,7 +6242,8 @@ export const pl_PL: EnTranslations = {
       "tradeTooFar": "Cel jest zbyt daleko, by handlować.",
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
-      "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić."
+      "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Wstajesz.",

@@ -6242,7 +6242,8 @@ export const it_IT: EnTranslations = {
       "tradeTooFar": "Il bersaglio è troppo lontano per commerciare.",
       "tradeExpired": "La richiesta di scambio è scaduta.",
       "tradeFailed": "Scambio fallito: oggetti o denaro non più disponibili.",
-      "tradeBound": "Quell'oggetto è legato e non può essere scambiato."
+      "tradeBound": "Quell'oggetto è legato e non può essere scambiato.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Ti alzi.",

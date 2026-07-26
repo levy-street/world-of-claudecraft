@@ -384,6 +384,7 @@ export const COMMAND_NAMES = [
   'deleteLoadout',
   'market_search',
   'market_list',
+  'market_list_instance',
   'market_buy',
   'market_cancel',
   'market_collect',
@@ -665,6 +666,7 @@ export const COMMAND_FACETS = {
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
   market_list: 'IWorldMarket',
+  market_list_instance: 'IWorldMarket',
   market_buy: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',

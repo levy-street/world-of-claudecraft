@@ -8491,6 +8491,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': '共鳴の鋼',
   'entities.items.resonant_timber.name': '共鳴の木材',
   'hud.errors.tradeBound': 'そのアイテムはバインドされているため取引できません。',
+  'hud.errors.marketListBound': 'そのアイテムはバインドされているため出品できません。',
   'hudChrome.enchantName.enchant_weapon_might': '武器エンチャント - 剛力',
   'hudChrome.enchantName.enchant_weapon_intellect': '武器エンチャント - 呪文威力',
   'hudChrome.enchantName.enchant_helmet_fortitude': '頭エンチャント - 堅牢',

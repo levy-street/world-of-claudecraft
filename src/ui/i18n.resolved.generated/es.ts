@@ -6242,7 +6242,8 @@ export const es: EnTranslations = {
       "tradeTooFar": "El objetivo está demasiado lejos para comerciar.",
       "tradeExpired": "La solicitud de comercio ha expirado.",
       "tradeFailed": "Comercio fallido: los objetos o el dinero ya no están disponibles.",
-      "tradeBound": "Ese objeto está vinculado y no puede comerciarse."
+      "tradeBound": "Ese objeto está vinculado y no puede comerciarse.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Te pones de pie.",

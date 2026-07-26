@@ -6242,7 +6242,8 @@ export const cs_CZ: EnTranslations = {
       "tradeTooFar": "Cíl je příliš daleko pro obchod.",
       "tradeExpired": "Žádost o obchod vypršela.",
       "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",
-      "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit."
+      "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Vstáváš.",

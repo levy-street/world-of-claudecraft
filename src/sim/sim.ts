@@ -8661,6 +8661,15 @@ export class Sim {
     this.market.marketList(itemId, count, price, pid);
   }
 
+  marketListInstance(
+    itemId: string,
+    price: number,
+    instance: ItemInstancePayload,
+    pid?: number,
+  ): void {
+    this.market.marketListInstance(itemId, price, instance, pid);
+  }
+
   marketBuy(listingId: number, pid?: number): void {
     this.market.marketBuy(listingId, pid);
   }

@@ -6242,7 +6242,8 @@ export const sv_SE: EnTranslations = {
       "tradeTooFar": "Målet är för långt bort för att handla.",
       "tradeExpired": "Handelsförfrågan har gått ut.",
       "tradeFailed": "Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.",
-      "tradeBound": "Det föremålet är bundet och kan inte handlas."
+      "tradeBound": "Det föremålet är bundet och kan inte handlas.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Du reser dig upp.",

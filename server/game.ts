@@ -68,6 +68,7 @@ import {
   type Entity,
   type EquipSlot,
   emptyMoveInput,
+  type ItemInstancePayload,
   isDungeonDifficulty,
   MAX_LEVEL,
   type MobFamily,
@@ -568,6 +569,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_weapon_skin',
   'prestige',
   'market_list',
+  'market_list_instance',
   'market_buy',
   'market_cancel',
   'market_collect',
@@ -4996,6 +4998,21 @@ export class GameServer {
           Number.isFinite(msg.price)
         ) {
           sim.marketList(msg.item, msg.count, msg.price, pid);
+        }
+        break;
+      case 'market_list_instance':
+        // The instance object is only an equality needle: the sim re-resolves
+        // it against the sender's own bags and escrows the actual held copy's
+        // payload, so no wire-supplied field ever enters the book directly.
+        if (
+          typeof msg.item === 'string' &&
+          typeof msg.price === 'number' &&
+          Number.isFinite(msg.price) &&
+          typeof msg.instance === 'object' &&
+          msg.instance !== null &&
+          !Array.isArray(msg.instance)
+        ) {
+          sim.marketListInstance(msg.item, msg.price, msg.instance as ItemInstancePayload, pid);
         }
         break;
       case 'market_buy':

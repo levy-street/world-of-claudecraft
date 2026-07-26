@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -27,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "es_ES": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -44,6 +46,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "fr_FR": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -61,6 +64,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "fr_CA": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -79,6 +83,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -96,6 +101,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "de_DE": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -117,6 +123,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -135,6 +142,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -152,6 +160,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "nl_NL": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -169,6 +178,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "pl_PL": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -186,6 +196,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "id_ID": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -203,6 +214,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "tr_TR": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -220,6 +232,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "sv_SE": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -237,6 +250,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "vi_VN": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",
@@ -254,6 +268,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestSpecimenLine"
   ],
   "da_DK": [
+    "hud.errors.marketListBound",
     "hudChrome.crafting.craftedToastQty",
     "hudChrome.enchanting.disenchantedAlso",
     "hudChrome.enchanting.disenchantedAlsoQty",

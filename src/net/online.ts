@@ -3956,6 +3956,12 @@ export class ClientWorld implements IWorld {
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });
   }
+  marketListInstance(itemId: string, price: number, instance: ItemInstancePayload): void {
+    // The payload is a SELECTOR, not content: the server re-resolves it against
+    // the sender's own inventory and escrows the actual held copy, so nothing
+    // here can mint state.
+    this.cmd({ cmd: 'market_list_instance', item: itemId, price, instance });
+  }
   marketBuy(listingId: number): void {
     this.cmd({ cmd: 'market_buy', id: listingId });
   }

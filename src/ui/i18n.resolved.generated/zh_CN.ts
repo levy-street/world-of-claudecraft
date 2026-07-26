@@ -6242,7 +6242,8 @@ export const zh_CN: EnTranslations = {
       "tradeTooFar": "目标太远，无法交易。",
       "tradeExpired": "交易请求已过期。",
       "tradeFailed": "交易失败：物品或金钱已不可用。",
-      "tradeBound": "该物品已绑定，无法交易。"
+      "tradeBound": "该物品已绑定，无法交易。",
+      "marketListBound": "该物品已绑定，无法上架。"
     },
     "logs": {
       "standUp": "你站了起来。",
