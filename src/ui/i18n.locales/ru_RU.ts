@@ -13,12 +13,58 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.finder.raidRewards': 'Предпросмотр наград Никсраксиса',
+  'hudChrome.finder.raidRarityLine':
+    'Редкий {rare}% · Эпический {epic}% · Легендарный {legendary}%',
+  'hudChrome.finder.raidItemLevels':
+    'Уровень предмета: редкий {rare} · эпический {epic} · легендарный {legendary}',
+  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Фрагмент Бессмертия каждому участнику',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '+{fragments} Фрагмента Бессмертия и +{marks} Героических знака каждому участнику',
+  'hudChrome.finder.raidSignatures': 'Особые легендарные силы: {signatures}',
+  'heroicShop.tabsAria': 'Услуги интенданта',
+  'heroicShop.fragmentBalance': 'Фрагменты Бессмертия: {count}',
+  'heroicShop.tab.gear': 'Героическое снаряжение',
+  'heroicShop.tab.forge': 'Кузня Бессмертия',
+  'heroicShop.tab.tune': 'Настройка легендарного',
+  'heroicShop.gearIntro': 'Тратьте Героические знаки на обычный ассортимент интенданта.',
+  'heroicShop.tuneEmpty': 'В сумках нет подходящей легендарной вещи Никсраксиса.',
+  'heroicShop.heroicClearReady':
+    'Героическое убийство Никсраксиса подтверждено для текущей суточной блокировки.',
+  'heroicShop.heroicClearNeeded':
+    'Для героических целей требуется убийство Никсраксиса в текущей суточной блокировке.',
+  'heroicShop.itemLevel': 'Уровень предмета {level}',
+  'heroicShop.cost': '{fragments} Фрагментов Бессмертия · {marks} Героических знаков',
+  'heroicShop.randomAffixes': 'Случайные свойства и значения',
+  'heroicShop.deterministicStats': 'Фиксированная авторская награда',
+  'heroicShop.raidForgedGuarantee': 'Рейдовая ковка, гарантирован бросок из верхней половины',
+  'heroicShop.raidForged': 'Рейдовая ковка',
+  'heroicShop.raidDrop': 'Рейдовая легендарная награда Никсраксиса',
+  'heroicShop.reforgeCount': 'Настроек: {count}',
+  'heroicShop.forgeKind.normal_procedural': 'Обычный процедурный эпический предмет',
+  'heroicShop.forgeKind.heroic_procedural': 'Героический процедурный эпический предмет',
+  'heroicShop.forgeKind.signature': 'Особая героическая легендарная награда',
+  'heroicShop.forgeKind.authored': 'Авторская целевая награда',
+  'heroicShop.blocked.class': 'Не подходит вашему классу',
+  'heroicShop.blocked.heroic_clear': 'Требуется текущее героическое убийство Никсраксиса',
+  'heroicShop.blocked.fragments': 'Недостаточно Фрагментов Бессмертия',
+  'heroicShop.blocked.marks': 'Недостаточно Героических знаков',
+  'heroicShop.forgeConfirmTitle': 'Подтвердить ковку',
+  'heroicShop.forgeConfirmBody':
+    'Выковать {item} за {fragments} Фрагментов Бессмертия и {marks} Героических знаков? Сервер создаст предмет после проверки оплаты.',
+  'heroicShop.forgeConfirmAccept': 'Выковать',
+  'heroicShop.tuneConfirmTitle': 'Подтвердить настройку легендарного',
+  'heroicShop.tuneConfirmAccept': 'Настроить',
+  'heroicShop.status.pending': 'Ожидание ответа сервера…',
+  'heroicShop.status.gear': 'Покупка завершена. Баланс обновлён.',
+  'heroicShop.status.forge': 'Ковка завершена. Новая награда уже в сумках.',
+  'heroicShop.status.tune': 'Настройка завершена. Выбранный предмет и баланс обновлены.',
   'heroicShop.forgeIntro':
     'Выберите семейство награды и базовый предмет. Сервер определит случайные свойства только после проверки точного предложения и оплаты.',
   'heroicShop.tuneIntro':
     'Выберите точную легендарную вещь Никсраксиса в сумках. Сервер сделает два броска новой силы и сохранит лучший результат. Сила не снизится, но может не измениться.',
   'heroicShop.tuneConfirmBody':
-    'Настроить именно этот экземпляр {item} за {fragments} Фрагментов Бессмертных и {marks} Героических знаков? Сохранится лучший из двух бросков; сила не снизится, но может остаться прежней.',
+    'Настроить именно этот экземпляр {item} за {fragments} Фрагментов Бессмертия и {marks} Героических знаков? Сохранится лучший из двух бросков; сила не снизится, но может остаться прежней.',
   'hudChrome.finder.raidSharedDrop':
     'На последнем трупе появится один общий процедурный предмет, за который бросает весь рейд.',
   'hudChrome.finder.raidForgedLegendary':

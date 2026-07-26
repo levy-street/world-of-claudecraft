@@ -13,12 +13,58 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.finder.raidRewards': 'ニスラクシス報酬プレビュー',
+  'hudChrome.finder.raidRarityLine':
+    'レア {rare}% · エピック {epic}% · レジェンダリー {legendary}%',
+  'hudChrome.finder.raidItemLevels':
+    'アイテムレベル：レア {rare} · エピック {epic} · レジェンダリー {legendary}',
+  'hudChrome.finder.raidCurrenciesNormal': '参加者1人につき不死の欠片 +{fragments}個',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '参加者1人につき不死の欠片 +{fragments}個、英雄の証 +{marks}個',
+  'hudChrome.finder.raidSignatures': '固有レジェンダリー威力：{signatures}',
+  'heroicShop.tabsAria': '補給将校のサービス',
+  'heroicShop.fragmentBalance': '不死の欠片：{count}',
+  'heroicShop.tab.gear': '英雄級装備',
+  'heroicShop.tab.forge': '不死の鍛造所',
+  'heroicShop.tab.tune': 'レジェンダリー調整',
+  'heroicShop.gearIntro': '英雄の証を使って、補給将校の既存商品を購入します。',
+  'heroicShop.tuneEmpty': 'バッグ内に調整可能なニスラクシス製レジェンダリーがありません。',
+  'heroicShop.heroicClearReady':
+    '現在のデイリーロックアウトで英雄級ニスラクシスの討伐を確認済みです。',
+  'heroicShop.heroicClearNeeded':
+    '英雄級の対象には、現在のデイリーロックアウトでニスラクシスを討伐する必要があります。',
+  'heroicShop.itemLevel': 'アイテムレベル {level}',
+  'heroicShop.cost': '不死の欠片 {fragments}個 · 英雄の証 {marks}個',
+  'heroicShop.randomAffixes': 'ランダムな特性と数値',
+  'heroicShop.deterministicStats': '設計済み固定報酬',
+  'heroicShop.raidForgedGuarantee': 'レイド鍛造威力、上半分のロールを保証',
+  'heroicShop.raidForged': 'レイド鍛造',
+  'heroicShop.raidDrop': 'ニスラクシスのレイド・レジェンダリー',
+  'heroicShop.reforgeCount': '調整回数：{count}',
+  'heroicShop.forgeKind.normal_procedural': '通常級の手続き生成エピック',
+  'heroicShop.forgeKind.heroic_procedural': '英雄級の手続き生成エピック',
+  'heroicShop.forgeKind.signature': '英雄級固有レジェンダリー',
+  'heroicShop.forgeKind.authored': '設計済み対象報酬',
+  'heroicShop.blocked.class': 'あなたのクラスでは使用できません',
+  'heroicShop.blocked.heroic_clear': '現在の英雄級ニスラクシス討伐が必要です',
+  'heroicShop.blocked.fragments': '不死の欠片が足りません',
+  'heroicShop.blocked.marks': '英雄の証が足りません',
+  'heroicShop.forgeConfirmTitle': '鍛造の確認',
+  'heroicShop.forgeConfirmBody':
+    '{item}を不死の欠片{fragments}個と英雄の証{marks}個で鍛造しますか？レルムは支払いを検証した後にアイテムをロールします。',
+  'heroicShop.forgeConfirmAccept': '鍛造',
+  'heroicShop.tuneConfirmTitle': 'レジェンダリー調整の確認',
+  'heroicShop.tuneConfirmAccept': '調整',
+  'heroicShop.status.pending': 'レルムからの応答を待っています……',
+  'heroicShop.status.gear': '購入が完了し、残高を更新しました。',
+  'heroicShop.status.forge': '鍛造が完了し、新しい報酬がバッグに入りました。',
+  'heroicShop.status.tune': '調整が完了し、対象の個体と残高を更新しました。',
   'heroicShop.forgeIntro':
     '報酬の系統とベースアイテムを選択します。正確なオファーと支払いが検証された後にのみ、レルムがランダムな特性を決定します。',
   'heroicShop.tuneIntro':
     'バッグ内のニスラクシス製レジェンダリーを1個選択します。レルムは置換候補を2回ロールし、最良の結果を残します。威力は低下しませんが、変化しない場合があります。',
   'heroicShop.tuneConfirmBody':
-    '{item}のこの個体を、死なずの欠片{fragments}個と英雄の印{marks}個で調整しますか？2回のうち最良のロールが残り、威力は低下しませんが変化しない場合があります。',
+    '{item}のこの個体を、不死の欠片{fragments}個と英雄の証{marks}個で調整しますか？2回のうち最良のロールが残り、威力は低下しませんが変化しない場合があります。',
   'hudChrome.finder.raidSharedDrop':
     '最後の死体には、レイド全員でロールする共有の手続き生成アイテムが1個追加されます。',
   'hudChrome.finder.raidForgedLegendary':

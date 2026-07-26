@@ -13,12 +13,54 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.finder.raidRewards': '尼瑟拉克西斯奖励预览',
+  'hudChrome.finder.raidRarityLine': '稀有 {rare}% · 史诗 {epic}% · 传奇 {legendary}%',
+  'hudChrome.finder.raidItemLevels': '物品等级：稀有 {rare} · 史诗 {epic} · 传奇 {legendary}',
+  'hudChrome.finder.raidCurrenciesNormal': '每位参与者 +{fragments} 个不死碎片',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '每位参与者 +{fragments} 个不死碎片和 +{marks} 个英雄徽记',
+  'hudChrome.finder.raidSignatures': '专属传奇威能：{signatures}',
+  'heroicShop.tabsAria': '军需官服务',
+  'heroicShop.fragmentBalance': '不死碎片：{count}',
+  'heroicShop.tab.gear': '英雄装备',
+  'heroicShop.tab.forge': '不死锻炉',
+  'heroicShop.tab.tune': '传奇调校',
+  'heroicShop.gearIntro': '使用英雄徽记购买军需官现有库存。',
+  'heroicShop.tuneEmpty': '背包中没有可调校的尼瑟拉克西斯传奇物品。',
+  'heroicShop.heroicClearReady': '已确认本次每日锁定周期内完成英雄难度尼瑟拉克西斯。',
+  'heroicShop.heroicClearNeeded': '英雄目标需要在当前每日锁定周期内完成英雄难度尼瑟拉克西斯。',
+  'heroicShop.itemLevel': '物品等级 {level}',
+  'heroicShop.cost': '{fragments} 个不死碎片 · {marks} 个英雄徽记',
+  'heroicShop.randomAffixes': '随机词缀和数值',
+  'heroicShop.deterministicStats': '固定设计奖励',
+  'heroicShop.raidForgedGuarantee': '团队锻造威能，保证上半区数值',
+  'heroicShop.raidForged': '团队锻造',
+  'heroicShop.raidDrop': '尼瑟拉克西斯团队传奇物品',
+  'heroicShop.reforgeCount': '调校次数：{count}',
+  'heroicShop.forgeKind.normal_procedural': '普通难度随机生成史诗',
+  'heroicShop.forgeKind.heroic_procedural': '英雄难度随机生成史诗',
+  'heroicShop.forgeKind.signature': '英雄难度专属传奇',
+  'heroicShop.forgeKind.authored': '固定设计目标奖励',
+  'heroicShop.blocked.class': '与你的职业不兼容',
+  'heroicShop.blocked.heroic_clear': '需要当前英雄难度尼瑟拉克西斯通关',
+  'heroicShop.blocked.fragments': '不死碎片不足',
+  'heroicShop.blocked.marks': '英雄徽记不足',
+  'heroicShop.forgeConfirmTitle': '确认锻造',
+  'heroicShop.forgeConfirmBody':
+    '要花费 {fragments} 个不死碎片和 {marks} 个英雄徽记锻造 {item} 吗？服务器会在验证付款后随机生成该物品。',
+  'heroicShop.forgeConfirmAccept': '锻造',
+  'heroicShop.tuneConfirmTitle': '确认传奇调校',
+  'heroicShop.tuneConfirmAccept': '调校',
+  'heroicShop.status.pending': '正在等待服务器……',
+  'heroicShop.status.gear': '购买完成，余额已刷新。',
+  'heroicShop.status.forge': '锻造完成，新奖励已放入背包。',
+  'heroicShop.status.tune': '调校完成，指定物品和余额已刷新。',
   'heroicShop.forgeIntro':
     '选择奖励类别和基础物品。服务器只会在验证具体兑换项目和付款后，才随机生成词缀与数值。',
   'heroicShop.tuneIntro':
     '从背包中选择一件具体的尼瑟拉克西斯传奇物品。服务器会生成两次替换威能并保留较优结果。威能不会降低，但也可能没有变化。',
   'heroicShop.tuneConfirmBody':
-    '要花费{fragments}个不朽碎片和{marks}个英雄印记调校这件具体的{item}吗？系统会保留两次结果中较好的一次；威能不会降低，但可能保持不变。',
+    '要花费{fragments}个不死碎片和{marks}个英雄徽记调校这件具体的{item}吗？系统会保留两次结果中较好的一次；威能不会降低，但可能保持不变。',
   'hudChrome.finder.raidSharedDrop':
     '最终首领的尸体会额外提供一件由整个团队共同掷骰的随机生成物品。',
   'hudChrome.finder.raidForgedLegendary':
