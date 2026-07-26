@@ -18,6 +18,7 @@ import {
   instanceBonusStatLines,
   instanceMakersMarkLine,
   isGatheredProvenanceKind,
+  itemAdaptiveNumber,
   itemNumber,
   itemStatName,
   wornTooltipInstance,
@@ -25,6 +26,13 @@ import {
 import { svgIcon } from '../src/ui/ui_icons';
 
 describe('item_instance_tooltip', () => {
+  it('keeps effective Legendary fractions without padding whole values', () => {
+    expect(itemAdaptiveNumber(20)).toBe('20');
+    expect(itemAdaptiveNumber(19.5)).toBe('19.5');
+    expect(itemAdaptiveNumber(13.65)).toBe('13.65');
+    expect(itemAdaptiveNumber(1.2349)).toBe('1.235');
+  });
+
   it('masterwork copy gets the gold seal and no enchanted marker', () => {
     const html = instanceBadgeLines({
       signer: 'Anna',

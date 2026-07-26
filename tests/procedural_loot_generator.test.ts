@@ -11,6 +11,7 @@ import {
   PROCEDURAL_RARITIES,
 } from '../src/sim/content/procedural_loot';
 import { PROCEDURAL_BASE_ITEMS } from '../src/sim/content/procedural_loot/item_defs';
+import { legendaryPowerEffectiveness } from '../src/sim/equipment/legendary_item_level';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import {
   calculateProceduralBudget,
@@ -182,6 +183,28 @@ describe('procedural item generator', () => {
     }
     expect(scenarios).toBe(288);
     expect(Object.keys(PROCEDURAL_LEGENDARY_POWERS)).toHaveLength(12);
+  });
+
+  it('keeps level-five Legendaries source-tiered instead of granting endgame power', () => {
+    for (let seed = 1; seed <= 64; seed++) {
+      const dropContext = context(seed, 1);
+      const item = generateProceduralItem({
+        seed: deriveProceduralItemSeed(seed, dropContext),
+        uid: `pi1:low-level-legendary:${seed}`,
+        context: dropContext,
+        basePoolId: 'initial_world',
+        rarityTableId: 'initial_world',
+        sourceItemLevel: 5,
+        forcedBaseId: 'iron_broadsword',
+        forcedRarity: 'legendary',
+        personalLootClass: 'warrior',
+      }).instance.procedural;
+
+      expect(item.itemLevel).toBeGreaterThanOrEqual(6);
+      expect(item.itemLevel).toBeLessThanOrEqual(8);
+      expect(legendaryPowerEffectiveness(item.itemLevel)).toBeGreaterThanOrEqual(0.3);
+      expect(legendaryPowerEffectiveness(item.itemLevel)).toBeLessThanOrEqual(0.4);
+    }
   });
 
   it('rejects impossible forced item levels and preserves feasible forced draws', () => {

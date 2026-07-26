@@ -127,6 +127,7 @@ describe('procedural item presentation', () => {
 
   it('uses the legendary power name as the unique item name', () => {
     const instance = payload('legendary', {
+      itemLevel: 20,
       legendaryPowerId: 'greyjaws_edge',
       powerRevision: 1,
       legendaryRolls: { potencyPct: 39 },
@@ -147,6 +148,42 @@ describe('procedural item presentation', () => {
         },
       ],
     });
+  });
+
+  it('shows the effective item-level-scaled Legendary roll and range', () => {
+    const instance = payload('legendary', {
+      itemLevel: 10,
+      legendaryPowerId: 'greyjaws_edge',
+      powerRevision: 1,
+      legendaryRolls: { potencyPct: 39 },
+    });
+    expect(proceduralLegendaryPresentation(instance)).toMatchObject({
+      rolls: { potencyPct: 39 },
+      rollDetails: [
+        {
+          key: 'potencyPct',
+          value: 19.5,
+          min: 19,
+          max: 20,
+          step: 0.5,
+          unit: 'percent',
+        },
+      ],
+    });
+  });
+
+  it('round-trips an existing low-level Legendary raw roll while presenting scaled power', () => {
+    const existing = payload('legendary', {
+      itemLevel: 10,
+      legendaryPowerId: 'greyjaws_edge',
+      powerRevision: 1,
+      legendaryRolls: { potencyPct: 39 },
+    });
+    const reloaded = JSON.parse(JSON.stringify(existing)) as ItemInstancePayload;
+
+    expect(reloaded).toEqual(existing);
+    expect(reloaded.procedural?.legendaryRolls).toEqual({ potencyPct: 39 });
+    expect(proceduralLegendaryPresentation(reloaded)?.rollDetails[0]?.value).toBe(19.5);
   });
 
   it('sorts implicit and explicit stat lines deterministically', () => {

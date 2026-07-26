@@ -81,6 +81,24 @@ describe('procedural legendary balance campaign', () => {
     });
 
     expect(report.gateFailures).toEqual([]);
+    const leveling = report.rows.find(
+      (row) =>
+        row.powerId === 'crown_last_pyre' &&
+        row.playerClass === 'mage' &&
+        row.profileId === 'fresh_l10',
+    );
+    expect(leveling?.sustainedDamagePct.minimum).toBeLessThan(8);
+    expect(leveling?.sustainedDamageGatePass).toBe(true);
+
+    const endgame = report.rows.find(
+      (row) =>
+        row.powerId === 'crown_last_pyre' &&
+        row.playerClass === 'mage' &&
+        row.profileId === 'pre_raid_l20',
+    );
+    expect(endgame?.sustainedDamagePct.minimum).toBeGreaterThanOrEqual(8);
+    expect(endgame?.sustainedDamagePct.maximum).toBeLessThanOrEqual(15);
+    expect(endgame?.sustainedDamageGatePass).toBe(true);
   });
 
   it('makes release enforcement fail closed on sample, coverage, and contribution gaps', () => {

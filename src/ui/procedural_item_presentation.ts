@@ -1,5 +1,6 @@
 import { PROCEDURAL_LEGENDARY_POWERS } from '../sim/content/procedural_legendary_powers';
 import { PROCEDURAL_AFFIXES } from '../sim/content/procedural_loot/affixes';
+import { scaleLegendaryPowerValue } from '../sim/equipment/legendary_item_level';
 import { proceduralQuality, type RolledAffix } from '../sim/procedural_item';
 import type { PublicItemInstanceView } from '../sim/procedural_item_public';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
@@ -159,6 +160,10 @@ function legendaryRollUnit(key: string): ProceduralLegendaryRollPresentation['un
   return 'number';
 }
 
+function presentedLegendaryRoll(value: number, itemLevel: number): number {
+  return Number(scaleLegendaryPowerValue(value, itemLevel).toFixed(3));
+}
+
 export function proceduralLegendaryPresentation(
   instance?: ItemPresentationInstance,
 ): ProceduralLegendaryPresentation | undefined {
@@ -181,10 +186,10 @@ export function proceduralLegendaryPresentation(
       return [
         {
           key,
-          value,
-          min: range.min,
-          max: range.max,
-          step: range.step,
+          value: presentedLegendaryRoll(value, procedural.itemLevel),
+          min: presentedLegendaryRoll(range.min, procedural.itemLevel),
+          max: presentedLegendaryRoll(range.max, procedural.itemLevel),
+          step: presentedLegendaryRoll(range.step, procedural.itemLevel),
           unit: legendaryRollUnit(key),
         },
       ];

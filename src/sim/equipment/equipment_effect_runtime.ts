@@ -9,6 +9,7 @@ import {
   type EquippedPowerCandidate,
   MAX_EQUIPMENT_PROC_DEPTH,
 } from './equipment_effect_types';
+import { scaleLegendaryPowerValue } from './legendary_item_level';
 
 interface PowerRuntimeState {
   eligibleEvents: number;
@@ -56,7 +57,7 @@ function resolveMagnitude(
   value *= classMultiplier;
   if (magnitude.minimum !== undefined) value = Math.max(value, magnitude.minimum);
   if (magnitude.maximum !== undefined) value = Math.min(value, magnitude.maximum);
-  return value;
+  return scaleLegendaryPowerValue(value, power.itemLevel);
 }
 
 function crossedHealthThreshold(

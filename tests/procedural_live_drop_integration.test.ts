@@ -6,7 +6,7 @@ import { canEquipItem } from '../src/sim/equipment_rules';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { appendLiveProceduralDrop, proceduralLootSourceEligible } from '../src/sim/loot/loot_roll';
 import { Sim } from '../src/sim/sim';
-import type { Entity, MobTemplate } from '../src/sim/types';
+import { type Entity, type LootSlot, MAX_LEVEL, type MobTemplate } from '../src/sim/types';
 
 const rareTemplate = Object.values(MOBS).find(
   (template) => template.maxLevel >= 5 && template.rare && !template.worldBoss,
@@ -102,6 +102,42 @@ describe('live procedural loot roll integration', () => {
     expect(new Set(sourceSequences).size).toBe(sourceSequences.length);
   });
 
+  it('suppresses procedural gear for an all-gray group and preserves at-level drops', () => {
+    const { sim, pid, meta, makeMob } = setup(71_005);
+    const mob = makeMob(rareTemplate);
+    mob.level = 5;
+
+    sim.setPlayerLevel(MAX_LEVEL, pid);
+    sim.ctx.rollLoot(mob, meta, [meta]);
+    expect(proceduralSlot(mob)).toBeUndefined();
+
+    sim.setPlayerLevel(5, pid);
+    mob.loot = null;
+    sim.ctx.rollLoot(mob, meta, [meta]);
+    const procedural = proceduralSlot(mob)?.instance?.procedural;
+    expect(procedural?.uid).toBe('pi1:live_int:1000');
+    expect(procedural?.itemLevel).toBeGreaterThanOrEqual(4);
+    expect(procedural?.itemLevel).toBeLessThanOrEqual(8);
+  });
+
+  it('allows source-tier loot for a mixed group with an at-level participant', () => {
+    const { sim, pid, meta, makeMob } = setup(71_006);
+    const atLevelPid = sim.addPlayer('mage', 'At-level Recipient');
+    const atLevelMeta = sim.ctx.players.get(atLevelPid);
+    if (!atLevelMeta) throw new Error('expected at-level recipient metadata');
+    sim.setPlayerLevel(MAX_LEVEL, pid);
+    sim.setPlayerLevel(5, atLevelPid);
+    const mob = makeMob(rareTemplate);
+    mob.level = 5;
+
+    sim.ctx.rollLoot(mob, meta, [meta, atLevelMeta]);
+
+    const procedural = proceduralSlot(mob)?.instance?.procedural;
+    expect(procedural).toBeDefined();
+    expect(procedural?.itemLevel).toBeGreaterThanOrEqual(4);
+    expect(procedural?.itemLevel).toBeLessThanOrEqual(8);
+  });
+
   it('fails closed for unregistered, summoned, developer, affix, world boss, and dummy sources', () => {
     const { sim, pid, makeMob } = setup();
     const unregistered = makeMob(rareTemplate, false);
@@ -128,9 +164,11 @@ describe('live procedural loot roll integration', () => {
     const replay = setup(7788);
     const mob = first.makeMob(rareTemplate);
     replay.makeMob(rareTemplate);
+    const items: LootSlot[] = [];
 
-    appendLiveProceduralDrop(first.sim.ctx, mob, rareTemplate, []);
+    appendLiveProceduralDrop(first.sim.ctx, mob, rareTemplate, items, [first.meta]);
 
+    expect(items).toHaveLength(1);
     expect(first.sim.ctx.rng.next()).toBe(replay.sim.ctx.rng.next());
   });
 

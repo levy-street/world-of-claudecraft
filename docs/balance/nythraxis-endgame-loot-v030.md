@@ -285,15 +285,22 @@ stale-click losses, injected offer IDs, and tune-by-display-name ambiguity.
 
 ## Existing items and save compatibility
 
-Existing items remain exactly as they are when this release is deployed.
+Existing item identity and stored rolls remain exactly as they are when this
+release is deployed.
 
 - No authored item is converted into a procedural item.
-- No existing affix, Legendary magnitude, enchant, signature, or binding is
+- No existing affix, raw Legendary roll, enchant, signature, or binding is
   rerolled.
 - Legacy quality, rolled-stat, and masterwork payloads remain valid.
 - New `raidForged` and `reforgeCount` fields are optional and allowlisted.
-- An old procedural item without those fields keeps its old behavior and art.
+- An old procedural item without those fields keeps its identity, stored data,
+  and art.
 - Exact numeric rolls are persisted rather than recomputed from live tables.
+- The global anti-low-level-farming rule deliberately scales the displayed and
+  runtime magnitude of an already-owned procedural Legendary below item level
+  20 by `min(1, item level / 20)` while leaving its raw roll untouched.
+- Nythraxis Legendary drops are item level 32 or 36, so their powers remain at
+  full effectiveness and are unaffected by that rule.
 - Corrupt payloads and duplicate procedural UIDs fail closed.
 
 There is no destructive migration and no background normalization pass.

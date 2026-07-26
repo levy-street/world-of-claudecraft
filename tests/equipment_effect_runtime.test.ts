@@ -297,6 +297,34 @@ describe('equipment effect cadence and command projection', () => {
     });
   });
 
+  it('scales rolled and flat Legendary magnitudes by item level up to the cap', () => {
+    const definition = PROCEDURAL_LEGENDARY_POWERS.greyjaws_edge;
+    const runtime = new EquipmentEffectRuntime(PROCEDURAL_LEGENDARY_POWERS, () => 0);
+    const power = {
+      ...activePower(definition),
+      itemLevel: 10,
+      rolls: { potencyPct: 38 },
+    };
+    const event = matchingEvent(definition);
+    runtime.evaluate(power, event);
+    runtime.evaluate(power, { ...event, nowMs: event.nowMs + 1 });
+    const result = runtime.evaluate(power, { ...event, nowMs: event.nowMs + 2 });
+
+    expect(result.commands[0]?.magnitude).toBeCloseTo(0.19);
+    expect(result.commands[1]?.magnitude).toBeCloseTo(2);
+
+    const cappedRuntime = new EquipmentEffectRuntime(PROCEDURAL_LEGENDARY_POWERS, () => 0);
+    const capped = { ...power, itemLevel: 36 };
+    cappedRuntime.evaluate(capped, event);
+    cappedRuntime.evaluate(capped, { ...event, nowMs: event.nowMs + 1 });
+    const cappedResult = cappedRuntime.evaluate(capped, {
+      ...event,
+      nowMs: event.nowMs + 2,
+    });
+    expect(cappedResult.commands[0]?.magnitude).toBeCloseTo(0.38);
+    expect(cappedResult.commands[1]?.magnitude).toBeCloseTo(4);
+  });
+
   it('applies authored class magnitude multipliers only to the matching class', () => {
     const definition = PROCEDURAL_LEGENDARY_POWERS.bell_of_the_ninth_peal;
     const mageRuntime = new EquipmentEffectRuntime(PROCEDURAL_LEGENDARY_POWERS, () => 0);

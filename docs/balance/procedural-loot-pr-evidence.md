@@ -37,6 +37,23 @@ more likely without eliminating off-class or tradeable results.
 
 Authored and Heroic loot rolls first. Procedural loot is additive.
 
+### Can a max-level player farm low-level monsters for the same gear?
+
+No. Two independent controls close that route:
+
+1. If every eligible recipient is grey to the monster under the existing XP
+   curve, no procedural entry is appended. At level 20, monsters at level 12 or
+   below are grey. A level-20 player killing a level-5 monster therefore has a
+   zero percent procedural and Legendary chance from this system.
+2. Eligible drops always use the monster's level, never the player's level. A
+   level-5 source can only create item levels 4 through 6 normally, 5 through 7
+   for Epic, or 6 through 8 for Legendary. Every Legendary effect magnitude is
+   multiplied by `min(1, item level / 20)`, so that level-5 Legendary operates
+   at only 30% through 40% of its endgame magnitude.
+
+A mixed party with an at-level recipient may still see the shared drop, but it
+remains low-level and low-power. Authored legacy loot remains unchanged.
+
 ### What are the exact Legendary chances?
 
 - Ordinary outdoor mob: 0.001% per eligible kill, or 1 in 100,000.
@@ -122,17 +139,28 @@ better item immediately.
 
 ### What happens to existing items and saves?
 
-Existing items stay exactly as they are.
+Existing item identity and stored rolls stay exactly as they are; one deliberate
+combat-balance rule applies to already-owned low-item-level procedural
+Legendaries.
 
 - No authored item is converted to a procedural item.
 - No existing rolled stat is rerolled.
 - Legacy quality, stats, and masterwork payloads remain supported.
 - Authored definition stats, legacy rolled stats, enchants, signing, binding,
   and procedural fields coexist through explicit allowlisted payload fields.
-- Existing numeric rolls remain final even if content tables change later.
+- A procedural copy keeps its UID, seed, base, item level, affixes, raw power
+  rolls, enchant, signature, and binding through save and reconnect.
+- Authored/static items and procedural Legendaries at item level 20 or above
+  retain their previous combat behavior.
+- An already-owned procedural Legendary below item level 20 keeps its raw roll,
+  but its displayed and runtime magnitude is now multiplied by
+  `min(1, item level / 20)`. This is the intentional anti-low-level-farming
+  rule, not a reroll or payload migration.
+- Nythraxis procedural Legendaries are above item level 20, so this effectiveness
+  rule does not reduce them.
 - Corrupt new payloads and duplicate UIDs fail closed at load or grant.
 
-This is an additive item format, not a destructive migration.
+This is an additive item format with no destructive data migration.
 
 ## Balance controls
 
@@ -151,6 +179,8 @@ Legendary combat power is controlled by:
 
 - exact class and base compatibility
 - revisioned, quantized roll ranges
+- an item-level effectiveness multiplier of `min(1, item level / 20)`
+- effective scaled roll values and ranges in the tooltip
 - deterministic trigger cadence, chance, and internal cooldowns
 - one active Legendary power per character
 - a fail-closed 33,000,000-event contribution gate
@@ -209,7 +239,7 @@ The most recently recorded release-sized campaign used:
 - 100,000 events at each persisted roll edge
 - 33,000,000 total events
 
-A complete campaign produced fingerprint `30e920f9`, full row coverage, and no
+A complete campaign produced fingerprint `f13a0ddb`, full row coverage, and no
 gate failures. Release acceptance reruns the same fail-closed command
 at the exact candidate SHA:
 
@@ -218,12 +248,17 @@ npm run loot:balance
 ```
 
 This primary command always enforces. `npm run loot:balance:report` is the
-explicit non-enforcing report command. Bell retains a persisted 25% to 29%
-roll and applies a documented 2.2x Paladin hybrid coefficient, producing a
-55% to 63.8% triggering-spell magnitude for Paladins.
+explicit non-enforcing report command. The campaign runs item-level 10 and 15
+profiles through the shipped effectiveness multiplier and keeps the item-level
+20, 25, and 26 profiles at full power. All profiles remain under the 15%
+sustained and 25% burst ceilings; the 8% build-value floor applies only at full
+power. Bell retains a persisted 25% to 29% roll and applies a documented 2.2x
+Paladin hybrid coefficient, producing a 55% to 63.8% triggering-spell magnitude
+for full-power Paladin copies.
 
-Its five Paladin profiles measured 9.314% to 11.681% sustained contribution
-and at most 14.802% in the 10-second burst window.
+Its three full-power Paladin profiles measured 9.314% to 11.681% sustained
+contribution and at most 14.802% in the 10-second burst window. Lower-item-level
+profiles are intentionally weaker.
 
 The PR records the exact candidate SHA and resulting fingerprint.
 
@@ -323,6 +358,8 @@ tracked files from this manifest.
 - Shared boss corpse, not one personal roll per player.
 - Boss targeting is strong but not exclusive.
 - Smart loot is a weight, not a guarantee.
+- Eligible near-level sources can still drop a Legendary, but its item level and
+  power remain source-tiered; fully grey sources do not roll this layer.
 - The contribution harness is not a full encounter or economy simulator.
 - The icon catalog covers the release rarity and named-Legendary states, but
   does not model every possible affix combination as separate artwork.

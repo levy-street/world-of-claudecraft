@@ -136,6 +136,13 @@ finite data vocabulary, simulation time for internal cooldowns, and a maximum
 proc depth of four. Proc-created damage does not recursively trigger equipment
 effects unless a power explicitly opts in.
 
+The additive procedural entry is suppressed when every eligible recipient is
+grey to the source under the existing XP curve. Eligible items derive level
+from the source, never the player. Legendary effect magnitudes scale by
+`min(1, item level / 20)`, reaching full authored strength at item level 20.
+This keeps leveling signatures exciting without making low-level bosses an
+endgame-strength farm.
+
 ## Delivery slices
 
 ### Slice 1: schema and deterministic generator

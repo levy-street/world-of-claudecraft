@@ -49,6 +49,13 @@ A source must:
 - not be spawned by a delve affix
 - not be a world boss or training dummy
 
+The live integration also applies the existing XP-grey rule to the eligible
+group. If every eligible recipient would receive zero XP from the source, the
+additive procedural entry is suppressed before a UID or rarity roll is
+allocated. Authored loot still rolls normally. A mixed party with at least one
+at-level recipient remains eligible, but the resulting item still scales from
+the monster rather than the highest-level player.
+
 Source routing after those guards:
 
 | Source | Procedural entry chance | Conditional rarity table |
@@ -109,6 +116,11 @@ The effective Legendary expectations are therefore:
 - Nythraxis Heroic: 1 in 20 eligible kills
 
 These are independent configured rolls. They are not guarantees.
+
+The table describes eligible, non-grey kills. A solo level-20 character receives
+no procedural entry from a level-5 monster, so the effective procedural and
+Legendary chances for that kill are both zero. At level 20 the existing XP curve
+marks monsters at level 12 or below as grey.
 
 ## Boss-kill tails and grind expectations
 
@@ -196,6 +208,22 @@ currently at base selection only.
 Variance is one of `-1`, `0`, or `1`. The Epic rarity bonus is `+1`, the
 Legendary bonus is `+2`, and all other rarities have no bonus. The result is
 clamped to item level 1 through 40.
+
+The player level is never substituted for the source level. For example, an
+eligible level-5 source produces item levels 4 through 6 for Common, Magic, and
+Rare items, 5 through 7 for Epic items, and 6 through 8 for Legendary items.
+It cannot produce a level-20-equivalent item.
+
+Every Legendary effect magnitude is additionally multiplied by:
+
+`min(1, item level / 20)`
+
+This applies to percentage, duration, resource, shield, healing, and damage
+magnitudes. Trigger cadence, proc chance, internal cooldown, and the one-power
+cap do not change. Item levels 20 and above receive the full authored power; a
+level-5 source's item-level 6 through 8 Legendary receives 30% through 40% of
+that magnitude. The tooltip shows this effective scaled value and range, while
+the raw quantized roll remains persisted for deterministic tuning and save/load.
 
 Live drops have an outer source-level gate of 5. Development-only forced item
 levels are truncated and clamped to 1 through 40, but they still have to reach
@@ -347,6 +375,11 @@ Existing authored and legacy items are not converted or rerolled.
   multi-count procedural copies are rejected.
 - Persisted numeric rolls remain final. Later table tuning does not reroll an
   existing copy.
+- The raw power roll of an existing procedural Legendary also remains final.
+  Its displayed and runtime magnitude follows the global item-level
+  effectiveness rule, so a copy below item level 20 is deliberately scaled by
+  `min(1, item level / 20)` after this update while item-level-20+ copies are
+  unchanged.
 
 This is additive migration behavior: old items remain old items, and newly
 dropped procedural items carry the new versioned payload.

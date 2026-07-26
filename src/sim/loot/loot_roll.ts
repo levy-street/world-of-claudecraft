@@ -53,7 +53,7 @@ import type {
   LootStrategies,
   MasterLootThreshold,
 } from '../types';
-import { dist2d, PARTY_XP_RANGE } from '../types';
+import { dist2d, mobXpValue, PARTY_XP_RANGE } from '../types';
 import {
   canFitExactLootSlot,
   grantExactLootSlot,
@@ -366,6 +366,18 @@ export function appendLiveProceduralDrop(
   eligibleRecipients: readonly PlayerMeta[] = [],
 ): void {
   if (!proceduralLootSourceEligible(ctx, mob, template)) return;
+  // Gray-content anti-farm gate. Authored loot remains untouched, but the
+  // additive procedural slot is suppressed when every eligible recipient is
+  // too far above the source to earn XP. A mixed party with any at-level
+  // recipient keeps the drop; its item level and Legendary power still scale
+  // from the monster, never from the highest player.
+  if (
+    !eligibleRecipients.some((recipient) => {
+      const entity = ctx.entities.get(recipient.entityId);
+      return entity !== undefined && mobXpValue(mob.level, entity.level) > 0;
+    })
+  )
+    return;
   const sourceInstance = ctx.instances.find(
     (instance) => instance.partyKey !== null && instance.mobIds.includes(mob.id),
   );

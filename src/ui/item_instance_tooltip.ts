@@ -44,6 +44,15 @@ export function itemNumber(value: number, fractionDigits = 0): string {
   });
 }
 
+/** Localized precision for effective Legendary rolls: preserve meaningful
+ * fractional scaling while keeping whole values compact. */
+export function itemAdaptiveNumber(value: number): string {
+  return formatNumber(value, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 3,
+  });
+}
+
 /** The WORN-slot tooltip payload (Professions 2.0 + procedural loot): exactly the
  *  fields the public eqi wire carries (signer/enchant/rolled/procedural, the
  *  worn-identity trim), so the offline paperdoll and the online mirror

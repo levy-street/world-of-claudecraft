@@ -374,6 +374,7 @@ import {
   instanceBindingLines,
   instanceBonusStatLines,
   instanceMakersMarkLine,
+  itemAdaptiveNumber,
   itemNumber,
   itemStatName,
 } from './item_instance_tooltip';
@@ -4838,12 +4839,12 @@ export class Hud {
           const suffix = roll.unit === 'percent' ? '%' : roll.unit === 'milliseconds' ? ' ms' : '';
           const range = `<span class="tt-roll-range" aria-label="${esc(
             t('itemUi.procedural.rollRangeAria', {
-              min: itemNumber(roll.min),
-              max: itemNumber(roll.max),
+              min: itemAdaptiveNumber(roll.min),
+              max: itemAdaptiveNumber(roll.max),
             }),
-          )}"> [${itemNumber(roll.min)}-${itemNumber(roll.max)}${suffix}]</span>`;
+          )}"> [${itemAdaptiveNumber(roll.min)}-${itemAdaptiveNumber(roll.max)}${suffix}]</span>`;
           return `<span class="tt-legendary-roll">${esc(
-            t(key, { value: itemNumber(roll.value) }),
+            t(key, { value: itemAdaptiveNumber(roll.value) }),
           )}${range}</span>`;
         })
         .join('');

@@ -40,6 +40,11 @@ effective 0.04% Legendary chance. Ordinary outdoor mobs use a 0.02%
 conditional Legendary weight behind a 5% entry gate, for an effective 0.001%
 chance.
 
+Those rates apply only when at least one eligible recipient is not grey to the
+source under the existing XP curve. If every eligible recipient would receive
+zero XP, the additive procedural entry is suppressed and its effective
+Legendary chance is zero. Authored loot is not changed by this guard.
+
 See `docs/balance/procedural-loot-generator-v1.md` for the full effective
 probability table and cumulative 2% boss-kill tails.
 
@@ -107,10 +112,39 @@ weapon, or ranged weapon. The generator and persisted-item validator call the
 same compatibility function. Paladins retain the canonical caster-weapon and
 caster-offhand proficiency. Because a Paladin's representative damage mix has
 a much smaller spell channel than a full caster, Bell applies an explicitly
-authored 2.2x Paladin magnitude coefficient. The persisted and tooltip roll
-remains 25% to 29%; the Paladin runtime magnitude is therefore 55% to 63.8% of
-the triggering spell. This is class normalization for the neutral power, not a
-hidden reroll, and all other classes continue to use a 1x coefficient.
+authored 2.2x Paladin magnitude coefficient. The raw persisted roll remains 25%
+to 29% at every item level. At item level 20 or above, the tooltip also displays
+25% to 29% and the Paladin runtime magnitude is therefore 55% to 63.8% of the
+triggering spell. Below item level 20, both the displayed roll and runtime
+magnitude are additionally multiplied by `item level / 20`. This is class
+normalization for the neutral power, not a hidden reroll, and all other classes
+continue to use a 1x coefficient.
+
+## Item-level power effectiveness
+
+The raw power roll remains canonical, quantized, and persisted. Runtime effect
+magnitude and the tooltip's displayed roll and possible range are multiplied by:
+
+`min(1, item level / 20)`
+
+This prevents a fast low-level signature boss from supplying an endgame-strength
+copy of the same named power. Every magnitude is covered, including percentages,
+silence duration, flat resource, shield, healing, and damage. Trigger cadence,
+proc chance, fixed buff duration, internal cooldown, and the one-active-power
+cap are unchanged.
+
+Examples using Greyjaw's Edge's raw 39% roll and 4-resource restoration:
+
+| Item level | Effectiveness | Effective damage roll | Effective resource |
+| ---: | ---: | ---: | ---: |
+| 7 | 35% | 13.65% | 1.4 |
+| 10 | 50% | 19.5% | 2 |
+| 20 or higher | 100% | 39% | 4 |
+
+An eligible level-5 Legendary is item level 6 through 8 and therefore operates
+at 30% through 40% effectiveness. Item-level 20 and endgame raid Legendaries use
+the full authored magnitude, so the release contribution simulations remain
+representative of endgame play.
 
 ## Can the same Legendary be good or bad?
 
@@ -129,9 +163,11 @@ rolls use a 50% floor within each available tier, so a low Legendary roll is
 bounded away from the weakest half of that tier but can still be materially
 worse than a high roll.
 
-The normal tooltip shows the current persisted power roll. The alternate
-detail view shows the possible range. This supports both immediate readability
-and an endgame chase for a better copy of a familiar power.
+The normal tooltip shows the effective item-level-scaled power roll. The
+alternate detail view shows the effective scaled range. The raw roll remains
+persisted for deterministic tuning and save/load. This supports immediate
+readability, prevents a low-level copy from masquerading as an endgame one, and
+preserves the chase for a better copy of a familiar power.
 
 ## One active Legendary power
 
@@ -194,16 +230,19 @@ Measured channels remain separate:
 - peak conditional haste
 - trigger rate and RNG draw count
 
-Direct sustained single-target damage powers must remain between 8% and 15%
-contribution, with no more than 25% in the intended 10-second burst window.
-Kill-conditioned, cleave, healing, mitigation, resource, control, and mobility
-powers are reported in their own units instead of being mislabeled as failed
-boss DPS.
+At full power, direct sustained single-target damage powers must remain between
+8% and 15% contribution, with no more than 25% in the intended 10-second burst
+window. The 8% build-value floor starts at item level 20. Leveling profiles are
+intentionally allowed below that floor because their runtime magnitude is
+source-tiered, but the 15% sustained ceiling and 25% burst ceiling still apply
+to every profile. Kill-conditioned, cleave, healing, mitigation, resource,
+control, and mobility powers are reported in their own units instead of being
+mislabeled as failed boss DPS.
 
 ## Most recently recorded release-sized result
 
 The last recorded 33,000,000-event campaign used seed `32106458`. A complete
-run produced fingerprint `30e920f9` with no gate failures. These
+run produced fingerprint `f13a0ddb` with no gate failures. These
 are recorded measurements, not authored constants.
 
 The primary `npm run loot:balance` command now always enforces the release
@@ -214,14 +253,15 @@ instead of silently falling back to release defaults. The final PR must rerun
 `npm run loot:balance` at the exact candidate SHA before claiming final
 balance signoff.
 
-Recorded direct-damage results:
+Recorded full-power direct-damage results, limited to item-level 20, 25, and 26
+profiles:
 
 | Power | Sustained minimum | Sustained maximum | Highest 10-second burst |
 | --- | ---: | ---: | ---: |
-| Crown of the Last Pyre | 8.118% | 11.127% | 19.027% |
-| Greyjaw's Edge | 9.121% | 11.025% | 23.784% |
+| Crown of the Last Pyre | 8.118% | 10.326% | 14.391% |
+| Greyjaw's Edge | 9.502% | 11.025% | 20.930% |
 | Ashbinder's Seal | 8.550% | 11.400% | 14.288% |
-| Bell of the Ninth Peal | 8.752% | 14.751% | 18.162% |
+| Bell of the Ninth Peal | 8.752% | 14.165% | 17.950% |
 
 Nightglass Fang is kill-conditioned. Its recorded highest add-cycle burst was
 4.592%, below the 25% ceiling, and it contributes zero in a pure boss phase
@@ -231,33 +271,35 @@ Recorded Bell class coverage:
 
 | Class | Sustained minimum | Sustained maximum | Highest 10-second burst |
 | --- | ---: | ---: | ---: |
-| Priest | 9.707% | 13.013% | 16.490% |
+| Priest | 11.011% | 13.013% | 16.490% |
 | Paladin | 9.314% | 11.681% | 14.802% |
-| Shaman | 9.864% | 12.607% | 15.522% |
-| Mage | 11.531% | 14.751% | 18.162% |
-| Warlock | 11.374% | 14.218% | 17.950% |
+| Shaman | 9.951% | 11.957% | 14.827% |
+| Mage | 11.531% | 13.861% | 17.349% |
+| Warlock | 11.713% | 14.165% | 17.950% |
 | Druid | 8.752% | 10.940% | 13.863% |
 
-Recorded non-DPS opportunity ranges:
+Recorded non-DPS opportunity ranges across all five profiles. Their reduced
+minimums are intentional evidence that item-level 10 and 15 copies no longer
+retain full endgame magnitude:
 
 | Power | Channel | Minimum to maximum |
 | --- | --- | ---: |
-| Crown of the Last Pyre | Four-extra-target cleave | 24.354% to 33.380% |
-| Greyjaw's Edge | Primary resource | 35.087 to 45.454 per minute |
-| Hushwood Longbow | Silence uptime | 2.740 to 4.677 seconds per minute |
-| Nightglass Fang | Sustained add-cycle damage | 2.398% to 4.348% |
-| Nightglass Fang | Peak haste | 10% to 14% |
-| Ysolei's Vigil | Single-target healing opportunity | 4.685% to 14.883% |
-| Ysolei's Vigil | Five-target healing opportunity | 23.426% to 74.413% |
-| Stormwake Idol | Five-target cleave damage | 16.887% to 29.954% |
-| Bell of the Ninth Peal | Four-extra-target cleave | 35.007% to 59.006% |
-| Dawnward Signet | Potential sustained mitigation | 4.253% to 6.536% |
-| Dawnward Signet | Potential 10-second mitigation | 6.275% to 10.000% |
-| Feral Moonclasp | Primary resource | 46.783 to 106.060 per minute |
-| Mantle of Stolen Hours | Sustained mitigation | 1.556% to 2.222% |
-| Mantle of Stolen Hours | 10-second mitigation | 7% to 10% |
-| Boots of the Unbroken Road | Average movement speed | 2.500% to 3.750% |
-| Boots of the Unbroken Road | Peak movement speed | 8% to 12% |
+| Crown of the Last Pyre | Four-extra-target cleave | 15.173% to 30.979% |
+| Greyjaw's Edge | Primary resource | 17.544 to 45.454 per minute |
+| Hushwood Longbow | Silence uptime | 1.404 to 4.677 seconds per minute |
+| Nightglass Fang | Sustained add-cycle damage | 1.199% to 4.348% |
+| Nightglass Fang | Peak haste | 5% to 14% |
+| Ysolei's Vigil | Single-target healing opportunity | 2.343% to 14.883% |
+| Ysolei's Vigil | Five-target healing opportunity | 11.713% to 74.413% |
+| Stormwake Idol | Five-target cleave damage | 10.892% to 25.272% |
+| Bell of the Ninth Peal | Four-extra-target cleave | 14.145% to 56.661% |
+| Dawnward Signet | Potential sustained mitigation | 2.127% to 6.536% |
+| Dawnward Signet | Potential 10-second mitigation | 3.636% to 9.474% |
+| Feral Moonclasp | Primary resource | 23.392 to 106.060 per minute |
+| Mantle of Stolen Hours | Sustained mitigation | 0.778% to 2.222% |
+| Mantle of Stolen Hours | 10-second mitigation | 3.5% to 10% |
+| Boots of the Unbroken Road | Average movement speed | 1.250% to 3.750% |
+| Boots of the Unbroken Road | Peak movement speed | 4% to 12% |
 
 Packed-target healing and cleave figures are opportunity bounds. They assume
 eligible targets remain in range. Mitigation figures assume enough incoming
@@ -309,6 +351,8 @@ The system has several independent chase axes:
 - every power has one target boss
 - target bosses remain non-exclusive, so all kills can still surprise
 - item level varies with source and rarity
+- grey sources do not roll the additive procedural entry
+- Legendary magnitude reaches full effectiveness at item level 20
 - Legendary affix families and values vary
 - every power has a bounded persisted magnitude range
 - one active power creates build choice instead of automatic proc stacking

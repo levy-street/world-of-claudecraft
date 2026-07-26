@@ -7,6 +7,7 @@ import type {
   EquipmentEffectEvent,
   EquipmentPowerDefinition,
 } from '../src/sim/equipment/equipment_effect_types';
+import { LEGENDARY_FULL_POWER_ITEM_LEVEL } from '../src/sim/equipment/legendary_item_level';
 import { Rng } from '../src/sim/rng';
 import type { PlayerClass } from '../src/sim/types';
 
@@ -759,6 +760,10 @@ function rowFor(
   const sustainedDamageGateApplicable =
     category === 'single_target_damage' &&
     (definition.trigger.event !== 'spell_damage' || CLASS_MODELS[playerClass].spellDamageShare > 0);
+  // The 8% floor is an endgame build-value target. Leveling copies are now
+  // intentionally below that floor because the shipped runtime scales every
+  // magnitude by item level. Their ceiling and burst safety still remain gated.
+  const sustainedDamageFloorApplicable = profile.itemLevel >= LEGENDARY_FULL_POWER_ITEM_LEVEL;
   const burstDamageGateApplicable =
     sustainedDamageGateApplicable || category === 'conditional_damage';
   const sustainedDamage = metricRange(minimum.sustainedDamagePct, maximum.sustainedDamagePct);
@@ -800,7 +805,8 @@ function rowFor(
     sustainedDamageGateApplicable,
     burstDamageGateApplicable,
     sustainedDamageGatePass: sustainedDamageGateApplicable
-      ? sustainedDamage.minimum >= LEGENDARY_SUSTAINED_MIN_PCT &&
+      ? (!sustainedDamageFloorApplicable ||
+          sustainedDamage.minimum >= LEGENDARY_SUSTAINED_MIN_PCT) &&
         sustainedDamage.maximum <= LEGENDARY_SUSTAINED_MAX_PCT
       : null,
     burstDamageGatePass: burstDamageGateApplicable
