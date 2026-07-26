@@ -168,6 +168,56 @@ describe('sourceCaveInfoWire: pure projection', () => {
     );
   });
 
+  it('projects prestige rung and combat role separately, including where they diverge', () => {
+    // The nameplate shows a DIFFERENT one per encounter phase, so the wire has to
+    // carry both. A roster past the combat budget makes them genuinely disagree:
+    // rank 3 is a Worldwright by merged PRs but fights as an Architect, and the
+    // tail past rank 42 keeps its rung while carrying no combat role at all.
+    const roster: SourceCaveRosterEntry[] = Array.from({ length: 44 }, (_, i) => ({
+      login: `contributor${i + 1}`,
+      mergedPrs: Math.max(1, 300 - i * 7),
+      rank: i + 1,
+    }));
+    const byLogin = new Map(
+      ((makeSim(roster).sourceCaveInfo() as SourceCaveInfo).mobs ?? []).map((mob) => [
+        mob.login,
+        mob,
+      ]),
+    );
+
+    // Rank 3 (286 PRs) is a Worldwright by prestige, an Architect by role.
+    expect(byLogin.get('contributor3')).toMatchObject({
+      tier: 'worldwright',
+      combatTier: 'architect',
+      combatant: true,
+    });
+    // Rank 1 is the boss and holds the top role on both sides.
+    expect(byLogin.get('contributor1')).toMatchObject({
+      tier: 'worldwright',
+      combatTier: 'worldwright',
+      boss: true,
+    });
+    // Rank 43 is past the 42-role budget: prestige survives, the role is null.
+    expect(byLogin.get('contributor43')).toMatchObject({ combatant: false, combatTier: null });
+    expect(byLogin.get('contributor43')?.tier).not.toBeNull();
+    // Exactly the tail overflows, and every combatant carries a role.
+    const guardians = [...byLogin.values()].filter((mob) => !mob.combatant);
+    expect(guardians.map((mob) => mob.login).sort()).toEqual(['contributor43', 'contributor44']);
+    expect([...byLogin.values()].every((mob) => mob.combatant === (mob.combatTier !== null))).toBe(
+      true,
+    );
+  });
+
+  it('projects a below-threshold contributor as an unranked rung, not a fabricated one', () => {
+    // charlie has 0 merged PRs: no prestige rung at all. The wire must say null
+    // rather than defaulting to the first rung, or the friendly-phase nameplate
+    // would award a title nobody earned.
+    const info = makeSim().sourceCaveInfo() as SourceCaveInfo;
+    const charlie = info.mobs.find((mob) => mob.login === 'charlie');
+    expect(charlie?.tier).toBeNull();
+    expect(info.mobs.find((mob) => mob.login === 'alpha')?.tier).toBe('worldwright');
+  });
+
   it('projects the elite display flag from the spec, not just the boss flag', () => {
     // alpha (90 PRs) clears the elite dev-tier threshold; charlie (0 PRs) does not,
     // so a regression that dropped/inverted/swapped the elite mapping in the wire

@@ -49,6 +49,16 @@ export interface SourceCaveMobDisplay {
   boss: boolean;
   /** Whether this visible contributor participates in the current encounter budget. */
   combatant: boolean;
+  /**
+   * The contributor's own merged-PR rung ('tinkerer' to 'worldwright'), or null
+   * below the first rung. This is PRESTIGE, not power: it names who the person is
+   * and drives the friendly-phase nameplate title, while `combatTier` below names
+   * what the mob does. The two diverge whenever the roster overflows the combat
+   * budget (src/sim/source_cave/combatants.ts).
+   */
+  tier: string | null;
+  /** Assigned combat role, or null for an overflow guardian. Drives the nameplate diamond tint. */
+  combatTier: string | null;
 }
 
 export type SourceCaveSealState = 'idle' | 'active' | 'breached' | 'cleared';

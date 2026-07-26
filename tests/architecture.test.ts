@@ -435,6 +435,7 @@ const RENDER_PURE_CORES = [
   'src/render/sea_mist_core.ts',
   'src/render/shadow_pass_gate_core.ts',
   'src/render/source_cave_mains_core.ts',
+  'src/render/source_cave_nameplate_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/terrain_splat_presence_core.ts',
   'src/render/vfx_pool_core.ts',

@@ -1,7 +1,26 @@
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
-export type NameplateMarkerTone = 'none' | 'quest' | 'active' | 'loot' | 'repeat' | 'cooldown';
+// The three sc-* tones are the Source Cave's role-tinted elite diamond (bronze
+// Runesmith, silver Architect, gold Worldwright): combat information, so it is
+// never gated behind a graphics preset or a cosmetic toggle
+// (docs/design/graphics-settings-fairness.md).
+export type NameplateMarkerTone =
+  | 'none'
+  | 'quest'
+  | 'active'
+  | 'loot'
+  | 'repeat'
+  | 'cooldown'
+  | 'sc-runesmith'
+  | 'sc-architect'
+  | 'sc-worldwright';
+
+const SOURCE_CAVE_ROLE_MARKER_COLORS: Record<string, string> = {
+  'sc-runesmith': '#c98a4b',
+  'sc-architect': '#cdd3da',
+  'sc-worldwright': '#f2c84b',
+};
 
 export interface NameplateBadge {
   url: string;
@@ -393,11 +412,12 @@ export class NameplateCanvasSurface {
       // repeatable arms, with the cooldown mark dimmed at the shared 0.55.
       this.configureTextStyle(
         style,
-        state.markerTone === 'active'
-          ? '#b9b9b9'
-          : state.markerTone === 'repeat' || state.markerTone === 'cooldown'
-            ? '#0070dd'
-            : '#f2c84b',
+        SOURCE_CAVE_ROLE_MARKER_COLORS[state.markerTone] ??
+          (state.markerTone === 'active'
+            ? '#b9b9b9'
+            : state.markerTone === 'repeat' || state.markerTone === 'cooldown'
+              ? '#0070dd'
+              : '#f2c84b'),
       );
       const dimmed = state.markerTone === 'cooldown';
       if (dimmed) ctx.globalAlpha = state.opacity * 0.55;

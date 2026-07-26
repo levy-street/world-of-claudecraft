@@ -9,6 +9,7 @@
 // null-when-nothing-exists contract; in practice only some test fixtures build a Sim
 // without a cave.
 
+import { devTierForMergedPrs } from '../dev_tier';
 import type { SimContext } from '../sim_context';
 import { sourceCaveDefeatMobIds } from './encounter';
 import { sourceCaveInstanceForPlayer, sourceCaveSealPopulation } from './occupancy';
@@ -23,6 +24,13 @@ export function sourceCaveInfoWire(ctx: SimContext, pid: number): object | null 
     elite: m.elite,
     boss: m.boss,
     combatant: m.combatant,
+    // Prestige rung and combat role ride together because the nameplate shows a
+    // DIFFERENT one per encounter phase (render/source_cave_nameplate_core.ts):
+    // the rung while the contributors are still friendly, the role once the
+    // reboot turns them hostile. Both are resolved here rather than shipping the
+    // raw merged-PR count, matching how elite/boss already cross as decisions.
+    tier: devTierForMergedPrs(m.mergedPrs)?.key ?? null,
+    combatTier: m.combatTier,
   }));
   let totalMobs = cave.spec.mobs.filter((mob) => mob.combatant).length;
   const moduleCount = cave.spec.modules.length;

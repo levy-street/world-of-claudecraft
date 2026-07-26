@@ -46,20 +46,6 @@
     transition: font-size 0.1s linear;
     vertical-align: middle;
   }
-  /* The Source Cave reboot button's warning call-out: oversized and heavily
-     outlined so the red DON'T TOUCH THIS BUTTON! reads at interaction range
-     (toggled by the nameplate painter, render/nameplate_painter.ts). */
-  .np-name.np-warning {
-    font-size: 18px;
-    letter-spacing: 0.6px;
-    text-shadow:
-      0 0 4px #000,
-      1px 1px 2px #000,
-      -1px 1px 2px #000,
-      1px -1px 2px #000,
-      -1px -1px 2px #000;
-  }
-
   .np-level {
     font-size: 19px;
     font-weight: bold;

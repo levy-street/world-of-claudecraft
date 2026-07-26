@@ -19,6 +19,21 @@ import type { SourceCaveInfo } from '../src/world_api/dungeons';
 // against the actual reserved delve sub-band, not a hand-picked magic number.
 const CAVE_X = sourceCaveOrigin(0).x;
 
+// One projected roster row. tier/combatTier default to null (an overflow
+// guardian below the first contribution rung), so a case that cares about the
+// nameplate's prestige-vs-role split states it explicitly.
+function rosterRow(over: Partial<SourceCaveInfo['mobs'][number]>): SourceCaveInfo['mobs'][number] {
+  return {
+    login: 'someone',
+    elite: false,
+    boss: false,
+    combatant: true,
+    tier: null,
+    combatTier: null,
+    ...over,
+  };
+}
+
 function mob(over: Partial<Entity> = {}): Entity {
   return {
     id: 5,
@@ -72,31 +87,42 @@ describe('isSourceCaveMobEntity', () => {
 describe('sourceCaveMobRank', () => {
   it('reads elite/boss from the roster projection, correlated by template login', () => {
     const roster: SourceCaveInfo['mobs'] = [
-      { login: 'someone', elite: false, boss: true, combatant: true },
-      { login: 'another', elite: true, boss: false, combatant: true },
+      rosterRow({ login: 'someone', boss: true, tier: 'worldwright', combatTier: 'worldwright' }),
+      rosterRow({ login: 'another', elite: true, tier: 'architect', combatTier: 'runesmith' }),
     ];
     const world = worldWithRoster(roster);
     expect(sourceCaveMobRankForTemplate('source_cave_someone', roster)).toEqual({
       elite: false,
       boss: true,
+      combatant: true,
+      tier: 'worldwright',
+      combatTier: 'worldwright',
     });
     expect(
       sourceCaveMobRank(mob({ templateId: 'source_cave_someone', name: 'Custom One' }), world),
     ).toEqual({
       elite: false,
       boss: true,
+      combatant: true,
+      tier: 'worldwright',
+      combatTier: 'worldwright',
     });
     expect(
       sourceCaveMobRank(mob({ templateId: 'source_cave_another', name: 'Custom Two' }), world),
     ).toEqual({
       elite: true,
       boss: false,
+      combatant: true,
+      // Prestige and combat role genuinely differ once the roster overflows the
+      // budget: this row is an Architect by merged PRs, fighting as a Runesmith.
+      tier: 'architect',
+      combatTier: 'runesmith',
     });
   });
 
   it('caches immutable rank data per world instead of rebuilding it every target-frame update', () => {
     let reads = 0;
-    const base = worldWithRoster([{ login: 'someone', elite: true, boss: false, combatant: true }]);
+    const base = worldWithRoster([rosterRow({ elite: true, combatTier: 'runesmith' })]);
     const world = {
       sourceCaveInfo: () => {
         reads++;
@@ -105,28 +131,42 @@ describe('sourceCaveMobRank', () => {
     } as unknown as IWorld;
     const entity = mob();
 
-    expect(sourceCaveMobRank(entity, world)).toEqual({ elite: true, boss: false });
-    expect(sourceCaveMobRank(entity, world)).toEqual({ elite: true, boss: false });
+    const runesmith = {
+      elite: true,
+      boss: false,
+      combatant: true,
+      tier: null,
+      combatTier: 'runesmith',
+    };
+    expect(sourceCaveMobRank(entity, world)).toEqual(runesmith);
+    expect(sourceCaveMobRank(entity, world)).toEqual(runesmith);
     expect(reads).toBe(1);
   });
 
   it('reads as plain (non-elite, non-boss) when the roster has no matching login', () => {
-    const world = worldWithRoster([
-      { login: 'someone-else', elite: true, boss: true, combatant: true },
-    ]);
+    const world = worldWithRoster([rosterRow({ login: 'someone-else', elite: true, boss: true })]);
     expect(sourceCaveMobRank(mob({ name: 'someone' }), world)).toEqual({
       elite: false,
       boss: false,
+      combatant: false,
+      tier: null,
+      combatTier: null,
     });
   });
 
   it('reads as plain when the cave info itself is null (no throw)', () => {
     const world = { sourceCaveInfo: () => null } as unknown as IWorld;
-    expect(sourceCaveMobRank(mob(), world)).toEqual({ elite: false, boss: false });
+    expect(sourceCaveMobRank(mob(), world)).toEqual({
+      elite: false,
+      boss: false,
+      combatant: false,
+      tier: null,
+      combatTier: null,
+    });
   });
 
   it('does not cache a null pre-boot projection before the roster arrives', () => {
-    const roster = [{ login: 'someone', elite: true, boss: false, combatant: true }];
+    const roster = [rosterRow({ elite: true, combatTier: 'runesmith' })];
     let info: SourceCaveInfo | null = null;
     let reads = 0;
     const world = {
@@ -137,10 +177,18 @@ describe('sourceCaveMobRank', () => {
     } as unknown as IWorld;
     const entity = mob();
 
-    expect(sourceCaveMobRank(entity, world)).toEqual({ elite: false, boss: false });
+    const plain = { elite: false, boss: false, combatant: false, tier: null, combatTier: null };
+    const runesmith = {
+      elite: true,
+      boss: false,
+      combatant: true,
+      tier: null,
+      combatTier: 'runesmith',
+    };
+    expect(sourceCaveMobRank(entity, world)).toEqual(plain);
     info = worldWithRoster(roster).sourceCaveInfo();
-    expect(sourceCaveMobRank(entity, world)).toEqual({ elite: true, boss: false });
-    expect(sourceCaveMobRank(entity, world)).toEqual({ elite: true, boss: false });
+    expect(sourceCaveMobRank(entity, world)).toEqual(runesmith);
+    expect(sourceCaveMobRank(entity, world)).toEqual(runesmith);
     expect(reads).toBe(2);
   });
 });

@@ -154,6 +154,12 @@ export function sourceCaveLoginFromTemplateId(templateId: string): string | null
 export interface SourceCaveMobRank {
   elite: boolean;
   boss: boolean;
+  /** In the fixed combat budget; false for an overflow guardian (and for an unknown login). */
+  combatant: boolean;
+  /** The contributor's own merged-PR rung (prestige), or null below the first rung. */
+  tier: string | null;
+  /** The assigned combat role, or null for an overflow guardian. */
+  combatTier: string | null;
 }
 
 export interface SourceCaveMobRankEntry extends SourceCaveMobRank {
@@ -167,7 +173,13 @@ export function sourceCaveMobRankForTemplate(
 ): SourceCaveMobRank {
   const login = sourceCaveLoginFromTemplateId(templateId);
   const entry = login ? mobs?.find((mob) => mob.login === login) : undefined;
-  return { elite: entry?.elite ?? false, boss: entry?.boss ?? false };
+  return {
+    elite: entry?.elite ?? false,
+    boss: entry?.boss ?? false,
+    combatant: entry?.combatant ?? false,
+    tier: entry?.tier ?? null,
+    combatTier: entry?.combatTier ?? null,
+  };
 }
 
 /**

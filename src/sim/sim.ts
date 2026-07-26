@@ -2476,6 +2476,7 @@ export class Sim {
         resetAvailableAt: 0,
         clearedBy: new Set(),
         enteredBy: new Set(),
+        combatExitMemory: new Map(),
       });
     }
 

@@ -85,6 +85,35 @@ cadence. Prestige wins the model; the combat role wins the numbers. Push this fa
 42 contributors all past 70 PR) and the encounter stays exactly as balanced, while the room
 stops reading: forty-two identical golden bodies, sixteen of them level-19 trash.
 
+## The nameplate reads the phase, not the model
+
+The room resolves that tension on the nameplates instead of on the models, by separating the
+two facts in TIME rather than crowding them into the same plate
+(`src/render/source_cave_nameplate_core.ts`).
+
+| Contributor state | Name | Rung title | Level badge | Diamond | Bar frame |
+|---|---|---|---|---|---|
+| Friendly, before the reboot | yes | yes | no | no | no |
+| Hostile combatant | yes | no | yes | tinted by combat role | gold / red |
+| Hostile overflow guardian | yes | no | yes | no | no |
+
+Before the press the contributors cannot be engaged, so the plate honours the PERSON: the
+display name over the contribution rung their own merged PRs earned, with no combat furniture
+at all. The press turns the entire visible roster hostile in one tick, dormant cohorts and
+overflow guardians included, and every plate switches to threat assessment together. The room
+changes character on the button, which is the beat the encounter is built around.
+
+In the hostile phase the elite diamond is tinted by COMBAT ROLE (bronze Runesmith, silver
+Architect, gold Worldwright), because three identical gold diamonds is exactly what a raid
+cannot act on. Overflow guardians stay plain, with no diamond and no frame: they are not part
+of the clear, and splashing one is otherwise punished with no warning at all, so "this one is
+not in the fight" is information the raid is allowed to have.
+
+The tint is combat information, so it is never gated behind a graphics preset or a cosmetic
+toggle (`docs/design/graphics-settings-fairness.md`). The phase signal is the mob's own
+`hostile` flag, which already crosses the wire, so a wipe reset restores the tribute plates
+with no extra bookkeeping. The mouseover tooltip is deliberately unchanged.
+
 Every dormant contributor remains hostile and visible in the encircling ring. The intact seal
 suppresses only automatic acquisition against players gathered on it. Striking a dormant
 combatant wakes that combatant's whole cohort. Leaving the seal wakes every combat cohort and
