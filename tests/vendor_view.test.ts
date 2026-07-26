@@ -8,6 +8,7 @@ function item(
   opts: {
     buyValue?: number;
     priceHonor?: number;
+    priceHero?: number;
     sellValue?: number;
     kind?: ItemDef['kind'];
   } = {},
@@ -21,10 +22,11 @@ function item(
     sellValue: opts.sellValue ?? 0,
     buyValue: opts.buyValue,
     priceHonor: opts.priceHonor,
+    priceHero: opts.priceHero,
   } as unknown as ItemDef;
 }
 
-const RICH = { copper: 1_000_000, honor: 1_000_000 } as const;
+const RICH = { copper: 1_000_000, honor: 1_000_000, hero: 1_000_000 } as const;
 
 function table(...items: ItemDef[]): Record<string, ItemDef> {
   return Object.fromEntries(items.map((i) => [i.id, i]));
@@ -36,8 +38,8 @@ describe('buildVendorView goods', () => {
     const view = buildVendorView(['bread', 'water'], [], items, RICH);
     expect(view.goods.map((g) => g.itemId)).toEqual(['bread', 'water']);
     expect(view.goods.map((g) => g.price)).toEqual([
-      { copper: 5, honor: 0 },
-      { copper: 2, honor: 0 },
+      { copper: 5, honor: 0, hero: 0 },
+      { copper: 2, honor: 0, hero: 0 },
     ]);
     expect(view.goods.every((g) => g.affordable)).toBe(true);
   });
@@ -52,9 +54,9 @@ describe('buildVendorView goods', () => {
     expect(view.goods.map((g) => g.quantity)).toEqual([5, 5, 1]);
     // Price is the total for the purchase: per-unit buyValue times the stack quantity.
     expect(view.goods.map((g) => g.price)).toEqual([
-      { copper: 25, honor: 0 },
-      { copper: 10, honor: 0 },
-      { copper: 9, honor: 0 },
+      { copper: 25, honor: 0, hero: 0 },
+      { copper: 10, honor: 0, hero: 0 },
+      { copper: 9, honor: 0, hero: 0 },
     ]);
   });
 
@@ -85,23 +87,44 @@ describe('buildVendorView goods', () => {
     );
     const view = buildVendorView(['banner', 'rations'], [], items, RICH);
     expect(view.goods.map((g) => g.price)).toEqual([
-      { copper: 0, honor: 250 },
-      { copper: 20, honor: 30 },
+      { copper: 0, honor: 250, hero: 0 },
+      { copper: 20, honor: 30, hero: 0 },
     ]);
     expect(view.hasHonorGoods).toBe(true);
     expect(view.honorBalance).toBe(RICH.honor);
   });
 
+  it('lists a hero-priced good and gates its affordability on the hero balance', () => {
+    // The Season 1 Frostrend set is priced in hero points alone (no copper, no honor):
+    // it must still appear, and its affordability must track the hero balance.
+    const items = table(item('frostrend_hauberk', { priceHero: 90 }));
+    const listed = buildVendorView(['frostrend_hauberk'], [], items, RICH);
+    expect(listed.goods).toHaveLength(1); // NOT filtered out despite copper/honor both 0
+    expect(listed.goods[0].price).toEqual({ copper: 0, honor: 0, hero: 90 });
+    expect(listed.hasHeroGoods).toBe(true);
+    expect(listed.heroBalance).toBe(RICH.hero);
+    expect(listed.goods[0].affordable).toBe(true);
+    // Enough hero points: affordable; one short: not.
+    expect(
+      buildVendorView(['frostrend_hauberk'], [], items, { copper: 0, honor: 0, hero: 90 }).goods[0]
+        .affordable,
+    ).toBe(true);
+    expect(
+      buildVendorView(['frostrend_hauberk'], [], items, { copper: 0, honor: 0, hero: 89 }).goods[0]
+        .affordable,
+    ).toBe(false);
+  });
+
   it('requires both balances for a dual-price good', () => {
     const items = table(item('blade', { buyValue: 25, priceHonor: 80 }));
     expect(
-      buildVendorView(['blade'], [], items, { copper: 25, honor: 80 }).goods[0].affordable,
+      buildVendorView(['blade'], [], items, { copper: 25, honor: 80, hero: 0 }).goods[0].affordable,
     ).toBe(true);
     expect(
-      buildVendorView(['blade'], [], items, { copper: 24, honor: 80 }).goods[0].affordable,
+      buildVendorView(['blade'], [], items, { copper: 24, honor: 80, hero: 0 }).goods[0].affordable,
     ).toBe(false);
     expect(
-      buildVendorView(['blade'], [], items, { copper: 25, honor: 79 }).goods[0].affordable,
+      buildVendorView(['blade'], [], items, { copper: 25, honor: 79, hero: 0 }).goods[0].affordable,
     ).toBe(false);
   });
 });

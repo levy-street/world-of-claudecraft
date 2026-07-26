@@ -124,6 +124,7 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
   c.known = [];
   c.questLog = new Map();
   c.questsDone = new Set();
+  c.dailyQuestsDoneToday = new Set();
   c.pendingQuestCommands = new Map();
   c.partyInfo = null;
   c.selectedDungeonDifficulty = 'normal';
@@ -2972,13 +2973,14 @@ describe('lockpick view rebuilds from events on the online client', () => {
 
 // The pinned set of delta keys, sorted. Cross-checked below against the
 // live `maybe(...)` (and `maybeRaw(...)`) calls scraped from server/game.ts
-// source, so a 51st unregistered delta key reddens this gate. All but two ride
+// source, so an unregistered delta key reddens this gate. All but two ride
 // via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
 // fragments, each serialized at most once per tick by a realm-readout memo and
 // shared across viewers), not plain `maybe(...)`.
 const ALL_DELTA_KEYS = [
   'achg',
   'achr',
+  'adaily',
   'arena',
   'atitle',
   'bags',
@@ -2989,6 +2991,7 @@ const ALL_DELTA_KEYS = [
   'corpse',
   'cosmetics',
   'cprof',
+  'dailyq',
   'dclears',
   'dcomp',
   'dcompanion',
@@ -3003,10 +3006,13 @@ const ALL_DELTA_KEYS = [
   'duel',
   'ench',
   'equip',
+  'fincur',
   'gprof',
   'hbl',
+  'hero',
   'honor',
   'inv',
+  'lhero',
   'lhonor',
   'lockouts',
   'lroll',
@@ -3047,6 +3053,7 @@ const ALL_DELTA_KEYS = [
 // on vcupb), so neither key alone equals the full CupInfo target.
 const TERSE_TO_IWORLD: Record<string, string> = {
   achg: 'abilityCharges',
+  adaily: 'arenaDaily',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
   bags: 'bags',
@@ -3068,8 +3075,11 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   duel: 'duelInfo',
   ench: 'lastEnchantResult',
   equip: 'equipment',
+  fincur: 'frontierIncursion',
   gprof: 'gatheringProficiency',
+  hero: 'heroPoints',
   inv: 'inventory',
+  lhero: 'lifetimeHeroPoints',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
   lroll: 'lootRollPrompts',
@@ -3206,6 +3216,12 @@ function dirtyEveryDeltaField(): {
   // seconds and nodeHarvestableByMe reports it not ready.
   meta.nodeHarvestReadyAt[GATHER_NODES[0].id] = sim.time + 30;
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
+  // `dailyq`: a daily quest turned in on the current host day. The real loop feeds
+  // sim.utcDay from the wall clock each tick; broadcast() alone never sets it, so
+  // pin a day here (the same one `delveDaily` above uses, so its done-today record
+  // stays current) and stamp the completion on it.
+  sim.utcDay = '2099-01-01';
+  meta.dailyQuests = { date: '2099-01-01', done: ['frontier_daily_muster'] };
   meta.talents = { spec: 'arms', rows: {} };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
@@ -3406,6 +3422,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(snap).not.toBeNull();
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
+      // fincur (the Frontier incursion bar) is position-gated: it is null unless the
+      // viewer is in the far-off band, which is mutually exclusive with the delve-door
+      // position this fixture needs to dirty `drun`. It rides as null here by design.
+      if (key === 'fincur') continue;
       // each was dirtied to a non-default value, so none rides the wire as null
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
     }
@@ -3458,6 +3478,10 @@ describe('full self-state snapshot delta fixture', () => {
       { questId: 'q_widows', counts: [10, 0], state: 'active' },
     ]); // qlog -> questLog (Map)
     expect(client.questsDone.has('q_wolves')).toBe(true); // qdone -> questsDone (Set)
+    // dailyq -> dailyQuestsDoneToday (private), surfaced through questState: the
+    // turned-in Frontier daily reads done-for-today online, matching the server's
+    // refusal to re-accept it (a daily never enters qdone).
+    expect(client.questState('frontier_daily_muster')).toBe('done');
     expect(client.unlockedMilestones).toEqual(['milestone_test']); // milestones -> unlockedMilestones
     // lockouts -> selfLockouts (private), via the raidLockouts() accessor
     expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
@@ -3685,9 +3709,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 56 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(56);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(56);
+  it('ALL_DELTA_KEYS contains exactly 61 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(61);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(61);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3706,7 +3730,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(56);
+    expect(scraped.size).toBe(61);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

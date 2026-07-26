@@ -1969,6 +1969,23 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'quest', questId: 'q_nythraxis_sealed_crypt' },
   },
+  pvp_frostreach_slayer: {
+    id: 'pvp_frostreach_slayer',
+    name: 'Frostreach Hunter',
+    desc: 'Help bring down a frost rare in the Frostreach Frontier incursion.',
+    category: 'pvp',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'frontierRareKills', count: 1 },
+  },
+  pvp_frostreach_warden: {
+    id: 'pvp_frostreach_warden',
+    name: 'Warden of the Frontier',
+    desc: 'Bring down 25 frost rares in the Frostreach Frontier.',
+    category: 'pvp',
+    renown: 25,
+    reward: { kind: 'title', text: 'the Frostwarden' },
+    trigger: { kind: 'stat', stat: 'frontierRareKills', count: 25 },
+  },
   chr_marsh_first_cast: {
     id: 'chr_marsh_first_cast',
     name: 'Eels in the Reeds',

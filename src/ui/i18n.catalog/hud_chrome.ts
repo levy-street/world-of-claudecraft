@@ -1052,13 +1052,38 @@ export const hudChromeStrings = {
     balance: 'Honor: {amount}',
     honorFloat: '+{amount} Honor',
     honorGain: 'You gain {amount} Honor ({reason}).',
+    heroAmount: '{amount} Hero Points',
+    heroBalance: 'Hero Points: {amount}',
+    heroFloat: '+{amount} Hero Points',
+    arenaDailyTitle: 'Coliseum Daily',
+    arenaDailyClaim: 'Claim daily reward',
+    arenaDailyReward: '{honor} Honor + {hero} Hero Points',
+    arenaDailyClaimed: 'You have already claimed your daily arena reward today.',
+    arenaDailyNotEntered: 'Enter an arena match today to claim your daily reward.',
+    heroGain: 'You gain {amount} Hero Points ({reason}).',
     notEnoughHonor: 'Not enough Honor.',
+    notEnoughHero: 'Not enough hero points.',
     reasons: {
       arenaWin: 'Arena victory',
       fiestaKill: 'Fiesta takedown',
       fiestaComplete: 'Fiesta completed',
       fiestaWin: 'Fiesta victory',
+      frontierKill: 'Frontier kill',
+      frontierRare: 'Frostreach rare',
+      frontierDaily: 'Frontier daily',
+      arenaDaily: 'Coliseum daily',
     },
+  },
+  // The Frostreach Frontier enter/leave control in the PvP window (alongside the
+  // arena and fiesta queue). The always-on open-PvP zone you travel to and from.
+  frontier: {
+    title: 'Frostreach Frontier',
+    enter: 'Travel to the Frontier',
+    leave: 'Return from the Frontier',
+    note: 'An always-on open-PvP zone. Beyond the safe hub, all players are enemies.',
+    // The top-screen incursion bar: while building it shows this title + the meter
+    // percent; while a rare is up it shows the rare's name + its HP percent instead.
+    incursionTitle: 'Frostreach Incursion',
   },
   // Character sheet showcase layout: the two titled stat-panel headings under the
   // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the

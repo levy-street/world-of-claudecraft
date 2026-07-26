@@ -247,6 +247,7 @@ const HOT_PAINTERS: ReadonlyArray<{
   reflowAllow: Partial<Record<string, number>>;
 }> = [
   { file: 'xp_bar_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'frontier_incursion_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },

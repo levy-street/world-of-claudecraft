@@ -1192,13 +1192,34 @@ export const en_XA: EnTranslations = {
       "balance": "[Ĥóñóŕ: {amount}]",
       "honorFloat": "[+{amount} Ĥóñóŕ]",
       "honorGain": "[Ýóú ĝáíñ {amount} Ĥóñóŕ ({reason}).]",
+      "heroAmount": "[{amount} Ĥéŕó Þóíñţš]",
+      "heroBalance": "[Ĥéŕó Þóíñţš: {amount}]",
+      "heroFloat": "[+{amount} Ĥéŕó Þóíñţš]",
+      "arenaDailyTitle": "[Çóļíšéúɱ Ðáíļý]",
+      "arenaDailyClaim": "[Çļáíɱ ðáíļý ŕéŵáŕð]",
+      "arenaDailyReward": "[{honor} Ĥóñóŕ + {hero} Ĥéŕó Þóíñţš]",
+      "arenaDailyClaimed": "[Ýóú ĥáʋé áļŕéáðý çļáíɱéð ýóúŕ ðáíļý áŕéñá ŕéŵáŕð ţóðáý.]",
+      "arenaDailyNotEntered": "[Éñţéŕ áñ áŕéñá ɱáţçĥ ţóðáý ţó çļáíɱ ýóúŕ ðáíļý ŕéŵáŕð.]",
+      "heroGain": "[Ýóú ĝáíñ {amount} Ĥéŕó Þóíñţš ({reason}).]",
       "notEnoughHonor": "[Ñóţ éñóúĝĥ Ĥóñóŕ.]",
+      "notEnoughHero": "[Ñóţ éñóúĝĥ ĥéŕó þóíñţš.]",
       "reasons": {
         "arenaWin": "[Áŕéñá ʋíçţóŕý]",
         "fiestaKill": "[Ƒíéšţá ţáķéðóŵñ]",
         "fiestaComplete": "[Ƒíéšţá çóɱþļéţéð]",
-        "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]"
+        "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]",
+        "frontierKill": "[Ƒŕóñţíéŕ ķíļļ]",
+        "frontierRare": "[Ƒŕóšţŕéáçĥ ŕáŕé]",
+        "frontierDaily": "[Ƒŕóñţíéŕ ðáíļý]",
+        "arenaDaily": "[Çóļíšéúɱ ðáíļý]"
       }
+    },
+    "frontier": {
+      "title": "[Ƒŕóšţŕéáçĥ Ƒŕóñţíéŕ]",
+      "enter": "[Ţŕáʋéļ ţó ţĥé Ƒŕóñţíéŕ]",
+      "leave": "[Ŕéţúŕñ ƒŕóɱ ţĥé Ƒŕóñţíéŕ]",
+      "note": "[Áñ áļŵáýš-óñ óþéñ-ÞʋÞ žóñé. Ɓéýóñð ţĥé šáƒé ĥúƀ, áļļ þļáýéŕš áŕé éñéɱíéš.]",
+      "incursionTitle": "[Ƒŕóšţŕéáçĥ Íñçúŕšíóñ]"
     },
     "charSheet": {
       "offense": "[Óƒƒéñšé]",
@@ -8798,6 +8819,33 @@ export const en_XA: EnTranslations = {
       "emberglass_warstaff": {
         "name": "[Éɱƀéŕĝļášš Ŵáŕšţáƒƒ]"
       },
+      "frostrend_helm": {
+        "name": "[Ƒŕóšţŕéñð Ĥéļɱ]"
+      },
+      "frostrend_spaulders": {
+        "name": "[Ƒŕóšţŕéñð Šþáúļðéŕš]"
+      },
+      "frostrend_hauberk": {
+        "name": "[Ƒŕóšţŕéñð Ĥáúƀéŕķ]"
+      },
+      "frostrend_girdle": {
+        "name": "[Ƒŕóšţŕéñð Ĝíŕðļé]"
+      },
+      "frostrend_legguards": {
+        "name": "[Ƒŕóšţŕéñð Ļéĝĝúáŕðš]"
+      },
+      "frostrend_gauntlets": {
+        "name": "[Ƒŕóšţŕéñð Ĝáúñţļéţš]"
+      },
+      "frostrend_sabatons": {
+        "name": "[Ƒŕóšţŕéñð Šáƀáţóñš]"
+      },
+      "frostrend_choker": {
+        "name": "[Ƒŕóšţŕéñð Çĥóķéŕ]"
+      },
+      "frostrend_band": {
+        "name": "[Ƒŕóšţŕéñð Ɓáñð]"
+      },
       "copper_ore": {
         "name": "[Çóþþéŕ Óŕé]"
       },
@@ -9955,6 +10003,15 @@ export const en_XA: EnTranslations = {
       "ridge_stalker": {
         "name": "[Ŕíðĝé Šţáļķéŕ]"
       },
+      "rimefang_stalker": {
+        "name": "[Ŕíɱéƒáñĝ Šţáļķéŕ]"
+      },
+      "frostbound_revenant": {
+        "name": "[Ƒŕóšţƀóúñð Ŕéʋéñáñţ]"
+      },
+      "rimebound_wisp": {
+        "name": "[Ŕíɱéƀóúñð Ŵíšþ]"
+      },
       "deeprock_kobold": {
         "name": "[Ðééþŕóçķ Ţúññéļéŕ]"
       },
@@ -10344,6 +10401,16 @@ export const en_XA: EnTranslations = {
         "name": "[ƑÚŔÝ]",
         "title": "[Ĥóñóŕ Ɋúáŕţéŕɱášţéŕ]",
         "greeting": "[Ţĥé šáñðš ŕéɱéɱƀéŕ éʋéŕý ʋíçţóŕý. Šþéñð ýóúŕ ĥóñóŕ ŵéļļ.]"
+      },
+      "frostreach_quartermaster": {
+        "name": "[Ʋáéļķá Ƒŕóšţŵáŕðéñ]",
+        "title": "[Ƒŕóšţŕéáçĥ Ɋúáŕţéŕɱášţéŕ]",
+        "greeting": "[Ţĥé Ƒŕóñţíéŕ þáýš íñ ƀļóóð áñð ƒŕóšţ. Šþéñð ýóúŕ ĥéŕó þóíñţš ŵéļļ.]"
+      },
+      "frontier_marshal": {
+        "name": "[Ɱáŕšĥáļ Ðŕéĝĝ]",
+        "title": "[Ƒŕóñţíéŕ Ɱáŕšĥáļ]",
+        "greeting": "[Ĥóļð ţĥé ļíñé, šóļðíéŕ. Ţĥé Ƒŕóñţíéŕ ñéʋéŕ šļééþš, áñð ñéíţĥéŕ ðó ŵé.]"
       },
       "loremaster_caddis": {
         "name": "[Ļóŕéɱášţéŕ Çáððíš]",
@@ -11391,6 +11458,16 @@ export const en_XA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "[Ĥéŕƀ þáţçĥ ĥáŕʋéšţéð]"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "[Ƒŕóñţíéŕ Ɱúšţéŕ]",
+        "text": "[Éʋéŕý šóļðíéŕ ŕéþóŕţš ƀéƒóŕé ţĥé ðáý'š ƒíĝĥţíñĝ. Ðŕáŵ ýóúŕ ŕéɋúíšíţíóñ ƒŕóɱ Ɋúáŕţéŕɱášţéŕ Ƒŕóšţŵáŕðéñ, ţĥéñ ɱúšţéŕ ƀáçķ ţó ɱé ƒóŕ ýóúŕ ĥóñóŕ.]",
+        "completion": "[Ĝóóð. Ţĥé Ƒŕóñţíéŕ ĥóļðš áñóţĥéŕ ðáý. Ţáķé ýóúŕ ĥóñóŕ, šóļðíéŕ, áñð ɱíñð ýóúŕ ƀáçķ óúţ ţĥéŕé.]",
+        "objectives": {
+          "0": {
+            "label": "[Ŕéɋúíšíţíóñ ƒŕóɱ Ɋúáŕţéŕɱášţéŕ Ƒŕóšţŵáŕðéñ]"
           }
         }
       },

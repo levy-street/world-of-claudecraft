@@ -88,9 +88,13 @@ describe('arena_window: offline skip-rebuild sentinel (collision-proof)', () => 
     // or an offline->live transition could wrongly skip a real rebuild.
     expect(sentinel.length).toBeGreaterThan(0);
     expect(sentinel.startsWith('[')).toBe(false);
-    // The offline branch early-returns on the sentinel (builds once per open, not every tick).
-    expect(code).toContain('this.lastSig === ARENA_OFFLINE_SIG');
-    expect(code).toContain('this.lastSig = ARENA_OFFLINE_SIG');
+    // The offline branch early-returns on a sig built FROM the sentinel plus the
+    // always-on Frontier-travel state (`|f:...`, never '['-prefixed), so it still
+    // builds once per open per travel state and can never collide with the live
+    // '['-prefixed JSON sig.
+    expect(code).toContain('const frontierSig =');
+    expect(code).toContain('ARENA_OFFLINE_SIG + frontierSig');
+    expect(code).toMatch(/const frontierSig = `\|f:/);
   });
 });
 

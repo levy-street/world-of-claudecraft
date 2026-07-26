@@ -1192,13 +1192,34 @@ export const ru_RU: EnTranslations = {
       "balance": "Честь: {amount}",
       "honorFloat": "+{amount} чести",
       "honorGain": "Вы получаете {amount} очк. чести ({reason}).",
+      "heroAmount": "{amount} очков героя",
+      "heroBalance": "Очки героя: {amount}",
+      "heroFloat": "+{amount} очков героя",
+      "arenaDailyTitle": "Ежедневная арена",
+      "arenaDailyClaim": "Забрать ежедневную награду",
+      "arenaDailyReward": "{honor} чести + {hero} очков героя",
+      "arenaDailyClaimed": "Вы уже забрали ежедневную награду арены сегодня.",
+      "arenaDailyNotEntered": "Проведите бой на арене сегодня, чтобы забрать ежедневную награду.",
+      "heroGain": "Вы получаете {amount} очков героя ({reason}).",
       "notEnoughHonor": "Недостаточно чести.",
+      "notEnoughHero": "Недостаточно очков героя.",
       "reasons": {
         "arenaWin": "Победа на арене",
         "fiestaKill": "Устранение на Фиесте",
         "fiestaComplete": "Завершение Фиесты",
-        "fiestaWin": "Победа на Фиесте"
+        "fiestaWin": "Победа на Фиесте",
+        "frontierKill": "Убийство во Фронтире",
+        "frontierRare": "Редкий во Фростриче",
+        "frontierDaily": "Ежедневное во Фронтире",
+        "arenaDaily": "Ежедневная арена"
       }
+    },
+    "frontier": {
+      "title": "Морозный Фронтир",
+      "enter": "Отправиться на Фронтир",
+      "leave": "Вернуться с Фронтира",
+      "note": "Постоянная зона открытого PvP. За пределами безопасного хаба все игроки враги.",
+      "incursionTitle": "Вторжение Морозного Предела"
     },
     "charSheet": {
       "offense": "Атака",
@@ -8798,6 +8819,33 @@ export const ru_RU: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Боевой посох из огненного стекла"
       },
+      "frostrend_helm": {
+        "name": "Шлем Ледяного Разрыва"
+      },
+      "frostrend_spaulders": {
+        "name": "Наплечники Ледяного Разрыва"
+      },
+      "frostrend_hauberk": {
+        "name": "Кольчуга Ледяного Разрыва"
+      },
+      "frostrend_girdle": {
+        "name": "Пояс Ледяного Разрыва"
+      },
+      "frostrend_legguards": {
+        "name": "Поножи Ледяного Разрыва"
+      },
+      "frostrend_gauntlets": {
+        "name": "Рукавицы Ледяного Разрыва"
+      },
+      "frostrend_sabatons": {
+        "name": "Сапоги Ледяного Разрыва"
+      },
+      "frostrend_choker": {
+        "name": "Ожерелье Ледяного Разрыва"
+      },
+      "frostrend_band": {
+        "name": "Кольцо Ледяного Разрыва"
+      },
       "copper_ore": {
         "name": "Медная руда"
       },
@@ -9955,6 +10003,15 @@ export const ru_RU: EnTranslations = {
       "ridge_stalker": {
         "name": "Хребтовый охотник"
       },
+      "rimefang_stalker": {
+        "name": "Изморозный охотник"
+      },
+      "frostbound_revenant": {
+        "name": "Мороженый ревенант"
+      },
+      "rimebound_wisp": {
+        "name": "Морозный дух"
+      },
       "deeprock_kobold": {
         "name": "Глубокоскальный туннельщик"
       },
@@ -10344,6 +10401,16 @@ export const ru_RU: EnTranslations = {
         "name": "Фьюри",
         "title": "Интендант чести",
         "greeting": "Пески поля боя помнят каждую победу. Распорядись своей честью достойно."
+      },
+      "frostreach_quartermaster": {
+        "name": "Ваэлка Морозный Страж",
+        "title": "Интендант Морозного Предела",
+        "greeting": "Фронтир платит кровью и морозом. Трать очки героя с умом."
+      },
+      "frontier_marshal": {
+        "name": "Маршал Дрегг",
+        "title": "Маршал Фронтира",
+        "greeting": "Держи строй, солдат. Фронтир не спит, и мы тоже."
       },
       "loremaster_caddis": {
         "name": "Хранитель знаний Каддис",
@@ -11391,6 +11458,16 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Собран участок трав"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "Сбор на Фронтире",
+        "text": "Каждый солдат отмечается перед боем. Получи довольствие у интенданта Морозного Стража, затем вернись ко мне на сбор за своей честью.",
+        "completion": "Хорошо. Фронтир продержался ещё день. Забирай свою честь, солдат, и береги спину там.",
+        "objectives": {
+          "0": {
+            "label": "Получить довольствие у интенданта Морозного Стража"
           }
         }
       },

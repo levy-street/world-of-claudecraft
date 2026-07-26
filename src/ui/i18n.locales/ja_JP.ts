@@ -13,6 +13,54 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.arenaDailyTitle': 'コロシアム日課',
+  'hudChrome.warfare.arenaDailyClaim': '日課報酬を受け取る',
+  'hudChrome.warfare.arenaDailyReward': '{honor} 名誉 + {hero} ヒーローポイント',
+  'hudChrome.warfare.arenaDailyClaimed': '本日の日課アリーナ報酬はすでに受け取っています。',
+  'hudChrome.warfare.arenaDailyNotEntered':
+    '日課報酬を受け取るには、本日アリーナの試合に参加してください。',
+  'hudChrome.warfare.heroAmount': '{amount} ヒーローポイント',
+  'hudChrome.warfare.heroBalance': 'ヒーローポイント：{amount}',
+  'hudChrome.warfare.heroFloat': '+{amount} ヒーローポイント',
+  'hudChrome.warfare.heroGain': '{amount} ヒーローポイントを獲得（{reason}）。',
+  'hudChrome.warfare.reasons.arenaDaily': 'コロシアム日課',
+  'hudChrome.frontier.incursionTitle': 'フロストリーチの侵攻',
+  'entities.mobs.rimebound_wisp.name': '霜縛のウィスプ',
+  'hudChrome.frontier.title': 'フロストリーチ辺境',
+  'hudChrome.frontier.enter': '辺境へ向かう',
+  'hudChrome.frontier.leave': '辺境から戻る',
+  'hudChrome.frontier.note':
+    '常時稼働のオープンPvPゾーン。安全なハブの外では、すべてのプレイヤーが敵となる。',
+  'entities.npcs.frontier_marshal.name': 'マーシャル・ドレッグ',
+  'entities.npcs.frontier_marshal.title': 'フロンティア元帥',
+  'entities.npcs.frontier_marshal.greeting':
+    '戦線を守れ、兵士よ。フロンティアは決して眠らぬ、我らもまた然り。',
+  'entities.quests.frontier_daily_muster.title': 'フロンティアの召集',
+  'entities.quests.frontier_daily_muster.text':
+    '兵士は皆、戦いの前に報告する。まず需品係フロストウォーデンから補給を受け取り、それから私のもとへ集結して名誉を受け取れ。',
+  'entities.quests.frontier_daily_muster.completion':
+    'よし。フロンティアはまた一日持ちこたえた。名誉を受け取れ、兵士よ、外では背後に気をつけろ。',
+  'entities.quests.frontier_daily_muster.objectives.0.label':
+    '需品係フロストウォーデンから補給を受け取る',
+  'hudChrome.warfare.notEnoughHero': 'ヒーローポイントが足りません。',
+  'entities.items.frostrend_helm.name': 'フロストレンドの兜',
+  'entities.items.frostrend_spaulders.name': 'フロストレンドの肩当て',
+  'entities.items.frostrend_hauberk.name': 'フロストレンドの鎖鎧',
+  'entities.items.frostrend_girdle.name': 'フロストレンドの帯',
+  'entities.items.frostrend_legguards.name': 'フロストレンドの具足',
+  'entities.items.frostrend_gauntlets.name': 'フロストレンドの手甲',
+  'entities.items.frostrend_sabatons.name': 'フロストレンドの脛当て',
+  'entities.items.frostrend_choker.name': 'フロストレンドの首飾り',
+  'entities.items.frostrend_band.name': 'フロストレンドの指輪',
+  'entities.npcs.frostreach_quartermaster.name': 'ヴァエルカ・フロストウォーデン',
+  'entities.npcs.frostreach_quartermaster.title': 'フロストリーチの需品係',
+  'entities.npcs.frostreach_quartermaster.greeting':
+    'フロンティアは血と氷で報いる。ヒーローポイントを賢く使え。',
+  'hudChrome.warfare.reasons.frontierKill': '辺境の討伐',
+  'hudChrome.warfare.reasons.frontierRare': 'フロストリーチの珍しい敵',
+  'hudChrome.warfare.reasons.frontierDaily': '辺境デイリー',
+  'entities.mobs.rimefang_stalker.name': '霜牙の追跡者',
+  'entities.mobs.frostbound_revenant.name': '霜縛の亡霊',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',

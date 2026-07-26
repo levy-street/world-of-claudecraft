@@ -35,6 +35,8 @@ import {
   DROWNED_LITANY_MODULES,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { FRONTIER_MOBS, FRONTIER_QUESTS } from './content/frontier';
+import { FRONTIER_MARSHAL_NPC, FRONTIER_QM_NPC, SEASON1_ITEMS } from './content/frontier_vendor';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import {
   type GraveyardDef,
@@ -175,6 +177,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   HEROIC_ITEMS,
   RETIRED_HEROIC_ITEMS,
   WARFARE_ITEMS,
+  SEASON1_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -184,6 +187,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
+  ...FRONTIER_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
   ...MAGE_PET_MOBS,
@@ -207,6 +211,8 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   [FURY_NPC.id]: FURY_NPC,
+  [FRONTIER_QM_NPC.id]: FRONTIER_QM_NPC,
+  [FRONTIER_MARSHAL_NPC.id]: FRONTIER_MARSHAL_NPC,
   brother_halven: BROTHER_HALVEN,
   brother_halven_marsh: BROTHER_HALVEN_MARSH,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
@@ -224,6 +230,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
   ...TEMPLE_QUESTS,
+  ...FRONTIER_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -231,6 +238,7 @@ export const QUEST_ORDER: string[] = [
   ...ZONE2_QUEST_ORDER,
   ...ZONE3_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
+  ...Object.keys(FRONTIER_QUESTS),
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported

@@ -1192,13 +1192,34 @@ export const ko_KR: EnTranslations = {
       "balance": "명예: {amount}",
       "honorFloat": "명예 +{amount}",
       "honorGain": "명예를 {amount} 획득했습니다({reason}).",
+      "heroAmount": "{amount} 영웅 점수",
+      "heroBalance": "영웅 점수: {amount}",
+      "heroFloat": "+{amount} 영웅 점수",
+      "arenaDailyTitle": "콜로세움 일일",
+      "arenaDailyClaim": "일일 보상 받기",
+      "arenaDailyReward": "명예 {honor} + 영웅 점수 {hero}",
+      "arenaDailyClaimed": "오늘 일일 아레나 보상을 이미 받았습니다.",
+      "arenaDailyNotEntered": "일일 보상을 받으려면 오늘 아레나 경기에 참가하세요.",
+      "heroGain": "영웅 점수 {amount}점 획득 ({reason}).",
       "notEnoughHonor": "명예가 부족합니다.",
+      "notEnoughHero": "영웅 점수가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
-        "fiestaWin": "피에스타 승리"
+        "fiestaWin": "피에스타 승리",
+        "frontierKill": "변경 처치",
+        "frontierRare": "서리손길 희귀",
+        "frontierDaily": "변경 일일",
+        "arenaDaily": "콜로세움 일일"
       }
+    },
+    "frontier": {
+      "title": "서리절경 변경",
+      "enter": "변경으로 이동",
+      "leave": "변경에서 귀환",
+      "note": "상시 개방형 PvP 구역. 안전 허브를 벗어나면 모든 플레이어가 적이다.",
+      "incursionTitle": "서리절경 침공"
     },
     "charSheet": {
       "offense": "공격",
@@ -8798,6 +8819,33 @@ export const ko_KR: EnTranslations = {
       "emberglass_warstaff": {
         "name": "불씨유리 전투지팡이"
       },
+      "frostrend_helm": {
+        "name": "서리절단 투구"
+      },
+      "frostrend_spaulders": {
+        "name": "서리절단 어깨보호구"
+      },
+      "frostrend_hauberk": {
+        "name": "서리절단 사슬갑옷"
+      },
+      "frostrend_girdle": {
+        "name": "서리절단 허리띠"
+      },
+      "frostrend_legguards": {
+        "name": "서리절단 다리보호구"
+      },
+      "frostrend_gauntlets": {
+        "name": "서리절단 장갑"
+      },
+      "frostrend_sabatons": {
+        "name": "서리절단 전투화"
+      },
+      "frostrend_choker": {
+        "name": "서리절단 목걸이"
+      },
+      "frostrend_band": {
+        "name": "서리절단 반지"
+      },
       "copper_ore": {
         "name": "구리 광석"
       },
@@ -9955,6 +10003,15 @@ export const ko_KR: EnTranslations = {
       "ridge_stalker": {
         "name": "산등성이 추적자"
       },
+      "rimefang_stalker": {
+        "name": "서리엄니 추적자"
+      },
+      "frostbound_revenant": {
+        "name": "서리결계 망령"
+      },
+      "rimebound_wisp": {
+        "name": "서리 결속 도깨비불"
+      },
       "deeprock_kobold": {
         "name": "깊은바위 굴꾼"
       },
@@ -10344,6 +10401,16 @@ export const ko_KR: EnTranslations = {
         "name": "퓨리",
         "title": "명예 병참장교",
         "greeting": "전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라."
+      },
+      "frostreach_quartermaster": {
+        "name": "바엘카 서리감시자",
+        "title": "서리절경 병참장교",
+        "greeting": "프론티어는 피와 서리로 값을 치른다. 영웅 점수를 현명하게 쓰라."
+      },
+      "frontier_marshal": {
+        "name": "드레그 원수",
+        "title": "프론티어 원수",
+        "greeting": "전선을 지켜라, 병사여. 프론티어는 결코 잠들지 않는다, 우리도 마찬가지다."
       },
       "loremaster_caddis": {
         "name": "현자 캐디스",
@@ -11391,6 +11458,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "약초 군락 채집"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "프론티어 소집",
+        "text": "모든 병사는 전투 전에 보고한다. 먼저 병참장교 프로스트워든에게 보급품을 받은 뒤, 내게 돌아와 소집하고 명예를 받아라.",
+        "completion": "좋다. 프론티어가 하루를 더 버텼다. 명예를 받아라, 병사여, 밖에서는 등 뒤를 조심해라.",
+        "objectives": {
+          "0": {
+            "label": "병참장교 프로스트워든에게 보급품 수령"
           }
         }
       },

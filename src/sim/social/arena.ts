@@ -24,7 +24,12 @@ import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
-import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
+import {
+  awardFiestaCompletionHonor,
+  awardRankedArenaWinHonor,
+  honorTeamIdentity,
+  markArenaEntered,
+} from '../pvp';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -817,6 +822,9 @@ export function startArenaMatch(
     fiesta: isFiesta ? ctx.createFiestaState() : undefined,
   };
   for (const pid of allPids) ctx.arenaMatches.set(pid, match);
+  // Ashen Coliseum daily claim: entering a bout today makes the once-per-day
+  // honor + hero claim available (arena_daily.ts). Draws no rng.
+  for (const meta of metas) if (meta) markArenaEntered(meta, ctx.utcDay);
   const origin = arenaOrigin(slot);
   // Spawns come from the slot's fixed map (parity-selected, never rng).
   const map = arenaMapForSlot(slot);

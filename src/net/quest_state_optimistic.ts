@@ -33,6 +33,10 @@ export function optimisticQuestState(
   professionState?: ArchetypeState,
   // The server-computed work-order cooldown set, mirrored via cprof.
   withinCadence?: ReadonlySet<string>,
+  // A daily quest already completed on the current host day (mirrored from the
+  // server's `dailyq` snapshot self-field): forwarded to computeQuestState so the
+  // online client shows the daily done-for-today exactly like the offline Sim.
+  dailyCompletedToday = false,
 ): QuestState {
   let effectiveDone = questsDone;
   if (pendingQuestCommands.size > 0) {
@@ -50,6 +54,7 @@ export function optimisticQuestState(
     playerLevel,
     professionState,
     withinCadence,
+    dailyCompletedToday,
   );
   const pending = pendingQuestCommands.get(questId);
   if (

@@ -30,7 +30,13 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
-import { pvpDamageMultiplier } from '../pvp';
+import {
+  awardFrontierPlayerKill,
+  awardFrontierRareKill,
+  frontierIncursionOnKill,
+  inFrontierHub,
+  pvpDamageMultiplier,
+} from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -373,6 +379,21 @@ export function dealDamage(
   if (amount > 0 && sourcePlayer && target.kind === 'player') {
     const cupMatch = ctx.vcup.match;
     if (cupMatch && vcupBothSeated(cupMatch, sourcePlayer.id, target.id)) amount = 0;
+  }
+
+  // The Frostreach Frontier safe hub: no PvP damage lands inside it (the promise in
+  // pvp/frontier.ts). A DoT/bleed or an in-flight projectile applied out in the band
+  // keeps calling dealDamage after the victim reaches the hub, and isHostileTo already
+  // reads false there (so the PvP multiplier above is skipped) but the BASE hit would
+  // still land, finishing someone at the vendor. Floor any player-vs-player damage to 0
+  // while the target stands in the hub, BEFORE absorb shields soak it.
+  if (
+    amount > 0 &&
+    sourcePlayer &&
+    target.kind === 'player' &&
+    inFrontierHub(target.pos.x, target.pos.z)
+  ) {
+    amount = 0;
   }
 
   if (
@@ -1032,6 +1053,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.fishReelDeadlineTick = 0;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
 
+  // Frontier incursion: a trash or PvP kill inside the band feeds the public meter
+  // (and a trash kill pays a small honor trickle). No-op outside the band. Draws no rng.
+  frontierIncursionOnKill(ctx, e, killer);
+  // Frontier open-world PvP: killing a hostile player out in the band pays the killer
+  // honor at the Frontier premium. No-op outside the band / in the hub. Draws no rng.
+  awardFrontierPlayerKill(ctx, e, killer);
+
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn
   if (e.kind === 'mob') ctx.clearEntityMarker(e.id);
@@ -1164,6 +1192,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       if (MOBS[e.templateId]?.family === 'demon') e.corpseTimer = 3;
       return; // owned pets drop no loot/credit; demons unravel, hunters revive or abandon
     }
+    // A frost rare slain inside the Frostreach Frontier drops honor + hero points to
+    // every contributor (the Season 1 PvP-zone reward loop). Below the owned-pet
+    // return + id-gated in awardFrontierRareKill, so no owned/future mob pays out.
+    awardFrontierRareKill(ctx, e, rareContribs);
     ctx.frenzyPackmates(e); // wild packmates fly into a frenzy when one falls
     ctx.armDeathThroes(e); // volatile corpses begin to destabilize, then burst
 

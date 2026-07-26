@@ -13,6 +13,53 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.arenaDailyTitle': 'Ежедневная арена',
+  'hudChrome.warfare.arenaDailyClaim': 'Забрать ежедневную награду',
+  'hudChrome.warfare.arenaDailyReward': '{honor} чести + {hero} очков героя',
+  'hudChrome.warfare.arenaDailyClaimed': 'Вы уже забрали ежедневную награду арены сегодня.',
+  'hudChrome.warfare.arenaDailyNotEntered':
+    'Проведите бой на арене сегодня, чтобы забрать ежедневную награду.',
+  'hudChrome.warfare.heroAmount': '{amount} очков героя',
+  'hudChrome.warfare.heroBalance': 'Очки героя: {amount}',
+  'hudChrome.warfare.heroFloat': '+{amount} очков героя',
+  'hudChrome.warfare.heroGain': 'Вы получаете {amount} очков героя ({reason}).',
+  'hudChrome.warfare.reasons.arenaDaily': 'Ежедневная арена',
+  'hudChrome.frontier.incursionTitle': 'Вторжение Морозного Предела',
+  'entities.mobs.rimebound_wisp.name': 'Морозный дух',
+  'hudChrome.frontier.title': 'Морозный Фронтир',
+  'hudChrome.frontier.enter': 'Отправиться на Фронтир',
+  'hudChrome.frontier.leave': 'Вернуться с Фронтира',
+  'hudChrome.frontier.note':
+    'Постоянная зона открытого PvP. За пределами безопасного хаба все игроки враги.',
+  'entities.npcs.frontier_marshal.name': 'Маршал Дрегг',
+  'entities.npcs.frontier_marshal.title': 'Маршал Фронтира',
+  'entities.npcs.frontier_marshal.greeting': 'Держи строй, солдат. Фронтир не спит, и мы тоже.',
+  'entities.quests.frontier_daily_muster.title': 'Сбор на Фронтире',
+  'entities.quests.frontier_daily_muster.text':
+    'Каждый солдат отмечается перед боем. Получи довольствие у интенданта Морозного Стража, затем вернись ко мне на сбор за своей честью.',
+  'entities.quests.frontier_daily_muster.completion':
+    'Хорошо. Фронтир продержался ещё день. Забирай свою честь, солдат, и береги спину там.',
+  'entities.quests.frontier_daily_muster.objectives.0.label':
+    'Получить довольствие у интенданта Морозного Стража',
+  'hudChrome.warfare.notEnoughHero': 'Недостаточно очков героя.',
+  'entities.items.frostrend_helm.name': 'Шлем Ледяного Разрыва',
+  'entities.items.frostrend_spaulders.name': 'Наплечники Ледяного Разрыва',
+  'entities.items.frostrend_hauberk.name': 'Кольчуга Ледяного Разрыва',
+  'entities.items.frostrend_girdle.name': 'Пояс Ледяного Разрыва',
+  'entities.items.frostrend_legguards.name': 'Поножи Ледяного Разрыва',
+  'entities.items.frostrend_gauntlets.name': 'Рукавицы Ледяного Разрыва',
+  'entities.items.frostrend_sabatons.name': 'Сапоги Ледяного Разрыва',
+  'entities.items.frostrend_choker.name': 'Ожерелье Ледяного Разрыва',
+  'entities.items.frostrend_band.name': 'Кольцо Ледяного Разрыва',
+  'entities.npcs.frostreach_quartermaster.name': 'Ваэлка Морозный Страж',
+  'entities.npcs.frostreach_quartermaster.title': 'Интендант Морозного Предела',
+  'entities.npcs.frostreach_quartermaster.greeting':
+    'Фронтир платит кровью и морозом. Трать очки героя с умом.',
+  'hudChrome.warfare.reasons.frontierKill': 'Убийство во Фронтире',
+  'hudChrome.warfare.reasons.frontierRare': 'Редкий во Фростриче',
+  'hudChrome.warfare.reasons.frontierDaily': 'Ежедневное во Фронтире',
+  'entities.mobs.rimefang_stalker.name': 'Изморозный охотник',
+  'entities.mobs.frostbound_revenant.name': 'Мороженый ревенант',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',

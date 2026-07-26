@@ -57,6 +57,22 @@ Offline Fiesta practice pays no Honor. Fiesta forfeits pay no completion or win
 bonus. Ranked and Fiesta result accounting is exactly once, including a
 disconnect during the post-match return delay.
 
+## Frostreach Frontier (Season 1)
+
+The always-on frost PvP band (`src/sim/pvp/frontier.ts`) adds three reward sources
+on top of the arena/Fiesta values above. Its named constants:
+
+- Frost rare kill: 15 Honor plus 3 hero points (`FRONTIER_RARE_HONOR`,
+  `FRONTIER_RARE_HERO_POINTS`), to every contributor on the rare's roster.
+- Open-world player kill inside the band: 2x the Fiesta takedown base
+  (`FRONTIER_KILL_HONOR_MULT`).
+- Frontier daily quest turn-in: 100 Honor (`FRONTIER_DAILY_HONOR`).
+
+Hero points are a second soulbound PvP currency, earned only from frost rares and
+spent only at the Frostreach Quartermaster on the item-level 31 Frostrend set. The
+zone, its currency, the vendor, the daily, and the PvP-window travel surface are
+specified in `docs/prd/frontier-frostreach-season1.md`.
+
 ## FURY prices
 
 FURY sells one item-level 28 epic tier for every equipment slot the game

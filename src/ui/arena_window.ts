@@ -18,6 +18,7 @@
 
 import { audio } from '../game/audio';
 import type { ArenaMapId } from '../sim/dungeon_layout';
+import { FRONTIER_MIN_LEVEL, isFrontierPos } from '../sim/pvp';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
 import {
@@ -169,24 +170,111 @@ export class ArenaWindow {
       practiceAvailable: this.practiceHook !== null,
     });
 
+    // The Frostreach Frontier enter/leave control rides alongside the arena/fiesta
+    // brackets in BOTH the offline and live panels (the zone is always-on, not an
+    // online-only feature), so its inside/combat state joins the render signature.
+    const inFrontier = isFrontierPos(world.player.pos.x);
+    const frontierCombat = !!world.player.inCombat;
+    // Endgame gate: below the cap you cannot travel in (the sim refuses it too).
+    const frontierBelowLevel = (world.player.level ?? 0) < FRONTIER_MIN_LEVEL;
+    const frontierSig = `|f:${inFrontier ? 'in' : 'out'}${frontierCombat ? 'c' : ''}${frontierBelowLevel ? 'L' : ''}`;
+
     if (view.kind === 'offline') {
       // offline / not yet synced: arena is an online ranked feature. The static note is
       // built once per open (skip-guarded by the offline sentinel) instead of every
-      // ~250ms mediumHud tick.
-      if (this.lastSig === ARENA_OFFLINE_SIG) return;
-      this.lastSig = ARENA_OFFLINE_SIG;
-      el.innerHTML = this.offlineHtml();
+      // ~250ms mediumHud tick. The Frontier control still updates as the player travels.
+      const sig = ARENA_OFFLINE_SIG + frontierSig;
+      if (this.lastSig === sig) return;
+      this.lastSig = sig;
+      el.innerHTML =
+        this.offlineHtml() + this.frontierHtml(inFrontier, frontierCombat, frontierBelowLevel);
       el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+      this.wireFrontier(el);
       return;
     }
 
     // A queue/match pins its bracket as the selection for the next render.
     if (view.commitBracket) this.bracket = view.bracket;
     this.fetchLeaderboard(view.bracket);
-    if (view.sig === this.lastSig) return;
-    this.lastSig = view.sig;
-    el.innerHTML = this.liveHtml(view);
+    // The Ashen Coliseum daily claim (online-only), folded into the signature so the
+    // button flips as eligibility / the reward changes.
+    const daily = world.arenaDaily;
+    const dailySig = `|d:${daily.status}:${daily.honor}:${daily.hero}`;
+    const sig = view.sig + frontierSig + dailySig;
+    if (sig === this.lastSig) return;
+    this.lastSig = sig;
+    el.innerHTML =
+      this.liveHtml(view) +
+      this.arenaDailyHtml(daily) +
+      this.frontierHtml(inFrontier, frontierCombat, frontierBelowLevel);
     this.wire(el, view);
+    this.wireArenaDaily(el);
+    this.wireFrontier(el);
+  }
+
+  /** The Ashen Coliseum daily-claim control: claim once a day after entering a bout. */
+  private arenaDailyHtml(info: import('../world_api').ArenaDailyInfo): string {
+    const reward = t('hudChrome.warfare.arenaDailyReward', {
+      honor: formatNumber(info.honor, { maximumFractionDigits: 0 }),
+      hero: formatNumber(info.hero, { maximumFractionDigits: 0 }),
+    });
+    const label =
+      info.status === 'claimed'
+        ? t('hudChrome.warfare.arenaDailyClaimed')
+        : info.status === 'unavailable'
+          ? t('hudChrome.warfare.arenaDailyNotEntered')
+          : t('hudChrome.warfare.arenaDailyClaim');
+    const disabled = info.status === 'ready' ? '' : ' disabled';
+    return (
+      `<div class="arena-sub">${esc(t('hudChrome.warfare.arenaDailyTitle'))}</div>` +
+      `<button class="btn arena-daily-claim" data-act="arena-daily-claim"${disabled}>${esc(label)}</button>` +
+      `<div class="arena-note">${esc(reward)}</div>`
+    );
+  }
+
+  /** Wire the daily-claim button; forces a re-render so it flips to claimed promptly. */
+  private wireArenaDaily(el: HTMLElement): void {
+    el.querySelector('[data-act="arena-daily-claim"]:not([disabled])')?.addEventListener(
+      'click',
+      () => {
+        this.deps.world().arenaDailyClaim();
+        this.lastSig = '';
+        audio.click();
+      },
+    );
+  }
+
+  /** The Frostreach Frontier travel control: Enter when outside, Leave when inside. */
+  private frontierHtml(inside: boolean, inCombat: boolean, belowLevel: boolean): string {
+    const act = inside ? 'frontier-leave' : 'frontier-enter';
+    const label = inside ? t('hudChrome.frontier.leave') : t('hudChrome.frontier.enter');
+    // Combat blocks either direction; the level gate blocks only entering.
+    const disabled = inCombat || (!inside && belowLevel) ? ' disabled' : '';
+    return (
+      `<div class="arena-sub">${esc(t('hudChrome.frontier.title'))}</div>` +
+      `<button class="btn frontier-travel" data-act="${act}"${disabled}>${esc(label)}</button>` +
+      `<div class="arena-note">${esc(t('hudChrome.frontier.note'))}</div>`
+    );
+  }
+
+  /** Wire the Frontier enter/leave button; forces a re-render so it flips promptly. */
+  private wireFrontier(el: HTMLElement): void {
+    el.querySelector('[data-act="frontier-enter"]:not([disabled])')?.addEventListener(
+      'click',
+      () => {
+        this.deps.world().frontierEnter();
+        this.lastSig = '';
+        audio.click();
+      },
+    );
+    el.querySelector('[data-act="frontier-leave"]:not([disabled])')?.addEventListener(
+      'click',
+      () => {
+        this.deps.world().frontierLeave();
+        this.lastSig = '';
+        audio.click();
+      },
+    );
   }
 
   private wire(el: HTMLElement, view: Extract<ArenaView, { kind: 'live' }>): void {

@@ -1049,6 +1049,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
+    // Frostreach Frontier enter/leave: only the shared "can't while dead" toast;
+    // every other rejection is a silent no-op the PvP window guards.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pvp/frontier_entry.ts'), 'utf8'),
+    // Ashen Coliseum daily claim: two eligibility-refusal toasts.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pvp/arena_daily.ts'), 'utf8'),
     // Heroic anti-kite mob charge: the "unleashes" announce line (the mechanic
     // name doubles as the mob_charge_stun debuff, localized via AURA_NAME_KEY's
     // 'Charge' row like the other boss mechanics).

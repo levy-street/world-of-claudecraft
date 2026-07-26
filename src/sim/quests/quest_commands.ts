@@ -28,6 +28,7 @@ import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
+import { grantHonor } from '../pvp';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -41,6 +42,7 @@ import {
   questObjectiveRequired,
   questTurnInNpcIds,
 } from '../types';
+import { dailyQuestDoneToday, recordDailyQuestDone } from './daily_quest';
 import {
   applyProfessionQuestEffect,
   professionQuestSelectionTargets,
@@ -62,9 +64,15 @@ export function computeQuestState(
   // ctx.tickCount, the online client from the server-computed cprof mirror), so
   // this shared decision point never reasons about tick domains itself.
   withinCadence?: ReadonlySet<string>,
+  // A daily quest already completed on the current host day: shows 'done' (on
+  // cooldown) until the day rolls. Only consulted when the quest is NOT active in
+  // the log (an accepted daily still reads active/ready). Defaults false so
+  // legacy four-arg call sites stay byte-identical.
+  dailyCompletedToday = false,
 ): QuestState {
   const qp = questLog.get(questId);
   if (qp) return qp.state === 'ready' ? 'ready' : 'active';
+  if (dailyCompletedToday) return 'done';
   const quest = QUESTS[questId];
   if (!quest) return 'unavailable';
   if (questsDone.has(questId) && !quest.repeatable) return 'done';
@@ -100,6 +108,9 @@ export function computeQuestState(
 export function questState(ctx: SimContext, questId: string, pid?: number): QuestState {
   const r = ctx.resolve(pid);
   if (!r) return 'unavailable';
+  const quest = QUESTS[questId];
+  const dailyCompletedToday =
+    !!quest?.daily && dailyQuestDoneToday(r.meta.dailyQuests, ctx.utcDay, questId);
   const withinCadence =
     r.meta.questCadence.size > 0
       ? new Set(cadenceBlockedKeys(r.meta.questCadence, ctx.tickCount))
@@ -111,6 +122,7 @@ export function questState(ctx: SimContext, questId: string, pid?: number): Ques
     r.e.level,
     r.meta.archetype,
     withinCadence,
+    dailyCompletedToday,
   );
 }
 
@@ -321,11 +333,22 @@ export function turnInQuestCore(
   }
   qp.state = 'done';
   meta.questLog.delete(questId);
-  const firstCompletion = !meta.questsDone.has(questId);
-  meta.questsDone.add(questId);
-  if (firstCompletion) meta.counters.questsCompleted++;
+  if (quest.daily) {
+    // A daily is never marked permanently done: instead record today's completion so
+    // it re-opens once the host day rolls (dailyQuestDoneToday/computeQuestState gate
+    // re-accept until then). Offline/headless never rolls a day, so it stays done.
+    meta.dailyQuests = recordDailyQuestDone(meta.dailyQuests, ctx.utcDay, questId);
+    meta.counters.questsCompleted++;
+  } else {
+    const firstCompletion = !meta.questsDone.has(questId);
+    meta.questsDone.add(questId);
+    if (firstCompletion) meta.counters.questsCompleted++;
+  }
   // Quest and chapter deed predicates read questsDone, so re-check this player.
   ctx.markDeedsDirty(meta.entityId);
+  if (quest.honorReward && quest.honorReward > 0) {
+    grantHonor(ctx, meta, quest.honorReward, 'frontier_daily');
+  }
   if (quest.copperReward > 0) {
     meta.copper += quest.copperReward;
     ctx.emit({

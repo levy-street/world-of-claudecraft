@@ -4821,6 +4821,12 @@
     font-family: var(--title-font);
     font-size: 12px;
   }
+  /* Hero points (the Frostreach Season 1 currency) tint frost-blue to distinguish
+     them from gold honor in the same vendor list. */
+  .vendor-item .vi-price .warfare-price.hero-price,
+  .warfare-balance.hero-balance {
+    color: #8fc7e8;
+  }
   .vendor-item .vi-sub {
     display: block;
     font-size: 10px;

@@ -3737,6 +3737,21 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "crest": "/ui/deeds/dgn_nythraxis_crypt.webp"
   },
   {
+    "id": "pvp_frostreach_slayer",
+    "name": "Frostreach Hunter",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "pvp_frostreach_warden",
+    "name": "Warden of the Frontier",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "the Frostwarden"
+  },
+  {
     "id": "chr_marsh_first_cast",
     "name": "Eels in the Reeds",
     "category": "chronicle",

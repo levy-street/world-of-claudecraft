@@ -39,11 +39,18 @@ function honorText(amount: number): string {
   });
 }
 
+function heroText(amount: number): string {
+  return t('hudChrome.warfare.heroAmount', {
+    amount: formatNumber(amount, { maximumFractionDigits: 0 }),
+  });
+}
+
 function goodsPriceText(price: VendorPrice): string {
   const money = price.copper > 0 ? formatLocalizedMoney(price.copper) : '';
   const honor = price.honor > 0 ? honorText(price.honor) : '';
-  if (money && honor) return t('hudChrome.warfare.dualPrice', { money, honor });
-  return money || honor;
+  const hero = price.hero > 0 ? heroText(price.hero) : '';
+  if (money && honor && !hero) return t('hudChrome.warfare.dualPrice', { money, honor });
+  return [money, honor, hero].filter(Boolean).join(' + ');
 }
 
 function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
@@ -51,6 +58,9 @@ function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
   if (row.price.copper > 0) parts.push(deps.moneyHtml(row.price.copper));
   if (row.price.honor > 0) {
     parts.push(`<span class="warfare-price">${esc(honorText(row.price.honor))}</span>`);
+  }
+  if (row.price.hero > 0) {
+    parts.push(`<span class="warfare-price hero-price">${esc(heroText(row.price.hero))}</span>`);
   }
   return parts.join('<span aria-hidden="true"> + </span>');
 }
@@ -75,6 +85,14 @@ export function renderVendorWindow(
       amount: formatNumber(view.honorBalance, { maximumFractionDigits: 0 }),
     });
     el.appendChild(balance);
+  }
+  if (view.hasHeroGoods) {
+    const heroBalance = document.createElement('div');
+    heroBalance.className = 'warfare-balance hero-balance';
+    heroBalance.textContent = t('hudChrome.warfare.heroBalance', {
+      amount: formatNumber(view.heroBalance, { maximumFractionDigits: 0 }),
+    });
+    el.appendChild(heroBalance);
   }
 
   // Landscape layout: goods tile up in a multi-column grid instead of one

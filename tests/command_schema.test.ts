@@ -30,9 +30,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (card_queue_join/leave, play_card, card_forfeit), and Professions 2.0's
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), and unbind_item (the
-// Maker's Bond unbind service).
-const EXPECTED_SEND_COUNT = 164;
-const EXPECTED_DISPATCH_COUNT = 173;
+// Maker's Bond unbind service); plus the Frostreach Frontier surface
+// (frontier_enter/frontier_leave/arena_daily_claim).
+const EXPECTED_SEND_COUNT = 167;
+const EXPECTED_DISPATCH_COUNT = 176;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -1309,6 +1309,44 @@
     font-family: var(--title-font);
     font-variant-numeric: tabular-nums;
   }
+  /* Frostreach Frontier incursion bar: a shared top-center meter shown while you are
+     in the PvP band; flips to the live rare's HP (danger styling) when a rare is up. */
+  #frontier-incursion {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 66px;
+    width: 340px;
+    height: 22px;
+    display: none;
+    align-items: center;
+    border: 2px solid var(--border);
+    outline: 1px solid #000;
+    border-radius: 4px;
+    background: #0a1420;
+    overflow: hidden;
+  }
+  #frontier-incursion .fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(#bfe6ff, #4a90c9 60%, #2a6a9a);
+    box-shadow: inset 0 1px 0 #fff5;
+    transition: width 200ms linear;
+  }
+  #frontier-incursion.incursion-danger .fill {
+    background: linear-gradient(#ffb0a0, #c9401a 60%, #9a2612);
+  }
+  #frontier-incursion .label {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-size: 12px;
+    line-height: 19px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    font-family: var(--title-font);
+    font-variant-numeric: tabular-nums;
+  }
   /* target/boss cast bar, sits under the target name+HP so the raid sees the cast */
   #tf-castbar {
     position: relative;

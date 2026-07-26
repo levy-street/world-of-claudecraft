@@ -128,6 +128,7 @@ const UI_PURE_CORES = [
   'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
+  'src/ui/frontier_incursion_view.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
   'src/ui/party_below_target_core.ts',

@@ -66,19 +66,26 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
       {
         itemId: 'bread',
         item: item('bread'),
-        price: { copper: 5, honor: 0 },
+        price: { copper: 5, honor: 0, hero: 0 },
         quantity: 1,
         affordable: true,
       },
       {
         itemId: 'water',
         item: item('water'),
-        price: { copper: 2, honor: 0 },
+        price: { copper: 2, honor: 0, hero: 0 },
         quantity: 1,
         affordable: true,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      heroBalance: 0,
+      hasHeroGoods: false,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -93,7 +100,14 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     const buyback: VendorBuybackRow[] = [
       { itemId: 'sword', item: item('sword'), count: 1, price: 100 },
     ];
-    const view: VendorView = { goods: [], buyback, honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = {
+      goods: [],
+      buyback,
+      honorBalance: 0,
+      hasHonorGoods: false,
+      heroBalance: 0,
+      hasHeroGoods: false,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -105,7 +119,14 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
   });
 
   it('appends no empty .vendor-goods-grid when both sections are empty', () => {
-    const view: VendorView = { goods: [], buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = {
+      goods: [],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      heroBalance: 0,
+      hasHeroGoods: false,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 

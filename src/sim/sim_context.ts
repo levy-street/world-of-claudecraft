@@ -21,6 +21,7 @@ import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { PendingProjectile } from './projectile_travel';
+import type { FrontierIncursionState } from './pvp';
 import type { Rng } from './rng';
 import type {
   ArenaMatch,
@@ -210,6 +211,10 @@ export interface SimContextPrimitives {
   // the holder), so a read-only live view suffices. Consumed by the vale_cup
   // module, the damage no-damage floor, and targeting's candidate arm.
   readonly vcup: VcState;
+  // The Frostreach Frontier incursion state (pvp/frontier_incursion.ts): a holder
+  // mutated in place, read by the incursion phase, the kill/heal hooks, and the
+  // IWorld incursion-bar read. A read-only live view suffices.
+  readonly frontierIncursionState: FrontierIncursionState;
   // Book of Deeds: players whose deed-relevant state changed this tick,
   // evaluated and cleared at the tick tail (deeds.ts updateDeeds). Sim-owned
   // Set mutated in place, so a read-only live view.
@@ -1054,6 +1059,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get vcup() {
       return host.vcup;
+    },
+    get frontierIncursionState() {
+      return host.frontierIncursionState;
     },
     get deedDirtyPids() {
       return host.deedDirtyPids;

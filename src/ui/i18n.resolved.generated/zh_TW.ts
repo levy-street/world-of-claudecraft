@@ -1192,13 +1192,34 @@ export const zh_TW: EnTranslations = {
       "balance": "榮譽：{amount}",
       "honorFloat": "+{amount} 榮譽",
       "honorGain": "你獲得了 {amount} 點榮譽（{reason}）。",
+      "heroAmount": "{amount} 英雄點數",
+      "heroBalance": "英雄點數：{amount}",
+      "heroFloat": "+{amount} 英雄點數",
+      "arenaDailyTitle": "競技場每日",
+      "arenaDailyClaim": "領取每日獎勵",
+      "arenaDailyReward": "{honor} 榮譽 + {hero} 英雄點數",
+      "arenaDailyClaimed": "你今天已經領取過每日競技場獎勵了。",
+      "arenaDailyNotEntered": "今天進行一場競技場對戰即可領取每日獎勵。",
+      "heroGain": "你獲得 {amount} 英雄點數（{reason}）。",
       "notEnoughHonor": "榮譽不足。",
+      "notEnoughHero": "英雄點數不足。",
       "reasons": {
         "arenaWin": "競技場勝利",
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
-        "fiestaWin": "嘉年華勝利"
+        "fiestaWin": "嘉年華勝利",
+        "frontierKill": "邊境擊殺",
+        "frontierRare": "霜達稀有精英",
+        "frontierDaily": "邊境每日任務",
+        "arenaDaily": "競技場每日"
       }
+    },
+    "frontier": {
+      "title": "霜達邊境",
+      "enter": "前往邊境",
+      "leave": "離開邊境",
+      "note": "常駐的開放PvP區域。走出安全樞紐後，所有玩家都是敵人。",
+      "incursionTitle": "霜達入侵"
     },
     "charSheet": {
       "offense": "攻擊",
@@ -8798,6 +8819,33 @@ export const zh_TW: EnTranslations = {
       "emberglass_warstaff": {
         "name": "燼晶戰杖"
       },
+      "frostrend_helm": {
+        "name": "裂霜頭盔"
+      },
+      "frostrend_spaulders": {
+        "name": "裂霜肩甲"
+      },
+      "frostrend_hauberk": {
+        "name": "裂霜鎖甲"
+      },
+      "frostrend_girdle": {
+        "name": "裂霜腰帶"
+      },
+      "frostrend_legguards": {
+        "name": "裂霜護腿"
+      },
+      "frostrend_gauntlets": {
+        "name": "裂霜護手"
+      },
+      "frostrend_sabatons": {
+        "name": "裂霜戰靴"
+      },
+      "frostrend_choker": {
+        "name": "裂霜項鍊"
+      },
+      "frostrend_band": {
+        "name": "裂霜指環"
+      },
       "copper_ore": {
         "name": "銅礦石"
       },
@@ -9955,6 +10003,15 @@ export const zh_TW: EnTranslations = {
       "ridge_stalker": {
         "name": "山脊潛獵者"
       },
+      "rimefang_stalker": {
+        "name": "霜牙潛襲者"
+      },
+      "frostbound_revenant": {
+        "name": "霜縛亡魂"
+      },
+      "rimebound_wisp": {
+        "name": "縛霜幽光"
+      },
       "deeprock_kobold": {
         "name": "深岩鑿道者"
       },
@@ -10344,6 +10401,16 @@ export const zh_TW: EnTranslations = {
         "name": "怒焰",
         "title": "榮譽軍需官",
         "greeting": "戰場黃沙銘記每一場勝利。願你妥善運用這份榮譽。"
+      },
+      "frostreach_quartermaster": {
+        "name": "維爾卡·霜衛",
+        "title": "霜達軍需官",
+        "greeting": "邊境以鮮血與寒霜為報。好好花你的英雄點數。"
+      },
+      "frontier_marshal": {
+        "name": "德雷格元帥",
+        "title": "邊境元帥",
+        "greeting": "守住陣線，士兵。邊境從不眠，我們也一樣。"
       },
       "loremaster_caddis": {
         "name": "凱迪斯博學者",
@@ -11391,6 +11458,16 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "採集草藥叢"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "邊境集結",
+        "text": "每個士兵在開戰前都要報到。先向軍需官霜衛領取補給，然後回到我這裡集結，領取你的榮譽。",
+        "completion": "很好。邊境又守住了一天。拿好你的榮譽，士兵，在外面小心背後。",
+        "objectives": {
+          "0": {
+            "label": "向軍需官霜衛領取補給"
           }
         }
       },

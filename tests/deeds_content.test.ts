@@ -54,9 +54,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 219 deeds worth 2710 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(219);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2710);
+  it('ships exactly 221 deeds worth 2745 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(221);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2745);
   });
 
   it('ships the audited per-category counts', () => {
@@ -69,7 +69,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       delve: 13,
       chronicle: 24,
       collection: 28,
-      pvp: 28,
+      pvp: 30,
       social: 18,
       exploration: 9,
       feat: 3,
@@ -87,6 +87,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'prog_callused_hands',
       'prog_tools_of_the_trade',
       'dgn_nythraxis_crypt',
+      'pvp_frostreach_slayer',
+      'pvp_frostreach_warden',
       'chr_marsh_first_cast',
       'pvp_card_duel_first_win',
       // Professions 2.0 tail (order-pinned like the block above).
@@ -122,6 +124,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_callused_hands.renown).toBe(5);
     expect(DEEDS.prog_tools_of_the_trade.renown).toBe(10);
     expect(DEEDS.dgn_nythraxis_crypt.renown).toBe(10);
+    expect(DEEDS.pvp_frostreach_slayer.renown).toBe(10);
+    expect(DEEDS.pvp_frostreach_warden.renown).toBe(25);
     expect(DEEDS.chr_marsh_first_cast.renown).toBe(5);
     expect(DEEDS.pvp_card_duel_first_win.renown).toBe(5);
     expect(DEEDS.pvp_card_duel_first_win.trigger).toEqual({
@@ -273,11 +277,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
   it('ships exactly 30 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(30);
+    expect(titles.length).toBe(31);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(30);
+    expect(new Set(titleTexts).size).toBe(31);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -313,7 +317,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // milestones, the rare-find quartet, and the salvage pair). No shipped
   // trigger or renown changed; prog_master_gatherer had only its English desc
   // reworded, which this digest deliberately does not cover.
-  const FROZEN_CATALOG_SHA256 = '059694159a630369a4f9536f741dff8128f04ced50b8eb11a3a9edfde65e996a';
+  // Re-baselined at the release/v0.30.0 merge into the Frostreach Frontier
+  // branch: the catalog now also carries the appended Frontier deeds
+  // (first blood, the rare-kill pair, and the Frontier title).
+  const FROZEN_CATALOG_SHA256 = '00a58362ffbcd1b49c88af0353c092d1762b4738dfef6f5b0225f4baea2c5a5f';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(

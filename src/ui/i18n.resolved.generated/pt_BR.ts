@@ -1192,13 +1192,34 @@ export const pt_BR: EnTranslations = {
       "balance": "Honra: {amount}",
       "honorFloat": "+{amount} de Honra",
       "honorGain": "Você recebe {amount} de Honra ({reason}).",
+      "heroAmount": "{amount} Hero Points",
+      "heroBalance": "Hero Points: {amount}",
+      "heroFloat": "+{amount} Hero Points",
+      "arenaDailyTitle": "Coliseum Daily",
+      "arenaDailyClaim": "Claim daily reward",
+      "arenaDailyReward": "{honor} Honor + {hero} Hero Points",
+      "arenaDailyClaimed": "You have already claimed your daily arena reward today.",
+      "arenaDailyNotEntered": "Enter an arena match today to claim your daily reward.",
+      "heroGain": "You gain {amount} Hero Points ({reason}).",
       "notEnoughHonor": "Honra insuficiente.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Vitória na arena",
         "fiestaKill": "Eliminação na Fiesta",
         "fiestaComplete": "Fiesta concluída",
-        "fiestaWin": "Vitória na Fiesta"
+        "fiestaWin": "Vitória na Fiesta",
+        "frontierKill": "Frontier kill",
+        "frontierRare": "Frostreach rare",
+        "frontierDaily": "Frontier daily",
+        "arenaDaily": "Coliseum daily"
       }
+    },
+    "frontier": {
+      "title": "Frostreach Frontier",
+      "enter": "Travel to the Frontier",
+      "leave": "Return from the Frontier",
+      "note": "An always-on open-PvP zone. Beyond the safe hub, all players are enemies.",
+      "incursionTitle": "Frostreach Incursion"
     },
     "charSheet": {
       "offense": "Ataque",
@@ -8798,6 +8819,33 @@ export const pt_BR: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Cajado de Guerra de Vidro de Brasa"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "copper_ore": {
         "name": "Minério de cobre"
       },
@@ -9955,6 +10003,15 @@ export const pt_BR: EnTranslations = {
       "ridge_stalker": {
         "name": "Rastreador da crista"
       },
+      "rimefang_stalker": {
+        "name": "Rimefang Stalker"
+      },
+      "frostbound_revenant": {
+        "name": "Frostbound Revenant"
+      },
+      "rimebound_wisp": {
+        "name": "Rimebound Wisp"
+      },
       "deeprock_kobold": {
         "name": "Tunelador de Deeprock"
       },
@@ -10344,6 +10401,16 @@ export const pt_BR: EnTranslations = {
         "name": "FÚRIA",
         "title": "Intendente de Honra",
         "greeting": "As areias lembram cada vitória. Gaste bem sua honra."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
+      },
+      "frontier_marshal": {
+        "name": "Marshal Dregg",
+        "title": "Frontier Marshal",
+        "greeting": "Hold the line, soldier. The Frontier never sleeps, and neither do we."
       },
       "loremaster_caddis": {
         "name": "Mestre do saber Caddis",
@@ -11391,6 +11458,16 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Canteiro de ervas colhido"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "Frontier Muster",
+        "text": "Every soldier reports before the day's fighting. Draw your requisition from Quartermaster Frostwarden, then muster back to me for your honor.",
+        "completion": "Good. The Frontier holds another day. Take your honor, soldier, and mind your back out there.",
+        "objectives": {
+          "0": {
+            "label": "Requisition from Quartermaster Frostwarden"
           }
         }
       },

@@ -80,8 +80,8 @@ interface IWorldMember {
   readonly kind: IWorldMemberKind;
 }
 
-// The 250 members of `interface IWorld`, in interface order (world_api.ts).
-// Partition: 68 `data` + 182 `method` (read-returning + command-void + async).
+// The 263 members of `interface IWorld`, in interface order (world_api.ts).
+// Partition: 73 `data` + 190 `method` (read-returning + command-void + async).
 // biome-ignore lint/suspicious/noExportsInTest: IWORLD_MEMBERS is the W0c pinned structural-parity contract (the authoritative IWorld member list)
 export const IWORLD_MEMBERS = [
   // --- core world / player roster + economy reads (data) ---
@@ -179,6 +179,8 @@ export const IWORLD_MEMBERS = [
   { name: 'arenaInfo', kind: 'data' },
   { name: 'honor', kind: 'data' },
   { name: 'lifetimeHonor', kind: 'data' },
+  { name: 'heroPoints', kind: 'data' },
+  { name: 'lifetimeHeroPoints', kind: 'data' },
   { name: 'cardMinigameInfo', kind: 'data' },
   { name: 'joinCardDuelQueue', kind: 'method' },
   { name: 'leaveCardDuelQueue', kind: 'method' },
@@ -242,6 +244,11 @@ export const IWORLD_MEMBERS = [
   { name: 'arenaQueueJoin', kind: 'method' },
   { name: 'arenaQueueLeave', kind: 'method' },
   { name: 'arenaAugmentPick', kind: 'method' },
+  { name: 'frontierEnter', kind: 'method' },
+  { name: 'frontierLeave', kind: 'method' },
+  { name: 'frontierIncursion', kind: 'data' },
+  { name: 'arenaDaily', kind: 'data' },
+  { name: 'arenaDailyClaim', kind: 'method' },
   // --- the Vale Cup boarball minigame (IWorldValeCup) ---
   { name: 'vcupQueueJoin', kind: 'method' },
   { name: 'vcupQueueLeave', kind: 'method' },
@@ -466,10 +473,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // pickRowTalent; rowPicks stays off the seam, rows live on the allocation)
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
-    // activeMobileStationCraft), and the commissions unbindItem command.
-    expect(IWORLD_MEMBERS.length).toBe(256);
-    expect(DATA_MEMBERS.length).toBe(69);
-    expect(METHOD_MEMBERS.length).toBe(187);
+    // activeMobileStationCraft), and the commissions unbindItem command;
+    // plus the Frostreach Frontier surface (heroPoints, lifetimeHeroPoints,
+    // frontierIncursion, arenaDaily data + frontierEnter, frontierLeave,
+    // arenaDailyClaim commands).
+    expect(IWORLD_MEMBERS.length).toBe(263);
+    expect(DATA_MEMBERS.length).toBe(73);
+    expect(METHOD_MEMBERS.length).toBe(190);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -496,6 +506,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'applyTalents',
       'archetypeTitle',
       'arenaAugmentPick',
+      'arenaDaily',
+      'arenaDailyClaim',
       'arenaInfo',
       'arenaQueueJoin',
       'arenaQueueLeave',
@@ -582,6 +594,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
+      'frontierEnter',
+      'frontierIncursion',
+      'frontierLeave',
       'gatheringProficiency',
       'guildAccept',
       'guildCreate',
@@ -600,6 +615,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestCorpse',
       'harvestNode',
       'healPet',
+      'heroPoints',
       'hobbyCraft',
       'honor',
       'ignoreAdd',
@@ -617,6 +633,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'leaveCardDuelQueue',
       'leaveDelve',
       'leaveDungeon',
+      'lifetimeHeroPoints',
       'lifetimeHonor',
       'lifetimeXp',
       'loadouts',
@@ -748,6 +765,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeTemporalHourglasses',
       'activeTitle',
       'archetypeTitle',
+      'arenaDaily',
       'arenaInfo',
       'bagCapacity',
       'bags',
@@ -770,7 +788,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderInfo',
       'entities',
       'equipment',
+      'frontierIncursion',
       'gatheringProficiency',
+      'heroPoints',
       'hobbyCraft',
       'honor',
       'inventory',
@@ -780,6 +800,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'lastEnchantResult',
       'lastMasterwork',
       'lastSalvageResult',
+      'lifetimeHeroPoints',
       'lifetimeHonor',
       'lifetimeXp',
       'loadouts',
@@ -824,6 +845,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'applyEnchant',
       'applyTalents',
       'arenaAugmentPick',
+      'arenaDailyClaim',
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
@@ -888,6 +910,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
+      'frontierEnter',
+      'frontierLeave',
       'guildAccept',
       'guildCreate',
       'guildDecline',
@@ -1048,8 +1072,8 @@ describe('membership, not equality: world extras do not fail the gate', () => {
 //   (2) a type-level AssertNever<Exclude<keyof IWorldX, array[number]>> per facet rejects
 //       a MISSING name (if the array omits a key, Exclude<> is a non-never union and tsc
 //       fails) -- (1)+(2) together make each array EXACTLY its facet key-set;
-//   (3) the 28 arrays are pairwise DISJOINT (a member filed in two facets reddens);
-//   (4) their union, sorted, equals the pinned 250-name IWORLD_MEMBERS set (a member
+//   (3) the facet arrays are pairwise DISJOINT (a member filed in two facets reddens);
+//   (4) their union, sorted, equals the pinned 263-name IWORLD_MEMBERS set (a member
 //       dropped from the split reddens).
 // This is the rigorous form, NOT the tautological `keyof IWorld === keyof (A & B & ...)`
 // (IWorld extends them, so that self-equality proves nothing): it asserts against the
@@ -1258,9 +1282,16 @@ const FACET_DUEL_ARENA = [
   'arenaInfo',
   'honor',
   'lifetimeHonor',
+  'heroPoints',
+  'lifetimeHeroPoints',
   'arenaQueueJoin',
   'arenaQueueLeave',
   'arenaAugmentPick',
+  'frontierEnter',
+  'frontierLeave',
+  'frontierIncursion',
+  'arenaDaily',
+  'arenaDailyClaim',
 ] as const satisfies readonly (keyof IWorldDuelArena)[];
 type _ExhaustDuelArena = AssertNever<
   Exclude<keyof IWorldDuelArena, (typeof FACET_DUEL_ARENA)[number]>
@@ -1518,8 +1549,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 28 fa
 
   it('the union of the facets equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(256);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(256);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(263);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(263);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

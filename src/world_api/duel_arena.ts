@@ -7,6 +7,17 @@ export interface DuelInfo {
   state: 'countdown' | 'active';
 }
 
+// The shared Frontier incursion state, surfaced to a viewer ONLY while they are in the
+// band (null otherwise, so the top-screen bar hides). While building it carries the
+// meter fraction; while a rare is up it carries the rare's mob id + HP fraction so the
+// bar can flip to the shared boss. The mob id is localized client-side (string-free seam).
+export interface FrontierIncursionView {
+  progress: number; // 0..1 meter, while building
+  active: boolean; // a rare is up
+  rareTemplateId: string | null; // the live rare's mob id, while active
+  rareHpFrac: number; // 0..1, while active
+}
+
 export interface ArenaLadderEntry {
   pid: number;
   name: string;
@@ -155,8 +166,32 @@ export interface IWorldDuelArena {
   honor: number;
   /** Monotonic total Honor earned by the local/observed character. */
   lifetimeHonor: number;
+  /** Spendable Season 1 hero points (the frost-rare currency), soulbound. */
+  heroPoints: number;
+  /** Monotonic total hero points earned. */
+  lifetimeHeroPoints: number;
   arenaQueueJoin(format?: ArenaFormat): void;
   arenaQueueLeave(): void;
   // 2v2 Fiesta: lock in one of the augments currently on offer
   arenaAugmentPick(augmentId: string): void;
+  // The always-on Frostreach Frontier PvP zone: entered/left from the same PvP
+  // window as the arena/fiesta queue. Enter hard-teleports to the safe hub
+  // (remembering the return spot); leave teleports back.
+  frontierEnter(): void;
+  frontierLeave(): void;
+  // The public Frontier incursion state for the top-screen bar, or null when the
+  // viewer is not in the band (the bar hides).
+  frontierIncursion: FrontierIncursionView | null;
+  // The Ashen Coliseum daily-claim state for the local player (status + the reward it
+  // would pay), driving the arena-window claim button.
+  arenaDaily: ArenaDailyInfo;
+  arenaDailyClaim(): void;
+}
+
+// The daily-claim readout: whether the local player can claim their Coliseum daily and
+// the honor + hero points it would grant. Recomputed each render.
+export interface ArenaDailyInfo {
+  status: 'unavailable' | 'ready' | 'claimed';
+  honor: number;
+  hero: number;
 }

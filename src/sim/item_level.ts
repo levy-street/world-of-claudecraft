@@ -19,6 +19,7 @@
 //     str/sta, a mage cloth piece stays int/spi). itemScore() is the realized
 //     power (stats + armor + weapon dps) for at-a-glance comparison.
 
+import { FRONTIER_QM_STOCK, FROSTREACH_SOURCE_LEVEL } from './content/frontier_vendor';
 import {
   HEROIC_BOSS_LOOT,
   HEROIC_LOOT_SOURCE_LEVEL,
@@ -160,6 +161,9 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // FURY's WARFARE stock is level-22 PvP content. The epic quality bump puts
   // every piece at item level 28, including vendor-only necks and rings.
   for (const itemId of FURY_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
+  // The Frostreach Quartermaster's Season 1 stock is level-25 PvP content. The
+  // epic quality bump puts every piece at item level 31, one tier above FURY.
+  for (const itemId of FRONTIER_QM_STOCK) bump(itemId, FROSTREACH_SOURCE_LEVEL, false);
   // Heroic boss drops: level-20 content one tier up (the heroic bump), so the
   // five-man epic pieces read item level 31 (25 + the epic bump). The 10-player
   // raid (Heroic Nythraxis) is one tier ABOVE the five-mans: its heroic-only

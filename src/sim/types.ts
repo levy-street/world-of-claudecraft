@@ -68,7 +68,19 @@ export function hitFractionFromRating(rating: number): number {
   return rating / (HIT_RATING_PER_PCT * 100);
 }
 
-export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
+export type HonorReason =
+  | 'arena_win'
+  | 'fiesta_kill'
+  | 'fiesta_complete'
+  | 'fiesta_win'
+  | 'frontier_kill'
+  | 'frontier_rare'
+  | 'frontier_daily'
+  | 'arena_daily';
+
+// The Season 1 PvP currency (hero points), earned from frost-rare kills and the
+// Ashen Coliseum daily claim.
+export type HeroPointsReason = 'frontier_rare' | 'arena_daily';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -682,6 +694,9 @@ interface BaseItemDef {
   // Honor price for a Quartermaster purchase. An honor-only item omits
   // buyValue; both fields may coexist when a vendor charges both currencies.
   priceHonor?: number;
+  // Hero-points price for a Season 1 Frostreach Quartermaster purchase. Hero
+  // points are the frost-rare PvP currency; a hero-priced item omits buyValue.
+  priceHero?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
@@ -2595,6 +2610,14 @@ export interface QuestDef {
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   shareable?: boolean; // quest-link sharing allowed (default true; set false to opt out)
   suggestedPlayers?: number; // group quests ("Suggested players: 5")
+  // Daily quest: repeatable once per host calendar day (the utcDay boundary the
+  // server injects; offline/headless never rolls a day, so a daily is one-and-done
+  // there, deterministically). A daily is never added to questsDone permanently; its
+  // per-day completion is tracked in PlayerMeta.dailyQuests so it re-opens on reset.
+  daily?: boolean;
+  // Honor granted on turn-in (via grantHonor). PvP dailies pay honor instead of, or
+  // on top of, xp/copper. Zero/omitted grants no honor.
+  honorReward?: number;
   // Repeatable quests remain in questsDone as history but become available
   // again when they are not active.
   repeatable?: boolean;
@@ -2616,6 +2639,14 @@ export interface QuestDef {
   // Resolve the first objective's count from the character's return history at
   // acceptance time. The snapshotted value stays stable while the quest is active.
   resolvedObjectiveCounts?: 'archetypeAmends';
+}
+
+// Per-player daily-quest completion record: the host calendar day (utcDay) plus the
+// daily quest ids finished that day. When utcDay rolls, the list is cleared so every
+// daily re-opens. Persisted with the character (mirrors HonorArenaDailyState).
+export interface DailyQuestState {
+  date: string;
+  done: string[];
 }
 
 export function questTurnInNpcIds(quest: QuestDef): readonly string[] {
@@ -3278,6 +3309,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'death'; entityId: number; killerId: number }
   | { type: 'xp'; amount: number; rested?: number }
   | { type: 'honor'; amount: number; reason: HonorReason }
+  | { type: 'heroPoints'; amount: number; reason: HeroPointsReason }
   | { type: 'levelup'; level: number }
   // opt-in post-cap rank reset (always personal: emitted with pid), fired by
   // prestige() in src/sim/progression/xp.ts alongside the 'log' chat line. The
@@ -4534,7 +4566,8 @@ export type DeedStatKey =
   | 'hubCraftsPerformed'
   | 'attunementsCompleted'
   | 'masterworksCrafted'
-  | 'salvagesPerformed';
+  | 'salvagesPerformed'
+  | 'frontierRareKills';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -4563,6 +4596,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'attunementsCompleted',
   'masterworksCrafted',
   'salvagesPerformed',
+  'frontierRareKills',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new

@@ -72,6 +72,7 @@ import type {
   AbilityDef,
   CalendarResultCode,
   EquipSlot,
+  HeroPointsReason,
   HonorReason,
   InvSlot,
   ItemInstancePayload,
@@ -232,6 +233,7 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { FrontierIncursionPainter } from './frontier_incursion_painter';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import {
   buildGatheringProficiencyRows,
@@ -240,6 +242,7 @@ import {
   gatherRareTierFor,
   gatherToolNoNodeKey,
 } from './gathering_view';
+import { holderTierBadgeDataUrl, holderTierByIndex, holderTierDisplayName } from './holder_tier';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
   handleShiftClearContextMenu,
@@ -792,6 +795,14 @@ const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
   fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
   fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
+  frontier_kill: 'hudChrome.warfare.reasons.frontierKill',
+  frontier_rare: 'hudChrome.warfare.reasons.frontierRare',
+  frontier_daily: 'hudChrome.warfare.reasons.frontierDaily',
+  arena_daily: 'hudChrome.warfare.reasons.arenaDaily',
+};
+const HERO_REASON_KEYS: Record<HeroPointsReason, TranslationKey> = {
+  frontier_rare: 'hudChrome.warfare.reasons.frontierRare',
+  arena_daily: 'hudChrome.warfare.reasons.arenaDaily',
 };
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
@@ -1216,6 +1227,9 @@ export class Hud {
   // every frame, the leak this fixes).
   private xpbarEl = $('#xpbar');
   private xpRestedEl = $('#xpbar .rested');
+  private frontierIncursionEl = $('#frontier-incursion');
+  private frontierIncursionFillEl = $('#frontier-incursion .fill');
+  private frontierIncursionLabelEl = $('#frontier-incursion .label');
   private playerFrameEl = $('#player-frame');
   // The party-frames container, resolved once (was re-queried every frame); the
   // keyed-pool party painter owns its children.
@@ -3269,6 +3283,12 @@ export class Hud {
     this.xpRestedEl,
     this.xpLabelEl,
     this.playerFrameEl,
+  );
+  private readonly frontierIncursionPainter = new FrontierIncursionPainter(
+    this.writerFacet,
+    this.frontierIncursionEl,
+    this.frontierIncursionFillEl,
+    this.frontierIncursionLabelEl,
   );
   private readonly swingTimerPainter = new SwingTimerPainter(
     this.writerFacet,
@@ -7550,6 +7570,10 @@ export class Hud {
     });
     this.xpBarPainter.paint(bar);
 
+    // Frontier incursion bar: shown only while in the band (null hides it), the shared
+    // meter while building and the live rare's name + HP while a rare is up.
+    this.frontierIncursionPainter.paint(sim.frontierIncursion);
+
     // FCT painter: drive the pooled floating-combat-text ring on the every-frame
     // tier (folded into the existing `hud` perf bucket, not a second rAF).
     // step() only TTL-recycles each live floater (the number is screen-anchored, positioned
@@ -9079,6 +9103,28 @@ export class Hud {
           // Keep the character sheet's Honor balance live if the sheet is open (spending
           // already refreshes via the inventory path; an award landing did not).
           this.renderCharIfOpen();
+          break;
+        }
+        case 'heroPoints': {
+          const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
+          const heroShape = fctSpawnShape({ type: 'honor' });
+          if (heroShape) {
+            this.fctPainter.spawn(
+              {
+                ...heroShape,
+                text: t('hudChrome.warfare.heroFloat', { amount }),
+                target: sim.player,
+              },
+              now,
+            );
+          }
+          this.combatLog(
+            t('hudChrome.warfare.heroGain', {
+              amount,
+              reason: t(HERO_REASON_KEYS[ev.reason]),
+            }),
+            '#8fc7e8',
+          );
           break;
         }
         case 'levelup': {
@@ -10962,6 +11008,11 @@ export class Hud {
       'That item is not sold here.': 'itemUi.errors.notSoldHere',
       'Not enough money.': 'itemUi.errors.notEnoughMoney',
       'Not enough honor.': 'hudChrome.warfare.notEnoughHonor',
+      'Not enough hero points.': 'hudChrome.warfare.notEnoughHero',
+      'Enter an arena match today to claim your daily reward.':
+        'hudChrome.warfare.arenaDailyNotEntered',
+      'You have already claimed your daily arena reward today.':
+        'hudChrome.warfare.arenaDailyClaimed',
       'You must bring your goods to the Merchant.': 'itemUi.errors.bringGoods',
       'The Merchant will not broker quest items.': 'itemUi.errors.noQuestItems',
       'You do not have that many to sell.': 'itemUi.errors.notEnoughToSell',
@@ -11526,6 +11577,7 @@ export class Hud {
       buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS, {
         copper: this.sim.copper,
         honor: this.sim.honor,
+        hero: this.sim.heroPoints,
       }),
       {
         ...this.presentationBag,

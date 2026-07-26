@@ -96,6 +96,12 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import {
+  FRONTIER_MARSHAL_ENTITY_ID,
+  FRONTIER_MARSHAL_NPC_ID,
+  FRONTIER_QM_ENTITY_ID,
+  FRONTIER_QM_NPC_ID,
+} from './content/frontier_vendor';
 import type { GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -412,6 +418,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { normalizeDailyQuestState } from './quests/daily_quest';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -491,6 +498,7 @@ import {
   type CrowdControlDrState,
   cloneInvSlot,
   cloneItemInstancePayload,
+  type DailyQuestState,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DeedStats,
   type DelveDef,
@@ -1003,8 +1011,20 @@ export interface PlayerMeta {
   // Soulbound PvP currency. honor is spendable; lifetimeHonor is monotonic.
   honor: number;
   lifetimeHonor: number;
+  // Season 1 Frontier PvP currency (hero points). heroPoints is spendable at the
+  // Frostreach hub vendor; lifetimeHeroPoints is a monotonic earned total.
+  heroPoints: number;
+  lifetimeHeroPoints: number;
   // Persisted per-day, per-opponent ranked-win accounting for honor DR.
   honorArenaDaily?: HonorArenaDailyState;
+  // Persisted per-day daily-quest completion record (the utcDay + ids done that day).
+  dailyQuests?: DailyQuestState;
+  // Where to teleport back to when leaving the Frostreach Frontier (the overworld
+  // spot the player entered from). Persisted so leave works across a relog.
+  frontierReturn?: { x: number; z: number; facing: number };
+  // Ashen Coliseum daily claim: the utcDay the player last entered a bout + last
+  // claimed, so the once-per-day honor+hero claim resets on the day boundary.
+  arenaDaily?: honorMod.ArenaDailyState;
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -1268,7 +1288,13 @@ export interface CharacterState {
   // Soulbound PvP progression. Optional so pre-honor saves load at zero.
   honor?: number;
   lifetimeHonor?: number;
+  // Season 1 Frontier hero points. Optional so pre-Frontier saves load at zero.
+  heroPoints?: number;
+  lifetimeHeroPoints?: number;
   honorArenaDaily?: HonorArenaDailyState;
+  dailyQuests?: DailyQuestState;
+  frontierReturn?: { x: number; z: number; facing: number };
+  arenaDaily?: honorMod.ArenaDailyState;
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
@@ -1591,6 +1617,10 @@ export class Sim {
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
   // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
   vcup: VcState = createVcState();
+  // The Frostreach Frontier incursion event (pvp/frontier_incursion.ts): a live
+  // holder mutated in place, exposed as a read-only SimContext view. Session-only
+  // (not persisted): the meter and any live rare rebuild on a fresh boot.
+  frontierIncursionState: honorMod.FrontierIncursionState = honorMod.createFrontierIncursionState();
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -1935,6 +1965,28 @@ export class Sim {
       }
     }
 
+    // The Frostreach Quartermaster (Season 1 hero-points vendor) mirrors FURY: a
+    // reserved id spawned after the rng-driven roster, standing in the Frontier
+    // safe hub. Cannot perturb existing entity ids or replay RNG.
+    {
+      const qmDef = worldContent.npcs[FRONTIER_QM_NPC_ID];
+      if (qmDef && !this.entities.has(FRONTIER_QM_ENTITY_ID)) {
+        const safe = this.findSafePos(qmDef.pos.x, qmDef.pos.z, waterLevel() + 0.6);
+        const qm = createNpc(FRONTIER_QM_ENTITY_ID, qmDef, this.groundPos(safe.x, safe.z));
+        this.addEntity(qm);
+      }
+      const marshalDef = worldContent.npcs[FRONTIER_MARSHAL_NPC_ID];
+      if (marshalDef && !this.entities.has(FRONTIER_MARSHAL_ENTITY_ID)) {
+        const safe = this.findSafePos(marshalDef.pos.x, marshalDef.pos.z, waterLevel() + 0.6);
+        const marshal = createNpc(
+          FRONTIER_MARSHAL_ENTITY_ID,
+          marshalDef,
+          this.groundPos(safe.x, safe.z),
+        );
+        this.addEntity(marshal);
+      }
+    }
+
     for (const delve of DELVE_LIST) {
       for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
         const origin = delveOrigin(delve.index, i);
@@ -2200,6 +2252,8 @@ export class Sim {
       lifetimeXp: 0,
       honor: 0,
       lifetimeHonor: 0,
+      heroPoints: 0,
+      lifetimeHeroPoints: 0,
       prestigeRank: 0,
       unlockedMilestones: new Set(),
       restedXp: 0,
@@ -2309,6 +2363,25 @@ export class Sim {
         honorMod.normalizeHonorCounter(s.lifetimeHonor ?? meta.honor),
       );
       meta.honorArenaDaily = honorMod.normalizeHonorDailyState(s.honorArenaDaily);
+      meta.dailyQuests = normalizeDailyQuestState(s.dailyQuests);
+      meta.arenaDaily = honorMod.normalizeArenaDaily(s.arenaDaily);
+      if (
+        s.frontierReturn &&
+        Number.isFinite(s.frontierReturn.x) &&
+        Number.isFinite(s.frontierReturn.z) &&
+        Number.isFinite(s.frontierReturn.facing)
+      ) {
+        meta.frontierReturn = {
+          x: s.frontierReturn.x,
+          z: s.frontierReturn.z,
+          facing: s.frontierReturn.facing,
+        };
+      }
+      meta.heroPoints = honorMod.normalizeHeroPoints(s.heroPoints);
+      meta.lifetimeHeroPoints = Math.max(
+        meta.heroPoints,
+        honorMod.normalizeHeroPoints(s.lifetimeHeroPoints ?? meta.heroPoints),
+      );
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
@@ -2980,6 +3053,9 @@ export class Sim {
       ...(meta.honor || meta.lifetimeHonor
         ? { honor: meta.honor, lifetimeHonor: meta.lifetimeHonor }
         : {}),
+      ...(meta.heroPoints || meta.lifetimeHeroPoints
+        ? { heroPoints: meta.heroPoints, lifetimeHeroPoints: meta.lifetimeHeroPoints }
+        : {}),
       ...(meta.honorArenaDaily
         ? {
             honorArenaDaily: {
@@ -2991,6 +3067,16 @@ export class Sim {
               totalWins: meta.honorArenaDaily.totalWins,
             },
           }
+        : {}),
+      ...(meta.dailyQuests && (meta.dailyQuests.date || meta.dailyQuests.done.length)
+        ? { dailyQuests: { date: meta.dailyQuests.date, done: [...meta.dailyQuests.done] } }
+        : {}),
+      ...(meta.frontierReturn ? { frontierReturn: { ...meta.frontierReturn } } : {}),
+      // An all-empty record (a bout entered with no host calendar, so both days are
+      // '') normalizes back to undefined on load; omit it here too so
+      // save/load/save stays byte-stable.
+      ...(meta.arenaDaily && (meta.arenaDaily.enteredDay || meta.arenaDaily.claimedDay)
+        ? { arenaDaily: { ...meta.arenaDaily } }
         : {}),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
@@ -3868,6 +3954,11 @@ export class Sim {
       get vcup() {
         return sim.vcup;
       },
+      // The Frontier incursion holder (mutated in place; the meter/rare/trash roster
+      // live inside it, so a read-only live view suffices).
+      get frontierIncursionState() {
+        return sim.frontierIncursionState;
+      },
       // Book of Deeds live views (all mutated in place, never reassigned).
       get deedDirtyPids() {
         return sim.deedDirtyPids;
@@ -4671,6 +4762,11 @@ export class Sim {
     lap?.('postOffice');
     drainDelayedEvents(this.ctx);
     lap?.('delayedEv');
+    // The Frontier incursion (pvp/frontier_incursion.ts) draws ZERO shared rng
+    // (deterministic spawns/positions/ids, player-gated), so appending it in the
+    // zero-rng tail cannot fork the draw order (the Vale Cup precedent).
+    honorMod.updateFrontierIncursion(this.ctx);
+    lap?.('frontierIncursionState');
     // The Book of Deeds evaluator runs at the very end of the tail: it sees
     // same-tick delayed-event results, and because it draws ZERO rng (pure
     // predicate checks over dirty players plus a 1 Hz proximity sweep) its
@@ -7649,6 +7745,22 @@ export class Sim {
       ) {
         return true;
       }
+      // The Frostreach Frontier: factionless open-world PvP. Both players inside
+      // the band are hostile, no team, no color (the Wilderness "flagged the
+      // instant you are in here" rule), EXCEPT party members: the rares are group
+      // content, so a party can heal/shield/AoE together (a party is not hostile to
+      // itself here). The one safe hub is exempted so nobody is attackable at the
+      // vendor/graveyard. isFriendlyTo mirrors this.
+      if (
+        honorMod.isFrontierPos(attackerPlayer.pos.x) &&
+        honorMod.isFrontierPos(target.pos.x) &&
+        !honorMod.inFrontierHub(attackerPlayer.pos.x, attackerPlayer.pos.z) &&
+        !honorMod.inFrontierHub(target.pos.x, target.pos.z)
+      ) {
+        const myParty = this.partyOf(attackerPlayer.id);
+        const sameParty = !!myParty && myParty.id === this.partyOf(target.id)?.id;
+        return !sameParty;
+      }
       // The jail brawl: prisoners are hostile to each other, always (pets
       // resolve to their owner via pvpController above, so a prisoner's pet
       // fights too). A visiting moderator is never jailed, so no prisoner
@@ -8096,6 +8208,70 @@ export class Sim {
 
   arenaQueueLeave(pid?: number): void {
     arenaMod.arenaQueueLeave(this.ctx, pid);
+  }
+
+  // The Frostreach Frontier is a persistent zone, not a matchmade bracket: entering
+  // hard-teleports to the safe hub (remembering the return spot), leaving teleports
+  // back. Driven from the same PvP window as the arena/fiesta queue.
+  frontierEnter(pid?: number): void {
+    honorMod.frontierEnter(this.ctx, pid);
+  }
+
+  frontierLeave(pid?: number): void {
+    honorMod.frontierLeave(this.ctx, pid);
+  }
+
+  // The incursion bar read: the shared meter / live rare, but ONLY for a viewer who
+  // is inside the band (null otherwise, so the bar hides). Server calls the per-pid
+  // form; the IWorld getter serves the offline primary player.
+  frontierIncursionFor(pid: number): import('../world_api').FrontierIncursionView | null {
+    const p = this.entities.get(pid);
+    if (!p || !honorMod.isFrontierPos(p.pos.x)) return null;
+    const inc = this.frontierIncursionState;
+    if (inc.phase === 'active' && inc.rareId !== null) {
+      const rare = this.entities.get(inc.rareId);
+      if (rare && !rare.dead) {
+        return {
+          progress: 0,
+          active: true,
+          rareTemplateId: inc.rareTemplateId,
+          rareHpFrac: rare.maxHp > 0 ? rare.hp / rare.maxHp : 0,
+        };
+      }
+    }
+    return { progress: inc.progress, active: false, rareTemplateId: null, rareHpFrac: 0 };
+  }
+
+  get frontierIncursion(): import('../world_api').FrontierIncursionView | null {
+    return this.frontierIncursionFor(this.primaryId);
+  }
+
+  // The Ashen Coliseum daily claim: once per host day, a player who entered a bout
+  // that day claims honor + hero points scaled by their best arena rating.
+  arenaDailyClaim(pid?: number): void {
+    honorMod.claimArenaDaily(this.ctx, pid);
+  }
+
+  arenaDailyInfoFor(pid: number): import('../world_api').ArenaDailyInfo {
+    const meta = this.players.get(pid);
+    if (!meta) return { status: 'unavailable', honor: 0, hero: 0 };
+    return honorMod.arenaDailyInfo(meta, this.utcDay);
+  }
+
+  // Daily-quest ids already completed on the current host day (empty when the day
+  // has rolled or the host set no calendar). The server ships this to the online
+  // client (the `dailyq` snapshot self-field) so ClientWorld.questState shows a
+  // turned-in daily as done-for-today exactly like the offline Sim's questState.
+  dailyQuestsDoneTodayFor(pid: number): string[] {
+    const d = this.players.get(pid)?.dailyQuests;
+    if (!d || d.date !== this.utcDay) return [];
+    return [...d.done];
+  }
+
+  get arenaDaily(): import('../world_api').ArenaDailyInfo {
+    return this.primaryId === -1
+      ? { status: 'unavailable', honor: 0, hero: 0 }
+      : this.arenaDailyInfoFor(this.primaryId);
   }
 
   private isArenaQueued(pid: number): boolean {
@@ -8917,6 +9093,14 @@ export class Sim {
 
   get lifetimeHonor(): number {
     return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHonor ?? 0);
+  }
+
+  get heroPoints(): number {
+    return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.heroPoints ?? 0);
+  }
+
+  get lifetimeHeroPoints(): number {
+    return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHeroPoints ?? 0);
   }
 
   get marketInfo(): import('../world_api').MarketInfo | null {

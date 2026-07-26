@@ -209,7 +209,9 @@ describe('axe: arena window', () => {
           ({
             arenaInfo: null,
             playerId: 1,
-            player: { name: 'Aurelia' },
+            // pos/level feed the Frostreach Frontier travel control the window
+            // renders alongside the offline note (arena_window.ts render()).
+            player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 }, level: 1 },
             partyInfo: null,
           }) as never,
         captureFocus: () => null,

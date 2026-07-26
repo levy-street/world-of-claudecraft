@@ -33,6 +33,7 @@ import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
+import { spendHeroPoints } from './pvp';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -539,9 +540,14 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     def?.priceHonor !== undefined && Number.isFinite(def.priceHonor) && def.priceHonor > 0
       ? Math.floor(def.priceHonor)
       : 0;
+  const heroPrice =
+    def?.priceHero !== undefined && Number.isFinite(def.priceHero) && def.priceHero > 0
+      ? Math.floor(def.priceHero)
+      : 0;
   const hasCopperPrice = copperUnitPrice > 0;
   const hasHonorPrice = honorPrice > 0;
-  if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice)) {
+  const hasHeroPrice = heroPrice > 0;
+  if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice && !hasHeroPrice)) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -561,6 +567,7 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   const qty = vendorStackSize(def);
   const copperCost = freeVendor ? 0 : copperUnitPrice * qty;
   const honorCost = freeVendor ? 0 : honorPrice;
+  const heroCost = freeVendor ? 0 : heroPrice;
   if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
@@ -569,12 +576,19 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
+  if (meta.heroPoints < heroCost) {
+    ctx.error(meta.entityId, 'Not enough hero points.');
+    return;
+  }
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.copper -= copperCost;
   meta.honor -= honorCost;
+  // Hero points spend through the one owner of the wallet rule (spendable down,
+  // lifetimeHeroPoints untouched); the affordability check above already passed.
+  if (heroCost > 0) spendHeroPoints(meta, heroCost);
   ctx.addItem(itemId, qty, meta.entityId);
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }

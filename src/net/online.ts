@@ -1336,6 +1336,11 @@ export class ClientWorld implements IWorld {
   activeLoadout = -1;
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
+  // Daily-quest ids already completed on the current host day, mirrored from the
+  // snapshot self (`s.dailyq`, delta-omitted). A daily never enters questsDone, so
+  // questState reads this to show it done-for-today (it re-opens on the day roll,
+  // when the server ships a fresh, emptied list).
+  private dailyQuestsDoneToday = new Set<string>();
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
   // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
   // field (pet state lives on the owned-mob entity wire). ---
@@ -1349,6 +1354,8 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  frontierIncursion: import('../world_api').FrontierIncursionView | null = null;
+  arenaDaily: import('../world_api').ArenaDailyInfo = { status: 'unavailable', honor: 0, hero: 0 };
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -1356,6 +1363,8 @@ export class ClientWorld implements IWorld {
   dungeonFinderBoard: import('../world_api').DungeonFinderBoard | null = null;
   honor = 0;
   lifetimeHonor = 0;
+  heroPoints = 0;
+  lifetimeHeroPoints = 0;
   // --- IWorldCardMinigame: Card Duel queue/match state, mirrored from the
   // snapshot self (`s.cardDuel`, delta-omitted). ---
   cardMinigameInfo: CardMinigameInfo = { queued: false, available: true, match: null };
@@ -2881,6 +2890,7 @@ export class ClientWorld implements IWorld {
       if (s.qlog !== undefined)
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
+      if (s.dailyq !== undefined) this.dailyQuestsDoneToday = new Set(s.dailyq ?? []);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
@@ -2934,6 +2944,11 @@ export class ClientWorld implements IWorld {
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
+      if (s.hero !== undefined) this.heroPoints = s.hero ?? 0;
+      if (s.lhero !== undefined) this.lifetimeHeroPoints = s.lhero ?? 0;
+      if (s.fincur !== undefined) this.frontierIncursion = s.fincur ?? null;
+      if (s.adaily !== undefined)
+        this.arenaDaily = s.adaily ?? { status: 'unavailable', honor: 0, hero: 0 };
       if (s.vcup !== undefined) this.lastVcupRemainder = s.vcup as VcViewerReadout | null;
       if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
       if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
@@ -3109,6 +3124,9 @@ export class ClientWorld implements IWorld {
           }
         : undefined,
       cadenceBlocked,
+      // Optional-chained for the same bareClient reason as the identity guard
+      // above: prototype-built test instances skip the field initializer.
+      this.dailyQuestsDoneToday?.has(questId) ?? false,
     );
   }
 
@@ -3714,6 +3732,15 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  frontierEnter(): void {
+    this.cmd({ cmd: 'frontier_enter' });
+  }
+  frontierLeave(): void {
+    this.cmd({ cmd: 'frontier_leave' });
+  }
+  arenaDailyClaim(): void {
+    this.cmd({ cmd: 'arena_daily_claim' });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---

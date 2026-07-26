@@ -49,6 +49,9 @@ const MOB_IDS = [
   'deacon_voss',
   'training_dummy',
   'ridge_stalker',
+  'rimefang_stalker',
+  'frostbound_revenant',
+  'rimebound_wisp',
   'deeprock_kobold',
   'thornpeak_ogre',
   'ogre_crusher',
@@ -134,6 +137,8 @@ const NPC_IDS = [
   'armorer_hode',
   'heroic_quartermaster', // Heroic Marks vendor (Highwatch, zone 3)
   'fury', // Honor Quartermaster and WARFARE vendor (Eastbrook, zone 1)
+  'frostreach_quartermaster', // Season 1 hero-points vendor (Frostreach Frontier)
+  'frontier_marshal', // Frontier daily-quest giver (Frostreach Frontier)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
@@ -247,6 +252,7 @@ const QUEST_IDS = [
   'q_prof_workorder_tannery',
   'q_prof_workorder_apothecary',
   'q_prof_hobby_switch',
+  'frontier_daily_muster', // Frostreach Frontier honor daily
 ] as const;
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;

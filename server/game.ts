@@ -360,6 +360,7 @@ export const SIM_LAP_PHASES = [
   'market',
   'postOffice',
   'delayedEv',
+  'frontierIncursionState',
   'deeds',
   'gridRefresh',
   // Per-family mob.update buckets, appended after the base lap names so those
@@ -526,6 +527,7 @@ const LANE_DROP_CAUSE = {
 } as const satisfies Record<MsgLane, WsDropCause>;
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
+  'frontier_enter',
   'vcup_queue',
   'vcup_ready',
   'vcup_practice',
@@ -4811,6 +4813,15 @@ export class GameServer {
           sim.arenaAugmentPick(msg.augment, pid);
         break;
       }
+      case 'frontier_enter':
+        sim.frontierEnter(pid);
+        break;
+      case 'frontier_leave':
+        sim.frontierLeave(pid);
+        break;
+      case 'arena_daily_claim':
+        sim.arenaDailyClaim(pid);
+        break;
 
       // Card Duel minigame (the Card Master NPC, docs: src/sim/social/card_duel.ts).
       case 'card_queue_join':
@@ -5864,6 +5875,17 @@ export class GameServer {
     // session receives both, then they ride only on earn/spend changes.
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
+    maybe('hero', meta.heroPoints);
+    maybe('lhero', meta.lifetimeHeroPoints);
+    // Frontier incursion bar: the shared meter / live rare, but only while this viewer
+    // is in the band (null otherwise). Delta-guarded, so it rides only on change.
+    maybe('fincur', this.sim.frontierIncursionFor(anchorSession.pid));
+    maybe('adaily', this.sim.arenaDailyInfoFor(anchorSession.pid));
+    // Daily-quest ids already done on the current host day, so the client's
+    // questState shows a turned-in daily as done-for-today (a daily never enters
+    // qdone; without this the client re-offers it while the server refuses).
+    // Delta-guarded: re-ships on turn-in and on the UTC day roll.
+    maybe('dailyq', this.sim.dailyQuestsDoneTodayFor(anchorSession.pid));
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));

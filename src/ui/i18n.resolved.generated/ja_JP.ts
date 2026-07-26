@@ -1192,13 +1192,34 @@ export const ja_JP: EnTranslations = {
       "balance": "名誉: {amount}",
       "honorFloat": "名誉 +{amount}",
       "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
+      "heroAmount": "{amount} ヒーローポイント",
+      "heroBalance": "ヒーローポイント：{amount}",
+      "heroFloat": "+{amount} ヒーローポイント",
+      "arenaDailyTitle": "コロシアム日課",
+      "arenaDailyClaim": "日課報酬を受け取る",
+      "arenaDailyReward": "{honor} 名誉 + {hero} ヒーローポイント",
+      "arenaDailyClaimed": "本日の日課アリーナ報酬はすでに受け取っています。",
+      "arenaDailyNotEntered": "日課報酬を受け取るには、本日アリーナの試合に参加してください。",
+      "heroGain": "{amount} ヒーローポイントを獲得（{reason}）。",
       "notEnoughHonor": "名誉が足りません。",
+      "notEnoughHero": "ヒーローポイントが足りません。",
       "reasons": {
         "arenaWin": "アリーナ勝利",
         "fiestaKill": "フィエスタ撃破",
         "fiestaComplete": "フィエスタ完遂",
-        "fiestaWin": "フィエスタ勝利"
+        "fiestaWin": "フィエスタ勝利",
+        "frontierKill": "辺境の討伐",
+        "frontierRare": "フロストリーチの珍しい敵",
+        "frontierDaily": "辺境デイリー",
+        "arenaDaily": "コロシアム日課"
       }
+    },
+    "frontier": {
+      "title": "フロストリーチ辺境",
+      "enter": "辺境へ向かう",
+      "leave": "辺境から戻る",
+      "note": "常時稼働のオープンPvPゾーン。安全なハブの外では、すべてのプレイヤーが敵となる。",
+      "incursionTitle": "フロストリーチの侵攻"
     },
     "charSheet": {
       "offense": "攻撃",
@@ -8798,6 +8819,33 @@ export const ja_JP: EnTranslations = {
       "emberglass_warstaff": {
         "name": "熾火硝子の戦杖"
       },
+      "frostrend_helm": {
+        "name": "フロストレンドの兜"
+      },
+      "frostrend_spaulders": {
+        "name": "フロストレンドの肩当て"
+      },
+      "frostrend_hauberk": {
+        "name": "フロストレンドの鎖鎧"
+      },
+      "frostrend_girdle": {
+        "name": "フロストレンドの帯"
+      },
+      "frostrend_legguards": {
+        "name": "フロストレンドの具足"
+      },
+      "frostrend_gauntlets": {
+        "name": "フロストレンドの手甲"
+      },
+      "frostrend_sabatons": {
+        "name": "フロストレンドの脛当て"
+      },
+      "frostrend_choker": {
+        "name": "フロストレンドの首飾り"
+      },
+      "frostrend_band": {
+        "name": "フロストレンドの指輪"
+      },
       "copper_ore": {
         "name": "銅鉱石"
       },
@@ -9955,6 +10003,15 @@ export const ja_JP: EnTranslations = {
       "ridge_stalker": {
         "name": "尾根の追跡者"
       },
+      "rimefang_stalker": {
+        "name": "霜牙の追跡者"
+      },
+      "frostbound_revenant": {
+        "name": "霜縛の亡霊"
+      },
+      "rimebound_wisp": {
+        "name": "霜縛のウィスプ"
+      },
       "deeprock_kobold": {
         "name": "ディープロックの坑夫"
       },
@@ -10344,6 +10401,16 @@ export const ja_JP: EnTranslations = {
         "name": "フューリー",
         "title": "名誉補給官",
         "greeting": "戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。"
+      },
+      "frostreach_quartermaster": {
+        "name": "ヴァエルカ・フロストウォーデン",
+        "title": "フロストリーチの需品係",
+        "greeting": "フロンティアは血と氷で報いる。ヒーローポイントを賢く使え。"
+      },
+      "frontier_marshal": {
+        "name": "マーシャル・ドレッグ",
+        "title": "フロンティア元帥",
+        "greeting": "戦線を守れ、兵士よ。フロンティアは決して眠らぬ、我らもまた然り。"
       },
       "loremaster_caddis": {
         "name": "博識者キャディス",
@@ -11391,6 +11458,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "薬草の群生地を採集"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "フロンティアの召集",
+        "text": "兵士は皆、戦いの前に報告する。まず需品係フロストウォーデンから補給を受け取り、それから私のもとへ集結して名誉を受け取れ。",
+        "completion": "よし。フロンティアはまた一日持ちこたえた。名誉を受け取れ、兵士よ、外では背後に気をつけろ。",
+        "objectives": {
+          "0": {
+            "label": "需品係フロストウォーデンから補給を受け取る"
           }
         }
       },

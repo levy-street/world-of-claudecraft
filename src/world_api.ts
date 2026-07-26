@@ -167,6 +167,7 @@ export type {
   LockpickView,
 } from './world_api/delves';
 export type {
+  ArenaDailyInfo,
   ArenaInfo,
   ArenaLadderEntry,
   DuelInfo,
@@ -174,6 +175,7 @@ export type {
   FiestaMatchInfo,
   FiestaPowerupView,
   FiestaScoreboardPlayer,
+  FrontierIncursionView,
 } from './world_api/duel_arena';
 export type {
   DungeonFinderApplicantView,
@@ -371,6 +373,9 @@ export const COMMAND_NAMES = [
   'arena_queue',
   'arena_leave',
   'arena_augment',
+  'frontier_enter',
+  'frontier_leave',
+  'arena_daily_claim',
   'card_queue_join',
   'card_queue_leave',
   'play_card',
@@ -630,6 +635,9 @@ export const COMMAND_FACETS = {
   arena_queue: 'IWorldDuelArena',
   arena_leave: 'IWorldDuelArena',
   arena_augment: 'IWorldDuelArena',
+  frontier_enter: 'IWorldDuelArena',
+  frontier_leave: 'IWorldDuelArena',
+  arena_daily_claim: 'IWorldDuelArena',
   // IWorldCardMinigame: the Card Duel minigame queue + in-match card plays.
   // cardMinigameInfo is a snapshot read (no send).
   card_queue_join: 'IWorldCardMinigame',
