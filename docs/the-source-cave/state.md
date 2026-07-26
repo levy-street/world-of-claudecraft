@@ -116,7 +116,9 @@ numbers rot faster than anyone updates them.
 - **Boot**: `startServer` in `server/main.ts`, the GameServer ctor in `server/game.ts`,
   `SimConfig` in `src/sim/types.ts`, `server/source_cave_boot.ts`.
 - **Render**: `src/render/source_cave_interior.ts`, `source_cave_reboot.ts`,
-  `source_cave_seal.ts` plus its pure core `source_cave_seal_state.ts`.
+  `source_cave_seal.ts` plus its pure core `source_cave_seal_state.ts`,
+  `source_cave_mains.ts` plus its pure core `source_cave_mains_core.ts`, and
+  `source_cave_chest_beacon.ts`.
 
 ## Resolved
 

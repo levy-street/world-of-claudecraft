@@ -336,6 +336,7 @@ import {
   type SkyView,
 } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
+import { buildSourceCaveChestBeacon } from './source_cave_chest_beacon';
 import { SourceCaveInteriors } from './source_cave_interior';
 import { SourceCaveMains } from './source_cave_mains';
 import { buildSourceCaveRebootButton } from './source_cave_reboot';
@@ -6824,6 +6825,12 @@ export class Renderer {
         // The sealed Source Cave chest deliberately does not advertise itself.
         e.templateId !== SOURCE_CAVE_CHEST_SEALED_TEMPLATE
       ) {
+        if (e.templateId === SOURCE_CAVE_CHEST_TEMPLATE) {
+          // The clear ARMS this chest (sealed -> armed template swap), which
+          // rebuilds this view: the beacon therefore lights the instant the room
+          // is won, in a room the aftermath lighting deliberately leaves dark.
+          group.add(buildSourceCaveChestBeacon());
+        }
         if (!this.sparkleMat) {
           this.sparkleMat = new THREE.SpriteMaterial({
             map: sparkleTexture(),

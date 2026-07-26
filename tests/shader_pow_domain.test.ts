@@ -100,6 +100,16 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     why: 'the offline inspector copy of the same clamped twinkles shader',
   },
   {
+    file: 'src/render/source_cave_seal.ts',
+    base: 'breath',
+    sites: 1,
+    // Same reasoning as the weapon_vfx row above: the clamp is the proof, not
+    // the 0.5 - 0.5 * cos() shape, so the anchor pins the whole guarded
+    // expression and the row falls the moment the clamp goes.
+    anchor: /float breath = clamp\(0\.5 - 0\.5 \* cos\([^;]*, 0\.0, 1\.0\);/,
+    why: 'breath is the result of a clamp(..., 0.0, 1.0), read one line above the pow()',
+  },
+  {
     file: 'src/render/water.ts',
     base: 'sunAlign',
     sites: 3,
@@ -134,6 +144,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/pbr_fragment_shader.ts': 1,
   'src/render/post_output_grade.ts': 1,
   'src/render/sky.ts': 1,
+  'src/render/source_cave_seal.ts': 1,
   'src/render/water.ts': 4,
   'src/render/weapon_vfx.ts': 4,
   'src/render/worn_stone.ts': 1,

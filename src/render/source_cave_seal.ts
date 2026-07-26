@@ -1,7 +1,8 @@
 // Source Cave centre seal. A single procedural shader supplies the distinct
 // stone insert, etched circuit graph, occupancy-fed blue energy, red containment
-// flow, and the irreversible breach flare. The core signal never changes by GFX
-// tier; composer tiers merely add bloom to the same HDR output.
+// flow, the irreversible breach flare, and the post-clear wreck. The core signal
+// never changes by GFX tier; composer tiers merely add bloom to the same HDR
+// output.
 
 import * as THREE from 'three';
 import {
@@ -49,6 +50,16 @@ const fragmentShader = /* glsl */ `
     return 1.0 - smoothstep(width, width * 1.8, abs(value - centre));
   }
 
+  // Stable per-sector noise for the wreck's burnt-out sectors. Deterministic and
+  // time-independent, so which sectors died is fixed for the life of the room.
+  float hash1(float n) {
+    return fract(sin(n * 12.9898) * 43758.5453);
+  }
+
+  float bevelAt(float r) {
+    return smoothstep(0.86, 0.94, r) * (1.0 - smoothstep(0.985, 1.0, r));
+  }
+
   void main() {
     vec2 p = (vUv - 0.5) * 2.0;
     float r = length(p);
@@ -67,6 +78,49 @@ const fragmentShader = /* glsl */ `
     float circuitry = clamp(max(max(rings, spokes), max(branch, nodes)), 0.0, 1.0);
 
     vec3 groove = vec3(0.008, 0.012, 0.018);
+
+    // uMode 3, the WRECK: what the room looks like once the raid has killed
+    // every contributor in it. Not a shutdown and not a restore. Most of the 16
+    // sectors are burnt out permanently, the few survivors smoulder on their own
+    // phases, and the perimeter that used to say "do not cross" breathes as a
+    // fault lamp.
+    //
+    // NOTHING HERE FLASHES, by construction. Every animated term is a raised
+    // cosine (ease in and out, zero derivative at both ends) at well under 1 Hz,
+    // and none of them reaches zero abruptly. An earlier revision drove a bright
+    // ring outward from the centre on a loop; it read as violent and was a real
+    // hazard for flicker-sensitive players, so it is gone rather than softened.
+    //
+    // ONE COLOUR FAMILY: ember orange, all of it. Mixing a cold interior with a
+    // hot rim read as two unrelated effects sharing a disc. Hot-and-cooling is
+    // also simply the better "I broke this" language than clean machine blue.
+    // The reward beacon takes the opposite end of the spectrum instead, so the
+    // two never compete (source_cave_chest_beacon.ts).
+    if (uMode > 2.5) {
+      float alive = step(0.74, hash1(sector));
+      float arcRate = 0.6 + hash1(sector + 3.0) * 0.9;
+      float arcPhase = hash1(sector + 7.0) * 6.2831853;
+      float arc = 0.42 + 0.58 * (0.5 - 0.5 * cos(uTime * arcRate + arcPhase));
+      float traces = circuitry * alive * arc * uEnergy;
+
+      // Weighted low (pow > 1) so the rim spends most of the cycle dim and
+      // swells smoothly rather than sitting bright: the chest across the room is
+      // what should hold the eye, not the floor under the player's feet.
+      // Clamped, not merely written in a range-safe shape: GLSL leaves the
+      // precision of the trigonometric functions to the implementation, so
+      // 0.5 - 0.5 * cos(x) is only provably >= 0 in exact arithmetic, and a
+      // negative base under pow() is undefined (the shader_pow_domain rule,
+      // same reasoning as the clamped twinkles base in weapon_vfx.ts).
+      float breath = clamp(0.5 - 0.5 * cos(uTime * uPulseSpeed), 0.0, 1.0);
+      float faultRim = band(r, 0.965, 0.030) * pow(breath, 1.7);
+
+      vec3 wreck = vec3(1.15, 0.34, 0.06) * traces * 0.75;
+      wreck += vec3(0.78, 0.14, 0.02) * faultRim;
+      float wreckAlpha = max(traces * 0.62, faultRim * 0.62) + bevelAt(r) * 0.18;
+      gl_FragColor = vec4(groove + wreck, clamp(wreckAlpha, 0.0, 0.9));
+      return;
+    }
+
     vec3 color = groove;
     float time = uTime * uPulseSpeed;
     float flow = 0.5 + 0.5 * sin(time * uFlowDirection + r * 24.0 + sector * 0.71);
@@ -83,8 +137,6 @@ const fragmentShader = /* glsl */ `
     } else if (uMode > 1.5 && uMode < 2.5) {
       energyColor = hotRed;
       energyStrength *= 0.72 + flow * 0.55 + heartbeat * 0.25;
-    } else if (uMode > 2.5) {
-      energyStrength = 0.0;
     } else {
       energyStrength *= 0.38 + 0.62 * flow;
     }
@@ -95,7 +147,7 @@ const fragmentShader = /* glsl */ `
     float emissiveMask = clamp(circuitry * (0.48 + flow * 0.7) + boundary * 0.85, 0.0, 1.7);
     color += energyColor * emissiveMask * energyStrength;
 
-    float bevel = smoothstep(0.86, 0.94, r) * (1.0 - smoothstep(0.985, 1.0, r));
+    float bevel = bevelAt(r);
     color += vec3(0.12, 0.15, 0.18) * bevel * 0.24;
     float alpha = circuitry * 0.34 + bevel * 0.18;
     if (uMode > 0.5 && uMode < 1.5) {

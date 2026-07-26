@@ -51,13 +51,27 @@ describe('source cave seal visual state', () => {
     expect(sourceCaveSealVisualState(info('cleared', 10, 10)).boundaryGlow).toBe(0);
   });
 
-  it('returns to an unpowered neutral seal after clear', () => {
-    expect(sourceCaveSealVisualState(info('cleared', 10, 10))).toMatchObject({
-      mode: 'cleared',
-      occupancy: 0,
-      energy: 0,
-      pulseSpeed: 0,
-      flowDirection: 0,
-    });
+  it('leaves a live wreck after the clear, not a dead disc', () => {
+    // Clearing this room is vandalism, not a repair. The seal must stay visibly
+    // broken AND still animating: energy scales the surviving circuit traces and
+    // pulseSpeed drives the boot sweep that keeps failing. Both at zero (the old
+    // behavior) rendered pure dark stone, which said nothing at all.
+    const wreck = sourceCaveSealVisualState(info('cleared', 10, 10));
+    expect(wreck.mode).toBe('cleared');
+    expect(wreck.energy).toBeGreaterThan(0);
+    // pulseSpeed is the rim's breathing rate in rad/s. It has to stay slow
+    // enough that the ease-in/out swell can never read as a flash: one cycle is
+    // 2*PI/pulseSpeed seconds, and anything under ~1 Hz is far below the
+    // photosensitivity threshold.
+    expect(wreck.pulseSpeed).toBeGreaterThan(0);
+    expect((2 * Math.PI) / wreck.pulseSpeed).toBeGreaterThan(1);
+    // The wreck has no flow left to direct; the shader's wreck branch reads none.
+    expect(wreck.flowDirection).toBe(0);
+    // Dimmer than the fight it followed: the chest beacon is the room's light now.
+    expect(wreck.energy).toBeLessThan(sourceCaveSealVisualState(info('breached', 10, 10)).energy);
+    // Occupancy is meaningless once the encounter is over: the disc must not
+    // brighten or dim as the raid walks off it to loot.
+    expect(wreck.occupancy).toBe(0);
+    expect(sourceCaveSealVisualState(info('cleared', 0, 10))).toEqual(wreck);
   });
 });

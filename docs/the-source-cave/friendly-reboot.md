@@ -82,12 +82,62 @@ as an inert prop.
 
 ## Lighting and dressing
 
-The hall runs fully lit off the mains while the button is live, and snaps down to
-torch-carried backup gloom when it is pressed (`updateSourceCaveMains` in the renderer): a
-cosmetic per-frame blend of hemi, env, and fog over the shared delve ambience, scoped to the
-cave x-band, with a fast falling edge like a breaker snapping and a slower recovery. It is
-cosmetic only, the sim never reads it, and the low-graphics path keeps the fog component so
-the cue survives.
+The room's light follows the ENCOUNTER, in three phases (`SourceCaveMains` plus its pure
+core `source_cave_mains_core.ts`): a cosmetic per-frame blend of hemi, env, and fog over the
+shared delve ambience, scoped to the cave x-band. It is cosmetic only, the sim never reads
+it, and the low-graphics path keeps the fog component so the cue survives.
+
+| Phase | Seal state | What the room does |
+|---|---|---|
+| mains | `idle` | Fully lit hall. The button is live (also true again after a wipe reset). |
+| outage | `active`, `breached` | Torch-carried gloom. Fast falling edge like a breaker snapping, slower recovery. |
+| aftermath | `cleared` | Stays dark. Only the fog reach opens up, and slowly. |
+
+The phase reads the seal state, NOT the reboot button. It used to read the button's
+`lootable` flag, which only ever says "pressable" or "pressed": a pressed button never
+unpresses, so a cleared room stayed in combat gloom forever and the room had no way to say
+the fight was over. A missing cave, or an online snapshot that has not shipped the info
+yet, keeps the hall lit rather than flickering to darkness on absent data.
+
+The aftermath is deliberately not a restore. Clearing this room is vandalism, not a repair,
+so the ambience stays at its outage values and only the fog reach moves, 58u to 100u. That
+distinction matters: the room is dark because nothing lights it, not because the fog is
+close, so a light source can still carry across it. The reason for the exact numbers is the
+chest, 42u from the centre seal in a 96u-deep arena: at the outage's 58u it is roughly 64%
+eaten by an almost-black fog, unreadable from where the raid finishes the boss; at 100u it
+is around 33%, clearly legible, while staying a faint far glow from the entrance 82u out.
+
+The centre seal ends the fight as a WRECK rather than switching off (`uMode` 3 in
+`source_cave_seal.ts`, values from `sourceCaveSealVisualState`). Most of its 16 sectors are
+burnt out for good, the survivors smoulder on their own phases, and the perimeter that used
+to say "do not cross" breathes as a fault lamp. It is all one colour family, ember orange:
+an earlier revision paired a cold interior with a hot rim and read as two unrelated effects
+sharing a disc, and hot-and-cooling is the better "I broke this" language anyway.
+
+**Nothing in the wreck flashes, by construction.** Every animated term is a raised cosine
+(ease in and out, zero derivative at both ends) under 1 Hz, and none reaches zero abruptly.
+An earlier revision drove a bright ring outward from the centre on a repeating loop; it read
+as violent and was a real hazard for flicker-sensitive players, so it was removed rather
+than softened. Measured over a full breath cycle in a real WebGL context, the frame-to-frame
+luminance step stays around 11% of the cycle peak per 100ms, and the peak itself sits under
+half the breach flare it succeeds.
+
+The reward chest carries the room's only steady light once armed
+(`source_cave_chest_beacon.ts`, built into the ARMED chest's entity view so it lights on the
+sealed-to-armed swap). Three separate axes of contrast do the work, which is what buys
+legibility across 42 units of murk rather than raw brightness: steady where everything else
+breathes, vertical where everything else is flat, and COLD where everything else is warm.
+That last one is not the obvious choice and was not the first one: the arena is lit by 18
+pillar torches and the wrecked seal is ember orange on top of that, so the original warm-gold
+beacon simply dissolved into the room at range, which is exactly where it has a job to do.
+
+It is also built in two parts on purpose. The renderer keeps only `GFX.maxPointLights` point
+lights visible (as few as 2), ranked by distance, and those same 18 pillar torches sit closer
+to the fight than the chest does, so a beacon that were only a `PointLight` would be ranked
+out at exactly the distance where a raid needs it, and harder on low tiers, making "where is
+the loot" a graphics-preset question. The shaft and floor pool are always-rendered additive
+meshes that carry the long read; the point light is local warmth that earns its budget slot
+once someone walks over.
 
 The room is an open-plan dev office: bench desking, server-rack monoliths framing the centre
 dais, and bookcase runs along the walls. Wall zoning keeps one bookcase run and one desk run
@@ -106,6 +156,12 @@ hostile-but-idle activation, raid muster safety, the boss yell and the delayed r
 shared distribution), `source_cave_i18n.test.ts` and `entity_labels.test.ts` (the yell and
 label localisation), `nameplate_view.test.ts` (label visible near, hidden at range), and
 `interactions.test.ts` (both click buttons and the interact key route to `interact`).
+
+For the victory presentation: `source_cave_mains_core.test.ts` (the three phases, and that
+the aftermath thins the murk without relighting the room), `source_cave_seal_state.test.ts`
+(the cleared seal stays a live wreck rather than a dead disc), and
+`source_cave_chest_beacon.test.ts` (the long-range read is carried by always-rendered
+meshes, not by the budgeted point light).
 
 `scripts/source_cave_reboot_e2e.mjs` covers the same ground in a real browser, and
 regenerates the before/after screenshots locally. Those screenshots are deliberately not

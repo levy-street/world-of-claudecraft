@@ -1,15 +1,17 @@
-// Thin Three applier for The Open Source's mains-to-backup lighting. Owns the
-// button lookup and the scene writes; every decision lives in the pure core
+// Thin Three applier for The Open Source's mains lighting. Owns the phase lookup
+// and the scene writes; every decision lives in the pure core
 // (source_cave_mains_core.ts). Cosmetic only: the sim never reads any of this.
 
 import * as THREE from 'three';
-import { isSourceCavePos, SOURCE_CAVE_REBOOT_TEMPLATE } from '../sim/source_cave';
+import { isSourceCavePos } from '../sim/source_cave';
 import type { IWorld } from '../world_api';
 import {
   createSourceCaveMainsState,
+  SOURCE_CAVE_AFTERMATH_FOG_COLOR,
   SOURCE_CAVE_BACKUP_FOG_COLOR,
   SOURCE_CAVE_MAINS_FOG_COLOR,
   type SourceCaveMainsAnchors,
+  type SourceCaveMainsPhase,
   stepSourceCaveMains,
 } from './source_cave_mains_core';
 
@@ -28,12 +30,9 @@ export interface SourceCaveMainsTarget {
 
 export class SourceCaveMains {
   private readonly state = createSourceCaveMainsState();
-  // Cached so the per-frame power check is a map get, not an entity scan;
-  // re-scanned only when the cached id stops resolving (fresh claim, or
-  // interest churn online).
-  private buttonId: number | null = null;
   private readonly baseColor = new THREE.Color();
   private readonly caveColor = new THREE.Color();
+  private readonly darkColor = new THREE.Color();
   private readonly mainsColor = new THREE.Color();
 
   update(
@@ -46,7 +45,7 @@ export class SourceCaveMains {
     const inCave = isSourceCavePos(px);
     const levels = stepSourceCaveMains(
       this.state,
-      { inCave, powered: inCave ? this.buttonPowered(world) : true, dt },
+      { inCave, phase: inCave ? sealPhase(world) : 'mains', dt },
       baseline,
     );
     if (!levels) return;
@@ -56,25 +55,31 @@ export class SourceCaveMains {
       target.scene.environmentIntensity = levels.env;
     }
     target.fog.far = levels.fogFar;
-    this.caveColor
+    // Dark end first (outage -> aftermath), then the lit blend, then how far
+    // into the cave we are. `power` is 0 for the whole aftermath, so the two
+    // dark tints never fight over the same frame.
+    this.darkColor
       .setHex(SOURCE_CAVE_BACKUP_FOG_COLOR)
-      .lerp(this.mainsColor.setHex(SOURCE_CAVE_MAINS_FOG_COLOR), levels.power);
-    this.baseColor.setHex(baseline.fogColorHex).lerp(this.caveColor, levels.mix);
+      .lerp(this.caveColor.setHex(SOURCE_CAVE_AFTERMATH_FOG_COLOR), levels.reach);
+    this.darkColor.lerp(this.mainsColor.setHex(SOURCE_CAVE_MAINS_FOG_COLOR), levels.power);
+    this.baseColor.setHex(baseline.fogColorHex).lerp(this.darkColor, levels.mix);
     target.fog.color.copy(this.baseColor);
   }
+}
 
-  /** An unresolved button (an online snapshot gap) keeps the hall lit rather
-   *  than flickering to backup on missing data. */
-  private buttonPowered(world: IWorld): boolean {
-    const cached = this.buttonId !== null ? world.entities.get(this.buttonId) : undefined;
-    if (cached?.templateId === SOURCE_CAVE_REBOOT_TEMPLATE) return cached.lootable;
-    this.buttonId = null;
-    for (const e of world.entities.values()) {
-      if (e.kind === 'object' && e.templateId === SOURCE_CAVE_REBOOT_TEMPLATE) {
-        this.buttonId = e.id;
-        return e.lootable;
-      }
-    }
-    return true;
-  }
+/**
+ * The lighting follows the ENCOUNTER, not the button. It used to read the reboot
+ * button's `lootable` flag, which only ever says "pressable" or "pressed": a
+ * pressed button never unpresses, so a cleared room stayed in combat gloom
+ * forever and the room had no way to say the fight was over.
+ *
+ * A missing cave or an online snapshot that has not shipped the info yet keeps
+ * the hall lit, the same fail-soft the button lookup had: never flicker to
+ * darkness on absent data.
+ */
+function sealPhase(world: IWorld): SourceCaveMainsPhase {
+  const seal = world.sourceCaveInfo()?.sealState;
+  if (seal === 'active' || seal === 'breached') return 'outage';
+  if (seal === 'cleared') return 'aftermath';
+  return 'mains';
 }

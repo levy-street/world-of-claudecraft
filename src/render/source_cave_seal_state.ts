@@ -36,11 +36,19 @@ export function sourceCaveSealVisualState(info: SourceCaveInfo): SourceCaveSealV
     };
   }
   if (info.sealState === 'cleared') {
+    // The wreck. Clearing this room is vandalism, not a repair, so the seal is
+    // not "off" and not "restored": it is visibly broken for good, and stays
+    // that way. `energy` scales the few surviving circuit traces and
+    // `pulseSpeed` is the rim's breathing rate in radians per second (1.6 gives
+    // a ~3.9s ease-in/out cycle, slow enough that nothing here reads as a
+    // flash). `flowDirection` is unused in this mode: the wreck has no flow
+    // left. `boundaryGlow` stays 0 because the perimeter switches from the
+    // containment chase to its own fault breath inside the shader's wreck branch.
     return {
       mode: 'cleared',
       occupancy: 0,
-      energy: 0,
-      pulseSpeed: 0,
+      energy: 0.5,
+      pulseSpeed: 1.6,
       flowDirection: 0,
       boundaryGlow: 0,
     };
