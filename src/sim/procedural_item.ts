@@ -66,6 +66,8 @@ export interface ProceduralItemInstance {
   legendaryPowerId?: string;
   powerRevision?: number;
   legendaryRolls?: Record<string, number>;
+  raidForged?: true;
+  reforgeCount?: number;
   generatedName: GeneratedItemName;
   seed: number;
   dropContext?: ItemDropContext;

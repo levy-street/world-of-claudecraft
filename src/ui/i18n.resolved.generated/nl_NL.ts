@@ -2557,6 +2557,14 @@ export const nl_NL: EnTranslations = {
       "lockedFor": "Vergrendeld voor ongeveer {minutes} min",
       "attunement": "Vereist afstemming: {quest}",
       "heroicMarks": "Heroïsche Merktekens: {count} per speler",
+      "raidRewards": "Nythraxis reward preview",
+      "raidSharedDrop": "The final corpse adds one shared procedural item for the raid to roll on.",
+      "raidRarityLine": "Rare {rare}% · Epic {epic}% · Legendary {legendary}%",
+      "raidItemLevels": "Item level: Rare {rare} · Epic {epic} · Legendary {legendary}",
+      "raidCurrenciesNormal": "+{fragments} Deathless Fragment per participant",
+      "raidCurrenciesHeroic": "+{fragments} Deathless Fragments and +{marks} Heroic Marks per participant",
+      "raidSignatures": "Signature Legendary powers: {signatures}",
+      "raidForgedLegendary": "Heroic Legendary powers are Raid-forged and guaranteed in the upper half of their authored roll range.",
       "entrance": "Ingang: {zone}",
       "showOnMap": "Tonen op Kaart",
       "encounters": "Ontmoetingen",
@@ -5177,7 +5185,52 @@ export const nl_NL: EnTranslations = {
     "buyConfirmTitle": "Bevestig aankoop",
     "buyConfirmBody": "{item} kopen voor {marks} Heroïsche Merken? Aankopen met merken kunnen niet worden terugbetaald.",
     "buyConfirmAccept": "Kopen",
-    "buyConfirmCancel": "Annuleren"
+    "buyConfirmCancel": "Annuleren",
+    "tabsAria": "Quartermaster services",
+    "fragmentBalance": "Deathless Fragments: {count}",
+    "tab": {
+      "gear": "Heroic Gear",
+      "forge": "Deathless Forge",
+      "tune": "Legendary Tuning"
+    },
+    "gearIntro": "Spend Heroic Marks on the established Quartermaster stock.",
+    "forgeIntro": "Choose the reward family and base item. The realm rolls random procedural affixes only after it validates the exact offer and payment.",
+    "tuneIntro": "Choose one exact Nythraxis Legendary from your bags. The realm rolls two replacement powers and keeps the best result. Power never decreases, but a tune can produce no change.",
+    "tuneEmpty": "No eligible Nythraxis Legendary is in your bags.",
+    "heroicClearReady": "Heroic Nythraxis clear verified for this daily lockout.",
+    "heroicClearNeeded": "Heroic targets require a current Heroic Nythraxis clear.",
+    "itemLevel": "Item level {level}",
+    "cost": "{fragments} Fragments · {marks} Heroic Marks",
+    "randomAffixes": "Random affixes and values",
+    "deterministicStats": "Authored fixed reward",
+    "raidForgedGuarantee": "Raid-forged power, guaranteed upper-half roll",
+    "raidForged": "Raid-forged",
+    "raidDrop": "Nythraxis raid Legendary",
+    "reforgeCount": "Tunes: {count}",
+    "forgeKind": {
+      "normal_procedural": "Normal procedural Epic",
+      "heroic_procedural": "Heroic procedural Epic",
+      "signature": "Heroic signature Legendary",
+      "authored": "Authored target reward"
+    },
+    "blocked": {
+      "class": "Not compatible with your class",
+      "heroic_clear": "Requires a current Heroic Nythraxis clear",
+      "fragments": "Not enough Deathless Fragments",
+      "marks": "Not enough Heroic Marks"
+    },
+    "forgeConfirmTitle": "Confirm Forge",
+    "forgeConfirmBody": "Forge {item} for {fragments} Deathless Fragments and {marks} Heroic Marks? The realm rolls the item after payment is validated.",
+    "forgeConfirmAccept": "Forge",
+    "tuneConfirmTitle": "Confirm Legendary Tuning",
+    "tuneConfirmBody": "Tune this exact copy of {item} for {fragments} Deathless Fragments and {marks} Heroic Marks? The best of two rolls is kept; the power cannot decrease, but it may stay unchanged.",
+    "tuneConfirmAccept": "Tune",
+    "status": {
+      "pending": "Waiting for the realm...",
+      "gear": "Purchase complete. Balances refreshed.",
+      "forge": "Forge complete. The new reward is in your bags.",
+      "tune": "Tuning complete. The exact copy and balances were refreshed."
+    }
   },
   "cardDuel": {
     "title": "Kaartduel",
@@ -6908,6 +6961,7 @@ export const nl_NL: EnTranslations = {
       "greed": "Hebzucht",
       "pass": "Passeren",
       "needAria": "Nodig voor {item}",
+      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
       "greedAria": "Hebzucht voor {item}",
       "passAria": "{item} passeren",
       "everyonePassed": "Iedereen passeerde {item}.",
@@ -9845,6 +9899,9 @@ export const nl_NL: EnTranslations = {
       "heroic_mark": {
         "name": "Heroïsch Merk"
       },
+      "deathless_fragment": {
+        "name": "Deathless Fragment"
+      },
       "eastbrook_buckler": {
         "name": "Oostbeek-Beukelaar"
       },
@@ -11847,6 +11904,11 @@ export const nl_NL: EnTranslations = {
         "sender": "Heroïsche kwartiermeester",
         "subject": "Je heroïsche marken",
         "body": "Je groep heeft de heroïsche beproeving doorstaan terwijl jij in de achterhoede vocht of verslagen op de grond lag. Ook jouw binding is vastgelegd, dus je aandeel heroïsche marken is hierheen gestuurd in plaats van verloren te gaan. Gebruik ze goed.\n\n- Heroïsche kwartiermeester"
+      },
+      "nythraxis_rewards": {
+        "sender": "The Deathless Quartermaster",
+        "subject": "Your share of the Deathless hoard",
+        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Het Ambachtsgilde",

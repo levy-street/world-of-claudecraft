@@ -64,4 +64,15 @@ export const PROCEDURAL_RARITY_TABLES: Record<string, RarityTable> = {
     // normal and Heroic loot, which is rolled independently.
     weights: { magic: 0.25, rare: 0.6, epic: 0.13, legendary: 0.02 },
   },
+  nythraxis_raid_normal: {
+    id: 'nythraxis_raid_normal',
+    // Normal Nythraxis is endgame content, so it cannot fall back to Magic gear.
+    weights: { rare: 0.65, epic: 0.33, legendary: 0.02 },
+  },
+  nythraxis_raid_heroic: {
+    id: 'nythraxis_raid_heroic',
+    // Heroic is a real progression step: 2.5x the Normal Legendary rate and a
+    // substantially stronger Epic share, while authored rewards roll beside it.
+    weights: { rare: 0.4, epic: 0.55, legendary: 0.05 },
+  },
 };

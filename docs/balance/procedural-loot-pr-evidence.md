@@ -9,6 +9,7 @@ feature. Detailed mechanics live in:
 
 - `docs/balance/procedural-loot-generator-v1.md`
 - `docs/balance/procedural-legendary-v1.md`
+- `docs/balance/nythraxis-endgame-loot-v030.md`
 
 ## What changes for players
 
@@ -42,10 +43,16 @@ Authored and Heroic loot rolls first. Procedural loot is additive.
 - Outdoor rare or named boss: 0.2%, or 1 in 500.
 - Delve elite or rare: 0.04%, or 1 in 2,500.
 - Dungeon or delve boss: 2%, or a mean of 1 in 50.
+- Nythraxis Normal: 2%, or a mean of 1 in 50.
+- Nythraxis Heroic: 5%, or a mean of 1 in 20.
 
 At 2%, the chance of at least one boss Legendary is 39.654% by 25 kills,
 63.583% by 50, 86.738% by 100, 95.072% by 149, and 99.001% by 228.
-There is no pity counter, so none of those are guarantees.
+There is no natural-drop pity counter, so none of those are guarantees. The
+Nythraxis Deathless Forge is a separate deterministic purchase path: an exact
+Heroic signature costs 60 Deathless Fragments and 45 Heroic Marks, reached in
+15 resets when both difficulties are cleared or 20 Heroic-only resets. It does
+not force or replace a natural drop.
 
 ### Do Legendaries drop from specific bosses?
 
@@ -86,20 +93,32 @@ without eliminating meaningful variance.
 
 ### Why will players keep grinding?
 
-The chase is layered:
+The generic chase is layered: farm the targeting boss, hit the shared
+Legendary event, roll a compatible base, compare item level and affixes,
+compare the bounded power roll, and choose one active power for the build.
+The first copy can unlock a build while later copies can still be upgrades.
 
-1. Farm the boss that targets the desired power.
-2. Get the 2% shared Legendary result.
-3. Roll a base compatible with the power and class.
-4. Compare item level and the three or four affix families.
-5. Compare each affix tier and value.
-6. Compare the bounded Legendary power roll.
-7. Choose one active Legendary power for the build.
+Nythraxis extends that loop into a full raid progression path:
 
-The first copy can unlock a build, while later copies can still be upgrades.
-Bosses have a clear purpose because they are 10 times more likely to yield a
-Legendary than an outdoor rare and 2,000 times more likely than an ordinary
-outdoor mob.
+1. Normal always drops one shared Rare, Epic, or Legendary at item levels 27,
+   28, or 32 and gives every eligible player one Deathless Fragment.
+2. Heroic always drops one shared item at levels 31, 32, or 36, raises the
+   Legendary rate to 5%, guarantees Heroic Legendary power rolls to the upper
+   half, and gives each player three Fragments and three Heroic Marks.
+3. Nythraxis targets Dawnward Signet and Feral Moonclasp, while roster filtering
+   prevents a class-required power for a class absent from the eligible raid.
+4. Independent Normal and Heroic daily lockouts allow two equipment events and
+   4 Fragments plus 3 Marks per complete reset.
+5. The Forge converts repeat clears into chosen-base Epics, authored Heroic
+   items, or an exact item-level 36 Raid-forged signature.
+6. Exact-copy tuning keeps the item identity and affixes, rolls two candidate
+   power magnitudes, takes the best value per key, and never downgrades.
+7. The one-active-power cap turns the growing collection into build choice
+   instead of automatic proc stacking.
+
+Bosses therefore provide both the best random odds and guaranteed progress.
+Even an unlucky raid advances, while a lucky Heroic kill can still produce a
+better item immediately.
 
 ### What happens to existing items and saves?
 
@@ -156,6 +175,28 @@ Across 300,000 items:
 
 These results sample the configured rarity tables after an item entry exists.
 The effective per-kill probabilities are the exact products documented above.
+
+
+The dedicated Nythraxis release campaign sampled another 200,000 live raid
+items with seed `30037`, split evenly across Normal and Heroic:
+
+| Raid table | Rare | Epic | Legendary |
+| --- | ---: | ---: | ---: |
+| Normal | 65.001% | 32.968% | 2.031% |
+| Heroic | 39.818% | 55.213% | 4.969% |
+
+It recorded 200,000 unique UIDs and zero missing drops, excluded rarities,
+wrong item levels, duplicate affix families, absent-class powers, Raid-forged
+state errors, or power-range violations. Heroic observed powers stayed inside
+their authored upper halves. The campaign returned `READY` with fingerprint
+`1d3acc91`.
+
+The primary release command now enforces both the 33,000,000-event Legendary
+contribution campaign and this 200,000-item raid distribution campaign:
+
+```powershell
+npm run loot:balance
+```
 
 ## Recorded Legendary contribution evidence
 
@@ -237,7 +278,9 @@ previous green run is evidence, but it is not a substitute for final-SHA CI.
 
 ## Screenshot evidence contract
 
-The checked-in gallery contains 25 reproducible 1440 by 900 captures:
+The checked-in gallery contains 32 captures from a reproducible 1440 by 900
+desktop viewport. Files 01 through 12 retain the full frame; focused tooltip,
+vendor, loot-roll, and Finder evidence is tightly cropped to the asserted UI:
 
 - files 01 through 09 show cloth, leather, mail, melee, caster, ranged,
   jewelry, shield, and caster-offhand icon families at inventory scale
@@ -250,24 +293,38 @@ The checked-in gallery contains 25 reproducible 1440 by 900 captures:
   jewelry, and staff examples in normal and Alt-range modes
 - files 23 through 25 show three copies of Ashbinder's Seal with 15%, 17%,
   and 20% power rolls, distinct affixes, equipped comparison, and Alt ranges
+- file 26 shows the Deathless Forge overview, current balances, Heroic-clear
+  state, Normal and Heroic procedural offers, and authored/signature targets
+- file 27 isolates the item-level 36 Raid-forged signature path and its exact
+  60-Fragment plus 45-Mark price without an unrelated hover tooltip
+- files 28 and 29 show exact-copy tuning rules and three bagged copies of
+  Ashbinder's Seal, including the item-level 36 Raid-forged copy and its rolls
+- file 30 shows the class-incompatible Need button disabled with a visible,
+  programmatically associated reason while Greed and Pass remain available
+- files 31 and 32 show the Normal and Heroic Nythraxis Finder reward previews,
+  including exact rarity rates, item levels, currencies, signature powers, and
+  the Heroic upper-half guarantee
 
-The capture harness validates the exact 25-file manifest, nonzero dimensions,
+The capture harness validates the exact 32-file manifest, nonzero dimensions,
 unique content hashes, tooltip visibility, rarity coverage, roll variance,
 advanced-range state, comparison state, icon loads, and absence of capture
-overlays. It completed 173 assertions on the final source tree.
+overlays. It also fails if the signature capture has a stale tooltip or the
+Finder evidence inherits an active fixture lockout. The final no-write preflight
+completed 189 assertions; the checked-in capture completed 194 assertions.
 
 Screenshots are presentation evidence. They must be captured from the final
-source after localization and icon integration. The PR body embeds all 25
+source after localization and icon integration. The PR body embeds all 32
 tracked files from this manifest.
 
 ## Remaining limitations to disclose
 
-- No pity or bad-luck protection in v1.
+- Natural drops have no pity or bad-luck counter. Nythraxis separately provides
+  a deterministic Forge purchase path.
 - Shared boss corpse, not one personal roll per player.
 - Boss targeting is strong but not exclusive.
 - Smart loot is a weight, not a guarantee.
 - The contribution harness is not a full encounter or economy simulator.
-- Current visuals use the launch icon catalog; a larger rarity-specific art
-  expansion is a separate product scope.
+- The icon catalog covers the release rarity and named-Legendary states, but
+  does not model every possible affix combination as separate artwork.
 - Visual review covers desktop at 1440 by 900 and device pixel ratio 1; it is
   not a formal screen-reader, mobile, localization, or WCAG certification.

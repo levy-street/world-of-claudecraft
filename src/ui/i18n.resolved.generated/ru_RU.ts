@@ -2557,6 +2557,14 @@ export const ru_RU: EnTranslations = {
       "lockedFor": "Закрыто еще примерно {minutes} мин",
       "attunement": "Требуется допуск: {quest}",
       "heroicMarks": "Героические знаки: {count} на игрока",
+      "raidRewards": "Nythraxis reward preview",
+      "raidSharedDrop": "На последнем трупе появится один общий процедурный предмет, за который бросает весь рейд.",
+      "raidRarityLine": "Rare {rare}% · Epic {epic}% · Legendary {legendary}%",
+      "raidItemLevels": "Item level: Rare {rare} · Epic {epic} · Legendary {legendary}",
+      "raidCurrenciesNormal": "+{fragments} Deathless Fragment per participant",
+      "raidCurrenciesHeroic": "+{fragments} Deathless Fragments and +{marks} Heroic Marks per participant",
+      "raidSignatures": "Signature Legendary powers: {signatures}",
+      "raidForgedLegendary": "Героические легендарные силы имеют рейдовую ковку и гарантированно попадают в верхнюю половину заданного диапазона.",
       "entrance": "Вход: {zone}",
       "showOnMap": "Показать на карте",
       "encounters": "Босс-схватки",
@@ -5177,7 +5185,52 @@ export const ru_RU: EnTranslations = {
     "buyConfirmTitle": "Подтвердить покупку",
     "buyConfirmBody": "Купить {item} за {marks} героических знаков? Покупки за знаки не подлежат возврату.",
     "buyConfirmAccept": "Купить",
-    "buyConfirmCancel": "Отмена"
+    "buyConfirmCancel": "Отмена",
+    "tabsAria": "Quartermaster services",
+    "fragmentBalance": "Deathless Fragments: {count}",
+    "tab": {
+      "gear": "Heroic Gear",
+      "forge": "Deathless Forge",
+      "tune": "Legendary Tuning"
+    },
+    "gearIntro": "Spend Heroic Marks on the established Quartermaster stock.",
+    "forgeIntro": "Выберите семейство награды и базовый предмет. Сервер определит случайные свойства только после проверки точного предложения и оплаты.",
+    "tuneIntro": "Выберите точную легендарную вещь Никсраксиса в сумках. Сервер сделает два броска новой силы и сохранит лучший результат. Сила не снизится, но может не измениться.",
+    "tuneEmpty": "No eligible Nythraxis Legendary is in your bags.",
+    "heroicClearReady": "Heroic Nythraxis clear verified for this daily lockout.",
+    "heroicClearNeeded": "Heroic targets require a current Heroic Nythraxis clear.",
+    "itemLevel": "Item level {level}",
+    "cost": "{fragments} Fragments · {marks} Heroic Marks",
+    "randomAffixes": "Random affixes and values",
+    "deterministicStats": "Authored fixed reward",
+    "raidForgedGuarantee": "Raid-forged power, guaranteed upper-half roll",
+    "raidForged": "Raid-forged",
+    "raidDrop": "Nythraxis raid Legendary",
+    "reforgeCount": "Tunes: {count}",
+    "forgeKind": {
+      "normal_procedural": "Normal procedural Epic",
+      "heroic_procedural": "Heroic procedural Epic",
+      "signature": "Heroic signature Legendary",
+      "authored": "Authored target reward"
+    },
+    "blocked": {
+      "class": "Not compatible with your class",
+      "heroic_clear": "Requires a current Heroic Nythraxis clear",
+      "fragments": "Not enough Deathless Fragments",
+      "marks": "Not enough Heroic Marks"
+    },
+    "forgeConfirmTitle": "Confirm Forge",
+    "forgeConfirmBody": "Forge {item} for {fragments} Deathless Fragments and {marks} Heroic Marks? The realm rolls the item after payment is validated.",
+    "forgeConfirmAccept": "Forge",
+    "tuneConfirmTitle": "Confirm Legendary Tuning",
+    "tuneConfirmBody": "Настроить именно этот экземпляр {item} за {fragments} Фрагментов Бессмертных и {marks} Героических знаков? Сохранится лучший из двух бросков; сила не снизится, но может остаться прежней.",
+    "tuneConfirmAccept": "Tune",
+    "status": {
+      "pending": "Waiting for the realm...",
+      "gear": "Purchase complete. Balances refreshed.",
+      "forge": "Forge complete. The new reward is in your bags.",
+      "tune": "Tuning complete. The exact copy and balances were refreshed."
+    }
   },
   "cardDuel": {
     "title": "Карточная дуэль",
@@ -6908,6 +6961,7 @@ export const ru_RU: EnTranslations = {
       "greed": "Жадность",
       "pass": "Пас",
       "needAria": "Нужно: {item}",
+      "needUnavailable": "Нельзя выбрать «Нужно»: ваш класс не может экипировать этот предмет.",
       "greedAria": "Жадность: {item}",
       "passAria": "Пас: {item}",
       "everyonePassed": "Все отказались от {item}.",
@@ -9845,6 +9899,9 @@ export const ru_RU: EnTranslations = {
       "heroic_mark": {
         "name": "Героический знак"
       },
+      "deathless_fragment": {
+        "name": "Фрагмент Бессмертия"
+      },
       "eastbrook_buckler": {
         "name": "Истврукский баклер"
       },
@@ -11847,6 +11904,11 @@ export const ru_RU: EnTranslations = {
         "sender": "Героический интендант",
         "subject": "Ваши героические знаки",
         "body": "Ваш отряд прошёл героическое испытание, пока вы сражались в тылу или лежали в пыли. Блокировка была наложена всё равно, поэтому ваша доля героических знаков прилетела к вам сюда, а не пропала. Расходуйте их с умом.\n\n- Героический интендант"
+      },
+      "nythraxis_rewards": {
+        "sender": "Интендант Бессмертных",
+        "subject": "Ваша доля сокровищ Бессмертных",
+        "body": "Ваш отряд сокрушил Бессмертного короля, пока вы сражались на фланге, лежали в пыли или возвращались с кладбища. Ваше право на ежедневную награду было учтено вместе с остальными, поэтому заслуженная личная добыча прилетела к вам сюда, а не пропала. Когда будете готовы выковать награду, отнесите фрагменты Героическому интенданту.\n\n- Интендант Бессмертных"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Гильдия ремесленников",

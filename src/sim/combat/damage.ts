@@ -1374,11 +1374,8 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
-    ctx.awardHeroicMarks(e, heroicRewardRecipients);
-    // Nythraxis normal and heroic raid lockouts use a wider room sweep than
-    // generic dungeon claims. Run it after heroic settlement so its lock stamp
-    // cannot make first-clear participants look previously rewarded.
-    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
+    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e, heroicRewardRecipients);
+    else ctx.awardHeroicMarks(e, heroicRewardRecipients);
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.
     if (worldBossContribs) {

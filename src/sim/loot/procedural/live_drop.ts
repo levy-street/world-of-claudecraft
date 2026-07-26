@@ -1,20 +1,30 @@
-import type { ItemDropContext } from '../../procedural_item';
-import type { MobTemplate, PlayerClass } from '../../types';
+import {
+  NYTHRAXIS_PROCEDURAL_RAID_PROFILES,
+  NYTHRAXIS_RAID_BOSS_ID,
+  NYTHRAXIS_RAID_DUNGEON_ID,
+} from '../../content/procedural_raid_loot';
+import type { ItemDropContext, ProceduralRarity } from '../../procedural_item';
+import type { DungeonDifficulty, MobTemplate, PlayerClass } from '../../types';
 import { type GeneratedProceduralDrop, generateProceduralItem } from './generate';
 import { deriveProceduralItemSeed, hash32Parts } from './item_seed';
 
-export type ProceduralLootSource = 'world' | 'rare' | 'dungeon' | 'delve';
+export type ProceduralLootSource = 'world' | 'rare' | 'dungeon' | 'delve' | 'raid';
 
 export interface ProceduralDropProfile {
   source: ProceduralLootSource;
   chance: number;
-  basePoolId: 'initial_world' | 'initial_rare' | 'initial_dungeon_boss';
-  rarityTableId: 'initial_world' | 'initial_rare' | 'initial_dungeon_boss';
+  basePoolId: string;
+  rarityTableId: string;
+  forcedItemLevels?: Partial<Record<Exclude<ProceduralRarity, 'mythic'>, number>>;
+  legendaryMagnitudeFloor?: number;
+  raidForgedLegendary?: true;
 }
 
 export interface ProceduralSourceFacts {
   inDungeon: boolean;
   inDelve: boolean;
+  dungeonId?: string;
+  dungeonDifficulty?: DungeonDifficulty;
 }
 
 export interface LiveProceduralDropInput {
@@ -50,6 +60,24 @@ const PROFILE_DUNGEON_BOSS: ProceduralDropProfile = {
   basePoolId: 'initial_dungeon_boss',
   rarityTableId: 'initial_dungeon_boss',
 };
+const PROFILE_NYTHRAXIS_NORMAL: ProceduralDropProfile = {
+  source: 'raid',
+  chance: 1,
+  basePoolId: 'nythraxis_raid',
+  rarityTableId: NYTHRAXIS_PROCEDURAL_RAID_PROFILES.normal.rarityTableId,
+  forcedItemLevels: NYTHRAXIS_PROCEDURAL_RAID_PROFILES.normal.itemLevels,
+  legendaryMagnitudeFloor: NYTHRAXIS_PROCEDURAL_RAID_PROFILES.normal.legendaryMagnitudeFloor,
+};
+
+const PROFILE_NYTHRAXIS_HEROIC: ProceduralDropProfile = {
+  source: 'raid',
+  chance: 1,
+  basePoolId: 'nythraxis_raid',
+  rarityTableId: NYTHRAXIS_PROCEDURAL_RAID_PROFILES.heroic.rarityTableId,
+  forcedItemLevels: NYTHRAXIS_PROCEDURAL_RAID_PROFILES.heroic.itemLevels,
+  legendaryMagnitudeFloor: NYTHRAXIS_PROCEDURAL_RAID_PROFILES.heroic.legendaryMagnitudeFloor,
+  raidForgedLegendary: true,
+};
 
 const PROFILE_DELVE_BOSS: ProceduralDropProfile = {
   source: 'delve',
@@ -74,6 +102,14 @@ export function proceduralDropProfile(
     if (template.boss) return PROFILE_DELVE_BOSS;
     return template.elite || template.rare ? PROFILE_DELVE_ELITE : null;
   }
+  if (
+    facts.inDungeon &&
+    facts.dungeonId === NYTHRAXIS_RAID_DUNGEON_ID &&
+    template.id === NYTHRAXIS_RAID_BOSS_ID
+  )
+    return facts.dungeonDifficulty === 'heroic'
+      ? PROFILE_NYTHRAXIS_HEROIC
+      : PROFILE_NYTHRAXIS_NORMAL;
   if (facts.inDungeon) return template.boss ? PROFILE_DUNGEON_BOSS : null;
   if (template.rare || template.boss) return PROFILE_RARE;
   if (template.elite) return null;
@@ -84,10 +120,15 @@ export function proceduralDropChanceRoll(itemSeed: number): number {
   return hash32Parts('procedural-drop-chance-v1', itemSeed) / 0x1_0000_0000;
 }
 
-function sourceTags(template: MobTemplate, profile: ProceduralDropProfile): string[] {
+function sourceTags(
+  template: MobTemplate,
+  profile: ProceduralDropProfile,
+  facts: ProceduralSourceFacts,
+): string[] {
   return [
     template.family,
     profile.source,
+    ...(facts.dungeonDifficulty ? [facts.dungeonDifficulty] : []),
     ...(template.rare ? ['rare'] : []),
     ...(template.elite ? ['elite'] : []),
     ...(template.boss ? ['boss'] : []),
@@ -106,7 +147,7 @@ export function generateLiveProceduralDrop(
     sourceSpawnSequence: input.sourceSpawnSequence,
     lootSlotIndex: input.lootSlotIndex,
     sourceTemplateId: input.sourceTemplate.id,
-    sourceTags: sourceTags(input.sourceTemplate, profile),
+    sourceTags: sourceTags(input.sourceTemplate, profile, input.sourceFacts),
   };
   const seed = deriveProceduralItemSeed(input.worldSeed, context);
   if (proceduralDropChanceRoll(seed) >= profile.chance) return null;
@@ -118,6 +159,15 @@ export function generateLiveProceduralDrop(
     basePoolId: profile.basePoolId,
     rarityTableId: profile.rarityTableId,
     sourceItemLevel: input.sourceItemLevel,
+    ...(profile.forcedItemLevels && {
+      forcedItemLevels: profile.forcedItemLevels,
+    }),
+    ...(profile.legendaryMagnitudeFloor !== undefined && {
+      legendaryMagnitudeFloor: profile.legendaryMagnitudeFloor,
+    }),
+    ...(profile.raidForgedLegendary && {
+      raidForgedLegendary: true,
+    }),
     ...(input.personalLootClass && {
       personalLootClass: input.personalLootClass,
     }),

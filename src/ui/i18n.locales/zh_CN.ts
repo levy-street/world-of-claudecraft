@@ -13,6 +13,17 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'heroicShop.forgeIntro':
+    '选择奖励类别和基础物品。服务器只会在验证具体兑换项目和付款后，才随机生成词缀与数值。',
+  'heroicShop.tuneIntro':
+    '从背包中选择一件具体的尼瑟拉克西斯传奇物品。服务器会生成两次替换威能并保留较优结果。威能不会降低，但也可能没有变化。',
+  'heroicShop.tuneConfirmBody':
+    '要花费{fragments}个不朽碎片和{marks}个英雄印记调校这件具体的{item}吗？系统会保留两次结果中较好的一次；威能不会降低，但可能保持不变。',
+  'hudChrome.finder.raidSharedDrop':
+    '最终首领的尸体会额外提供一件由整个团队共同掷骰的随机生成物品。',
+  'hudChrome.finder.raidForgedLegendary':
+    '英雄难度的传奇威能必定为团队锻造，其数值保证位于设计范围的上半区。',
+  'itemUi.lootRoll.needUnavailable': '你的职业无法装备此物品，因此不能选择需求。',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -3849,6 +3860,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.kings_signet.name': '国王印戒',
   'entities.items.event_skin_token.name': '神秘外观宝箱',
   'entities.items.heroic_mark.name': '英雄徽记',
+  'entities.items.deathless_fragment.name': '不死碎片',
   'hudChrome.raidLockout.heroicName': '英雄难度：{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被锁定至英雄难度的{name}。',
   'entities.items.morthens_cryptforged_hauberk.name': '莫尔森的墓铸锁甲',
@@ -6780,6 +6792,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': '你的英勇印记',
   'entities.letters.heroic_marks_reward.body':
     '你的部队清剿了英勇试炼，而你在后排作战，或已倒在尘土之中。你的锁定同样已经生效，因此你那一份英勇印记飞到了这里，而非就此遗失。好好使用它们。\n\n- 英勇军需官',
+  'entities.letters.nythraxis_rewards.sender': '不死军需官',
+  'entities.letters.nythraxis_rewards.subject': '你应得的不死宝藏',
+  'entities.letters.nythraxis_rewards.body':
+    '你的战团击败了不死之王，而你当时正在侧翼作战、倒在尘土中，或仍在从墓地返回的漫长路上。你的每日领取资格与他们一同记录，因此你赢得的个人战利品会由信鸦送来，而不会丢失。准备好塑造奖励时，请把碎片带给英勇军需官。\n\n- 不死军需官',
   'entities.letters.guild_trend_engineering_alchemy.sender': '工匠公会',
   'entities.letters.guild_trend_engineering_alchemy.subject': '关于你的工程学与炼金术',
   'entities.letters.guild_trend_engineering_alchemy.body':

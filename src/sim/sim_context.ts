@@ -53,6 +53,7 @@ import type {
   EquipSlot,
   ErrorReason,
   GatherNodeDef,
+  InvSlot,
   ItemInstancePayload,
   PendingResurrection,
   PlayerClass,
@@ -545,7 +546,7 @@ export interface SimContextCallbacks {
   applyNonPlayerStatAura(target: Entity, aura: Aura, direction: 1 | -1): void;
   delveRunForMob(mobId: number): DelveRun | null;
   onDelveBossDefeated(run: DelveRun): void;
-  grantNythraxisLockout(boss: Entity): void;
+  grantNythraxisLockout(boss: Entity, recipients?: PlayerMeta[]): void;
   frenzyPackmates(dead: Entity): void;
   armDeathThroes(dead: Entity): void;
   // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts) both
@@ -828,7 +829,7 @@ export interface SimContextCallbacks {
   // Ravenpost mail: posts Heroic Marks to a heroic final-boss participant who took
   // the daily lockout but was not at the corpse to loot them (awardHeroicMarks in
   // instances/dungeons.ts). Binding points at the PostOffice instance on Sim.
-  mailHeroicMarks(pid: number, itemId: string, count: number): void;
+  mailHeroicMarks(pid: number, itemId: string, count: number, additionalItems?: InvSlot[]): void;
 
   // Ravenpost mail: books an authored letter to a character through the standard
   // system-mail path (mailKeyFor recipient key, 'system' kind, the letter's own

@@ -6,6 +6,7 @@ import {
   activeLootRolls,
   awardSharedLootItem,
   CORPSE_INTERACT_GRACE_SECONDS,
+  canNeedLootRoll,
   distributeLootCopper,
   lootRollGroupStatus,
   lootSlotVisibleTo,
@@ -15,6 +16,7 @@ import {
   rollLoot,
   submitLootRoll,
 } from '../src/sim/loot/loot_roll';
+import { generateProceduralItem } from '../src/sim/loot/procedural';
 import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -31,7 +33,7 @@ const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', noPlayer:
 function partyOfThree(seed = 42) {
   const sim = makeSim(seed);
   const a = sim.addPlayer('warrior', 'Aaa');
-  const b = sim.addPlayer('mage', 'Bbb');
+  const b = sim.addPlayer('paladin', 'Bbb');
   const c = sim.addPlayer('rogue', 'Ccc');
   sim.partyInvite(b, a);
   sim.partyAccept(b);
@@ -194,6 +196,117 @@ describe('loot_roll: probability tables', () => {
   });
 });
 
+describe('loot_roll: Need eligibility authority', () => {
+  it('rejects class-ineligible Need before RNG while leaving Greed available', () => {
+    const sim = makeSim(811);
+    const hunter = sim.addPlayer('hunter', 'Hunter');
+    const mage = sim.addPlayer('mage', 'Mage');
+    sim.partyInvite(mage, hunter);
+    sim.partyAccept(mage);
+    const instance = generateProceduralItem({
+      seed: 811,
+      uid: 'pi1:need-gate:811',
+      context: {
+        source: 'raid',
+        sourceEntityId: 811,
+        sourceSpawnSequence: 1,
+        lootSlotIndex: 0,
+        sourceTemplateId: 'nythraxis_scourge_of_thornpeak',
+        sourceTags: ['raid', 'normal', 'boss'],
+      },
+      basePoolId: 'nythraxis_raid',
+      rarityTableId: 'nythraxis_raid_normal',
+      sourceItemLevel: 20,
+      forcedBaseId: 'mirefen_hunting_bow',
+      forcedRarity: 'rare',
+      forcedItemLevel: 27,
+    }).instance;
+    const mob = deadCorpse(sim, hunter, [hunter, mage], {
+      copper: 0,
+      items: [{ itemId: 'mirefen_hunting_bow', count: 1, instance }],
+    });
+    awardSharedLootItem(
+      sim.ctx,
+      { itemId: 'mirefen_hunting_bow', count: 1, instance },
+      mob,
+      playerMeta(sim, hunter),
+    );
+    const rollId = lootRollEvent(sim).rollId;
+    const roll = sim.ctx.pendingLootRolls.get(rollId)!;
+    expect(canNeedLootRoll(roll, playerMeta(sim, hunter))).toBe(true);
+    expect(canNeedLootRoll(roll, playerMeta(sim, mage))).toBe(false);
+    const int = vi.spyOn(sim.ctx.rng, 'int');
+
+    submitLootRoll(sim.ctx, rollId, 'need', mage);
+    expect(roll.choices.has(mage)).toBe(false);
+    expect(int).not.toHaveBeenCalled();
+    expect(
+      sim.events.some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === mage &&
+          event.text === 'Your class cannot Need that item.',
+      ),
+    ).toBe(true);
+
+    submitLootRoll(sim.ctx, rollId, 'greed', mage);
+    submitLootRoll(sim.ctx, rollId, 'need', hunter);
+    expect(int).toHaveBeenCalledTimes(2);
+    expect(sim.countItem('mirefen_hunting_bow', hunter)).toBe(1);
+    expect(sim.countItem('mirefen_hunting_bow', mage)).toBe(0);
+  });
+
+  it('rejects Need for an absent class-required Legendary power even on a usable base', () => {
+    const sim = makeSim(812);
+    const paladin = sim.addPlayer('paladin', 'Paladin');
+    const mage = sim.addPlayer('mage', 'Mage');
+    sim.partyInvite(mage, paladin);
+    sim.partyAccept(mage);
+    const instance = generateProceduralItem({
+      seed: 812,
+      uid: 'pi1:need-gate:812',
+      context: {
+        source: 'raid',
+        sourceEntityId: 812,
+        sourceSpawnSequence: 1,
+        lootSlotIndex: 0,
+        sourceTemplateId: 'nythraxis_scourge_of_thornpeak',
+        sourceTags: ['raid', 'normal', 'boss'],
+      },
+      basePoolId: 'nythraxis_raid',
+      rarityTableId: 'nythraxis_raid_normal',
+      sourceItemLevel: 20,
+      forcedBaseId: 'gravecaller_ring',
+      forcedRarity: 'legendary',
+      forcedItemLevel: 32,
+      forcedLegendaryPowerId: 'dawnward_signet',
+    }).instance;
+    const mob = deadCorpse(sim, paladin, [paladin, mage], {
+      copper: 0,
+      items: [{ itemId: 'gravecaller_ring', count: 1, instance }],
+    });
+    awardSharedLootItem(
+      sim.ctx,
+      { itemId: 'gravecaller_ring', count: 1, instance },
+      mob,
+      playerMeta(sim, paladin),
+    );
+    const rollId = lootRollEvent(sim).rollId;
+    const roll = sim.ctx.pendingLootRolls.get(rollId)!;
+    expect(canNeedLootRoll(roll, playerMeta(sim, paladin))).toBe(true);
+    expect(canNeedLootRoll(roll, playerMeta(sim, mage))).toBe(false);
+
+    submitLootRoll(sim.ctx, rollId, 'need', mage);
+    expect(roll.choices.has(mage)).toBe(false);
+    submitLootRoll(sim.ctx, rollId, 'greed', mage);
+    submitLootRoll(sim.ctx, rollId, 'need', paladin);
+    expect(
+      playerMeta(sim, paladin).inventory.some(
+        (slot) => slot.instance?.procedural?.uid === 'pi1:need-gate:812',
+      ),
+    ).toBe(true);
+  });
+});
 describe('loot_roll: need-greed resolution (module entry)', () => {
   it('need beats greed; the winner receives the item and others get nothing', () => {
     const { sim, a, b, c } = partyOfThree();

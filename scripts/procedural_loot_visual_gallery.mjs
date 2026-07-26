@@ -40,6 +40,13 @@ const PRESENTATION_SCREENSHOT_FILENAMES = Object.freeze([
   '23-tooltip-named-legendary-ashbinders-seal-roll-b-compare-normal.png',
   '24-tooltip-named-legendary-ashbinders-seal-roll-c-compare-normal.png',
   '25-tooltip-named-legendary-ashbinders-seal-roll-c-compare-alt.png',
+  '26-quartermaster-deathless-forge-overview.png',
+  '27-quartermaster-signature-legendary-target.png',
+  '28-quartermaster-legendary-tuning-rules.png',
+  '29-quartermaster-three-same-legendary-raid-forged-variance.png',
+  '30-loot-roll-need-disabled-class-reason.png',
+  '31-finder-nythraxis-normal-rewards.png',
+  '32-finder-nythraxis-heroic-rewards.png',
 ]);
 const PRESENTATION_SCREENSHOT_COUNT = PRESENTATION_SCREENSHOT_FILENAMES.length;
 // The expanded capture lands close to one site-presence refresh boundary. Depending
@@ -530,12 +537,40 @@ async function preparePresentationFixtures(page) {
       );
     }
     const sameNamedDrops = [bestTriple.low, bestTriple.mid, bestTriple.high];
+    const tuningDrops = sameNamedDrops.map((candidate, index) => {
+      const heroic = index === 2;
+      const seed = candidate.seed + 90_000;
+      return procedural.generateProceduralItem({
+        seed,
+        uid: procedural.formatProceduralItemUid('gallery-nythraxis-tune', seed),
+        context: {
+          source: 'raid',
+          sourceEntityId: 9901,
+          sourceSpawnSequence: seed,
+          lootSlotIndex: index,
+          sourceTemplateId: 'nythraxis_scourge_of_thornpeak',
+          sourceTags: ['raid', heroic ? 'heroic' : 'normal'],
+        },
+        basePoolId: 'nythraxis_raid',
+        rarityTableId: heroic ? 'nythraxis_raid_heroic' : 'nythraxis_raid_normal',
+        sourceItemLevel: 22,
+        forcedBaseId: ringBaseId,
+        forcedRarity: 'legendary',
+        forcedItemLevel: heroic ? 36 : 32,
+        forcedLegendaryPowerId: 'ashbinders_seal',
+        legendaryMagnitudeFloor: heroic ? 0.5 : 0,
+        ...(heroic && { raidForgedLegendary: true }),
+      });
+    });
     const legendaryDrops = [bestTriple.low.drop, legendaryByPower.get('dawnward_signet')];
     const sim = window.__game?.sim;
     const hud = window.__game?.hud;
     if (!sim?.player || !hud) throw new Error('offline game did not expose the live Sim and Hud');
     const pid = sim.player.id;
     sim.player.level = 40;
+    sim.players
+      .get(pid)
+      ?.raidLockouts.set('nythraxis_boss_arena:heroic', Math.floor(sim.time * 1000) + 3_600_000);
     sim.addItemInstance(rollPair[0].itemId, rollPair[0].instance, pid);
     sim.equipItem(rollPair[0].itemId, rollPair[0].instance.procedural.uid);
     sim.addItemInstance(rollPair[1].itemId, rollPair[1].instance, pid);
@@ -609,6 +644,10 @@ async function preparePresentationFixtures(page) {
       legendary,
       representatives,
       sameNamedLegendary,
+      tuningDrops: tuningDrops.map((drop) => ({
+        itemId: drop.itemId,
+        instance: drop.instance,
+      })),
     };
   });
 }
@@ -666,8 +705,8 @@ async function focusProceduralComparisonRow(page, selector) {
   check('unequipped comparison candidate selected', false, `${String(rowCount)} candidate rows`);
 }
 
-async function presentationClip(page) {
-  const clip = await page.evaluate(() => {
+async function presentationClip(page, selectors = ['#bags', '#tooltip']) {
+  const clip = await page.evaluate((captureSelectors) => {
     const visibleRect = (selector) => {
       const element = document.querySelector(selector);
       if (!element || getComputedStyle(element).display === 'none') return null;
@@ -676,8 +715,8 @@ async function presentationClip(page) {
         ? { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom }
         : null;
     };
-    const rects = [visibleRect('#bags'), visibleRect('#tooltip')].filter(Boolean);
-    if (rects.length !== 2) return null;
+    const rects = captureSelectors.map(visibleRect).filter(Boolean);
+    if (rects.length !== captureSelectors.length) return null;
     const margin = 18;
     const left = Math.max(0, Math.floor(Math.min(...rects.map((rect) => rect.left)) - margin));
     const top = Math.max(0, Math.floor(Math.min(...rects.map((rect) => rect.top)) - margin));
@@ -690,7 +729,7 @@ async function presentationClip(page) {
       Math.ceil(Math.max(...rects.map((rect) => rect.bottom)) + margin),
     );
     return { x: left, y: top, width: right - left, height: bottom - top };
-  });
+  }, selectors);
   check(
     'presentation screenshot clip',
     clip !== null && clip.width > 0 && clip.height > 0,
@@ -699,7 +738,7 @@ async function presentationClip(page) {
   return clip;
 }
 
-async function capturePresentationScreenshot(page, filename) {
+async function capturePresentationScreenshot(page, filename, selectors) {
   const outputPath = path.join(OUTPUT_DIR, filename);
   const captureOverlayState = await page.evaluate(() => {
     try {
@@ -736,7 +775,7 @@ async function capturePresentationScreenshot(page, filename) {
     captureOverlayState.visible.length === 0,
     JSON.stringify(captureOverlayState),
   );
-  const clip = await presentationClip(page);
+  const clip = await presentationClip(page, selectors);
   if (PREFLIGHT_ONLY) {
     console.log(`PREFLIGHT ${path.relative(REPO_ROOT, outputPath)}`);
     return;
@@ -890,7 +929,7 @@ async function capturePresentationEvidence(page) {
   const response = await page.goto(gameUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
   check('presentation game bootstrap', response?.ok() === true, gameUrl);
   const gameBooted = await enterOfflineGame(page, {
-    charClass: 'mage',
+    charClass: 'warlock',
     charName: 'Rollkeeper',
     settleMs: 1600,
     gameBootTimeoutMs: 45000,
@@ -1337,6 +1376,237 @@ async function capturePresentationEvidence(page) {
   );
   await page.keyboard.up('Alt');
   await page.waitForFunction(() => !document.body.classList.contains('item-details-advanced'));
+
+  await page.evaluate((tuningDrops) => {
+    const sim = window.__game.sim;
+    const pid = sim.player.id;
+    const playerMeta = sim.players.get(pid);
+    if (!playerMeta) throw new Error('offline player metadata unavailable');
+
+    // The first 25 captures intentionally exercise a crowded, varied bag. Reset only the
+    // browser fixture after those captures so endgame evidence has deterministic capacity.
+    playerMeta.inventory.splice(0, playerMeta.inventory.length);
+    sim.unequipItem('ring1');
+    sim.unequipItem('ring2');
+    sim.addItem('deathless_fragment', 80, pid);
+    sim.addItem('heroic_mark', 60, pid);
+    for (const drop of tuningDrops) sim.addItemInstance(drop.itemId, drop.instance, pid);
+    window.__game.hud.renderBags?.();
+  }, fixtures.tuningDrops);
+  await sleep(120);
+
+  const forgeState = await page.evaluate(() => {
+    const sim = window.__game.sim;
+    const hud = window.__game.hud;
+    hud.closeAll?.();
+    const quartermaster = [...sim.entities.values()].find(
+      (entity) => entity.templateId === 'heroic_quartermaster',
+    );
+    if (!quartermaster) throw new Error('Heroic Quartermaster entity not found');
+    sim.player.pos = { ...quartermaster.pos };
+    sim.player.prevPos = { ...quartermaster.pos };
+    sim.rebucket(sim.player);
+    hud.openHeroicVendor(quartermaster.id);
+    document.querySelector("#vendor-window [data-tab='forge']")?.click();
+    const root = document.getElementById('vendor-window');
+    return {
+      visible: root ? getComputedStyle(root).display !== 'none' : false,
+      balances: root?.querySelector('.hq-balances')?.textContent?.trim() ?? '',
+      clear: root?.querySelector('.hq-clear-state')?.textContent?.trim() ?? '',
+      normal: root?.querySelector("[data-forge^='normal:']")?.textContent?.trim() ?? '',
+      heroic: root?.querySelector("[data-forge^='heroic:']")?.textContent?.trim() ?? '',
+      signatureCount: root?.querySelectorAll("[data-forge^='signature:']").length ?? 0,
+    };
+  });
+  check(
+    'Deathless Forge production window',
+    forgeState.visible &&
+      forgeState.balances.includes('Deathless Fragments: 80') &&
+      forgeState.balances.includes('Heroic Marks: 60') &&
+      forgeState.clear.includes('verified') &&
+      forgeState.normal.includes('Item level 28') &&
+      forgeState.heroic.includes('Item level 32') &&
+      forgeState.signatureCount === 2,
+    JSON.stringify(forgeState),
+  );
+  await capturePresentationScreenshot(page, '26-quartermaster-deathless-forge-overview.png', [
+    '#vendor-window',
+  ]);
+
+  await page.mouse.move(720, 88);
+  const [signatureState, signatureTooltipHidden] = await page.evaluate(() => {
+    const hud = window.__game.hud;
+    const offer = document.querySelector(
+      "#vendor-window [data-forge^='signature:dawnward_signet:']",
+    );
+    if (!(offer instanceof HTMLElement)) return null;
+    offer.scrollIntoView({ block: 'center' });
+    hud.hideTooltip();
+    const tooltip = document.getElementById('tooltip');
+    return [
+      offer.textContent?.trim() ?? '',
+      !tooltip || getComputedStyle(tooltip).display === 'none',
+    ];
+  });
+  check(
+    'Raid-forged signature target path',
+    signatureState?.includes('Dawnward Signet') &&
+      signatureState.includes('Item level 36') &&
+      signatureState.includes('60 Fragments · 45 Heroic Marks') &&
+      signatureState.includes('guaranteed upper-half roll') &&
+      signatureTooltipHidden,
+    String(signatureState),
+  );
+  await capturePresentationScreenshot(page, '27-quartermaster-signature-legendary-target.png', [
+    '#vendor-window',
+  ]);
+
+  const tuningState = await page.evaluate(() => {
+    document.querySelector("#vendor-window [data-tab='tune']")?.click();
+    const root = document.getElementById('vendor-window');
+    const rows = [...(root?.querySelectorAll('.hq-tune-offer') ?? [])];
+    return {
+      intro: root?.querySelector('.hq-section-copy')?.textContent?.trim() ?? '',
+      names: rows.map((row) => row.querySelector('.hq-offer-name')?.textContent?.trim() ?? ''),
+      meta: rows.map((row) => row.querySelector('.hq-offer-meta')?.textContent?.trim() ?? ''),
+      traits: rows.map((row) => row.querySelector('.hq-offer-traits')?.textContent?.trim() ?? ''),
+      costs: rows.map((row) => row.querySelector('.hq-cost')?.textContent?.trim() ?? ''),
+    };
+  });
+  check(
+    'exact-copy Legendary tuning list',
+    tuningState.names.length === 3 &&
+      new Set(tuningState.names).size === 1 &&
+      tuningState.names[0] === "Ashbinder's Seal" &&
+      tuningState.intro.includes('two replacement powers') &&
+      tuningState.intro.includes('never decreases') &&
+      tuningState.intro.includes('no change') &&
+      tuningState.meta.some((line) => line.includes('Item level 36')) &&
+      tuningState.traits.some((line) => line.includes('Raid-forged')) &&
+      tuningState.costs.every((line) => line.includes('6 Fragments · 6 Heroic Marks')),
+    JSON.stringify(tuningState),
+  );
+  await capturePresentationScreenshot(page, '28-quartermaster-legendary-tuning-rules.png', [
+    '#vendor-window',
+  ]);
+
+  const raidForgedTuningState = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('#vendor-window .hq-tune-offer')];
+    const row = rows.find((candidate) =>
+      candidate.querySelector('.hq-offer-traits')?.textContent?.includes('Raid-forged'),
+    );
+    if (!(row instanceof HTMLElement)) return null;
+    row.scrollIntoView({ block: 'center' });
+    row.focus();
+    return {
+      name: row.querySelector('.hq-offer-name')?.textContent?.trim() ?? '',
+      meta: row.querySelector('.hq-offer-meta')?.textContent?.trim() ?? '',
+      traits: row.querySelector('.hq-offer-traits')?.textContent?.trim() ?? '',
+    };
+  });
+  await page.waitForFunction(() => {
+    const tooltip = document.getElementById('tooltip');
+    return tooltip && getComputedStyle(tooltip).display !== 'none' && tooltip.offsetWidth > 0;
+  });
+  check(
+    'same-name Raid-forged variance focus',
+    raidForgedTuningState?.name === "Ashbinder's Seal" &&
+      raidForgedTuningState.meta.includes('Item level 36') &&
+      raidForgedTuningState.traits.includes('Raid-forged'),
+    JSON.stringify(raidForgedTuningState),
+  );
+  await capturePresentationScreenshot(
+    page,
+    '29-quartermaster-three-same-legendary-raid-forged-variance.png',
+    ['#vendor-window', '#tooltip'],
+  );
+
+  const blockedNeedState = await page.evaluate(() => {
+    const hud = window.__game.hud;
+    hud.closeHeroicVendor();
+    hud.lootRolls.showRoll({
+      type: 'lootRoll',
+      rollId: 9901,
+      itemId: 'deathless_greatblade',
+      itemName: 'Deathless Greatblade',
+      quality: 'epic',
+      expiresAt: performance.now() + 60_000,
+      canNeed: false,
+    });
+    const root = document.getElementById('loot-rolls');
+    const need = root?.querySelector("[data-choice='need']");
+    return {
+      visible: root ? getComputedStyle(root).display !== 'none' : false,
+      disabled: need instanceof HTMLButtonElement && need.disabled,
+      ariaDisabled: need?.getAttribute('aria-disabled'),
+      describedBy: need?.getAttribute('aria-describedby') ?? '',
+      reason: root?.querySelector('.loot-roll-need-reason')?.textContent?.trim() ?? '',
+    };
+  });
+  check(
+    'disabled Need production prompt',
+    blockedNeedState.visible &&
+      blockedNeedState.disabled &&
+      blockedNeedState.ariaDisabled === 'true' &&
+      blockedNeedState.describedBy.length > 0 &&
+      blockedNeedState.reason.includes('class cannot equip'),
+    JSON.stringify(blockedNeedState),
+  );
+  await capturePresentationScreenshot(page, '30-loot-roll-need-disabled-class-reason.png', [
+    '#loot-rolls',
+  ]);
+
+  await page.evaluate(() => {
+    const sim = window.__game.sim;
+    const hud = window.__game.hud;
+    sim.players.get(sim.player.id)?.raidLockouts.delete('nythraxis_boss_arena:heroic');
+    hud.lootRolls.closeForItem('Deathless Greatblade');
+    hud.toggleDungeonFinder();
+  });
+  await page.waitForSelector('#dungeon-finder-window .df-row');
+  await page.click("#dungeon-finder-window [data-row='nythraxis_boss_arena_normal']");
+  await page.waitForSelector('#dungeon-finder-window .df-raid-rewards');
+  const normalFinderState = await page.$eval(
+    '#dungeon-finder-window .df-raid-rewards',
+    (element) => element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+  );
+  check(
+    'Normal Nythraxis Finder rewards',
+    normalFinderState.includes('Rare 65% · Epic 33% · Legendary 2%') &&
+      normalFinderState.includes('Rare 27 · Epic 28 · Legendary 32') &&
+      normalFinderState.includes('+1 Deathless Fragment per participant') &&
+      !normalFinderState.includes('Raid-forged and guaranteed'),
+    normalFinderState,
+  );
+  await capturePresentationScreenshot(page, '31-finder-nythraxis-normal-rewards.png', [
+    '#dungeon-finder-window',
+  ]);
+
+  await page.click("#dungeon-finder-window [data-row='nythraxis_boss_arena_heroic']");
+  await page.waitForFunction(() => {
+    const reward = document.querySelector('#dungeon-finder-window .df-raid-rewards');
+    return reward?.textContent?.includes('Rare 40%') ?? false;
+  });
+  const heroicFinderState = await page.$eval(
+    '#dungeon-finder-window .df-raid-rewards',
+    (element) => element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+  );
+  const heroicFinderDetailState = await page.$eval(
+    '#dungeon-finder-window .df-detail',
+    (element) => element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+  );
+  check(
+    'Heroic Nythraxis Finder rewards',
+    heroicFinderState.includes('Rare 40% · Epic 55% · Legendary 5%') &&
+      heroicFinderState.includes('Rare 31 · Epic 32 · Legendary 36') &&
+      heroicFinderState.includes('+3 Deathless Fragments and +3 Heroic Marks per participant') &&
+      heroicFinderState.includes('Raid-forged and guaranteed in the upper half') &&
+      !heroicFinderDetailState.includes('Locked for about'),
+    JSON.stringify({ rewards: heroicFinderState, detail: heroicFinderDetailState }),
+  );
+  await capturePresentationScreenshot(page, '32-finder-nythraxis-heroic-rewards.png', [
+    '#dungeon-finder-window',
+  ]);
   return {
     freshDesktopBagsPng,
     screenshotCount: PRESENTATION_SCREENSHOT_COUNT,
@@ -1431,7 +1701,7 @@ try {
   ];
   check(
     'expanded gallery screenshot count',
-    expectedGalleryFilenames.length === 25 && expectedGalleryFilenames.length >= 22,
+    expectedGalleryFilenames.length === 32 && expectedGalleryFilenames.length >= 28,
     `${expectedGalleryFilenames.length}`,
   );
   check(

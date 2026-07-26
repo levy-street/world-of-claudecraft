@@ -22,6 +22,7 @@ function presentationInstance(
   rarity: ProceduralRarity,
   legendaryPowerId?: string,
   powerRevision?: number,
+  raidForged = false,
 ): ItemPresentationInstance {
   return {
     procedural: {
@@ -32,6 +33,7 @@ function presentationInstance(
       affixes: [],
       ...(legendaryPowerId && { legendaryPowerId }),
       ...(powerRevision !== undefined && { powerRevision }),
+      ...(raidForged && { raidForged: true as const }),
       generatedName: {
         baseId,
         ...(legendaryPowerId && { legendaryNameId: legendaryPowerId }),
@@ -200,6 +202,28 @@ describe('procedural item static icon resolver', () => {
     }
     expect(compatibleCount).toBe(21);
     expect(incompatibleCount).toBe(387);
+  });
+
+  it('routes all 21 compatible raid-forged pairs to their Ascendant art', () => {
+    let ascendantCount = 0;
+    for (const base of Object.values(PROCEDURAL_ITEM_BASES)) {
+      for (const power of Object.values(PROCEDURAL_LEGENDARY_POWERS)) {
+        if (!proceduralLegendaryPowerCompatibleWithBase(power, base)) continue;
+        const resolved = resolveProceduralItemIcon(
+          base.id,
+          presentationInstance(base.id, 'legendary', power.id, power.revision, true),
+        );
+        expect(resolved, `${base.id}:${power.id}`).toEqual({
+          cacheKey: `pli|v1|${base.id}|legendary|${power.id}|` + `r${power.revision}.ascendant`,
+          state: 'legendary-raid-forged',
+          url:
+            `/ui/items/procedural/v1/${base.id}/legendary/` +
+            `${power.id}.r${power.revision}.ascendant.webp`,
+        });
+        ascendantCount++;
+      }
+    }
+    expect(ascendantCount).toBe(21);
   });
 
   it('fails malformed Legendary states closed to the requested base fallback', () => {

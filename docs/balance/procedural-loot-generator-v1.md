@@ -17,7 +17,9 @@ The v1 system adds one deterministic, uniquely identified equipment copy after
 the existing authored loot roll. It does not replace normal, Heroic, quest, or
 profession items. Ordinary enemies provide a very low-frequency chase, rare
 enemies provide a reliable upgrade stream, and repeatable dungeon and delve
-bosses provide the main Legendary path.
+bosses provide the generic Legendary path. Nythraxis has a dedicated Normal
+and Heroic raid table plus personal deterministic progression, documented in
+`docs/balance/nythraxis-endgame-loot-v030.md`.
 
 The launch catalog contains 34 base families:
 
@@ -56,6 +58,8 @@ Source routing after those guards:
 | Delve elite or rare | 20% | Rare |
 | Dungeon boss | 100% | Dungeon boss |
 | Delve boss | 100% | Dungeon boss |
+| Nythraxis Normal | 100% | Nythraxis raid Normal |
+| Nythraxis Heroic | 100% | Nythraxis raid Heroic |
 | Ordinary outdoor elite | 0% | None |
 | Dungeon trash | 0% | None |
 | Ordinary delve trash | 0% | None |
@@ -79,6 +83,8 @@ The rarity weights live in `PROCEDURAL_RARITY_TABLES` in
 | World | 70% | 24.5% | 5% | 0.48% | 0.02% |
 | Rare | 0% | 60% | 36% | 3.8% | 0.2% |
 | Dungeon or delve boss | 0% | 25% | 60% | 13% | 2% |
+| Nythraxis Normal | 0% | 0% | 65% | 33% | 2% |
+| Nythraxis Heroic | 0% | 0% | 40% | 55% | 5% |
 
 ### Effective probability per eligible kill
 
@@ -90,6 +96,8 @@ These values multiply the entry chance by the conditional rarity weight.
 | Outdoor rare or named boss | 0% | 0% | 60% | 36% | 3.8% | 0.2% |
 | Delve elite or rare | 80% | 0% | 12% | 7.2% | 0.76% | 0.04% |
 | Dungeon or delve boss | 0% | 0% | 25% | 60% | 13% | 2% |
+| Nythraxis Normal | 0% | 0% | 0% | 65% | 33% | 2% |
+| Nythraxis Heroic | 0% | 0% | 0% | 40% | 55% | 5% |
 
 The effective Legendary expectations are therefore:
 
@@ -97,13 +105,16 @@ The effective Legendary expectations are therefore:
 - outdoor rare or named boss: 1 in 500 eligible kills
 - delve elite or rare: 1 in 2,500 eligible kills
 - dungeon or delve boss: 1 in 50 eligible kills
+- Nythraxis Normal: 1 in 50 eligible kills
+- Nythraxis Heroic: 1 in 20 eligible kills
 
 These are independent configured rolls. They are not guarantees.
 
 ## Boss-kill tails and grind expectations
 
-For a repeatable boss with a 2% Legendary chance, the chance of seeing at least
-one Legendary after `n` independent kills is:
+For a repeatable generic boss or Normal Nythraxis kill with a 2% Legendary
+chance, the chance of seeing at least one Legendary after `n` independent
+kills is:
 
 `1 - 0.98^n`
 
@@ -123,14 +134,17 @@ one Legendary after `n` independent kills is:
 
 This creates a meaningful long-tail chase while making bosses much more useful
 than ordinary farming. It also means an unlucky player can exceed any of these
-kill counts. V1 has no pity counter or bad-luck protection. Adding a per-player
-pity system to a shared corpse would require an explicit ownership and party
-policy, so it is intentionally not simulated by pretending the current shared
-drop is personal.
+kill counts. Natural drops have no pity counter. Nythraxis instead awards
+personal Deathless progression currency, with an exact Heroic signature capped
+at 15 resets when both difficulties are cleared or 20 Heroic-only resets. The
+Forge is a deterministic purchase path, not a forced natural drop.
+
+Heroic Nythraxis uses 5% instead: `1 - 0.95^n`. It reaches 51.233% by 14
+kills, 90.056% by 45, 95.151% by 59, and 99.011% by 90.
 
 Boss signature targeting makes the desired power substantially more likely
-after a Legendary occurs. It does not alter the 2% Legendary entry rate. The
-exact targeting map and two-stage selection are documented in
+after a Legendary occurs. It does not alter the active table's Legendary entry
+rate. The exact targeting map and two-stage selection are documented in
 `docs/balance/procedural-legendary-v1.md`.
 
 ## Base selection and smart loot
@@ -437,7 +451,9 @@ does not replace it.
 
 ## Known limitations
 
-- V1 has no pity counter or bad-luck protection.
+- Natural drops have no pity counter or bad-luck protection. Nythraxis has a
+  separate deterministic Deathless Forge path without changing the natural
+  drop result.
 - Boss signatures improve targetability but are deliberately not exclusive.
 - The three 100,000-entry reports measure generation, not combat encounter
   balance or player behavior.

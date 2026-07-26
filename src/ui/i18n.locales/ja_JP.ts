@@ -13,6 +13,18 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'heroicShop.forgeIntro':
+    '報酬の系統とベースアイテムを選択します。正確なオファーと支払いが検証された後にのみ、レルムがランダムな特性を決定します。',
+  'heroicShop.tuneIntro':
+    'バッグ内のニスラクシス製レジェンダリーを1個選択します。レルムは置換候補を2回ロールし、最良の結果を残します。威力は低下しませんが、変化しない場合があります。',
+  'heroicShop.tuneConfirmBody':
+    '{item}のこの個体を、死なずの欠片{fragments}個と英雄の印{marks}個で調整しますか？2回のうち最良のロールが残り、威力は低下しませんが変化しない場合があります。',
+  'hudChrome.finder.raidSharedDrop':
+    '最後の死体には、レイド全員でロールする共有の手続き生成アイテムが1個追加されます。',
+  'hudChrome.finder.raidForgedLegendary':
+    '英雄レジェンダリーの威力はレイド鍛造となり、設定されたロール範囲の上半分が保証されます。',
+  'itemUi.lootRoll.needUnavailable':
+    'あなたのクラスではこのアイテムを装備できないため、「必要」は選択できません。',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -4013,6 +4025,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.kings_signet.name': '王の印章指輪',
   'entities.items.event_skin_token.name': '謎めいた装いの宝箱',
   'entities.items.heroic_mark.name': '英雄の証',
+  'entities.items.deathless_fragment.name': '不死の欠片',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
   'entities.items.morthens_cryptforged_hauberk.name': 'モルセンの墓鋳ホーバーク',
@@ -7132,6 +7145,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': 'あなたの英雄の印',
   'entities.letters.heroic_marks_reward.body':
     'あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官',
+  'entities.letters.nythraxis_rewards.sender': '不死者の補給官',
+  'entities.letters.nythraxis_rewards.subject': '不死の財宝からの取り分',
+  'entities.letters.nythraxis_rewards.body':
+    'あなたの戦団は不死王を打ち破りました。あなたが側面で戦っていた時も、地に倒れていた時も、墓地から戻る長い道の途中にいた時もです。あなたの日次受領権も仲間と同時に記録されたため、獲得した個人戦利品は失われず、ここへ届けられます。報酬を形作る準備ができたら、欠片を英雄級補給官へ持ってきてください。\n\n- 不死者の補給官',
   'entities.letters.guild_trend_engineering_alchemy.sender': '製作ギルド',
   'entities.letters.guild_trend_engineering_alchemy.subject': '工作と錬金術の腕前について',
   'entities.letters.guild_trend_engineering_alchemy.body':

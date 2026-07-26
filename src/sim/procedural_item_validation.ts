@@ -369,6 +369,24 @@ export function sanitizeProceduralItemInstance(
     value.dropContext === undefined ? undefined : sanitizeDropContext(value.dropContext);
   if (value.dropContext !== undefined && !dropContext)
     return failure('invalid procedural drop context');
+  let raidForged: true | undefined;
+  if (value.raidForged !== undefined) {
+    if (value.raidForged !== true) return failure('invalid raid-forged marker');
+    if (
+      rarity !== 'legendary' ||
+      dropContext?.source !== 'raid' ||
+      !dropContext.sourceTags?.includes('heroic')
+    )
+      return failure('raid-forged items must be Heroic raid Legendaries');
+    raidForged = true;
+  }
+  let reforgeCount: number | undefined;
+  if (value.reforgeCount !== undefined) {
+    if (!integer(value.reforgeCount, 1, 99)) return failure('invalid reforge count');
+    if (rarity !== 'legendary' || dropContext?.source !== 'raid')
+      return failure('only raid Legendaries can carry a reforge count');
+    reforgeCount = value.reforgeCount;
+  }
 
   const item: ProceduralItemInstance = {
     version: 1,
@@ -382,6 +400,8 @@ export function sanitizeProceduralItemInstance(
       powerRevision,
       legendaryRolls,
     }),
+    ...(raidForged && { raidForged }),
+    ...(reforgeCount !== undefined && { reforgeCount }),
     generatedName,
     seed: value.seed,
     ...(dropContext && { dropContext }),

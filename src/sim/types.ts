@@ -1042,6 +1042,7 @@ export interface LootRollPrompt {
   quality: ItemDef['quality'];
   instance?: import('./procedural_item_public').PublicItemInstanceView;
   expiresAt: number;
+  canNeed: boolean;
 }
 
 // One candidate's live vote on an open need-greed roll, as the whole group sees
@@ -3354,6 +3355,7 @@ export type SimEvent = { pid?: number } & (
       quality: ItemDef['quality'];
       instance?: import('./procedural_item_public').PublicItemInstanceView;
       expiresAt: number;
+      canNeed: boolean;
     }
   // master loot: sent only to the master looter; candidates are the eligible recipients
   | {

@@ -2557,6 +2557,14 @@ export const cs_CZ: EnTranslations = {
       "lockedFor": "Uzamčeno přibližně na {minutes} min",
       "attunement": "Vyžaduje naladění: {quest}",
       "heroicMarks": "Hrdinská znamení: {count} za hráče",
+      "raidRewards": "Nythraxis reward preview",
+      "raidSharedDrop": "The final corpse adds one shared procedural item for the raid to roll on.",
+      "raidRarityLine": "Rare {rare}% · Epic {epic}% · Legendary {legendary}%",
+      "raidItemLevels": "Item level: Rare {rare} · Epic {epic} · Legendary {legendary}",
+      "raidCurrenciesNormal": "+{fragments} Deathless Fragment per participant",
+      "raidCurrenciesHeroic": "+{fragments} Deathless Fragments and +{marks} Heroic Marks per participant",
+      "raidSignatures": "Signature Legendary powers: {signatures}",
+      "raidForgedLegendary": "Heroic Legendary powers are Raid-forged and guaranteed in the upper half of their authored roll range.",
       "entrance": "Vstup: {zone}",
       "showOnMap": "Zobrazit na mapě",
       "encounters": "Střety",
@@ -5177,7 +5185,52 @@ export const cs_CZ: EnTranslations = {
     "buyConfirmTitle": "Potvrdit nákup",
     "buyConfirmBody": "Koupit {item} za {marks} Hrdinských známek? Nákupy za známky nelze vrátit.",
     "buyConfirmAccept": "Nakoupit",
-    "buyConfirmCancel": "Zrušit"
+    "buyConfirmCancel": "Zrušit",
+    "tabsAria": "Quartermaster services",
+    "fragmentBalance": "Deathless Fragments: {count}",
+    "tab": {
+      "gear": "Heroic Gear",
+      "forge": "Deathless Forge",
+      "tune": "Legendary Tuning"
+    },
+    "gearIntro": "Spend Heroic Marks on the established Quartermaster stock.",
+    "forgeIntro": "Choose the reward family and base item. The realm rolls random procedural affixes only after it validates the exact offer and payment.",
+    "tuneIntro": "Choose one exact Nythraxis Legendary from your bags. The realm rolls two replacement powers and keeps the best result. Power never decreases, but a tune can produce no change.",
+    "tuneEmpty": "No eligible Nythraxis Legendary is in your bags.",
+    "heroicClearReady": "Heroic Nythraxis clear verified for this daily lockout.",
+    "heroicClearNeeded": "Heroic targets require a current Heroic Nythraxis clear.",
+    "itemLevel": "Item level {level}",
+    "cost": "{fragments} Fragments · {marks} Heroic Marks",
+    "randomAffixes": "Random affixes and values",
+    "deterministicStats": "Authored fixed reward",
+    "raidForgedGuarantee": "Raid-forged power, guaranteed upper-half roll",
+    "raidForged": "Raid-forged",
+    "raidDrop": "Nythraxis raid Legendary",
+    "reforgeCount": "Tunes: {count}",
+    "forgeKind": {
+      "normal_procedural": "Normal procedural Epic",
+      "heroic_procedural": "Heroic procedural Epic",
+      "signature": "Heroic signature Legendary",
+      "authored": "Authored target reward"
+    },
+    "blocked": {
+      "class": "Not compatible with your class",
+      "heroic_clear": "Requires a current Heroic Nythraxis clear",
+      "fragments": "Not enough Deathless Fragments",
+      "marks": "Not enough Heroic Marks"
+    },
+    "forgeConfirmTitle": "Confirm Forge",
+    "forgeConfirmBody": "Forge {item} for {fragments} Deathless Fragments and {marks} Heroic Marks? The realm rolls the item after payment is validated.",
+    "forgeConfirmAccept": "Forge",
+    "tuneConfirmTitle": "Confirm Legendary Tuning",
+    "tuneConfirmBody": "Tune this exact copy of {item} for {fragments} Deathless Fragments and {marks} Heroic Marks? The best of two rolls is kept; the power cannot decrease, but it may stay unchanged.",
+    "tuneConfirmAccept": "Tune",
+    "status": {
+      "pending": "Waiting for the realm...",
+      "gear": "Purchase complete. Balances refreshed.",
+      "forge": "Forge complete. The new reward is in your bags.",
+      "tune": "Tuning complete. The exact copy and balances were refreshed."
+    }
   },
   "cardDuel": {
     "title": "Karetní souboj",
@@ -6908,6 +6961,7 @@ export const cs_CZ: EnTranslations = {
       "greed": "Chamtivost",
       "pass": "Vzdát se",
       "needAria": "Potřeba pro {item}",
+      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
       "greedAria": "Chamtivost pro {item}",
       "passAria": "Vzdát se nároku na {item}",
       "everyonePassed": "Všichni se vzdali nároku na {item}.",
@@ -9845,6 +9899,9 @@ export const cs_CZ: EnTranslations = {
       "heroic_mark": {
         "name": "Hrdinská značka"
       },
+      "deathless_fragment": {
+        "name": "Deathless Fragment"
+      },
       "eastbrook_buckler": {
         "name": "Eastbrookský pukléř"
       },
@@ -11847,6 +11904,11 @@ export const cs_CZ: EnTranslations = {
         "sender": "Hrdinský zásobovač",
         "subject": "Vaše hrdinské marky",
         "body": "Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač"
+      },
+      "nythraxis_rewards": {
+        "sender": "The Deathless Quartermaster",
+        "subject": "Your share of the Deathless hoard",
+        "body": "Your warband broke the Deathless King while you fought from the wings, from the dirt, or on the long road back from the graveyard. Your daily claim was struck with theirs, so the personal spoils you earned fly to you here rather than being lost. Bring the fragments to the Heroic Quartermaster when you are ready to shape a reward.\n\n- The Deathless Quartermaster"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Řemeslnický cech",

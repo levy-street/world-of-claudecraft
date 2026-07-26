@@ -2355,6 +2355,7 @@ const itemNamesEn = {
       greed: 'Greed',
       pass: 'Pass',
       needAria: 'Need for {item}',
+      needUnavailable: 'Need is unavailable because your class cannot equip this item.',
       greedAria: 'Greed for {item}',
       passAria: 'Pass on {item}',
       everyonePassed: 'Everyone passed on {item}.',

@@ -427,6 +427,10 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import {
+  forgeNythraxisReward as forgeNythraxisRewardImpl,
+  tuneNythraxisLegendary as tuneNythraxisLegendaryImpl,
+} from './instances/nythraxis_forge';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -4157,7 +4161,8 @@ export class Sim {
       applyNonPlayerStatAura: sim.applyNonPlayerStatAura.bind(sim),
       // N1: grantNythraxisLockout now lives in encounters/nythraxis.ts; late-bound arrow
       // (handleDeath in combat/damage.ts reaches it via ctx on the boss-death path).
-      grantNythraxisLockout: (boss) => nythraxis.grantNythraxisLockout(sim.ctx, boss),
+      grantNythraxisLockout: (boss, recipients) =>
+        nythraxis.grantNythraxisLockout(sim.ctx, boss, recipients),
       // frenzyPackmates / armDeathThroes flipped points-at to mob/lifecycle (M4); their
       // late-bound lifecycle arrows live in the death-lifecycle block below.
       refreshKnownAbilities: sim.refreshKnownAbilities.bind(sim),
@@ -4344,7 +4349,8 @@ export class Sim {
       partyCapacity: (party) => sim.party.partyCapacity(party),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
-      mailHeroicMarks: (pid, itemId, count) => sim.postOffice.mailHeroicMarks(pid, itemId, count),
+      mailHeroicMarks: (pid, itemId, count, additionalItems) =>
+        sim.postOffice.mailHeroicMarks(pid, itemId, count, additionalItems),
       mailAuthoredLetter: (meta, letter) =>
         sim.postOffice.sendLetter(sim.postOffice.mailKeyFor(meta), meta.name, letter, 'system'),
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
@@ -8978,6 +8984,13 @@ export class Sim {
   // heroic_buy command dispatch and the offline HUD resolve it on the facade.
   buyHeroicVendorItem(itemId: string, pid?: number): void {
     buyHeroicVendorItemImpl(this.ctx, itemId, pid);
+  }
+  forgeNythraxisReward(offerId: string, pid?: number): void {
+    forgeNythraxisRewardImpl(this.ctx, offerId, pid);
+  }
+
+  tuneNythraxisLegendary(instanceUid: string, pid?: number): void {
+    tuneNythraxisLegendaryImpl(this.ctx, instanceUid, pid);
   }
 
   private dungeonDifficultyForPid(pid: number): DungeonDifficulty {

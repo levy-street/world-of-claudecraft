@@ -23,7 +23,7 @@ function teleportTo(sim: Sim, x: number, z: number, pid?: number) {
 // holding `itemId`, with master loot enabled. Returns the pids.
 function partyOnCorpse(sim: Sim, itemId: string, mobId = 990500) {
   const a = sim.playerId;
-  const b = sim.addPlayer('mage', 'Bert');
+  const b = sim.addPlayer('rogue', 'Bert');
   sim.partyInvite(b, a);
   sim.partyAccept(b);
   teleportTo(sim, 20, 20, a);

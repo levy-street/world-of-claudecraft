@@ -2557,6 +2557,14 @@ export const ja_JP: EnTranslations = {
       "lockedFor": "約 {minutes} 分ロック中",
       "attunement": "前提クエストが必要：{quest}",
       "heroicMarks": "ヒロイックの証：1 人 {count} 個",
+      "raidRewards": "Nythraxis reward preview",
+      "raidSharedDrop": "最後の死体には、レイド全員でロールする共有の手続き生成アイテムが1個追加されます。",
+      "raidRarityLine": "Rare {rare}% · Epic {epic}% · Legendary {legendary}%",
+      "raidItemLevels": "Item level: Rare {rare} · Epic {epic} · Legendary {legendary}",
+      "raidCurrenciesNormal": "+{fragments} Deathless Fragment per participant",
+      "raidCurrenciesHeroic": "+{fragments} Deathless Fragments and +{marks} Heroic Marks per participant",
+      "raidSignatures": "Signature Legendary powers: {signatures}",
+      "raidForgedLegendary": "英雄レジェンダリーの威力はレイド鍛造となり、設定されたロール範囲の上半分が保証されます。",
       "entrance": "入口：{zone}",
       "showOnMap": "マップに表示",
       "encounters": "ボス戦",
@@ -5177,7 +5185,52 @@ export const ja_JP: EnTranslations = {
     "buyConfirmTitle": "購入の確認",
     "buyConfirmBody": "英雄の証{marks}個で{item}を購入しますか？証での購入は返金できません。",
     "buyConfirmAccept": "購入",
-    "buyConfirmCancel": "キャンセル"
+    "buyConfirmCancel": "キャンセル",
+    "tabsAria": "Quartermaster services",
+    "fragmentBalance": "Deathless Fragments: {count}",
+    "tab": {
+      "gear": "Heroic Gear",
+      "forge": "Deathless Forge",
+      "tune": "Legendary Tuning"
+    },
+    "gearIntro": "Spend Heroic Marks on the established Quartermaster stock.",
+    "forgeIntro": "報酬の系統とベースアイテムを選択します。正確なオファーと支払いが検証された後にのみ、レルムがランダムな特性を決定します。",
+    "tuneIntro": "バッグ内のニスラクシス製レジェンダリーを1個選択します。レルムは置換候補を2回ロールし、最良の結果を残します。威力は低下しませんが、変化しない場合があります。",
+    "tuneEmpty": "No eligible Nythraxis Legendary is in your bags.",
+    "heroicClearReady": "Heroic Nythraxis clear verified for this daily lockout.",
+    "heroicClearNeeded": "Heroic targets require a current Heroic Nythraxis clear.",
+    "itemLevel": "Item level {level}",
+    "cost": "{fragments} Fragments · {marks} Heroic Marks",
+    "randomAffixes": "Random affixes and values",
+    "deterministicStats": "Authored fixed reward",
+    "raidForgedGuarantee": "Raid-forged power, guaranteed upper-half roll",
+    "raidForged": "Raid-forged",
+    "raidDrop": "Nythraxis raid Legendary",
+    "reforgeCount": "Tunes: {count}",
+    "forgeKind": {
+      "normal_procedural": "Normal procedural Epic",
+      "heroic_procedural": "Heroic procedural Epic",
+      "signature": "Heroic signature Legendary",
+      "authored": "Authored target reward"
+    },
+    "blocked": {
+      "class": "Not compatible with your class",
+      "heroic_clear": "Requires a current Heroic Nythraxis clear",
+      "fragments": "Not enough Deathless Fragments",
+      "marks": "Not enough Heroic Marks"
+    },
+    "forgeConfirmTitle": "Confirm Forge",
+    "forgeConfirmBody": "Forge {item} for {fragments} Deathless Fragments and {marks} Heroic Marks? The realm rolls the item after payment is validated.",
+    "forgeConfirmAccept": "Forge",
+    "tuneConfirmTitle": "Confirm Legendary Tuning",
+    "tuneConfirmBody": "{item}のこの個体を、死なずの欠片{fragments}個と英雄の印{marks}個で調整しますか？2回のうち最良のロールが残り、威力は低下しませんが変化しない場合があります。",
+    "tuneConfirmAccept": "Tune",
+    "status": {
+      "pending": "Waiting for the realm...",
+      "gear": "Purchase complete. Balances refreshed.",
+      "forge": "Forge complete. The new reward is in your bags.",
+      "tune": "Tuning complete. The exact copy and balances were refreshed."
+    }
   },
   "cardDuel": {
     "title": "カードデュエル",
@@ -6908,6 +6961,7 @@ export const ja_JP: EnTranslations = {
       "greed": "強欲",
       "pass": "パス",
       "needAria": "{item}を必要",
+      "needUnavailable": "あなたのクラスではこのアイテムを装備できないため、「必要」は選択できません。",
       "greedAria": "{item}を強欲",
       "passAria": "{item}をパス",
       "everyonePassed": "全員が{item}をパスしました。",
@@ -9845,6 +9899,9 @@ export const ja_JP: EnTranslations = {
       "heroic_mark": {
         "name": "英雄の証"
       },
+      "deathless_fragment": {
+        "name": "不死の欠片"
+      },
       "eastbrook_buckler": {
         "name": "イーストブルックのバックラー"
       },
@@ -11847,6 +11904,11 @@ export const ja_JP: EnTranslations = {
         "sender": "英雄級補給官",
         "subject": "あなたの英雄の印",
         "body": "あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官"
+      },
+      "nythraxis_rewards": {
+        "sender": "不死者の補給官",
+        "subject": "不死の財宝からの取り分",
+        "body": "あなたの戦団は不死王を打ち破りました。あなたが側面で戦っていた時も、地に倒れていた時も、墓地から戻る長い道の途中にいた時もです。あなたの日次受領権も仲間と同時に記録されたため、獲得した個人戦利品は失われず、ここへ届けられます。報酬を形作る準備ができたら、欠片を英雄級補給官へ持ってきてください。\n\n- 不死者の補給官"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "製作ギルド",

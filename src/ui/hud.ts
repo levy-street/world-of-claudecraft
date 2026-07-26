@@ -31,8 +31,8 @@ import {
 } from '../sim/account_flair';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
-import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
+import { NYTHRAXIS_RAID_DUNGEON_ID } from '../sim/content/procedural_raid_loot';
 import { recipeById } from '../sim/content/recipes';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
@@ -341,8 +341,11 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
-import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
-import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
+import {
+  buildHeroicQuartermasterView,
+  type HeroicVendorTab,
+} from './hud/vendor/heroic_vendor_view';
+import { renderHeroicQuartermasterWindow } from './hud/vendor/heroic_vendor_window';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
 import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view';
 import { renderTrainWindow } from './hud/vendor/train_window';
@@ -1310,6 +1313,11 @@ export class Hud {
   private readonly lootRolls: LootRollController;
   private openVendorNpcId: number | null = null;
   private openHeroicVendorNpcId: number | null = null;
+  private readonly heroicVendorWindowFocus = this.windowFocus('#vendor-window');
+  private heroicVendorOpenerFocus: HTMLElement | null = null;
+  private heroicVendorTab: HeroicVendorTab = 'gear';
+  private heroicVendorStatus: string | null = null;
+  private heroicVendorPending: 'gear' | 'forge' | 'tune' | null = null;
   private openTrainNpcId: number | null = null;
   // Learn flights + confirmed-grant overlay for the train window (issue
   // #2342): begin on click (the double-submit guard), resolve on the
@@ -9598,7 +9606,15 @@ export class Hud {
           if (this.openVendorNpcId !== null) this.renderVendor();
           // A Heroic Marks purchase rides the same 'vendor' event; refresh the
           // shop so the balance and per-offer affordability update after a buy.
-          if (this.openHeroicVendorNpcId !== null) this.renderHeroicVendor();
+          if (this.openHeroicVendorNpcId !== null) {
+            if (this.heroicVendorPending) {
+              this.heroicVendorStatus = t(
+                `heroicShop.status.${this.heroicVendorPending}` as TranslationKey,
+              );
+              this.heroicVendorPending = null;
+            }
+            this.renderHeroicVendor();
+          }
           // A delve Marks purchase rides the same 'vendor' event; refresh the shop
           // tab so the balance and per-offer affordability update after a buy.
           if (this.delveBoard.isOpen) this.renderDelveBoard();
@@ -11650,25 +11666,44 @@ export class Hud {
     if (this.bankWindowOpen) this.closeBank();
     this.openVendorNpcId = null; // shares the container with the copper vendor
     this.openHeroicVendorNpcId = npcId;
+    this.heroicVendorTab = 'gear';
+    this.heroicVendorStatus = null;
+    this.heroicVendorPending = null;
     this.renderHeroicVendor();
+    this.heroicVendorOpenerFocus = this.heroicVendorWindowFocus.captureFocus();
   }
 
   private renderHeroicVendor(): void {
     if (this.openHeroicVendorNpcId === null) return;
     const npc = this.sim.entities.get(this.openHeroicVendorNpcId);
     if (!npc) return;
-    const balance = this.sim.inventory
-      .filter((slot) => slot.itemId === HEROIC_MARK_ITEM_ID)
-      .reduce((sum, slot) => sum + slot.count, 0);
-    renderHeroicVendorWindow(
+    const heroicClear = this.sim
+      .raidLockouts()
+      .some((lockout) => lockout.id === `${NYTHRAXIS_RAID_DUNGEON_ID}:heroic`);
+    renderHeroicQuartermasterWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
-      buildHeroicVendorView(HEROIC_VENDOR_STOCK, ITEMS, balance),
+      buildHeroicQuartermasterView({
+        tab: this.heroicVendorTab,
+        stock: HEROIC_VENDOR_STOCK,
+        items: ITEMS,
+        inventory: this.sim.inventory,
+        playerClass: this.sim.cfg.playerClass,
+        heroicClear,
+      }),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
         onBuy: (itemId) => this.requestHeroicVendorPurchase(itemId),
+        onForge: (offerId) => this.requestNythraxisForge(offerId),
+        onTune: (instanceUid) => this.requestNythraxisTune(instanceUid),
+        onTab: (tab) => {
+          this.heroicVendorTab = tab;
+          this.heroicVendorStatus = null;
+          this.renderHeroicVendor();
+        },
         onClose: () => this.closeHeroicVendor(),
+        status: this.heroicVendorStatus,
       },
     );
   }
@@ -11678,6 +11713,8 @@ export class Hud {
     $('#vendor-window').style.display = 'none';
     this.openHeroicVendorNpcId = null;
     this.hideTooltip();
+    this.heroicVendorWindowFocus.restoreFocus(this.heroicVendorOpenerFocus);
+    this.heroicVendorOpenerFocus = null;
   }
 
   closeVendor(): void {
@@ -12624,7 +12661,77 @@ export class Hud {
       }),
       t('heroicShop.buyConfirmAccept'),
       t('heroicShop.buyConfirmCancel'),
-      () => this.sim.buyHeroicVendorItem(itemId),
+      () => {
+        this.heroicVendorPending = 'gear';
+        this.heroicVendorStatus = t('heroicShop.status.pending');
+        this.renderHeroicVendor();
+        this.sim.buyHeroicVendorItem(itemId);
+      },
+    );
+  }
+
+  private requestNythraxisForge(offerId: string): void {
+    if (this.heroicVendorPending) return;
+    const heroicClear = this.sim
+      .raidLockouts()
+      .some((lockout) => lockout.id === `${NYTHRAXIS_RAID_DUNGEON_ID}:heroic`);
+    const row = buildHeroicQuartermasterView({
+      tab: 'forge',
+      stock: HEROIC_VENDOR_STOCK,
+      items: ITEMS,
+      inventory: this.sim.inventory,
+      playerClass: this.sim.cfg.playerClass,
+      heroicClear,
+    }).forgeRows.find((candidate) => candidate.offerId === offerId);
+    if (!row || row.blockReason) return;
+    const item = row.powerId
+      ? t(`itemUi.procedural.legendary.${row.powerId}.name` as TranslationKey)
+      : itemDisplayName(row.item);
+    this.confirmDialog(
+      t('heroicShop.forgeConfirmTitle'),
+      t('heroicShop.forgeConfirmBody', {
+        item,
+        fragments: formatNumber(row.cost.fragments, { maximumFractionDigits: 0 }),
+        marks: formatNumber(row.cost.heroicMarks, { maximumFractionDigits: 0 }),
+      }),
+      t('heroicShop.forgeConfirmAccept'),
+      t('heroicShop.buyConfirmCancel'),
+      () => {
+        this.heroicVendorPending = 'forge';
+        this.heroicVendorStatus = t('heroicShop.status.pending');
+        this.renderHeroicVendor();
+        this.sim.forgeNythraxisReward(offerId);
+      },
+    );
+  }
+
+  private requestNythraxisTune(instanceUid: string): void {
+    if (this.heroicVendorPending) return;
+    const row = buildHeroicQuartermasterView({
+      tab: 'tune',
+      stock: HEROIC_VENDOR_STOCK,
+      items: ITEMS,
+      inventory: this.sim.inventory,
+      playerClass: this.sim.cfg.playerClass,
+      heroicClear: true,
+    }).tuneRows.find((candidate) => candidate.instanceUid === instanceUid);
+    if (!row || row.blockReason) return;
+    const item = itemPresentationName({ name: itemDisplayName(row.item) }, row.instance);
+    this.confirmDialog(
+      t('heroicShop.tuneConfirmTitle'),
+      t('heroicShop.tuneConfirmBody', {
+        item,
+        fragments: formatNumber(row.cost.fragments, { maximumFractionDigits: 0 }),
+        marks: formatNumber(row.cost.heroicMarks, { maximumFractionDigits: 0 }),
+      }),
+      t('heroicShop.tuneConfirmAccept'),
+      t('heroicShop.buyConfirmCancel'),
+      () => {
+        this.heroicVendorPending = 'tune';
+        this.heroicVendorStatus = t('heroicShop.status.pending');
+        this.renderHeroicVendor();
+        this.sim.tuneNythraxisLegendary(instanceUid);
+      },
     );
   }
 

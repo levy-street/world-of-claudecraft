@@ -55,6 +55,10 @@ export interface GenerateProceduralItemInput {
   forcedBaseId?: string;
   forcedRarity?: ActiveRarity;
   forcedItemLevel?: number;
+  forcedItemLevels?: Partial<Record<ActiveRarity, number>>;
+  forcedLegendaryPowerId?: ProceduralLegendaryPowerId;
+  legendaryMagnitudeFloor?: number;
+  raidForgedLegendary?: true;
 }
 
 export interface GeneratedProceduralDrop {
@@ -87,17 +91,32 @@ function rarityFromTable(rng: Rng, table: RarityTable): ActiveRarity {
   ][0];
 }
 
+function legendaryPowerAllowed(
+  powerId: ProceduralLegendaryPowerId,
+  base: ProceduralItemBase,
+  input: GenerateProceduralItemInput,
+): boolean {
+  const power = PROCEDURAL_LEGENDARY_POWERS[powerId];
+  if (!proceduralLegendaryPowerCompatibleWithBase(power, base, input.personalLootClass))
+    return false;
+  const recipients = input.lootRecipientClasses ?? [];
+  const requiredClass = 'requiredClass' in power ? power.requiredClass : undefined;
+
+  if (
+    !input.personalLootClass &&
+    recipients.length > 0 &&
+    requiredClass &&
+    !recipients.includes(requiredClass)
+  )
+    return false;
+  return true;
+}
+
 function baseHasCompatibleLegendary(
   base: ProceduralItemBase,
-  personalLootClass: PlayerClass | undefined,
+  input: GenerateProceduralItemInput,
 ): boolean {
-  return PROCEDURAL_LEGENDARY_POWER_IDS.some((id) =>
-    proceduralLegendaryPowerCompatibleWithBase(
-      PROCEDURAL_LEGENDARY_POWERS[id],
-      base,
-      personalLootClass,
-    ),
-  );
+  return PROCEDURAL_LEGENDARY_POWER_IDS.some((id) => legendaryPowerAllowed(id, base, input));
 }
 
 function chooseBase(
@@ -115,7 +134,7 @@ function chooseBase(
     : poolBases.filter(
         (base) =>
           base.sourceLevel <= input.sourceItemLevel &&
-          (rarity !== 'legendary' || baseHasCompatibleLegendary(base, input.personalLootClass)),
+          (rarity !== 'legendary' || baseHasCompatibleLegendary(base, input)),
       );
   if (bases.length === 0)
     throw new Error(
@@ -133,13 +152,7 @@ function chooseBase(
       ? new Set(proceduralBossLegendarySignatures(input.context.sourceTemplateId))
       : new Set<ProceduralLegendaryPowerId>();
   const signatureBases = bases.filter((base) =>
-    [...signatureIds].some((id) =>
-      proceduralLegendaryPowerCompatibleWithBase(
-        PROCEDURAL_LEGENDARY_POWERS[id],
-        base,
-        input.personalLootClass,
-      ),
-    ),
+    [...signatureIds].some((id) => legendaryPowerAllowed(id, base, input)),
   );
   let selected: ProceduralItemBase;
   if (signatureBases.length > 0) {
@@ -159,7 +172,7 @@ function chooseBase(
   const forced = PROCEDURAL_ITEM_BASES[input.forcedBaseId];
   if (!forced || !pool.baseIds.includes(forced.id))
     throw new Error(`forced base ${input.forcedBaseId} is not in pool ${input.basePoolId}`);
-  if (rarity === 'legendary' && !baseHasCompatibleLegendary(forced, input.personalLootClass))
+  if (rarity === 'legendary' && !baseHasCompatibleLegendary(forced, input))
     throw new Error(
       `forced base ${input.forcedBaseId} has no compatible legendary power` +
         (input.personalLootClass ? ` for ${input.personalLootClass}` : ''),
@@ -244,30 +257,40 @@ function legendaryPowerFromRoll(
   selectionRoll: number,
   rollValue: number,
   base: ProceduralItemBase,
-  personalLootClass: PlayerClass | undefined,
-  sourceTemplateId: string | undefined,
+  input: GenerateProceduralItemInput,
 ): {
   powerId: string;
   powerRevision: 1;
   rolls: Record<string, number>;
 } {
-  const compatible = PROCEDURAL_LEGENDARY_POWER_IDS.map(
-    (id) => PROCEDURAL_LEGENDARY_POWERS[id],
-  ).filter((power) => proceduralLegendaryPowerCompatibleWithBase(power, base, personalLootClass));
+  const compatible = PROCEDURAL_LEGENDARY_POWER_IDS.filter((id) =>
+    legendaryPowerAllowed(id, base, input),
+  ).map((id) => PROCEDURAL_LEGENDARY_POWERS[id]);
   if (compatible.length === 0) throw new Error(`no legendary power is compatible with ${base.id}`);
-  const signatures = new Set(proceduralBossLegendarySignatures(sourceTemplateId));
-  const preferred = compatible.filter((power) => signatures.has(power.id));
   let power: (typeof compatible)[number];
-  if (preferred.length > 0 && selectionRoll < PROCEDURAL_LEGENDARY_SIGNATURE_SHARE) {
-    const signatureRoll = selectionRoll / PROCEDURAL_LEGENDARY_SIGNATURE_SHARE;
-    power = preferred[Math.min(preferred.length - 1, Math.floor(signatureRoll * preferred.length))];
+  if (input.forcedLegendaryPowerId) {
+    const forced = PROCEDURAL_LEGENDARY_POWERS[input.forcedLegendaryPowerId];
+    if (!compatible.includes(forced))
+      throw new Error(
+        `forced legendary power ${input.forcedLegendaryPowerId} is incompatible with ${base.id}`,
+      );
+    power = forced;
   } else {
-    const globalRoll =
-      preferred.length > 0
-        ? (selectionRoll - PROCEDURAL_LEGENDARY_SIGNATURE_SHARE) /
-          (1 - PROCEDURAL_LEGENDARY_SIGNATURE_SHARE)
-        : selectionRoll;
-    power = compatible[Math.min(compatible.length - 1, Math.floor(globalRoll * compatible.length))];
+    const signatures = new Set(proceduralBossLegendarySignatures(input.context.sourceTemplateId));
+    const preferred = compatible.filter((candidate) => signatures.has(candidate.id));
+    if (preferred.length > 0 && selectionRoll < PROCEDURAL_LEGENDARY_SIGNATURE_SHARE) {
+      const signatureRoll = selectionRoll / PROCEDURAL_LEGENDARY_SIGNATURE_SHARE;
+      power =
+        preferred[Math.min(preferred.length - 1, Math.floor(signatureRoll * preferred.length))];
+    } else {
+      const globalRoll =
+        preferred.length > 0
+          ? (selectionRoll - PROCEDURAL_LEGENDARY_SIGNATURE_SHARE) /
+            (1 - PROCEDURAL_LEGENDARY_SIGNATURE_SHARE)
+          : selectionRoll;
+      power =
+        compatible[Math.min(compatible.length - 1, Math.floor(globalRoll * compatible.length))];
+    }
   }
   const rolls = Object.fromEntries(
     Object.entries(power.rolls).map(([key, range]) => [
@@ -339,7 +362,7 @@ export function generateProceduralItem(
   const rarity = input.forcedRarity ?? rolledRarity;
   const base = chooseBase(rng, input, rarity);
   const itemLevel = forcedItemLevel(
-    input.forcedItemLevel,
+    input.forcedItemLevel ?? input.forcedItemLevels?.[rarity],
     itemLevelFromSource(rng, input.sourceItemLevel, rarity),
   );
   const rarityDef = PROCEDURAL_RARITIES[rarity];
@@ -380,16 +403,14 @@ export function generateProceduralItem(
   }
 
   const legendarySelectionRoll = rng.next();
-  const legendaryMagnitudeRoll = rng.next();
+  const rawLegendaryMagnitudeRoll = rng.next();
+  const magnitudeFloor = input.legendaryMagnitudeFloor ?? 0;
+  if (!Number.isFinite(magnitudeFloor) || magnitudeFloor < 0 || magnitudeFloor > 1)
+    throw new Error('legendary magnitude floor must be between 0 and 1');
+  const legendaryMagnitudeRoll = magnitudeFloor + (1 - magnitudeFloor) * rawLegendaryMagnitudeRoll;
   const legendary =
     rarity === 'legendary'
-      ? legendaryPowerFromRoll(
-          legendarySelectionRoll,
-          legendaryMagnitudeRoll,
-          base,
-          input.personalLootClass,
-          input.context.sourceTemplateId,
-        )
+      ? legendaryPowerFromRoll(legendarySelectionRoll, legendaryMagnitudeRoll, base, input)
       : null;
   const firstNameRoll = rng.next();
   const secondNameRoll = rng.next();
@@ -406,6 +427,7 @@ export function generateProceduralItem(
       powerRevision: legendary.powerRevision,
       legendaryRolls: legendary.rolls,
     }),
+    ...(legendary && input.raidForgedLegendary && { raidForged: true }),
     generatedName: legendary
       ? { baseId: base.id, legendaryNameId: legendary.powerId }
       : generatedName(rarity, base, affixes, firstNameRoll, secondNameRoll),

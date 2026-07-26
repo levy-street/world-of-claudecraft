@@ -4063,6 +4063,12 @@ export class ClientWorld implements IWorld {
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
   }
+  forgeNythraxisReward(offerId: string): void {
+    this.cmd({ cmd: 'nythraxis_forge', offerId });
+  }
+  tuneNythraxisLegendary(instanceUid: string): void {
+    this.cmd({ cmd: 'nythraxis_tune', instanceUid });
+  }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};

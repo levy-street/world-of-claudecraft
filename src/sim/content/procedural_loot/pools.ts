@@ -10,4 +10,5 @@ export const PROCEDURAL_BASE_POOLS: Record<string, ProceduralBasePool> = {
   initial_world: fullPool('initial_world'),
   initial_rare: fullPool('initial_rare'),
   initial_dungeon_boss: fullPool('initial_dungeon_boss'),
+  nythraxis_raid: fullPool('nythraxis_raid'),
 };

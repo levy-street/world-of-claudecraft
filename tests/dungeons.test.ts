@@ -7,9 +7,10 @@ import { describe, expect, it } from 'vitest';
 import { resolvePosition } from '../src/sim/colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
-import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
+import { HEROIC_MARK_LETTER, NYTHRAXIS_REWARD_LETTER } from '../src/sim/content/letters';
+import { DEATHLESS_FRAGMENT_ITEM_ID } from '../src/sim/content/procedural_raid_loot';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
-import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
+import { grantNythraxisLockout, spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import {
   awardHeroicMarks,
   enterDungeon,
@@ -72,12 +73,21 @@ function mailedMarksTo(sim: AnySim, pid: number): number {
     .filter((s) => s.itemId === HEROIC_MARK_ITEM_ID)
     .reduce((n, s) => n + s.count, 0);
 }
+function mailedItemTo(sim: AnySim, pid: number, itemId: string): number {
+  const name = sim.players.get(pid)!.name;
+  return ((sim.postOffice as any).mail as any[])
+    .filter((m) => m.recipientName === name)
+    .flatMap((m) => m.items as { itemId: string; count: number }[])
+    .filter((slot) => slot.itemId === itemId)
+    .reduce((total, slot) => total + slot.count, 0);
+}
 
 function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
   const mob = inst.mobIds
     .map((id: number) => sim.entities.get(id))
     .find((e: AnyEntity | undefined) => e?.templateId === templateId);
   if (!mob) throw new Error(`missing ${templateId} in ${inst.dungeonId}`);
+
   return mob as AnyEntity;
 }
 
@@ -1918,10 +1928,81 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     );
 
     expect(boss.dead).toBe(true);
-    for (const pid of raiders) expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(3);
+    for (const pid of raiders) {
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(3);
+      expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(3);
+      expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
+      expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena')).toBe(false);
+    }
+    grantNythraxisLockout(
+      sim.ctx,
+      boss,
+      raiders.map((pid) => sim.players.get(pid)!),
+    );
+    for (const pid of raiders) {
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(3);
+      expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(3);
+    }
     expect(((boss.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID)).toBe(
       false,
     );
+  });
+
+  it('pays one personal fragment on Normal while keeping both raid lockouts independent', () => {
+    const { sim, raiders, inst } = raidSetup('normal');
+    const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
+    raiders.forEach((pid, i) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
+    });
+
+    (sim as any).dealDamage(
+      sim.entities.get(raiders[0]),
+      boss,
+      boss.hp + 100,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+
+    expect(boss.dead).toBe(true);
+    for (const pid of raiders) {
+      expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(1);
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(0);
+      expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
+      expect(sim.players.get(pid)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(false);
+    }
+  });
+
+  it('locks an owning-roster camper but never turns membership alone into raid income', () => {
+    const { sim, tank, raiders, inst } = raidSetup('heroic');
+    const camper = sim.addPlayer('priest', 'DoorCamper');
+    sim.players.get(camper)!.questsDone.add('q_nythraxis_bound_guardian');
+    sim.partyInvite(camper, tank);
+    sim.partyAccept(camper);
+    teleport(sim, sim.entities.get(camper) as AnyEntity, 0, 0);
+    const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
+    raiders.forEach((pid, i) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
+    });
+
+    (sim as any).dealDamage(
+      sim.entities.get(raiders[0]),
+      boss,
+      boss.hp + 100,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+
+    expect(boss.dead).toBe(true);
+    expect(inst.enteredBy.has(camper)).toBe(false);
+    expect(sim.players.get(camper)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, camper)).toBe(0);
+    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, camper)).toBe(0);
+    expect(mailedItemTo(sim, camper, HEROIC_MARK_ITEM_ID)).toBe(0);
+    expect(mailedItemTo(sim, camper, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(0);
   });
 
   it('mails the marks to a raider locked from far back, so lockout never outruns reward', () => {
@@ -1952,13 +2033,26 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     // ...so the marks must reach them too. Not present at the corpse to loot, so
     // they ride the Ravenpost instead of dropping into a distant player's bags.
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(0);
-    const healerName = sim.players.get(healer)!.name;
-    const mailedMarks = ((sim.postOffice as any).mail as any[])
-      .filter((m) => m.recipientName === healerName)
-      .flatMap((m) => m.items as { itemId: string; count: number }[])
-      .filter((s) => s.itemId === HEROIC_MARK_ITEM_ID)
-      .reduce((n, s) => n + s.count, 0);
-    expect(mailedMarks).toBe(3);
+    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, healer)).toBe(0);
+    expect(mailedItemTo(sim, healer, HEROIC_MARK_ITEM_ID)).toBe(3);
+    expect(mailedItemTo(sim, healer, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(3);
+    const rewardLetter = ((sim.postOffice as any).mail as any[]).find(
+      (mail) =>
+        mail.recipientName === sim.players.get(healer)!.name &&
+        mail.letterId === NYTHRAXIS_REWARD_LETTER.letterId,
+    );
+    expect(rewardLetter?.items).toEqual([
+      { itemId: HEROIC_MARK_ITEM_ID, count: 3 },
+      { itemId: DEATHLESS_FRAGMENT_ITEM_ID, count: 3 },
+    ]);
+
+    grantNythraxisLockout(
+      sim.ctx,
+      boss,
+      raiders.slice(0, 4).map((pid) => sim.players.get(pid)!),
+    );
+    expect(mailedItemTo(sim, healer, HEROIC_MARK_ITEM_ID)).toBe(3);
+    expect(mailedItemTo(sim, healer, DEATHLESS_FRAGMENT_ITEM_ID)).toBe(3);
   });
 
   it('lets a locked ghost return to its defeated heroic raid instance for loot', () => {

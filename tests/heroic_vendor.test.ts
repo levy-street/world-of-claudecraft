@@ -12,7 +12,10 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
-import { buildHeroicVendorView } from '../src/ui/hud/vendor/heroic_vendor_view';
+import {
+  buildHeroicQuartermasterView,
+  buildHeroicVendorView,
+} from '../src/ui/hud/vendor/heroic_vendor_view';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -145,6 +148,79 @@ describe('heroic vendor shop view (pure)', () => {
     const neck = view.rows.find((r) => r.itemId === 'yumis_keepsake_locket');
     expect(ring?.affordable).toBe(true); // 12 >= 12
     expect(neck?.affordable).toBe(false); // 12 < 16
+  });
+
+  it('derives gated Forge targets and exact Legendary copies without resolving outcomes', () => {
+    const inventory = [
+      { itemId: 'deathless_fragment', count: 60 },
+      { itemId: HEROIC_MARK_ITEM_ID, count: 45 },
+      {
+        itemId: 'gravecaller_ring',
+        count: 1,
+        instance: {
+          procedural: {
+            version: 1,
+            uid: 'exact-dawnward-copy',
+            baseId: 'gravecaller_ring',
+            itemLevel: 36,
+            rarity: 'legendary',
+            affixes: [],
+            legendaryPowerId: 'dawnward_signet',
+            powerRevision: 1,
+            legendaryRolls: { healingPct: 17 },
+            raidForged: true,
+            reforgeCount: 2,
+            generatedName: { baseId: 'gravecaller_ring' },
+            seed: 19,
+          },
+        },
+      },
+    ] as any;
+    const view = buildHeroicQuartermasterView({
+      tab: 'forge',
+      stock: HEROIC_VENDOR_STOCK,
+      items: ITEMS,
+      inventory,
+      playerClass: 'paladin',
+      heroicClear: true,
+    });
+    const signature = view.forgeRows.find((row) => row.powerId === 'dawnward_signet');
+    expect(signature).toMatchObject({
+      offerId: 'signature:dawnward_signet:gravecaller_ring',
+      itemLevel: 36,
+      raidForged: true,
+      randomAffixes: true,
+      cost: { fragments: 60, heroicMarks: 45 },
+      blockReason: null,
+    });
+    expect(view.forgeRows.find((row) => row.powerId === 'feral_moonclasp')?.blockReason).toBe(
+      'class',
+    );
+    expect(view.tuneRows).toHaveLength(1);
+    expect(view.tuneRows[0]).toMatchObject({
+      instanceUid: 'exact-dawnward-copy',
+      itemLevel: 36,
+      raidForged: true,
+      reforgeCount: 2,
+      cost: { fragments: 6, heroicMarks: 6 },
+    });
+  });
+
+  it('requires the current Heroic clear and derives currency gates in priority order', () => {
+    const view = buildHeroicQuartermasterView({
+      tab: 'forge',
+      stock: HEROIC_VENDOR_STOCK,
+      items: ITEMS,
+      inventory: [],
+      playerClass: 'paladin',
+      heroicClear: false,
+    });
+    expect(view.forgeRows.find((row) => row.offerId.startsWith('normal:'))?.blockReason).toBe(
+      'fragments',
+    );
+    expect(view.forgeRows.find((row) => row.offerId.startsWith('heroic:'))?.blockReason).toBe(
+      'heroic_clear',
+    );
   });
 });
 

@@ -1421,6 +1421,30 @@ describe('dungeon difficulty wire', () => {
     send('seal_of_the_nine_oaths');
     expect(server.sim.countItem('seal_of_the_nine_oaths', session.pid)).toBe(0);
   });
+
+  it('dispatches only string forge offer ids and exact-copy tune UIDs', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hero');
+    const forge = vi.spyOn(server.sim, 'forgeNythraxisReward').mockImplementation(() => {});
+    const tune = vi.spyOn(server.sim, 'tuneNythraxisLegendary').mockImplementation(() => {});
+    const send = (cmd: string, payload: Record<string, unknown>) =>
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd, ...payload }));
+
+    send('nythraxis_forge', { offerId: 7 });
+    send('nythraxis_forge', { offerId: null });
+    send('nythraxis_tune', { instanceUid: { injected: true } });
+    send('nythraxis_tune', { instanceUid: 99 });
+    expect(forge).not.toHaveBeenCalled();
+    expect(tune).not.toHaveBeenCalled();
+
+    send('nythraxis_forge', { offerId: 'signature:dawnward_signet:gravecaller_ring' });
+    send('nythraxis_tune', { instanceUid: 'pi1:wire:77' });
+    expect(forge).toHaveBeenCalledOnce();
+    expect(forge).toHaveBeenCalledWith('signature:dawnward_signet:gravecaller_ring', session.pid);
+    expect(tune).toHaveBeenCalledOnce();
+    expect(tune).toHaveBeenCalledWith('pi1:wire:77', session.pid);
+  });
 });
 
 describe('restart countdown', () => {

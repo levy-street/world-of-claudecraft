@@ -26,7 +26,12 @@
 import { bagCapacity } from '../bags';
 import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { heroicVariantId } from '../content/heroic_variants';
+import {
+  PROCEDURAL_LEGENDARY_POWERS,
+  type ProceduralLegendaryPowerId,
+} from '../content/procedural_legendary_powers';
 import { ITEMS, MOBS, QUESTS } from '../data';
+import { canEquipItem } from '../equipment_rules';
 import { formatMoney } from '../format_money';
 import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
@@ -361,11 +366,14 @@ export function appendLiveProceduralDrop(
   eligibleRecipients: readonly PlayerMeta[] = [],
 ): void {
   if (!proceduralLootSourceEligible(ctx, mob, template)) return;
+  const sourceInstance = ctx.instances.find(
+    (instance) => instance.partyKey !== null && instance.mobIds.includes(mob.id),
+  );
   const sourceFacts = {
-    inDungeon: ctx.instances.some(
-      (instance) => instance.partyKey !== null && instance.mobIds.includes(mob.id),
-    ),
+    inDungeon: sourceInstance !== undefined,
     inDelve: ctx.delveRunForMob(mob.id) !== null,
+    ...(sourceInstance && { dungeonId: sourceInstance.dungeonId }),
+    ...(sourceInstance && { dungeonDifficulty: sourceInstance.difficulty }),
   };
   const lootRecipientClasses = [...eligibleRecipients]
     .sort((a, b) => a.entityId - b.entityId)
@@ -478,6 +486,7 @@ function startNeedGreedRoll(
       quality: roll.quality,
       ...(roll.instance && { instance: publicItemInstanceView(roll.instance) }),
       expiresAt: roll.expiresAt,
+      canNeed: canNeedLootRoll(roll, candidate),
       pid: candidate.entityId,
     });
   }
@@ -604,6 +613,7 @@ export function activeLootRolls(ctx: SimContext, pid: number): LootRollPrompt[] 
       quality: roll.quality,
       ...(roll.instance && { instance: publicItemInstanceView(roll.instance) }),
       expiresAt: roll.expiresAt,
+      canNeed: !!ctx.players.get(pid) && canNeedLootRoll(roll, ctx.players.get(pid)!),
     });
   }
   return out;
@@ -637,6 +647,16 @@ export function lootRollGroupStatus(ctx: SimContext, pid: number): LootRollGroup
   }
   return out;
 }
+export function canNeedLootRoll(roll: PendingLootRoll, meta: PlayerMeta): boolean {
+  const def = ITEMS[roll.itemId];
+  if (!def || !canEquipItem(meta.cls, def)) return false;
+  const procedural = roll.instance?.procedural;
+  if (procedural?.rarity !== 'legendary' || !procedural.legendaryPowerId) return true;
+  const power =
+    PROCEDURAL_LEGENDARY_POWERS[procedural.legendaryPowerId as ProceduralLegendaryPowerId];
+  if (!power) return false;
+  return !('requiredClass' in power) || power.requiredClass === meta.cls;
+}
 
 export function submitLootRoll(
   ctx: SimContext,
@@ -656,6 +676,10 @@ export function submitLootRoll(
     roll.choices.has(r.meta.entityId)
   )
     return;
+  if (choice === 'need' && !canNeedLootRoll(roll, r.meta)) {
+    ctx.error(r.meta.entityId, 'Your class cannot Need that item.');
+    return;
+  }
   roll.choices.set(r.meta.entityId, {
     choice,
     roll: choice === 'need' || choice === 'greed' ? ctx.rng.int(1, 100) : null,
@@ -762,6 +786,7 @@ function convertMasterRollToNeedGreed(
       quality: roll.quality,
       ...(roll.instance && { instance: publicItemInstanceView(roll.instance) }),
       expiresAt: roll.expiresAt,
+      canNeed: !!ctx.players.get(pid) && canNeedLootRoll(roll, ctx.players.get(pid)!),
       pid,
     });
   }

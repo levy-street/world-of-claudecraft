@@ -2920,6 +2920,16 @@ export const hudChromeStrings = {
     lockedFor: 'Locked for about {minutes} min',
     attunement: 'Requires attunement: {quest}',
     heroicMarks: 'Heroic Marks: {count} per player',
+    raidRewards: 'Nythraxis reward preview',
+    raidSharedDrop: 'The final corpse adds one shared procedural item for the raid to roll on.',
+    raidRarityLine: 'Rare {rare}% · Epic {epic}% · Legendary {legendary}%',
+    raidItemLevels: 'Item level: Rare {rare} · Epic {epic} · Legendary {legendary}',
+    raidCurrenciesNormal: '+{fragments} Deathless Fragment per participant',
+    raidCurrenciesHeroic:
+      '+{fragments} Deathless Fragments and +{marks} Heroic Marks per participant',
+    raidSignatures: 'Signature Legendary powers: {signatures}',
+    raidForgedLegendary:
+      'Heroic Legendary powers are Raid-forged and guaranteed in the upper half of their authored roll range.',
     entrance: 'Entrance: {zone}',
     showOnMap: 'Show on Map',
     encounters: 'Encounters',

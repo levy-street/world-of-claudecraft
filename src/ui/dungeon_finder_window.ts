@@ -475,7 +475,29 @@ export class DungeonFinderWindow {
     const encounters =
       `<div class="df-sub">${esc(t('hudChrome.finder.encounters'))}</div>` +
       d.encounters.map((e) => this.encounterHtml(e)).join('');
-    return head + meta + encounters;
+    return head + meta + this.proceduralRaidHtml(d) + encounters;
+  }
+
+  private proceduralRaidHtml(d: FinderActivityDetailView): string {
+    const reward = d.proceduralRaid;
+    if (!reward) return '';
+    const pct = (value: number): string => formatNumber(value * 100, { maximumFractionDigits: 0 });
+    const signatures = reward.signaturePowerIds
+      .map((id) => t(`itemUi.procedural.legendary.${id}.name` as TranslationKey))
+      .join(', ');
+    const currency =
+      reward.heroicMarks > 0
+        ? t('hudChrome.finder.raidCurrenciesHeroic', {
+            fragments: formatNumber(reward.fragments, { maximumFractionDigits: 0 }),
+            marks: formatNumber(reward.heroicMarks, { maximumFractionDigits: 0 }),
+          })
+        : t('hudChrome.finder.raidCurrenciesNormal', {
+            fragments: formatNumber(reward.fragments, { maximumFractionDigits: 0 }),
+          });
+    const forged = reward.raidForgedLegendary
+      ? `<div class="df-raid-highlight">${esc(t('hudChrome.finder.raidForgedLegendary'))}</div>`
+      : '';
+    return `<section class="df-raid-rewards" aria-label="${esc(t('hudChrome.finder.raidRewards'))}"><div class="df-sub">${esc(t('hudChrome.finder.raidRewards'))}</div><div class="df-raid-line">${esc(t('hudChrome.finder.raidSharedDrop'))}</div><div class="df-raid-line">${esc(t('hudChrome.finder.raidRarityLine', { rare: pct(reward.rarity.rare), epic: pct(reward.rarity.epic), legendary: pct(reward.rarity.legendary) }))}</div><div class="df-raid-line">${esc(t('hudChrome.finder.raidItemLevels', { rare: formatNumber(reward.itemLevels.rare, { maximumFractionDigits: 0 }), epic: formatNumber(reward.itemLevels.epic, { maximumFractionDigits: 0 }), legendary: formatNumber(reward.itemLevels.legendary, { maximumFractionDigits: 0 }) }))}</div><div class="df-raid-line">${esc(currency)}</div><div class="df-raid-line">${esc(t('hudChrome.finder.raidSignatures', { signatures }))}</div>${forged}</section>`;
   }
 
   private encounterHtml(e: FinderEncounterViewModel): string {

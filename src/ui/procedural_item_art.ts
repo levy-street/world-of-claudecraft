@@ -11,7 +11,12 @@ export type ProceduralIconRarity = (typeof PROCEDURAL_ICON_RARITIES)[number];
 
 export const PROCEDURAL_ICON_ROOT = '/ui/items/procedural/v1';
 
-export type ProceduralItemIconState = 'legacy' | 'rarity' | 'legendary' | 'legendary-fallback';
+export type ProceduralItemIconState =
+  | 'legacy'
+  | 'rarity'
+  | 'legendary'
+  | 'legendary-raid-forged'
+  | 'legendary-fallback';
 
 export interface ProceduralItemIconResolution {
   cacheKey: string;
@@ -84,10 +89,14 @@ export function resolveProceduralItemIcon(
     return fallback;
   }
 
+  const raidForged = procedural.raidForged === true;
+  const suffix = raidForged ? '.ascendant' : '';
   return {
-    cacheKey: `pli|v1|${base.id}|legendary|${power.id}|r${power.revision}`,
-    state: 'legendary',
-    url: `${PROCEDURAL_ICON_ROOT}/${base.id}/legendary/` + `${power.id}.r${power.revision}.webp`,
+    cacheKey: `pli|v1|${base.id}|legendary|${power.id}|r${power.revision}${suffix}`,
+    state: raidForged ? 'legendary-raid-forged' : 'legendary',
+    url:
+      `${PROCEDURAL_ICON_ROOT}/${base.id}/legendary/` +
+      `${power.id}.r${power.revision}${suffix}.webp`,
   };
 }
 

@@ -2557,6 +2557,14 @@ export const zh_TW: EnTranslations = {
       "lockedFor": "鎖定約 {minutes} 分鐘",
       "attunement": "需要完成前置任務：{quest}",
       "heroicMarks": "英雄徽記：每人 {count} 枚",
+      "raidRewards": "Nythraxis reward preview",
+      "raidSharedDrop": "最終首領的屍體會額外提供一件由整個團隊共同擲骰的隨機生成物品。",
+      "raidRarityLine": "Rare {rare}% · Epic {epic}% · Legendary {legendary}%",
+      "raidItemLevels": "Item level: Rare {rare} · Epic {epic} · Legendary {legendary}",
+      "raidCurrenciesNormal": "+{fragments} Deathless Fragment per participant",
+      "raidCurrenciesHeroic": "+{fragments} Deathless Fragments and +{marks} Heroic Marks per participant",
+      "raidSignatures": "Signature Legendary powers: {signatures}",
+      "raidForgedLegendary": "英雄難度的傳奇威能必定為團隊鍛造，其數值保證位於設計範圍的上半區。",
       "entrance": "入口：{zone}",
       "showOnMap": "在地圖上顯示",
       "encounters": "首領戰",
@@ -5177,7 +5185,52 @@ export const zh_TW: EnTranslations = {
     "buyConfirmTitle": "確認購買",
     "buyConfirmBody": "用{marks}枚英雄徽記購買{item}？徽記購買後無法退款。",
     "buyConfirmAccept": "購買",
-    "buyConfirmCancel": "取消"
+    "buyConfirmCancel": "取消",
+    "tabsAria": "Quartermaster services",
+    "fragmentBalance": "Deathless Fragments: {count}",
+    "tab": {
+      "gear": "Heroic Gear",
+      "forge": "Deathless Forge",
+      "tune": "Legendary Tuning"
+    },
+    "gearIntro": "Spend Heroic Marks on the established Quartermaster stock.",
+    "forgeIntro": "選擇獎勵類別和基礎物品。伺服器只會在驗證指定兌換項目和付款後，才隨機產生詞綴與數值。",
+    "tuneIntro": "從背包中選擇一件指定的尼瑟拉克西斯傳奇物品。伺服器會產生兩次替換威能並保留較佳結果。威能不會降低，但也可能沒有變化。",
+    "tuneEmpty": "No eligible Nythraxis Legendary is in your bags.",
+    "heroicClearReady": "Heroic Nythraxis clear verified for this daily lockout.",
+    "heroicClearNeeded": "Heroic targets require a current Heroic Nythraxis clear.",
+    "itemLevel": "Item level {level}",
+    "cost": "{fragments} Fragments · {marks} Heroic Marks",
+    "randomAffixes": "Random affixes and values",
+    "deterministicStats": "Authored fixed reward",
+    "raidForgedGuarantee": "Raid-forged power, guaranteed upper-half roll",
+    "raidForged": "Raid-forged",
+    "raidDrop": "Nythraxis raid Legendary",
+    "reforgeCount": "Tunes: {count}",
+    "forgeKind": {
+      "normal_procedural": "Normal procedural Epic",
+      "heroic_procedural": "Heroic procedural Epic",
+      "signature": "Heroic signature Legendary",
+      "authored": "Authored target reward"
+    },
+    "blocked": {
+      "class": "Not compatible with your class",
+      "heroic_clear": "Requires a current Heroic Nythraxis clear",
+      "fragments": "Not enough Deathless Fragments",
+      "marks": "Not enough Heroic Marks"
+    },
+    "forgeConfirmTitle": "Confirm Forge",
+    "forgeConfirmBody": "Forge {item} for {fragments} Deathless Fragments and {marks} Heroic Marks? The realm rolls the item after payment is validated.",
+    "forgeConfirmAccept": "Forge",
+    "tuneConfirmTitle": "Confirm Legendary Tuning",
+    "tuneConfirmBody": "要花費{fragments}個不朽碎片和{marks}個英雄印記調校這件指定的{item}嗎？系統會保留兩次結果中較好的一次；威能不會降低，但可能維持不變。",
+    "tuneConfirmAccept": "Tune",
+    "status": {
+      "pending": "Waiting for the realm...",
+      "gear": "Purchase complete. Balances refreshed.",
+      "forge": "Forge complete. The new reward is in your bags.",
+      "tune": "Tuning complete. The exact copy and balances were refreshed."
+    }
   },
   "cardDuel": {
     "title": "紙牌對決",
@@ -6908,6 +6961,7 @@ export const zh_TW: EnTranslations = {
       "greed": "貪婪",
       "pass": "放棄",
       "needAria": "需求 {item}",
+      "needUnavailable": "你的職業無法裝備此物品，因此不能選擇需求。",
       "greedAria": "貪婪 {item}",
       "passAria": "放棄 {item}",
       "everyonePassed": "所有人都放棄了 {item}。",
@@ -9845,6 +9899,9 @@ export const zh_TW: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽記"
       },
+      "deathless_fragment": {
+        "name": "不死碎片"
+      },
       "eastbrook_buckler": {
         "name": "東溪小圓盾"
       },
@@ -11847,6 +11904,11 @@ export const zh_TW: EnTranslations = {
         "sender": "英勇軍需官",
         "subject": "你的英勇印記",
         "body": "你的部隊清剿了英勇試煉，而你在後排作戰，或已倒在塵土之中。你的鎖定同樣已經生效，因此你那一份英勇印記飛到了這裡，而非就此遺失。好好使用它們。\n\n- 英勇軍需官"
+      },
+      "nythraxis_rewards": {
+        "sender": "不死軍需官",
+        "subject": "你應得的不死寶藏",
+        "body": "你的戰團擊敗了不死之王，而你當時正在側翼作戰、倒在塵土中，或仍在從墓地返回的漫長路上。你的每日領取資格與他們一同記錄，因此你贏得的個人戰利品會由信鴉送來，而不會遺失。準備好塑造獎勵時，請把碎片帶給英勇軍需官。\n\n- 不死軍需官"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "工匠公會",

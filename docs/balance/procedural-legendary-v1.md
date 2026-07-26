@@ -18,12 +18,21 @@ the exact-SHA acceptance commands documented below.
 
 ## Drop rate
 
-Every eligible dungeon or delve boss appends one procedural equipment entry.
-That entry uses a 2% Legendary weight, so the configured mean is one Legendary
-per 50 boss kills.
+Every eligible generic dungeon or delve boss appends one procedural equipment
+entry. That entry uses a 2% Legendary weight, so the configured mean is one
+Legendary per 50 boss kills. Normal Nythraxis uses the same 2% rate at fixed
+item level 32. Heroic Nythraxis uses a dedicated 5% rate at item level 36 and
+guarantees its power magnitude to the authored upper half.
 
 The drop is a shared corpse entry under the existing party-loot rules. It is
 not a personal 2% roll for every group member.
+
+Nythraxis also awards personal Deathless currency on each eligible clear. The
+Deathless Forge provides a deterministic exact-signature path at 60 Fragments
+and 45 Heroic Marks, capped at 15 resets when Normal and Heroic are both
+cleared or 20 Heroic-only resets. This does not alter or pity the shared
+natural drop. Exact raid behavior is specified in
+`docs/balance/nythraxis-endgame-loot-v030.md`.
 
 Outdoor rares use a 0.2% Legendary weight on a guaranteed procedural entry.
 Delve elites use that same conditional table behind a 20% entry gate, for an
@@ -295,7 +304,8 @@ npm run gate
 
 The system has several independent chase axes:
 
-- bosses are the best Legendary source at 2% per shared kill
+- generic and Normal raid bosses provide a 2% shared chase, while Heroic
+  Nythraxis provides the peak 5% shared chase
 - every power has one target boss
 - target bosses remain non-exclusive, so all kills can still surprise
 - item level varies with source and rarity
@@ -309,7 +319,9 @@ level, more useful affix mix, and higher power roll.
 
 ## Honest limitations
 
-- There is no pity counter or deterministic guarantee.
+- Natural drops have no pity counter or forced result. Nythraxis separately
+  provides a deterministic Forge purchase path whose selected signature still
+  rolls variable affixes and power magnitude.
 - A 2% shared-corpse drop is not a 2% personal roll for each party member.
 - Signature targeting is probabilistic and compatibility-dependent.
 - The contribution harness is not a full encounter simulator.

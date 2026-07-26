@@ -314,6 +314,8 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
+  { name: 'forgeNythraxisReward', kind: 'method' },
+  { name: 'tuneNythraxisLegendary', kind: 'method' },
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
   { name: 'devLeaderboard', kind: 'method' }, // async
@@ -467,9 +469,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), and the commissions unbindItem command.
-    expect(IWORLD_MEMBERS.length).toBe(256);
+    expect(IWORLD_MEMBERS.length).toBe(258);
     expect(DATA_MEMBERS.length).toBe(69);
-    expect(METHOD_MEMBERS.length).toBe(187);
+    expect(METHOD_MEMBERS.length).toBe(189);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -579,6 +581,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'feedPet',
       'forfeitCardDuel',
+      'forgeNythraxisReward',
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
@@ -721,6 +724,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeRequest',
       'tradeSetOffer',
       'trainRecipe',
+      'tuneNythraxisLegendary',
       'turnInQuest',
       'unbindItem',
       'unequipBag',
@@ -885,6 +889,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipItemToSlot',
       'feedPet',
       'forfeitCardDuel',
+      'forgeNythraxisReward',
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
@@ -990,6 +995,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeRequest',
       'tradeSetOffer',
       'trainRecipe',
+      'tuneNythraxisLegendary',
       'turnInQuest',
       'unbindItem',
       'unequipBag',
@@ -1342,6 +1348,8 @@ const FACET_DUNGEONS = [
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
+  'forgeNythraxisReward',
+  'tuneNythraxisLegendary',
 ] as const satisfies readonly (keyof IWorldDungeons)[];
 type _ExhaustDungeons = AssertNever<Exclude<keyof IWorldDungeons, (typeof FACET_DUNGEONS)[number]>>;
 
@@ -1518,8 +1526,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 28 fa
 
   it('the union of the facets equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(256);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(256);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(258);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(258);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

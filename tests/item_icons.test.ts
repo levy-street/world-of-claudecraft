@@ -25,7 +25,7 @@ import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 //   A) every id in ITEM_IMAGE_IDS resolves to a committed, VALID .webp;
 //   B) only .webp art (+ mapping.json) is committed under public/ui/items;
 //   C) every committed top-level .webp is a WIRED id (an item id, or a UI pseudo-item id);
-//   H) Procedural Loot v1 is exactly 34 legacy aliases plus 191 nested static states, all
+//   H) Procedural Loot v1 is exactly 34 legacy aliases plus 212 nested static states, all
 //      schema-pinned, provenance-mapped, image-valid, orphan-free, and budgeted;
 //   D) every wired ITEM id is a real ITEMS entry; only procedural-launch weapons may opt out of the rendered
 //      thumbnail pipeline; everything else, armor included, lives here),
@@ -213,6 +213,13 @@ const canonicalProceduralPowers = (): ProceduralSetMapping['legendaryPowers'] =>
         a.revision - b.revision,
     );
 
+function expectedAscendantProceduralPaths(): string[] {
+  return canonicalProceduralPowers().map(
+    ({ baseId, powerId, revision }) =>
+      `${PROCEDURAL_SET_ROOT}/${baseId}/legendary/${powerId}.r${revision}.ascendant.webp`,
+  );
+}
+
 function expectedNestedProceduralPaths(): string[] {
   const rarityPaths = canonicalProceduralBaseIds().flatMap((baseId) =>
     PROCEDURAL_RARITY_FALLBACKS.map(
@@ -223,7 +230,7 @@ function expectedNestedProceduralPaths(): string[] {
     ({ baseId, powerId, revision }) =>
       `${PROCEDURAL_SET_ROOT}/${baseId}/legendary/${powerId}.r${revision}.webp`,
   );
-  return [...rarityPaths, ...powerPaths].sort();
+  return [...rarityPaths, ...powerPaths, ...expectedAscendantProceduralPaths()].sort();
 }
 
 const proceduralAssetFiles = (): string[] => {
@@ -236,6 +243,142 @@ const proceduralAssetFiles = (): string[] => {
     );
   });
 };
+
+type SmallIconVisibilityGate = {
+  relative: string;
+  minUsefulPixels: number;
+  minP90Delta: number;
+};
+
+const P1_SMALL_ICON_PATHS = [
+  'gravecaller_cloth_raiment/magic.webp',
+  'gravecaller_cloth_leggings/rare.webp',
+  'gravecaller_cloth_leggings/epic.webp',
+  'gravecaller_cloth_leggings/legendary/_fallback.webp',
+  'mirefen_leather_hood/magic.webp',
+  'mirefen_leather_hood/rare.webp',
+  'mirefen_leather_hood/legendary/_fallback.webp',
+  'mirefen_leather_jerkin/magic.webp',
+  'mirefen_leather_jerkin/rare.webp',
+  'mirefen_leather_belt/rare.webp',
+  'mirefen_leather_belt/legendary/_fallback.webp',
+  'mirefen_leather_leggings/magic.webp',
+  'mirefen_leather_leggings/rare.webp',
+  'mirefen_leather_leggings/epic.webp',
+  'mirefen_leather_leggings/legendary/_fallback.webp',
+  'thornpeak_mail_chest/magic.webp',
+  'thornpeak_mail_chest/rare.webp',
+  'thornpeak_mail_chest/epic.webp',
+  'thornpeak_mail_chest/legendary/_fallback.webp',
+  'thornpeak_mail_helm/magic.webp',
+  'thornpeak_mail_helm/rare.webp',
+  'thornpeak_mail_helm/epic.webp',
+  'thornpeak_mail_helm/legendary/_fallback.webp',
+  'thornpeak_mail_girdle/rare.webp',
+  'thornpeak_mail_girdle/epic.webp',
+  'thornpeak_mail_girdle/legendary/_fallback.webp',
+  'thornpeak_mail_legguards/magic.webp',
+  'thornpeak_mail_legguards/rare.webp',
+  'thornpeak_mail_legguards/epic.webp',
+  'thornpeak_mail_legguards/legendary/_fallback.webp',
+  'gravecaller_pendant/rare.webp',
+  'gravecaller_pendant/epic.webp',
+  'gravecaller_pendant/legendary/_fallback.webp',
+  'thornpeak_bulwark/rare.webp',
+  'gravecaller_focus/rare.webp',
+  'gravecaller_focus/epic.webp',
+].map((relative) => `${PROCEDURAL_SET_ROOT}/${relative}`);
+
+// These production-background gates pin the P0 remasters that were unreadable at the HUD's
+// 28px floor. Long weapons need 7.5 percent of the square to carry useful contrast; the
+// broader focus and shield silhouettes need 12 percent. P1 armor and accessories need nearly
+// 20 percent; P2 and Ascendant gates pin their authored silhouettes too. The percentile floor
+// prevents an icon from passing on a few isolated hot pixels while the rest collapses into
+// black.
+const SMALL_ICON_VISIBILITY_GATES: SmallIconVisibilityGate[] = [
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/ashwood_staff/magic.webp`,
+    minUsefulPixels: 59,
+    minP90Delta: 60,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/gravecaller_wand/magic.webp`,
+    minUsefulPixels: 59,
+    minP90Delta: 60,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/mirefen_hunting_bow/magic.webp`,
+    minUsefulPixels: 59,
+    minP90Delta: 60,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/thornpeak_polearm/magic.webp`,
+    minUsefulPixels: 59,
+    minP90Delta: 60,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/gravecaller_focus/legendary/_fallback.webp`,
+    minUsefulPixels: 94,
+    minP90Delta: 65,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/thornpeak_bulwark/common.webp`,
+    minUsefulPixels: 94,
+    minP90Delta: 35,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/mirefen_hunting_bow/epic.webp`,
+    minUsefulPixels: 75,
+    minP90Delta: 70,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/thornpeak_polearm/epic.webp`,
+    minUsefulPixels: 65,
+    minP90Delta: 70,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/mirefen_hunting_bow/legendary/hushwood_longbow.r1.webp`,
+    minUsefulPixels: 75,
+    minP90Delta: 70,
+  },
+  ...P1_SMALL_ICON_PATHS.map((relative) => ({
+    relative,
+    minUsefulPixels: 155,
+    minP90Delta: 60,
+  })),
+  ...expectedAscendantProceduralPaths().map((relative) => ({
+    relative,
+    minUsefulPixels: 85,
+    minP90Delta: 60,
+  })),
+];
+
+async function smallIconVisibility(file: string): Promise<{
+  usefulPixels: number;
+  p90Delta: number;
+}> {
+  const background = { r: 8, g: 9, b: 11 };
+  const { data, info } = await sharp(file)
+    .resize(28, 28, { fit: 'fill', kernel: sharp.kernel.lanczos3 })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const deltas: number[] = [];
+  let usefulPixels = 0;
+  for (let offset = 0; offset < data.length; offset += info.channels) {
+    const alpha = data[offset + 3] / 255;
+    if (alpha < 0.25) continue;
+    const red = background.r * (1 - alpha) + data[offset] * alpha;
+    const green = background.g * (1 - alpha) + data[offset + 1] * alpha;
+    const blue = background.b * (1 - alpha) + data[offset + 2] * alpha;
+    const delta = Math.hypot(red - background.r, green - background.g, blue - background.b);
+    deltas.push(delta);
+    if (delta >= 18) usefulPixels++;
+  }
+  deltas.sort((a, b) => a - b);
+  const p90Delta = deltas[Math.max(0, Math.ceil(deltas.length * 0.9) - 1)] ?? 0;
+  return { usefulPixels, p90Delta };
+}
 
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
@@ -466,11 +609,11 @@ describe('item webp icons', () => {
     expect(set.license).toContain('AI-assisted');
   });
 
-  it('H2) has an exact 225-file procedural inventory: 34 aliases plus 191 nested states', () => {
+  it('H2) has an exact 246-file procedural inventory: 34 aliases plus 212 nested states', () => {
     const expectedLegacy = canonicalProceduralBaseIds().map((baseId) => `${baseId}.webp`);
     const expectedNested = expectedNestedProceduralPaths();
     expect(expectedLegacy).toHaveLength(34);
-    expect(expectedNested).toHaveLength(34 * 5 + 21);
+    expect(expectedNested).toHaveLength(34 * 5 + 21 * 2);
 
     const actualLegacy = topLevelWebpFiles()
       .map(relativeItemPath)
@@ -517,14 +660,14 @@ describe('item webp icons', () => {
     const p95 = sizes[Math.max(0, Math.ceil(sizes.length * 0.95) - 1)];
     const total = sizes.reduce((sum, size) => sum + size, 0);
     expect(p95, 'procedural icon p95 must stay at or below 20 KiB').toBeLessThanOrEqual(20 * 1024);
-    expect(total, 'all 225 procedural icons must stay at or below 10 MiB').toBeLessThanOrEqual(
+    expect(total, 'all 246 procedural icons must stay at or below 10 MiB').toBeLessThanOrEqual(
       10 * 1024 * 1024,
     );
   });
 
-  it('H5) gives all 191 nested rarity and Legendary states unique decoded RGBA art', async () => {
+  it('H5) gives all 212 nested rarity and Legendary states unique decoded RGBA art', async () => {
     const nestedPaths = expectedNestedProceduralPaths();
-    expect(nestedPaths).toHaveLength(191);
+    expect(nestedPaths).toHaveLength(212);
     const byPixelHash = new Map<string, string[]>();
     for (const relative of nestedPaths) {
       const { data, info } = await sharp(path.join(itemsDir, relative))
@@ -540,6 +683,95 @@ describe('item webp icons', () => {
     expect(
       [...byPixelHash.values()].filter((paths) => paths.length > 1),
       'rarity and named Legendary states must remain visually distinct after decoding',
+    ).toEqual([]);
+  });
+
+  it('H5a) gives every compatible named Legendary a distinct Ascendant art pair', async () => {
+    const failures: string[] = [];
+    const powers = canonicalProceduralPowers();
+    expect(powers).toHaveLength(21);
+    for (const { baseId, powerId, revision } of powers) {
+      const normal = `${PROCEDURAL_SET_ROOT}/${baseId}/legendary/${powerId}.r${revision}.webp`;
+      const ascendant =
+        `${PROCEDURAL_SET_ROOT}/${baseId}/legendary/` + `${powerId}.r${revision}.ascendant.webp`;
+      if (!existsSync(path.join(itemsDir, normal)) || !existsSync(path.join(itemsDir, ascendant))) {
+        failures.push(`${baseId}/${powerId}.r${revision} (missing normal or Ascendant art)`);
+        continue;
+      }
+      const [normalPixels, ascendantPixels] = await Promise.all(
+        [normal, ascendant].map(async (relative) => {
+          const { data, info } = await sharp(path.join(itemsDir, relative))
+            .ensureAlpha()
+            .raw()
+            .toBuffer({ resolveWithObject: true });
+          expect(info).toMatchObject({ width: 128, height: 128, channels: 4 });
+          return createHash('sha256').update(data).digest('hex');
+        }),
+      );
+      if (normalPixels === ascendantPixels) {
+        failures.push(`${baseId}/${powerId}.r${revision} (decoded pixels are identical)`);
+      }
+    }
+    expect(
+      failures,
+      'each named Legendary needs both normal and visually distinct Ascendant art',
+    ).toEqual([]);
+  });
+
+  it('H6) keeps every procedural silhouette inside its hard-alpha safety margin', async () => {
+    const violations: string[] = [];
+    const strictTwoPixelPaths = new Set([
+      ...SMALL_ICON_VISIBILITY_GATES.map((gate) => gate.relative),
+      ...expectedAscendantProceduralPaths(),
+      'thornpeak_bulwark.webp',
+    ]);
+    for (const file of proceduralAssetFiles()) {
+      const relative = relativeItemPath(file);
+      const margin = strictTwoPixelPaths.has(relative) ? 2 : 1;
+      const { data, info } = await sharp(file)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      let hardEdgePixels = 0;
+      let maxEdgeAlpha = 0;
+      for (let y = 0; y < info.height; y++) {
+        for (let x = 0; x < info.width; x++) {
+          if (x >= margin && x < info.width - margin && y >= margin && y < info.height - margin)
+            continue;
+          const alpha = data[(y * info.width + x) * info.channels + 3];
+          if (alpha >= 128) hardEdgePixels++;
+          maxEdgeAlpha = Math.max(maxEdgeAlpha, alpha);
+        }
+      }
+      if (hardEdgePixels > 0) {
+        violations.push(
+          `${relative} (${margin}px margin, ${hardEdgePixels} hard pixels, ` +
+            `max alpha ${maxEdgeAlpha})`,
+        );
+      }
+    }
+    expect(
+      violations,
+      'all procedural art needs one transparent pixel; P0 remasters need two',
+    ).toEqual([]);
+  });
+
+  it('H7) keeps the P0, P1, P2, and Ascendant remasters readable at the 28px HUD floor', async () => {
+    const failures: string[] = [];
+    expect(P1_SMALL_ICON_PATHS).toHaveLength(36);
+    for (const gate of SMALL_ICON_VISIBILITY_GATES) {
+      const result = await smallIconVisibility(path.join(itemsDir, gate.relative));
+      if (result.usefulPixels < gate.minUsefulPixels || result.p90Delta < gate.minP90Delta) {
+        failures.push(
+          `${gate.relative} (` +
+            `${result.usefulPixels}/${gate.minUsefulPixels} useful pixels, ` +
+            `${result.p90Delta.toFixed(1)}/${gate.minP90Delta} p90 delta)`,
+        );
+      }
+    }
+    expect(
+      failures,
+      'authored icon silhouettes must stay visible against the production #08090b slot background',
     ).toEqual([]);
   });
 

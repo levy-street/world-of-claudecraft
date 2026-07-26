@@ -113,6 +113,8 @@ export class LootRollController {
   }
 
   private submit(rollId: number, choice: LootRollChoice): void {
+    const roll = this.activeRolls.get(rollId);
+    if (!roll || (choice === 'need' && !roll.event.canNeed)) return;
     this.deps.world().submitLootRoll(rollId, choice);
     this.activeRolls.delete(rollId);
     this.dismissedRolls.set(rollId, this.deps.now());
@@ -317,6 +319,13 @@ export class LootRollController {
         ? itemPresentationQuality(item, event.instance)
         : (event.quality ?? 'common');
       const status = statusByRoll.get(rollId);
+      const needReasonId = `loot-roll-need-reason-${rollId}`;
+      const needAttrs = event.canNeed
+        ? ''
+        : ` disabled aria-disabled='true' aria-describedby='${needReasonId}'`;
+      const needReason = event.canNeed
+        ? ''
+        : `<div class='loot-roll-need-reason' id='${needReasonId}'>${esc(t('itemUi.lootRoll.needUnavailable'))}</div>`;
       const row = this.deps.document.createElement('div');
       row.className = 'loot-roll panel';
       row.dataset.rollId = String(rollId);
@@ -333,10 +342,10 @@ export class LootRollController {
         <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
         ${status ? this.votesHtml(status) : ''}
         <div class="loot-roll-actions">
-          <button type="button" class="loot-roll-btn need" data-choice="need">${esc(t('itemUi.lootRoll.need'))}</button>
+          <button type="button" class="loot-roll-btn need" data-choice="need"${needAttrs}>${esc(t('itemUi.lootRoll.need'))}</button>
           <button type="button" class="loot-roll-btn greed" data-choice="greed">${esc(t('itemUi.lootRoll.greed'))}</button>
           <button type="button" class="loot-roll-btn pass" data-choice="pass">${esc(t('itemUi.lootRoll.pass'))}</button>
-        </div>`;
+        </div>${needReason}`;
       const itemElement = row.querySelector<HTMLElement>('.loot-roll-item');
       if (item && itemElement) {
         this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item, event.instance));

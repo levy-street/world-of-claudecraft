@@ -21,6 +21,7 @@ import { bagCapacity, canGrantItemInstance, instancedCountCap } from '../bags';
 import {
   HEROIC_MARK_LETTER,
   type LetterDef,
+  NYTHRAXIS_REWARD_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
 } from '../content/letters';
@@ -655,17 +656,26 @@ export class PostOffice {
     this.sendLetter(this.mailKeyFor(meta), meta.name, WELCOME_LETTER, 'system');
   }
 
-  // Heroic Marks reward hook (awardHeroicMarks): posts a participant's marks when
-  // they took the daily lockout but were not at the corpse to loot them (a distant
-  // healer, a fallen raider). The letter's attachment carries the exact mark count
-  // for this kill. No postage, no proximity gate: the raid already earned it.
-  mailHeroicMarks(pid: number, itemId: string, count: number): void {
+  // System reward-mail hook. The original Heroic Marks caller supplies one
+  // stack; Nythraxis may append its personal fragment stack so one atomic boss
+  // settlement produces one accurate letter instead of two unrelated parcels.
+  mailHeroicMarks(
+    pid: number,
+    itemId: string,
+    count: number,
+    additionalItems: InvSlot[] = [],
+  ): void {
     const meta = this.ctx.players.get(pid);
     if (!meta || count <= 0) return;
+    const items = [{ itemId, count }, ...additionalItems.map((slot) => ({ ...slot }))];
+    const nythraxisReward = items.some((slot) => slot.itemId === 'deathless_fragment');
     this.sendLetter(
       this.mailKeyFor(meta),
       meta.name,
-      { ...HEROIC_MARK_LETTER, items: [{ itemId, count }] },
+      {
+        ...(nythraxisReward ? NYTHRAXIS_REWARD_LETTER : HEROIC_MARK_LETTER),
+        items,
+      },
       'system',
     );
   }

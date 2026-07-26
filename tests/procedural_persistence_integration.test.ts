@@ -29,6 +29,33 @@ function generated(uid = UID, seed = 701): ItemInstancePayload {
     forcedRarity: 'magic',
   }).instance;
 }
+function raidForgedGenerated(uid = 'pi1:persist:7002', seed = 702): ItemInstancePayload {
+  const instance = generateProceduralItem({
+    seed,
+    uid,
+    context: {
+      source: 'raid',
+      sourceEntityId: 41,
+      sourceSpawnSequence: 3,
+      lootSlotIndex: 0,
+      sourceTemplateId: 'nythraxis_scourge_of_thornpeak',
+      sourceTags: ['raid', 'heroic', 'boss'],
+    },
+    basePoolId: 'nythraxis_raid',
+    rarityTableId: 'nythraxis_raid_heroic',
+    sourceItemLevel: 22,
+    forcedBaseId: BASE_ID,
+    forcedRarity: 'legendary',
+    forcedItemLevel: 36,
+    forcedLegendaryPowerId: 'dawnward_signet',
+    personalLootClass: 'paladin',
+    legendaryMagnitudeFloor: 0.5,
+    raidForgedLegendary: true,
+  }).instance;
+  if (!instance.procedural) throw new Error('missing Raid-forged fixture');
+  instance.procedural.reforgeCount = 7;
+  return instance;
+}
 
 function freshState(): CharacterState {
   const sim = new Sim({ seed: 90, playerClass: 'mage', noPlayer: true });
@@ -38,9 +65,10 @@ function freshState(): CharacterState {
   return structuredClone(state);
 }
 
-function load(state: CharacterState): void {
-  const sim = new Sim({ seed: 90, playerClass: 'mage', noPlayer: true });
+function load(state: CharacterState): InspectableSim {
+  const sim = new Sim({ seed: 90, playerClass: 'mage', noPlayer: true }) as InspectableSim;
   sim.addPlayer('mage', 'Persist', { state });
+  return sim;
 }
 
 describe('procedural persistence boundaries', () => {
@@ -57,6 +85,36 @@ describe('procedural persistence boundaries', () => {
     expect(hydrated).not.toBe(source);
     expect(hydrated?.procedural).not.toBe(source.procedural);
     expect(hydrated?.procedural?.affixes[0]).not.toBe(source.procedural?.affixes[0]);
+  });
+
+  it('round-trips Raid-forged metadata while leaving an older procedural copy unchanged', () => {
+    const state = freshState();
+    const legacy = generated('pi1:persist:7003', 703);
+    const ascendant = raidForgedGenerated();
+    state.inventory.push(
+      { itemId: BASE_ID, count: 1, instance: legacy },
+      { itemId: BASE_ID, count: 1, instance: ascendant },
+    );
+
+    const sim = load(state);
+    const meta = [...sim.players.values()][0];
+    const loadedLegacy = meta.inventory.find(
+      (slot) => slot.instance?.procedural?.uid === 'pi1:persist:7003',
+    )?.instance?.procedural;
+    const loadedAscendant = meta.inventory.find(
+      (slot) => slot.instance?.procedural?.uid === 'pi1:persist:7002',
+    )?.instance?.procedural;
+
+    expect(loadedLegacy).toEqual(legacy.procedural);
+    expect(loadedLegacy?.raidForged).toBeUndefined();
+    expect(loadedLegacy?.reforgeCount).toBeUndefined();
+    expect(loadedAscendant).toEqual(ascendant.procedural);
+    expect(loadedAscendant).toMatchObject({
+      raidForged: true,
+      reforgeCount: 7,
+      legendaryPowerId: 'dawnward_signet',
+      itemLevel: 36,
+    });
   });
 
   it('rejects a corrupt procedural payload in carried inventory', () => {

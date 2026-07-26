@@ -13,6 +13,18 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'heroicShop.forgeIntro':
+    'Выберите семейство награды и базовый предмет. Сервер определит случайные свойства только после проверки точного предложения и оплаты.',
+  'heroicShop.tuneIntro':
+    'Выберите точную легендарную вещь Никсраксиса в сумках. Сервер сделает два броска новой силы и сохранит лучший результат. Сила не снизится, но может не измениться.',
+  'heroicShop.tuneConfirmBody':
+    'Настроить именно этот экземпляр {item} за {fragments} Фрагментов Бессмертных и {marks} Героических знаков? Сохранится лучший из двух бросков; сила не снизится, но может остаться прежней.',
+  'hudChrome.finder.raidSharedDrop':
+    'На последнем трупе появится один общий процедурный предмет, за который бросает весь рейд.',
+  'hudChrome.finder.raidForgedLegendary':
+    'Героические легендарные силы имеют рейдовую ковку и гарантированно попадают в верхнюю половину заданного диапазона.',
+  'itemUi.lootRoll.needUnavailable':
+    'Нельзя выбрать «Нужно»: ваш класс не может экипировать этот предмет.',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -4039,6 +4051,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.kings_signet.name': 'Перстень короля',
   'entities.items.event_skin_token.name': 'Загадочный косметический тайник',
   'entities.items.heroic_mark.name': 'Героический знак',
+  'entities.items.deathless_fragment.name': 'Фрагмент Бессмертия',
   'hudChrome.raidLockout.heroicName': 'Героический режим: {name}',
   'hudChrome.raidLockout.heroicLocked': 'Вы закреплены за героическим подземельем: {name}.',
   'entities.items.morthens_cryptforged_hauberk.name': 'Кольчуга Мортена из гробничной стали',
@@ -7247,6 +7260,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': 'Ваши героические знаки',
   'entities.letters.heroic_marks_reward.body':
     'Ваш отряд прошёл героическое испытание, пока вы сражались в тылу или лежали в пыли. Блокировка была наложена всё равно, поэтому ваша доля героических знаков прилетела к вам сюда, а не пропала. Расходуйте их с умом.\n\n- Героический интендант',
+  'entities.letters.nythraxis_rewards.sender': 'Интендант Бессмертных',
+  'entities.letters.nythraxis_rewards.subject': 'Ваша доля сокровищ Бессмертных',
+  'entities.letters.nythraxis_rewards.body':
+    'Ваш отряд сокрушил Бессмертного короля, пока вы сражались на фланге, лежали в пыли или возвращались с кладбища. Ваше право на ежедневную награду было учтено вместе с остальными, поэтому заслуженная личная добыча прилетела к вам сюда, а не пропала. Когда будете готовы выковать награду, отнесите фрагменты Героическому интенданту.\n\n- Интендант Бессмертных',
   'entities.letters.guild_trend_engineering_alchemy.sender': 'Гильдия ремесленников',
   'entities.letters.guild_trend_engineering_alchemy.subject':
     'О вашей работе: инженерное дело и алхимия',

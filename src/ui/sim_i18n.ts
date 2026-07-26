@@ -211,6 +211,13 @@ const baseEnTable = {
   'log.dungeonDifficultyIsHeroic': 'Dungeon difficulty: Heroic. Use /dungeon normal to change it.',
   'log.dungeonDifficultyIsNormal': 'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
   'error.heroicMarksNeeded': 'You need {marks} Heroic Marks to buy {name}.',
+  'error.lootNeedClass': 'Your class cannot Need that item.',
+  'error.nythForgeOfferMissing': 'That Deathless forge offer does not exist.',
+  'error.nythRewardClass': 'Your class cannot use that reward.',
+  'error.nythHeroicClearRequired': 'Defeat Heroic Nythraxis in the current raid reset first.',
+  'error.nythExactLegendaryMissing': 'That exact Nythraxis Legendary is no longer in your bags.',
+  'error.nythTuneClass': 'Your class cannot tune that Legendary power.',
+  'error.nythCost': 'You need {fragments} Deathless Fragments and {marks} Heroic Marks.',
   'error.channelUsage': 'Usage: /{action} <channel>. Channels: {list}.',
   'error.generalAlwaysOn': 'The General channel is always on - just use /general.',
   'error.noSuchChannel': "There is no channel named '{name}'. Channels: {list}.",
@@ -8230,6 +8237,10 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  {
+    re: /^You need (\d+) Deathless Fragments and (\d+) Heroic Marks\.$/,
+    build: (m) => tSim('error.nythCost', { fragments: m[1], marks: m[2] }),
+  },
   // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
   {
     re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,

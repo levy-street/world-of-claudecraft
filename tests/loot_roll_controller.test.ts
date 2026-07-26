@@ -64,6 +64,7 @@ const prompt = (rollId = 7): LootRollPrompt => ({
   itemName: 'Greyjaw Hide Boots',
   quality: 'uncommon',
   expiresAt: 60_000,
+  canNeed: true,
 });
 
 const rollEvent = (rollId = 7): Extract<SimEvent, { type: 'lootRoll' }> => ({
@@ -154,6 +155,7 @@ describe('LootRollController', () => {
       quality: 'legendary',
       instance: legendaryInstance,
       expiresAt: 60_000,
+      canNeed: true,
     });
 
     const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement | null;
@@ -203,6 +205,30 @@ describe('LootRollController', () => {
     test.advance(LOOT_ROLL_REGRACE_MS);
     test.controller.update(test.now());
     expect(test.root.style.display).toBe('flex');
+  });
+
+  it('keeps an ineligible Need prompt open, exposes the reason, and still allows Greed', () => {
+    const test = harness();
+    const blocked = { ...prompt(29), canNeed: false };
+    test.setOpen([blocked]);
+    test.controller.showRoll({ type: 'lootRoll', ...blocked });
+    const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement;
+    expect(row.innerHTML).toContain('data-choice="need" disabled aria-disabled=');
+    expect(row.innerHTML).toContain('aria-describedby=');
+    expect(row.innerHTML).toContain(
+      'Need is unavailable because your class cannot equip this item.',
+    );
+    const buttons = row.querySelectorAll<HTMLElement>('[data-choice]') as unknown as LootElement[];
+
+    buttons.find((button) => button.dataset.choice === 'need')?.dispatchEvent(new Event('click'));
+
+    expect(test.submitLootRoll).not.toHaveBeenCalled();
+    expect(test.root.style.display).toBe('flex');
+    expect(test.root.querySelector<HTMLElement>('.loot-roll')).not.toBeNull();
+
+    buttons.find((button) => button.dataset.choice === 'greed')?.dispatchEvent(new Event('click'));
+    expect(test.submitLootRoll).toHaveBeenCalledWith(29, 'greed');
+    expect(test.root.style.display).toBe('none');
   });
 
   it('replaces a master-loot prompt when the server converts the same roll to need-greed', () => {

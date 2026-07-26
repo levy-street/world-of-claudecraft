@@ -2557,6 +2557,14 @@ export const ko_KR: EnTranslations = {
       "lockedFor": "약 {minutes}분 동안 귀속됨",
       "attunement": "선행 퀘스트 필요: {quest}",
       "heroicMarks": "영웅의 징표: 1인당 {count}개",
+      "raidRewards": "Nythraxis reward preview",
+      "raidSharedDrop": "마지막 시체에 공격대가 함께 주사위를 굴릴 절차 생성 아이템 한 개가 추가됩니다.",
+      "raidRarityLine": "Rare {rare}% · Epic {epic}% · Legendary {legendary}%",
+      "raidItemLevels": "Item level: Rare {rare} · Epic {epic} · Legendary {legendary}",
+      "raidCurrenciesNormal": "+{fragments} Deathless Fragment per participant",
+      "raidCurrenciesHeroic": "+{fragments} Deathless Fragments and +{marks} Heroic Marks per participant",
+      "raidSignatures": "Signature Legendary powers: {signatures}",
+      "raidForgedLegendary": "영웅 전설 위력은 공격대 제련 상태이며, 설정된 수치 범위의 상위 절반이 보장됩니다.",
       "entrance": "입구: {zone}",
       "showOnMap": "지도에 표시",
       "encounters": "우두머리 전투",
@@ -5177,7 +5185,52 @@ export const ko_KR: EnTranslations = {
     "buyConfirmTitle": "구매 확인",
     "buyConfirmBody": "영웅의 징표 {marks}개로 {item}을(를) 구매하시겠습니까? 징표 구매는 환불되지 않습니다.",
     "buyConfirmAccept": "구매",
-    "buyConfirmCancel": "취소"
+    "buyConfirmCancel": "취소",
+    "tabsAria": "Quartermaster services",
+    "fragmentBalance": "Deathless Fragments: {count}",
+    "tab": {
+      "gear": "Heroic Gear",
+      "forge": "Deathless Forge",
+      "tune": "Legendary Tuning"
+    },
+    "gearIntro": "Spend Heroic Marks on the established Quartermaster stock.",
+    "forgeIntro": "보상 계열과 기본 아이템을 선택하세요. 서버는 정확한 제안과 비용을 검증한 뒤에만 무작위 속성을 결정합니다.",
+    "tuneIntro": "가방에 있는 니스락시스 전설 아이템 한 개를 정확히 선택하세요. 서버가 대체 위력을 두 번 굴려 더 좋은 결과를 유지합니다. 위력은 낮아지지 않지만 변화가 없을 수 있습니다.",
+    "tuneEmpty": "No eligible Nythraxis Legendary is in your bags.",
+    "heroicClearReady": "Heroic Nythraxis clear verified for this daily lockout.",
+    "heroicClearNeeded": "Heroic targets require a current Heroic Nythraxis clear.",
+    "itemLevel": "Item level {level}",
+    "cost": "{fragments} Fragments · {marks} Heroic Marks",
+    "randomAffixes": "Random affixes and values",
+    "deterministicStats": "Authored fixed reward",
+    "raidForgedGuarantee": "Raid-forged power, guaranteed upper-half roll",
+    "raidForged": "Raid-forged",
+    "raidDrop": "Nythraxis raid Legendary",
+    "reforgeCount": "Tunes: {count}",
+    "forgeKind": {
+      "normal_procedural": "Normal procedural Epic",
+      "heroic_procedural": "Heroic procedural Epic",
+      "signature": "Heroic signature Legendary",
+      "authored": "Authored target reward"
+    },
+    "blocked": {
+      "class": "Not compatible with your class",
+      "heroic_clear": "Requires a current Heroic Nythraxis clear",
+      "fragments": "Not enough Deathless Fragments",
+      "marks": "Not enough Heroic Marks"
+    },
+    "forgeConfirmTitle": "Confirm Forge",
+    "forgeConfirmBody": "Forge {item} for {fragments} Deathless Fragments and {marks} Heroic Marks? The realm rolls the item after payment is validated.",
+    "forgeConfirmAccept": "Forge",
+    "tuneConfirmTitle": "Confirm Legendary Tuning",
+    "tuneConfirmBody": "이 {item} 개체를 죽지 않는 파편 {fragments}개와 영웅 징표 {marks}개로 조율하시겠습니까? 두 번 중 더 좋은 결과를 유지하며, 위력은 낮아지지 않지만 그대로일 수 있습니다.",
+    "tuneConfirmAccept": "Tune",
+    "status": {
+      "pending": "Waiting for the realm...",
+      "gear": "Purchase complete. Balances refreshed.",
+      "forge": "Forge complete. The new reward is in your bags.",
+      "tune": "Tuning complete. The exact copy and balances were refreshed."
+    }
   },
   "cardDuel": {
     "title": "카드 대결",
@@ -6908,6 +6961,7 @@ export const ko_KR: EnTranslations = {
       "greed": "탐욕",
       "pass": "포기",
       "needAria": "{item} 필요",
+      "needUnavailable": "현재 직업으로 이 아이템을 착용할 수 없어 필요 주사위를 선택할 수 없습니다.",
       "greedAria": "{item} 탐욕",
       "passAria": "{item} 포기",
       "everyonePassed": "모두 {item}을(를) 포기했습니다.",
@@ -9845,6 +9899,9 @@ export const ko_KR: EnTranslations = {
       "heroic_mark": {
         "name": "영웅의 징표"
       },
+      "deathless_fragment": {
+        "name": "불멸의 파편"
+      },
       "eastbrook_buckler": {
         "name": "이스트브룩 버클러"
       },
@@ -11847,6 +11904,11 @@ export const ko_KR: EnTranslations = {
         "sender": "영웅 병참장교",
         "subject": "당신의 영웅의 징표",
         "body": "당신이 후방에서, 혹은 쓰러진 채로 싸우는 동안 당신의 부대가 영웅 시련을 돌파했습니다. 잠금은 똑같이 적용되었으니, 당신 몫의 영웅의 징표는 사라지지 않고 이곳으로 날아왔습니다. 잘 쓰십시오.\n\n- 영웅 병참장교"
+      },
+      "nythraxis_rewards": {
+        "sender": "불멸 병참장교",
+        "subject": "불멸의 보물에서 얻은 당신의 몫",
+        "body": "당신의 전투단이 불멸왕을 쓰러뜨렸습니다. 당신이 측면에서 싸우고 있었거나, 땅에 쓰러져 있었거나, 묘지에서 돌아오는 긴 길 위에 있었더라도 말입니다. 당신의 일일 보상 권리도 동료들과 함께 기록되었으므로, 획득한 개인 전리품은 사라지지 않고 이곳으로 배달됩니다. 보상을 빚을 준비가 되면 파편을 영웅 병참장교에게 가져오십시오.\n\n- 불멸 병참장교"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "제작 길드",
