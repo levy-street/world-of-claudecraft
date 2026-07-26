@@ -21,29 +21,29 @@ export function parseLegendaryBalanceCliArguments(
   let seed = 32_106_458;
 
   for (let index = 0; index < argv.length; index += 1) {
-    const token = argv[index];
-    if (token === '--') continue;
-    if (token === '--enforce') {
+    const arg = argv[index];
+    if (arg === '--') continue;
+    if (arg === '--enforce') {
       enforce = true;
       continue;
     }
-    if (token === '--samples') {
-      samplesPerRollEdge = integerValue(token, argv[++index]);
+    if (arg === '--samples') {
+      samplesPerRollEdge = integerValue(arg, argv[++index]);
       continue;
     }
-    if (token.startsWith('--samples=')) {
-      samplesPerRollEdge = integerValue('--samples', token.slice('--samples='.length));
+    if (arg.startsWith('--samples=')) {
+      samplesPerRollEdge = integerValue('--samples', arg.slice('--samples='.length));
       continue;
     }
-    if (token === '--seed') {
-      seed = integerValue(token, argv[++index]);
+    if (arg === '--seed') {
+      seed = integerValue(arg, argv[++index]);
       continue;
     }
-    if (token.startsWith('--seed=')) {
-      seed = integerValue('--seed', token.slice('--seed='.length));
+    if (arg.startsWith('--seed=')) {
+      seed = integerValue('--seed', arg.slice('--seed='.length));
       continue;
     }
-    throw new Error(`unknown legendary balance argument: ${token}`);
+    throw new Error(`unknown legendary balance argument: ${arg}`);
   }
 
   return { enforce, samplesPerRollEdge, seed };
