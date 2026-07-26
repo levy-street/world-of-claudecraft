@@ -40,6 +40,20 @@ describe('attachShadowPassOnlyGate', () => {
     }
   });
 
+  it('lands at zero after multiple shadow-casting lights in one frame', () => {
+    // three fires the hook pair once per shadow light; the world has one sun
+    // today, but the gate must stay correct if a second caster ever ships:
+    // each light sees the full count for its own draw, and the color pass
+    // (after the last light) still sees zero.
+    const mesh = gated(9);
+    for (let light = 0; light < 3; light++) {
+      (mesh.onBeforeShadow as () => void)();
+      expect(mesh.count).toBe(9);
+      (mesh.onAfterShadow as () => void)();
+    }
+    expect(mesh.count).toBe(0);
+  });
+
   it('stays at zero when the shadow pass never runs (shadows off or culled)', () => {
     const mesh = gated(12);
     expect(mesh.count).toBe(0);

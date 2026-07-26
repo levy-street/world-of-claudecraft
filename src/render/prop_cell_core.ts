@@ -18,10 +18,13 @@ export const PROP_FAR_CELL_SIZE = 120;
 
 /**
  * Camera-to-cell-box distance at which a cell flips to individual mode. The
- * ghost segment is at most one camera boom (~14u) plus the largest structure
- * footprint radius (~6u), and the check runs against the cell BOX (already
- * conservative for members deep inside the cell); 40 keeps roughly 2x that
- * reach, and because the swap is pixel-identical no hysteresis is needed.
+ * ghost segment reaches at most one camera boom (22u, the src/game/input.ts
+ * camDist clamp; the camera director's vista/drift caps stay below it) plus
+ * the largest structure footprint radius (~8u), and the check runs against
+ * the cell BOX, which is already conservative for members deep inside the
+ * cell. tests/prop_cell_core.test.ts pins 40 >= 22 + 8 + margin; raising the
+ * zoom clamp past that margin must raise this constant with it. Because the
+ * swap is pixel-identical no hysteresis is needed.
  */
 export const PROP_FAR_SWAP_DISTANCE = 40;
 
