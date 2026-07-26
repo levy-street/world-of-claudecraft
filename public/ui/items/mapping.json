@@ -2111,73 +2111,73 @@
     {
       "itemId": "frostrend_helm",
       "name": "Frostrend Helm",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "boundstone_helm.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_helm.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     },
     {
       "itemId": "frostrend_spaulders",
       "name": "Frostrend Spaulders",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "crownforged_warspaulders.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_spaulders.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     },
     {
       "itemId": "frostrend_hauberk",
       "name": "Frostrend Hauberk",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "bogiron_hauberk.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_hauberk.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     },
     {
       "itemId": "frostrend_girdle",
       "name": "Frostrend Girdle",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "crownforged_girdle.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_girdle.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     },
     {
       "itemId": "frostrend_legguards",
       "name": "Frostrend Legguards",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "deathlord_legguards.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_legguards.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     },
     {
       "itemId": "frostrend_gauntlets",
       "name": "Frostrend Gauntlets",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "crownforged_gauntlets.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_gauntlets.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     },
     {
       "itemId": "frostrend_sabatons",
       "name": "Frostrend Sabatons",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "deathlord_sabatons.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_sabatons.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     },
     {
       "itemId": "frostrend_choker",
       "name": "Frostrend Choker",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "bonechill_cord.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_choker.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     },
     {
       "itemId": "frostrend_band",
       "name": "Frostrend Band",
-      "sourcePack": "woc_frost_recolor",
-      "sourceFile": "ashen_focus_ring.webp",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved (frost recolor of the committed catalog icon named in sourceFile)",
+      "sourcePack": "woc_generated",
+      "sourceFile": "frostrend_band.webp",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved",
       "confidence": "high"
     }
   ],
