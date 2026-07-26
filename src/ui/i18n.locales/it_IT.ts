@@ -9176,6 +9176,74 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Acquista {item} per {marks} Marchi eroici? Gli acquisti di Marchi non possono essere rimborsati.',
   'heroicShop.buyConfirmCancel': 'Annulla',
   'heroicShop.buyConfirmTitle': 'Conferma acquisto',
+  'heroicShop.blocked.class': 'Non compatibile con la tua classe',
+  'heroicShop.blocked.fragments': 'Non hai abbastanza Frammenti senza morte',
+  'heroicShop.blocked.heroic_clear':
+    'Richiede di aver completato Nythraxis in modalità eroica durante il blocco attuale',
+  'heroicShop.blocked.marks': 'Non hai abbastanza Marchi Eroici',
+  'heroicShop.cost': '{fragments} Frammenti · {marks} Marchi Eroici',
+  'heroicShop.deterministicStats': 'Ricompensa fissa predefinita',
+  'heroicShop.forgeConfirmAccept': 'Forgia',
+  'heroicShop.forgeConfirmBody':
+    "Forgiare {item} per {fragments} Frammenti senza morte e {marks} Marchi Eroici? Il reame esegue il tiro dell'oggetto dopo aver convalidato il pagamento.",
+  'heroicShop.forgeConfirmTitle': 'Conferma forgiatura',
+  'heroicShop.forgeIntro':
+    "Scegli la famiglia di ricompense e l'oggetto base. Il reame esegue il tiro casuale degli affissi procedurali solo dopo aver convalidato l'offerta esatta e il pagamento.",
+  'heroicShop.forgeKind.authored': 'Ricompensa obiettivo predefinita',
+  'heroicShop.forgeKind.heroic_procedural': 'Epico procedurale eroico',
+  'heroicShop.forgeKind.normal_procedural': 'Epico procedurale normale',
+  'heroicShop.forgeKind.signature': 'Leggendario caratteristico eroico',
+  'heroicShop.fragmentBalance': 'Frammenti senza morte: {count}',
+  'heroicShop.gearIntro': "Spendi Marchi Eroici nell'assortimento abituale del Quartiermastro.",
+  'heroicShop.heroicClearNeeded':
+    'Le ricompense eroiche richiedono di aver completato Nythraxis in modalità eroica durante il blocco attuale.',
+  'heroicShop.heroicClearReady':
+    'Vittoria su Nythraxis in modalità eroica verificata per questo blocco giornaliero.',
+  'heroicShop.itemLevel': 'Livello oggetto {level}',
+  'heroicShop.raidDrop': "Leggendario dell'incursione di Nythraxis",
+  'heroicShop.raidForged': 'Forgiato in incursione',
+  'heroicShop.raidForgedGuarantee':
+    'Potere forgiato in incursione, con tiro garantito nella metà superiore',
+  'heroicShop.randomAffixes': 'Affissi e valori casuali',
+  'heroicShop.reforgeCount': 'Ricalibrature: {count}',
+  'heroicShop.status.forge': 'Forgiatura completata. La nuova ricompensa è nelle tue borse.',
+  'heroicShop.status.gear': 'Acquisto completato. Saldi aggiornati.',
+  'heroicShop.status.pending': 'In attesa del reame...',
+  'heroicShop.status.tune':
+    'Ricalibratura completata. La copia esatta e i saldi sono stati aggiornati.',
+  'heroicShop.tab.forge': 'Forgia Senza Morte',
+  'heroicShop.tab.gear': 'Equipaggiamento Eroico',
+  'heroicShop.tab.tune': 'Ricalibratura Leggendaria',
+  'heroicShop.tabsAria': 'Servizi del Quartiermastro',
+  'heroicShop.tuneConfirmAccept': 'Ricalibra',
+  'heroicShop.tuneConfirmBody':
+    'Ricalibrare questa copia esatta di {item} per {fragments} Frammenti senza morte e {marks} Marchi Eroici? Viene conservato il migliore di due tiri; il potere non può diminuire, ma può rimanere invariato.',
+  'heroicShop.tuneConfirmTitle': 'Conferma Ricalibratura Leggendaria',
+  'heroicShop.tuneEmpty': 'Nelle tue borse non ci sono Leggendari di Nythraxis idonei.',
+  'heroicShop.tuneIntro':
+    'Scegli un esemplare specifico di un Leggendario di Nythraxis dalle tue borse. Il reame esegue due nuovi tiri di potere e conserva il risultato migliore. Il potere non diminuisce mai, ma una ricalibratura può non produrre cambiamenti.',
+  'hudChrome.bags.itemAriaProcedural':
+    '{item}, {rarity}, livello oggetto {level}, quantità {count}',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, livello oggetto {level}, quantità {count}, copia vincolata',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, livello oggetto {level}, quantità {count}, copia incantata',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, livello oggetto {level}, quantità {count}, capolavoro',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, livello oggetto {level}, quantità {count}, copia con marchio del creatore',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '+{fragments} Frammenti senza morte e +{marks} Marchi Eroici per partecipante',
+  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Frammento senza morte per partecipante',
+  'hudChrome.finder.raidForgedLegendary':
+    "I poteri Leggendari eroici vengono forgiati in incursione e garantiscono un tiro nella metà superiore dell'intervallo definito.",
+  'hudChrome.finder.raidItemLevels':
+    'Livello oggetto: Raro {rare} · Epico {epic} · Leggendario {legendary}',
+  'hudChrome.finder.raidRarityLine': 'Raro {rare}% · Epico {epic}% · Leggendario {legendary}%',
+  'hudChrome.finder.raidRewards': 'Anteprima delle ricompense di Nythraxis',
+  'hudChrome.finder.raidSharedDrop':
+    "Il cadavere finale aggiunge un oggetto procedurale condiviso per cui l'incursione può effettuare un tiro.",
+  'hudChrome.finder.raidSignatures': 'Poteri Leggendari caratteristici: {signatures}',
   'hudChrome.crafting.comboTierUnmetNamed': 'Aumenta {crafts} al livello {tier}.',
   'hudChrome.crafting.difficultyFull': 'Guadagno completo di abilità',
   'hudChrome.crafting.difficultyNone': 'Nessun guadagno di abilità',

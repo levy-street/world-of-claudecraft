@@ -9511,4 +9511,70 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Kerusakan senjata per detik',
   'itemUi.stats.weaponMax': 'Kerusakan senjata maksimum',
   'itemUi.stats.weaponMin': 'Kerusakan senjata minimum',
+  'heroicShop.blocked.class': 'Tidak cocok dengan kelasmu',
+  'heroicShop.blocked.fragments': 'Fragmen Abadi tidak cukup',
+  'heroicShop.blocked.heroic_clear':
+    'Memerlukan penyelesaian Heroik Nythraxis pada periode saat ini',
+  'heroicShop.blocked.marks': 'Tanda Heroik tidak cukup',
+  'heroicShop.cost': '{fragments} Fragmen · {marks} Tanda Heroik',
+  'heroicShop.deterministicStats': 'Hadiah tetap rancangan khusus',
+  'heroicShop.forgeConfirmAccept': 'Tempa',
+  'heroicShop.forgeConfirmBody':
+    'Tempa {item} dengan {fragments} Fragmen Abadi dan {marks} Tanda Heroik? Dunia akan mengacak item setelah pembayaran divalidasi.',
+  'heroicShop.forgeConfirmTitle': 'Konfirmasi Penempaan',
+  'heroicShop.forgeIntro':
+    'Pilih keluarga hadiah dan item dasar. Dunia baru mengacak afiks prosedural setelah tawaran dan pembayaran yang tepat divalidasi.',
+  'heroicShop.forgeKind.authored': 'Hadiah sasaran rancangan khusus',
+  'heroicShop.forgeKind.heroic_procedural': 'Item Epik prosedural Heroik',
+  'heroicShop.forgeKind.normal_procedural': 'Item Epik prosedural Normal',
+  'heroicShop.forgeKind.signature': 'Item Legendaris khas Heroik',
+  'heroicShop.fragmentBalance': 'Fragmen Abadi: {count}',
+  'heroicShop.gearIntro': 'Belanjakan Tanda Heroik untuk stok tetap intendan.',
+  'heroicShop.heroicClearNeeded':
+    'Sasaran Heroik memerlukan penyelesaian Heroik Nythraxis pada periode saat ini.',
+  'heroicShop.heroicClearReady':
+    'Penyelesaian Heroik Nythraxis telah diverifikasi untuk penguncian harian ini.',
+  'heroicShop.itemLevel': 'Level item {level}',
+  'heroicShop.raidDrop': 'Item Legendaris dari raid Nythraxis',
+  'heroicShop.raidForged': 'Ditempa dalam raid',
+  'heroicShop.raidForgedGuarantee':
+    'Kekuatan tempaan raid, dijamin berada di separuh atas hasil acak',
+  'heroicShop.randomAffixes': 'Afiks dan nilai acak',
+  'heroicShop.reforgeCount': 'Penyetelan: {count}',
+  'heroicShop.status.forge': 'Penempaan selesai. Hadiah baru ada di tasmu.',
+  'heroicShop.status.gear': 'Pembelian selesai. Saldo telah diperbarui.',
+  'heroicShop.status.pending': 'Menunggu dunia...',
+  'heroicShop.status.tune': 'Penyetelan selesai. Salinan yang tepat dan saldo telah diperbarui.',
+  'heroicShop.tab.forge': 'Penempaan Abadi',
+  'heroicShop.tab.gear': 'Perlengkapan Heroik',
+  'heroicShop.tab.tune': 'Penyetelan Item Legendaris',
+  'heroicShop.tabsAria': 'Layanan intendan',
+  'heroicShop.tuneConfirmAccept': 'Setel',
+  'heroicShop.tuneConfirmBody':
+    'Setel salinan tepat {item} ini dengan {fragments} Fragmen Abadi dan {marks} Tanda Heroik? Hasil terbaik dari dua pengacakan akan disimpan; kekuatan tidak dapat berkurang, tetapi mungkin tetap sama.',
+  'heroicShop.tuneConfirmTitle': 'Konfirmasi Penyetelan Item Legendaris',
+  'heroicShop.tuneEmpty': 'Tidak ada item Legendaris Nythraxis yang memenuhi syarat di tasmu.',
+  'heroicShop.tuneIntro':
+    'Pilih satu salinan tepat item Legendaris Nythraxis dari tasmu. Dunia mengacak dua kekuatan pengganti dan menyimpan hasil terbaik. Kekuatan tidak pernah berkurang, tetapi penyetelan mungkin tidak mengubah apa pun.',
+  'hudChrome.bags.itemAriaProcedural': '{item}, {rarity}, level item {level}, jumlah {count}',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, level item {level}, jumlah {count}, salinan terikat',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, level item {level}, jumlah {count}, salinan terpesona',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, level item {level}, jumlah {count}, mahakarya',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, level item {level}, jumlah {count}, salinan bertanda pembuat',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '+{fragments} Fragmen Abadi dan +{marks} Tanda Heroik per peserta',
+  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Fragmen Abadi per peserta',
+  'hudChrome.finder.raidForgedLegendary':
+    'Kekuatan Legendaris Heroik ditempa dalam raid dan dijamin berada di separuh atas rentang hasil rancangannya.',
+  'hudChrome.finder.raidItemLevels':
+    'Level item: Langka {rare} · Epik {epic} · Legendaris {legendary}',
+  'hudChrome.finder.raidRarityLine': 'Langka {rare}% · Epik {epic}% · Legendaris {legendary}%',
+  'hudChrome.finder.raidRewards': 'Pratinjau hadiah Nythraxis',
+  'hudChrome.finder.raidSharedDrop':
+    'Mayat terakhir menambahkan satu item prosedural bersama untuk diperebutkan dalam raid.',
+  'hudChrome.finder.raidSignatures': 'Kekuatan Legendaris khas: {signatures}',
 };

@@ -9016,6 +9016,73 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Comprar {item} por {marks} Marcas Heroicas? As compras de marcas não podem ser reembolsadas.',
   'heroicShop.buyConfirmCancel': 'Cancelar',
   'heroicShop.buyConfirmTitle': 'Confirmar compra',
+  'heroicShop.blocked.class': 'Não compatível com sua classe',
+  'heroicShop.blocked.fragments': 'Fragmentos Imortais insuficientes',
+  'heroicShop.blocked.heroic_clear':
+    'Requer a conclusão de Nythraxis no modo Heroico durante o bloqueio atual',
+  'heroicShop.blocked.marks': 'Marcas Heroicas insuficientes',
+  'heroicShop.cost': '{fragments} Fragmentos · {marks} Marcas Heroicas',
+  'heroicShop.deterministicStats': 'Recompensa fixa predefinida',
+  'heroicShop.forgeConfirmAccept': 'Forjar',
+  'heroicShop.forgeConfirmBody':
+    'Forjar {item} por {fragments} Fragmentos Imortais e {marks} Marcas Heroicas? O reino realiza a rolagem do item após validar o pagamento.',
+  'heroicShop.forgeConfirmTitle': 'Confirmar forja',
+  'heroicShop.forgeIntro':
+    'Escolha a família de recompensa e o item-base. O reino só realiza a rolagem aleatória dos afixos procedurais depois de validar a oferta exata e o pagamento.',
+  'heroicShop.forgeKind.authored': 'Recompensa-alvo predefinida',
+  'heroicShop.forgeKind.heroic_procedural': 'Épico procedural Heroico',
+  'heroicShop.forgeKind.normal_procedural': 'Épico procedural Normal',
+  'heroicShop.forgeKind.signature': 'Lendário distintivo Heroico',
+  'heroicShop.fragmentBalance': 'Fragmentos Imortais: {count}',
+  'heroicShop.gearIntro': 'Gaste Marcas Heroicas no estoque habitual do Intendente.',
+  'heroicShop.heroicClearNeeded':
+    'As recompensas Heroicas exigem a conclusão de Nythraxis no modo Heroico durante o bloqueio atual.',
+  'heroicShop.heroicClearReady':
+    'Conclusão de Nythraxis no modo Heroico verificada para este bloqueio diário.',
+  'heroicShop.itemLevel': 'Nível do item {level}',
+  'heroicShop.raidDrop': 'Lendário da raide de Nythraxis',
+  'heroicShop.raidForged': 'Forjado em raide',
+  'heroicShop.raidForgedGuarantee':
+    'Poder forjado em raide, com rolagem garantida na metade superior',
+  'heroicShop.randomAffixes': 'Afixos e valores aleatórios',
+  'heroicShop.reforgeCount': 'Recalibragens: {count}',
+  'heroicShop.status.forge': 'Forja concluída. A nova recompensa está nas suas bolsas.',
+  'heroicShop.status.gear': 'Compra concluída. Saldos atualizados.',
+  'heroicShop.status.pending': 'Aguardando o reino...',
+  'heroicShop.status.tune': 'Recalibragem concluída. A cópia exata e os saldos foram atualizados.',
+  'heroicShop.tab.forge': 'Forja Imortal',
+  'heroicShop.tab.gear': 'Equipamento Heroico',
+  'heroicShop.tab.tune': 'Recalibragem Lendária',
+  'heroicShop.tabsAria': 'Serviços do Intendente',
+  'heroicShop.tuneConfirmAccept': 'Recalibrar',
+  'heroicShop.tuneConfirmBody':
+    'Recalibrar esta cópia exata de {item} por {fragments} Fragmentos Imortais e {marks} Marcas Heroicas? O melhor de duas rolagens será mantido; o poder não pode diminuir, mas pode permanecer inalterado.',
+  'heroicShop.tuneConfirmTitle': 'Confirmar Recalibragem Lendária',
+  'heroicShop.tuneEmpty': 'Não há nenhum Lendário de Nythraxis elegível nas suas bolsas.',
+  'heroicShop.tuneIntro':
+    'Escolha um Lendário de Nythraxis específico nas suas bolsas. O reino faz duas novas rolagens de poder e mantém o melhor resultado. O poder nunca diminui, mas uma recalibragem pode não produzir alteração.',
+  'hudChrome.bags.itemAriaProcedural':
+    '{item}, {rarity}, nível do item {level}, quantidade {count}',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, nível do item {level}, quantidade {count}, cópia vinculada',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, nível do item {level}, quantidade {count}, cópia encantada',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, nível do item {level}, quantidade {count}, obra-prima',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, nível do item {level}, quantidade {count}, cópia marcada pelo criador',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '+{fragments} Fragmentos Imortais e +{marks} Marcas Heroicas por participante',
+  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Fragmento Imortal por participante',
+  'hudChrome.finder.raidForgedLegendary':
+    'Os poderes Lendários Heroicos são forjados em raide e têm rolagem garantida na metade superior do intervalo definido.',
+  'hudChrome.finder.raidItemLevels':
+    'Nível do item: Raro {rare} · Épico {epic} · Lendário {legendary}',
+  'hudChrome.finder.raidRarityLine': 'Raro {rare}% · Épico {epic}% · Lendário {legendary}%',
+  'hudChrome.finder.raidRewards': 'Prévia das recompensas de Nythraxis',
+  'hudChrome.finder.raidSharedDrop':
+    'O cadáver do chefe final adiciona um item procedural compartilhado para a raide disputar em uma rolagem.',
+  'hudChrome.finder.raidSignatures': 'Poderes Lendários distintivos: {signatures}',
   'hudChrome.crafting.comboTierUnmetNamed': 'Aumente {crafts} para o nível {tier}.',
   'hudChrome.crafting.difficultyFull': 'Ganho total de habilidade',
   'hudChrome.crafting.difficultyNone': 'Sem ganho de habilidade',

@@ -9390,4 +9390,68 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Våbenskade pr. sekund',
   'itemUi.stats.weaponMax': 'Maksimal våbenskade',
   'itemUi.stats.weaponMin': 'Minimal våbenskade',
+  'heroicShop.blocked.class': 'Ikke kompatibel med din klasse',
+  'heroicShop.blocked.fragments': 'Ikke nok Dødsløse Fragmenter',
+  'heroicShop.blocked.heroic_clear': 'Kræver en aktuel heroisk sejr over Nythraxis',
+  'heroicShop.blocked.marks': 'Ikke nok Heroiske Mærker',
+  'heroicShop.cost': '{fragments} Fragmenter · {marks} Heroiske Mærker',
+  'heroicShop.deterministicStats': 'Fast udformet belønning',
+  'heroicShop.forgeConfirmAccept': 'Smed',
+  'heroicShop.forgeConfirmBody':
+    'Smed {item} for {fragments} Dødsløse Fragmenter og {marks} Heroiske Mærker? Riget ruller genstanden, efter betalingen er valideret.',
+  'heroicShop.forgeConfirmTitle': 'Bekræft smedning',
+  'heroicShop.forgeIntro':
+    'Vælg belønningsfamilien og basisgenstanden. Riget ruller først tilfældige procedurelle affikser, efter det præcise tilbud og betalingen er valideret.',
+  'heroicShop.forgeKind.authored': 'Fast udformet målbelønning',
+  'heroicShop.forgeKind.heroic_procedural': 'Heroisk procedurel episk genstand',
+  'heroicShop.forgeKind.normal_procedural': 'Normal procedurel episk genstand',
+  'heroicShop.forgeKind.signature': 'Heroisk signatur, legendarisk',
+  'heroicShop.fragmentBalance': 'Dødsløse Fragmenter: {count}',
+  'heroicShop.gearIntro': 'Brug Heroiske Mærker på kvartermesterens faste varesortiment.',
+  'heroicShop.heroicClearNeeded': 'Heroiske mål kræver en aktuel heroisk sejr over Nythraxis.',
+  'heroicShop.heroicClearReady': 'Heroisk sejr over Nythraxis bekræftet for denne daglige låsning.',
+  'heroicShop.itemLevel': 'Genstandsniveau {level}',
+  'heroicShop.raidDrop': 'Legendarisk Nythraxis-raidbytte',
+  'heroicShop.raidForged': 'Raidsmedet',
+  'heroicShop.raidForgedGuarantee': 'Raidsmedet kraft, garanteret rul i den øverste halvdel',
+  'heroicShop.randomAffixes': 'Tilfældige affikser og værdier',
+  'heroicShop.reforgeCount': 'Finjusteringer: {count}',
+  'heroicShop.status.forge': 'Smedning fuldført. Den nye belønning ligger i dine tasker.',
+  'heroicShop.status.gear': 'Køb fuldført. Saldi opdateret.',
+  'heroicShop.status.pending': 'Venter på riget...',
+  'heroicShop.status.tune':
+    'Finjustering fuldført. Det præcise eksemplar og dine saldi blev opdateret.',
+  'heroicShop.tab.forge': 'Dødsløs Smedje',
+  'heroicShop.tab.gear': 'Heroisk Udstyr',
+  'heroicShop.tab.tune': 'Legendarisk Finjustering',
+  'heroicShop.tabsAria': 'Kvartermesterens tjenester',
+  'heroicShop.tuneConfirmAccept': 'Finjuster',
+  'heroicShop.tuneConfirmBody':
+    'Finjuster dette præcise eksemplar af {item} for {fragments} Dødsløse Fragmenter og {marks} Heroiske Mærker? Det bedste af to rul beholdes; kraften kan ikke falde, men den kan forblive uændret.',
+  'heroicShop.tuneConfirmTitle': 'Bekræft legendarisk finjustering',
+  'heroicShop.tuneEmpty':
+    'Der er ingen legendarisk Nythraxis-genstand i dine tasker, som kan finjusteres.',
+  'heroicShop.tuneIntro':
+    'Vælg én specifik legendarisk Nythraxis-genstand fra dine tasker. Riget ruller to erstatningsværdier for kraften og beholder det bedste resultat. Kraften falder aldrig, men en finjustering kan ende uden ændring.',
+  'hudChrome.bags.itemAriaProcedural': '{item}, {rarity}, genstandsniveau {level}, antal {count}',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, genstandsniveau {level}, antal {count}, bundet kopi',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, genstandsniveau {level}, antal {count}, fortryllet kopi',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, genstandsniveau {level}, antal {count}, mesterværk',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, genstandsniveau {level}, antal {count}, signeret kopi',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '+{fragments} Dødsløse Fragmenter og +{marks} Heroiske Mærker pr. deltager',
+  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Dødsløst Fragment pr. deltager',
+  'hudChrome.finder.raidForgedLegendary':
+    'Heroiske legendariske kræfter er raidsmedede og garanteres et rul i den øverste halvdel af deres fastlagte interval.',
+  'hudChrome.finder.raidItemLevels':
+    'Genstandsniveau: Sjælden {rare} · Episk {epic} · Legendarisk {legendary}',
+  'hudChrome.finder.raidRarityLine': 'Sjælden {rare}% · Episk {epic}% · Legendarisk {legendary}%',
+  'hudChrome.finder.raidRewards': 'Forhåndsvisning af Nythraxis-belønninger',
+  'hudChrome.finder.raidSharedDrop':
+    'Slutbossens lig tilføjer én fælles procedurel genstand, som raidet kan rulle om.',
+  'hudChrome.finder.raidSignatures': 'Legendariske signaturkræfter: {signatures}',
 };

@@ -9333,4 +9333,70 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Poškození zbraně za sekundu',
   'itemUi.stats.weaponMax': 'Maximální poškození zbraně',
   'itemUi.stats.weaponMin': 'Minimální poškození zbraně',
+  'heroicShop.blocked.class': 'Není kompatibilní s tvou třídou',
+  'heroicShop.blocked.fragments': 'Nedostatek Úlomků Nesmrtelného',
+  'heroicShop.blocked.heroic_clear': 'Vyžaduje aktuální dokončení Nythraxis na hrdinské obtížnosti',
+  'heroicShop.blocked.marks': 'Nedostatek Hrdinských známek',
+  'heroicShop.cost': '{fragments} úlomků · {marks} Hrdinských známek',
+  'heroicShop.deterministicStats': 'Pevně navržená odměna',
+  'heroicShop.forgeConfirmAccept': 'Ukovat',
+  'heroicShop.forgeConfirmBody':
+    'Ukovat {item} za {fragments} Úlomků Nesmrtelného a {marks} Hrdinských známek? Říše vygeneruje předmět až po ověření platby.',
+  'heroicShop.forgeConfirmTitle': 'Potvrdit kování',
+  'heroicShop.forgeIntro':
+    'Vyber rodinu odměny a základní předmět. Říše náhodně vygeneruje procedurální vlastnosti až po ověření přesné nabídky a platby.',
+  'heroicShop.forgeKind.authored': 'Pevně navržená cílová odměna',
+  'heroicShop.forgeKind.heroic_procedural': 'Hrdinský procedurální epický předmět',
+  'heroicShop.forgeKind.normal_procedural': 'Normální procedurální epický předmět',
+  'heroicShop.forgeKind.signature': 'Hrdinský charakteristický legendární předmět',
+  'heroicShop.fragmentBalance': 'Úlomky Nesmrtelného: {count}',
+  'heroicShop.gearIntro': 'Utrať Hrdinské známky za zavedenou nabídku intendanta.',
+  'heroicShop.heroicClearNeeded':
+    'Hrdinské cíle vyžadují aktuální dokončení Nythraxis na hrdinské obtížnosti.',
+  'heroicShop.heroicClearReady':
+    'Dokončení Nythraxis na hrdinské obtížnosti je pro tento denní limit ověřeno.',
+  'heroicShop.itemLevel': 'Úroveň předmětu {level}',
+  'heroicShop.raidDrop': 'Legendární předmět z nájezdu Nythraxis',
+  'heroicShop.raidForged': 'Vykováno v nájezdu',
+  'heroicShop.raidForgedGuarantee':
+    'Síla vykovaná v nájezdu, zaručený hod v horní polovině rozsahu',
+  'heroicShop.randomAffixes': 'Náhodné vlastnosti a hodnoty',
+  'heroicShop.reforgeCount': 'Vyladění: {count}',
+  'heroicShop.status.forge': 'Kování dokončeno. Nová odměna je v tvých brašnách.',
+  'heroicShop.status.gear': 'Nákup dokončen. Zůstatky byly obnoveny.',
+  'heroicShop.status.pending': 'Čeká se na říši...',
+  'heroicShop.status.tune': 'Ladění dokončeno. Přesná kopie i zůstatky byly obnoveny.',
+  'heroicShop.tab.forge': 'Výheň Nesmrtelného',
+  'heroicShop.tab.gear': 'Hrdinská výbava',
+  'heroicShop.tab.tune': 'Ladění legendárních předmětů',
+  'heroicShop.tabsAria': 'Služby intendanta',
+  'heroicShop.tuneConfirmAccept': 'Vyladit',
+  'heroicShop.tuneConfirmBody':
+    'Vyladit tuto přesnou kopii předmětu {item} za {fragments} Úlomků Nesmrtelného a {marks} Hrdinských známek? Zachová se lepší ze dvou hodů; síla nemůže klesnout, ale může zůstat beze změny.',
+  'heroicShop.tuneConfirmTitle': 'Potvrdit ladění legendárního předmětu',
+  'heroicShop.tuneEmpty': 'V brašnách nemáš žádný vhodný legendární předmět z Nythraxis.',
+  'heroicShop.tuneIntro':
+    'Vyber jednu přesnou kopii legendárního předmětu z Nythraxis ve svých brašnách. Říše vygeneruje dvě náhradní síly a zachová lepší výsledek. Síla nikdy neklesne, ale ladění nemusí nic změnit.',
+  'hudChrome.bags.itemAriaProcedural':
+    '{item}, {rarity}, úroveň předmětu {level}, množství {count}',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, úroveň předmětu {level}, množství {count}, vázaná kopie',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, úroveň předmětu {level}, množství {count}, očarovaná kopie',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, úroveň předmětu {level}, množství {count}, mistrovské dílo',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, úroveň předmětu {level}, množství {count}, kopie se značkou výrobce',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '+{fragments} Úlomků Nesmrtelného a +{marks} Hrdinských známek pro každého účastníka',
+  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} Úlomek Nesmrtelného pro každého účastníka',
+  'hudChrome.finder.raidForgedLegendary':
+    'Síly hrdinských legendárních předmětů jsou vykované v nájezdu a zaručeně leží v horní polovině svého navrženého rozsahu.',
+  'hudChrome.finder.raidItemLevels':
+    'Úroveň předmětu: vzácný {rare} · epický {epic} · legendární {legendary}',
+  'hudChrome.finder.raidRarityLine': 'Vzácný {rare} % · epický {epic} % · legendární {legendary} %',
+  'hudChrome.finder.raidRewards': 'Náhled odměn z Nythraxis',
+  'hudChrome.finder.raidSharedDrop':
+    'Závěrečná mrtvola přidá jeden společný procedurální předmět, o který bude nájezd losovat.',
+  'hudChrome.finder.raidSignatures': 'Charakteristické legendární síly: {signatures}',
 };

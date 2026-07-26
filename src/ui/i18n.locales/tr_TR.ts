@@ -9413,4 +9413,68 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Saniye başına silah hasarı',
   'itemUi.stats.weaponMax': 'Azami silah hasarı',
   'itemUi.stats.weaponMin': 'Asgari silah hasarı',
+  'heroicShop.blocked.class': 'Sınıfınla uyumlu değil',
+  'heroicShop.blocked.fragments': 'Yeterli Ölümsüz Parçası yok',
+  'heroicShop.blocked.heroic_clear': 'Mevcut dönemde Kahramanca Nythraxis tamamlaması gerektirir',
+  'heroicShop.blocked.marks': 'Yeterli Kahramanca Nişan yok',
+  'heroicShop.cost': '{fragments} Parça · {marks} Kahramanca Nişan',
+  'heroicShop.deterministicStats': 'Tasarlanmış sabit ödül',
+  'heroicShop.forgeConfirmAccept': 'Döv',
+  'heroicShop.forgeConfirmBody':
+    '{item}, {fragments} Ölümsüz Parçası ve {marks} Kahramanca Nişan karşılığında dövülsün mü? Diyar, ödeme doğrulandıktan sonra eşyayı oluşturur.',
+  'heroicShop.forgeConfirmTitle': 'Dövmeyi Onayla',
+  'heroicShop.forgeIntro':
+    'Ödül ailesini ve temel eşyayı seç. Diyar, rastgele yöntemsel özellikleri yalnızca kesin teklifi ve ödemeyi doğruladıktan sonra oluşturur.',
+  'heroicShop.forgeKind.authored': 'Tasarlanmış hedef ödül',
+  'heroicShop.forgeKind.heroic_procedural': 'Kahramanca yöntemsel Destansı eşya',
+  'heroicShop.forgeKind.normal_procedural': 'Normal yöntemsel Destansı eşya',
+  'heroicShop.forgeKind.signature': 'Kahramanca özgün Efsanevi eşya',
+  'heroicShop.fragmentBalance': 'Ölümsüz Parçaları: {count}',
+  'heroicShop.gearIntro': 'Kahramanca Nişanları levazımcının yerleşik stoğunda harca.',
+  'heroicShop.heroicClearNeeded':
+    'Kahramanca hedefler, mevcut dönemde Kahramanca Nythraxis tamamlaması gerektirir.',
+  'heroicShop.heroicClearReady':
+    'Kahramanca Nythraxis tamamlaması bu günlük kilit için doğrulandı.',
+  'heroicShop.itemLevel': 'Eşya seviyesi {level}',
+  'heroicShop.raidDrop': 'Nythraxis akını Efsanevi eşyası',
+  'heroicShop.raidForged': 'Akında dövülmüş',
+  'heroicShop.raidForgedGuarantee': 'Akında dövülmüş güç, üst yarıdan sonuç garantili',
+  'heroicShop.randomAffixes': 'Rastgele özellikler ve değerler',
+  'heroicShop.reforgeCount': 'Ayarlamalar: {count}',
+  'heroicShop.status.forge': 'Dövme tamamlandı. Yeni ödül çantalarında.',
+  'heroicShop.status.gear': 'Satın alma tamamlandı. Bakiyeler yenilendi.',
+  'heroicShop.status.pending': 'Diyar bekleniyor...',
+  'heroicShop.status.tune': 'Ayarlama tamamlandı. Birebir kopya ve bakiyeler yenilendi.',
+  'heroicShop.tab.forge': 'Ölümsüz Ocağı',
+  'heroicShop.tab.gear': 'Kahramanca Teçhizat',
+  'heroicShop.tab.tune': 'Efsanevi Eşya Ayarlama',
+  'heroicShop.tabsAria': 'Levazımcı hizmetleri',
+  'heroicShop.tuneConfirmAccept': 'Ayarla',
+  'heroicShop.tuneConfirmBody':
+    'Bu birebir {item} kopyası, {fragments} Ölümsüz Parçası ve {marks} Kahramanca Nişan karşılığında ayarlansın mı? İki sonuçtan iyisi korunur; güç azalmaz ama aynı kalabilir.',
+  'heroicShop.tuneConfirmTitle': 'Efsanevi Eşya Ayarlamasını Onayla',
+  'heroicShop.tuneEmpty': 'Çantalarında uygun bir Nythraxis Efsanevi eşyası yok.',
+  'heroicShop.tuneIntro':
+    'Çantalarından birebir bir Nythraxis Efsanevi eşya kopyası seç. Diyar iki yedek güç oluşturur ve daha iyi sonucu korur. Güç asla azalmaz ama ayarlama hiçbir şeyi değiştirmeyebilir.',
+  'hudChrome.bags.itemAriaProcedural': '{item}, {rarity}, eşya seviyesi {level}, adet {count}',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, eşya seviyesi {level}, adet {count}, bağlı kopya',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, eşya seviyesi {level}, adet {count}, büyülenmiş kopya',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, eşya seviyesi {level}, adet {count}, şaheser',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, eşya seviyesi {level}, adet {count}, üretici damgalı kopya',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    'Katılımcı başına +{fragments} Ölümsüz Parçası ve +{marks} Kahramanca Nişan',
+  'hudChrome.finder.raidCurrenciesNormal': 'Katılımcı başına +{fragments} Ölümsüz Parçası',
+  'hudChrome.finder.raidForgedLegendary':
+    'Kahramanca Efsanevi güçler akında dövülür ve tasarlanmış sonuç aralıklarının üst yarısında olacağı garantidir.',
+  'hudChrome.finder.raidItemLevels':
+    'Eşya seviyesi: Nadir {rare} · Destansı {epic} · Efsanevi {legendary}',
+  'hudChrome.finder.raidRarityLine': 'Nadir %{rare} · Destansı %{epic} · Efsanevi %{legendary}',
+  'hudChrome.finder.raidRewards': 'Nythraxis ödül önizlemesi',
+  'hudChrome.finder.raidSharedDrop':
+    'Son ceset, akının zar atması için bir ortak yöntemsel eşya ekler.',
+  'hudChrome.finder.raidSignatures': 'Özgün Efsanevi güçler: {signatures}',
 };

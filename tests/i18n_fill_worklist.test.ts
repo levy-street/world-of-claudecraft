@@ -57,6 +57,8 @@ describe("worklist classification (blocked-by-default; the stopping rule)", () =
       "errors.noEnemyNearby",
       "nav.home",
       "a11y.characterActions",
+      "heroicShop.forgeConfirmBody",
+      "hudChrome.finder.raidRewards",
       "classDetails.roles.warrior", // chrome, even though classDetails.lore.* is prose
       "realmTypes.pvp",
     ];

@@ -9401,4 +9401,68 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.weaponDps': 'Vapenskada per sekund',
   'itemUi.stats.weaponMax': 'Maximal vapenskada',
   'itemUi.stats.weaponMin': 'Minimal vapenskada',
+  'heroicShop.blocked.class': 'Inte kompatibelt med din klass',
+  'heroicShop.blocked.fragments': 'Inte tillräckligt med dödslösa fragment',
+  'heroicShop.blocked.heroic_clear': 'Kräver en aktuell heroisk seger över Nythraxis',
+  'heroicShop.blocked.marks': 'Inte tillräckligt med heroiska märken',
+  'heroicShop.cost': '{fragments} fragment · {marks} heroiska märken',
+  'heroicShop.deterministicStats': 'Fast utformad belöning',
+  'heroicShop.forgeConfirmAccept': 'Smid',
+  'heroicShop.forgeConfirmBody':
+    'Smid {item} för {fragments} dödslösa fragment och {marks} heroiska märken? Riket slår fram föremålet efter att betalningen har validerats.',
+  'heroicShop.forgeConfirmTitle': 'Bekräfta smide',
+  'heroicShop.forgeIntro':
+    'Välj belöningsfamilj och basföremål. Riket slår fram slumpmässiga procedurella affix först efter att det exakta erbjudandet och betalningen har validerats.',
+  'heroicShop.forgeKind.authored': 'Fast utformad målbelöning',
+  'heroicShop.forgeKind.heroic_procedural': 'Heroiskt procedurellt episkt föremål',
+  'heroicShop.forgeKind.normal_procedural': 'Normalt procedurellt episkt föremål',
+  'heroicShop.forgeKind.signature': 'Heroisk signatur, legendarisk',
+  'heroicShop.fragmentBalance': 'Dödslösa fragment: {count}',
+  'heroicShop.gearIntro': 'Spendera heroiska märken på kvartersmästarens ordinarie lager.',
+  'heroicShop.heroicClearNeeded': 'Heroiska mål kräver en aktuell heroisk seger över Nythraxis.',
+  'heroicShop.heroicClearReady': 'Heroisk seger över Nythraxis bekräftad för denna dagliga spärr.',
+  'heroicShop.itemLevel': 'Föremålsnivå {level}',
+  'heroicShop.raidDrop': 'Legendariskt Nythraxis-raidbyte',
+  'heroicShop.raidForged': 'Raidsmidd',
+  'heroicShop.raidForgedGuarantee': 'Raidsmidd kraft, slag i den övre halvan garanterat',
+  'heroicShop.randomAffixes': 'Slumpmässiga affix och värden',
+  'heroicShop.reforgeCount': 'Finjusteringar: {count}',
+  'heroicShop.status.forge': 'Smidet är klart. Den nya belöningen finns i dina väskor.',
+  'heroicShop.status.gear': 'Köpet är klart. Saldona har uppdaterats.',
+  'heroicShop.status.pending': 'Väntar på riket...',
+  'heroicShop.status.tune':
+    'Finjusteringen är klar. Det exakta exemplaret och saldona har uppdaterats.',
+  'heroicShop.tab.forge': 'Dödslösa smedjan',
+  'heroicShop.tab.gear': 'Heroisk utrustning',
+  'heroicShop.tab.tune': 'Legendarisk finjustering',
+  'heroicShop.tabsAria': 'Kvartersmästarens tjänster',
+  'heroicShop.tuneConfirmAccept': 'Finjustera',
+  'heroicShop.tuneConfirmBody':
+    'Finjustera just detta exemplar av {item} för {fragments} dödslösa fragment och {marks} heroiska märken? Det bästa av två slag behålls; kraften kan inte minska men kan förbli oförändrad.',
+  'heroicShop.tuneConfirmTitle': 'Bekräfta legendarisk finjustering',
+  'heroicShop.tuneEmpty':
+    'Du har inget legendariskt Nythraxis-föremål i dina väskor som kan finjusteras.',
+  'heroicShop.tuneIntro':
+    'Välj ett specifikt legendariskt Nythraxis-föremål ur dina väskor. Riket slår fram två nya kraftvärden och behåller det bästa resultatet. Kraften minskar aldrig, men en finjustering kan bli utan ändring.',
+  'hudChrome.bags.itemAriaProcedural': '{item}, {rarity}, föremålsnivå {level}, antal {count}',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, föremålsnivå {level}, antal {count}, bunden kopia',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, föremålsnivå {level}, antal {count}, förtrollad kopia',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, föremålsnivå {level}, antal {count}, mästerverk',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, föremålsnivå {level}, antal {count}, tillverkarmärkt kopia',
+  'hudChrome.finder.raidCurrenciesHeroic':
+    '+{fragments} dödslösa fragment och +{marks} heroiska märken per deltagare',
+  'hudChrome.finder.raidCurrenciesNormal': '+{fragments} dödslöst fragment per deltagare',
+  'hudChrome.finder.raidForgedLegendary':
+    'Heroiska legendariska krafter är raidsmidda och garanteras ett slag i den övre halvan av sitt fastställda intervall.',
+  'hudChrome.finder.raidItemLevels':
+    'Föremålsnivå: Sällsynt {rare} · Episk {epic} · Legendarisk {legendary}',
+  'hudChrome.finder.raidRarityLine': 'Sällsynt {rare}% · Episk {epic}% · Legendarisk {legendary}%',
+  'hudChrome.finder.raidRewards': 'Förhandsvisning av Nythraxis-belöningar',
+  'hudChrome.finder.raidSharedDrop':
+    'Slutbossens lik lägger till ett delat procedurellt föremål som raiden får slå om.',
+  'hudChrome.finder.raidSignatures': 'Legendariska signaturkrafter: {signatures}',
 };
