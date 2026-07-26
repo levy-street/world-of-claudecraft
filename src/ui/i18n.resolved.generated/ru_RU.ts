@@ -6962,6 +6962,7 @@ export const ru_RU: EnTranslations = {
       "pass": "Пас",
       "needAria": "Нужно: {item}",
       "needUnavailable": "Нельзя выбрать «Нужно»: ваш класс не может экипировать этот предмет.",
+      "needUnavailablePower": "Выбрать «Нужно» нельзя: эта легендарная сила предназначена для другого класса.",
       "greedAria": "Жадность: {item}",
       "passAria": "Пас: {item}",
       "everyonePassed": "Все отказались от {item}.",

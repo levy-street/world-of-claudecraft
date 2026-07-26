@@ -6962,6 +6962,7 @@ export const ko_KR: EnTranslations = {
       "pass": "포기",
       "needAria": "{item} 필요",
       "needUnavailable": "현재 직업으로 이 아이템을 착용할 수 없어 필요 주사위를 선택할 수 없습니다.",
+      "needUnavailablePower": "이 전설 능력은 다른 직업 전용이므로 필요를 선택할 수 없습니다.",
       "greedAria": "{item} 탐욕",
       "passAria": "{item} 포기",
       "everyonePassed": "모두 {item}을(를) 포기했습니다.",

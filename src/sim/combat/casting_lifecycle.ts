@@ -1727,6 +1727,13 @@ function applyAbility(
         return;
       }
       ctx.runEffects(src, meta, tgt, res, !isSpell);
+      if (src.kind === 'player' && !tgt.dead) {
+        ctx.triggerEquipmentEffects(src, {
+          kind: 'ability_hit',
+          abilityId: ability.id,
+          targetId: tgt.id,
+        });
+      }
     });
     // 'spellCast' set procs (Clearcasting) roll at CAST COMPLETION, matching the
     // trigger name: the cast is done even though the bolt is still in flight (a

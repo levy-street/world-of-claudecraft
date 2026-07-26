@@ -427,6 +427,7 @@ function classesFor(definition: EquipmentPowerDefinition): readonly PlayerClass[
 function baseIntervalMs(definition: EquipmentPowerDefinition): number {
   switch (definition.trigger.event) {
     case 'ability_cast':
+    case 'ability_hit':
       if (definition.id === 'feral_moonclasp') return 1_500;
       return 2_500;
     case 'weapon_hit':
@@ -452,6 +453,7 @@ function intervalMsFor(
 ): number {
   const cadenceScaled =
     definition.trigger.event === 'ability_cast' ||
+    definition.trigger.event === 'ability_hit' ||
     definition.trigger.event === 'weapon_hit' ||
     definition.trigger.event === 'spell_damage' ||
     definition.trigger.event === 'heal' ||

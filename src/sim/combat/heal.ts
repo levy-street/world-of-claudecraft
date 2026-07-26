@@ -26,8 +26,9 @@
 // (enforced by tests/architecture.test.ts).
 
 import type { SimContext } from '../sim_context';
+import { dungeonFinalBossInstance } from '../instances/dungeons';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
-import type { Entity } from '../types';
+import { type Entity } from '../types';
 import { runWeaponProcs } from './equip_procs';
 import { onSpellCrit } from './talent_procs';
 
@@ -173,7 +174,10 @@ export function healingThreat(
   }
   if (aware.length === 0) return;
   const per = total / aware.length;
-  for (const m of aware) addThreat(m, source.id, per);
+  for (const m of aware) {
+    addThreat(m, source.id, per);
+    if (dungeonFinalBossInstance(ctx, m)) m.bossDamagers.add(source.id);
+  }
 }
 
 /** True when a hate-table entry belongs to the healed entity or its pet. */

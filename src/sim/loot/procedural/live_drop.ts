@@ -6,7 +6,11 @@ import {
 import type { ItemDropContext, ProceduralRarity } from '../../procedural_item';
 import type { DungeonDifficulty, MobTemplate, PlayerClass } from '../../types';
 import { type GeneratedProceduralDrop, generateProceduralItem } from './generate';
-import { deriveProceduralItemSeed, hash32Parts } from './item_seed';
+import {
+  deriveProceduralItemSeed,
+  deriveSecretProceduralItemSeed,
+  hash32Parts,
+} from './item_seed';
 
 export type ProceduralLootSource = 'world' | 'rare' | 'dungeon' | 'delve' | 'raid';
 
@@ -29,6 +33,8 @@ export interface ProceduralSourceFacts {
 
 export interface LiveProceduralDropInput {
   worldSeed: number;
+  /** Omitted in deterministic offline/tools; required by the authoritative server. */
+  lootSeedSecret?: string;
   sourceEntityId: number;
   sourceSpawnSequence: number;
   lootSlotIndex: number;
@@ -149,7 +155,9 @@ export function generateLiveProceduralDrop(
     sourceTemplateId: input.sourceTemplate.id,
     sourceTags: sourceTags(input.sourceTemplate, profile, input.sourceFacts),
   };
-  const seed = deriveProceduralItemSeed(input.worldSeed, context);
+  const seed = input.lootSeedSecret
+    ? deriveSecretProceduralItemSeed(input.lootSeedSecret, input.worldSeed, context)
+    : deriveProceduralItemSeed(input.worldSeed, context);
   if (proceduralDropChanceRoll(seed) >= profile.chance) return null;
   const uid = typeof input.uid === 'function' ? input.uid() : input.uid;
   return generateProceduralItem({

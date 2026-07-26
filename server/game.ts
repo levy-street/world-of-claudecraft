@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import {
@@ -55,7 +55,7 @@ import {
   publicItemInstanceView,
   publicProceduralItemView,
 } from '../src/sim/procedural_item_public';
-import type { PetState, PlayerMeta } from '../src/sim/sim';
+import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import type { VcMatch } from '../src/sim/social/vale_cup';
 import {
@@ -208,7 +208,6 @@ import { PartyFrameProjectionCache } from './party_frame_projection';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
-import { createSerialWriter } from './serial_writer';
 import {
   jsonWithField,
   StableAuraWireCache,
@@ -776,8 +775,8 @@ export interface ClientSession {
   // published to the character_deeds index (and, chained off it, Steam).
   // Publishing before the blob is durable creates the one drift direction the
   // insert-only join reconcile can never heal: records claiming a deed the
-  // character does not have. Event-ordered; drained by saveCharacter up to
-  // the count captured when the blob was serialized.
+  // character does not have. Event-ordered; each save captures the exact ids
+  // inside its blob and drains only those still pending when that write lands.
   pendingDeedRecords: string[];
   spectating: {
     characterId: number;
@@ -1373,6 +1372,10 @@ export class GameServer {
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
   private readonly characterSaveQueues = new Map<number, Promise<void>>();
+  private realmPersistenceQueue: Promise<void> = Promise.resolve();
+  private readonly persistenceQuarantinedSessions = new WeakSet<ClientSession>();
+  private atomicEconomyTransactionsPending = 0;
+  private marketPersistenceQuarantined = false;
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
@@ -1381,12 +1384,15 @@ export class GameServer {
   // One FIFO per character so a burst of debounced client saves cannot commit on
   // separate pool clients in reverse order and persist a stale layout.
   private readonly hotbarLayoutSaveQueues = new Map<number, Promise<void>>();
-  // Serializes every write of the single global Market blob (the 30s autosave
-  // and the leave-path combined save). Both serialize the whole market; without
-  // a queue their transactions could commit out of capture order and persist an
-  // older snapshot over a newer one. Snapshots are captured inside the queued
-  // thunk, so commit order equals capture order equals freshness order.
-  private readonly enqueueMarketWrite = createSerialWriter();
+  // One FIFO covers every realm Market/Ravenpost writer and can be shared with
+  // one or two character FIFOs for an escrow transaction. Snapshots are captured
+  // when work is enqueued; commit order therefore matches mutation order, and a
+  // pre-transfer save can never read post-transfer live state while waiting.
+  // A rejected Ravenpost blob must never be replaced by this process's fresh
+  // empty in-memory book. loadMail sets this before rethrowing; every mail write
+  // path, including the leave transaction queued above, re-checks it at write
+  // time. A later successful operator-triggered reload clears the quarantine.
+  private mailPersistenceQuarantined = false;
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
   private readonly startedAt = Date.now();
@@ -1478,9 +1484,15 @@ export class GameServer {
   private readonly ipSessionCounts = new Map<string, number>();
 
   constructor() {
+    const configuredLootSecret = process.env.PROCEDURAL_LOOT_SECRET;
+    const proceduralLootSecret = configuredLootSecret ?? randomBytes(16).toString('hex');
+    if (!/^[0-9a-f]{32}$/.test(proceduralLootSecret)) {
+      throw new Error('PROCEDURAL_LOOT_SECRET must be exactly 32 lowercase hexadecimal characters');
+    }
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
+      proceduralLootSecret,
       noPlayer: true,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
@@ -1996,6 +2008,7 @@ export class GameServer {
             lap('stale');
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
+            this.persistAtomicSystemRewards();
             lap('tick');
             // Fold this tick's mob-scan counts before the next tick resets them: the
             // latest-tick values feed the heartbeat, and an in-flight capture sums and
@@ -3196,121 +3209,283 @@ export class GameServer {
     }
   }
 
-  async saveCharacter(session: ClientSession, opts: { withMarket?: boolean } = {}): Promise<void> {
-    const previous = this.characterSaveQueues.get(session.characterId);
-    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
-      const state = this.sim.serializeCharacter(session.pid);
-      const e = this.sim.entities.get(session.pid);
-      // Captured at serialize time: only unlocks already inside THIS blob may
-      // publish when it lands. An unlock granted while the write is in flight
-      // stays pending for the save queued behind it, so the character_deeds
-      // index (and Steam, chained off it) never runs ahead of durable state.
-      const recordUpTo = session.pendingDeedRecords.length;
-      if (state && e) {
-        if (session.spectating) {
-          state.pos = {
-            x: session.spectating.savedPos.x,
-            z: session.spectating.savedPos.z,
-          };
-          state.pet = session.spectating.stowedPet;
+  /** Reserve every persistence resource synchronously, then run once all prior
+   * owners settle. One shared barrier is published to each character FIFO and
+   * the realm FIFO, so no later save can overtake a multi-row transaction. */
+  private enqueuePersistenceWrite<T>(
+    sessions: readonly ClientSession[],
+    includeRealm: boolean,
+    write: () => Promise<T>,
+  ): Promise<T> {
+    const unique = [...new Map(sessions.map((session) => [session.characterId, session])).values()];
+    const dependencies = unique
+      .map((session) => this.characterSaveQueues.get(session.characterId))
+      .filter((pending): pending is Promise<void> => pending !== undefined);
+    if (includeRealm) dependencies.push(this.realmPersistenceQueue);
+
+    const run = Promise.all(dependencies).then(write);
+    // Queue tails never reject: a failed write is surfaced through `run`, while
+    // later work is still allowed to reach its own quarantine check.
+    const barrier = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    for (const session of unique) this.characterSaveQueues.set(session.characterId, barrier);
+    if (includeRealm) this.realmPersistenceQueue = barrier;
+    void barrier.then(() => {
+      for (const session of unique) {
+        if (this.characterSaveQueues.get(session.characterId) === barrier) {
+          this.characterSaveQueues.delete(session.characterId);
         }
-        if (session.jailVisit) {
-          state.pos = {
-            x: session.jailVisit.savedPos.x,
-            z: session.jailVisit.savedPos.z,
-          };
-          state.facing = session.jailVisit.savedFacing;
-          state.pet = session.jailVisit.stowedPet;
-        }
-        if (session.jailed) {
-          const jailPos = this.jailSpawnFor(session);
-          state.pos = { x: jailPos.x, z: jailPos.z };
-          state.jail = session.jailed;
-          state.dead = false;
-          state.ghost = false;
-          state.corpsePos = null;
-          state.hp = Math.max(1, state.hp);
-        } else {
-          delete state.jail;
-        }
-        // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
-        // is temporarily 20, but serializeCharacter reports the real level — so the
-        // character-list/leaderboard `level` column never reflects the temp state.
-        let saved: boolean;
-        if (opts.withMarket) {
-          // Atomic on the leave path so a logout bag-flush can never tear away
-          // from the global Market escrow (see saveCharacterAndMarketState). Run
-          // through the market queue and capture the market snapshot at write
-          // time so this commit can't clobber a newer one.
-          saved = await this.enqueueMarketWrite(() =>
-            saveCharacterAndMarketState(
-              session.characterId,
-              state.level,
-              state,
-              this.sim.serializeMarket(),
-              this.sim.serializeMail(),
-              session.leaseNonce,
-            ),
-          );
-        } else {
-          saved = await saveCharacterState(
-            session.characterId,
-            state.level,
-            state,
-            session.leaseNonce,
-          );
-        }
-        // A same-account takeover can reclaim this character's lease and rotate the
-        // nonce out from under a displaced session; the lease-fenced save then matches
-        // no row and reports false, meaning nothing persisted. Skip every post-save
-        // step: never stamp lastSave (the write did not land) and never drain
-        // pendingDeedRecords into the durable index (a deed must never publish ahead
-        // of the blob that proves it). The ids stay queued and simply never drain for
-        // this doomed session; the live holder records its own unlocks from its own
-        // saves. Only an explicit false is a fence-out: the no-nonce legacy path
-        // returns true, so a strict comparison never mistakes an ordinary save for one.
-        if (saved === false) {
-          console.warn(
-            `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
-          );
-          // The lease is gone: this session is a displaced zombie whose writes
-          // can never land again. Give the player the same explicit signal an
-          // in-process takeover sends instead of letting them keep playing an
-          // unsaved session. Deliberately not awaited: kickSession -> leave ->
-          // the leave save queues behind this closure on the per-character save
-          // queue, so awaiting here would deadlock. leave() is idempotent
-          // (session.left), so that leave save fencing out again cannot re-kick.
-          if (!session.left) {
-            void this.kickSession(session, 'character taken over', 'character taken over');
-          }
-          return;
-        }
-        session.lastSave = Date.now();
-        // The blob is durable: publish every unlock it contains. A rejected
-        // save skips this (the throw propagates past it), leaving the ids
-        // pending for the next save attempt (the 30s autosave, the next
-        // unlock's save, or the leave save), so a transient failure delays
-        // the public record instead of publishing it ahead of the source.
-        // A returning veteran's first save flushes many pending unlocks at
-        // once; recordDeedUnlocks mirrors the whole spliced slice in ONE
-        // multi-row insert (a single id still takes the single-row path), so a
-        // login storm never serializes N single-row round trips ahead of the
-        // index and the Steam pushes. The capture-at-serialize recordUpTo
-        // watermark is preserved: only ids already inside THIS blob drain now.
-        recordDeedUnlocks(
-          { characterId: session.characterId, accountId: session.accountId },
-          session.pendingDeedRecords.splice(0, recordUpTo),
-        );
       }
     });
-    this.characterSaveQueues.set(session.characterId, run);
-    try {
-      await run;
-    } finally {
-      if (this.characterSaveQueues.get(session.characterId) === run) {
-        this.characterSaveQueues.delete(session.characterId);
-      }
+    return run;
+  }
+
+  // Snapshot at ENQUEUE time, not when the FIFO eventually runs. This makes a
+  // save reserved before an economy mutation a true pre-mutation write; letting
+  // it read live state later could persist one half before the atomic barrier.
+  private captureCharacterPersistence(session: ClientSession): {
+    state: CharacterState;
+    deedRecords: string[];
+  } | null {
+    const state = this.sim.serializeCharacter(session.pid);
+    const entity = this.sim.entities.get(session.pid);
+    if (!state || !entity) return null;
+    if (session.spectating) {
+      state.pos = { x: session.spectating.savedPos.x, z: session.spectating.savedPos.z };
+      state.pet = session.spectating.stowedPet;
     }
+    if (session.jailVisit) {
+      state.pos = { x: session.jailVisit.savedPos.x, z: session.jailVisit.savedPos.z };
+      state.facing = session.jailVisit.savedFacing;
+      state.pet = session.jailVisit.stowedPet;
+    }
+    if (session.jailed) {
+      const jailPos = this.jailSpawnFor(session);
+      state.pos = { x: jailPos.x, z: jailPos.z };
+      state.jail = session.jailed;
+      state.dead = false;
+      state.ghost = false;
+      state.corpsePos = null;
+      state.hp = Math.max(1, state.hp);
+    } else {
+      delete state.jail;
+    }
+    return { state, deedRecords: [...session.pendingDeedRecords] };
+  }
+
+  private completeCharacterPersistence(session: ClientSession, deedRecords: readonly string[]): void {
+    session.lastSave = Date.now();
+    const captured = new Set(deedRecords);
+    const durable = session.pendingDeedRecords.filter((deedId) => captured.has(deedId));
+    session.pendingDeedRecords = session.pendingDeedRecords.filter(
+      (deedId) => !captured.has(deedId),
+    );
+    if (durable.length > 0) {
+      recordDeedUnlocks(
+        { characterId: session.characterId, accountId: session.accountId },
+        durable,
+      );
+    }
+  }
+
+  private quarantinePersistenceSessions(sessions: readonly ClientSession[], reason: string): void {
+    for (const session of sessions) this.persistenceQuarantinedSessions.add(session);
+    for (const session of sessions) {
+      if (session.left) continue;
+      // kickSession uses the normal cleanup path, but saveCharacter is now a
+      // hard no-op for this session. The socket closes and the lease releases
+      // without any post-transfer blob being allowed to escape quarantine.
+      void this.kickSession(
+        session,
+        'Transfer could not be saved. Reconnect to restore your last durable state.',
+        reason,
+      ).catch((err) =>
+        console.error(`persistence quarantine cleanup failed for ${session.name}:`, err),
+      );
+    }
+  }
+
+  private queueAtomicEconomyPersistence(
+    sessions: readonly ClientSession[],
+    quarantineMailOnFailure: boolean,
+    label: string,
+  ): void {
+    const unique = [...new Map(sessions.map((session) => [session.characterId, session])).values()];
+    if (unique.length < 1) {
+      throw new Error(`${label} persistence requires at least one character`);
+    }
+    const captures = unique.map((session) => ({
+      session,
+      captured: this.captureCharacterPersistence(session),
+    }));
+    if (captures.some(({ captured }) => captured === null)) {
+      this.marketPersistenceQuarantined = true;
+      if (quarantineMailOnFailure) this.mailPersistenceQuarantined = true;
+      this.quarantinePersistenceSessions(unique, `${label} snapshot failed`);
+      return;
+    }
+    const market = this.sim.serializeMarket();
+    const mail = this.sim.serializeMail();
+
+    const write = async (): Promise<void> => {
+      try {
+        if (this.marketPersistenceQuarantined || this.mailPersistenceQuarantined) {
+          throw new Error('realm economy persistence is quarantined');
+        }
+        if (unique.some((session) => this.persistenceQuarantinedSessions.has(session))) {
+          throw new Error('character persistence is quarantined');
+        }
+        const first = captures[0];
+        if (!first?.captured) throw new Error(`${label} character snapshot missing`);
+        const peers = captures.slice(1).map(({ session, captured }) => {
+          if (!captured) throw new Error(`${label} peer character snapshot missing`);
+          return {
+            characterId: session.characterId,
+            level: captured.state.level,
+            state: captured.state,
+            leaseNonce: session.leaseNonce,
+          };
+        });
+        const saved = await saveCharacterAndMarketState(
+          first.session.characterId,
+          first.captured.state.level,
+          first.captured.state,
+          market,
+          mail,
+          first.session.leaseNonce,
+          peers.length === 0 ? undefined : peers.length === 1 ? peers[0] : peers,
+        );
+        if (saved === false) throw new Error(`${label} persistence lease fence rejected`);
+        for (const { session, captured } of captures) {
+          if (captured) this.completeCharacterPersistence(session, captured.deedRecords);
+        }
+      } catch (err) {
+        // A recipient can transform/sell a just-received copy, then spend the
+        // proceeds on the Market while this transaction is pending. If it rolls
+        // back, publishing that later Market mutation would externalize value
+        // derived from an item the durable old owner still has. Freeze the
+        // global Market on every economy failure until it is reloaded.
+        this.marketPersistenceQuarantined = true;
+        // A failed mail transaction leaves the live realm book ahead of its
+        // durable row. Freeze every later Ravenpost/combined write until restart
+        // so no unrelated autosave can publish that rolled-back escrow half.
+        if (quarantineMailOnFailure) this.mailPersistenceQuarantined = true;
+        this.quarantinePersistenceSessions(unique, `${label} persistence failed`);
+        throw err;
+      }
+    };
+    this.atomicEconomyTransactionsPending++;
+    void this.enqueuePersistenceWrite(unique, true, write)
+      .catch((err) => console.error(`${label} atomic persistence failed:`, err))
+      .finally(() => {
+        this.atomicEconomyTransactionsPending--;
+      });
+  }
+
+  private persistMailMutationIfChanged(session: ClientSession, beforeRevision: number): void {
+    if (this.sim.postOffice.persistenceMutationRevision !== beforeRevision) {
+      this.queueAtomicEconomyPersistence([session], true, 'mail transfer');
+    }
+  }
+
+  private persistAtomicSystemRewards(): void {
+    const recipientIds = this.sim.postOffice.drainAtomicRewardRecipientIds();
+    if (recipientIds.length === 0) return;
+    const sessions: ClientSession[] = [];
+    for (const pid of recipientIds) {
+      const session = this.clients.get(pid);
+      if (!session || session.left) {
+        this.marketPersistenceQuarantined = true;
+        this.mailPersistenceQuarantined = true;
+        this.quarantinePersistenceSessions(sessions, 'system reward recipient disappeared');
+        console.error(`system reward mail has no live persistence session for player ${pid}`);
+        return;
+      }
+      sessions.push(session);
+    }
+    this.queueAtomicEconomyPersistence(sessions, true, 'system reward mail');
+  }
+
+  async saveCharacter(session: ClientSession, opts: { withMarket?: boolean } = {}): Promise<void> {
+    if (this.persistenceQuarantinedSessions.has(session)) return;
+    const captured = this.captureCharacterPersistence(session);
+    if (!captured) return;
+    const { state, deedRecords } = captured;
+    const market = opts.withMarket ? this.sim.serializeMarket() : null;
+    const mail =
+      opts.withMarket && !this.mailPersistenceQuarantined ? this.sim.serializeMail() : null;
+    await this.enqueuePersistenceWrite([session], opts.withMarket === true, async () => {
+      if (this.persistenceQuarantinedSessions.has(session)) return;
+      // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
+      // is temporarily 20, but serializeCharacter reports the real level — so the
+      // character-list/leaderboard `level` column never reflects the temp state.
+      let saved: boolean;
+      if (opts.withMarket) {
+        // Atomic on the leave path so a logout bag-flush can never tear away
+        // from the global Market escrow (see saveCharacterAndMarketState). Run
+        // through the shared realm queue with the snapshots captured above so
+        // this commit can't clobber a newer one. If either realm store failed,
+        // fall back to the lease-fenced character write: persisting a default
+        // empty mail snapshot would destroy the rejected realm book.
+        saved =
+          this.marketPersistenceQuarantined || this.mailPersistenceQuarantined || !market || !mail
+            ? await saveCharacterState(session.characterId, state.level, state, session.leaseNonce)
+            : await saveCharacterAndMarketState(
+                session.characterId,
+                state.level,
+                state,
+                market,
+                mail,
+                session.leaseNonce,
+              );
+      } else {
+        saved = await saveCharacterState(
+          session.characterId,
+          state.level,
+          state,
+          session.leaseNonce,
+        );
+      }
+      // A same-account takeover can reclaim this character's lease and rotate the
+      // nonce out from under a displaced session; the lease-fenced save then matches
+      // no row and reports false, meaning nothing persisted. Skip every post-save
+      // step: never stamp lastSave (the write did not land) and never drain
+      // pendingDeedRecords into the durable index (a deed must never publish ahead
+      // of the blob that proves it). The ids stay queued and simply never drain for
+      // this doomed session; the live holder records its own unlocks from its own
+      // saves. Only an explicit false is a fence-out: the no-nonce legacy path
+      // returns true, so a strict comparison never mistakes an ordinary save for one.
+      if (saved === false) {
+        console.warn(
+          `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
+        );
+        // The lease is gone: this session is a displaced zombie whose writes
+        // can never land again. Give the player the same explicit signal an
+        // in-process takeover sends instead of letting them keep playing an
+        // unsaved session. Deliberately not awaited: kickSession -> leave ->
+        // the leave save queues behind this closure on the per-character save
+        // queue, so awaiting here would deadlock. leave() is idempotent
+        // (session.left), so that leave save fencing out again cannot re-kick.
+        if (!session.left) {
+          void this.kickSession(session, 'character taken over', 'character taken over');
+        }
+        return;
+      }
+      // The blob is durable: publish every unlock it contains. A rejected
+      // save skips this (the throw propagates past it), leaving the ids
+      // pending for the next save attempt (the 30s autosave, the next
+      // unlock's save, or the leave save), so a transient failure delays
+      // the public record instead of publishing it ahead of the source.
+      // A returning veteran's first save flushes many pending unlocks at
+      // once; recordDeedUnlocks mirrors the durable captured ids in ONE
+      // multi-row insert (a single id still takes the single-row path), so a
+      // login storm never serializes N single-row round trips ahead of the
+      // index and the Steam pushes. Exact capture-at-serialize ids are preserved:
+      // a later unlock cannot be drained by an older queued snapshot.
+      this.completeCharacterPersistence(session, deedRecords);
+    });
   }
 
   async saveAll(reason: string): Promise<void> {
@@ -3346,15 +3521,22 @@ export class GameServer {
   // The World Market is shared global state, persisted as a single JSONB blob.
   async loadMarket(): Promise<void> {
     try {
+      await this.realmPersistenceQueue;
       this.sim.loadMarket(await loadMarketState());
+      this.marketPersistenceQuarantined = false;
     } catch (err) {
+      this.marketPersistenceQuarantined = true;
       console.error('failed to load world market:', err);
     }
   }
 
   async saveMarket(): Promise<void> {
+    if (this.marketPersistenceQuarantined) return;
+    const snapshot = this.sim.serializeMarket();
     try {
-      await this.enqueueMarketWrite(() => saveMarketState(this.sim.serializeMarket()));
+      await this.enqueuePersistenceWrite([], true, () =>
+        this.marketPersistenceQuarantined ? Promise.resolve() : saveMarketState(snapshot),
+      );
     } catch (err) {
       console.error('failed to save world market:', err);
     }
@@ -3365,15 +3547,30 @@ export class GameServer {
   // snapshot can never interleave with the atomic leave-path write.
   async loadMail(): Promise<void> {
     try {
+      // An operator reload is the only action that clears mail quarantine. Drain
+      // every previously reserved realm task first: otherwise a callback that
+      // captured the rejected live book could wake after this reload and publish
+      // that stale snapshot once the boolean is clear again.
+      await this.realmPersistenceQueue;
       this.sim.loadMail(await loadMailState());
+      this.mailPersistenceQuarantined = false;
     } catch (err) {
+      this.mailPersistenceQuarantined = true;
       console.error('failed to load mail:', err);
+      // Main awaits this before game.start/server.listen. Rejecting here makes a
+      // corrupt realm book a boot failure instead of serving an empty mailbox;
+      // the quarantine above remains defence in depth for any caller that catches.
+      throw err;
     }
   }
 
   async saveMail(): Promise<void> {
+    if (this.mailPersistenceQuarantined) return;
+    const snapshot = this.sim.serializeMail();
     try {
-      await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
+      await this.enqueuePersistenceWrite([], true, () =>
+        this.mailPersistenceQuarantined ? Promise.resolve() : saveMailState(snapshot),
+      );
     } catch (err) {
       console.error('failed to save mail:', err);
     }
@@ -4685,7 +4882,29 @@ export class GameServer {
         if (Array.isArray(msg.items)) sim.tradeSetOffer(msg.items, Number(msg.copper) || 0, pid);
         break;
       case 'trade_confirm':
-        sim.tradeConfirm(pid);
+        if (
+          this.marketPersistenceQuarantined ||
+          this.mailPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          sim.tradeCancel(pid);
+          break;
+        }
+        {
+          const completion = sim.tradeConfirm(pid);
+          if (!completion?.changed) break;
+          const first = this.clients.get(completion.a);
+          const second = this.clients.get(completion.b);
+          if (!first || !second) {
+            const present = [first, second].filter(
+              (candidate): candidate is ClientSession => candidate !== undefined,
+            );
+            this.quarantinePersistenceSessions(present, 'trade participant disappeared');
+            console.error('completed trade had no live persistence session for both participants');
+            break;
+          }
+          this.queueAtomicEconomyPersistence([first, second], false, 'direct trade');
+        }
         break;
       case 'trade_cancel':
         sim.tradeCancel(pid);
@@ -5011,6 +5230,13 @@ export class GameServer {
         break;
       case 'market_list':
         if (
+          this.atomicEconomyTransactionsPending > 0 ||
+          this.marketPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          break;
+        }
+        if (
           typeof msg.item === 'string' &&
           typeof msg.count === 'number' &&
           Number.isFinite(msg.count) &&
@@ -5021,15 +5247,43 @@ export class GameServer {
         }
         break;
       case 'market_buy':
+        if (
+          this.atomicEconomyTransactionsPending > 0 ||
+          this.marketPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          break;
+        }
         if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid);
         break;
       case 'market_cancel':
+        if (
+          this.atomicEconomyTransactionsPending > 0 ||
+          this.marketPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          break;
+        }
         if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);
         break;
       case 'market_collect':
+        if (
+          this.atomicEconomyTransactionsPending > 0 ||
+          this.marketPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          break;
+        }
         sim.marketCollect(pid);
         break;
       case 'mail_send': {
+        if (
+          this.marketPersistenceQuarantined ||
+          this.mailPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          break;
+        }
         if (
           typeof msg.to !== 'string' ||
           typeof msg.subject !== 'string' ||
@@ -5101,6 +5355,7 @@ export class GameServer {
             });
             break;
           }
+          const beforeRevision = sim.postOffice.persistenceMutationRevision;
           sim.mailSendResolved(
             { key: String(live.characterId), name: live.name },
             subject,
@@ -5109,6 +5364,7 @@ export class GameServer {
             items,
             pid,
           );
+          this.persistMailMutationIfChanged(session, beforeRevision);
           break;
         }
         // Offline recipient: resolve against the character DB (realm-scoped),
@@ -5117,7 +5373,13 @@ export class GameServer {
         void this.socialDb
           .findCharacterByName(to)
           .then(async (target) => {
-            if (this.clients.get(pid) !== session) return;
+            if (
+              this.clients.get(pid) !== session ||
+              this.marketPersistenceQuarantined ||
+              this.mailPersistenceQuarantined ||
+              this.persistenceQuarantinedSessions.has(session)
+            )
+              return;
             if (!target) {
               // Structured outcome, localized client-side (the sim's mailResult shape).
               this.send(session, {
@@ -5129,7 +5391,13 @@ export class GameServer {
             // Offline recipient block check (same rule as the online path above):
             // a sender the recipient has blocked is refused before any escrow.
             const blockedBy = await this.socialDb.blockedIds(target.id);
-            if (this.clients.get(pid) !== session) return;
+            if (
+              this.clients.get(pid) !== session ||
+              this.marketPersistenceQuarantined ||
+              this.mailPersistenceQuarantined ||
+              this.persistenceQuarantinedSessions.has(session)
+            )
+              return;
             if (blockedBy.includes(session.characterId)) {
               this.send(session, {
                 t: 'events',
@@ -5137,6 +5405,7 @@ export class GameServer {
               });
               return;
             }
+            const beforeRevision = sim.postOffice.persistenceMutationRevision;
             sim.mailSendResolved(
               { key: String(target.id), name: target.name },
               subject,
@@ -5145,20 +5414,51 @@ export class GameServer {
               items,
               pid,
             );
+            this.persistMailMutationIfChanged(session, beforeRevision);
             session.selfHeavyDirty = true;
           })
           .catch((err) => console.error('mail send resolve failed:', err));
         break;
       }
-      case 'mail_take':
+      case 'mail_take': {
+        if (
+          this.marketPersistenceQuarantined ||
+          this.mailPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          break;
+        }
+        const beforeRevision = sim.postOffice.persistenceMutationRevision;
         if (typeof msg.id === 'number') sim.mailTake(msg.id, pid);
+        this.persistMailMutationIfChanged(session, beforeRevision);
         break;
-      case 'mail_delete':
+      }
+      case 'mail_delete': {
+        if (
+          this.marketPersistenceQuarantined ||
+          this.mailPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          break;
+        }
+        const beforeRevision = sim.postOffice.persistenceMutationRevision;
         if (typeof msg.id === 'number') sim.mailDelete(msg.id, pid);
+        this.persistMailMutationIfChanged(session, beforeRevision);
         break;
-      case 'mail_read':
+      }
+      case 'mail_read': {
+        if (
+          this.marketPersistenceQuarantined ||
+          this.mailPersistenceQuarantined ||
+          this.persistenceQuarantinedSessions.has(session)
+        ) {
+          break;
+        }
+        const beforeRevision = sim.postOffice.persistenceMutationRevision;
         if (typeof msg.id === 'number') sim.mailMarkRead(msg.id, pid);
+        this.persistMailMutationIfChanged(session, beforeRevision);
         break;
+      }
       // Bank: the per-character deposit box. `slot` is a container index (the
       // castAbilityBySlot wire idiom); `count` is optional (omit = whole stack).
       // The Sim owns every gameplay rule (banker proximity, capacity, quest-bind,

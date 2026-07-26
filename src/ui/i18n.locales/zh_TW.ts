@@ -8915,4 +8915,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '沒有該 ID 的物品。',
   'devCommand.kitCurrentSpec': '目前專精',
   'hudChrome.enchanting.wornTag': '已裝備（{slot}）',
+  'itemUi.lootRoll.needUnavailablePower': '此傳奇能力僅限其他職業使用，因此不能選擇需求。',
 };

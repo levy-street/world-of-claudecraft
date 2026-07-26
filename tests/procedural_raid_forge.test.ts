@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { bagCapacity } from '../src/sim/bags';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { PROCEDURAL_LEGENDARY_POWERS } from '../src/sim/content/procedural_legendary_powers';
 import { PROCEDURAL_BASE_POOLS } from '../src/sim/content/procedural_loot';
@@ -14,6 +15,7 @@ import {
   resolveNythraxisForgeOffer,
   tuneNythraxisLegendary,
 } from '../src/sim/instances/nythraxis_forge';
+import { heroicRewardWindowToken } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, type Entity, type PlayerClass } from '../src/sim/types';
 import { resolveProceduralItemIcon } from '../src/ui/procedural_item_art';
@@ -39,9 +41,13 @@ function addCurrency(sim: AnySim, pid: number, fragments: number, marks: number)
 }
 
 function unlockHeroic(sim: AnySim, pid: number): void {
-  sim.players
-    .get(pid)!
-    .raidLockouts.set('nythraxis_boss_arena:heroic', sim.ctx.raidResetMs(sim.ctx.lockoutNowMs()));
+  const meta = sim.players.get(pid)!;
+  const until = sim.ctx.raidResetMs(sim.ctx.lockoutNowMs());
+  meta.raidLockouts.set('nythraxis_boss_arena:heroic', until);
+  meta.heroicDaily = {
+    date: heroicRewardWindowToken(until),
+    marked: new Set(['nythraxis_boss_arena']),
+  };
 }
 
 function proceduralSlots(sim: AnySim, pid: number, itemId?: string) {
@@ -199,6 +205,16 @@ describe('Nythraxis forge offer authority', () => {
     expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(cost.fragments);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(cost.heroicMarks);
 
+    const meta = sim.players.get(pid)!;
+    meta.raidLockouts.set(
+      'nythraxis_boss_arena:heroic',
+      sim.ctx.raidResetMs(sim.ctx.lockoutNowMs()),
+    );
+    forgeNythraxisReward(sim.ctx, 'heroic:iron_broadsword', pid);
+    expect(proceduralSlots(sim, pid)).toHaveLength(0);
+    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(cost.fragments);
+    expect(errorTexts(sim)).toContain('Defeat Heroic Nythraxis in the current raid reset first.');
+
     unlockHeroic(sim, pid);
     forgeNythraxisReward(sim.ctx, 'heroic:iron_broadsword', pid);
     expect(proceduralSlots(sim, pid)[0].instance?.procedural).toMatchObject({
@@ -284,13 +300,48 @@ describe('Nythraxis forge offer authority', () => {
     sim.removeItem(DEATHLESS_FRAGMENT_ITEM_ID, 1, pid);
     forgeNythraxisReward(sim.ctx, 'normal:iron_broadsword', pid);
     expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(19);
-    sim.addItem(DEATHLESS_FRAGMENT_ITEM_ID, 1, pid);
+    sim.addItem(DEATHLESS_FRAGMENT_ITEM_ID, 2, pid);
     for (let i = 0; i < 40 && sim.canAddItem('worn_sword', 1, pid); i++)
       sim.addItem('worn_sword', 1, pid);
     expect(sim.canAddItem('iron_broadsword', 1, pid)).toBe(false);
     forgeNythraxisReward(sim.ctx, 'normal:iron_broadsword', pid);
-    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(20);
+    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(21);
     expect(proceduralSlots(sim, pid)).toHaveLength(0);
+  });
+
+  it('allows a full-bag forge when spending the exact currency frees room for the reward', () => {
+    const { sim, pid, meta } = setup('warrior');
+    const cost = NYTHRAXIS_FORGE_COSTS.normalProceduralEpic;
+    addCurrency(sim, pid, cost.fragments, cost.heroicMarks);
+    while (sim.canAddItem('worn_sword', 1, pid)) sim.addItem('worn_sword', 1, pid);
+
+    expect(meta.inventory).toHaveLength(bagCapacity(meta.bags));
+    expect(sim.canAddItem('iron_broadsword', 1, pid)).toBe(false);
+
+    forgeNythraxisReward(sim.ctx, 'normal:iron_broadsword', pid);
+
+    expect(proceduralSlots(sim, pid, 'iron_broadsword')).toHaveLength(1);
+    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(0);
+    expect(meta.inventory.length).toBeLessThanOrEqual(bagCapacity(meta.bags));
+  });
+
+  it('does not accept instanced lookalikes as spendable forge currency', () => {
+    const { sim, pid } = setup('warrior');
+    const cost = NYTHRAXIS_FORGE_COSTS.normalProceduralEpic;
+    sim.addItemInstance(
+      DEATHLESS_FRAGMENT_ITEM_ID,
+      { signer: 'not-fungible' },
+      pid,
+      cost.fragments,
+    );
+    sim.drainEvents();
+
+    forgeNythraxisReward(sim.ctx, 'normal:iron_broadsword', pid);
+
+    expect(proceduralSlots(sim, pid)).toHaveLength(0);
+    expect(sim.countFungibleItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(0);
+    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(cost.fragments);
+    expect(errorTexts(sim)).toContain('You need 20 Deathless Fragments and 0 Heroic Marks.');
   });
 });
 
@@ -410,5 +461,50 @@ describe('exact-copy Nythraxis Legendary tuning', () => {
       proceduralSlots(sim, pid).some((slot) => slot.instance?.procedural?.uid === secondUid),
     ).toBe(true);
     expect(errorTexts(sim)).toContain('Your class cannot tune that Legendary power.');
+  });
+
+  it('rejects an ambiguous duplicate UID without spending or mutating either copy', () => {
+    const { sim, pid, meta } = setup('paladin');
+    unlockHeroic(sim, pid);
+    const forgeCost = NYTHRAXIS_FORGE_COSTS.raidForgedSignature;
+    addCurrency(sim, pid, forgeCost.fragments, forgeCost.heroicMarks);
+    forgeNythraxisReward(sim.ctx, 'signature:dawnward_signet:gravecaller_ring', pid);
+    const target = proceduralSlots(sim, pid, 'gravecaller_ring')[0];
+    const uid = target.instance!.procedural!.uid;
+    meta.inventory.push(structuredClone(target));
+    const before = structuredClone(meta.inventory);
+    const tuneCost = NYTHRAXIS_FORGE_COSTS.legendaryPowerTune;
+    addCurrency(sim, pid, tuneCost.fragments, tuneCost.heroicMarks);
+
+    tuneNythraxisLegendary(sim.ctx, uid, pid);
+
+    expect(meta.inventory.slice(0, before.length)).toEqual(before);
+    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(tuneCost.fragments);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(tuneCost.heroicMarks);
+    expect(errorTexts(sim)).toContain('That exact Nythraxis Legendary is no longer in your bags.');
+  });
+
+  it('rejects a colliding replacement UID before spending tuning currency', () => {
+    const { sim, pid, meta } = setup('paladin');
+    unlockHeroic(sim, pid);
+    const forgeCost = NYTHRAXIS_FORGE_COSTS.raidForgedSignature;
+    addCurrency(sim, pid, forgeCost.fragments * 2, forgeCost.heroicMarks * 2);
+    forgeNythraxisReward(sim.ctx, 'signature:dawnward_signet:gravecaller_ring', pid);
+    forgeNythraxisReward(sim.ctx, 'signature:dawnward_signet:gravecaller_ring', pid);
+    const [target, collision] = proceduralSlots(sim, pid, 'gravecaller_ring');
+    const before = structuredClone(target.instance);
+    const collisionUid = collision.instance!.procedural!.uid;
+    const tuneCost = NYTHRAXIS_FORGE_COSTS.legendaryPowerTune;
+    addCurrency(sim, pid, tuneCost.fragments, tuneCost.heroicMarks);
+    sim.ctx.allocateProceduralItemUid = () => collisionUid;
+
+    expect(() =>
+      tuneNythraxisLegendary(sim.ctx, target.instance!.procedural!.uid, pid),
+    ).toThrow(/Duplicate procedural item UID/);
+
+    expect(target.instance).toEqual(before);
+    expect(meta.inventory).toContain(collision);
+    expect(sim.countItem(DEATHLESS_FRAGMENT_ITEM_ID, pid)).toBe(tuneCost.fragments);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(tuneCost.heroicMarks);
   });
 });

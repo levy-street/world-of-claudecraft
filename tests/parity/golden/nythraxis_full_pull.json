@@ -9256,7 +9256,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "eb078655",
+      "state": "80fb007e",
       "events": "ee9c762b",
       "rng": {
         "draws": 3027,
@@ -10163,6 +10163,9 @@
         },
         {
           "aiState": "dead",
+          "bossDamagers": [
+            415
+          ],
           "comboUntil": -1,
           "corpseTimer": 59.95,
           "critChance": 0.05,
@@ -10683,7 +10686,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "ffa3411b",
+      "state": "f435389e",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10694,7 +10697,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "38e1f08b",
+      "state": "9c6edad8",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10705,7 +10708,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "59173d5b",
+      "state": "1ec0efe8",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10716,7 +10719,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "a4acbbff",
+      "state": "4b397cda",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10727,7 +10730,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "c4c08173",
+      "state": "9e3bbade",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10738,7 +10741,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "9c9571db",
+      "state": "48442094",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10749,7 +10752,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "2a436ff9",
+      "state": "ef286194",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -11656,6 +11659,9 @@
         },
         {
           "aiState": "dead",
+          "bossDamagers": [
+            415
+          ],
           "comboUntil": -1,
           "corpseTimer": 56.95,
           "critChance": 0.05,

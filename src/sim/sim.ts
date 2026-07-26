@@ -906,10 +906,9 @@ export interface InstanceSlot {
   // treat someone else's cleared claim as their own loot run.
   clearedBy: Set<number>;
   // Players who stepped through this claim's door during this run (enterDungeon).
-  // Session-only like clearedBy, cleared with the claim. The heroic mail arm
-  // (instances/dungeons awardHeroicMarks) pays a locked-but-absent player only
-  // when they actually entered this run: a door-camper or a member parked in
-  // town takes the lockout without turning roster membership into mailed income.
+  // Session-only like clearedBy, cleared with the claim. This records ownership
+  // and lockout scope, but it is not reward proof: absent Heroic reward mail also
+  // requires permanent final-boss damage or effective-heal contribution.
   enteredBy: Set<number>;
 }
 
@@ -1746,6 +1745,7 @@ export class Sim {
     this.cfg = {
       seed: cfg.seed,
       playerClass: cfg.playerClass,
+      proceduralLootSecret: cfg.proceduralLootSecret ?? '',
       respawnSeconds: cfg.respawnSeconds ?? 25,
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
@@ -4161,8 +4161,8 @@ export class Sim {
       applyNonPlayerStatAura: sim.applyNonPlayerStatAura.bind(sim),
       // N1: grantNythraxisLockout now lives in encounters/nythraxis.ts; late-bound arrow
       // (handleDeath in combat/damage.ts reaches it via ctx on the boss-death path).
-      grantNythraxisLockout: (boss, recipients) =>
-        nythraxis.grantNythraxisLockout(sim.ctx, boss, recipients),
+      grantNythraxisLockout: (boss, recipients, participants) =>
+        nythraxis.grantNythraxisLockout(sim.ctx, boss, recipients, participants),
       // frenzyPackmates / armDeathThroes flipped points-at to mob/lifecycle (M4); their
       // late-bound lifecycle arrows live in the death-lifecycle block below.
       refreshKnownAbilities: sim.refreshKnownAbilities.bind(sim),
@@ -8730,8 +8730,8 @@ export class Sim {
     tradeMod.tradeSetOffer(this.ctx, items, copper, pid);
   }
 
-  tradeConfirm(pid?: number): void {
-    tradeMod.tradeConfirm(this.ctx, pid);
+  tradeConfirm(pid?: number): tradeMod.TradeCompletion | null {
+    return tradeMod.tradeConfirm(this.ctx, pid);
   }
 
   tradeCancel(pid?: number): void {
@@ -8976,8 +8976,8 @@ export class Sim {
 
   // Owned by instances/dungeons (heroic final-boss reward + lockout settlement);
   // the C1 death hub reaches it through the seam, this delegate keeps the facade.
-  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void {
-    awardHeroicMarksImpl(this.ctx, mob, recipients);
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[], participants: PlayerMeta[]): void {
+    awardHeroicMarksImpl(this.ctx, mob, recipients, participants);
   }
 
   // Heroic Quartermaster purchase (owned by instances/heroic_vendor.ts): the

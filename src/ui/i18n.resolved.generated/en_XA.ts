@@ -6962,6 +6962,7 @@ export const en_XA: EnTranslations = {
       "pass": "[Þášš]",
       "needAria": "[Ñééð ƒóŕ {item}]",
       "needUnavailable": "[Ñééð íš úñáʋáíļáƀļé ƀéçáúšé ýóúŕ çļášš çáññóţ éɋúíþ ţĥíš íţéɱ.]",
+      "needUnavailablePower": "[Ñééð íš úñáʋáíļáƀļé ƀéçáúšé ţĥíš Ļéĝéñðáŕý þóŵéŕ íš ŕéšţŕíçţéð ţó áñóţĥéŕ çļášš.]",
       "greedAria": "[Ĝŕééð ƒóŕ {item}]",
       "passAria": "[Þášš óñ {item}]",
       "everyonePassed": "[Éʋéŕýóñé þáššéð óñ {item}.]",

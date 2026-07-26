@@ -4327,6 +4327,8 @@ export interface WorldContent {
 export interface SimConfig {
   seed: number;
   playerClass: PlayerClass;
+  /** Server-only 128-bit hex key for unpredictable live procedural drops. */
+  proceduralLootSecret?: string;
   proceduralItemUidLease?: ProceduralItemUidLease;
   respawnSeconds?: number; // mob respawn time (default 25)
   autoEquip?: boolean; // auto-equip better gear on loot (headless convenience)

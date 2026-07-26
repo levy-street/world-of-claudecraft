@@ -6683,110 +6683,110 @@ export const tr_TR: EnTranslations = {
       "critChance": "Kritik Şansı",
       "dodge": "Sıyırma",
       "parry": "Savuşturma",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Asgari silah hasarı",
+      "weaponMax": "Azami silah hasarı",
+      "weaponDps": "Saniye başına silah hasarı",
+      "healthOnKill": "Öldürmede sağlık",
+      "manaOnKill": "Öldürmede mana",
+      "blockValue": "Engelleme değeri"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "{min} ile {max} arasında olası atış",
+      "advancedDetailsHint": "Olası atış aralıklarını göstermek için {key} tuşunu basılı tut.",
+      "powerRollPercent": "Güç atışı: {value}%",
+      "powerRollMilliseconds": "Güç atışı: {value} ms",
+      "powerRollResource": "Güç atışı: {value} kaynak",
+      "powerRollNumber": "Güç atışı: {value}",
+      "legendaryPower": "Efsanevi güç",
+      "legendaryLimit": "Benzersiz kuşanım: {count} efsanevi güç",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Sıradan",
+        "magic": "Büyülü",
+        "rare": "Nadir",
+        "epic": "Destansı",
+        "legendary": "Efsanevi",
+        "mythic": "Mitik"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Kudretli",
+        "deft": "Becerikli",
+        "stalwart": "Metin",
+        "sages": "Bilgenin",
+        "spiritual": "Ruhani",
+        "of_focus": "Odağın",
+        "of_striking": "Vuruşun",
+        "of_alacrity": "Atikliğin",
+        "of_precision": "Kesinliğin",
+        "warded": "Korunaklı",
+        "of_reaping": "Hasadın",
+        "of_remembrance": "Hatıranın"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Külrengi",
+        "blackfen": "Karakır",
+        "doom": "Felaket",
+        "grave": "Mezar",
+        "mire": "Bataklık",
+        "storm": "Fırtına",
+        "thorn": "Diken",
+        "wyrm": "Ejder",
+        "bite": "Isırık",
+        "brand": "Dağlama",
+        "promise": "Söz",
+        "thread": "İplik",
+        "vigil": "Nöbet",
+        "ward": "Koruma",
+        "whisper": "Fısıltı",
+        "oath": "Yemin"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Son Cenaze Ateşinin Tacı",
+          "description": "Her üçüncü Köz Oku hedefin yakınındaki düşmanları kavurur."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Bozçene’nin Keskin Ucu",
+          "description": "Her üçüncü silah vuruşu hedefi kanatır ve biraz kaynak yeniler."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Sessizorman Uzun Yayı",
+          "description": "Uzun Çekiş veya Uğursuz Atış hedefini kısa süreliğine susturabilir."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Gececamı Dişi",
+          "description": "Bir öldürme kısa süreli hız kazandırır."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Ysolei’nin Nöbeti",
+          "description": "Kritik iyileştirme yerde kısa süreli onarıcı bir alan oluşturur."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Fırtına Uyanışı Putu",
+          "description": "Her dördüncü Ark Oku yakındaki düşmanlara sıçrar."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Külbağlayanın Mührü",
+          "description": "Her dördüncü Kasvet Oku hedefini ek Gölge hasarı için işaretler."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Şafak Muhafızı Mührü",
+          "description": "Onaran Işık alıcısını iyileştirmenin bir kısmı kadar kalkanla korur."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Vahşi Ay Tokası",
+          "description": "Her üçüncü Yaban Oku birincil kaynağı yeniler."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Dokuzuncu Çan",
+          "description": "Her ikinci hasar büyüsü hedefin çevresinde çınlar."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Çalınmış Saatlerin Pelerini",
+          "description": "Sağlık 35% altına düştüğünde kısa süreli savunma koruması kazanırsın."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Kırılmaz Yolun Çizmeleri",
+          "description": "15 yarda hareket etmek kısa süreli hareket hızı artışı sağlar."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const tr_TR: EnTranslations = {
       "greed": "Açgözlülük",
       "pass": "Pas",
       "needAria": "{item} için ihtiyaç",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Sınıfın bu eşyayı kuşanamadığı için İhtiyaç kullanılamıyor.",
+      "needUnavailablePower": "Bu efsanevi güç başka bir sınıfa özel olduğu için İhtiyaç kullanılamıyor.",
       "greedAria": "{item} için açgözlülük",
       "passAria": "{item} için pas geç",
       "everyonePassed": "Herkes {item} için pas geçti.",

@@ -309,7 +309,9 @@ export class EquipmentEffectsController {
   }
 
   refresh(ctx: SimContext, actorId: number): void {
-    this.runtime.clearActor(actorId);
+    // Refresh only changes which power is active. Runtime state is keyed by actor
+    // and power, so retaining it prevents gear swaps from resetting cadence or an
+    // internal cooldown. Death and actor removal still clear all tracked state.
     const meta = ctx.players.get(actorId);
     this.active.set(actorId, meta ? activePowerFor(meta) : null);
   }

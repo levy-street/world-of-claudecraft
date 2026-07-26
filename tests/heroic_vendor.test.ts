@@ -16,6 +16,7 @@ import {
   buildHeroicQuartermasterView,
   buildHeroicVendorView,
 } from '../src/ui/hud/vendor/heroic_vendor_view';
+import { resolveProceduralItemIcon } from '../src/ui/procedural_item_art';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -185,6 +186,8 @@ describe('heroic vendor shop view (pure)', () => {
       heroicClear: true,
     });
     const signature = view.forgeRows.find((row) => row.powerId === 'dawnward_signet');
+    expect(signature).toBeDefined();
+    if (!signature) throw new Error('missing dawnward signature row');
     expect(signature).toMatchObject({
       offerId: 'signature:dawnward_signet:gravecaller_ring',
       itemLevel: 36,
@@ -192,6 +195,24 @@ describe('heroic vendor shop view (pure)', () => {
       randomAffixes: true,
       cost: { fragments: 60, heroicMarks: 45 },
       blockReason: null,
+    });
+    expect(signature?.previewInstance?.procedural).toMatchObject({
+      baseId: 'gravecaller_ring',
+      rarity: 'legendary',
+      legendaryPowerId: 'dawnward_signet',
+      powerRevision: 1,
+      raidForged: true,
+    });
+    expect(resolveProceduralItemIcon(signature.itemId, signature.previewInstance)).toMatchObject({
+      state: 'legendary-raid-forged',
+      url: expect.stringContaining('dawnward_signet.r1.ascendant.webp'),
+    });
+    const epic = view.forgeRows.find((row) => row.offerId.startsWith('normal:'));
+    expect(epic).toBeDefined();
+    if (!epic) throw new Error('missing normal procedural row');
+    expect(resolveProceduralItemIcon(epic.itemId, epic.previewInstance)).toMatchObject({
+      state: 'rarity',
+      url: expect.stringContaining('/epic.webp'),
     });
     expect(view.forgeRows.find((row) => row.powerId === 'feral_moonclasp')?.blockReason).toBe(
       'class',
@@ -280,7 +301,7 @@ describe('heroic mark reward persistence', () => {
 
     now = nextReset;
     nextReset += DAY_MS;
-    sim.awardHeroicMarks(morthen, [meta]);
+    sim.awardHeroicMarks(morthen, [meta], []);
 
     expect(sim.utcDay).toBe('2026-07-07');
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(2);
@@ -311,7 +332,7 @@ describe('heroic mark reward persistence', () => {
           (entity: AnyEntity | undefined) =>
             entity?.templateId === HEROIC_DUNGEON_TUNING[dungeonId].finalBossId,
         ) as AnyEntity;
-      sim.awardHeroicMarks(boss, [meta]);
+      sim.awardHeroicMarks(boss, [meta], []);
     }
     sim.tick();
 

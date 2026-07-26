@@ -45,6 +45,107 @@ const MARKET = { listings: [], collections: {} } as unknown as MarketSave;
 const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
 
 describe('saveCharacterAndMarketState', () => {
+  it('lease-fences both trade participants before either realm blob commits', async () => {
+    const client = clientStub();
+    client.query.mockImplementation(async (sql: string) =>
+      /UPDATE characters/i.test(sql)
+        ? ({ rows: [], rowCount: 1 } as any)
+        : ({ rows: [], rowCount: 0 } as any),
+    );
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-a', {
+      characterId: 84,
+      level: 9,
+      state: { ...STATE, level: 9 },
+      leaseNonce: 'nonce-b',
+    });
+
+    expect(ok).toBe(true);
+    const calls = client.query.mock.calls;
+    const characterCalls = calls.filter((call) => /UPDATE characters/i.test(String(call[0])));
+    expect(characterCalls).toHaveLength(2);
+    expect(characterCalls[0]?.[1]).toEqual([
+      42,
+      7,
+      expect.any(String),
+      expect.any(String),
+      'nonce-a',
+    ]);
+    expect(characterCalls[1]?.[1]).toEqual([
+      84,
+      9,
+      expect.any(String),
+      expect.any(String),
+      'nonce-b',
+    ]);
+    const secondCharacter = calls.indexOf(characterCalls[1]);
+    const firstRealm = calls.findIndex((call) => /world_state/i.test(String(call[0])));
+    expect(firstRealm).toBeGreaterThan(secondCharacter);
+    expect(String(calls.at(-1)?.[0])).toMatch(/^COMMIT/);
+  });
+
+  it('persists a multi-recipient reward batch before either realm blob commits', async () => {
+    const client = clientStub();
+    client.query.mockImplementation(async (sql: string) =>
+      /UPDATE characters/i.test(sql)
+        ? ({ rows: [], rowCount: 1 } as any)
+        : ({ rows: [], rowCount: 0 } as any),
+    );
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-a', [
+      {
+        characterId: 84,
+        level: 8,
+        state: { ...STATE, level: 8 },
+        leaseNonce: 'nonce-b',
+      },
+      {
+        characterId: 126,
+        level: 9,
+        state: { ...STATE, level: 9 },
+        leaseNonce: 'nonce-c',
+      },
+    ]);
+
+    expect(ok).toBe(true);
+    const calls = client.query.mock.calls;
+    const characterCalls = calls.filter((call) => /UPDATE characters/i.test(String(call[0])));
+    expect(characterCalls.map((call) => call[1][0])).toEqual([42, 84, 126]);
+    const lastCharacter = calls.indexOf(characterCalls.at(-1)!);
+    const firstRealm = calls.findIndex((call) => /world_state/i.test(String(call[0])));
+    expect(firstRealm).toBeGreaterThan(lastCharacter);
+    expect(String(calls.at(-1)?.[0])).toMatch(/^COMMIT/);
+  });
+
+  it('rolls back both character writes when the peer lease fence rejects', async () => {
+    const client = clientStub();
+    let characterUpdate = 0;
+    client.query.mockImplementation(async (sql: string) => {
+      if (/UPDATE characters/i.test(sql)) {
+        characterUpdate++;
+        return { rows: [], rowCount: characterUpdate === 1 ? 1 : 0 } as any;
+      }
+      return { rows: [], rowCount: 0 } as any;
+    });
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-a', {
+      characterId: 84,
+      level: 9,
+      state: { ...STATE, level: 9 },
+      leaseNonce: 'stale-b',
+    });
+
+    expect(ok).toBe(false);
+    const sqls = client.query.mock.calls.map((call) => String(call[0]));
+    expect(sqls.filter((sql) => /UPDATE characters/i.test(sql))).toHaveLength(2);
+    expect(sqls.some((sql) => /world_state/i.test(sql))).toBe(false);
+    expect(sqls.at(-1)).toMatch(/^ROLLBACK/);
+    expect(sqls.some((sql) => /^COMMIT/.test(sql))).toBe(false);
+  });
+
   it('writes the character row and the market row in ONE transaction (atomic escrow)', async () => {
     const client = clientStub();
     dbMock.connect.mockResolvedValueOnce(client as any);

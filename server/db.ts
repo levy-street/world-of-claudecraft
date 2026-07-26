@@ -2821,8 +2821,9 @@ export async function saveCharacterState(
   return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
 }
 
-// Persist a character row AND this realm's World Market + Ravenpost mail blobs
-// in ONE transaction. They live in different tables (characters / world_state),
+// Persist one character row (and, for direct trades, an optional peer) AND this
+// realm's World Market + Ravenpost mail blobs in ONE transaction. They live in
+// different tables (characters / world_state),
 // but a Market listing and a mail attachment are both escrows: the item leaves
 // the character's bags (character state) and becomes a listing / a letter
 // parcel (world state) in the same Sim action. Saving them as independent
@@ -2836,12 +2837,37 @@ export async function saveCharacterAndMarketState(
   market: MarketSave,
   mail: MailSave,
   leaseNonce?: string,
+  peer?:
+    | {
+        characterId: number;
+        level: number;
+        state: CharacterState;
+        leaseNonce?: string;
+      }
+    | readonly {
+        characterId: number;
+        level: number;
+        state: CharacterState;
+        leaseNonce?: string;
+      }[],
 ): Promise<boolean> {
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
   // has confirmed the marker and opened the gate. Checked before any pool work.
   assertMarketWriteGateOpen();
   const cleanState = sanitizeRemovedZone1Content(state).state;
+  const peers = peer === undefined ? [] : Array.isArray(peer) ? [...peer] : [peer];
+  const cleanPeers = peers.map((candidate) => ({
+    ...candidate,
+    state: sanitizeRemovedZone1Content(candidate.state).state,
+  }));
+  const characterIds = new Set([characterId]);
+  for (const candidate of cleanPeers) {
+    if (characterIds.has(candidate.characterId)) {
+      throw new Error('atomic character transfer requires distinct character ids');
+    }
+    characterIds.add(candidate.characterId);
+  }
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -2874,6 +2900,33 @@ export async function saveCharacterAndMarketState(
     if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');
       return false;
+    }
+    for (const candidate of cleanPeers) {
+      const peerRes =
+        candidate.leaseNonce === undefined
+          ? await client.query(
+              'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+              [candidate.characterId, candidate.level, JSON.stringify(candidate.state)],
+            )
+          : await client.query(
+              `UPDATE characters SET level = $2, state = $3, updated_at = now()
+                WHERE id = $1
+                  AND EXISTS (
+                    SELECT 1 FROM character_leases
+                     WHERE character_id = $1 AND holder = $4 AND nonce = $5
+                  )`,
+              [
+                candidate.characterId,
+                candidate.level,
+                JSON.stringify(candidate.state),
+                PROCESS_LEASE_HOLDER,
+                candidate.leaseNonce,
+              ],
+            );
+      if (candidate.leaseNonce !== undefined && (peerRes.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
     }
     await client.query(
       `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())

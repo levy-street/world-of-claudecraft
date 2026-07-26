@@ -42,6 +42,10 @@ describe('bags_window: load-bearing behaviors preserved', () => {
 
   it('reuses bag_filter via buildBagGrid (does not re-derive the filter)', () => {
     expect(painter).toContain('buildBagGrid(');
+    expect(painter).toContain(
+      'name: itemPresentationName({ name: itemDisplayName(item) }, slot.instance)',
+    );
+    expect(painter).toContain('quality: itemPresentationQuality(item, slot.instance)');
     // the filter/sort stays in bag_filter.ts; the painter must not call it directly
     expect(painter).not.toContain('applyBagFilter(');
   });
@@ -290,6 +294,10 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
     );
     expect(painter).toContain('destroyAction(itemId: string): BagDestroyAction');
     expect(painter).toContain("t('hudChrome.bags.cannotDestroy')");
+    expect(painter).toContain(
+      'bagDiscardInstance(this.deps.world().inventory, itemId, instanceUid)',
+    );
+    expect(painter).toContain('itemPresentationName({ name: itemDisplayName(item) }, instance)');
     // The HUD installs the canvas as the world drop target with exactly those seams.
     expect(hud).toContain('installWorldDropTarget({');
     expect(hud).toContain("root: () => $('#game-canvas'),");

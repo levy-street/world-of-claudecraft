@@ -96,15 +96,18 @@ describe('requiredClassesForTooltip', () => {
   });
 });
 
-// hud.ts renders the tooltip; assert the source no longer suppresses the classes
+// The item presentation controller renders the tooltip; assert it never suppresses the classes
 // line for items that match a known armor-weight/weapon-archetype grouping (the
 // regression), and that it renders through the new pure resolver.
-describe('hud.ts item tooltip class-restriction line', () => {
-  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+describe('item presentation tooltip class-restriction line', () => {
+  const source = readFileSync(
+    new URL('../src/ui/item_presentation_controller.ts', import.meta.url),
+    'utf8',
+  );
 
   it('renders the classes line for every class-restricted item, not just narrow ones', () => {
-    expect(hud).toContain('requiredClassesForTooltip(item)');
-    expect(hud).not.toContain(
+    expect(source).toContain('requiredClassesForTooltip(item)');
+    expect(source).not.toContain(
       'if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {',
     );
   });

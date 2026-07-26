@@ -9,7 +9,7 @@
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
-import { formatNumber, type TranslationKey, t } from '../../i18n';
+import { formatList, formatNumber, type TranslationKey, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { itemPresentationName } from '../../procedural_item_presentation';
 import { svgIcon } from '../../ui_icons';
@@ -34,6 +34,7 @@ export interface HeroicVendorWindowDeps extends LegacyHeroicVendorWindowDeps {
   onTune(instanceUid: string): void;
   onTab(tab: HeroicVendorTab): void;
   status: string | null;
+  pending: boolean;
 }
 
 function num(value: number): string {
@@ -56,9 +57,11 @@ function blockedText(reason: QuartermasterBlockReason): string {
   return t(`heroicShop.blocked.${reason}` as TranslationKey);
 }
 
+const HEROIC_VENDOR_TABS: readonly HeroicVendorTab[] = ['gear', 'forge', 'tune'];
+
 function tabButton(tab: HeroicVendorTab, active: HeroicVendorTab): string {
   const selected = tab === active;
-  return `<button type='button' role='tab' class='hq-tab${selected ? ' active' : ''}' data-tab='${tab}' data-focus-key='tab:${tab}' aria-selected='${selected}'>${esc(t(`heroicShop.tab.${tab}` as TranslationKey))}</button>`;
+  return `<button type='button' role='tab' id='heroic-quartermaster-tab-${tab}' class='hq-tab${selected ? ' active' : ''}' data-tab='${tab}' data-focus-key='tab:${tab}' aria-selected='${selected}' aria-controls='heroic-quartermaster-panel-${tab}' tabindex='${selected ? '0' : '-1'}'>${esc(t(`heroicShop.tab.${tab}` as TranslationKey))}</button>`;
 }
 
 function gearHtml(view: HeroicQuartermasterView, deps: HeroicVendorWindowDeps): string {
@@ -66,7 +69,7 @@ function gearHtml(view: HeroicQuartermasterView, deps: HeroicVendorWindowDeps): 
     .map(({ itemId, item, marks, affordable }) => {
       const itemName = itemDisplayName(item);
       const reason = affordable ? '' : t('heroicShop.blocked.marks');
-      return `<button type='button' class='vendor-item hq-offer' data-buy='${esc(itemId)}' data-focus-key='gear:${esc(itemId)}' aria-disabled='${!affordable}' aria-label='${esc(t('heroicShop.buyAria', { item: itemName, marks: num(marks) }))}'>${deps.itemIcon(item)}<span class='vi-name'>${esc(itemName)}</span><span class='vi-price${affordable ? '' : ' unaffordable'}'>${esc(t('delveUi.shop.price', { marks: num(marks) }))}</span>${reason ? `<span class='hq-blocked'>${esc(reason)}</span>` : ''}</button>`;
+      return `<button type='button' class='vendor-item hq-offer' data-buy='${esc(itemId)}' data-focus-key='gear:${esc(itemId)}' aria-disabled='${!affordable || deps.pending}' aria-label='${esc(t('heroicShop.buyAria', { item: itemName, marks: num(marks) }))}'>${deps.itemIcon(item)}<span class='vi-name'>${esc(itemName)}</span><span class='vi-price${affordable ? '' : ' unaffordable'}'>${esc(t('delveUi.shop.price', { marks: num(marks) }))}</span>${reason ? `<span class='hq-blocked'>${esc(reason)}</span>` : ''}</button>`;
     })
     .join('');
   return `<div class='hq-section-copy'>${esc(t('heroicShop.gearIntro'))}</div><div class='vendor-goods-grid'>${rows}</div>`;
@@ -78,11 +81,10 @@ function forgeRowHtml(row: NythraxisForgeRow, deps: HeroicVendorWindowDeps): str
   const traits = [
     row.randomAffixes ? t('heroicShop.randomAffixes') : t('heroicShop.deterministicStats'),
     row.raidForged ? t('heroicShop.raidForgedGuarantee') : null,
-  ]
-    .filter((value): value is string => value !== null)
-    .join(' · ');
+  ].filter((value): value is string => value !== null);
+  const traitList = formatList(traits, { style: 'short', type: 'unit' });
   const blocked = blockedText(row.blockReason);
-  return `<button type='button' class='hq-offer hq-forge-offer q-${row.quality}' data-forge='${esc(row.offerId)}' data-focus-key='forge:${esc(row.offerId)}' aria-disabled='${row.blockReason !== null}'>${deps.itemIcon(row.item)}<span class='hq-offer-copy'><span class='hq-offer-name'>${esc(itemName)}</span><span class='hq-offer-meta'>${esc(kind)} · ${esc(t('heroicShop.itemLevel', { level: num(row.itemLevel) }))}</span><span class='hq-offer-traits'>${esc(traits)}</span><span class='hq-cost'>${esc(costText(row.cost))}</span>${blocked ? `<span class='hq-blocked'>${esc(blocked)}</span>` : ''}</span></button>`;
+  return `<button type='button' class='hq-offer hq-forge-offer q-${row.quality}' data-forge='${esc(row.offerId)}' data-focus-key='forge:${esc(row.offerId)}' aria-disabled='${row.blockReason !== null || deps.pending}'>${deps.itemIcon(row.item, row.previewInstance)}<span class='hq-offer-copy'><span class='hq-offer-name'>${esc(itemName)}</span><span class='hq-offer-meta'>${esc(kind)} · ${esc(t('heroicShop.itemLevel', { level: num(row.itemLevel) }))}</span><span class='hq-offer-traits'>${esc(traitList)}</span><span class='hq-cost'>${esc(costText(row.cost))}</span>${blocked ? `<span class='hq-blocked'>${esc(blocked)}</span>` : ''}</span></button>`;
 }
 
 function forgeHtml(view: HeroicQuartermasterView, deps: HeroicVendorWindowDeps): string {
@@ -97,7 +99,7 @@ function tuneRowHtml(row: NythraxisTuneRow, deps: HeroicVendorWindowDeps): strin
   const itemName = itemPresentationName({ name: itemDisplayName(row.item) }, row.instance);
   const source = row.raidForged ? t('heroicShop.raidForged') : t('heroicShop.raidDrop');
   const blocked = blockedText(row.blockReason);
-  return `<button type='button' class='hq-offer hq-tune-offer q-legendary' data-tune='${esc(row.instanceUid)}' data-focus-key='tune:${esc(row.instanceUid)}' aria-disabled='${row.blockReason !== null}'>${deps.itemIcon(row.item, row.instance)}<span class='hq-offer-copy'><span class='hq-offer-name'>${esc(itemName)}</span><span class='hq-offer-meta'>${esc(powerName(row.powerId))} · ${esc(t('heroicShop.itemLevel', { level: num(row.itemLevel) }))}</span><span class='hq-offer-traits'>${esc(source)} · ${esc(t('heroicShop.reforgeCount', { count: num(row.reforgeCount) }))}</span><span class='hq-cost'>${esc(costText(row.cost))}</span>${blocked ? `<span class='hq-blocked'>${esc(blocked)}</span>` : ''}</span></button>`;
+  return `<button type='button' class='hq-offer hq-tune-offer q-legendary' data-tune='${esc(row.instanceUid)}' data-focus-key='tune:${esc(row.instanceUid)}' aria-disabled='${row.blockReason !== null || deps.pending}'>${deps.itemIcon(row.item, row.instance)}<span class='hq-offer-copy'><span class='hq-offer-name'>${esc(itemName)}</span><span class='hq-offer-meta'>${esc(powerName(row.powerId))} · ${esc(t('heroicShop.itemLevel', { level: num(row.itemLevel) }))}</span><span class='hq-offer-traits'>${esc(source)} · ${esc(t('heroicShop.reforgeCount', { count: num(row.reforgeCount) }))}</span><span class='hq-cost'>${esc(costText(row.cost))}</span>${blocked ? `<span class='hq-blocked'>${esc(blocked)}</span>` : ''}</span></button>`;
 }
 
 function tuneHtml(view: HeroicQuartermasterView, deps: HeroicVendorWindowDeps): string {
@@ -178,11 +180,25 @@ export function renderHeroicQuartermasterWindow(
       : view.tab === 'forge'
         ? forgeHtml(view, deps)
         : tuneHtml(view, deps);
-  el.innerHTML = `<div class='panel-title'><span id='heroic-quartermaster-title'>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type='button' class='x-btn' data-close aria-label='${esc(t('itemUi.vendor.close'))}'>${svgIcon('close')}</button></div><div class='hq-balances'><span>${esc(t('heroicShop.fragmentBalance', { count: num(view.fragments) }))}</span><span>${esc(t('heroicShop.balance', { count: num(view.heroicMarks) }))}</span></div><div class='hq-tabs' role='tablist' aria-label='${esc(t('heroicShop.tabsAria'))}'>${tabButton('gear', view.tab)}${tabButton('forge', view.tab)}${tabButton('tune', view.tab)}</div><div class='hq-status' role='status' aria-live='polite'>${deps.status ? esc(deps.status) : ''}</div><div class='hq-tab-panel' role='tabpanel'>${body}</div>`;
+  el.innerHTML = `<div class='panel-title'><span id='heroic-quartermaster-title'>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type='button' class='x-btn' data-close aria-label='${esc(t('itemUi.vendor.close'))}'>${svgIcon('close')}</button></div><div class='hq-balances'><span>${esc(t('heroicShop.fragmentBalance', { count: num(view.fragments) }))}</span><span>${esc(t('heroicShop.balance', { count: num(view.heroicMarks) }))}</span></div><div class='hq-tabs' role='tablist' aria-label='${esc(t('heroicShop.tabsAria'))}' aria-orientation='horizontal'>${tabButton('gear', view.tab)}${tabButton('forge', view.tab)}${tabButton('tune', view.tab)}</div><div class='hq-status' role='status' aria-live='polite'>${deps.status ? esc(deps.status) : ''}</div><div class='hq-tab-panel' id='heroic-quartermaster-panel-${view.tab}' role='tabpanel' aria-labelledby='heroic-quartermaster-tab-${view.tab}'>${body}</div>`;
   markDialogRoot(el, { labelledBy: 'heroic-quartermaster-title' });
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.querySelectorAll<HTMLElement>('[data-tab]').forEach((button) => {
     button.addEventListener('click', () => deps.onTab(button.dataset.tab as HeroicVendorTab));
+    button.addEventListener('keydown', (event) => {
+      const current = HEROIC_VENDOR_TABS.indexOf(button.dataset.tab as HeroicVendorTab);
+      let next = current;
+      if (event.key === 'ArrowRight') next = (current + 1) % HEROIC_VENDOR_TABS.length;
+      else if (event.key === 'ArrowLeft')
+        next = (current - 1 + HEROIC_VENDOR_TABS.length) % HEROIC_VENDOR_TABS.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = HEROIC_VENDOR_TABS.length - 1;
+      else return;
+      event.preventDefault();
+      const tab = HEROIC_VENDOR_TABS[next];
+      deps.onTab(tab);
+      el.querySelector<HTMLElement>(`[data-tab='${tab}']`)?.focus();
+    });
   });
   el.querySelectorAll<HTMLElement>('[data-buy]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -211,7 +227,7 @@ export function renderHeroicQuartermasterWindow(
   });
   el.querySelectorAll<HTMLElement>('[data-forge]').forEach((button) => {
     const row = view.forgeRows.find((candidate) => candidate.offerId === button.dataset.forge);
-    if (row) deps.attachTooltip(button, () => deps.itemTooltip(row.item));
+    if (row) deps.attachTooltip(button, () => deps.itemTooltip(row.item, row.previewInstance));
   });
   el.querySelectorAll<HTMLElement>('[data-tune]').forEach((button) => {
     const row = view.tuneRows.find((candidate) => candidate.instanceUid === button.dataset.tune);

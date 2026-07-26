@@ -86,11 +86,21 @@ function clearResetLocksForClaim(ctx: SimContext, claimId: number): void {
   }
 }
 
-export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): void {
+export function dungeonFinalBossInstance(ctx: SimContext, mob: Entity): InstanceSlot | null {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-  if (inst?.difficulty !== 'normal' || RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId)) return;
+  if (!inst) return null;
   const finalBossId = HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId;
-  if (mob.templateId !== finalBossId || inst.exitId === null) return;
+  return mob.templateId === finalBossId ? inst : null;
+}
+
+export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): void {
+  const inst = dungeonFinalBossInstance(ctx, mob);
+  if (
+    inst?.difficulty !== 'normal' ||
+    RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId) ||
+    inst.exitId === null
+  )
+    return;
   for (const meta of instanceLockoutMetas(ctx, inst)) {
     ctx.dungeonResetLocks.set(resetCooldownKey(ctx, meta.entityId, inst.dungeonId), {
       availableAt: Number.POSITIVE_INFINITY,
@@ -768,36 +778,39 @@ function lockToHeroicClaim(
   meta.raidLockouts.set(lockId, lockedUntil);
 }
 
-function heroicRewardWindowToken(lockedUntil: number): string {
+export function heroicRewardWindowToken(lockedUntil: number): string {
   return `reset:${Math.floor(lockedUntil / HEROIC_REWARD_WINDOW_MS)}`;
 }
 
 // Settle a heroic final-boss kill in one synchronous mutation. Every player who
 // takes the realm-reset lockout for this kill (the whole group owning the claim,
-// plus anyone still inside) also earns the configured marks, provided they took
-// part: locked AND entered this run means paid, so the lockout can never outrun
-// the reward for anyone who actually ran the dungeon. A recipient already locked
-// for this reset is not paid again. Delivery splits on presence at the corpse: a
-// player in the death-time participation snapshot takes the marks straight to
-// bags (they were there to loot), while one locked from afar who walked through
-// the door this run (a back-line healer, a fallen or released raider) has them
-// posted to the Ravenpost so a distant participant never eats the daily lockout
-// without the reward. A member who never entered (a door-camper, an alt parked
-// in town) takes the lockout with no pay: roster membership alone is not income.
+// plus anyone still inside) can earn the configured marks. Delivery splits on
+// presence at the corpse: a player in the death-time party snapshot takes marks
+// straight to bags, while a prior final-boss damage or effective-heal contributor
+// who is absent from that snapshot receives them through Ravenpost. Entering the
+// claim alone is never participation, so a zoned-in AFK player takes the lockout
+// with no pay and no Forge-authorizing daily receipt. A recipient already locked
+// for this reset is not paid again.
 // An uncredited death (no tap and no killer credit resolves, so the death-time
 // snapshot is empty) pays nobody, bags or mail, while the lockout still strikes.
-export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
-  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+export function awardHeroicMarks(
+  ctx: SimContext,
+  mob: Entity,
+  recipients: PlayerMeta[],
+  participants: PlayerMeta[],
+): void {
+  const inst = dungeonFinalBossInstance(ctx, mob);
   if (inst?.difficulty !== 'heroic') return;
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
-  if (!tuning || mob.templateId !== tuning.finalBossId) return;
+  if (!tuning) return;
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
   const rewardWindow = heroicRewardWindowToken(lockedUntil);
-  // recipients is the death-time participation snapshot (damage.ts): it is empty
+  // recipients is the death-time party snapshot (damage.ts): it is empty
   // exactly when the kill resolved without player credit, and a credited kill
   // always carries at least the credited player.
   const credited = recipients.length > 0;
   const presentIds = new Set(recipients.map((meta) => meta.entityId));
+  const participantIds = new Set(participants.map((meta) => meta.entityId));
   const lockoutRecipients = new Map<number, PlayerMeta>();
   for (const meta of instanceLockoutMetas(ctx, inst)) lockoutRecipients.set(meta.entityId, meta);
   // A tap holder who left both party and instance before the kill remains in
@@ -811,7 +824,7 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
       if (presentIds.has(meta.entityId)) {
         ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
         paid = true;
-      } else if (inst.enteredBy.has(meta.entityId)) {
+      } else if (inst.enteredBy.has(meta.entityId) && participantIds.has(meta.entityId)) {
         ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant);
         paid = true;
       }

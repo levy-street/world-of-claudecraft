@@ -395,7 +395,7 @@ export class BankWindow {
       slots,
       (id) => ITEMS[id],
       this.filter,
-      (id) => this.itemNameOf(id),
+      (slot, item) => itemPresentationName({ name: itemDisplayName(item) }, slot.instance),
     );
     if (visible.length === 0) {
       // A narrowing filter matched nothing: show the no-match line. With NO filter active
@@ -464,14 +464,6 @@ export class BankWindow {
       cell.setAttribute('aria-hidden', 'true');
       grid.appendChild(cell);
     }
-  }
-
-  // Localized display name, used for search matching AND the name-sort so both agree
-  // with the visible cell. An unknown id (already dropped by filterBankSlots) falls back
-  // to the raw id defensively.
-  private itemNameOf(itemId: string): string {
-    const item = ITEMS[itemId];
-    return item ? itemDisplayName(item) : itemId;
   }
 
   // Repaint ONLY the grid from the live bank + current filter, preserving the search

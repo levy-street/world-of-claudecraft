@@ -6683,110 +6683,110 @@ export const cs_CZ: EnTranslations = {
       "critChance": "Šance na kritický zásah",
       "dodge": "Vyhnutí",
       "parry": "Odražení",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Minimální poškození zbraně",
+      "weaponMax": "Maximální poškození zbraně",
+      "weaponDps": "Poškození zbraně za sekundu",
+      "healthOnKill": "Zdraví za zabití",
+      "manaOnKill": "Mana za zabití",
+      "blockValue": "Hodnota blokování"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Možný hod od {min} do {max}",
+      "advancedDetailsHint": "Podržením {key} zobrazíš možné rozsahy hodů.",
+      "powerRollPercent": "Hod moci: {value}%",
+      "powerRollMilliseconds": "Hod moci: {value} ms",
+      "powerRollResource": "Hod moci: {value} zdroje",
+      "powerRollNumber": "Hod moci: {value}",
+      "legendaryPower": "Legendární moc",
+      "legendaryLimit": "Unikátní výbava: {count} legendární moc",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Běžná",
+        "magic": "Magická",
+        "rare": "Vzácná",
+        "epic": "Epická",
+        "legendary": "Legendární",
+        "mythic": "Mýtická"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Mocný",
+        "deft": "Obratný",
+        "stalwart": "Neochvějný",
+        "sages": "Mudrcův",
+        "spiritual": "Duchovní",
+        "of_focus": "Soustředění",
+        "of_striking": "Úderu",
+        "of_alacrity": "Hbitosti",
+        "of_precision": "Přesnosti",
+        "warded": "Chráněný",
+        "of_reaping": "Sklizně",
+        "of_remembrance": "Vzpomínání"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Popelavý",
+        "blackfen": "Černá bažina",
+        "doom": "Zkáza",
+        "grave": "Hrob",
+        "mire": "Močál",
+        "storm": "Bouře",
+        "thorn": "Trn",
+        "wyrm": "Drak",
+        "bite": "Kousnutí",
+        "brand": "Znamení",
+        "promise": "Slib",
+        "thread": "Vlákno",
+        "vigil": "Stráž",
+        "ward": "Ochrana",
+        "whisper": "Šepot",
+        "oath": "Přísaha"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Koruna Poslední hranice",
+          "description": "Každý třetí Škvárový šíp sežehne nepřátele poblíž cíle."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Ostří Šedé čelisti",
+          "description": "Každý třetí zásah zbraní způsobí cíli krvácení a obnoví trochu zdroje."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Dlouhý luk Tichého lesa",
+          "description": "Dlouhý nátah nebo Prokletý výstřel mohou cíl krátce umlčet."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Tesák Nočního skla",
+          "description": "Zabití krátce zvýší spěch."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Ysoleina stráž",
+          "description": "Kritické léčení krátce vytvoří na zemi obnovující oblast."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Modla Probuzení bouře",
+          "description": "Každý čtvrtý Bleskový šíp přeskočí na blízké nepřátele."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Pečeť Poutače popela",
+          "description": "Každý čtvrtý Šíp šera označí cíl, který pak utrpí dodatečné stínové poškození."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Pečetní prsten Úsvitu",
+          "description": "Léčivé světlo ochrání příjemce štítem za část vyléčeného zdraví."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Spona Divokého měsíce",
+          "description": "Každý třetí Šíp divočiny obnoví primární zdroj."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Zvon Devátého úderu",
+          "description": "Každé druhé kouzlo způsobující poškození zazní kolem cíle."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Plášť Ukradených hodin",
+          "description": "Pokles pod 35% zdraví krátce poskytne obrannou ochranu."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Boty Nepřerušené cesty",
+          "description": "Překonání 15 yardů krátce zvýší rychlost pohybu."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const cs_CZ: EnTranslations = {
       "greed": "Chamtivost",
       "pass": "Vzdát se",
       "needAria": "Potřeba pro {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Potřeba není dostupná, protože tvá třída nemůže tento předmět vybavit.",
+      "needUnavailablePower": "Potřeba není dostupná, protože tato legendární moc je vyhrazena jiné třídě.",
       "greedAria": "Chamtivost pro {item}",
       "passAria": "Vzdát se nároku na {item}",
       "everyonePassed": "Všichni se vzdali nároku na {item}.",

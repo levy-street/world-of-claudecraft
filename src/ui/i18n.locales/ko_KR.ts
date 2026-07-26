@@ -9335,4 +9335,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '해당 ID를 가진 아이템이 없습니다.',
   'devCommand.kitCurrentSpec': '현재 전문화',
   'hudChrome.enchanting.wornTag': '착용 중 ({slot})',
+  'itemUi.lootRoll.needUnavailablePower':
+    '이 전설 능력은 다른 직업 전용이므로 필요를 선택할 수 없습니다.',
 };

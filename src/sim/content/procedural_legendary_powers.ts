@@ -66,7 +66,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     requiredClass: 'hunter',
     compatibleBaseIds: ['mirefen_hunting_bow'],
     trigger: {
-      event: 'ability_cast',
+      event: 'ability_hit',
       abilityIds: ['aimed_shot', 'arcane_shot'],
       chance: 0.25,
       internalCooldownMs: 8000,
@@ -168,7 +168,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     description: 'Mending Light shields its recipient for a portion of the heal.',
     requiredClass: 'paladin',
     compatibleBaseIds: ['gravecaller_ring'],
-    trigger: { event: 'ability_cast', abilityIds: ['holy_light'], internalCooldownMs: 6000 },
+    trigger: { event: 'heal', abilityIds: ['holy_light'], internalCooldownMs: 6000 },
     rolls: { potencyPct: { min: 16, max: 22, step: 1 } },
     effects: [
       {

@@ -30,9 +30,11 @@ vi.mock('../server/db', () => ({
 
 import {
   heartbeatCharacterLeases,
+  loadMailState,
   releaseCharacterLease,
   saveCharacterAndMarketState,
   saveCharacterState,
+  saveMailState,
 } from '../server/db';
 import { GameServer } from '../server/game';
 
@@ -62,11 +64,62 @@ function join(
 // Flush the microtask queue so an awaited leave() reaches its post-save steps.
 const flushMicrotasks = () => new Promise((r) => setTimeout(r, 0));
 
+const CORRUPT_MAIL = {
+  mail: [
+    {
+      id: 1,
+      recipientKey: '7',
+      recipientName: 'Keeper',
+      senderName: 'Corruptor',
+      kind: 'system',
+      subject: 'Invalid persisted parcel',
+      body: '',
+      copper: 0,
+      items: [{ itemId: 'roasted_boar', count: 1, instance: {} }],
+      deliverIn: 0,
+      secondsLeft: -1,
+      read: false,
+    },
+  ],
+  nextMailId: 2,
+} as never;
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe('character load lease, GameServer wiring', () => {
+  it('quarantines mail writes after a failed load', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      vi.mocked(loadMailState).mockResolvedValueOnce(CORRUPT_MAIL);
+      const server = new GameServer();
+      await expect(server.loadMail()).rejects.toThrow('empty item instance payload');
+
+      // Periodic and shutdown both call saveMail. Both must remain no-ops even
+      // when their queued callback runs after the load failure.
+      (server as any).flushPeriodicSaves(1000);
+      await server.saveMail();
+      await flushMicrotasks();
+      expect(vi.mocked(saveMailState)).not.toHaveBeenCalled();
+
+      // Leave normally writes character+market+mail together. Quarantine falls
+      // back to the lease-fenced character write so the bad realm blob survives.
+      const session = join(server, 100, 7, 'Keeper', 'nonce-mail');
+      expect('error' in session).toBe(false);
+      await server.leave(session, 'test');
+      expect(vi.mocked(saveCharacterAndMarketState)).not.toHaveBeenCalled();
+      expect(vi.mocked(saveCharacterState)).toHaveBeenCalled();
+
+      // Only a later verified load clears the write quarantine.
+      await server.loadMail();
+      await server.saveMail();
+      expect(vi.mocked(saveMailState)).toHaveBeenCalledTimes(1);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
   it("leave() releases the lease exactly once with the session's own nonce", async () => {
     const server = new GameServer();
     const s = join(server, 100, 7, 'Leaver', 'nonce-1');

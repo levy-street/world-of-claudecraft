@@ -14,6 +14,7 @@ import type { InvSlot } from '../sim/types';
 import {
   applyBagFilter,
   type BagFilterState,
+  type BagSlotPresentationResolver,
   bagFilterIsDefault,
   bagOrderIsManual,
   type ItemLookup,
@@ -131,6 +132,20 @@ export function bagShiftLinks(mode: BagMode): boolean {
  *  The bank deposit command is index-based, so this is how a click targets a slot. */
 export function bagStackIndex(inventory: readonly InvSlot[], slot: InvSlot): number {
   return inventory.indexOf(slot);
+}
+
+/** Resolve the per-copy payload named by a destructive world-drop command. The UID
+ *  is opaque and duplicate base item ids are common, so the confirmation must use
+ *  the exact matching slot rather than the first stack with that item id. */
+export function bagDiscardInstance(
+  inventory: readonly InvSlot[],
+  itemId: string,
+  instanceUid?: string,
+): InvSlot['instance'] | undefined {
+  if (!instanceUid) return undefined;
+  return inventory.find(
+    (slot) => slot.itemId === itemId && slot.instance?.procedural?.uid === instanceUid,
+  )?.instance;
 }
 
 /** Whether a shift-click in bank-deposit mode opens the partial-amount prompt (a
@@ -284,6 +299,7 @@ export function buildBagGrid(
   lookup: ItemLookup,
   filter: BagFilterState,
   capacity = 0,
+  presentationOf?: BagSlotPresentationResolver,
 ): BagGridModel {
   const showEmpties = bagFilterIsDefault(filter);
   const emptyCells = showEmpties ? Math.max(0, capacity - inventory.length) : 0;
@@ -296,7 +312,7 @@ export function buildBagGrid(
       ? { state: 'items', cells, visible: [], emptyCells, overflow }
       : { state: 'empty', cells: [], visible: [], emptyCells: 0, overflow };
   }
-  const visible = applyBagFilter(inventory, lookup, filter);
+  const visible = applyBagFilter(inventory, lookup, filter, presentationOf);
   if (visible.length === 0)
     return { state: 'noMatch', cells: [], visible: [], emptyCells: 0, overflow };
   return { state: 'items', cells, visible, emptyCells, overflow };

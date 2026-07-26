@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   deriveProceduralItemSeed,
+  deriveSecretProceduralItemSeed,
   formatProceduralItemUid,
   hash32Parts,
 } from '../src/sim/loot/procedural';
@@ -19,6 +20,28 @@ describe('procedural item identity', () => {
   it('derives a stable non-zero child seed from the authoritative tuple', () => {
     expect(deriveProceduralItemSeed(12345, CONTEXT)).toBe(2177513945);
     expect(deriveProceduralItemSeed(12345, CONTEXT)).not.toBe(0);
+  });
+
+  it('requires the private server key to predict a live procedural result', () => {
+    const publicTupleGuess = deriveProceduralItemSeed(12345, CONTEXT);
+    const first = deriveSecretProceduralItemSeed(
+      '000102030405060708090a0b0c0d0e0f',
+      12345,
+      CONTEXT,
+    );
+    const rotated = deriveSecretProceduralItemSeed(
+      'f0e0d0c0b0a090807060504030201000',
+      12345,
+      CONTEXT,
+    );
+
+    expect(first).toBe(4211982041);
+    expect(first).not.toBe(publicTupleGuess);
+    expect(rotated).toBe(1779677970);
+    expect(rotated).not.toBe(first);
+    expect(() => deriveSecretProceduralItemSeed('public-world-seed', 12345, CONTEXT)).toThrow(
+      /128 bits/,
+    );
   });
 
   it.each([

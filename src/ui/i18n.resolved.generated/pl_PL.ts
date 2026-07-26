@@ -6683,110 +6683,110 @@ export const pl_PL: EnTranslations = {
       "critChance": "Szansa na trafienie krytyczne",
       "dodge": "Unik",
       "parry": "Parowanie",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Minimalne obrażenia broni",
+      "weaponMax": "Maksymalne obrażenia broni",
+      "weaponDps": "Obrażenia broni na sekundę",
+      "healthOnKill": "Zdrowie za zabicie",
+      "manaOnKill": "Mana za zabicie",
+      "blockValue": "Wartość bloku"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Możliwe losowanie od {min} do {max}",
+      "advancedDetailsHint": "Przytrzymaj {key}, aby wyświetlić możliwe zakresy losowania.",
+      "powerRollPercent": "Losowanie mocy: {value}%",
+      "powerRollMilliseconds": "Losowanie mocy: {value} ms",
+      "powerRollResource": "Losowanie mocy: {value} zasobu",
+      "powerRollNumber": "Losowanie mocy: {value}",
+      "legendaryPower": "Legendarna moc",
+      "legendaryLimit": "Unikatowe wyposażenie: {count} legendarna moc",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Pospolita",
+        "magic": "Magiczna",
+        "rare": "Rzadka",
+        "epic": "Epicka",
+        "legendary": "Legendarna",
+        "mythic": "Mityczna"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Potężny",
+        "deft": "Zręczny",
+        "stalwart": "Niezłomny",
+        "sages": "Mędrca",
+        "spiritual": "Duchowy",
+        "of_focus": "Skupienia",
+        "of_striking": "Uderzenia",
+        "of_alacrity": "Żwawości",
+        "of_precision": "Precyzji",
+        "warded": "Chroniony",
+        "of_reaping": "Żniw",
+        "of_remembrance": "Pamięci"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Popielaty",
+        "blackfen": "Czarne Mokradło",
+        "doom": "Zguba",
+        "grave": "Grób",
+        "mire": "Trzęsawisko",
+        "storm": "Burza",
+        "thorn": "Cierń",
+        "wyrm": "Żmij",
+        "bite": "Ugryzienie",
+        "brand": "Piętno",
+        "promise": "Obietnica",
+        "thread": "Nić",
+        "vigil": "Czuwanie",
+        "ward": "Osłona",
+        "whisper": "Szept",
+        "oath": "Przysięga"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Korona Ostatniego Stosu",
+          "description": "Co trzeci Żarowy pocisk przypala wrogów w pobliżu celu."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Ostrze Szarej Szczęki",
+          "description": "Co trzecie trafienie bronią wywołuje krwawienie celu i odnawia trochę zasobu."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Długi Łuk Cichego Lasu",
+          "description": "Długie naciągnięcie lub Plugawy strzał mogą na krótko uciszyć cel."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Kieł Nocnego Szkła",
+          "description": "Zabicie zapewnia krótki przypływ pośpiechu."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Czuwanie Ysolei",
+          "description": "Leczenie krytyczne tworzy na krótko odnawiający obszar na ziemi."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Idol Przebudzenia Burzy",
+          "description": "Co czwarty Łukowy pocisk przeskakuje na pobliskich wrogów."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Pieczęć Wiążącego Popioły",
+          "description": "Co czwarty Pocisk mroku oznacza cel, zwiększając otrzymywane przez niego obrażenia Cienia."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Sygnet Straży Świtu",
+          "description": "Kojące Światło osłania odbiorcę tarczą równą części leczenia."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Klamra Dzikiego Księżyca",
+          "description": "Co trzeci Dziki pocisk odnawia główny zasób."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Dzwon Dziewiątego Uderzenia",
+          "description": "Co drugie zaklęcie zadające obrażenia rozbrzmiewa wokół celu."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Płaszcz Skradzionych Godzin",
+          "description": "Spadek poniżej 35% zdrowia zapewnia krótką osłonę obronną."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Buty Nieprzerwanej Drogi",
+          "description": "Przebycie 15 jardów zapewnia krótkie zwiększenie szybkości ruchu."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const pl_PL: EnTranslations = {
       "greed": "Chciwość",
       "pass": "Pasuj",
       "needAria": "Potrzeba na {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Potrzeba jest niedostępna, ponieważ twoja klasa nie może wyposażyć tego przedmiotu.",
+      "needUnavailablePower": "Potrzeba jest niedostępna, ponieważ ta legendarna moc jest przeznaczona dla innej klasy.",
       "greedAria": "Chciwość na {item}",
       "passAria": "Pasuj na {item}",
       "everyonePassed": "Wszyscy spasowali na {item}.",

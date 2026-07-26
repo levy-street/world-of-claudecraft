@@ -6683,110 +6683,110 @@ export const id_ID: EnTranslations = {
       "critChance": "Peluang Kritis",
       "dodge": "Mengelak",
       "parry": "Tangkis",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Kerusakan senjata minimum",
+      "weaponMax": "Kerusakan senjata maksimum",
+      "weaponDps": "Kerusakan senjata per detik",
+      "healthOnKill": "Kesehatan saat membunuh",
+      "manaOnKill": "Mana saat membunuh",
+      "blockValue": "Nilai tangkisan"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Kemungkinan guliran dari {min} sampai {max}",
+      "advancedDetailsHint": "Tahan {key} untuk menampilkan kemungkinan rentang guliran.",
+      "powerRollPercent": "Guliran kekuatan: {value}%",
+      "powerRollMilliseconds": "Guliran kekuatan: {value} ms",
+      "powerRollResource": "Guliran kekuatan: {value} sumber daya",
+      "powerRollNumber": "Guliran kekuatan: {value}",
+      "legendaryPower": "Kekuatan Legendaris",
+      "legendaryLimit": "Unik dipakai: {count} kekuatan Legendaris",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Umum",
+        "magic": "Magis",
+        "rare": "Langka",
+        "epic": "Epik",
+        "legendary": "Legendaris",
+        "mythic": "Mitologis"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Perkasa",
+        "deft": "Tangkas",
+        "stalwart": "Teguh",
+        "sages": "Milik Sang Bijak",
+        "spiritual": "Rohani",
+        "of_focus": "Fokus",
+        "of_striking": "Serangan",
+        "of_alacrity": "Ketangkasan",
+        "of_precision": "Ketepatan",
+        "warded": "Terlindungi",
+        "of_reaping": "Penuaian",
+        "of_remembrance": "Kenangan"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Kelabu Abu",
+        "blackfen": "Rawa Hitam",
+        "doom": "Malapetaka",
+        "grave": "Makam",
+        "mire": "Rawa",
+        "storm": "Badai",
+        "thorn": "Duri",
+        "wyrm": "Naga",
+        "bite": "Gigitan",
+        "brand": "Cap",
+        "promise": "Janji",
+        "thread": "Benang",
+        "vigil": "Vigili",
+        "ward": "Perlindungan",
+        "whisper": "Bisikan",
+        "oath": "Sumpah"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Mahkota Tumpukan Api Terakhir",
+          "description": "Setiap Panah Bara ketiga membakar musuh di dekat target."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Mata Pedang Rahang Kelabu",
+          "description": "Setiap serangan senjata ketiga membuat target berdarah dan memulihkan sedikit sumber daya."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Busur Panjang Kayu Sunyi",
+          "description": "Tarikan Panjang atau Tembakan Bengis dapat membungkam target sejenak."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Taring Kaca Malam",
+          "description": "Satu pembunuhan memberikan peningkatan singkat kecepatan serang."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Vigili Ysolei",
+          "description": "Penyembuhan kritis menciptakan area pemulihan singkat di tanah."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Berhala Bangkitnya Badai",
+          "description": "Setiap Sambaran Busur keempat melompat ke musuh di sekitar."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Segel Pengikat Abu",
+          "description": "Setiap Panah Suram keempat menandai target agar menerima tambahan kerusakan Bayangan."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Cincin Meterai Penjaga Fajar",
+          "description": "Cahaya Pemulih melindungi penerimanya dengan perisai senilai sebagian penyembuhan."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Pengait Bulan Liar",
+          "description": "Setiap Panah Liar ketiga memulihkan sumber daya utama."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Lonceng Dentang Kesembilan",
+          "description": "Setiap mantra perusak kedua berdentang di sekitar target."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Mantel Jam Curian",
+          "description": "Turun di bawah 35% kesehatan memberikan perlindungan defensif singkat."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Sepatu Jalan Tak Terputus",
+          "description": "Bergerak 15 yard memberikan peningkatan singkat kecepatan gerak."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const id_ID: EnTranslations = {
       "greed": "Tamak",
       "pass": "Lewati",
       "needAria": "Butuh untuk {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Pilihan Butuh tidak tersedia karena kelasmu tidak dapat memakai barang ini.",
+      "needUnavailablePower": "Pilihan Butuh tidak tersedia karena kekuatan Legendaris ini terbatas untuk kelas lain.",
       "greedAria": "Tamak untuk {item}",
       "passAria": "Lewati {item}",
       "everyonePassed": "Semua orang melewatkan {item}.",

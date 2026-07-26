@@ -1,34 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import type { ItemDef } from '../src/sim/types';
-import { Hud } from '../src/ui/hud';
+import type { PlayerClass } from '../src/sim/types';
+import { ItemPresentationController } from '../src/ui/item_presentation_controller';
 
-// The item tooltip is a private Hud method that only builds an HTML string, so
-// exercise it directly on a prototype-only instance (no constructor / DOM),
-// mirroring tests/hud_confirm_gates.ts. Only the few fields the weapon/armor slot
-// lines read need stubbing: sim.player.level (the requires-level line) and
-// sim.cfg.playerClass + sim.equipment (the armor can-equip check).
-interface TooltipHarness {
-  sim: {
-    player: { level: number };
-    cfg: { playerClass: string };
-    equipment: Record<string, string>;
-  };
-  itemTooltip(item: ItemDef, compare?: boolean): string;
+function harness(playerClass: PlayerClass = 'rogue'): ItemPresentationController {
+  return new ItemPresentationController({
+    items: ITEMS,
+    playerClass: () => playerClass,
+    playerLevel: () => 80,
+    showItemLevel: () => false,
+    equippedItemId: () => undefined,
+    equippedInstance: () => undefined,
+    equippedItemIds: () => [],
+  });
 }
 
-function harness(playerClass = 'rogue'): TooltipHarness {
-  const hud = Object.create(Hud.prototype) as unknown as TooltipHarness;
-  hud.sim = { player: { level: 80 }, cfg: { playerClass }, equipment: {} };
-  return hud;
-}
-
-function tooltip(itemId: string, playerClass?: string): string {
+function tooltip(itemId: string, playerClass?: PlayerClass): string {
   const item = ITEMS[itemId];
   if (!item) throw new Error(`missing test item ${itemId}`);
   // compare=false: the compare block reads more IWorld surface than this slim
   // harness stubs and is out of scope for the slot-line assertions.
-  return harness(playerClass).itemTooltip(item, false);
+  return harness(playerClass).tooltip(item, false);
 }
 
 describe('weapon type line on the item tooltip', () => {

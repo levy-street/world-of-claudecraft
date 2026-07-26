@@ -6683,110 +6683,110 @@ export const de_DE: EnTranslations = {
       "critChance": "Krit. Chance",
       "dodge": "Ausweichen",
       "parry": "Parieren",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Minimaler Waffenschaden",
+      "weaponMax": "Maximaler Waffenschaden",
+      "weaponDps": "Waffenschaden pro Sekunde",
+      "healthOnKill": "Gesundheit bei Tötung",
+      "manaOnKill": "Mana bei Tötung",
+      "blockValue": "Blockwert"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Möglicher Wurf von {min} bis {max}",
+      "advancedDetailsHint": "Halte {key} gedrückt, um die möglichen Wurfbereiche anzuzeigen.",
+      "powerRollPercent": "Machtwurf: {value}%",
+      "powerRollMilliseconds": "Machtwurf: {value} ms",
+      "powerRollResource": "Machtwurf: {value} Ressource",
+      "powerRollNumber": "Machtwurf: {value}",
+      "legendaryPower": "Legendäre Macht",
+      "legendaryLimit": "Einzigartig angelegt: {count} legendäre Macht",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Gewöhnlich",
+        "magic": "Magisch",
+        "rare": "Selten",
+        "epic": "Episch",
+        "legendary": "Legendär",
+        "mythic": "Mythisch"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Mächtig",
+        "deft": "Geschickt",
+        "stalwart": "Standhaft",
+        "sages": "des Weisen",
+        "spiritual": "Geistvoll",
+        "of_focus": "des Fokus",
+        "of_striking": "des Zuschlagens",
+        "of_alacrity": "der Eile",
+        "of_precision": "der Präzision",
+        "warded": "Geschützt",
+        "of_reaping": "der Ernte",
+        "of_remembrance": "der Erinnerung"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Aschgrau",
+        "blackfen": "Schwarzmoor",
+        "doom": "Verderben",
+        "grave": "Grab",
+        "mire": "Morast",
+        "storm": "Sturm",
+        "thorn": "Dorn",
+        "wyrm": "Lindwurm",
+        "bite": "Biss",
+        "brand": "Brandmal",
+        "promise": "Versprechen",
+        "thread": "Faden",
+        "vigil": "Wacht",
+        "ward": "Schutz",
+        "whisper": "Flüstern",
+        "oath": "Eid"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Krone des Letzten Scheiterhaufens",
+          "description": "Jeder dritte Feuerball versengt Gegner in der Nähe des Ziels."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Graukiefers Schneide",
+          "description": "Jeder dritte Waffentreffer lässt das Ziel bluten und stellt etwas Ressource wieder her."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Langbogen des Stillholzes",
+          "description": "Langer Zug oder Finsterer Schuss können ihr Ziel kurzzeitig zum Schweigen bringen."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Nachtglasfang",
+          "description": "Ein Todesstoß gewährt kurzzeitig Tempo."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Ysoleis Wacht",
+          "description": "Kritische Heilung erschafft kurzzeitig eine heilende Bodenfläche."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Idol des Sturmerwachens",
+          "description": "Jeder vierte Lichtbogenblitz springt auf Gegner in der Nähe über."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Siegel des Aschenbinders",
+          "description": "Jeder vierte Gloom-Blitz markiert sein Ziel für zusätzlichen Schattenschaden."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Siegel der Morgenwacht",
+          "description": "Heilendes Licht schützt sein Ziel mit einem Schild in Höhe eines Teils der Heilung."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Wilder Mondverschluss",
+          "description": "Jeder dritte Wildblitz stellt die Primärressource wieder her."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Glocke des Neunten Schlags",
+          "description": "Jeder zweite Schadenszauber ertönt rings um das Ziel."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Mantel der Gestohlenen Stunden",
+          "description": "Unter 35% Gesundheit gewährt eine kurze defensive Schutzwirkung."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Stiefel des Ungebrochenen Weges",
+          "description": "15 Meter Bewegung gewähren kurzzeitig erhöhte Bewegungsgeschwindigkeit."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const de_DE: EnTranslations = {
       "greed": "Gier",
       "pass": "Passen",
       "needAria": "Bedarf für {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Bedarf ist nicht verfügbar, weil deine Klasse diesen Gegenstand nicht ausrüsten kann.",
+      "needUnavailablePower": "Bedarf ist nicht verfügbar, weil diese legendäre Macht einer anderen Klasse vorbehalten ist.",
       "greedAria": "Gier für {item}",
       "passAria": "Bei {item} passen",
       "everyonePassed": "Alle passen bei {item}.",

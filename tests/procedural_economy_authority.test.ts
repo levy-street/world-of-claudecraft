@@ -355,35 +355,26 @@ describe('procedural trade exact-copy authority', () => {
     },
   );
 
-  it('preflights a reverse-direction generic procedural transfer against recipient containers', () => {
+  it('refuses to downgrade a procedural copy into a generic base-id offer', () => {
     const sim = makeWorld();
-    const a = cleanPlayer(sim, 'warrior', 'GenericCollisionAlice');
-    const b = cleanPlayer(sim, 'mage', 'GenericCollisionBob');
+    const a = cleanPlayer(sim, 'warrior', 'GenericAlice');
+    const b = cleanPlayer(sim, 'mage', 'GenericBob');
     const metaA = mustMeta(sim, a);
     const metaB = mustMeta(sim, b);
-    const exact = generated(UID_B, 1126, { signer: 'Generic reverse collision' });
-    sim.addItemInstance(BASE_ID, exact, b);
-    metaA.bank.inventory.push({
-      itemId: BASE_ID,
-      count: 1,
-      instance: cloneProceduralPayload(exact),
-    });
-    metaA.copper = 20;
-    metaB.copper = 10;
+    sim.addItemInstance(BASE_ID, generated(UID_B, 1126, { bindOnTrade: true }), b);
     openTrade(sim, a, b);
-    sim.tradeSetOffer([], 5, a);
     sim.tradeSetOffer([{ itemId: BASE_ID, count: 1 }], 0, b);
 
+    expect(sim.tradeFor(b)?.offerB.items).toEqual([]);
     expect(() => {
       sim.tradeConfirm(a);
       sim.tradeConfirm(b);
     }).not.toThrow();
     expect(sim.tradeFor(a)).toBeNull();
     expect(uidSlots(metaB, UID_B)).toHaveLength(1);
-    expect(metaA.copper).toBe(20);
-    expect(metaB.copper).toBe(10);
+    expect(uidSlots(metaA, UID_B)).toHaveLength(0);
   });
-  it('reserves exact UIDs from generic same-base scans in both directions at full capacity', () => {
+  it('ignores generic procedural rows while exact same-base rows still swap at full capacity', () => {
     const sim = makeWorld();
     const a = cleanPlayer(sim, 'warrior', 'CapacityAlice');
     const b = cleanPlayer(sim, 'mage', 'CapacityBob');
@@ -425,6 +416,8 @@ describe('procedural trade exact-copy authority', () => {
       0,
       b,
     );
+    expect(sim.tradeFor(a)?.offerA.items).toHaveLength(1);
+    expect(sim.tradeFor(b)?.offerB.items).toHaveLength(1);
     sim.tradeConfirm(a);
     sim.tradeConfirm(b);
 
@@ -432,10 +425,10 @@ describe('procedural trade exact-copy authority', () => {
     expect(metaA.inventory).toHaveLength(16);
     expect(metaB.inventory).toHaveLength(16);
     expect(allInventoryUids(metaA).sort()).toEqual(
-      [bGeneric.procedural?.uid, bExact.procedural?.uid].sort(),
+      [aGeneric.procedural?.uid, bExact.procedural?.uid].sort(),
     );
     expect(allInventoryUids(metaB).sort()).toEqual(
-      [aGeneric.procedural?.uid, aExact.procedural?.uid].sort(),
+      [bGeneric.procedural?.uid, aExact.procedural?.uid].sort(),
     );
     expect(
       duplicateProceduralItemUids({

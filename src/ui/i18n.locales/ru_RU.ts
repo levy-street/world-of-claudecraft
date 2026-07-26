@@ -9524,4 +9524,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
   'devCommand.kitCurrentSpec': 'Текущая специализация',
   'hudChrome.enchanting.wornTag': 'Надето ({slot})',
+  'itemUi.lootRoll.needUnavailablePower':
+    'Выбрать «Нужно» нельзя: эта легендарная сила предназначена для другого класса.',
 };

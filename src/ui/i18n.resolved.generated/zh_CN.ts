@@ -6962,6 +6962,7 @@ export const zh_CN: EnTranslations = {
       "pass": "放弃",
       "needAria": "需求 {item}",
       "needUnavailable": "你的职业无法装备此物品，因此不能选择需求。",
+      "needUnavailablePower": "该传奇能力仅限其他职业使用，因此不能选择需求。",
       "greedAria": "贪婪 {item}",
       "passAria": "放弃 {item}",
       "everyonePassed": "所有人都放弃了 {item}。",

@@ -8913,4 +8913,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '没有该 ID 对应的物品。',
   'devCommand.kitCurrentSpec': '当前专精',
   'hudChrome.enchanting.wornTag': '已装备（{slot}）',
+  'itemUi.lootRoll.needUnavailablePower': '该传奇能力仅限其他职业使用，因此不能选择需求。',
 };

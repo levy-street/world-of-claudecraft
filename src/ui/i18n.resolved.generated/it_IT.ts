@@ -6683,110 +6683,110 @@ export const it_IT: EnTranslations = {
       "critChance": "Prob. critico",
       "dodge": "Schivata",
       "parry": "Parata",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Danni minimi dell’arma",
+      "weaponMax": "Danni massimi dell’arma",
+      "weaponDps": "Danni dell’arma al secondo",
+      "healthOnKill": "Salute per uccisione",
+      "manaOnKill": "Mana per uccisione",
+      "blockValue": "Valore di blocco"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Tiro possibile da {min} a {max}",
+      "advancedDetailsHint": "Tieni premuto {key} per mostrare i possibili intervalli dei tiri.",
+      "powerRollPercent": "Tiro del potere: {value}%",
+      "powerRollMilliseconds": "Tiro del potere: {value} ms",
+      "powerRollResource": "Tiro del potere: {value} risorsa",
+      "powerRollNumber": "Tiro del potere: {value}",
+      "legendaryPower": "Potere leggendario",
+      "legendaryLimit": "Unico equipaggiabile: {count} potere leggendario",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Comune",
+        "magic": "Magico",
+        "rare": "Raro",
+        "epic": "Epico",
+        "legendary": "Leggendario",
+        "mythic": "Mitico"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Possente",
+        "deft": "Abile",
+        "stalwart": "Saldo",
+        "sages": "del Saggio",
+        "spiritual": "Spirituale",
+        "of_focus": "della Concentrazione",
+        "of_striking": "dei Colpi",
+        "of_alacrity": "della Prontezza",
+        "of_precision": "della Precisione",
+        "warded": "Protetto",
+        "of_reaping": "della Mietitura",
+        "of_remembrance": "del Ricordo"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Cinereo",
+        "blackfen": "Palude Nera",
+        "doom": "Sventura",
+        "grave": "Tomba",
+        "mire": "Pantano",
+        "storm": "Tempesta",
+        "thorn": "Spina",
+        "wyrm": "Dragone",
+        "bite": "Morso",
+        "brand": "Marchio",
+        "promise": "Promessa",
+        "thread": "Filo",
+        "vigil": "Veglia",
+        "ward": "Protezione",
+        "whisper": "Sussurro",
+        "oath": "Giuramento"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Corona dell’Ultima Pira",
+          "description": "Ogni terzo Dardo di Braci brucia i nemici vicini al bersaglio."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Lama di Mascellagrigia",
+          "description": "Ogni terzo colpo con arma fa sanguinare il bersaglio e ripristina un po’ di risorsa."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Arco Lungo del Bosco Muto",
+          "description": "Tiro Teso o Tiro Nefasto possono silenziare brevemente il bersaglio."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Zanna di Vetro Notturno",
+          "description": "Un’uccisione conferisce un breve aumento della celerità."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Veglia di Ysolei",
+          "description": "Una cura critica crea per breve tempo un’area ristoratrice sul terreno."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Idolo del Risveglio della Tempesta",
+          "description": "Ogni quarto Dardo Folgorante si propaga ai nemici vicini."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Sigillo del Vincolacenere",
+          "description": "Ogni quarto Dardo di Tenebra marchia il bersaglio, aumentando i danni da Ombra subiti."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Sigillo dell’Alba",
+          "description": "Luce Risanatrice protegge il destinatario con uno scudo pari a una parte delle cure."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Fermaglio della Luna Ferale",
+          "description": "Ogni terzo Dardo Silvano ripristina la risorsa primaria."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Campana del Nono Rintocco",
+          "description": "Ogni secondo incantesimo che infligge danni rintocca attorno al bersaglio."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Manto delle Ore Rubate",
+          "description": "Scendere sotto il 35% di salute conferisce una breve protezione difensiva."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Stivali della Strada Ininterrotta",
+          "description": "Percorrere 15 iarde conferisce un breve aumento della velocità di movimento."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const it_IT: EnTranslations = {
       "greed": "Brama",
       "pass": "Passa",
       "needAria": "Bisogno per {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Bisogno non è disponibile perché la tua classe non può equipaggiare questo oggetto.",
+      "needUnavailablePower": "Bisogno non è disponibile perché questo potere leggendario è riservato a un’altra classe.",
       "greedAria": "Brama per {item}",
       "passAria": "Passa su {item}",
       "everyonePassed": "Tutti hanno passato su {item}.",

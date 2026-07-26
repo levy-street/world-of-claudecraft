@@ -206,4 +206,33 @@ describe('procedural economy server wire authority', () => {
     expect(counterparty?.procedural).not.toHaveProperty('seed');
     expect(counterparty?.procedural).not.toHaveProperty('dropContext');
   });
+
+  it('rejects a raw generic procedural offer instead of hiding its payload from the recipient', () => {
+    const server = new GameServer();
+    const alice = join(server, 1431, 'GenericWireAlice');
+    const bob = join(server, 1432, 'GenericWireBob');
+    const aliceMeta = server.sim.meta(alice.pid);
+    const bobMeta = server.sim.meta(bob.pid);
+    if (!aliceMeta || !bobMeta) throw new Error('missing generic wire player meta');
+    aliceMeta.inventory = [];
+    bobMeta.inventory = [];
+    server.sim.addItemInstance(BASE_ID, exactInstance(), alice.pid);
+    placeTogether(server, alice.pid, bob.pid);
+
+    cmd(server, alice, { cmd: 'trade_req', id: bob.pid });
+    cmd(server, bob, { cmd: 'trade_accept' });
+    cmd(server, alice, {
+      cmd: 'trade_offer',
+      items: [{ itemId: BASE_ID, count: 1 }],
+      copper: 0,
+    });
+
+    type TradeWire = { myOffer: { items: Array<{ instance?: ItemInstancePayload }> } };
+    const wire = server as unknown as { tradeWire(pid: number): TradeWire };
+    expect(wire.tradeWire(alice.pid).myOffer.items).toEqual([]);
+    cmd(server, alice, { cmd: 'trade_confirm' });
+    cmd(server, bob, { cmd: 'trade_confirm' });
+    expect(aliceMeta.inventory[0]?.instance?.procedural?.uid).toBe(UID);
+    expect(bobMeta.inventory).toHaveLength(0);
+  });
 });

@@ -32,7 +32,6 @@ import {
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
-import { NYTHRAXIS_RAID_DUNGEON_ID } from '../sim/content/procedural_raid_loot';
 import { recipeById } from '../sim/content/recipes';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
@@ -58,14 +57,8 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { MAX_ACTIVE_LEGENDARY_POWERS } from '../sim/equipment/equipment_effect_types';
-import { resolvedItemStats } from '../sim/equipment/resolved_item';
-import { canEquipItem, weaponHand } from '../sim/equipment_rules';
-import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { junkSellableSlot } from '../sim/items';
 import type { Ante, PickAction } from '../sim/lockpick';
-import { requiredLevelForItemInstance } from '../sim/procedural_item_level';
-import { itemVendorSellValue } from '../sim/procedural_vendor_value';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
@@ -78,7 +71,6 @@ import type {
   HonorReason,
   InvSlot,
   ItemInstancePayload,
-  ItemSlot,
   MailResultCode,
   MotdResultCode,
   PetMode,
@@ -89,7 +81,6 @@ import type {
 import {
   type AbilityEffect,
   type AuraKind,
-  CONSUME_DURATION,
   canPrestige,
   dist2d,
   type Entity,
@@ -236,7 +227,6 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
-import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
@@ -341,11 +331,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
-import {
-  buildHeroicQuartermasterView,
-  type HeroicVendorTab,
-} from './hud/vendor/heroic_vendor_view';
-import { renderHeroicQuartermasterWindow } from './hud/vendor/heroic_vendor_window';
+import { HeroicQuartermasterController } from './hud/vendor/heroic_quartermaster_controller';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
 import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view';
 import { renderTrainWindow } from './hud/vendor/train_window';
@@ -366,19 +352,8 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
-import { itemArmorTypeLabelKey } from './item_armor_type';
-import { requiredClassesForTooltip } from './item_class_restriction';
 import { ItemDragState } from './item_drag_state';
-import {
-  instanceBadgeLines,
-  instanceBindingLines,
-  instanceBonusStatLines,
-  instanceMakersMarkLine,
-  itemAdaptiveNumber,
-  itemNumber,
-  itemStatName,
-} from './item_instance_tooltip';
-import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import { ItemPresentationController, itemSlotName } from './item_presentation_controller';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -399,7 +374,6 @@ import {
 } from './map_window_view';
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
-import { materialHintLine } from './material_hint_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -456,17 +430,11 @@ import {
   frostOverlayCharges,
   procOverlayState,
 } from './proc_overlay_view';
-import { resolveProceduralItemIcon } from './procedural_item_art';
 import {
   type ItemPresentationInstance,
   itemPresentationName,
   itemPresentationQuality,
-  proceduralAffixPresentations,
-  proceduralLegendaryPresentation,
-  proceduralRarityLabel,
 } from './procedural_item_presentation';
-import { resolvedItemDeltas } from './procedural_item_view';
-import { legendaryPowerRuneSvg } from './procedural_loot_icons';
 import { maskProfanity } from './profanity';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { type ProfessionEventInput, planProfessionEvent } from './profession_event_lines_core';
@@ -495,12 +463,7 @@ import {
   type StatTooltipModel,
   weaponDps,
 } from './stat_tooltip';
-import {
-  type StatTooltipI18n,
-  statCellHtml,
-  statNameKey,
-  statTooltipHtml,
-} from './stat_tooltip_view';
+import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
@@ -513,6 +476,7 @@ import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { SharedTooltipOwner } from './tooltip_owner';
+import { TOOLTIP_EDGE_MARGIN, tooltipPosition } from './tooltip_position_core';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus } from './town_focus_view';
@@ -545,8 +509,6 @@ import {
   wocBalance,
   wocBalanceVerified,
 } from './wallet_balance';
-import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
-import { weaponTypeLabelKey } from './weapon_type_label';
 import {
   installWindowDrag,
   isWindowDragPreviewMutation,
@@ -834,45 +796,6 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passiveDesc',
   defensive: 'hud.pet.defensiveDesc',
   aggressive: 'hud.pet.aggressiveDesc',
-};
-type ItemQuality = NonNullable<ItemDef['quality']>;
-const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
-  mainhand: 'itemUi.slots.mainhand',
-  offhand: 'itemUi.slots.offhand',
-  helmet: 'itemUi.slots.helmet',
-  neck: 'itemUi.slots.neck',
-  shoulder: 'itemUi.slots.shoulder',
-  chest: 'itemUi.slots.chest',
-  waist: 'itemUi.slots.waist',
-  legs: 'itemUi.slots.legs',
-  gloves: 'itemUi.slots.gloves',
-  feet: 'itemUi.slots.feet',
-  // The three ring forms share one player-facing label ("Finger"): items
-  // declare 'ring', the paperdoll cells are the concrete ring1/ring2 keys.
-  ring: 'itemUi.slots.ring',
-  ring1: 'itemUi.slots.ring',
-  ring2: 'itemUi.slots.ring',
-};
-const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
-  poor: 'itemUi.quality.poor',
-  common: 'itemUi.quality.common',
-  uncommon: 'itemUi.quality.uncommon',
-  rare: 'itemUi.quality.rare',
-  epic: 'itemUi.quality.epic',
-  legendary: 'itemUi.quality.legendary',
-};
-const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
-  weapon: 'itemUi.kind.weapon',
-  armor: 'itemUi.kind.armor',
-  held_offhand: 'itemUi.kind.armor',
-  quest: 'itemUi.kind.quest',
-  junk: 'itemUi.kind.junk',
-  food: 'itemUi.kind.food',
-  drink: 'itemUi.kind.drink',
-  tool: 'itemUi.kind.tool',
-  potion: 'itemUi.kind.potion',
-  elixir: 'itemUi.kind.elixir',
-  bag: 'itemUi.kind.bag',
 };
 // Classic class colors (CLASSES[cls].color is a 0xRRGGBB number) as a CSS
 // string, used to color-code party members on the minimap and in the frames.
@@ -1312,13 +1235,9 @@ export class Hud {
   // keyed by module id, redrawn only when the module changes.
   private readonly lootWindow: LootWindowController;
   private readonly lootRolls: LootRollController;
+  private readonly itemPresentation: ItemPresentationController;
+  private readonly heroicQuartermaster: HeroicQuartermasterController;
   private openVendorNpcId: number | null = null;
-  private openHeroicVendorNpcId: number | null = null;
-  private readonly heroicVendorWindowFocus = this.windowFocus('#vendor-window');
-  private heroicVendorOpenerFocus: HTMLElement | null = null;
-  private heroicVendorTab: HeroicVendorTab = 'gear';
-  private heroicVendorStatus: string | null = null;
-  private heroicVendorPending: 'gear' | 'forge' | 'tune' | null = null;
   private openTrainNpcId: number | null = null;
   // Learn flights + confirmed-grant overlay for the train window (issue
   // #2342): begin on click (the double-submit guard), resolve on the
@@ -1533,6 +1452,46 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     this.localIgnoredNames = this.loadLocalIgnoredNames();
+    this.itemPresentation = new ItemPresentationController({
+      items: ITEMS,
+      playerClass: () => this.sim.cfg.playerClass,
+      playerLevel: () => this.sim.player.level,
+      showItemLevel: () => this.optionsHooks?.settings.get('showItemLevel') ?? false,
+      equippedItemId: (slot) => this.sim.equipment[slot],
+      equippedInstance: (slot) => this.sim.player.equippedInstances?.[slot],
+      equippedItemIds: () => Object.values(this.sim.equipment),
+    });
+    this.heroicQuartermaster = new HeroicQuartermasterController({
+      element: () => $('#vendor-window'),
+      npcName: (npcId) => {
+        const npc = this.sim.entities.get(npcId);
+        return npc ? entityDisplayName(npc) : null;
+      },
+      npcInRange: (npcId, range) => {
+        const npc = this.sim.entities.get(npcId);
+        return !!npc && dist2d(this.sim.player.pos, npc.pos) <= range;
+      },
+      inventory: () => this.sim.inventory,
+      playerClass: () => this.sim.cfg.playerClass,
+      raidLockoutIds: () => this.sim.raidLockouts().map((lockout) => lockout.id),
+      stock: HEROIC_VENDOR_STOCK,
+      items: ITEMS,
+      presentation: this.presentationBag,
+      focus: this.windowFocus('#vendor-window'),
+      closeOtherWindows: (selector) => this.closeOtherWindows(selector),
+      closeBank: () => {
+        if (this.bankWindowOpen) this.closeBank();
+      },
+      closeCopperVendor: () => {
+        this.openVendorNpcId = null;
+      },
+      hideTooltip: () => this.hideTooltip(),
+      confirm: (title, body, okText, cancelText, onOk) =>
+        this.confirmDialog(title, body, okText, cancelText, onOk),
+      buy: (itemId) => this.sim.buyHeroicVendorItem(itemId),
+      forge: (offerId) => this.sim.forgeNythraxisReward(offerId),
+      tune: (instanceUid) => this.sim.tuneNythraxisLegendary(instanceUid),
+    });
     this.meters = new Meters(sim);
     this.actionBarController = new ActionBarController({
       storage: localStorage,
@@ -1651,7 +1610,7 @@ export class Hud {
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       openChronicles: () => this.openDeeds('chronicle'),
       openVendor: (npcId) => this.openVendor(npcId),
-      openHeroicVendor: (npcId) => this.openHeroicVendor(npcId),
+      openHeroicVendor: (npcId) => this.heroicQuartermaster.open(npcId),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
       openMarket: () => this.openMarket(),
@@ -1694,6 +1653,7 @@ export class Hud {
       world: () => this.sim,
       now: () => performance.now(),
       isMobileLayout: () => this.isMobileLayout(),
+      playerClass: () => this.sim.cfg.playerClass,
       itemIcon: (item, instance) => this.itemIcon(item, instance),
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
@@ -2752,7 +2712,7 @@ export class Hud {
         break;
       case 'vendor-window':
         this.closeVendor();
-        this.closeHeroicVendor();
+        this.heroicQuartermaster.close();
         break;
       case 'train-window':
         this.closeTrain();
@@ -4302,9 +4262,7 @@ export class Hud {
   }
 
   private itemIcon(item: ItemDef, instance?: ItemPresentationInstance): string {
-    const q = itemPresentationQuality(item, instance);
-    const src = resolveProceduralItemIcon(item.id, instance)?.url ?? iconDataUrl('item', item.id);
-    return `<img class="item-icon q-${q}" src="${src}" alt="" draggable="false">`;
+    return this.itemPresentation.icon(item, instance);
   }
 
   moneyHtml(copper: number): string {
@@ -4445,8 +4403,17 @@ export class Hud {
       // reuse the box size measured in showAt: same content, no forced reflow
       const tw = ttW,
         th = ttH;
-      this.tooltipEl.style.left = `${Math.min(window.innerWidth / z - tw - 8, e.clientX / z + 14)}px`;
-      this.tooltipEl.style.top = `${Math.max(8, e.clientY / z - th - 10)}px`;
+      const position = tooltipPosition({
+        pointerX: e.clientX,
+        pointerY: e.clientY,
+        tooltipWidth: tw,
+        tooltipHeight: th,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        uiScale: z,
+      });
+      this.tooltipEl.style.left = `${position.left}px`;
+      this.tooltipEl.style.top = `${position.top}px`;
     });
     el.addEventListener('mouseleave', () => {
       clearTouchTimer();
@@ -4571,10 +4538,20 @@ export class Hud {
     // arrive in visual (zoomed) space, so map x/y into author space (÷ scale)
     // before clamping against the author-space tooltip box + viewport.
     const z = getUiScale();
+    this.tooltipEl.style.maxHeight = `${Math.max(0, window.innerHeight / z - TOOLTIP_EDGE_MARGIN * 2)}px`;
     const tw = this.tooltipEl.offsetWidth,
       th = this.tooltipEl.offsetHeight;
-    this.tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, x / z + 14))}px`;
-    this.tooltipEl.style.top = `${Math.max(8, y / z - th - 10)}px`;
+    const position = tooltipPosition({
+      pointerX: x,
+      pointerY: y,
+      tooltipWidth: tw,
+      tooltipHeight: th,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      uiScale: z,
+    });
+    this.tooltipEl.style.left = `${position.left}px`;
+    this.tooltipEl.style.top = `${position.top}px`;
     return { w: tw, h: th };
   }
 
@@ -4589,6 +4566,7 @@ export class Hud {
     this.tooltipEl.innerHTML = html;
     this.tooltipEl.style.display = 'block';
     const z = getUiScale();
+    this.tooltipEl.style.maxHeight = `${Math.max(0, window.innerHeight / z - TOOLTIP_EDGE_MARGIN * 2)}px`;
     const tw = this.tooltipEl.offsetWidth,
       th = this.tooltipEl.offsetHeight;
     const isMobileTouch = document.body.classList.contains('mobile-touch');
@@ -4682,381 +4660,10 @@ export class Hud {
     this.hideTooltip();
   }
 
-  // `instance` is the optional per-copy payload (#1165): a masterwork seal, a
-  // maker's mark, or baked bonus stats specific to THIS copy. Absent for
-  // fungible stacks and def-only surfaces (the crafting window's result rows),
-  // so those render exactly as before.
+  // Item HTML is owned by the executable presentation controller; Hud exposes
+  // only the shared host delegate consumed by windows and action surfaces.
   private itemTooltip(item: ItemDef, compare = true, instance?: ItemPresentationInstance): string {
-    // Public roll/inspect views deliberately omit UID and seed; the stat and level
-    // resolvers only consume the shared rolled fields, so this structural projection
-    // is safe and keeps secret deterministic inputs out of the client UI.
-    const resolverInstance = instance as ItemInstancePayload | undefined;
-    const quality = itemPresentationQuality(item, instance);
-    const qColor = QUALITY_COLOR[quality];
-    const displayName = itemPresentationName({ name: itemDisplayName(item) }, instance);
-    let html = `<div class="tt-title" style="color:${qColor}">${esc(displayName)}</div>`;
-    // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
-    // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
-    // "[HEROIC]" tag here (never in the name) so the drop reads "Epic Armor [HEROIC]".
-    let qualityKindHtml = esc(
-      t('itemUi.tooltip.qualityKind', {
-        quality: proceduralRarityLabel(instance) ?? itemQualityLabel(item.quality),
-        kind: itemKindLabel(item.kind),
-      }),
-    );
-    if (item.heroicOf || item.heroic) {
-      qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
-    }
-    html += `<div class="tt-sub">${qualityKindHtml}</div>`;
-    // Weapon type (Sword/Dagger/Mace/...) as its own plain line under the
-    // quality/kind line and above the slot/handedness line, classic-style, so a
-    // player can tell a dagger from a sword at a glance (rogues need daggers). It
-    // is NOT colored by class the way armor weight is: any class can equip most
-    // weapon types and the class/weapon rules are archetype-based, not type-based,
-    // so a red type label would mislead. Null only for a non-weapon or
-    // unclassified id (the map is guarded), which simply shows no type line.
-    if (item.kind === 'weapon') {
-      const weaponTypeKey = weaponTypeLabelKey(item.id);
-      if (weaponTypeKey) {
-        html += `<div class="tt-sub tt-weapon-type">${esc(t(weaponTypeKey))}</div>`;
-      }
-    }
-    if (item.slot) {
-      // Classic layout: slot name on the left, armor subtype (Cloth/Leather/Mail)
-      // right-aligned on the same line so it is clear which classes the gear suits.
-      // A two-handed weapon reads "Two-Hand" (the classic label), not its
-      // mainhand slot: the hand, not the paperdoll cell, is what the player needs.
-      const slotName =
-        item.kind === 'weapon' && weaponHand(item) === 'twohand'
-          ? t('itemUi.slots.twoHand')
-          : itemSlotName(item.slot);
-      const armorTypeKey = itemArmorTypeLabelKey(item);
-      if (armorTypeKey) {
-        // Red armor type = the viewing player's class cannot wear this armor weight
-        // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
-        const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
-        html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
-      } else {
-        html += `<div class="tt-sub">${esc(slotName)}</div>`;
-      }
-    }
-    // Procedural equipment always exposes its rolled item level. Legacy gear keeps
-    // the existing opt-in item-level and score preference.
-    if (instance?.procedural) {
-      html += `<div class="tt-stat tt-item-level" style="color:var(--gold)">${esc(
-        t('hudChrome.options.itemLevelLine', {
-          level: itemNumber(instance.procedural.itemLevel),
-        }),
-      )}</div>`;
-    } else if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
-      const level = itemLevel(item);
-      if (level !== undefined) {
-        html += `<div class="tt-stat" style="color:var(--gold)">${esc(
-          t('hudChrome.options.itemLevelLine', { level: itemNumber(level) }),
-        )}</div>`;
-        html += `<div class="tt-sub">${esc(
-          t('hudChrome.options.itemScoreLine', { score: itemNumber(itemScore(item), 1) }),
-        )}</div>`;
-      }
-    }
-    // Bound-to-owner marker (marks and other soulbound tokens): shown like the
-    // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
-    if (item.soulbound) {
-      html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
-    }
-    // Maker's Bond lines (Professions 2.0): the commission
-    // binds-on-first-trade warning or the bound lock, beside the def-level
-    // soulbound line it parallels (item_instance_tooltip.ts owns the copy
-    // rules, incl. the equipment-kind scope and the no-name doctrine).
-    html += instanceBindingLines(resolverInstance, item.kind);
-    // Per-copy instance badges (Professions 2.0): the masterwork
-    // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
-    // rules, incl. never claiming a quality-rank upgrade).
-    html += instanceBadgeLines(resolverInstance);
-    const tooltipStats = resolvedItemStats(item, resolverInstance);
-    const tooltipWeapon = instance?.procedural ? tooltipStats.weapon : item.weapon;
-    if (tooltipWeapon) {
-      const dps = (tooltipWeapon.min + tooltipWeapon.max) / 2 / tooltipWeapon.speed;
-      html += `<div class="tt-stat">${esc(
-        t('itemUi.tooltip.damageSpeed', {
-          min: itemNumber(tooltipWeapon.min),
-          max: itemNumber(tooltipWeapon.max),
-          speed: itemNumber(tooltipWeapon.speed, 1),
-        }),
-      )}</div>`;
-      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.dps', { dps: itemNumber(dps, 1) }))}</div>`;
-    }
-    if (instance?.procedural && tooltipStats.stats.armor > 0) {
-      html += `<div class="tt-stat">${esc(
-        t('itemUi.tooltip.armorStat', { value: itemNumber(tooltipStats.stats.armor) }),
-      )}</div>`;
-    } else if (item.stats) {
-      for (const [k, v] of Object.entries(item.stats)) {
-        if (v === undefined) continue;
-        if (k === 'armor') {
-          html += `<div class="tt-stat">${esc(t('itemUi.tooltip.armorStat', { value: itemNumber(v) }))}</div>`;
-        } else {
-          html += `<div class="tt-green">${esc(
-            t('itemUi.tooltip.stat', {
-              value: itemNumber(v),
-              stat: itemStatName(k),
-            }),
-          )}</div>`;
-        }
-      }
-    }
-    html += instanceBonusStatLines(resolverInstance);
-    const proceduralAffixes = proceduralAffixPresentations(instance);
-    for (const line of proceduralAffixes) {
-      const stat = proceduralItemStatName(line.stat);
-      const range = `<span class="tt-roll-range" aria-label="${esc(
-        t('itemUi.procedural.rollRangeAria', {
-          min: itemNumber(line.min),
-          max: itemNumber(line.max),
-        }),
-      )}"> [${itemNumber(line.min)}-${itemNumber(line.max)}]</span>`;
-      html += `<div class="${line.implicit ? 'tt-stat tt-procedural-implicit' : 'tt-green tt-procedural-affix'}">${esc(
-        t('itemUi.tooltip.stat', { value: itemNumber(line.value), stat }),
-      )}${range}</div>`;
-    }
-    if (proceduralAffixes.length > 0) {
-      html += `<div class="tt-sub tt-advanced-detail-hint">${esc(
-        t('itemUi.procedural.advancedDetailsHint', { key: keyCapLabel('Alt') }),
-      )}</div>`;
-    }
-    const legendary = proceduralLegendaryPresentation(instance);
-    if (legendary) {
-      const rollLines = legendary.rollDetails
-        .map((roll) => {
-          const key =
-            roll.unit === 'percent'
-              ? 'itemUi.procedural.powerRollPercent'
-              : roll.unit === 'milliseconds'
-                ? 'itemUi.procedural.powerRollMilliseconds'
-                : roll.unit === 'resource'
-                  ? 'itemUi.procedural.powerRollResource'
-                  : 'itemUi.procedural.powerRollNumber';
-          const suffix = roll.unit === 'percent' ? '%' : roll.unit === 'milliseconds' ? ' ms' : '';
-          const range = `<span class="tt-roll-range" aria-label="${esc(
-            t('itemUi.procedural.rollRangeAria', {
-              min: itemAdaptiveNumber(roll.min),
-              max: itemAdaptiveNumber(roll.max),
-            }),
-          )}"> [${itemAdaptiveNumber(roll.min)}-${itemAdaptiveNumber(roll.max)}${suffix}]</span>`;
-          return `<span class="tt-legendary-roll">${esc(
-            t(key, { value: itemAdaptiveNumber(roll.value) }),
-          )}${range}</span>`;
-        })
-        .join('');
-      html += `<div class="tt-legendary-power"><span class="tt-legendary-rune">${legendaryPowerRuneSvg()}</span><span class="tt-legendary-copy"><span>${esc(
-        legendary.description,
-      )}</span>${rollLines}<span class="tt-legendary-limit">${esc(
-        t('itemUi.procedural.legendaryLimit', {
-          count: itemNumber(MAX_ACTIVE_LEGENDARY_POWERS),
-        }),
-      )}</span></span></div>`;
-    }
-    const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
-    if (warfareRating > 0) {
-      html += `<div class="tt-green">${esc(
-        t('itemUi.tooltip.stat', {
-          value: itemNumber(warfareRating),
-          stat: t(statNameKey('warfare') as TranslationKey),
-        }),
-      )}</div>`;
-    }
-    // Combat ratings (hit / crit / haste): shown as classic "+N Rating" affix lines,
-    // sharing the character-sheet HUD-chrome labels. Hit answers the higher-level
-    // miss/resist penalty; crit and haste add throughput.
-    for (const ratingStat of ['hitRating', 'critRating', 'hasteRating'] as const) {
-      const value = item[ratingStat] ?? 0;
-      if (value <= 0) continue;
-      html += `<div class="tt-green">${esc(
-        t('itemUi.tooltip.stat', {
-          value: itemNumber(value),
-          stat: t(statNameKey(ratingStat) as TranslationKey),
-        }),
-      )}</div>`;
-    }
-    if (item.foodHp)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
-    if (item.drinkMana)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
-    // Gathering implements (#2343): picks/axes/sickles/rods and the simple
-    // pole render their kind, requirement, use, and bonus lines from the
-    // pure sibling module (the item_instance_tooltip.ts pattern).
-    html += gatherToolTooltipLines(item);
-    // Purpose hint for the eight enchanting materials (material_hint_view.ts
-    // keys the table by item id): what the reagent is for and which gear
-    // disenchants into it. Every other item id renders nothing here.
-    html += materialHintLine(item.id);
-    if (item.potionHp)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
-    if (item.potionMana)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
-    if (item.kind === 'quest')
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
-    if (item.kind === 'bag' && item.bagSlots)
-      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
-    const requiredClasses = requiredClassesForTooltip(item);
-    if (requiredClasses) {
-      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
-    }
-    // Classic "Requires Level N" line for equippable gear gated above level 1.
-    // Red when the viewer is below the requirement (cannot equip yet), otherwise
-    // a normal sub line. Level math/data lives in the pure sim leaf.
-    const req = requiredLevelForItemInstance(item, resolverInstance);
-    if ((item.kind === 'weapon' || item.kind === 'armor') && req > 1) {
-      const meets = this.sim.player.level >= req;
-      html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }))}</div>`;
-    }
-    html += this.itemProcBlock(item);
-    html += this.itemSetBlock(item);
-    html += instanceMakersMarkLine(resolverInstance, item.kind);
-    const vendorSellValue = itemVendorSellValue(item, instance);
-    if (vendorSellValue > 0)
-      html += `<div class="tt-sub">${esc(
-        t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(vendorSellValue) }),
-      )}</div>`;
-    if (compare) html += this.itemCompareBlock(item, instance);
-    return html;
-  }
-
-  // Legendary "chance on action" procs: one green trigger line per proc, each
-  // wrapping its joined effect fragments. Reads ItemDef.weaponProcs through the
-  // pure weapon_proc_view core so the derived numbers stay unit-tested.
-  private itemProcBlock(item: ItemDef): string {
-    const lines = weaponProcLines(item.kind === 'weapon' ? item.weaponProcs : undefined);
-    if (!lines.length) return '';
-    let html = '';
-    for (const line of lines) {
-      const effect = line.effects.map((e) => this.procEffectText(e)).join(' ');
-      const triggerKey =
-        // onMeleeHit is the legacy key id; its English reads the generic "Chance on
-        // hit", correct for a weaponHit proc that fires on melee AND hunter ranged.
-        line.trigger === 'weaponHit'
-          ? 'hudChrome.itemProc.onMeleeHit'
-          : line.trigger === 'spellDamage'
-            ? 'hudChrome.itemProc.onSpellDamage'
-            : 'hudChrome.itemProc.onHeal';
-      html += `<div class="tt-green">${esc(
-        t(triggerKey, {
-          chance: formatNumber(line.chancePct, { maximumFractionDigits: 0 }),
-          effect,
-        }),
-      )}</div>`;
-    }
-    return html;
-  }
-
-  // One effect fragment (chain arc / attack slow / dot / hot) as localized text.
-  private procEffectText(e: WeaponProcEffectDesc): string {
-    const n = (v: number | undefined): string => formatNumber(v ?? 0, { maximumFractionDigits: 0 });
-    switch (e.kind) {
-      case 'chainArc':
-        return t('hudChrome.itemProc.chainArc', {
-          school: e.school ?? '',
-          name: e.name ?? '',
-          damage: n(e.damage),
-          jumps: n(e.jumps),
-        });
-      case 'attackSlow':
-        return t('hudChrome.itemProc.attackSlow', { pct: n(e.slowPct), duration: n(e.duration) });
-      case 'dot':
-        return t('hudChrome.itemProc.dot', {
-          name: e.name ?? '',
-          school: e.school ?? '',
-          total: n(e.total),
-          duration: n(e.duration),
-        });
-      case 'hot':
-        return t('hudChrome.itemProc.hot', {
-          name: e.name ?? '',
-          total: n(e.total),
-          duration: n(e.duration),
-        });
-    }
-  }
-
-  // How many equipped pieces belong to the given set (read from IWorld.equipment
-  // so it is identical offline and online).
-  private equippedSetPieces(setId: string): number {
-    let n = 0;
-    for (const equippedId of Object.values(this.sim.equipment)) {
-      if (equippedId && ITEMS[equippedId]?.set === setId) n += 1;
-    }
-    return n;
-  }
-
-  // Classic tier-set block: the set name with the live (have/total) piece count,
-  // then each bonus tier - lit when its threshold is met, greyed otherwise. Set
-  // name and bonus text localize through entity_i18n (English source in
-  // content/item_sets.ts).
-  private itemSetBlock(item: ItemDef): string {
-    if (!item.set) return '';
-    const model = itemSetTooltipModel({
-      itemSetId: item.set,
-      equippedPieces: this.equippedSetPieces(item.set),
-      itemSetMembers: itemSetMemberCounts(),
-    });
-    if (!model) return '';
-    const name = tEntity({ kind: 'itemSet', id: model.setId, field: 'name' });
-    let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(model.equippedPieces, { maximumFractionDigits: 0 }), total: formatNumber(model.totalPieces, { maximumFractionDigits: 0 }) }))}</div>`;
-    for (const tier of model.bonusTiers) {
-      const field = tier.pieces === 2 ? 'bonus2' : tier.pieces === 3 ? 'bonus3' : 'bonus4';
-      const text = tEntity({ kind: 'itemSet', id: model.setId, field });
-      html += `<div class="tt-set-bonus${tier.active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
-    }
-    return html;
-  }
-
-  // Classic-style item comparison: when hovering an equippable item, append the
-  // item currently worn in that slot plus the stat change you'd see if you
-  // swapped to it (green = gain, red = loss). Reads IWorld.equipment, so it
-  // works identically offline and online.
-  private itemCompareBlock(item: ItemDef, instance?: ItemPresentationInstance): string {
-    if (!item.slot) return '';
-    // A hovered ring compares against BOTH worn rings (classic behavior); every
-    // other slot kind is its own single equipment key.
-    const slots: readonly EquipSlot[] = item.slot === 'ring' ? ['ring1', 'ring2'] : [item.slot];
-    return slots.map((slot) => this.itemCompareBlockForSlot(item, instance, slot)).join('');
-  }
-
-  private itemCompareBlockForSlot(
-    item: ItemDef,
-    instance: ItemPresentationInstance | undefined,
-    slot: EquipSlot,
-  ): string {
-    const equippedId = this.sim.equipment[slot];
-    const equippedInstance = this.sim.player.equippedInstances?.[slot];
-    if (!equippedId || (equippedId === item.id && !instance && !equippedInstance)) return '';
-    const equipped = ITEMS[equippedId];
-    if (!equipped) return '';
-    const deltas = resolvedItemDeltas(
-      item,
-      instance as ItemInstancePayload | undefined,
-      equipped,
-      equippedInstance,
-    )
-      .map((d) => {
-        const cls = d.delta > 0 ? 'tt-green' : 'tt-red';
-        const sign = d.delta > 0 ? '+' : '&minus;';
-        const decimals = d.stat === 'weaponDps' ? 1 : 0;
-        const magnitude = formatNumber(Math.abs(d.delta), {
-          minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals,
-        });
-        return `<div class="${cls}">${sign}${magnitude} ${esc(
-          proceduralItemStatName(d.stat),
-        )}</div>`;
-      })
-      .join('');
-    let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
-    html += `<div class="tt-cmp-body">${this.itemTooltip(equipped, false, equippedInstance)}</div>`;
-    if (deltas)
-      html += `<div class="tt-cmp-head">${esc(t('itemUi.tooltip.ifYouEquip'))}</div>${deltas}`;
-    html += `</div>`;
-    return html;
+    return this.itemPresentation.tooltip(item, compare, instance);
   }
 
   // Build the pure stat-breakdown model for the currently-shown player, the bridge
@@ -5156,8 +4763,7 @@ export class Hud {
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
-    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
-      this.renderHeroicVendor();
+    this.heroicQuartermaster.relocalize();
     if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
       this.renderTrain();
     if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
@@ -7810,10 +7416,7 @@ export class Hud {
         const npc = sim.entities.get(this.openVendorNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeVendor();
       }
-      if (this.openHeroicVendorNpcId !== null) {
-        const npc = sim.entities.get(this.openHeroicVendorNpcId);
-        if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeHeroicVendor();
-      }
+      this.heroicQuartermaster.updateProximity();
       if (this.openTrainNpcId !== null) {
         const npc = sim.entities.get(this.openTrainNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeTrain();
@@ -9605,17 +9208,7 @@ export class Hud {
         case 'vendor': {
           if ($('#bags').style.display !== 'none') this.renderBags();
           if (this.openVendorNpcId !== null) this.renderVendor();
-          // A Heroic Marks purchase rides the same 'vendor' event; refresh the
-          // shop so the balance and per-offer affordability update after a buy.
-          if (this.openHeroicVendorNpcId !== null) {
-            if (this.heroicVendorPending) {
-              this.heroicVendorStatus = t(
-                `heroicShop.status.${this.heroicVendorPending}` as TranslationKey,
-              );
-              this.heroicVendorPending = null;
-            }
-            this.renderHeroicVendor();
-          }
+          this.heroicQuartermaster.onVendorResult();
           // A delve Marks purchase rides the same 'vendor' event; refresh the shop
           // tab so the balance and per-offer affordability update after a buy.
           if (this.delveBoard.isOpen) this.renderDelveBoard();
@@ -9701,9 +9294,12 @@ export class Hud {
           this.log(deedBroadcastLine(ev.characterName, ev.deedId), '#40d264');
           break;
         }
-        case 'error':
-          this.showError(this.localizeErrorText(ev.text));
+        case 'error': {
+          const message = this.localizeErrorText(ev.text);
+          this.heroicQuartermaster.onError(message);
+          this.showError(message);
           break;
+        }
         case 'questAccepted':
           sfx.playUi('quest_accept');
           this.questDialog.refresh();
@@ -11607,7 +11203,7 @@ export class Hud {
     // through the painter so onBankClosed clears body.bank-open before the
     // vendor pairing takes over.
     if (this.bankWindowOpen) this.closeBank();
-    this.openHeroicVendorNpcId = null; // the marks shop shares the container
+    this.heroicQuartermaster.close(); // the marks shop shares the container
     this.openVendorNpcId = npcId;
     document.body.classList.add('vendor-open');
     this.renderVendor();
@@ -11657,65 +11253,6 @@ export class Hud {
         },
       },
     );
-  }
-
-  openHeroicVendor(npcId: number): void {
-    this.closeOtherWindows('#vendor-window');
-    // The bags companion is exclusive (see openBank): close the bank cluster
-    // through the painter so onBankClosed clears body.bank-open before the
-    // marks shop takes the container.
-    if (this.bankWindowOpen) this.closeBank();
-    this.openVendorNpcId = null; // shares the container with the copper vendor
-    this.openHeroicVendorNpcId = npcId;
-    this.heroicVendorTab = 'gear';
-    this.heroicVendorStatus = null;
-    this.heroicVendorPending = null;
-    this.renderHeroicVendor();
-    this.heroicVendorOpenerFocus = this.heroicVendorWindowFocus.captureFocus();
-  }
-
-  private renderHeroicVendor(): void {
-    if (this.openHeroicVendorNpcId === null) return;
-    const npc = this.sim.entities.get(this.openHeroicVendorNpcId);
-    if (!npc) return;
-    const heroicClear = this.sim
-      .raidLockouts()
-      .some((lockout) => lockout.id === `${NYTHRAXIS_RAID_DUNGEON_ID}:heroic`);
-    renderHeroicQuartermasterWindow(
-      $('#vendor-window'),
-      entityDisplayName(npc),
-      buildHeroicQuartermasterView({
-        tab: this.heroicVendorTab,
-        stock: HEROIC_VENDOR_STOCK,
-        items: ITEMS,
-        inventory: this.sim.inventory,
-        playerClass: this.sim.cfg.playerClass,
-        heroicClear,
-      }),
-      {
-        ...this.presentationBag,
-        hideTooltip: () => this.hideTooltip(),
-        onBuy: (itemId) => this.requestHeroicVendorPurchase(itemId),
-        onForge: (offerId) => this.requestNythraxisForge(offerId),
-        onTune: (instanceUid) => this.requestNythraxisTune(instanceUid),
-        onTab: (tab) => {
-          this.heroicVendorTab = tab;
-          this.heroicVendorStatus = null;
-          this.renderHeroicVendor();
-        },
-        onClose: () => this.closeHeroicVendor(),
-        status: this.heroicVendorStatus,
-      },
-    );
-  }
-
-  closeHeroicVendor(): void {
-    if (this.openHeroicVendorNpcId === null) return;
-    $('#vendor-window').style.display = 'none';
-    this.openHeroicVendorNpcId = null;
-    this.hideTooltip();
-    this.heroicVendorWindowFocus.restoreFocus(this.heroicVendorOpenerFocus);
-    this.heroicVendorOpenerFocus = null;
   }
 
   closeVendor(): void {
@@ -12067,9 +11604,9 @@ export class Hud {
     // the two windows on the same side of #bags (and on mobile the cluster-close
     // precedence would strand the bank at half-width with its x-btn hidden).
     if (this.vendorOpen) this.closeVendor();
-    // The heroic marks shop is a second tenant of #vendor-window that nulls
-    // openVendorNpcId, so the vendorOpen guard above never sees it.
-    if (this.openHeroicVendorNpcId !== null) this.closeHeroicVendor();
+    // The heroic marks shop is a second tenant of #vendor-window and is not
+    // represented by vendorOpen, so close its controller explicitly.
+    this.heroicQuartermaster.close();
     document.body.classList.add('bank-open');
     this.bankWindow.open();
     this.renderBags();
@@ -12644,95 +12181,6 @@ export class Hud {
       t('hudChrome.death.healerConfirmAccept'),
       t('hudChrome.death.healerConfirmCancel'),
       () => this.onResurrectAtSpiritHealer?.(),
-    );
-  }
-
-  // Heroic Quartermaster purchases debit Heroic Marks with no buyback recorded
-  // (gold vendors are the only buyback source), so a mis-tap is unrefundable:
-  // confirm before sending the exact pre-existing buy command.
-  private requestHeroicVendorPurchase(itemId: string): void {
-    const offer = HEROIC_VENDOR_STOCK.find((candidate) => candidate.itemId === itemId);
-    const item = ITEMS[itemId];
-    if (!offer || !item) return;
-    this.confirmDialog(
-      t('heroicShop.buyConfirmTitle'),
-      t('heroicShop.buyConfirmBody', {
-        item: itemDisplayName(item),
-        marks: formatNumber(offer.marks, { maximumFractionDigits: 0 }),
-      }),
-      t('heroicShop.buyConfirmAccept'),
-      t('heroicShop.buyConfirmCancel'),
-      () => {
-        this.heroicVendorPending = 'gear';
-        this.heroicVendorStatus = t('heroicShop.status.pending');
-        this.renderHeroicVendor();
-        this.sim.buyHeroicVendorItem(itemId);
-      },
-    );
-  }
-
-  private requestNythraxisForge(offerId: string): void {
-    if (this.heroicVendorPending) return;
-    const heroicClear = this.sim
-      .raidLockouts()
-      .some((lockout) => lockout.id === `${NYTHRAXIS_RAID_DUNGEON_ID}:heroic`);
-    const row = buildHeroicQuartermasterView({
-      tab: 'forge',
-      stock: HEROIC_VENDOR_STOCK,
-      items: ITEMS,
-      inventory: this.sim.inventory,
-      playerClass: this.sim.cfg.playerClass,
-      heroicClear,
-    }).forgeRows.find((candidate) => candidate.offerId === offerId);
-    if (!row || row.blockReason) return;
-    const item = row.powerId
-      ? t(`itemUi.procedural.legendary.${row.powerId}.name` as TranslationKey)
-      : itemDisplayName(row.item);
-    this.confirmDialog(
-      t('heroicShop.forgeConfirmTitle'),
-      t('heroicShop.forgeConfirmBody', {
-        item,
-        fragments: formatNumber(row.cost.fragments, { maximumFractionDigits: 0 }),
-        marks: formatNumber(row.cost.heroicMarks, { maximumFractionDigits: 0 }),
-      }),
-      t('heroicShop.forgeConfirmAccept'),
-      t('heroicShop.buyConfirmCancel'),
-      () => {
-        this.heroicVendorPending = 'forge';
-        this.heroicVendorStatus = t('heroicShop.status.pending');
-        this.renderHeroicVendor();
-        this.sim.forgeNythraxisReward(offerId);
-      },
-    );
-  }
-
-  private requestNythraxisTune(instanceUid: string): void {
-    if (this.heroicVendorPending) return;
-    const row = buildHeroicQuartermasterView({
-      tab: 'tune',
-      stock: HEROIC_VENDOR_STOCK,
-      items: ITEMS,
-      inventory: this.sim.inventory,
-      playerClass: this.sim.cfg.playerClass,
-      heroicClear: true,
-    }).tuneRows.find((candidate) => candidate.instanceUid === instanceUid);
-    if (!row || row.blockReason) return;
-    const item = itemPresentationName({ name: itemDisplayName(row.item) }, row.instance);
-    this.confirmDialog(
-      t('heroicShop.tuneConfirmTitle'),
-      t('heroicShop.tuneConfirmBody', {
-        item,
-        fragments: formatNumber(row.cost.fragments, { maximumFractionDigits: 0 }),
-        marks: formatNumber(row.cost.heroicMarks, { maximumFractionDigits: 0 }),
-      }),
-      t('heroicShop.tuneConfirmAccept'),
-      t('heroicShop.buyConfirmCancel'),
-      () => {
-        this.heroicVendorPending = 'tune';
-        this.heroicVendorStatus = t('heroicShop.status.pending');
-        this.renderHeroicVendor();
-        this.sim.tuneNythraxisLegendary(instanceUid);
-      },
     );
   }
 
@@ -14559,31 +14007,6 @@ function combatAbilityName(name: string | null): string {
 
 function resourceDisplayName(resourceType: ResourceType | null): string {
   return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
-}
-
-function itemSlotName(slot: ItemSlot): string {
-  return t(ITEM_SLOT_LABEL_KEYS[slot]);
-}
-
-function proceduralItemStatName(stat: string): string {
-  if (
-    stat === 'spellPower' ||
-    stat === 'critRating' ||
-    stat === 'hasteRating' ||
-    stat === 'hitRating'
-  ) {
-    return t(statNameKey(stat) as TranslationKey);
-  }
-  const optional = tOptional(`itemUi.stats.${stat}`);
-  return optional ?? itemStatName(stat);
-}
-
-function itemQualityLabel(quality: ItemDef['quality']): string {
-  return t(ITEM_QUALITY_LABEL_KEYS[quality ?? 'common']);
-}
-
-function itemKindLabel(kind: ItemDef['kind']): string {
-  return t(ITEM_KIND_LABEL_KEYS[kind]);
 }
 
 function parseSimMoney(text: string): number | null {

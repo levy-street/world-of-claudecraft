@@ -6683,110 +6683,110 @@ export const pt_BR: EnTranslations = {
       "critChance": "Chance crítica",
       "dodge": "Esquiva",
       "parry": "Aparar",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Dano mínimo da arma",
+      "weaponMax": "Dano máximo da arma",
+      "weaponDps": "Dano de arma por segundo",
+      "healthOnKill": "Vida ao matar",
+      "manaOnKill": "Mana ao matar",
+      "blockValue": "Valor de bloqueio"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Rolagem possível de {min} a {max}",
+      "advancedDetailsHint": "Segure {key} para mostrar os intervalos de rolagem possíveis.",
+      "powerRollPercent": "Rolagem de poder: {value}%",
+      "powerRollMilliseconds": "Rolagem de poder: {value} ms",
+      "powerRollResource": "Rolagem de poder: {value} de recurso",
+      "powerRollNumber": "Rolagem de poder: {value}",
+      "legendaryPower": "Poder lendário",
+      "legendaryLimit": "Único equipado: {count} poder lendário",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Comum",
+        "magic": "Mágico",
+        "rare": "Raro",
+        "epic": "Épico",
+        "legendary": "Lendário",
+        "mythic": "Mítico"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Poderoso",
+        "deft": "Hábil",
+        "stalwart": "Resoluto",
+        "sages": "do Sábio",
+        "spiritual": "Espiritual",
+        "of_focus": "do Foco",
+        "of_striking": "do Golpe",
+        "of_alacrity": "da Presteza",
+        "of_precision": "da Precisão",
+        "warded": "Protegido",
+        "of_reaping": "da Colheita",
+        "of_remembrance": "da Lembrança"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Cinzento",
+        "blackfen": "Pântano Negro",
+        "doom": "Perdição",
+        "grave": "Túmulo",
+        "mire": "Lamaçal",
+        "storm": "Tempestade",
+        "thorn": "Espinho",
+        "wyrm": "Serpe",
+        "bite": "Mordida",
+        "brand": "Marca",
+        "promise": "Promessa",
+        "thread": "Fio",
+        "vigil": "Vigília",
+        "ward": "Proteção",
+        "whisper": "Sussurro",
+        "oath": "Juramento"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Coroa da Última Pira",
+          "description": "Cada terceiro Raio de Brasa incendeia os inimigos próximos do alvo."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Gume de Maxilacinzento",
+          "description": "Cada terceiro acerto com arma faz o alvo sangrar e restaura um pouco de recurso."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Arco Longo da Mata Silente",
+          "description": "Puxada Longa ou Tiro Vil podem silenciar brevemente o alvo."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Presa de Vidro Noturno",
+          "description": "Uma morte concede um breve aumento de aceleração."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Vigília de Ysolei",
+          "description": "Uma cura crítica cria brevemente uma área restauradora no chão."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Ídolo do Despertar da Tempestade",
+          "description": "Cada quarto Raio em Arco salta para inimigos próximos."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Selo do Vinculacinzas",
+          "description": "Cada quarto Raio Lúgubre marca o alvo para receber dano de Sombra adicional."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Sinete da Alvorada",
+          "description": "Luz Restauradora protege o alvo com um escudo equivalente a uma parte da cura."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Fecho da Lua Feral",
+          "description": "Cada terceiro Raio Selvagem restaura o recurso primário."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Sino do Nono Toque",
+          "description": "Cada segundo feitiço de dano ressoa ao redor do alvo."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Manto das Horas Roubadas",
+          "description": "Ficar abaixo de 35% de vida concede uma breve proteção defensiva."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Botas da Estrada Inquebrável",
+          "description": "Percorrer 15 jardas concede um breve aumento de velocidade de movimento."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const pt_BR: EnTranslations = {
       "greed": "Ganância",
       "pass": "Passar",
       "needAria": "Necessidade por {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Necessidade está indisponível porque sua classe não pode equipar este item.",
+      "needUnavailablePower": "Necessidade está indisponível porque este poder lendário é restrito a outra classe.",
       "greedAria": "Ganância por {item}",
       "passAria": "Passar em {item}",
       "everyonePassed": "Todos passaram em {item}.",

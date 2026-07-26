@@ -194,6 +194,69 @@ describe('live procedural loot roll integration', () => {
     expect(run('mage')).toEqual(run('warrior'));
   });
 
+  it('keeps contributors, but not entered AFK players, in final-boss smart loot', () => {
+    const run = (
+      includeMageInKillRange: boolean,
+      mageContributed = true,
+      mageEntered = true,
+    ) => {
+      const sim = new Sim({
+        seed: 65_901,
+        playerClass: 'warrior',
+        noPlayer: true,
+        proceduralItemUidLease: {
+          realmNamespace: includeMageInKillRange ? 'stable_full' : 'stable_far',
+          startSerial: '1',
+          endExclusive: '1000',
+        },
+      });
+      const warriorPid = sim.addPlayer('warrior', 'Stable Warrior');
+      const magePid = sim.addPlayer('mage', 'Stable Mage');
+      const warrior = sim.ctx.players.get(warriorPid)!;
+      const mage = sim.ctx.players.get(magePid)!;
+      enterDungeon(sim.ctx, 'hollow_crypt', warriorPid);
+      const instance = sim.ctx.instances.find(
+        (candidate) => candidate.dungeonId === 'hollow_crypt' && candidate.partyKey !== null,
+      );
+      if (!instance) throw new Error('expected claimed Hollow Crypt');
+      const boss = instance.mobIds
+        .map((id) => sim.ctx.entities.get(id))
+        .find((entity) => entity?.templateId === 'morthen');
+      if (!boss) throw new Error('expected Morthen');
+      if (mageEntered) instance.enteredBy.add(magePid);
+      if (mageContributed) boss.bossDamagers.add(magePid);
+      const drops: unknown[] = [];
+      for (let attempt = 0; attempt < 64; attempt++) {
+        boss.loot = null;
+        sim.ctx.rollLoot(boss, warrior, includeMageInKillRange ? [warrior, mage] : [warrior]);
+        const slot = proceduralSlot(boss);
+        if (!slot) throw new Error('expected guaranteed dungeon-boss procedural slot');
+        drops.push({ itemId: slot.itemId, procedural: slot.instance?.procedural });
+      }
+      return drops;
+    };
+
+    const far = run(false).map((drop: any) => ({
+      ...drop,
+      procedural: { ...drop.procedural, uid: 'stable' },
+    }));
+    const present = run(true).map((drop: any) => ({
+      ...drop,
+      procedural: { ...drop.procedural, uid: 'stable' },
+    }));
+    expect(far).toEqual(present);
+
+    const enteredAfk = run(false, false, true).map((drop: any) => ({
+      ...drop,
+      procedural: { ...drop.procedural, uid: 'stable' },
+    }));
+    const neverEntered = run(false, false, false).map((drop: any) => ({
+      ...drop,
+      procedural: { ...drop.procedural, uid: 'stable' },
+    }));
+    expect(enteredAfk).toEqual(neverEntered);
+  });
+
   it('raises caster-only base frequency when a caster shares loot eligibility', () => {
     const sample = (includeMage: boolean) => {
       const state = setup(56_881);

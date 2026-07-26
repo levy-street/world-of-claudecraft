@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { handleDeath } from '../src/sim/combat/damage';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import type { ProceduralLegendaryPowerId } from '../src/sim/content/procedural_legendary_powers';
@@ -10,6 +11,7 @@ import { MAX_ACTIVE_LEGENDARY_POWERS } from '../src/sim/equipment/equipment_effe
 import { generateProceduralItem } from '../src/sim/loot/procedural';
 import { Sim } from '../src/sim/sim';
 import type { Entity, EquipSlot, ItemInstancePayload, PlayerClass } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 let uidSequence = 0;
 
@@ -123,13 +125,33 @@ describe('legendary equipment integration', () => {
     expect(sim.player.resource).toBe(4);
   });
 
-  it('uses the chance gate and authoritative silence aura', () => {
+  it('applies Hushwood silence only after a successful projectile impact', () => {
     const sim = makeSim('hunter');
+    sim.setPlayerLevel(20);
+    placePlayerInOpenField(sim);
     equipPower(sim, 'hushwood_longbow');
-    const target = hostile(sim, 2);
+    const target = hostile(sim, 20);
+    sim.player.resource = sim.player.maxResource;
+    sim.player.facing = Math.atan2(
+      target.pos.x - sim.player.pos.x,
+      target.pos.z - sim.player.pos.z,
+    );
+    sim.targetEntity(target.id);
     vi.spyOn(sim.rng, 'next').mockReturnValue(0);
 
-    onCastCompleted(sim.ctx, sim.player, 'aimed_shot', target);
+    castAbility(sim.ctx, 'aimed_shot', sim.playerId);
+    expect(sim.player.castingAbility).toBe('aimed_shot');
+    const meta = sim.players.get(sim.playerId);
+    expect(meta).toBeDefined();
+    if (!meta) throw new Error('Expected the simulated player metadata to exist.');
+    for (let i = 0; i < 100 && sim.player.castingAbility; i++) {
+      updateCasting(sim.ctx, sim.player, meta);
+    }
+
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+    expect(target.auras.some((a) => a.kind === 'silence')).toBe(false);
+
+    for (let i = 0; i < 100 && !target.auras.some((a) => a.kind === 'silence'); i++) sim.tick();
 
     expect(target.auras.some((a) => a.kind === 'silence')).toBe(true);
   });
@@ -157,6 +179,36 @@ describe('legendary equipment integration', () => {
     expect(sim.ctx.groundAoEs[0].equipmentAllyHeal?.powerId).toBe('ysoleis_vigil');
   });
 
+  it('scales Dawnward from effective Holy Light healing and ignores zero healing', () => {
+    const sim = makeSim('paladin');
+    equipPower(sim, 'dawnward_signet');
+
+    const overheal = sim.ctx.applyHeal(
+      sim.player,
+      sim.player,
+      100,
+      'Mending Light',
+      'holy_light',
+      false,
+    );
+    expect(overheal).toBe(0);
+    expect(sim.player.auras.some((a) => a.kind === 'absorb')).toBe(false);
+
+    sim.player.hp -= 100;
+    const healed = sim.ctx.applyHeal(
+      sim.player,
+      sim.player,
+      100,
+      'Mending Light',
+      'holy_light',
+      false,
+    );
+    const shield = sim.player.auras.find((a) => a.kind === 'absorb');
+
+    expect(healed).toBe(100);
+    expect(shield?.value).toBe(16);
+  });
+
   it('chains every fourth lightning cast to nearby enemies but not the primary', () => {
     const sim = makeSim('shaman');
     equipPower(sim, 'stormwake_idol');
@@ -171,17 +223,12 @@ describe('legendary equipment integration', () => {
     expect(nearbyB.hp).toBeLessThan(nearbyB.maxHp);
   });
 
-  it('maps mark, shield, and resource powers onto existing primitives', () => {
+  it('maps mark and resource powers onto existing primitives', () => {
     const warlock = makeSim('warlock');
     equipPower(warlock, 'ashbinders_seal');
     const marked = hostile(warlock, 2);
     for (let i = 0; i < 4; i++) onCastCompleted(warlock.ctx, warlock.player, 'shadow_bolt', marked);
     expect(marked.auras.some((a) => a.kind === 'vuln_source')).toBe(true);
-
-    const paladin = makeSim('paladin');
-    equipPower(paladin, 'dawnward_signet');
-    onCastCompleted(paladin.ctx, paladin.player, 'holy_light', paladin.player);
-    expect(paladin.player.auras.some((a) => a.kind === 'absorb')).toBe(true);
 
     const druid = makeSim('druid');
     equipPower(druid, 'feral_moonclasp');
@@ -268,18 +315,24 @@ describe('legendary equipment integration', () => {
     ).not.toContain('You can equip only one Legendary power at a time.');
   });
 
-  it('resets cadence on real unequip', () => {
-    const reset = makeSim('mage');
-    const payload = equipPower(reset, 'crown_last_pyre');
-    const target = hostile(reset, 2);
-    onCastCompleted(reset.ctx, reset.player, 'fireball', target);
-    onCastCompleted(reset.ctx, reset.player, 'fireball', target);
-    expect(reset.unequipItem('helmet')).toBe(true);
+  it('preserves internal cooldowns across unrelated gear changes and real re-equip', () => {
+    const sim = makeSim('rogue');
+    const payload = equipPower(sim, 'nightglass_fang');
+    sim.ctx.triggerEquipmentEffects(sim.player, { kind: 'kill', targetId: 99 });
+    expect(sim.player.auras.some((a) => a.kind === 'buff_haste')).toBe(true);
+
+    sim.player.auras = [];
+    sim.addItem('mirefen_leather_boots', 1, sim.playerId);
+    sim.equipItemToSlot('mirefen_leather_boots', 'feet', sim.playerId);
+    sim.ctx.triggerEquipmentEffects(sim.player, { kind: 'kill', targetId: 100 });
+    expect(sim.player.auras.some((a) => a.kind === 'buff_haste')).toBe(false);
+
     const resetUid = payload.procedural?.uid;
     if (!resetUid) throw new Error('legendary fixture lost procedural UID');
-    reset.equipItemToSlot('gravecaller_cloth_hood', 'helmet', reset.playerId, resetUid);
-    onCastCompleted(reset.ctx, reset.player, 'fireball', target);
-    expect(target.hp).toBe(target.maxHp);
+    expect(sim.unequipItem('mainhand')).toBe(true);
+    sim.equipItemToSlot('mirefen_dirk', 'mainhand', sim.playerId, resetUid);
+    sim.ctx.triggerEquipmentEffects(sim.player, { kind: 'kill', targetId: 101 });
+    expect(sim.player.auras.some((a) => a.kind === 'buff_haste')).toBe(false);
   });
 
   it('clears internal cooldown state on death while retaining equipped selection', () => {

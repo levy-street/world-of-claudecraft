@@ -387,15 +387,26 @@ export function appendLiveProceduralDrop(
     ...(sourceInstance && { dungeonId: sourceInstance.dungeonId }),
     ...(sourceInstance && { dungeonDifficulty: sourceInstance.difficulty }),
   };
-  const lootRecipientClasses = [...eligibleRecipients]
+  // A dungeon/raid final boss's smart-loot roster is every permanent damage/heal
+  // contributor, unioned with the death snapshot. A contributor who steps out of
+  // XP range at the last second cannot remove their class from the signature
+  // table, while an entered AFK player cannot manipulate it merely by zoning in.
+  const lootClassRecipients = new Map<number, PlayerMeta>();
+  if (sourceInstance) {
+    for (const entityId of mob.bossDamagers) {
+      const recipient = ctx.players.get(entityId);
+      if (recipient) lootClassRecipients.set(entityId, recipient);
+    }
+  }
+  for (const recipient of eligibleRecipients) {
+    lootClassRecipients.set(recipient.entityId, recipient);
+  }
+  const lootRecipientClasses = [...lootClassRecipients.values()]
     .sort((a, b) => a.entityId - b.entityId)
-    .filter(
-      (recipient, index, recipients) =>
-        index === 0 || recipient.entityId !== recipients[index - 1].entityId,
-    )
     .map((recipient) => recipient.cls);
   const drop = generateLiveProceduralDrop({
     worldSeed: ctx.cfg.seed,
+    ...(ctx.cfg.proceduralLootSecret && { lootSeedSecret: ctx.cfg.proceduralLootSecret }),
     sourceEntityId: mob.id,
     sourceSpawnSequence: ctx.nextProceduralLootSourceSequence(mob),
     lootSlotIndex: 0,

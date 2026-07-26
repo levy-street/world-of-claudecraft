@@ -6683,110 +6683,110 @@ export const fr_CA: EnTranslations = {
       "critChance": "Chances de critique",
       "dodge": "Esquive",
       "parry": "Parade",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Dégâts d’arme minimum",
+      "weaponMax": "Dégâts d’arme maximum",
+      "weaponDps": "Dégâts d’arme par seconde",
+      "healthOnKill": "Points de vie par victime",
+      "manaOnKill": "Mana par victime",
+      "blockValue": "Valeur de blocage"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Jet possible de {min} à {max}",
+      "advancedDetailsHint": "Maintenez {key} pour afficher les plages de jets possibles.",
+      "powerRollPercent": "Jet de pouvoir : {value}%",
+      "powerRollMilliseconds": "Jet de pouvoir : {value} ms",
+      "powerRollResource": "Jet de pouvoir : {value} de ressource",
+      "powerRollNumber": "Jet de pouvoir : {value}",
+      "legendaryPower": "Pouvoir légendaire",
+      "legendaryLimit": "Unique équipé : {count} pouvoir légendaire",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
+        "common": "Commun",
+        "magic": "Magique",
         "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "epic": "Épique",
+        "legendary": "Légendaire",
+        "mythic": "Mythique"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Puissant",
+        "deft": "Habile",
+        "stalwart": "Robuste",
+        "sages": "du Sage",
+        "spiritual": "Spirituel",
+        "of_focus": "de Focalisation",
+        "of_striking": "de Frappe",
+        "of_alacrity": "d’Alacrité",
+        "of_precision": "de Précision",
+        "warded": "Protégé",
+        "of_reaping": "de Moisson",
+        "of_remembrance": "du Souvenir"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
+        "ashen": "Cendré",
+        "blackfen": "Marais-Noir",
+        "doom": "Fléau",
+        "grave": "Tombe",
+        "mire": "Bourbe",
+        "storm": "Tempête",
+        "thorn": "Épine",
         "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "bite": "Morsure",
+        "brand": "Marque",
+        "promise": "Promesse",
+        "thread": "Fil",
+        "vigil": "Veille",
+        "ward": "Protection",
+        "whisper": "Murmure",
+        "oath": "Serment"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Couronne du Dernier Bûcher",
+          "description": "Chaque troisième Trait de braises brûle les ennemis proches de la cible."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Tranchant de Mâchoire-Grise",
+          "description": "Un coup d’arme sur trois fait saigner la cible et rend un peu de ressource."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Arc long du Bois-sourd",
+          "description": "Tir tendu ou Tir funeste peut brièvement réduire sa cible au silence."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Croc de Verre nocturne",
+          "description": "Tuer un ennemi confère une brève accélération."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Veille d’Ysolei",
+          "description": "Un soin critique crée brièvement une zone réparatrice au sol."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Idole de l’Éveil de la tempête",
+          "description": "Chaque quatrième Éclair d’arc se propage aux ennemis proches."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Sceau du Lieur de cendres",
+          "description": "Chaque quatrième Trait de pénombre marque sa cible, qui subit des dégâts d’Ombre supplémentaires."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Chevalière de l’Aube",
+          "description": "Lumière guérisseuse protège son bénéficiaire avec un bouclier proportionnel aux soins."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Fermoir de Lune farouche",
+          "description": "Chaque troisième Trait sauvage rend de la ressource principale."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Cloche du Neuvième Glas",
+          "description": "Un sort de dégâts sur deux résonne autour de la cible."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Mantelet des Heures volées",
+          "description": "Passer sous 35% de points de vie confère une brève protection défensive."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Bottes de la Route ininterrompue",
+          "description": "Parcourir 15 mètres confère une brève accélération de déplacement."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const fr_CA: EnTranslations = {
       "greed": "Cupidité",
       "pass": "Passer",
       "needAria": "Besoin pour {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "L’option Besoin est indisponible, car votre classe ne peut pas équiper cet objet.",
+      "needUnavailablePower": "L’option Besoin est indisponible, car ce pouvoir légendaire est réservé à une autre classe.",
       "greedAria": "Cupidité pour {item}",
       "passAria": "Passer pour {item}",
       "everyonePassed": "Tout le monde a passé pour {item}.",

@@ -6962,6 +6962,7 @@ export const ja_JP: EnTranslations = {
       "pass": "パス",
       "needAria": "{item}を必要",
       "needUnavailable": "あなたのクラスではこのアイテムを装備できないため、「必要」は選択できません。",
+      "needUnavailablePower": "このレジェンダリー能力は別のクラス専用のため、「必要」を選択できません。",
       "greedAria": "{item}を強欲",
       "passAria": "{item}をパス",
       "everyonePassed": "全員が{item}をパスしました。",

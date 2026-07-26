@@ -39,6 +39,7 @@ import {
   type BagDestroyAction,
   type BagMode,
   bagDestroyAction,
+  bagDiscardInstance,
   bagItemAction,
   bagQualityKey,
   bagShiftLinks,
@@ -561,7 +562,16 @@ export class BagsWindow {
   // without rebuilding the filter bar and stealing input focus.
   private fillGrid(grid: HTMLElement): void {
     const world = this.deps.world();
-    const model = buildBagGrid(world.inventory, (id) => ITEMS[id], this.filter, world.bagCapacity);
+    const model = buildBagGrid(
+      world.inventory,
+      (id) => ITEMS[id],
+      this.filter,
+      world.bagCapacity,
+      (slot, item) => ({
+        name: itemPresentationName({ name: itemDisplayName(item) }, slot.instance),
+        quality: itemPresentationQuality(item, slot.instance),
+      }),
+    );
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
       return;
@@ -1199,7 +1209,10 @@ export class BagsWindow {
     if (!stack) return;
     const prompt = document.createElement('div');
     prompt.className = 'prompt panel discard-item-prompt';
-    const itemName = item ? itemDisplayName(item) : itemId;
+    const instance = bagDiscardInstance(this.deps.world().inventory, itemId, instanceUid);
+    const itemName = item
+      ? itemPresentationName({ name: itemDisplayName(item) }, instance)
+      : itemId;
     prompt.innerHTML = `<div class="prompt-text">${esc(t('itemUi.bags.destroyTitle', { item: itemName }))}</div>`;
     let input: HTMLInputElement | null = null;
     if (maxCount > 1) {

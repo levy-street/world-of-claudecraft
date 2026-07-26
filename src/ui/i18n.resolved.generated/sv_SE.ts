@@ -6683,110 +6683,110 @@ export const sv_SE: EnTranslations = {
       "critChance": "Kritisk chans",
       "dodge": "Undvikande",
       "parry": "Parering",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Minimal vapenskada",
+      "weaponMax": "Maximal vapenskada",
+      "weaponDps": "Vapenskada per sekund",
+      "healthOnKill": "Hälsa vid dödande",
+      "manaOnKill": "Mana vid dödande",
+      "blockValue": "Blockeringsvärde"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Möjligt slag från {min} till {max}",
+      "advancedDetailsHint": "Håll ned {key} för att visa möjliga slagintervall.",
+      "powerRollPercent": "Kraftslag: {value}%",
+      "powerRollMilliseconds": "Kraftslag: {value} ms",
+      "powerRollResource": "Kraftslag: {value} resurs",
+      "powerRollNumber": "Kraftslag: {value}",
+      "legendaryPower": "Legendarisk kraft",
+      "legendaryLimit": "Unikt utrustad: {count} legendarisk kraft",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Vanlig",
+        "magic": "Magisk",
+        "rare": "Sällsynt",
+        "epic": "Episk",
+        "legendary": "Legendarisk",
+        "mythic": "Mytisk"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Mäktig",
+        "deft": "Skicklig",
+        "stalwart": "Ståndaktig",
+        "sages": "Visemannens",
+        "spiritual": "Andlig",
+        "of_focus": "av Fokus",
+        "of_striking": "av Slagkraft",
+        "of_alacrity": "av Raskhet",
+        "of_precision": "av Precision",
+        "warded": "Beskyddad",
+        "of_reaping": "av Skörd",
+        "of_remembrance": "av Hågkomst"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
+        "ashen": "Askgrå",
+        "blackfen": "Svartkärr",
+        "doom": "Undergång",
+        "grave": "Grav",
+        "mire": "Dy",
         "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "thorn": "Törn",
+        "wyrm": "Drakorm",
+        "bite": "Bett",
+        "brand": "Brännmärke",
+        "promise": "Löfte",
+        "thread": "Tråd",
+        "vigil": "Vaka",
+        "ward": "Skydd",
+        "whisper": "Viskning",
+        "oath": "Ed"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Sista bålets krona",
+          "description": "Var tredje Glödbult sveder fiender nära målet."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Gråkäkes egg",
+          "description": "Var tredje vapenträff får målet att blöda och återställer lite resurs."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Tystskogens långbåge",
+          "description": "Långt drag eller Ondskeskott kan tysta målet en kort stund."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Nattglasets huggtand",
+          "description": "Ett dödande ger en kort ökning av snabbhet."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Ysoleis vaka",
+          "description": "Kritisk läkning skapar kortvarigt ett återställande område på marken."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Stormuppvaknandets avgud",
+          "description": "Var fjärde Bågblixt hoppar till fiender i närheten."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Askbindarens sigill",
+          "description": "Var fjärde Dysterbult märker sitt mål för ytterligare Skuggskada."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Gryningsvaktens signet",
+          "description": "Lagande ljus skyddar mottagaren med en sköld motsvarande en del av läkningen."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Vildmånens spänne",
+          "description": "Var tredje Vildbult återställer den primära resursen."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Nionde klangens klocka",
+          "description": "Varannan skadlig besvärjelse klämtar runt målet."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "De stulna timmarnas mantel",
+          "description": "Att falla under 35% hälsa ger ett kort defensivt skydd."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Den obrutna vägens stövlar",
+          "description": "Att röra sig 15 yard ger en kort ökning av rörelsehastigheten."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const sv_SE: EnTranslations = {
       "greed": "Girighet",
       "pass": "Avstå",
       "needAria": "Behov av {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Behov är inte tillgängligt eftersom din klass inte kan utrusta föremålet.",
+      "needUnavailablePower": "Behov är inte tillgängligt eftersom den här legendariska kraften är begränsad till en annan klass.",
       "greedAria": "Girighet för {item}",
       "passAria": "Avstå från {item}",
       "everyonePassed": "Alla avstod från {item}.",

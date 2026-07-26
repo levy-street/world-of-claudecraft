@@ -6683,110 +6683,110 @@ export const nl_NL: EnTranslations = {
       "critChance": "Kritieke Kans",
       "dodge": "Ontwijken",
       "parry": "Pareren",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Minimale wapenschade",
+      "weaponMax": "Maximale wapenschade",
+      "weaponDps": "Wapenschade per seconde",
+      "healthOnKill": "Gezondheid bij doden",
+      "manaOnKill": "Mana bij doden",
+      "blockValue": "Blokkeerwaarde"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Mogelijke worp van {min} tot {max}",
+      "advancedDetailsHint": "Houd {key} ingedrukt om de mogelijke worpbereiken te tonen.",
+      "powerRollPercent": "Krachtworp: {value}%",
+      "powerRollMilliseconds": "Krachtworp: {value} ms",
+      "powerRollResource": "Krachtworp: {value} hulpbron",
+      "powerRollNumber": "Krachtworp: {value}",
+      "legendaryPower": "Legendarische kracht",
+      "legendaryLimit": "Uniek uitgerust: {count} legendarische kracht",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Gewoon",
+        "magic": "Magisch",
+        "rare": "Zeldzaam",
+        "epic": "Episch",
+        "legendary": "Legendarisch",
+        "mythic": "Mythisch"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Machtig",
+        "deft": "Bedreven",
+        "stalwart": "Standvastig",
+        "sages": "van de Wijze",
+        "spiritual": "Spiritueel",
+        "of_focus": "van Focus",
+        "of_striking": "van Slagkracht",
+        "of_alacrity": "van Voortvarendheid",
+        "of_precision": "van Precisie",
+        "warded": "Beschermd",
+        "of_reaping": "van de Oogst",
+        "of_remembrance": "van Herinnering"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
+        "ashen": "Asgrauw",
+        "blackfen": "Zwartveen",
+        "doom": "Doem",
+        "grave": "Graf",
+        "mire": "Moeras",
         "storm": "Storm",
-        "thorn": "Thorn",
+        "thorn": "Doorn",
         "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "bite": "Beet",
+        "brand": "Brandmerk",
+        "promise": "Belofte",
+        "thread": "Draad",
+        "vigil": "Wake",
+        "ward": "Bescherming",
+        "whisper": "Fluistering",
+        "oath": "Eed"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Kroon van de Laatste Brandstapel",
+          "description": "Elke derde Sintelbout verschroeit vijanden in de buurt van het doelwit."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Snede van Grijskaak",
+          "description": "Elke derde wapentreffer laat het doelwit bloeden en herstelt een beetje hulpbron."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Langboog van het Stille Woud",
+          "description": "Lange Trek of Boosaardig Schot kan het doelwit kort het zwijgen opleggen."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Nachtglastand",
+          "description": "Een gedode vijand geeft kort haast."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Ysoleis Wake",
+          "description": "Kritieke genezing maakt kort een herstellend gebied op de grond."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Idool van Stormontwaken",
+          "description": "Elke vierde Boogbliksem springt over naar vijanden in de buurt."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Zegel van de Asbinder",
+          "description": "Elke vierde Duisterbout markeert zijn doelwit voor extra Schaduwschade."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Zegelring van de Dageraad",
+          "description": "Helend Licht beschermt de ontvanger met een schild voor een deel van de genezing."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Gesp van de Wilde Maan",
+          "description": "Elke derde Wildbout herstelt de primaire hulpbron."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Bel van de Negende Slag",
+          "description": "Elke tweede schadelijke spreuk galmt rond het doelwit."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Mantel van Gestolen Uren",
+          "description": "Onder 35% gezondheid komen geeft kort een defensieve bescherming."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Laarzen van de Ongebroken Weg",
+          "description": "15 meter bewegen geeft kort een hogere bewegingssnelheid."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const nl_NL: EnTranslations = {
       "greed": "Hebzucht",
       "pass": "Passeren",
       "needAria": "Nodig voor {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Nodig is niet beschikbaar omdat je klasse dit voorwerp niet kan uitrusten.",
+      "needUnavailablePower": "Nodig is niet beschikbaar omdat deze legendarische kracht tot een andere klasse is beperkt.",
       "greedAria": "Hebzucht voor {item}",
       "passAria": "{item} passeren",
       "everyonePassed": "Iedereen passeerde {item}.",

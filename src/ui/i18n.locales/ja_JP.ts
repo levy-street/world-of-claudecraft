@@ -9352,4 +9352,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'そのIDのアイテムはありません。',
   'devCommand.kitCurrentSpec': '現在のスペック',
   'hudChrome.enchanting.wornTag': '装備中 ({slot})',
+  'itemUi.lootRoll.needUnavailablePower':
+    'このレジェンダリー能力は別のクラス専用のため、「必要」を選択できません。',
 };

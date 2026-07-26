@@ -5,6 +5,7 @@ export const MAX_ACTIVE_LEGENDARY_POWERS = 1;
 
 export type EquipmentEventKind =
   | 'ability_cast'
+  | 'ability_hit'
   | 'damage_taken'
   | 'heal'
   | 'health_changed'

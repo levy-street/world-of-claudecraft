@@ -6962,6 +6962,7 @@ export const zh_TW: EnTranslations = {
       "pass": "放棄",
       "needAria": "需求 {item}",
       "needUnavailable": "你的職業無法裝備此物品，因此不能選擇需求。",
+      "needUnavailablePower": "此傳奇能力僅限其他職業使用，因此不能選擇需求。",
       "greedAria": "貪婪 {item}",
       "passAria": "放棄 {item}",
       "everyonePassed": "所有人都放棄了 {item}。",

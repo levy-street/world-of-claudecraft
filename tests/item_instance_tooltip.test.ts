@@ -382,30 +382,33 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
   });
 });
 
-// Composition ORDER inside hud.itemTooltip (the builders are pinned above,
-// the composed placement is hud.ts glue): badges under the soulbound line,
+// Composition order inside ItemPresentationController (the builders are pinned above):
+// badges under the soulbound line,
 // baked bonus stats after the def's own stat lines, the maker's mark near the
 // bottom (after the set block, before the sell price).
 import { readFileSync } from 'node:fs';
 
-describe('hud.itemTooltip composition order (source pins)', () => {
-  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+describe('ItemPresentationController composition order (source pins)', () => {
+  const source = readFileSync(
+    new URL('../src/ui/item_presentation_controller.ts', import.meta.url),
+    'utf8',
+  );
   const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
-  const badges = hud.indexOf('instanceBadgeLines(resolverInstance)');
-  const bonus = hud.indexOf('instanceBonusStatLines(resolverInstance)');
+  const badges = source.indexOf('instanceBadgeLines(resolverInstance)');
+  const bonus = source.indexOf('instanceBonusStatLines(resolverInstance)');
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
-  const mark = hud.indexOf('instanceMakersMarkLine(resolverInstance, item.kind)');
-  const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
-  const setBlock = hud.indexOf('this.itemSetBlock(item)');
+  const mark = source.indexOf('instanceMakersMarkLine(resolverInstance, item.kind)');
+  const soulbound = source.indexOf("t('hudChrome.itemSoulbound')");
+  const setBlock = source.indexOf('this.itemSetBlock(item)');
 
   it('composes all three instance line sets exactly once each', () => {
     expect(badges).toBeGreaterThan(-1);
     expect(bonus).toBeGreaterThan(-1);
     expect(mark).toBeGreaterThan(-1);
-    expect(hud.indexOf('instanceBadgeLines(resolverInstance)', badges + 1)).toBe(-1);
-    expect(hud.indexOf('instanceBonusStatLines(resolverInstance)', bonus + 1)).toBe(-1);
-    expect(hud.indexOf('instanceMakersMarkLine(', mark + 1)).toBe(-1);
+    expect(source.indexOf('instanceBadgeLines(resolverInstance)', badges + 1)).toBe(-1);
+    expect(source.indexOf('instanceBonusStatLines(resolverInstance)', bonus + 1)).toBe(-1);
+    expect(source.indexOf('instanceMakersMarkLine(', mark + 1)).toBe(-1);
   });
 
   it('orders them badge lines, then bonus stats, then the makers mark', () => {

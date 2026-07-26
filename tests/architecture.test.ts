@@ -144,6 +144,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/stat_tooltip_view.ts',
+  'src/ui/tooltip_position_core.ts',
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
   'src/ui/mob_tooltip_view.ts',
@@ -165,6 +166,7 @@ const UI_PURE_CORES = [
   'src/ui/options_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
+  'src/ui/hud/vendor/heroic_vendor_pending_core.ts',
   'src/ui/hud/vendor/train_view.ts',
   'src/ui/hud/vendor/train_learn_core.ts',
   'src/ui/hud/vendor/unbind_view.ts',
@@ -174,6 +176,7 @@ const UI_PURE_CORES = [
   'src/ui/woc_store_view.ts',
   'src/ui/wallet_connection_view.ts',
   'src/ui/hud/loot/loot_roll_status_view.ts',
+  'src/ui/hud/loot/need_roll_eligibility_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
   'src/ui/craft_celebration_view.ts',
   'src/ui/crafting_view.ts',
@@ -769,5 +772,19 @@ describe('curated bare-named pure cores (cross-check)', () => {
       [...new Set(derivedBare)],
       'BARE_NAMED must equal the registered cores whose name is bare (not _view/_core)',
     ).toEqual([...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort());
+  });
+});
+
+describe('protected Hud coordinator budget', () => {
+  // Release base c1a7f42f contains 14,525 newline-delimited rows. Feature work
+  // must extract into focused controllers rather than grow the root coordinator.
+  const releaseBaseLines = 14_525;
+
+  it('does not grow src/ui/hud.ts beyond the release base', () => {
+    const lines = readFileSync(join(repoRoot, 'src', 'ui', 'hud.ts'), 'utf8').split(/\r?\n/);
+    expect(
+      lines.length,
+      `src/ui/hud.ts grew to ${lines.length} lines; extract feature orchestration instead`,
+    ).toBeLessThanOrEqual(releaseBaseLines);
   });
 });

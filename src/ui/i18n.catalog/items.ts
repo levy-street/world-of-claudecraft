@@ -2356,6 +2356,8 @@ const itemNamesEn = {
       pass: 'Pass',
       needAria: 'Need for {item}',
       needUnavailable: 'Need is unavailable because your class cannot equip this item.',
+      needUnavailablePower:
+        'Need is unavailable because this Legendary power is restricted to another class.',
       greedAria: 'Greed for {item}',
       passAria: 'Pass on {item}',
       everyonePassed: 'Everyone passed on {item}.',

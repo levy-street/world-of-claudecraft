@@ -1,6 +1,6 @@
 import { ITEMS } from '../../../sim/data';
 import type { PublicItemInstanceView } from '../../../sim/procedural_item_public';
-import type { ItemDef, LootRollChoice, SimEvent } from '../../../sim/types';
+import type { ItemDef, LootRollChoice, PlayerClass, SimEvent } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -19,6 +19,7 @@ import {
   type LootRollStatusRow,
   lootRollStatusFingerprint,
 } from './loot_roll_status_view';
+import { needDenialReason } from './need_roll_eligibility_view';
 
 type LootRollEvent = Extract<SimEvent, { type: 'lootRoll' }>;
 type MasterLootEvent = Extract<SimEvent, { type: 'masterLoot' }>;
@@ -34,6 +35,7 @@ export interface LootRollControllerDeps {
   world(): LootRollWorld;
   now(): number;
   isMobileLayout(): boolean;
+  playerClass(): PlayerClass;
   itemIcon(item: ItemDef, instance?: PublicItemInstanceView): string;
   itemTooltip(item: ItemDef, instance?: PublicItemInstanceView): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
@@ -325,7 +327,13 @@ export class LootRollController {
         : ` disabled aria-disabled='true' aria-describedby='${needReasonId}'`;
       const needReason = event.canNeed
         ? ''
-        : `<div class='loot-roll-need-reason' id='${needReasonId}'>${esc(t('itemUi.lootRoll.needUnavailable'))}</div>`;
+        : `<div class='loot-roll-need-reason' id='${needReasonId}'>${esc(
+            t(
+              needDenialReason(item, event.instance, this.deps.playerClass()) === 'legendary_power'
+                ? 'itemUi.lootRoll.needUnavailablePower'
+                : 'itemUi.lootRoll.needUnavailable',
+            ),
+          )}</div>`;
       const row = this.deps.document.createElement('div');
       row.className = 'loot-roll panel';
       row.dataset.rollId = String(rollId);

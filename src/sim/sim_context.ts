@@ -281,7 +281,7 @@ export interface SimContextCallbacks {
   inheritDungeonResetLocks(pid: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
-  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[], participants: PlayerMeta[]): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and
@@ -546,7 +546,11 @@ export interface SimContextCallbacks {
   applyNonPlayerStatAura(target: Entity, aura: Aura, direction: 1 | -1): void;
   delveRunForMob(mobId: number): DelveRun | null;
   onDelveBossDefeated(run: DelveRun): void;
-  grantNythraxisLockout(boss: Entity, recipients?: PlayerMeta[]): void;
+  grantNythraxisLockout(
+    boss: Entity,
+    recipients?: PlayerMeta[],
+    participants?: PlayerMeta[],
+  ): void;
   frenzyPackmates(dead: Entity): void;
   armDeathThroes(dead: Entity): void;
   // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts) both

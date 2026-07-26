@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { proceduralCorpseLootMarker } from '../src/render/procedural_loot_marker';
 import type { ProceduralRarity } from '../src/sim/procedural_item';
@@ -90,5 +91,26 @@ describe('procedural corpse loot marker', () => {
       quality: 'epic',
       labelKey: 'itemUi.procedural.rarity.epic',
     });
+  });
+});
+
+describe('procedural corpse loot marker readability', () => {
+  const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+  const marker = css.slice(
+    css.indexOf('.np-marker.loot.procedural-loot {'),
+    css.indexOf('.np-marker.loot.procedural-loot::before'),
+  );
+
+  it('uses a readable text floor and an opaque outlined backing in the 3D world', () => {
+    expect(marker).toContain('font-size: 12px;');
+    expect(marker).toContain('font-weight: 800;');
+    expect(marker).toContain('background: rgb(0 0 0 / 82%);');
+    expect(marker).toContain('border: 1px solid var(--procedural-loot-color);');
+  });
+
+  it('keeps an explicit forced-colors backing', () => {
+    expect(css).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?--procedural-loot-color: CanvasText;[\s\S]*?background: Canvas;/,
+    );
   });
 });

@@ -61,6 +61,7 @@ export interface NythraxisForgeRow {
   randomAffixes: boolean;
   raidForged: boolean;
   powerId: ProceduralLegendaryPowerId | null;
+  previewInstance?: ItemInstancePayload;
   blockReason: QuartermasterBlockReason;
 }
 
@@ -133,6 +134,33 @@ function forgeRow(
   };
 }
 
+function proceduralForgePreview(
+  baseId: string,
+  itemLevel: number,
+  quality: NythraxisForgeRow['quality'],
+  powerId: ProceduralLegendaryPowerId | null,
+  raidForged: boolean,
+): ItemInstancePayload {
+  const power = powerId ? PROCEDURAL_LEGENDARY_POWERS[powerId] : undefined;
+  return {
+    procedural: {
+      version: 1,
+      uid: `quartermaster-preview:${baseId}:${powerId ?? quality}`,
+      baseId,
+      itemLevel,
+      rarity: quality,
+      affixes: [],
+      ...(power && {
+        legendaryPowerId: power.id,
+        powerRevision: power.revision,
+      }),
+      ...(raidForged && { raidForged: true }),
+      generatedName: { baseId },
+      seed: 0,
+    },
+  };
+}
+
 function looksLikeNythraxisLegendary(slot: InvSlot): boolean {
   const procedural = slot.instance?.procedural;
   if (!procedural || procedural.rarity !== 'legendary' || !procedural.legendaryPowerId)
@@ -176,6 +204,13 @@ function buildForgeRows(
           randomAffixes: true,
           raidForged: false,
           powerId: null,
+          previewInstance: proceduralForgePreview(
+            base.id,
+            normalProfile.itemLevels.epic,
+            'epic',
+            null,
+            false,
+          ),
         },
         balances,
       ),
@@ -193,6 +228,13 @@ function buildForgeRows(
           randomAffixes: true,
           raidForged: false,
           powerId: null,
+          previewInstance: proceduralForgePreview(
+            base.id,
+            heroicProfile.itemLevels.epic,
+            'epic',
+            null,
+            false,
+          ),
         },
         balances,
       ),
@@ -222,6 +264,13 @@ function buildForgeRows(
           randomAffixes: true,
           raidForged: true,
           powerId,
+          previewInstance: proceduralForgePreview(
+            base.id,
+            heroicProfile.itemLevels.legendary,
+            'legendary',
+            powerId,
+            true,
+          ),
         },
         balances,
       ),

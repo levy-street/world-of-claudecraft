@@ -7059,6 +7059,7 @@ export type TranslationKeyFlat =
   | 'itemUi.lootRoll.need'
   | 'itemUi.lootRoll.needAria'
   | 'itemUi.lootRoll.needUnavailable'
+  | 'itemUi.lootRoll.needUnavailablePower'
   | 'itemUi.lootRoll.pass'
   | 'itemUi.lootRoll.passAria'
   | 'itemUi.lootRoll.rolled'

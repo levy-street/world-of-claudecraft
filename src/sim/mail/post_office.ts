@@ -114,6 +114,14 @@ export class PostOffice {
   // Sim's thin delegates; internal to this module otherwise.
   mail: MailMessage[] = [];
   private nextMailId = 1;
+  // Monotonic, process-local marker for successful player mail commands. The
+  // server samples it around a synchronous command so it can enqueue the
+  // character+realm transaction only when the command actually mutated escrow.
+  private commandMutationRevision = 0;
+  // Distant Heroic rewards mutate both a character's lockout/receipt and the
+  // shared Ravenpost escrow in one combat settlement. The server drains these
+  // recipient ids after each tick and persists the whole batch atomically.
+  private atomicRewardRecipientIds = new Set<number>();
   // Entity ids of every mailbox object, assigned by the Sim ctor during world
   // placement (the spawn loop stays on Sim). Any raven pillar is a valid place
   // to tend your post.
@@ -130,6 +138,16 @@ export class PostOffice {
   private undelivered = new Set<MailMessage>();
 
   constructor(private readonly ctx: SimContext) {}
+
+  get persistenceMutationRevision(): number {
+    return this.commandMutationRevision;
+  }
+
+  drainAtomicRewardRecipientIds(): number[] {
+    const recipients = [...this.atomicRewardRecipientIds].sort((a, b) => a - b);
+    this.atomicRewardRecipientIds.clear();
+    return recipients;
+  }
 
   // Public tick entry: the Sim tick calls this in the end-of-tick system block
   // (after market.update()). Once a second: land due letters, prune expired ones.
@@ -504,6 +522,7 @@ export class PostOffice {
       items: escrowItems,
       delaySeconds: MAIL_DELIVERY_SECONDS,
     });
+    this.commandMutationRevision++;
     this.result(meta.entityId, 'sent', { name: recipient.name, value: MAIL_POSTAGE });
     if (coin > 0 || escrowItems.length > 0) {
       this.ctx.bumpDeedStat(meta, 'mailAttachmentsSent', 1);
@@ -527,6 +546,7 @@ export class PostOffice {
       return;
     }
     const hadAttachments = m.copper > 0 || m.items.length > 0;
+    let changed = false;
     // Prepare the authoritative arrival payloads before the first mutation.
     // Bind-on-trade is a transfer primitive, not a trade-window special case:
     // an armed mailed copy locks to the recipient when collected.
@@ -555,6 +575,7 @@ export class PostOffice {
       meta.copper += m.copper;
       this.result(meta.entityId, 'collected', { value: m.copper });
       m.copper = 0;
+      changed = true;
     }
     // Parcels respect bag capacity (#1354, the market-collect rule): a stack that
     // does not fit stays ATTACHED to the letter for a later take, never destroyed
@@ -570,10 +591,13 @@ export class PostOffice {
           s.itemId,
           s.instance,
         );
-        if (fits) this.ctx.addItemInstance(s.itemId, s.instance, meta.entityId);
-        else kept.push(m.items[index]);
+        if (fits) {
+          this.ctx.addItemInstance(s.itemId, s.instance, meta.entityId);
+          changed = true;
+        } else kept.push(m.items[index]);
       } else if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
         this.ctx.addItem(s.itemId, s.count, meta.entityId);
+        changed = true;
       } else {
         kept.push(m.items[index]);
       }
@@ -583,18 +607,24 @@ export class PostOffice {
     if (!m.read) {
       this.indexDec(m.recipientKey);
       m.read = true;
+      changed = true;
     }
     if (kept.length > 0) {
       // Attachments remain: the expiry clock stays paused (Infinity) and the
       // player is told to make room, exactly as the Merchant's collect does.
       this.ctx.error(meta.entityId, 'Your bags are full.');
+      if (changed) this.commandMutationRevision++;
       return;
     }
     // Fully emptied: the letter leaves its attachment clock (Infinity for
     // system/npc mail, the attachment window for player parcels, either way a
     // returned letter included) and starts the standard emptied-letter window.
     // Only the take that empties it fires, so a repeat take never extends it.
-    if (hadAttachments) m.expiresAt = this.ctx.time + MAIL_EXPIRY_SECONDS;
+    if (hadAttachments) {
+      m.expiresAt = this.ctx.time + MAIL_EXPIRY_SECONDS;
+      changed = true;
+    }
+    if (changed) this.commandMutationRevision++;
   }
 
   mailDelete(mailId: number, pid?: number): void {
@@ -621,6 +651,7 @@ export class PostOffice {
     // A delivered-and-unread letter deleted before it is read leaves the index.
     if (!m.read) this.indexDec(m.recipientKey);
     this.mail.splice(idx, 1);
+    this.commandMutationRevision++;
   }
 
   mailMarkRead(mailId: number, pid?: number): void {
@@ -630,6 +661,7 @@ export class PostOffice {
     if (m && !m.read) {
       this.indexDec(m.recipientKey);
       m.read = true;
+      this.commandMutationRevision++;
     }
   }
 
@@ -669,15 +701,44 @@ export class PostOffice {
     if (!meta || count <= 0) return;
     const items = [{ itemId, count }, ...additionalItems.map((slot) => ({ ...slot }))];
     const nythraxisReward = items.some((slot) => slot.itemId === 'deathless_fragment');
+    const letter = nythraxisReward ? NYTHRAXIS_REWARD_LETTER : HEROIC_MARK_LETTER;
+    const recipientKey = this.mailKeyFor(meta);
+    // Reward attachments are fungible counters, so accumulate them into the
+    // recipient's one durable letter per reward stream. Without this, permanent
+    // system parcels bypass the player-mail cap forever, eventually fill the
+    // mailbox and make the realm-wide JSONB blob grow once per absent clear.
+    const existing = this.mail.find(
+      (message) =>
+        message.kind === 'system' &&
+        message.letterId === letter.letterId &&
+        (message.recipientKey === recipientKey || message.recipientKey === meta.name),
+    );
+    if (existing) {
+      const wasRead = existing.read;
+      for (const item of items) {
+        const stack = existing.items.find(
+          (candidate) => candidate.itemId === item.itemId && candidate.instance === undefined,
+        );
+        if (stack) stack.count += item.count;
+        else existing.items.push(cloneInvSlot(item));
+      }
+      existing.expiresAt = Infinity;
+      existing.read = false;
+      existing.announced = false;
+      if (wasRead && this.ctx.time >= existing.deliverAt) this.indexInc(existing.recipientKey);
+      this.atomicRewardRecipientIds.add(meta.entityId);
+      return;
+    }
     this.sendLetter(
-      this.mailKeyFor(meta),
+      recipientKey,
       meta.name,
       {
-        ...(nythraxisReward ? NYTHRAXIS_REWARD_LETTER : HEROIC_MARK_LETTER),
+        ...letter,
         items,
       },
       'system',
     );
+    this.atomicRewardRecipientIds.add(meta.entityId);
   }
 
   // Quest turn-in hook (turnInQuestCore): quests with an authored letter have

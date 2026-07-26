@@ -27,37 +27,37 @@ const TRADE_RANGE = 10;
 // trade-locked once its payload carries boundTo: a bound instance stays with
 // its owner and is never offered, revalidated-in, or consumed by a swap.
 // (bindOnTrade only ARMS the lock; boundTo is the applied lock, stamped on the
-// recipient's copy in grantOffer below.) Used at the three trade sites: the
-// offerable-count gate in tradeSetOffer, the confirm-time revalidation in
-// offerCovered, and the removal preference in removeOffer/fitsAfterSwap.
+// recipient's copy in grantOffer below.) Exact instance rows consult this
+// predicate; generic rows are restricted to payload-free fungible stock.
 function isTradeLocked(instance: ItemInstancePayload | undefined): boolean {
   return instance?.boundTo !== undefined;
 }
 
-// How many held copies of itemId are trade-locked (boundTo set). A bound copy
-// is always instanced, so this only ever counts instanced slots; a plain stack
-// never contributes. Kept as a SUBTRACTION from ctx.countItem (offerableCount
-// below) rather than a direct unbound sum so the count stays correct against
-// any inventory hub: the offline Sim keeps its slots on meta.inventory, but a
-// decoupled test ctx may store copies elsewhere and leave meta.inventory empty,
-// where the bound count is simply zero and every copy is offerable.
 function boundCount(meta: PlayerMeta, itemId: string): number {
-  let n = 0;
-  // `?? []`: a decoupled test ctx (tests/heroic_soulbound.test.ts's fake) may
-  // model counts elsewhere and carry NO inventory array at all; per the
-  // documented intent above, its bound count is simply zero.
-  for (const s of meta.inventory ?? []) {
-    if (s.itemId === itemId && isTradeLocked(s.instance)) n += s.count;
-  }
-  return n;
+  return (meta.inventory ?? []).reduce(
+    (count, slot) =>
+      count + (slot.itemId === itemId && isTradeLocked(slot.instance) ? slot.count : 0),
+    0,
+  );
 }
 
-// The count of itemId the player may actually trade: the raw held total minus
-// the trade-locked copies. tradeSetOffer and offerCovered gate on this instead
-// of the raw held total so a bound copy is never offered nor passes final
-// validation.
 function offerableCount(ctx: SimContext, meta: PlayerMeta, itemId: string): number {
   return ctx.countItem(itemId, meta.entityId) - boundCount(meta, itemId);
+}
+
+// Procedural copies have a stable UID selector and must never be consumed by a
+// generic row. Other legacy instance payloads do not yet have a stable selector,
+// so they retain their existing generic transport semantics.
+function genericOfferableCount(ctx: SimContext, meta: PlayerMeta, itemId: string): number {
+  const unboundProcedural = (meta.inventory ?? []).reduce(
+    (count, slot) =>
+      count +
+      (slot.itemId === itemId && slot.instance?.procedural && !isTradeLocked(slot.instance)
+        ? slot.count
+        : 0),
+    0,
+  );
+  return offerableCount(ctx, meta, itemId) - unboundProcedural;
 }
 
 export function tradeRequest(ctx: SimContext, targetPid: number, pid?: number): void {
@@ -182,18 +182,15 @@ export function tradeSetOffer(
     merged.set(request.itemId, (merged.get(request.itemId) ?? 0) + count);
   }
 
-  // Fungible/base-id offers retain their legacy merged-count semantics. Exact
-  // generated offers above are separate one-copy rows and cannot be flattened.
+  // A procedural copy must use its stable exact selector so the canonical offer
+  // exposes the payload to both parties before either confirms. Legacy instance
+  // payloads without UIDs retain their existing base-id transport semantics.
   for (const [itemId, count] of merged) {
     if (ctx.countItem(itemId, r.meta.entityId) < count) continue;
-    const exactReserved = cleaned.reduce(
-      (total, slot) => total + (slot.itemId === itemId ? slot.count : 0),
-      0,
-    );
-    const unbound = Math.max(0, offerableCount(ctx, r.meta, itemId) - exactReserved);
-    if (unbound < count) {
-      boundDenied = true;
-      if (unbound > 0) cleaned.push({ itemId, count: unbound });
+    const generic = genericOfferableCount(ctx, r.meta, itemId);
+    if (generic < count) {
+      if (offerableCount(ctx, r.meta, itemId) < count) boundDenied = true;
+      if (generic > 0) cleaned.push({ itemId, count: generic });
       continue;
     }
     cleaned.push({ itemId, count });
@@ -209,16 +206,9 @@ export function tradeSetOffer(
   session.acceptedB = false;
 }
 
-// Removal phase of the swap: consumes one side's offer out of their bags,
-// preserving each slot's ItemInstancePayload (enchants, signed materials,
-// rolled quality, boundTo) for grantOffer instead of re-granting plain copies.
-// removePreferFungible already reports exactly which consumed slots carried an
-// instance; grantOffer only had to route those payloads back in through
-// addItemInstance rather than discarding them, the same way discardItem never
-// needed to because a discarded item's payload does not need to reappear
-// anywhere. Vendor buyback is a separate path and preserves its own exact
-// payload; trade still needs the two-phase remove/grant ordering below because
-// both participants mutate in one atomic swap.
+// Removal phase of the swap: exact procedural rows preserve their authoritative
+// payload. Generic rows retain legacy non-procedural instance transport, but the
+// removal predicate can never consume a procedural copy without its UID.
 // BOTH removals must run before EITHER grant: when the two offers share an
 // itemId, granting first inflates the counter-party's stock, so their removal
 // consumes just-received copies (removeItem scans highest-index-first, exactly
@@ -227,9 +217,8 @@ export function tradeSetOffer(
 type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstancePayload[] };
 
 /** Resolve the procedural copies an offer would remove without mutating live
- * bags. Exact rows are consumed first (the canonical offer order), then
- * generic rows consume fungible stock before walking unbound instance slots
- * from the end, matching removeOffer/removePreferFungible. */
+ * bags. Every procedural transfer is an exact canonical row. Generic rows
+ * consume payload-free stock only and therefore never contribute here. */
 function proceduralTransfersForOffer(
   meta: PlayerMeta,
   items: readonly InvSlot[],
@@ -258,37 +247,7 @@ function proceduralTransfersForOffer(
       continue;
     }
 
-    let remaining = offered.count;
-    for (let index = scratch.length - 1; index >= 0 && remaining > 0; index--) {
-      const held = scratch[index];
-      if (held.itemId !== offered.itemId || held.instance) continue;
-      const take = Math.min(held.count, remaining);
-      held.count -= take;
-      remaining -= take;
-      if (held.count <= 0) scratch.splice(index, 1);
-    }
-    for (let index = scratch.length - 1; index >= 0 && remaining > 0; index--) {
-      const held = scratch[index];
-      if (held.itemId !== offered.itemId || !held.instance || isTradeLocked(held.instance)) {
-        continue;
-      }
-      const take = Math.min(held.count, remaining);
-      if (held.instance.procedural) {
-        for (let unit = 0; unit < take; unit++) {
-          transfers.push({
-            itemId: held.itemId,
-            count: 1,
-            instance: cloneItemInstancePayload(held.instance),
-          });
-        }
-      }
-      held.count -= take;
-      remaining -= take;
-      if (held.count <= 0) scratch.splice(index, 1);
-    }
-    // A decoupled test context may keep generic stock outside meta.inventory.
-    // offerCovered remains authoritative for it; no surfaced procedural UID
-    // exists to collision-check here.
+    // Generic rows cannot carry a procedural payload by construction.
   }
   return transfers;
 }
@@ -318,9 +277,13 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
       });
       continue;
     }
-    // A base-id removal NEVER consumes a trade-locked copy. The offer was
-    // clamped above; the predicate is defence in depth.
-    const instances = removePreferFungible(ctx, s.itemId, s.count, fromPid, isTradeLocked);
+    const instances = removePreferFungible(
+      ctx,
+      s.itemId,
+      s.count,
+      fromPid,
+      (instance) => isTradeLocked(instance) || instance?.procedural !== undefined,
+    );
     grants.push({ itemId: s.itemId, plainCount: s.count - instances.length, instances });
   }
   return grants;
@@ -345,20 +308,26 @@ function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): voi
   }
 }
 
-export function tradeConfirm(ctx: SimContext, pid?: number): void {
+export interface TradeCompletion {
+  a: number;
+  b: number;
+  changed: boolean;
+}
+
+export function tradeConfirm(ctx: SimContext, pid?: number): TradeCompletion | null {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return null;
   const session = ctx.trades.get(r.meta.entityId);
-  if (!session) return;
+  if (!session) return null;
   if (session.a === r.meta.entityId) session.acceptedA = true;
   else session.acceptedB = true;
-  if (!(session.acceptedA && session.acceptedB)) return;
+  if (!(session.acceptedA && session.acceptedB)) return null;
 
   const metaA = ctx.players.get(session.a);
   const metaB = ctx.players.get(session.b);
   if (!metaA || !metaB) {
     tradeCancel(ctx, session.a);
-    return;
+    return null;
   }
   // final validation before the atomic swap
   const valid =
@@ -370,7 +339,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     for (const tPid of [session.a, session.b])
       ctx.error(tPid, 'Trade failed: items or money no longer available.');
     closeTrade(ctx, session);
-    return;
+    return null;
   }
   // Resolve every procedural arrival before the first live mutation. A
   // recipient-side replay/collision in bags, bank, buyback, or equipment would
@@ -387,7 +356,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
       ctx.error(tPid, 'Trade failed: items or money no longer available.');
     }
     closeTrade(ctx, session);
-    return;
+    return null;
   }
   // capacity gate: each side must fit what they RECEIVE after what they GIVE
   // leaves their bags (simulated on a scratch copy; nothing moved yet). A
@@ -423,14 +392,6 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
       if (scratch[index].count <= 0) scratch.splice(index, 1);
     }
     const capacity = bagCapacity(meta.bags);
-    // Exact rows reserve those authoritative copies for the whole offer. A
-    // generic row of the same base may consume other fungible/instanced copies,
-    // but must never walk an exact-reserved UID a second time.
-    const reservedExactUids = new Set(
-      receives
-        .map((slot) => slot.instance?.procedural?.uid)
-        .filter((uid): uid is string => uid !== undefined),
-    );
     for (const s of receives) {
       const exactUid = s.instance?.procedural?.uid;
       if (exactUid) {
@@ -460,36 +421,24 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
       }
       let remaining = s.count - plainCount;
       for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {
-        const g = giver.inventory[i];
-        // Skip trade-locked copies here too: the real transfer
-        // (removeOffer) spares them, so the capacity model must walk the same
-        // unbound instanced slots or it would mis-estimate the receiver's slots.
+        const held = giver.inventory[i];
         if (
-          g.itemId !== s.itemId ||
-          !g.instance ||
-          isTradeLocked(g.instance) ||
-          (g.instance.procedural?.uid !== undefined &&
-            reservedExactUids.has(g.instance.procedural.uid))
+          held.itemId !== s.itemId ||
+          !held.instance ||
+          isTradeLocked(held.instance) ||
+          held.instance.procedural !== undefined
         ) {
           continue;
         }
-        // Model the payload AS IT ARRIVES: grantOffer stamps boundTo onto an
-        // armed copy on this first trade, and a stamped payload merges
-        // differently than the giver's pre-stamp copy (#2139: a capacity
-        // pre-check that disagrees with the real grant re-opens the overflow
-        // class, in both directions).
         const arrival =
-          g.instance.bindOnTrade === true && g.instance.boundTo === undefined
-            ? { ...g.instance, boundTo: meta.entityId }
-            : g.instance;
-        const take = Math.min(g.count, remaining);
+          held.instance.bindOnTrade === true && held.instance.boundTo === undefined
+            ? { ...held.instance, boundTo: meta.entityId }
+            : held.instance;
+        const take = Math.min(held.count, remaining);
         remaining -= take;
         if (countFit(scratch, capacity, s.itemId, take, arrival) < take) return false;
         addStacked(scratch, s.itemId, take, arrival);
       }
-      // Stock the giver's inventory list does not surface (a stubbed store in
-      // tests, or a desynced offer the final validation above already
-      // covered): the conservative one-fresh-slot-per-unit model.
       for (let i = 0; i < remaining; i++) {
         if (scratch.length >= capacity) return false;
         scratch.push({ itemId: s.itemId, count: 1, instance: {} });
@@ -504,7 +453,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     for (const tPid of [session.a, session.b])
       ctx.error(tPid, 'Trade failed: not enough bag space.');
     closeTrade(ctx, session);
-    return;
+    return null;
   }
   // swap
   metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
@@ -531,6 +480,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     ctx.bumpDeedStat(metaB, 'tradesCompleted', 1);
   }
   closeTrade(ctx, session);
+  return { a: session.a, b: session.b, changed: nonEmpty };
 }
 
 export function tradeCancel(ctx: SimContext, pid?: number): void {
@@ -546,14 +496,12 @@ export function tradeCancel(ctx: SimContext, pid?: number): void {
 
 // true when the player's bags cover the offered totals per item, summing
 // duplicate slots: a per-slot check would let duplicates each pass alone.
-// Counts against the UNBOUND copies only (unboundCount), the same
-// exclusion tradeSetOffer applies, so a copy bound between set-offer and
-// confirm can never slip through final validation into the swap.
+// Generic rows exclude every procedural copy. Exact procedural rows re-resolve
+// their authoritative UID, so a stale or newly-bound copy fails.
 function offerCovered(ctx: SimContext, items: InvSlot[], pid: number): boolean {
   const meta = ctx.players.get(pid);
   if (!meta) return false;
   const totals = new Map<string, number>();
-  const exactReserved = new Map<string, number>();
   const seenUids = new Set<string>();
   for (const s of items) {
     const uid = s.instance?.procedural?.uid;
@@ -571,10 +519,9 @@ function offerCovered(ctx: SimContext, items: InvSlot[], pid: number): boolean {
         !isTradeLocked(slot.instance),
     );
     if (!held) return false;
-    exactReserved.set(s.itemId, (exactReserved.get(s.itemId) ?? 0) + 1);
   }
   for (const [itemId, count] of totals) {
-    const available = offerableCount(ctx, meta, itemId) - (exactReserved.get(itemId) ?? 0);
+    const available = genericOfferableCount(ctx, meta, itemId);
     if (available < count) return false;
   }
   return true;

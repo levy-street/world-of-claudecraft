@@ -6683,110 +6683,110 @@ export const vi_VN: EnTranslations = {
       "critChance": "Tỉ Lệ Chí Mạng",
       "dodge": "Né Tránh",
       "parry": "Đỡ Đòn",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Sát thương vũ khí tối thiểu",
+      "weaponMax": "Sát thương vũ khí tối đa",
+      "weaponDps": "Sát thương vũ khí mỗi giây",
+      "healthOnKill": "Máu khi hạ gục",
+      "manaOnKill": "Năng lượng khi hạ gục",
+      "blockValue": "Giá trị chặn"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "powerRollPercent": "Power roll: {value}%",
-      "powerRollMilliseconds": "Power roll: {value} ms",
-      "powerRollResource": "Power roll: {value} resource",
-      "powerRollNumber": "Power roll: {value}",
-      "legendaryPower": "Legendary power",
-      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rollRangeAria": "Chỉ số có thể từ {min} đến {max}",
+      "advancedDetailsHint": "Giữ {key} để hiển thị các khoảng chỉ số có thể nhận.",
+      "powerRollPercent": "Chỉ số sức mạnh: {value}%",
+      "powerRollMilliseconds": "Chỉ số sức mạnh: {value} ms",
+      "powerRollResource": "Chỉ số sức mạnh: {value} tài nguyên",
+      "powerRollNumber": "Chỉ số sức mạnh: {value}",
+      "legendaryPower": "Sức mạnh Huyền Thoại",
+      "legendaryLimit": "Trang bị duy nhất: {count} sức mạnh Huyền Thoại",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Thường",
+        "magic": "Ma Thuật",
+        "rare": "Hiếm",
+        "epic": "Sử Thi",
+        "legendary": "Huyền Thoại",
+        "mythic": "Thần Thoại"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Hùng Mạnh",
+        "deft": "Khéo Léo",
+        "stalwart": "Kiên Cường",
+        "sages": "của Hiền Giả",
+        "spiritual": "Tâm Linh",
+        "of_focus": "của Tập Trung",
+        "of_striking": "của Đả Kích",
+        "of_alacrity": "của Nhanh Nhẹn",
+        "of_precision": "của Chính Xác",
+        "warded": "Được Bảo Hộ",
+        "of_reaping": "của Gặt Hái",
+        "of_remembrance": "của Tưởng Nhớ"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Tro Tàn",
+        "blackfen": "Đầm Đen",
+        "doom": "Diệt Vong",
+        "grave": "Mộ Phần",
+        "mire": "Bùn Lầy",
+        "storm": "Bão Tố",
+        "thorn": "Gai Nhọn",
+        "wyrm": "Cự Long",
+        "bite": "Vết Cắn",
+        "brand": "Dấu Ấn",
+        "promise": "Lời Hứa",
+        "thread": "Sợi Chỉ",
+        "vigil": "Canh Thức",
+        "ward": "Bảo Hộ",
+        "whisper": "Lời Thì Thầm",
+        "oath": "Lời Thề"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Vương Miện Giàn Hỏa Cuối Cùng",
+          "description": "Mỗi Tia Tàn Lửa thứ ba thiêu đốt kẻ địch gần mục tiêu."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Lưỡi Cạnh Hàm Xám",
+          "description": "Mỗi đòn vũ khí thứ ba khiến mục tiêu chảy máu và hồi một ít tài nguyên."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Cung Dài Rừng Tĩnh Lặng",
+          "description": "Kéo Cung Dài hoặc Bắn Tà Ác có thể khiến mục tiêu câm lặng trong thời gian ngắn."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Nanh Thủy Tinh Đêm",
+          "description": "Hạ gục một kẻ địch giúp tăng nhanh nhẹn trong thời gian ngắn."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Canh Thức của Ysolei",
+          "description": "Hồi phục chí mạng tạo một vùng phục hồi ngắn trên mặt đất."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Thần Tượng Bão Thức Tỉnh",
+          "description": "Mỗi Tia Hồ Quang thứ tư lan sang kẻ địch ở gần."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Ấn của Kẻ Buộc Tro",
+          "description": "Mỗi Tia U Ám thứ tư đánh dấu mục tiêu để chịu thêm sát thương Bóng Tối."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Nhẫn Ấn Canh Giữ Bình Minh",
+          "description": "Thánh Quang Chữa Lành tạo lá chắn cho người nhận bằng một phần lượng hồi phục."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Khuy Cài Trăng Hoang Dã",
+          "description": "Mỗi Tia Hoang Dã thứ ba hồi phục tài nguyên chính."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Chuông Ngân Thứ Chín",
+          "description": "Mỗi phép gây sát thương thứ hai ngân vang quanh mục tiêu."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Áo Choàng Những Giờ Bị Đánh Cắp",
+          "description": "Khi máu giảm dưới 35%, nhận một lớp bảo hộ phòng thủ ngắn."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Ủng Con Đường Bất Đoạn",
+          "description": "Di chuyển 15 thước giúp tăng tốc độ di chuyển trong thời gian ngắn."
         }
       }
     },
@@ -6961,7 +6961,8 @@ export const vi_VN: EnTranslations = {
       "greed": "Tham Lam",
       "pass": "Bỏ Qua",
       "needAria": "Cần Dùng {item}",
-      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailable": "Không thể chọn Cần Dùng vì lớp nhân vật của bạn không thể trang bị vật phẩm này.",
+      "needUnavailablePower": "Không thể chọn Cần Dùng vì sức mạnh Huyền Thoại này chỉ dành cho lớp nhân vật khác.",
       "greedAria": "Tham Lam giành {item}",
       "passAria": "Bỏ qua {item}",
       "everyonePassed": "Mọi người đều bỏ qua {item}.",

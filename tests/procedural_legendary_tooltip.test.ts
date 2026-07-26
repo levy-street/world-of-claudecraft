@@ -1,23 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
-import { Hud } from '../src/ui/hud';
+import type { ItemInstancePayload, PlayerClass } from '../src/sim/types';
+import { ItemPresentationController } from '../src/ui/item_presentation_controller';
 
-interface TooltipHarness {
-  sim: {
-    player: { level: number };
-    cfg: { playerClass: string };
-    equipment: Record<string, string>;
-  };
-  itemTooltip(item: ItemDef, compare: boolean, instance: ItemInstancePayload): string;
-}
-
-function tooltip(baseId: string, playerClass: string, instance: ItemInstancePayload): string {
+function tooltip(baseId: string, playerClass: PlayerClass, instance: ItemInstancePayload): string {
   const item = ITEMS[baseId];
   if (!item) throw new Error(`missing test item ${baseId}`);
-  const hud = Object.create(Hud.prototype) as unknown as TooltipHarness;
-  hud.sim = { player: { level: 20 }, cfg: { playerClass }, equipment: {} };
-  return hud.itemTooltip(item, false, instance);
+  const controller = new ItemPresentationController({
+    items: ITEMS,
+    playerClass: () => playerClass,
+    playerLevel: () => 20,
+    showItemLevel: () => false,
+    equippedItemId: () => undefined,
+    equippedInstance: () => undefined,
+    equippedItemIds: () => [],
+  });
+  return controller.tooltip(item, false, instance);
 }
 
 function legendary(

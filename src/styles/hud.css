@@ -299,14 +299,17 @@
   .np-marker.loot.procedural-loot {
     --procedural-loot-color: #fff;
     position: relative;
-    min-width: 52px;
+    min-width: 64px;
     width: max-content;
-    padding: 0 3px;
+    padding: 1px 5px;
+    border: 1px solid var(--procedural-loot-color);
+    border-radius: 3px;
+    background: rgb(0 0 0 / 82%);
     color: var(--procedural-loot-color);
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.04em;
-    line-height: 14px;
+    line-height: 16px;
     text-align: center;
     text-transform: uppercase;
     text-shadow:
@@ -314,22 +317,22 @@
       1px 1px 2px #000;
   }
   .np-marker.loot.procedural-loot.q-uncommon {
-    --procedural-loot-color: #1eff00;
+    --procedural-loot-color: #5cff45;
   }
   .np-marker.loot.procedural-loot.q-rare {
-    --procedural-loot-color: #0070dd;
+    --procedural-loot-color: #4da3ff;
   }
   .np-marker.loot.procedural-loot.q-epic {
-    --procedural-loot-color: #a335ee;
+    --procedural-loot-color: #c46cff;
   }
   .np-marker.loot.procedural-loot.q-legendary {
-    --procedural-loot-color: #ff8000;
+    --procedural-loot-color: #ff9b3d;
   }
   .np-marker.loot.procedural-loot::before {
     content: "";
     position: absolute;
     left: 50%;
-    bottom: 13px;
+    bottom: 17px;
     transform: translateX(-50%);
     width: 2px;
     height: 36px;
@@ -351,6 +354,7 @@
   @media (forced-colors: active) {
     .np-marker.loot.procedural-loot {
       --procedural-loot-color: CanvasText;
+      background: Canvas;
     }
   }
   /* party raid/target marker, floats above the name; display toggled in JS so
@@ -3377,9 +3381,16 @@
     z-index: 100;
     pointer-events: none;
     max-width: 280px;
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
     padding: 8px 10px;
     font-size: 12px;
     line-height: 1.5;
+  }
+  body.mobile-touch #tooltip,
+  body.gamepad-pointer-mode #tooltip {
+    pointer-events: auto;
+    overscroll-behavior: contain;
   }
   #tooltip .tt-title {
     font-family: var(--title-font);

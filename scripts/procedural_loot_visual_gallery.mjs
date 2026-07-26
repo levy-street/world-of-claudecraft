@@ -47,6 +47,22 @@ const PRESENTATION_SCREENSHOT_FILENAMES = Object.freeze([
   '30-loot-roll-need-disabled-class-reason.png',
   '31-finder-nythraxis-normal-rewards.png',
   '32-finder-nythraxis-heroic-rewards.png',
+  '33-full-context-seeded-comparison-normal.png',
+  '34-full-context-seeded-comparison-alt.png',
+  '35-full-context-legendary-ashbinders-seal.png',
+  '36-full-context-legendary-dawnward-signet.png',
+  '37-full-context-rare-mirefen-jerkin.png',
+  '38-full-context-epic-ashwood-staff-alt.png',
+  '39-full-context-legendary-roll-b.png',
+  '40-full-context-legendary-roll-c.png',
+  '41-full-context-legendary-roll-c-alt.png',
+  '42-full-context-quartermaster-signature.png',
+  '43-full-context-quartermaster-tune.png',
+  '44-full-context-quartermaster-tune-tooltip.png',
+  '45-full-context-need-denial.png',
+  '46-full-context-finder-normal.png',
+  '47-full-context-finder-heroic.png',
+  '48-mobile-landscape-legendary-comparison.png',
 ]);
 const PRESENTATION_SCREENSHOT_COUNT = PRESENTATION_SCREENSHOT_FILENAMES.length;
 // The expanded capture lands close to one site-presence refresh boundary. Depending
@@ -789,6 +805,22 @@ async function capturePresentationScreenshot(page, filename, selectors) {
   });
   console.log(`WROTE ${path.relative(REPO_ROOT, outputPath)}`);
 }
+
+async function captureFullContextScreenshot(page, filename) {
+  const outputPath = path.join(OUTPUT_DIR, filename);
+  if (PREFLIGHT_ONLY) {
+    console.log(`PREFLIGHT ${path.relative(REPO_ROOT, outputPath)}`);
+    return;
+  }
+  await page.screenshot({
+    path: outputPath,
+    type: 'png',
+    fullPage: false,
+    captureBeyondViewport: false,
+    omitBackground: false,
+  });
+  console.log(`WROTE ${path.relative(REPO_ROOT, outputPath)}`);
+}
 async function readFocusedProceduralTooltip(page) {
   return page.evaluate(() => {
     const focused = document.activeElement;
@@ -937,6 +969,8 @@ async function capturePresentationEvidence(page) {
   check('presentation offline game boot', gameBooted);
 
   const fixtures = await preparePresentationFixtures(page);
+  let rootAltRangesPng = null;
+  let rootQuartermasterPng = null;
   check(
     'same-base seeded roll fixture',
     fixtures.rollPair.length === 2 &&
@@ -1108,6 +1142,7 @@ async function capturePresentationEvidence(page) {
     JSON.stringify(normalTooltip),
   );
   await capturePresentationScreenshot(page, '13-tooltip-seeded-roll-comparison-normal.png');
+  await captureFullContextScreenshot(page, '33-full-context-seeded-comparison-normal.png');
 
   await page.keyboard.down('Alt');
   await page.waitForFunction(() => document.body.classList.contains('item-details-advanced'));
@@ -1130,6 +1165,18 @@ async function capturePresentationEvidence(page) {
     JSON.stringify(altTooltip),
   );
   await capturePresentationScreenshot(page, '14-tooltip-seeded-roll-comparison-alt.png');
+  await captureFullContextScreenshot(page, '34-full-context-seeded-comparison-alt.png');
+  if (!PREFLIGHT_ONLY) {
+    await page.evaluate(() => window.__game.hud.toggleChar());
+    await sleep(180);
+    rootAltRangesPng = await page.screenshot({
+      type: 'png',
+      fullPage: false,
+      captureBeyondViewport: false,
+      omitBackground: false,
+    });
+    await page.evaluate(() => window.__game.hud.toggleChar());
+  }
   await page.keyboard.up('Alt');
   await page.waitForFunction(() => !document.body.classList.contains('item-details-advanced'));
 
@@ -1206,6 +1253,10 @@ async function capturePresentationEvidence(page) {
       page,
       `${15 + index}-tooltip-named-legendary-${expected.powerId}.png`,
     );
+    await captureFullContextScreenshot(
+      page,
+      `${35 + index}-full-context-legendary-${expected.powerId.replaceAll('_', '-')}.png`,
+    );
   }
 
   const representativeShots = [
@@ -1244,6 +1295,12 @@ async function capturePresentationEvidence(page) {
     const fixture = fixtures.representatives.find((entry) => entry.id === shot.id);
     check(`${shot.id} fixture available`, fixture !== undefined);
     await captureRepresentativeTooltip(page, fixture, shot.filename, shot.advanced);
+    if (shot.id === 'rare-mirefen-leather-jerkin') {
+      await captureFullContextScreenshot(page, '37-full-context-rare-mirefen-jerkin.png');
+    }
+    if (shot.id === 'epic-ashwood-staff') {
+      await captureFullContextScreenshot(page, '38-full-context-epic-ashwood-staff-alt.png');
+    }
   }
 
   await page.evaluate((equipped) => {
@@ -1294,6 +1351,7 @@ async function capturePresentationEvidence(page) {
     page,
     '23-tooltip-named-legendary-ashbinders-seal-roll-b-compare-normal.png',
   );
+  await captureFullContextScreenshot(page, '39-full-context-legendary-roll-b.png');
 
   await focusProceduralBagRowByName(page, 'legendary', rollCLegendary.name, 1);
   const rollCLegendaryState = await readFocusedProceduralTooltip(page);
@@ -1335,6 +1393,7 @@ async function capturePresentationEvidence(page) {
     page,
     '24-tooltip-named-legendary-ashbinders-seal-roll-c-compare-normal.png',
   );
+  await captureFullContextScreenshot(page, '40-full-context-legendary-roll-c.png');
 
   await page.keyboard.down('Alt');
   await page.waitForFunction(() => document.body.classList.contains('item-details-advanced'));
@@ -1374,6 +1433,7 @@ async function capturePresentationEvidence(page) {
     page,
     '25-tooltip-named-legendary-ashbinders-seal-roll-c-compare-alt.png',
   );
+  await captureFullContextScreenshot(page, '41-full-context-legendary-roll-c-alt.png');
   await page.keyboard.up('Alt');
   await page.waitForFunction(() => !document.body.classList.contains('item-details-advanced'));
 
@@ -1432,6 +1492,14 @@ async function capturePresentationEvidence(page) {
   await capturePresentationScreenshot(page, '26-quartermaster-deathless-forge-overview.png', [
     '#vendor-window',
   ]);
+  if (!PREFLIGHT_ONLY) {
+    rootQuartermasterPng = await page.screenshot({
+      type: 'png',
+      fullPage: false,
+      captureBeyondViewport: false,
+      omitBackground: false,
+    });
+  }
 
   await page.mouse.move(720, 88);
   const [signatureState, signatureTooltipHidden] = await page.evaluate(() => {
@@ -1460,6 +1528,7 @@ async function capturePresentationEvidence(page) {
   await capturePresentationScreenshot(page, '27-quartermaster-signature-legendary-target.png', [
     '#vendor-window',
   ]);
+  await captureFullContextScreenshot(page, '42-full-context-quartermaster-signature.png');
 
   const tuningState = await page.evaluate(() => {
     document.querySelector("#vendor-window [data-tab='tune']")?.click();
@@ -1489,6 +1558,7 @@ async function capturePresentationEvidence(page) {
   await capturePresentationScreenshot(page, '28-quartermaster-legendary-tuning-rules.png', [
     '#vendor-window',
   ]);
+  await captureFullContextScreenshot(page, '43-full-context-quartermaster-tune.png');
 
   const raidForgedTuningState = await page.evaluate(() => {
     const rows = [...document.querySelectorAll('#vendor-window .hq-tune-offer')];
@@ -1520,6 +1590,7 @@ async function capturePresentationEvidence(page) {
     '29-quartermaster-three-same-legendary-raid-forged-variance.png',
     ['#vendor-window', '#tooltip'],
   );
+  await captureFullContextScreenshot(page, '44-full-context-quartermaster-tune-tooltip.png');
 
   const blockedNeedState = await page.evaluate(() => {
     const hud = window.__game.hud;
@@ -1555,6 +1626,7 @@ async function capturePresentationEvidence(page) {
   await capturePresentationScreenshot(page, '30-loot-roll-need-disabled-class-reason.png', [
     '#loot-rolls',
   ]);
+  await captureFullContextScreenshot(page, '45-full-context-need-denial.png');
 
   await page.evaluate(() => {
     const sim = window.__game.sim;
@@ -1581,6 +1653,7 @@ async function capturePresentationEvidence(page) {
   await capturePresentationScreenshot(page, '31-finder-nythraxis-normal-rewards.png', [
     '#dungeon-finder-window',
   ]);
+  await captureFullContextScreenshot(page, '46-full-context-finder-normal.png');
 
   await page.click("#dungeon-finder-window [data-row='nythraxis_boss_arena_heroic']");
   await page.waitForFunction(() => {
@@ -1607,8 +1680,56 @@ async function capturePresentationEvidence(page) {
   await capturePresentationScreenshot(page, '32-finder-nythraxis-heroic-rewards.png', [
     '#dungeon-finder-window',
   ]);
+  await captureFullContextScreenshot(page, '47-full-context-finder-heroic.png');
+
+  await page.setViewport({
+    width: 844,
+    height: 390,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 2,
+  });
+  await page.evaluate(() => {
+    document.body.classList.add('mobile-touch');
+    const game = window.__game;
+    const sim = game.sim;
+    game.hud.closeAll?.();
+    const meta = sim.players.get(sim.player.id);
+    const copies = (meta?.inventory ?? []).filter(
+      (slot) => slot.instance?.procedural?.rarity === 'legendary',
+    );
+    const first = copies[0];
+    if (first?.instance?.procedural?.uid) {
+      sim.equipItem(first.itemId, first.instance.procedural.uid);
+    }
+    game.hud.toggleBags();
+  });
+  await page.waitForSelector('#bags', { visible: true, timeout: 10000 });
+  await focusProceduralComparisonRow(page, '.bag-item[data-procedural-rarity=legendary]');
+  const mobileTooltipState = await page.$eval('#tooltip', (tooltip) => {
+    const rect = tooltip.getBoundingClientRect();
+    return {
+      bounds: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom },
+      viewport: { width: innerWidth, height: innerHeight },
+      hasComparison: tooltip.querySelector('.tt-cmp') !== null,
+      scrollable: tooltip.scrollHeight >= tooltip.clientHeight,
+    };
+  });
+  check(
+    'mobile landscape Legendary comparison remains inside the viewport',
+    mobileTooltipState.hasComparison &&
+      mobileTooltipState.scrollable &&
+      mobileTooltipState.bounds.left >= 0 &&
+      mobileTooltipState.bounds.top >= 0 &&
+      mobileTooltipState.bounds.right <= mobileTooltipState.viewport.width &&
+      mobileTooltipState.bounds.bottom <= mobileTooltipState.viewport.height,
+    JSON.stringify(mobileTooltipState),
+  );
+  await captureFullContextScreenshot(page, '48-mobile-landscape-legendary-comparison.png');
   return {
     freshDesktopBagsPng,
+    rootAltRangesPng,
+    rootQuartermasterPng,
     screenshotCount: PRESENTATION_SCREENSHOT_COUNT,
     screenshotFilenames: [...PRESENTATION_SCREENSHOT_FILENAMES],
   };
@@ -1701,7 +1822,7 @@ try {
   ];
   check(
     'expanded gallery screenshot count',
-    expectedGalleryFilenames.length === 32 && expectedGalleryFilenames.length >= 28,
+    expectedGalleryFilenames.length === 48 && expectedGalleryFilenames.length >= 44,
     `${expectedGalleryFilenames.length}`,
   );
   check(
@@ -1751,16 +1872,25 @@ try {
     },
     {
       filename: '02-desktop-tooltip-alt-ranges.png',
-      source: path.join(OUTPUT_DIR, '14-tooltip-seeded-roll-comparison-alt.png'),
+      source: presentationEvidence.rootAltRangesPng,
     },
     {
-      filename: '03-desktop-character-exact-comparison.png',
-      source: path.join(OUTPUT_DIR, '13-tooltip-seeded-roll-comparison-normal.png'),
+      filename: '03-desktop-quartermaster-forge.png',
+      source: presentationEvidence.rootQuartermasterPng,
     },
   ];
   if (!PREFLIGHT_ONLY) {
+    const staleDuplicate = path.join(
+      SCREENSHOT_ROOT,
+      '03-desktop-character-exact-comparison.png',
+    );
+    if (fs.existsSync(staleDuplicate)) {
+      fs.rmSync(staleDuplicate);
+      console.log(`REMOVED ${path.relative(REPO_ROOT, staleDuplicate)}`);
+    }
     for (const evidence of rootEvidence) {
       const outputPath = path.join(SCREENSHOT_ROOT, evidence.filename);
+      check(`${evidence.filename} unique root source`, evidence.source !== null);
       if (typeof evidence.source === 'string') {
         fs.copyFileSync(evidence.source, outputPath);
       } else {

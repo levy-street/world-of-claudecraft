@@ -86,7 +86,7 @@ const legendaryInstance: NonNullable<LootRollPrompt['instance']> = {
   },
 };
 
-function harness() {
+function harness(playerClass: 'warrior' | 'paladin' = 'warrior') {
   const document = new LootDocument();
   const ui = document.element('ui');
   const root = document.element('loot-rolls') as LootElement;
@@ -120,6 +120,7 @@ function harness() {
     world: () => world,
     now: () => now,
     isMobileLayout: () => false,
+    playerClass: () => playerClass,
     itemIcon: () => '<img class="test-item-icon">',
     itemTooltip: () => 'tooltip',
     attachTooltip: () => {},
@@ -229,6 +230,25 @@ describe('LootRollController', () => {
     buttons.find((button) => button.dataset.choice === 'greed')?.dispatchEvent(new Event('click'));
     expect(test.submitLootRoll).toHaveBeenCalledWith(29, 'greed');
     expect(test.root.style.display).toBe('none');
+  });
+
+  it('explains a class-restricted Legendary power separately from base equipment', () => {
+    const test = harness('paladin');
+    const blocked = {
+      rollId: 31,
+      itemId: 'iron_broadsword',
+      itemName: 'Iron Broadsword',
+      quality: 'legendary' as const,
+      instance: legendaryInstance,
+      expiresAt: 60_000,
+      canNeed: false,
+    };
+    test.controller.showRoll({ type: 'lootRoll', ...blocked });
+    const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement;
+
+    expect(row.innerHTML).toContain(
+      'Need is unavailable because this Legendary power is restricted to another class.',
+    );
   });
 
   it('replaces a master-loot prompt when the server converts the same roll to need-greed', () => {

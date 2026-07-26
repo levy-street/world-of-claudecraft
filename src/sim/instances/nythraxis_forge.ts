@@ -1,4 +1,4 @@
-import { bagsFullError } from '../bags';
+import { bagCapacity, bagsFullError } from '../bags';
 import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
   PROCEDURAL_LEGENDARY_POWERS,
@@ -19,6 +19,7 @@ import { ITEMS } from '../data';
 import { canEquipItem } from '../equipment_rules';
 import { generateProceduralItem } from '../loot/procedural/generate';
 import { hash32Parts } from '../loot/procedural/item_seed';
+import { assertProceduralUidAvailable } from '../procedural_persistence';
 import { sanitizeItemInstancePayload } from '../procedural_item_validation';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -28,7 +29,7 @@ import {
   type InvSlot,
   type ItemInstancePayload,
 } from '../types';
-import { heroicLockoutId } from './dungeons';
+import { heroicLockoutId, heroicRewardWindowToken } from './dungeons';
 import { heroicVendorInRange } from './heroic_vendor';
 
 export type NythraxisForgeOfferKind =
@@ -111,12 +112,17 @@ export function resolveNythraxisForgeOffer(offerId: string): NythraxisForgeOffer
 
 function currentHeroicClear(ctx: SimContext, meta: PlayerMeta): boolean {
   const lockId = heroicLockoutId(NYTHRAXIS_RAID_DUNGEON_ID);
+  const now = ctx.lockoutNowMs();
   const until = meta.raidLockouts.get(lockId) ?? 0;
-  if (until <= ctx.lockoutNowMs()) {
+  if (until <= now) {
     meta.raidLockouts.delete(lockId);
     return false;
   }
-  return true;
+  const rewardWindow = heroicRewardWindowToken(ctx.raidResetMs(now));
+  return (
+    meta.heroicDaily.date === rewardWindow &&
+    meta.heroicDaily.marked.has(NYTHRAXIS_RAID_DUNGEON_ID)
+  );
 }
 
 function validateServiceAccess(ctx: SimContext, p: Entity, meta: PlayerMeta): boolean {
@@ -136,8 +142,8 @@ function canAfford(
   meta: PlayerMeta,
   cost: Pick<NythraxisForgeOfferResolution, 'fragments' | 'heroicMarks'>,
 ): boolean {
-  const fragments = ctx.countItem(DEATHLESS_FRAGMENT_ITEM_ID, meta.entityId);
-  const marks = ctx.countItem(HEROIC_MARK_ITEM_ID, meta.entityId);
+  const fragments = ctx.countFungibleItem(DEATHLESS_FRAGMENT_ITEM_ID, meta.entityId);
+  const marks = ctx.countFungibleItem(HEROIC_MARK_ITEM_ID, meta.entityId);
   if (fragments >= cost.fragments && marks >= cost.heroicMarks) return true;
   ctx.error(
     meta.entityId,
@@ -155,6 +161,25 @@ function spend(
     ctx.removeFungibleItem(DEATHLESS_FRAGMENT_ITEM_ID, cost.fragments, meta.entityId);
   if (cost.heroicMarks > 0)
     ctx.removeFungibleItem(HEROIC_MARK_ITEM_ID, cost.heroicMarks, meta.entityId);
+}
+
+function removeFungibleFromScratch(scratch: InvSlot[], itemId: string, count: number): void {
+  for (let index = scratch.length - 1; index >= 0 && count > 0; index--) {
+    const slot = scratch[index];
+    if (slot.itemId !== itemId || slot.instance) continue;
+    const take = Math.min(slot.count, count);
+    slot.count -= take;
+    count -= take;
+    if (slot.count <= 0) scratch.splice(index, 1);
+  }
+}
+
+function forgeRewardFitsAfterSpend(meta: PlayerMeta, cost: NythraxisForgeOfferResolution): boolean {
+  const scratch = meta.inventory.map((slot) => ({ ...slot }));
+  removeFungibleFromScratch(scratch, DEATHLESS_FRAGMENT_ITEM_ID, cost.fragments);
+  removeFungibleFromScratch(scratch, HEROIC_MARK_ITEM_ID, cost.heroicMarks);
+  // Every forge output is one exact instanced equipment copy, so it needs a fresh slot.
+  return scratch.length < bagCapacity(meta.bags);
 }
 
 function forgedContext(meta: PlayerMeta, offerId: string, heroic: boolean, uid: string) {
@@ -227,7 +252,7 @@ export function forgeNythraxisReward(ctx: SimContext, offerId: string, pid?: num
     return;
   }
   if (!canAfford(ctx, meta, offer)) return;
-  if (!ctx.canAddItem(offer.itemId, 1, meta.entityId)) {
+  if (!forgeRewardFitsAfterSpend(meta, offer)) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
@@ -235,8 +260,19 @@ export function forgeNythraxisReward(ctx: SimContext, offerId: string, pid?: num
   const payload = offer.baseId
     ? generatedForgePayload(ctx, meta, offerId, offer)
     : ({ boundTo: meta.entityId } satisfies ItemInstancePayload);
+  const validated = sanitizeItemInstancePayload(payload, offer.itemId);
+  if (!validated.ok) throw new Error(`Nythraxis forge generated invalid item: ${validated.error}`);
+  assertProceduralUidAvailable(
+    {
+      inventory: meta.inventory,
+      bank: meta.bank.inventory,
+      buyback: meta.vendorBuyback,
+      equipmentInstance: meta.equipmentInstance,
+    },
+    validated.value,
+  );
   spend(ctx, meta, offer);
-  ctx.addItemInstance(offer.itemId, payload, meta.entityId);
+  ctx.addItemInstance(offer.itemId, validated.value, meta.entityId);
   ctx.emit({ type: 'vendor', action: 'buy', itemId: offer.itemId, pid: meta.entityId });
 }
 
@@ -244,12 +280,14 @@ function exactBaggedProceduralItem(
   meta: PlayerMeta,
   instanceUid: string,
 ): ExactBaggedProceduralItem | null {
+  let found: ExactBaggedProceduralItem | null = null;
   for (let index = meta.inventory.length - 1; index >= 0; index--) {
     const slot = meta.inventory[index];
     if (slot.instance?.procedural?.uid !== instanceUid) continue;
-    return { slot, itemId: slot.itemId, payload: slot.instance };
+    if (slot.count !== 1 || found) return null;
+    found = { slot, itemId: slot.itemId, payload: slot.instance };
   }
-  return null;
+  return found;
 }
 
 function tunedLegendaryRolls(
@@ -329,6 +367,15 @@ export function tuneNythraxisLegendary(ctx: SimContext, instanceUid: string, pid
   };
   const validated = sanitizeItemInstancePayload(replacement, selected.itemId);
   if (!validated.ok) throw new Error(`Nythraxis tune generated invalid item: ${validated.error}`);
+  assertProceduralUidAvailable(
+    {
+      inventory: meta.inventory,
+      bank: meta.bank.inventory,
+      buyback: meta.vendorBuyback,
+      equipmentInstance: meta.equipmentInstance,
+    },
+    validated.value,
+  );
 
   spend(ctx, meta, cost);
   selected.slot.instance = validated.value;

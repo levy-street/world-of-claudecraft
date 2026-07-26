@@ -29,7 +29,10 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
-import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
+import {
+  dungeonFinalBossInstance,
+  lockNormalDungeonResetOnBossKill,
+} from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
@@ -867,7 +870,9 @@ export function dealDamage(
   if (
     source &&
     amount > 0 &&
-    (MOBS[target.templateId]?.worldBoss || MOBS[target.templateId]?.rare)
+    (MOBS[target.templateId]?.worldBoss ||
+      MOBS[target.templateId]?.rare ||
+      dungeonFinalBossInstance(ctx, target) !== null)
   ) {
     const contributorId = source.kind === 'player' ? source.id : source.ownerId;
     if (contributorId !== null) target.bossDamagers.add(contributorId);
@@ -1193,6 +1198,11 @@ export function handleDeath(
     // clearThreat below, exactly like worldBossContribs.
     const rareContribs =
       !template?.worldBoss && template?.rare ? worldBossLootContributors(ctx, e) : null;
+    const nythraxisContribs =
+      e.templateId === NYTHRAXIS_BOSS_ID ? worldBossLootContributors(ctx, e) : null;
+    const finalBossInstance = dungeonFinalBossInstance(ctx, e);
+    const heroicFinalBossContribs =
+      finalBossInstance?.difficulty === 'heroic' ? worldBossLootContributors(ctx, e) : null;
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;
@@ -1374,8 +1384,9 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
-    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e, heroicRewardRecipients);
-    else ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    if (e.templateId === NYTHRAXIS_BOSS_ID)
+      ctx.grantNythraxisLockout(e, heroicRewardRecipients, nythraxisContribs ?? []);
+    else ctx.awardHeroicMarks(e, heroicRewardRecipients, heroicFinalBossContribs ?? []);
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.
     if (worldBossContribs) {
