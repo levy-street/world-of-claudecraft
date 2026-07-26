@@ -18,11 +18,21 @@ export interface ProceduralAffixPresentation {
   implicit: boolean;
 }
 
+export interface ProceduralLegendaryRollPresentation {
+  key: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  unit: 'percent' | 'milliseconds' | 'resource' | 'number';
+}
+
 export interface ProceduralLegendaryPresentation {
   id: string;
   name: string;
   description: string;
   rolls: Readonly<Record<string, number>>;
+  rollDetails: readonly ProceduralLegendaryRollPresentation[];
 }
 
 const STAT_ORDER: Readonly<Record<string, number>> = {
@@ -142,6 +152,13 @@ export function proceduralAffixPresentations(
   ];
 }
 
+function legendaryRollUnit(key: string): ProceduralLegendaryRollPresentation['unit'] {
+  if (key.endsWith('Pct')) return 'percent';
+  if (key.endsWith('Ms')) return 'milliseconds';
+  if (key === 'resource') return 'resource';
+  return 'number';
+}
+
 export function proceduralLegendaryPresentation(
   instance?: ItemPresentationInstance,
 ): ProceduralLegendaryPresentation | undefined {
@@ -152,11 +169,26 @@ export function proceduralLegendaryPresentation(
       procedural.legendaryPowerId as keyof typeof PROCEDURAL_LEGENDARY_POWERS
     ];
   if (!power) return undefined;
+  const rolls = { ...(procedural.legendaryRolls ?? {}) };
   return {
     id: power.id,
     name: legendaryCopy(power.id, 'name'),
     description: legendaryCopy(power.id, 'description'),
-    rolls: { ...(procedural.legendaryRolls ?? {}) },
+    rolls,
+    rollDetails: Object.entries(power.rolls).flatMap(([key, range]) => {
+      const value = rolls[key];
+      if (value === undefined) return [];
+      return [
+        {
+          key,
+          value,
+          min: range.min,
+          max: range.max,
+          step: range.step,
+          unit: legendaryRollUnit(key),
+        },
+      ];
+    }),
   };
 }
 

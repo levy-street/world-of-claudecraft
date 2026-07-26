@@ -1,4 +1,5 @@
-import { PROCEDURAL_ITEM_BASES } from '../src/sim/content/procedural_loot';
+import { PROCEDURAL_BASE_ITEMS } from '../src/sim/content/procedural_loot/item_defs';
+import { canEquipItem } from '../src/sim/equipment_rules';
 import {
   deriveProceduralItemSeed,
   formatProceduralItemUid,
@@ -111,11 +112,9 @@ export function simulateProceduralLoot(
     if (uids.has(item.uid)) duplicateUidCount++;
     else uids.add(item.uid);
 
-    const base = PROCEDURAL_ITEM_BASES[item.baseId];
     if (
       !options.personalLootClass ||
-      !base.requiredClass ||
-      base.requiredClass.includes(options.personalLootClass)
+      canEquipItem(options.personalLootClass, PROCEDURAL_BASE_ITEMS[item.baseId])
     )
       classUsableCount++;
 

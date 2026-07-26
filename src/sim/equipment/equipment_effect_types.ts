@@ -1,6 +1,7 @@
 import type { PlayerClass } from '../types';
 
 export const MAX_EQUIPMENT_PROC_DEPTH = 4;
+export const MAX_ACTIVE_LEGENDARY_POWERS = 1;
 
 export type EquipmentEventKind =
   | 'ability_cast'

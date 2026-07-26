@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulateProceduralLoot } from '../scripts/procedural_loot_sim_core';
+import { PROCEDURAL_BASE_ITEMS } from '../src/sim/content/procedural_loot/item_defs';
+import { canEquipItem } from '../src/sim/equipment_rules';
 
 describe('procedural loot distribution', () => {
   it('holds the initial world table inside deterministic frequency envelopes', () => {
@@ -47,8 +49,19 @@ describe('procedural loot distribution', () => {
         personalLootClass,
       });
       expect(report.classUsableRate, personalLootClass).toBeGreaterThan(0.5);
-      // Shaman spans mail, caster, and melee families, but still keeps over 7% off-class drops.
-      expect(report.classUsableRate, personalLootClass).toBeLessThan(0.93);
+      const expectedUsableCount = Object.entries(report.baseCounts).reduce(
+        (sum, [baseId, count]) =>
+          sum + (canEquipItem(personalLootClass, PROCEDURAL_BASE_ITEMS[baseId]) ? count : 0),
+        0,
+      );
+      expect(report.classUsableCount, `${personalLootClass}:equip-rule parity`).toBe(
+        expectedUsableCount,
+      );
+      expect(1 - report.classUsableRate, `${personalLootClass}:off-class rate`).toBeGreaterThan(
+        0.02,
+      );
+      if (personalLootClass === 'shaman')
+        expect(report.classUsableRate, personalLootClass).toBeLessThan(0.97);
     }
   });
 
@@ -88,7 +101,7 @@ describe('procedural loot distribution', () => {
           "4": 171,
           "5": 27,
         },
-        "averageItemAffixBudget": 2.088633,
+        "averageItemAffixBudget": 3.662585,
         "itemLevelCounts": {
           "17": 3266,
           "18": 3309,
@@ -96,7 +109,7 @@ describe('procedural loot distribution', () => {
           "20": 27,
           "21": 1,
         },
-        "maximumItemAffixBudget": 36.42,
+        "maximumItemAffixBudget": 33.25,
         "rarityCounts": {
           "common": 7048,
           "epic": 58,

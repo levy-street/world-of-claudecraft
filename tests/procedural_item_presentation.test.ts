@@ -129,11 +129,23 @@ describe('procedural item presentation', () => {
     const instance = payload('legendary', {
       legendaryPowerId: 'greyjaws_edge',
       powerRevision: 1,
+      legendaryRolls: { potencyPct: 39 },
     });
     expect(itemPresentationName(base, instance)).toBe("Greyjaw's Edge");
     expect(proceduralLegendaryPresentation(instance)).toMatchObject({
       id: 'greyjaws_edge',
       name: "Greyjaw's Edge",
+      rolls: { potencyPct: 39 },
+      rollDetails: [
+        {
+          key: 'potencyPct',
+          value: 39,
+          min: 38,
+          max: 40,
+          step: 1,
+          unit: 'percent',
+        },
+      ],
     });
   });
 

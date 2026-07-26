@@ -6568,7 +6568,12 @@ export const en_XA: EnTranslations = {
     "procedural": {
       "rollRangeAria": "[Þóššíƀļé ŕóļļ ƒŕóɱ {min} ţó {max}]",
       "advancedDetailsHint": "[Ĥóļð {key} ţó šĥóŵ þóššíƀļé ŕóļļ ŕáñĝéš.]",
+      "powerRollPercent": "[Þóŵéŕ ŕóļļ: {value}%]",
+      "powerRollMilliseconds": "[Þóŵéŕ ŕóļļ: {value} ɱš]",
+      "powerRollResource": "[Þóŵéŕ ŕóļļ: {value} ŕéšóúŕçé]",
+      "powerRollNumber": "[Þóŵéŕ ŕóļļ: {value}]",
       "legendaryPower": "[Ļéĝéñðáŕý þóŵéŕ]",
+      "legendaryLimit": "[Úñíɋúé-éɋúíþþéð: {count} Ļéĝéñðáŕý þóŵéŕ]",
       "rarity": {
         "common": "[Çóɱɱóñ]",
         "magic": "[Ɱáĝíç]",

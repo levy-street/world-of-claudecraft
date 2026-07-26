@@ -6568,7 +6568,12 @@ export const ru_RU: EnTranslations = {
     "procedural": {
       "rollRangeAria": "Возможное значение от {min} до {max}",
       "advancedDetailsHint": "Удерживайте {key}, чтобы показать диапазоны возможных значений.",
+      "powerRollPercent": "Power roll: {value}%",
+      "powerRollMilliseconds": "Power roll: {value} ms",
+      "powerRollResource": "Power roll: {value} resource",
+      "powerRollNumber": "Power roll: {value}",
       "legendaryPower": "Легендарное свойство",
+      "legendaryLimit": "Unique-equipped: {count} Legendary power",
       "rarity": {
         "common": "Обычный",
         "magic": "Магический",

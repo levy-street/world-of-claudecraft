@@ -59,6 +59,9 @@ export const PROCEDURAL_RARITY_TABLES: Record<string, RarityTable> = {
   },
   initial_dungeon_boss: {
     id: 'initial_dungeon_boss',
-    weights: { magic: 0.25, rare: 0.61, epic: 0.13, legendary: 0.01 },
+    // Bosses always add one procedural entry. A two-percent Legendary rate
+    // keeps the shared-corpse chase meaningful without replacing authored
+    // normal and Heroic loot, which is rolled independently.
+    weights: { magic: 0.25, rare: 0.6, epic: 0.13, legendary: 0.02 },
   },
 };

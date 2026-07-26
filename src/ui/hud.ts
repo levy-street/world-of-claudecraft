@@ -57,6 +57,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
+import { MAX_ACTIVE_LEGENDARY_POWERS } from '../sim/equipment/equipment_effect_types';
 import { resolvedItemStats } from '../sim/equipment/resolved_item';
 import { canEquipItem, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
@@ -4794,9 +4795,35 @@ export class Hud {
     }
     const legendary = proceduralLegendaryPresentation(instance);
     if (legendary) {
-      html += `<div class="tt-legendary-power"><span class="tt-legendary-rune">${legendaryPowerRuneSvg()}</span><span>${esc(
+      const rollLines = legendary.rollDetails
+        .map((roll) => {
+          const key =
+            roll.unit === 'percent'
+              ? 'itemUi.procedural.powerRollPercent'
+              : roll.unit === 'milliseconds'
+                ? 'itemUi.procedural.powerRollMilliseconds'
+                : roll.unit === 'resource'
+                  ? 'itemUi.procedural.powerRollResource'
+                  : 'itemUi.procedural.powerRollNumber';
+          const suffix = roll.unit === 'percent' ? '%' : roll.unit === 'milliseconds' ? ' ms' : '';
+          const range = `<span class="tt-roll-range" aria-label="${esc(
+            t('itemUi.procedural.rollRangeAria', {
+              min: itemNumber(roll.min),
+              max: itemNumber(roll.max),
+            }),
+          )}"> [${itemNumber(roll.min)}-${itemNumber(roll.max)}${suffix}]</span>`;
+          return `<span class="tt-legendary-roll">${esc(
+            t(key, { value: itemNumber(roll.value) }),
+          )}${range}</span>`;
+        })
+        .join('');
+      html += `<div class="tt-legendary-power"><span class="tt-legendary-rune">${legendaryPowerRuneSvg()}</span><span class="tt-legendary-copy"><span>${esc(
         legendary.description,
-      )}</span></div>`;
+      )}</span>${rollLines}<span class="tt-legendary-limit">${esc(
+        t('itemUi.procedural.legendaryLimit', {
+          count: itemNumber(MAX_ACTIVE_LEGENDARY_POWERS),
+        }),
+      )}</span></span></div>`;
     }
     const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
     if (warfareRating > 0) {

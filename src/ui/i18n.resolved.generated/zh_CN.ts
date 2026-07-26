@@ -6568,7 +6568,12 @@ export const zh_CN: EnTranslations = {
     "procedural": {
       "rollRangeAria": "可能的数值范围：{min} 至 {max}",
       "advancedDetailsHint": "按住 {key} 显示可能的数值范围。",
+      "powerRollPercent": "Power roll: {value}%",
+      "powerRollMilliseconds": "Power roll: {value} ms",
+      "powerRollResource": "Power roll: {value} resource",
+      "powerRollNumber": "Power roll: {value}",
       "legendaryPower": "传奇威能",
+      "legendaryLimit": "Unique-equipped: {count} Legendary power",
       "rarity": {
         "common": "普通",
         "magic": "魔法",

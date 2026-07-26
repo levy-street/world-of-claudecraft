@@ -203,10 +203,14 @@ function pageShell(title, subtitle, content, pageClass = '') {
       position: relative;
       width: 52px;
     }
-    .rarity-magic .icon-frame { border-color: #2887dc; }
-    .rarity-rare .icon-frame { border-color: #e0bd42; }
-    .rarity-epic .icon-frame { border-color: #9859d8; }
-    .rarity-legendary .icon-frame {
+    .rarity-magic .icon-frame,
+    .contact-icon.rarity-magic { border-color: #2887dc; }
+    .rarity-rare .icon-frame,
+    .contact-icon.rarity-rare { border-color: #e0bd42; }
+    .rarity-epic .icon-frame,
+    .contact-icon.rarity-epic { border-color: #9859d8; }
+    .rarity-legendary .icon-frame,
+    .contact-icon.rarity-legendary {
       border-color: #e78826;
       box-shadow: 0 0 10px rgba(231, 136, 38, 0.22);
     }
@@ -526,7 +530,7 @@ function renderLegendaryRow(variant) {
 function renderLegendaryPage(variants, pageNumber, totalPages) {
   return pageShell(
     `Named Legendary variants: ${pageNumber} of ${totalPages}`,
-    'Each row is a valid production base/power pairing. Shared powers intentionally reuse their power-specific asset URL.',
+    'Each row is a valid production base/power pairing with base-specific art and a stable revisioned URL.',
     `<main class="legendary-list">${variants.map(renderLegendaryRow).join('')}</main>`,
   );
 }

@@ -53,6 +53,7 @@ const baseEnTable = {
   'error.noLoadout': 'No such loadout.',
   'error.loadoutLevel': 'That loadout needs a higher level.',
   'error.cannotEquip': 'You cannot equip that.',
+  'error.legendaryPowerLimit': 'You can equip only one Legendary power at a time.',
   // Refusal when an aimed equip slot (a paperdoll drop target) does not accept the
   // dragged piece, e.g. a helm dropped on a ring finger (src/sim/items.ts equipItem).
   'error.wrongEquipSlot': 'That does not go in that slot.',

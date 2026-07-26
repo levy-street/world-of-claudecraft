@@ -6,6 +6,7 @@ import { PROCEDURAL_LEGENDARY_POWERS } from '../src/sim/content/procedural_legen
 import { PROCEDURAL_ITEM_BASES } from '../src/sim/content/procedural_loot';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { MAX_ACTIVE_LEGENDARY_POWERS } from '../src/sim/equipment/equipment_effect_types';
 import { generateProceduralItem } from '../src/sim/loot/procedural';
 import { Sim } from '../src/sim/sim';
 import type { Entity, EquipSlot, ItemInstancePayload, PlayerClass } from '../src/sim/types';
@@ -219,13 +220,55 @@ describe('legendary equipment integration', () => {
     expect(boots.player.auras.some((a) => a.kind === 'buff_speed')).toBe(true);
   });
 
-  it('rejects multiple equipped powers and resets cadence on real unequip', () => {
-    const invalid = makeSim('mage');
-    equipPower(invalid, 'bell_of_the_ninth_peal', 'mainhand', 'ashwood_staff');
-    equipPower(invalid, 'boots_of_the_unbroken_road');
-    invalid.ctx.triggerEquipmentEffects(invalid.player, { kind: 'movement', movementDistance: 20 });
-    expect(invalid.player.auras.some((a) => a.kind === 'buff_speed')).toBe(false);
+  it('rejects a second Legendary power before inventory mutation', () => {
+    expect(MAX_ACTIVE_LEGENDARY_POWERS).toBe(1);
+    const sim = makeSim('mage');
+    equipPower(sim, 'bell_of_the_ninth_peal', 'mainhand', 'ashwood_staff');
+    const boots = powerPayload('boots_of_the_unbroken_road', 'gravecaller_cloth_slippers');
+    const bootsUid = boots.procedural?.uid;
+    if (!bootsUid) throw new Error('legendary fixture lost procedural UID');
+    sim.addItemInstance('gravecaller_cloth_slippers', boots, sim.playerId);
+    sim.drainEvents();
 
+    sim.equipItemToSlot('gravecaller_cloth_slippers', 'feet', sim.playerId, bootsUid);
+
+    const meta = sim.players.get(sim.playerId);
+    expect(meta?.equipment.feet).toBeUndefined();
+    expect(meta?.inventory.some((slot) => slot.instance?.procedural?.uid === bootsUid)).toBe(true);
+    expect(
+      sim
+        .drainEvents()
+        .filter((event) => event.type === 'error')
+        .map((event) => event.text),
+    ).toContain('You can equip only one Legendary power at a time.');
+  });
+
+  it('allows a same-slot replacement while enforcing the one-power limit', () => {
+    const sim = makeSim('priest');
+    const first = equipPower(sim, 'bell_of_the_ninth_peal', 'mainhand', 'ashwood_staff');
+    const firstUid = first.procedural?.uid;
+    if (!firstUid) throw new Error('first legendary fixture lost procedural UID');
+    const replacement = powerPayload('ysoleis_vigil', 'ashwood_staff');
+    const replacementUid = replacement.procedural?.uid;
+    if (!replacementUid) throw new Error('replacement legendary fixture lost procedural UID');
+    sim.addItemInstance('ashwood_staff', replacement, sim.playerId);
+    sim.drainEvents();
+
+    sim.equipItemToSlot('ashwood_staff', 'mainhand', sim.playerId, replacementUid);
+
+    const meta = sim.players.get(sim.playerId);
+    expect(meta?.equipment.mainhand).toBe('ashwood_staff');
+    expect(meta?.equipmentInstance.mainhand?.procedural?.uid).toBe(replacementUid);
+    expect(meta?.inventory.some((slot) => slot.instance?.procedural?.uid === firstUid)).toBe(true);
+    expect(
+      sim
+        .drainEvents()
+        .filter((event) => event.type === 'error')
+        .map((event) => event.text),
+    ).not.toContain('You can equip only one Legendary power at a time.');
+  });
+
+  it('resets cadence on real unequip', () => {
     const reset = makeSim('mage');
     const payload = equipPower(reset, 'crown_last_pyre');
     const target = hostile(reset, 2);

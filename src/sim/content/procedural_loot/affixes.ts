@@ -19,32 +19,25 @@ function tiers(
   stat: string,
   ranges: readonly [NumericRoll, NumericRoll, NumericRoll, NumericRoll],
 ): AffixTier[] {
-  return [
-    {
-      tier: 1,
-      minItemLevel: 1,
-      budgetCost: PROCEDURAL_STAT_BUDGET_COST[stat],
-      rolls: { [stat]: ranges[0] },
+  const budgetCost = PROCEDURAL_STAT_BUDGET_COST[stat];
+  const specs = [
+    { tier: 1, minItemLevel: 1, range: ranges[0], maxBudget: 1.5 },
+    { tier: 2, minItemLevel: 4, range: ranges[1], maxBudget: 6 },
+    { tier: 3, minItemLevel: 8, range: ranges[2], maxBudget: 10 },
+    { tier: 4, minItemLevel: 12, range: ranges[3], maxBudget: 16 },
+    { tier: 5, minItemLevel: 18, range: ranges[3], maxBudget: 24 },
+  ] as const;
+  return specs.map((spec) => ({
+    tier: spec.tier,
+    minItemLevel: spec.minItemLevel,
+    budgetCost,
+    rolls: {
+      [stat]: {
+        ...spec.range,
+        max: Math.max(spec.range.min, Math.floor((spec.maxBudget + 1e-10) / budgetCost)),
+      },
     },
-    {
-      tier: 2,
-      minItemLevel: 6,
-      budgetCost: PROCEDURAL_STAT_BUDGET_COST[stat],
-      rolls: { [stat]: ranges[1] },
-    },
-    {
-      tier: 3,
-      minItemLevel: 12,
-      budgetCost: PROCEDURAL_STAT_BUDGET_COST[stat],
-      rolls: { [stat]: ranges[2] },
-    },
-    {
-      tier: 4,
-      minItemLevel: 18,
-      budgetCost: PROCEDURAL_STAT_BUDGET_COST[stat],
-      rolls: { [stat]: ranges[3] },
-    },
-  ];
+  }));
 }
 
 export const PROCEDURAL_AFFIXES: Record<string, AffixDefinition> = {
@@ -167,7 +160,7 @@ export const PROCEDURAL_AFFIXES: Record<string, AffixDefinition> = {
     displayName: 'of Alacrity',
     nameFragmentId: 'procedural.name.of_alacrity',
     tags: ['armor', 'weapon', 'held_offhand', 'jewelry'],
-    minItemLevel: 6,
+    minItemLevel: 4,
     weight: 0.75,
     tiers: tiers('hasteRating', [
       { min: 2, max: 4 },
@@ -216,7 +209,7 @@ export const PROCEDURAL_AFFIXES: Record<string, AffixDefinition> = {
     displayName: 'of Reaping',
     nameFragmentId: 'procedural.name.of_reaping',
     tags: ['melee', 'ranged'],
-    minItemLevel: 8,
+    minItemLevel: 4,
     weight: 0.35,
     tiers: tiers('healthOnKill', [
       { min: 1, max: 2 },

@@ -1,11 +1,15 @@
 import {
   PROCEDURAL_LEGENDARY_POWER_IDS,
   PROCEDURAL_LEGENDARY_POWERS,
+  type ProceduralLegendaryPowerId,
   proceduralLegendaryPowerCompatibleWithBase,
 } from '../../content/procedural_legendary_powers';
 import {
+  PROCEDURAL_LEGENDARY_SIGNATURE_SHARE,
+  proceduralBossLegendarySignatures,
+} from '../../content/procedural_legendary_sources';
+import {
   type AffixDefinition,
-  type AffixTier,
   baseEligibleForAffix,
   PROCEDURAL_AFFIXES,
   PROCEDURAL_BASE_POOLS,
@@ -14,24 +18,31 @@ import {
   PROCEDURAL_RARE_SECOND_WORD_IDS,
   PROCEDURAL_RARITIES,
   PROCEDURAL_RARITY_TABLES,
-  PROCEDURAL_STAT_BUDGET_COST,
   type ProceduralItemBase,
   type RarityTable,
   type WeightedAffixCount,
 } from '../../content/procedural_loot';
+import { PROCEDURAL_BASE_ITEMS } from '../../content/procedural_loot/item_defs';
 import type {
   GeneratedItemName,
   ItemDropContext,
-  ItemTag,
   ProceduralItemInstance,
   ProceduralRarity,
   RolledAffix,
 } from '../../procedural_item';
 import { Rng } from '../../rng';
 import type { ItemInstancePayload, PlayerClass } from '../../types';
+import {
+  allocateProceduralAffixes,
+  calculateProceduralBudget,
+  findProceduralBudgetFeasibleAffixSet,
+  ProceduralBudgetAllocationError,
+} from './budget';
+import { proceduralLootUsabilityMultiplier } from './smart_loot';
+
+export { calculateProceduralBudget } from './budget';
 
 type ActiveRarity = Exclude<ProceduralRarity, 'mythic'>;
-
 export interface GenerateProceduralItemInput {
   seed: number;
   uid: string;
@@ -40,6 +51,7 @@ export interface GenerateProceduralItemInput {
   rarityTableId: string;
   sourceItemLevel: number;
   personalLootClass?: PlayerClass;
+  lootRecipientClasses?: readonly PlayerClass[];
   forcedBaseId?: string;
   forcedRarity?: ActiveRarity;
   forcedItemLevel?: number;
@@ -50,27 +62,19 @@ export interface GeneratedProceduralDrop {
   instance: ItemInstancePayload & { procedural: ProceduralItemInstance };
 }
 
-const CLASS_TAG_BIAS: Record<PlayerClass, ItemTag[]> = {
-  warrior: ['melee', 'mail'],
-  paladin: ['melee', 'mail', 'caster'],
-  hunter: ['ranged', 'mail'],
-  rogue: ['melee', 'leather'],
-  priest: ['caster', 'cloth'],
-  shaman: ['caster', 'melee', 'mail'],
-  mage: ['caster', 'cloth'],
-  warlock: ['caster', 'cloth'],
-  druid: ['caster', 'melee', 'leather'],
-};
-
-function weightedIndex(rng: Rng, weights: readonly number[]): number {
+function weightedIndexFromRoll(selectionRoll: number, weights: readonly number[]): number {
   const total = weights.reduce((sum, weight) => sum + weight, 0);
   if (!(total > 0)) throw new Error('weighted selection requires positive total weight');
-  let cursor = rng.next() * total;
+  let cursor = selectionRoll * total;
   for (let i = 0; i < weights.length; i++) {
     cursor -= weights[i];
     if (cursor < 0) return i;
   }
   return weights.length - 1;
+}
+
+function weightedIndex(rng: Rng, weights: readonly number[]): number {
+  return weightedIndexFromRoll(rng.next(), weights);
 }
 
 function rarityFromTable(rng: Rng, table: RarityTable): ActiveRarity {
@@ -117,17 +121,40 @@ function chooseBase(
     throw new Error(
       `procedural base pool ${input.basePoolId} has no base at source level ${input.sourceItemLevel}`,
     );
-  const classTags = input.personalLootClass ? CLASS_TAG_BIAS[input.personalLootClass] : [];
+  const lootRecipientClasses =
+    input.lootRecipientClasses ?? (input.personalLootClass ? [input.personalLootClass] : []);
   const weights = bases.map((base) => {
-    const classMultiplier =
-      input.personalLootClass && base.requiredClass?.includes(input.personalLootClass)
-        ? 3
-        : classTags.some((tag) => base.tags.includes(tag))
-          ? 2
-          : 1;
-    return base.dropWeight * classMultiplier;
+    const definition = PROCEDURAL_BASE_ITEMS[base.id];
+    if (!definition) throw new Error(`procedural base ${base.id} has no item definition`);
+    return base.dropWeight * proceduralLootUsabilityMultiplier(definition, lootRecipientClasses);
   });
-  const selected = bases[weightedIndex(rng, weights)];
+  const signatureIds =
+    rarity === 'legendary'
+      ? new Set(proceduralBossLegendarySignatures(input.context.sourceTemplateId))
+      : new Set<ProceduralLegendaryPowerId>();
+  const signatureBases = bases.filter((base) =>
+    [...signatureIds].some((id) =>
+      proceduralLegendaryPowerCompatibleWithBase(
+        PROCEDURAL_LEGENDARY_POWERS[id],
+        base,
+        input.personalLootClass,
+      ),
+    ),
+  );
+  let selected: ProceduralItemBase;
+  if (signatureBases.length > 0) {
+    const selectionRoll = rng.next();
+    const useSignatureBranch = selectionRoll < PROCEDURAL_LEGENDARY_SIGNATURE_SHARE;
+    const branch = useSignatureBranch ? signatureBases : bases;
+    const branchRoll = useSignatureBranch
+      ? selectionRoll / PROCEDURAL_LEGENDARY_SIGNATURE_SHARE
+      : (selectionRoll - PROCEDURAL_LEGENDARY_SIGNATURE_SHARE) /
+        (1 - PROCEDURAL_LEGENDARY_SIGNATURE_SHARE);
+    const branchWeights = branch.map((base) => weights[bases.indexOf(base)]);
+    selected = branch[weightedIndexFromRoll(branchRoll, branchWeights)];
+  } else {
+    selected = bases[weightedIndex(rng, weights)];
+  }
   if (!input.forcedBaseId) return selected;
   const forced = PROCEDURAL_ITEM_BASES[input.forcedBaseId];
   if (!forced || !pool.baseIds.includes(forced.id))
@@ -168,6 +195,15 @@ function affixWeight(affix: AffixDefinition, cls: PlayerClass | undefined): numb
   return affix.weight * (cls ? (affix.classBias?.[cls] ?? 1) : 1);
 }
 
+function affixesCompatible(
+  candidate: AffixDefinition,
+  selected: readonly AffixDefinition[],
+): boolean {
+  if (selected.some((affix) => affix.family === candidate.family)) return false;
+  const selectedGroups = new Set(selected.flatMap((affix) => affix.exclusiveGroups ?? []));
+  return !candidate.exclusiveGroups?.some((group) => selectedGroups.has(group));
+}
+
 function selectAffixes(
   rng: Rng,
   pool: AffixDefinition[],
@@ -176,35 +212,21 @@ function selectAffixes(
 ): AffixDefinition[] {
   const remaining = [...pool];
   const selected: AffixDefinition[] = [];
-  const families = new Set<string>();
-  const groups = new Set<string>();
   while (selected.length < count) {
-    const candidates = remaining.filter(
-      (affix) =>
-        !families.has(affix.family) && !affix.exclusiveGroups?.some((group) => groups.has(group)),
-    );
+    const candidates = remaining.filter((affix) => affixesCompatible(affix, selected));
     if (candidates.length === 0)
       throw new Error(`affix pool exhausted after ${selected.length} of ${count} selections`);
     const choice =
       candidates[
         weightedIndex(
           rng,
-          candidates.map((a) => affixWeight(a, cls)),
+          candidates.map((affix) => affixWeight(affix, cls)),
         )
       ];
     selected.push(choice);
-    families.add(choice.family);
-    for (const group of choice.exclusiveGroups ?? []) groups.add(group);
     remaining.splice(remaining.indexOf(choice), 1);
   }
   return selected;
-}
-
-function chooseTier(rng: Rng, affix: AffixDefinition, itemLevel: number): AffixTier {
-  const eligible = affix.tiers.filter((tier) => tier.minItemLevel <= itemLevel);
-  if (eligible.length === 0) throw new Error(`affix ${affix.id} has no eligible tier`);
-  const weights = eligible.map((_, index) => index + 1);
-  return eligible[weightedIndex(rng, weights)];
 }
 
 function quantize(value: number, step = 1): number {
@@ -223,6 +245,7 @@ function legendaryPowerFromRoll(
   rollValue: number,
   base: ProceduralItemBase,
   personalLootClass: PlayerClass | undefined,
+  sourceTemplateId: string | undefined,
 ): {
   powerId: string;
   powerRevision: 1;
@@ -232,8 +255,20 @@ function legendaryPowerFromRoll(
     (id) => PROCEDURAL_LEGENDARY_POWERS[id],
   ).filter((power) => proceduralLegendaryPowerCompatibleWithBase(power, base, personalLootClass));
   if (compatible.length === 0) throw new Error(`no legendary power is compatible with ${base.id}`);
-  const power =
-    compatible[Math.min(compatible.length - 1, Math.floor(selectionRoll * compatible.length))];
+  const signatures = new Set(proceduralBossLegendarySignatures(sourceTemplateId));
+  const preferred = compatible.filter((power) => signatures.has(power.id));
+  let power: (typeof compatible)[number];
+  if (preferred.length > 0 && selectionRoll < PROCEDURAL_LEGENDARY_SIGNATURE_SHARE) {
+    const signatureRoll = selectionRoll / PROCEDURAL_LEGENDARY_SIGNATURE_SHARE;
+    power = preferred[Math.min(preferred.length - 1, Math.floor(signatureRoll * preferred.length))];
+  } else {
+    const globalRoll =
+      preferred.length > 0
+        ? (selectionRoll - PROCEDURAL_LEGENDARY_SIGNATURE_SHARE) /
+          (1 - PROCEDURAL_LEGENDARY_SIGNATURE_SHARE)
+        : selectionRoll;
+    power = compatible[Math.min(compatible.length - 1, Math.floor(globalRoll * compatible.length))];
+  }
   const rolls = Object.fromEntries(
     Object.entries(power.rolls).map(([key, range]) => [
       key,
@@ -244,29 +279,6 @@ function legendaryPowerFromRoll(
     ]),
   );
   return { powerId: power.id, powerRevision: power.revision, rolls };
-}
-
-function rollAffix(rng: Rng, affix: AffixDefinition, tier: AffixTier, floor: number): RolledAffix {
-  const values: Record<string, number> = {};
-  const ranges: RolledAffix['ranges'] = {};
-  let budget = 0;
-  for (const [stat, range] of Object.entries(tier.rolls)) {
-    const percentile = floor + rng.next() * (1 - floor);
-    const value = quantize(range.min + (range.max - range.min) * percentile, range.step);
-    values[stat] = value;
-    ranges[stat] = { min: range.min, max: range.max };
-    budget += value * PROCEDURAL_STAT_BUDGET_COST[stat];
-  }
-  return {
-    affixId: affix.id,
-    family: affix.family,
-    position: affix.position,
-    tier: tier.tier,
-    revision: 1,
-    budget: Number(budget.toFixed(3)),
-    values,
-    ranges,
-  };
 }
 
 function generatedName(
@@ -307,16 +319,6 @@ function generatedName(
   return { baseId: base.id };
 }
 
-export function calculateProceduralBudget(
-  base: ProceduralItemBase,
-  itemLevel: number,
-  rarity: ActiveRarity,
-): number {
-  return Number(
-    (itemLevel * PROCEDURAL_RARITIES[rarity].budgetMultiplier * base.slotMultiplier).toFixed(3),
-  );
-}
-
 export function generateProceduralItem(
   input: GenerateProceduralItemInput,
 ): GeneratedProceduralDrop {
@@ -328,7 +330,7 @@ export function generateProceduralItem(
 
   // Fixed draw order:
   // 1 rarity, 2 base, 3 item level, 4 affix count, 5 selections,
-  // 6 tiers, 7 values, 8 legendary selection, 9 legendary rolls,
+  // 6 budget shares, 7 budget values, 8 legendary selection, 9 legendary rolls,
   // 10 two name-fragment draws. Forced development values still consume their
   // normal draw before overriding it.
   const rarityTable = PROCEDURAL_RARITY_TABLES[input.rarityTableId];
@@ -342,16 +344,40 @@ export function generateProceduralItem(
   );
   const rarityDef = PROCEDURAL_RARITIES[rarity];
   const affixCount = countFromWeights(rng, rarityDef.affixCounts);
-  const selected = selectAffixes(
-    rng,
-    eligibleAffixes(base, itemLevel),
-    affixCount,
-    input.personalLootClass,
-  );
-  const tiers = selected.map((affix) => chooseTier(rng, affix, itemLevel));
-  const affixes = selected.map((affix, index) =>
-    rollAffix(rng, affix, tiers[index], rarityDef.rollFloor),
-  );
+  const canonicalBudget = calculateProceduralBudget(base, itemLevel, rarity);
+  const affixPool = eligibleAffixes(base, itemLevel);
+  const selected = selectAffixes(rng, affixPool, affixCount, input.personalLootClass);
+  const shareRolls = selected.map(() => rng.next());
+  const valueRolls = selected.map(() => rng.next());
+  let affixes: RolledAffix[];
+  try {
+    affixes = allocateProceduralAffixes({
+      affixes: selected,
+      itemLevel,
+      rarity,
+      canonicalBudget,
+      shareRolls,
+      valueRolls,
+    });
+  } catch (error) {
+    if (!(error instanceof ProceduralBudgetAllocationError)) throw error;
+    const fallback = findProceduralBudgetFeasibleAffixSet({
+      pool: affixPool,
+      count: affixCount,
+      itemLevel,
+      rarity,
+      canonicalBudget,
+    });
+    if (!fallback) throw error;
+    affixes = allocateProceduralAffixes({
+      affixes: fallback,
+      itemLevel,
+      rarity,
+      canonicalBudget,
+      shareRolls,
+      valueRolls,
+    });
+  }
 
   const legendarySelectionRoll = rng.next();
   const legendaryMagnitudeRoll = rng.next();
@@ -362,6 +388,7 @@ export function generateProceduralItem(
           legendaryMagnitudeRoll,
           base,
           input.personalLootClass,
+          input.context.sourceTemplateId,
         )
       : null;
   const firstNameRoll = rng.next();

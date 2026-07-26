@@ -6568,7 +6568,12 @@ export const ko_KR: EnTranslations = {
     "procedural": {
       "rollRangeAria": "가능한 수치 범위: {min}~{max}",
       "advancedDetailsHint": "가능한 수치 범위를 보려면 {key} 키를 누르세요.",
+      "powerRollPercent": "Power roll: {value}%",
+      "powerRollMilliseconds": "Power roll: {value} ms",
+      "powerRollResource": "Power roll: {value} resource",
+      "powerRollNumber": "Power roll: {value}",
       "legendaryPower": "전설 능력",
+      "legendaryLimit": "Unique-equipped: {count} Legendary power",
       "rarity": {
         "common": "일반",
         "magic": "마법",

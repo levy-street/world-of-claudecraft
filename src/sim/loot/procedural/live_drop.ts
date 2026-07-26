@@ -27,6 +27,7 @@ export interface LiveProceduralDropInput {
   sourceFacts: ProceduralSourceFacts;
   uid: string | (() => string);
   personalLootClass?: PlayerClass;
+  lootRecipientClasses?: readonly PlayerClass[];
 }
 
 const PROFILE_WORLD: ProceduralDropProfile = {
@@ -119,6 +120,9 @@ export function generateLiveProceduralDrop(
     sourceItemLevel: input.sourceItemLevel,
     ...(input.personalLootClass && {
       personalLootClass: input.personalLootClass,
+    }),
+    ...(input.lootRecipientClasses && {
+      lootRecipientClasses: input.lootRecipientClasses,
     }),
   });
 }

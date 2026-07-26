@@ -9,7 +9,13 @@ import {
   PROCEDURAL_RARE_FIRST_WORD_IDS,
   PROCEDURAL_RARE_SECOND_WORD_IDS,
   PROCEDURAL_RARITIES,
+  PROCEDURAL_STAT_BUDGET_COST,
 } from './content/procedural_loot';
+import {
+  calculateProceduralBudget,
+  minimumValueForRollFloor,
+  proceduralBudgetTolerance,
+} from './loot/procedural/budget';
 import {
   cloneProceduralItemInstance,
   type GeneratedItemName,
@@ -72,6 +78,14 @@ function finiteNumber(value: unknown, min: number, max: number): value is number
 function boundedString(value: unknown, max = MAX_PAYLOAD_STRING): value is string {
   return typeof value === 'string' && value.length > 0 && value.length <= max;
 }
+function sameStringKeys(actual: readonly string[], expected: readonly string[]): boolean {
+  return [...actual].sort().join('\0') === [...expected].sort().join('\0');
+}
+
+function quantizedToStep(value: number, step: number): boolean {
+  const steps = value / step;
+  return Math.abs(steps - Math.round(steps)) <= 1e-8;
+}
 
 function integer(value: unknown, min: number, max: number): value is number {
   return finiteNumber(value, min, max) && Number.isInteger(value);
@@ -121,6 +135,7 @@ function sanitizeRolledAffix(
   value: unknown,
   baseId: string,
   itemLevel: number,
+  rarity: Exclude<ProceduralRarity, 'mythic'>,
 ): ValidationResult<RolledAffix> {
   if (!isRecord(value)) return failure('affix must be an object');
   if (!boundedString(value.affixId, 64)) return failure('invalid affix id');
@@ -129,6 +144,11 @@ function sanitizeRolledAffix(
   const base = PROCEDURAL_ITEM_BASES[baseId];
   if (!baseEligibleForAffix(base, definition))
     return failure(`affix ${definition.id} is incompatible with base ${baseId}`);
+  if (
+    itemLevel < definition.minItemLevel ||
+    (definition.maxItemLevel !== undefined && itemLevel > definition.maxItemLevel)
+  )
+    return failure(`affix ${definition.id} is outside its item level range`);
   if (value.family !== definition.family) return failure(`affix ${definition.id} family mismatch`);
   if (value.position !== definition.position)
     return failure(`affix ${definition.id} position mismatch`);
@@ -142,15 +162,24 @@ function sanitizeRolledAffix(
   if (!isRecord(value.values) || !isRecord(value.ranges))
     return failure(`affix ${definition.id} values and ranges must be objects`);
   const valueEntries = Object.entries(value.values);
-  if (valueEntries.length < 1 || valueEntries.length > MAX_VALUES_PER_AFFIX)
+  const valueKeys = valueEntries.map(([stat]) => stat);
+  const rangeKeys = Object.keys(value.ranges);
+  const authoredKeys = Object.keys(tier.rolls);
+  if (!sameStringKeys(valueKeys, authoredKeys) || !sameStringKeys(rangeKeys, authoredKeys))
+    return failure(`affix ${definition.id} stat keys do not match tier`);
+  if (
+    valueEntries.length < 1 ||
+    valueEntries.length > MAX_VALUES_PER_AFFIX ||
+    authoredKeys.length > MAX_VALUES_PER_AFFIX
+  )
     return failure(`affix ${definition.id} has invalid value count`);
-  if (Object.keys(value.ranges).length !== valueEntries.length)
-    return failure(`affix ${definition.id} range count mismatch`);
 
   const values: Record<string, number> = {};
   const ranges: RolledAffix['ranges'] = {};
+  let expectedBudget = 0;
   for (const [stat, numericValue] of valueEntries) {
-    if (!(stat in tier.rolls)) return failure(`affix ${definition.id} has unknown stat ${stat}`);
+    const authoredRange = tier.rolls[stat];
+    if (!authoredRange) return failure(`affix ${definition.id} has unknown stat ${stat}`);
     if (!finiteNumber(numericValue, -MAX_NUMERIC_MAGNITUDE, MAX_NUMERIC_MAGNITUDE))
       return failure(`affix ${definition.id} has invalid value for ${stat}`);
     const range = value.ranges[stat];
@@ -158,14 +187,27 @@ function sanitizeRolledAffix(
     if (
       !finiteNumber(range.min, -MAX_NUMERIC_MAGNITUDE, MAX_NUMERIC_MAGNITUDE) ||
       !finiteNumber(range.max, -MAX_NUMERIC_MAGNITUDE, MAX_NUMERIC_MAGNITUDE) ||
-      range.min > range.max ||
-      numericValue < range.min ||
-      numericValue > range.max
+      range.min !== authoredRange.min ||
+      range.max !== authoredRange.max
     )
-      return failure(`affix ${definition.id} has invalid range for ${stat}`);
+      return failure(`affix ${definition.id} range does not match tier for ${stat}`);
+    if (numericValue < authoredRange.min || numericValue > authoredRange.max)
+      return failure(`affix ${definition.id} has invalid value for ${stat}`);
+    if (!quantizedToStep(numericValue, authoredRange.step ?? 1))
+      return failure(`affix ${definition.id} value for ${stat} is not quantized`);
+    const rollFloor = PROCEDURAL_RARITIES[rarity].rollFloor;
+    if (numericValue + 1e-8 < minimumValueForRollFloor(authoredRange, rollFloor))
+      return failure(`affix ${definition.id} value for ${stat} is below the ${rarity} roll floor`);
+    const budgetCost = PROCEDURAL_STAT_BUDGET_COST[stat];
+    if (budgetCost === undefined)
+      return failure(`affix ${definition.id} has no budget cost for ${stat}`);
     values[stat] = numericValue;
-    ranges[stat] = { min: range.min, max: range.max };
+    ranges[stat] = { min: authoredRange.min, max: authoredRange.max };
+    expectedBudget += numericValue * budgetCost;
   }
+  expectedBudget = Number(expectedBudget.toFixed(3));
+  if (Math.abs(value.budget - expectedBudget) > 1e-8)
+    return failure(`affix ${definition.id} budget does not match values`);
 
   return success({
     affixId: definition.id,
@@ -237,6 +279,7 @@ export function sanitizeProceduralItemInstance(
   if (!integer(value.itemLevel, 1, 40)) return failure('invalid procedural item level');
   if (!ACTIVE_RARITIES.has(value.rarity as ProceduralRarity))
     return failure('invalid procedural rarity');
+  const rarity = value.rarity as Exclude<ProceduralRarity, 'mythic'>;
   if (!integer(value.seed, 1, 0xffffffff)) return failure('invalid procedural seed');
   if (!Array.isArray(value.affixes) || value.affixes.length > MAX_AFFIXES)
     return failure('invalid procedural affix count');
@@ -250,19 +293,38 @@ export function sanitizeProceduralItemInstance(
 
   const affixes: RolledAffix[] = [];
   const families = new Set<string>();
+  const exclusiveGroups = new Set<string>();
   for (const entry of value.affixes) {
-    const result = sanitizeRolledAffix(entry, value.baseId, value.itemLevel);
+    const result = sanitizeRolledAffix(entry, value.baseId, value.itemLevel, rarity);
     if (!result.ok) return result;
     if (families.has(result.value.family)) return failure('duplicate procedural affix family');
+    const definition = PROCEDURAL_AFFIXES[result.value.affixId];
+    for (const group of definition.exclusiveGroups ?? []) {
+      if (exclusiveGroups.has(group))
+        return failure(`duplicate procedural affix exclusive group ${group}`);
+      exclusiveGroups.add(group);
+    }
     families.add(result.value.family);
     affixes.push(result.value);
   }
-  const rarity = value.rarity as Exclude<ProceduralRarity, 'mythic'>;
   const allowedCounts: number[] = PROCEDURAL_RARITIES[rarity].affixCounts.map(
     (entry) => entry.count,
   );
   if (!allowedCounts.includes(affixes.length))
     return failure('affix count does not match procedural rarity');
+  if (rarity !== 'common') {
+    const canonicalBudget = calculateProceduralBudget(
+      PROCEDURAL_ITEM_BASES[value.baseId],
+      value.itemLevel,
+      rarity,
+    );
+    const realizedBudget = affixes.reduce((sum, affix) => sum + affix.budget, 0);
+    if (
+      Math.abs(realizedBudget - canonicalBudget) >
+      proceduralBudgetTolerance(canonicalBudget) + 1e-8
+    )
+      return failure('procedural affix total exceeds canonical budget tolerance');
+  }
   const generatedName = sanitizeGeneratedName(value.generatedName, value.baseId, rarity, affixes);
   if (!generatedName) return failure('invalid generated item name');
   let legendaryPowerId: string | undefined;

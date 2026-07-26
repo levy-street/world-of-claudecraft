@@ -328,7 +328,7 @@ export function rollLoot(
       }
     }
   }
-  appendLiveProceduralDrop(ctx, mob, template, items);
+  appendLiveProceduralDrop(ctx, mob, template, items, eligible);
   if (copper > 0 || items.length > 0) {
     mob.loot = { copper, items };
     mob.lootable = true;
@@ -358,6 +358,7 @@ export function appendLiveProceduralDrop(
   mob: Entity,
   template: (typeof MOBS)[string],
   items: LootSlot[],
+  eligibleRecipients: readonly PlayerMeta[] = [],
 ): void {
   if (!proceduralLootSourceEligible(ctx, mob, template)) return;
   const sourceFacts = {
@@ -366,6 +367,13 @@ export function appendLiveProceduralDrop(
     ),
     inDelve: ctx.delveRunForMob(mob.id) !== null,
   };
+  const lootRecipientClasses = [...eligibleRecipients]
+    .sort((a, b) => a.entityId - b.entityId)
+    .filter(
+      (recipient, index, recipients) =>
+        index === 0 || recipient.entityId !== recipients[index - 1].entityId,
+    )
+    .map((recipient) => recipient.cls);
   const drop = generateLiveProceduralDrop({
     worldSeed: ctx.cfg.seed,
     sourceEntityId: mob.id,
@@ -375,6 +383,7 @@ export function appendLiveProceduralDrop(
     sourceTemplate: template,
     sourceFacts,
     uid: () => ctx.allocateProceduralItemUid(),
+    lootRecipientClasses,
   });
   if (drop) items.push({ itemId: drop.itemId, count: 1, instance: drop.instance });
 }

@@ -25,6 +25,7 @@ import {
 } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
+import { MAX_ACTIVE_LEGENDARY_POWERS } from './equipment/equipment_effect_types';
 import {
   canDualWield,
   canDualWieldTwoHand,
@@ -312,6 +313,20 @@ export function equipItem(
     const offhand = meta.equipment.offhand ? ITEMS[meta.equipment.offhand] : undefined;
     const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
     if (meta.equipment.offhand && !titanPair) displacedSlot = 'offhand';
+  }
+  const incomingPowerId = incomingInstance?.procedural?.legendaryPowerId;
+  if (incomingPowerId) {
+    const replacedSlots = new Set<EquipSlot>([slot, ...(displacedSlot ? [displacedSlot] : [])]);
+    const retainedPowerCount = Object.entries(meta.equipmentInstance).filter(
+      ([equippedSlot, payload]) =>
+        !replacedSlots.has(equippedSlot as EquipSlot) &&
+        meta.equipment[equippedSlot as EquipSlot] !== undefined &&
+        payload?.procedural?.legendaryPowerId !== undefined,
+    ).length;
+    if (retainedPowerCount >= MAX_ACTIVE_LEGENDARY_POWERS) {
+      ctx.error(meta.entityId, 'You can equip only one Legendary power at a time.');
+      return;
+    }
   }
   const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;
   const displacedInstance = displacedSlot ? meta.equipmentInstance?.[displacedSlot] : undefined;

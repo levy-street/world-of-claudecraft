@@ -6568,7 +6568,12 @@ export const ja_JP: EnTranslations = {
     "procedural": {
       "rollRangeAria": "変動範囲：{min}から{max}",
       "advancedDetailsHint": "{key} を押している間、変動範囲を表示します。",
+      "powerRollPercent": "Power roll: {value}%",
+      "powerRollMilliseconds": "Power roll: {value} ms",
+      "powerRollResource": "Power roll: {value} resource",
+      "powerRollNumber": "Power roll: {value}",
       "legendaryPower": "レジェンダリーパワー",
+      "legendaryLimit": "Unique-equipped: {count} Legendary power",
       "rarity": {
         "common": "コモン",
         "magic": "マジック",

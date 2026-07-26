@@ -6568,7 +6568,12 @@ export const fr_FR: EnTranslations = {
     "procedural": {
       "rollRangeAria": "Possible roll from {min} to {max}",
       "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
+      "powerRollPercent": "Power roll: {value}%",
+      "powerRollMilliseconds": "Power roll: {value} ms",
+      "powerRollResource": "Power roll: {value} resource",
+      "powerRollNumber": "Power roll: {value}",
       "legendaryPower": "Legendary power",
+      "legendaryLimit": "Unique-equipped: {count} Legendary power",
       "rarity": {
         "common": "Common",
         "magic": "Magic",
