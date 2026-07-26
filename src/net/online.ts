@@ -3451,8 +3451,10 @@ export class ClientWorld implements IWorld {
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
   }
-  buyBackItem(itemId: string): void {
-    this.cmd({ cmd: 'buyback', item: itemId });
+  buyBackItem(itemId: string, instance?: ItemInstancePayload): void {
+    // The payload is a row SELECTOR (the market_list_instance rule): the
+    // server matches it against the buyback rows, never stores it.
+    this.cmd({ cmd: 'buyback', item: itemId, ...(instance ? { instance } : {}) });
   }
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the

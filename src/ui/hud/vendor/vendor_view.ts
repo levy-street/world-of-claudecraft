@@ -9,7 +9,7 @@
 //
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
-import type { InvSlot, ItemDef } from '../../../sim/types';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { vendorStackSize } from '../../../sim/vendor_stack';
 
 export interface VendorGoodsRow {
@@ -41,6 +41,9 @@ export interface VendorBuybackRow {
   count: number;
   /** Copper the player pays to buy the item back (the vendor sell value). */
   price: number;
+  /** The sold copy's payload (issue 1165): buyback rows split per payload, so
+   *  the tooltip must show WHICH copy this row returns. */
+  instance?: ItemInstancePayload;
 }
 
 export interface VendorView {
@@ -86,7 +89,13 @@ export function buildVendorView(
   for (const slot of buybackSlots) {
     const item = items[slot.itemId];
     if (!item || slot.count <= 0) continue;
-    buyback.push({ itemId: slot.itemId, item, count: slot.count, price: item.sellValue });
+    buyback.push({
+      itemId: slot.itemId,
+      item,
+      count: slot.count,
+      price: item.sellValue,
+      ...(slot.instance ? { instance: slot.instance } : {}),
+    });
   }
   return {
     goods,

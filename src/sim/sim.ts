@@ -205,7 +205,7 @@ import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
-import { canStackInstancePayloads } from './item_instance_merge';
+import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
 import type { JailState } from './jail';
@@ -2354,7 +2354,18 @@ export class Sim {
           meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
         }
       }
-      meta.vendorBuyback = (s.vendorBuyback ?? []).map(cloneInvSlot);
+      // Buyback rows deliberately skip the full instancedCountCap: byte-equal
+      // merges past the stack cap are legitimate here (recordVendorBuyback
+      // merges an entire multi-unit sale into one row, and buyBackItem
+      // re-splits on the way out). The one arm that must clamp is charges: a
+      // charge-bearing payload can never merge, so a legitimate charge row is
+      // always count 1, and a hand-edited count would mint independent
+      // charge-bearing copies through the grant's fresh-slot clone.
+      meta.vendorBuyback = (s.vendorBuyback ?? []).map((raw) => {
+        const slot = cloneInvSlot(raw);
+        if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
+        return slot;
+      });
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
       meta.bank = sanitizeBankState(s.bank);
@@ -7082,8 +7093,20 @@ export class Sim {
     items.sellAllJunk(this.ctx, pid);
   }
 
-  buyBackItem(itemId: string, pid?: number): void {
-    items.buyBackItem(this.ctx, itemId, pid);
+  buyBackItem(
+    itemId: string,
+    pidOrInstance?: number | ItemInstancePayload,
+    instance?: ItemInstancePayload,
+  ): void {
+    // Dual-shape delegate: the IWorld surface calls (itemId, instance) with no
+    // pid (the offline primary player), while the server calls
+    // (itemId, pid, instance). A payload can never be a number, so the runtime
+    // split is unambiguous.
+    if (typeof pidOrInstance === 'object') {
+      items.buyBackItem(this.ctx, itemId, undefined, pidOrInstance);
+    } else {
+      items.buyBackItem(this.ctx, itemId, pidOrInstance, instance);
+    }
   }
 
   // Gather-node harvest (#1121): a thin delegate onto

@@ -4287,9 +4287,16 @@ export class GameServer {
           sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
         }
         break;
-      case 'buyback':
-        if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
+      case 'buyback': {
+        if (typeof msg.item !== 'string') break;
+        // Optional row selector, an equality needle only (never stored).
+        const needle =
+          msg.instance !== null && typeof msg.instance === 'object' && !Array.isArray(msg.instance)
+            ? (msg.instance as ItemInstancePayload)
+            : undefined;
+        sim.buyBackItem(msg.item, pid, needle);
         break;
+      }
       case 'harvest_node':
         this.sendCommandOutcome(
           session,
