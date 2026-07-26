@@ -83,6 +83,8 @@ describe('procedural loot content', () => {
       initial_world: 0.0002,
       initial_rare: 0.002,
       initial_dungeon_boss: 0.02,
+      nythraxis_raid_normal: 0.02,
+      nythraxis_raid_heroic: 0.05,
     };
 
     for (const table of Object.values(PROCEDURAL_RARITY_TABLES)) {

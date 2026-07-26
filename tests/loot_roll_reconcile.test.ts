@@ -26,7 +26,7 @@ function teleportTo(sim: Sim, pid: number, x: number, z: number) {
 function partyWithSharedRoll(seed = 42) {
   const sim = makeSim(seed);
   const a = sim.addPlayer('warrior', 'Aaa');
-  const b = sim.addPlayer('mage', 'Bbb');
+  const b = sim.addPlayer('rogue', 'Bbb');
   sim.partyInvite(b, a);
   sim.partyAccept(b);
   teleportTo(sim, a, 20, 20);

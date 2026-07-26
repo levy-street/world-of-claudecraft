@@ -23,6 +23,7 @@ interface ConfirmCall {
 
 interface GateHarness {
   onResurrectAtSpiritHealer: (() => void) | null;
+  openHeroicVendorNpcId: number | null;
   sim: { buyHeroicVendorItem(itemId: string): void };
   confirmDialog(
     title: string,
@@ -38,6 +39,7 @@ interface GateHarness {
 function harness() {
   const confirmations: ConfirmCall[] = [];
   const hud = Object.create(Hud.prototype) as unknown as GateHarness;
+  hud.openHeroicVendorNpcId = null;
   hud.confirmDialog = (title, body, ok, cancel, onOk) => {
     confirmations.push({ title, body, ok, cancel, onOk });
   };

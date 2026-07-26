@@ -421,7 +421,7 @@ describe('GameServer sessions', () => {
   it('forfeits pending loot rolls before the disconnect save can yield', async () => {
     const server = new GameServer();
     const leaver = expectJoined(server.join(fakeWs(), 11, 101, 'Leaver', 'warrior', null));
-    const stayer = expectJoined(server.join(fakeWs(), 12, 102, 'Stayer', 'mage', null));
+    const stayer = expectJoined(server.join(fakeWs(), 12, 102, 'Stayer', 'rogue', null));
     const third = expectJoined(server.join(fakeWs(), 13, 103, 'Third', 'rogue', null));
     server.sim.partyInvite(stayer.pid, leaver.pid);
     server.sim.partyAccept(stayer.pid);
@@ -496,7 +496,7 @@ describe('GameServer sessions', () => {
   it('preserves corpse loot rights and strategy after the original tapper leaves', async () => {
     const server = new GameServer();
     const leaver = expectJoined(server.join(fakeWs(), 11, 101, 'Leaver', 'warrior', null));
-    const stayer = expectJoined(server.join(fakeWs(), 12, 102, 'Stayer', 'mage', null));
+    const stayer = expectJoined(server.join(fakeWs(), 12, 102, 'Stayer', 'rogue', null));
     const third = expectJoined(server.join(fakeWs(), 13, 103, 'Third', 'rogue', null));
     server.sim.partyInvite(stayer.pid, leaver.pid);
     server.sim.partyAccept(stayer.pid);
