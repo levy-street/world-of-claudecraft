@@ -12,10 +12,12 @@ the probe, rather than trusting this page after a retune.
 ## Player experience
 
 The contributors still begin friendly and occupy deterministic rings around the raid. The
-centre of the room is now a distinct ten-unit stone seal. Before reboot, its blue engraved
-circuits brighten in direct proportion to the living players standing on it. Zero players
-leaves the seal neutral, half the raid produces half charge, and the full raid produces the
-complete blue pattern. This is the primary, diegetic indication that the group should gather.
+centre of the room is now a distinct ten-unit stone seal. Before reboot, its terminal-green
+engraved circuits brighten in direct proportion to the living players standing on it. Zero
+players leaves the seal neutral, half the raid produces half charge, and the full raid
+produces the complete pattern. This is the primary, diegetic indication that the group should
+gather. The green is the room's own server-rack colour rather than generic arcane blue: the
+disc reads as a console the raid is powering up by standing on it.
 
 If everyone is on the seal, the reboot button starts the encounter immediately. If at least
 one living player in the cave is outside, the first press shows only this roleplay warning:
@@ -199,10 +201,11 @@ removing the gameplay cue.
 
 The animation has both color and motion language:
 
-- idle charge: blue, gradually filled, slow inward flow;
+- idle charge: terminal green, gradually filled, slow inward flow;
 - active containment: dark red, slow inward flow;
 - breached containment: vivid red, fast outward flow and heartbeat;
-- clear or reset: unlit neutral stone and engravings.
+- reset: unlit neutral stone and engravings;
+- clear: the ember-orange wreck (see friendly-reboot.md's lighting section).
 
 ## Code and coverage
 

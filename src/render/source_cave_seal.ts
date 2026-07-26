@@ -1,5 +1,5 @@
 // Source Cave centre seal. A single procedural shader supplies the distinct
-// stone insert, etched circuit graph, occupancy-fed blue energy, red containment
+// stone insert, etched circuit graph, occupancy-fed terminal-green charge, red containment
 // flow, the irreversible breach flare, and the post-clear wreck. The core signal
 // never changes by GFX tier; composer tiers merely add bloom to the same HDR
 // output.
@@ -126,10 +126,15 @@ const fragmentShader = /* glsl */ `
     float flow = 0.5 + 0.5 * sin(time * uFlowDirection + r * 24.0 + sector * 0.71);
     float heartbeat = 0.78 + 0.22 * sin(time * 1.7);
 
-    vec3 blue = vec3(0.018, 0.38, 1.35);
+    // Terminal green for the dormant seal, the colour of the room's own server
+    // racks rather than generic arcane blue: the disc is a console the raid is
+    // powering up by standing on it. Weighted for GREEN's luminance, not blue's
+    // (0.59 vs 0.11 in luma), so the charge reads at the same brightness the
+    // blue did instead of scorching the floor.
+    vec3 terminalGreen = vec3(0.05, 0.55, 0.23);
     vec3 darkRed = vec3(0.24, 0.005, 0.012);
     vec3 hotRed = vec3(2.8, 0.018, 0.025);
-    vec3 energyColor = blue;
+    vec3 energyColor = terminalGreen;
     float energyStrength = uEnergy;
     if (uMode > 0.5 && uMode < 1.5) {
       energyColor = darkRed;

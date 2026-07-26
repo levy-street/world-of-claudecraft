@@ -19,7 +19,7 @@ function info(sealState: SourceCaveSealState, inside: number, total: number): So
 }
 
 describe('source cave seal visual state', () => {
-  it('maps gathering population to a clamped gradual blue-energy fraction', () => {
+  it('maps gathering population to a clamped gradual charge fraction', () => {
     expect(sourceCaveSealVisualState(info('idle', 0, 10)).occupancy).toBe(0);
     expect(sourceCaveSealVisualState(info('idle', 1, 10)).occupancy).toBe(0.1);
     expect(sourceCaveSealVisualState(info('idle', 5, 10)).energy).toBe(0.5);
