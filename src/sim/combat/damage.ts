@@ -29,10 +29,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
-import {
-  dungeonFinalBossInstance,
-  lockNormalDungeonResetOnBossKill,
-} from '../instances/dungeons';
+import { dungeonFinalBossInstance, lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';

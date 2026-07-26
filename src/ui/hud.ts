@@ -1610,7 +1610,7 @@ export class Hud {
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       openChronicles: () => this.openDeeds('chronicle'),
       openVendor: (npcId) => this.openVendor(npcId),
-      openHeroicVendor: (npcId) => this.heroicQuartermaster.open(npcId),
+      openHeroicVendor: (npcId) => this.openHeroicVendor(npcId),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
       openMarket: () => this.openMarket(),
@@ -11196,6 +11196,14 @@ export class Hud {
   // -------------------------------------------------------------------------
   // Vendor
   // -------------------------------------------------------------------------
+
+  openHeroicVendor(npcId: number): void {
+    this.heroicQuartermaster.open(npcId);
+  }
+
+  closeHeroicVendor(): void {
+    this.heroicQuartermaster.close();
+  }
 
   openVendor(npcId: number): void {
     this.closeOtherWindows(['#vendor-window', '#bags']);

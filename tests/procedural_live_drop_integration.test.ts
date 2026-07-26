@@ -195,11 +195,7 @@ describe('live procedural loot roll integration', () => {
   });
 
   it('keeps contributors, but not entered AFK players, in final-boss smart loot', () => {
-    const run = (
-      includeMageInKillRange: boolean,
-      mageContributed = true,
-      mageEntered = true,
-    ) => {
+    const run = (includeMageInKillRange: boolean, mageContributed = true, mageEntered = true) => {
       const sim = new Sim({
         seed: 65_901,
         playerClass: 'warrior',

@@ -244,7 +244,6 @@ function proceduralTransfersForOffer(
       });
       held.count -= 1;
       if (held.count <= 0) scratch.splice(index, 1);
-      continue;
     }
 
     // Generic rows cannot carry a procedural payload by construction.

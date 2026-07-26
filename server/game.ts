@@ -3275,7 +3275,10 @@ export class GameServer {
     return { state, deedRecords: [...session.pendingDeedRecords] };
   }
 
-  private completeCharacterPersistence(session: ClientSession, deedRecords: readonly string[]): void {
+  private completeCharacterPersistence(
+    session: ClientSession,
+    deedRecords: readonly string[],
+  ): void {
     session.lastSave = Date.now();
     const captured = new Set(deedRecords);
     const durable = session.pendingDeedRecords.filter((deedId) => captured.has(deedId));

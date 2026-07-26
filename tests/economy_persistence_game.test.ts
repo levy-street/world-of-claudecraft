@@ -43,8 +43,8 @@ import {
   saveMailState,
   saveMarketState,
 } from '../server/db';
-import { type ClientSession, GameServer } from '../server/game';
 import { recordDeedUnlocks } from '../server/deeds_records';
+import { type ClientSession, GameServer } from '../server/game';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
 import { generateProceduralItem } from '../src/sim/loot/procedural';
@@ -512,18 +512,19 @@ describe('atomic direct-transfer persistence', () => {
 
     await vi.waitFor(() => expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1));
     const call = vi.mocked(saveCharacterAndMarketState).mock.calls[0];
-    const peers = call?.[6];
+    if (!call) throw new Error('missing atomic system reward save');
+    const peers = call[6];
     expect(Array.isArray(peers)).toBe(true);
     expect((peers as any[]).map((peer) => peer.characterId)).toEqual([
       recipients[1].characterId,
       recipients[2].characterId,
     ]);
     expect(
-      (call?.[4] as MailSave).mail.filter(
+      (call[4] as MailSave).mail.filter(
         (message) => message.letterId === HEROIC_MARK_LETTER.letterId,
       ),
     ).toHaveLength(3);
-    expect((call?.[2] as CharacterState).heroicDaily).toMatchObject({ date: 'reset:1' });
+    expect((call[2] as CharacterState).heroicDaily).toMatchObject({ date: 'reset:1' });
   });
 
   it('quarantines the sender and realm mail after a failed procedural send transaction', async () => {

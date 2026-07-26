@@ -70,7 +70,8 @@ const PRESENTATION_SCREENSHOT_COUNT = PRESENTATION_SCREENSHOT_FILENAMES.length;
 // the one known project-stats resource 502. Keep the range narrow while rejecting
 // every unknown console error.
 const EXPECTED_OFFLINE_CONSOLE_ERRORS = new Map([
-  ['Failed to load resource: the server responded with a status of 502 (Bad Gateway)', [2, 3]],
+  // The expanded full-context pass runs across three site-presence polling intervals.
+  ['Failed to load resource: the server responded with a status of 502 (Bad Gateway)', [5, 7]],
   ['Failed to fetch project stats: ApiError: request failed (502)', 1],
   [
     'character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb',
@@ -1685,8 +1686,6 @@ async function capturePresentationEvidence(page) {
   await page.setViewport({
     width: 844,
     height: 390,
-    isMobile: true,
-    hasTouch: true,
     deviceScaleFactor: 2,
   });
   await page.evaluate(() => {
@@ -1880,10 +1879,7 @@ try {
     },
   ];
   if (!PREFLIGHT_ONLY) {
-    const staleDuplicate = path.join(
-      SCREENSHOT_ROOT,
-      '03-desktop-character-exact-comparison.png',
-    );
+    const staleDuplicate = path.join(SCREENSHOT_ROOT, '03-desktop-character-exact-comparison.png');
     if (fs.existsSync(staleDuplicate)) {
       fs.rmSync(staleDuplicate);
       console.log(`REMOVED ${path.relative(REPO_ROOT, staleDuplicate)}`);

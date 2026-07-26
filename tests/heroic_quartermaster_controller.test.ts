@@ -158,6 +158,13 @@ describe('HeroicQuartermasterController', () => {
 describe('Hud architecture boundary', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
+  it('keeps the public Quartermaster compatibility API', () => {
+    expect(hud).toContain('openHeroicVendor(npcId: number): void {');
+    expect(hud).toContain('this.heroicQuartermaster.open(npcId);');
+    expect(hud).toContain('closeHeroicVendor(): void {');
+    expect(hud).toContain('this.heroicQuartermaster.close();');
+  });
+
   it('delegates Quartermaster state and procedural item presentation', () => {
     expect(hud).toContain('new HeroicQuartermasterController({');
     expect(hud).toContain('this.heroicQuartermaster.onVendorResult()');

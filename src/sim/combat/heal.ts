@@ -25,10 +25,10 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import type { SimContext } from '../sim_context';
 import { dungeonFinalBossInstance } from '../instances/dungeons';
+import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
-import { type Entity } from '../types';
+import type { Entity } from '../types';
 import { runWeaponProcs } from './equip_procs';
 import { onSpellCrit } from './talent_procs';
 

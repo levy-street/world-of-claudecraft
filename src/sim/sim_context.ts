@@ -546,11 +546,7 @@ export interface SimContextCallbacks {
   applyNonPlayerStatAura(target: Entity, aura: Aura, direction: 1 | -1): void;
   delveRunForMob(mobId: number): DelveRun | null;
   onDelveBossDefeated(run: DelveRun): void;
-  grantNythraxisLockout(
-    boss: Entity,
-    recipients?: PlayerMeta[],
-    participants?: PlayerMeta[],
-  ): void;
+  grantNythraxisLockout(boss: Entity, recipients?: PlayerMeta[], participants?: PlayerMeta[]): void;
   frenzyPackmates(dead: Entity): void;
   armDeathThroes(dead: Entity): void;
   // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts) both

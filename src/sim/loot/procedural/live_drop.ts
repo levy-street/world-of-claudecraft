@@ -6,11 +6,7 @@ import {
 import type { ItemDropContext, ProceduralRarity } from '../../procedural_item';
 import type { DungeonDifficulty, MobTemplate, PlayerClass } from '../../types';
 import { type GeneratedProceduralDrop, generateProceduralItem } from './generate';
-import {
-  deriveProceduralItemSeed,
-  deriveSecretProceduralItemSeed,
-  hash32Parts,
-} from './item_seed';
+import { deriveProceduralItemSeed, deriveSecretProceduralItemSeed, hash32Parts } from './item_seed';
 
 export type ProceduralLootSource = 'world' | 'rare' | 'dungeon' | 'delve' | 'raid';
 

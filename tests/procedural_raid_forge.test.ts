@@ -10,12 +10,12 @@ import {
 } from '../src/sim/content/procedural_raid_loot';
 import { ITEMS, NPCS } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
+import { heroicRewardWindowToken } from '../src/sim/instances/dungeons';
 import {
   forgeNythraxisReward,
   resolveNythraxisForgeOffer,
   tuneNythraxisLegendary,
 } from '../src/sim/instances/nythraxis_forge';
-import { heroicRewardWindowToken } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, type Entity, type PlayerClass } from '../src/sim/types';
 import { resolveProceduralItemIcon } from '../src/ui/procedural_item_art';
@@ -498,9 +498,9 @@ describe('exact-copy Nythraxis Legendary tuning', () => {
     addCurrency(sim, pid, tuneCost.fragments, tuneCost.heroicMarks);
     sim.ctx.allocateProceduralItemUid = () => collisionUid;
 
-    expect(() =>
-      tuneNythraxisLegendary(sim.ctx, target.instance!.procedural!.uid, pid),
-    ).toThrow(/Duplicate procedural item UID/);
+    expect(() => tuneNythraxisLegendary(sim.ctx, target.instance!.procedural!.uid, pid)).toThrow(
+      /Duplicate procedural item UID/,
+    );
 
     expect(target.instance).toEqual(before);
     expect(meta.inventory).toContain(collision);

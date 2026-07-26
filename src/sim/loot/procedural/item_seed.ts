@@ -39,7 +39,9 @@ function rotateLeft64(value: bigint, bits: bigint): bigint {
   return ((value << bits) | (value >> (64n - bits))) & U64_MASK;
 }
 
-function sipRound(state: readonly [bigint, bigint, bigint, bigint]): [bigint, bigint, bigint, bigint] {
+function sipRound(
+  state: readonly [bigint, bigint, bigint, bigint],
+): [bigint, bigint, bigint, bigint] {
   let [v0, v1, v2, v3] = state;
   v0 = (v0 + v1) & U64_MASK;
   v1 = rotateLeft64(v1, 13n) ^ v0;
@@ -56,7 +58,8 @@ function sipRound(state: readonly [bigint, bigint, bigint, bigint]): [bigint, bi
 
 function littleEndianU64(bytes: readonly number[], offset: number): bigint {
   let value = 0n;
-  for (let index = 0; index < 8; index++) value |= BigInt(bytes[offset + index] ?? 0) << BigInt(index * 8);
+  for (let index = 0; index < 8; index++)
+    value |= BigInt(bytes[offset + index] ?? 0) << BigInt(index * 8);
   return value;
 }
 

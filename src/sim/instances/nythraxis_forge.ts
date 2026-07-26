@@ -19,8 +19,8 @@ import { ITEMS } from '../data';
 import { canEquipItem } from '../equipment_rules';
 import { generateProceduralItem } from '../loot/procedural/generate';
 import { hash32Parts } from '../loot/procedural/item_seed';
-import { assertProceduralUidAvailable } from '../procedural_persistence';
 import { sanitizeItemInstancePayload } from '../procedural_item_validation';
+import { assertProceduralUidAvailable } from '../procedural_persistence';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -120,8 +120,7 @@ function currentHeroicClear(ctx: SimContext, meta: PlayerMeta): boolean {
   }
   const rewardWindow = heroicRewardWindowToken(ctx.raidResetMs(now));
   return (
-    meta.heroicDaily.date === rewardWindow &&
-    meta.heroicDaily.marked.has(NYTHRAXIS_RAID_DUNGEON_ID)
+    meta.heroicDaily.date === rewardWindow && meta.heroicDaily.marked.has(NYTHRAXIS_RAID_DUNGEON_ID)
   );
 }
 

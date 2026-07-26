@@ -1510,15 +1510,7 @@ describe('dungeons: heroic daily lockouts', () => {
     leaveDungeon(sim.ctx, parked);
     teleport(sim, sim.entities.get(parked) as AnyEntity, 0, 0);
 
-    (sim as any).dealDamage(
-      leaderEntity,
-      morthen,
-      morthen.hp + 10,
-      false,
-      'physical',
-      null,
-      'hit',
-    );
+    (sim as any).dealDamage(leaderEntity, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     const parkedMeta = sim.players.get(parked)!;
     expect(inst.enteredBy.has(parked)).toBe(true);
@@ -1579,15 +1571,7 @@ describe('dungeons: heroic daily lockouts', () => {
     morthen.tappedById = leader;
     // The quitter contributed before leaving the group. Presence in the room by
     // itself is not enough to authorize an out-of-party reward by mail.
-    (sim as any).dealDamage(
-      sim.entities.get(quitter),
-      morthen,
-      1,
-      false,
-      'physical',
-      null,
-      'hit',
-    );
+    (sim as any).dealDamage(sim.entities.get(quitter), morthen, 1, false, 'physical', null, 'hit');
     sim.partyLeave(quitter); // no longer in the group, still standing in the boss room
 
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
