@@ -158,7 +158,7 @@ export function buildSourceCaveSpec(
       };
     },
   );
-  const combatRoles = sourceCaveCombatRoles(placedMobs, seed);
+  const combatRoles = sourceCaveCombatRoles(placedMobs);
   const mobs: SourceCaveMobSpec[] = placedMobs.map((mob) => {
     const combatTier = combatRoles.get(mob.login) ?? null;
     const profile = combatTier ? sourceCaveMobProfileForTier(combatTier, mob.boss) : null;

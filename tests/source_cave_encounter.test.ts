@@ -39,6 +39,23 @@ const ROSTER: SourceCaveRosterEntry[] = [
   { login: 'tinkerer-c', mergedPrs: 1, rank: 8 },
 ];
 
+/**
+ * The live roster padded with one-PR newcomers up to the server's visible-roster
+ * cap (server/source_cave_boot.ts SOURCE_CAVE_ROSTER_MAX). Every padded entry
+ * ranks below the real leaderboard, so the overflow guardians these tests drive
+ * are exactly the newcomers, which is the shipping selection rule (combatants.ts).
+ */
+function cappedRoster(): SourceCaveRosterEntry[] {
+  return [
+    ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
+    ...Array.from({ length: 60 - SOURCE_CAVE_PLACEHOLDER_ROSTER.length }, (_, i) => ({
+      login: `newcomer-${i}`,
+      mergedPrs: 1,
+      rank: SOURCE_CAVE_PLACEHOLDER_ROSTER.length + 1 + i,
+    })),
+  ];
+}
+
 function makeSim(roster = ROSTER): AnySim {
   return new Sim({
     seed: 42,
@@ -133,14 +150,14 @@ describe('source cave deterministic waves', () => {
     expect(buildSourceCaveWaveLogins(tied)).toEqual([['alpha', 'zeta']]);
   });
 
-  it('partitions the live 37-contributor roster into the intended six waves', () => {
+  it('partitions the live roster into the intended eight waves', () => {
     const sim = makeSim(SOURCE_CAVE_PLACEHOLDER_ROSTER);
     if (!sim.sourceCave) throw new Error('source cave runtime missing');
-    // 16 tinkerers chunk at the raid-tier wave cap of 10 (10 + 6), then the 8
-    // artificers, 6 runesmiths, and the architect tier (5 architects + the
-    // non-boss worldwright) split at the 3-cleaver cap (3 + 3), then the boss.
+    // 18 tinkerers chunk at the raid-tier wave cap of 10 (10 + 8), then the 8
+    // artificers, 6 runesmiths, and the architect tier (8 architects + the
+    // non-boss worldwright) split at the 3-cleaver cap (3 + 3 + 3), then the boss.
     expect(buildSourceCaveWaveLogins(sim.sourceCave.spec.mobs).map((wave) => wave.length)).toEqual([
-      10, 6, 8, 6, 3, 3, 1,
+      10, 8, 8, 6, 3, 3, 3, 1,
     ]);
   });
 
@@ -152,19 +169,35 @@ describe('source cave deterministic waves', () => {
     const sim = makeSim(promoted);
     if (!sim.sourceCave) throw new Error('source cave runtime missing');
     expect(buildSourceCaveWaveLogins(sim.sourceCave.spec.mobs).map((wave) => wave.length)).toEqual([
-      10, 6, 8, 6, 3, 3, 1,
+      10, 8, 8, 6, 3, 3, 3, 1,
     ]);
   });
 
+  it('flips the WHOLE visible roster from friendly to hostile on the reboot press', () => {
+    // The nameplate's two-phase display keys off this single per-mob flag
+    // (render/source_cave_nameplate_core.ts), so the flip has to be total and
+    // simultaneous: every contributor friendly before the press, every one
+    // hostile after, guardians and not-yet-activated cohorts included.
+    const sim = makeSim(cappedRoster());
+    const { leader, member, inst, button } = setupRaid(sim);
+    putAtButton(sim, leader, button);
+    putAtButton(sim, member, button, 2);
+
+    const hostileCount = () =>
+      inst.mobIds.filter((id: number) => sim.entities.get(id)?.hostile === true).length;
+    expect(inst.mobIds.length).toBe(60);
+    expect(hostileCount()).toBe(0);
+
+    sim.interact(leader);
+
+    expect(hostileCount()).toBe(inst.mobIds.length);
+    // No wave has been activated yet, so this is the reboot press itself and not
+    // a side effect of the first cohort engaging.
+    expect(inst.sourceCaveEncounter.activatedWaves.size).toBe(0);
+  });
+
   it('keeps overflow contributors hostile on the ring, retires them with waves, and wakes them on breach', () => {
-    const roster: SourceCaveRosterEntry[] = [
-      ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
-      ...Array.from({ length: 23 }, (_, i) => ({
-        login: `newcomer-${i}`,
-        mergedPrs: 1,
-        rank: 38 + i,
-      })),
-    ];
+    const roster = cappedRoster();
     const sim = makeSim(roster);
     const { leader, member, inst, button } = setupRaid(sim);
     putAtButton(sim, leader, button);
@@ -175,8 +208,8 @@ describe('source cave deterministic waves', () => {
     const combatIds = new Set(inst.sourceCaveEncounter.waves.flat());
     const spectatorIds = inst.mobIds.filter((id: number) => !combatIds.has(id));
     expect(inst.mobIds.length).toBe(60);
-    expect(combatIds.size).toBe(37);
-    expect(spectatorIds.length).toBe(23);
+    expect(combatIds.size).toBe(42);
+    expect(spectatorIds.length).toBe(18);
     expect([...combatIds].every((id) => sim.entities.get(id)?.hostile === true)).toBe(true);
     expect(spectatorIds.every((id: number) => sim.entities.get(id)?.hostile === true)).toBe(true);
     tickFor(sim, SOURCE_CAVE_INITIAL_DELAY + 0.1);
@@ -228,14 +261,7 @@ describe('source cave deterministic waves', () => {
   });
 
   it('requires a deliberately pulled overflow guardian for a normal clear', () => {
-    const roster: SourceCaveRosterEntry[] = [
-      ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
-      ...Array.from({ length: 23 }, (_, i) => ({
-        login: `newcomer-${i}`,
-        mergedPrs: 1,
-        rank: 38 + i,
-      })),
-    ];
+    const roster = cappedRoster();
     const sim = makeSim(roster);
     const { leader, member, inst, button } = setupRaid(sim);
     putAtButton(sim, leader, button);
@@ -250,7 +276,7 @@ describe('source cave deterministic waves', () => {
     }
     sim.tick();
     expect(inst.sourceCaveEncounter.cleared).toBe(false);
-    expect(sim.sourceCaveInfoWire(leader)).toMatchObject({ totalMobs: 38, killed: 37 });
+    expect(sim.sourceCaveInfoWire(leader)).toMatchObject({ totalMobs: 43, killed: 42 });
 
     const guardian = sim.entities.get(guardianId) as Entity;
     guardian.dead = true;
@@ -260,14 +286,7 @@ describe('source cave deterministic waves', () => {
   });
 
   it('wakes only the overflow guardians actually hit by a capped chain proc', () => {
-    const roster: SourceCaveRosterEntry[] = [
-      ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
-      ...Array.from({ length: 23 }, (_, i) => ({
-        login: `newcomer-${i}`,
-        mergedPrs: 1,
-        rank: 38 + i,
-      })),
-    ];
+    const roster = cappedRoster();
     const sim = makeSim(roster);
     const { leader, member, inst, button } = setupRaid(sim);
     putAtButton(sim, leader, button);
@@ -304,14 +323,7 @@ describe('source cave deterministic waves', () => {
   });
 
   it('retires exactly the overflow guardian group assigned to each completed wave', () => {
-    const roster: SourceCaveRosterEntry[] = [
-      ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
-      ...Array.from({ length: 23 }, (_, i) => ({
-        login: `newcomer-${i}`,
-        mergedPrs: 1,
-        rank: 38 + i,
-      })),
-    ];
+    const roster = cappedRoster();
     const sim = makeSim(roster);
     const { leader, member, inst, button } = setupRaid(sim);
     putAtButton(sim, leader, button);
@@ -349,14 +361,7 @@ describe('source cave deterministic waves', () => {
   });
 
   it('keeps combatant and breached-guardian corpses for exactly 10 seconds', () => {
-    const roster: SourceCaveRosterEntry[] = [
-      ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
-      ...Array.from({ length: 23 }, (_, i) => ({
-        login: `newcomer-${i}`,
-        mergedPrs: 1,
-        rank: 38 + i,
-      })),
-    ];
+    const roster = cappedRoster();
 
     const combatSim = makeSim(roster);
     const combatRaid = setupRaid(combatSim);
@@ -508,14 +513,7 @@ describe('source cave deterministic waves', () => {
   });
 
   it('includes every remaining overflow guardian in breached HUD progress', () => {
-    const roster: SourceCaveRosterEntry[] = [
-      ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
-      ...Array.from({ length: 23 }, (_, i) => ({
-        login: `newcomer-${i}`,
-        mergedPrs: 1,
-        rank: 38 + i,
-      })),
-    ];
+    const roster = cappedRoster();
     const sim = makeSim(roster);
     const { leader, member, inst, button } = setupRaid(sim);
     putAtButton(sim, leader, button);
@@ -532,7 +530,7 @@ describe('source cave deterministic waves', () => {
     expect(sim.sourceCaveInfoWire(leader)).toMatchObject({
       sealState: 'breached',
       totalMobs: 60,
-      killed: 37,
+      killed: 42,
     });
   });
 
@@ -679,14 +677,7 @@ describe('source cave deterministic waves', () => {
   });
 
   it('rebuilds retired spectators and despawned corpses on wipe reset', () => {
-    const roster: SourceCaveRosterEntry[] = [
-      ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
-      ...Array.from({ length: 23 }, (_, i) => ({
-        login: `newcomer-${i}`,
-        mergedPrs: 1,
-        rank: 38 + i,
-      })),
-    ];
+    const roster = cappedRoster();
     const sim = makeSim(roster);
     const { leader, member, inst, button } = setupRaid(sim);
     putAtButton(sim, leader, button);
@@ -727,7 +718,7 @@ describe('source cave deterministic waves', () => {
         ...inst.sourceCaveEncounter.spectatorMobIdsByWave.flat(),
       ]),
     ).toEqual(new Set(inst.mobIds));
-    expect(inst.sourceCaveEncounter.combatMobIds).toHaveLength(37);
+    expect(inst.sourceCaveEncounter.combatMobIds).toHaveLength(42);
     expect(inst.sourceCaveEncounter.started).toBe(false);
     expect((sim.entities.get(leader) as Entity).targetId).toBeNull();
     expect((sim.entities.get(member) as Entity).targetId).toBeNull();

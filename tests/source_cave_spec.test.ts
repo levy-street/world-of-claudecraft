@@ -133,29 +133,29 @@ describe('buildSourceCaveSpec roster sizes', () => {
     }
   });
 
-  it('keeps the current 37-person roster fully combatant at the calibrated tier mix', () => {
+  it('fills the calibrated tier mix from the live roster', () => {
     const spec = buildSourceCaveSpec(SOURCE_CAVE_PLACEHOLDER_ROSTER, 42);
     const combatants = spec.mobs.filter(
       (mob) => (mob as typeof mob & { combatant?: boolean }).combatant === true,
     );
-    expect(combatants.length).toBe(37);
+    expect(combatants.length).toBe(42);
     expect(combatants.filter((mob) => mob.boss).length).toBe(1);
-    expect(combatants.filter((mob) => !mob.boss && mob.combatTier === 'tinkerer')).toHaveLength(16);
+    expect(combatants.filter((mob) => !mob.boss && mob.combatTier === 'tinkerer')).toHaveLength(18);
     expect(combatants.filter((mob) => !mob.boss && mob.combatTier === 'artificer')).toHaveLength(8);
     expect(combatants.filter((mob) => !mob.boss && mob.combatTier === 'runesmith')).toHaveLength(6);
-    expect(combatants.filter((mob) => !mob.boss && mob.combatTier === 'architect')).toHaveLength(5);
+    expect(combatants.filter((mob) => !mob.boss && mob.combatTier === 'architect')).toHaveLength(8);
     expect(combatants.filter((mob) => !mob.boss && mob.combatTier === 'worldwright')).toHaveLength(
       1,
     );
   });
 
-  it('caps a 60-person roster at the same combat budget and rotates overflow by seed', () => {
+  it('caps a 60-person roster at the combat budget, cutting only the leaderboard tail', () => {
     const roster = [
       ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
-      ...Array.from({ length: 23 }, (_, i) => ({
+      ...Array.from({ length: 60 - SOURCE_CAVE_PLACEHOLDER_ROSTER.length }, (_, i) => ({
         login: `newcomer-${i}`,
         mergedPrs: 1,
-        rank: 38 + i,
+        rank: SOURCE_CAVE_PLACEHOLDER_ROSTER.length + 1 + i,
       })),
     ];
     const combatantLogins = (seed: number, input = roster) =>
@@ -165,13 +165,60 @@ describe('buildSourceCaveSpec roster sizes', () => {
         .sort();
 
     const seedA = combatantLogins(42);
-    const seedARepeat = combatantLogins(42);
-    const seedB = combatantLogins(43);
-    expect(seedA).toEqual(seedARepeat);
-    expect(seedA.length).toBe(37);
-    expect(seedB.length).toBe(37);
-    expect(seedA).not.toEqual(seedB);
+    expect(seedA.length).toBe(42);
+    // Membership is a pure function of the roster: neither the seed nor the input
+    // order can shuffle a contributor out of the fight (and into the overflow
+    // guardians the encounter retires wave by wave).
+    expect(combatantLogins(42)).toEqual(seedA);
+    expect(combatantLogins(43)).toEqual(seedA);
     expect(combatantLogins(42, [...roster].reverse())).toEqual(seedA);
+    // The cut falls exactly at rank 42: everybody above fights, nobody below does.
+    expect(seedA).toEqual(
+      roster
+        .filter((entry) => entry.rank <= 42)
+        .map((entry) => entry.login)
+        .sort(),
+    );
+  });
+
+  it('never demotes a heavier contributor below a lighter one, at any seed', () => {
+    // The regression this pins: an earlier build bucketed candidates by their own
+    // merged-PR rung and shuffled the rungs that overflowed their cap, so three of
+    // the five 70+ contributors could be cut while one-PR newcomers fought. Rank
+    // order is now total, over membership AND power role.
+    const roster = [
+      ...SOURCE_CAVE_PLACEHOLDER_ROSTER,
+      ...Array.from({ length: 60 - SOURCE_CAVE_PLACEHOLDER_ROSTER.length }, (_, i) => ({
+        login: `newcomer-${i}`,
+        mergedPrs: 1,
+        rank: SOURCE_CAVE_PLACEHOLDER_ROSTER.length + 1 + i,
+      })),
+    ];
+    const strength: Record<string, number> = {
+      worldwright: 5,
+      architect: 4,
+      runesmith: 3,
+      artificer: 2,
+      tinkerer: 1,
+      unranked: 0,
+    };
+    for (const seed of [1, 42, 4242]) {
+      const byRank = [...buildSourceCaveSpec(roster, seed).mobs].sort((a, b) => a.rank - b.rank);
+      const power = byRank.map((mob) =>
+        mob.combatant && mob.combatTier ? strength[mob.combatTier] + (mob.boss ? 10 : 0) : -1,
+      );
+      for (let i = 1; i < power.length; i++) {
+        expect(
+          power[i],
+          `rank ${byRank[i].rank} vs ${byRank[i - 1].rank} at seed ${seed}`,
+        ).toBeLessThanOrEqual(power[i - 1]);
+      }
+      // The five 70+ contributors all fight; the tail carries the whole overflow.
+      const overflow = byRank.filter((mob) => !mob.combatant);
+      expect(overflow.length).toBe(roster.length - 42);
+      expect(Math.min(...overflow.map((mob) => mob.rank))).toBe(43);
+      expect(overflow.every((mob) => mob.mergedPrs <= 1)).toBe(true);
+    }
   });
 
   it('keeps headcount, HP, damage and affix roles exact when contributors are promoted', () => {
@@ -196,14 +243,14 @@ describe('buildSourceCaveSpec roster sizes', () => {
         { hp: 0, damage: 0, roles: {} as Record<string, number> },
       );
 
-    expect(combatants).toHaveLength(37);
+    expect(combatants).toHaveLength(42);
     expect(budget(combatants)).toEqual(budget(baseline));
     expect(budget(combatants).roles).toEqual({
       worldwright: 2,
-      architect: 5,
+      architect: 8,
       runesmith: 6,
       artificer: 8,
-      tinkerer: 16,
+      tinkerer: 18,
     });
   });
 
@@ -235,8 +282,8 @@ describe('buildSourceCaveSpec roster sizes', () => {
     );
     if (!architect) throw new Error('promoted architect combat role missing');
     const template = sourceCaveMobTemplate(architect);
-    expect(template.hpMult).toBe(4);
-    expect(template.dmgMult).toBe(1.45);
+    expect(template.hpMult).toBe(5.65);
+    expect(template.dmgMult).toBe(1.75);
     expect(template.cleave).toBeDefined();
     expect(template.rampage).toBeUndefined();
     expect(template.visualKey).toBe('dev_hacker');
@@ -473,48 +520,55 @@ describe('buildSourceCaveSpec placement (concentric rings)', () => {
 });
 
 describe('SOURCE_CAVE_PLACEHOLDER_ROSTER', () => {
-  it('matches the complete 2026-07-11 developer leaderboard snapshot', () => {
+  it('matches the complete 2026-07-26 developer leaderboard snapshot', () => {
     const roster = SOURCE_CAVE_PLACEHOLDER_ROSTER;
-    expect(roster).toHaveLength(37);
+    expect(roster).toHaveLength(44);
     expect(
       roster.map((entry) => `${entry.rank}:${entry.login}:${entry.mergedPrs}`).join('\n'),
-    ).toBe(`1:jgyy:204
-2:Rubsey:125
-3:TrevCavill:60
-4:ryan-foo:44
-5:madmatah:38
-6:FernandoX7:36
-7:EnriqueGF:35
-8:gndk:23
-9:Blaine1705:22
-10:maxpolaczuk:22
-11:patrick261:21
-12:sf-chris:21
-13:MasterZensei:15
-14:jbaron34:12
-15:daxdax89:11
-16:nicadeddu:11
-17:Donny-Deals:10
-18:CharlieSaxton:9
-19:Nervescraper:9
-20:DaPandamonium:8
-21:No898:5
-22:ChrisDBaldwin:4
-23:slonce70:4
-24:aqn96:3
-25:awidearray:3
-26:jamiecypher:3
-27:postoso:3
-28:Steakmushroompie:3
-29:Humpalumps:2
-30:Pepijnvdliefvoort:2
-31:a-aznar:1
-32:AccompliceNZ:1
-33:Dubtribe11:1
-34:gurtymcburty:1
-35:IMasterChiefI:1
-36:SturdyStubs:1
-37:zaidsinwan7474:1`);
+    ).toBe(`1:jgyy:289
+2:Rubsey:173
+3:FernandoX7:117
+4:TrevCavill:74
+5:ryan-foo:72
+6:EnriqueGF:51
+7:seanghods:42
+8:madmatah:38
+9:maxpolaczuk:31
+10:jamiecypher:28
+11:Blaine1705:26
+12:sf-chris:24
+13:gndk:23
+14:patrick261:21
+15:daxdax89:17
+16:MasterZensei:17
+17:CharlieSaxton:12
+18:jbaron34:12
+19:Donny-Deals:11
+20:nicadeddu:11
+21:No898:11
+22:Nervescraper:9
+23:DaPandamonium:8
+24:awidearray:4
+25:ChrisDBaldwin:4
+26:Humpalumps:4
+27:slonce70:4
+28:Steakmushroompie:4
+29:aqn96:3
+30:postoso:3
+31:Pepijnvdliefvoort:2
+32:Wmedrado:2
+33:a-aznar:1
+34:AccompliceNZ:1
+35:dems3398:1
+36:Dubtribe11:1
+37:gurtymcburty:1
+38:IMasterChiefI:1
+39:jfconde:1
+40:raidolo:1
+41:snipercup:1
+42:SturdyStubs:1
+43:troypolaczuk:1
+44:zaidsinwan7474:1`);
     const tiers = new Set(roster.map((r) => devTierIndexForMergedPrs(r.mergedPrs)));
     for (const t of [1, 2, 3, 4, 5]) expect(tiers.has(t)).toBe(true);
     expect(roster.some((r) => r.mergedPrs >= 70)).toBe(true);

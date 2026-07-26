@@ -10,6 +10,7 @@ import {
   SOURCE_CAVE_CHEST_TEMPLATE,
   SOURCE_CAVE_DUNGEON_ID,
   sourceCaveChestLocalZ,
+  sourceCaveDefeatMobIds,
   sourceCaveOrigin,
 } from '../src/sim/source_cave';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -179,8 +180,8 @@ describe('source cave clear: reward chest arming + once-only guard', () => {
     const inst = claimedCave(sim);
     const combatIds = new Set<number>(inst.sourceCaveEncounter.waves.flat());
     const spectatorIds = inst.mobIds.filter((id: number) => !combatIds.has(id));
-    expect(combatIds.size).toBe(37);
-    expect(spectatorIds.length).toBe(23);
+    expect(combatIds.size).toBe(42);
+    expect(spectatorIds.length).toBe(18);
 
     for (const id of combatIds) {
       const mob = sim.entities.get(id) as Entity;
@@ -467,11 +468,15 @@ describe('source cave clear: kill-progress SimEvents', () => {
     const pid = addLvl20(sim, 'Alice');
     sim.enterDungeon(SOURCE_CAVE_DUNGEON_ID, pid);
     const inst = claimedCave(sim);
-    const total = inst.mobIds.length;
+    // Progress counts the mobs the clear actually requires, not the whole visible
+    // roster: the overflow guardians retire with their waves (encounter.ts).
+    const requiredIds = sourceCaveDefeatMobIds(inst);
+    const total = requiredIds.length;
+    expect(total).toBeLessThan(inst.mobIds.length);
     sim.drainEvents(); // clear enter/setup emits
 
     for (let i = 0; i < total; i++) {
-      const mob = sim.entities.get(inst.mobIds[i]) as Entity;
+      const mob = sim.entities.get(requiredIds[i]) as Entity;
       mob.dead = true; // handleDeath sets this before calling the hook
       mob.hp = 0;
       onSourceCaveMobKilled(sim.ctx, mob);
@@ -495,14 +500,15 @@ describe('source cave clear: kill-progress SimEvents', () => {
     const killer = sim.entities.get(pid) as Entity;
     sim.drainEvents();
 
-    const mob = sim.entities.get(inst.mobIds[0]) as Entity;
+    const requiredIds = sourceCaveDefeatMobIds(inst);
+    const mob = sim.entities.get(requiredIds[0]) as Entity;
     const login = mob.name;
     sim.handleDeath(mob, killer);
     const lines = progressLines(sim.drainEvents());
     expect(
       lines.some(
         (l) =>
-          l === `${login} has fallen. (1 of ${inst.mobIds.length} defeated in The Open Source)`,
+          l === `${login} has fallen. (1 of ${requiredIds.length} defeated in The Open Source)`,
       ),
     ).toBe(true);
   });
@@ -527,7 +533,7 @@ describe('source cave clear: kill-progress SimEvents', () => {
     onSourceCaveMobKilled(sim.ctx, spectator);
 
     expect(progressLines(sim.drainEvents())).toEqual([]);
-    expect(combatIds.size).toBe(37);
+    expect(combatIds.size).toBe(42);
   });
 });
 

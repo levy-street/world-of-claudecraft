@@ -157,8 +157,8 @@ describe('configureSourceCaveRuntime -> GameServer boot wiring', () => {
     broadcast(server);
     const info = lastSnap(fc.sent).self.scave;
     expect(info.mobs.length).toBe(60);
-    expect(info.totalMobs).toBe(37);
-    expect(info.mobs.filter((mob: { combatant: boolean }) => mob.combatant)).toHaveLength(37);
+    expect(info.totalMobs).toBe(42);
+    expect(info.mobs.filter((mob: { combatant: boolean }) => mob.combatant)).toHaveLength(42);
   });
 });
 
@@ -174,7 +174,12 @@ describe('source cave wire (scave)', () => {
     const entrySnap = lastSnap(fc.sent);
     expect(entrySnap.self).toHaveProperty('scave');
     expect(entrySnap.self.scave.killed).toBe(0);
-    expect(entrySnap.self.scave.totalMobs).toBe(inst.mobIds.length);
+    // The clear requirement, not the visible roster: the live roster overflows the
+    // combat budget, so the overflow guardians are visible but not required.
+    expect(entrySnap.self.scave.totalMobs).toBe(
+      server.sim.sourceCave!.spec.mobs.filter((mob) => mob.combatant).length,
+    );
+    expect(entrySnap.self.scave.totalMobs).toBeLessThan(inst.mobIds.length);
     expect(entrySnap.self.scave.moduleCount).toBeGreaterThan(0);
     // The ordered module-type sequence rides the wire too (render needs the real
     // per-module footprint to stack interiors, not just the count).

@@ -36,8 +36,9 @@ const RUNESMITH_WAVE_SIZE = 6;
 // Small on purpose: architects carry Sweeping Refactor (templates.ts) and the
 // the original probe measured six simultaneous cleavers zone-killing even a
 // spread raid; capping the cohort at three keeps the mechanic lethal-if-stacked
-// instead of lethal-always. The tier combat budget prevents roster growth from
-// adding more architect waves.
+// instead of lethal-always. Growing the encounter therefore adds architect
+// WAVES (the combat budget's architect cap is a multiple of this), never a
+// wider architect wave: three is the measured ceiling, not a starting point.
 const ARCHITECT_WAVE_SIZE = 3;
 
 // Encirclement: once the reboot fires, every living dormant contributor leaves

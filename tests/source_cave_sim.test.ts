@@ -22,6 +22,7 @@ import {
   SOURCE_CAVE_WELL_BANTER_LINES,
   sourceCaveMobCustomAttributesForLogin,
   sourceCaveMobProfileForMergedPrs,
+  sourceCaveMobProfileForTier,
   sourceCaveOrigin,
   sourceCaveTierWeaponForLogin,
 } from '../src/sim/source_cave';
@@ -181,22 +182,29 @@ describe('source cave: entry, claim and spawns', () => {
       if (!e) continue;
       expect(e.name).toBe(sourceCaveMobCustomAttributesForLogin(mob.login)?.name ?? mob.login);
       expect(e.level).toBe(mob.level);
-      const profile = sourceCaveMobProfileForMergedPrs(mob.mergedPrs, mob.boss);
-      expect(e.maxHp).toBe(expectedMaxHp(mob.level, profile.hpMult));
+      // The identity/power split (templates.ts): body, tint and the HELD weapon
+      // come from the contributor's own merged-PR rung, while level, HP, damage,
+      // scale and the swing cadence come from the assigned combat role. On a
+      // roster larger than the combat budget the two genuinely differ.
+      const identity = sourceCaveMobProfileForMergedPrs(mob.mergedPrs, mob.boss);
+      const combat = mob.combatTier
+        ? sourceCaveMobProfileForTier(mob.combatTier, mob.boss)
+        : identity;
+      expect(e.maxHp).toBe(expectedMaxHp(mob.level, combat.hpMult));
       // Armed tiers re-pace the swing at constant dps: damage scales by the
       // weapon's speed over the archetype's 2.3 (templates.ts).
-      const tierWeapon = sourceCaveTierWeaponForLogin(profile.key, mob.login);
-      const pace = (tierWeapon?.attackSpeed ?? 2.3) / 2.3;
-      expect(e.weapon.min).toBe(expectedWeapon(mob.level, profile.dmgMult * pace).min);
-      expect(e.weapon.max).toBe(expectedWeapon(mob.level, profile.dmgMult * pace).max);
-      expect(e.weapon.speed).toBe(tierWeapon?.attackSpeed ?? 2.3);
+      const combatWeapon = sourceCaveTierWeaponForLogin(combat.key, mob.login);
+      const pace = (combatWeapon?.attackSpeed ?? 2.3) / 2.3;
+      expect(e.weapon.min).toBe(expectedWeapon(mob.level, combat.dmgMult * pace).min);
+      expect(e.weapon.max).toBe(expectedWeapon(mob.level, combat.dmgMult * pace).max);
+      expect(e.weapon.speed).toBe(combatWeapon?.attackSpeed ?? 2.3);
       expect(e.mainhandItemId).toBe(
         sourceCaveMobCustomAttributesForLogin(mob.login)?.mainhandItemId ??
-          tierWeapon?.itemId ??
+          sourceCaveTierWeaponForLogin(identity.key, mob.login)?.itemId ??
           null,
       );
-      expect(e.scale).toBe(profile.scale);
-      expect(e.visualKey).toBe(profile.visualKey ?? null);
+      expect(e.scale).toBe(combat.scale);
+      expect(e.visualKey).toBe(identity.visualKey ?? null);
       // World position = instance origin + delve module z-offset + module-local (x, z).
       const zBase = delveModuleZOffset(spec.modules, mob.moduleIndex);
       expect(e.pos.x).toBe(origin.x + mob.x);
@@ -232,7 +240,7 @@ describe('source cave: entry, claim and spawns', () => {
           level: 19,
           elite: false,
           boss: false,
-          hpMult: 1.6,
+          hpMult: 2.25,
           dmgMult: 0.7,
           scale: 1,
           visualKey: 'dev_noob',
@@ -244,7 +252,7 @@ describe('source cave: entry, claim and spawns', () => {
           level: 19,
           elite: false,
           boss: false,
-          hpMult: 1.45,
+          hpMult: 2.05,
           dmgMult: 0.8,
           scale: 1.05,
           visualKey: 'dev_noob',
@@ -256,7 +264,7 @@ describe('source cave: entry, claim and spawns', () => {
           level: 19,
           elite: false,
           boss: false,
-          hpMult: 1.8,
+          hpMult: 2.55,
           dmgMult: 0.9,
           scale: 1.1,
           visualKey: 'dev_gamer',
@@ -268,10 +276,10 @@ describe('source cave: entry, claim and spawns', () => {
           level: 20,
           elite: true,
           boss: false,
-          hpMult: 2.5,
+          hpMult: 3.5,
           // The 'runesmith' login hashes onto the Bug Squasher: dmg re-paced
           // by 2.6/2.3 at constant dps.
-          dmgMult: 1.2 * (2.6 / 2.3),
+          dmgMult: 1.45 * (2.6 / 2.3),
           scale: 1.15,
           visualKey: 'hacker_druid',
           mainhandItemId: 'bug_squasher',
@@ -284,8 +292,8 @@ describe('source cave: entry, claim and spawns', () => {
           level: 20,
           elite: true,
           boss: false,
-          hpMult: 4,
-          dmgMult: 1.45,
+          hpMult: 5.65,
+          dmgMult: 1.75,
           scale: 1.3,
           visualKey: 'coder_hunter',
           mainhandItemId: 'commit_blade',
@@ -298,8 +306,8 @@ describe('source cave: entry, claim and spawns', () => {
           level: 20,
           elite: true,
           boss: true,
-          hpMult: 6 * 3.2,
-          dmgMult: 1.9 * 2.6,
+          hpMult: 8.45 * 3.2,
+          dmgMult: 2.3 * 2.6,
           scale: 1.7 + 0.15,
           visualKey: 'dev_hacker',
           color: 0xf0c454,
@@ -1250,13 +1258,13 @@ describe('source cave: mob model by dev tier', () => {
   });
 
   it('splits the real runesmith cohort between both weapons, stable per login', () => {
-    // The live 37-contributor roster carries six runesmiths; the login hash
-    // fans them across BOTH weapons (a one-weapon cohort would mean the split
-    // regressed to a constant), and re-paces each swing at constant dps.
+    // The live roster carries seven contributors at the runesmith rung; the
+    // login hash fans them across BOTH weapons (a one-weapon cohort would mean
+    // the split regressed to a constant), and re-paces each swing at constant dps.
     const runesmiths = SOURCE_CAVE_PLACEHOLDER_ROSTER.filter(
       (r: SourceCaveRosterEntry) => r.mergedPrs >= 15 && r.mergedPrs < 30,
     );
-    expect(runesmiths.length).toBe(6);
+    expect(runesmiths.length).toBe(7);
     const byWeapon = new Map<string, string[]>();
     for (const r of runesmiths) {
       const weapon = sourceCaveTierWeaponForLogin('runesmith', r.login);

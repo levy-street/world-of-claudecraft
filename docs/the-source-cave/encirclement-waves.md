@@ -39,30 +39,51 @@ when all required opponents are gone or when a wiped instance resets.
 
 ## Deterministic waves
 
-The current 37-person roster is divided weak to strong:
+The 42 combat roles are divided weak to strong:
 
 | Wave | Cohort | Size | Delay |
 |------|--------|------|-------|
-| 1 | Tinkerers, ranks 28 to 37 | 10 | 3 seconds after reboot |
-| 2 | Tinkerers, ranks 22 to 27 | 6 | 2 seconds after wave 1 dies |
-| 3 | Artificers, ranks 14 to 21 | 8 | 2 seconds after wave 2 dies |
-| 4 | Runesmiths, ranks 8 to 13 | 6 | 2 seconds after wave 3 dies |
-| 5 | Architects, ranks 5 to 7 | 3 | 2 seconds after wave 4 dies |
-| 6 | Architects ranks 3 to 4 plus rank 2 Worldwright | 3 | 2 seconds after wave 5 dies |
-| 7 | Rank 1 Worldwright boss | 1 | 5 seconds after wave 6 dies |
+| 1 | Tinkerers, ranks 33 to 42 | 10 | 3 seconds after reboot |
+| 2 | Tinkerers, ranks 25 to 32 | 8 | 2 seconds after wave 1 dies |
+| 3 | Artificers, ranks 17 to 24 | 8 | 2 seconds after wave 2 dies |
+| 4 | Runesmiths, ranks 11 to 16 | 6 | 2 seconds after wave 3 dies |
+| 5 | Architects, ranks 8 to 10 | 3 | 2 seconds after wave 4 dies |
+| 6 | Architects, ranks 5 to 7 | 3 | 2 seconds after wave 5 dies |
+| 7 | Architects ranks 3 to 4 plus rank 2 Worldwright | 3 | 2 seconds after wave 6 dies |
+| 8 | Rank 1 Worldwright boss | 1 | 5 seconds after wave 7 dies |
 
-At 37 or more visible contributors, the builder assigns exactly 36 non-boss combat roles plus
-the rank 1 boss: 16 Tinkerers, 8 Artificers, 6 Runesmiths, 5 Architects, and 1 non-boss
-Worldwright. A seeded selection rotates overflow identities, then rank orders the selected
-identities into those fixed roles. The displayed login, rank, merged-PR count, body, color,
+At 42 or more visible contributors, the builder assigns exactly 41 non-boss combat roles plus
+the rank 1 boss: 18 Tinkerers, 8 Artificers, 6 Runesmiths, 8 Architects, and 1 non-boss
+Worldwright. Every cap is a whole number of waves at that tier's wave size, so the budget
+grows by adding a wave of an already-calibrated kind, never by widening one: three architects
+is the measured ceiling for simultaneous cleavers, so a bigger encounter gets a third
+architect WAVE. Contribution rank alone fills the roles, strongest role first, so the wave table above
+reads directly as leaderboard position and only ranks 43 and below overflow into guardian duty.
+Nothing in the selection draws rng: the same contributor holds the same standing on every host,
+seed, and reboot. The displayed login, rank, merged-PR count, body, color,
 and held weapon stay derived from real prestige; scale, cadence, HP, damage, affixes, and wave membership
 come from the fixed combat role. Therefore promotions
-through 30 or 70 PR cannot increase or decrease total attrition. The same seed and roster are
-order independent. Below 37 contributors, everyone fights with their natural contribution tier
+through 30 or 70 PR cannot increase or decrease total attrition. Below 42 contributors, everyone
+fights with their natural contribution tier
 so a small roster is not artificially promoted. The separate 60-person visible-roster cap is
-unchanged. Every unselected contributor is assigned deterministically to one of the seven waves.
+unchanged. Every unselected contributor is assigned deterministically to one of the eight waves,
+weakest first, so the earliest waves retire the smallest contributions.
 When that wave dies, its assigned overflow guardians disappear as if they had fought in it, so
 the encircling roster thins throughout the encounter and nobody remains after the boss.
+
+Rank ordering is load bearing, not a simplification. An earlier build bucketed candidates by
+their own merged-PR rung and shuffled any rung that overflowed its cap, so with five 70+
+contributors against one non-boss Worldwright role, three of the project's heaviest
+contributors were cut to guardian duty and deleted from the room wave by wave while one-PR
+newcomers fought. Whoever the encounter erases must always be the tail of the leaderboard.
+
+One consequence of the split is deliberate and visible: past the budget, a contributor's body
+and held weapon can disagree with what it does in combat. The five 70+ contributors all wear
+the golden Worldwright rig, but ranks 3 to 10 fight as Architects, so they cleave without a
+visible Commit Blade, and rank 8 carries the Architect blade while swinging at Runesmith
+cadence. Prestige wins the model; the combat role wins the numbers. Push this far enough (say
+42 contributors all past 70 PR) and the encounter stays exactly as balanced, while the room
+stops reading: forty-two identical golden bodies, sixteen of them level-19 trash.
 
 Every dormant contributor remains hostile and visible in the encircling ring. The intact seal
 suppresses only automatic acquisition against players gathered on it. Striking a dormant
@@ -81,18 +102,51 @@ preparation beat.
 
 The deterministic raid probe now runs four full 10-player profiles across 20 fixed seeds by
 default. The runner refuses unsafe AoE casts that would touch a dormant cohort, and it still
-rejects any early wake as a harness failure. At the current tuning:
+rejects any early wake as a harness failure. Measured over the current roster:
 
 | Profile | Valid clears | Invalid pacing runs | Median clear | P90 deaths | P10 minimum healer mana |
 |---------|--------------|---------------------|--------------|------------|-------------------------|
-| AoE mixed | 20/20 | 0/20 | 172.75 seconds | 4 | 0% |
-| Single-target mixed | 20/20 | 0/20 | 243.0 seconds | 3 | 0% |
-| Single-target melee | 20/20 | 0/20 | 243.7 seconds | 1 | 0% |
-| Single-target hunters, controlled pets | 20/20 | 0/20 | 159.2 seconds | 0 | 0% |
+| AoE mixed | 19/19 | 1/20 | 209.4 seconds | 1 | 0% |
+| Single-target mixed | 20/20 | 0/20 | 231.5 seconds | 1 | 0% |
+| Single-target melee | 20/20 | 0/20 | 240.2 seconds | 0 | 0% |
+| Single-target hunters, controlled pets | 20/20 | 0/20 | 225.8 seconds | 1 | 0% |
 
-All 80 runs preserve the intended pacing. Invalid runs remain separately reported and excluded
-from clear-rate statistics. Median clear time is computed from clears only; wipe and timeout
-durations cannot distort that value.
+Invalid runs remain separately reported and excluded from clear-rate statistics. Median clear
+time is computed from clears only; wipe and timeout durations cannot distort that value.
+
+### How this matrix was reached
+
+Four measured steps, each on the full 80-run matrix, because the encounter had silently
+drifted off its design point and the cause had to be attributed before anything was retuned.
+
+1. **Rank-ordered selection is balance neutral**, and the matrix confirmed it: measured against
+   the previous seeded-rotation build on the same roster, every median moved by about one
+   percent (138.0 / 156.6 / 154.6 / 162.8 against 137.9 / 157.1 / 154.0 / 164.4). Selection can
+   only decide WHICH contributor fills a role, never how many roles exist or what they cost.
+2. **The drift was gear, not roster.** Those numbers sit far under the 172.75 / 243.0 / 243.7
+   seconds this page carried at ship time, and the gap reproduces exactly on a build with the
+   old roster AND the old selection. It dates from the raid loot that landed after the original
+   matrix was recorded, which quietly halved the fight.
+3. **The budget went to 42 roles, then the hp multipliers absorbed the rest.** Widening the
+   budget recovered 155.5 / 177.7 / 177.5 / 190.4 on its own. Scaling every rung's hpMult by
+   the same 1.41 (`tier_profiles.ts`) closed the remainder, restoring total combat HP from
+   48131 to 78344.
+
+4. **Lethality came last, from the elite rungs only.** Scaling hp restored fight LENGTH (the
+   single-target melee median landed within two seconds of its original) but left p90 deaths at
+   0 to 1 against an original 4 / 3 / 1 / 0. Raising dmgMult by 1.2 on runesmith, architect and
+   worldwright (and the boss through its rung) moved p90 deaths to 1 / 1 / 0 / 1 while every
+   profile held 20 out of 20 clears and the medians barely moved. The swarm rungs were left
+   alone deliberately: ten tinkerers already sum to about 216 raw dps against a triage band of
+   roughly 230, whereas three architects sum to about 148, so the headroom was on the elite side.
+
+The retune stops there on purpose. p90 deaths remain under the original 4 / 3 / 1, and closing
+that last gap numerically would take a much larger damage pass. The probe is a SCRIPTED raid
+playing near-perfectly, so it understates what a real group loses; the original 3-to-4-death
+figure was also measured against weaker gear, which makes a perfect-play raid losing one player
+at p90 the harder encounter of the two in practice. If the fight ever needs more bite, the next
+lever is mechanics (the affix pass), not bigger swings. The hard constraint on any future pass
+is 20 out of 20 clears on every profile.
 
 ## Reset and exit rules
 
@@ -126,7 +180,8 @@ The animation has both color and motion language:
 The sim state machine lives in `src/sim/source_cave/encounter.ts`; shared spatial rules live in
 `occupancy.ts`; the IWorld projection is extended in `wire.ts`; and the render split is
 `source_cave_seal_state.ts` plus `source_cave_seal.ts`. The offline/headless placeholder roster
-matches the current 37-entry GitHub leaderboard exactly.
+matches the GitHub leaderboard snapshot in `placeholder_roster.ts` exactly, including the
+entries past the combat budget that ride the cave as overflow guardians.
 
 Focused coverage includes deterministic wave construction, muster confirmation, forced breach,
 direct cohort pulls, exit sealing, wipe reset, gradual IWorld occupancy, client wire parity, and

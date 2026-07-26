@@ -161,7 +161,7 @@ describe('sourceCaveInfoWire: pure projection', () => {
     const info = sim.sourceCaveInfo() as SourceCaveInfo;
     expect(info.moduleCount).toBe(1);
     expect(info.modules).toEqual(['source_cave_arena']);
-    expect(info.totalMobs).toBeLessThanOrEqual(37);
+    expect(info.totalMobs).toBeLessThanOrEqual(42);
     expect(info.totalMobs).toBe(
       sim.sourceCave.spec.mobs.filter((mob: { combatant?: boolean }) => mob.combatant === true)
         .length,
@@ -203,7 +203,7 @@ describe('sourceCaveInfoWire: pure projection', () => {
     const combatIds = new Set<number>(inst.sourceCaveEncounter.waves.flat());
     const spectatorId = inst.mobIds.find((id: number) => !combatIds.has(id)) as number;
     expect(sim.sourceCaveInfoWire(pid) as SourceCaveInfo).toMatchObject({
-      totalMobs: 37,
+      totalMobs: 42,
       killed: 0,
     });
     expect((sim.sourceCaveInfoWire(pid) as SourceCaveInfo).mobs.length).toBe(60);

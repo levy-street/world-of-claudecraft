@@ -45,15 +45,26 @@ export interface SourceCaveTierProfile {
 // affixed tiers (templates.ts) fund their mechanics FROM this budget: their
 // dmgMult sits one notch under the plain-swing derivation so affix damage
 // replaces white damage instead of stacking on it.
-// Probe matrix after the swarm-HP adjustment (20 deterministic seeds):
-// single-target mixed and melee raids clear 20/20 at 243.0s / 243.7s median;
-// controlled-pet hunters clear 20/20 at 159.2s. AoE clears 20/20 at a 172.75s
-// median after the harness learned to withhold AoE that would touch a dormant wave.
-// The p10 minimum end-of-fight healer mana remains 0% in every profile.
+// The hp multipliers were re-derived once, when the raid loot that shipped after
+// the original calibration had quietly halved the fight: the probe measured a
+// 157.1s median single-target clear with ZERO p90 deaths against a design point
+// of 243s and 3 deaths. Widening the combat budget to 42 roles (combatants.ts)
+// recovered 155.5s to 177.7s, and the remainder is this pass: every rung's
+// hpMult scaled by the SAME 1.41, so the calibrated shape between rungs (and the
+// affix budget derived from it) survives untouched and only the total moves.
+// dmgMult moved separately, and only on the ELITE rungs (runesmith, architect,
+// worldwright, and the boss through its rung), by 1.2. The triage band above is
+// saturated by the SWARM waves, not the elite ones: ten tinkerers sum to about
+// 216 raw dps against the band's ~230, while three architects sum to about 148,
+// so the elite rungs had headroom the swarm rungs did not. Restoring lethality
+// without touching the swarm keeps deaths where the design wants them, on the
+// elite beats, and keeps a distributed wave opening survivable for cloth.
+// Probe matrix after the retune (20 deterministic seeds), recorded in
+// docs/the-source-cave/encirclement-waves.md; re-measure there, not here.
 export const SOURCE_CAVE_UNRANKED_PROFILE = {
   key: 'unranked',
   level: 19,
-  hpMult: 1.6,
+  hpMult: 2.25,
   dmgMult: 0.7,
   scale: 1,
   elite: false,
@@ -65,7 +76,7 @@ export const SOURCE_CAVE_TIER_PROFILES = {
   tinkerer: {
     key: 'tinkerer',
     level: 19,
-    hpMult: 1.45,
+    hpMult: 2.05,
     dmgMult: 0.8,
     scale: 1.05,
     elite: false,
@@ -75,7 +86,7 @@ export const SOURCE_CAVE_TIER_PROFILES = {
   artificer: {
     key: 'artificer',
     level: 19,
-    hpMult: 1.8,
+    hpMult: 2.55,
     dmgMult: 0.9,
     scale: 1.1,
     elite: false,
@@ -85,8 +96,8 @@ export const SOURCE_CAVE_TIER_PROFILES = {
   runesmith: {
     key: 'runesmith',
     level: 20,
-    hpMult: 2.5,
-    dmgMult: 1.2,
+    hpMult: 3.5,
+    dmgMult: 1.45,
     scale: 1.15,
     elite: true,
     boss: false,
@@ -95,8 +106,8 @@ export const SOURCE_CAVE_TIER_PROFILES = {
   architect: {
     key: 'architect',
     level: 20,
-    hpMult: 4,
-    dmgMult: 1.45,
+    hpMult: 5.65,
+    dmgMult: 1.75,
     scale: 1.3,
     elite: true,
     boss: false,
@@ -105,8 +116,8 @@ export const SOURCE_CAVE_TIER_PROFILES = {
   worldwright: {
     key: 'worldwright',
     level: 20,
-    hpMult: 6,
-    dmgMult: 1.9,
+    hpMult: 8.45,
+    dmgMult: 2.3,
     scale: 1.7,
     elite: true,
     boss: false,
@@ -116,8 +127,10 @@ export const SOURCE_CAVE_TIER_PROFILES = {
 } as const satisfies Readonly<Record<DevTierKey, SourceCaveTierProfile>>;
 
 // The rank-1 contributor's boss bump, on top of its (worldwright) rung: a raid
-// boss pool (~9.6k hp) and swings that spike a level-20 tank hard without the
-// enrage-style mechanics reserved for the affix pass.
+// boss pool (~13.5k hp after the hp retune above) and swings that spike a
+// level-20 tank hard without the enrage-style mechanics reserved for the affix
+// pass. The multipliers themselves are untouched by that retune: the boss rides
+// its rung, so it scales with the encounter instead of drifting off it.
 export const SOURCE_CAVE_BOSS_OVERLAY = {
   hpMult: 3.2,
   dmgMult: 2.6,
