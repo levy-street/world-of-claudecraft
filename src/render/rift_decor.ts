@@ -37,6 +37,12 @@ const DECOR_MODELS: Record<string, { url: string; height: number }> = {
   tower_skull_totem: { url: '/models/props/tower_skull_totem.glb', height: 2.4 },
   tower_iron_cage: { url: '/models/props/tower_iron_cage.glb', height: 2.4 },
   tower_ascent_arch: { url: '/models/props/tower_ascent_arch.glb', height: 4.6 },
+  tower_chain_pillar: { url: '/models/props/tower_chain_pillar.glb', height: 4.0 },
+  tower_rune_slab: { url: '/models/props/tower_rune_slab.glb', height: 1.2 },
+  tower_bone_heap: { url: '/models/props/tower_bone_heap.glb', height: 0.9 },
+  tower_spike_cluster: { url: '/models/props/tower_spike_cluster.glb', height: 2.6 },
+  tower_ember_font: { url: '/models/props/tower_ember_font.glb', height: 1.5 },
+  tower_impaled_banner: { url: '/models/props/tower_impaled_banner.glb', height: 3.4 },
 };
 
 /** The arcane flame the rune pylons already use, re-tinted for the citadel's

@@ -43,17 +43,34 @@ export interface DemonTowerWave {
  * the enemies visibly change as you climb instead of the same imps scaling up.
  * Every id must exist in MOBS (pinned by tests/demon_tower_content.test.ts). */
 export const DEMON_TOWER_ROSTER: readonly string[] = [
+  'tower_gloom_bat',
   'tower_imp',
+  'tower_cinder_crawler',
   'tower_hellhound',
+  'tower_bone_acolyte',
   'tower_pact_reaver',
+  'tower_shade_dancer',
   'tower_brimstone_zealot',
+  'tower_flame_herald',
   'tower_soulbinder',
+  'tower_rot_hulk',
   'tower_iron_defiler',
+  'tower_blood_matron',
   'tower_abyss_knight',
+  'tower_void_sentinel',
   'tower_dread_harbinger',
 ];
 
-/** The two bosses: the mid-tower gatekeeper (floor 5) and the summit (floor 10). */
+/** The four bosses, by the floor that releases them. The tower gates at 3, 5 and
+ * 7 before the summit, so a raid meets a real check roughly every other floor
+ * instead of climbing five quiet floors to the first one. */
+export const DEMON_TOWER_BOSS_BY_FLOOR: Readonly<Record<number, string>> = {
+  2: 'tower_boss_flesh_shaper',
+  4: 'tower_boss_gatekeeper',
+  6: 'tower_boss_ash_tyrant',
+  9: 'tower_boss_demon_lord',
+};
+
 export const DEMON_TOWER_GATEKEEPER = 'tower_boss_gatekeeper';
 export const DEMON_TOWER_LORD = 'tower_boss_demon_lord';
 
@@ -107,8 +124,7 @@ export function demonTowerWavePlan(floorIndex: number): DemonTowerWave[] {
 /** Which boss a floor releases, or null when it is not a boss floor. */
 export function demonTowerBossFor(floorIndex: number): string | null {
   const k = clampTowerFloorIndex(floorIndex);
-  if (!isDemonTowerBossFloor(k)) return null;
-  return k === DEMON_TOWER_FLOOR_COUNT - 1 ? DEMON_TOWER_LORD : DEMON_TOWER_GATEKEEPER;
+  return DEMON_TOWER_BOSS_BY_FLOOR[k] ?? null;
 }
 
 /** Total demons a floor sends across every wave (the HUD's "N left" denominator

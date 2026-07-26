@@ -10862,6 +10862,36 @@ export const it_IT: EnTranslations = {
       "tower_boss_demon_lord": {
         "name": "Malgrath, the Tower Unbound"
       },
+      "tower_gloom_bat": {
+        "name": "Gloom Bat"
+      },
+      "tower_cinder_crawler": {
+        "name": "Cinder Crawler"
+      },
+      "tower_bone_acolyte": {
+        "name": "Bone Acolyte"
+      },
+      "tower_shade_dancer": {
+        "name": "Shade Dancer"
+      },
+      "tower_flame_herald": {
+        "name": "Flame Herald"
+      },
+      "tower_rot_hulk": {
+        "name": "Rot Hulk"
+      },
+      "tower_blood_matron": {
+        "name": "Blood Matron"
+      },
+      "tower_void_sentinel": {
+        "name": "Void Sentinel"
+      },
+      "tower_boss_flesh_shaper": {
+        "name": "Ghol the Flesh-Shaper"
+      },
+      "tower_boss_ash_tyrant": {
+        "name": "Cinderax, the Ash Tyrant"
+      },
       "orkadia_grunt": {
         "name": "Bloodtusk Grunt"
       },

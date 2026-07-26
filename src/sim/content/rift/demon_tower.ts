@@ -149,6 +149,12 @@ const DECOR_RADIUS: Readonly<Record<string, number>> = {
   tower_obelisk: 1.03,
   tower_skull_totem: 0.34,
   tower_iron_cage: 1.14,
+  tower_chain_pillar: 1.32,
+  tower_bone_heap: 0.44,
+  tower_spike_cluster: 1.15,
+  tower_ember_font: 0.74,
+  tower_impaled_banner: 0.85,
+  // tower_rune_slab is a flat floor sigil the raid stands on: no collider.
 };
 
 /** Half-width of the southern arc kept clear of decor, in radians: the raid
@@ -212,6 +218,25 @@ export function demonTowerDecor(floorIndex: number): AuthoredDecor[] {
   if (k >= 3) out.push(...decorRing('tower_bone_banner', 6, 0.88, R, Math.PI / 3));
   if (k >= 5) out.push(...decorRing('tower_obelisk', 4, 0.84, R, Math.PI / 8));
   if (k >= 6) out.push(...decorRing('tower_iron_cage', 4, 0.93, R, Math.PI / 2));
+  if (k >= 1) out.push(...decorRing('tower_bone_heap', 5, 0.88, R, Math.PI / 7));
+  if (k >= 2) out.push(...decorRing('tower_ember_font', 4, 0.87, R, Math.PI / 3));
+  if (k >= 4) out.push(...decorRing('tower_spike_cluster', 5, 0.91, R, Math.PI / 9));
+  if (k >= 4) out.push(...decorRing('tower_impaled_banner', 4, 0.89, R, Math.PI / 2.5));
+  if (k >= 7) out.push(...decorRing('tower_chain_pillar', 4, 0.94, R, Math.PI / 12));
+  // Rune sigils ring the core itself from the upper floors: flat, walk-through,
+  // and the only decor allowed inside the wave ring because it blocks nothing.
+  if (k >= 3) {
+    for (let i = 0; i < 6; i++) {
+      const angle = Math.PI / 6 + (i / 6) * Math.PI * 2;
+      const r = DEMON_TOWER_CORE_RADIUS + 2.2;
+      out.push({
+        key: 'tower_rune_slab',
+        x: Math.round(Math.sin(angle) * r * 1000) / 1000,
+        z: Math.round(Math.cos(angle) * r * 1000) / 1000,
+        yaw: Math.round(facingInward(angle) * 1000) / 1000,
+      });
+    }
+  }
   return out;
 }
 

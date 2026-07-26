@@ -122,7 +122,7 @@ async function shoot(page, name) {
   console.log(`  wrote ${name}.png`);
 }
 
-async function run(label, viewport) {
+async function run(label, viewport, floors) {
   const browser = await puppeteer.launch({
     executablePath: BROWSER_PATH,
     args: ['--use-angle=swiftshader', '--no-sandbox', '--enable-unsafe-swiftshader'],
@@ -138,20 +138,24 @@ async function run(label, viewport) {
   console.log(`${label} door:`, JSON.stringify(door));
   await shoot(page, `after-${label}-door`);
 
-  const floor1 = await enterTowerFloor(page, 0);
-  console.log(`${label} floor1:`, JSON.stringify(floor1));
-  await shoot(page, `after-${label}-floor1`);
-
-  await page.reload({ waitUntil: 'networkidle2', timeout: 90000 });
-  await enterOfflineGame(page, {});
-  await sleep(2500);
-  const floor8 = await enterTowerFloor(page, 7);
-  console.log(`${label} floor8:`, JSON.stringify(floor8));
-  await shoot(page, `after-${label}-floor8`);
+  // One reload per floor: climbing in-place would leave the previous floor's
+  // corpses and an already-advanced wave counter in the shot.
+  for (const floor of floors) {
+    await page.reload({ waitUntil: 'networkidle2', timeout: 90000 });
+    await enterOfflineGame(page, {});
+    await sleep(2200);
+    const info = await enterTowerFloor(page, floor - 1);
+    console.log(`${label} floor${floor}:`, JSON.stringify(info));
+    await shoot(page, `after-${label}-floor${floor}`);
+  }
 
   await browser.close();
 }
 
-await run('desktop', DESKTOP);
-await run('mobile', MOBILE);
+const ALL_FLOORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+// Mobile is a spot check of the shape, not a second full tour.
+const MOBILE_FLOORS = [1, 5, 10];
+
+await run('desktop', DESKTOP, ALL_FLOORS);
+await run('mobile', MOBILE, MOBILE_FLOORS);
 console.log(`done -> ${OUT}`);

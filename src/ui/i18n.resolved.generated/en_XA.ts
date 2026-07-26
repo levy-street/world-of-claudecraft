@@ -10862,6 +10862,36 @@ export const en_XA: EnTranslations = {
       "tower_boss_demon_lord": {
         "name": "[Ɱáļĝŕáţĥ, ţĥé Ţóŵéŕ Úñƀóúñð]"
       },
+      "tower_gloom_bat": {
+        "name": "[Ĝļóóɱ Ɓáţ]"
+      },
+      "tower_cinder_crawler": {
+        "name": "[Çíñðéŕ Çŕáŵļéŕ]"
+      },
+      "tower_bone_acolyte": {
+        "name": "[Ɓóñé Áçóļýţé]"
+      },
+      "tower_shade_dancer": {
+        "name": "[Šĥáðé Ðáñçéŕ]"
+      },
+      "tower_flame_herald": {
+        "name": "[Ƒļáɱé Ĥéŕáļð]"
+      },
+      "tower_rot_hulk": {
+        "name": "[Ŕóţ Ĥúļķ]"
+      },
+      "tower_blood_matron": {
+        "name": "[Ɓļóóð Ɱáţŕóñ]"
+      },
+      "tower_void_sentinel": {
+        "name": "[Ʋóíð Šéñţíñéļ]"
+      },
+      "tower_boss_flesh_shaper": {
+        "name": "[Ĝĥóļ ţĥé Ƒļéšĥ-Šĥáþéŕ]"
+      },
+      "tower_boss_ash_tyrant": {
+        "name": "[Çíñðéŕáẋ, ţĥé Ášĥ Ţýŕáñţ]"
+      },
       "orkadia_grunt": {
         "name": "[Ɓļóóðţúšķ Ĝŕúñţ]"
       },

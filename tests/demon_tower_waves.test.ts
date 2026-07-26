@@ -123,7 +123,9 @@ describe('demon tower waves', () => {
     }
   });
 
-  it('maps the two bosses to the gate and the summit', () => {
+  it('maps every boss floor to its own boss, and no other floor to any', () => {
+    expect(demonTowerBossFor(2)).toBe('tower_boss_flesh_shaper');
+    expect(demonTowerBossFor(6)).toBe('tower_boss_ash_tyrant');
     expect(demonTowerBossFor(4)).toBe(DEMON_TOWER_GATEKEEPER);
     expect(demonTowerBossFor(DEMON_TOWER_FLOOR_COUNT - 1)).toBe(DEMON_TOWER_LORD);
     for (const k of FLOORS) {
@@ -153,6 +155,12 @@ describe('demon tower decor', () => {
       const ring = demonTowerRingRadius(k);
       for (const d of demonTowerDecor(k)) {
         const r = Math.hypot(d.x, d.z);
+        // Flat walk-through sigils are the one thing allowed inside the ring:
+        // they carry no collider, so they cannot bodyblock anything.
+        if (d.r === undefined && d.key === 'tower_rune_slab') {
+          expect(r).toBeGreaterThan(DEMON_TOWER_CORE_RADIUS);
+          continue;
+        }
         expect(r, `floor ${k + 1} ${d.key} sits on the wave ring`).toBeGreaterThan(ring + 2);
         expect(r, `floor ${k + 1} ${d.key} escaped the wall`).toBeLessThan(arena);
       }

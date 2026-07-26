@@ -94,8 +94,10 @@ describe('demon tower scaling: the escalation is real', () => {
     }
   });
 
-  it('places the two bosses at the mid-tower gate and the summit, nowhere else', () => {
-    expect(FLOORS.filter(isDemonTowerBossFloor)).toEqual([4, 9]);
+  it('gates on floors 3, 5, 7 and the summit, nowhere else', () => {
+    // A raid should meet a real check roughly every other floor rather than
+    // climbing five quiet floors to the first one.
+    expect(FLOORS.filter(isDemonTowerBossFloor)).toEqual([2, 4, 6, 9]);
   });
 
   it('tightens the arena on every floor', () => {

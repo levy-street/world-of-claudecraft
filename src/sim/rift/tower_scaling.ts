@@ -86,8 +86,13 @@ export function demonTowerFloorTuning(floorIndex: number): DemonTowerFloorTuning
  * earned rather than a door you walk through. */
 export function isDemonTowerBossFloor(floorIndex: number): boolean {
   const k = clampTowerFloorIndex(floorIndex);
-  return k === 4 || k === DEMON_TOWER_FLOOR_COUNT - 1;
+  return DEMON_TOWER_BOSS_FLOORS.has(k);
 }
+
+/** 0-based floors that release a boss: 3, 5, 7 and the summit as players count
+ * them. Kept here (not in tower_waves) so the scaling curve and the wave plan
+ * read the same set without a cycle. */
+export const DEMON_TOWER_BOSS_FLOORS: ReadonlySet<number> = new Set([2, 4, 6, 9]);
 
 /** Collision radius of the Demon Core standing at the centre of every arena.
  * MEASURED from the built GLB by the asset pipeline's prop lane (job
