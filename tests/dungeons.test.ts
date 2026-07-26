@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { resolvePosition } from '../src/sim/colliders';
-import { applyHeal } from '../src/sim/combat/heal';
+
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
@@ -1149,8 +1149,6 @@ describe('dungeons: heroic marks', () => {
       count: 1,
     }));
 
-    // Both players must actually contribute to the boss; proximity alone is not reward eligibility.
-    (sim as any).dealDamage(me, morthen, 1, false, 'physical', null, 'hit');
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     expect(morthen.dead).toBe(true);
@@ -1460,7 +1458,7 @@ describe('dungeons: heroic daily lockouts', () => {
     ).toBe(false);
   });
 
-  it('mails a participant waiting back at camp, and never twice', () => {
+  it('mails a healer waiting back at camp who entered this run, and never twice', () => {
     const sim = makeSim(5);
     const leader = sim.addPlayer('warrior', 'Lead');
     const healer = sim.addPlayer('priest', 'Heals');
@@ -1472,86 +1470,26 @@ describe('dungeons: heroic daily lockouts', () => {
     const inst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
     const morthen = mobInInstance(sim, inst, 'morthen');
     const le = sim.entities.get(leader) as AnyEntity;
-    const healerEntity = sim.entities.get(healer) as AnyEntity;
     teleport(sim, le, morthen.pos.x + 1, morthen.pos.z);
-    teleport(sim, healerEntity, morthen.pos.x - 1, morthen.pos.z);
-    // The healer contributed to the final encounter, then stepped out to wait
-    // at camp: still a group member, far from the corpse at kill time.
-    le.hp = Math.max(1, le.maxHp - 20);
-    morthen.inCombat = true;
-    morthen.threat.set(le.id, 1);
-    expect(applyHeal(sim.ctx, healerEntity, le, 10, 'Heal')).toBeGreaterThan(0);
-    expect(morthen.bossDamagers.has(healer)).toBe(true);
+    // The healer ran the dungeon, then stepped out to wait at camp: still a
+    // group member, far from the corpse at kill time.
     leaveDungeon(sim.ctx, healer);
-    teleport(sim, healerEntity, 0, 0);
+    teleport(sim, sim.entities.get(healer) as AnyEntity, 0, 0);
 
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
     expect(morthen.dead).toBe(true);
 
-    // Locked and paid by mail: their final-boss contribution survives distance,
-    // so leaving kill range changes only the delivery route.
+    // Locked and paid by mail: they entered this run, so distance costs them
+    // only the delivery route, never the reward.
     expect(sim.players.get(healer)!.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(0);
     expect(mailedMarksTo(sim, healer)).toBe(1);
 
     // A repeat settlement on the same claim (the alreadyLocked guard) must not
     // pay anyone again, bags or mail.
-    awardHeroicMarks(sim.ctx, morthen, [sim.players.get(leader)!], [sim.players.get(healer)!]);
+    awardHeroicMarks(sim.ctx, morthen, [sim.players.get(leader)!]);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
     expect(mailedMarksTo(sim, healer)).toBe(1);
-  });
-
-  it('locks an entered AFK player without Marks', () => {
-    const sim = makeSim(5);
-    const leader = sim.addPlayer('warrior', 'Lead');
-    const parked = sim.addPlayer('mage', 'Parked');
-    sim.partyInvite(parked, leader);
-    sim.partyAccept(parked);
-    sim.setDungeonDifficulty('heroic', leader);
-    enterDungeon(sim.ctx, 'hollow_crypt', leader);
-    enterDungeon(sim.ctx, 'hollow_crypt', parked);
-    const inst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
-    const morthen = mobInInstance(sim, inst, 'morthen');
-    const leaderEntity = sim.entities.get(leader) as AnyEntity;
-    teleport(sim, leaderEntity, morthen.pos.x + 1, morthen.pos.z);
-    leaveDungeon(sim.ctx, parked);
-    teleport(sim, sim.entities.get(parked) as AnyEntity, 0, 0);
-
-    (sim as any).dealDamage(leaderEntity, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
-
-    const parkedMeta = sim.players.get(parked)!;
-    expect(inst.enteredBy.has(parked)).toBe(true);
-    expect(parkedMeta.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, parked)).toBe(0);
-    expect(mailedMarksTo(sim, parked)).toBe(0);
-    expect(parkedMeta.heroicDaily.marked.has('hollow_crypt')).toBe(false);
-  });
-
-  it('locks a nearby AFK player without Marks', () => {
-    const sim = makeSim(5);
-    const leader = sim.addPlayer('warrior', 'Lead');
-    const parked = sim.addPlayer('mage', 'NearbyParked');
-    sim.partyInvite(parked, leader);
-    sim.partyAccept(parked);
-    sim.setDungeonDifficulty('heroic', leader);
-    enterDungeon(sim.ctx, 'hollow_crypt', leader);
-    enterDungeon(sim.ctx, 'hollow_crypt', parked);
-    const inst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
-    const morthen = mobInInstance(sim, inst, 'morthen');
-    const leaderEntity = sim.entities.get(leader) as AnyEntity;
-    const parkedEntity = sim.entities.get(parked) as AnyEntity;
-    teleport(sim, leaderEntity, morthen.pos.x + 1, morthen.pos.z);
-    teleport(sim, parkedEntity, morthen.pos.x - 1, morthen.pos.z);
-
-    (sim as any).dealDamage(leaderEntity, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
-
-    const parkedMeta = sim.players.get(parked)!;
-    expect(morthen.lootRecipientIds).toContain(parked);
-    expect(morthen.bossDamagers.has(parked)).toBe(false);
-    expect(parkedMeta.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, parked)).toBe(0);
-    expect(mailedMarksTo(sim, parked)).toBe(0);
-    expect(parkedMeta.heroicDaily.marked.has('hollow_crypt')).toBe(false);
   });
 
   it("uses a released participant's corpse position for loot and Heroic Mark eligibility", () => {
@@ -1577,7 +1515,6 @@ describe('dungeons: heroic daily lockouts', () => {
     expect(sim.instanceSlotAt(me.pos)).toBeNull();
     expect(me.corpseInstanceId).toBe(inst.exitId);
 
-    morthen.bossDamagers.add(member);
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     expect(new Set(morthen.lootRecipientIds)).toEqual(new Set([leader, member]));
@@ -1603,10 +1540,6 @@ describe('dungeons: heroic daily lockouts', () => {
     teleport(sim, le, morthen.pos.x + 1, morthen.pos.z);
     teleport(sim, sim.entities.get(buddy) as AnyEntity, morthen.pos.x - 1, morthen.pos.z);
     teleport(sim, sim.entities.get(quitter) as AnyEntity, morthen.pos.x, morthen.pos.z + 2);
-    morthen.tappedById = leader;
-    // The quitter contributed before leaving the group. Presence in the room by
-    // itself is not enough to authorize an out-of-party reward by mail.
-    (sim as any).dealDamage(sim.entities.get(quitter), morthen, 1, false, 'physical', null, 'hit');
     sim.partyLeave(quitter); // no longer in the group, still standing in the boss room
 
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
@@ -1620,8 +1553,8 @@ describe('dungeons: heroic daily lockouts', () => {
         false,
       );
     }
-    // The quitter helped on the final boss but left the credit party, so their
-    // marks ride the Ravenpost.
+    // The quitter ran the dungeon (they entered this run and stood in the boss
+    // room) but left the credit party, so their marks ride the Ravenpost.
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, quitter)).toBe(0);
     expect(mailedMarksTo(sim, quitter)).toBe(1);
   });
@@ -1646,8 +1579,6 @@ describe('dungeons: heroic daily lockouts', () => {
     teleport(sim, le, morthen.pos.x + 1, morthen.pos.z);
     teleport(sim, sim.entities.get(buddy) as AnyEntity, morthen.pos.x - 1, morthen.pos.z);
     teleport(sim, qe, morthen.pos.x, morthen.pos.z + 2);
-    morthen.tappedById = leader;
-    (sim as any).dealDamage(qe, morthen, 1, false, 'physical', null, 'hit');
 
     qe.dead = true;
     qe.hp = 0;
@@ -1660,8 +1591,8 @@ describe('dungeons: heroic daily lockouts', () => {
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     expect(sim.players.get(quitter)!.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
-    // Locked away from the corpse but a real participant (they damaged the boss
-    // before dying), so the marks arrive end to end as the reward letter's exact
+    // Locked away from the corpse but a real participant (they entered and died
+    // in there), so the marks arrive end to end as the reward letter's exact
     // attachment rather than dropping into distant bags.
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, quitter)).toBe(0);
     const letter = ((sim.postOffice as any).mail as any[]).find(
@@ -2011,8 +1942,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       const proceduralUid = proceduralSlots[0].instance.procedural.uid;
       expect(proceduralUid).toEqual(expect.any(String));
       expect(lootItems.map((slot) => slot.itemId)).not.toContain(HEROIC_MARK_ITEM_ID);
-      expect(lootItems.map((slot) => slot.itemId)).not.toContain('deathless_fragment');
-      expect(ITEMS).not.toHaveProperty('deathless_fragment');
+
       for (const pid of raiders) {
         expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(0);
         expect(mailedItemTo(sim, pid, HEROIC_MARK_ITEM_ID)).toBe(0);

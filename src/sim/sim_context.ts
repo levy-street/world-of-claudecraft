@@ -280,7 +280,7 @@ export interface SimContextCallbacks {
   inheritDungeonResetLocks(pid: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
-  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[], participants: PlayerMeta[]): void;
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and

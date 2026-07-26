@@ -31,6 +31,7 @@ import {
 } from '../sim/account_flair';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
+import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { recipeById } from '../sim/content/recipes';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
@@ -339,7 +340,8 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
-import { HeroicQuartermasterController } from './hud/vendor/heroic_quartermaster_controller';
+import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
+import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
 import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view';
 import { renderTrainWindow } from './hud/vendor/train_window';
@@ -1244,8 +1246,8 @@ export class Hud {
   private readonly lootWindow: LootWindowController;
   private readonly lootRolls: LootRollController;
   private readonly itemPresentation: ItemPresentationController;
-  private readonly heroicQuartermaster: HeroicQuartermasterController;
   private openVendorNpcId: number | null = null;
+  private openHeroicVendorNpcId: number | null = null;
   private openTrainNpcId: number | null = null;
   // Learn flights + confirmed-grant overlay for the train window (issue
   // #2342): begin on click (the double-submit guard), resolve on the
@@ -1469,33 +1471,7 @@ export class Hud {
       equippedInstance: (slot) => this.sim.player.equippedInstances?.[slot],
       equippedItemIds: () => Object.values(this.sim.equipment),
     });
-    this.heroicQuartermaster = new HeroicQuartermasterController({
-      element: () => $('#vendor-window'),
-      npcName: (npcId) => {
-        const npc = this.sim.entities.get(npcId);
-        return npc ? entityDisplayName(npc) : null;
-      },
-      npcInRange: (npcId, range) => {
-        const npc = this.sim.entities.get(npcId);
-        return !!npc && dist2d(this.sim.player.pos, npc.pos) <= range;
-      },
-      inventory: () => this.sim.inventory,
-      stock: HEROIC_VENDOR_STOCK,
-      items: ITEMS,
-      presentation: this.presentationBag,
-      focus: this.windowFocus('#vendor-window'),
-      closeOtherWindows: (selector) => this.closeOtherWindows(selector),
-      closeBank: () => {
-        if (this.bankWindowOpen) this.closeBank();
-      },
-      closeCopperVendor: () => {
-        this.openVendorNpcId = null;
-      },
-      hideTooltip: () => this.hideTooltip(),
-      confirm: (title, body, okText, cancelText, onOk) =>
-        this.confirmDialog(title, body, okText, cancelText, onOk),
-      buy: (itemId) => this.sim.buyHeroicVendorItem(itemId),
-    });
+
     this.meters = new Meters(sim);
     this.actionBarController = new ActionBarController({
       storage: localStorage,
@@ -2716,7 +2692,7 @@ export class Hud {
         break;
       case 'vendor-window':
         this.closeVendor();
-        this.heroicQuartermaster.close();
+        this.closeHeroicVendor();
         break;
       case 'train-window':
         this.closeTrain();
@@ -4767,7 +4743,8 @@ export class Hud {
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
-    this.heroicQuartermaster.relocalize();
+    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
+      this.renderHeroicVendor();
     if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
       this.renderTrain();
     if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
@@ -7420,7 +7397,10 @@ export class Hud {
         const npc = sim.entities.get(this.openVendorNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeVendor();
       }
-      this.heroicQuartermaster.updateProximity();
+      if (this.openHeroicVendorNpcId !== null) {
+        const npc = sim.entities.get(this.openHeroicVendorNpcId);
+        if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeHeroicVendor();
+      }
       if (this.openTrainNpcId !== null) {
         const npc = sim.entities.get(this.openTrainNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeTrain();
@@ -9297,7 +9277,9 @@ export class Hud {
         case 'vendor': {
           if ($('#bags').style.display !== 'none') this.renderBags();
           if (this.openVendorNpcId !== null) this.renderVendor();
-          this.heroicQuartermaster.onVendorResult();
+          // A Heroic Marks purchase rides the same 'vendor' event; refresh the
+          // shop so the balance and per-offer affordability update after a buy.
+          if (this.openHeroicVendorNpcId !== null) this.renderHeroicVendor();
           // A delve Marks purchase rides the same 'vendor' event; refresh the shop
           // tab so the balance and per-offer affordability update after a buy.
           if (this.delveBoard.isOpen) this.renderDelveBoard();
@@ -9385,7 +9367,6 @@ export class Hud {
         }
         case 'error': {
           const message = this.localizeErrorText(ev.text);
-          this.heroicQuartermaster.onError(message);
           this.showError(message);
           break;
         }
@@ -11286,21 +11267,13 @@ export class Hud {
   // Vendor
   // -------------------------------------------------------------------------
 
-  openHeroicVendor(npcId: number): void {
-    this.heroicQuartermaster.open(npcId);
-  }
-
-  closeHeroicVendor(): void {
-    this.heroicQuartermaster.close();
-  }
-
   openVendor(npcId: number): void {
     this.closeOtherWindows(['#vendor-window', '#bags']);
     // The bags companion is exclusive (see openBank): close the bank cluster
     // through the painter so onBankClosed clears body.bank-open before the
     // vendor pairing takes over.
     if (this.bankWindowOpen) this.closeBank();
-    this.heroicQuartermaster.close(); // the marks shop shares the container
+    this.openHeroicVendorNpcId = null; // the marks shop shares the container
     this.openVendorNpcId = npcId;
     document.body.classList.add('vendor-open');
     this.renderVendor();
@@ -11350,6 +11323,44 @@ export class Hud {
         },
       },
     );
+  }
+
+  openHeroicVendor(npcId: number): void {
+    this.closeOtherWindows('#vendor-window');
+    // The bags companion is exclusive (see openBank): close the bank cluster
+    // through the painter so onBankClosed clears body.bank-open before the
+    // marks shop takes the container.
+    if (this.bankWindowOpen) this.closeBank();
+    this.openVendorNpcId = null; // shares the container with the copper vendor
+    this.openHeroicVendorNpcId = npcId;
+    this.renderHeroicVendor();
+  }
+
+  private renderHeroicVendor(): void {
+    if (this.openHeroicVendorNpcId === null) return;
+    const npc = this.sim.entities.get(this.openHeroicVendorNpcId);
+    if (!npc) return;
+    const balance = this.sim.inventory
+      .filter((slot) => slot.itemId === HEROIC_MARK_ITEM_ID)
+      .reduce((sum, slot) => sum + slot.count, 0);
+    renderHeroicVendorWindow(
+      $('#vendor-window'),
+      entityDisplayName(npc),
+      buildHeroicVendorView(HEROIC_VENDOR_STOCK, ITEMS, balance),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onBuy: (itemId) => this.requestHeroicVendorPurchase(itemId),
+        onClose: () => this.closeHeroicVendor(),
+      },
+    );
+  }
+
+  closeHeroicVendor(): void {
+    if (this.openHeroicVendorNpcId === null) return;
+    $('#vendor-window').style.display = 'none';
+    this.openHeroicVendorNpcId = null;
+    this.hideTooltip();
   }
 
   closeVendor(): void {
@@ -11704,9 +11715,9 @@ export class Hud {
     // the two windows on the same side of #bags (and on mobile the cluster-close
     // precedence would strand the bank at half-width with its x-btn hidden).
     if (this.vendorOpen) this.closeVendor();
-    // The heroic marks shop is a second tenant of #vendor-window and is not
-    // represented by vendorOpen, so close its controller explicitly.
-    this.heroicQuartermaster.close();
+    // The heroic marks shop is a second tenant of #vendor-window that nulls
+    // openVendorNpcId, so the vendorOpen guard above never sees it.
+    if (this.openHeroicVendorNpcId !== null) this.closeHeroicVendor();
     document.body.classList.add('bank-open');
     this.bankWindow.open();
     this.renderBags();
@@ -12281,6 +12292,25 @@ export class Hud {
       t('hudChrome.death.healerConfirmAccept'),
       t('hudChrome.death.healerConfirmCancel'),
       () => this.onResurrectAtSpiritHealer?.(),
+    );
+  }
+
+  // Heroic Quartermaster purchases debit Heroic Marks with no buyback recorded
+  // (gold vendors are the only buyback source), so a mis-tap is unrefundable:
+  // confirm before sending the exact pre-existing buy command.
+  private requestHeroicVendorPurchase(itemId: string): void {
+    const offer = HEROIC_VENDOR_STOCK.find((candidate) => candidate.itemId === itemId);
+    const item = ITEMS[itemId];
+    if (!offer || !item) return;
+    this.confirmDialog(
+      t('heroicShop.buyConfirmTitle'),
+      t('heroicShop.buyConfirmBody', {
+        item: itemDisplayName(item),
+        marks: formatNumber(offer.marks, { maximumFractionDigits: 0 }),
+      }),
+      t('heroicShop.buyConfirmAccept'),
+      t('heroicShop.buyConfirmCancel'),
+      () => this.sim.buyHeroicVendorItem(itemId),
     );
   }
 

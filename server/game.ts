@@ -2012,7 +2012,7 @@ export class GameServer {
             lap('stale');
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
-            this.persistAtomicSystemRewards();
+
             lap('tick');
             // Fold this tick's mob-scan counts before the next tick resets them: the
             // latest-tick values feed the heartbeat, and an in-flight capture sums and
@@ -3411,23 +3411,6 @@ export class GameServer {
     if (this.sim.market.persistenceMutationRevision !== beforeRevision) {
       this.queueAtomicEconomyPersistence([session], { market: true }, 'market transfer');
     }
-  }
-
-  private persistAtomicSystemRewards(): void {
-    const recipientIds = this.sim.postOffice.drainAtomicRewardRecipientIds();
-    if (recipientIds.length === 0) return;
-    const sessions: ClientSession[] = [];
-    for (const pid of recipientIds) {
-      const session = this.clients.get(pid);
-      if (!session || session.left) {
-        this.mailPersistenceQuarantined = true;
-        this.quarantinePersistenceSessions(sessions, 'system reward recipient disappeared');
-        console.error(`system reward mail has no live persistence session for player ${pid}`);
-        return;
-      }
-      sessions.push(session);
-    }
-    this.queueAtomicEconomyPersistence(sessions, { mail: true }, 'system reward mail');
   }
 
   async saveCharacter(session: ClientSession, opts: { withMarket?: boolean } = {}): Promise<void> {

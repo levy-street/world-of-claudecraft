@@ -204,7 +204,7 @@ describe('heroic mark reward persistence', () => {
 
     now = nextReset;
     nextReset += DAY_MS;
-    sim.awardHeroicMarks(morthen, [meta], [meta]);
+    sim.awardHeroicMarks(morthen, [meta]);
 
     expect(sim.utcDay).toBe('2026-07-07');
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(2);
@@ -235,7 +235,7 @@ describe('heroic mark reward persistence', () => {
           (entity: AnyEntity | undefined) =>
             entity?.templateId === HEROIC_DUNGEON_TUNING[dungeonId].finalBossId,
         ) as AnyEntity;
-      sim.awardHeroicMarks(boss, [meta], [meta]);
+      sim.awardHeroicMarks(boss, [meta]);
     }
     sim.tick();
 

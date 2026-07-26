@@ -13,10 +13,6 @@ const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url)
 const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-const heroicQuartermaster = readFileSync(
-  new URL('../src/ui/hud/vendor/heroic_quartermaster_controller.ts', import.meta.url),
-  'utf8',
-);
 const mainSrc = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8');
@@ -211,11 +207,11 @@ describe('bank_window: hud.ts wiring', () => {
     // vendorOpen guard reads only openVendorNpcId (the heroic arm nulls it), so both
     // arms need their own wiring or the two windows overlap and the mobile
     // cluster-close precedence strands the bank at half-width with its x-btn hidden.
-    expect(heroicQuartermaster).toMatch(
-      /open\(npcId: number\): void \{[\s\S]{0,300}?this\.deps\.closeBank\(\);/,
+    expect(hud).toMatch(
+      /openHeroicVendor\(npcId: number\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
     );
     expect(hud).toMatch(
-      /openBank\(\): void \{[\s\S]{0,600}?this\.heroicQuartermaster\.close\(\);[\s\S]{0,600}?classList\.add\('bank-open'\)/,
+      /openBank\(\): void \{[\s\S]{0,600}?if \(this\.openHeroicVendorNpcId !== null\) this\.closeHeroicVendor\(\);[\s\S]{0,600}?classList\.add\('bank-open'\)/,
     );
   });
 

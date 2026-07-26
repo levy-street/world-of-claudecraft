@@ -45,8 +45,7 @@ import {
 } from '../server/db';
 import { recordDeedUnlocks } from '../server/deeds_records';
 import { type ClientSession, GameServer } from '../server/game';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
-import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
+
 import { generateProceduralItem } from '../src/sim/loot/procedural';
 import type { CharacterState, MailSave } from '../src/sim/sim';
 import type { ItemInstancePayload } from '../src/sim/types';
@@ -300,7 +299,18 @@ describe('atomic direct-transfer persistence', () => {
     cmd(server, carol, { cmd: 'trade_confirm' });
 
     moveToMailbox(server, carol.pid);
-    server.sim.postOffice.mailHeroicMarks(carol.pid, HEROIC_MARK_ITEM_ID, 1);
+    server.sim.postOffice.sendLetter(
+      carol.name,
+      carol.name,
+      {
+        letterId: 'test_atomic_backpressure',
+        senderName: 'Test Courier',
+        subject: 'Backpressure',
+        body: 'Test message.',
+        delaySeconds: 0,
+      },
+      'system',
+    );
     const letter = server.sim.postOffice.mail.find((mail) => mail.recipientName === carol.name);
     if (!letter) throw new Error('missing backpressure mail');
 
@@ -543,7 +553,19 @@ describe('atomic direct-transfer persistence', () => {
     if (!recipientMeta) throw new Error('missing mail lifecycle recipient');
     recipientMeta.inventory = [];
     moveToMailbox(server, recipient.pid);
-    server.sim.postOffice.mailHeroicMarks(recipient.pid, HEROIC_MARK_ITEM_ID, 2);
+    server.sim.postOffice.sendLetter(
+      recipient.name,
+      recipient.name,
+      {
+        letterId: 'test_mail_lifecycle',
+        senderName: 'Test Courier',
+        subject: 'Lifecycle',
+        body: 'Test attachment.',
+        items: [{ itemId: 'roasted_boar', count: 2 }],
+        delaySeconds: 0,
+      },
+      'system',
+    );
     const letter = server.sim.postOffice.mail.find(
       (message) => message.recipientName === recipient.name,
     );
@@ -557,40 +579,6 @@ describe('atomic direct-transfer persistence', () => {
     await vi.waitFor(() => expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(3));
 
     expect(server.sim.postOffice.mail.some((message) => message.id === letter.id)).toBe(false);
-  });
-
-  it('persists all distant system rewards and recipient characters in one transaction', async () => {
-    const server = new GameServer();
-    const recipients = [
-      join(server, 543, 'RewardBatchA'),
-      join(server, 544, 'RewardBatchB'),
-      join(server, 545, 'RewardBatchC'),
-    ];
-    for (const recipient of recipients) {
-      const meta = server.sim.meta(recipient.pid);
-      if (!meta) throw new Error('missing reward batch recipient');
-      meta.raidLockouts.set('hollow_crypt:heroic', 123456);
-      meta.heroicDaily = { date: 'reset:1', marked: new Set(['hollow_crypt']) };
-      server.sim.postOffice.mailHeroicMarks(recipient.pid, HEROIC_MARK_ITEM_ID, 1);
-    }
-
-    (server as unknown as { persistAtomicSystemRewards(): void }).persistAtomicSystemRewards();
-
-    await vi.waitFor(() => expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1));
-    const call = vi.mocked(saveCharacterAndMarketState).mock.calls[0];
-    if (!call) throw new Error('missing atomic system reward save');
-    const peers = call[6];
-    expect(Array.isArray(peers)).toBe(true);
-    expect((peers as any[]).map((peer) => peer.characterId)).toEqual([
-      recipients[1].characterId,
-      recipients[2].characterId,
-    ]);
-    expect(
-      (call[4] as MailSave).mail.filter(
-        (message) => message.letterId === HEROIC_MARK_LETTER.letterId,
-      ),
-    ).toHaveLength(3);
-    expect((call[2] as CharacterState).heroicDaily).toMatchObject({ date: 'reset:1' });
   });
 
   it('quarantines the sender and realm mail after a failed procedural send transaction', async () => {

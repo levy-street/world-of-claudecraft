@@ -1,7 +1,10 @@
 // Thin DOM consumer for the Heroic Quartermaster window.
 //
-// Paints the marks-currency shop from a structured HeroicShopView and reports
-// buy/close clicks through injected callbacks. It owns no state.
+// The consumer half of the pure-core + thin-consumer split (reference
+// vendor_window.ts): paints the marks-currency shop from the structured
+// HeroicShopView and reports buy/close clicks back through the injected
+// callbacks. Reuses the vendor window's CSS classes (.vendor-item, .vi-name,
+// .vi-price) so the shop reads as the same window family. It owns no state.
 
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -16,13 +19,15 @@ export interface HeroicVendorWindowDeps extends PainterHostPresentation {
   onClose(): void;
 }
 
-/** Paint the Heroic Quartermaster gear panel from a prepared view. */
+/** Paint the Heroic Quartermaster panel from a prepared view. */
 export function renderHeroicVendorWindow(
   el: HTMLElement,
   vendorName: string,
   view: HeroicShopView,
   deps: HeroicVendorWindowDeps,
 ): void {
+  // The rebuild replaces the hovered row (its mouseleave never fires) and
+  // collapses the scrolled list; drop the tooltip and restore the scroll.
   deps.hideTooltip();
   const scrollTop = el.scrollTop;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
@@ -34,6 +39,10 @@ export function renderHeroicVendorWindow(
   });
   el.appendChild(balance);
 
+  // Same landscape tile grid as the goods/buyback vendor (.vendor-goods-grid
+  // in components.css): the Heroic Quartermaster is the same kind of shop
+  // counter and shares #vendor-window's width, so its rows must flow into
+  // the grid rather than stay a single full-width column at that width.
   const goodsGrid = document.createElement('div');
   goodsGrid.className = 'vendor-goods-grid';
   for (const { itemId, item, marks, affordable } of view.rows) {
@@ -53,6 +62,8 @@ export function renderHeroicVendorWindow(
     );
     goodsGrid.appendChild(row);
   }
+  // Guard mirrors vendor_window.ts's goods/buyback grids: skip appending an
+  // empty grid container rather than leaving a dead node in the DOM.
   if (view.rows.length > 0) el.appendChild(goodsGrid);
 
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());

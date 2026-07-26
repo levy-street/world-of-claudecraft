@@ -1453,8 +1453,6 @@ async function capturePresentationEvidence(page) {
     normalFinderState.includes('Rare 65% · Epic 33% · Legendary 2%') &&
       normalFinderState.includes('Rare 27 · Epic 28 · Legendary 32') &&
       normalFinderState.includes('one shared procedural item') &&
-      !normalFinderState.includes('Deathless Fragment') &&
-      !normalFinderState.includes('Heroic Marks') &&
       !normalFinderState.includes('Raid-forged and guaranteed'),
     normalFinderState,
   );
@@ -1481,8 +1479,6 @@ async function capturePresentationEvidence(page) {
     heroicFinderState.includes('Rare 40% · Epic 55% · Legendary 5%') &&
       heroicFinderState.includes('Rare 31 · Epic 32 · Legendary 36') &&
       heroicFinderState.includes('one shared procedural item') &&
-      !heroicFinderState.includes('Deathless Fragment') &&
-      !heroicFinderState.includes('Heroic Marks') &&
       heroicFinderState.includes('Raid-forged and guaranteed in the upper half') &&
       !heroicFinderDetailState.includes('Locked for about'),
     JSON.stringify({ rewards: heroicFinderState, detail: heroicFinderDetailState }),

@@ -511,47 +511,6 @@ describe('the Heroic Marks reward letter (mailHeroicMarks)', () => {
     sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, -2);
     expect((sim.postOffice as any).mail.length).toBe(before);
   });
-
-  it('exposes each changed reward recipient once for atomic persistence', () => {
-    const sim = makeWorld();
-    const first = sim.addPlayer('warrior', 'FirstReward');
-    const second = sim.addPlayer('mage', 'SecondReward');
-
-    sim.postOffice.mailHeroicMarks(first, HEROIC_MARK_ITEM_ID, 1);
-    sim.postOffice.mailHeroicMarks(first, HEROIC_MARK_ITEM_ID, 2);
-    sim.postOffice.mailHeroicMarks(second, HEROIC_MARK_ITEM_ID, 1);
-
-    expect(sim.postOffice.drainAtomicRewardRecipientIds()).toEqual(
-      [first, second].sort((a, b) => a - b),
-    );
-    expect(sim.postOffice.drainAtomicRewardRecipientIds()).toEqual([]);
-  });
-
-  it('coalesces repeated permanent reward parcels so they cannot fill the mailbox', () => {
-    const sim = makeWorld();
-    const recipient = sim.addPlayer('warrior', 'Backline');
-    const sender = sim.addPlayer('mage', 'Sender');
-    for (let i = 0; i < 150; i++) {
-      sim.postOffice.mailHeroicMarks(recipient, HEROIC_MARK_ITEM_ID, 3);
-    }
-
-    const rewardLetters = (sim.postOffice as any).mail.filter(
-      (message: { letterId?: string }) => message.letterId === HEROIC_MARK_LETTER.letterId,
-    );
-    expect(rewardLetters).toHaveLength(1);
-    expect(rewardLetters[0].items).toEqual([{ itemId: HEROIC_MARK_ITEM_ID, count: 450 }]);
-
-    const senderMeta = sim.meta(sender);
-    if (!senderMeta) throw new Error('missing sender meta');
-    senderMeta.copper = 1_000;
-    moveToMailbox(sim, sender);
-    sim.mailSend('Backline', 'Still open', 'Reward mail stays bounded.', 0, [], sender);
-    expect(
-      (sim.postOffice as any).mail.some(
-        (message: { subject: string }) => message.subject === 'Still open',
-      ),
-    ).toBe(true);
-  });
 });
 
 describe('persistence and rename', () => {

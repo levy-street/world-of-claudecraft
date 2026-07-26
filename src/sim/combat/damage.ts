@@ -1197,9 +1197,6 @@ export function handleDeath(
     const rareContribs =
       !template?.worldBoss && template?.rare ? worldBossLootContributors(ctx, e) : null;
 
-    const finalBossInstance = dungeonFinalBossInstance(ctx, e);
-    const heroicFinalBossContribs =
-      finalBossInstance?.difficulty === 'heroic' ? worldBossLootContributors(ctx, e) : null;
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;
@@ -1381,7 +1378,7 @@ export function handleDeath(
     // group cannot dodge it. Nythraxis progression comes only from corpse loot.
     lockNormalDungeonResetOnBossKill(ctx, e);
     if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e, heroicRewardRecipients);
-    else ctx.awardHeroicMarks(e, heroicRewardRecipients, heroicFinalBossContribs ?? []);
+    else ctx.awardHeroicMarks(e, heroicRewardRecipients);
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.
     if (worldBossContribs) {

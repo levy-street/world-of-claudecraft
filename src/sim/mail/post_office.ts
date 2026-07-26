@@ -117,10 +117,7 @@ export class PostOffice {
   // server samples it around a synchronous command so it can enqueue the
   // character+realm transaction only when the command actually mutated escrow.
   private commandMutationRevision = 0;
-  // Distant Heroic rewards mutate both a character's lockout/receipt and the
-  // shared Ravenpost escrow in one combat settlement. The server drains these
-  // recipient ids after each tick and persists the whole batch atomically.
-  private atomicRewardRecipientIds = new Set<number>();
+
   // Entity ids of every mailbox object, assigned by the Sim ctor during world
   // placement (the spawn loop stays on Sim). Any raven pillar is a valid place
   // to tend your post.
@@ -140,12 +137,6 @@ export class PostOffice {
 
   get persistenceMutationRevision(): number {
     return this.commandMutationRevision;
-  }
-
-  drainAtomicRewardRecipientIds(): number[] {
-    const recipients = [...this.atomicRewardRecipientIds].sort((a, b) => a - b);
-    this.atomicRewardRecipientIds.clear();
-    return recipients;
   }
 
   // Public tick entry: the Sim tick calls this in the end-of-tick system block
@@ -687,49 +678,19 @@ export class PostOffice {
     this.sendLetter(this.mailKeyFor(meta), meta.name, WELCOME_LETTER, 'system');
   }
 
-  // System reward-mail hook for the existing five-player Heroic Marks flow.
+  // Heroic Marks reward hook (awardHeroicMarks): posts a participant's marks when
+  // they took the daily lockout but were not at the corpse to loot them (a distant
+  // healer, a fallen raider). The letter's attachment carries the exact mark count
+  // for this kill. No postage, no proximity gate: the raid already earned it.
   mailHeroicMarks(pid: number, itemId: string, count: number): void {
     const meta = this.ctx.players.get(pid);
     if (!meta || count <= 0) return;
-    const items = [{ itemId, count }];
-    const letter = HEROIC_MARK_LETTER;
-    const recipientKey = this.mailKeyFor(meta);
-    // Reward attachments are fungible counters, so accumulate them into the
-    // recipient's one durable letter per reward stream. Without this, permanent
-    // system parcels bypass the player-mail cap forever, eventually fill the
-    // mailbox and make the realm-wide JSONB blob grow once per absent clear.
-    const existing = this.mail.find(
-      (message) =>
-        message.kind === 'system' &&
-        message.letterId === letter.letterId &&
-        (message.recipientKey === recipientKey || message.recipientKey === meta.name),
-    );
-    if (existing) {
-      const wasRead = existing.read;
-      for (const item of items) {
-        const stack = existing.items.find(
-          (candidate) => candidate.itemId === item.itemId && candidate.instance === undefined,
-        );
-        if (stack) stack.count += item.count;
-        else existing.items.push(cloneInvSlot(item));
-      }
-      existing.expiresAt = Infinity;
-      existing.read = false;
-      existing.announced = false;
-      if (wasRead && this.ctx.time >= existing.deliverAt) this.indexInc(existing.recipientKey);
-      this.atomicRewardRecipientIds.add(meta.entityId);
-      return;
-    }
     this.sendLetter(
-      recipientKey,
+      this.mailKeyFor(meta),
       meta.name,
-      {
-        ...letter,
-        items,
-      },
+      { ...HEROIC_MARK_LETTER, items: [{ itemId, count }] },
       'system',
     );
-    this.atomicRewardRecipientIds.add(meta.entityId);
   }
 
   // Quest turn-in hook (turnInQuestCore): quests with an authored letter have

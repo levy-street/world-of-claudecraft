@@ -903,9 +903,10 @@ export interface InstanceSlot {
   // treat someone else's cleared claim as their own loot run.
   clearedBy: Set<number>;
   // Players who stepped through this claim's door during this run (enterDungeon).
-  // Session-only like clearedBy, cleared with the claim. This records ownership
-  // and lockout scope, but it is not reward proof: absent Heroic reward mail also
-  // requires permanent final-boss damage or effective-heal contribution.
+  // Session-only like clearedBy, cleared with the claim. The heroic mail arm
+  // (instances/dungeons awardHeroicMarks) pays a locked-but-absent player only
+  // when they actually entered this run: a door-camper or a member parked in
+  // town takes the lockout without turning roster membership into mailed income.
   enteredBy: Set<number>;
 }
 
@@ -9060,8 +9061,8 @@ export class Sim {
 
   // Owned by instances/dungeons (heroic final-boss reward + lockout settlement);
   // the C1 death hub reaches it through the seam, this delegate keeps the facade.
-  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[], participants: PlayerMeta[]): void {
-    awardHeroicMarksImpl(this.ctx, mob, recipients, participants);
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void {
+    awardHeroicMarksImpl(this.ctx, mob, recipients);
   }
 
   // Heroic Quartermaster purchase (owned by instances/heroic_vendor.ts): the

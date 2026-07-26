@@ -8,13 +8,8 @@ Nythraxis progression comes from loot drops only.
 
 - Every eligible final-boss corpse adds one shared procedural equipment item.
 - The item uses the existing party loot and Need/Greed flow.
-- The raid does not award a personal currency.
-- The raid does not award Heroic Marks.
-- There is no Deathless Forge, deterministic purchase path, or Legendary tuning service.
+- The corpse item is the complete progression reward added by this system.
 - Natural drops have no pity counter.
-
-The ordinary five-player Heroic Marks system and its established gear vendor are
-separate existing game systems. Nythraxis does not contribute Marks to them.
 
 ## Difficulty profiles
 
