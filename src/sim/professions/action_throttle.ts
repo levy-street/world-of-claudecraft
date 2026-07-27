@@ -1,5 +1,5 @@
 // One shared 10-per-60s pacing budget for crafting, disenchant, enchant-apply,
-// and salvage (Professions 2.0 Phase 12c: the #1301 craft-output throttle
+// and salvage (Professions 2.0: the #1301 craft-output throttle
 // widened into the single action window every paced profession resolver
 // draws from). The backing field keeps its historical craftThrottle name on
 // PlayerMeta to spare save/wire/pin churn: the name is legacy, the budget is

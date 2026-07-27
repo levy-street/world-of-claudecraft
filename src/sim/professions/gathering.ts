@@ -38,7 +38,7 @@ import {
 } from './gather_events';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
-import { BARE_HANDS_TOOL_TIER, bestOwnedGatherToolTier, canGatherTier } from './tools';
+import { bestOwnedGatherToolTierOrNone, canGatherTier, NO_TOOL_OWNED } from './tools';
 import type { PlayerProfessionSkill } from './types';
 import { tierProgressMultiplier } from './wheel';
 
@@ -47,7 +47,7 @@ export type GatheringProficiency = Record<GatheringProfessionId, number>;
 // Per-node harvest tuning (#1121). Each node type maps to one gathering
 // profession (one proficiency point per harvest) and a per-player respawn
 // timer. Which material item a harvest grants is zone-dependent and lives in
-// NODE_MATERIAL_TABLE below (Professions 2.0 Phase 4); the pre-Phase-4
+// NODE_MATERIAL_TABLE below (Professions 2.0); the former
 // placeholder junk grants (bone_fragments/linen_scrap/spider_leg) are gone,
 // but those items themselves survive (recipes consume them, players hold
 // them): only their node source went away.
@@ -60,8 +60,8 @@ export const NODE_HARVEST_TABLE: Record<
   herb: { professionId: 'herbalism', respawnSeconds: 120 },
 };
 
-// Every material row yields this many units per rolled rarity (Phase 4's one
-// shared curve; Phase 15 tunes per family if playtests want divergence).
+// Every material row yields this many units per rolled rarity (one
+// shared curve; a per-family tune may diverge later if playtests want it).
 // Frozen because every NODE_MATERIAL_TABLE row shares this one object: a
 // per-family tune must clone it per row, never mutate it in place.
 const MATERIAL_QTY_BY_RARITY: Record<MaterialRarity, number> = Object.freeze({
@@ -72,7 +72,7 @@ const MATERIAL_QTY_BY_RARITY: Record<MaterialRarity, number> = Object.freeze({
   legendary: 4,
 });
 
-// Zone x node-type material matrix (Professions 2.0 Phase 4): which item a
+// Zone x node-type material matrix (Professions 2.0): which item a
 // harvest grants in which zone, and the per-rarity unit counts. The zone-1
 // (eastbrook_vale) rows grant ONLY the dedicated sellValue-4 starter materials
 // (copper_ore/ironbark_log/silverleaf_herb), never the premium vendor
@@ -136,7 +136,7 @@ export const MATERIAL_RARITY_MAX_PROFICIENCY = 100;
 // never hurts your odds" acceptance bar. Tuned so legendary stays rare even at max
 // proficiency (2% at p=100) while uncommon becomes the single likeliest non-common
 // outcome quickly.
-const MATERIAL_RARITY_SHARE: Record<Exclude<MaterialRarity, 'common'>, number> = {
+export const MATERIAL_RARITY_SHARE: Record<Exclude<MaterialRarity, 'common'>, number> = {
   uncommon: 0.6,
   rare: 0.3,
   epic: 0.08,
@@ -189,7 +189,7 @@ export function isNodeHarvestableBy(meta: PlayerMeta, nodeId: string, now: numbe
   return readyAt === undefined || now >= readyAt;
 }
 
-// Node-tier-relative proficiency gain (Professions 2.0 Phase 12c): every
+// Node-tier-relative proficiency gain (Professions 2.0): every
 // GATHER_GAIN_TIER_STEP points of proficiency is one gain tier, scored
 // against the node's tier through the same four-state mastery curve crafting
 // uses (wheel.ts tierProgressMultiplier). A node of tier T (1 = bare-hands)
@@ -213,7 +213,7 @@ export interface HarvestResolution {
   itemId?: string;
   professionId?: GatheringProfessionId;
   // The rolled material rarity (#1122), scaled by the player's proficiency in
-  // the node's matching profession at the moment of harvest. Since Phase 4 it
+  // the node's matching profession at the moment of harvest. It
   // drives the yield: unit count via the material row's qtyByRarity, and
   // signing via isSignableMaterialRarity.
   rarity?: MaterialRarity;
@@ -225,14 +225,14 @@ export interface HarvestResolution {
   // corpse-harvest precedent): a rare-or-better rarity roll, or any rare
   // event, which forces signing regardless of the rolled rarity.
   signed?: boolean;
-  // Non-null when draw #2 hit the zone-broadcast rare event (Phase 4).
+  // Non-null when draw #2 hit the zone-broadcast rare event.
   rareEvent?: GatherRareEventFlavor | null;
 }
 
 // Resolves one player's harvest attempt against one node: if that player's own
 // timer for this node has elapsed, resolves the zone's material and yield
 // (rarity scaled by the player's current proficiency in the node's profession,
-// plus the Phase 4 rare-event roll) and queues the matching profession's
+// plus the rare-event roll) and queues the matching profession's
 // proficiency gain, then resets that player's timer; otherwise denies without
 // side effects. Never touches any other player's state for this or any other
 // node. Granting is the caller's job (harvestNode), which may truncate to bag
@@ -256,7 +256,7 @@ export function resolveHarvest(
   const material = nodeMaterialFor(node.type, node.zoneId);
   const qty = material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1);
   const signed = rareEvent !== null || isSignableMaterialRarity(rarity);
-  // Phase 12c: the queued gain is node-tier-relative (gatherNodeGainMultiplier
+  // The queued gain is node-tier-relative (gatherNodeGainMultiplier
   // above), read off the proficiency at the moment of harvest; a gray harvest
   // resolves to 0, which queueGatheringGrant drops, so it queues nothing.
   queueGatheringGrant(
@@ -275,7 +275,7 @@ export function resolveHarvest(
   };
 }
 
-// Gather cast timing (Professions 2.0 Phase 12b): the harvest is a short
+// Gather cast timing (Professions 2.0): the harvest is a short
 // visible cast instead of an instant grant. Base duration, shortened per
 // owned tool tier ABOVE the node's tier (owning exactly the required tier
 // buys nothing: the gate already demands covering it) and modestly per
@@ -301,8 +301,8 @@ export function gatherCastDurationSec(
 }
 
 // Command entry point (behind the SimContext seam): validates one player's
-// harvest attempt against a node they must be standing near and, since Phase
-// 12b, STARTS a gather cast instead of granting instantly (draws and grants
+// harvest attempt against a node they must be standing near and STARTS a
+// gather cast instead of granting instantly (draws and grants
 // moved to completeGatherCast below). Runs on the deterministic 20 Hz tick
 // path (dispatched from a wire command the same tick it arrives, per the
 // other immediate-interaction commands like `buyItem`), never off-tick.
@@ -323,7 +323,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
     ctx.error(meta.entityId, "You can't do that while dead.");
     return false;
   }
-  // Busy gate (Phase 12b, right after the dead gate): a running cast or a
+  // Busy gate (right after the dead gate): a running cast or a
   // consume blocks starting a gather cast, the startFishing busy literal.
   if (p.castingAbility || isConsuming(p)) {
     ctx.error(meta.entityId, 'You are busy.');
@@ -342,29 +342,26 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
     return false;
   }
-  // Phase 12 tool gate: pure access gating, never a speed mechanic. Bare hands
-  // resolve to tier 1 (BARE_HANDS_TOOL_TIER floors the owned-best bag scan),
-  // so a tier-1 node, which is ALL pre-phase content, skips this branch
-  // entirely and its hot path is untouched. A tier-2+ node needs a
-  // matching-profession gatherTool of at least the node's tier anywhere in
-  // bags (no equip slot). The gate is rng-free and sits before both rng draws:
-  // a denial never touches the respawn timer, never draws rng, and never
-  // consumes anything.
+  // Tool gate (#2343, the RuneScape rule): pure access gating, never a speed
+  // mechanic. EVERY node harvest requires a matching-profession gatherTool of
+  // at least the node's tier anywhere in bags (no equip slot); bare hands
+  // never harvest, so a tier-1 node needs a tier-1 tool and requiredTier 1 on
+  // the denial means "no tool owned at all". The gate is rng-free and sits
+  // before both rng draws: a denial never touches the respawn timer, never
+  // draws rng, and never consumes anything.
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
   // One bag scan serves both the tool gate and the cast-duration formula
   // below (pure lookup, no rng, so hoisting it cannot shift the draw order).
-  const ownedToolTier = bestOwnedGatherToolTier(meta.inventory, professionId, ITEMS);
-  if (node.tier > BARE_HANDS_TOOL_TIER) {
-    if (!canGatherTier(ownedToolTier, node.tier)) {
-      ctx.emit({
-        type: 'gatherDenied',
-        pid: meta.entityId,
-        surface: 'node',
-        professionId,
-        requiredTier: node.tier,
-      });
-      return false;
-    }
+  const ownedToolTier = bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS);
+  if (ownedToolTier === NO_TOOL_OWNED || !canGatherTier(ownedToolTier, node.tier)) {
+    ctx.emit({
+      type: 'gatherDenied',
+      pid: meta.entityId,
+      surface: 'node',
+      professionId,
+      requiredTier: node.tier,
+    });
+    return false;
   }
   // Capacity pre-gate on the material this zone's node actually grants. The
   // item id is known BEFORE any rng draw (zone x type lookup, no roll), so a
@@ -375,7 +372,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
     ctx.error(meta.entityId, 'Your bags are full.');
     return false;
   }
-  // Start the gather cast (Phase 12b): every gate above is rng-free, so a
+  // Start the gather cast: every gate above is rng-free, so a
   // denial draws nothing and starts no cast. The draws and the grant moved
   // to completeGatherCast below, routed by the cast lifecycle on completion.
   if (p.sitting) ctx.standUp(p);
@@ -390,11 +387,70 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   p.castTargetId = null;
   p.channeling = false;
   p.gatherCastNodeId = node.id;
-  ctx.emit({ type: 'castStart', entityId: p.id, ability: GATHER_CAST_ID, time: duration });
+  ctx.emit({
+    type: 'castStart',
+    entityId: p.id,
+    ability: GATHER_CAST_ID,
+    time: duration,
+    gatherNodeType: node.type,
+  });
   return true;
 }
 
-// Completion of a running gather cast (Phase 12b), reached through the
+// Inverse of NODE_HARVEST_TABLE for the tool-use path below: which node type
+// a gathering tool works. Fishing has no world nodes (its gatherTool rods
+// route to startFishing at the items.ts boundary), so it never appears here.
+export const NODE_TYPE_BY_PROFESSION: Partial<Record<GatheringProfessionId, GatherNodeType>> = {
+  mining: 'ore',
+  logging: 'wood',
+  herbalism: 'herb',
+};
+
+// Using a pick/axe/sickle from the bags (#2343): behaves like the interact
+// press, scoped to the tool's own profession. Finds the nearest matching
+// node within interact range, preferring one that is ready for this player
+// over one still respawning, and starts the standard gather cast on it
+// through harvestNode (which re-runs every gate: dead, busy, range, respawn,
+// tool, capacity). With no matching node in range it emits the text-free
+// gatherToolNoNode event so the click is never a silent no-op. The scan is
+// pure state (no rng), so a no-node denial draws nothing.
+export function useGatherToolItem(
+  ctx: SimContext,
+  professionId: GatheringProfessionId,
+  pid?: number,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const { meta, e: p } = r;
+  const nodeType = NODE_TYPE_BY_PROFESSION[professionId];
+  if (!nodeType) return false;
+  let best: GatherNodeDef | null = null;
+  let bestDist = Infinity;
+  let bestReady = false;
+  for (const node of GATHER_NODES) {
+    if (node.type !== nodeType) continue;
+    const d = distToNode(p.pos, node.pos);
+    if (d > INTERACT_RANGE) continue;
+    const ready = isNodeHarvestableBy(meta, node.id, ctx.time);
+    // A ready node always beats a respawning one; ties resolve by distance.
+    if (ready !== bestReady) {
+      if (!ready) continue;
+      best = node;
+      bestDist = d;
+      bestReady = true;
+    } else if (d < bestDist) {
+      best = node;
+      bestDist = d;
+    }
+  }
+  if (!best) {
+    ctx.emit({ type: 'gatherToolNoNode', pid: meta.entityId, professionId });
+    return false;
+  }
+  return harvestNode(ctx, best.id, pid);
+}
+
+// Completion of a running gather cast, reached through the
 // ctx.completeGatherCast callback when updateCasting sees the cast finish.
 // Re-validates EXACTLY range, respawn readiness, and capacity with the same
 // error literals as the cast start (the world can move during the cast: the
@@ -447,15 +503,21 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   const grantFungibleFit = (): number => {
     let fit = qty;
     while (fit > 1 && !ctx.canAddItem(itemId, fit, meta.entityId)) fit--;
-    ctx.addItem(itemId, fit, meta.entityId);
+    // silent + callerLogs: the gatherResult event below owns BOTH halves of
+    // the player feedback for this harvest. It plays its own node-type cue
+    // (audio.gather in src/game/audio.ts), so the generic loot ding would
+    // stack on top of it, and it logs the rarity-colored, item-linked gather
+    // line, so the hub's "You receive:" line would be a second line for the
+    // one grant (#2430).
+    ctx.addItem(itemId, fit, meta.entityId, { silent: true, callerLogs: true });
     return fit;
   };
   if (signed) {
     // A signed instance merges only into a byte-equal same-signer stack
-    // (identical-payload stacking, Phase 12d; never a plain stack, #1165):
+    // (identical-payload stacking; never a plain stack, #1165):
     // countFit with the payload counts that merge room plus free slots, so a
     // rare-event windfall lands whole once a single slot (or same-signer
-    // stack room) is open, where the pre-12d contract needed one free slot
+    // stack room) is open, where the earlier contract needed one free slot
     // per unit. The fungible pre-gate above can pass on plain-stack top-up
     // room alone, so when no signed unit fits the yield falls back to an
     // unsigned top-up grant (the truncation contract wins over signing in
@@ -463,13 +525,21 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     // tests/gather_rare_events.test.ts).
     const capacity = bagCapacity(meta.bags);
     const fit = countFit(meta.inventory, capacity, itemId, qty, { signer: meta.name });
-    for (let i = 0; i < fit; i++) {
-      ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId);
-      grantedQty++;
+    if (fit > 0) {
+      // One batched grant: a x5 windfall lands as ONE hub loot event
+      // instead of five (the recorded loot-burst polish), which the gather
+      // line then renders as a single "You gather: X x5." line.
+      // silent + callerLogs: see grantFungibleFit's matching comment above,
+      // same reasons.
+      ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId, fit, {
+        silent: true,
+        callerLogs: true,
+      });
+      grantedQty = fit;
     }
     if (grantedQty === 0) {
       grantedQty = grantFungibleFit();
-      // Phase 12d: the yield survived as a plain top-up but its signature did
+      // The yield survived as a plain top-up but its signature did
       // not; tell the player (a text-free personal event, the gatherDenied
       // idiom; one signed batch per harvest, so no dedupe flag is needed).
       ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'node', lost: 'mark' });
@@ -484,14 +554,14 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // level-gated the same way kill XP is: a max-level player farming a
   // trivial (gray) node gets zero.
   ctx.grantXp(gatherActionXp(node.level, p.level), meta);
-  // Phase 4 rare event: soft zone broadcast plus the dormant per-flavor
+  // Rare event: soft zone broadcast plus the dormant per-flavor
   // deed mark, resolved in gather_events.ts after the grant lands.
   if (rareEvent) announceGatherRareEvent(ctx, meta, node, rareEvent, itemId);
   // Gather-completion event (#1729): personal (pid), so the client can play a
   // gathering audio cue for the acting player only. Emitted here on the granted
   // path exactly like craftItem emits craftResult on a completed craft; carries
   // the rolled rarity so a rare-material harvest is distinguishable for a
-  // special cue, plus the Phase 4 fields: qty is the ACTUAL granted unit count
+  // special cue, plus the rare-event fields: qty is the ACTUAL granted unit count
   // (post-truncation), rareEvent the flavor or null. Draws no rng, so the
   // two-draws-per-harvest contract (see the rng-draw test) is unaffected.
   ctx.emit({
@@ -522,7 +592,7 @@ export function isGatheringProfessionId(id: string): id is GatheringProfessionId
 
 // Normalizes a possibly-absent, possibly-partial saved record (old character
 // saves predate this field entirely) into a full, zero-defaulted proficiency
-// record. Never throws on an absent or malformed field. Phase 12c: a loaded
+// record. Never throws on an absent or malformed field. A loaded
 // value above the profession's enforced content cap (GATHERING_PROFESSIONS
 // maxSkill) clamps DOWN to it; the sim.ts call site feeds this both the
 // current gatheringProficiency key and the legacy pre-rename `professions`
@@ -559,7 +629,7 @@ export function queueGatheringGrant(
 // Drains one player's queued grants, applying each additively to that
 // profession's own counter only. Called once per player per tick (sim.ts
 // `tick()`), so a grant issued this tick is visible starting next tick, the
-// same cadence as every other per-tick system. Phase 12c: each result clamps
+// same cadence as every other per-tick system. Each result clamps
 // at the profession's enforced content cap (GATHERING_PROFESSIONS maxSkill),
 // the gain-time arm for harvests, catches, and the `/dev gather` cheat; at
 // cap, harvests and catches still yield, only proficiency gain stops.
@@ -686,14 +756,100 @@ export interface FocusHarvestYield {
  * capacity gate (src/sim/interaction.ts), which must see exactly the set the
  * roll will yield WITHOUT drawing rng (a refused command must not shift the
  * world's draw order).
+ *
+ * `chosen` reaches here straight off the wire (server/game.ts forwards the
+ * client's `components` array after a type filter only), so it is SANITIZED
+ * first and only then interpreted: deduped to a set (#2474), then narrowed to
+ * the tags this corpse actually carries (#2504). BOTH length tests below read
+ * that sanitized set, never the raw array, which is what stops a padded frame
+ * from switching arms:
+ *   - A repeated tag counts ONCE. A corpse is single-use, so a repeat that
+ *     survived would let one hand-crafted frame farm the same family several
+ *     times off one claim: two tier rolls, two grants, and on a rare-or-better
+ *     roll two signed yields (#2474).
+ *   - A tag the corpse does not carry counts for NOTHING. Measured against the
+ *     raw count it padded the pick past the `>= taggedComponents.length` spread
+ *     threshold, so `['hide','junk']` on a two-tag corpse spread across every
+ *     family at bonus 0 where `['hide']` concentrates on hide (#2504).
+ * After the narrowing that second test can only ever be an equality: `picked`
+ * is a deduped subset of the tags, so it can exceed their count only if the
+ * tags themselves repeat, which tests/mob_component_tags.test.ts forbids. That
+ * cross-file pin is what makes the `>` half unreachable; the comparator stays
+ * `>=` as the plain statement of "the pick covers every tagged component", and
+ * degrades safely rather than silently if the pin ever loosens.
+ *
+ * Consequence, decided rather than inherited: a pick whose entries are ALL
+ * invalid sanitizes to the empty pick, so it spreads, exactly as sending no
+ * selection at all does. "Ignored entirely" is then one rule applied
+ * uniformly, a junk tag is never the difference between two outcomes, and a
+ * client whose tag vocabulary has drifted from the server's content degrades
+ * to the #1141 default instead of burning a single-use corpse for nothing.
+ * This supersedes the narrower #2474 knock-on (an all-junk pick yielded
+ * nothing), which was itself only ever true BELOW the threshold: above it, the
+ * same frame already spread. Scope, so the sentence above is not read as more
+ * than it is: this covers a tag the corpse does not CARRY. A tag it carries
+ * that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills, horn) is a
+ * different case and is handled a different way: it stays in the pick here,
+ * because dropping it would move the concentration-bonus denominator below,
+ * and the command boundary REFUSES the harvest pre-claim when the surviving
+ * pick maps to no item at all (#2509, src/sim/interaction.ts harvestCorpse).
+ *
+ * First occurrence wins (Set iteration is insertion-ordered) and the narrowing
+ * preserves that order, so tag ORDER is untouched: it is the order the yields,
+ * the grants and the harvestResult ledger entries land in (#2457). Same
+ * order-preserving idiom the picker's own view-core (`corpseHarvestView`)
+ * already applied to the tags it renders, which is why no CURRENT shipped
+ * client produces either shape. "Current" is load-bearing and not hedging: a
+ * cached desktop or native bundle whose content predates a retag can still
+ * name a tag this server no longer carries, which is the realistic path to the
+ * junk shape and the reason the ruling above is decided the way it is.
+ * `taggedComponents` needs no dedupe of its own: content uniqueness is pinned
+ * by tests/mob_component_tags.test.ts, the same cross-file pin the `>=`
+ * argument above leans on.
  */
 export function effectiveFocusComponents(
   taggedComponents: readonly string[],
   chosen: readonly string[],
 ): readonly string[] {
-  return chosen.length === 0 || chosen.length >= taggedComponents.length
+  const picked = [...new Set(chosen)].filter((c) => taggedComponents.includes(c));
+  return picked.length === 0 || picked.length >= taggedComponents.length
     ? taggedComponents
-    : chosen.filter((c) => taggedComponents.includes(c));
+    : picked;
+}
+
+/**
+ * #2509: does this pick throw away EVERYTHING the corpse had to give? True when
+ * the effective set maps to no item at all while the corpse carries at least
+ * one family that does, i.e. a different pick on the same corpse would have
+ * paid out. The command boundary refuses on it (src/sim/interaction.ts
+ * harvestCorpse, pre-claim and rng-free) and the picker's view-core disables
+ * Harvest on it (src/ui/hud/loot/corpse_harvest_view.ts), so this is the ONE
+ * place the rule is written: a mirror stated twice is a mirror that can drift,
+ * and the spread threshold it depends on lives in effectiveFocusComponents
+ * above rather than in either caller.
+ *
+ * Both halves matter. Without the first, a pick that yields something would be
+ * refused. Without the second, a corpse whose families ALL map to nothing
+ * (fen_troll: claw, tusk) would become permanently unharvestable instead of
+ * keeping its documented zero-yield path: no pick forfeits anything there,
+ * because no pick could have paid out.
+ *
+ * Pure and rng-free, so the refusal it drives draws nothing.
+ *
+ * `yields` is a TRUTHINESS test, not `!== undefined`, to stay byte-equivalent
+ * to the `if (!itemId) continue` the grant loop and the capacity gate already
+ * use. An empty-string mapping would otherwise read as yieldable here and as
+ * grantable nowhere, which is the exact bug this refuses.
+ */
+export function forfeitsEveryMappedYield(
+  taggedComponents: readonly string[],
+  chosen: readonly string[],
+): boolean {
+  const yields = (component: string) => !!HARVEST_COMPONENT_ITEMS[component];
+  return (
+    !effectiveFocusComponents(taggedComponents, chosen).some(yields) &&
+    taggedComponents.some(yields)
+  );
 }
 
 /**
@@ -712,7 +868,9 @@ export function effectiveFocusComponents(
  *
  * Backward compatibility: an empty `chosen` (no selection made) or a `chosen`
  * that covers every tagged component both default to spreading across all of
- * `taggedComponents`, matching the single-harvest behavior from #1141.
+ * `taggedComponents`, matching the single-harvest behavior from #1141. A
+ * `chosen` naming only tags this corpse does not carry sanitizes to the empty
+ * pick, and spreads for that same reason (#2504); see effectiveFocusComponents.
  *
  * Pure: draws only from the passed-in `Rng`, one draw per yielded component,
  * in `effectiveChosen` order.

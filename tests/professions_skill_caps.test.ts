@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 12c stage 2: enforced per-profession skill caps as
+// Professions 2.0 stage 2: enforced per-profession skill caps as
 // content data. Every profession record carries maxSkill (crafts and
 // enchanting 125, mining/logging/herbalism 100, fishing 200), enforced at all
 // four arms: gainCraftSkill (gain time, covering crafting, enchanting, and
@@ -42,7 +42,7 @@ const mustMeta = (sim: Sim, pid: number): PlayerMeta => {
   return meta;
 };
 
-describe('cap literals as content data (Phase 12c stage 2)', () => {
+describe('cap literals as content data', () => {
   it('every craft on the ring, enchanting included, caps at 125', () => {
     for (const craft of CRAFT_RING) expect(craft.maxSkill).toBe(125);
   });
@@ -153,6 +153,8 @@ describe('at cap, actions still work: only skill gain stops', () => {
     for (let i = 0; i < 200 && masterworks === 0; i++) {
       for (let j = 0; j < 3; j++) sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
       // Harness-only throttle reset: #1301's rolling window caps successful
       // crafts per minute, which is not what this pin is about.
       meta.craftThrottle.count = 0;
@@ -171,6 +173,8 @@ describe('at cap, actions still work: only skill gain stops', () => {
   it('a harvest at mining 100 still yields the node material; proficiency stays at cap', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Capped');
+    // #2343: every node harvest needs the matching-profession tool in bags.
+    sim.addItem('copper_mining_pick', 1, pid);
     const meta = mustMeta(sim, pid);
     meta.gatheringProficiency.mining = 100;
     const p = (sim as any).entities.get(pid);

@@ -3,6 +3,7 @@ import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes
 import { Sim } from '../src/sim/sim';
 import { type AuraKind, dist2d } from '../src/sim/types';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 const NEW_DRUID = [
   'travel_form',
@@ -166,6 +167,7 @@ describe('druid spell pack — casting applies effects', () => {
     const distanceOver = (withForm: boolean): number => {
       const sim = makeWorld();
       const a = sim.addPlayer('druid', 'Strider');
+      placePlayerInOpenField(sim, a);
       const e = sim.entities.get(a)!;
       sim.setPlayerLevel(20, a);
       e.resource = 100;
@@ -198,6 +200,7 @@ describe('druid spell pack — casting applies effects', () => {
     const distanceOver = (withProwl: boolean): number => {
       const sim = makeWorld();
       const pid = sim.addPlayer('druid', withProwl ? 'Prowler' : 'Runner');
+      placePlayerInOpenField(sim, pid);
       const e = sim.entities.get(pid)!;
       sim.setPlayerLevel(20, pid);
       e.resource = e.maxResource;

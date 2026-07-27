@@ -3,7 +3,8 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { DungeonInteriors } from '../src/render/dungeon';
-import { ARENA_LAYOUT } from '../src/sim/dungeon_layout';
+import { ARENA_SLOT_COUNT, arenaOrigin } from '../src/sim/data';
+import { ARENA_LAYOUT, arenaMapForSlot } from '../src/sim/dungeon_layout';
 
 interface PlacementCall {
   kind: string;
@@ -74,6 +75,23 @@ describe('arena cover rendering', () => {
       expect(Math.max(...xs)).toBeCloseTo(stub.x + stub.hw, 3);
       expect(Math.min(...zs)).toBeCloseTo(stub.z - stub.hd, 3);
       expect(Math.max(...zs)).toBeCloseTo(stub.z + stub.hd, 3);
+    }
+  });
+});
+
+describe('arena variant parity (render vs sim map selection)', () => {
+  it('resolves the same map as arenaMapForSlot at every arena slot', () => {
+    const interiors = Object.create(DungeonInteriors.prototype) as DungeonInteriors;
+    const variantFor = (
+      interiors as unknown as {
+        variantFor(interior: string, ox: number, oz: number): string;
+      }
+    ).variantFor.bind(interiors);
+    for (let slot = 0; slot < ARENA_SLOT_COUNT; slot++) {
+      const o = arenaOrigin(slot);
+      const variant = variantFor('arena', o.x, o.z);
+      const expected = arenaMapForSlot(slot).id === 'drowned_court' ? 'arena_drowned' : 'arena';
+      expect(variant, `slot ${slot}`).toBe(expected);
     }
   });
 });

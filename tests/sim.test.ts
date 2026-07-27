@@ -7,6 +7,7 @@ import {
   ITEMS,
   LAKE,
   NPCS,
+  QUESTS,
 } from '../src/sim/data';
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
 import { completeFishing } from '../src/sim/professions/fishing';
@@ -25,6 +26,7 @@ import {
   xpForLevel,
 } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -129,6 +131,7 @@ function despawnMobs(sim: Sim) {
 }
 
 function forwardDistance(sim: Sim, ticks = 60): number {
+  placePlayerInOpenField(sim);
   const start = { ...sim.player.pos };
   sim.moveInput.forward = true;
   for (let i = 0; i < ticks; i++) sim.tick();
@@ -542,7 +545,7 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     for (let i = 0; i < 20 * 30 && !wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(true);
-    // Phase 12d: consume BOTH halves (harvest then loot); a tagged corpse with
+    // Consume BOTH halves (harvest then loot); a tagged corpse with
     // an unclaimed harvest would otherwise hold its 30s grace window and defer
     // the respawn past this loop.
     sim.harvestCorpse(wolf.id);
@@ -1083,29 +1086,33 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
     sim.copper = 0;
-    sim.addItem('wolf_fang', 2); // poor (gray), sellValue 4 -> 8
+    // wolf_fang is a crafting reagent now (quality common, never
+    // swept), so this sweep uses mudfin_scale as its gray fodder.
+    sim.addItem('mudfin_scale', 2); // poor (gray), sellValue 5 -> 10
     sim.addItem('bandit_bandana', 1); // poor (gray), sellValue 6
+    sim.addItem('wolf_fang', 1); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1); // not poor -> kept
     sim.addItem('boar_hide', 1); // quest item -> kept
 
     sim.sellAllJunk();
 
     // only the gray items leave the bags
-    expect(sim.countItem('wolf_fang')).toBe(0);
+    expect(sim.countItem('mudfin_scale')).toBe(0);
     expect(sim.countItem('bandit_bandana')).toBe(0);
+    expect(sim.countItem('wolf_fang')).toBe(1);
     expect(sim.countItem('apprentice_staff')).toBe(1);
     expect(sim.countItem('boar_hide')).toBe(1);
-    // proceeds = 2*4 + 6 = 14 copper
-    expect(sim.copper).toBe(14);
+    // proceeds = 2*5 + 6 = 16 copper
+    expect(sim.copper).toBe(16);
     // each sold gray stack is recorded for buyback
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
     expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(
       true,
     );
     // exactly one summary loot line (not one per stack)
     const sold = sim.events.filter((e) => e.type === 'loot' && /^Sold /.test(e.text));
     expect(sold).toHaveLength(1);
-    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 14c.' });
+    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 16c.' });
   });
 
   it('Sell Junk needs a vendor in range and no-ops cleanly with nothing to sell', () => {
@@ -1113,9 +1120,9 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
 
     // far from any merchant: refuses, sells nothing
-    sim.addItem('wolf_fang', 1);
+    sim.addItem('mudfin_scale', 1);
     sim.sellAllJunk();
-    expect(sim.countItem('wolf_fang')).toBe(1);
+    expect(sim.countItem('mudfin_scale')).toBe(1);
     expect(sim.events).toContainEqual({
       type: 'error',
       text: 'There is no merchant nearby.',
@@ -1124,7 +1131,7 @@ describe('food, drink, vendor', () => {
 
     // at the vendor with no gray items: silent no-op (button is disabled in the UI)
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
-    sim.removeItem('wolf_fang', 1);
+    sim.removeItem('mudfin_scale', 1);
     sim.addItem('apprentice_staff', 1); // not gray
     sim.copper = 0;
     const before = sim.events.length;
@@ -1173,7 +1180,7 @@ describe('food, drink, vendor', () => {
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
     sim.events = [];
-    // Phase 12b: the cast start draws EXACTLY the one hidden bite delay; the
+    // The cast start draws EXACTLY the one hidden bite delay; the
     // visible timer is the constant session cap and leaks nothing.
     let draws = 0;
     sim.rng.setObserver(() => draws++);
@@ -1572,7 +1579,9 @@ describe('quests', () => {
 
   it('collect quest tracks inventory and consumes items on turn-in', () => {
     const sim = makeSim('warrior');
-    teleportTo(sim, -7, 1);
+    const giver = NPCS[QUESTS.q_boars.giverNpcId];
+    if (!giver) throw new Error('q_boars giver fixture missing');
+    teleportTo(sim, giver.pos.x, giver.pos.z);
     sim.interact();
     expect(sim.questState('q_boars')).toBe('active');
     sim.addItem('boar_hide', 5);

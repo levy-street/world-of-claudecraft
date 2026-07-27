@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 13: the typed disenchant secondaries and the generic
+// Professions 2.0: the typed disenchant secondaries and the generic
 // bind-on-trade primitive they are the first consumer of.
 //
 // Covers three seams: the def -> material mapping (disenchant_reagents.ts
@@ -64,7 +64,7 @@ describe('typed disenchant secondary mapping (disenchant_reagents.ts)', () => {
     expectSecondary('moggers_copper_cudgel', 'resonant_steel'); // mace
     expectSecondary('tidereaver_gaff', 'resonant_steel'); // polearm
     // Caster/ranged haft-and-stock families -> timber. Staff and wand are the
-    // mandatory pins for the maintainer-resolved "staves/wands sit in the WEAPON
+    // mandatory pins for the "staves/wands sit in the WEAPON
     // (timber) bucket" decision; bow and crossbow share the same timber bucket
     // (disenchant_reagents.ts TIMBER_WEAPON_TYPES) for forward completeness but
     // no shipped weapon item classifies as one, so there is no real id to pin.
@@ -166,7 +166,7 @@ describe('disenchant yield model (professions/enchanting.ts)', () => {
     sim.addItem(id, 1, pid);
     const { result, draws } = countDraws(sim, () => resolveDisenchant(sim.ctx, pid, id));
     expect(result.ok).toBe(true);
-    // Exactly one draw: disenchantYield's +0/+1 bonus, unchanged from pre-Phase-13.
+    // Exactly one draw: disenchantYield's +0/+1 bonus.
     expect(draws).toBe(1);
     expect(result.materialItemId).toBe('arcane_dust');
     expect(result.secondaryItemId).toBeUndefined();
@@ -235,7 +235,7 @@ describe('disenchant yield model (professions/enchanting.ts)', () => {
       counts.set(result.secondaryCount as number, seed);
       if (result.secondaryCount === 2) {
         // The 2-count is not just reported: two armed copies really land, as one
-        // byte-equal counted stack (the 12d merge model).
+        // byte-equal counted stack (the merge model).
         expect(sim.countItem(result.secondaryItemId as string, pid)).toBe(2);
         const slot = slotFor(sim, pid, result.secondaryItemId as string);
         expect(slot?.count).toBe(2);
@@ -388,7 +388,7 @@ describe('bind-on-trade primitive (social/trade.ts)', () => {
     expect(slotFor(sim, b, 'resonant_steel')?.instance?.boundTo).toBe(b);
   });
 
-  it('byte-equal armed copies stack into one counted slot (Phase 12d model)', () => {
+  it('byte-equal armed copies stack into one counted slot', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     grantInstance(sim, 'resonant_steel', { bindOnTrade: true }, pid);

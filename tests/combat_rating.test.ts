@@ -6,7 +6,10 @@ import { itemLevel } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import type { Entity, ItemDef } from '../src/sim/types';
 import {
+  CRIT_RATING_PER_PCT,
   critFractionFromRating,
+  HASTE_RATING_PER_PCT,
+  HIT_RATING_PER_PCT,
   hasteFractionFromRating,
   hitFractionFromRating,
   meleeMissChance,
@@ -28,9 +31,12 @@ function ent(partial: Partial<Entity>): Entity {
 }
 
 describe('combat ratings', () => {
-  it('converts haste, crit and hit ratings to fractions', () => {
-    expect(hasteFractionFromRating(150)).toBe(0.15);
-    expect(critFractionFromRating(20)).toBe(0.02);
+  it('halves haste and crit per point while preserving hit strength', () => {
+    expect(HASTE_RATING_PER_PCT).toBe(20);
+    expect(CRIT_RATING_PER_PCT).toBe(20);
+    expect(HIT_RATING_PER_PCT).toBe(10);
+    expect(hasteFractionFromRating(150)).toBe(0.075);
+    expect(critFractionFromRating(20)).toBe(0.01);
     expect(hitFractionFromRating(50)).toBe(0.05);
   });
 
@@ -58,10 +64,10 @@ describe('combat ratings', () => {
       expect(p.hasteRating).toBe(150);
       expect(p.critRating).toBe(20);
       expect(p.hitRating).toBe(200);
-      expect(p.meleeHaste).toBe(0.15);
-      expect(p.rangedHaste).toBe(0.15);
-      expect(p.spellHaste).toBe(0.15);
-      expect(p.critChance).toBeCloseTo(0.05 + p.stats.agi * 0.0005 + 0.02);
+      expect(p.meleeHaste).toBe(0.075);
+      expect(p.rangedHaste).toBe(0.075);
+      expect(p.spellHaste).toBe(0.075);
+      expect(p.critChance).toBeCloseTo(0.05 + p.stats.agi * 0.0005 + 0.01);
       expect(p.hitBonus).toBeCloseTo(0.2);
     } finally {
       delete ITEMS[itemId];

@@ -57,7 +57,7 @@ export function computeQuestState(
   questsDone: Set<string>,
   playerLevel: number,
   professionState?: ArchetypeState,
-  // The set of quest ids currently inside their repeat-cadence window (Phase 14).
+  // The set of quest ids currently inside their repeat-cadence window.
   // Built per-tick-domain by the caller (the Sim from PlayerMeta.questCadence +
   // ctx.tickCount, the online client from the server-computed cprof mirror), so
   // this shared decision point never reasons about tick domains itself.
@@ -337,7 +337,7 @@ export function turnInQuestCore(
   const rewardItem = questRewardItemId(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
   ctx.grantXp(quest.xpReward, meta);
-  // Arm the repeat-cadence window (Phase 14 work orders): the quest stays
+  // Arm the repeat-cadence window (work orders): the quest stays
   // unavailable (computeQuestState) until now + repeatCadenceTicks, server-
   // authoritative and persisted per character with zero-default omission.
   if (quest.repeatCadenceTicks && quest.repeatCadenceTicks > 0) {

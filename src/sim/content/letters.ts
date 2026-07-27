@@ -1,8 +1,8 @@
 // Authored mail content for the Ravenpost (the in-game mail service): the
 // welcome letter every character receives once, the Heroic Marks reward
 // letter, the NPC thank-you letters select quests send after their turn-in,
-// and the Guild trend letters (one per adjacent craft pair, Professions 2.0
-// Phase 7). Data-as-code, merged nowhere: the PostOffice
+// and the Guild trend letters (one per adjacent craft pair, Professions 2.0).
+// Data-as-code, merged nowhere: the PostOffice
 // (src/sim/mail/post_office.ts) reads these tables directly.
 //
 // English here is the source of truth; the client localizes each letter by its
@@ -61,7 +61,7 @@ export const HEROIC_MARK_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
-// The one-time mastery reset notice (Professions 2.0 Phase 12c): sent by the
+// The one-time mastery reset notice (Professions 2.0): sent by the
 // tick mail phase to every pre-curve character whose load-time normalize just
 // zeroed their craft skills and gathering proficiencies (see
 // src/sim/professions/mastery_reset.ts; the literal id here is pinned equal
@@ -125,14 +125,14 @@ export const QUEST_LETTERS: Record<string, LetterDef> = {
   },
 };
 
-// Guild trend letters (Professions 2.0 Phase 7): when an unattuned character's
+// Guild trend letters (Professions 2.0): when an unattuned character's
 // leading adjacent craft pair first crosses the letter threshold
 // (src/sim/professions/trend.ts), the Crafting Guild sends exactly one of
 // these. Keyed by the canonical pair id from ARCHETYPE_PAIR_TARGETS
 // (src/sim/professions/archetype.ts); each letterId is 'guild_trend_' plus the
 // pair id with its '+' replaced by '_'. delaySeconds stays unset so the
 // standard NPC delivery delay applies. Smith Haldren stands in for the pair
-// masters until Phase 8 seats them.
+// masters.
 export const GUILD_TREND_LETTERS: Record<string, LetterDef> = {
   'engineering+alchemy': {
     letterId: 'guild_trend_engineering_alchemy',
@@ -296,7 +296,7 @@ for (const pairId of Object.keys(GUILD_TREND_LETTERS)) {
   }
 }
 
-// Master tier-milestone letters (Professions 2.0 Phase 14): when one of a
+// Master tier-milestone letters (Professions 2.0): when one of a
 // character's two attuned majors first reaches a tier milestone, the anchor
 // master of that pair sends the matching congratulation. Keyed by the canonical
 // archetype pair id (ARCHETYPE_PAIR_TARGETS) so the sender can look the set up

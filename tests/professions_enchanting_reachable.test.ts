@@ -1,4 +1,4 @@
-// Wheel-window reachability pin (Professions 2.0 Phase 13, deliverable 6):
+// Wheel-window reachability pin (Professions 2.0, deliverable 6):
 // enchanting is a first-class craft in CRAFT_RING, so the read-only professions
 // window already renders it. This pins that the composed view model contains an
 // enchanting craft row whose skill bar reflects craftSkills.enchanting (display

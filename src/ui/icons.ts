@@ -10,7 +10,10 @@
 
 import { ABILITIES, ITEMS } from '../sim/data';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
+import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
+
+export { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
 
 export type IconKind = 'ability' | 'item' | 'aura' | 'crest';
 
@@ -3503,7 +3506,7 @@ function itemFallback(id: string): IconRecipe | null {
       : r('drink', 'sky', ['waterskin']);
   }
   if (it.kind === 'potion' || it.kind === 'elixir') {
-    // Crafted consumables without curated art (the Phase 10 draughts and
+    // Crafted consumables without curated art (the trained-ladder draughts and
     // elixirs) render the flask, tinted by function, instead of falling
     // through to the trinket arm below.
     const pal: PaletteName = has(name, ['healing'])
@@ -3626,11 +3629,6 @@ export const QUALITY_COLOR: Record<string, string> = {
   epic: '#a335ee',
   legendary: '#ff8000',
 };
-
-// The house gold accent (--gold in src/styles/tokens.css, the masterwork seal
-// idiom): the named TS-side twin for painters that inline-style a color and
-// cannot read the CSS custom property. Keep the two values in lockstep.
-export const GOLD_ACCENT_COLOR = '#ffd100';
 
 // ---------------------------------------------------------------------------
 // Photographic weapon icons
@@ -3965,10 +3963,13 @@ export function abilityImageUrl(id: string): string | null {
 }
 
 // Item ids with committed painted art under /ui/items/<id>.webp (curated from the CraftPix
-// resource/consumable AND armor/equipment packs; provenance + license in
-// public/ui/items/mapping.json). Served for kind 'item' (bags, tooltips, loot, vendor, the
-// /wiki guide). Covers everything except weapons, which keep their rendered-model thumbnails
-// via WEAPON_ICON_DIR; items not listed fall through to the procedural ITEM_RECIPES below.
+// resource/consumable and armor/equipment packs, the project-owned profession materials, and
+// the generated icon rebrand batches; provenance + license in public/ui/items/mapping.json).
+// Served for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Every real non-weapon
+// item must ship a WebP: the derive loop below adds every non-weapon ITEMS id, so a new item
+// without art reds the gate instead of regressing to the procedural compositor. Weapons keep
+// their rendered-model thumbnails via WEAPON_ICON_DIR; procedural item recipes remain available
+// only for UI fallbacks and development-time unknown ids.
 // For armor the icon is purely cosmetic (rarity colour still comes from item.quality), and the
 // flashier icons are reserved for higher-rarity pieces. WebP only, like the skill icons. Add
 // art via `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
@@ -4241,6 +4242,40 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'orange_steel_armor_plate',
   'silverleaf_sickle',
   'vanguard_chrome_armor_plate',
+  // profession materials
+  'arcane_dust',
+  'arcane_essence',
+  'arcane_shard',
+  'arcanite_bar',
+  'ashwood_log',
+  'cooking_salt',
+  'copper_ore',
+  'elderwood_log',
+  'game_meat',
+  'glass_vial',
+  'goldleaf_herb',
+  'homespun_cloth',
+  'iron_ore',
+  'ironbark_log',
+  'prime_cut',
+  'pristine_hide',
+  'pristine_silk',
+  'pristine_venom_gland',
+  'resonant_hide',
+  'resonant_links',
+  'resonant_steel',
+  'resonant_thread',
+  'resonant_timber',
+  'rough_hide',
+  'silverleaf_herb',
+  'smithing_flux',
+  'spider_leg',
+  'spider_silk',
+  'spool_of_thread',
+  'sunpetal_herb',
+  'tanning_agent',
+  'thorium_ore',
+  'venom_gland',
   // junk
   'bandit_bandana',
   'briny_idol',
@@ -4257,6 +4292,13 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'sanctum_key_shard',
   'unknown_alien_weaponry',
 ]);
+
+// The grouped literals above preserve the curated catalog's provenance history. Derive the
+// complete runtime set from live content so a newly added non-weapon item immediately enters the
+// filesystem and provenance gates instead of silently regressing to a procedural placeholder.
+for (const item of Object.values(ITEMS)) {
+  if (item.kind !== 'weapon') ITEM_IMAGE_IDS.add(item.id);
+}
 
 // UI-only icon ids that ship painted art under /ui/items/<id>.webp but are NOT ITEMS
 // records. `backpack` is the implicit 16-slot bag the bag bar draws first: it can never be
@@ -4383,8 +4425,8 @@ export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_I
 // ---------------------------------------------------------------------------
 // Profession icons (Professions 2.0): the ten craft-wheel crafts plus the
 // gathering skills, consumed by the professions window via professionIconUrl.
-// Ids follow docs/professions-2/asset-manifest.json (prof_<craftId>,
-// gather_<skill>). Committed painted art under public/ui/professions/
+// Ids follow the prof_<craftId> / gather_<skill> convention (see
+// docs/design/professions-asset-manifest.json). Committed painted art under public/ui/professions/
 // (PROFESSION_IMAGE_IDS, normalized by scripts/convert_profession_icons_webp.mjs)
 // wins over the procedural recipe, mirroring the item/deed image sets.
 // ---------------------------------------------------------------------------
@@ -4437,18 +4479,6 @@ const PROFESSION_RECIPES: Record<string, IconRecipe> = {
   ),
   gather_fishing: r('drink', 'sky', [{ p: 'fish' }], ['glow']),
 };
-
-// Painted profession art override (mirrors ITEM_IMAGE_IDS / DEED_IMAGE_IDS): ids
-// whose committed WebP under public/ui/professions/ wins over the procedural
-// recipe. Empty until painted art lands; tests/profession_icons.test.ts pins the
-// bijection with the committed files.
-export const PROFESSION_IMAGE_IDS = new Set<string>([]);
-
-const PROFESSION_ICON_DIR = '/ui/professions';
-/** Static URL of a profession icon's painted art, or null while unshipped. */
-export function professionImageUrl(id: string): string | null {
-  return PROFESSION_IMAGE_IDS.has(id) ? `${PROFESSION_ICON_DIR}/${id}.webp` : null;
-}
 
 /** True when `id` has an explicit profession recipe, as opposed to falling
  *  through to the generic fallback; lets a test pin every manifest id to a

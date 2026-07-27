@@ -11,6 +11,7 @@ import type { AccountModerationStatus, CharacterRow } from '../../server/db';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
+import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 
 // A fake socket: real EventEmitter wiring (on/once/off/emit) so the handshake
 // buffer and the post-join ws.on('message'|'close'|'error') handlers work, plus
@@ -120,7 +121,7 @@ function joinedMeta(game: ReturnType<typeof setup>['game']): Record<string, unkn
 }
 
 const authRaw = (over: Record<string, unknown> = {}) =>
-  JSON.stringify({ t: 'auth', token: 'tok', character: 7, ...over });
+  JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character: 7, ...over });
 
 const errorFrame = (error: string) => JSON.stringify({ t: 'error', error });
 
@@ -130,6 +131,28 @@ function expectSendThenClose(ws: FakeWs, frame: string) {
   expect(ws.close).toHaveBeenCalledTimes(1);
   // ws.send must fire before ws.close on every reject path.
   expect(ws.send.mock.invocationCallOrder[0]).toBeLessThan(ws.close.mock.invocationCallOrder[0]);
+}
+
+function expectNoAdmissionWork({ deps, game }: ReturnType<typeof setup>): void {
+  expect(deps.accountAndScopeForToken).not.toHaveBeenCalled();
+  expect(deps.moderationStatusForAccount).not.toHaveBeenCalled();
+  expect(deps.getCharacter).not.toHaveBeenCalled();
+  expect(deps.chatMuteStatusForAccount).not.toHaveBeenCalled();
+  expect(deps.adminRolesForAccount).not.toHaveBeenCalled();
+  expect(deps.permissionsForRoles).not.toHaveBeenCalled();
+  expect(deps.metaRequestUserData).not.toHaveBeenCalled();
+  expect(deps.metaEventSourceUrl).not.toHaveBeenCalled();
+  expect(deps.loadAccountCosmetics).not.toHaveBeenCalled();
+  expect(deps.isConnectionRefused).not.toHaveBeenCalled();
+  expect(deps.requestMetadata).not.toHaveBeenCalled();
+  expect(deps.acquireCharacterLease).not.toHaveBeenCalled();
+  expect(deps.releaseCharacterLease).not.toHaveBeenCalled();
+  expect(deps.bankBonusForAccount).not.toHaveBeenCalled();
+  expect(game.isIpBlocked).not.toHaveBeenCalled();
+  expect(game.countIpSessions).not.toHaveBeenCalled();
+  expect(game.hasSessionForCharacter).not.toHaveBeenCalled();
+  expect(game.join).not.toHaveBeenCalled();
+  expect(game.handleMessage).not.toHaveBeenCalled();
 }
 
 async function flushMicrotasks() {
@@ -149,10 +172,95 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
   });
 
   it('2. rejects a non-auth message with "authentication required"', async () => {
-    const { ws, deps, req } = setup();
+    const fixture = setup();
+    const { ws, deps, req } = fixture;
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), JSON.stringify({ t: 'hello' }), req);
     expectSendThenClose(ws, errorFrame('authentication required'));
+    expectNoAdmissionWork(fixture);
+  });
+
+  it('2a. preserves "authentication required" for an unrelated auth-like discriminator', async () => {
+    const fixture = setup();
+    const { ws, deps, req } = fixture;
+
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      JSON.stringify({ t: 'auth-worldwide', token: 'tok', character: 7 }),
+      req,
+    );
+
+    expectSendThenClose(ws, errorFrame('authentication required'));
+    expectNoAdmissionWork(fixture);
+  });
+
+  it('2b. rejects the legacy auth discriminator before credentials or admission work', async () => {
+    const fixture = setup();
+    const { ws, deps, req } = fixture;
+
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      JSON.stringify({ t: 'auth', token: 'tok', character: 7 }),
+      req,
+    );
+
+    expectSendThenClose(
+      ws,
+      errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+    );
+    expectNoAdmissionWork(fixture);
+  });
+
+  it('2c. rejects an auth-world-2 client on the auth-world-3 server before all admission work', async () => {
+    const fixture = setup();
+    const { ws, deps, req } = fixture;
+
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      JSON.stringify({ t: 'auth-world-2', token: 'tok', character: 7 }),
+      req,
+    );
+
+    expectSendThenClose(
+      ws,
+      errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+    );
+    expectNoAdmissionWork(fixture);
+  });
+
+  it.each(['auth-world', 'auth-world-4', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
+    '2d. rejects the non-current world auth discriminator %s before all admission work',
+    async (authType) => {
+      const fixture = setup();
+      const { ws, deps, req } = fixture;
+
+      await createWsAuth(deps).authenticateWebSocket(
+        asWs(ws),
+        JSON.stringify({ t: authType, token: 'tok', character: 7 }),
+        req,
+      );
+
+      expectSendThenClose(
+        ws,
+        errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+      );
+      expectNoAdmissionWork(fixture);
+    },
+  );
+
+  it('2e. admits the exact current world discriminator for both fresh and resume joins', async () => {
+    const fresh = setup();
+    await createWsAuth(fresh.deps).authenticateWebSocket(asWs(fresh.ws), authRaw(), fresh.req);
+    expect(fresh.game.join).toHaveBeenCalledTimes(1);
+    expect(fresh.deps.acquireCharacterLease).toHaveBeenCalledTimes(1);
+    expect(fresh.ws.send).not.toHaveBeenCalled();
+
+    const resume = setup();
+    resume.game.hasSessionForCharacter.mockReturnValue(true);
+    await createWsAuth(resume.deps).authenticateWebSocket(asWs(resume.ws), authRaw(), resume.req);
+    expect(resume.game.join).toHaveBeenCalledTimes(1);
+    expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
+    expect(resume.ws.send).not.toHaveBeenCalled();
   });
 
   it('3. rejects a null account with "not authenticated"', async () => {

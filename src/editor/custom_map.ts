@@ -4,6 +4,7 @@
 // document to the editor's live editing model and projects it onto the engine's
 // WorldContent for play-test. Pure: no DOM, Vitest-importable.
 
+import { clonePropsWithoutEastbrookLayout } from '../sim/custom_world_props';
 import { BUILTIN_WORLD, PLAYER_START } from '../sim/data';
 import {
   collideRadiusFor,
@@ -97,8 +98,9 @@ export function customMapFromContent(
   return map;
 }
 
-// Project a CustomMap onto the engine's WorldContent for play-testing. Props
-// come from the built-in world (the editor does not author them yet); free
+// Project a CustomMap onto the engine's WorldContent for play-testing. The
+// editor does not author structured ZoneProps yet, so custom worlds retain an
+// independent clone of reusable built-in props outside Eastbrook. Free
 // placements carry their collide footprint so the Sim's colliders and the
 // renderer read the SAME records.
 export function customMapToWorldContent(map: CustomMap): WorldContent {
@@ -109,7 +111,7 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     npcs: deepClone(map.content.npcs as WorldContent['npcs']),
     groundObjects: deepClone(map.content.objects as WorldContent['groundObjects']),
     roads: deepClone((map.content.roads ?? BUILTIN_WORLD.roads) as WorldContent['roads']),
-    props: deepClone(BUILTIN_WORLD.props),
+    props: clonePropsWithoutEastbrookLayout(BUILTIN_WORLD.props),
     playerStart: { x: start.x, z: start.z },
     terrainEdits: deepClone(map.terrainEdits),
     placements: placementsToPlayAssets(map.placements),

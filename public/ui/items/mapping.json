@@ -46,6 +46,46 @@
       "confidence": "high"
     },
     {
+      "itemId": "arcane_dust",
+      "name": "Chime Dust",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-11/masters/arcane_dust.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "arcane_essence",
+      "name": "Chime Essence",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-11/masters/arcane_essence.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "arcane_shard",
+      "name": "Chime Shard",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-11/masters/arcane_shard.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "arcanite_bar",
+      "name": "Glyphsteel Bar",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-6/masters/arcanite_bar.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "ashwood_log",
+      "name": "Ashwood Log",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/ashwood_log.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "backpack",
       "name": "Backpack (implicit bag-bar slot; UI id, not an item)",
       "sourcePack": "woc_bags",
@@ -236,11 +276,27 @@
       "confidence": "medium"
     },
     {
+      "itemId": "cooking_salt",
+      "name": "Cooking Salt",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/cooking_salt.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "copper_mining_pick",
       "name": "Copper Mining Pick",
       "sourcePack": "farming",
       "sourceFile": "2.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "copper_ore",
+      "name": "Copper Ore",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-6/masters/copper_ore.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "cracked_fetish",
@@ -488,6 +544,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "elderwood_log",
+      "name": "Highpine Log",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/elderwood_log.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "elixir_of_the_bear",
       "name": "Elixir of the Bear",
       "sourcePack": "generic100b",
@@ -572,6 +636,14 @@
       "confidence": "high"
     },
     {
+      "itemId": "game_meat",
+      "name": "Game Meat",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/game_meat.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "gathering_sickle",
       "name": "Gathering Sickle",
       "sourcePack": "farming",
@@ -593,8 +665,16 @@
       "confidence": "high"
     },
     {
+      "itemId": "glass_vial",
+      "name": "Glass Vial",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/glass_vial.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "glimmerfin_koi",
-      "name": "Glimmerfin Koi",
+      "name": "Sunglint Koi",
       "sourcePack": "fishing",
       "sourceFile": "12.png",
       "confidence": "high"
@@ -605,6 +685,14 @@
       "sourcePack": "generic100b",
       "sourceFile": "59.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "goldleaf_herb",
+      "name": "Goldleaf Herb",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/goldleaf_herb.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "grave_captain_voss",
@@ -776,6 +864,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "homespun_cloth",
+      "name": "Homespun Cloth",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/homespun_cloth.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "imperial_crimson_armor_plate",
       "name": "Imperial Crimson",
       "sourcePack": "blacksmith",
@@ -804,11 +900,27 @@
       "confidence": "high"
     },
     {
+      "itemId": "iron_ore",
+      "name": "Iron Ore",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-6/masters/iron_ore.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "ironbark_axe",
       "name": "Ironbark Axe",
       "sourcePack": "farming",
       "sourceFile": "18.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "ironbark_log",
+      "name": "Ironbark Log",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/ironbark_log.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "ivory_copper_armor_plate",
@@ -997,7 +1109,7 @@
     },
     {
       "itemId": "mithril_mining_pick",
-      "name": "Mithril Mining Pick",
+      "name": "Skysilver Mining Pick",
       "sourcePack": "farming",
       "sourceFile": "9.png",
       "confidence": "high"
@@ -1220,6 +1332,38 @@
       "confidence": "medium"
     },
     {
+      "itemId": "prime_cut",
+      "name": "Prime Cut",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-9/masters/prime_cut.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "pristine_hide",
+      "name": "Pristine Hide",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-9/masters/pristine_hide.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "pristine_silk",
+      "name": "Pristine Silk",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-9/masters/pristine_silk.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "pristine_venom_gland",
+      "name": "Pristine Venom Gland",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-9/masters/pristine_venom_gland.png (accepted v4)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "quilted_trousers",
       "name": "Quilted Trousers",
       "sourcePack": "greaves",
@@ -1325,6 +1469,46 @@
       "confidence": "medium"
     },
     {
+      "itemId": "resonant_hide",
+      "name": "Resonant Hide",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_hide.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "resonant_links",
+      "name": "Resonant Links",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_links.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "resonant_steel",
+      "name": "Resonant Steel",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_steel.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "resonant_thread",
+      "name": "Resonant Thread",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_thread.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "resonant_timber",
+      "name": "Resonant Timber",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_timber.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "revenant_silk_robe",
       "name": "Revenant Silk Robe",
       "sourcePack": "armor",
@@ -1372,6 +1556,14 @@
       "sourcePack": "cooking",
       "sourceFile": "30.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "rough_hide",
+      "name": "Rough Hide",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/rough_hide.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "roughspun_gloves",
@@ -1444,8 +1636,16 @@
       "confidence": "medium"
     },
     {
+      "itemId": "silverleaf_herb",
+      "name": "Sheenleaf Herb",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/silverleaf_herb.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "silverleaf_sickle",
-      "name": "Silverleaf Sickle",
+      "name": "Sheenleaf Sickle",
       "sourcePack": "farming",
       "sourceFile": "5.png",
       "confidence": "high"
@@ -1470,6 +1670,14 @@
       "sourcePack": "armor",
       "sourceFile": "17.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "smithing_flux",
+      "name": "Smithing Flux",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/smithing_flux.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "smoked_eel",
@@ -1514,6 +1722,30 @@
       "confidence": "high"
     },
     {
+      "itemId": "spider_leg",
+      "name": "Twitching Spider Leg",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/spider_leg.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "spider_silk",
+      "name": "Spider Silk",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/spider_silk.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "spool_of_thread",
+      "name": "Spool of Thread",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/spool_of_thread.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "spring_water",
       "name": "Refreshing Spring Water",
       "sourcePack": "generic100b",
@@ -1529,7 +1761,7 @@
     },
     {
       "itemId": "stalkerhide_jerkin",
-      "name": "Stalkerhide Jerkin",
+      "name": "Prowlhide Jerkin",
       "sourcePack": "armor",
       "sourceFile": "20.png",
       "confidence": "medium"
@@ -1584,6 +1816,14 @@
       "confidence": "high"
     },
     {
+      "itemId": "sunpetal_herb",
+      "name": "Sunpetal Herb",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/sunpetal_herb.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "supply_crate",
       "name": "Stolen Supply Crate",
       "sourcePack": "generic100b",
@@ -1605,11 +1845,27 @@
       "confidence": "high"
     },
     {
+      "itemId": "tanning_agent",
+      "name": "Tanning Agent",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/tanning_agent.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "the_codfather",
       "name": "The Codfather",
       "sourcePack": "generic100b",
       "sourceFile": "14.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "thorium_ore",
+      "name": "Osmium Ore",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-6/masters/thorium_ore.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "tideguard_greaves",
@@ -1716,6 +1972,14 @@
       "sourcePack": "helmets",
       "sourceFile": "23.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "venom_gland",
+      "name": "Venom Gland",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/venom_gland.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "wanderers_chestguard",
@@ -1843,6 +2107,275 @@
       "sourcePack": "greaves",
       "sourceFile": "22.png",
       "confidence": "medium"
+    }
+  ],
+  "generatedBatches": [
+    {
+      "source": "OpenAI built-in image generation",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "existing painted WebP catalog in public/ui/items/",
+      "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, atmospheric dark background, no text or watermark",
+      "itemIds": [
+        "acolyte_chain_grips",
+        "ancient_crypt_door",
+        "anglers_feast_platter",
+        "arcanite_mining_pick",
+        "architects_cornerstone",
+        "ashen_focus_ring",
+        "ashstalker_cowl",
+        "ashstalker_grips",
+        "ashstalker_harness",
+        "ashstalker_legguards",
+        "ashstalker_shoulderguards",
+        "ashstalker_treads",
+        "ashstalker_waistband",
+        "ashwood_axe",
+        "ashwood_smoked_eel",
+        "blackwater_vanguard_chest",
+        "bonechill_cord",
+        "bonechill_striders",
+        "bonewrought_bulwark",
+        "bristlehide_spaulders",
+        "bronze_sickle",
+        "bulwark_rusted_pauldrons",
+        "cantors_drowned_sash",
+        "choir_blessed_spaulders",
+        "choirmothers_casque",
+        "chunk_of_ore",
+        "cinder_sigil_pendant",
+        "cinderweave_cord",
+        "cinderweave_cowl",
+        "cinderweave_handwraps",
+        "cinderweave_legwraps",
+        "cinderweave_mantle",
+        "cinderweave_raiment",
+        "cinderweave_slippers",
+        "conjured_bread4",
+        "conjured_water4",
+        "coppermail_gauntlets",
+        "coppermail_sabatons",
+        "cragprowl_belt",
+        "cragward_pauldrons",
+        "crownforged_warspaulders",
+        "cryptbloom_shoulderguards",
+        "cryptbone_pauldrons",
+        "cryptplate_helm",
+        "deathless_warguard_legmail",
+        "dreamroot_boots",
+        "duskhide_wraps",
+        "duskthorn_mantle",
+        "eastbrook_buckler",
+        "eastbrook_druids_hide",
+        "eastbrook_ritual_vestments",
+        "eastbrook_warded_leggings",
+        "eelskin_tunic",
+        "elderwood_axe",
+        "elixir_of_the_boar",
+        "elixir_of_the_serpent",
+        "embroidered_mantle",
+        "fenbark_leggings",
+        "fenbridge_hide_belt",
+        "fenbridge_hide_boots",
+        "fenbridge_hide_leggings",
+        "fenwarden_sabatons",
+        "final_oath_medallion",
+        "fleetblood_band",
+        "frostgill_chowder",
+        "furyforged_gauntlets",
+        "furyforged_girdle",
+        "furyforged_legguards",
+        "furyforged_sabatons",
+        "furyforged_warhelm",
+        "furyforged_warplate",
+        "furyforged_warspaulders",
+        "goldleaf_game_stew",
+        "goldleaf_healing_draught",
+        "goldleaf_mana_draught",
+        "goldleaf_sickle",
+        "goldweave_leggings",
+        "goldweave_robe",
+        "gravescale_girdle",
+        "gravewyrm_claws",
+        "gravewyrm_mantle",
+        "grovewardens_grips",
+        "herbed_marsh_pike",
+        "heroic_boneguard_breastplate",
+        "heroic_bonewrought_bulwark",
+        "heroic_boundstone_girdle",
+        "heroic_boundstone_helm",
+        "heroic_crownforged_dreadhelm",
+        "heroic_crownforged_warspaulders",
+        "heroic_deathlord_legguards",
+        "heroic_deathlord_warplate",
+        "heroic_deathlords_dread_visage",
+        "heroic_drowned_prayer_leggings",
+        "heroic_drowned_prayer_sandals",
+        "heroic_eelscale_leggings",
+        "heroic_eelscale_treads",
+        "heroic_gravewyrm_gauntlets",
+        "heroic_gravewyrm_mantle",
+        "heroic_gravewyrm_sabatons",
+        "heroic_gravewyrm_stalkers_treads",
+        "heroic_grovewardens_grips",
+        "heroic_korgaths_chainwraps",
+        "heroic_mark",
+        "heroic_moonshroud_breastplate",
+        "heroic_moonshroud_robe",
+        "heroic_moonshroud_tunic",
+        "heroic_necromancers_soulspire_mantle",
+        "heroic_necromancers_soulsteps",
+        "heroic_necromancers_starshroud",
+        "heroic_nighttalon_crown",
+        "heroic_nighttalon_shoulderguards",
+        "heroic_selthes_seastriders",
+        "heroic_shadowmeld_tunic",
+        "heroic_soulflame_cowl",
+        "heroic_soulflame_mantle",
+        "heroic_stormcallers_crown",
+        "heroic_stormcallers_spaulders",
+        "heroic_tideguard_greaves",
+        "heroic_tideguard_sabatons",
+        "heroic_tidescale_vest",
+        "heroic_verdant_walkers",
+        "heroic_wildgrowth_leggings",
+        "heroic_wraithfire_orb",
+        "heroic_wyrmcult_grand_robe",
+        "heroic_wyrmcult_soulsteps",
+        "heroic_wyrmshadow_harness",
+        "heroic_wyrmshadow_legguards",
+        "heroic_wyrmshadow_talongrips",
+        "heroic_wyrmshadow_treads",
+        "heroic_ysols_pearl_greaves",
+        "highwatch_wallshield",
+        "homespun_hood",
+        "homespun_mitts",
+        "hunters_game_skewer",
+        "iron_vow_band",
+        "ironlink_hauberk",
+        "ironlink_legguards",
+        "ironlink_spaulders",
+        "ironreel_fishing_rod",
+        "last_step_signet",
+        "litany_cloth_chest",
+        "litany_gloves_rog",
+        "litany_helm",
+        "litany_leather_chest",
+        "litany_legs",
+        "litany_plate_chest",
+        "litany_shoulder",
+        "lunar_choir_leggings",
+        "lunarward_cinch",
+        "marlows_grand_roast",
+        "marshlight_hauberk",
+        "marshstalker_hood",
+        "marshstalker_jerkin",
+        "marshstalker_spaulders",
+        "medallion_of_endless_profit",
+        "meltwater_flask",
+        "minor_mana_potion",
+        "mirebloom_treads",
+        "mirewarden_jerkin",
+        "mirewarden_leggings",
+        "mirewarden_treads",
+        "mistforged_pauldrons",
+        "moonbark_vestments",
+        "moonshroud_tunic",
+        "morthens_cryptforged_hauberk",
+        "mosshide_vest",
+        "necromancers_soulspire_mantle",
+        "nielas_coldlight_band",
+        "nighttalon_shoulderguards",
+        "nightwalk_jerkin",
+        "oath_of_the_round_table",
+        "onyx_gold_armor_plate",
+        "pan_seared_perch",
+        "peaksong_helm",
+        "pearlward_aegis",
+        "razorwind_torque",
+        "reedstalker_jerkin",
+        "reinforced_pauldrons",
+        "reliquary_leather_chest",
+        "reliquary_shoulder",
+        "revenantstep_treads",
+        "riveted_copper_girdle",
+        "rusted_censer",
+        "sanctum_prowlers_grips",
+        "sash_of_the_sunken_court",
+        "scourgehide_carapace",
+        "seal_of_the_nine_oaths",
+        "shadowmeld_tunic",
+        "shadowpulse_handwraps",
+        "shadowpulse_slippers",
+        "shardfang_grips",
+        "shardsong_mantle",
+        "shroud_of_the_gravewyrm",
+        "silkbinders_raiment",
+        "siltguard_helm",
+        "siltstep_leggings",
+        "silvered_carp_supper",
+        "silverleaf_healing_draught",
+        "silverleaf_mana_draught",
+        "silverstream_fishing_rod",
+        "silverthread_slippers",
+        "sister_nhalia_choir_plate",
+        "soggy_boot",
+        "sootscale_mantle",
+        "soulflame_mantle",
+        "soulforged_warplate",
+        "soulrend_diadem",
+        "spellbreakers_seal",
+        "stormbark_mantle",
+        "stormbound_crown",
+        "stormbound_greaves",
+        "stormbound_handguards",
+        "stormbound_hauberk",
+        "stormbound_legmail",
+        "stormbound_spaulders",
+        "stormbound_waistguard",
+        "stormcallers_spaulders",
+        "stormchant_gauntlets",
+        "stormroot_cowl",
+        "stormvotive_hauberk",
+        "sunken_court_mantle",
+        "sunken_reliquary_hood",
+        "sunpetal_healing_draught",
+        "sunpetal_mana_draught",
+        "sunpetal_sickle",
+        "sunweave_mantle",
+        "sunweave_treads",
+        "sutils_gambit",
+        "swiftfang_talisman",
+        "tallow_candle",
+        "thorium_mining_pick",
+        "thoriumscale_cuirass",
+        "thoriumscale_greathelm",
+        "thoriumscale_leggings",
+        "thornling_grips",
+        "thornpeak_wildwraps",
+        "thunderward_legguards",
+        "tidebound_spaulders",
+        "tideguard_faceguard",
+        "tidehymn_slippers",
+        "tideworn_warboots",
+        "tidewoven_trousers",
+        "unbroken_circle",
+        "valefire_lantern",
+        "venomfire_elixir",
+        "verdant_walkers",
+        "vestments_of_the_waking_grove",
+        "votive_chain_belt",
+        "wardweave_cowl",
+        "waterlogged_idol",
+        "widow_silk_hood",
+        "wildgrove_cinch",
+        "wildgrowth_leggings",
+        "wraithfire_orb",
+        "wyrmchoir_handwraps",
+        "wyrmcult_spellgrips",
+        "yumis_keepsake_locket",
+        "zense_meridian",
+        "zyzzs_deathless_signet"
+      ]
     }
   ]
 }

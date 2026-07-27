@@ -18,7 +18,7 @@ const PAIR = 'weaponcrafting+armorcrafting';
 const DORMANT = 'cooking';
 // The Smith pair's hobby (the craft opposite a major on the ring).
 const HOBBY = 'leatherworking';
-// A pre-Phase-14 non-wave-one pair: attunable only via the retired un-narrowed
+// A legacy non-wave-one pair: attunable only via the retired un-narrowed
 // acceptance quest, a valid adjacent ring pair with NO seated master, so
 // MASTER_TIER_LETTERS carries no entry for it.
 const NON_WAVE_ONE_PRIMARY = 'tailoring';
@@ -52,13 +52,13 @@ function recordingCtx(): { ctx: SimContext; booked: LetterDef[] } {
   return { ctx, booked };
 }
 
-describe('tier-crossing master mail (Professions 2.0 Phase 14)', () => {
+describe('tier-crossing master mail (Professions 2.0)', () => {
   it('baselines an already-attuned character silently (deploy migration, no retroactive spam)', () => {
     const sim = makeSim();
     const meta = attunedMeta(sim);
     meta.craftSkills[PRIMARY] = tierSkill(3);
     meta.craftSkills[SECONDARY] = tierSkill(1);
-    expect(meta.tierMailSent.size).toBe(0); // a loaded pre-Phase-14 save
+    expect(meta.tierMailSent.size).toBe(0); // a loaded legacy save
 
     const { ctx, booked } = recordingCtx();
     expect(updateTierMailFor(meta, ctx)).toBe(false);
@@ -134,8 +134,8 @@ describe('tier-crossing master mail (Professions 2.0 Phase 14)', () => {
     expect(meta.tierMailSent.get(PRIMARY)).toBe(4);
   });
 
-  it('baseline-arms a pre-phase non-wave-one active pair without mailing or crashing', () => {
-    // A character attuned before Phase 14 (via the retired un-narrowed acceptance
+  it('baseline-arms a legacy non-wave-one active pair without mailing or crashing', () => {
+    // A legacy character attuned via the retired un-narrowed acceptance
     // quest) can hold any of the ten ring pairs; the four seated masters cover
     // only the wave-one pairs, so this pair has no MASTER_TIER_LETTERS entry.
     const sim = makeSim();
@@ -270,19 +270,54 @@ describe('tier-crossing master mail (Professions 2.0 Phase 14)', () => {
     expect(saved && 'tierMailSent' in saved).toBe(false);
   });
 
-  it('normalizeTierMailOnLoad drops invalid entries and keeps valid ones', () => {
+  it('normalizeTierMailOnLoad keeps only KNOWN ring craft ids with valid tiers', () => {
     expect(normalizeTierMailOnLoad(undefined).size).toBe(0);
     expect([
       ...normalizeTierMailOnLoad({
         [PRIMARY]: 3,
         [SECONDARY]: 0,
-        bad: Number.NaN,
-        alsoBad: -1,
-        infinite: Infinity,
+        // Invalid VALUES on KNOWN ring ids: the value arm must fire on its own
+        // (an unknown-id key would be dropped before the value check runs).
+        [DORMANT]: Number.NaN,
+        [HOBBY]: -1,
+        alchemy: Infinity,
+        // A VALID tier on an id not on the shipped
+        // ring (a retired craft, a corrupt save) drops instead of being kept
+        // forever, so the record self-heals on load.
+        goldsmithing: 2,
       }).entries(),
     ]).toEqual([
       [PRIMARY, 3],
       [SECONDARY, 0],
     ]);
+  });
+
+  it('drops an unknown craft id on load while known keys survive the round trip', () => {
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    meta.craftSkills[SECONDARY] = tierSkill(1);
+    baselineActivePairTierMail(meta);
+    // A stale acknowledgement written by content that no longer ships: the
+    // serialize arm passes it through verbatim (the heal is load-side only).
+    meta.tierMailSent.set('goldsmithing', 2);
+
+    const saved = sim.serializeCharacter(sim.playerId);
+    expect(saved?.tierMailSent).toEqual({ [PRIMARY]: 2, [SECONDARY]: 1, goldsmithing: 2 });
+
+    const reloaded = makeSim(5152);
+    const pid = reloaded.addPlayer('warrior', 'Reloaded', { state: saved ?? undefined });
+    const reloadedMeta = reloaded.players.get(pid)!;
+    expect(reloadedMeta.tierMailSent.has('goldsmithing')).toBe(false); // self-healed
+    expect([...reloadedMeta.tierMailSent.entries()]).toEqual([
+      [PRIMARY, 2],
+      [SECONDARY, 1],
+    ]);
+    // The healed record is what the next save writes: the unknown key is gone
+    // for good, never resurrected by a later serialize.
+    expect(reloaded.serializeCharacter(pid)?.tierMailSent).toEqual({
+      [PRIMARY]: 2,
+      [SECONDARY]: 1,
+    });
   });
 });

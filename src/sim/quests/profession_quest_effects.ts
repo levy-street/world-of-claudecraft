@@ -18,7 +18,7 @@ export function professionQuestSelectionTargets(quest: QuestDef, state: Archetyp
   const effect = quest.completionEffect;
   if (!effect) return [];
   if (effect.type === 'attunePair') {
-    // A per-pair attune quest (Phase 14) pins one pairId, so its target list is
+    // A per-pair attune quest pins one pairId, so its target list is
     // that single pair intersected with the mode-legal candidates (empty, hence
     // the quest is unavailable at that master, unless that exact pair is legal
     // for the mode right now); a quest with no pairId offers every legal pair.
@@ -43,7 +43,7 @@ export function validateProfessionQuestSelection(
   if (!effect) return selection === undefined;
   if (!selection) return false;
   if (effect.type === 'attunePair') {
-    // A per-pair quest accepts and turns in ONLY its pinned pair (Phase 14),
+    // A per-pair quest accepts and turns in ONLY its pinned pair,
     // over and above the shared mode-legality gate.
     if (effect.pairId && selection !== effect.pairId) return false;
     return canAttuneArchetypePair(meta.archetype, selection, effect.mode);

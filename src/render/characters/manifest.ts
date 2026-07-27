@@ -124,8 +124,13 @@ export interface VisualDef {
    *  applied as a local-space rotation (radians) after the bind transform. */
   weaponFix?: { node: string; rotX?: number; rotY?: number; rotZ?: number }[];
   /** Glowing ring parented behind the head bone (the priest's Light halo).
-   *  Value is the glow color; geometry/placement live in visual.ts. */
+   *  Value is the glow color; geometry/placement live in halo.ts. */
   halo?: number;
+  /** Halo placement overrides, head-bone space (defaults in halo.ts): lift
+   *  above the bone and ring radius, for models whose headgear the default
+   *  ring would clip. */
+  haloUpOffset?: number;
+  haloRadius?: number;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and

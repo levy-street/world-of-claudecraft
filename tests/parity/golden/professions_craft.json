@@ -285,8 +285,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "5d3edfe6",
-      "events": "c3a1794c",
+      "state": "d892533f",
+      "events": "055e81f3",
       "rng": {
         "draws": 1,
         "digest": "fff65987"
@@ -327,6 +327,7 @@
               "linen_scrap",
               "minor_healing_potion",
               "recruit_tunic",
+              "silverleaf_herb",
               "spider_leg",
               "worn_sword"
             ]
@@ -440,8 +441,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "d7b261a5",
-      "events": "a39a1866",
+      "state": "bb62bbb0",
+      "events": "a90da3ee",
       "rng": {
         "draws": 2,
         "digest": "d6442b50"
@@ -470,7 +471,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 91
+            "xpGained": 24
           },
           "craftSkills": {
             "alchemy": 1,
@@ -481,17 +482,21 @@
           },
           "deedStats": {
             "counters": {
-              "craftsPerformed": 2
+              "craftsPerformed": 2,
+              "masterworksCrafted": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
               "eastbrook_ritual_vestments",
+              "homespun_cloth",
               "linen_scrap",
               "minor_healing_potion",
               "recruit_tunic",
+              "silverleaf_herb",
               "spider_leg",
+              "spool_of_thread",
               "worn_sword"
             ]
           },
@@ -514,6 +519,14 @@
             {
               "count": 1,
               "itemId": "minor_healing_potion"
+            },
+            {
+              "count": 1,
+              "itemId": "homespun_cloth"
+            },
+            {
+              "count": 1,
+              "itemId": "spool_of_thread"
             },
             {
               "count": 1,
@@ -544,7 +557,7 @@
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
-          "lifetimeXp": 91,
+          "lifetimeXp": 24,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -552,7 +565,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 91
+          "xp": 24
         }
       ],
       "entities": [
@@ -625,8 +638,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "ce411798",
-      "events": "c3a1794c",
+      "state": "4b90794c",
+      "events": "055e81f3",
       "rng": {
         "draws": 3,
         "digest": "07bdddf8"
@@ -655,7 +668,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 115
+            "xpGained": 48
           },
           "craftSkills": {
             "alchemy": 2,
@@ -666,17 +679,21 @@
           },
           "deedStats": {
             "counters": {
-              "craftsPerformed": 3
+              "craftsPerformed": 3,
+              "masterworksCrafted": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
               "eastbrook_ritual_vestments",
+              "homespun_cloth",
               "linen_scrap",
               "minor_healing_potion",
               "recruit_tunic",
+              "silverleaf_herb",
               "spider_leg",
+              "spool_of_thread",
               "worn_sword"
             ]
           },
@@ -699,6 +716,14 @@
             {
               "count": 2,
               "itemId": "minor_healing_potion"
+            },
+            {
+              "count": 1,
+              "itemId": "homespun_cloth"
+            },
+            {
+              "count": 1,
+              "itemId": "spool_of_thread"
             },
             {
               "count": 1,
@@ -727,7 +752,7 @@
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
-          "lifetimeXp": 115,
+          "lifetimeXp": 48,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -735,7 +760,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 115
+          "xp": 48
         }
       ],
       "entities": [
@@ -808,7 +833,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "ce411798",
+      "state": "4b90794c",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -838,7 +863,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 115
+            "xpGained": 48
           },
           "craftSkills": {
             "alchemy": 2,
@@ -849,17 +874,21 @@
           },
           "deedStats": {
             "counters": {
-              "craftsPerformed": 3
+              "craftsPerformed": 3,
+              "masterworksCrafted": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
               "eastbrook_ritual_vestments",
+              "homespun_cloth",
               "linen_scrap",
               "minor_healing_potion",
               "recruit_tunic",
+              "silverleaf_herb",
               "spider_leg",
+              "spool_of_thread",
               "worn_sword"
             ]
           },
@@ -882,6 +911,14 @@
             {
               "count": 2,
               "itemId": "minor_healing_potion"
+            },
+            {
+              "count": 1,
+              "itemId": "homespun_cloth"
+            },
+            {
+              "count": 1,
+              "itemId": "spool_of_thread"
             },
             {
               "count": 1,
@@ -910,7 +947,7 @@
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
-          "lifetimeXp": 115,
+          "lifetimeXp": 48,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -918,7 +955,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 115
+          "xp": 48
         }
       ],
       "entities": [

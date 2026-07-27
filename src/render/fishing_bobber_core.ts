@@ -1,5 +1,5 @@
-// Pure anchor-selection core for the fishing bobber visual (Professions 2.0
-// Phase 12b): which facing-forward water point the bobber floats at. Three/DOM
+// Pure anchor-selection core for the fishing bobber visual (Professions
+// 2.0): which facing-forward water point the bobber floats at. Three/DOM
 // free and registered in RENDER_PURE_CORES so the decision logic (the sample
 // walk and the fishable-depth rule) is Node-tested directly; the visual module
 // (fishing_bobber.ts) is a thin consumer. Walks the sim's own exported

@@ -100,6 +100,12 @@ export class MeterData {
   /** party membership check is supplied by the caller (self + party pids) */
   onEvent(ev: SimEvent, world: IWorld, partyPids: Set<number>, now: number): void {
     if (ev.type !== 'damage' && ev.type !== 'heal2') return;
+    // The HoT-application sound cue (Sim.applyAura, cueOnly:true) is audio-only
+    // and must not open or keep alive an otherwise-idle encounter segment. Gated
+    // on the explicit flag, not amount === 0: a genuine direct heal (applyHeal)
+    // can also legitimately land at amount 0 (full HP, fully absorbed) and that
+    // real cast should still count as party activity.
+    if (ev.type === 'heal2' && ev.cueOnly) return;
     const sourceInParty = partyPids.has(ev.sourceId);
     const targetInParty = partyPids.has(ev.targetId);
     if (!sourceInParty && !targetInParty) return;

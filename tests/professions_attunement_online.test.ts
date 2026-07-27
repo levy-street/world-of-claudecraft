@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 14 over the live GameServer wire (Phase 14 QA): the
+// Professions 2.0 over the live GameServer wire: the
 // offline suites pin the emit side (attunement_events, prof_nudges, tier_mail,
 // quest_cadence) through the real Sim, but nothing pinned that the four new
 // personal/zone celebration events route to the right sessions over the REAL
@@ -312,7 +312,7 @@ describe('work-order cadence on the online client (ClientWorld.questState)', () 
     expect(client.questState(WORK_ORDER)).toBe('unavailable');
     expect(client.questState('q_prof_workorder_loom')).toBe('available');
 
-    // With the mirror empty (a lapsed window or a pre-Phase-14 server), the same
+    // With the mirror empty (a lapsed window or an older server), the same
     // work order is available again.
     const clear = bareClient({ cadenceBlockedQuests: [] });
     expect(clear.questState(WORK_ORDER)).toBe('available');

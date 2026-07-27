@@ -1,9 +1,10 @@
-// Pins the per-copy instance tooltip lines (Professions 2.0 Phase 6): every
+// Pins the per-copy instance tooltip lines (Professions 2.0): every
 // ItemInstancePayload variant renders its exact line set, so a regression in
-// any arm (seal, enchanted marker, bonus stats, maker's mark, the legacy
-// shapes) fails a decisive assertion. The module is the pure string-builder
-// side of hud.itemTooltip's instance composition.
+// any arm (seal, bonus stats and their enchant attribution, maker's mark, the
+// legacy shapes) fails a decisive assertion. The module is the pure
+// string-builder side of hud.itemTooltip's instance composition.
 import { describe, expect, it } from 'vitest';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import {
   HARVEST_COMPONENT_ITEMS,
   HARVEST_COMPONENT_SPECIMENS,
@@ -21,6 +22,7 @@ import {
   itemStatName,
   wornTooltipInstance,
 } from '../src/ui/item_instance_tooltip';
+import { svgIcon } from '../src/ui/ui_icons';
 
 describe('item_instance_tooltip', () => {
   it('masterwork copy gets the gold seal and no enchanted marker', () => {
@@ -29,31 +31,27 @@ describe('item_instance_tooltip', () => {
       rolled: { masterwork: true, stats: { str: 2 } },
     });
     expect(html).toContain('Masterwork');
-    expect(html).toContain('#ffd100');
+    expect(html).toContain('color:var(--gold)');
+    expect(html).toContain('class="tt-masterwork-seal-icon"');
+    expect(html).toContain('src="/ui/professions/masterwork_seal.webp"');
+    expect(html).toContain('alt="" aria-hidden="true"');
     expect(html).not.toContain('Enchanted');
   });
 
-  it('enchant-marker copy gets the enchanted marker and no seal', () => {
-    const html = instanceBadgeLines({ enchant: 'ench_firepower' });
-    expect(html).toContain('Enchanted');
-    expect(html).not.toContain('Masterwork');
-  });
-
-  it('legacy enchanted copy (bare rolled.stats, no masterwork flag) reads as enchanted', () => {
-    const html = instanceBadgeLines({ rolled: { stats: { int: 3 } } });
-    expect(html).toContain('Enchanted');
-    expect(html).not.toContain('Masterwork');
-  });
-
-  it('masterwork plus enchant renders both badges, seal first', () => {
-    const html = instanceBadgeLines({
-      enchant: 'ench_firepower',
+  // The standalone enchanted badge was retired: the fact rides the bonus stat
+  // lines it caused instead (the attribution suite below). No payload shape may
+  // resurrect a marker line here.
+  it('no instance shape renders a standalone enchanted badge any more', () => {
+    expect(instanceBadgeLines({ enchant: 'enchant_chest_stamina' })).toBe('');
+    expect(instanceBadgeLines({ rolled: { stats: { int: 3 } } })).toBe('');
+    const both = instanceBadgeLines({
+      enchant: 'enchant_chest_stamina',
       rolled: { masterwork: true, stats: { str: 1 } },
     });
-    const seal = html.indexOf('Masterwork');
-    const ench = html.indexOf('Enchanted');
-    expect(seal).toBeGreaterThanOrEqual(0);
-    expect(ench).toBeGreaterThan(seal);
+    expect(both).toContain('Masterwork');
+    expect(both).not.toContain('Enchanted');
+    // Exactly one badge line survives on a masterwork+enchant copy.
+    expect((both.match(/<div/g) ?? []).length).toBe(1);
   });
 
   it('legacy signed copy (signer only) renders the mark alone, no badges, no throw', () => {
@@ -71,8 +69,127 @@ describe('item_instance_tooltip', () => {
     expect(html).toContain(itemStatName('sta'));
   });
 
-  it('zero-valued baked stats are skipped', () => {
-    expect(instanceBonusStatLines({ rolled: { stats: { str: 0 } } })).toBe('');
+  it('zero-valued baked stats render no stat line', () => {
+    // A zero-stat masterwork copy is silent, exactly as before. A zero-stat
+    // bare-stats copy still reads as enchanted to the sim (isEnchantedInstance),
+    // and its bag corner paints the enchant glyph, so the fallback keeps the
+    // tooltip saying so rather than going blank.
+    expect(instanceBonusStatLines({ rolled: { masterwork: true, stats: { str: 0 } } })).toBe('');
+    const bare = instanceBonusStatLines({ rolled: { stats: { str: 0 } } });
+    expect(bare).not.toContain('tt-instance-bonus');
+    expect(bare).toContain('Enchanted');
+  });
+
+  // The attribution matrix: which bonus stat lines carry the "(Enchanted)"
+  // suffix, per payload shape. `enchant_chest_stamina` is a live enchant
+  // granting exactly sta 4 (content/enchants.ts), so the split below is read
+  // off real content, not a fixture.
+  describe('bonus stat attribution', () => {
+    const ENCHANT_ID = 'enchant_chest_stamina';
+    const SHARE = ENCHANTS[ENCHANT_ID].statBonus.sta as number;
+
+    it('the fixture enchant still grants the stamina this suite splits on', () => {
+      expect(SHARE).toBeGreaterThan(0);
+      expect(Object.keys(ENCHANTS[ENCHANT_ID].statBonus)).toEqual(['sta']);
+    });
+
+    it('a marker copy attributes exactly the enchant share and leaves no remainder', () => {
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { stats: { sta: SHARE } },
+      });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(SHARE)} ${itemStatName('sta')} (Enchanted)`);
+    });
+
+    it('an enchanted MASTERWORK copy splits the stat: enchant share suffixed, bake plain', () => {
+      const bake = 3;
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { masterwork: true, stats: { sta: SHARE + bake } },
+      });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(2);
+      const suffixed = `+${itemNumber(SHARE)} ${itemStatName('sta')} (Enchanted)`;
+      const plain = `+${itemNumber(bake)} ${itemStatName('sta')}<`;
+      expect(html).toContain(suffixed);
+      expect(html).toContain(plain);
+      // The enchant share leads; the remainder follows it.
+      expect(html.indexOf(plain)).toBeGreaterThan(html.indexOf(suffixed));
+      // The suffix is its own key, never concatenated onto the plain line.
+      expect(html).not.toContain(`+${itemNumber(SHARE + bake)}`);
+    });
+
+    it('a stat the enchant does not touch stays entirely plain on a marker copy', () => {
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { masterwork: true, stats: { str: 2 } },
+      });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(2)} ${itemStatName('str')}<`);
+      expect(html).not.toContain('(Enchanted)');
+    });
+
+    it('a LEGACY enchanted copy (no enchant field) suffixes every bonus line', () => {
+      const html = instanceBonusStatLines({ rolled: { stats: { int: 3, spi: 2 } } });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(2);
+      expect(html).toContain(`+${itemNumber(3)} ${itemStatName('int')} (Enchanted)`);
+      expect(html).toContain(`+${itemNumber(2)} ${itemStatName('spi')} (Enchanted)`);
+    });
+
+    it('a masterwork-only copy is untouched: every line stays plain', () => {
+      const html = instanceBonusStatLines({
+        rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
+      });
+      expect(html).not.toContain('(Enchanted)');
+      expect(html).toContain(`+${itemNumber(2)} ${itemStatName('str')}<`);
+      expect(html).toContain(`+${itemNumber(1)} ${itemStatName('sta')}<`);
+    });
+
+    it('an unknown enchant id keeps its stat line plain but still states the enchant', () => {
+      // Reachable mid-rollout: an older client resolving an id its own ENCHANTS
+      // table lacks. The share is unknowable, so the stat stays unattributed,
+      // but the copy must not go silent about being enchanted (its bag corner
+      // already paints the enchant glyph).
+      const html = instanceBonusStatLines({
+        enchant: 'not_a_real_enchant',
+        rolled: { stats: { sta: 4 } },
+      });
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(4)} ${itemStatName('sta')}<`);
+      expect(html).not.toContain('(Enchanted)');
+      expect(html).toContain('Enchanted');
+    });
+
+    it('a marker copy with no baked stats at all still states the enchant', () => {
+      const html = instanceBonusStatLines({ enchant: ENCHANT_ID });
+      expect(html).toContain('Enchanted');
+      expect(html).not.toContain('tt-instance-bonus');
+    });
+
+    it('the fallback never doubles up beside an attributed line', () => {
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { stats: { sta: SHARE } },
+      });
+      expect((html.match(/Enchanted/g) ?? []).length).toBe(1);
+    });
+
+    it('a masterwork-only copy never triggers the enchanted fallback', () => {
+      const html = instanceBonusStatLines({ rolled: { masterwork: true, stats: { str: 2 } } });
+      expect(html).not.toContain('Enchanted');
+    });
+
+    it('a share larger than the baked stat never renders a negative remainder', () => {
+      // Guards a later ENCHANTS retune against an already-minted copy: the
+      // remainder is clamped away rather than rendered as "+-2 Stamina".
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { stats: { sta: 1 } },
+      });
+      expect(html).not.toContain('+-');
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(1)} ${itemStatName('sta')} (Enchanted)`);
+    });
   });
 
   it("maker's mark escapes the signer name", () => {
@@ -87,18 +204,32 @@ describe('item_instance_tooltip', () => {
     expect(instanceMakersMarkLine(undefined)).toBe('');
   });
 
-  it('a gathered-kind signed copy reads Gathered by, a crafted-kind keeps Crafted by (Phase 12d)', () => {
+  it('a gathered-kind signed copy reads Gathered by, a crafted-kind keeps Crafted by', () => {
     // Both arms of the kind split, against real defs from each family.
     expect(ITEMS.copper_ore.kind).toBe('junk');
     const gathered = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.copper_ore.kind);
     expect(gathered).toContain('Gathered by Anna');
     expect(gathered).not.toContain('Crafted by');
+    expect(gathered).not.toContain('makers-mark');
     expect(ITEMS.ironedge_longsword.kind).toBe('weapon');
     const crafted = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.ironedge_longsword.kind);
     expect(crafted).toContain('Crafted by Anna');
     expect(crafted).not.toContain('Gathered by');
+    expect(crafted).toContain('tt-makers-mark-icon');
+    expect(crafted).toContain('aria-hidden="true"');
     // No kind at all (a caller without the def) stays the crafted wording.
     expect(instanceMakersMarkLine({ signer: 'Anna' })).toContain('Crafted by Anna');
+  });
+
+  it("uses the exact project-owned maker's-mark stroke as a decorative currentColor glyph", () => {
+    const glyph = svgIcon('makers-mark');
+    expect(glyph).toContain('viewBox="0 0 512 512"');
+    expect(glyph).toContain(
+      'd="M82 390C126 341 151 273 157 204C162 156 213 139 249 168C284 196 274 247 236 262C204 274 177 253 178 220C204 276 258 326 323 340C364 349 397 329 426 296C393 365 315 400 231 382C171 369 122 363 82 390"',
+    );
+    expect(glyph).toContain('fill="none" stroke="currentColor" stroke-width="46"');
+    expect(glyph).toContain('stroke-linecap="round" stroke-linejoin="round"');
+    expect(glyph).toContain('aria-hidden="true"');
   });
 
   it('itemNumber pins fraction digits and itemStatName capitalizes unknown keys', () => {
@@ -108,15 +239,15 @@ describe('item_instance_tooltip', () => {
   });
 });
 
-// The Maker's Bond lines (Professions 2.0 Phase 14b): commission tooltip copy
+// The Maker's Bond lines (Professions 2.0): commission tooltip copy
 // is scoped to the commission-eligible equipment kinds and renders in the def
 // soulbound line's gold. The bound line names NO one (boundTo is an entity
 // id, not a stable cross-session identity), so there is no name arm to pin.
-describe('instanceBindingLines (Phase 14b commission lines)', () => {
+describe('instanceBindingLines (commission lines)', () => {
   it('an armed-unbound equipment copy warns it binds to the first recipient', () => {
     const html = instanceBindingLines({ bindOnTrade: true }, 'weapon');
     expect(html).toContain('Commission piece: binds to the first recipient');
-    expect(html).toContain('#ffd100');
+    expect(html).toContain('color:var(--gold)');
   });
 
   it('a bound equipment copy states the lock (and never the unbound warning)', () => {
@@ -133,7 +264,7 @@ describe('instanceBindingLines (Phase 14b commission lines)', () => {
     );
   });
 
-  it('the Phase 13 reagent shape (junk kind) renders NOTHING: reagent tooltips stay line-free', () => {
+  it('the bound-reagent shape (junk kind) renders NOTHING: reagent tooltips stay line-free', () => {
     expect(instanceBindingLines({ bindOnTrade: true }, 'junk')).toBe('');
     expect(instanceBindingLines({ bindOnTrade: true, boundTo: 999 }, 'junk')).toBe('');
   });
@@ -145,7 +276,7 @@ describe('instanceBindingLines (Phase 14b commission lines)', () => {
   });
 });
 
-// The worn-slot projection (Phase 14b): the paperdoll renders exactly the
+// The worn-slot projection: the paperdoll renders exactly the
 // public eqi allowlist (signer/enchant/rolled) in BOTH hosts, so the offline
 // full payload can never show the bond lines on worn gear that the online
 // eqi-trimmed mirror lacks. char_window.ts is pinned to route through it.
@@ -184,7 +315,7 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
   });
 });
 
-// The Phase 12d provenance partition: the signed universe splits cleanly on
+// The provenance partition: the signed universe splits cleanly on
 // item KIND. Every signable gathered item (corpse components, Pristine
 // specimens, the zone node materials) is kind 'junk'; every crafted recipe
 // output lands on a non-junk kind. If either side ever drifts (a junk-kind
@@ -192,7 +323,7 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
 // signed copies silently flips, so both sides are pinned against the live
 // content tables. Fish are out of scope by construction: they share kind
 // 'food' with crafted meals but fishing never signs a catch.
-describe('isGatheredProvenanceKind partition over the live content (Phase 12d)', () => {
+describe('isGatheredProvenanceKind partition over the live content', () => {
   it('every signable gathered item id resolves to a gathered-kind def', () => {
     const gatheredIds = [
       ...Object.values(HARVEST_COMPONENT_ITEMS),
@@ -230,9 +361,10 @@ import { readFileSync } from 'node:fs';
 
 describe('hud.itemTooltip composition order (source pins)', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+  const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
   const badges = hud.indexOf('instanceBadgeLines(instance)');
   const bonus = hud.indexOf('instanceBonusStatLines(instance)');
-  // The mark line takes the def's kind too (Phase 12d): the gathered-vs-crafted
+  // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
   const mark = hud.indexOf('instanceMakersMarkLine(instance, item.kind)');
   const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
@@ -253,5 +385,14 @@ describe('hud.itemTooltip composition order (source pins)', () => {
     expect(bonus).toBeGreaterThan(badges);
     expect(mark).toBeGreaterThan(bonus);
     expect(mark).toBeGreaterThan(setBlock);
+  });
+
+  it('sizes the authored marks at their manifest live sizes and follows tooltip scaling', () => {
+    expect(hudCss).toMatch(
+      /#tooltip \.tt-masterwork-seal-icon[\s\S]*?width: calc\(20px \* var\(--tooltip-scale, 1\)\)/,
+    );
+    expect(hudCss).toMatch(
+      /#tooltip \.tt-makers-mark-icon[\s\S]*?width: calc\(16px \* var\(--tooltip-scale, 1\)\)/,
+    );
   });
 });

@@ -1,4 +1,4 @@
-// The one-time mastery reset (Professions 2.0 Phase 12c, the curve deploy):
+// The one-time mastery reset (Professions 2.0, the curve deploy):
 // fires once per pre-curve character at load-time normalize (the sim.ts
 // masteryResetApplied branch), and touches EXACTLY the two skill maps: every
 // CRAFT_RING craft skill and every gathering proficiency, zeroed in place.

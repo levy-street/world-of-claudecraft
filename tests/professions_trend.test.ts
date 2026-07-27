@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 7: the Guild letter. Covers the pure leading-pair
+// Professions 2.0: the Guild letter. Covers the pure leading-pair
 // classifier (src/sim/professions/trend.ts), the one-shot Guild-letter
 // delivery through the real Sim (mail.test.ts driving pattern), and the
 // GUILD_TREND_LETTERS content completeness pins. Guild letters are counted by
@@ -9,6 +9,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GUILD_TREND_LETTERS, type LetterDef } from '../src/sim/content/letters';
+import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { ARCHETYPE_PAIR_TARGETS, craftsForPairTarget } from '../src/sim/professions/archetype';
 import { maybeSendGuildTrendLetter } from '../src/sim/professions/guild_letter';
 import { classifyCraftTrend, GUILD_LETTER_SKILL_THRESHOLD } from '../src/sim/professions/trend';
@@ -263,7 +264,7 @@ describe('the Guild letter through the real Sim', () => {
       const seedPid = seedWorld.addPlayer('warrior', 'Seed');
       const state = seedWorld.serializeCharacter(seedPid);
       if (!state) throw new Error('expected a serialized character state');
-      // A pre-Phase-7 save carries no guildLetterSent field at all.
+      // A save predating the guild letter carries no guildLetterSent field at all.
       delete state.guildLetterSent;
       state.craftSkills = { ...state.craftSkills, engineering: 30, alchemy: 10 };
 
@@ -405,8 +406,8 @@ describe('the Guild letter delivery contract', () => {
       // character at the Eastbrook raven pillar and stream mailInfo.
       const e = sim.entities.get(pid);
       if (!e) throw new Error('no entity');
-      e.pos.x = 7;
-      e.pos.z = -8;
+      e.pos.x = EASTBROOK_LAYOUT.services.mailbox.position.x;
+      e.pos.z = EASTBROOK_LAYOUT.services.mailbox.position.z;
       sim.tick();
       const info = sim.mailInfoFor(pid);
       if (!info) throw new Error('expected mailInfo at the mailbox');

@@ -14,13 +14,16 @@ function makeSim(seed = 6161): Sim {
 }
 
 /** A minimal ctx exposing only what announceAttunement + emitToZonePlayers read:
- *  the live players/entities maps and an emit recorder. */
+ *  the live players/entities maps, an emit recorder, and the real
+ *  bumpDeedStat, delegated to the live sim ctx so the attunementsCompleted
+ *  counter behind prog_guildsworn lands on the real meta. */
 function announceCtx(sim: Sim) {
   const emitted: SimEvent[] = [];
   const ctx = {
     players: sim.players,
     entities: sim.entities,
     emit: (e: SimEvent) => emitted.push(e),
+    bumpDeedStat: sim.ctx.bumpDeedStat,
   } as unknown as SimContext;
   return { ctx, emitted };
 }
@@ -34,7 +37,7 @@ function moveToNpc(sim: Sim, templateId: string, pid = sim.playerId): void {
   player.pos.z = npc.pos.z;
 }
 
-describe('attunement celebration events (Professions 2.0 Phase 14)', () => {
+describe('attunement celebration events (Professions 2.0)', () => {
   it('emits the personal event plus a zone broadcast for an overworld celebrant', () => {
     const sim = makeSim();
     const pid = sim.playerId;
@@ -45,6 +48,9 @@ describe('attunement celebration events (Professions 2.0 Phase 14)', () => {
 
     const personal = emitted.find((e) => e.type === 'attuned');
     expect(personal).toEqual({ type: 'attuned', pid, pairId: PAIR });
+    // The announce site is the one bump site for the Craftsworn
+    // counter, and it bumps for an overworld celebrant.
+    expect(meta.deedStats.counters.attunementsCompleted).toBe(1);
     const zone = emitted.filter((e) => e.type === 'attunedZone');
     // One zone copy per overworld player in the celebrant's zone (the celebrant).
     expect(zone).toHaveLength(1);
@@ -69,6 +75,9 @@ describe('attunement celebration events (Professions 2.0 Phase 14)', () => {
 
     expect(emitted.filter((e) => e.type === 'attuned')).toHaveLength(1);
     expect(emitted.filter((e) => e.type === 'attunedZone')).toHaveLength(0);
+    // The bump sits BEFORE the instance-space early return, so an
+    // instanced celebrant still counts toward prog_guildsworn.
+    expect(sim.players.get(pid)!.deedStats.counters.attunementsCompleted).toBe(1);
   });
 
   it('the live quest attune path emits both events (new mode)', () => {

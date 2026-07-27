@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 12b (Gathering rhythm): the cross-cutting pins the
+// Professions 2.0 (Gathering rhythm): the cross-cutting pins the
 // phase file's tests deliverable names beyond the re-pinned appendix set.
 // The bite-delay draw-and-bounds contract, the rod synergy on both the delay
 // ceiling and the reel window, the reel deadline boundary, the hidden-state
@@ -130,7 +130,11 @@ describe('bite delay draw contract and rod-tiered bounds', () => {
   function delays(rod: string | null, n: number): number[] {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
-    if (rod) sim.addItem(rod, 1);
+    // #2343: casting a line always needs an implement in bags. The null arm
+    // carries the simple pole, which is mechanically identical to the old
+    // bare hands (effective tier 1), so every tick literal below is
+    // byte-identical to the pre-gate bare arm.
+    sim.addItem(rod ?? 'simple_fishing_pole', 1);
     teleportToValeShore(sim);
     const out: number[] = [];
     let draws = 0;
@@ -152,7 +156,7 @@ describe('bite delay draw contract and rod-tiered bounds', () => {
     return out;
   }
 
-  it('bare hands: one draw per cast, every delay in [60, 160] ticks, and the tail above 100 is live', () => {
+  it('the tier-1 pole: one draw per cast, every delay in [60, 160] ticks, and the tail above 100 is live', () => {
     expect(Math.ceil(FISH_BITE_DELAY_MIN_SEC / DT)).toBe(60);
     expect(Math.ceil(FISH_BITE_DELAY_MAX_SEC / DT)).toBe(160);
     const ticks = delays(null, 40);
@@ -181,14 +185,16 @@ describe('bite delay draw contract and rod-tiered bounds', () => {
     ] as [string | null, number][]) {
       const sim = makeSim(4242);
       const meta = mustMeta(sim, sim.playerId);
-      if (rod) sim.addItem(rod, 1);
+      // #2343 implement gate: the base arm carries the tier-1 pole (identical
+      // to the old bare hands), so the base 60-tick window literal holds.
+      sim.addItem(rod ?? 'simple_fishing_pole', 1);
       teleportToValeShore(sim);
       const p = sim.player;
       startFishing(sim.ctx, p, meta);
       sim.tickCount = p.fishBiteAtTick;
       updateCasting(sim.ctx, p, meta);
       expect(p.fishBiteAtTick).toBe(0);
-      expect(p.fishReelDeadlineTick - sim.tickCount, rod ?? 'bare').toBe(windowTicks);
+      expect(p.fishReelDeadlineTick - sim.tickCount, rod ?? 'pole').toBe(windowTicks);
     }
   });
 });
@@ -197,6 +203,7 @@ describe('reel deadline boundary', () => {
   it('a re-press at exactly the deadline tick lands the catch (and pre-bite re-press stays busy)', () => {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
     teleportToValeShore(sim);
     const p = sim.player;
     let draws = 0;
@@ -227,6 +234,7 @@ describe('reel deadline boundary', () => {
   it('one tick past the deadline the tick phase misses first; a re-press then starts a FRESH cast', () => {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
     teleportToValeShore(sim);
     const p = sim.player;
     startFishing(sim.ctx, p, meta);
@@ -266,6 +274,7 @@ describe('hidden-state wire invariant', () => {
     const run = (seed: number) => {
       const sim = makeSim(seed);
       const meta = mustMeta(sim, sim.playerId);
+      sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
       teleportToValeShore(sim);
       startFishing(sim.ctx, sim.player, meta);
       const delay = sim.player.fishBiteAtTick - sim.tickCount;
@@ -336,6 +345,7 @@ describe('hidden-state wire invariant', () => {
     gatherer.pos.z = NODE.pos.z;
     gatherer.pos.y = terrainHeight(NODE.pos.x, NODE.pos.z, server.sim.cfg.seed);
     gatherer.prevPos = { ...gatherer.pos };
+    server.sim.addItem('copper_mining_pick', 1, sb.pid); // #2343: node harvest needs the tool
     expect(server.sim.harvestNode(NODE.id, sb.pid)).toBe(true);
     server.sim.tick(); // both casts mid-flight
     // The hidden fields ARE nonzero right now, so an accidental broadcast
@@ -408,6 +418,7 @@ describe('gather completion re-validation', () => {
   function simMidCast() {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Revalidated');
+    sim.addItem('copper_mining_pick', 1, pid); // #2343: tier-1 tool keeps castTotal at base
     teleportOntoNode(sim, pid, NODE.id);
     expect(sim.harvestNode(NODE.id, pid)).toBe(true);
     sim.drainEvents();
@@ -437,6 +448,9 @@ describe('gather completion re-validation', () => {
 
   it('bags filled mid-cast: the bags literal, zero draws, no grant', () => {
     const { sim, pid, meta } = simMidCast();
+    // Wiping the pick with the rest of the bags is deliberate: completion
+    // never re-checks the tool gate (it was held at cast start), so the
+    // denial here is the bags literal, not a tool denial.
     meta.inventory.length = 0;
     for (let i = 0; i < bagCapacity(meta.bags); i++) {
       meta.inventory.push({ itemId: 'bone_fragments', count: 1, instance: { boundTo: pid } });
@@ -457,7 +471,7 @@ describe('gather completion re-validation', () => {
   });
 });
 
-describe('node-tier-relative proficiency gain through the live cast loop (Phase 12c)', () => {
+describe('node-tier-relative proficiency gain through the live cast loop', () => {
   // The resolveHarvest call site queues gatherNodeGainMultiplier(proficiency,
   // node.tier) instead of the old flat 1. NODE is tier 1, so mining 50 sits
   // two gain tiers above it (green, 0.25) and mining 75 grays it out
@@ -467,6 +481,7 @@ describe('node-tier-relative proficiency gain through the live cast loop (Phase 
     const pid = sim.addPlayer('warrior', 'Curved');
     const meta = mustMeta(sim, pid);
     meta.gatheringProficiency.mining = proficiency;
+    sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
     expect(sim.harvestNode(NODE.id, pid)).toBe(true);
     completeCastNow(sim, pid);
@@ -490,6 +505,7 @@ describe('move cancel is free', () => {
     const sim = makeSim(42);
     despawnMobs(sim); // a mob-dead world ticks draw-free, so the observer is decisive
     const pid = sim.playerId;
+    sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
     expect(sim.harvestNode(NODE.id, pid)).toBe(true);
     sim.moveInput.forward = true;
@@ -524,6 +540,7 @@ describe('same-seed determinism across the whole rhythm loop', () => {
       sim.rng.setObserver(() => draws++);
       try {
         teleportOntoNode(sim, pid, NODE.id);
+        sim.addItem('copper_mining_pick', 1, pid); // #2343 tool gate; addItem draws no rng
         sim.harvestNode(NODE.id, pid);
         for (let i = 0; i < 60 && sim.player.castingAbility; i++) events.push(...sim.tick());
         events.push(...sim.drainEvents());
@@ -653,6 +670,7 @@ describe('interrupt immunity and damage-cancels-not-pushback', () => {
   it('damage CANCELS a gather cast outright rather than pushing it back', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Struck');
+    sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
     expect(sim.harvestNode(NODE.id, pid)).toBe(true);
     const p = sim.entities.get(pid);
@@ -694,6 +712,10 @@ describe('the reel window follows the rod held at BITE time, not cast start', ()
   it('a rod picked up between cast start and the bite widens the window', () => {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
+    // #2343: the cast start needs SOME implement; the tier-1 pole satisfies
+    // the gate without touching the bite-time rod re-scan, so the widened
+    // window still proves the rod picked up mid-session was the one scanned.
+    sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
     const p = sim.player;
     startFishing(sim.ctx, p, meta);
@@ -724,12 +746,15 @@ describe('every gather start-deny arm leaves no cast and draws nothing', () => {
     expect(p.gatherCastNodeId).toBe('');
   }
 
-  it('dead, unknown node, too far, respawn-not-ready, bags-full: no cast, zero draws', () => {
+  it('dead, unknown node, too far, respawn-not-ready, toolless, bags-full: no cast, zero draws', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Denied');
     const p = sim.entities.get(pid);
     const meta = mustMeta(sim, pid);
     if (!p) throw new Error('missing entity');
+    // The first four arms run WITH the pick so each denies at its own gate,
+    // not at the #2343 tool gate that now sits after them.
+    sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, NODE.id);
     // dead
     p.dead = true;
@@ -745,7 +770,23 @@ describe('every gather start-deny arm leaves no cast and draws nothing', () => {
     meta.nodeHarvestReadyAt[NODE.id] = sim.time + 60;
     expectDenied(sim, pid, NODE.id);
     delete meta.nodeHarvestReadyAt[NODE.id];
-    // bags full of an unstackable the material cannot top up
+    // toolless (#2343, the RuneScape rule): bare hands never gather, so a
+    // ready tier-1 node denies with the structured gatherDenied event
+    // (requiredTier 1 = "no tool owned at all") and the full deny shape.
+    sim.removeItem('copper_mining_pick', 1, pid);
+    sim.drainEvents();
+    expectDenied(sim, pid, NODE.id);
+    expect(sim.drainEvents()).toContainEqual({
+      type: 'gatherDenied',
+      pid,
+      surface: 'node',
+      professionId: 'mining',
+      requiredTier: NODE.tier,
+    });
+    // bags full of an unstackable the material cannot top up (the pick is
+    // re-added first so the deny reaches the capacity gate, not the tool gate;
+    // it holds one of the slots the wolf_fang fill then tops up around)
+    sim.addItem('copper_mining_pick', 1, pid);
     const capacity = bagCapacity(meta.bags);
     while (meta.inventory.length < capacity) {
       sim.addItemInstance('wolf_fang', { signer: 'Denied' }, pid);
@@ -758,6 +799,7 @@ describe('every gather start-deny arm leaves no cast and draws nothing', () => {
     const pid = sim.addPlayer('warrior', 'Busy');
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing entity');
+    sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
     expect(sim.harvestNode(NODE.id, pid)).toBe(true);
     const total = p.castTotal;
@@ -790,6 +832,7 @@ describe('death clears the hidden cast state (review fix)', () => {
   it('a sourceless lethal blow mid-fishing leaves every hidden field inert', () => {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
     teleportToValeShore(sim);
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
@@ -806,6 +849,7 @@ describe('death clears the hidden cast state (review fix)', () => {
     const pid = sim.addPlayer('warrior', 'Slain');
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing entity');
+    sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
     expect(sim.harvestNode(NODE.id, pid)).toBe(true);
     expect(p.gatherCastNodeId).toBe(NODE.id);
@@ -833,6 +877,7 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
   it('cancelCast inside the armed reel window clears both fishing fields, so the next session cannot instant-reel off a stale deadline', () => {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
     teleportToValeShore(sim);
     const p = sim.player;
     startFishing(sim.ctx, p, meta);
@@ -866,6 +911,7 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
   it('the arena fighter reset clears the hidden fields', () => {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
     teleportToValeShore(sim);
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
@@ -879,6 +925,7 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
   it('the fiesta down path clears the hidden fields', () => {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
     teleportToValeShore(sim);
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
@@ -896,6 +943,7 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     // the bite still pending.
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
     teleportToValeShore(sim);
     const p = sim.player;
     startFishing(sim.ctx, p, meta);
@@ -927,6 +975,7 @@ describe('the widened useItem busy guard covers the gather cast (QA pin)', () =>
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing entity');
     sim.addItem('minor_mana_potion', 1, pid);
+    sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
     expect(sim.harvestNode(NODE.id, pid)).toBe(true);
     const nodeId = p.gatherCastNodeId;
@@ -946,7 +995,7 @@ describe('rod synergy is literal-pinned on one shared draw (QA pins)', () => {
   // literals pin FISH_BITE_DELAY_MIN_SEC and the 1.5 s/tier max-side
   // reduction in BOTH directions (the sampled-bounds arms above catch only
   // a shrink of the reduction, not a growth).
-  it('first-cast delay ticks at seed 4242: bare 127, tier-2 rod 107, tier-3 rod 87', () => {
+  it('first-cast delay ticks at seed 4242: tier-1 pole 127, tier-2 rod 107, tier-3 rod 87', () => {
     for (const [rod, ticks] of [
       [null, 127],
       ['ironreel_fishing_rod', 107],
@@ -954,11 +1003,13 @@ describe('rod synergy is literal-pinned on one shared draw (QA pins)', () => {
     ] as [string | null, number][]) {
       const sim = makeSim(4242);
       const meta = mustMeta(sim, sim.playerId);
-      if (rod) sim.addItem(rod, 1);
+      // #2343: the base arm carries the tier-1 pole, mechanically identical
+      // to the old bare hands, so the 127 literal is byte-identical.
+      sim.addItem(rod ?? 'simple_fishing_pole', 1);
       teleportToValeShore(sim);
       const p = sim.player;
       startFishing(sim.ctx, p, meta);
-      expect(p.fishBiteAtTick - sim.tickCount, rod ?? 'bare').toBe(ticks);
+      expect(p.fishBiteAtTick - sim.tickCount, rod ?? 'pole').toBe(ticks);
     }
   });
 });

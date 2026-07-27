@@ -89,6 +89,13 @@ describe('inspect showcase CSS', () => {
     expect(shell).toContain('.char-title-text .panel-subtitle { display: inline-block;');
     expect(shell).toContain('border-radius: 999px;');
   });
+
+  it('keeps the archetype crest and label aligned inside their pill', () => {
+    expect(shell).toContain(
+      '.char-title-text .panel-subtitle.char-archetype-title { display: inline-flex; align-items: center; gap: 4px; }',
+    );
+    expect(components).not.toContain('.char-archetype-title { display: inline-flex;');
+  });
 });
 
 describe('mobile showcase CSS', () => {

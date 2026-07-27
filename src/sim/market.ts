@@ -11,6 +11,7 @@
 
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import { planListingIds, playerListingIdFloor } from './market_listing_ids';
 import {
   MARKET_PAGE_SIZE,
   type MarketQuery,
@@ -26,8 +27,14 @@ const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to de
 // so it is the one const exported back to sim.ts; the rest are market-internal.
 export const MARKET_MAX_LISTINGS = 12; // active player listings per seller
 const MARKET_MIN_PRICE = 1; // copper
-const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling — guards against overflow / fat-finger
-const MARKET_CUT = 0.05; // the Merchant's cut on a completed sale (a gold sink)
+const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling, guards against overflow / fat-finger
+// Exported for the wiki generator (scripts/wiki/build_content.mjs) and its
+// accuracy guard: the published cut percent derives from this one constant.
+export const MARKET_CUT = 0.05; // the Merchant's cut on a completed sale (a gold sink)
+// No listing deposit is charged today; the constant exists so the wiki reads
+// the sim's own number instead of hardcoding one, and so a future deposit
+// lever has a named home the published page tracks automatically.
+export const MARKET_LISTING_DEPOSIT_COPPER = 0;
 const MARKET_LISTING_DURATION = 48 * 3600; // sim-seconds an unsold listing lingers before returning
 const MARKET_WIRE_LIMIT = 120; // most listings shipped to one client at a time
 
@@ -192,6 +199,23 @@ export class Market {
       { itemId: 'outrider_legguards', count: 1, price: 2100 },
       { itemId: 'pilgrims_leggings', count: 1, price: 1700 },
       { itemId: 'outrider_sabatons', count: 1, price: 1900 },
+      // The two vendor-sold bags, at their vendor price, so the Bags filter is never
+      // empty on a fresh world. The four drop-only bags stay player-listed goods:
+      // house rows never deplete, so seeding those would be an endless bag faucet.
+      //
+      // APPENDED, never inserted mid-array: ids come off one counter in array order
+      // (below), house rows are reseeded every boot and are NOT persisted, and
+      // `market_buy` carries only the listing id with no item cross-check. Inserting
+      // here would renumber every row after it, so a client holding a browse list
+      // across a server restart could click Buy on a row that now means a different
+      // item. Appending leaves every existing id pointing at the same goods.
+      // (Growing this table is otherwise content-safe now: the counter is floored
+      // to the reserved player base below, so no id this build issues a player
+      // listing can ever be reached by stock, and an id a pre-#2463 build issued
+      // below that base is reissued by the load path in the same boot the table
+      // grows over it. See market_listing_ids.ts, #2463.)
+      { itemId: 'linen_pouch', count: 1, price: 250 },
+      { itemId: 'travelers_knapsack', count: 1, price: 2000 },
     ];
     for (const s of stock) {
       if (!ITEMS[s.itemId]) continue;
@@ -206,6 +230,11 @@ export class Market {
         house: true,
       });
     }
+    // Reserve the whole low band for house stock before a player listing can be
+    // issued an id. House rows are reseeded from this counter every boot and are
+    // never persisted, so without the floor a grown stock table reissues ids an
+    // older build already handed to persisted player listings (#2463).
+    this.nextListingId = playerListingIdFloor(this.marketListings.map((l) => l.id));
   }
 
   // List a stack from your bags for sale. The goods are escrowed (pulled from
@@ -446,6 +475,17 @@ export class Market {
     }
   }
 
+  // Whether anything (sale gold or returned items) waits for this player at the
+  // Merchant. The always-streamed HUD indicator bit (the mailUnread pattern):
+  // unlike marketInfoFor it has NO proximity gate, so the minimap badge can
+  // light anywhere in the world; collection itself stays at the Merchant.
+  collectPendingFor(pid: number): boolean {
+    const meta = this.ctx.players.get(pid);
+    if (!meta) return false;
+    const col = this.collectionForSeller(meta);
+    return !!col && (col.copper > 0 || col.items.length > 0);
+  }
+
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
     const meta = this.ctx.players.get(pid);
     const e = this.ctx.entities.get(pid);
@@ -536,18 +576,38 @@ export class Market {
 
   loadMarket(save: MarketSave | null | undefined): void {
     if (!save) return;
-    for (const l of save.listings ?? []) {
+    // Drop the rows that carry no item id at all BEFORE planning, so the plan
+    // describes exactly what gets pushed: no planned id is burned on a row that
+    // never lands, and `remapped` counts only reissues the book actually took.
+    // (A listing whose item id is merely no longer in ITEMS is a different case
+    // and is KEPT; see the loop below.)
+    const saved = (save.listings ?? []).filter((l) => l && typeof l.itemId === 'string');
+    // Settle the id counter and reissue any collision BEFORE a single row is
+    // pushed back. The house band is already in the book (seeded by the ctor)
+    // and is sized by the CURRENT stock table, so a save written under a smaller
+    // table can carry an id that now names a house row. Replaying it verbatim
+    // would put two rows in the book under one id, and every id-resolving call
+    // site (marketBuy/marketCancel/the wire) would resolve to the house row that
+    // sits earlier in the array (#2463). Boot order makes this safe: the server
+    // loads the market before any client connects (server/main.ts).
+    const plan = planListingIds({
+      taken: this.marketListings.map((l) => l.id),
+      saved: saved.map((l) => l.id),
+      from: this.nextListingId,
+      savedNext: save.nextListingId,
+    });
+    for (let i = 0; i < saved.length; i++) {
+      const l = saved[i];
       // Keep a listing whose item id is no longer in ITEMS (a content rename,
       // retirement, or typo). Dropping it would silently destroy every escrowed
       // copy on the next restart and never refund the seller. An unknown id is
       // dormant, recoverable data (the owner can reclaim it into bags, exactly
       // as the character load path keeps unknown ids verbatim); a re-added or
       // corrected id rehydrates it. Display/buy paths already guard on ITEMS[id].
-      if (!l || typeof l.itemId !== 'string') continue;
       if (!ITEMS[l.itemId])
         console.warn(`market: keeping listing with unknown item id ${l.itemId}`);
       this.marketListings.push({
-        id: l.id,
+        id: plan.ids[i],
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
         itemId: l.itemId,
@@ -574,8 +634,16 @@ export class Market {
           .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) })),
       });
     }
-    const maxId = this.marketListings.reduce((m, l) => Math.max(m, l.id + 1), 1);
-    this.nextListingId = Math.max(this.nextListingId, save.nextListingId ?? 1, maxId);
+    this.nextListingId = plan.nextListingId;
+    if (plan.remapped > 0) {
+      // Dev-channel only: a boot-time repair the operator should see in the log.
+      // The count covers all three reissue causes (taken by the house band,
+      // duplicated inside the save, or malformed), so the log never sends an
+      // operator after the wrong hypothesis on a corrupt blob.
+      console.warn(
+        `market: reissued ${plan.remapped} persisted listing id(s) that collided or were malformed`,
+      );
+    }
     this.reclaimSoulboundListings();
   }
 

@@ -1,6 +1,6 @@
-// Pure, host-agnostic model for the first-tier tutorial panel (Professions 2.0
-// Phase 14): the one-time explainer fired by the `profTierTutorial` SimEvent the
-// first time any craft skill crosses tier 1. The sim guarantees once-ever
+// Pure, host-agnostic model for the first-tier tutorial panel
+// (Professions 2.0): the one-time explainer fired by the `profTierTutorial`
+// SimEvent the first time any craft skill crosses tier 1. The sim guarantees once-ever
 // (professions/prof_nudges.ts, a persisted one-shot flag), so this model is
 // static content: it lists the ordered explainer paragraphs (the tier cap that
 // just bit, the craft-wheel identity concept, and that masters offer attunement

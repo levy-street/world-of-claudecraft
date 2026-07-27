@@ -1,4 +1,4 @@
-// Identical-payload stacking (Professions 2.0 Phase 12d): the equality and
+// Identical-payload stacking (Professions 2.0): the equality and
 // mergeability matrix for src/sim/item_instance_merge.ts, the one predicate
 // every merge point (bags countFit/addStacked, Sim.addItemInstance, bank
 // moveBetweenContainers, trade fitsAfterSwap) consumes. Every refusal arm is

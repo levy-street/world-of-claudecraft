@@ -39,8 +39,16 @@ const dmg = (sourceId: number, targetId: number, amount: number): SimEvent =>
     ability: null,
     kind: 'hit',
   }) as SimEvent;
-const heal = (sourceId: number, targetId: number, amount: number): SimEvent =>
-  ({ type: 'heal2', sourceId, targetId, amount, crit: false, ability: 'Heal' }) as SimEvent;
+const heal = (sourceId: number, targetId: number, amount: number, cueOnly = false): SimEvent =>
+  ({
+    type: 'heal2',
+    sourceId,
+    targetId,
+    amount,
+    crit: false,
+    ability: 'Heal',
+    cueOnly,
+  }) as SimEvent;
 
 describe('combat meters', () => {
   it('tallies party damage and healing into the current encounter and all-time', () => {
@@ -59,6 +67,33 @@ describe('combat meters', () => {
     // label follows the beefiest mob fought
     expect(m.current!.label).toBe('Gorrak');
     expect(m.current!.mainMobId).toBe(51);
+  });
+
+  it('ignores a cueOnly heal2 (the HoT-application sound cue): no encounter opens, no tally, no lastActivity bump', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(heal(2, 1, 0, true), w, party, 1000);
+    expect(m.current).toBeNull();
+    expect(m.allTime.tallies.has(2)).toBe(false);
+    // a real event afterward opens the encounter fresh, proving the cue left no trace
+    m.onEvent(heal(2, 1, 30), w, party, 2000);
+    expect(m.current).not.toBeNull();
+    expect(m.current!.startedAt).toBe(2000);
+    expect(m.current!.tallies.get(2)!.heal).toBe(30);
+  });
+
+  it('a genuine amount:0 direct heal (no cueOnly flag) still keeps the encounter alive, just untallied', () => {
+    // Distinguishes the cueOnly flag from amount === 0 itself: a real heal
+    // that lands for 0 (full HP, fully absorbed) is still party activity,
+    // unlike the HoT-application cue above.
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(heal(2, 1, 0), w, party, 1000);
+    expect(m.current).not.toBeNull();
+    expect(m.current!.startedAt).toBe(1000);
+    expect(m.allTime.tallies.has(2)).toBe(false); // 0-amount still untallied
   });
 
   it('ends the encounter after inactivity once no mob holds aggro, keeping history + all-time', () => {

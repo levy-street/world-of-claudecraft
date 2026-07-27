@@ -160,6 +160,15 @@ class FakeDb implements SocialDb {
     return this.guilds.size;
   } // test helper: detect orphaned guilds
 
+  // guild billboard (motd)
+  private motds = new Map<number, { motd: string; motdSetBy: string }>();
+  async setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void> {
+    this.motds.set(guildId, { motd, motdSetBy: setBy });
+  }
+  async guildMotd(guildId: number): Promise<{ motd: string; motdSetBy: string }> {
+    return this.motds.get(guildId) ?? { motd: '', motdSetBy: '' };
+  }
+
   // guild calendar events
   private events = new Map<number, GuildEventRow & { guildId: number }>();
   private nextEventId = 1;
@@ -1268,6 +1277,121 @@ describe('guild calendar events', () => {
     });
     expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(0);
     expect(h.tx.snapshotCount.get(3) ?? 0).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guild billboard (motd): officer-gated set/clear, the server clamp, the
+// snapshot lane, and the structured motdResult outcomes the client localizes.
+// ---------------------------------------------------------------------------
+
+describe('guild billboard (motd)', () => {
+  // Leader (1) + officer (2) + member (3), officers/member online, motdResult
+  // lane cleared; the seatedGuild recipe from the calendar suite.
+  async function seatedGuild() {
+    const h = setup();
+    h.add(1, 'Lead');
+    h.add(2, 'Officer');
+    h.add(3, 'Member');
+    h.tx.setOnline(2);
+    h.tx.setOnline(3);
+    await h.svc.guildCreate(h.actor(1), 'Night Watch');
+    await h.svc.guildInvite(h.actor(1), 'Officer');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildInvite(h.actor(1), 'Member');
+    await h.svc.guildAccept(h.actor(3));
+    await h.svc.guildSetRank(h.actor(1), 'Officer', 'officer');
+    h.tx.clear();
+    return h;
+  }
+
+  function resultsFor(h: Awaited<ReturnType<typeof seatedGuild>>, id: number): string[] {
+    return h.tx
+      .eventsFor(id)
+      .filter((e) => e.type === 'motdResult')
+      .map((e: any) => e.code);
+  }
+
+  it('lets an officer set the billboard; the snapshot carries text + setter', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(2), 'Raid night Friday. Discord: discord.gg/example');
+    expect(resultsFor(h, 2)).toEqual(['set']);
+    const snap = await h.svc.snapshot(3);
+    expect(snap.guild?.motd).toBe('Raid night Friday. Discord: discord.gg/example');
+    expect(snap.guild?.motdSetBy).toBe('Officer');
+  });
+
+  it('lets the leader set the billboard', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(1), 'Welcome to Night Watch');
+    expect(resultsFor(h, 1)).toEqual(['set']);
+    const snap = await h.svc.snapshot(1);
+    expect(snap.guild?.motd).toBe('Welcome to Night Watch');
+    expect(snap.guild?.motdSetBy).toBe('Lead');
+  });
+
+  it('denies a plain member with notOfficer and writes nothing', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(1), 'Original');
+    h.tx.clear();
+    await h.svc.guildSetMotd(h.actor(3), 'Member takeover');
+    expect(resultsFor(h, 3)).toEqual(['notOfficer']);
+    const snap = await h.svc.snapshot(3);
+    expect(snap.guild?.motd).toBe('Original');
+    expect(snap.guild?.motdSetBy).toBe('Lead');
+  });
+
+  it('denies a character with no guild with notInGuild', async () => {
+    const h = await seatedGuild();
+    h.add(9, 'Loner');
+    await h.svc.guildSetMotd(h.actor(9), 'Hello?');
+    expect(resultsFor(h, 9)).toEqual(['notInGuild']);
+  });
+
+  it('trims and clamps the text to 240 characters (241 in, 240 stored)', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(2), `  ${'x'.repeat(241)}  `);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.motd).toBe('x'.repeat(240));
+    expect(snap.guild?.motd).toHaveLength(240);
+  });
+
+  it('never stores a lone surrogate when the clamp lands inside an astral pair', async () => {
+    const h = await seatedGuild();
+    // 239 ascii chars + an astral codepoint (2 UTF-16 units): the 240 slice
+    // would cut the pair in half; the stored text drops the orphaned half.
+    await h.svc.guildSetMotd(h.actor(2), `${'x'.repeat(239)}\u{1F600}`);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.motd).toBe('x'.repeat(239));
+    // and a well-formed message is untouched
+    expect([...(snap.guild?.motd ?? '')].every((c) => !/[\uD800-\uDFFF]/.test(c))).toBe(true);
+  });
+
+  it('an empty (or whitespace-only) message clears the billboard and its attribution', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(2), 'Something');
+    await h.svc.guildSetMotd(h.actor(1), '   ');
+    expect(resultsFor(h, 1)).toEqual(['set']);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.motd).toBe('');
+    expect(snap.guild?.motdSetBy).toBe('');
+  });
+
+  it('pushes a fresh snapshot to every ONLINE guild member, and not to outsiders', async () => {
+    const h = await seatedGuild();
+    h.add(9, 'Loner');
+    h.tx.setOnline(9);
+    await h.svc.guildSetMotd(h.actor(2), 'Meeting at dusk');
+    expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(0);
+    expect(h.tx.snapshotCount.get(3) ?? 0).toBeGreaterThan(0);
+    expect(h.tx.snapshotCount.get(9) ?? 0).toBe(0);
+  });
+
+  it('a fresh guild starts with an empty billboard', async () => {
+    const h = await seatedGuild();
+    const snap = await h.svc.snapshot(1);
+    expect(snap.guild?.motd).toBe('');
+    expect(snap.guild?.motdSetBy).toBe('');
   });
 });
 

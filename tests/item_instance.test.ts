@@ -1,7 +1,7 @@
 // #1165: the additive per-instance item payload (signer/charges/rolled/boundTo)
 // on InvSlot. Covers the round-trip through save/load, the bag display view-core
 // not crashing on an instanced slot, and instanced items staying inert (never
-// listed) on the World Market. Professions 2.0 Phase 2 adds the masterwork
+// listed) on the World Market. Professions 2.0 adds the masterwork
 // marker (rolled.masterwork plus baked bonus stats): the cases in the second
 // describe pin the additive JSONB back-compat (legacy rolled.quality payloads
 // keep loading and equipping unchanged) and the masterwork payload round-trip.
@@ -117,6 +117,49 @@ describe('item-instance payload (#1165)', () => {
     expect(slots.some((s) => !s.instance && s.count === 1)).toBe(true);
   });
 
+  it('a batched multi-unit grant emits one xN loot line and lands units as usual', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    sim.drainEvents();
+    sim.addItemInstance('wolf_fang', { signer: 'Aldric' }, sim.playerId, 3);
+
+    const loot = sim
+      .drainEvents()
+      .filter((e) => e.type === 'loot')
+      .map((e) => (e as unknown as { text: string }).text);
+    expect(loot).toEqual(['You receive: Cracked Wolf Fang x3.']);
+    const slots = sim.meta(sim.playerId)!.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(slots).toHaveLength(1);
+    expect(slots[0].count).toBe(3);
+    expect(slots[0].instance?.signer).toBe('Aldric');
+  });
+
+  it('a zero-count grant is a full no-op: no slot, no loot line', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    sim.drainEvents();
+    sim.addItemInstance('wolf_fang', { signer: 'Aldric' }, sim.playerId, 0);
+
+    expect(sim.drainEvents().filter((e) => e.type === 'loot')).toHaveLength(0);
+    expect(sim.meta(sim.playerId)!.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(false);
+  });
+
+  it('a batch forced across slots never shares one mutable payload object', () => {
+    // charges payloads are one-per-slot by the merge carve-out, so a count-2
+    // grant must mint two slots holding DISTINCT payload objects: charges
+    // mutate in place, and a shared reference would drain both copies.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    sim.addItemInstance(
+      'apprentice_staff',
+      { signer: 'Aldric', charges: { zap: 2 } },
+      sim.playerId,
+      2,
+    );
+
+    const slots = sim.meta(sim.playerId)!.inventory.filter((s) => s.itemId === 'apprentice_staff');
+    expect(slots).toHaveLength(2);
+    expect(slots[0].instance).toEqual(slots[1].instance);
+    expect(slots[0].instance).not.toBe(slots[1].instance);
+  });
+
   it('the bag display view-core renders an instanced slot without crashing', () => {
     const model = buildBagGrid(
       [
@@ -166,11 +209,11 @@ describe('item-instance payload (#1165)', () => {
   });
 });
 
-describe('masterwork and legacy instance payloads (Professions 2.0 Phase 2 back-compat)', () => {
+describe('masterwork and legacy instance payloads (Professions 2.0 back-compat)', () => {
   it('a legacy rolled.quality payload still loads, clones without aliasing, and equips unchanged', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
-    // The Phase 2 model retired NEW rolled.quality writes; a persisted legacy
-    // payload (pre-Phase 2 signed craft) must keep loading exactly as saved.
+    // The current model retired NEW rolled.quality writes; a persisted legacy
+    // payload (a legacy signed craft) must keep loading exactly as saved.
     sim.addItemInstance('cryptbone_greaves', { rolled: { quality: 'rare' } }, sim.playerId);
 
     const state = sim.serializeCharacter(sim.playerId)!;
@@ -293,7 +336,7 @@ describe('masterwork and legacy instance payloads (Professions 2.0 Phase 2 back-
 
   it('the top-level enchant marker survives save/load intact and keeps the copy enchant-guarded', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
-    // The exact post-Phase-2 shape of an enchanted masterwork copy: signer plus
+    // The exact current shape of an enchanted masterwork copy: signer plus
     // rolled.masterwork plus baked stats plus the authoritative top-level
     // enchant id (types.ts ItemInstancePayload.enchant). If persistence dropped
     // the marker, isEnchantedInstance would fall through to the masterwork arm
@@ -329,7 +372,7 @@ describe('masterwork and legacy instance payloads (Professions 2.0 Phase 2 back-
   });
 });
 
-describe('identical-payload stacking (Professions 2.0 Phase 12d)', () => {
+describe('identical-payload stacking (Professions 2.0)', () => {
   const makeSim = () => new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
 
   it('two same-signer grants merge into ONE slot at count 2; a third keeps merging', () => {
@@ -463,7 +506,7 @@ describe('identical-payload stacking (Professions 2.0 Phase 12d)', () => {
     expect(loaded[0].instance).toEqual({ signer: 'Ana' });
   });
 
-  it('addPlayer clamps a tampered counted instanced slot with the same rule as the bank arm (12d QA)', () => {
+  it('addPlayer clamps a tampered counted instanced slot with the same rule as the bank arm', () => {
     const sim = makeSim();
     sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
     const state = JSON.parse(JSON.stringify(sim.serializeCharacter(sim.playerId)!));

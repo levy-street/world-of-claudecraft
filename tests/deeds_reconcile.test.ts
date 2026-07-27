@@ -244,6 +244,8 @@ describe('reconcile through GameServer.join', () => {
       id: 1,
       name: 'The Vanguard',
       rank: 'member' as const,
+      motd: '',
+      motdSetBy: '',
       members: [],
       events: [],
     };

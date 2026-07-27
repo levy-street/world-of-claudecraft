@@ -1,4 +1,4 @@
-// Crafting stations (Professions 2.0 Phase 8): the hands-vs-stations split.
+// Crafting stations (Professions 2.0): the hands-vs-stations split.
 // Field recipes (content/recipes.ts FIELD_RECIPES) craft anywhere; a recipe
 // carrying a `stationType` (professions/types.ts ProfessionRecipeRecord)
 // resolves only while the crafter stands at a matching station, or while
@@ -14,35 +14,28 @@
 // STATION_TYPE_BY_CRAFT) lives in content/professions.ts; that module
 // imports these TYPES back type-only, so there is no runtime cycle.
 
-import { STATION_RADIUS, STATION_TYPE_BY_CRAFT, STATIONS } from '../content/professions';
+import { STATION_RADIUS, STATION_TYPE_BY_CRAFT } from '../content/professions';
+import type { StationDef, StationType } from '../types';
+
+export type { StationDef, StationType } from '../types';
 
 // The six physical station kinds. A StationType is a stable id, never
 // player-facing text: display names live in src/ui/i18n.catalog/
 // hud_chrome.ts (`hudChrome.crafting.stationName.<type>`).
-export type StationType = 'forge' | 'kitchens' | 'apothecary' | 'tannery' | 'loom' | 'toolworks';
-
-// One placed station in the world: WHERE it sits and WHICH master NPC runs
-// it. `pos` is world coordinates in the station's zone; `masterNpcId` names
-// the resident master (content agent's NpcDef) so quest/vendor content can
-// anchor to the station record instead of re-typing coordinates.
-export interface StationDef {
-  id: string;
-  type: StationType;
-  zoneId: string;
-  pos: { x: number; z: number };
-  masterNpcId: string;
-}
-
 /** Every station of one type (a type can have stations in several zones). */
-export function stationsOfType(type: StationType): StationDef[] {
-  return STATIONS.filter((s) => s.type === type);
+export function stationsOfType(stations: readonly StationDef[], type: StationType): StationDef[] {
+  return stations.filter((station) => station.type === type);
 }
 
 /** True while `pos` sits within STATION_RADIUS of ANY station of `type`
  *  (squared-distance compare, the same proximity idiom the old
  *  crafting_hub.ts isAtCraftingHub used). */
-export function isAtStation(pos: { x: number; z: number }, type: StationType): boolean {
-  for (const station of STATIONS) {
+export function isAtStation(
+  stations: readonly StationDef[],
+  pos: { x: number; z: number },
+  type: StationType,
+): boolean {
+  for (const station of stations) {
     if (station.type !== type) continue;
     const dx = pos.x - station.pos.x;
     const dz = pos.z - station.pos.z;
@@ -52,11 +45,14 @@ export function isAtStation(pos: { x: number; z: number }, type: StationType): b
 }
 
 /** True while `pos` sits within STATION_RADIUS of ANY static station,
- *  whatever its type: the Maker's Bond unbind service gate (Professions 2.0
- *  Phase 14b), which every station master offers regardless of craft. A
+ *  whatever its type: the Maker's Bond unbind service gate (Professions 2.0),
+ *  which every station master offers regardless of craft. A
  *  mobile station NEVER satisfies this, the training precedent. */
-export function isAtAnyStation(pos: { x: number; z: number }): boolean {
-  for (const station of STATIONS) {
+export function isAtAnyStation(
+  stations: readonly StationDef[],
+  pos: { x: number; z: number },
+): boolean {
+  for (const station of stations) {
     const dx = pos.x - station.pos.x;
     const dz = pos.z - station.pos.z;
     if (dx * dx + dz * dz <= STATION_RADIUS * STATION_RADIUS) return true;
@@ -70,10 +66,6 @@ export function stationTypeForCraft(craftId: string): StationType | undefined {
   return STATION_TYPE_BY_CRAFT[craftId];
 }
 
-// The distinct station types present in STATIONS, in content order. Derived,
-// so a content edit can never leave a type behind.
-const STATION_TYPES: readonly StationType[] = [...new Set(STATIONS.map((s) => s.type))];
-
 /**
  * The set of station types the crafting UI should treat as in range right
  * now: every type with a physical station within STATION_RADIUS of `pos`,
@@ -83,12 +75,15 @@ const STATION_TYPES: readonly StationType[] = [...new Set(STATIONS.map((s) => s.
  * stations), computed once per repaint by the HUD.
  */
 export function inRangeStationTypes(
+  stations: readonly StationDef[],
   pos: { x: number; z: number },
   activeMobileStationCraft: string | null = null,
 ): Set<StationType> {
   const inRange = new Set<StationType>();
-  for (const type of STATION_TYPES) {
-    if (isAtStation(pos, type)) inRange.add(type);
+  for (const station of stations) {
+    const dx = pos.x - station.pos.x;
+    const dz = pos.z - station.pos.z;
+    if (dx * dx + dz * dz <= STATION_RADIUS * STATION_RADIUS) inRange.add(station.type);
   }
   if (activeMobileStationCraft !== null) {
     const mobileType = stationTypeForCraft(activeMobileStationCraft);

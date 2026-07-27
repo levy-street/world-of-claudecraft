@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NAMEPLATE_INTERVAL_LOW_SEC, nameplateIntervalSec } from '../src/game/ui_tier_knobs';
+import { FAR_ANIM_RANGE_SCALE_MAX } from '../src/render/crowd_lod';
 import {
   classifyGpuRenderer,
   configureMaskedDoubleSidedVegetationMaterial,
@@ -402,9 +403,12 @@ describe('graphics tier resolution', () => {
 
   it('classifies GPU renderer strings into device-capability buckets', () => {
     expect(classifyGpuRenderer('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)')).toBe('strongDesktop');
+    // Apple Silicon is its own class (split from strongDesktop) so it can default to the safe
+    // middle rather than ultra on thermally constrained MacBooks (issue 1676).
     expect(classifyGpuRenderer('ANGLE (Apple, ANGLE Metal Renderer: Apple M2)')).toBe(
-      'strongDesktop',
+      'appleSilicon',
     );
+    expect(classifyGpuRenderer('Apple M1 Pro')).toBe('appleSilicon');
     // AMD discrete + Intel Arc desktop -> strongDesktop (the "(TM)" Windows drivers print is tolerated)
     expect(classifyGpuRenderer('ANGLE (AMD, AMD Radeon RX 6800 XT Direct3D11 vs_5_0 ps_5_0)')).toBe(
       'strongDesktop',
@@ -555,7 +559,8 @@ describe('graphics tier resolution', () => {
           deviceMemory: 8,
         }),
       ).toBe(3); // flagship phone
-      // an M-series iPad (strong GPU on a touch device) is capped at HIGH (ultra is desktop-only)
+      // an M-series iPad (Apple Silicon on a touch device) is capped at HIGH (ultra is desktop-only);
+      // the touch cap is unchanged by the MacBook thermal default (issue 1676).
       expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple M2' })).toBe(3);
       expect(
         resolveDefaultGraphicsPreset({
@@ -564,6 +569,32 @@ describe('graphics tier resolution', () => {
         }),
       ).toBe(1); // old phone
       expect(resolveDefaultGraphicsPreset(phone)).toBe(2); // typical/unknown phone -> medium
+    });
+
+    it('defaults Apple Silicon Macs to MEDIUM, not ultra (thermally constrained laptops, issue 1676)', () => {
+      // A MacBook (Apple Silicon on a non-touch device) with ample RAM+cores would have earned
+      // ULTRA under the old strongDesktop bucket; it now defaults to the safe middle so the fanless
+      // form factor does not sit pinned at ultra. Ample corroborating signal must NOT promote it.
+      for (const gpuRenderer of ['ANGLE (Apple, ANGLE Metal Renderer: Apple M2)', 'Apple M3 Max']) {
+        expect(
+          resolveDefaultGraphicsPreset({
+            ...desktop,
+            gpuRenderer,
+            deviceMemory: 8,
+            hardwareConcurrency: 16,
+          }),
+        ).toBe(2);
+      }
+      // Non-regression: a real strong desktop discrete GPU still reaches ULTRA (the split did not
+      // demote NVIDIA/AMD/Arc).
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)',
+          deviceMemory: 8,
+          hardwareConcurrency: 16,
+        }),
+      ).toBe(4);
     });
 
     it('rewards a strong desktop: ULTRA with a corroborating signal (or unreported mem), else HIGH', () => {
@@ -707,5 +738,39 @@ describe('graphics tier resolution', () => {
     expect(mat.forceSinglePass).toBe(true);
     expect(mat.depthTest).toBe(true);
     expect(mat.depthWrite).toBe(true);
+  });
+});
+
+// The animated far character band (crowd_lod.ts) is skinning + draw-call cost, so
+// its per-tier ceiling opts out exactly where extra rigs are unaffordable. A tier
+// that silently regained the extension would push articulated rigs out to ~75yd on
+// software GL and phone WebKit, which is the profile the frozen far mesh exists for.
+describe('animated far character band: per-tier ceiling', () => {
+  it('opts the low tier and software GL out (straight-to-frozen far LOD)', () => {
+    expect(gfxInternalsForTest.settingsFor('low', desktop).farCharacterAnimScale).toBe(1);
+  });
+
+  it('extends the band on the desktop tiers', () => {
+    for (const tier of ['medium', 'high', 'ultra'] as const) {
+      const scale = gfxInternalsForTest.settingsFor(tier, desktop).farCharacterAnimScale;
+      expect(scale).toBe(FAR_ANIM_RANGE_SCALE_MAX);
+      expect(scale).toBeGreaterThan(1);
+    }
+  });
+
+  it('opts the phone memory profiles out on every tier', () => {
+    const nativeIos: GfxRuntimeHints = {
+      search: '',
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      nativeApp: true,
+      platform: 'ios',
+    };
+    const constrained: GfxRuntimeHints = { ...nativeIos, nativeApp: false, deviceMemory: 2 };
+    for (const tier of ['medium', 'high', 'ultra'] as const) {
+      expect(gfxInternalsForTest.settingsFor(tier, nativeIos).farCharacterAnimScale).toBe(1);
+      expect(gfxInternalsForTest.settingsFor(tier, constrained).farCharacterAnimScale).toBe(1);
+    }
   });
 });

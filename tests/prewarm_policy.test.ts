@@ -3,8 +3,12 @@ import { describe, expect, it } from 'vitest';
 import {
   CONSTRAINED_PREWARM_KEEP,
   constrainedEntryViewCreateBudget,
+  interactionLandmarkViewPriority,
+  mandatoryLandmarkViewsReady,
+  NEARBY_LANDMARK_STREAM_RADIUS,
   orderedPrewarmIds,
   type PrewarmPolicyInput,
+  partitionMandatoryLandmarkCandidates,
   prewarmEntryRuns,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
@@ -28,6 +32,8 @@ const BASE: PrewarmPolicyInput = {
 // The full manifest id order the renderer builds, for the reorder tests.
 const MANIFEST_IDS = [
   'views.required',
+  'views.landmarks',
+  'views.persistent-portals',
   'views.nearby',
   'props.dungeon-doors',
   'interiors.materials',
@@ -115,9 +121,7 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
   it('wires the two-view constrained cap into the renderer', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     expect(renderer).toContain('const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;');
-    expect(renderer).toContain(
-      'this.createPersistentPortalViews(\n            createdViewTypes,\n            deadline,\n            remainingPrewarmViewBudget(policy.maxViews, createdViews),\n          )',
-    );
+    expect(renderer).toContain('remainingPrewarmViewBudget(policy.maxViews, createdViews)');
   });
 
   it('moves programs.compile to just before world.initial-frame', () => {
@@ -177,11 +181,136 @@ describe('the keep-list is the minimal entry set', () => {
         'programs.compile',
         'render.settle-passes',
         'textures.scene',
+        'views.landmarks',
         'views.nearby',
+        'views.persistent-portals',
         'views.required',
         'world.initial-frame',
       ].sort(),
     );
+  });
+});
+
+describe('mandatory interaction-landmark prewarm', () => {
+  const entities = [
+    { id: 10, kind: 'npc', templateId: 'flight_master', pos: { x: 3, z: -2 } },
+    { id: 20, kind: 'object', templateId: 'mailbox', pos: { x: 0, z: -7.5 } },
+    {
+      id: 30,
+      kind: 'object',
+      templateId: 'noticeboard_eastbrook',
+      pos: { x: 10, z: -8 },
+    },
+    { id: 40, kind: 'object', templateId: 'dungeon_door', pos: { x: 75, z: 75 } },
+  ];
+
+  it('selects the spawn mailbox ahead of nearby NPCs and a remote persistent portal', () => {
+    const partition = partitionMandatoryLandmarkCandidates(entities, { x: 2, z: -2 });
+    expect(partition.mandatory.map((entity) => entity.id)).toEqual([20]);
+    expect([...partition.mandatory, ...partition.ordinary].map((entity) => entity.id)).toEqual([
+      20, 10, 30, 40,
+    ]);
+  });
+
+  it('selects only the noticeboard from a board-adjacent entry position', () => {
+    const partition = partitionMandatoryLandmarkCandidates(entities, { x: 10, z: -6 });
+    expect(partition.mandatory.map((entity) => entity.id)).toEqual([30]);
+  });
+
+  it('selects both landmarks when their authored interaction radii overlap', () => {
+    const partition = partitionMandatoryLandmarkCandidates(entities, { x: 6.5, z: -8 });
+    expect(partition.mandatory.map((entity) => entity.id)).toEqual([20, 30]);
+  });
+
+  it('excludes landmarks outside their authored mailbox 7 and noticeboard 4 radii', () => {
+    const partition = partitionMandatoryLandmarkCandidates(entities, { x: 100, z: 100 });
+    expect(partition.mandatory).toEqual([]);
+    expect(partition.ordinary.map((entity) => entity.id)).toEqual([10, 20, 30, 40]);
+  });
+
+  it('streams nearby service landmarks before NPCs without promoting remote ones', () => {
+    const nearSq = NEARBY_LANDMARK_STREAM_RADIUS * NEARBY_LANDMARK_STREAM_RADIUS;
+    expect(interactionLandmarkViewPriority('mailbox', nearSq)).toBe(0.5);
+    expect(interactionLandmarkViewPriority('noticeboard_eastbrook', nearSq + 1)).toBe(1.5);
+    expect(interactionLandmarkViewPriority('ore_iron', 0)).toBeNull();
+    expect(interactionLandmarkViewPriority(null, 0)).toBeNull();
+  });
+
+  it('does not report ready while any mandatory view is absent or compile-pending', () => {
+    const requiredIds = [20, 30];
+    expect(
+      mandatoryLandmarkViewsReady(requiredIds, new Map([[20, { compilePending: false }]])),
+    ).toBe(false);
+    expect(
+      mandatoryLandmarkViewsReady(
+        requiredIds,
+        new Map([
+          [20, { compilePending: false }],
+          [30, { compilePending: true }],
+        ]),
+      ),
+    ).toBe(false);
+    expect(
+      mandatoryLandmarkViewsReady(
+        requiredIds,
+        new Map([
+          [20, { compilePending: false }],
+          [30, { compilePending: false }],
+        ]),
+      ),
+    ).toBe(true);
+  });
+
+  it('runs the bounded landmark step before persistent portals and generic candidates', () => {
+    const policy = resolvePrewarmPolicy({
+      ...BASE,
+      constrainedMemory: true,
+      asyncCompileSupported: true,
+    });
+    const ordered = orderedPrewarmIds(MANIFEST_IDS, policy).filter((id) =>
+      prewarmEntryRuns(id, policy),
+    );
+    expect(ordered.indexOf('views.landmarks')).toBeLessThan(
+      ordered.indexOf('views.persistent-portals'),
+    );
+    expect(ordered.indexOf('views.landmarks')).toBeLessThan(ordered.indexOf('views.nearby'));
+
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const landmarkEntryAt = renderer.indexOf("id: 'views.landmarks'");
+    const portalEntryAt = renderer.indexOf("id: 'views.persistent-portals'");
+    const nearbyEntryAt = renderer.indexOf("id: 'views.nearby'");
+    expect(landmarkEntryAt).toBeGreaterThan(-1);
+    expect(portalEntryAt).toBeGreaterThan(landmarkEntryAt);
+    expect(nearbyEntryAt).toBeGreaterThan(portalEntryAt);
+    expect(renderer.slice(landmarkEntryAt, portalEntryAt)).toContain('deadlineExempt: true');
+
+    const helperStart = renderer.indexOf('private async createMandatoryLandmarkViews(');
+    const helperEnd = renderer.indexOf('\n  private createPersistentPortalViews(', helperStart);
+    const helper = renderer.slice(helperStart, helperEnd);
+    const partitionAt = helper.indexOf('partitionMandatoryLandmarkCandidates(');
+    const createAt = helper.indexOf('this.createView(entity)');
+    const compileWaitAt = helper.indexOf('await Promise.all(compileWaits)');
+    const readinessAt = helper.indexOf('mandatoryLandmarkViewsReady(ids, this.views)');
+    expect(helperStart).toBeGreaterThan(-1);
+    expect(helperEnd).toBeGreaterThan(helperStart);
+    expect(partitionAt).toBeGreaterThan(-1);
+    expect(createAt).toBeGreaterThan(partitionAt);
+    expect(compileWaitAt).toBeGreaterThan(createAt);
+    expect(readinessAt).toBeGreaterThan(compileWaitAt);
+    expect(helper).not.toContain('remainingPrewarmViewBudget');
+  });
+
+  it('bounds parallel compile readiness and makes the no-parallel path immediate', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const gateStart = renderer.indexOf('private gateViewOnCompile(');
+    const gateEnd = renderer.indexOf('\n  /** The visual the player currently sees', gateStart);
+    const gate = renderer.slice(gateStart, gateEnd);
+    expect(gateStart).toBeGreaterThan(-1);
+    expect(gateEnd).toBeGreaterThan(gateStart);
+    expect(gate).toContain('if (!this.asyncCompileSupported) return null;');
+    expect(gate).toContain('const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);');
+    expect(gate).toContain('view.compilePending = false;');
+    expect(gate).toContain('resolve();');
   });
 });
 

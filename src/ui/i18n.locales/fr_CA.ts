@@ -11,6 +11,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_CA: Partial<Record<TranslationKey, string>> = {
+  'guide.professions.craftMasteryBody':
+    "Quelques attentes honnêtes : la montée jusqu'au plafond de 125 d'un métier demande au moins 125 fabrications réussies, chaque fabrication à gain complet vous faisant progresser d'exactement un point, et en pratique un peu plus au fur et à mesure que les recettes s'estompent entre les échelons du formateur. La fabrication elle-même est rapide ; c'est l'approvisionnement qui constitue le vrai voyage, alors prévoyez quelques soirées dédiées à la récolte et à l'artisanat par métier.\n\nLes métiers de récolte atteignent leur plafond de 100 au fil d'une progression normale si vous récoltez en voyageant, bien que le dernier tronçon réclame les noeuds de haut palier du grand nord. La Pêche est la longue route par conception : selon son propre barème de gain, 200 points de maîtrise représentent plus de trois mille prises. Grand Pêcheur est un titre qui se gagne au fil d'une saison de soirées tranquilles, pas d'une fin de semaine.",
   'download.macCta': 'Telecharger la version macOS',
   'download.windowsPending': 'Version Windows a venir.',
   // Stat tooltips inherit the fr_FR base: none of these strings has a genuine
@@ -147,7 +149,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_floes.name': 'Glaces flottantes',
   'entities.abilities.ice_floes.description':
     "Tes deux prochains sorts qui ont un temps d'incantation peuvent être lancés en mouvement. Dure 15 s. (Talent de mage)",
-  'entities.abilities.ignition.name': 'Embrasement',
   'entities.abilities.ignition.description':
     'Passif : les coups critiques de tes sorts enflamment la cible et lui infligent 40% des dégâts causés sur 6 s; cet effet se cumule. (Maîtrise du Feu)',
   'entities.abilities.mass_barrier.name': 'Bouclier collectif',

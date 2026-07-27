@@ -205,7 +205,10 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
     const marketSave: MarketSave = {
       listings: [
         {
-          id: 7,
+          // A player-band id (>= MARKET_PLAYER_LISTING_ID_BASE), so the round-trip
+          // below stays strict: an id inside the reseeded house band would be
+          // reissued at load by the #2463 repair, which is not this test's charter.
+          id: 1007,
           sellerKey: 'legacy-seller',
           sellerName: 'Legacy Seller',
           itemId: 'soulrend_diadem',
@@ -221,7 +224,7 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
           items: [{ itemId: 'soulforged_warplate', count: 1 }],
         },
       ],
-      nextListingId: 8,
+      nextListingId: 1008,
     };
     const mailSave: MailSave = {
       mail: [
@@ -250,7 +253,7 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
     const reserializedMarket = sim.serializeMarket();
     expect(reserializedMarket.listings).toEqual(marketSave.listings);
     expect(reserializedMarket.collections).toEqual(marketSave.collections);
-    // Phase 12d deploy clock: a pre-existing player parcel persisted with the
+    // Deploy clock: a pre-existing player parcel persisted with the
     // never sentinel (-1) starts its 30-day attachment window at load, and the
     // return-cycle flag materializes to false; the retired item id itself (the
     // charter of this test) still round-trips untouched.

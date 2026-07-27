@@ -118,7 +118,7 @@ describe('LootWindowController', () => {
 
     const takeLoot = test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)');
     const harvest = test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
-    // Phase 12d QA legibility fix: the corpse arm's button is "Take Loot" (the
+    // Legibility fix: the corpse arm's button is "Take Loot" (the
     // old "Take All" label promised the harvest too); native title attributes
     // stay empty so touch players are never without the tooltip.
     expect(takeLoot?.textContent).toBe('Take Loot');
@@ -152,6 +152,7 @@ describe('LootWindowController', () => {
       componentTags: undefined,
       harvestable: false,
       visibleItems: [],
+      visibleCopper: 0,
       hasLoot: false,
       canOpen: false,
     }));
@@ -162,6 +163,34 @@ describe('LootWindowController', () => {
     expect(corpseAvailability).toHaveBeenCalledWith(mob);
     expect(test.closeTransient).not.toHaveBeenCalled();
     expect(test.element.style.display).not.toBe('block');
+  });
+
+  it("hides a stranger's owner-locked copper and shared items, listing only my personal drop", () => {
+    // Tapped by 9, owner-lock still counting: viewer 7 has no shared rights, so
+    // the coin row and the plain slot must not be advertised (the take would
+    // deny them); only the personal slot naming 7 renders.
+    const mob = entity(15, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      tappedById: 9,
+      lootFfaTimer: 60,
+      harvestClaimedBy: 9,
+      loot: {
+        copper: 25,
+        items: [
+          { itemId: itemIds[0], count: 1 },
+          { itemId: itemIds[1], count: 1, personalFor: [7] },
+        ],
+      },
+    });
+    const test = harness([mob]);
+
+    test.controller.openCorpse(15, 400, 300);
+
+    expect(test.element.style.display).toBe('block');
+    expect(test.element.innerHTML).not.toContain('money:25');
+    expect(test.element.innerHTML).not.toContain(`data-item="${itemIds[0]}"`);
+    expect(test.element.innerHTML).toContain(`data-item="${itemIds[1]}"`);
   });
 
   it('passes the selected harvest components through the IWorld seam', () => {
@@ -181,7 +210,7 @@ describe('LootWindowController', () => {
     expect(test.element.style.display).toBe('none');
   });
 
-  it('pre-checks the town-focus components in the harvest picker (Phase 12d)', () => {
+  it('pre-checks the town-focus components in the harvest picker', () => {
     const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)!.componentTags!;
     expect(tags.length).toBeGreaterThanOrEqual(2); // a strict focused subset must be expressible
     const mob = entity(13, { kind: 'mob', templateId: harvestMobId, loot: null });

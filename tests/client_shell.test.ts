@@ -1841,8 +1841,11 @@ describe('client HTML shell', () => {
     // reach it. The window now scrolls the whole sheet (tabs, controls, and the
     // listing body together) instead of clipping, and #market-body sizes to its
     // natural content height rather than flexing to fill a fixed remainder.
+    // height: auto releases the desktop height clamp on the mobile sheet's
+    // standalone arm too (the market docking pair's mobile fix), so the sheet
+    // owns its height on every arm rather than inheriting min(640px, ...).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
+      'body.mobile-touch #market-window {\n    height: auto;\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #market-body {\n    flex: none;\n    overflow-y: visible;\n    min-height: 0;',
@@ -1857,6 +1860,8 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).toContain('data-market-filter-menu="${menu}"');
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'itemType'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'subtype'/);
+    expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'armorClass'/);
+    expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'primaryStat'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'rarity'/);
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
     // The load-bearing claim of the landscape refactor: `.mkt-controls` (search +
@@ -2025,7 +2030,7 @@ describe('client HTML shell', () => {
     );
     expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
-    // Phase 4 open-gate flip: the trailing (online === null) override is gone,
+    // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
     // corpse-claim mirror online); the call now closes right after the
     // nothing-to-interact string.
@@ -2033,7 +2038,7 @@ describe('client HTML shell', () => {
     expect(mainTs).not.toContain('online === null');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
-      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteractImmediately)',
+      'isClickMoveButton &&\n        shouldApproachPickedEntity(\n          world.player,\n          e,\n          didInteractImmediately,\n          true,\n          localPartyMemberIds(world.partyInfo),\n        )',
     );
     expect(mainTs).toContain(
       'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',

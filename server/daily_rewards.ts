@@ -107,6 +107,7 @@ interface Eligibility {
 }
 
 export interface DailyRewardRuntimeConfig {
+  enabled: boolean;
   minUsd: number;
   prizePoolUsd: number;
   prizePoolSol: number | null;
@@ -240,6 +241,7 @@ function parseTaskPayload(payload: unknown): DailyRewardTaskSeed[] {
 
 function fallbackRuntimeConfig(): DailyRewardRuntimeConfig {
   return {
+    enabled: true,
     minUsd: DEFAULT_MIN_USD,
     prizePoolUsd: DEFAULT_POOL_USD,
     prizePoolSol: null,
@@ -262,6 +264,9 @@ function parseRuntimeConfigPayload(payload: unknown): DailyRewardRuntimeConfig {
   const record = payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : {};
   const fallback = fallbackRuntimeConfig();
   return {
+    // A configured authority must affirmatively enable rewards. Older/malformed
+    // service responses fail closed; the no-service local path uses fallbackRuntimeConfig.
+    enabled: record.enabled === true,
     minUsd: finitePositive(record.minUsd) ?? finitePositive(record.min_usd) ?? fallback.minUsd,
     prizePoolUsd:
       finitePositive(record.prizePoolUsd) ??
@@ -297,6 +302,7 @@ function parseStrictRuntimeConfigPayload(
   const activeSeconds = finitePositive(record.activeSeconds);
   const dayStartUtcMinutes = finiteDayStartUtcMinutes(record.dayStartUtcMinutes);
   if (
+    typeof record.enabled !== 'boolean' ||
     minUsd === null ||
     prizePoolUsd === null ||
     activeSeconds === null ||
@@ -316,6 +322,7 @@ function parseStrictRuntimeConfigPayload(
   }
 
   return {
+    enabled: record.enabled,
     minUsd,
     prizePoolUsd,
     prizePoolSol: finitePositive(record.prizePoolSol),
@@ -432,7 +439,12 @@ export async function dailyRewardRuntimeConfig(
   } catch (err) {
     if (requireFresh) throw err;
     logRuntimeConfigFailure(err);
-    return runtimeConfigCache?.day === day ? runtimeConfigCache.config : fallbackRuntimeConfig();
+    if (dailyRewardServiceUrl()) {
+      const config = { ...fallbackRuntimeConfig(), enabled: false };
+      runtimeConfigCache = { day, config, at: now };
+      return config;
+    }
+    return fallbackRuntimeConfig();
   }
 }
 
@@ -448,7 +460,14 @@ async function dailyRewardClock(now = new Date()): Promise<{
   day: string;
   config: DailyRewardRuntimeConfig;
 }> {
-  const dayStartUtcMinutes = await dailyRewardScheduleCache.read();
+  let dayStartUtcMinutes: number;
+  try {
+    dayStartUtcMinutes = await dailyRewardScheduleCache.read();
+  } catch (error) {
+    if (!dailyRewardServiceUrl()) throw error;
+    logRuntimeConfigFailure(error);
+    dayStartUtcMinutes = DEFAULT_DAY_START_UTC_MINUTES;
+  }
   const day = rewardDayForDate(now, dayStartUtcMinutes);
   const config = await dailyRewardRuntimeConfig(day);
   return { day, config: { ...config, dayStartUtcMinutes } };
@@ -775,12 +794,38 @@ export class DailyRewardService {
 
   async ensureActiveDay(day = utcRewardDay()): Promise<DailyRewardRuntimeConfig> {
     const config = await dailyRewardRuntimeConfig(day);
-    await this.ensureSeeded(day, config);
+    if (config.enabled) await this.ensureSeeded(day, config);
     return config;
   }
 
   async status(accountId: number): Promise<DailyRewardStatus> {
     const { day, config } = await dailyRewardClock();
+    if (!config.enabled) {
+      return {
+        enabled: false,
+        day,
+        resetAt: nextUtcResetIso(day, config.dayStartUtcMinutes),
+        prizePoolUsd: config.prizePoolUsd,
+        prizePoolSol: config.prizePoolSol,
+        eligibility: {
+          eligible: false,
+          reason: 'price_unavailable',
+          banReason: null,
+          banExpiresAt: null,
+          walletPubkey: null,
+          wocBalance: null,
+          wocUsdPrice: config.wocUsdPrice,
+          usdValue: null,
+          minUsd: config.minUsd,
+        },
+        score: 0,
+        rank: null,
+        spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
+        tasks: [],
+        leaderboard: [],
+        leaderboardTotal: 0,
+      };
+    }
     await this.ensureSeeded(day, config);
     const eligibility = await this.eligibility(accountId, config);
     // The four ranked reads come from the board cache (one snapshot per TTL
@@ -800,6 +845,7 @@ export class DailyRewardService {
       if (viewerRow) leaderboardRows.push(viewerRow);
     }
     return {
+      enabled: true,
       day,
       resetAt: nextUtcResetIso(day, config.dayStartUtcMinutes),
       prizePoolUsd: config.prizePoolUsd,
@@ -849,6 +895,7 @@ export class DailyRewardService {
     accountId: number,
   ): Promise<DailyRewardSpinResult | { error: string; status: number }> {
     const { day, config } = await dailyRewardClock();
+    if (!config.enabled) return { error: 'daily rewards are disabled', status: 409 };
     await this.ensureSeeded(day, config);
     const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible)
@@ -897,6 +944,7 @@ export class DailyRewardService {
 
   async recordOnlineMinute(accountId: number, activeAt: Date = new Date()): Promise<void> {
     const { day, config } = await dailyRewardClock(activeAt);
+    if (!config.enabled) return;
     await this.ensureSeeded(day, config);
     const minute = activeAt.toISOString().slice(0, 16);
     await this.recordPoints(day, accountId, 'online', 0, `online:${minute}`, {
@@ -912,6 +960,7 @@ export class DailyRewardService {
   ): Promise<number> {
     if (!questId) return 0;
     const { day, config } = await dailyRewardClock(completedAt);
+    if (!config.enabled) return 0;
     await this.ensureSeeded(day, config);
     const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
@@ -968,6 +1017,7 @@ export class DailyRewardService {
     if (result.format === '1v1' || result.format === 'yumi3' || result.format === 'yumi5') return 0;
     const completedAt = result.completedAt ?? new Date();
     const { day, config } = await dailyRewardClock(completedAt);
+    if (!config.enabled) return 0;
     await this.ensureSeeded(day, config);
     const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
@@ -1014,6 +1064,7 @@ export class DailyRewardService {
   ): Promise<number> {
     if (!DELVES[delveId]) return 0;
     const { day, config } = await dailyRewardClock(completedAt);
+    if (!config.enabled) return 0;
     await this.ensureSeeded(day, config);
     const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
@@ -1060,6 +1111,7 @@ export class DailyRewardService {
   ): Promise<number> {
     if (!DELVES[delveId]) return 0;
     const { day, config } = await dailyRewardClock(openedAt);
+    if (!config.enabled) return 0;
     await this.ensureSeeded(day, config);
     const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
@@ -1122,6 +1174,7 @@ export class DailyRewardService {
     const completedAtIso = completedAt.toISOString();
     const completionId = result.completionId?.trim() || null;
     const { day, config } = await dailyRewardClock(completedAt);
+    if (!config.enabled) return 0;
     await this.ensureSeeded(day, config);
     const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;

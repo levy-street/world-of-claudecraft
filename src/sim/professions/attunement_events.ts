@@ -1,4 +1,4 @@
-// Attunement celebration events (Professions 2.0 Phase 14): when a quest-
+// Attunement celebration events (Professions 2.0): when a quest-
 // validated pair attunement lands (new OR return: returning to a held pair is
 // also a celebration), the celebrant gets a personal `attuned` event and every
 // overworld player in their zone gets a soft `attunedZone` broadcast. Sim-pure
@@ -26,13 +26,17 @@ import { emitToZonePlayers } from './gather_events';
  *  masterworkZone rule). Draws NO rng, so its position in the turn-in path cannot
  *  fork the deterministic draw order.
  *
- *  Phase 15 hook: a per-pair attunement deed attaches here, off the same `pid` +
- *  `pairId`, once the deeds pipeline exposes an idiomatic mark; no deed content
- *  yet. */
+ *  Lifetime-counter hook: every quest-validated attunement (new or return) bumps
+ *  the attunementsCompleted lifetime counter behind prog_guildsworn. The bump
+ *  sits before the instance-space early return below (a celebrant attuning from
+ *  instance space still attuned) and draws nothing. Veterans whose once-ever
+ *  attunement predates the counter are healed by the retroFallbackGrants arm in
+ *  src/sim/deeds.ts (attunedPairs is the proof). */
 export function announceAttunement(ctx: SimContext, pid: number, pairId: string): void {
   const meta = ctx.players.get(pid);
   if (!meta) return;
   ctx.emit({ type: 'attuned', pid, pairId });
+  ctx.bumpDeedStat(meta, 'attunementsCompleted', 1);
   const celebrantE = ctx.entities.get(pid);
   if (!celebrantE || celebrantE.pos.x > DUNGEON_X_THRESHOLD) return;
   const zoneId = zoneAt(celebrantE.pos.z).id;

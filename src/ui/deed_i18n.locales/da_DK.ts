@@ -60,7 +60,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Engens Mester', desc: 'Nå 100 i færdigheden Urtekundskab.' },
   prog_master_gatherer: {
     name: 'Mestersamler',
-    desc: 'Nå 100 i færdighed i Minedrift, Skovhugst og Urtekundskab.',
+    desc: 'Nå 100 i færdighed i tre af fagene Minedrift, Skovhugst, Urtekundskab og Fiskeri.',
   },
   prog_first_craft: { name: 'Håndlavet', desc: 'Fuldfør din første vellykkede fremstilling.' },
   prog_craft_specialist: {
@@ -386,7 +386,10 @@ export const table: DeedLocaleTable = {
     name: 'Stamkunde',
     desc: 'Opdag alle ti dele af den Heroiske Kvartermesters lager.',
   },
-  col_glimmerfin: { name: 'Et Glimt af Håb', desc: 'Fang en Glimtfinne-Koi.' },
+  col_glimmerfin: {
+    name: 'Et Glimt af Håb',
+    desc: 'Fang en Solglimt-Koikarpe.',
+  },
   col_full_creel: {
     name: 'Fyldt Fiskekurv',
     desc: 'Opdag alle seks almindelige fangster fra Dalens, Sumpens og Højdernes vande.',
@@ -553,7 +556,10 @@ export const table: DeedLocaleTable = {
     name: 'Noget, der Glimter',
     desc: 'Saml en funklende genstand op fra jorden.',
   },
-  exp_first_ore: { name: 'Hak i Klippen', desc: 'Høst din første malmforekomst.' },
+  exp_first_ore: {
+    name: 'Hakken Moder Klippen',
+    desc: 'Høst din første malmforekomst.',
+  },
   exp_first_timber: { name: 'Træet Falder!', desc: 'Høst din første træforekomst.' },
   exp_first_herb: { name: 'Grønne Fingre', desc: 'Høst din første urteforekomst.' },
   feat_era_cap: {
@@ -623,4 +629,119 @@ export const table: DeedLocaleTable = {
     desc: 'Vov dig ind i Den Forladte Krypt, og hent begge halvdele af nøglestenen og den ældgamle dagbog fra dens vogtere.',
   },
   chr_marsh_first_cast: { name: 'Ål i Sivene', desc: 'Fang en fisk i Mosekær Sumps vande.' },
+  prog_guildsworn: {
+    name: 'Håndværkssvoren',
+    desc: 'Stem dig ind på et arketypepar og tag dets håndværk op i fuldt alvor.',
+    title: 'Håndværkssvoren',
+  },
+  prog_masterwright: {
+    name: 'Mesterbygger',
+    desc: 'Skab dit første mesterværk, et stykke så fint at hele zonen hører om det.',
+    title: 'Mesterbygger',
+  },
+  prog_fishing_100: {
+    name: 'Gammel Søulk',
+    desc: 'Nå 100 i færdighed i Fiskeri.',
+  },
+  prog_master_angler: {
+    name: 'Mesterangler',
+    desc: 'Nå 200 i færdighed i Fiskeri, selve toppen af fiskerkunsten.',
+    title: 'Mesterangler',
+  },
+  prog_engineering_50: {
+    name: 'Tandhjul og Drivaksler',
+    desc: 'Nå 50 i færdighed i Ingeniørkunst.',
+  },
+  prog_alchemy_50: {
+    name: 'Sælsomme Bryggerier',
+    desc: 'Nå 50 i færdighed i Alkymi.',
+  },
+  prog_cooking_50: {
+    name: 'Krydret Hånd',
+    desc: 'Nå 50 i færdighed i Madlavning.',
+  },
+  prog_leatherworking_50: {
+    name: 'Garverens Laerdom',
+    desc: 'Nå 50 i færdighed i Læderhåndværk.',
+  },
+  prog_tailoring_50: {
+    name: 'Et Præcist Søm',
+    desc: 'Nå 50 i færdighed i Skræderi.',
+  },
+  prog_enchanting_50: {
+    name: 'Et Glimt af Arkan',
+    desc: 'Nå 50 i færdighed i Fortryllelse.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Æg og Hærde',
+    desc: 'Nå 50 i færdighed i Våbenfremstilling.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Hammer og Plade',
+    desc: 'Nå 50 i færdighed i Rustningsfremstilling.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Grandmester i Ingeniørkunst',
+    desc: 'Nå 125 i færdighed i Ingeniørkunst, selve toppen af fagets mæstring.',
+    title: 'Grandmester i Ingeniørkunst',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Grandmester i Alkymi',
+    desc: 'Nå 125 i færdighed i Alkymi, selve toppen af fagets mæstring.',
+    title: 'Grandmester i Alkymi',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Grandmester i Madlavning',
+    desc: 'Nå 125 i færdighed i Madlavning, selve toppen af fagets mæstring.',
+    title: 'Grandmester i Madlavning',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Grandmester i Læderhåndværk',
+    desc: 'Nå 125 i færdighed i Læderhåndværk, selve toppen af fagets mæstring.',
+    title: 'Grandmester i Læderhåndværk',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Grandmester i Skræderi',
+    desc: 'Nå 125 i færdighed i Skræderi, selve toppen af fagets mæstring.',
+    title: 'Grandmester i Skræderi',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Grandmester i Fortryllelse',
+    desc: 'Nå 125 i færdighed i Fortryllelse, selve toppen af fagets mæstring.',
+    title: 'Grandmester i Fortryllelse',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Grandmester i Våbenfremstilling',
+    desc: 'Nå 125 i færdighed i Våbenfremstilling, selve toppen af fagets mæstring.',
+    title: 'Grandmester i Våbenfremstilling',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Grandmester i Rustningsfremstilling',
+    desc: 'Nå 125 i færdighed i Rustningsfremstilling, selve toppen af fagets mæstring.',
+    title: 'Grandmester i Rustningsfremstilling',
+  },
+  col_pristine_vein: {
+    name: 'Uberørt Åre',
+    desc: 'Knæk en uberørt åre, og lad hele zonen høre om det.',
+  },
+  col_ancient_heartwood: {
+    name: 'Gammelt Kernetræ',
+    desc: 'Lok et stykke gammelt kernetræ ud af en fældet stamme.',
+  },
+  col_moonlit_bloom: {
+    name: 'Måneskinsblomst',
+    desc: 'Høst en måneskinsblomst i det øjeblik den åbner sig.',
+  },
+  col_perfect_specimen: {
+    name: 'Et Perfekt Eksemplar',
+    desc: 'Tag et perfekt eksemplar fra et høstet dyr, uden en skramme eller en plet.',
+  },
+  soc_first_salvage: {
+    name: 'Ingenting Spildes',
+    desc: 'Bjærg et stykke udstyr tilbage til råmaterialer.',
+  },
+  soc_salvage_50: {
+    name: 'Ophuggerens Plads',
+    desc: 'Bjærg 50 stykker udstyr tilbage til råmaterialer.',
+  },
 };

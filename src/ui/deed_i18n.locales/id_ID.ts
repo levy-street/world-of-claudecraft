@@ -79,7 +79,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Penguasa Padang Rumput', desc: 'Capai 100 kecakapan Herbalisme.' },
   prog_master_gatherer: {
     name: 'Pengumpul Ulung',
-    desc: 'Capai 100 kecakapan dalam Penambangan, Penebangan Kayu, dan Herbalisme.',
+    desc: 'Capai 100 kecakapan pada tiga dari Penambangan, Penebangan Kayu, Herbalisme, dan Memancing.',
   },
   prog_first_craft: { name: 'Buatan Tangan', desc: 'Selesaikan hasil kerajinan sukses pertamamu.' },
   prog_craft_specialist: {
@@ -435,7 +435,10 @@ export const table: DeedLocaleTable = {
     name: 'Pelanggan Kesayangan',
     desc: 'Temukan kesepuluh barang dagangan Kepala Perbekalan Vex.',
   },
-  col_glimmerfin: { name: 'Kilau Harapan', desc: 'Pancing seekor Koi Sirip Kilau.' },
+  col_glimmerfin: {
+    name: 'Kilau Harapan',
+    desc: 'Tangkap seekor Koi Kerlip Surya.',
+  },
   col_full_creel: {
     name: 'Keranjang Ikan Penuh',
     desc: 'Temukan keenam tangkapan umum dari perairan Lembah, Rawa, dan Dataran Tinggi.',
@@ -617,7 +620,10 @@ export const table: DeedLocaleTable = {
     name: 'Sesuatu yang Berkilau',
     desc: 'Pungut sebuah benda berkilauan dari tanah.',
   },
-  exp_first_ore: { name: 'Belah Bumi', desc: 'Panen titik bijih pertamamu.' },
+  exp_first_ore: {
+    name: 'Beliung Menemui Batu',
+    desc: 'Panen titik bijih pertamamu.',
+  },
   exp_first_timber: { name: 'Awas, Tumbang!', desc: 'Panen titik kayu pertamamu.' },
   exp_first_herb: { name: 'Tangan Dingin', desc: 'Panen titik herba pertamamu.' },
   feat_era_cap: {
@@ -689,5 +695,120 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Belut di Sela Buluh',
     desc: 'Pancing seekor ikan dari perairan Rawa Mirefen.',
+  },
+  prog_guildsworn: {
+    name: 'Tersumpah Karya',
+    desc: 'Selaraskan dirimu pada sepasang arketipe dan tekuni perdagangan-perdagangannya dengan sungguh-sungguh.',
+    title: 'Tersumpah Karya',
+  },
+  prog_masterwright: {
+    name: 'Pandai Karya',
+    desc: 'Ciptakan karya besarmu yang pertama, sebuah karya sedemikian indah hingga seluruh zona mendengarnya.',
+    title: 'Pandai Karya',
+  },
+  prog_fishing_100: {
+    name: 'Garam Tua',
+    desc: 'Capai 100 kecakapan Memancing.',
+  },
+  prog_master_angler: {
+    name: 'Pemancing Mahir',
+    desc: 'Capai 200 kecakapan Memancing, puncak tertinggi seni memancing.',
+    title: 'Pemancing Mahir',
+  },
+  prog_engineering_50: {
+    name: 'Roda Gigi dan Per',
+    desc: 'Capai 50 keahlian Rekayasa.',
+  },
+  prog_alchemy_50: {
+    name: 'Ramuan Aneh',
+    desc: 'Capai 50 keahlian Alkimia.',
+  },
+  prog_cooking_50: {
+    name: 'Koki Berpengalaman',
+    desc: 'Capai 50 keahlian Memasak.',
+  },
+  prog_leatherworking_50: {
+    name: 'Perdagangan Penyamak',
+    desc: 'Capai 50 keahlian Pengolahan Kulit.',
+  },
+  prog_tailoring_50: {
+    name: 'Jahitan Halus',
+    desc: 'Capai 50 keahlian Menjahit.',
+  },
+  prog_enchanting_50: {
+    name: 'Sekilas Arkana',
+    desc: 'Capai 50 keahlian Pemantraan.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Bilah dan Tempa',
+    desc: 'Capai 50 keahlian Penempaan Senjata.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Palu dan Pelat',
+    desc: 'Capai 50 keahlian Penempaan Zirah.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Rekayasa Mahaguru',
+    desc: 'Capai 125 keahlian Rekayasa, puncak tertinggi kerajinan ini.',
+    title: 'Rekayasa Mahaguru',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Alkimia Mahaguru',
+    desc: 'Capai 125 keahlian Alkimia, puncak tertinggi kerajinan ini.',
+    title: 'Alkimia Mahaguru',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Memasak Mahaguru',
+    desc: 'Capai 125 keahlian Memasak, puncak tertinggi kerajinan ini.',
+    title: 'Memasak Mahaguru',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Pengolahan Kulit Mahaguru',
+    desc: 'Capai 125 keahlian Pengolahan Kulit, puncak tertinggi kerajinan ini.',
+    title: 'Pengolahan Kulit Mahaguru',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Menjahit Mahaguru',
+    desc: 'Capai 125 keahlian Menjahit, puncak tertinggi kerajinan ini.',
+    title: 'Menjahit Mahaguru',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Pemantraan Mahaguru',
+    desc: 'Capai 125 keahlian Pemantraan, puncak tertinggi kerajinan ini.',
+    title: 'Pemantraan Mahaguru',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Penempaan Senjata Mahaguru',
+    desc: 'Capai 125 keahlian Penempaan Senjata, puncak tertinggi kerajinan ini.',
+    title: 'Penempaan Senjata Mahaguru',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Penempaan Zirah Mahaguru',
+    desc: 'Capai 125 keahlian Penempaan Zirah, puncak tertinggi kerajinan ini.',
+    title: 'Penempaan Zirah Mahaguru',
+  },
+  col_pristine_vein: {
+    name: 'Urat Murni',
+    desc: 'Pecahkan sebuah urat murni dan biarkan seluruh zona mendengarnya.',
+  },
+  col_ancient_heartwood: {
+    name: 'Kayu Hati Kuno',
+    desc: 'Dapatkan sepotong kayu hati kuno dari pohon yang telah ditebang.',
+  },
+  col_moonlit_bloom: {
+    name: 'Mekar Bulan Purnama',
+    desc: 'Pungut sekuntum mekar bulan purnama tepat pada saat mekarnya.',
+  },
+  col_perfect_specimen: {
+    name: 'Spesimen Sempurna',
+    desc: 'Ambil spesimen sempurna dari bangkai binatang buruan, tanpa satu cacat pun.',
+  },
+  soc_first_salvage: {
+    name: 'Tak Ada yang Terbuang',
+    desc: 'Salvasi sepotong perlengkapan kembali menjadi material mentah.',
+  },
+  soc_salvage_50: {
+    name: 'Halaman Pembongkaran',
+    desc: 'Salvasi 50 potong perlengkapan kembali menjadi material mentah.',
   },
 };

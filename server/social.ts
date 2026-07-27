@@ -77,6 +77,10 @@ export interface GuildView {
   id: number;
   name: string;
   rank: GuildRank;
+  // The guild billboard: a short officer-set message pinned atop the Guild tab
+  // ('' when unset), with the setter's display name for attribution.
+  motd: string;
+  motdSetBy: string;
   members: GuildMemberEntry[];
   events: GuildEventRow[];
 }
@@ -135,6 +139,9 @@ export interface SocialDb {
   ): Promise<
     (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
   >;
+  // guild billboard (motd): the officer-set message + setter name on the guilds row
+  setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void>;
+  guildMotd(guildId: number): Promise<{ motd: string; motdSetBy: string }>;
   // guild calendar events (the event calendar's guild lane)
   guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]>;
   guildEventCount(guildId: number, fromDay: string): Promise<number>;
@@ -224,6 +231,8 @@ export type SocialEvent =
   // Structured guild-calendar outcome; the client renders the visible line
   // from the code (the sim's mailResult convention, so no server English here).
   | { type: 'calendarResult'; code: CalendarResultCode }
+  // Structured guild-billboard outcome, same convention as calendarResult.
+  | { type: 'motdResult'; code: MotdResultCode }
   // A guildmate's or followed friend's marquee deed unlock. Carries the deed
   // ID only, never English (the client composes the line from deed_i18n plus
   // its own chrome key, the calendarResult convention).
@@ -238,12 +247,18 @@ export type CalendarResultCode =
   | 'calendarFull'
   | 'eventGone';
 
+// Guild billboard command outcomes ('set' is the success; the rest refusals).
+export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
+
 const FRIEND_LIMIT = 50;
 const BLOCK_LIMIT = 50;
 const IGNORE_LIMIT = 50;
 const GUILD_MEMBER_LIMIT = 100;
 const GUILD_INVITE_TTL_MS = 60_000;
 const GUILD_MESSAGE_MAX = 200;
+// Guild billboard: the officer-set message pinned atop the Guild tab.
+// Server-clamped; '' clears the billboard.
+export const GUILD_MOTD_MAX = 240;
 // Guild calendar: caps + input bounds. Events are UTC-day keyed ('YYYY-MM-DD',
 // matching the sim's utcDay convention) and may be booked up to a year out.
 const GUILD_EVENT_LIMIT = 25; // upcoming events per guild
@@ -312,14 +327,17 @@ export class SocialService {
     let guild: GuildView | null = null;
     if (membership) {
       const fromDay = shiftDay(this.todayIso(), -GUILD_EVENT_KEEP_PAST_DAYS);
-      const [members, events] = await Promise.all([
+      const [members, events, motd] = await Promise.all([
         this.db.guildMembers(membership.guildId),
         this.db.guildEvents(membership.guildId, fromDay),
+        this.db.guildMotd(membership.guildId),
       ]);
       guild = {
         id: membership.guildId,
         name: membership.guildName,
         rank: membership.rank,
+        motd: motd.motd,
+        motdSetBy: motd.motdSetBy,
         members: members
           .map((m) => ({ ...m, ...this.presence(m.id) }))
           .sort((a, b) => rankOrder(a.rank) - rankOrder(b.rank) || a.name.localeCompare(b.name)),
@@ -1033,6 +1051,40 @@ export class SocialService {
     }
     await this.db.createGuildEvent(membership.guildId, actor.characterId, day, hour, title, note);
     this.calendarResult(actor.characterId, 'created');
+    await this.pushGuild(membership.guildId);
+  }
+
+  // -------------------------------------------------------------------------
+  // Guild billboard (motd)
+  // -------------------------------------------------------------------------
+
+  private motdResult(charId: number, code: MotdResultCode): void {
+    this.tx.deliver(charId, [{ type: 'motdResult', code }]);
+  }
+
+  // Set (or clear, with '') the guild billboard. Officers + the Guild Master
+  // only; the text is server-clamped and the wire layer has already run the
+  // mute/rate/content gates (game.ts, the guild_event_create stack).
+  async guildSetMotd(actor: SocialActor, rawText: string): Promise<void> {
+    const membership = await this.db.guildMembership(actor.characterId);
+    if (!membership) {
+      this.motdResult(actor.characterId, 'notInGuild');
+      return;
+    }
+    if (membership.rank === 'member') {
+      this.motdResult(actor.characterId, 'notOfficer');
+      return;
+    }
+    let text = String(rawText ?? '')
+      .trim()
+      .slice(0, GUILD_MOTD_MAX);
+    // The clamp slices UTF-16 code units, so a boundary landing inside a
+    // surrogate pair (emoji-class codepoint) would store a lone surrogate that
+    // pg encodes as U+FFFD; drop the orphaned half instead.
+    const last = text.charCodeAt(text.length - 1);
+    if (last >= 0xd800 && last <= 0xdbff) text = text.slice(0, -1);
+    await this.db.setGuildMotd(membership.guildId, text, text === '' ? '' : actor.name);
+    this.motdResult(actor.characterId, 'set');
     await this.pushGuild(membership.guildId);
   }
 

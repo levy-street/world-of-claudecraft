@@ -13,6 +13,7 @@ import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { AuraKind, Entity, PlayerClass } from '../src/sim/types';
 import { MELEE_RANGE } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -21,6 +22,7 @@ type Ev = Record<string, any>;
 function makeSim(seed = 7): { sim: AnySim; p: AnyEntity } {
   const sim = new Sim({ seed, playerClass: 'druid', autoEquip: true }) as AnySim;
   sim.setPlayerLevel(20);
+  placePlayerInOpenField(sim);
   const p = sim.player as AnyEntity;
   p.resource = p.maxResource;
   return { sim, p };

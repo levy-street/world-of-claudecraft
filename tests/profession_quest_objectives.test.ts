@@ -80,6 +80,7 @@ describe('craft quest objectives', () => {
 
     sim.addItem('linen_scrap', 1, pid);
     sim.addItem('spider_leg', 1, pid);
+    sim.addItem('silverleaf_herb', 2, pid); // the reworked recipe's herb reagent
     sim.craftItem('recipe_minor_healing_potion', false, pid);
 
     expect(sim.meta(pid)!.lastCraftResult?.ok).toBe(true);
@@ -88,7 +89,7 @@ describe('craft quest objectives', () => {
   });
 });
 
-// Phase 12b: harvestNode STARTS a gather cast; quest credit lands at
+// harvestNode STARTS a gather cast; quest credit lands at
 // completion. Mirror the lifecycle completion arm synchronously (the
 // gather_rare_events.test.ts completeCastNow idiom) so these seed-stable
 // drives stay free of world-tick noise. Only called after a GRANTED start
@@ -115,6 +116,10 @@ describe('gather quest objectives', () => {
     ]);
     const ore = GATHER_NODES.find((node) => node.type === 'ore')!;
     const wood = GATHER_NODES.find((node) => node.type === 'wood')!;
+    // #2343: every node harvest needs the matching-profession tool in bags
+    // (the too-far denial below still fires before the tool gate).
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('handaxe', 1, pid);
 
     // Too far away, so the server denies without quest credit.
     sim.harvestNode(ore.id, pid);

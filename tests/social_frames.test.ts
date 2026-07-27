@@ -253,6 +253,8 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
         id: 1,
         name: 'Guild',
         rank: 'leader',
+        motd: '',
+        motdSetBy: '',
         members: [
           {
             id: 4,

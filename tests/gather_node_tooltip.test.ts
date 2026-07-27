@@ -1,5 +1,5 @@
 // Gather-node tooltip copy surface + the hud gatherDenied binding (Professions
-// 2.0 Phase 12). The pure MODEL is covered in tests/gathering_view.test.ts;
+// 2.0). The pure MODEL is covered in tests/gathering_view.test.ts;
 // this file drives the i18n-composing half (gatherNodeTooltipHtml,
 // gatherNodeToolGateFor) directly, plus the hud.ts source pins in the
 // tests/gather_event_i18n.test.ts idiom (the event switch case must stay an
@@ -38,10 +38,15 @@ describe('gatherNodeTooltipHtml', () => {
     expect(html).not.toContain('tt-red');
   });
 
-  it('a tier-1 node renders NO requirement line (the bare-hands floor makes it false)', () => {
-    const html = gatherNodeTooltipHtml(model({ tier: 1, locked: false }));
-    expect(html).not.toContain('Requires');
-    expect(html).toContain('<div class="tt-title">Ore Vein</div>');
+  it('a tier-1 node renders the tierless base-tool requirement line (#2343: bare hands never gather)', () => {
+    // Locked (no pick owned): the tierless line renders red.
+    const locked = gatherNodeTooltipHtml(model({ tier: 1, locked: true }));
+    expect(locked).toContain('<div class="tt-red">Requires a mining pick</div>');
+    expect(locked).toContain('<div class="tt-title">Ore Vein</div>');
+    // Owning the pick turns the same line neutral, never drops it.
+    const tooled = gatherNodeTooltipHtml(model({ tier: 1, locked: false }));
+    expect(tooled).toContain('<div class="tt-sub">Requires a mining pick</div>');
+    expect(tooled).not.toContain('tt-red');
   });
 
   it('the cooldown state renders the respawning line without the ready green', () => {
@@ -63,6 +68,9 @@ describe('gatherNodeTooltipHtml', () => {
       'hudChrome.gathering.nodeName.wood',
       'hudChrome.gathering.nodeName.herb',
       'hudChrome.gathering.tierRequired.mining',
+      'hudChrome.gathering.requiresTool.mining',
+      'hudChrome.gathering.requiresTool.logging',
+      'hudChrome.gathering.requiresTool.herbalism',
       'hudChrome.gathering.stateReady',
       'hudChrome.gathering.stateCooldown',
     ] as const) {
@@ -86,16 +94,25 @@ describe('gatherNodeToolGateFor', () => {
       viewerToolTier: 2,
       unmetText: 'You need a tier 3 mining pick to harvest this vein.',
     });
-    // Bare hands floor to 1, and the wood/herb families word their own lines.
+    // Empty bags read as no tool owned (0, #2343: no bare-hands floor), and
+    // the wood/herb families word their own tiered lines.
     expect(gatherNodeToolGateFor(worldWith([]), { type: 'wood', tier: 2 })).toEqual({
       nodeTier: 2,
-      viewerToolTier: 1,
+      viewerToolTier: 0,
       unmetText: 'You need a tier 2 logging axe to fell this stand.',
     });
     expect(gatherNodeToolGateFor(worldWith([]), { type: 'herb', tier: 2 })).toEqual({
       nodeTier: 2,
-      viewerToolTier: 1,
+      viewerToolTier: 0,
       unmetText: 'You need a tier 2 herbalism sickle to gather this patch.',
+    });
+  });
+
+  it('a tier-1 node with empty bags gates on the tierless base-tool line (#2343)', () => {
+    expect(gatherNodeToolGateFor(worldWith([]), { type: 'ore', tier: 1 })).toEqual({
+      nodeTier: 1,
+      viewerToolTier: 0,
+      unmetText: 'You need a mining pick to harvest this vein.',
     });
   });
 });
@@ -105,11 +122,28 @@ describe('hud gatherDenied case stays an error toast only (source pin)', () => {
   const caseStart = source.indexOf("case 'gatherDenied'");
   const block = source.slice(caseStart, source.indexOf('break;', caseStart));
 
-  it('maps surface + professionId through the pure key mapper into showError', () => {
+  it('maps surface + professionId + requiredTier through the pure key mapper into showError', () => {
     expect(caseStart).toBeGreaterThan(-1);
     expect(block).toContain('this.showError(');
-    expect(block).toContain('gatherDeniedLineKey(ev.surface, ev.professionId)');
+    expect(block).toContain('gatherDeniedLineKey(ev.surface, ev.professionId, ev.requiredTier)');
     expect(block).toContain('formatNumber(ev.requiredTier');
+  });
+
+  it('adds no log line and no audio cue (toast only, the double-feedback trap)', () => {
+    expect(block).not.toContain('this.log(');
+    expect(block).not.toContain('audio.');
+  });
+});
+
+describe('hud gatherToolNoNode case mirrors the gatherDenied toast-only pattern (source pin)', () => {
+  const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  const caseStart = source.indexOf("case 'gatherToolNoNode'");
+  const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+
+  it('maps the professionId through the pure key mapper into showError', () => {
+    expect(caseStart).toBeGreaterThan(-1);
+    expect(block).toContain('this.showError(');
+    expect(block).toContain('gatherToolNoNodeKey(ev.professionId)');
   });
 
   it('adds no log line and no audio cue (toast only, the double-feedback trap)', () => {

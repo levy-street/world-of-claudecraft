@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
+import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -16,7 +17,10 @@ import { isSoftwareRendererName } from './software_renderer';
 //      anything unrecognized -> medium), so the 3D tier matches the medium data-fx-level fallback
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra';
-export const GFX_CONFIG_VERSION = 17;
+// v18: composer-tier draw counts became real (draw_stats_core accumulator);
+// fleet dashboards segment the rendererCalls/rendererTriangles semantics
+// change on this version (packet 0 ruling R2).
+export const GFX_CONFIG_VERSION = 18;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -108,6 +112,15 @@ export interface GfxSettings {
   readonly nativeIosMemoryProfile: boolean;
   /** Global cap for inactive skinned character rigs retained for reuse. */
   readonly maxPooledCharacterVisuals: number;
+  /**
+   * Linear range multiplier for the animated far character band (`crowd_lod.ts`):
+   * how much further than the articulated band a rig keeps animating at a low
+   * cadence before it collapses to the frozen single-draw far mesh. 1 keeps the
+   * pre-existing straight-to-frozen behaviour, which is what phone-class and
+   * software profiles want; the crowd knee and the frame-budget pressure ease it
+   * back to 1 on their own, so this is only the per-tier ceiling.
+   */
+  readonly farCharacterAnimScale: number;
 }
 
 export interface GfxRuntimeBudget {
@@ -739,6 +752,11 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     constrainedMemory,
     nativeIosMemoryProfile,
     maxPooledCharacterVisuals: nativeIosMemoryProfile ? 6 : Number.POSITIVE_INFINITY,
+    // Extra articulated rigs are skinning + draw-call cost, so the phone-class
+    // memory profiles and the low tier (which includes software GL) opt out and
+    // keep the straight-to-frozen far LOD.
+    farCharacterAnimScale:
+      tier === 'low' || constrainedMemory || nativeIosMemoryProfile ? 1 : FAR_ANIM_RANGE_SCALE_MAX,
   };
   if (hints?.graphicsPreset === PRESET_ADVANCED) {
     if ((hints.terrainDetail ?? 1) < 0.5) settings = { ...settings, terrainSplat: false };
@@ -880,6 +898,7 @@ export function isConstrainedBrowser(
 export type GpuClass =
   | 'software'
   | 'strongDesktop'
+  | 'appleSilicon'
   | 'flagshipMobile'
   | 'midIntegrated'
   | 'midMobile'
@@ -900,11 +919,14 @@ export function classifyGpuRenderer(name: string | undefined): GpuClass {
   // mid-integrated bucket so an Iris Plus 6xx / UHD 6xx / HD 5xx-6xx stays weak, consistent with
   // the existing leanFoliage treatment in settingsFor).
   if (isWeakIntegratedGpu(name)) return 'weak';
-  // Strong desktop discrete + Apple Silicon. The `(\(tm\))?` tolerates the "(TM)" some Windows
-  // drivers print after "Radeon" ("Radeon(TM) RX 580").
-  if (
-    /\b(rtx|gtx)\b|geforce|radeon(\(tm\))?\s?(rx|pro|vii)|\barc\b|\bnvidia\b|apple\s?m[1-9]/.test(n)
-  )
+  // Apple Silicon (M1..M9). Split out of strongDesktop: these are thermally constrained laptop
+  // SoCs (the MacBook form factor has no active-cooling headroom), so the resolver defaults them
+  // to the safe middle tier rather than ultra (issue 1676). Kept AHEAD of strongDesktop, whose
+  // regex no longer claims `apple m`. A player can still pick ultra manually.
+  if (/apple\s?m[1-9]/.test(n)) return 'appleSilicon';
+  // Strong desktop discrete. The `(\(tm\))?` tolerates the "(TM)" some Windows drivers print
+  // after "Radeon" ("Radeon(TM) RX 580").
+  if (/\b(rtx|gtx)\b|geforce|radeon(\(tm\))?\s?(rx|pro|vii)|\barc\b|\bnvidia\b/.test(n))
     return 'strongDesktop';
   // Recent flagship mobile.
   if (
@@ -974,6 +996,12 @@ export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
   if (gpu === 'strongDesktop' && !isMobile) return ampleOrUnknownMem ? PRESET_ULTRA : PRESET_HIGH;
   // A strong/flagship GPU on a touch device: capped at HIGH (ultra is desktop-only) for thermals.
   if (gpu === 'flagshipMobile' || (gpu === 'strongDesktop' && isMobile)) return PRESET_HIGH;
+  // Apple Silicon: an M-series iPad (touch) keeps the mobile HIGH cap above; an M-series Mac
+  // (non-touch) defaults to the safe middle. These SoCs can render high, but the thermally
+  // constrained MacBook form factor overheats and drains battery on a sustained ultra load, so
+  // medium is the right auto-default (the runtime governor can still climb; ultra stays a manual
+  // opt-in). Issue 1676.
+  if (gpu === 'appleSilicon') return isMobile ? PRESET_HIGH : PRESET_MEDIUM;
   if (gpu === 'midIntegrated' || gpu === 'midMobile') return PRESET_MEDIUM;
   if (
     gpu === 'unknown' &&
@@ -1117,6 +1145,7 @@ export const SUN_DIR = SUN_ANCHOR.clone().normalize();
 export interface SurfaceMatOpts {
   color?: number;
   map?: THREE.Texture;
+  vertexColors?: boolean;
   normalMap?: THREE.Texture;
   /** PBR roughness map (high/ultra only; ignored on the Lambert tier) */
   roughnessMap?: THREE.Texture;
@@ -1173,6 +1202,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     ? new THREE.MeshStandardMaterial({
         color: opts.color ?? 0xffffff,
         map: opts.map ?? null,
+        vertexColors: opts.vertexColors ?? false,
         normalMap: opts.normalMap ?? null,
         roughnessMap: opts.roughnessMap ?? null,
         aoMap: opts.aoMap ?? null,
@@ -1186,6 +1216,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     : new THREE.MeshLambertMaterial({
         color: opts.color ?? 0xffffff,
         map: opts.map ?? null,
+        vertexColors: opts.vertexColors ?? false,
         flatShading: opts.flatShading ?? false,
         emissive: opts.emissive ?? 0x000000,
         emissiveIntensity: opts.emissiveIntensity ?? 1,

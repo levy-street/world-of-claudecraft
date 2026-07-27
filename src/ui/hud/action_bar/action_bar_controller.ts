@@ -218,12 +218,16 @@ export class ActionBarController {
   }
 
   isHotbarItemId(itemId: string): boolean {
+    // Gathering implements (#2343): the simple pole (use.type 'fishing') and
+    // every gatherTool (picks, axes, sickles, tiered rods) are placeable, so
+    // a keybound press works the tool exactly like the bags click.
     const item = ITEMS[itemId];
     return (
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||
-      item?.use?.type === 'fishing'
+      item?.use?.type === 'fishing' ||
+      item?.use?.type === 'gatherTool'
     );
   }
 

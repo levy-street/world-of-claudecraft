@@ -23,9 +23,10 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
+import { ClientWorld } from '../src/net/online';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import type { PlayerMeta } from '../src/sim/sim';
-import type { Entity, SimEvent } from '../src/sim/types';
+import { type Entity, GATHER_CAST_ID, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
 
 const NODE_ID = 'ore_eastbrook_1';
 
@@ -85,6 +86,9 @@ function liveSetup() {
   moveTo(internals, sa.pid, node.pos.x, node.pos.z);
   moveTo(internals, sb.pid, 300, 0);
   moveTo(internals, sc.pid, 0, 340);
+  // #2343: every node harvest needs the matching-profession tool in bags
+  // (addItem draws no rng; its loot event drains with the settle tick below).
+  server.sim.addItem('copper_mining_pick', 1, sa.pid);
   // One tick settles the join and re-indexes the spatial grid (the
   // corpse_harvest_sim idiom), then drop the join-time traffic.
   server.sim.tick();
@@ -96,7 +100,7 @@ function route(server: GameServer, events: SimEvent[]): void {
   (server as any).routeEvents(events);
 }
 
-// Phase 12b: harvestNode STARTS a gather cast; the draws, grant, and events
+// harvestNode STARTS a gather cast; the draws, grant, and events
 // land at completion. Mirror the lifecycle completion arm synchronously so
 // the hunted rng stream stays free of world-tick noise (the
 // gather_rare_events.test.ts completeCastNow idiom).
@@ -109,7 +113,7 @@ function completeCastNow(server: GameServer, pid: number): void {
   server.sim.ctx.completeGatherCast(p, meta);
 }
 
-describe('gather events over the live server (Professions 2.0 Phase 4)', () => {
+describe('gather events over the live server (Professions 2.0)', () => {
   it('a real harvest delivers gatherResult (with qty and rareEvent) to the harvesting client only', () => {
     const { server, fcA, fcB, fcC, sa } = liveSetup();
 
@@ -124,7 +128,7 @@ describe('gather events over the live server (Professions 2.0 Phase 4)', () => {
     expect(g.pid).toBe(sa.pid);
     expect(g.nodeId).toBe(NODE_ID);
     expect(g.itemId).toBe('copper_ore');
-    // The Phase 4 payload fields ride the wire: qty reflects the granted
+    // The rare-event payload fields ride the wire: qty reflects the granted
     // units (1 at proficiency 0, x5 only on a rare event) and rareEvent is
     // explicitly present, null on a miss.
     expect(g).toHaveProperty('rareEvent');
@@ -146,7 +150,10 @@ describe('gather events over the live server (Professions 2.0 Phase 4)', () => {
     // respawn noise interleaves with the hunted stream.
     let hitEvents: SimEvent[] | null = null;
     for (let i = 0; i < 3000 && !hitEvents; i++) {
+      // The wipe removes the #2343 tool too; re-add it by direct push (event-
+      // and draw-free) so every iteration passes the tool gate.
       meta.inventory.length = 0;
+      meta.inventory.push({ itemId: 'copper_mining_pick', count: 1 });
       delete meta.nodeHarvestReadyAt[NODE_ID];
       expect(server.sim.harvestNode(NODE_ID, sa.pid)).toBe(true);
       completeCastNow(server, sa.pid);
@@ -180,5 +187,66 @@ describe('gather events over the live server (Professions 2.0 Phase 4)', () => {
 
     // The out-of-zone player receives nothing.
     expect(deliveredEvents(fcC).filter((e) => e.type === 'gatherRareEvent')).toHaveLength(0);
+  });
+});
+
+// #2343: the tool-use dispatch over the REAL command path. The suites above
+// call sim.harvestNode directly; these prove a raw {cmd:'use'} wire message
+// on a pick reaches useGatherToolItem server-side (handleMessage -> useItem),
+// starts the gather cast on the node, and that the no-node denial event is
+// delivered to the using client only and mirrors into a real ClientWorld
+// event queue (the surface the HUD drains).
+describe('gathering-tool use over the live command path (#2343)', () => {
+  it("a pick {cmd:'use'} beside the vein starts the gather cast server-side and grants to the user only", () => {
+    const { server, internals, fcA, fcB, sa } = liveSetup();
+
+    server.handleMessage(sa, JSON.stringify({ t: 'cmd', cmd: 'use', item: 'copper_mining_pick' }));
+    const alpha = internals.entities.get(sa.pid);
+    if (!alpha) throw new Error('missing entity');
+    expect(alpha.castingAbility).toBe(GATHER_CAST_ID);
+    expect(alpha.gatherCastNodeId).toBe(NODE_ID);
+
+    completeCastNow(server, sa.pid);
+    route(server, server.sim.drainEvents());
+    const mine = deliveredEvents(fcA).filter((e) => e.type === 'gatherResult');
+    expect(mine).toHaveLength(1);
+    if (mine[0].type !== 'gatherResult') throw new Error('expected gatherResult');
+    expect(mine[0].pid).toBe(sa.pid);
+    expect(mine[0].nodeId).toBe(NODE_ID);
+    expect(mine[0].itemId).toBe('copper_ore');
+    expect(deliveredEvents(fcB).filter((e) => e.type === 'gatherResult')).toHaveLength(0);
+  });
+
+  it("a pick {cmd:'use'} with no vein in reach delivers gatherToolNoNode to the user only and mirrors into ClientWorld", () => {
+    const { server, internals, fcA, fcB, sa } = liveSetup();
+
+    // Precondition guard, not the assertion under test: the idle spot is
+    // genuinely ore-free within interact range, so the denial below is the
+    // no-node arm and never a range coincidence.
+    moveTo(internals, sa.pid, 300, 0);
+    for (const node of GATHER_NODES) {
+      if (node.type !== 'ore') continue;
+      expect(Math.hypot(300 - node.pos.x, 0 - node.pos.z)).toBeGreaterThan(INTERACT_RANGE);
+    }
+
+    server.handleMessage(sa, JSON.stringify({ t: 'cmd', cmd: 'use', item: 'copper_mining_pick' }));
+    const alpha = internals.entities.get(sa.pid);
+    if (!alpha) throw new Error('missing entity');
+    expect(alpha.castingAbility).toBe(null);
+    route(server, server.sim.drainEvents());
+    const expected = { type: 'gatherToolNoNode', pid: sa.pid, professionId: 'mining' };
+    expect(deliveredEvents(fcA).filter((e) => e.type === 'gatherToolNoNode')).toEqual([expected]);
+    expect(deliveredEvents(fcB).filter((e) => e.type === 'gatherToolNoNode')).toHaveLength(0);
+
+    // Mirror leg: the exact events frames fcA received, replayed through the
+    // real ClientWorld.onMessage, land in the queue the HUD drains.
+    const client: any = Object.create(ClientWorld.prototype);
+    client.eventQueue = [];
+    for (const frame of fcA.sent.filter((m) => m.t === 'events')) {
+      client.onMessage(JSON.stringify(frame));
+    }
+    expect(client.drainEvents().filter((e: SimEvent) => e.type === 'gatherToolNoNode')).toEqual([
+      expected,
+    ]);
   });
 });

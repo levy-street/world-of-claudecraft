@@ -38,6 +38,14 @@ export const zh_TW: EnTranslations = {
     "filterLabel": "篩選指令",
     "filterPlaceholder": "搜尋此類別",
     "noMatches": "沒有符合的指令。",
+    "itemSearchPlaceholder": "依名稱或 ID 搜尋",
+    "itemResultsAria": "符合的物品",
+    "itemNoMatches": "沒有符合的物品。",
+    "itemMore": "顯示 {total} 個相符項目中的 {shown} 個。請繼續輸入以縮小範圍。",
+    "itemChosen": "已選擇：{name}",
+    "itemUnknown": "沒有該 ID 的物品。",
+    "itemHeroicTag": "英雄",
+    "kitCurrentSpec": "目前專精",
     "serverRequirement": "伺服器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
     "invalidValues": "執行此指令前請選擇有效值。",
     "sent": "已傳送：{command}",
@@ -55,7 +63,8 @@ export const zh_TW: EnTranslations = {
       "z": "Z",
       "dungeon": "地城",
       "difficulty": "難度",
-      "name": "名稱"
+      "name": "名稱",
+      "spec": "專精"
     },
     "difficulty": {
       "normal": "普通",
@@ -113,6 +122,10 @@ export const zh_TW: EnTranslations = {
       "give": {
         "label": "給予物品",
         "description": "將一件物品加入玩家物品欄。"
+      },
+      "kit": {
+        "label": "裝備新手20級套裝",
+        "description": "為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。"
       },
       "gold": {
         "label": "新增金幣",
@@ -355,6 +368,7 @@ export const zh_TW: EnTranslations = {
       "close": "關閉每日獎勵",
       "loading": "正在載入每日獎勵...",
       "error": "無法載入每日獎勵。",
+      "disabled": "每日獎勵目前已停用。我們將在 Discord 頻道中公布此功能的更新。",
       "intro": "在已驗證的錢包中持有足夠的 WOC 即可解鎖每日獎勵。透過每日一次轉盤與輪換任務賺取點數，再登上每日排行榜以分得獎池的一份獎勵。",
       "disclaimer": "WOC 價格可能快速波動。我們建議持有高於 $20 USD 最低要求的數量，避免正常價格波動導致獎勵被鎖定。這不是財務建議。",
       "prize": "獎池",
@@ -652,7 +666,7 @@ export const zh_TW: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "優惠 20%",
+      "railWocDiscount": "優惠 {percent}%",
       "railWocUnavailable": "WOC 定價目前無法使用。",
       "railNativeUnavailable": "SOL/WOC 無法使用",
       "amountLabel": "數量",
@@ -1048,6 +1062,7 @@ export const zh_TW: EnTranslations = {
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
       "mouseoverCast": "對隊伍框架滑鼠指向施法",
+      "stickyTarget": "點擊地面時保留目標",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
@@ -1449,6 +1464,7 @@ export const zh_TW: EnTranslations = {
       "harvestButton": "採集",
       "harvestTooltip": "採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。",
       "concentrateHint": "選擇的部位越少，每個部位的品質越高。",
+      "nothingSelectedYields": "你選擇的部位都無法從這具屍體上採集。",
       "alreadyHarvested": "這具屍體已經被採集過了。",
       "componentAria": "採集{component}",
       "components": {
@@ -1459,7 +1475,9 @@ export const zh_TW: EnTranslations = {
         "gills": "魚鰓",
         "claw": "爪",
         "horn": "角",
-        "tusk": "獠牙"
+        "tusk": "獠牙",
+        "meat": "獸肉",
+        "cloth": "布"
       }
     },
     "townFocus": {
@@ -1526,6 +1544,9 @@ export const zh_TW: EnTranslations = {
       "dragDestroyHint": "拖曳到世界中以銷毀",
       "reorderNeedsRecent": "清除篩選並按「最近」排序即可整理背包",
       "itemAriaInstanced": "{item}，數量 {count}，帶工匠印記的物品",
+      "itemAriaEnchanted": "{item}，數量 {count}，已附魔的副本",
+      "itemAriaBound": "{item}，數量 {count}，已綁定的副本",
+      "itemAriaMasterwork": "{item}，數量 {count}，傑作",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -1749,7 +1770,19 @@ export const zh_TW: EnTranslations = {
       "label": "重置框體位置"
     },
     "itemTooltip": {
-      "requiresLevel": "需要等級 {level}"
+      "requiresLevel": "需要等級 {level}",
+      "statEnchanted": "+{value} {stat}（附魔）",
+      "enchantedFallback": "已附魔"
+    },
+    "materialHint": {
+      "arcaneDust": "附魔材料。分解普通和優秀品質的裝備可得。",
+      "arcaneEssence": "附魔材料。分解精良品質的裝備可得。",
+      "arcaneShard": "附魔材料。分解史詩和傳說品質的裝備可得。",
+      "resonantThread": "附魔材料。分解精良及以上品質的布甲可得。",
+      "resonantHide": "附魔材料。分解精良及以上品質的皮甲可得。",
+      "resonantLinks": "附魔材料。分解精良及以上品質的鎖甲可得。",
+      "resonantSteel": "附魔材料。分解精良及以上品質的近戰武器可得。",
+      "resonantTimber": "附魔材料。分解精良及以上品質的法杖、魔杖、弓和弩可得。"
     },
     "discord": {
       "title": "Discord",
@@ -1990,6 +2023,13 @@ export const zh_TW: EnTranslations = {
         "takeParcelsFirst": "請先取出包裹再丟棄信件。"
       }
     },
+    "marketIndicator": {
+      "aria": "世界市場待領取物品",
+      "tip": "有金幣或物品正在商人處等待你領取。"
+    },
+    "noticeboard": {
+      "empty": "看起來沒有張貼任何內容。"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "鍍金保險箱",
@@ -2106,7 +2146,19 @@ export const zh_TW: EnTranslations = {
       "onlineHeader": "在線 ({n})",
       "offlineHeader": "離線 ({n})",
       "hideOffline": "隱藏離線",
-      "hideOfflineTitle": "隱藏離線公會成員"
+      "hideOfflineTitle": "隱藏離線公會成員",
+      "billboard": {
+        "label": "公會公告板",
+        "empty": "公告板上還沒有內容。",
+        "setBy": "由 {name} 設定",
+        "save": "儲存",
+        "placeholder": "給公會寫一則訊息",
+        "inputLabel": "公會公告板訊息",
+        "result": {
+          "set": "公會公告板已更新。",
+          "notOfficer": "只有幹部和會長可以編輯公告板。"
+        }
+      }
     },
     "gathering": {
       "title": "採集",
@@ -2117,6 +2169,9 @@ export const zh_TW: EnTranslations = {
       "notReady": "這個資源節點尚未為你重新生成。",
       "gatherLine": "你採集了：{name}。",
       "gatherLineQty": "你採集了：{name} x{qty}。",
+      "harvestLine": "你剝取了：{name}。",
+      "harvestLineQty": "你剝取了：{name} x{qty}。",
+      "harvestSpecimenLine": "你還獲得了 {name}。",
       "catchLine": "你釣上了：{name}",
       "biteLine": "有東西上鉤了！",
       "gotAwayLine": "牠跑掉了。",
@@ -2130,12 +2185,51 @@ export const zh_TW: EnTranslations = {
         "logging": "需要{tier}階伐木斧",
         "herbalism": "需要{tier}階草藥鐮"
       },
+      "requiresTool": {
+        "mining": "需要採礦鎬",
+        "logging": "需要伐木斧",
+        "herbalism": "需要草藥鐮"
+      },
       "toolTierUnmet": {
         "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",
         "logging": "你需要{tier}階伐木斧才能砍伐這片林木。",
         "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。"
       },
+      "toolRequired": {
+        "mining": "你需要採礦鎬才能開採這條礦脈。",
+        "logging": "你需要伐木斧才能砍伐這片林木。",
+        "herbalism": "你需要草藥鐮才能採集這片草藥叢。",
+        "fishing": "你需要釣竿才能拋竿垂釣。"
+      },
+      "noNodeNearby": {
+        "mining": "附近沒有礦脈可供開採。",
+        "logging": "附近沒有林木可供砍伐。",
+        "herbalism": "附近沒有草藥叢可供採集。"
+      },
       "toolTierUnmetCorpse": "你需要{tier}階採集工具才能取得最上等的材料。",
+      "toolTooltip": {
+        "kind": {
+          "mining": "採礦工具（{tier}階）",
+          "logging": "伐木工具（{tier}階）",
+          "herbalism": "草藥工具（{tier}階）",
+          "fishing": "釣魚竿（{tier}階）"
+        },
+        "unlocks": {
+          "mining": "開採最高{tier}階的礦脈所需。",
+          "logging": "砍伐最高{tier}階的林木所需。",
+          "herbalism": "採集最高{tier}階的草藥叢所需。"
+        },
+        "use": {
+          "mining": "使用：開採附近的礦脈。",
+          "logging": "使用：砍伐附近的林木。",
+          "herbalism": "使用：採集附近的草藥叢。"
+        },
+        "speed": "在低於{tier}階的節點採集速度更快。",
+        "rodRequired": "釣魚所需。",
+        "rodBite": "魚上鉤最多可提前{seconds}秒。",
+        "rodReel": "收線時限延長{seconds}秒。",
+        "rodBand": "釣魚技能達到{skill}後可解鎖更豐富的漁獲。"
+      },
       "downgradeMark": "背包已滿：這份收穫未能留下採集者的印記。",
       "downgradeFind": "背包已滿：一件完美的收穫溜走了。",
       "stateReady": "可採集",
@@ -2151,7 +2245,7 @@ export const zh_TW: EnTranslations = {
       "alchemy+cooking": "藥劑師",
       "cooking+leatherworking": "捕獸人",
       "leatherworking+tailoring": "製裝師",
-      "tailoring+inscription": "織法師",
+      "tailoring+inscription": "織墨師",
       "inscription+enchanting": "秘法師",
       "enchanting+jewelcrafting": "縛晶師",
       "jewelcrafting+weaponcrafting": "鑄刃師",
@@ -2208,7 +2302,7 @@ export const zh_TW: EnTranslations = {
       "enchant_legs_greater_stamina": "附魔腿部 - 強效耐力",
       "enchant_gloves_greater_agility": "附魔手部 - 強效敏捷",
       "enchant_weapon_runed_edge": "附魔武器 - 符文鋒刃",
-      "enchant_weapon_runed_focus": "附魔武器 - 符文聚能",
+      "enchant_weapon_runed_focus": "附魔武器 - 符文印記",
       "enchant_chest_runeweave": "附魔胸部 - 符文織紋",
       "enchant_legs_runed_hide": "附魔腿部 - 符文獸皮",
       "enchant_helmet_runed_links": "附魔頭部 - 符文鎖環"
@@ -2240,6 +2334,7 @@ export const zh_TW: EnTranslations = {
       "tutorialLine": "將任意一門技藝提升到技能 {target}，即可解鎖你的第一個階級。",
       "ctaHeader": "下一步",
       "ctaRaise": "繼續提升{craft}：距離下一階級還差 {points} 點。",
+      "ctaRaiseSpecialized": "繼續提升{craft}：距離專精還差 {points} 點，材料消耗將降低。",
       "ctaStart": "使用任意專業進行製作或採集，即可開始。",
       "unattunedIdentity": "你尚未調諧任何原型。提升你的技藝並完成一次調諧，以選擇你的組合。",
       "nudgeNearTier": "{craft}：距離下一階級還差 {points} 點",
@@ -2258,6 +2353,7 @@ export const zh_TW: EnTranslations = {
       "empty": "尚無已知配方。",
       "resultAria": "製作{name}",
       "craftedToast": "已製作:{name}",
+      "craftedToastQty": "已製作:{name} x{qty}",
       "insufficientMaterials": "你沒有足夠的材料。",
       "unknownRecipe": "該配方不存在。",
       "comboRequirementUnmet": "你尚未達到該配方所需組合的兩項製造技能等級。",
@@ -2310,6 +2406,7 @@ export const zh_TW: EnTranslations = {
       },
       "throttled": "你製作得太快了，請稍等片刻後再試。",
       "recipeNotLearned": "你還沒有學會這個配方。",
+      "noBagSpace": "背包空間不足，無法存放製作的物品。",
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成長",
       "difficultyReduced": "技能成長減少",
@@ -2335,7 +2432,6 @@ export const zh_TW: EnTranslations = {
       "makersMark": "製作者：{name}",
       "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
-      "enchantedLine": "已附魔",
       "commissionToggle": "委託製品",
       "commissionToggleHint": "將綁定給交易中第一個收到它的角色。",
       "commissionUnbound": "委託製品：將綁定給第一位收貨人",
@@ -2350,7 +2446,13 @@ export const zh_TW: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "你分解了 {item}。",
+      "disenchantedYield": "你將 {item} 分解為 {material}。",
+      "disenchantedYieldQty": "你將 {item} 分解為 {material} x{qty}。",
+      "disenchantedAlso": "你還獲得了 {material}。",
+      "disenchantedAlsoQty": "你還獲得了 {material} x{qty}。",
       "salvagedLine": "你拆解了 {item}。",
+      "salvagedYield": "你將 {item} 拆解為 {material}。",
+      "salvagedYieldQty": "你將 {item} 拆解為 {material} x{qty}。",
       "enchantAppliedLine": "你為 {item} 施加了 {enchant}。",
       "notHeld": "你沒有那件物品。",
       "notDisenchantable": "你無法分解那件物品。",
@@ -2361,6 +2463,9 @@ export const zh_TW: EnTranslations = {
       "enchantWrongSlot": "該附魔無法施加於那件物品。",
       "enchantUnknown": "該附魔不存在。",
       "enchantInsufficient": "你沒有該附魔所需的材料。",
+      "disenchantNoSpace": "背包空間不足，無法存放奧術材料。",
+      "salvageNoSpace": "背包空間不足，無法存放拆解出的材料。",
+      "enchantNoSpace": "背包空間不足，無法存放附魔後的物品。",
       "disenchantConfirmTitle": "分解 {item}？",
       "disenchantConfirmBody": "這會摧毀 {item} 並產出奧術材料。此操作無法復原。",
       "disenchantConfirmBodySpecial": "這會摧毀一件特殊的 {item}（署名、傑作或已附魔）並產出奧術材料。此操作無法復原。",
@@ -2370,7 +2475,31 @@ export const zh_TW: EnTranslations = {
       "pickerTitle": "施加附魔",
       "targetTitle": "選擇要附魔的物品",
       "noEnchants": "沒有附魔會用到此材料。",
-      "noTargets": "沒有可附魔的合適物品。"
+      "noTargets": "沒有可附魔的合適物品。",
+      "wornTag": "已裝備（{slot}）",
+      "tier": {
+        "base": "基礎附魔",
+        "runed": "符文附魔",
+        "greater": "強效附魔"
+      },
+      "yieldHeader": "預計產出材料：",
+      "yieldLineExact": "{item} {count} 個",
+      "yieldLineRange": "{item} {min} 至 {max} 個",
+      "alreadyEnchanted": "那件物品已經附魔。",
+      "sameEnchant": "那件物品已經擁有該附魔。",
+      "replaceTag": "替換{enchant}",
+      "sameEnchantTag": "已施加",
+      "plainTag": "未附魔",
+      "replaceConfirmTitle": "替換 {item} 上的附魔？",
+      "replaceConfirmBody": "這會將 {item} 上的 {old} 替換為 {new}。",
+      "replaceConfirmNoRefund": "舊附魔將被摧毀，材料不予退還。此操作無法復原。",
+      "replaceConfirmKeeps": "保留：{kept}",
+      "replaceConfirmKeepsSigner": "製作者印記",
+      "replaceConfirmKeepsMasterwork": "傑作加成",
+      "replaceConfirmKeepsBond": "委託綁定",
+      "replaceConfirmCost": "費用：{cost}",
+      "replaceConfirmCostItem": "{name} {count} 個",
+      "replaceConfirmAccept": "替換"
     },
     "training": {
       "title": "訓練：{name}",
@@ -2380,8 +2509,10 @@ export const zh_TW: EnTranslations = {
       "stateKnown": "已學會",
       "stateTeachable": "可學習",
       "stateLocked": "未解鎖",
+      "statePending": "學習中",
       "requirement": "需要{craft}達到 {skill} 後傳授",
       "trainAria": "花費{fee}學習{name}",
+      "pendingAria": "正在學習{name}",
       "dialogOption": "訓練",
       "dialogOptionAria": "向{name}學習配方",
       "learned": "已學會配方：{recipe}",
@@ -2408,7 +2539,8 @@ export const zh_TW: EnTranslations = {
       "notEligible": "該物品無法解綁。",
       "notBound": "該物品未綁定。",
       "cannotAfford": "你付不起解綁費用。",
-      "outOfRange": "你必須站在對應的工作臺旁才能解綁。"
+      "outOfRange": "你必須站在對應的工作臺旁才能解綁。",
+      "noSpace": "背包空間不足，無法存放解綁後的物品。"
     },
     "finder": {
       "title": "地城搜尋器",
@@ -2496,7 +2628,7 @@ export const zh_TW: EnTranslations = {
         "lunar_tide": "月潮（週期性範圍傷害）",
         "enrage": "低血量時狂怒",
         "shuddering_stomp": "震顫踐踏（範圍暈眩）",
-        "necrotic_shockwave": "死靈衝擊波（高額範圍傷害）",
+        "grave_inferno": "墓場煉獄（引導火焰AoE，保持分散）",
         "grave_cleaver": "掘墓劈砍（正面順劈）",
         "shadow_nova": "暗影新星（範圍爆發）",
         "profane_mending": "褻瀆治療（治療其盟友）",
@@ -3609,38 +3741,311 @@ export const zh_TW: EnTranslations = {
     },
     "professions": {
       "intro": "除了戰鬥與任務之外，這個世界還會獎勵你耕耘土地與鍛造：採集原材料，透過十種製作行業將其打造成裝備與物品，並在這些行業所代表的十種命途之一中確立自己的身分。",
-      "gatherTitle": "採集：採礦、伐木與草藥學",
-      "gatherIntro": "三種採集行業讓你從世界中直接取得原材料：採礦從礦脈中開採礦石與石料，伐木從林地中砍伐木材，草藥學採集野生生長的草藥與植物。三者分別計算進度，從事其中一項不會拖慢你在另一項上的進展。初次接觸這一切嗎？東溪鎮的工頭歐戴爾有一項簡短的差事，「人人皆可從事的行業」，會帶你走過你的第一次採集。",
-      "gatherWhatTitle": "資源節點",
-      "gatherWhatBody": "礦脈、林地與藥草叢作為可見、無主的地物分布在溪谷與濕地各處。走近並與之互動即可採集其中的資源。採集過一個節點後，它需要一段時間才能恢復供你本人再次採集，但這從不會阻擋其他玩家：其他人可以在此期間採集同一個節點。",
-      "gatherProficiencyTitle": "熟練度",
-      "gatherProficiencyBody": "每次成功採集都會提升你在該採集行業的熟練度，而你的角色資訊面板會分別記錄每一門行業。多加練習永遠不會損及你的進展，只會不斷為它增添。",
-      "gatherToolsTitle": "行業工具",
-      "gatherToolsBody": "商人出售各採集行業的基礎工具，更好的工具則可以製作出來。目前採集節點並不需要任何工具：工具是為日後更豐富的節點所鋪的基礎，屆時更高階的鎬、斧與鐮刀將是採集它們的門路。",
       "harvestTitle": "從狩獵本身採收",
       "harvestBody": "採集並不止於節點。有些被擊倒的野獸可以採收出部件：獸皮、獠牙、絲線，以及更稀奇的東西，直接從屍體上取得，與它的普通戰利品並存。每次擊殺只容一位採收者：誰先動手，就全歸誰所有。每一次也都由你選擇：把屍體能給的一切盡數剝下，或專注於單一部件，換取更精細的品級。任何角色都能採收，無需入行也無需訓練，而一件特別精良的部件甚至會冠上採收者的名字。",
       "focusTitle": "城鎮專注",
       "focusBody": "每座主據點城鎮都為到訪的採收者備有一面城鎮專注面板：站在鎮上，從小地圖旁打開它，把一小筆專注點數投向你在意的部件類型。此後每具屍體上的專注部件都會精細一個品級、也略微豐厚一些；你的分配會跟著角色走遍天涯，而且日後任何一次回到鎮上，都能免費重新調整。",
-      "craftTitle": "十大製作行業",
-      "craftIntro": "十種製作行業將採集到的材料轉化為成品裝備與物品：製甲、製械與珠寶加工將原材料塑形為可穿戴裝備；煉金術與工程學依靠反覆試驗；烹飪、銘文與附魔各自作用於其他行業的產出；裁縫與製皮則依照精確的圖樣進行。它們共同構成一個輪環，每種行業都與兩個鄰居相鄰，並與另一種行業相對。",
-      "craftRingTitle": "專精之輪",
-      "craftRingBody": "十種行業排列在一個固定的輪環上，行業在輪環上的位置很重要：相鄰的行業彼此之間的共通之處比處於對面的行業更多。專注於一種行業應當讓人感覺像是加入了一個相關行業組成的家族，而不是選擇了一項孤立的技能。",
-      "craftRecipesTitle": "配方與材料",
-      "craftRecipesBody": "每個配方都需要你採集或購買的特定材料。最簡單的配方只需要普通材料，從一開始就能製作，因此你一拿起一門行業就能立刻上手。配方清單仍在持續補齊：少數行業還在等待它們的第一批配方，而隨著這些行業成長，會有更多配方登場。",
       "craftHowTitle": "製作視窗",
-      "craftHowBody": "開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階配方，包括高階工具與稀有的施法者護甲，則要求你站在高守哨站的製作站前。",
       "craftMasteryTitle": "技能與精通",
       "craftMasteryBody": "成功製作會提升你在該行業的技能，而技能從不會把行業的配方鎖起來：只要你會某個配方並持有其材料，就能嘗試製作。每個配方產出的都是它所承諾的那件成品，而熟練的手藝偶爾能打造出一件傑作：同樣的成品，做工更精，並蘊含一絲額外的力量。唯一的例外是組合配方：只有調諧到連接這兩門行業的原型、並在兩門行業都證明過技藝的製作者，才能使用它們。",
-      "craftComboTitle": "組合配方",
-      "craftComboBody": "除了單一行業自身的配方列表之外，這個輪環還支援需要同時調用兩個相鄰行業的組合配方，用以獎勵那些在輪環上投入了相鄰行業的角色，而非只專精孤立一項的人。製作者必須自己同時掌握這兩門行業；夥伴的技能無法替代其中任一半。",
-      "archetypeTitle": "十大命途",
-      "archetypeIntro": "十種行業各自也代表一種命途，一種超越單純從事該行業本身的更廣闊身分。你的當前命途一次只能有一個，而非一份清單：你只承載一個命途，但如果願意，之後可以更改。",
       "archetypeChooseTitle": "選擇你的命途",
       "archetypeChooseBody": "宣告命途是一個劇情時刻：一個正式接納你進入該身分的任務。在你宣告之前，每種行業的技能都能提升到稀有層級。一旦你選定一對行業，這兩門行業便完全放開；輪盤對側的一門行業會作為嗜好留在你身邊，仍能練到稀有層級；而在你保有這一身分期間，其餘所有行業都停留在普通層級。",
-      "archetypeSwitchTitle": "回心轉意",
       "archetypeSwitchBody": "宣告也不會是一紙終身判決。目前的計畫是：在拿起新行業之前，先向你的舊行業完成一次可重複的贖罪，而每轉換一次，贖罪就會加重一分，因此這個選擇始終有其分量，而非毫無代價。它和宣告本身一樣，仍在路上。",
-      "archetypeIdentityTitle": "你的命途意味著什麼",
-      "archetypeIdentityBody": "你當前的命途，是關於你的角色在這個世界中是誰的一種宣告，會體現在他人與世界如何稱呼你之中。它所附帶的具體獎勵與認可仍在完善之中；請隨著系統的完善持續關注。"
+      "whatHeading": "劍之外的一門手藝",
+      "whatBody": "專業是這個世界的營生：四種採集行業從大地中獲取原料，十種製作行業把它們變成裝備、飯菜、藥水與工具。萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵。這裡沒有專業數量限制：每個角色都能同時修習全部八種已有內容的製作行業與全部四種採集行業，唯一的排他選擇是你最終宣誓的命途，而一旦宣誓，落入休眠的製作行業便不再上升。技能永不下降，學會的東西也永遠不會被奪走。",
+      "ringHeading": "製作之輪",
+      "ringBody": "十種製作行業排列在一個輪環上，各自獨立記錄技能；點開一張卡片即可查看完整的配方表與數值。",
+      "ringWaveNote": "珠寶設計與銘文學如今已在輪環上，但尚未提供任何配方；它們的內容將隨後續的區域擴充一同到來。",
+      "capFmt": "上限{cap}",
+      "comingSoon": "暫無配方",
+      "gatherHubHeading": "採集",
+      "gatherHubBody": "四種採集行業為製作供給材料：採礦、伐木與藥草學的上限為100，釣魚為200。",
+      "archetypesHeading": "十大命途",
+      "archetypesBody": "調諧到兩個相鄰行業即可獲得一個成對頭銜：兩門主修可以一路練到最高層級，對側的一門行業作為愛好保留在精良層級，其餘行業則停留在普通層級。",
+      "pairFmt": "{a}與{b}",
+      "curveHeading": "精通曲線",
+      "curveBody": "每{step}點技能為一個層級：在自身層級或以上的配方給予全額成長，隨著配方落到你之下，成長會減半、再減為四分之一，最終停止。",
+      "provenanceHeading": "出處",
+      "provenanceBody": "精良及以上的成品帶有製作者的名字，傑作會額外提升一個品質層級，而委託製品會綁定給它的收貨人（製作者之約）。",
+      "stationsHeading": "工位與大師",
+      "stationsBody": "三座主城中共設六座分類工位，常駐大師在此傳授配方並發布工作訂單。",
+      "deedsHeading": "銘記旅程的功業",
+      "deedsBody": "功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。八種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。",
+      "startHeading": "從哪裡開始",
+      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮西南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。",
+      "colStation": "工位",
+      "colHub": "主城",
+      "colMaster": "大師",
+      "masterCellFmt": "{name}（{title}）"
+    },
+    "profPages": {
+      "back": "返回專業總覽",
+      "capLabel": "技能上限",
+      "stationLabel": "工位",
+      "stationNone": "無需工位",
+      "stationAnywhere": "任意地點",
+      "mastersLabel": "大師",
+      "masterFmt": "{name}（{hub}）",
+      "specializationLabel": "專精",
+      "specializationFact": "技能{at}：材料消耗減少{pct}%",
+      "matFmt": "{name}×{count}",
+      "outputFmt": "{name}×{count}",
+      "comboReq": "需要{a}與{b}",
+      "sourceTrainerFee": "訓練師，{fee}",
+      "sourceTrainerFree": "訓練師，免費",
+      "sourceKnown": "初始即會",
+      "gainFmt": "{reduced} / {minimal} / {zero}",
+      "colRecipe": "配方",
+      "colSkill": "技能",
+      "colSource": "來源",
+      "colStation": "工位",
+      "colMaterials": "材料",
+      "colQuality": "品質",
+      "colGain": "成長衰減點",
+      "colMaterial": "材料",
+      "colTool": "工具",
+      "colTier": "階",
+      "colPrice": "價格",
+      "colZone": "區域",
+      "colNodes": "節點數",
+      "colNodeTier": "節點階級",
+      "colToolNeeded": "所需工具",
+      "craftIntro": {
+        "weaponcrafting": "武器鍛造在東溪的鍛造坊打造斧、錘、刃與法杖，從銅製入門武器一路到精良的鋨金與銘鋼之作。",
+        "armorcrafting": "護甲鍛造在東溪的鍛造坊打造鎖甲，從鉚接銅甲到精良的鋨鱗重甲。",
+        "tailoring": "裁縫在東溪的織布機旁織造施法者布甲與一只寬敞的背包，從家紡基礎款到精良的鎏金織套裝。",
+        "leatherworking": "製皮在芬橋的製革坊鞣製靈巧的皮甲，從獸皮基礎款到精良的澤守系列。",
+        "cooking": "烹飪在東溪的廚房把魚、野味和草藥做成坐下享用的餐食，最高可達精良的盛宴佳餚。",
+        "alchemy": "鍊金術在高望的藥坊調配治療與法力藥劑，以及耐力合劑。",
+        "engineering": "工程學在東溪的工坊打造4階與5階採集工具，每一件都要消耗低一階的工具。",
+        "enchanting": "附魔將不需要的裝備分解成奧術材料，再將其用於永久性的裝備附魔，無需任何工位。"
+      },
+      "craftProse": {
+        "weaponcrafting": {
+          "identityHeading": "人人都要買的鋒刃",
+          "identityBody": "精良一檔就涵蓋三種胃口：力量近戰的Osmium Warblade、敏捷戰士的Glyphsteel War Axe，以及施法者的智力精神法杖Highpine Battle Staff。在製作之輪上它位於護甲鍛造與珠寶設計之間；鐵匠（武器鍛造與護甲鍛造）可在Forgemistress Darva處宣誓，與珠寶設計組成的Bladewright則要等後者的配方隨未來區域到來。",
+          "materialsHeading": "鍛爐吞噬什麼",
+          "materialsBody": "採礦是根基：銅礦出自Eastbrook Vale，鐵礦出自Mirefen Marsh，鋨礦出自Thornpeak Heights。伐木也很重要：鐵皮木做矛桿，梣木做錘柄，一根高松成杖。粗皮從狼和野豬屍體上剝取，碎骨來自日常獵殺，梯子上的配方要燒Smithing Flux（Darva處20銅一罐）。Darva賣鋨礦，Tinker Gizzel在工坊賣銘鋼錠，價格不菲。",
+          "ladderHeading": "一級一級的梯子",
+          "ladderBody": "野外配方Eastbrook Arming Sword人人都會、隨處可做。真正的梯子是三檔九個訓練師配方，全部綁定鍛造坊：銅檔技能0免費，鐵檔技能25每個25銀，鋨檔技能50每個1金；你的層級一到，Darva就會教。另有一件組合配方Gravewyrm Gauntlets：只有武器鍛造與護甲鍛造都到25的調諧鐵匠能做，且不需要任何工位。",
+          "routeHeading": "傑作與通往125之路",
+          "routeBody": "有屬性的成品（鐵檔及以上）才可能出傑作；無屬性的銅檔普通件永遠不會觸發。鐵算一級材料（加成1%），高松與銘鋼算二級（2%）。路線：銅檔到25，鐵檔到50，鋨檔到75；此後暫無更高配方，鋨檔衰減為半速再到四分之一，到125上限約需再做150次，注意每分鐘十次的共享節流。Darva的工作訂單每30分鐘收八塊銅礦。功業之書在技能50記下Edge and Temper，125加冕Grandmaster Weaponcrafting。"
+        },
+        "armorcrafting": {
+          "identityHeading": "前線的鎖甲",
+          "identityBody": "梯子如同士兵的履歷：鉚接銅甲起步，ironlink一檔有了真正的屬性，精良的osmiumscale頭盔、胸甲與護腿則是工匠能敲出的最大護甲數值。還有安靜的一面：野外普通件Eastbrook Warded Leggings與技能75的Kilnscale Mantle（智力精神鎖甲肩）留住法系鎖甲客戶。它位於武器鍛造與工程學之間；鐵匠對可在Darva處宣誓，Gearwright暫無誓約任務。",
+          "materialsHeading": "成袋的礦石",
+          "materialsBody": "沒有哪個行業吃礦更快：ironlink hauberk一件就要五塊鐵礦，每件osmiumscale要三到四塊鋨礦外加一塊銘鋼錠，認真的甲匠要麼自己挖遍Mirefen Marsh和Thornpeak Heights，要麼花錢請人。金屬之外還有軟料：粗皮、碎骨與亞麻碎布，幾乎每個配方都要一罐Smithing Flux（鍛造坊20銅）。急用時Darva櫃檯就賣鋨礦。",
+          "ladderHeading": "在Darva的鍛爐學藝",
+          "ladderBody": "兩件野外普通件（Eastbrook Chainmail Vest與Warded Leggings）人人都會、隨處可做。訓練師梯子是Eastbrook鍛造坊的三檔九個配方：銅檔技能0免費，ironlink檔25技能每個25銀，osmiumscale檔50技能每個1金。梯子之外有兩件特例：Boundstone Helm是鐵匠組合配方（需調諧且雙技能25，不佔工位）；Kilnscale Mantle無需老師，但要技能75且綁定鍛造坊，是本行業的三層壓軸。",
+          "routeHeading": "傑作與通往125之路",
+          "routeBody": "ironlink檔及以上都擲傑作；只有護甲值的銅檔普通件不會觸發。鐵算一級材料，銘鋼算二級。路線照常：銅到25，ironlink到50，osmiumscale到75。75之後的運氣在於Kilnscale Mantle：三層配方，到99全速、之後半速，最後五十點約75次而非150次；每件要七塊鋨礦五份Smithing Flux，先在Thornpeak和鍛造坊櫃檯備貨。Darva的訂單每30分鐘收八塊銅礦。技能50記下Hammer and Plate，125等著Grandmaster Armorcrafting。"
+        },
+        "tailoring": {
+          "identityHeading": "施法者的布衣，所有人的背包",
+          "identityBody": "梯子從homespun基礎布裝經gildenweave套裝爬到精良檔：Silkbinder's Raiment與sunweave件。第二門生意人人需要：Silkspun Satchel是十格背包，沒有哪個職業或等級嫌包多。裁縫位於製皮與銘文學之間；製裝師（製皮與裁縫）在Eastbrook織布機旁的Weaver Ottilie處宣誓（先獵四隻webwood蜘蛛取絲），與銘文學組成的Inkweaver要等銘文學的第一批配方。",
+          "materialsHeading": "線、絲，還有藥草",
+          "materialsBody": "織布機靠獵獲與田野運轉：亞麻碎布與家紡布來自人形生物，蜘蛛絲從蛛屍上採取，精良檔的核心Silkbinder's Raiment要一塊Pristine Silk（屍體採集的署名標本）。藥草餵養裁縫勝過任何裝備行業：潤光葉鑲拖鞋，金葉染gildenweave，日瓣草貫穿整個精良檔。Spool of Thread在Ottilie處12銅一軸，織布機根本不用金屬，連Wardweave Cowl頂階也是用高級草藥、Pristine Silk、蛛絲與線織成。",
+          "ladderHeading": "在Ottilie的織布機學藝",
+          "ladderBody": "兩件野外普通件（Eastbrook Wool Trousers與Ritual Vestments）隨處可做。訓練師梯子在Eastbrook水井南側的織布機：homespun檔技能0免費，gildenweave檔（含Silkspun Satchel）技能25每個25銀，精良檔技能50每個1金。Wardweave Cowl無需訓練師：人人都會，但要技能75且綁定織布機，是本行業的三層壓軸。",
+          "routeHeading": "傑作與通往125之路",
+          "routeBody": "長袍裡的Pristine Silk本身就補足署名材料加成，金葉與日瓣草分別算一、二級材料，精良檔因此觸發率最高；背包之類無屬性的成品永不觸發。路線：homespun到25，gildenweave到50，精良檔到75；75之後靠Wardweave Cowl（三層配方，到99全速、之後半速），最後五十點約75次，每次兩塊Pristine Silk、四束蛛絲、日瓣草與金葉各兩、兩份線。背包賣給所有人，Ottilie的訂單每30分鐘收六束蛛絲。技能50記下A Fine Seam，125等著Grandmaster Tailoring。"
+        },
+        "leatherworking": {
+          "identityHeading": "迅捷者的皮甲",
+          "identityBody": "梯子從樸素的Fenbridge硬皮件經優秀的marshstalker件爬到精良的mirewarden套裝，工匠能裁出的最好皮甲。兩件法系皮件補全陣容：野外普通件Eastbrook Druid's Hide與技能75的Duskhide Wraps。製皮位於烹飪與裁縫之間；製裝師在Eastbrook的Weaver Ottilie處宣誓，與烹飪組成的Trapper暫無誓約任務。",
+          "materialsHeading": "狩獵即收穫",
+          "materialsBody": "在製皮這裡，練級路線與供應線是同一條：粗皮直接從帶皮屍體上剝取（狼和野豬最多），每具屍體只服務先到的一人。精良及以上的採集還會給出Pristine Hide，Mirewarden Jerkin正需要這種署名標本，見一塊存一塊。配角不多：蛛腿與蛛絲、人形生物的家紡布、每件mirewarden精良品一塊鋨礦（Duskhide Wraps頂階要六塊），以及製革坊櫃檯16銅的Tanning Agent。不想挖礦的話Tanner Hesk也賣鋨礦。",
+          "ladderHeading": "在Fenbridge受訓",
+          "ladderBody": "特別之處：製革坊在Mirefen Marsh路上的Fenbridge，這是唯一在Eastbrook之外受訓的深度行業。Tanner Hesk在他的鞣池邊授課：硬皮檔技能0免費，marshstalker檔技能25每個25銀，mirewarden檔技能50每個1金。兩件配方跳過訓練師：野外普通件（Tanned Leather Jerkin與Druid's Hide）隨處可做，Duskhide Wraps人人都會但要技能75且綁定製革坊。注意製裝師誓約本身在Eastbrook的Ottilie處宣誓，只有授課在沼澤。",
+          "routeHeading": "傑作與通往125之路",
+          "routeBody": "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，mirewarden到75，此後Duskhide Wraps（三層配方，六塊鋨礦、三塊Pristine Hide、兩塊粗皮、一份Tanning Agent）帶你走完最後五十點（約75次）。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。"
+        },
+        "cooking": {
+          "identityHeading": "餵飽隊伍的鍋",
+          "identityBody": "吃下熟食會在18秒的休息中治療你，這是拉怪間隙最便宜的治療。梯子從90點治療的Pan-Seared River Perch一路做到980點的Marlow's Grand Roast，現存最大的坐地回復。烹飪位於鍊金術與製皮之間；藥劑師（鍊金術與烹飪）在Eastbrook廚房的Cook Marlow處宣誓（先為鍋獵四頭野豬），與製皮組成的Trapper暫無誓約任務。",
+          "materialsHeading": "釣竿與獵刀供養的食櫃",
+          "materialsBody": "釣魚按區域供應招牌食材：Eastbrook Vale的鏡鱒與河鱸，Mirefen Marsh的沼狗魚與泥鰻，Thornpeak Heights的霜鰓鱒與板鰭鯉，每一檔都烹本檔的魚。屠夫的一側來自屍體採集：野味肉，以及精良採集擲出的署名Prime Cut（大烤肉的核心）。藥草調味，梣木燻鰻，Cooking Salt在Marlow攤位8銅一袋。",
+          "ladderHeading": "從肉乾到大烤肉",
+          "ladderBody": "Salted Jerky是野外配方：初始即會、一條蛛腿、隨處可做。訓練師梯子在廣場西側的Eastbrook廚房：免費檔技能0（河鱸、Hunter's Game Skewer、Herbed Marsh Pike），中檔技能25每個25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良檔技能50每個1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：燻鰻與燉肉每次兩份，宴會拼盤三份。",
+          "routeHeading": "專精而非傑作，以及通往125之路",
+          "routeBody": "烹飪是傑作故事裡誠實的例外：菜餚沒有屬性可提升，永不觸發，也不必追。這門手藝的精通在於75的專精：每樣食材省五分之一（批量菜上疊加極快），外加移動野外廚房，讓宴席在副本門口出鍋。邊釣邊做，兩門技能互相供養：免費檔到25，中檔到50，精良檔到75；此後精良菜衰減為半速與四分之一，到上限約再做150次。Marlow的訂單每30分鐘收八塊野味肉。技能50記下Seasoned Chef，125是Grandmaster Cooking頭銜。"
+        },
+        "alchemy": {
+          "identityHeading": "贏下戰鬥的瓶子",
+          "identityBody": "這門手藝在Highwatch的藥坊操持，主人是Alchemist Verane：教配方、賣12銅的Glass Vial、以工作訂單收藥草。鍊金術位於工程學與烹飪之間，因此有兩條命途：爆破師（工程學與鍊金術，在Eastbrook的Tinker Gizzel處受誓）與藥劑師（鍊金術與烹飪，在Cook Marlow處宣誓）。調諧任一對即可讓鍊金成為主修直至上限；此前它像所有未宣誓行業一樣練到精良層。",
+          "materialsHeading": "藥草、毒腺與玻璃",
+          "materialsBody": "每瓶藥劑要一個Glass Vial外加對應檔位的藥草：潤光葉生於Eastbrook Vale，金葉生於Mirefen Marsh，日瓣草生於Thornpeak Heights，一區一藥，瓶子隨世界一起攀升。藥草學是天然的夥伴技能；深區的高階草叢需要更好的鐮刀。強化藥劑一線另需獵手的材料：從帶毒屍體採集的Venom Gland，頂級藥劑還要一塊Pristine Venom Gland（署名標本）。",
+          "ladderHeading": "配方階梯",
+          "ladderBody": "Minor Healing Potion人人初始即會、隨處可調。真正的梯子是Verane在藥坊教的九個配方，每檔三個：技能0免費，25檔每個25銀，50檔每個1金；每檔都是治療藥劑、法力藥劑與耐力強化劑，從普通潤光葉瓶（120生命、160法力）經優秀金葉（200、260）到精良日瓣（280、360）。強化劑同樣攀升：Elixir of the Boar給6耐力10分鐘，Vipersear Elixir給9耐力15分鐘，Elixir of the Serpent給12耐力15分鐘且一次兩瓶。旁邊還有組合配方Elixir of the Bear：鍊金25時Verane以25銀傳授，隨處可調，但只有雙技能25的調諧爆破師能做。",
+          "routeHeading": "釀藥師的125之路",
+          "routeBody": "藥劑永不出傑作，那屬於有屬性的裝備；但名字仍會流傳：精良的日瓣藥劑單瓶釀造、出瓶即署名，雙瓶的Elixir of the Serpent則是無名的。75專精後每個配方省20%材料。早學藥草邊練邊採：潤光葉遍布山谷，到了Verane的工作檯，免費檔就能靠順手採的藥草乾淨地推到25；25檔一開就學，採藥轉往沼澤，Verane的訂單（六株Goldleaf Herb換45銅，每30分鐘一次）順路回本。50以後用Thornpeak的藥草釀日瓣與蛇藥；100到125是刻意的涓流，釀能賣的，別為數字燒草。技能50記下Strange Brews，上限處是Grandmaster Alchemy。"
+        },
+        "engineering": {
+          "identityHeading": "工具匠的獨門生意",
+          "identityBody": "這門手藝在Eastbrook廣場東南角的工坊操持，主人是Tinker Gizzel。每條工具線的1到3級都是尋常商店貨，4級與5級只出自工程師之手。它位於鍊金術與護甲鍛造之間，兩條命途是爆破師（工程學與鍊金術）與Gearwright（尚不可宣誓）。最要緊的警告：工程學的兩檔配方都高於愛好與未宣誓者的精良層上限，技能只為主修包含工程學的人（今天即爆破師）增長；誰都能做這些工具，未調諧者只是學不到東西。",
+          "materialsHeading": "材料與前置工具",
+          "materialsBody": "每個工具配方都吞掉低一級的工具外加高級材料：四塊Osmium Ore加一把Skysilver Mining Pick成為Osmium Mining Pick，再用兩塊Glyphsteel Bar加鋨鎬成為Glyphsteel Mining Pick；斧與鐮兩條線以Ashwood與Highpine Log、Goldleaf與Sunpetal Herb如法炮製。Gizzel在工坊備齊全部六種高級材料，但礦、木、草都能在Mirefen Marsh與Thornpeak Heights自採，自採才有利潤；唯一例外是僅商店有售的Glyphsteel Bar，給每件銘鋼級工具墊了固定的成本底價。",
+          "ladderHeading": "工具階梯",
+          "ladderBody": "整條梯子只有六個配方，全部綁定工坊且自動學會、永不收費：技能75的4級鎬、斧、鐮，與技能150的5級版本。150不是筆誤，故意高於當前125上限：技能需求從不阻止製作，只影響成長，材料與前置工具到手當天就能做出5級工具。每件成品都是精良或史詩品質且出廠署名。工程學還撐起一件組合配方的一半：Elixir of the Bear，由雙技能25的調諧爆破師調製。",
+          "routeHeading": "工程師的125之路",
+          "routeBody": "工具沒有戰鬥屬性，永不出傑作。75照常專精：省20%材料，外加把任何採集之旅變成車間的臨時野外工坊。成長幾乎不衰減：75檔配方到100全速、之後半速，150檔配方到125上限一路全速，真正的瓶頸是材料與銅板。先定命途，從Tinker Gizzel處取爆破師調諧；再餵梯子：自練採集或結交採集者，商店買齊3級工具，把Gizzel的訂單（八根Ironbark Log換16銅，每30分鐘一次）當零花錢。賣點不言自明：高於節點的每級工具都從2.5秒採集讀條裡削去0.4秒（下限1.5秒）。技能50記下Cogs and Sprockets，125是Grandmaster Engineering。"
+        },
+        "enchanting": {
+          "identityHeading": "拆開裝備，注回力量",
+          "identityBody": "沒有工位、沒有訓練師、沒有要買的配方書：所有附魔初始即會，誰都能從第一天開始分解，技能與各行業一樣以125為上限。它位於銘文學與珠寶設計之間，兩條命途是Arcanist與Gembinder，均因鄰居還沒有配方而暫不可宣誓；因此附魔今天是所有人的手藝：宣誓前自由練到精良層，也是爆破師或藥劑師天然的愛好選擇。附魔師還維繫著採集世界：三種可鑲嵌的工具效果都是附魔師的作品，原作者為自己的作品充能享有折扣，專精後更深。",
+          "levelingHeading": "附魔如何升級",
+          "levelingBody": "兩種行動推動技能：分解與施加附魔，每次成功最多一點，按工作的分量折算：普通分解與純粉塵附魔算普通活；優秀分解與精華附魔算優秀活；精良分解與所有Runed或Greater附魔算精良活；史詩與傳說分解更高。熟悉的精通衰減按25點層級作用：普通活在技能75變灰，優秀活在100，精良活恰在125上限。附魔另有一份仁慈：高於命途上限的輸入向下取整而非歸零，宣誓前史詩分解按精良計而非一無所獲；若附魔淪為休眠，一切按普通活計，爬升停在75；作為愛好則精良活仍有收益，只是75之後變慢。",
+          "marketHeading": "附魔副本、出處與市場",
+          "marketBody": "施加附魔消耗材料並標記特定的一件副本。用在背包中的副本上，交還一件獨立的附魔副本；用在已穿戴的裝備上，則就地附魔，無需脫下再穿上。無論哪種，加成都永遠跟隨。一件一附魔：對附魔副本施加另一個附魔會先要求確認，然後直接替換舊附魔，舊附魔被摧毀且不退還材料；出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。世界市場只經手無標記的普通貨，附魔與署名件都面對面交易；材料才是可上市的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。"
+        }
+      },
+      "howHeading": "製作流程",
+      "howBody": "備齊材料後打開製作視窗（預設按鍵T）；綁定工位的配方要求你站在對應工位旁，野外配方則隨處可做。",
+      "recipesHeading": "配方",
+      "recipesNote": "每個配方的確切技能與材料需求、學習來源，以及其成長開始衰減的技能數值。",
+      "masteryHeading": "技能成長",
+      "masteryBody": "每{step}點技能為一個層級：配方在你層級或以上給予全額成長，低一層減半，低兩層為四分之一，低三層及以上則毫無成長；本行業的上限為{cap}。",
+      "masterworkHeading": "傑作",
+      "masterworkBody": "每次成功製作都有{base}%的傑作機率，你每高於配方一層再加{perTier}%，使用任何署名材料加{signed}%，專精後加{spec}%，上限為{cap}%。",
+      "trainingHeading": "訓練",
+      "trainingBody": "當你在本行業的層級達到配方自身的層級時，大師即可傳授：0層配方免費，1層需{tier1}，2層需{tier2}。",
+      "specializationHeading": "專精",
+      "specializationBody": "技能達到{at}即在本行業專精，配方材料消耗減少{pct}%。",
+      "ench": {
+        "disenchantHeading": "分解",
+        "disenchantNote": "分解任何普通品質及以上的武器或護甲，每次只消耗一件，優先消耗未附魔的；當只剩下已附魔的裝備時，會連同附魔一併分解其中一件。普通與優秀品質的裝備研磨後隨機產出若干鈴音之塵，稀有度越高、等級越高則產量越豐；精良品起，產出形態改變：精良件出一個鈴音精華，史詩或傳說件出一個鈴音碎片，另附一個與原件材質掛鉤的定向副產物。",
+        "typedHeading": "定向副產物",
+        "typedNote": "精良及以上的裝備還會產出一種定向的、交易綁定的副產物：精良裝備產出{rare}件，史詩或傳說產出{epicMin}到{epicMax}件。",
+        "colSource": "拆解來源",
+        "meleeWeapons": "近戰武器",
+        "timberWeapons": "法杖、魔杖、弓與弩",
+        "enchantsHeading": "附魔",
+        "enchantsNote": "附魔分三個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽與除副手外的全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔。進階層消耗一個鈴音碎片加鈴音精華，是鈴音碎片的唯一用途：為高價值槽位提供更強的加成。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼）、符文印記（武器，智力，共鳴木）、符文織紋（胸部，精神，共鳴絲線）、符文皮革（護腿，敏捷，共鳴皮革）、符文鎖鏈（頭盔，耐力，共鳴鏈環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與進階附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文皮革則是護腿唯一的敏捷附魔。確切加成數值見下表。",
+        "colEnchant": "附魔",
+        "colSlot": "部位",
+        "colTier": "層級",
+        "colBonus": "加成",
+        "tier": {
+          "base": "基礎",
+          "runed": "符文",
+          "greater": "強效"
+        },
+        "salvageHeading": "回收",
+        "salvageNote": "任何人都可以把武器或護甲按品質回收成普通材料，無需附魔技能。",
+        "bonusFmt": "+{value}{stat}"
+      },
+      "gatherIntro": {
+        "mining": "採礦直接從世界的岩層中開採礦石：東溪谷產銅礦，泥沼濕地產鐵礦，荊峰高地產鋨礦，供給鍛造類行業。從1級起人人皆可採集：只需背包中備有一把採礦鎬，各區域主城均售20銅幣。以獨立計數器追蹤，上限為100。",
+        "logging": "伐木在三大區域的林地中砍伐木材：東溪谷產鐵皮木，泥沼濕地產梣木，荊峰高地產高松，供給武器柄材、法杖與工程師工坊。從1級起人人皆可伐木，只需背包中備有一把伐木斧（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
+        "herbalism": "藥草學採集野地所生的草藥：東溪谷產潤光葉，泥沼濕地產金葉，荊峰高地產日瓣草，這些葉與莖讓藥劑類行業得以持續調製。從1級起人人皆可採集，只需背包中備有一把草藥鐮（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
+        "fishing": "釣魚通過咬鉤與收線的節奏，在每個區域的開闊水面垂釣，上限為200。"
+      },
+      "rhythmHeading": "採集節奏",
+      "rhythmBody": "採集是一段可見的施法：基礎{base}秒，最短不低於{floor}秒；工具每高於節點一階縮短{tool}秒，每個熟練度區間再縮短{band}秒。",
+      "gainBody": "每{step}點熟練度為一個成長層級，與節點階級相比較：低階節點的成長會逐漸消退，而更高階的節點會帶你練到{cap}的上限。",
+      "nodesHeading": "各區域節點",
+      "nodesNote": "節點的位置、階級、所需工具與產出；每個節點在你採集後{respawn}秒才會為你本人重生。",
+      "toolsHeading": "工具",
+      "toolsNote": "每一處節點都需要背包中備有對應行業的工具，1階節點也不例外：沒有採礦鎬就採不到礦石，沒有魚竿就釣不上魚。商人階梯涵蓋1階到3階，各區域主城皆有備貨；工具只要放在背包裡即可，沒有裝備欄位，也沒有耐久度，因此每件都只需購買一次。門檻只看階級：工具的稀有度顏色純屬外觀。\n\n商人階梯之上還有兩件製作工具，4階與5階，由工程師在工坊打造，任何NPC都不販售。目前沒有任何節點需要超過3階的工具，因此它們現階段的價值在於速度：頂階工具能把低階節點的施法時間壓到下限；等更高階的地域開放時，它們便是入場券。",
+      "toolCrafted": "製作獲得（{craft}）",
+      "toolVendor": "{name}（{hub}）",
+      "toolUnavailable": "無販售",
+      "priceNone": "無販售",
+      "toolTierReq": "{tier}階工具",
+      "yieldsHeading": "一次採集的收穫",
+      "yieldsBody": "每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。",
+      "bandsHeading": "熟練度區間",
+      "bandsBody": "熟練度區間會加快你的採集施法；對釣魚而言還決定漁獲表。",
+      "bandFmt": "區間{band}：自{at}熟練度起",
+      "rareHeading": "稀有發現",
+      "rareBody": "每次採集都有{oneIn}分之一的機率觸發稀有發現：產量乘以{mult}、必定署名，並向全區域播報。",
+      "specimenBody": "採集屍體還可能獲得署名的完美標本：約{pct}%的屍體採集會擲出精良或更高品質。",
+      "gatherDeedsHeading": "沿途的功業",
+      "gatherDeeds": {
+        "mining": "任意行業的第一次採集獲得Fruits of the Field，採礦100上限銘刻Ore in the Blood。採礦、伐木、藥草學與釣魚中任意三項達到100可得Master Gatherer（25聲望），鑿開純淨礦脈另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
+        "logging": "任意行業的第一次採集獲得Fruits of the Field，伐木100上限銘刻Heartwood Hewer。四種採集行業中任意三項達到100可得Master Gatherer（25聲望），劈出遠古心材另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
+        "herbalism": "任意行業的第一次採集獲得Fruits of the Field，藥草學100上限銘刻Master of the Meadow。四種採集行業中任意三項達到100可得Master Gatherer（25聲望），採下月光綻放另有收藏印記。功業只有頭銜與聲望，永不賦予力量。",
+        "fishing": "釣魚100熟練銘刻Old Salt，200銘刻Master Angler及其頭銜，垂釣技藝的頂點；釣魚同樣計入Master Gatherer（任意三項採集達到100）。在每個區域的水域釣起第一條魚各有其頁，釣起日輝錦鯉則記下Glimmer of Hope。"
+      },
+      "fish": {
+        "startHeading": "入門",
+        "startBody": "一根Simple Fishing Pole在Eastbrook的Fisherman Brandt處只賣20銅（他在鎮東緣望著Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存貨。面向前方約24碼內足夠深的水面使用魚竿即可拋竿。戰鬥中、游泳時或死亡時無法拋竿：站在岸上釣才是正途，任何區域的可釣水域都行。",
+        "biteHeading": "咬鉤與收線",
+        "biteBody": "拋竿後{min}到{max}秒之間魚會咬鉤（更好的魚竿最多縮短{rod}秒等待），收線視窗持續{reel}秒、魚竿每高一階再加{reelRod}秒，單次垂釣最長{cap}秒。",
+        "scheduleHeading": "熟練度成長",
+        "scheduleNote": "釣魚成長按熟練度遵循固定檔位，且從{cutoff}起，釣上雜物不再有任何成長。",
+        "colProficiency": "熟練度",
+        "colGain": "每次漁獲成長",
+        "belowFmt": "低於{below}",
+        "tablesHeading": "漁獲表",
+        "tablesNote": "每個區間在各區域的確切漁獲機率；每一行中的{rare}都是稀有漁獲。",
+        "bandHeading": "區間{band}：熟練度{at}及以上，需{rod}階魚竿",
+        "colCatch": "漁獲",
+        "colOdds": "機率",
+        "pctFmt": "{pct}%",
+        "emptyHook": "無魚上鉤",
+        "koiHeading": "日輝錦鯉",
+        "koiBody": "全世界的每片水域都藏著同一份大獎：日輝錦鯉，一尾優秀品質的閃光錦鯉，賣給商人值75銅，對你的自豪感則遠不止此。牠的機率固定為每次起竿3%（Thornpeak的冷水中為4%），不隨技能變化，因此碼頭上的新手與Master Angler機會均等。釣起牠會在功業之書記下Glimmer of Hope（零聲望的收藏印記）。"
+      },
+      "econ": {
+        "title": "製作經濟",
+        "intro": "專業經濟背後的確切費用、回收與報酬。",
+        "feesHeading": "費用與回收",
+        "feesNote": "各項專業費用，從每次製作的金幣回收到市場抽成。",
+        "feeCraft": "製作費",
+        "feeCraftValue": "每點物品預算{fee}",
+        "feeMarket": "市場抽成",
+        "feeMarketValue": "成交額的{pct}%",
+        "feeDeposit": "掛單押金",
+        "feeDepositValue": "無",
+        "feeUnbind": "解綁費",
+        "feeUnbindValue": "優秀{uncommon}、精良{rare}、史詩{epic}",
+        "trainingHeading": "訓練費",
+        "trainingNote": "按配方層級收取一筆固定費用，僅在大師傳授時收取一次。",
+        "trainingTierFmt": "{tier}層：{fee}",
+        "free": "免費",
+        "sellsHeading": "什麼好賣，為什麼",
+        "sellsBody": "最穩的生意是消耗品，因為用掉就要再買：藥水、熟食與附魔都隨使用而消失。傑作是高端市場：無法訂做，想要的人只能出高價，而上面的署名就是行走的招牌。原料是第三支柱：分解所得的奧術材料、直接從拆解者流向附魔師的各類Resonant次級材料，以及追逐傑作觸發的工匠願意溢價收購的署名採集品。",
+        "marketHeading": "世界市場與抽成",
+        "marketBody": "世界市場是全服交易所，由Eastbrook的Merchant與Highwatch的Auctioneer Voss主持。掛單免費，沒有押金，流拍原樣退回；只在成交時抽取5%。重要限制：市場只經手無標記的普通貨，署名、傑作、附魔或已綁定的副本一律不收，這些特殊物品只能面對面透過交易視窗轉手。",
+        "workOrdersHeading": "工作訂單",
+        "workOrdersNote": "每位大師都會以商店價的{pct}%收購一批本行常用材料，每{minutes}分鐘可重複一次。",
+        "colOrder": "工作訂單",
+        "colMaster": "大師",
+        "colAsks": "需求",
+        "colPays": "報酬",
+        "commissionsHeading": "委託與製作者之約",
+        "commissionsBody": "自願選擇的委託製作會附上製作者之約：成品會綁定給交易中收到它的人，而任意工位大師都可按層級費用為其解綁。",
+        "provenanceHeading": "署名作品",
+        "provenanceBody": "精良及以上的成品與發現都帶有製作者的署名，而署名完全相同的物品仍可堆疊。",
+        "collectorsHeading": "收藏家、戰利品與故事的價格",
+        "collectorsBody": "商人看不見出處：署名物品賣給NPC只值普通價，簽名的溢價只存在於玩家之間。名家署名的橫財礦石、一塊Prime Cut、一柄署著已退隱工匠之名的傑作之刃，價格全憑記憶開價。功業之書裡的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen與Glimmer of Hope都是零聲望的收藏印記，只為證明那一刻發生在你身上。出處不買屬性也不贏戰鬥，它是這遊戲裡美好日子的存根。",
+        "throttleHeading": "操作限頻",
+        "throttleBody": "製作、分解、附魔與回收共用一個限頻：每{seconds}秒最多{actions}次操作。",
+        "doctrineHeading": "玩家與玩家交易",
+        "doctrineBody": "製作裝備的強度始終低於團隊副本的底線，而上述費用會把貨物推向玩家之間的交易，而非商店循環。"
+      },
+      "faq": {
+        "title": "專業常見問題",
+        "intro": "製作者最常問的問題，一併作答。",
+        "q1": "我能學多少專業？",
+        "a1": "每個角色都可以提升全部八種可修煉製作行業和全部四種採集行業；只有命途身分是唯一的選擇。",
+        "q2": "在哪裡學配方？",
+        "a2": "訓練師階梯配方由各工位的常駐大師傳授，而九個通用野外配方和工具配方所有人從一開始就會。",
+        "q3": "採集需要工具嗎？",
+        "a3": "1階節點徒手即可；2階或3階節點需要至少同階級的對應工具。",
+        "q4": "為什麼技能不再增長？",
+        "a4": "當配方落到你之下時，精通曲線會把成長減為一半、四分之一直至歸零，而每種專業都會在上限處停止。",
+        "q5": "什麼是傑作？",
+        "a5": "每次製作都有一個小機率（3%起，上限15%）產出品質高一層的成品，但絕不會超過團隊副本的底線。",
+        "q6": "「由某某製作」是什麼意思？",
+        "a6": "九種通用的野外配方與工具配方人人從一開始便已知曉，三種綁定作業台的上級配方（窯鱗披肩、織衛兜帽、暮影裹手）也是如此，它們無需訓練師，只需對應的作業台。其餘一切都由三座樞紐城鎮中各作業台旁的常駐師傅傳授：多數在東溪，製革師守著芬橋的製革場，煉金師守著高望的藥房。\n\n訓練師配方分為技能0、25、50三檔，作為一次性費用分別是免費、25銀和1金。當你在該行業的檔位達到配方自身的檔位時，師傅便會傳授，而且學習時你必須站在其作業台旁：移動作業台不算數。",
+        "q7": "什麼是製作者之約？",
+        "a7": "委託製品會綁定給交易中收到它的人，而任意工位大師都可按層級費用為其解綁。",
+        "q8": "我能更換命途嗎？",
+        "a8": "從未持有過的組合只需一次全新的調諧任務，而回到曾經持有的組合則需要完成代價遞增的贖罪差事。"
+      }
     },
     "economy": {
       "intro": "錢幣是整個世界的潤滑劑：它能購買你的裝備、補給與旅行用品，並在玩家之間易手。這一切只要遊玩就能自然取得，所以不妨把這一頁當成一張地圖，看看你的錢從何處來、又往何處去。",
@@ -5257,8 +5662,10 @@ export const zh_TW: EnTranslations = {
     "reconnectingNow": "連線已中斷，正在重新連線...（第 {attempt}/{maxAttempts} 次嘗試）",
     "slowConnection": "載入時間比平常長。請檢查您的網路連線。",
     "connectionRejected": "伺服器已關閉連線。",
+    "incompatibleWorldVersion": "遊戲與伺服器版本不相容。請重新整理或更新後再試一次。",
     "realmFull": "這個世界目前已滿，請於幾分鐘後再試。",
     "tooManyConnections": "您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。",
+    "messageRateExceeded": "由於發送操作過快，您已中斷連線。請稍候片刻後重新登入。",
     "tips": {
       "classes": "提示：9 個職業玩法各不相同，投入之前不妨都試一試。",
       "talents": "提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。",
@@ -5326,6 +5733,12 @@ export const zh_TW: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
     "bodyWeb": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
+    "dismiss": "關閉"
+  },
+  "perfNudge": {
+    "integratedGpu": "遊戲目前在內建（省電）顯示晶片上執行。如果這台電腦還配有獨立遊戲顯示卡，請在 Windows 的 設定 > 系統 > 顯示器 > 顯示卡 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇遊戲顯示卡。",
+    "hardwareAccelerationDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，因此非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
+    "hardwareAccelerationWeb": "遊戲目前在沒有 GPU 加速的情況下執行，因此非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
     "dismiss": "關閉"
   },
   "realm": {
@@ -5752,7 +6165,8 @@ export const zh_TW: EnTranslations = {
       "death": "{name}死亡。",
       "auraGain": "你獲得了 {name}。",
       "auraFade": "{name}從你身上消失。",
-      "auraAfflicted": "{target}受到了 {name} 影響。"
+      "auraAfflicted": "{target}受到了 {name} 影響。",
+      "auraGainOther": "{target}獲得了 {name}。"
     },
     "system": {
       "playerDeath": "你已經死亡。",
@@ -5855,6 +6269,7 @@ export const zh_TW: EnTranslations = {
       "arenaJoin": "你加入了灰燼競技場佇列。等待一位值得一戰的對手...",
       "arenaLeave": "你離開了灰燼競技場佇列。",
       "arenaSands": "你踏上了灰燼競技場的沙地。",
+      "arenaSandsDrowned": "你踏上了沉沒王庭的水淹石地。",
       "tradeRequestSent": "你已請求與 {name} 交易。",
       "tradeOpened": "交易視窗已開啟。",
       "tradeComplete": "交易完成。",
@@ -5865,6 +6280,8 @@ export const zh_TW: EnTranslations = {
       "soldItem": "你以 {money} 賣出 {item}。",
       "soldJunkOne": "你以 {money} 賣出 {count} 件雜物。",
       "soldJunkMany": "你以 {money} 賣出 {count} 件雜物。",
+      "keptBoundOne": "已保留 {count} 件綁定物品。",
+      "keptBoundMany": "已保留 {count} 件綁定物品。",
       "friendOnline": "{name} 上線了。",
       "friendOffline": "{name} 下線了。"
     },
@@ -6021,6 +6438,11 @@ export const zh_TW: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level} 級 {className}",
       "noChallengers": "還沒有已排名的挑戰者 - 成為第一個。",
       "matchInProgress": "正在對戰 {name}。",
+      "mapName": "地圖：{name}",
+      "map": {
+        "coliseum": "灰燼競技場",
+        "drownedCourt": "沉沒王庭"
+      },
       "leaveQueue": "離開佇列",
       "searching": "正在尋找對手...（佇列中 {count} 人）",
       "enterQueue": "加入佇列",
@@ -6133,6 +6555,7 @@ export const zh_TW: EnTranslations = {
       "readyQuestAria": "可交付任務：{name}",
       "discussQuest": "談論{name}。",
       "discussQuestAria": "談論任務：{name}",
+      "profIntroHint": "請找{name}接取《{quest}》。",
       "nythraxisDeathlessKingWarning": "三件遺物講述著同一個故事：阿爾德倫為守護國王而戰，馬爾里克打破了死亡的界限，沃斯試圖阻止隨後發生的一切。封印正在減弱，廢棄墓穴就是通往地下的道路。",
       "browseGoods": "讓我看看你的貨物。",
       "browseGoodsAria": "查看 {name} 的貨物",
@@ -6312,18 +6735,29 @@ export const zh_TW: EnTranslations = {
       "pageNextAria": "下一頁市場商品",
       "pageStatus": "第 {current} 頁，共 {total} 頁",
       "filters": "市場篩選",
+      "filterValueAria": "{label}：{value}",
       "filterType": "類型",
       "filterTypeAll": "全部類型",
       "filterTypeWeapon": "武器",
       "filterTypeArmor": "護甲",
+      "filterTypeBag": "背包",
       "filterTypeConsumable": "消耗品",
       "filterTypeMaterial": "材料",
       "filterTypeCosmetic": "外觀",
       "filterTypeOther": "其他",
       "filterArmorType": "護甲類型",
       "filterArmorAll": "全部護甲",
+      "filterArmorSlot": "護甲部位",
+      "filterArmorClassAll": "所有護甲類型",
+      "armorCloth": "布甲",
+      "armorLeather": "皮甲",
+      "armorMail": "鎖甲",
       "filterWeaponType": "武器類型",
       "filterWeaponAll": "全部武器",
+      "filterBagSize": "背包容量",
+      "filterBagAll": "全部背包",
+      "filterPrimaryStat": "主要屬性",
+      "filterPrimaryStatAll": "任意主要屬性",
       "filterRarity": "稀有度",
       "filterRarityAll": "全部稀有度",
       "weaponSword": "劍",
@@ -7010,7 +7444,7 @@ export const zh_TW: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形態",
-        "description": "變形為熊：護甲 +90%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
+        "description": "變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
       },
       "maul": {
         "name": "碎骨擊",
@@ -7746,7 +8180,7 @@ export const zh_TW: EnTranslations = {
         "name": "暮影裹手"
       },
       "sootscale_mantle": {
-        "name": "灰鱗披肩"
+        "name": "窯鱗披肩"
       },
       "gravecaller_blade": {
         "name": "喚墓者寬刃劍"
@@ -7821,13 +8255,13 @@ export const zh_TW: EnTranslations = {
         "name": "亞麻碎布"
       },
       "arcane_dust": {
-        "name": "奧術之塵"
+        "name": "鈴音之塵"
       },
       "arcane_essence": {
-        "name": "奧術精華"
+        "name": "鈴音精華"
       },
       "arcane_shard": {
-        "name": "奧術碎片"
+        "name": "鈴音碎片"
       },
       "fen_muster_order": {
         "name": "芬橋集結令"
@@ -8076,7 +8510,7 @@ export const zh_TW: EnTranslations = {
         "name": "峰羊毛長袍"
       },
       "stalkerhide_jerkin": {
-        "name": "潛獵者皮甲"
+        "name": "巡獵皮甲"
       },
       "cragwalker_boots": {
         "name": "岩行者長靴"
@@ -8217,7 +8651,7 @@ export const zh_TW: EnTranslations = {
         "name": "鐵製採礦鎬"
       },
       "mithril_mining_pick": {
-        "name": "秘銀採礦鎬"
+        "name": "天銀採礦鎬"
       },
       "handaxe": {
         "name": "手斧"
@@ -8235,19 +8669,19 @@ export const zh_TW: EnTranslations = {
         "name": "青銅鐮刀"
       },
       "silverleaf_sickle": {
-        "name": "銀葉鐮刀"
+        "name": "潤光葉鐮刀"
       },
       "thorium_mining_pick": {
-        "name": "釷礦採礦鎬"
+        "name": "鋨金採礦鎬"
       },
       "arcanite_mining_pick": {
-        "name": "秘法採礦鎬"
+        "name": "銘鋼採礦鎬"
       },
       "ashwood_axe": {
         "name": "白蠟木斧"
       },
       "elderwood_axe": {
-        "name": "古木斧"
+        "name": "高松斧"
       },
       "goldleaf_sickle": {
         "name": "金葉鐮刀"
@@ -8256,16 +8690,16 @@ export const zh_TW: EnTranslations = {
         "name": "陽瓣鐮刀"
       },
       "thorium_ore": {
-        "name": "瑟銀礦石"
+        "name": "鋨礦石"
       },
       "arcanite_bar": {
-        "name": "秘銀錠"
+        "name": "銘鋼錠"
       },
       "ashwood_log": {
         "name": "灰木原木"
       },
       "elderwood_log": {
-        "name": "古老接骨木原木"
+        "name": "高松原木"
       },
       "goldleaf_herb": {
         "name": "金葉草"
@@ -8403,7 +8837,7 @@ export const zh_TW: EnTranslations = {
         "name": "鐵皮木原木"
       },
       "silverleaf_herb": {
-        "name": "銀葉草"
+        "name": "潤光葉草"
       },
       "rough_hide": {
         "name": "粗糙的獸皮"
@@ -8466,13 +8900,13 @@ export const zh_TW: EnTranslations = {
         "name": "磨利鐵匕首"
       },
       "thorium_warblade": {
-        "name": "瑟銀戰刃"
+        "name": "鋨金戰刃"
       },
       "arcanite_war_axe": {
-        "name": "秘銀戰斧"
+        "name": "銘鋼戰斧"
       },
       "elderwood_battle_staff": {
-        "name": "古老接骨木戰棍"
+        "name": "高松戰棍"
       },
       "riveted_copper_girdle": {
         "name": "鉚釘銅腰帶"
@@ -8493,13 +8927,13 @@ export const zh_TW: EnTranslations = {
         "name": "鐵鏈肩甲"
       },
       "thoriumscale_greathelm": {
-        "name": "瑟銀鱗巨盔"
+        "name": "鋨鱗巨盔"
       },
       "thoriumscale_cuirass": {
-        "name": "瑟銀鱗胸甲"
+        "name": "鋨鱗胸甲"
       },
       "thoriumscale_leggings": {
-        "name": "瑟銀鱗腿甲"
+        "name": "鋨鱗腿甲"
       },
       "homespun_hood": {
         "name": "手織兜帽"
@@ -8508,13 +8942,13 @@ export const zh_TW: EnTranslations = {
         "name": "手織連指手套"
       },
       "silverthread_slippers": {
-        "name": "銀線便鞋"
+        "name": "素線便鞋"
       },
       "goldweave_robe": {
-        "name": "金織長袍"
+        "name": "鎏金織長袍"
       },
       "goldweave_leggings": {
-        "name": "金織護腿"
+        "name": "鎏金織護腿"
       },
       "silkspun_satchel": {
         "name": "絲紡挎包"
@@ -8583,10 +9017,10 @@ export const zh_TW: EnTranslations = {
         "name": "馬洛的盛大烤肉"
       },
       "silverleaf_healing_draught": {
-        "name": "銀葉治療藥水"
+        "name": "潤光葉治療藥水"
       },
       "silverleaf_mana_draught": {
-        "name": "銀葉法力藥水"
+        "name": "潤光葉法力藥水"
       },
       "elixir_of_the_boar": {
         "name": "野豬藥劑"
@@ -8598,7 +9032,7 @@ export const zh_TW: EnTranslations = {
         "name": "金葉法力藥水"
       },
       "venomfire_elixir": {
-        "name": "毒火藥劑"
+        "name": "蝰灼藥劑"
       },
       "sunpetal_healing_draught": {
         "name": "陽瓣治療藥水"
@@ -8901,7 +9335,7 @@ export const zh_TW: EnTranslations = {
         "name": "夜牙足墊"
       },
       "glimmerfin_koi": {
-        "name": "微光鰭錦鯉"
+        "name": "日輝錦鯉"
       },
       "raw_bog_eel": {
         "name": "生沼澤鰻魚"
@@ -10483,7 +10917,7 @@ export const zh_TW: EnTranslations = {
         }
       },
       "q_stalker_pelts": {
-        "title": "冬日將至高望",
+        "title": "初霜降臨高望",
         "text": "{playerName}，這座山的冬天不會敲門，它會踹門。8張山脊潛獵者皮能為守牆披風加襯。",
         "completion": "厚得像我的手臂。今年守望者不會凍死。",
         "objectives": {
@@ -11456,6 +11890,7 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineCandleInteract": "燭火神龕：按 F 觸碰",
     "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
     "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
-    "mailboxName": "郵箱"
+    "mailboxName": "郵箱",
+    "noticeboardName": "告示板"
   }
 };

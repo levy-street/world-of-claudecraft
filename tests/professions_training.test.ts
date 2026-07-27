@@ -1,10 +1,11 @@
-// Recipe training (Professions 2.0 Phase 9): the resolveTrain deny order,
+// Recipe training (Professions 2.0): the resolveTrain deny order,
 // the tiered fee table, the locked teach-tier predicate, and the Sim-level
 // trainRecipe command (fee charged exactly once, grant, trainResult event,
 // lastTrainResult probe, single-surface denials). The grandfather/persistence
 // arm lives in tests/professions_grandfather.test.ts; the online wire arm in
 // tests/professions_training_online.test.ts.
 import { describe, expect, it } from 'vitest';
+import { STATIONS } from '../src/sim/content/professions';
 import {
   COMBO_RECIPES,
   COMMON_RECIPES,
@@ -53,7 +54,7 @@ function placeAtTrainerFor(sim: Sim, pid: number, recipeId: string) {
   if (!recipe) throw new Error(`unknown recipe ${recipeId}`);
   const type = stationTypeForCraft(recipe.professionId);
   if (!type) throw new Error(`${recipe.professionId} has no station`);
-  placeAt(sim, pid, stationsOfType(type)[0].pos);
+  placeAt(sim, pid, stationsOfType(STATIONS, type)[0].pos);
 }
 
 function trainResultsOf(events: SimEvent[]): SimEvent[] {
@@ -61,10 +62,11 @@ function trainResultsOf(events: SimEvent[]): SimEvent[] {
 }
 
 describe('TRAINING_FEE_BY_TIER and trainingFeeFor', () => {
-  it('is literally [0, 2500, 10000] copper and frozen', () => {
+  it('is literally [0, 2500, 10000, 40000, 160000] copper and frozen', () => {
     // Literal expectation on purpose (never a derived comparison): common is
-    // free, uncommon 25 silver, rare 1 gold.
-    expect(TRAINING_FEE_BY_TIER).toEqual([0, 2500, 10000]);
+    // free, uncommon 25 silver, rare 1 gold, then the 4x
+    // geometric step (tier 3 is 4 gold, tier 4 is 16 gold).
+    expect(TRAINING_FEE_BY_TIER).toEqual([0, 2500, 10000, 40000, 160000]);
     expect(Object.isFrozen(TRAINING_FEE_BY_TIER)).toBe(true);
   });
 
@@ -72,11 +74,13 @@ describe('TRAINING_FEE_BY_TIER and trainingFeeFor', () => {
     const base = recipeById('recipe_tough_jerky')!;
     expect(trainingFeeFor({ ...base, skillReq: 0 })).toBe(0); // tier 0
     expect(trainingFeeFor({ ...base, skillReq: 25 })).toBe(2500); // tier 1
-    expect(trainingFeeFor({ ...base, skillReq: 50 })).toBe(10000); // tier 2, last entry
-    // Tier 3+ recipes (skillReq >= 75) clamp to the last entry until the
-    // Phase 10/15 tuning extends the table.
-    expect(trainingFeeFor({ ...base, skillReq: 75 })).toBe(10000);
-    expect(trainingFeeFor({ ...base, skillReq: 150 })).toBe(10000);
+    expect(trainingFeeFor({ ...base, skillReq: 50 })).toBe(10000); // tier 2
+    // Deliberate re-pin: the 4x geometric extension prices
+    // tier 3 at 40000 and tier 4 at 160000; tiers past the table (skillReq
+    // 125+, tier 5 and up) clamp to the 160000 last entry.
+    expect(trainingFeeFor({ ...base, skillReq: 75 })).toBe(40000); // tier 3
+    expect(trainingFeeFor({ ...base, skillReq: 100 })).toBe(160000); // tier 4, last entry
+    expect(trainingFeeFor({ ...base, skillReq: 150 })).toBe(160000); // tier 6 clamps to last
   });
 
   it('prices every trainer-taught combo recipe at 2500 (tier 1)', () => {
@@ -115,7 +119,7 @@ describe('resolveTrain deny order (replay safety)', () => {
   it('an unknown recipe id denies silently: ok false, NO reason, fee 0', () => {
     const sim = makeSim();
     const meta = metaOf(sim, sim.playerId);
-    const result = resolveTrain(meta, { x: 0, z: 0 }, 'recipe_that_never_was');
+    const result = resolveTrain(STATIONS, meta, { x: 0, z: 0 }, 'recipe_that_never_was');
     expect(result.ok).toBe(false);
     expect(result.reason).toBeUndefined();
     expect(result.fee).toBe(0);
@@ -127,7 +131,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     meta.knownRecipes.add(ALCH_COMBO_ID);
     meta.copper = 0;
     // Away from every station too: known-ness precedes the range arm as well.
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result.reason).toBe('train_already_known');
     expect(result.ok).toBe(false);
   });
@@ -141,9 +145,9 @@ describe('resolveTrain deny order (replay safety)', () => {
     const sim = makeSim();
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 0;
-    const common = resolveTrain(meta, FIELD_POS, COMMON_RECIPES[0].id);
+    const common = resolveTrain(STATIONS, meta, FIELD_POS, COMMON_RECIPES[0].id);
     expect(common.reason).toBe('train_already_known');
-    const tool = resolveTrain(meta, FIELD_POS, TOOL_RECIPES[0].id);
+    const tool = resolveTrain(STATIONS, meta, FIELD_POS, TOOL_RECIPES[0].id);
     expect(tool.reason).toBe('train_already_known');
   });
 
@@ -153,14 +157,14 @@ describe('resolveTrain deny order (replay safety)', () => {
     // order via a combo id temporarily NOT known: the arm after already_known
     // reads recipe.acquisition, so a trainer recipe passes it and lands on
     // the RANGE arm instead. The decisive assertion: an unknown trainer-less
-    // recipe id can only surface once Phase 10 content adds one, and the
+    // recipe id can only surface once content adds one, and the
     // combo (trainer-taught, unknown, away from the station) falls through
     // to train_out_of_range, proving the taught-here arm sits between.
     const sim = makeSim();
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 999999;
     meta.craftSkills.alchemy = 25;
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result.reason).toBe('train_out_of_range');
   });
 
@@ -169,7 +173,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 999999;
     meta.craftSkills.alchemy = 0; // tier unmet too, but range must win
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result.reason).toBe('train_out_of_range');
   });
 
@@ -181,7 +185,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 0;
     meta.craftSkills.alchemy = 0;
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result).toEqual({
       ok: false,
       recipeId: ALCH_COMBO_ID,
@@ -198,7 +202,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     meta.copper = 0;
     meta.craftSkills.alchemy = 24;
     const entity = (sim as any).entities.get(pid);
-    const result = resolveTrain(meta, entity.pos, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, entity.pos, ALCH_COMBO_ID);
     expect(result.reason).toBe('train_tier_unmet');
   });
 
@@ -206,7 +210,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     const sim = makeSim();
     const meta = metaOf(sim, sim.playerId);
     meta.copper = 0;
-    const result = resolveTrain(meta, FIELD_POS, ALCH_COMBO_ID);
+    const result = resolveTrain(STATIONS, meta, FIELD_POS, ALCH_COMBO_ID);
     expect(result.fee).toBe(2500);
   });
 });
@@ -368,17 +372,17 @@ describe('Sim.trainRecipe (fee exactly once, grant, event, probe)', () => {
   });
 });
 
-describe('knowing vs crafting stay orthogonal (Phase 9 does not use-gate)', () => {
+describe('knowing vs crafting stay orthogonal (no use-gate)', () => {
   it('a KNOWN recipe is never use-gated by skill: skill 0 crafts a skillReq-75 tool at the toolworks', () => {
     // The no-admission-gate pin vs the new teach predicate: skillReq still
     // scales outcomes only (crafting.ts), it never denies a KNOWN recipe, so
-    // Phase 9 must not have leaked teachTierMet into craft admission.
+    // teachTierMet must not leak into craft admission.
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = metaOf(sim, pid);
     expect(meta.craftSkills.engineering ?? 0).toBe(0);
     const recipe = recipeById('recipe_thorium_mining_pick')!; // grandfathered known
-    placeAt(sim, pid, stationsOfType(recipe.stationType!)[0].pos);
+    placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
     for (let i = 0; i < 4; i++) sim.addItem('thorium_ore', 1, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
 
@@ -392,7 +396,7 @@ describe('knowing vs crafting stay orthogonal (Phase 9 does not use-gate)', () =
     const meta = metaOf(sim, sim.playerId);
     for (const recipe of COMMON_RECIPES) {
       expect(isRecipeKnown(meta, recipe), recipe.id).toBe(true);
-      const result = resolveTrain(meta, FIELD_POS, recipe.id);
+      const result = resolveTrain(STATIONS, meta, FIELD_POS, recipe.id);
       expect(result.reason, recipe.id).toBe('train_already_known');
       expect(trainingFeeFor(recipe), recipe.id).toBe(0);
     }

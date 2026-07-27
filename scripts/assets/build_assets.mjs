@@ -10,7 +10,8 @@
 //   "addClipsFrom": ["tmp/.../Rig_Medium_X.glb"], // optional: merge clips from rig libs
 //   "attachMeshes": [{ "from": "weapon.glb",      // optional: bake a prop/weapon mesh
 //                      "bone": "handslot.r" }],    //   parented under a named bone
-//   "maxTex": 512                                  // optional: clamp texture dimension
+//   "maxTex": 512,                                 // optional: clamp texture dimension
+//   "keepExtras": true                             // optional: retain extras-bearing leaf nodes
 // } ] }
 //
 // Bulk mode: instead of `src`/`out`, an item may use `srcDir`/`outDir` to convert
@@ -57,6 +58,15 @@ function resolveSrc(src) {
   return path.isAbsolute(src) ? src : path.join(ROOT, src);
 }
 
+function resolveOutput(outputRoot, out) {
+  const absoluteRoot = path.resolve(outputRoot);
+  const outputPath = path.resolve(absoluteRoot, out);
+  if (outputPath === absoluteRoot || !outputPath.startsWith(`${absoluteRoot}${path.sep}`)) {
+    throw new Error(`output path escapes output root: ${out}`);
+  }
+  return outputPath;
+}
+
 // Expand any `srcDir`/`outDir` item into one item per .gltf/.glb in that folder,
 // so a single spec entry can bulk-convert a whole pack. Each out name is derived
 // from the source basename: lowercased, non-alphanumerics → `_`, and the
@@ -89,9 +99,9 @@ function expandItems(items) {
   return out;
 }
 
-async function processModel(io, item) {
+async function processModel(io, item, outputRoot) {
   const srcPath = resolveSrc(item.src);
-  const outPath = path.join(PUBLIC_DIR, item.out);
+  const outPath = resolveOutput(outputRoot, item.out);
   const doc = await io.read(srcPath);
   const root = doc.getRoot();
 
@@ -185,7 +195,7 @@ async function processModel(io, item) {
     if (missing.length) console.warn(`  WARN ${item.out}: missing clips ${missing.join(', ')}`);
   }
 
-  const transforms = [resample(), prune(), dedup()];
+  const transforms = [resample(), prune({ keepExtras: item.keepExtras === true }), dedup()];
   if (item.maxTex) {
     transforms.push(
       textureCompress({
@@ -205,9 +215,9 @@ async function processModel(io, item) {
   console.log(`  ${item.out}  ${kb}KB${clips ? ` (${clips} clips)` : ''}`);
 }
 
-function processCopy(item) {
+function processCopy(item, outputRoot) {
   const srcPath = resolveSrc(item.src);
-  const outPath = path.join(PUBLIC_DIR, item.out);
+  const outPath = resolveOutput(outputRoot, item.out);
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.copyFileSync(srcPath, outPath);
   console.log(`  ${item.out}  ${(fs.statSync(outPath).size / 1024).toFixed(0)}KB (copy)`);
@@ -215,6 +225,19 @@ function processCopy(item) {
 
 async function main() {
   const args = process.argv.slice(2);
+  // `--output-root` is an explicit non-shipping destination for reproducible
+  // candidate builds. The default remains public/ for every existing caller.
+  let outputRoot = PUBLIC_DIR;
+  const oi = args.indexOf('--output-root');
+  if (oi >= 0) {
+    const requestedRoot = args[oi + 1];
+    if (!requestedRoot) {
+      console.error('usage: --output-root <directory>');
+      process.exit(1);
+    }
+    outputRoot = path.isAbsolute(requestedRoot) ? requestedRoot : path.resolve(ROOT, requestedRoot);
+    args.splice(oi, 2);
+  }
   // optional `--shard i/n`: process only every n-th expanded item, so several
   // converter processes can run in parallel over ONE spec. Filtering happens
   // after srcDir expansion over a stable sorted order, so shards are disjoint
@@ -232,7 +255,9 @@ async function main() {
   }
   const specs = args;
   if (!specs.length) {
-    console.error('usage: node scripts/assets/build_assets.mjs <spec.json> [...] [--shard i/n]');
+    console.error(
+      'usage: node scripts/assets/build_assets.mjs <spec.json> [...] [--output-root dir] [--shard i/n]',
+    );
     process.exit(1);
   }
   await MeshoptEncoder.ready;
@@ -254,8 +279,8 @@ async function main() {
     for (const raw of items) {
       const item = { ...defaults, ...raw };
       try {
-        if (item.type === 'copy') processCopy(item);
-        else await processModel(io, item);
+        if (item.type === 'copy') processCopy(item, outputRoot);
+        else await processModel(io, item, outputRoot);
       } catch (err) {
         failures++;
         console.error(`  FAIL ${item.src}: ${err instanceof Error ? err.message : err}`);

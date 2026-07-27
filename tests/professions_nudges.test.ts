@@ -20,7 +20,7 @@ function nudgeCtx() {
   return { ctx: raw as unknown as SimContext, emitted, raw };
 }
 
-describe('trend nudge (Professions 2.0 Phase 14)', () => {
+describe('trend nudge (Professions 2.0)', () => {
   it('emits at most once per NUDGE_CADENCE_TICKS across a tick loop', () => {
     const sim = makeSim();
     const meta = sim.players.get(sim.playerId)!;
@@ -103,7 +103,7 @@ describe('trend nudge (Professions 2.0 Phase 14)', () => {
   });
 });
 
-describe('first-tier tutorial one-shot (Professions 2.0 Phase 14)', () => {
+describe('first-tier tutorial one-shot (Professions 2.0)', () => {
   it('emits exactly once ever, the first time a craft crosses tier 1', () => {
     const sim = makeSim();
     const meta = sim.players.get(sim.playerId)!;
@@ -147,7 +147,7 @@ describe('first-tier tutorial one-shot (Professions 2.0 Phase 14)', () => {
   });
 });
 
-describe('nudge sweep determinism (Professions 2.0 Phase 14)', () => {
+describe('nudge sweep determinism (Professions 2.0)', () => {
   it('two same-seed sims run the sweep identically', () => {
     const run = () => {
       const sim = makeSim(9001);

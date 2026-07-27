@@ -43,10 +43,10 @@ const base: InspectInput = {
 
 describe('classColorCss', () => {
   it('mirrors hud.ts classCss: the mage class color as a #rrggbb string', () => {
-    // Pinned literals (CLASSES[mage].color === 0x69ccf0, warrior === 0xc79c6e), the
+    // Pinned literals (CLASSES[mage].color === 0x33c1f1, warrior === 0xd67a54), the
     // exact hue the inspect stage border / glow / haze take.
-    expect(classColorCss('mage')).toBe('#69ccf0');
-    expect(classColorCss('warrior')).toBe('#c79c6e');
+    expect(classColorCss('mage')).toBe('#33c1f1');
+    expect(classColorCss('warrior')).toBe('#d67a54');
   });
 
   it('falls back to the shared blue for an unknown class id', () => {
@@ -61,7 +61,7 @@ describe('buildInspectView: header', () => {
       name: 'Elowen',
       level: 45,
       cls: 'mage',
-      classColor: '#69ccf0',
+      classColor: '#33c1f1',
     });
     expect(m.skin).toBe(2);
   });
@@ -166,7 +166,7 @@ describe('buildInspectRemoteView: the thin out-of-range card carries no gear', (
       name: 'Elowen',
       level: 45,
       cls: 'mage',
-      classColor: '#69ccf0',
+      classColor: '#33c1f1',
       guild: 'Nightwatch',
     });
     expect('gear' in m).toBe(false);

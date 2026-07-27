@@ -58,6 +58,7 @@ await new Promise((r) => setTimeout(r, 400));
 const harvestResult = await page.evaluate(() => {
   const sim = window.__game.sim;
   const nodeId = 'ore_eastbrook_1';
+  sim.addItem('copper_mining_pick', 1); // #2343: every harvest needs the tool
   const before = sim.nodeHarvestableByMe(nodeId);
   sim.harvestNode(nodeId);
   const after = sim.nodeHarvestableByMe(nodeId);

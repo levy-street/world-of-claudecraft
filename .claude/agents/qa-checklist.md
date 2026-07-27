@@ -82,11 +82,14 @@ Skip if no `src/sim/` files are in scope.
 - `src/sim/` imports nothing from `render/`, `ui/`, `game/`, `net/`, and has no DOM/Three.js
   imports (it must run unchanged in Node). Game-system logic now lives in `src/sim/<system>/`
   modules behind the `SimContext` seam (`src/sim/sim_context.ts`); `Sim` is a thin coordinator.
-- `npx vitest run tests/architecture.test.ts` passes. This guard now has three arms: the sim
+- `npx vitest run tests/architecture.test.ts` passes. Its arms: the sim
   import / DOM / nondeterminism scan AND the UI / render pure-core split (it enforces that every
   `src/ui/*_view.ts` | `*_core.ts` and `src/render/*_view.ts` | `*_core.ts` is registered in `UI_PURE_CORES` /
   `RENDER_PURE_CORES` and imports no `three`, no `*_painter` / `*_window` / `painter_host`, and
-  no i18n runtime). Run it for any sim OR UI/render-core change, not only sim.
+  no i18n runtime) AND the src/ui module classification (every OTHER `src/ui` module is a
+  registered `UI_PAINTER_HELPERS` host-agnostic helper, a registered `UI_DOM_MODULES` owner of
+  browser state, or unregistered and therefore forbidden to touch a browser global at all).
+  Run it for any sim change OR any `src/ui` / `src/render` change, not only sim.
 - A same-seed-same-result determinism test exists or is updated for new sim logic.
 
 ### 2. Three-host / IWorld parity

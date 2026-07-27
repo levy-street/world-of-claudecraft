@@ -12,6 +12,14 @@
 // The flavourful glyphs are from game-icons.net (CC BY 3.0 — Lorc & Delapouite;
 // see CREDITS.md). The plain geometrics (close, check, arrows, star, ellipsis,
 // bars, warning, envelope, note) are hand-authored to match their visual weight.
+//
+// One exception to "every glyph renders as this SVG": the names in CHROME_ART_IDS
+// (chrome_icon_art.ts) are PRIMARY DESTINATIONS, which DESIGN.md section 6 gives painted
+// art. `hydrateIcons` serves that art for their `[data-icon]` placeholders (the side rail,
+// the mobile bar, the More tray); their glyph below stays the source for every direct
+// `svgIcon()` call, where the icon sits inline beside text and must tint with currentColor.
+
+import { chromeIconUrl } from './chrome_icon_art';
 
 export type UiIconName =
   // game-icons.net
@@ -64,7 +72,11 @@ export type UiIconName =
   | 'book'
   | 'cards'
   | 'trash'
-  | 'crafting';
+  | 'crafting'
+  | 'professions'
+  | 'makers-mark'
+  | 'enchant-rune'
+  | 'bond-link';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -180,6 +192,27 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored anvil (the Crafting window): a horned top slab over a waisted
   // body and flared base, one solid silhouette so it reads at micro-button size
   crafting: '<path d="M60 102l90-11h300v85h-100l-30 92v97h68v54H124v-54h68v-97l-30-92h-12z"/>',
+  // hand-authored mortar and pestle (the Professions window): a bowl with a rim over a
+  // leaning pestle. Distinct from the `crafting` anvil, and distinct from `target`, whose
+  // crosshair this button used to borrow (the same glyph the mobile target-cycle uses).
+  professions:
+    '<path d="M104 268h304v36h-30l-22 92a44 44 0 0 1-43 34h-114a44 44 0 0 1-43-34l-22-92h-30z"/><path d="M318 104 246 236" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round"/><circle cx="238" cy="250" r="30"/>',
+  // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
+  // stroke used beside a crafted copy's provenance line. Unlike the filled
+  // chrome glyphs above, this mark is intentionally an open currentColor line.
+  'makers-mark':
+    '<path d="M82 390C126 341 151 273 157 204C162 156 213 139 249 168C284 196 274 247 236 262C204 274 177 253 178 220C204 276 258 326 323 340C364 349 397 329 426 296C393 365 315 400 231 382C171 369 122 363 82 390" fill="none" stroke="currentColor" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>',
+  // hand-authored enchant rune (the bag grid's enchanted-copy corner glyph): a
+  // four-point arcane spark with a small orbiting mote, so it reads as "magic
+  // was worked on this" at the ~12px corner size and stays tellable apart from
+  // the maker's-mark stroke and the bond links beside it.
+  'enchant-rune':
+    '<path d="M256 40 300 190 450 234 300 278 256 428 212 278 62 234 212 190Z"/><path d="M404 60a34 34 0 1 0 0 68 34 34 0 0 0 0-68z"/>',
+  // hand-authored bond links (the bind-on-trade / bound corner glyph): two
+  // interlocked chain rings, the classic "this is bound to someone" read,
+  // hollowed with evenodd so the links stay legible at corner size.
+  'bond-link':
+    '<path fill-rule="evenodd" d="M186 148a108 108 0 1 0 0 216 108 108 0 0 0 0-216zm0 56a52 52 0 1 1 0 104 52 52 0 0 1 0-104zM326 148a108 108 0 1 0 0 216 108 108 0 0 0 0-216zm0 56a52 52 0 1 1 0 104 52 52 0 0 1 0-104z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {
@@ -203,15 +236,33 @@ export function svgIcon(name: UiIconName, opts: SvgIconOpts = {}): string {
 }
 
 /**
- * Replace `[data-icon="name"]` placeholders in static markup (index.html) with
- * their SVG, once. Existing children (keybind labels, mobile captions) are kept;
- * the icon is prepended and marked decorative since the host element carries the
- * accessible name (title / aria-label).
+ * Painted-art `<img>` markup for a primary destination (DESIGN.md section 6). Decorative
+ * by construction: every host that carries art is a button or link with its own
+ * `aria-label`, so a second accessible name here would double-announce it.
+ * `draggable="false"` matters on a HUD control: a native image drag on a launcher starts a
+ * ghost-drag instead of a click.
+ */
+function chromeArtIcon(url: string): string {
+  return `<img class="ui-icon ui-icon-art" src="${url}" alt="" aria-hidden="true" draggable="false" decoding="async">`;
+}
+
+/**
+ * Replace `[data-icon="name"]` placeholders in static markup (index.html) with their icon,
+ * once. Existing children (keybind labels, mobile captions) are kept; the icon is prepended
+ * and marked decorative since the host element carries the accessible name (title /
+ * aria-label).
+ *
+ * A name with committed painted art (CHROME_ART_IDS) hydrates as that `<img>` instead of
+ * the inline SVG: these placeholders ARE the primary destinations (the side rail, the
+ * mobile bar, the More tray), which DESIGN.md section 6 gives painted art. The SVG stays
+ * the source everywhere else, including every direct `svgIcon()` call, so the small inline
+ * uses beside text keep tinting with `currentColor`.
  */
 export function hydrateIcons(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>('[data-icon]').forEach((el) => {
     const name = el.dataset.icon;
     if (!name || !hasUiIcon(name) || el.querySelector(':scope > .ui-icon')) return;
-    el.insertAdjacentHTML('afterbegin', svgIcon(name));
+    const art = chromeIconUrl(name);
+    el.insertAdjacentHTML('afterbegin', art ? chromeArtIcon(art) : svgIcon(name));
   });
 }

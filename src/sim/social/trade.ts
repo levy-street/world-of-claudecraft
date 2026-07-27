@@ -22,7 +22,7 @@ import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
 const TRADE_RANGE = 10;
 
-// The one trade-locked predicate (Professions 2.0 Phase 13). A copy is
+// The one trade-locked predicate (Professions 2.0). A copy is
 // trade-locked once its payload carries boundTo: a bound instance stays with
 // its owner and is never offered, revalidated-in, or consumed by a swap.
 // (bindOnTrade only ARMS the lock; boundTo is the applied lock, stamped on the
@@ -143,7 +143,7 @@ export function tradeSetOffer(
     merged.set(slot.itemId, (merged.get(slot.itemId) ?? 0) + count);
   }
   const cleaned: InvSlot[] = [];
-  // Phase 13: the offerable count EXCLUDES trade-locked copies. When the raw
+  // The offerable count EXCLUDES trade-locked copies. When the raw
   // held count covers the offered count but the unbound count does not, the
   // player is trying to trade a bound copy: deny ONCE for the whole offer and
   // clamp that line to the unbound copies they can actually give (dropping it
@@ -192,7 +192,7 @@ type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstanc
 function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
   const grants: PendingGrant[] = [];
   for (const s of items) {
-    // Phase 13: a trade removal NEVER consumes a trade-locked copy. The offer
+    // A trade removal NEVER consumes a trade-locked copy. The offer
     // was already clamped to the unbound count (tradeSetOffer / offerCovered),
     // so enough unbound copies exist; the skip predicate is defence in depth so
     // removePreferFungible's highest-index-first walk spares a bound copy even
@@ -208,7 +208,7 @@ function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): voi
   for (const g of grants) {
     if (g.plainCount > 0) ctx.addItem(g.itemId, g.plainCount, toPid);
     for (const instance of g.instances) {
-      // Bind-on-trade stamp (Phase 13): a payload armed with bindOnTrade locks
+      // Bind-on-trade stamp: a payload armed with bindOnTrade locks
       // to the recipient the first time it changes hands. The instances here
       // are per-unit deep clones (removeItem's contract; the final unit of a
       // fully-consumed slot is the original, whose slot is already gone), so
@@ -254,7 +254,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   // leaves their bags (simulated on a scratch copy; nothing moved yet). A
   // receive is not uniformly fungible: grantOffer (below) grants each
   // instanced copy via addItemInstance, which merges only into a byte-equal
-  // identical-payload stack with room (Phase 12d) and otherwise takes a fresh
+  // identical-payload stack with room and otherwise takes a fresh
   // slot, never a plain stack of the same itemId. fitsAll alone assumes every
   // unit of a receive can stack, which under-predicts slot usage whenever the
   // giver's stock for that item is (partly) instanced copies, letting a
@@ -281,7 +281,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
       let remaining = s.count - plainCount;
       for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {
         const g = giver.inventory[i];
-        // Skip trade-locked copies here too (Phase 13): the real transfer
+        // Skip trade-locked copies here too: the real transfer
         // (removeOffer) spares them, so the capacity model must walk the same
         // unbound instanced slots or it would mis-estimate the receiver's slots.
         if (g.itemId !== s.itemId || !g.instance || isTradeLocked(g.instance)) continue;
@@ -358,7 +358,7 @@ export function tradeCancel(ctx: SimContext, pid?: number): void {
 
 // true when the player's bags cover the offered totals per item, summing
 // duplicate slots: a per-slot check would let duplicates each pass alone.
-// Phase 13: counts against the UNBOUND copies only (unboundCount), the same
+// Counts against the UNBOUND copies only (unboundCount), the same
 // exclusion tradeSetOffer applies, so a copy bound between set-offer and
 // confirm can never slip through final validation into the swap.
 function offerCovered(ctx: SimContext, items: InvSlot[], pid: number): boolean {

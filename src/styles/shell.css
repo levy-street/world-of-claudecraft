@@ -2675,31 +2675,31 @@
     margin-left: 0;
   }
   .mini-class[data-class="warrior"] {
-    --class-color: #c79c6e;
+    --class-color: #d67a54;
   }
   .mini-class[data-class="paladin"] {
-    --class-color: #f58cba;
+    --class-color: #f58ca0;
   }
   .mini-class[data-class="hunter"] {
-    --class-color: #abd473;
+    --class-color: #a6d84f;
   }
   .mini-class[data-class="rogue"] {
-    --class-color: #fff569;
+    --class-color: #fcee58;
   }
   .mini-class[data-class="priest"] {
-    --class-color: #ffffff;
+    --class-color: #c6d4f0;
   }
   .mini-class[data-class="shaman"] {
-    --class-color: #0070de;
+    --class-color: #4e8aea;
   }
   .mini-class[data-class="mage"] {
-    --class-color: #69ccf0;
+    --class-color: #33c1f1;
   }
   .mini-class[data-class="warlock"] {
-    --class-color: #9482c9;
+    --class-color: #a785e6;
   }
   .mini-class[data-class="druid"] {
-    --class-color: #ff7d0a;
+    --class-color: #ff8c1a;
   }
 
   .mini-class {
@@ -3594,9 +3594,9 @@
     color: #fff;
   }
   .skin-swatch.sel {
-    border-color: var(--class-color, #69ccf0);
+    border-color: var(--class-color, #33c1f1);
     color: #fff;
-    box-shadow: 0 0 9px var(--class-color, #69ccf0);
+    box-shadow: 0 0 9px var(--class-color, #33c1f1);
   }
   /* Chroma swatch: a plain armour-colour dot (no portrait). */
   .skin-swatch-color {
@@ -4471,7 +4471,7 @@
     margin: 8px 0 12px;
     max-height: 50vh;
     overflow-y: auto;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 5px;
   }
   .realm-loading {
@@ -4929,7 +4929,7 @@
     color: #c73c3c;
   }
   .class-details-role.role-ranged {
-    color: #abd473;
+    color: #a6d84f;
   }
   .class-details-role.role-healer {
     color: #58beea;
@@ -5053,15 +5053,15 @@
   }
 
   .badge-resource.resource-energy {
-    background: rgba(255, 245, 105, 0.12);
-    border-color: rgba(255, 245, 105, 0.4);
-    color: #fff569;
+    background: rgba(252, 238, 88, 0.12);
+    border-color: rgba(252, 238, 88, 0.4);
+    color: #fcee58;
   }
 
   .badge-resource.resource-rage {
-    background: rgba(199, 156, 110, 0.15);
-    border-color: rgba(199, 156, 110, 0.4);
-    color: #c79c6e;
+    background: rgba(214, 122, 84, 0.15);
+    border-color: rgba(214, 122, 84, 0.4);
+    color: #d67a54;
   }
 
   /* Signature Abilities Section */
@@ -5954,31 +5954,31 @@
 
   /* Class color tokens, any element with data-class exposes --class-color */
   [data-class="warrior"] {
-    --class-color: #c79c6e;
+    --class-color: #d67a54;
   }
   [data-class="paladin"] {
-    --class-color: #f58cba;
+    --class-color: #f58ca0;
   }
   [data-class="hunter"] {
-    --class-color: #abd473;
+    --class-color: #a6d84f;
   }
   [data-class="rogue"] {
-    --class-color: #fff569;
+    --class-color: #fcee58;
   }
   [data-class="priest"] {
-    --class-color: #ffffff;
+    --class-color: #c6d4f0;
   }
   [data-class="shaman"] {
-    --class-color: #0070de;
+    --class-color: #4e8aea;
   }
   [data-class="mage"] {
-    --class-color: #69ccf0;
+    --class-color: #33c1f1;
   }
   [data-class="warlock"] {
-    --class-color: #9482c9;
+    --class-color: #a785e6;
   }
   [data-class="druid"] {
-    --class-color: #ff7d0a;
+    --class-color: #ff8c1a;
   }
 
   /* Portrait chip, a class-ringed headshot rendered from the 3D model.
@@ -6076,9 +6076,14 @@
     padding: 4px 9px;
     font-size: 10.5px;
     line-height: 1;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.3);
+  }
+  .char-title-text .panel-subtitle.char-archetype-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
   /* The honor chip drops its special gold to the shared muted chip color, so it
      reads as one of the header pills rather than a highlighted line. */
@@ -6149,7 +6154,7 @@
     font-size: 10.5px;
     line-height: 1;
     color: var(--color-text-muted);
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.3);
   }
@@ -7482,14 +7487,14 @@
     gap: 12px;
     min-width: 0;
     min-height: 0;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #100d08;
     padding: 14px;
   }
   .se-roll-banner {
     flex: 0 0 auto;
-    border: 1px solid color-mix(in srgb, var(--tier-color, #fff) 45%, #463a1c);
+    border: 1px solid color-mix(in srgb, var(--tier-color, #fff) 45%, var(--color-border-showcase));
     border-radius: 8px;
     padding: 10px 12px;
     background: linear-gradient(180deg, #1b150d, #0f0c07);
@@ -7513,7 +7518,7 @@
     padding: 2px 8px 8px 2px;
   }
   .se-tier {
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #14110a;
     width: 100%;
@@ -7625,7 +7630,7 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #0f0d12;
     padding: 0;
@@ -7838,6 +7843,67 @@
   }
   @media (pointer: coarse) {
     #gpu-notice button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+  }
+
+  /* ---------- performance nudge toast ---------- */
+  /* Owned by src/ui/perf_nudge_toast.ts: the one-time machine-local performance
+     nudge (packet 0 rulings R14-R16), a SIBLING of the software rendering
+     notice above with the same visual language. It sits one slot BELOW the
+     gpu-notice slot so the stack can never overlap; the two toasts are mutually
+     exclusive by construction (the nudge's software arm is suppressed when the
+     boot notice showed), but the fixed slot keeps a defensive ordering anyway. */
+  #perf-nudge {
+    position: fixed;
+    /* Same safe-area handling as #gpu-notice: clear of a notch on mobile
+       shells, zero everywhere else; 112px clears both toast slots above.
+       Unlike the pre-game portrait sibling, this toast surfaces IN-GAME,
+       where web mobile is landscape-only, so the right edge also clears a
+       rotated notch / rounded corner. */
+    top: calc(var(--spacing-md) + 112px + env(safe-area-inset-top, 0px));
+    right: calc(var(--spacing-md) + env(safe-area-inset-right, 0px));
+    z-index: 260;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    max-width: min(440px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  #perf-nudge[hidden] {
+    display: none;
+  }
+  #perf-nudge button {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    /* WCAG 2.5.8 absolute floor on any pointer; the coarse-pointer block below
+       raises it to the repo's 40x40 mobile touch floor (this toast can surface
+       in a mobile browser mid-session). */
+    min-height: 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font: inherit;
+    cursor: var(--cursor-point);
+  }
+  #perf-nudge button:hover {
+    border-color: var(--color-primary);
+  }
+  #perf-nudge button:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (pointer: coarse) {
+    #perf-nudge button {
       min-height: 40px;
       min-width: 40px;
     }

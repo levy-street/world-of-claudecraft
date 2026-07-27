@@ -8,7 +8,7 @@ vi.mock('../src/render/gfx', () => ({ gfxSoftwareRendering: vi.fn() }));
 vi.mock('../src/render/software_renderer', () => ({ probeMajorPerformanceCaveat: vi.fn() }));
 vi.mock('../src/ui/gpu_notice_toast', () => ({ initGpuNotice: vi.fn() }));
 
-import { initSoftwareRenderNotice } from '../src/game/software_render_notice';
+import { initSoftwareRenderNotice, softwareNoticeShown } from '../src/game/software_render_notice';
 import { gfxSoftwareRendering } from '../src/render/gfx';
 import { probeMajorPerformanceCaveat } from '../src/render/software_renderer';
 import { initGpuNotice } from '../src/ui/gpu_notice_toast';
@@ -48,5 +48,19 @@ describe('initSoftwareRenderNotice', () => {
     probe.mockReturnValue(null);
     initSoftwareRenderNotice(true);
     expect(notice).toHaveBeenCalledWith({ softwareRendering: false, desktopShell: true });
+  });
+
+  it('records whether the toast actually showed, for the perf-nudge suppression', () => {
+    // Ruling R16: the nudge's software arm suppresses only when the boot
+    // notice DISPLAYED, which the toast alone decides (it also reads the
+    // persisted dismissal), so the memo must follow its return value.
+    gfxVerdict.mockReturnValue(true);
+    notice.mockReturnValue(true);
+    initSoftwareRenderNotice(false);
+    expect(softwareNoticeShown()).toBe(true);
+
+    notice.mockReturnValue(false);
+    initSoftwareRenderNotice(false);
+    expect(softwareNoticeShown()).toBe(false);
   });
 });

@@ -110,4 +110,77 @@ describe('talent buffPct resolver fixes', () => {
     expect(effect.dmgMult).toBeCloseTo(1.15, 6);
     expect(effect.flat ?? 0).toBe(0);
   });
+
+  // scaleEffect had no case for 'groundAoE' or 'repositionToAim', so a global
+  // damage modifier (e.g. the Fiesta arena augments, aug_bloodhunter's
+  // +18%/+18%) silently no-opped on Consecration, Earthquake, Blizzard,
+  // Meteor, and Heroic Leap's landing hit while every directDamage ability
+  // scaled correctly. These pin the fix against the same global mult a
+  // directDamage ability already applies.
+  it('Consecration groundAoE damage scales with the global spell damage modifier, same factor as a directDamage ability', () => {
+    const mods = emptyModifiers();
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.18 } }, 1);
+
+    const exorcism = resolvedEffect('paladin', 'exorcism', 'directDamage', mods);
+    expect(exorcism.min).toBe(Math.round(46 * 1.18));
+    expect(exorcism.max).toBe(Math.round(56 * 1.18));
+
+    const consecration = resolvedEffect('paladin', 'consecration', 'groundAoE', mods);
+    expect(consecration.min).toBe(Math.round(28 * 1.18));
+    expect(consecration.max).toBe(Math.round(34 * 1.18));
+  });
+
+  it('Earthquake groundAoE damage scales with the global spell damage modifier', () => {
+    const mods = emptyModifiers();
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.3 } }, 1);
+
+    const earthquake = resolvedEffect('shaman', 'earthquake', 'groundAoE', mods);
+    expect(earthquake.min).toBe(Math.round(13 * 1.3));
+    expect(earthquake.max).toBe(Math.round(17 * 1.3));
+  });
+
+  it('Blizzard groundAoE damage scales with the global spell damage modifier and keeps its snare/orb riders', () => {
+    const mods = emptyModifiers();
+    mods.spec = 'frost';
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.3 } }, 1);
+
+    const blizzard = resolvedEffect('mage', 'blizzard', 'groundAoE', mods);
+    expect(blizzard.min).toBe(Math.round(12 * 1.3));
+    expect(blizzard.max).toBe(Math.round(16 * 1.3));
+    expect(blizzard.slowMult).toBe(0.6);
+    expect(blizzard.orbCdr).toBe(true);
+  });
+
+  it('Meteor groundAoE damage scales with the global spell damage modifier and keeps its ignite/delay riders', () => {
+    const mods = emptyModifiers();
+    mods.spec = 'fire';
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.45 } }, 1);
+
+    const meteor = resolvedEffect('mage', 'meteor', 'groundAoE', mods);
+    expect(meteor.min).toBe(Math.round(90 * 1.45));
+    expect(meteor.max).toBe(Math.round(120 * 1.45));
+    expect(meteor.igniteFrac).toBe(0.4);
+    expect(meteor.delayed).toBe(true);
+  });
+
+  it('Rune of Power groundAoE ally-buff pulse (0/0 min/max) is left untouched by the global spell damage modifier', () => {
+    // Rune of Power is only reachable via the mage 20 choice row grant.
+    const mods = rowMods('mage', { 20: 'mag_r20_rune_of_power' });
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.45 } }, 1);
+
+    const rune = resolvedEffect('mage', 'rune_of_power', 'groundAoE', mods);
+    expect(rune.min).toBe(0);
+    expect(rune.max).toBe(0);
+    expect(rune.allyBuffPct).toBe(0.1);
+  });
+
+  it('Heroic Leap landingAoe damage scales with the global melee damage modifier', () => {
+    const mods = emptyModifiers();
+    accumulateTalentEffect(mods, { global: { meleeDmgPct: 0.4 } }, 1);
+
+    const leap = resolvedEffect('warrior', 'heroic_leap', 'repositionToAim', mods);
+    expect(leap.landingAoe?.min).toBe(Math.round(24 * 1.4));
+    expect(leap.landingAoe?.max).toBe(Math.round(32 * 1.4));
+    expect(leap.landingAoe?.radius).toBe(6);
+  });
 });

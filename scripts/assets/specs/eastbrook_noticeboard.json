@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/eastbrook_noticeboard/eastbrook_noticeboard-final.glb",
+      "out": "models/props/eastbrook_noticeboard.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

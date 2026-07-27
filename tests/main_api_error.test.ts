@@ -2,6 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Api, ApiError } from '../src/net/online';
 import {
+  isTransientReconnectRejection,
+  isTransientTimeoutRejection,
+} from '../src/net/reconnect_policy';
+import {
   API_ERROR_KEYS,
   technicalErrorMessage,
   userFacingApiError,
@@ -163,6 +167,25 @@ describe('userFacingApiError prose fallback (un-migrated routes, until Phase 25)
     expect(userFacingApiError('too many connections from your network')).toBe(
       t('loading.tooManyConnections'),
     );
+    expect(
+      userFacingApiError(
+        'Game and server versions are incompatible. Reload or update, then try again.',
+      ),
+    ).toBe(t('loading.incompatibleWorldVersion'));
+  });
+
+  it('re-localizes the flood-kick reason and keeps it session-fatal', () => {
+    // 'message rate exceeded' is the dedicated limiter kick literal
+    // (server/msg_rate_limit.ts MSG_RATE_KICK_REASON): its own actionable copy,
+    // distinct from the generic rejection so a flood kick stops masquerading as
+    // the anti-bot kick, which deliberately keeps 'rejected by server'.
+    expect(userFacingApiError('message rate exceeded')).toBe(t('loading.messageRateExceeded'));
+    expect(userFacingApiError('message rate exceeded')).not.toBe(t('loading.connectionRejected'));
+    // Session-fatal by design: an immediately reconnecting flooder re-floods,
+    // so neither transient-rejection helper may match it even mid-reconnect
+    // with a fresh counter.
+    expect(isTransientReconnectRejection('message rate exceeded', 1, 0)).toBe(false);
+    expect(isTransientTimeoutRejection('message rate exceeded', 1, 0)).toBe(false);
   });
 
   it('re-localizes a moderation kick through tServer', () => {

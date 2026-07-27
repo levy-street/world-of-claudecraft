@@ -76,6 +76,13 @@ describe('classifyDiff', () => {
     );
     expect(keys).toEqual(['inventory', 'world-map']);
   });
+
+  it('stages a complete profession identity for refresh-aware captures', () => {
+    const target = resolveTargets(['src/ui/professions_window.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'professions',
+    );
+    expect(target?.capture.toString()).toContain('knownRecipes: []');
+  });
 });
 
 describe('diffChangedPaths', () => {

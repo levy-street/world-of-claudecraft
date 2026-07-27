@@ -19,6 +19,7 @@
 // Three/render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { corpseInteractionAvailability } from './corpse_interaction';
 import { deadTargetSelectable } from './dead_target';
 import type { SimContext } from './sim_context';
 import { isVcupCrossTeam } from './social/vale_cup';
@@ -50,9 +51,17 @@ export class Targeting {
       return;
     }
     const e = this.ctx.entities.get(id);
-    if (!e || (e.dead && !deadTargetSelectable(e, p.id))) return;
+    if (!e || (e.dead && !this.deadEntitySelectableFor(e, p.id))) return;
     p.targetId = id;
     if (!this.ctx.isHostileTo(p, e) || e.dead) p.autoAttack = false;
+  }
+
+  private deadEntitySelectableFor(e: Entity, viewerId: number): boolean {
+    if (!deadTargetSelectable(e, viewerId)) return false;
+    if (e.kind === 'mob' && e.lootable) {
+      return corpseInteractionAvailability(this.ctx, e, viewerId, true).canInteract;
+    }
+    return true;
   }
 
   tabTarget(pid?: number): void {

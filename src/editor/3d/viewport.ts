@@ -640,7 +640,7 @@ export class Editor3DViewport {
     const ground = terrainHeight(this.cam.target.x, this.cam.target.z, this.seed);
     if (this.cam.target.y < ground + 0.5) this.cam.target.y = ground + 0.5;
     // Teleport the frozen player (hidden below) to the ground under the camera
-    // target so foliage/critter LOD stays populated under the cursor (the
+    // target so foliage LOD stays populated under the cursor (the
     // renderer re-centers dressing on the player).
     const player = this.sim.player;
     if (player) {

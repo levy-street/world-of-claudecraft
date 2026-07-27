@@ -248,6 +248,7 @@ function stubPriceConfig(): void {
           url.pathname === '/daily-schedule'
             ? { dayStartUtcMinutes: 22 * 60 }
             : {
+                enabled: true,
                 day: url.searchParams.get('day'),
                 minUsd: 20,
                 prizePoolUsd: 150,

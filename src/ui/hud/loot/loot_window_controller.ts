@@ -54,7 +54,7 @@ export class LootWindowController {
     const world = this.deps.world();
     const mob = world.entities.get(mobId);
     if (!mob) return;
-    const { componentTags, harvestable, visibleItems, hasLoot, canOpen } =
+    const { componentTags, harvestable, visibleItems, visibleCopper, hasLoot, canOpen } =
       this.deps.corpseAvailability(mob);
     if (!canOpen) return;
 
@@ -62,16 +62,18 @@ export class LootWindowController {
     this.mobId = mobId;
     this.chestId = null;
     let html = this.titleHtml(this.deps.entityName(mob));
-    if (mob.loot && mob.loot.copper > 0) {
-      html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(mob.loot.copper)}</span></div>`;
+    // visibleCopper, not mob.loot.copper: coin is shared (tap-owned) loot, so
+    // the popup must not advertise a stranger's copper the take would deny.
+    if (visibleCopper > 0) {
+      html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(visibleCopper)}</span></div>`;
     }
     html += visibleItems.map((stack) => this.itemRowHtml(stack)).join('');
     this.deps.element.innerHTML = html;
     this.attachItemTooltips();
 
     if (hasLoot) {
-      // "Take Loot", not "Take All": the old label promised the harvest too
-      // (Phase 12d QA legibility fix). The delve-chest arm keeps Take All.
+      // "Take Loot", not "Take All": the old label promised the harvest too.
+      // The delve-chest arm keeps Take All.
       this.appendTakeButton(
         t('hudChrome.loot.takeLootButton'),
         () => {
@@ -83,7 +85,7 @@ export class LootWindowController {
     }
     if (harvestable && componentTags) {
       // Pre-check the caller's town focus: the same subset an omitted-components
-      // harvest resolves server-side (Phase 12d). Deselecting every box still
+      // harvest resolves server-side. Deselecting every box still
       // submits an explicit empty pick, which spreads.
       const focused = new Set(componentTags.filter((tag) => (world.townFocus[tag] ?? 0) > 0));
       renderCorpseHarvestPicker(this.deps.element, corpseHarvestView(componentTags, focused), {

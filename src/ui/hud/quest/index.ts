@@ -1,4 +1,5 @@
 export * from './gossip_menu';
+export * from './prof_intro_hint_core';
 export * from './quest_dialog_controller';
 export * from './quest_link';
 export * from './quest_progress_banner';

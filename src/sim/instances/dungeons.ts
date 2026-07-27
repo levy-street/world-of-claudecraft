@@ -32,7 +32,7 @@ import {
   type Vec3,
 } from '../types';
 import {
-  applyHeroicMobTuning,
+  applyDungeonMobTuning,
   claimDifficultyForDungeon,
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
@@ -80,6 +80,25 @@ function activeResetLock(
   return lock;
 }
 
+function clearResetLocksForClaim(ctx: SimContext, claimId: number): void {
+  for (const [key, lock] of ctx.dungeonResetLocks) {
+    if (lock.claimId === claimId) ctx.dungeonResetLocks.delete(key);
+  }
+}
+
+export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): void {
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+  if (inst?.difficulty !== 'normal' || RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId)) return;
+  const finalBossId = HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId;
+  if (mob.templateId !== finalBossId || inst.exitId === null) return;
+  for (const meta of instanceLockoutMetas(ctx, inst)) {
+    ctx.dungeonResetLocks.set(resetCooldownKey(ctx, meta.entityId, inst.dungeonId), {
+      availableAt: Number.POSITIVE_INFINITY,
+      claimId: inst.exitId,
+    });
+  }
+}
+
 // Joining a party during a reset cooldown inherits that party's active dungeon
 // locks. Otherwise fresh characters could take over the replacement claim, rotate
 // the ephemeral party id, and open another run before the five-minute boundary.
@@ -119,7 +138,7 @@ export function instanceOriginOf(inst: InstanceSlot): { x: number; z: number } {
 export function instanceClaimIdAt(ctx: SimContext, pos: Vec3): number | null {
   for (const inst of ctx.instances) {
     if (inst.partyKey === null || inst.exitId === null) continue;
-    if (instanceClaimContains(ctx, inst, pos)) return inst.exitId;
+    if (instanceClaimContains(inst, pos)) return inst.exitId;
   }
   return null;
 }
@@ -130,20 +149,26 @@ function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean 
   return Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250;
 }
 
-function instanceClaimContains(ctx: SimContext, inst: InstanceSlot, pos: Vec3): boolean {
+function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   const origin = instanceOriginOf(inst);
   if (instanceContains(origin, pos)) return true;
   if (inst.dungeonId !== 'nythraxis_boss_arena') return false;
-  const boss = inst.mobIds
-    .map((id) => ctx.entities.get(id))
-    .find((entity) => entity?.templateId === NYTHRAXIS_BOSS_ID);
+  const bossSpawn = DUNGEONS.nythraxis_boss_arena.spawns.find(
+    (spawn) => spawn.mobId === NYTHRAXIS_BOSS_ID,
+  );
   // The raid room is wider than the generic instance footprint, so its claim
   // includes the side wings. Keep that wider circle clipped to this slot's z
-  // band or it reaches into the adjacent arena slot 500 yards away.
+  // band or it reaches into the adjacent arena slot 500 yards away. Derive the
+  // centre from content rather than the live boss entity: the room remains a
+  // raid instance after Nythraxis' corpse has despawned.
   return (
-    !!boss &&
+    !!bossSpawn &&
     Math.abs(pos.z - origin.z) < 250 &&
-    dist2d(pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS
+    dist2d(pos, {
+      x: origin.x + bossSpawn.x,
+      y: pos.y,
+      z: origin.z + bossSpawn.z,
+    }) <= NYTHRAXIS_ROOM_RADIUS
   );
 }
 
@@ -431,7 +456,7 @@ function defeatedNythraxisCorpseRunClaim(
       candidate.dungeonId === 'nythraxis_boss_arena' &&
       candidate.partyKey === partyKey &&
       candidate.exitId === p.corpseInstanceId &&
-      instanceClaimContains(ctx, candidate, corpsePos),
+      instanceClaimContains(candidate, corpsePos),
   );
   if (!inst || !isDefeatedNythraxisParticipant(ctx, inst, p.id)) return undefined;
   return inst;
@@ -460,9 +485,7 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   // e.g. their pet) from every inside mob's hate table: dancing in and out of
   // the exit portal cannot be used to kite a pull to the door and back.
   // Re-entering means earning aggro from scratch.
-  const inst = ctx.instances.find(
-    (i) => i.partyKey !== null && instanceClaimContains(ctx, i, p.pos),
-  );
+  const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
   if (inst) scrubInstanceThreat(ctx, inst, p.id);
   p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
   p.prevPos = { ...p.pos };
@@ -527,7 +550,7 @@ function claimInstance(
       level,
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
-    applyHeroicMobTuning(mob, inst.dungeonId, difficulty);
+    applyDungeonMobTuning(mob, inst.dungeonId, difficulty);
     mob.facing = Math.PI; // face the entrance
     mob.prevFacing = mob.facing;
     ctx.addEntity(mob);
@@ -567,6 +590,7 @@ function claimInstance(
 }
 
 function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
+  const claimId = inst.exitId;
   for (const id of inst.mobIds) {
     if (!ctx.entities.has(id)) continue;
     // drop any player targets on the despawning mob so the delete is clean
@@ -579,7 +603,10 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   for (const id of inst.objectIds) {
     if (ctx.entities.has(id)) ctx.dropEntity(id);
   }
-  if (inst.exitId !== null) ctx.dropEntity(inst.exitId);
+  if (claimId !== null) {
+    clearResetLocksForClaim(ctx, claimId);
+    ctx.dropEntity(claimId);
+  }
   inst.partyKey = null;
   inst.difficulty = 'normal';
   inst.mobIds = [];
@@ -637,7 +664,10 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
     resettable.some(
       (inst) =>
         inst.resetAvailableAt > ctx.time ||
-        ownerPids.some((ownerPid) => activeResetLock(ctx, ownerPid, inst.dungeonId) !== null),
+        ownerPids.some((ownerPid) => {
+          const lock = activeResetLock(ctx, ownerPid, inst.dungeonId);
+          return lock !== null && lock.claimId !== inst.exitId;
+        }),
     )
   ) {
     ctx.error(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
@@ -715,7 +745,7 @@ export function instanceLockoutMetas(ctx: SimContext, inst: InstanceSlot): Playe
     const matchingInstanceCorpse =
       e?.ghost && e.corpsePos && e.corpseInstanceId === inst.exitId ? e.corpsePos : null;
     const lockoutPos = matchingInstanceCorpse ?? e?.pos;
-    if (lockoutPos && instanceClaimContains(ctx, inst, lockoutPos)) out.push(meta);
+    if (lockoutPos && instanceClaimContains(inst, lockoutPos)) out.push(meta);
   }
   return out;
 }
@@ -757,7 +787,7 @@ function heroicRewardWindowToken(lockedUntil: number): string {
 // snapshot is empty) pays nobody, bags or mail, while the lockout still strikes.
 export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-  if (!inst || inst.difficulty !== 'heroic') return;
+  if (inst?.difficulty !== 'heroic') return;
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning || mob.templateId !== tuning.finalBossId) return;
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
@@ -829,7 +859,7 @@ export function instanceInfoAt(
   pos: Vec3,
 ): { slot: number; dungeonId: string } | null {
   for (const inst of ctx.instances) {
-    if (instanceContains(instanceOriginOf(inst), pos)) {
+    if (instanceClaimContains(inst, pos)) {
       return { slot: inst.slot, dungeonId: inst.dungeonId };
     }
   }

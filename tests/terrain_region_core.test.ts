@@ -1,6 +1,18 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { chunkIntersectsRegion, normalTexelBounds } from '../src/render/terrain_region_core';
-import { shoreDepthAt } from '../src/render/water_core';
+import {
+  advanceWaterSchedule,
+  shoreDepthAt,
+  WATER_MAX_STEPS_PER_FRAME,
+  WATER_SCHEDULE_SLEEP,
+  WATER_SCHEDULE_WAKE,
+  waterBodyVisible,
+  waterCellIntersectsDisc,
+  waterGridPlan,
+  waterResidentBodyBudget,
+  waterSimulationPlan,
+  waterSimulationTargetResolution,
+} from '../src/render/water_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../src/sim/world';
 
@@ -118,6 +130,83 @@ describe('normalTexelBounds (macro normal partial rebake)', () => {
     const b = normalTexelBounds(-10, 5, 5, 8, 0, 0, W, D, TEX_W, TEX_H, 1);
     expect(b).not.toBeNull();
     expect(b?.i0).toBe(0);
+  });
+});
+
+describe('optimized water geometry and culling', () => {
+  it('bounds tessellation for very large editor-authored lakes', () => {
+    expect(waterGridPlan(48, 2.6, 8, 64)).toEqual({ size: 96, segments: 37 });
+    expect(waterGridPlan(10_000, 2, 8, 64).segments).toBe(64);
+  });
+
+  it('drops corner cells but retains every cell touching the circular boundary', () => {
+    expect(waterCellIntersectsDisc(-1, -1, 1, 1, 5)).toBe(true);
+    expect(waterCellIntersectsDisc(4.9, -0.2, 5.2, 0.2, 5)).toBe(true);
+    expect(waterCellIntersectsDisc(7, 7, 8, 8, 5)).toBe(false);
+  });
+
+  it('culls only after the whole lake has left fog range', () => {
+    expect(waterBodyVisible(70, 0, 0, 0, 20, 50)).toBe(true);
+    expect(waterBodyVisible(70.01, 0, 0, 0, 20, 50)).toBe(false);
+    expect(waterBodyVisible(0, 0, 500, 500, 20, 100)).toBe(false);
+  });
+
+  it('bounds fixed-step wave simulation by graphics tier', () => {
+    expect(waterSimulationPlan(29, 'medium')).toEqual({ resolution: 64, stepHz: 20 });
+    expect(waterSimulationPlan(48, 'high')).toEqual({ resolution: 96, stepHz: 24 });
+    expect(waterSimulationPlan(56, 'ultra')).toEqual({ resolution: 128, stepHz: 30 });
+    expect(waterSimulationPlan(10_000, 'ultra')).toEqual({ resolution: 128, stepHz: 30 });
+    expect(waterSimulationPlan(0, 'low')).toEqual({ resolution: 48, stepHz: 15 });
+  });
+
+  it('keeps target allocation fixed for every lake radius and contact order', () => {
+    const radii = [0, 1, 29, 48, 96, 10_000];
+    for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+      const allocation = waterSimulationTargetResolution(tier);
+      expect(radii.map((radius) => waterSimulationPlan(radius, tier).resolution)).toEqual(
+        radii.map(() => allocation),
+      );
+    }
+  });
+
+  it('bounds resident height fields independently of custom-map lake count', () => {
+    expect(waterResidentBodyBudget('low')).toBe(1);
+    expect(waterResidentBodyBudget('medium')).toBe(2);
+    expect(waterResidentBodyBudget('high')).toBe(3);
+    expect(waterResidentBodyBudget('ultra')).toBe(4);
+  });
+
+  it('drops hidden impulses without extending the wake and sleeps on schedule', () => {
+    const state = {
+      active: true,
+      pendingCount: 4,
+      accumulator: 0.03,
+      awakeUntil: 6,
+      stepSeconds: 1 / 30,
+    };
+    expect(advanceWaterSchedule(state, false, 5, 0.1)).toBe(0);
+    expect(state.pendingCount).toBe(0);
+    expect(state.accumulator).toBe(0);
+    expect(state.awakeUntil).toBe(6);
+    expect(advanceWaterSchedule(state, false, 6, 0.1)).toBe(WATER_SCHEDULE_SLEEP);
+  });
+
+  it('wakes once and caps hitch catch-up to two fixed steps', () => {
+    const stepSeconds = 1 / 24;
+    const state = {
+      active: false,
+      pendingCount: 1,
+      accumulator: 0,
+      awakeUntil: 0,
+      stepSeconds,
+    };
+    expect(advanceWaterSchedule(state, true, 10, 1)).toBe(WATER_SCHEDULE_WAKE);
+    expect(state.active).toBe(true);
+    expect(state.awakeUntil).toBe(16);
+    expect(state.accumulator).toBe(stepSeconds * WATER_MAX_STEPS_PER_FRAME);
+    state.pendingCount = 0;
+    state.accumulator = 0;
+    expect(advanceWaterSchedule(state, true, 16, 0.01)).toBe(WATER_SCHEDULE_SLEEP);
   });
 });
 

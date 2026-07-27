@@ -64,7 +64,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Ängens mästare', desc: 'Nå 100 i färdigheten Örtkunskap.' },
   prog_master_gatherer: {
     name: 'Mästersamlare',
-    desc: 'Nå 100 i färdigheterna Gruvdrift, Timmerhuggning och Örtkunskap.',
+    desc: 'Nå 100 i skicklighet i tre valfria av Gruvdrift, Skogsavverkning, Örtkunskap och Fiske.',
   },
   prog_first_craft: { name: 'Handgjort', desc: 'Slutför ditt första lyckade hantverk.' },
   prog_craft_specialist: {
@@ -405,7 +405,10 @@ export const table: DeedLocaleTable = {
     name: 'Stamkund',
     desc: 'Upptäck alla tio delar av den heroiska kvartersmästarens utbud.',
   },
-  col_glimmerfin: { name: 'Ett skimmer av hopp', desc: 'Fånga en skimmerfenad koi.' },
+  col_glimmerfin: {
+    name: 'Ett skimmer av hopp',
+    desc: 'Fanga en Solglintens koi.',
+  },
   col_full_creel: {
     name: 'Full fiskekorg',
     desc: 'Upptäck alla sex vanliga fångster ur dalens, träskets och höjdernas vatten.',
@@ -566,7 +569,10 @@ export const table: DeedLocaleTable = {
     name: 'Något som glimmar',
     desc: 'Plocka upp ett gnistrande föremål från marken.',
   },
-  exp_first_ore: { name: 'Hugg i berget', desc: 'Skörda din första malmådra.' },
+  exp_first_ore: {
+    name: 'Hackan mot stenen',
+    desc: 'Skörda din första malmådra.',
+  },
   exp_first_timber: { name: 'Träd faller!', desc: 'Skörda ditt första timmerbestånd.' },
   exp_first_herb: { name: 'Gröna fingrar', desc: 'Skörda ditt första örtstånd.' },
   feat_era_cap: { name: 'Första erans barn', desc: 'Nådde nivå 20 medan Första eran ännu rådde.' },
@@ -624,4 +630,119 @@ export const table: DeedLocaleTable = {
     desc: 'Trotsa Den övergivna kryptan och återta båda nyckelstenshalvorna och den uråldriga dagboken från dess väktare.',
   },
   chr_marsh_first_cast: { name: 'Ålar i vassen', desc: 'Fånga en fisk ur Dykärrsträskets vatten.' },
+  prog_guildsworn: {
+    name: 'Hantverkssvuren',
+    desc: 'Inrikta dig på ett arketyppar och ta upp dess hantverk på allvar.',
+    title: 'Hantverkssvuren',
+  },
+  prog_masterwright: {
+    name: 'Mästerhantverkaren',
+    desc: 'Slutför ditt första mästerverk, ett alster så fint att hela zonen hör talas om det.',
+    title: 'Mästerhantverkaren',
+  },
+  prog_fishing_100: {
+    name: 'Gamla saltet',
+    desc: 'Nå 100 i skickligheten Fiske.',
+  },
+  prog_master_angler: {
+    name: 'Mästarfiskaren',
+    desc: 'Nå 200 i skickligheten Fiske, den absoluta toppen av fiskarkonsten.',
+    title: 'Mästarfiskaren',
+  },
+  prog_engineering_50: {
+    name: 'Kugghjul och fjädrar',
+    desc: 'Nå 50 i skickligheten Ingenjörskonst.',
+  },
+  prog_alchemy_50: {
+    name: 'Konstiga brygder',
+    desc: 'Nå 50 i skickligheten Alkemi.',
+  },
+  prog_cooking_50: {
+    name: 'Kryddad kock',
+    desc: 'Nå 50 i skickligheten Matlagning.',
+  },
+  prog_leatherworking_50: {
+    name: 'Garvarens handel',
+    desc: 'Nå 50 i skickligheten Läderhantverkeri.',
+  },
+  prog_tailoring_50: {
+    name: 'En fin söm',
+    desc: 'Nå 50 i skickligheten Skrädderi.',
+  },
+  prog_enchanting_50: {
+    name: 'En glimt av arkanamagi',
+    desc: 'Nå 50 i skickligheten Förtrollning.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Egg och härdning',
+    desc: 'Nå 50 i skickligheten Vapensmide.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Hammare och plåt',
+    desc: 'Nå 50 i skickligheten Rustningssmide.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Stormästare i Ingenjörskonst',
+    desc: 'Nå 125 i skickligheten Ingenjörskonst, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Ingenjörskonst',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Stormästare i Alkemi',
+    desc: 'Nå 125 i skickligheten Alkemi, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Alkemi',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Stormästare i Matlagning',
+    desc: 'Nå 125 i skickligheten Matlagning, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Matlagning',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Stormästare i Läderhantverkeri',
+    desc: 'Nå 125 i skickligheten Läderhantverkeri, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Läderhantverkeri',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Stormästare i Skrädderi',
+    desc: 'Nå 125 i skickligheten Skrädderi, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Skrädderi',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Stormästare i Förtrollning',
+    desc: 'Nå 125 i skickligheten Förtrollning, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Förtrollning',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Stormästare i Vapensmide',
+    desc: 'Nå 125 i skickligheten Vapensmide, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Vapensmide',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Stormästare i Rustningssmide',
+    desc: 'Nå 125 i skickligheten Rustningssmide, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Rustningssmide',
+  },
+  col_pristine_vein: {
+    name: 'Orörd ådra',
+    desc: 'Spräng upp en orörd ådra och låt hela zonen höra talas om det.',
+  },
+  col_ancient_heartwood: {
+    name: 'Gammal kärnved',
+    desc: 'Bärga ett stycke gammal kärnved ur ett fällt bestånd.',
+  },
+  col_moonlit_bloom: {
+    name: 'Månbelyst blomning',
+    desc: 'Skörda en månbelyst blomning i just det ögonblick den öppnar sig.',
+  },
+  col_perfect_specimen: {
+    name: 'Ett perfekt specimen',
+    desc: 'Ta ett perfekt specimen från ett skördat djur, utan ett enda jack eller en fläck.',
+  },
+  soc_first_salvage: {
+    name: 'Slösa inte',
+    desc: 'Bärga en utrustningspjäs tillbaka till råmaterial.',
+  },
+  soc_salvage_50: {
+    name: 'Rivningsgården',
+    desc: 'Bärga 50 utrustningspjäser tillbaka till råmaterial.',
+  },
 };

@@ -1,9 +1,10 @@
-// Gather-node world-hover tooltip (Professions 2.0 Phase 12): desktop pointer
+// Gather-node world-hover tooltip (Professions 2.0): desktop pointer
 // only. Hovering an ore vein / timber stand / herb patch in the 3D scene shows
-// the node's name, its tool-tier requirement (tier 2+ only: tier 1 is the
-// bare-hands floor, so a requirement line would be false), and its per-viewer
-// ready/cooldown state. Mobile has no hover surface: touch players read the
-// tier off the minimap lock tint and the gatherDenied error toast instead.
+// the node's name, its tool requirement (#2343: every node requires its
+// profession's tool, so tier-1 nodes show the tierless base-tool line and
+// tier 2+ the tiered one), and its per-viewer ready/cooldown state. Mobile
+// has no hover surface: touch players read the tier off the minimap lock
+// tint and the gatherDenied error toast instead.
 //
 // Reuses the HUD's shared #tooltip container and the paintTooltipAt idiom
 // (hud.ts): same box, same +14/-10 cursor offsets, same author-space viewport
@@ -19,14 +20,13 @@
 
 import type { GatheringProfessionId } from '../sim/content/professions';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
-import { BARE_HANDS_TOOL_TIER } from '../sim/professions/tools';
 import type { GatherNodeDef, GatherNodeType } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { esc } from './esc';
 import {
   buildGatherNodeTooltip,
   type GatherNodeTooltipModel,
-  viewerBestToolTier,
+  viewerOwnedToolTier,
 } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { getUiScale } from './ui_scale';
@@ -50,15 +50,26 @@ const TIER_REQUIRED_KEYS: Partial<Record<GatheringProfessionId, string>> = {
   herbalism: 'hudChrome.gathering.tierRequired.herbalism',
 };
 
+// The tierless requirement line for tier-1 nodes (#2343: bare hands never
+// gather, so even a tier-1 node names its base tool).
+const REQUIRES_TOOL_KEYS: Partial<Record<GatheringProfessionId, string>> = {
+  mining: 'hudChrome.gathering.requiresTool.mining',
+  logging: 'hudChrome.gathering.requiresTool.logging',
+  herbalism: 'hudChrome.gathering.requiresTool.herbalism',
+};
+
 /** The tooltip's inner HTML for one resolved node model. Exported for the
  *  hover module's own use; all copy resolves through t() here (the pure core
  *  stays i18n-free). */
 export function gatherNodeTooltipHtml(model: GatherNodeTooltipModel): string {
   const name = t(NODE_NAME_KEYS[model.type] as TranslationKey);
   let html = `<div class="tt-title">${esc(name)}</div>`;
-  const tierKey = TIER_REQUIRED_KEYS[model.professionId];
-  if (model.tier > BARE_HANDS_TOOL_TIER && tierKey) {
-    const line = t(tierKey as TranslationKey, {
+  const reqKey =
+    model.tier > 1
+      ? TIER_REQUIRED_KEYS[model.professionId]
+      : REQUIRES_TOOL_KEYS[model.professionId];
+  if (reqKey) {
+    const line = t(reqKey as TranslationKey, {
       tier: formatNumber(model.tier, { maximumFractionDigits: 0 }),
     });
     // Red only while the viewer's owned-best tool falls short, mirroring the
@@ -79,19 +90,30 @@ const TOOL_TIER_UNMET_KEYS: Record<GatherNodeType, string> = {
   herb: 'hudChrome.gathering.toolTierUnmet.herbalism',
 };
 
-/** The client-side tool-tier pre-gate for one node, with the localized denial
+// Tierless denial lines for tier-1 nodes (#2343: requiredTier 1 means "no
+// tool owned at all", so no tier number is named).
+const TOOL_REQUIRED_KEYS: Record<GatherNodeType, string> = {
+  ore: 'hudChrome.gathering.toolRequired.mining',
+  wood: 'hudChrome.gathering.toolRequired.logging',
+  herb: 'hudChrome.gathering.toolRequired.herbalism',
+};
+
+/** The client-side tool pre-gate for one node, with the localized denial
  *  line already resolved for exactly this node (this module is the gathering
  *  copy surface, so main.ts wires it in one line). Structurally matches
  *  gather_node_interact.ts GatherNodeToolGate; the server stays authoritative
- *  either way (a stale read still answers gatherDenied). */
+ *  either way (a stale read still answers gatherDenied). `viewerToolTier` is
+ *  the unfloored owned tier (0 = no tool, #2343), so the shared canGatherTier
+ *  comparison locks every node, tier 1 included, for a toolless viewer. */
 export function gatherNodeToolGateFor(
   world: IWorld,
   node: Pick<GatherNodeDef, 'type' | 'tier'>,
 ): { nodeTier: number; viewerToolTier: number; unmetText: string } {
+  const unmetKey = node.tier > 1 ? TOOL_TIER_UNMET_KEYS[node.type] : TOOL_REQUIRED_KEYS[node.type];
   return {
     nodeTier: node.tier,
-    viewerToolTier: viewerBestToolTier(world, NODE_HARVEST_TABLE[node.type].professionId),
-    unmetText: t(TOOL_TIER_UNMET_KEYS[node.type] as TranslationKey, {
+    viewerToolTier: viewerOwnedToolTier(world, NODE_HARVEST_TABLE[node.type].professionId),
+    unmetText: t(unmetKey as TranslationKey, {
       tier: formatNumber(node.tier, { maximumFractionDigits: 0 }),
     }),
   };

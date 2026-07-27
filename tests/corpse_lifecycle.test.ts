@@ -8,7 +8,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
 
-// Phase 12d corpse lifecycle decoupling: the loot half and the harvest half of
+// Corpse lifecycle decoupling: the loot half and the harvest half of
 // a tagged corpse can be consumed in either order without ever stranding the
 // other. Fully looted with an unclaimed harvest keeps the corpse open for a
 // short grace window (pruneCorpseLoot); a spent harvest claim shortens the
@@ -66,7 +66,7 @@ function fillBags(sim: Sim, internals: SimInternals, pid: number): void {
   }
 }
 
-describe('corpse lifecycle decoupling (Phase 12d)', () => {
+describe('corpse lifecycle decoupling', () => {
   it('full loot with an unclaimed harvest keeps the corpse open on the grace clamp', () => {
     const { sim, mob, a } = setup();
     giveLoot(mob);

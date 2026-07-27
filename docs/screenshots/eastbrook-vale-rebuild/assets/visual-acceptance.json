@@ -1,0 +1,450 @@
+{
+  "schemaVersion": 1,
+  "method": "img2threejs visual gate adapted to a coordinated multi-asset town kit",
+  "reviewedAt": "2026-07-23",
+  "policy": {
+    "authority": "agent-vision-review",
+    "globalThreshold": 0.7,
+    "criticalFeatureThreshold": 0.7,
+    "decisionRule": "global-and-every-critical-feature"
+  },
+  "turnaroundViews": [
+    "front",
+    "right",
+    "back",
+    "left",
+    "front-3q",
+    "rear-3q",
+    "hero",
+    "grazing"
+  ],
+  "auditViews": ["neutral", "dusk", "player-scale", "collider-overlay"],
+  "surfaceAtlas": {
+    "id": "eastbrook-surface-atlas",
+    "decision": "accept",
+    "sourceImage": "../materials/eastbrook-surface-atlas-source.png",
+    "comparisonImage": "../materials/eastbrook-surface-atlas-comparison.png",
+    "shippingAsset": "/textures/eastbrook_surface_atlas.webp",
+    "sourceDimensions": [1254, 1254],
+    "sourceSha256": "abec3036f8887e9c94972dab52aea664f18a74696db6b6d24cc48a4cfbe22b7d",
+    "shippingDimensions": [512, 512],
+    "shippingSha256": "d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b",
+    "shippingBytes": 141666,
+    "atlasFingerprint": "ae247c4f22d166408f465a64a862db259e166e97dd266baf8fd072a6c9b87e56",
+    "grid": {
+      "columns": 4,
+      "rows": 4,
+      "cellDimensions": [128, 128],
+      "coordinateOrigin": "top-left-image"
+    },
+    "usageContract": {
+      "role": "high-key-grayscale-detail-multiplier",
+      "colorSpace": "none",
+      "channelRange": [192, 255],
+      "paletteAuthority": "vertex-color",
+      "glbTextures": 0
+    },
+    "review": {
+      "authority": "agent-vision-review",
+      "layerScores": {
+        "source-cell-identity": 0.96,
+        "derived-detail-preservation": 0.92,
+        "palette-neutrality": 1,
+        "cell-boundary-integrity": 0.96
+      },
+      "criticalFeatures": [
+        {
+          "id": "exact-four-by-four-semantic-order",
+          "score": 1,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "All sixteen accepted material families retain their row-major identity in the source and derived panels."
+        },
+        {
+          "id": "high-key-grayscale-multiplier",
+          "score": 1,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Every decoded shipping pixel is neutral grayscale within 192 through 255, so the atlas adds grain and value breakup without replacing vertex-color palette authority."
+        },
+        {
+          "id": "independent-cell-normalization",
+          "score": 0.96,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Every quadrant is cropped, resized, and percentile-normalized independently; no source color or adjacent-cell image content bleeds through the derived comparison."
+        }
+      ],
+      "notes": [
+        "The comparison sheet shows the unchanged full-color accepted source on the left and the decoded lossless shipping multiplier on the right.",
+        "The review verifies semantic cell isolation, not mathematical seamless repetition across opposite edges; runtime UVs remain inside their selected atlas cell."
+      ]
+    }
+  },
+  "scopeNotes": [
+    "Scores judge the accepted reference identity at game-read distance, not pixel alignment against the source sheet.",
+    "Collider overlays show preview-only contract bounds and socket markers; all nine GLBs intentionally ship without collision meshes.",
+    "The civic reference benches are intentionally separate runtime layout instances and are excluded from the civic GLB score scope.",
+    "The wall GLB is intentionally a straight bounded-chord module; curvature is verified at assembled-layout scope, where chords no longer than 6.5 yards form the 28.4-yard ring around six exact five-yard openings."
+  ],
+  "assets": [
+    {
+      "id": "bank",
+      "decision": "accept",
+      "globalScore": 0.79,
+      "comparisonImage": "bank-comparison.png",
+      "auditImage": "bank-optimized-audit-contact.png",
+      "layerScores": {
+        "silhouette-proportion": 0.82,
+        "geometry-depth": 0.78,
+        "color-material": 0.83,
+        "service-readability": 0.76
+      },
+      "criticalFeatures": [
+        {
+          "id": "cobalt-gable-and-entry-canopy",
+          "score": 0.82,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The steep cobalt roof, sheltered arch, and heavy gable frame read in front and three-quarter views."
+        },
+        {
+          "id": "arched-teller-window",
+          "score": 0.8,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The recessed triple-arched illuminated counter is the dominant front service cue."
+        },
+        {
+          "id": "vault-and-banner-service-cues",
+          "score": 0.74,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The side vault shelter and blue banner are clear across the side and rear-three-quarter evidence."
+        }
+      ],
+      "intentionalOmissions": ["fine masonry seams", "individual metal fasteners"]
+    },
+    {
+      "id": "smithy",
+      "decision": "accept",
+      "globalScore": 0.76,
+      "comparisonImage": "smithy-comparison.png",
+      "auditImage": "smithy-optimized-audit-contact.png",
+      "layerScores": {
+        "silhouette-proportion": 0.76,
+        "geometry-depth": 0.76,
+        "color-material": 0.81,
+        "service-readability": 0.78
+      },
+      "criticalFeatures": [
+        {
+          "id": "open-forge-lean-to",
+          "score": 0.74,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The covered forge mass and pale hot-work surface remain readable without a texture or point light."
+        },
+        {
+          "id": "anvil-and-hanging-tools",
+          "score": 0.79,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The anvil, workbench, and hanging tool silhouettes identify the trade from front and side views."
+        },
+        {
+          "id": "chimney-and-log-rack",
+          "score": 0.79,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The chimney caps the roof while the rear log stack survives optimization cleanly."
+        }
+      ],
+      "intentionalOmissions": ["dormer", "fence continuation", "animated forge flame"]
+    },
+    {
+      "id": "inn",
+      "decision": "accept",
+      "globalScore": 0.82,
+      "comparisonImage": "inn-comparison.png",
+      "auditImage": "inn-optimized-audit-contact.png",
+      "layerScores": {
+        "silhouette-proportion": 0.84,
+        "geometry-depth": 0.8,
+        "color-material": 0.85,
+        "service-readability": 0.78
+      },
+      "criticalFeatures": [
+        {
+          "id": "tall-two-storey-dormer-silhouette",
+          "score": 0.85,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The tall cobalt roof, dormer, and chimney preserve the reference hierarchy."
+        },
+        {
+          "id": "deep-arched-portico",
+          "score": 0.83,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Layered beams, columns, canopy, and recessed entry provide strong facade depth."
+        },
+        {
+          "id": "provision-service-area",
+          "score": 0.76,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The table, sacks, and barrels read in side and rear-three-quarter views."
+        }
+      ],
+      "intentionalOmissions": ["dense upper-storey cross-bracing", "individual stone blocks"]
+    },
+    {
+      "id": "chapel",
+      "decision": "accept",
+      "globalScore": 0.84,
+      "comparisonImage": "chapel-comparison.png",
+      "auditImage": "chapel-optimized-audit-contact.png",
+      "layerScores": {
+        "silhouette-proportion": 0.86,
+        "geometry-depth": 0.84,
+        "color-material": 0.86,
+        "service-readability": 0.83
+      },
+      "criticalFeatures": [
+        {
+          "id": "closed-long-ridge-roof-and-gable-frame",
+          "score": 0.86,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The corrected roof is watertight from all eight views; gable braces terminate at the ridge and eaves rather than floating."
+        },
+        {
+          "id": "pointed-entry-lancets-and-buttresses",
+          "score": 0.85,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The pointed doorway, repeating lancets, and stepped buttresses carry the chapel identity."
+        },
+        {
+          "id": "flower-boxes-and-crystal-finial",
+          "score": 0.82,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The colorful flower relief and cyan ridge crystal remain legible at game scale and dusk."
+        }
+      ],
+      "intentionalOmissions": ["shield plaque", "masonry seam texture"]
+    },
+    {
+      "id": "weaving_workshop",
+      "decision": "accept",
+      "globalScore": 0.81,
+      "comparisonImage": "weaving_workshop-comparison.png",
+      "auditImage": "weaving_workshop-optimized-audit-contact.png",
+      "layerScores": {
+        "silhouette-proportion": 0.81,
+        "geometry-depth": 0.8,
+        "color-material": 0.84,
+        "service-readability": 0.84
+      },
+      "criticalFeatures": [
+        {
+          "id": "compact-cobalt-workshop-shell",
+          "score": 0.81,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The compact house-and-lean-to profile matches the intended artisan row scale."
+        },
+        {
+          "id": "threaded-open-loom",
+          "score": 0.86,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The actual loom frame and alternating colored warp threads are unambiguous in front and three-quarter views."
+        },
+        {
+          "id": "fabric-rolls-and-dye-barrel",
+          "score": 0.84,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Stacked fabric rolls and the barrel survive the two-material collapse as distinct geometry."
+        }
+      ],
+      "intentionalOmissions": ["thread-level microgeometry", "wall masonry texture"]
+    },
+    {
+      "id": "toolworks",
+      "decision": "accept",
+      "globalScore": 0.81,
+      "comparisonImage": "toolworks-comparison.png",
+      "auditImage": "toolworks-optimized-audit-contact.png",
+      "layerScores": {
+        "silhouette-proportion": 0.81,
+        "geometry-depth": 0.81,
+        "color-material": 0.82,
+        "service-readability": 0.84
+      },
+      "criticalFeatures": [
+        {
+          "id": "covered-tool-display",
+          "score": 0.86,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Four distinct hanging tools sit in a recessed covered display rather than on a facade card."
+        },
+        {
+          "id": "workbench-and-service-depth",
+          "score": 0.82,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Posts, canopy, and the projecting workbench preserve the reference service bay."
+        },
+        {
+          "id": "crate-and-barrel-clutter",
+          "score": 0.82,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Front and rear storage cues distinguish this workshop from the weaving shop."
+        }
+      ],
+      "intentionalOmissions": ["tool-edge bevels", "individual masonry blocks"]
+    },
+    {
+      "id": "civic_well_beacon",
+      "decision": "accept",
+      "globalScore": 0.8,
+      "comparisonImage": "civic_well_beacon-comparison.png",
+      "auditImage": "civic_well_beacon-optimized-audit-contact.png",
+      "layerScores": {
+        "silhouette-proportion": 0.83,
+        "geometry-depth": 0.82,
+        "color-material": 0.84,
+        "service-readability": 0.81
+      },
+      "criticalFeatures": [
+        {
+          "id": "circular-masonry-well",
+          "score": 0.84,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The layered circular base, alternating rim stones, and deep basin read from every azimuth."
+        },
+        {
+          "id": "water-basin-depth",
+          "score": 0.82,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The recessed blue water surface remains visible in elevated three-quarter views."
+        },
+        {
+          "id": "central-crystal-beacon",
+          "score": 0.86,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The dark obelisk, gold collar, and cyan crystal preserve the civic focal point in neutral and dusk light."
+        }
+      ],
+      "intentionalOmissions": [
+        "three reference benches, supplied as separate collision-tested runtime instances"
+      ]
+    },
+    {
+      "id": "market_stall",
+      "decision": "accept",
+      "globalScore": 0.86,
+      "comparisonImage": "market_stall-comparison.png",
+      "auditImage": "market_stall-optimized-audit-contact.png",
+      "layerScores": {
+        "silhouette-proportion": 0.87,
+        "geometry-depth": 0.85,
+        "color-material": 0.9,
+        "service-readability": 0.87
+      },
+      "criticalFeatures": [
+        {
+          "id": "blue-cream-red-canopy",
+          "score": 0.91,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The three broad canopy stripes match the reference palette and dominate the silhouette."
+        },
+        {
+          "id": "produce-counter",
+          "score": 0.88,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Four colored goods, a raised shelf, and deep counter geometry make the vendor function immediate."
+        },
+        {
+          "id": "open-rear-storage-and-lights",
+          "score": 0.84,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The open rear, crate, barrel, warm lantern, and cyan crystal remain legible across the turnaround."
+        }
+      ],
+      "intentionalOmissions": ["separate fence wing, supplied by the wall/fence layout kit"]
+    },
+    {
+      "id": "wall_wing",
+      "decision": "accept",
+      "globalScore": 0.74,
+      "comparisonImage": "wall_wing-comparison.png",
+      "auditImage": "wall_wing-optimized-audit-contact.png",
+      "assemblyVerification": {
+        "moduleTopology": "straight-bounded-chord",
+        "nativeBounds": [6.5, 2.7, 0.65],
+        "ringRadius": 28.4,
+        "maximumChordSpan": 6.5,
+        "gateCount": 6,
+        "gateWidth": 5,
+        "automatedEvidence": "tests/eastbrook_layout.test.ts: wall and road geometry"
+      },
+      "runtimeBudgetVerification": {
+        "trianglesPerInstance": 206,
+        "primitiveTriangles": [196, 10],
+        "wallInstances": 26,
+        "fixedNonWallTriangles": 24216,
+        "optionalFoundationSkirtTriangles": 72,
+        "wholeTownWorstCaseTriangles": 29644,
+        "wholeTownTriangleTarget": 30000
+      },
+      "layerScores": {
+        "silhouette-proportion": 0.77,
+        "geometry-depth": 0.71,
+        "color-material": 0.74,
+        "service-readability": 0.76
+      },
+      "criticalFeatures": [
+        {
+          "id": "long-masonry-wing-and-rail",
+          "score": 0.74,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The straight bounded chord, sparse rail, and distinct end pillars preserve the kit-piece silhouette while remaining safe for tangent-fitted ring assembly at 206 triangles per instance."
+        },
+        {
+          "id": "watch-lantern-tower",
+          "score": 0.81,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "The six-triangle cobalt pyramid roof and warm inset window preserve the watch-lantern landmark from front, side, dusk, and player-scale views."
+        },
+        {
+          "id": "masonry-courses-and-banded-gate-leaf",
+          "score": 0.71,
+          "threshold": 0.7,
+          "visible": true,
+          "notes": "Six raised course panels, two metal bands, four studs, and a mounted cyan marker remain distinct after optimization without malformed or floating geometry."
+        }
+      ],
+      "intentionalOmissions": [
+        "literal curvature within one 6.5-yard GLB, supplied by bounded-chord layout assembly",
+        "fine individual block joints and multi-tier pier caps, omitted to meet the repeated-runtime triangle target",
+        "separate freestanding beacon",
+        "full gate counterpart"
+      ]
+    }
+  ]
+}

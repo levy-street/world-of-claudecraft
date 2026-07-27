@@ -10,7 +10,35 @@ import { json, readBody } from './http_util';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
-const PERF_REPORT_SCHEMA_VERSION = 1;
+// Bumped to 2 for the packet 0 report dimensions (zone, crowd, views,
+// worst-10s; ruling R6); the intIn clamp below keeps version-1 clients valid.
+const PERF_REPORT_SCHEMA_VERSION = 2;
+
+// Fixed crowd labels (ruling R3). server/ cannot import src/game, so this is
+// a deliberate copy of src/game/crowd_bucket.ts CROWD_BUCKET_LABELS;
+// tests/perf_report.test.ts pins the two catalogs equal.
+const CROWD_BUCKET_LABELS = ['lt10', '10-24', '25-49', '50-99', '100plus', 'unknown'] as const;
+// Client-computed perf-doctor suggestion ids (ruling R14). Same deliberate-copy
+// pattern as the crowd labels: server/ cannot import src/game, so this mirrors
+// src/game/perf_doctor.ts PERF_SUGGESTION_IDS and the cross-boundary pin in
+// tests/perf_suggestion_id_parity.test.ts is the drift guard. Everything else
+// from the wire is dropped before it can reach storage or admin aggregates.
+const KNOWN_PERF_SUGGESTION_IDS = [
+  'hardware-acceleration',
+  'integrated-gpu',
+  'high-dpi',
+  'forced-high-graphics',
+  'low-memory',
+  'browser-stalls',
+  'heap-pressure',
+  'context-loss',
+] as const;
+// The client analyzer caps its output at 3 suggestions per report; the server
+// re-imposes the same ceiling so a hostile payload cannot widen the column.
+const PERF_SUGGESTION_IDS_MAX = 3;
+// A legitimate payload is at most 3 entries; scanning stops far above that so
+// the sanitizer stays O(1) even if the body-size cap ever loosens upstream.
+const PERF_SUGGESTION_IDS_SCAN_MAX = 64;
 const PERF_REPORT_MAX_PER_MINUTE = 30;
 const PERF_REPORT_WINDOW_MS = 60_000;
 const PERF_REPORT_MAX_TRACKED_IPS = 5000;
@@ -109,6 +137,23 @@ function textIn(value: unknown, max: number, fallback = ''): string {
 function choiceIn(value: unknown, choices: readonly string[], fallback: string): string {
   const text = textIn(value, 64);
   return choices.includes(text) ? text : fallback;
+}
+
+// Allowlist-filter, dedupe, and cap the client-supplied suggestion ids (ruling
+// R14): unknown ids, non-string entries, duplicates, and everything past the
+// cap are dropped silently (a beacon is never rejected over its diagnostics).
+function suggestionIdsIn(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const out: string[] = [];
+  for (const entry of value.slice(0, PERF_SUGGESTION_IDS_SCAN_MAX)) {
+    if (typeof entry !== 'string') continue;
+    const id = entry.trim();
+    if (!(KNOWN_PERF_SUGGESTION_IDS as readonly string[]).includes(id)) continue;
+    if (out.includes(id)) continue;
+    out.push(id);
+    if (out.length >= PERF_SUGGESTION_IDS_MAX) break;
+  }
+  return out;
 }
 
 function browserFamily(userAgent: string): string {
@@ -243,6 +288,8 @@ function compactRawSummary(value: Record<string, unknown>): Record<string, unkno
     'rendererQualityBuckets',
     'input',
     'hud',
+    'netPipeline',
+    'heapSawtooth',
   ]) {
     if (value[key] !== undefined) out[key] = value[key];
   }
@@ -368,6 +415,12 @@ export async function handlePerfReport(
       source === 'benchmark' ? 'benchmark' : 'gameplay',
     ),
     source,
+    crowdBucket: choiceIn(body.crowdBucket, CROWD_BUCKET_LABELS, 'unknown'),
+    simEntities: intIn(body.simEntities, 0, 100_000, 0),
+    activeViews: intIn(body.activeViews, 0, 100_000, 0),
+    visibleViews: intIn(body.visibleViews, 0, 100_000, 0),
+    worst10sFrameP95Ms: numberIn(body.worst10sFrameP95Ms, 0, 1000, 0),
+    suggestionIds: suggestionIdsIn(body.suggestionIds),
     rawSummary: rawSummary(body.rawSummary, devTraceAllowed),
   };
 
@@ -383,4 +436,8 @@ export const perfReportInternalsForTest = {
   allowDevTrace,
   rawSummary,
   shouldStorePerfReport,
+  suggestionIdsIn,
+  CROWD_BUCKET_LABELS,
+  KNOWN_PERF_SUGGESTION_IDS,
+  PERF_REPORT_SCHEMA_VERSION,
 };

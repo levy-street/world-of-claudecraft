@@ -137,7 +137,7 @@ describe('set-bonus haste derivation (recalcPlayerStats)', () => {
     expect(p.meleeHaste).toBe(SET_HASTE_3PC);
     expect(p.spellHaste).toBe(SET_HASTE_3PC);
     // the pre-existing 3pc payload still applies alongside the haste
-    expect(p.critChance).toBeCloseTo(0.05 + p.stats.agi * 0.0005 + 0.02);
+    expect(p.critChance).toBeCloseTo(0.05 + p.stats.agi * 0.0005 + 0.01);
   });
 
   it('the tier-1 Deathlord 3-piece grants no haste', () => {

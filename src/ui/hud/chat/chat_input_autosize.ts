@@ -45,6 +45,16 @@ export interface ChatInputSize {
   overflowY: 'hidden' | 'auto';
 }
 
+// The structural slice of an HTMLTextAreaElement the autosize routine touches,
+// so Vitest can drive it with a hand-rolled fake and the module stays
+// DOM-import-free.
+export interface AutosizeTextarea {
+  value: string;
+  placeholder: string;
+  readonly scrollHeight: number;
+  style: { height: string; overflowY: string };
+}
+
 const finite = (n: number): number => (Number.isFinite(n) ? n : 0);
 
 // Clamp a measured content height to [minHeight, maxHeight]. Tracks whichever of the
@@ -67,4 +77,32 @@ export function chatInputSize(
   // Compare the rounded, border-inclusive natural height so a value that lands exactly
   // on the cap does not spuriously surface a scrollbar.
   return { height, overflowY: natural > max ? 'auto' : 'hidden' };
+}
+
+// Size the chat textarea to whatever it is displaying: the typed value, or the
+// placeholder hint while empty. Engines disagree on whether a textarea's
+// scrollHeight accounts for the placeholder, so while the box is empty we
+// briefly swap the placeholder in as the value, measure, and restore.
+export function autosizeChatInput(
+  el: AutosizeTextarea,
+  limits: ChatInputSizeLimits,
+  borderY: number,
+): ChatInputSize {
+  const measureScrollHeight = (): number => {
+    el.style.height = 'auto';
+    return el.scrollHeight;
+  };
+  let placeholderHeight = 0;
+  if (el.value === '' && el.placeholder) {
+    el.value = el.placeholder;
+    placeholderHeight = measureScrollHeight();
+    el.value = '';
+  }
+  const size = chatInputSize(
+    { contentHeight: measureScrollHeight(), placeholderHeight, borderY },
+    limits,
+  );
+  el.style.height = `${size.height}px`;
+  el.style.overflowY = size.overflowY;
+  return size;
 }

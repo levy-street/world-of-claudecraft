@@ -91,7 +91,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maestro Raccoglitore',
-    desc: 'Raggiungi 100 di competenza in Estrazione, Disboscamento ed Erboristeria.',
+    desc: 'Raggiungi 100 di competenza in almeno tre tra Estrazione, Disboscamento, Erboristeria e Pesca.',
   },
   prog_first_craft: {
     name: 'Fatto a Mano',
@@ -452,7 +452,7 @@ export const table: DeedLocaleTable = {
   },
   col_glimmerfin: {
     name: 'Un Barlume di Speranza',
-    desc: 'Pesca un Koi dalle pinne scintillanti.',
+    desc: 'Cattura un Koi del Bagliore Solare.',
   },
   col_full_creel: {
     name: 'Cesta Piena',
@@ -650,7 +650,10 @@ export const table: DeedLocaleTable = {
     name: 'Qualcosa che Luccica',
     desc: 'Raccogli da terra un oggetto scintillante.',
   },
-  exp_first_ore: { name: 'Giù il Piccone', desc: 'Raccogli il tuo primo nodo di minerale.' },
+  exp_first_ore: {
+    name: 'Il Piccone Incontra la Roccia',
+    desc: 'Raccogli il tuo primo nodo di minerale.',
+  },
   exp_first_timber: { name: "Cade l'Albero!", desc: 'Raccogli il tuo primo nodo di legname.' },
   exp_first_herb: { name: 'Pollice Verde', desc: 'Raccogli il tuo primo nodo di erbe.' },
   feat_era_cap: {
@@ -725,5 +728,120 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Anguille tra le Canne',
     desc: 'Pesca un pesce nelle acque della Palude di Mirefen.',
+  },
+  prog_guildsworn: {
+    name: 'Giurato del Mestiere',
+    desc: 'Sintonizzati su una coppia di archetipi e abbraccia i suoi mestieri con dedizione.',
+    title: 'Giurato del Mestiere',
+  },
+  prog_masterwright: {
+    name: 'Mastro Artefice',
+    desc: 'Forgia il tuo primo capolavoro, un pezzo tanto pregiato che tutta la zona ne viene a sapere.',
+    title: 'Mastro Artefice',
+  },
+  prog_fishing_100: {
+    name: 'Vecchio Sale',
+    desc: 'Raggiungi 100 di competenza in Pesca.',
+  },
+  prog_master_angler: {
+    name: 'Maestro Pescatore',
+    desc: "Raggiungi 200 di competenza in Pesca, il vertice assoluto dell'arte del pescatore.",
+    title: 'Maestro Pescatore',
+  },
+  prog_engineering_50: {
+    name: 'Ingranaggi e Molle',
+    desc: 'Raggiungi 50 di abilita in Ingegneria.',
+  },
+  prog_alchemy_50: {
+    name: 'Strane Misture',
+    desc: 'Raggiungi 50 di abilita in Alchimia.',
+  },
+  prog_cooking_50: {
+    name: 'Chef Esperto',
+    desc: 'Raggiungi 50 di abilita in Cucina.',
+  },
+  prog_leatherworking_50: {
+    name: 'Mestiere del Conciatore',
+    desc: 'Raggiungi 50 di abilita in Lavorazione del Cuoio.',
+  },
+  prog_tailoring_50: {
+    name: 'Una Cucitura Pregiata',
+    desc: 'Raggiungi 50 di abilita in Sartoria.',
+  },
+  prog_enchanting_50: {
+    name: 'Un Bagliore di Arcana',
+    desc: 'Raggiungi 50 di abilita in Incantamento.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Affilato e Temprato',
+    desc: 'Raggiungi 50 di abilita in Forgiatura di Armi.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Martello e Piastra',
+    desc: 'Raggiungi 50 di abilita in Forgiatura di Armature.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Grande Maestro Ingegneria',
+    desc: 'Raggiungi 125 di abilita in Ingegneria, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Ingegnere',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Grande Maestro Alchimia',
+    desc: 'Raggiungi 125 di abilita in Alchimia, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Alchimista',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Grande Maestro Cucina',
+    desc: 'Raggiungi 125 di abilita in Cucina, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Cuoco',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Grande Maestro Lavorazione del Cuoio',
+    desc: 'Raggiungi 125 di abilita in Lavorazione del Cuoio, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Conciatore',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Grande Maestro Sartoria',
+    desc: 'Raggiungi 125 di abilita in Sartoria, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Sarto',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Grande Maestro Incantamento',
+    desc: 'Raggiungi 125 di abilita in Incantamento, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Incantatore',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Grande Maestro Forgiatura di Armi',
+    desc: 'Raggiungi 125 di abilita in Forgiatura di Armi, il vertice assoluto del mestiere.',
+    title: "Gran Maestro Forgiatore d'Armi",
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Grande Maestro Forgiatura di Armature',
+    desc: 'Raggiungi 125 di abilita in Forgiatura di Armature, il vertice assoluto del mestiere.',
+    title: "Grande Maestro Forgiatore d'Armature",
+  },
+  col_pristine_vein: {
+    name: 'Filone Intatto',
+    desc: "Spacca una vena incontaminata e fa' sapere a tutta la zona della scoperta.",
+  },
+  col_ancient_heartwood: {
+    name: 'Cuore di Legno Antico',
+    desc: 'Ricava un tratto di antico durame da un albero abbattuto.',
+  },
+  col_moonlit_bloom: {
+    name: 'Fiore di Luna',
+    desc: 'Cogli una fioritura illuminata dalla luna nel preciso istante in cui si schiude.',
+  },
+  col_perfect_specimen: {
+    name: 'Un Esemplare Perfetto',
+    desc: 'Preleva un esemplare perfetto da una bestia abbattuta, senza un graffio ne un difetto.',
+  },
+  soc_first_salvage: {
+    name: 'Nulla Va Sprecato',
+    desc: "Smantella un pezzo d'equipaggiamento ricavandone materie prime.",
+  },
+  soc_salvage_50: {
+    name: 'Il Cantiere dei Demolitore',
+    desc: "Smantella 50 pezzi d'equipaggiamento ricavandone materie prime.",
   },
 };

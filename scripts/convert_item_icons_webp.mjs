@@ -8,7 +8,8 @@
 // in tests/item_icons.test.ts fails if a non-webp image is ever committed). WebP is the
 // source of truth: no lossless original is kept, and nothing converts at build time (this
 // is a pre-commit tool, NOT wired into `npm run build`, so CI never re-encodes). The file
-// basename IS the item id, which must then be listed in ITEM_IMAGE_IDS (src/ui/icons.ts).
+// basename IS the item id. ITEM_IMAGE_IDS derives every real non-weapon item from ITEMS;
+// tests/item_icons.test.ts verifies that each derived id has art and provenance.
 // Re-running with everything already WebP is a no-op.
 //
 // Sibling of scripts/convert_skill_icons_webp.mjs; the one behavioral difference is the
@@ -119,9 +120,7 @@ async function main() {
     `[assets:items] converted ${converted} image(s) to ${ICON_SIZE}px webp at q${quality} and ` +
       `deleted the originals; ${kib(srcBytes)} -> ${kib(webpBytes)} (${pct}% of source)`,
   );
-  console.log(
-    '[assets:items] remember to list each new basename in ITEM_IMAGE_IDS (src/ui/icons.ts)',
-  );
+  console.log('[assets:items] remember to add provenance in public/ui/items/mapping.json');
 }
 
 main().catch((err) => {

@@ -179,7 +179,7 @@ describe('buildDelveInteractable', () => {
     for (const templateId of puzzleTemplates) {
       expect(delveInteractableVisible(templateId, false), templateId).toBe(true);
       const rebuilt = buildDelveInteractable(templateId, 42).group;
-      syncDelveInteractableVisibility(rebuilt, templateId, false);
+      syncDelveInteractableVisibility(rebuilt, templateId, false, false);
       expect(rebuilt.visible, `${templateId} rebuilt mesh`).toBe(true);
     }
     expect(delveInteractableVisible('ordinary_hidden_object', false)).toBe(false);
@@ -188,9 +188,22 @@ describe('buildDelveInteractable', () => {
 
     const rangeCulled = buildDelveInteractable('delve_bell_rope_pulled', 43).group;
     expect(
-      syncDelveInteractableVisibility(rangeCulled, 'delve_bell_rope_pulled', false, false),
+      syncDelveInteractableVisibility(rangeCulled, 'delve_bell_rope_pulled', false, false, false),
     ).toBe(false);
     expect(rangeCulled.visible).toBe(false);
+  });
+
+  it('keeps an object view hidden until async shader compilation completes', () => {
+    const compiling = buildDelveInteractable('delve_bell_rope_pulled', 44).group;
+    expect(syncDelveInteractableVisibility(compiling, 'delve_bell_rope_pulled', false, true)).toBe(
+      false,
+    );
+    expect(compiling.visible).toBe(false);
+
+    expect(syncDelveInteractableVisibility(compiling, 'delve_bell_rope_pulled', false, false)).toBe(
+      true,
+    );
+    expect(compiling.visible).toBe(true);
   });
 
   it('returns a non-empty group for every templateId', () => {

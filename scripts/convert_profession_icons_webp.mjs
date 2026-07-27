@@ -9,21 +9,23 @@
 // committed). WebP is the source of truth: no lossless original is kept, and nothing
 // converts at build time (this is a pre-commit tool, NOT wired into `npm run build`, so
 // CI never re-encodes). The file basename IS the asset id from
-// docs/professions-2/asset-manifest.json (prof_<craftId>, gather_<skill>), which must
-// then be listed in PROFESSION_IMAGE_IDS (src/ui/icons.ts). Re-running with everything
-// already WebP is a no-op.
+// docs/design/professions-asset-manifest.json (profession, gathering, archetype,
+// or masterwork),
+// and regenerates src/ui/profession_image_ids.ts from the committed WebPs. Re-running with
+// everything already WebP is a byte-stable no-op.
 //
 // Sibling of scripts/convert_item_icons_webp.mjs; behavior is identical, only the
 // target directory and the wiring set differ.
 //
 // Flag: --quality <n> overrides the default 82 (e.g. --quality 90 for finer art).
 
-import { existsSync, readdirSync, statSync, unlinkSync } from 'node:fs';
+import { existsSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
 const root = process.cwd();
 const professionsDir = path.join(root, 'public/ui/professions');
+const moduleFile = path.join(root, 'src/ui/profession_image_ids.ts');
 
 // The served icon square. Mirrors "iconSize" in public/ui/professions/mapping.json;
 // the HUD upscales it in CSS for the larger slots.
@@ -49,6 +51,25 @@ const webpOptions = { quality, alphaQuality: 100, smartSubsample: true, effort: 
 
 const rel = (p) => path.relative(professionsDir, p).split(path.sep).join('/');
 
+function regenerateImageIds() {
+  const ids = readdirSync(professionsDir)
+    .filter((name) => path.extname(name).toLowerCase() === '.webp')
+    .map((name) => path.basename(name, '.webp'))
+    .sort();
+  const idLines = ids.map((id) => `  '${id}',`).join('\n');
+  const moduleText = `// Profession-side ids with committed painted art under public/ui/professions/<id>.webp.
+// GENERATED: do not hand-edit; re-run npm run assets:professions to regenerate this registry.
+// The converter derives this exact set from the WebP tree, while tests/profession_icons.test.ts
+// gates those files and ids against the Professions 2.0 asset manifest in both directions.
+
+export const PROFESSION_IMAGE_IDS: ReadonlySet<string> = new Set([
+${idLines}
+]);
+`;
+  writeFileSync(moduleFile, moduleText);
+  return ids.length;
+}
+
 async function main() {
   if (!existsSync(professionsDir)) {
     console.error(
@@ -63,7 +84,10 @@ async function main() {
     .sort();
 
   if (sources.length === 0) {
-    console.log('[assets:professions] no non-webp images found; tree is already webp-only (no-op)');
+    const wired = regenerateImageIds();
+    console.log(
+      `[assets:professions] no non-webp images found; tree is already webp-only; regenerated ${wired} image id(s)`,
+    );
     return;
   }
 
@@ -124,9 +148,7 @@ async function main() {
     `[assets:professions] converted ${converted} image(s) to ${ICON_SIZE}px webp at q${quality} and ` +
       `deleted the originals; ${kib(srcBytes)} -> ${kib(webpBytes)} (${pct}% of source)`,
   );
-  console.log(
-    '[assets:professions] remember to list each new basename in PROFESSION_IMAGE_IDS (src/ui/icons.ts)',
-  );
+  console.log(`[assets:professions] regenerated ${regenerateImageIds()} image id(s)`);
 }
 
 main().catch((err) => {

@@ -1,4 +1,4 @@
-// Professions wheel window view core (Professions 2.0 Phase 5): the pure model
+// Professions wheel window view core (Professions 2.0): the pure model
 // behind the read-only professions window. COMPOSES the PR 2039 identity view
 // (profession_identity_view.ts) rather than absorbing it, because the crafting
 // window and quest dialogs keep consuming that module directly; the full
@@ -32,7 +32,7 @@ import {
 // ---------------------------------------------------------------------------
 // Skill bar + tier pips (shared by the ten craft rows and the gathering rows).
 // Craft rows read the ENFORCED per-profession content cap
-// (content/professions.ts craftMaxSkillFor, Phase 12c); pip slot count and
+// (content/professions.ts craftMaxSkillFor); pip slot count and
 // the 'mastered' next-unlock state derive from it. The old display-only
 // CRAFT_MAX_SKILL 300 constant is retired.
 // ---------------------------------------------------------------------------
@@ -236,7 +236,7 @@ export interface GatheringSkillInput {
 export interface ProfessionsViewInput {
   identity: CraftingIdentityView;
   /** Injected gathering rows (today mining/logging/herbalism via
-   *  professionsState); nothing here hardcodes the id set, so Phase 11's
+   *  professionsState); nothing here hardcodes the id set, so the
    *  fishing row flows through unchanged. */
   gathering: readonly GatheringSkillInput[];
 }
@@ -260,6 +260,11 @@ export interface SwitchCostModel {
   amendsRequired: number;
   /** Client-computed at rest, display-only: requiredAmendsProgress(returnCount). */
   nextSwitchCost: number;
+  /** Whether the switch-cost line renders at all: a player who has NEVER
+   *  attuned (attunedPairs empty) has no archetype to switch from, so the
+   *  "next switch costs N amends" line is noise until the first
+   *  attunement. */
+  show: boolean;
 }
 
 export type ProfessionsWindowMode = 'simplified' | 'full';
@@ -348,6 +353,7 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
       amendsProgress: input.identity.amendsProgress,
       amendsRequired: input.identity.amendsRequired,
       nextSwitchCost: requiredAmendsProgress(input.identity.switchCount),
+      show: input.identity.attunedPairs.length > 0,
     },
     simplified: mode === 'simplified' ? buildSimplifiedCallToAction(identity) : null,
   };

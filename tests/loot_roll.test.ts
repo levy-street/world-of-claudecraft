@@ -534,7 +534,7 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
   });
 
   it('pruneCorpseLoot keeps an emptied corpse open for its unclaimed harvest (grace arm)', () => {
-    // Phase 12d: forest_wolf carries componentTags and the claim is untaken,
+    // forest_wolf carries componentTags and the claim is untaken,
     // so the emptied corpse stays lootable for the interact-grace window
     // instead of collapsing (the respawn gate ends it at corpseTimer 0).
     const sim = makeSim();

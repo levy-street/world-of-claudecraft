@@ -4,77 +4,117 @@ import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, SUN_DIR, sharedUniforms } from './gfx';
 import { waterNormalish, waterNormalMaps } from './textures';
-import { shoreDepthAt } from './water_core';
+import {
+  shoreDepthAt,
+  waterBodyVisible,
+  waterCellIntersectsDisc,
+  waterGridPlan,
+} from './water_core';
+import { WaterSimulation, type WaterWaveUniforms } from './water_simulation';
 
-// Water only where a declared lake actually is: one plane per lake footprint
-// (`waterBodies()`, `src/sim/world.ts`), not one plane spanning an entire
-// zone's width. A zone with no lakes gets no water mesh at all, so any
-// terrain that happens to dip below waterLevel() elsewhere (a crater, a
-// sunken tunnel) never reads as flooded.
-//
-// High tier: one ShaderMaterial plane per lake (so off-screen lakes frustum
-// cull away) with a CPU-precomputed per-vertex shore depth. Dual scrolling
-// real normal maps (three.js r165 water set, MIT) + a broad ocean-swell map
-// at range, fresnel sky tint, HDR sun glints (>1 so bloom catches them), a
-// shoreline foam band and a subtle wave displacement.
-//
-// Low tier keeps the legacy scrolling Phong plane, one per lake, upgraded with
-// the real swell normal map for textured speculars.
-
-const VERTEX_SPACING = 2; // yards/segment, matches the old whole-zone density
 const MIN_SEGMENTS = 8;
+const WATER_CULL_MARGIN = 12;
 
-// Real water normal maps, fetched at module import and gated by the boot
-// preload only for the shader tier. Low/mobile uses generated canvas water
-// so it does not pay network/decode/upload cost for water detail.
+interface WaterTierPlan {
+  vertexSpacing: number;
+  maxSegments: number;
+}
+
+function shaderTierPlan(): WaterTierPlan {
+  if (GFX.tier === 'ultra') return { vertexSpacing: 2.3, maxSegments: 80 };
+  if (GFX.tier === 'high') return { vertexSpacing: 2.6, maxSegments: 64 };
+  return { vertexSpacing: 3.25, maxSegments: 48 };
+}
+
+// The persistent height field supplies broad and medium-scale detail, so one
+// 512px micro normal is enough for the fine surface. The previous three-map
+// path decoded about 6 MiB of normals before the wave simulation existed.
 const WATER_TEX: Record<string, THREE.Texture> = {};
-function kickWaterTex(key: string, file: string): void {
+if (GFX.standardMaterials) {
   registerPreload(
-    loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
+    loadTexture('/textures/water/water_2_normal.jpg', { repeat: true }).then((tex) => {
       tex.anisotropy = 4;
-      WATER_TEX[key] = tex;
+      WATER_TEX.micro = tex;
       return tex;
     }),
   );
 }
-if (GFX.standardMaterials) {
-  kickWaterTex('n1', 'water_1_normal.jpg');
-  kickWaterTex('n2', 'water_2_normal.jpg');
-  kickWaterTex('broad', 'waternormals.jpg');
-}
 
 export function hasWaterShaderAssets(): boolean {
-  return Boolean(WATER_TEX.n1 && WATER_TEX.n2 && WATER_TEX.broad);
+  return Boolean(WATER_TEX.micro);
 }
 
 const DEEP_COLOR = new THREE.Color(0x0d3a52);
 const SHALLOW_COLOR = new THREE.Color(0x2d8077);
-const SKY_TINT = new THREE.Color(0x7fb2e0); // matches the sky horizon band
+const SKY_TINT = new THREE.Color(0x7fb2e0);
 const SUN_COLOR = new THREE.Color(0xfff0d4);
 
 export interface WaterView {
   meshes: THREE.Mesh[];
-  /** advances the legacy texture scroll (low tier); high tier uses uTime */
-  update(time: number): void;
-  /**
-   * Editor-only: re-seat the surface at the ACTIVE waterLevel() and recompute
-   * the per-vertex shore depth from the CURRENT terrainHeight (after a
-   * water-level change or a sculpt near the shoreline). Updates the existing
-   * geometry in place (no geometry is replaced, so nothing leaks); the low
-   * Phong tier has no shore attribute and only repositions its one plane.
-   */
+  /** Advances wave simulation and fog-culls whole water bodies. */
+  update(time: number, cameraX: number, cameraZ: number, visibleRange: number): number;
+  /** Adds a local entry, landing, fish, or bobber disturbance. */
+  addSplash(x: number, z: number, radius: number, strength?: number): void;
+  /** Presses a facing-aligned body footprint into the surface. */
+  enterContact(
+    x: number,
+    z: number,
+    radius: number,
+    halfLength: number,
+    axisX: number,
+    axisZ: number,
+    strength?: number,
+  ): void;
+  /** Moves submerged volume from the previous footprint to the current one. */
+  moveContact(
+    oldX: number,
+    oldZ: number,
+    x: number,
+    z: number,
+    radius: number,
+    halfLength: number,
+    axisX: number,
+    axisZ: number,
+    strength?: number,
+  ): void;
+  /** Refills the final submerged footprint when a contact exits. */
+  releaseContact(
+    x: number,
+    z: number,
+    radius: number,
+    halfLength: number,
+    axisX: number,
+    axisZ: number,
+    strength?: number,
+  ): void;
+  /** Re-seats editor water and rebakes per-vertex shore depth in place. */
   setLevel(): void;
+  /** Releases view-owned geometry, materials, and simulation targets. */
+  dispose(): void;
 }
 
 const WATER_VERT = /* glsl */ `
   attribute float aShoreDepth;
   uniform float uTime;
+  uniform sampler2D uWaveState;
+  uniform float uWaveEnabled;
+  uniform vec2 uCenter;
+  uniform float uRadius;
   varying vec3 vWPos;
   varying float vShoreDepth;
   #include <fog_pars_vertex>
+
   void main() {
     vec3 pos = position;
-    pos.y += (sin(uTime * 1.1 + pos.x * 0.35) + sin(uTime * 0.7 + pos.z * 0.28)) * 0.05;
+    float swell =
+      sin(uTime * 0.82 + pos.x * 0.17 + pos.z * 0.09) * 0.035 +
+      sin(uTime * 0.57 + pos.z * 0.14 - pos.x * 0.06) * 0.025;
+    float interactionHeight = 0.0;
+    if (uWaveEnabled > 0.001) {
+      vec2 waveUv = clamp((pos.xz - uCenter) / (uRadius * 2.0) + 0.5, 0.0, 1.0);
+      interactionHeight = texture2D(uWaveState, waveUv).r * uWaveEnabled;
+    }
+    pos.y += swell + interactionHeight;
     vShoreDepth = aShoreDepth;
     vec4 wp = modelMatrix * vec4(pos, 1.0);
     vWPos = wp.xyz;
@@ -85,9 +125,9 @@ const WATER_VERT = /* glsl */ `
 `;
 
 const WATER_FRAG = /* glsl */ `
-  uniform sampler2D uNorm1;
-  uniform sampler2D uNorm2;
-  uniform sampler2D uNorm3;
+  uniform sampler2D uMicroNormal;
+  uniform sampler2D uWaveState;
+  uniform float uWaveEnabled;
   uniform vec3 uSunDir;
   uniform vec3 uSunColor;
   uniform vec3 uSkyColor;
@@ -100,45 +140,65 @@ const WATER_FRAG = /* glsl */ `
   varying float vShoreDepth;
   #include <common>
   #include <fog_pars_fragment>
+
   void main() {
-    // the plane is a square footprint around a circular lake: drop the
-    // corner fragments outside the declared radius so they never read as
-    // flooded ground.
-    if (length(vWPos.xz - uCenter) > uRadius) discard;
-    float camDist = length(cameraPosition - vWPos);
-    // dual-scroll detail ripples (real three.js water normal maps)
-    vec3 n1 = texture2D(uNorm1, vWPos.xz * 0.055 + uTime * vec2(0.013, 0.019)).xyz * 2.0 - 1.0;
-    vec3 n2 = texture2D(uNorm2, vWPos.xz * 0.115 - uTime * vec2(0.021, 0.011)).xyz * 2.0 - 1.0;
-    // broad slow ocean swell that survives at range, where the detail maps
-    // average out to a mirror — keeps big water surfaces alive from above
-    vec3 n3 = texture2D(uNorm3, vWPos.xz * 0.016 + uTime * vec2(0.005, -0.004)).xyz * 2.0 - 1.0;
-    float farW = smoothstep(24.0, 140.0, camDist);
-    // rippled up close -> glassy at distance: detail fades out, swell stays
-    vec2 nm = mix(n1.xy * 0.85 + n2.xy * 0.6, n3.xy * 1.5, farW * 0.78);
-    vec3 N = normalize(vec3(nm, 3.1).xzy);
-    vec3 V = normalize(cameraPosition - vWPos);
-    float fresnel = 0.05 + 0.95 * pow(1.0 - max(dot(N, V), 0.0), 4.0);
+    vec2 edgeDelta = vWPos.xz - uCenter;
+    if (dot(edgeDelta, edgeDelta) > uRadius * uRadius) discard;
+
+    vec3 toCamera = cameraPosition - vWPos;
+    float camDistSq = dot(toCamera, toCamera);
+    vec3 detail = texture2D(
+      uMicroNormal,
+      vWPos.xz * 0.092 + uTime * vec2(0.016, 0.011)
+    ).xyz * 2.0 - 1.0;
+    vec2 waveSlope = vec2(0.0);
+    float waveEnergy = 0.0;
+    if (uWaveEnabled > 0.001) {
+      vec2 waveUv = clamp(edgeDelta / (uRadius * 2.0) + 0.5, 0.0, 1.0);
+      vec4 wave = texture2D(uWaveState, waveUv);
+      waveSlope = wave.ba * uWaveEnabled;
+      waveEnergy = (abs(wave.g) * 0.9 + length(wave.ba) * 0.4) * uWaveEnabled;
+    }
+    float detailFade = 1.0 / (1.0 + camDistSq * 0.0007);
+    vec2 normalXY = detail.xy * mix(0.68, 1.15, detailFade) + waveSlope * 9.5;
+    vec3 N = normalize(vec3(normalXY.x, 3.1, normalXY.y));
+    if (!gl_FrontFacing) N = -N;
+    vec3 V = normalize(toCamera);
+    float facing = 1.0 - max(dot(N, V), 0.0);
+    float facing2 = facing * facing;
+    float fresnel = 0.05 + 0.95 * facing2 * facing2;
     float depth = clamp(vShoreDepth / 6.0, 0.0, 1.0);
     vec3 col = mix(uShallow, uDeep, depth);
-    // dappled shimmer — fades with distance so it never reads as speckle
-    float shimmer = max(n1.x * 0.7 + n2.y * 0.55, 0.0) * exp(-camDist * 0.022);
-    col *= 0.92 + 0.4 * shimmer;
-    // reflection tracks the live fog/horizon color so each biome's water
-    // belongs to its sky instead of a constant pasted-on tint
+
+    float shimmerFade = 1.0 / (1.0 + camDistSq * 0.0011);
+    float shimmer = max(detail.x * 0.75 + detail.y * 0.35, 0.0) * shimmerFade;
+    col *= 0.92 + 0.3 * shimmer;
     vec3 skyRef = mix(uSkyColor, fogColor, 0.5);
     col = mix(col, skyRef, min(fresnel * 0.65, 0.42));
+
     float sunAlign = max(dot(reflect(-uSunDir, N), V), 0.0);
-    col += uSunColor * pow(sunAlign, 130.0) * 2.6;                   // sparkle glints (>1 -> bloom)
-    col += uSunColor * pow(sunAlign, 28.0) * 0.30;                   // wider lobe: survives steep cameras
-    col += uSunColor * pow(sunAlign, 6.0) * 0.05;                    // faint warm sheen sunward
-    // shoreline foam: wide animated band hugging the waterline (the shore
-    // attribute is per-vertex at ~2u, so the band must span several units)
-    float foamBand = smoothstep(3.2, 0.1, vShoreDepth + n1.x * 0.7);
+    float spec2 = sunAlign * sunAlign;
+    float spec4 = spec2 * spec2;
+    float spec8 = spec4 * spec4;
+    float spec16 = spec8 * spec8;
+    float spec32 = spec16 * spec16;
+    float spec64 = spec32 * spec32;
+    float spec128 = spec64 * spec64;
+    col += uSunColor * (spec128 * 2.6 + spec32 * 0.3 + spec8 * 0.05);
+
+    float foamBand = 1.0 - smoothstep(0.1, 3.2, vShoreDepth + detail.x * 0.7);
     foamBand *= foamBand;
-    float foamWave = 0.62 + 0.38 * sin(uTime * 1.7 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0);
-    float foam = foamBand * foamWave;
-    col = mix(col, vec3(1.05), clamp(foam, 0.0, 0.9));
-    float alpha = max(mix(0.84, 0.96, depth), foam * 0.95);
+    float foamWave = 0.62 + 0.38 * sin(
+      uTime * 1.7 + vWPos.x * 1.2 + vWPos.z * 0.95 + detail.y * 6.0
+    );
+    float shoreFoam = foamBand * foamWave;
+    float contactSheen = smoothstep(0.025, 0.13, waveEnergy) * shimmerFade;
+    vec3 contactTint = mix(uShallow, uSkyColor, 0.52);
+    col = mix(col, contactTint, contactSheen * 0.24);
+    float shoreMix = clamp(shoreFoam, 0.0, 0.9);
+    col = mix(col, vec3(1.05), shoreMix);
+    float surfaceAccent = clamp(shoreFoam + contactSheen * 0.12, 0.0, 0.92);
+    float alpha = max(mix(0.84, 0.96, depth), surfaceAccent * 0.95);
     gl_FragColor = vec4(col, alpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -146,21 +206,66 @@ const WATER_FRAG = /* glsl */ `
   }
 `;
 
-function buildShaderWater(seed: number): WaterView {
-  // legacy procedural maps still get generated (unused) to preserve the
-  // shared-LCG call order in textures.ts for everything generated after
+function pruneDiscGrid(geometry: THREE.PlaneGeometry, radius: number, segments: number): void {
+  const source = geometry.getIndex();
+  if (!source) return;
+  const next: number[] = [];
+  const step = (radius * 2) / segments;
+  for (let row = 0; row < segments; row++) {
+    const z0 = -radius + row * step;
+    const z1 = z0 + step;
+    for (let col = 0; col < segments; col++) {
+      const x0 = -radius + col * step;
+      const x1 = x0 + step;
+      if (!waterCellIntersectsDisc(x0, z0, x1, z1, radius)) continue;
+      const offset = (row * segments + col) * 6;
+      for (let i = 0; i < 6; i++) next.push(source.getX(offset + i));
+    }
+  }
+  geometry.setIndex(next);
+}
+
+function disposeOwned(meshes: THREE.Mesh[]): void {
+  const materials = new Set<THREE.Material>();
+  for (const mesh of meshes) {
+    mesh.geometry.dispose();
+    const material = mesh.material;
+    if (Array.isArray(material)) for (const entry of material) materials.add(entry);
+    else materials.add(material);
+  }
+  for (const material of materials) material.dispose();
+}
+
+function zeroWaveUniforms(): WaterWaveUniforms {
+  const texture = WATER_TEX.micro;
+  return {
+    uWaveState: { value: texture },
+    uWaveEnabled: { value: 0 },
+  };
+}
+
+function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterView {
+  // Preserve the procedural texture LCG call order for later world textures.
   waterNormalMaps();
-  // Each lake gets its own material instance (its uCenter/uRadius differ);
-  // uTime/uSunDir/textures are shared by reference so a single sync() still
-  // drives every lake.
-  const makeMaterial = (center: THREE.Vector2, radius: number): THREE.ShaderMaterial =>
-    new THREE.ShaderMaterial({
+  const plan = shaderTierPlan();
+  const bodies = waterBodies();
+  const simulation = renderer ? new WaterSimulation(renderer, bodies) : null;
+  const waveUniforms = bodies.map((_, index) =>
+    simulation ? simulation.uniforms(index) : zeroWaveUniforms(),
+  );
+
+  const makeMaterial = (
+    center: THREE.Vector2,
+    radius: number,
+    wave: WaterWaveUniforms,
+  ): THREE.ShaderMaterial => {
+    const material = new THREE.ShaderMaterial({
       uniforms: {
         ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
-        uNorm1: { value: WATER_TEX.n1 },
-        uNorm2: { value: WATER_TEX.n2 },
-        uNorm3: { value: WATER_TEX.broad },
-        uSunDir: { value: SUN_DIR.clone() }, // the one shared sun (gfx.ts)
+        uMicroNormal: { value: WATER_TEX.micro },
+        uWaveState: wave.uWaveState,
+        uWaveEnabled: wave.uWaveEnabled,
+        uSunDir: { value: SUN_DIR.clone() },
         uSunColor: { value: SUN_COLOR },
         uSkyColor: { value: SKY_TINT },
         uDeep: { value: DEEP_COLOR },
@@ -171,103 +276,183 @@ function buildShaderWater(seed: number): WaterView {
       },
       vertexShader: WATER_VERT,
       fragmentShader: WATER_FRAG,
+      side: THREE.DoubleSide,
       transparent: true,
       depthWrite: false,
       fog: true,
     });
+    material.forceSinglePass = true;
+    return material;
+  };
 
-  // (Re)fill the per-vertex shore depth from the CURRENT terrain + water level,
-  // writing into the existing attribute in place (build and setLevel share it).
-  const fillShoreDepth = (geo: THREE.BufferGeometry): void => {
-    const pos = geo.attributes.position as THREE.BufferAttribute;
-    let attr = geo.attributes.aShoreDepth as THREE.BufferAttribute | undefined;
-    if (!attr) {
-      attr = new THREE.BufferAttribute(new Float32Array(pos.count), 1);
-      geo.setAttribute('aShoreDepth', attr);
+  const fillShoreDepth = (geometry: THREE.BufferGeometry): void => {
+    const position = geometry.attributes.position as THREE.BufferAttribute;
+    let attribute = geometry.attributes.aShoreDepth as THREE.BufferAttribute | undefined;
+    if (!attribute) {
+      attribute = new THREE.BufferAttribute(new Float32Array(position.count), 1);
+      geometry.setAttribute('aShoreDepth', attribute);
     }
-    const depths = attr.array as Float32Array;
-    for (let i = 0; i < pos.count; i++) {
-      depths[i] = shoreDepthAt(pos.getX(i), pos.getZ(i), seed);
+    const depths = attribute.array as Float32Array;
+    for (let i = 0; i < position.count; i++) {
+      depths[i] = shoreDepthAt(position.getX(i), position.getZ(i), seed);
     }
-    attr.needsUpdate = true;
+    attribute.needsUpdate = true;
   };
 
   const meshes: THREE.Mesh[] = [];
-  for (const lake of waterBodies()) {
-    const size = lake.radius * 2;
-    const segments = Math.max(MIN_SEGMENTS, Math.ceil(size / VERTEX_SPACING));
-    const geo = new THREE.PlaneGeometry(size, size, segments, segments).rotateX(-Math.PI / 2);
-    geo.translate(lake.x, 0, lake.z);
-    fillShoreDepth(geo);
-    geo.computeBoundingBox();
-    geo.computeBoundingSphere();
-    const material = makeMaterial(new THREE.Vector2(lake.x, lake.z), lake.radius);
-    const mesh = new THREE.Mesh(geo, material);
+  for (let bodyIndex = 0; bodyIndex < bodies.length; bodyIndex++) {
+    const lake = bodies[bodyIndex];
+    const grid = waterGridPlan(lake.radius, plan.vertexSpacing, MIN_SEGMENTS, plan.maxSegments);
+    const geometry = new THREE.PlaneGeometry(grid.size, grid.size, grid.segments, grid.segments);
+    pruneDiscGrid(geometry, lake.radius, grid.segments);
+    geometry.rotateX(-Math.PI / 2);
+    geometry.translate(lake.x, 0, lake.z);
+    fillShoreDepth(geometry);
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    const mesh = new THREE.Mesh(
+      geometry,
+      makeMaterial(new THREE.Vector2(lake.x, lake.z), lake.radius, waveUniforms[bodyIndex]),
+    );
     mesh.position.y = waterLevel();
     meshes.push(mesh);
   }
+
+  const visibleBodies = bodies.map(() => true);
   return {
     meshes,
-    update: () => {},
+    update(time: number, cameraX: number, cameraZ: number, visibleRange: number): number {
+      for (let i = 0; i < meshes.length; i++) {
+        const lake = bodies[i];
+        const visible = waterBodyVisible(
+          cameraX,
+          cameraZ,
+          lake.x,
+          lake.z,
+          lake.radius,
+          visibleRange + WATER_CULL_MARGIN,
+        );
+        visibleBodies[i] = visible;
+        meshes[i].visible = visible;
+      }
+      return simulation?.update(time, visibleBodies) ?? 0;
+    },
+    addSplash(x: number, z: number, radius: number, strength = 1): void {
+      simulation?.addSplash(x, z, radius, strength);
+    },
+    enterContact(
+      x: number,
+      z: number,
+      radius: number,
+      halfLength: number,
+      axisX: number,
+      axisZ: number,
+      strength = 1,
+    ): void {
+      simulation?.enterContact(x, z, radius, halfLength, axisX, axisZ, strength);
+    },
+    moveContact(
+      oldX: number,
+      oldZ: number,
+      x: number,
+      z: number,
+      radius: number,
+      halfLength: number,
+      axisX: number,
+      axisZ: number,
+      strength = 1,
+    ): void {
+      simulation?.moveContact(oldX, oldZ, x, z, radius, halfLength, axisX, axisZ, strength);
+    },
+    releaseContact(
+      x: number,
+      z: number,
+      radius: number,
+      halfLength: number,
+      axisX: number,
+      axisZ: number,
+      strength = 1,
+    ): void {
+      simulation?.releaseContact(x, z, radius, halfLength, axisX, axisZ, strength);
+    },
     setLevel(): void {
       const y = waterLevel();
+      simulation?.reset();
       for (const mesh of meshes) {
         mesh.position.y = y;
-        // vertices never move (only the attribute + the mesh transform change),
-        // so the baked bounding volumes stay valid.
         fillShoreDepth(mesh.geometry);
       }
+    },
+    dispose(): void {
+      simulation?.dispose();
+      disposeOwned(meshes);
     },
   };
 }
 
 function buildPhongWater(): WaterView {
-  const tex = waterNormalish();
-  tex.repeat.set(30, 30);
-  const [norm] = waterNormalMaps();
-  norm.repeat.set(26, 78);
-  const mat = new THREE.MeshPhongMaterial({
+  const texture = waterNormalish();
+  texture.repeat.set(30, 30);
+  const [normal] = waterNormalMaps();
+  normal.repeat.set(26, 78);
+  const material = new THREE.MeshPhongMaterial({
     color: 0x2a6a96,
+    side: THREE.DoubleSide,
     transparent: true,
     opacity: 0.8,
     shininess: 140,
     specular: 0xd8ecff,
-    map: tex,
-    normalMap: norm,
+    map: texture,
+    normalMap: normal,
     normalScale: new THREE.Vector2(0.8, 0.8),
   });
-  const meshes = waterBodies().map((lake) => {
-    // a disc, not a square plane: the low tier has no per-fragment shore
-    // mask, so the geometry itself must not cover the corners outside the
-    // declared lake radius.
-    const segments = Math.max(
-      MIN_SEGMENTS,
-      Math.ceil((Math.PI * lake.radius * 2) / VERTEX_SPACING),
-    );
+  material.forceSinglePass = true;
+  const bodies = waterBodies();
+  const meshes = bodies.map((lake) => {
+    const segments = Math.min(80, Math.max(24, Math.ceil((Math.PI * lake.radius * 2) / 4)));
     const mesh = new THREE.Mesh(
       new THREE.CircleGeometry(lake.radius, segments).rotateX(-Math.PI / 2),
-      mat,
+      material,
     );
     mesh.position.set(lake.x, waterLevel(), lake.z);
     return mesh;
   });
   return {
     meshes,
-    update(time: number): void {
-      tex.offset.x = time * 0.008;
-      tex.offset.y = time * 0.011;
-      norm.offset.x = time * 0.006;
-      norm.offset.y = time * 0.009;
+    update(time: number, cameraX: number, cameraZ: number, visibleRange: number): number {
+      texture.offset.x = time * 0.008;
+      texture.offset.y = time * 0.011;
+      normal.offset.x = time * 0.006;
+      normal.offset.y = time * 0.009;
+      for (let i = 0; i < meshes.length; i++) {
+        const lake = bodies[i];
+        meshes[i].visible = waterBodyVisible(
+          cameraX,
+          cameraZ,
+          lake.x,
+          lake.z,
+          lake.radius,
+          visibleRange + WATER_CULL_MARGIN,
+        );
+      }
+      return 0;
     },
+    addSplash: () => {},
+    enterContact: () => {},
+    moveContact: () => {},
+    releaseContact: () => {},
     setLevel(): void {
       const y = waterLevel();
       for (const mesh of meshes) mesh.position.y = y;
     },
+    dispose(): void {
+      disposeOwned(meshes);
+    },
   };
 }
 
-export function buildWater(seed: number): WaterView {
+export function buildWater(seed: number, renderer?: THREE.WebGLRenderer): WaterView {
   return GFX.standardMaterials && hasWaterShaderAssets()
-    ? buildShaderWater(seed)
+    ? buildShaderWater(seed, renderer)
     : buildPhongWater();
 }

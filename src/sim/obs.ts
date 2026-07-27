@@ -1,3 +1,4 @@
+import { noticeboardDefByEntityId } from './content/noticeboards';
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
 import type { Sim } from './sim';
 import {
@@ -5,6 +6,7 @@ import {
   dist2d,
   type Entity,
   GCD,
+  INTERACT_RANGE,
   MAX_LEVEL,
   normAngle,
   questObjectiveRequired,
@@ -217,20 +219,46 @@ export function encodeObs(sim: Sim): number[] {
     }
   }
 
-  // --- nearest interactable (5): corpse, ground object, or quest npc ---
-  let best: { e: Entity; d: number; type: number } | null = null;
-  for (const e of sim.entities.values()) {
-    let type = 0;
-    if (e.kind === 'mob' && e.lootable) type = 0.33;
-    else if (e.kind === 'object' && e.lootable) type = 0.66;
-    else if (e.kind === 'npc') type = 1;
-    else continue;
-    const d = dist2d(p.pos, e.pos);
-    if (d < 60 && (!best || d < best.d)) best = { e, d, type };
-  }
+  // --- proximity interactable (5): corpse, ground object, or quest npc ---
+  // Match the no-target Sim.interact path: only advertise entities the interact
+  // action can select now, and preserve its corpse, object, then quest-NPC priority.
+  // Noticeboards own a narrower authored radius; ordinary objects keep the shared
+  // five-yard interaction range.
+  type Interactable = { e: Entity; d2: number; type: number };
+  let bestCorpse: Interactable | null = null;
+  let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestObject: Interactable | null = null;
+  let bestObjectD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestQuestEntity: Interactable | null = null;
+  let bestQuestEntityD2 = INTERACT_RANGE * INTERACT_RANGE;
+  sim.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
+    if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) {
+      bestCorpse = { e, d2, type: 0.33 };
+      bestCorpseD2 = d2;
+    }
+    if (e.kind === 'object' && e.lootable && d2 < bestObjectD2) {
+      const noticeboardDef = noticeboardDefByEntityId(sim.noticeboardDefinitions, e.id);
+      if (!noticeboardDef || d2 <= noticeboardDef.interactionRadius ** 2) {
+        bestObject = { e, d2, type: 0.66 };
+        bestObjectD2 = d2;
+      }
+    }
+    const questEntity =
+      e.kind === 'npc' || (e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0);
+    if (questEntity && d2 < bestQuestEntityD2) {
+      bestQuestEntity = { e, d2, type: 1 };
+      bestQuestEntityD2 = d2;
+    }
+  });
+  // Re-read through wider types: TypeScript cannot see the closure assignments above.
+  const best =
+    (bestCorpse as Interactable | null) ??
+    (bestObject as Interactable | null) ??
+    (bestQuestEntity as Interactable | null);
   if (best) {
+    const d = Math.sqrt(best.d2);
     const rel = normAngle(angleTo(p.pos, best.e.pos) - p.facing);
-    obs.push(1, clamp(best.d / 40, 0, 1.5), Math.sin(rel), Math.cos(rel), best.type);
+    obs.push(1, clamp(d / 40, 0, 1.5), Math.sin(rel), Math.cos(rel), best.type);
   } else {
     obs.push(0, 1.5, 0, 0, 0);
   }

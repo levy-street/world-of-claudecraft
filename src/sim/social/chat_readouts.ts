@@ -559,7 +559,7 @@ export function castingReadout(e: Entity): string {
   const remaining = e.castRemaining.toFixed(1);
   const total = e.castTotal.toFixed(1);
   if (e.castingAbility === FISHING_CAST_ID) {
-    // Honest with no bite leak (Phase 12b): the fixed-cast countdown died
+    // Honest with no bite leak: the fixed-cast countdown died
     // with the bite minigame, and a countdown here would leak session
     // timing, so the readout names the waiting state and nothing more.
     return 'You are fishing. Waiting for a bite.';

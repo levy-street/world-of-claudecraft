@@ -40,7 +40,12 @@ describe('coverage: each scenario fires its subsystem', () => {
 
   it('solo_mage: casting lifecycle runs', () => {
     const rec = run('solo_mage');
-    expect((rec.allEvents as Ev[]).some((e) => e.type === 'castStart')).toBe(true);
+    const events = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId;
+    expect(events.some((e) => e.type === 'castStart')).toBe(true);
+    // The fixture lives in the shared collider-free lane so this proves effect
+    // dispatch and spell damage, not merely that a cast bar began behind town LOS.
+    expect(events.some((e) => e.type === 'damage' && e.sourceId === pid)).toBe(true);
   });
 
   it('frost_proc_orb: committed Frost reaches proc draws and Frozen Orb pulses', () => {
@@ -943,14 +948,14 @@ describe('coverage: each scenario fires its subsystem', () => {
     const pid = rec.notes.pid as number;
     const crafts = ev.filter((e) => e.type === 'craftResult');
 
-    // Phase 1 denial: an ok:false craftResult with the insufficient_materials reason.
+    // Step 1 denial: an ok:false craftResult with the insufficient_materials reason.
     expect(crafts.some((e) => e.ok === false && e.reason === 'insufficient_materials')).toBe(true);
-    // Phase 2/4 plain crafts (consumable def): ok:true, def quality common, no masterwork flag.
+    // Step 2/4 plain crafts (consumable def): ok:true, def quality common, no masterwork flag.
     expect(
       crafts.some((e) => e.ok === true && e.quality === 'common' && e.masterwork === undefined),
     ).toBe(true);
 
-    // Phase 3 masterwork proc: the personal masterwork SimEvent (ids only).
+    // Step 3 masterwork proc: the personal masterwork SimEvent (ids only).
     const mw = ev.find((e) => e.type === 'masterwork');
     expect(mw, 'masterwork event did not fire (proc missed for the pinned seed)').toBeTruthy();
     expect(mw!.recipeId).toBe('recipe_eastbrook_ritual_vestments');
@@ -996,12 +1001,12 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(gathers).toHaveLength(102);
     expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(false);
 
-    // Phase 1 pins ride the first labelled frame: the granted harvest drew
+    // Step-1 pins ride the first labelled frame: the granted harvest drew
     // exactly TWO rng values (rarity + rare event) and the cooldown denial
     // drew ZERO, since no tick ran before that snapshot.
-    const phase1 = trace.frames.find((f) => f.label === 'harvest-ore-common-and-denial');
-    expect(phase1, 'missing the phase 1 frame').toBeTruthy();
-    expect(phase1!.rng.draws).toBe(2);
+    const step1 = trace.frames.find((f) => f.label === 'harvest-ore-common-and-denial');
+    expect(step1, 'missing the step 1 frame').toBeTruthy();
+    expect(step1!.rng.draws).toBe(2);
     expect(
       ev.some(
         (e) => e.type === 'error' && e.text === 'This resource node has not respawned for you yet.',
@@ -1041,7 +1046,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     const signed = meta.inventory.filter(
       (s: any) => s.itemId === rare!.itemId && s.instance?.signer === meta.name,
     );
-    // Identical-payload stacking (Phase 12d): the same-signer units merge into
+    // Identical-payload stacking: the same-signer units merge into
     // signed stacks, so count UNITS and pin that the merge actually collapsed
     // them into far fewer slots than units (stack cap 20).
     const signedUnits = signed.reduce((n: number, s: any) => n + s.count, 0);

@@ -5,6 +5,7 @@ import type { GroundAoE } from '../src/sim/entity_roster';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { OPEN_FIELD, placePlayerInOpenField } from './helpers/open_field';
 
 // Ground-targeted casting primitive (docs/design/arpg-spell-mechanics.md), exercised
 // through Flamestrike (mage, targetMode 'position', range 30). The deterministic sim
@@ -21,6 +22,7 @@ function place(sim: Sim, id: number, x: number, z: number): void {
 function makeMage(): { sim: Sim; pid: number } {
   const sim = new Sim({ seed: 7, playerClass: 'mage', noPlayer: true });
   const pid = sim.addPlayer('mage', 'Mag');
+  placePlayerInOpenField(sim, pid);
   sim.setPlayerLevel(20, pid); // plenty of level for Flamestrike
   // The mage unify spec-gated Flamestrike into the fire kit (specs: ['fire']).
   if (!sim.setSpec('fire', pid)) throw new Error('no fire spec');
@@ -89,14 +91,14 @@ describe('ground-targeted casting (Flamestrike)', () => {
 
   it('clamps the aimed point to the ability range from the caster', () => {
     const { sim, pid } = makeMage();
-    place(sim, pid, 0, 0);
-    const atClamp = spawnWolfAt(sim, 30, 0);
+    place(sim, pid, OPEN_FIELD.x, OPEN_FIELD.z);
+    const atClamp = spawnWolfAt(sim, OPEN_FIELD.x + 30, OPEN_FIELD.z);
     sim.drainEvents();
 
-    sim.castAbility('flamestrike', pid, { x: 100, z: 0 }); // far beyond range 30
+    sim.castAbility('flamestrike', pid, { x: OPEN_FIELD.x + 100, z: OPEN_FIELD.z });
 
     const fx = resolveAimedCast(sim, pid);
-    expect(fx?.x).toBeCloseTo(30, 0); // clamped onto the 30 yd range
+    expect(fx?.x).toBeCloseTo(OPEN_FIELD.x + 30, 0);
     expect(atClamp.hp).toBeLessThan(5000);
   });
 

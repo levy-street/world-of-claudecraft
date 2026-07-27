@@ -21,7 +21,15 @@
 import { ITEMS } from '../sim/data';
 import type { ItemDef } from '../sim/types';
 import type { MarketInfo, MarketListingView } from '../world_api';
-import { MARKET_PAGE_SIZE, type MarketFilters } from './market_filters';
+import {
+  MARKET_ARMOR_TYPE_FILTERS,
+  MARKET_BAG_SIZE_FILTERS,
+  MARKET_PAGE_SIZE,
+  MARKET_WEAPON_TYPE_FILTERS,
+  type MarketFilters,
+  type MarketItemTypeFilter,
+  type MarketSubtypeFilter,
+} from './market_filters';
 
 export type MarketTab = 'browse' | 'sell' | 'collect';
 
@@ -114,11 +122,13 @@ export interface MarketViewInput {
   sellHave: number;
 }
 
-/** True when any of the type/subtype/rarity dropdowns is narrowing the browse. */
+/** True when any dropdown is narrowing the browse. */
 function filtersActive(filters: MarketFilters): boolean {
   return (
     filters.itemType !== 'all' ||
     (filters.subtype !== undefined && filters.subtype !== 'all') ||
+    (filters.armorClass !== undefined && filters.armorClass !== 'all') ||
+    (filters.primaryStat !== undefined && filters.primaryStat !== 'all') ||
     filters.rarity !== 'all'
   );
 }
@@ -169,8 +179,16 @@ export function buildMarketSell(sellItemId: string | null, sellHave: number): Ma
   if (!sellItemId || !item || sellHave <= 0) return { state: 'pick-empty' };
   if (item.kind === 'quest' || item.noMarketList || item.soulbound)
     return { state: 'cannot-market' };
-  // A gentle starting ask: a few times vendor value, never below 1c.
-  const suggested = Math.max(1, item.buyValue ?? Math.max(1, item.sellValue) * 4);
+  // A gentle starting ask: the vendor shop price when the item has one, but
+  // never more than 10x its vendor sell value (the recipe-economy rework re-priced
+  // four commons' sellValues while deliberately keeping their historical shop
+  // buyValues, so a raw buyValue read would suggest a 20x-29x ask); items with
+  // no shop price suggest a few times sell value. Never below 1c.
+  const vendorFloor = Math.max(1, item.sellValue);
+  const suggested = Math.max(
+    1,
+    item.buyValue != null ? Math.min(item.buyValue, vendorFloor * 10) : vendorFloor * 4,
+  );
   const gold = Math.floor(suggested / COPPER_PER_GOLD);
   const silver = Math.floor((suggested % COPPER_PER_GOLD) / COPPER_PER_SILVER);
   const copper = suggested % COPPER_PER_SILVER;
@@ -218,10 +236,79 @@ export function buildMarketView(input: MarketViewInput): MarketView {
 }
 
 /**
+ * What axis the subtype menu narrows by. The painter switches its caption and its
+ * option labels on THIS, never on the item type again: the two are decided together
+ * here, so an item type that gains a subtype axis cannot get its options from one
+ * place and its wording from another.
+ */
+export type MarketSubtypeKind = 'armorSlot' | 'weaponFamily' | 'bagCapacity';
+
+/** Which secondary browse menus an item type shows, and the subtype menu's options. */
+export interface MarketFilterMenus {
+  /** The subtype menu's option list, or null when this type has no subtype axis. */
+  subtype: readonly MarketSubtypeFilter[] | null;
+  /** What those options MEAN, for the painter's caption and per-option wording. */
+  subtypeKind: MarketSubtypeKind | null;
+  /** True when the armor-class (cloth / leather / mail) menu applies. */
+  armorClass: boolean;
+  /** True when the primary-stat menu applies. */
+  primaryStat: boolean;
+}
+
+/**
+ * Which secondary menus an item type can actually narrow by.
+ *
+ * Bags get a capacity menu but NOT a primary-stat menu: bags carry no str/agi/int
+ * and `itemMatchesPrimaryStat` ignores the filter outside armor/weapon, so a stat
+ * menu on bags would be a live-looking control that can never change the result.
+ * Lives here, not on the painter, because the decision is pure: it is a function of
+ * the item type alone, so a Node test drives it directly instead of grepping the
+ * painter's source for the gate.
+ */
+export function marketFilterMenus(itemType: MarketItemTypeFilter): MarketFilterMenus {
+  if (itemType === 'armor')
+    return {
+      subtype: MARKET_ARMOR_TYPE_FILTERS,
+      subtypeKind: 'armorSlot',
+      armorClass: true,
+      primaryStat: true,
+    };
+  if (itemType === 'weapon')
+    return {
+      subtype: MARKET_WEAPON_TYPE_FILTERS,
+      subtypeKind: 'weaponFamily',
+      armorClass: false,
+      primaryStat: true,
+    };
+  if (itemType === 'bag')
+    return {
+      subtype: MARKET_BAG_SIZE_FILTERS,
+      subtypeKind: 'bagCapacity',
+      armorClass: false,
+      primaryStat: false,
+    };
+  return { subtype: null, subtypeKind: null, armorClass: false, primaryStat: false };
+}
+
+/**
  * The count of items waiting to be collected, for the Collect tab's badge. The
  * proceeds purse counts as one, plus each returned stack.
  */
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
   return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
+}
+
+/** The minimap-corner collect indicator (the mailIndicatorView pattern). */
+export interface MarketCollectIndicatorView {
+  visible: boolean;
+}
+
+/**
+ * Driven by the always-streamed IWorld.marketCollectPending bit, NOT by
+ * marketInfo (null away from the Merchant), so the badge lights anywhere in
+ * the world while sale proceeds or returned items wait.
+ */
+export function marketCollectIndicatorView(pending: boolean): MarketCollectIndicatorView {
+  return { visible: pending === true };
 }

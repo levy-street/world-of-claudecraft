@@ -44,6 +44,9 @@ import {
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { MAGE_PET_MOBS } from './content/mage_pets';
+import { MAILBOXES } from './content/mailboxes';
+import { NOTICEBOARDS } from './content/noticeboards';
+import { STATIONS } from './content/professions';
 import {
   ALL_RECIPES as ALL_RECIPES_CONTENT,
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
@@ -105,6 +108,7 @@ import {
   ZONE3_ZONE,
 } from './content/zone3';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
+import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -140,7 +144,6 @@ function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef
 export type { ClassDef } from './content/classes';
 export { ABILITIES, abilitiesKnownAt, CLASSES } from './content/classes';
 export { GATHER_NODE_TYPES } from './content/gather_nodes';
-export { STATIONS } from './content/professions';
 // Re-export content shapes so existing `from './data'` imports keep working.
 export type {
   BiomeId,
@@ -155,6 +158,7 @@ export type {
   ZoneDef,
   ZonePropsDef,
 } from './types';
+export { STATIONS };
 
 // ---------------------------------------------------------------------------
 // Merged content tables
@@ -282,11 +286,14 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     mines: sets.flatMap((s) => s.mines),
     docks: sets.flatMap((s) => s.docks),
     tents: sets.flatMap((s) => s.tents),
+    marshReeds: sets.flatMap((s) => s.marshReeds),
     crates: sets.flatMap((s) => s.crates),
     campfires: sets.flatMap((s) => s.campfires),
     mudHuts: sets.flatMap((s) => s.mudHuts),
     ruinRings: sets.flatMap((s) => s.ruinRings),
     fences: sets.flatMap((s) => s.fences),
+    benches: sets.flatMap((s) => s.benches ?? []),
+    walls: sets.flatMap((s) => s.walls ?? []),
     graveyards: sets.flatMap((s) => s.graveyards),
     // optional per-zone field, was being dropped here, so the delve entrance
     // marker (name slab + arch) never reached the renderer (props.ts)
@@ -336,7 +343,7 @@ export const WORLD_MAX_X = WORLD_SIZE / 2;
 export const WORLD_MIN_Z = ZONES[0].zMin;
 export const WORLD_MAX_Z = ZONES[ZONES.length - 1].zMax;
 
-export const PLAYER_START = { x: 2, z: -2 };
+export const PLAYER_START = { ...EASTBROOK_LAYOUT.services.playerStart.position };
 
 // ---------------------------------------------------------------------------
 // Active world content registry.
@@ -359,6 +366,12 @@ export const BUILTIN_WORLD: WorldContent = {
   roads: ROADS,
   props: PROPS,
   playerStart: PLAYER_START,
+  services: {
+    stations: STATIONS,
+    mailboxes: MAILBOXES,
+    noticeboards: NOTICEBOARDS,
+    graveyards: OVERWORLD_GRAVEYARDS,
+  },
   blockers: JAIL_BLOCKERS,
   terrainEdits: JAIL_TERRAIN_EDITS,
 };
@@ -447,7 +460,7 @@ export const ARENA_X = 4200; // arena instances share this x; slots stack along 
 export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
-const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
+const ARENA_SLOT_SPACING = 120; // > the pit footprint (~52yd) so slots never overlap
 
 export function arenaOrigin(slot: number): { x: number; z: number } {
   return { x: ARENA_X, z: ARENA_Z0 + slot * ARENA_SLOT_SPACING };

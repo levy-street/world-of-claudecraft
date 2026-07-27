@@ -34,6 +34,7 @@ import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
@@ -48,7 +49,7 @@ const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
 // The ten pair-archetype title keys (issue 1130, pair-named under Professions
-// 2.0 Phase 1), one per canonical pair id (see src/sim/professions/archetype.ts
+// 2.0), one per canonical pair id (see src/sim/professions/archetype.ts
 // ARCHETYPE_PAIR_TARGETS and getArchetypeTitle: the title identifier IS the
 // pair id). Every player-visible string is a t() key, so this is a literal
 // id-to-key table, never a built string.
@@ -152,7 +153,7 @@ export interface CharWindowDeps extends PainterHostPresentation {
 // Maps each gathering profession id to its hud_chrome display-name key (issue
 // 1124). String-keyed like the sibling professions_window.ts GATHERING_NAME_KEYS
 // (and this file's CRAFT_NAME_KEYS): an id with no key here renders no row
-// (fishing landed with Professions 2.0 Phase 11).
+// (fishing landed with Professions 2.0).
 const GATHERING_PROFESSION_LABEL_KEY: Record<string, TranslationKey> = {
   mining: 'hudChrome.gathering.mining',
   logging: 'hudChrome.gathering.logging',
@@ -205,12 +206,16 @@ export class CharWindow {
     // WCAG 2.2 AA: name the focus-trapped root via the character title span.
     markDialogRoot(el, { labelledBy: 'char-title' });
     const archetypeTitle = archetypeTitleText(world.archetypeTitle);
+    const archetypeCrestUrl = archetypeImageUrl(world.archetypeTitle);
+    const archetypeCrest = archetypeCrestUrl
+      ? `<img class="char-archetype-title-crest" src="${esc(archetypeCrestUrl)}" alt="" draggable="false">`
+      : '';
     const hobbyCraft = hobbyCraftText(world.hobbyCraft);
     const hobbyRow =
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -248,7 +253,6 @@ export class CharWindow {
       audio.click();
       this.deps.openPlayerCard();
     });
-
     const view = buildPaperdollView(world.equipment, ITEMS);
     const leftCol = el.querySelector('#equip-col-left');
     const rightCol = el.querySelector('#equip-col-right');
@@ -276,7 +280,11 @@ export class CharWindow {
       .map((r) => {
         const key = GATHERING_PROFESSION_LABEL_KEY[r.professionId];
         if (key === undefined) return '';
-        return `<span>${esc(t(key))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`;
+        const imageUrl = professionImageUrl(`gather_${r.professionId}`);
+        const icon = imageUrl
+          ? `<img class="char-gather-icon" src="${esc(imageUrl)}" alt="" draggable="false">`
+          : '';
+        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${formatNumber(r.displayValue, { maximumFractionDigits: 0 })}</b></span></span>`;
       })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
@@ -309,7 +317,7 @@ export class CharWindow {
       this.deps.attachTooltip(row, () => {
         // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
         // the self entity mirror carries equippedInstances in both worlds.
-        // Projected through wornTooltipInstance (Phase 14b) so the offline
+        // Projected through wornTooltipInstance so the offline
         // full payload renders exactly what the online eqi-trimmed mirror
         // does: worn identity is signer/enchant/rolled, never the bond.
         const world = this.deps.world();

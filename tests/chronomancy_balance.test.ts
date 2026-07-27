@@ -18,12 +18,14 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 type Spec = 'arcane' | 'fire' | 'frost';
 
 function makeMage(spec: Spec, level = 20) {
   const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(level);
+  placePlayerInOpenField(sim);
   sim.setSpec(spec);
   sim.tick();
   const p = sim.player;
@@ -288,6 +290,7 @@ function cascadeAoeHeal(enemyCount: number): CascadeMeasure {
   sim.setPlayerLevel(20);
   sim.setSpec('arcane');
   sim.tick();
+  placePlayerInOpenField(sim);
   const p = sim.player;
   p.resource = p.maxResource;
   const allyIds: number[] = [];

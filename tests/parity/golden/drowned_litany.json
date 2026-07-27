@@ -9,8 +9,8 @@
     "Sister Nhalia driver: Blackwater Mark + Tolling Bells volley rng draws",
     "cantor phases + Final Bell + rite choose -> playback pulses"
   ],
-  "draws": 2517,
-  "drawDigest": "bc1e1461",
+  "draws": 2521,
+  "drawDigest": "4aa25447",
   "frames": [
     {
       "tick": 0,
@@ -761,8 +761,8 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 449,
-      "state": "f138e292",
-      "events": "6ac65185",
+      "state": "412a5838",
+      "events": "15f527af",
       "rng": {
         "draws": 2133,
         "digest": "aef49a06"
@@ -772,88 +772,88 @@
       "tick": 440,
       "time": 22,
       "nextId": 449,
-      "state": "4546bf3d",
-      "events": "741638a5",
+      "state": "a9158762",
+      "events": "f398378a",
       "rng": {
-        "draws": 2187,
-        "digest": "155fde35"
+        "draws": 2190,
+        "digest": "9cfc7b17"
       }
     },
     {
       "tick": 450,
       "time": 22.5,
       "nextId": 449,
-      "state": "6e1d8cb6",
+      "state": "fabcbb73",
       "events": "6efb0f6a",
       "rng": {
-        "draws": 2217,
-        "digest": "a56e1087"
+        "draws": 2221,
+        "digest": "b0f7d9c5"
       }
     },
     {
       "tick": 460,
       "time": 23,
       "nextId": 449,
-      "state": "b7058f13",
+      "state": "066b4268",
       "events": "6efb0f6a",
       "rng": {
-        "draws": 2271,
-        "digest": "d955e16b"
+        "draws": 2273,
+        "digest": "81c4bd32"
       }
     },
     {
       "tick": 470,
       "time": 23.5,
       "nextId": 449,
-      "state": "94b8397e",
-      "events": "d9c2d3bb",
+      "state": "4eb8f1c3",
+      "events": "7a232164",
       "rng": {
-        "draws": 2313,
-        "digest": "316ca960"
+        "draws": 2315,
+        "digest": "9be86032"
       }
     },
     {
       "tick": 480,
       "time": 24,
       "nextId": 449,
-      "state": "b878ba1c",
-      "events": "3c7fc1be",
+      "state": "a6ae8651",
+      "events": "15f010fc",
       "rng": {
-        "draws": 2366,
-        "digest": "8f81d78e"
+        "draws": 2370,
+        "digest": "a0f728c3"
       }
     },
     {
       "tick": 490,
       "time": 24.5,
       "nextId": 449,
-      "state": "bff91c0b",
-      "events": "8ddade6e",
+      "state": "8b2d5b67",
+      "events": "ae67468d",
       "rng": {
-        "draws": 2417,
-        "digest": "3053e8bd"
+        "draws": 2424,
+        "digest": "f06c471b"
       }
     },
     {
       "tick": 500,
       "time": 25,
       "nextId": 449,
-      "state": "8d6d8111",
-      "events": "d9c2d3bb",
+      "state": "4010afc9",
+      "events": "c7185058",
       "rng": {
-        "draws": 2480,
-        "digest": "8bedf7ab"
+        "draws": 2491,
+        "digest": "ae4db914"
       }
     },
     {
       "tick": 505,
       "time": 25.25,
       "nextId": 449,
-      "state": "b5927b47",
+      "state": "641d42a2",
       "events": "6efb0f6a",
       "rng": {
-        "draws": 2505,
-        "digest": "8481e431"
+        "draws": 2511,
+        "digest": "9f44a19f"
       },
       "label": "rite-started",
       "players": [
@@ -874,7 +874,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 5558,
-            "damageTaken": 31012,
+            "damageTaken": 31049,
             "kills": 3,
             "xpGained": 450
           },
@@ -957,7 +957,7 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 1.35,
+          "combatTimer": 1.3,
           "comboUntil": -1,
           "critChance": 0.0665,
           "detonateTimer": "Infinity",
@@ -1078,11 +1078,11 @@
       "tick": 507,
       "time": 25.35,
       "nextId": 449,
-      "state": "106a5a9b",
+      "state": "49555d5a",
       "events": "741638a5",
       "rng": {
-        "draws": 2517,
-        "digest": "bc1e1461"
+        "draws": 2521,
+        "digest": "4aa25447"
       },
       "label": "final",
       "players": [
@@ -1103,7 +1103,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 5558,
-            "damageTaken": 31012,
+            "damageTaken": 31049,
             "kills": 3,
             "xpGained": 450
           },
@@ -1186,7 +1186,7 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 1.45,
+          "combatTimer": 1.4,
           "comboUntil": -1,
           "critChance": 0.0665,
           "detonateTimer": "Infinity",

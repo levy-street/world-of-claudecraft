@@ -1,9 +1,14 @@
-// Pure-core pins for the crafting celebration plan (Professions 2.0 Phase 6):
+// @vitest-environment jsdom
+
+// Pure-core pins for the crafting celebration plan (Professions 2.0):
 // tier-crossing detection over craft-skill snapshots and the coalesced
 // banner / one-sound-per-drain / reduced-motion batching rules the HUD arm
 // consumes thinly (the buildDeedUnlockPlan contract shape).
 
-import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { audio } from '../src/game/audio';
 import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
 import {
   buildCraftCelebrationPlan,
@@ -11,6 +16,8 @@ import {
   computeCraftTierUps,
   observeCraftSkillsForTierUps,
 } from '../src/ui/craft_celebration_view';
+import { Hud } from '../src/ui/hud';
+import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
 
 describe('computeCraftTierUps', () => {
   it('reports no tier-ups on first observation (null prev), the silent init', () => {
@@ -143,32 +150,76 @@ describe('buildCraftCelebrationPlan', () => {
   });
 });
 
-// The plan's motion flag has exactly ONE consumer contract: showBanner skips
-// the fade (a CSS class), while the log lines, the banner TEXT, the sound, and
-// the ARIA announcer stay motion-blind (information always survives reduced
-// motion). The pure suites above pin the flag itself; these source pins hold
-// the consumer wiring in hud.ts/hud.css to that contract, since no test
-// instantiates the full Hud.
-import { readFileSync } from 'node:fs';
+interface CraftCelebrationHudHarness {
+  bannerEl: HTMLElement;
+  bannerTimer: number | undefined;
+  log: ReturnType<typeof vi.fn>;
+  combatAnnouncer: { push: ReturnType<typeof vi.fn> };
+  handleCraftCelebrations(
+    masterworkItemId: string | null,
+    tierUps: { craftId: string; toTier: number }[],
+  ): void;
+  showBanner(text: string, motion?: boolean, decorativeIconUrl?: string): void;
+}
 
-describe('plan.motion consumer wiring (source pins)', () => {
-  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-  const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+function celebrationHud(): CraftCelebrationHudHarness {
+  const hud = Object.create(Hud.prototype) as unknown as CraftCelebrationHudHarness;
+  hud.bannerEl = document.createElement('div');
+  hud.bannerTimer = undefined;
+  hud.log = vi.fn();
+  hud.combatAnnouncer = { push: vi.fn() };
+  return hud;
+}
 
-  it('showBanner takes the motion flag and toggles exactly the no-motion class', () => {
-    expect(hud).toContain('showBanner(text: string, motion = true)');
-    expect(hud).toContain("this.bannerEl.classList.toggle('banner-no-motion', !motion)");
+describe('craft celebration HUD behavior', () => {
+  const hudCss = readFileSync(join(process.cwd(), 'src/styles/hud.css'), 'utf8');
+  const hudMobileCss = readFileSync(join(process.cwd(), 'src/styles/hud.mobile.css'), 'utf8');
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    window.matchMedia = vi.fn(
+      (query: string) => ({ matches: true, media: query }) as MediaQueryList,
+    );
   });
 
-  it('the celebration handler feeds plan.motion to the banner and never gates the announcer', () => {
-    expect(hud).toContain('this.showBanner(text, plan.motion);');
-    // The polite ARIA push sits beside the banner call, unconditioned on the
-    // plan's motion flag (accessibility: reduced motion is never reduced info).
-    expect(hud).toContain('this.combatAnnouncer.push(text, performance.now());');
-    expect(hud).not.toContain('if (plan.motion) this.combatAnnouncer');
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    document.body.replaceChildren();
   });
 
-  it('the no-motion class only drops the transition (same text, same duration)', () => {
+  it('renders the masterwork seal, keeps copy announced under reduced motion, then clears stale art', () => {
+    const achievement = vi.spyOn(audio, 'achievement').mockImplementation(() => {});
+    const hud = celebrationHud();
+
+    hud.handleCraftCelebrations('iron_sword', []);
+
+    const icon = hud.bannerEl.querySelector<HTMLImageElement>('img.banner-art');
+    const copy = hud.bannerEl.querySelector<HTMLElement>('.banner-copy');
+    expect(icon?.getAttribute('src')).toBe(MASTERWORK_SEAL_IMAGE_URL);
+    expect(icon?.alt).toBe('');
+    expect(icon?.getAttribute('aria-hidden')).toBe('true');
+    expect(copy?.textContent).toBeTruthy();
+    expect(hud.bannerEl.classList.contains('banner-with-art')).toBe(true);
+    expect(hud.bannerEl.classList.contains('banner-no-motion')).toBe(true);
+    expect(hud.combatAnnouncer.push).toHaveBeenCalledTimes(1);
+    expect(hud.combatAnnouncer.push.mock.calls[0][0]).toBe(copy?.textContent);
+    expect(hud.log.mock.calls[0][0]).toBe(copy?.textContent);
+    expect(achievement).toHaveBeenCalledTimes(1);
+
+    hud.showBanner('Ordinary banner');
+
+    expect(hud.bannerEl.querySelector('img')).toBeNull();
+    expect(hud.bannerEl.children).toHaveLength(1);
+    expect(hud.bannerEl.querySelector('.banner-copy')?.textContent).toBe('Ordinary banner');
+    expect(hud.bannerEl.classList.contains('banner-with-art')).toBe(false);
+    expect(hud.bannerEl.classList.contains('banner-no-motion')).toBe(false);
+  });
+
+  it('keeps the banner art sizing and no-motion presentation contracts in CSS', () => {
+    expect(hudCss).toMatch(/#banner\.banner-with-art[\s\S]*?display:\s*flex/);
+    expect(hudCss).toMatch(/#banner \.banner-art[\s\S]*?width:\s*46px/);
+    expect(hudMobileCss).toMatch(/body\.mobile-touch #banner \.banner-art[\s\S]*?width:\s*34px/);
     expect(hudCss).toMatch(/#banner\.banner-no-motion\s*\{\s*transition:\s*none;\s*\}/);
   });
 });

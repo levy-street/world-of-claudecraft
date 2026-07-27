@@ -33,6 +33,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { type BagInstanceGlyphKind, bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import {
   type BagDestroyAction,
@@ -42,6 +43,7 @@ import {
   bagQualityKey,
   bagShiftLinks,
   bagStackIndex,
+  bagsMoneyRowStale,
   bagTooltipHintKey,
   bankDepositOpensPrompt,
   buildBagBar,
@@ -58,9 +60,10 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
 import type { PainterHostPresentation } from './painter_host';
+import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
-import { svgIcon } from './ui_icons';
+import { svgIcon, type UiIconName } from './ui_icons';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
@@ -85,6 +88,29 @@ export function dismissBagPrompts(): void {
 // QUALITY_COLOR map carries the real per-quality hex; this token covers the rare
 // item with no quality field, so no raw hex lives in the painter.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
+
+// The procedural chrome glyph each per-copy corner kind paints
+// (bag_instance_glyph_view.ts decides WHICH kind; this maps it to art). The
+// masterwork kind is absent on purpose: it keeps its authored seal IMAGE, and
+// the generic kind keeps the pre-existing CSS wedge. No binary asset is added.
+const BAG_GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconName>> = {
+  enchanted: 'enchant-rune',
+  signed: 'makers-mark',
+  bound: 'bond-link',
+};
+
+// The accessible name each corner kind gives its CELL. The glyph is aria-hidden,
+// so this is the ONLY channel carrying the per-copy fact to assistive tech: the
+// three visual kinds must not collapse back into one label. 'signed' and the
+// unclassified 'generic' both keep the pre-existing maker-marked wording, which
+// is accurate for a signer payload and is the status quo for the rest.
+const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> = {
+  masterwork: 'hudChrome.bags.itemAriaMasterwork',
+  enchanted: 'hudChrome.bags.itemAriaEnchanted',
+  signed: 'hudChrome.bags.itemAriaInstanced',
+  bound: 'hudChrome.bags.itemAriaBound',
+  generic: 'hudChrome.bags.itemAriaInstanced',
+};
 
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
@@ -163,6 +189,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
+  /** Gathering-tool click routing (#2343): true when the interact-style
+   *  handler consumed the use (nearest matching node + autorun stop); false
+   *  falls back to the plain useItem command. */
+  useGatherTool(item: ItemDef): boolean;
   // Hotbar drag plumbing (cross-window drag state lives on the HUD).
   isHotbarItemId(itemId: string): boolean;
   setDragAction(action: { type: 'item'; id: string } | null): void;
@@ -179,7 +209,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
   dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
-  /** Open the Phase 13 bag-item action menu (Disenchant / Salvage / Apply Enchant)
+  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
    *  for a stack at a viewport point. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row stays
    *  byte-identical to a plain click. */
@@ -213,7 +243,66 @@ export class BagsWindow {
   // (vendor / mobile), where a null restore is a safe no-op.
   private openerFocus: HTMLElement | null = null;
 
+  // The purse as of the last money-row paint (issue #2373), re-armed by every paint
+  // whatever caused it. -1 is the cold sentinel: a real purse is never negative, so
+  // a window shown without a paint would always converge on the first probe.
+  private lastMoneyCopper = -1;
+
   constructor(private readonly deps: BagsWindowDeps) {}
+
+  /**
+   * Repaint the money row when the purse moved, the staleness contract this window
+   * owns (issue #2373). Joins the refreshIfChanged family the HUD's slow band drives
+   * (bank / mailbox / market / social / deeds / professions / calendar), so the
+   * coordinator stays a one-line consumer.
+   *
+   * Deliberately NOT a full render(): nothing else inside #bags reads copper, and a
+   * rebuild would tear down the hovered row's tooltip, the bag-search caret and an
+   * armed touch drag. This edge fires from a server credit or a coin-only mob loot
+   * with no user action behind it, so unlike the user-initiated paint paths it must
+   * not move anything the player is holding. Same reason refreshGrid() exists for
+   * live search.
+   */
+  refreshIfChanged(): void {
+    const el = this.deps.root();
+    if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper))
+      return;
+    this.refreshMoneyRow();
+  }
+
+  /** Rewrite ONLY the .money footer in place, re-binding its two launchers. Every
+   *  paint path runs through here (the full render(), the purse probe, and the async
+   *  $WOC / Claudium balance reads), so the latch arms on all of them.
+   *
+   *  Deliberately does NOT restore focus across the rewrite, unlike the
+   *  deeds/professions refocus family. Two reasons, both settled on PR #2377: the
+   *  footer's launchers are BUTTONs, and input.ts leaves a focused button's Enter
+   *  default alone on the chat edge, so parking focus back on one makes the player's
+   *  next Enter open chat AND re-fire the button; and #bags is non-modal and absent
+   *  from isModalOpen(), so canUseGameKeys() stays true and Tab is swallowed by
+   *  target-nearest, which means keyboard focus never lands in here to begin with. */
+  private paintMoneyRow(row: HTMLElement, copper: number): void {
+    row.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(copper)}`;
+    row.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
+      this.deps.openClaudium();
+    });
+    row.querySelector('[data-wallet-action]')?.addEventListener('click', () => {
+      this.deps.openWallet();
+    });
+    this.lastMoneyCopper = copper;
+  }
+
+  /** The narrow repaint: find the existing footer and re-paint it. A window that has
+   *  never been rendered has no .money row yet, so this is a no-op rather than a
+   *  partial paint. Public because the async $WOC / Claudium balance reads land on
+   *  their own schedule and need the same footer-only treatment: before this they
+   *  called the HUD's full renderBags() from a promise resolve, which tore the window
+   *  down under a player who had not touched anything. */
+  refreshMoneyRow(): void {
+    const row = this.deps.root().querySelector('.money') as HTMLElement | null;
+    if (!row) return;
+    this.paintMoneyRow(row, this.deps.world().copper);
+  }
 
   /** Record the element that opened the window, so close() can return focus to it.
    *  Called by the HUD's toggleBags on the keyboard/minimap open path. */
@@ -265,14 +354,8 @@ export class BagsWindow {
     grid.scrollTop = prevScrollTop;
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
-    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
     el.appendChild(moneyRow);
-    moneyRow.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
-      this.deps.openClaudium();
-    });
-    moneyRow.querySelector('[data-wallet-action]')?.addEventListener('click', () => {
-      this.deps.openWallet();
-    });
+    this.paintMoneyRow(moneyRow, world.copper);
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so
       // this bags x-btn is the whole cluster's single close control: it closes the
@@ -515,24 +598,41 @@ export class BagsWindow {
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
+      // The single corner-glyph decision for this stack (bag_instance_glyph_view.ts
+      // owns the priority: masterwork, then enchanted, signed, bound, generic).
+      const glyphKind = bagInstanceGlyphKind(s.instance);
+      const isMasterwork = glyphKind === 'masterwork';
       row.style.setProperty('--bag-slot-quality', qColor);
       // An instanced stack's accessible name carries the per-copy flag the
-      // aria-hidden corner marker shows sighted players (the review's a11y
-      // arm); plain stacks keep the pre-12d label.
+      // aria-hidden corner glyph shows sighted players (the review's a11y arm),
+      // now per KIND so the two channels agree; plain stacks keep the plain
+      // label.
+      const itemAriaKey = glyphKind ? BAG_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
-        t(s.instance ? 'hudChrome.bags.itemAriaInstanced' : 'itemUi.bags.itemAria', {
+        t(itemAriaKey, {
           item: itemName,
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // The instanced-slot corner marker (Professions 2.0 Phase 12d): every
-      // per-copy stack (signed / enchanted / masterwork) shows a static corner
-      // tab on the cell itself, desktop and touch alike (no hover needed; the
-      // long-press tooltip stays the detail surface). Composes WITH the count
-      // badge: an instanced stack with count > 1 renders both.
-      const instanceMark = s.instance ? '<span class="bi-instance" aria-hidden="true"></span>' : '';
-      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // The instanced-slot corner marker (Professions 2.0): one glyph per
+      // stack, naming WHICH kind of special copy it is. A masterwork keeps the
+      // authored seal exactly as before; enchanted / signed / bound each get
+      // their own procedural glyph (no new binary asset); an instanced payload
+      // matching none of them keeps the pre-existing generic tab, so no copy
+      // silently loses its marker. Exactly one treatment ever renders, it
+      // composes with the bottom-right count badge, and it stays visible
+      // without hover on desktop and touch, identical on every graphics preset.
+      const instanceMark =
+        glyphKind === 'generic'
+          ? '<span class="bi-instance" aria-hidden="true"></span>'
+          : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
+            ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
+            : '';
+      const masterworkSeal = isMasterwork
+        ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
+        : '';
+      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /
@@ -553,7 +653,7 @@ export class BagsWindow {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
-        // Touch has no right-click, so a tap on an item with a Phase 13 action
+        // Touch has no right-click, so a tap on an item with an action
         // (Disenchant / Salvage / Apply Enchant) opens the action menu instead of
         // running the classic action directly; the menu's first row is that
         // classic action, so nothing is lost. A plain item taps straight through,
@@ -588,7 +688,7 @@ export class BagsWindow {
           return;
         }
         ev.preventDefault();
-        // An item with a Phase 13 action (Disenchant / Salvage / Apply Enchant)
+        // An item with an action (Disenchant / Salvage / Apply Enchant)
         // opens the action menu, whose FIRST row is the classic left-click action
         // so that binding survives. Every other item keeps today's behavior
         // byte-identical: right-click runs the SAME action as left-click (use /
@@ -842,11 +942,16 @@ export class BagsWindow {
         this.deps.hideTooltip();
         this.render();
         break;
-      case 'use':
-        this.deps.world().useItem(s.itemId);
+      case 'use': {
+        // Gathering tools (#2343) route through the interact-style handler
+        // (nearest matching node + autorun stop) when main.ts has wired it;
+        // everything else, and any unwired host, keeps the plain useItem.
+        const item = ITEMS[s.itemId];
+        if (!item || !this.deps.useGatherTool(item)) this.deps.world().useItem(s.itemId);
         this.render();
         this.deps.renderCharIfOpen();
         break;
+      }
     }
   }
 
@@ -906,7 +1011,7 @@ export class BagsWindow {
     };
   }
 
-  // Whether the Phase 13 action menu should open for this item. Offered ONLY in
+  // Whether the action menu should open for this item. Offered ONLY in
   // the plain-use default mode (never trade / mail / market / vendor / bank /
   // pet-feed, whose own click owns the slot), mirroring bagDestroyAction's
   // transactional-mode gate, and only when the item has an eligible action.

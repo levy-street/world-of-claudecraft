@@ -82,7 +82,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maestro recolector',
-    desc: 'Alcanza 100 de competencia en Minería, Tala y Herboristería.',
+    desc: 'Alcanza 100 de pericia en cualquiera de tres entre Minería, Tala, Herboristería y Pesca.',
   },
   prog_first_craft: { name: 'Hecho a mano', desc: 'Completa con éxito tu primera fabricación.' },
   prog_craft_specialist: {
@@ -438,7 +438,10 @@ export const table: DeedLocaleTable = {
     name: 'Cliente preferente',
     desc: 'Descubre las diez piezas del inventario del Intendente Vex.',
   },
-  col_glimmerfin: { name: 'Un destello de esperanza', desc: 'Pesca un Koi de aletas brillantes.' },
+  col_glimmerfin: {
+    name: 'Un destello de esperanza',
+    desc: 'Pesca un Koi Destello Solar.',
+  },
   col_full_creel: {
     name: 'Nasa llena',
     desc: 'Descubre las seis capturas comunes de las aguas del Valle, la Ciénaga y las Alturas.',
@@ -623,7 +626,10 @@ export const table: DeedLocaleTable = {
     title: 'Caminante',
   },
   exp_something_shiny: { name: 'Algo brillante', desc: 'Recoge un objeto reluciente del suelo.' },
-  exp_first_ore: { name: '¡A picar piedra!', desc: 'Recolecta tu primer nodo de mineral.' },
+  exp_first_ore: {
+    name: 'El pico y la piedra',
+    desc: 'Recolecta tu primer nodo de mineral.',
+  },
   exp_first_timber: { name: '¡Árbol va!', desc: 'Recolecta tu primer nodo de madera.' },
   exp_first_herb: { name: 'Mano verde', desc: 'Recolecta tu primer nodo de hierbas.' },
   feat_era_cap: {
@@ -695,6 +701,121 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Anguilas entre los juncos',
     desc: 'Pesca un pez en las aguas de la Ciénaga de Mirefen.',
+  },
+  prog_guildsworn: {
+    name: 'Juramentado del Oficio',
+    desc: 'Sintonízate con un par de arquetipos y toma sus oficios en serio.',
+    title: 'Juramentado del Oficio',
+  },
+  prog_masterwright: {
+    name: 'Gran Artesano',
+    desc: 'Fabrica tu primera obra maestra, una pieza tan fina que toda la zona se entera.',
+    title: 'Gran Artesano',
+  },
+  prog_fishing_100: {
+    name: 'Viejo Sal',
+    desc: 'Alcanza 100 de pericia en Pesca.',
+  },
+  prog_master_angler: {
+    name: 'Pescador Maestro',
+    desc: 'Alcanza 200 de pericia en Pesca, la verdadera cumbre del arte del pescador.',
+    title: 'Pescador Maestro',
+  },
+  prog_engineering_50: {
+    name: 'Tuercas y engranajes',
+    desc: 'Alcanza 50 de habilidad en Ingeniería.',
+  },
+  prog_alchemy_50: {
+    name: 'Brebajes extraños',
+    desc: 'Alcanza 50 de habilidad en Alquimia.',
+  },
+  prog_cooking_50: {
+    name: 'Chef curtido',
+    desc: 'Alcanza 50 de habilidad en Cocina.',
+  },
+  prog_leatherworking_50: {
+    name: 'Oficio del curtidor',
+    desc: 'Alcanza 50 de habilidad en Peletería.',
+  },
+  prog_tailoring_50: {
+    name: 'Costura de primera',
+    desc: 'Alcanza 50 de habilidad en Sastrería.',
+  },
+  prog_enchanting_50: {
+    name: 'Un destello de arcana',
+    desc: 'Alcanza 50 de habilidad en Encantación.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Filo y temple',
+    desc: 'Alcanza 50 de habilidad en Fabricación de armas.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Martillo y plancha',
+    desc: 'Alcanza 50 de habilidad en Fabricación de armaduras.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Gran Maestro de Ingeniería',
+    desc: 'Alcanza 125 de habilidad en Ingeniería, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Ingeniería',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Gran Maestro de Alquimia',
+    desc: 'Alcanza 125 de habilidad en Alquimia, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Alquimia',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Gran Maestro de Cocina',
+    desc: 'Alcanza 125 de habilidad en Cocina, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Cocina',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Gran Maestro de Peletería',
+    desc: 'Alcanza 125 de habilidad en Peletería, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Peletería',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Gran Maestro de Sastrería',
+    desc: 'Alcanza 125 de habilidad en Sastrería, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Sastrería',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Gran Maestro de Encantación',
+    desc: 'Alcanza 125 de habilidad en Encantación, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Encantación',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Gran Maestro de Fabricación de armas',
+    desc: 'Alcanza 125 de habilidad en Fabricación de armas, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Fabricación de armas',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Gran Maestro de Fabricación de armaduras',
+    desc: 'Alcanza 125 de habilidad en Fabricación de armaduras, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Fabricación de armaduras',
+  },
+  col_pristine_vein: {
+    name: 'Vena prístina',
+    desc: 'Abre una vena prístina y deja que toda la zona se entere.',
+  },
+  col_ancient_heartwood: {
+    name: 'Duramen antiguo',
+    desc: 'Extrae un trozo de duramen antiguo de un árbol derribado.',
+  },
+  col_moonlit_bloom: {
+    name: 'Flor iluminada por la luna',
+    desc: 'Cosecha una flor iluminada por la luna en el mismo instante en que se abre.',
+  },
+  col_perfect_specimen: {
+    name: 'Espécimen perfecto',
+    desc: 'Obtén un espécimen perfecto de una bestia cosechada, sin un rasguño ni una mella.',
+  },
+  soc_first_salvage: {
+    name: 'Nada se desperdicia',
+    desc: 'Desguaza una pieza de equipo para recuperar sus materiales en bruto.',
+  },
+  soc_salvage_50: {
+    name: 'El taller del desmontador',
+    desc: 'Desguaza 50 piezas de equipo para recuperar sus materiales en bruto.',
   },
 };
 

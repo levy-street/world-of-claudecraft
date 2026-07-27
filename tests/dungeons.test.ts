@@ -85,20 +85,21 @@ function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
 // record, independently of mobTemplateForDungeonDifficulty, mirroring createMob's
 // formulas. Dropping any multiplier from the transform reddens these pins even
 // though forcing level 22 alone would already raise the per-level stats.
+// Per-mob health overrides (healthMultiplierByMob) take precedence over the
+// dungeon-wide healthMultiplier -- e.g. 2026-07-24 nerf: skeleton adds at 2.22x
+// their normal-mode pool (3,768 HP) via healthMultiplierByMob.nythraxis_skeleton_warrior.
 function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   const levelUps = tuning.level - 1;
   const hpMult = template.elite ? 2.3 : 1;
   const dmgMult = template.elite ? 1.5 : 1;
+  const tuningDmg = tuning.damageMultiplierByMob?.[template.id] ?? tuning.damageMultiplier;
+  const tuningHp = tuning.healthMultiplierByMob?.[template.id] ?? tuning.healthMultiplier;
   const dmg =
-    (template.dmgBase * tuning.damageMultiplier +
-      template.dmgPerLevel * tuning.damageMultiplier * levelUps) *
-    dmgMult;
+    (template.dmgBase * tuningDmg + template.dmgPerLevel * tuningDmg * levelUps) * dmgMult;
   return {
     maxHp: Math.round(
-      (template.hpBase * tuning.healthMultiplier +
-        template.hpPerLevel * tuning.healthMultiplier * levelUps) *
-        hpMult,
+      (template.hpBase * tuningHp + template.hpPerLevel * tuningHp * levelUps) * hpMult,
     ),
     weaponMin: Math.round(dmg * 0.8),
     weaponMax: Math.round(dmg * 1.25),
@@ -873,12 +874,16 @@ describe('dungeons: heroic difficulty', () => {
     expect(heroicMorthen.weapon.min).toBeGreaterThan(normalMorthen.weapon.min);
     expect(normalMorthen.mechanicDamageMult).toBeUndefined();
     expect(normalMorthen.mechanicHealMult).toBeUndefined();
-    // Normal Morthen keeps his template speed and stays controllable.
+    // Normal Morthen keeps his template speed. He is still CC- and snare-immune,
+    // but through the TEMPLATE flags (bosses are immune on both difficulties,
+    // tests/dungeon_difficulty.test.ts): the heroic entity stamp stays heroic-only.
     expect(normalMorthen.moveSpeed).toBe(7);
+    expect(normalMorthen.ccImmune).toBeUndefined();
+    expect(normalMorthen.slowImmune).toBeUndefined();
     (normal as any).applyAura(normalMorthen, stunAura(normalPid));
     (normal as any).applyAura(normalMorthen, slowAura(normalPid));
-    expect(normalMorthen.auras.some((a: any) => a.id === 'test_stun')).toBe(true);
-    expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(true);
+    expect(normalMorthen.auras.some((a: any) => a.id === 'test_stun')).toBe(false);
+    expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(false);
   });
 
   it('supports heroic mode across the four five-player dungeons only', () => {
@@ -1877,20 +1882,24 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       expect(add.templateId).toBe(NYTHRAXIS_ADD_ID);
       expect(add.level).toBe(22);
       expect(add.maxHp).toBe(addPins.maxHp);
+      // Encounter add waves ride the per-mob override (7.5x holds the Royal
+      // Guard at the heroic 500 floor), not the boss's dungeon-wide 8.75x.
       expect(add.mechanicDamageMult).toBe(
-        HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplier,
+        HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplierByMob?.[NYTHRAXIS_ADD_ID],
       );
     }
   });
 
-  it('a normal raid claim is untransformed; a heroic kill pays marks to every raider', () => {
+  it('a normal raid claim carries the normal retune; a heroic kill pays marks to every raider', () => {
     const normal = raidSetup('normal');
     const nBoss = mobInInstance(normal.sim, normal.inst, NYTHRAXIS_BOSS_ID);
-    expect(nBoss.maxHp).toBe(60000); // the untransformed raid boss (60k on normal)
-    expect(nBoss.mechanicDamageMult).toBeUndefined();
+    // Normal Nythraxis rides NORMAL_DUNGEON_TUNING (economy retune): doubled
+    // health (was 60000) and the 5x per-mob multiplier stamped for mechanics.
+    expect(nBoss.maxHp).toBe(120000);
+    expect(nBoss.mechanicDamageMult).toBe(5);
     spawnNythraxisAdds(normal.sim.ctx, nBoss);
     const nAdd = normal.sim.entities.get((nBoss.summonedIds as number[])[0]) as AnyEntity;
-    expect(nAdd.mechanicDamageMult).toBeUndefined();
+    expect(nAdd.mechanicDamageMult).toBe(5);
 
     const { sim, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);

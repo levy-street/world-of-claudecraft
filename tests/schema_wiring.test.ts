@@ -356,6 +356,47 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(openIdx).toBeGreaterThan(rewardEventsIndex);
     expect(openIdx).toBeLessThan(sessionUnlock);
     expect(h.calls[openIdx]).toContain('WHERE ended_at IS NULL');
+    // The client-perf worst-10s ranking index (packet 0 ruling R7) builds
+    // fourth, still inside the session lock and never as boot DDL; its
+    // columns must exist by then (the ALTERs ride the committed transaction).
+    const worst10sIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS client_perf_reports_worst10s_created'),
+    );
+    expect(worst10sIdx).toBeGreaterThan(openIdx);
+    expect(worst10sIdx).toBeLessThan(sessionUnlock);
+    expect(h.calls[worst10sIdx]).toContain('worst_10s_frame_p95_ms DESC, created_at DESC');
+  });
+
+  it('adds the phase 03 client-perf dimension columns as guarded boot DDL', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS crowd_bucket TEXT NOT NULL DEFAULT ''",
+    );
+    expect(applied).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS sim_entities INT NOT NULL DEFAULT 0',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS active_views INT NOT NULL DEFAULT 0',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS visible_views INT NOT NULL DEFAULT 0',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS worst_10s_frame_p95_ms REAL NOT NULL DEFAULT 0',
+    );
+    // Phase 05 (ruling R14): the suggestion-ids array rides the same guarded
+    // boot-DDL block; NOT NULL DEFAULT '{}' keeps legacy rows array-readable.
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}'",
+    );
+    // The worst-10s index must NEVER appear as transactional boot DDL: the
+    // only CREATE for it is the post-commit CONCURRENTLY build (ruling R7).
+    const commitIndex = h.calls.indexOf('COMMIT');
+    const bootCreates = h.calls.filter(
+      (sql, i) => i < commitIndex && sql.includes('client_perf_reports_worst10s_created'),
+    );
+    expect(bootCreates).toEqual([]);
   });
 
   it('drops an INVALID metrics-index carcass before rebuilding it (a killed CONCURRENTLY build self-heals)', async () => {
@@ -465,6 +506,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'play_sessions_account_started_id',
       'daily_reward_events_account_day_created_id',
       'play_sessions_open_character',
+      'client_perf_reports_worst10s_created',
     ]);
   });
 

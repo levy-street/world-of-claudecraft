@@ -1,4 +1,4 @@
-// Source pins over the Hud's Phase 9 training integration (the
+// Source pins over the Hud's recipe-training integration (the
 // craft_celebration/log_event_route source-scan style: the wiring lives in
 // the hud.ts coordinator, so these pin the load-bearing snippets instead of
 // booting the whole Hud):
@@ -18,7 +18,7 @@ const hudSource = readFileSync(resolve(__dirname, '../src/ui/hud.ts'), 'utf8');
 
 function trainResultArm(): string {
   const start = hudSource.indexOf("case 'trainResult': {");
-  // Phase 14b inserted the unbindResult arm between trainResult and
+  // The unbindResult arm sits between trainResult and
   // masterwork; the slice ends at the NEXT case so the single-surface pins
   // below stay scoped to the trainResult arm alone.
   const end = hudSource.indexOf("case 'unbindResult': {", start);
@@ -92,13 +92,24 @@ describe('hud.ts trainResult event arm (source pins)', () => {
     const arm = trainResultArm();
     expect(arm).toContain('this.renderTrain();');
     expect(arm).toContain('this.renderCrafting();');
-    expect(arm).toContain("$('#crafting-window').style.display === 'block'");
+    expect(arm).toContain("$('#crafting-window').style.display === 'flex'");
+  });
+
+  it('resolves the learn flight from the event, ok or deny (issue #2342)', () => {
+    // resolve() closes the pending flight either way and feeds the confirmed
+    // overlay on ok, so the repaint below reads Known even when the cprof
+    // mirror has not caught up yet. It must run BEFORE the renderTrain
+    // repaint, or the repaint paints the stale pending row.
+    const arm = trainResultArm();
+    const resolveAt = arm.indexOf('this.trainLearns.resolve(ev.recipeId, ev.ok);');
+    expect(resolveAt, 'resolve call present in the arm').toBeGreaterThan(-1);
+    expect(resolveAt).toBeLessThan(arm.indexOf('this.renderTrain();'));
   });
 });
 
 describe('hud.ts crafting known-filter (source pins)', () => {
   it('filters the recipe list through the SHARED viewer predicate before the view build', () => {
-    // Deliberate re-pin (Phase 9 QA): the filter must delegate to the one
+    // Deliberate re-pin: the filter must delegate to the one
     // isRecipeKnownForViewer helper the train ladder also uses, never an
     // inline restatement the two windows could let drift apart.
     expect(hudSource).toContain('const knownRecipes = this.sim.recipeList.filter((recipe) =>');
@@ -113,8 +124,28 @@ describe('hud.ts crafting known-filter (source pins)', () => {
 describe('hud.ts train window wiring (source pins)', () => {
   it('feeds the pure view core from the IWorld identity mirror and routes trains to the seam', () => {
     expect(hudSource).toContain('knownRecipes: identity.knownRecipes');
-    expect(hudSource).toContain('onTrain: (recipeId) => this.sim.trainRecipe(recipeId)');
+    expect(hudSource).toContain('onTrain: (recipeId) => this.trainRecipeClicked(recipeId)');
     expect(hudSource).toContain("this.closeOtherWindows('#train-window')");
+  });
+
+  it('opens the learn flight BEFORE the command leaves and repaints immediately (issue #2342)', () => {
+    // begin() false swallows the activation, so a rapid double-click sends
+    // train_recipe exactly once and train_already_known can never surface
+    // from the trainer window; the immediate renderTrain paints the disabled
+    // pending row as the first click's feedback.
+    expect(hudSource).toMatch(
+      /private trainRecipeClicked\(recipeId: string\): void \{\s*\n\s*if \(!this\.trainLearns\.begin\(recipeId, performance\.now\(\)\)\) return;\s*\n\s*this\.sim\.trainRecipe\(recipeId\);\s*\n\s*this\.renderTrain\(\);/,
+    );
+    expect(hudSource).toMatch(
+      /import \{ TrainLearnTracker \} from '\.\/hud\/vendor\/train_learn_core';/,
+    );
+  });
+
+  it('feeds both tracker read surfaces into buildTrainView', () => {
+    expect(hudSource).toContain('pendingRecipes: this.trainLearns.pendingIds(performance.now())');
+    expect(hudSource).toContain(
+      'confirmedRecipes: this.trainLearns.confirmedIds(identity.knownRecipes)',
+    );
   });
 });
 

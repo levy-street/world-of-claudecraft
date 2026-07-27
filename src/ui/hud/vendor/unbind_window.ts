@@ -1,20 +1,23 @@
-// Thin DOM consumer for the Maker's Bond unbind window (Professions 2.0
-// Phase 14b).
+// Thin DOM consumer for the Maker's Bond unbind window (Professions 2.0).
 //
 // The consumer half of the pure-core + thin-consumer split (reference
 // train_window.ts): paints the station master's unbind service from the
 // structured UnbindView and reports unbind/close clicks back through the
-// injected callbacks. Reuses the vendor window's CSS classes (.vendor-item,
-// .vi-name, .vi-price, .vi-sub) so the service reads as the same window
-// family. It owns no state; the fee-confirm dialog is the HUD's ONE
-// confirmDialog family (the destruction-confirm precedent), opened by the
-// onUnbind callback, never a bespoke prompt here.
+// injected callbacks. Keeps the vendor family's row classes (.vendor-item,
+// .vi-name, .vi-price, .vi-sub) for anatomy while the rows ride the same
+// showcase inset-card treatment as the train ladder (card fill and
+// hairline, quality-glow socket, gold-gradient fee chip when affordable).
+// It owns no state; the fee-confirm dialog is the HUD's ONE confirmDialog
+// family (the destruction-confirm precedent), opened by the onUnbind
+// callback, never a bespoke prompt here.
 
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatMoney, formatNumber, t } from '../../i18n';
+import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
+import { qualityGlowShadow } from '../../quality_glow';
 import { svgIcon } from '../../ui_icons';
 import type { UnbindRow, UnbindView } from './unbind_view';
 
@@ -66,8 +69,14 @@ export function renderUnbindWindow(
     button.setAttribute('aria-label', t('hudChrome.unbind.unbindAria', { name, fee }));
     const countSuffix =
       row.boundCount > 1 ? ` x${formatNumber(row.boundCount, { maximumFractionDigits: 0 })}` : '';
-    const iconHtml = row.item ? deps.itemIcon(row.item) : '';
-    button.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}${esc(countSuffix)}<span class="vi-sub">${esc(t('hudChrome.unbind.rowSub'))}</span></span><span class="vi-price${row.affordable ? '' : ' unaffordable'}">${esc(fee)}</span>`;
+    // Quality-glow socket and fee treatment: the train_window idiom (gold
+    // action chip when affordable, plain error-tint price when not).
+    const glow = row.item?.quality ? qualityGlowShadow(QUALITY_COLOR[row.item.quality]) : '';
+    const iconHtml = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item) : ''}</span>`;
+    const feeHtml = row.affordable
+      ? `<span class="vi-price-chip">${esc(fee)}</span>`
+      : `<span class="vi-price unaffordable">${esc(fee)}</span>`;
+    button.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}${esc(countSuffix)}<span class="vi-sub">${esc(t('hudChrome.unbind.rowSub'))}</span></span>${feeHtml}`;
     button.addEventListener('click', () => deps.onUnbind(row.itemId, row.feeCopper));
     if (row.item) {
       const item = row.item;

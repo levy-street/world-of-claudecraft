@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // the two character-lease functions, so the handshake drives with no live
 // database and no module mock: the lease fns are vi.fn spies on the deps object.
 import { createWsAuth } from '../server/ws_auth';
+import { ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
 
 const ALREADY_IN_WORLD = 'character already in world';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -23,7 +24,8 @@ function fakeWs() {
   };
 }
 
-const authFrame = (character: number) => JSON.stringify({ t: 'auth', token: 'tok', character });
+const authFrame = (character: number) =>
+  JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character });
 const fakeReq = () => ({}) as any;
 
 // Build a full WsAuthDeps bag whose cheap checks all pass, so a handshake reaches

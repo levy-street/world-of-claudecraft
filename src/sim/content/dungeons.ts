@@ -20,6 +20,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 18,
     moveSpeed: 6.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 90, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.8 },
@@ -78,6 +86,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 9,
     family: 'undead',
     elite: true,
+    // Named mid-boss: the boss CC/snare immunity rule applies on both
+    // difficulties even without the boss: true flag (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 110,
     hpPerLevel: 24,
     dmgBase: 9,
@@ -86,6 +98,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 22,
     moveSpeed: 7,
     aggroRadius: 14,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 400, chance: 1 },
       { itemId: 'quilted_trousers', chance: 0.4 },
@@ -102,6 +122,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'undead',
     elite: true,
     boss: true,
+    // Endgame-instance bosses can be neither controlled nor kited on EITHER
+    // difficulty (the heroic entity stamp in instances/difficulty.ts stays as
+    // belt and braces): the normal-difficulty economy retune assumes swings land.
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 230,
     hpPerLevel: 32,
     dmgBase: 11,
@@ -141,6 +166,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 18,
     moveSpeed: 6.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 150, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.7 },
@@ -188,6 +221,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [], // summoned add — nothing to loot
     scale: 0.95,
     color: 0x6fae9e,
@@ -199,6 +240,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 13,
     family: 'undead',
     elite: true,
+    // Named mid-boss: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 120,
     hpPerLevel: 26,
     dmgBase: 11,
@@ -207,6 +251,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 7,
     aggroRadius: 14,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 800, chance: 1 },
       { itemId: 'trollhide_leggings', chance: 0.5, rollGroup: 'olen_guaranteed_uncommon' },
@@ -228,6 +280,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
+    // Boss rule: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 240,
     hpPerLevel: 34,
     dmgBase: 12,
@@ -273,6 +328,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 22,
     moveSpeed: 6.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 300, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.6 },
@@ -321,6 +384,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 7,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [], // summoned add — nothing to loot
     scale: 1.0,
     color: 0xc8cfc8,
@@ -332,6 +403,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 20,
     family: 'ogre',
     elite: true,
+    // Named mid-boss: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 260,
     hpPerLevel: 36,
     dmgBase: 14,
@@ -368,6 +442,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 20,
     family: 'humanoid',
     elite: true,
+    // Named mid-boss: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 230,
     hpPerLevel: 33,
     dmgBase: 13,
@@ -402,6 +479,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'dragonkin',
     elite: true,
     boss: true,
+    // Boss rule: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 420,
     hpPerLevel: 48,
     dmgBase: 15,
@@ -410,7 +490,26 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 7,
     aggroRadius: 18,
-    aoePulse: { min: 30, max: 42, radius: 14, every: 8, name: 'Necrotic Shockwave' },
+    // Grave Inferno (2026-07): the old Necrotic Shockwave aoePulse hit every
+    // melee for an unavoidable, unmitigated 570-798 each 8s. Replaced by a
+    // Geddon-style stationary channel: 8s rooted, no melee, four escalating
+    // fire pulses (base x1/2/3/4 x the per-mob mechanic multiplier), 14yd.
+    // Moving out at the windup eats the small first pulse or nothing.
+    // The 50% hp gate (2026-07-26) guarantees the channel fires once per kill
+    // on BOTH difficulties: a group out-pacing the 30s cadence used to skip
+    // the mechanic entirely. One gate only, and it lands before the 30% enrage
+    // so the burn phase never stacks on enraged melee.
+    infernoChannel: {
+      every: 30,
+      duration: 8,
+      pulses: 4,
+      min: 7,
+      max: 9,
+      radius: 14,
+      name: 'Grave Inferno',
+      school: 'fire',
+      atHpPct: [0.5],
+    },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 50000, chance: 1 },
@@ -542,7 +641,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 3.4,
     attackSpeed: 2.0,
     armorPerLevel: 16,
-    moveSpeed: 11,
+    moveSpeed: 8,
     aggroRadius: 14,
     ignoreTaunt: true,
     loot: [],
@@ -560,6 +659,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     elite: true,
     boss: true,
     ccImmune: true,
+    // Boss rule: snare-immune on both difficulties too (the raid boss was
+    // ccImmune from day one but still slowable on normal; see morthen).
+    slowImmune: true,
     // 60k on normal (createMob applies the 2.3x elite factor); heroic scales
     // this via the nythraxis_boss_arena healthMultiplier.
     hpBase: 60000 / 2.3,

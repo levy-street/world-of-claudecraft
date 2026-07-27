@@ -153,7 +153,7 @@ describe('gossipMenuIsEmpty', () => {
         hasTraining: false,
       }),
     ).toBe(false);
-    // Phase 9: a station master's Train option alone keeps the menu open.
+    // A station master's Train option alone keeps the menu open.
     expect(
       gossipMenuIsEmpty({
         questCount: 0,

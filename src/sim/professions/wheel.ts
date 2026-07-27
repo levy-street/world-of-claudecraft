@@ -39,7 +39,7 @@ export function emptyCraftSkills(): CraftSkills {
 /** Backfill a persisted/partial record so every ring craft has an entry, without
  *  disturbing any in-range value already present (additive back-compat: an older
  *  save with fewer or zero craft keys loads cleanly at 0 for the missing ones).
- *  Phase 12c: a loaded value above the craft's enforced content cap clamps DOWN
+ *  A loaded value above the craft's enforced content cap clamps DOWN
  *  to it (the load-time arm of the maxSkill cap). */
 export function normalizeCraftSkills(
   saved: Record<string, number> | undefined | null,
@@ -56,7 +56,7 @@ export function normalizeCraftSkills(
 
 /** Additive-only skill gain for exactly one craft. Never touches any other craft's
  *  value (each of the ten crafts is an independent counter). A non-positive amount
- *  is a no-op; skill never goes negative. Phase 12c: gain clamps at the craft's
+ *  is a no-op; skill never goes negative. Gain clamps at the craft's
  *  enforced content cap (craftMaxSkillFor); this single primitive is the gain-time
  *  arm for crafting, enchanting, AND the battlefield trickle, so at cap all of
  *  them stop advancing skill while the actions themselves keep working. */
@@ -81,7 +81,7 @@ export function craftSkillsFor(ctx: SimContext, pid: number): CraftSkills {
 // and so on. Recipes bucket their skillReq the same way, so a recipe's tier
 // and a player's capability tier are directly comparable.
 //
-// Skill-progress rule on a successful craft (Professions 2.0 Phase 12c, the
+// Skill-progress rule on a successful craft (Professions 2.0, the
 // four-state mastery curve): EVERY recipe tier, tier 0 included, is scored by
 // how many tiers it sits below the player's capability. The tier-0 free floor
 // from #1126/#1127 (full gain forever on the cheapest recipe) is retired.
@@ -116,7 +116,7 @@ export function tierCapability(skills: CraftSkills, craftId: string): number {
 export const REDUCED_TIER_MULTIPLIER = 0.5;
 
 // Multiplier applied to a two-tiers-below craft's skill-progress amount: the
-// third state of the Phase 12c four-state mastery curve.
+// third state of the four-state mastery curve.
 export const MINIMAL_TIER_MULTIPLIER = 0.25;
 
 /** The skill-progress multiplier for crafting a recipe of `recipeTier` given a

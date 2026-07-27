@@ -1079,6 +1079,16 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   if (Object.entries(meta.craftSkills).some(([craftId, v]) => craftId !== 'enchanting' && v > 0)) {
     grantDeed(ctx, meta, 'prog_first_craft', { retro: true });
   }
+  // Proof: attunedPairs records every archetype pair this character ever
+  // attuned (written only by professions/archetype.ts: attuneArchetypePair
+  // and the save-restore of that same history, both downstream of a real
+  // quest-validated attunement), so a non-empty history proves an attunement
+  // happened before the attunementsCompleted counter existed. Without this
+  // arm a veteran who attuned once and never switches would be PERMANENTLY
+  // stranded (attunement can be once-ever for a player who never switches).
+  if (meta.archetype.attunedPairs.length > 0) {
+    grantDeed(ctx, meta, 'prog_guildsworn', { retro: true });
+  }
   // Proof: every ground object is a quest item whose pickup is denied unless
   // its quest is active (interaction.ts), so a done proving quest can only
   // have been completed through the pickup path. The counter itself stays
@@ -1832,4 +1842,11 @@ export const VISITED_MARK_NAMESPACES = [
   'fiesta',
   'dungeon',
   'witness',
+  // Rare gather-event finds (the marks were authored dormant before their
+  // deed consumers): the three node flavors written by announceGatherRareEvent
+  // plus the corpse-harvest perfect_specimen jackpot. Registering the
+  // namespace also lets restoreDeedStats keep marks an older save
+  // already carries (they serialized fine but were dropped on load while the
+  // namespace was unregistered).
+  'gather_event',
 ] as const;

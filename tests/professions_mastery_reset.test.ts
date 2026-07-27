@@ -1,4 +1,4 @@
-// THE PHASE 12c ONE-TIME SKILL RESET, with the keep ledger. A character
+// THE ONE-TIME MASTERY SKILL RESET, with the keep ledger. A character
 // loaded WITHOUT the CharacterState masteryResetApplied flag has craftSkills
 // and gatheringProficiency zeroed exactly once at load-time normalize
 // (professions/mastery_reset.ts), then the flag serializes as literal true
@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { DEEDS } from '../src/sim/content/deeds';
 import { MASTERY_RESET_LETTER } from '../src/sim/content/letters';
 import { CRAFT_RING, GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
 import { markDeedsDirty } from '../src/sim/deeds';
@@ -274,18 +275,18 @@ describe('one-shot: the flag serializes literal true and never re-fires', () => 
   });
 
   it('ROLLBACK CAVEAT pinned: a flag-stripping round trip re-fires the reset', () => {
-    // Pre-12c serialize knows no masteryResetApplied key, so a rollback
+    // Pre-reset serialize knows no masteryResetApplied key, so a rollback
     // window strips it and the re-upgrade re-fires the reset, zeroing the
     // skills regained during the window. This is the ACCEPTED destructive
     // arm of the mailWelcomed flag class (release-notes item); this pin
-    // makes the acceptance conscious, per the Phase 9 rollback-pin
+    // makes the acceptance conscious, per the rollback-pin
     // precedent.
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Rolled', { state: resetSave() });
     const blob = sim.serializeCharacter(pid);
     if (!blob) throw new Error('serializeCharacter returned null');
     blob.craftSkills = { ...blob.craftSkills, armorcrafting: 40 };
-    // biome-ignore lint/performance/noDelete: modeling the pre-12c blob shape
+    // biome-ignore lint/performance/noDelete: modeling the pre-reset blob shape
     delete blob.masteryResetApplied;
     const sim2 = makeSim(43);
     const pid2 = sim2.addPlayer('warrior', 'Rolled', { state: blob });
@@ -336,7 +337,7 @@ describe('the mail-phase notice letter', () => {
 });
 
 describe('re-crossing the 75/100 thresholds after the reset', () => {
-  it('no duplicate deed grant, no renown change, no second guild trend letter', () => {
+  it('no duplicate deed grant, no renown change beyond the NEW mid-ladder rung, no second guild trend letter', () => {
     // No archetype (so the guild trend sweep is live for this character) but
     // guildLetterSent already true, both threshold deeds already earned.
     const s = resetSave();
@@ -356,9 +357,69 @@ describe('re-crossing the 75/100 thresholds after the reset', () => {
     for (let i = 0; i < 45; i++) sim.tick(); // deed eval + the 1 Hz mail sweeps
     expect(meta.deedsEarned.get('prog_craft_specialist')).toBe('2026-01-01');
     expect(meta.deedsEarned.get('prog_mining_100')).toBe('2026-01-02');
-    expect(meta.renown).toBe(renownBefore);
+    // The newer mid-ladder rung (prog_armorcrafting_50) did not exist when
+    // this pre-curve save was frozen, so the re-climb legitimately earns it
+    // FRESH here (renown 5): the reset zeroed the skills BEFORE the join retro
+    // sweep, so no join-time grant fired either (the arm two tests up). The
+    // already-earned deeds above are the no-duplicate half of the pin.
+    expect(meta.deedsEarned.has('prog_armorcrafting_50')).toBe(true);
+    expect(meta.renown).toBe(renownBefore + DEEDS.prog_armorcrafting_50.renown);
     expect(meta.guildLetterSent).toBe(true);
     expect(sim.mailUnreadFor(pid)).toBe(unreadBefore);
+  });
+
+  it('re-climbing to the raised mastery cap (125) after the reset double-grants NOTHING', () => {
+    // A save that already earned the full armorcrafting deed ladder (the 50
+    // rung, the Specialist, and the Grandmaster cap deed) loses the SKILLS to
+    // the one-time reset but keeps the deeds; re-climbing to 125 must leave
+    // every stamp and the renown total byte-identical (grantDeed idempotence
+    // driven through the live evaluator, not asserted on the function).
+    const s = resetSave();
+    // biome-ignore lint/suspicious/noExplicitAny: fixture shaping
+    delete (s as any).archetype;
+    // biome-ignore lint/suspicious/noExplicitAny: fixture shaping
+    (s as any).deeds.prog_armorcrafting_50 = '2026-01-03';
+    // biome-ignore lint/suspicious/noExplicitAny: fixture shaping
+    (s as any).deeds.prog_grandmaster_armorcrafting = '2026-01-04';
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'CapRecross', { state: s });
+    const meta = metaOf(sim, pid);
+    sim.tick(); // drains the one reset notice letter
+    expect(meta.craftSkills.armorcrafting).toBe(0); // the reset really fired
+    const renownBefore = meta.renown;
+    sim.gainCraftSkill(pid, 'armorcrafting', 125);
+    // biome-ignore lint/suspicious/noExplicitAny: test reaches the ctx seam
+    markDeedsDirty((sim as any).ctx, pid);
+    for (let i = 0; i < 45; i++) sim.tick();
+    // Stamps unchanged: the fixture sentinels survive the whole re-climb.
+    expect(meta.deedsEarned.get('prog_armorcrafting_50')).toBe('2026-01-03');
+    expect(meta.deedsEarned.get('prog_craft_specialist')).toBe('2026-01-01');
+    expect(meta.deedsEarned.get('prog_grandmaster_armorcrafting')).toBe('2026-01-04');
+    expect(meta.renown).toBe(renownBefore);
+  });
+
+  it('positive control: a never-earned Grandmaster deed IS granted fresh on the 125 re-climb', () => {
+    // Identical fixture minus the Grandmaster stamp: the same climb in the
+    // same idiom grants it fresh with a new stamp and pays its renown, so the
+    // unchanged pins above are demonstrably not vacuous.
+    const s = resetSave();
+    // biome-ignore lint/suspicious/noExplicitAny: fixture shaping
+    delete (s as any).archetype;
+    // biome-ignore lint/suspicious/noExplicitAny: fixture shaping
+    (s as any).deeds.prog_armorcrafting_50 = '2026-01-03';
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'CapFresh', { state: s });
+    const meta = metaOf(sim, pid);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_grandmaster_armorcrafting')).toBe(false);
+    const renownBefore = meta.renown;
+    sim.gainCraftSkill(pid, 'armorcrafting', 125);
+    // biome-ignore lint/suspicious/noExplicitAny: test reaches the ctx seam
+    markDeedsDirty((sim as any).ctx, pid);
+    for (let i = 0; i < 45; i++) sim.tick();
+    expect(meta.deedsEarned.has('prog_grandmaster_armorcrafting')).toBe(true);
+    expect(meta.deedsEarned.get('prog_grandmaster_armorcrafting')).not.toBe('2026-01-04');
+    expect(meta.renown).toBe(renownBefore + DEEDS.prog_grandmaster_armorcrafting.renown);
   });
 
   it('positive control: the deed eval DOES fire on the climb for a never-earned deed', () => {
@@ -389,11 +450,14 @@ describe('re-crossing the 75/100 thresholds after the reset', () => {
 });
 
 describe('parity: zero new sampled PlayerMeta fields', () => {
-  it('samplePlayerMeta(fresh meta) contains neither reset key', () => {
+  it('samplePlayerMeta(fresh meta) contains no one-time load-flag key', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Sampled');
     const sample = samplePlayerMeta(metaOf(sim, pid)) as Record<string, unknown>;
     expect(Object.keys(sample)).not.toContain('pendingMasteryResetNotice');
     expect(Object.keys(sample)).not.toContain('masteryResetApplied');
+    // The proficiency display heal (issue 2339) follows the same contract:
+    // CharacterState-only, serialized as literal true, no PlayerMeta mirror.
+    expect(Object.keys(sample)).not.toContain('proficiencyDisplayHealApplied');
   });
 });

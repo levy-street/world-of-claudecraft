@@ -44,18 +44,29 @@ describe('CharacterVisual swimming presentation', () => {
     state.swimPitch = 0;
     state.bobPhase = 0;
     state.swimHidingWeapons = false;
+    // v31 refactored the swim rise to an eased swimBlend (0..1) scaling an
+    // accumulated swimBobTime; Object.create skips the field initializers, so
+    // seed both. swimBlend = 1 isolates the surface pin from the eased entry,
+    // and swimBobTime = -dt lands the bob on phase 0 after update()'s += dt.
+    state.swimBlend = 1;
+    state.swimBobTime = -0.1;
     state.model = model;
     state.weaponAuraMeshes = [aura];
     state.pendingDt = 0;
 
+    // Swimming: the pose is pinned at the surface rise (SWIM_RISE = 0.05) and
+    // both hands are busy, so the held weapon and aura are hidden.
     visual.update(0.1, idleState(true), false);
     expect((state.poseWrap as THREE.Group).position.y).toBeCloseTo(0.05);
     expect(weapon.visible).toBe(false);
     expect(aura.visible).toBe(false);
 
+    // Leaving the water restores the held props on the swim edge (first frame);
+    // the surface pin then eases back to rest as swimBlend releases toward 0.
     visual.update(0.1, idleState(false), false);
-    expect((state.poseWrap as THREE.Group).position.y).toBe(0);
     expect(weapon.visible).toBe(true);
     expect(aura.visible).toBe(true);
+    for (let i = 0; i < 40; i++) visual.update(0.1, idleState(false), false);
+    expect((state.poseWrap as THREE.Group).position.y).toBeCloseTo(0);
   });
 });

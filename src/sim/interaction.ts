@@ -24,7 +24,9 @@
 // (enforced by tests/architecture.test.ts).
 
 import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
+import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
+import { corpseInteractionAvailability } from './corpse_interaction';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -45,15 +47,18 @@ import {
 import { applyFocusBonus, applyFocusTierBonus, type FocusAllocation } from './professions/focus';
 import {
   effectiveFocusComponents,
+  forfeitsEveryMappedYield,
   HARVEST_COMPONENT_ITEMS,
   type HarvestTier,
   harvestTierQuantity,
   isHarvestableCorpse,
   isSignableMaterialRarity,
+  type MaterialRarity,
   resolveCorpseFocusHarvest,
   resolveCorpseHarvest,
   rollCorpseMaterialRarity,
 } from './professions/gathering';
+import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
 import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
@@ -212,13 +217,20 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * professions/gathering.ts for the race-freedom argument.
  *
  * `components` (#1142) is the player's per-corpse focus pick: which tagged
- * component(s) to extract. OMITTED (undefined, Phase 12d) resolves to the
+ * component(s) to extract. OMITTED (undefined) resolves to the
  * player's persistent town focus: the corpse tags holding allocation points
  * (none focused falls through to the spread). An EXPLICIT array keeps the
  * #1142 semantics: empty or covering every tagged component spreads across
  * every tag (the #1141 behavior); picking fewer concentrates the effort for
  * a higher tier per component, per resolveCorpseFocusHarvest in
- * professions/gathering.ts.
+ * professions/gathering.ts. That array is sanitized before any of it is read
+ * (effectiveFocusComponents): repeats collapse (#2474) and tags this corpse
+ * does not carry drop out (#2504), so `['hide','hide']` and `['hide','junk']`
+ * are both exactly `['hide']` here and in the pre-claim capacity gate below,
+ * and a pick of nothing but junk is exactly the empty pick (it spreads).
+ * A pick that survives sanitization but names only families with no item
+ * behind them is REFUSED pre-claim instead (#2509, see the gate below), so no
+ * selection can spend a single-use corpse for nothing.
  */
 export function harvestCorpse(
   ctx: SimContext,
@@ -261,12 +273,63 @@ export function harvestCorpse(
   // persistent town focus per component, fit cumulatively): a gate on less
   // could pass on a nearly-full stack and let the uncapped addItem spill past
   // capacity.
-  // Phase 12d omitted-components default: no explicit pick means the player's
+  // Omitted-components default: no explicit pick means the player's
   // persistent town focus IS the pick (the focused subset of this corpse's
   // tags; nothing focused spreads, exactly like an explicit empty pick). The
   // derivation is rng-free, so a refused command below still draws nothing.
   const chosen =
     components ?? (componentTags ?? []).filter((tag) => (meta.townFocus[tag] ?? 0) > 0);
+  // #2509: refuse a pick that forfeits EVERYTHING this corpse had to give,
+  // before the claim is spent. Measured pre-fix on old_greyjaw (hide, fang,
+  // claw) with ['claw']: the claim was spent, one tier roll was drawn, nothing
+  // was granted, and the harvestResult ledger was skipped (it is gated on
+  // `granted.length > 0`), so the player burned a single-use corpse for no
+  // items and NO chat line at all. Nine shipped templates mix mapped and
+  // unmapped families, and on the three `gills, hide` murlocs a single
+  // checkbox is enough to hit it.
+  //
+  // Placed with the capacity gate below, for the same three reasons that one
+  // is here: pre-claim (a refusal must leave the corpse for the next
+  // harvester), rng-free (a refused command must not shift the world's draw
+  // order), and reading the same `effectiveFocusComponents` set the roll will.
+  // It fires exactly when the `wanted` loop below would come out empty, and
+  // the bags-full gate needs `wanted` non-empty, so neither can mask the
+  // other's message. The predicate itself lives beside effectiveFocusComponents
+  // (professions/gathering.ts) because the picker's view-core mirrors it; one
+  // rule, one place, or the two drift the first time the spread rule moves.
+  //
+  // Deliberately NOT narrowed inside effectiveFocusComponents the way an
+  // uncarried tag is (#2504): the concentration bonus is
+  // `taggedComponents.length - effectiveChosen.length`, so dropping a
+  // carried-but-unmapped entry from the pick would raise the bonus on every
+  // mixed pick and break the documented "an explicit full cover spreads
+  // exactly like an empty pick" equivalence. Measured on old_greyjaw seed 5:
+  // ['hide','claw'] yields rough_hide 3 at bonus 1 today and would become the
+  // bonus-2 ['hide'] world (rough_hide 4 plus a pristine_hide), and the
+  // check-every-box ['hide','fang','claw'] would stop spreading. This refusal
+  // re-tunes nothing: every pick that yields anything behaves exactly as before.
+  //
+  // Scope, the other half of the #2504 comment: that one covers a tag the
+  // corpse does not CARRY, which sanitizes away and spreads. This covers a tag
+  // it carries that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills,
+  // horn). A corpse whose tags ALL map to nothing (fen_troll: claw, tusk) is
+  // untouched on purpose: no pick forfeits anything there, so it keeps the
+  // documented deferred-design path (claim spent, zero yield, zero emits) that
+  // tests/corpse_harvest_sim.test.ts and
+  // tests/corpse_harvest_result_event.test.ts both pin. That is what the
+  // predicate's second half buys, and it is why the pin stays green rather
+  // than being re-argued away.
+  //
+  // This also covers the DERIVED pick, not just an explicit one: an omitted
+  // `components` resolves through meta.townFocus, and set_town_focus does not
+  // validate that a key is a real component tag (#2511), so a persisted
+  // `{ claw: 5 }` makes the plain interact press take this arm too. Refusing
+  // is the better outcome there as well: the corpse survives for a pick that
+  // can pay out, instead of being burned by a focus the player cannot see.
+  if (forfeitsEveryMappedYield(componentTags ?? [], chosen)) {
+    ctx.error(meta.entityId, 'Nothing you selected can be harvested from that corpse.');
+    return;
+  }
   const wanted: InvSlot[] = [];
   for (const component of effectiveFocusComponents(componentTags ?? [], chosen)) {
     const wantedItemId = HARVEST_COMPONENT_ITEMS[component];
@@ -281,28 +344,36 @@ export function harvestCorpse(
     return;
   }
   mob.harvestClaimedBy = claim.claimedBy;
-  // Phase 12 tool gate for the PREMIUM arm only: the plain component grant is
+  // Tool gate for the PREMIUM arm only: the plain component grant is
   // never gated (the bare-hands floor), but a signable rarity roll's
   // signed/specimen upgrade needs the player's best owned gathering tool of
   // ANY profession to cover the component family's material tier. Resolved
   // once, rng-free, before the per-yield loop. Every wave-one family is tier 1
   // (content/professions.ts MONSTER_MATERIAL_TIERS, the prime directive), so
-  // in shipped content this gate never fires: it is the Phase 12 seam future
+  // in shipped content this gate never fires: it is the seam future
   // higher-tier corpse families compose with.
   const bestAny = bestOwnedAnyGatherToolTier(meta.inventory, ITEMS);
   let toolDeniedEmitted = false;
+  // #2457: the yield ledger the single harvestResult event below carries. Every
+  // grant in this function passes { silent: true, callerLogs: true } from here
+  // on, so the hub's own per-grant "You receive:" line and generic ding stand
+  // down (the #2430 contract) and this ledger becomes the harvest's ONLY chat
+  // feedback. Recorded beside each grant as it LANDS rather than from the roll
+  // loop, so a full-bag downgrade reports the plain top-up it actually became
+  // and a refused specimen contributes no entry at all.
+  const granted: HarvestYield[] = [];
   // #1145: a rare-or-better monster material is stamped with the harvester's
   // name (a non-fungible instance slot); anything below that rarity stays a
   // plain fungible grant, same as before this issue. One rarity roll per
   // yielded component, same one-draw-per-yield convention as
   // resolveCorpseFocusHarvest's own tier roll.
   const yields = resolveCorpseFocusHarvest(componentTags ?? [], chosen, ctx.rng);
-  // #1145 + Phase 10: one rarity roll per yielded component, independent of
+  // #1145: one rarity roll per yielded component, independent of
   // the component's tier roll/bonus. For a family with a Pristine specimen
   // (HARVEST_COMPONENT_SPECIMENS), a rare-or-better roll grants the specimen
   // as the SIGNED jackpot IN ADDITION to the plain component; the regular
   // component always grants plain. A family without a specimen keeps the
-  // pre-Phase-10 behavior: the component itself grants signed at rare+.
+  // pre-specimen behavior: the component itself grants signed at rare+.
   //
   // Grant ORDER is load-bearing: the pre-gate above reserves room for the
   // plain component stacks ONLY, so every plain yield must land before any
@@ -310,8 +381,19 @@ export function harvestCorpse(
   // the slot reserved for a LATER family's plain stack and push the uncapped
   // plain grant past capacity). The rarity rolls stay in this first loop, in
   // yield order, so the draw sequence is byte-identical to the single-pass
-  // shape (pinned by the parity goldens); only the grants are reordered.
-  const signedGrants: { itemId: string; specimen: boolean; plainQty: number }[] = [];
+  // shape (pinned by the draw-count cases in tests/corpse_harvest_sim.test.ts
+  // and tests/corpse_harvest_result_event.test.ts, NOT by the parity goldens:
+  // no parity scenario drives harvestCorpse); only the grants are reordered.
+  // `rarity` rides along purely so the deferred grants below can record their
+  // ledger entry with the roll that produced them (#2457): the line color is
+  // the ROLLED material rarity, and by the time a signed grant lands its own
+  // loop iteration is long past.
+  const signedGrants: {
+    itemId: string;
+    specimen: boolean;
+    plainQty: number;
+    rarity: MaterialRarity;
+  }[] = [];
   for (const y of yields) {
     const itemId = HARVEST_COMPONENT_ITEMS[y.component];
     if (!itemId) continue;
@@ -324,8 +406,10 @@ export function harvestCorpse(
     const qty = focusedHarvestQuantity(tier, y.component, meta.townFocus);
     const rarity = rollCorpseMaterialRarity(ctx.rng);
     // The rarity roll above MUST stay exactly where it is (one roll per yield,
-    // in yield order: the draw sequence is pinned by the parity goldens). The
-    // Phase 12 premium-arm denial below happens strictly AFTER the roll and
+    // in yield order: the draw sequence is pinned by the corpse suites' own
+    // draw-count cases, one per arm, since no parity scenario harvests a
+    // corpse). The
+    // premium-arm denial below happens strictly AFTER the roll and
     // draws no rng: a denied family downgrades to the plain fungible grant it
     // gets on a common roll today (a specimen family keeps its plain component
     // and only loses the jackpot push; a non-specimen family loses the
@@ -335,7 +419,8 @@ export function harvestCorpse(
       isSignableMaterialRarity(rarity) &&
       !canHarvestMonsterMaterial(bestAny, monsterMaterialTierFor(y.component))
     ) {
-      ctx.addItem(itemId, qty, meta.entityId);
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
       if (!toolDeniedEmitted) {
         toolDeniedEmitted = true;
         ctx.emit({
@@ -351,35 +436,102 @@ export function harvestCorpse(
       ? HARVEST_COMPONENT_SPECIMENS[y.component]
       : undefined;
     if (specimenId !== undefined) {
-      ctx.addItem(itemId, qty, meta.entityId);
-      signedGrants.push({ itemId: specimenId, specimen: true, plainQty: 0 });
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
+      signedGrants.push({ itemId: specimenId, specimen: true, plainQty: 0, rarity });
     } else if (isSignableMaterialRarity(rarity)) {
-      signedGrants.push({ itemId, specimen: false, plainQty: qty });
+      signedGrants.push({ itemId, specimen: false, plainQty: qty, rarity });
     } else {
-      ctx.addItem(itemId, qty, meta.entityId);
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
     }
   }
   // Signed-family components first: their plain FALLBACK still owns
   // pre-gate-reserved stack room, so they outrank the specimens, which are
   // pure extras. A signed instance merges into a byte-equal same-signer stack
-  // (identical-payload stacking, Phase 12d; never a plain stack, #1165), so
-  // this gate accepts same-signer stack room OR a genuinely free slot
+  // (identical-payload stacking; never a plain stack, #1165), so
+  // this gate accepts same-signer stack room plus genuinely free slots
   // (canGrantItemInstance, the countFit model harvestNode's signed grants
-  // share, #2139); with neither the signed-family grant falls back to the
+  // share, #2139), measured against the FULL grant: one unit for a specimen,
+  // the whole rolled quantity for a signed component (#2473). Without room for
+  // all of it the signed-family grant falls back to the
   // plain fungible top-up (the signature truncates, the yield does not) while
   // a specimen truncates outright, the same truncation contract harvestNode's
   // signed grants follow. Each downgrade tells the player via the text-free
   // personal gatherDowngrade event, at most ONCE per harvest command (the
   // toolDeniedEmitted idiom); the mark-lost arm runs first, so when both a
   // signature and a jackpot are lost the single event reports the mark.
+  // All-or-nothing is a deliberate divergence from harvestNode, whose signed
+  // batch lands a PARTIAL fit and lets the rest of the yield go: a corpse
+  // downgrade is an UNCAPPED plain grant of the whole rolled quantity into
+  // pre-gate-reserved room, so refusing the signature here costs the player no
+  // units and keeps the harvest at one ledger entry (one chat line) per item.
+  //
+  // #2473, the one behavior this quantity fix trades away, deliberately: with
+  // PARTIAL same-signer merge room the counted grant spills into a fresh slot
+  // where the one-unit grant it replaces merged for free, so on a corpse that
+  // also procs a specimen (forest_wolf tags hide AND fang) the last free slot
+  // can go to the component instead of the jackpot, which then truncates with
+  // its lost: 'find' notice. The component wins that slot for one reason only,
+  // stated plainly because it is easy to get wrong: this loop runs FIRST. It is
+  // NOT holding a claim on the slot. The pre-gate reserves room for a PLAIN add
+  // (every `wanted` entry carries no instance) and a signed instance can never
+  // spend plain-stack room (#1165), so the free slot taken here is unreserved
+  // room, the same unreserved room the specimen wanted.
+  // Refusing the signature whenever a jackpot is pending was measured across
+  // corpse templates, bag shapes, seeds and focus picks: it saves the specimen
+  // in every case that truncates and costs no yield, but it refuses tens of
+  // signatures for each specimen saved, because most bags have plain-stack room
+  // the fallback would have used anyway. Paying that much for a rare extra is
+  // the worse trade, so the simple rule stands. BOTH states are pinned in
+  // tests/corpse_harvest_sim.test.ts: the one where holding back would change
+  // nothing, and the one where it would have saved the jackpot. The real cure
+  // is a specimen reservation in the pre-gate, wider than this issue.
   let downgradeEmitted = false;
   for (const grant of signedGrants) {
     if (grant.specimen) continue;
     const payload = { signer: meta.name };
-    if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
-      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
+    if (
+      canGrantItemInstance(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        grant.itemId,
+        payload,
+        grant.plainQty,
+      )
+    ) {
+      // The whole rolled quantity, stamped (#2473): on a specimen-less family
+      // the component ITSELF is the signed grant, so the signature and the
+      // yield ride one call and a hardcoded count of 1 dropped the rest of the
+      // roll on the floor, leaving the premium arm smaller than the plain
+      // fallback right below it. The guard counts the WHOLE quantity for the
+      // same reason (#2139): a same-signer stack with room for one of three
+      // units must refuse rather than let the other two push a fresh slot past
+      // capacity. Mergeable signer payloads stack, so the whole roll costs at
+      // most ONE slot; that is one more than the single-unit grant it replaces
+      // spent whenever partial merge room let that one unit land for free,
+      // which is what the jackpot hold-back above accounts for.
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId, grant.plainQty, {
+        silent: true,
+        callerLogs: true,
+      });
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: grant.plainQty,
+        rarity: grant.rarity,
+        kind: 'signed',
+      });
     } else {
-      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId);
+      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId, { silent: true, callerLogs: true });
+      // Recorded 'plain', not 'signed': the ledger reports what LANDED, and
+      // this arm landed an unsigned top-up. The gatherDowngrade toast below
+      // still tells the player the mark was the thing that got away.
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: grant.plainQty,
+        rarity: grant.rarity,
+        kind: 'plain',
+      });
       if (!downgradeEmitted) {
         downgradeEmitted = true;
         ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'mark' });
@@ -390,13 +542,40 @@ export function harvestCorpse(
     if (!grant.specimen) continue;
     const payload = { signer: meta.name };
     if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
-      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
+      // Exactly one unit, deliberately: the specimen is a jackpot, not a
+      // quantity, so it never carries the component's rolled count the way the
+      // signed grant above does. The guard's count defaults to that same 1.
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId, 1, {
+        silent: true,
+        callerLogs: true,
+      });
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: 1,
+        rarity: grant.rarity,
+        kind: 'specimen',
+      });
+      // The perfect-specimen find mark (col_perfect_specimen), on
+      // the LANDED jackpot only (a truncated find got away, like a fish with
+      // no bag room). Every rarity draw happened in the roll loop above, so
+      // this mark write cannot perturb the pinned draw sequence.
+      ctx.markVisited(meta, 'gather_event:perfect_specimen');
     } else if (!downgradeEmitted) {
+      // A truncated specimen contributes NO ledger entry: nothing landed, so
+      // no line claims it did. The 'find' toast is the whole feedback.
       downgradeEmitted = true;
       ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'find' });
     }
   }
-  // Phase 12d lifecycle decoupling, the harvested half: with the claim spent
+  // #2457: one result event for the whole command, after every grant has
+  // landed, so the client prints one line per distinct granted item and plays
+  // exactly one cue instead of the per-grant burst the hub used to produce.
+  // Skipped entirely on a harvest that landed nothing (a corpse whose only
+  // tags map to no item, the gatherResult "granted path only" rule), so the
+  // client never renders a cue for a no-op. Draws no rng and reads no world
+  // state, so it cannot perturb the pinned draw sequence or the grant order.
+  if (granted.length > 0) ctx.emit({ type: 'harvestResult', pid: meta.entityId, yields: granted });
+  // Lifecycle decoupling, the harvested half: with the claim spent
   // the corpse owes nobody a harvest window anymore, so exhausted loot
   // collapses it on the prune's fast arm while remaining loot keeps only a
   // short owner window instead of the full decay. A pending need-greed roll
@@ -425,7 +604,12 @@ function focusedHarvestQuantity(
   return Math.round(applyFocusBonus(harvestTierQuantity(tier), component, focus));
 }
 
-export function pickUpObject(ctx: SimContext, objId: number, pid?: number): boolean {
+export function pickUpObject(
+  ctx: SimContext,
+  objId: number,
+  pid?: number,
+  noticeboardDefinitions: readonly NoticeboardDef[] = [],
+): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   const { meta, e: p } = r;
@@ -435,11 +619,27 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
     return false;
   }
   const obj = ctx.entities.get(objId);
-  if (obj?.kind !== 'object' || !obj.lootable || !obj.objectItemId) return false;
-  if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
+  if (obj?.kind !== 'object' || !obj.lootable) return false;
+  const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
+  // Preserve the historical no-op for malformed/non-pickup objects. The board
+  // is the one intentional lootable object without an item payload.
+  if (!noticeboardDef && !obj.objectItemId) return false;
+  const interactionRange = noticeboardDef?.interactionRadius ?? INTERACT_RANGE;
+  if (dist2d(p.pos, obj.pos) > interactionRange) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }
+  if (noticeboardDef) {
+    ctx.emit({
+      type: 'noticeboard',
+      noticeboardId: noticeboardDef.templateId,
+      state: 'empty',
+      pid: meta.entityId,
+    });
+    return true;
+  }
+  const objectItemId = obj.objectItemId;
+  if (!objectItemId) return false;
   const beforeCastingAbility = p.castingAbility;
   const beforeChanneling = p.channeling;
   if (tryStartNythraxisWardChannel(ctx, obj, p)) {
@@ -458,7 +658,7 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
   if (interactObjectForQuests(ctx, obj, meta)) {
     return meta.counters.questProgress !== beforeQuestProgress || ctx.nextId !== beforeQuestNextId;
   }
-  const def = ITEMS[obj.objectItemId];
+  const def = ITEMS[objectItemId];
   if (def?.questId) {
     const qp = meta.questLog.get(def.questId);
     if (!qp || (qp.state !== 'active' && qp.state !== 'ready')) {
@@ -467,7 +667,7 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
     }
     const quest = QUESTS[def.questId];
     const objIdx = quest.objectives.findIndex(
-      (o) => o.type === 'collect' && o.itemId === obj.objectItemId,
+      (o) => o.type === 'collect' && o.itemId === objectItemId,
     );
     if (objIdx < 0) {
       ctx.error(meta.entityId, def.pickupEnough ?? `${def.name} offers nothing more.`);
@@ -475,17 +675,17 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
     }
     if (
       objIdx >= 0 &&
-      ctx.countItem(obj.objectItemId, meta.entityId) >= quest.objectives[objIdx].count
+      ctx.countItem(objectItemId, meta.entityId) >= quest.objectives[objIdx].count
     ) {
       ctx.error(meta.entityId, def.pickupEnough ?? 'You have enough of those.');
       return false;
     }
   }
-  if (!ctx.canAddItem(obj.objectItemId, 1, meta.entityId)) {
+  if (!ctx.canAddItem(objectItemId, 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return false;
   }
-  ctx.addItem(obj.objectItemId, 1, meta.entityId);
+  ctx.addItem(objectItemId, 1, meta.entityId);
   obj.lootable = false;
   obj.respawnTimer = OBJECT_RESPAWN;
   // Success only: a capacity-refused attempt returned above and never counts.
@@ -493,7 +693,11 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): bool
   return true;
 }
 
-export function interact(ctx: SimContext, pid?: number): void {
+export function interact(
+  ctx: SimContext,
+  pid?: number,
+  noticeboardDefinitions: readonly NoticeboardDef[] = [],
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
@@ -525,18 +729,18 @@ export function interact(ctx: SimContext, pid?: number): void {
     const target = ctx.entities.get(p.targetId);
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
       if (target.kind === 'mob' && target.lootable) {
-        // Phase 12d unified press, targeted arm: same composition as the
-        // proximity-scan arm below (harvest while the corpse still owes its
-        // unclaimed half, omitted components = the town focus default, then
-        // loot; separate calls so neither refusal blocks the other).
-        if (
-          isHarvestableCorpse(MOBS[target.templateId]?.componentTags) &&
-          target.harvestClaimedBy === null
-        ) {
-          harvestCorpse(ctx, target.id, undefined, p.id);
+        const availability = corpseInteractionAvailability(ctx, target, p.id, true);
+        if (availability.canInteract) {
+          // Unified press, targeted arm: same composition as the
+          // proximity-scan arm below (harvest while the corpse still owes its
+          // unclaimed half, omitted components = the town focus default, then
+          // loot; separate calls so neither refusal blocks the other).
+          if (availability.harvestable) {
+            harvestCorpse(ctx, target.id, undefined, p.id);
+          }
+          lootCorpse(ctx, target.id, p.id);
+          return;
         }
-        lootCorpse(ctx, target.id, p.id);
-        return;
       }
       if (target.kind === 'object' && target.lootable) {
         if (target.templateId === 'dungeon_door' && target.dungeonId) {
@@ -552,7 +756,7 @@ export function interact(ctx: SimContext, pid?: number): void {
           return;
         }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
-        pickUpObject(ctx, target.id, p.id);
+        pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
       }
       if (target.kind === 'npc' && ctx.bankerIds.includes(target.id)) {
@@ -574,13 +778,21 @@ export function interact(ctx: SimContext, pid?: number): void {
   let bestQuestEntity: Entity | null = null;
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
   ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
-    if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) {
+    if (
+      e.kind === 'mob' &&
+      e.lootable &&
+      corpseInteractionAvailability(ctx, e, p.id, true).canInteract &&
+      d2 < bestCorpseD2
+    ) {
       bestCorpse = e;
       bestCorpseD2 = d2;
     }
     if (e.kind === 'object' && e.lootable && d2 < bestObjD2) {
-      bestObj = e;
-      bestObjD2 = d2;
+      const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, e.id);
+      if (!noticeboardDef || d2 <= noticeboardDef.interactionRadius ** 2) {
+        bestObj = e;
+        bestObjD2 = d2;
+      }
     }
     if (ctx.isQuestInteractionEntity(e) && d2 < bestQuestD2) {
       bestQuestEntity = e;
@@ -592,14 +804,11 @@ export function interact(ctx: SimContext, pid?: number): void {
   const obj = bestObj as Entity | null;
   const questEntity = bestQuestEntity as Entity | null;
   if (corpse) {
-    // Phase 12d unified press: one interact both harvests (while the corpse
+    // Unified press: one interact both harvests (while the corpse
     // still owes its unclaimed harvest half; omitted components = the town
     // focus default) and loots. Two separate calls on purpose: a harvest
     // refusal never blocks the loot half, and vice versa.
-    if (
-      isHarvestableCorpse(MOBS[corpse.templateId]?.componentTags) &&
-      corpse.harvestClaimedBy === null
-    ) {
+    if (corpseInteractionAvailability(ctx, corpse, p.id, true).harvestable) {
       harvestCorpse(ctx, corpse.id, undefined, p.id);
     }
     lootCorpse(ctx, corpse.id, p.id);
@@ -619,7 +828,7 @@ export function interact(ctx: SimContext, pid?: number): void {
       return;
     }
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;
-    pickUpObject(ctx, obj.id, p.id);
+    pickUpObject(ctx, obj.id, p.id, noticeboardDefinitions);
     return;
   }
   if (questEntity && ctx.bankerIds.includes(questEntity.id)) {

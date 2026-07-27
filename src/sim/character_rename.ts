@@ -1,4 +1,4 @@
-// Force-rename instance-signer sweep (Professions 2.0 Phase 12d): a
+// Force-rename instance-signer sweep (Professions 2.0): a
 // moderator-sanctioned rename re-keys market listings and the Ravenpost
 // mailbox, but the renamed character's OWN signed instances still carry the
 // old name in ItemInstancePayload.signer, which silently breaks the #1145
@@ -33,7 +33,7 @@ function rekeySigner(
  * nothing else: foreign signers, every other payload field, slot order, the
  * manual `slot` placements, and stack counts all pass through untouched, and
  * the sweep never merges slots (two slots left byte-equal by the rewrite stay
- * separate; the Phase 12d merge points unify them on a future add).
+ * separate; the identical-payload merge points unify them on a future add).
  *
  * Mutates `state` IN PLACE (the rename handler owns the loaded blob and
  * persists it whole right after) and returns whether any signer was

@@ -1,6 +1,6 @@
-// Pure, host-agnostic core for the bag-item context menu (Professions 2.0
-// Phase 13). It owns the DOM-free decisions behind the right-click / touch
-// action menu on a bag stack: which Phase 13 actions (Disenchant, Salvage,
+// Pure, host-agnostic core for the bag-item context menu (Professions 2.0).
+// It owns the DOM-free decisions behind the right-click / touch
+// action menu on a bag stack: which new actions (Disenchant, Salvage,
 // Apply Enchant) are eligible for an item, the full ordered menu (the classic
 // left-click action first so that binding survives, then the eligible new
 // rows), and the "would this destroy a special copy?" predicate the confirm
@@ -60,7 +60,7 @@ function defaultActionLabelKey(def: ItemDef): TranslationKey {
     : 'hudChrome.itemMenu.use';
 }
 
-/** The eligible Phase 13 actions for this item, in fixed order (disenchant,
+/** The eligible new actions for this item, in fixed order (disenchant,
  *  salvage, apply-enchant). Empty when none apply, which is what keeps a plain
  *  item's right-click byte-identical to today. */
 export function bagItemNewActions(def: ItemDef, itemId: string): BagItemNewActionId[] {
@@ -71,14 +71,14 @@ export function bagItemNewActions(def: ItemDef, itemId: string): BagItemNewActio
   return out;
 }
 
-/** Whether this item has at least one Phase 13 action, so a right-click / tap
+/** Whether this item has at least one new action, so a right-click / tap
  *  opens the menu instead of running the classic action directly. */
 export function bagItemHasContextActions(def: ItemDef, itemId: string): boolean {
   return bagItemNewActions(def, itemId).length > 0;
 }
 
 /** The full ordered menu: the classic default row first (so left-click's binding
- *  survives as row one), then each eligible Phase 13 action. */
+ *  survives as row one), then each eligible new action. */
 export function bagItemContextActions(def: ItemDef, itemId: string): BagItemContextAction[] {
   const rows: BagItemContextAction[] = [{ id: 'default', labelKey: defaultActionLabelKey(def) }];
   for (const id of bagItemNewActions(def, itemId)) {
@@ -113,9 +113,11 @@ export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolea
  *  copies):
  *   - salvage (items.ts removePreferFungible): once fungible is exhausted the
  *     highest-index instanced copy of ANY kind is taken (enchanted included).
- *   - disenchant (sim.ts removeEnchantableItem): the highest-index NON-enchanted
- *     instanced copy is taken (already-enchanted copies are never eligible, so
- *     they are skipped when choosing the victim). */
+ *   - disenchant (professions/enchanting.ts resolveDisenchant): the
+ *     highest-index NON-enchanted instanced copy is taken first
+ *     (removeEnchantableItem); once every remaining copy is enchanted, the
+ *     highest-index enchanted copy is the victim (issue #2340), which is
+ *     always special, so that arm always warns. */
 export function destroyConsumesSpecialCopy(
   action: 'disenchant' | 'salvage',
   copies: readonly BagCopy[],
@@ -127,5 +129,8 @@ export function destroyConsumesSpecialCopy(
     if (action === 'disenchant' && isEnchantedInstance(instance)) continue;
     return isSpecialCopy(instance);
   }
-  return false;
+  // Reachable with held copies only on the disenchant arm with every copy
+  // enchanted (salvage returns on the first instanced copy above): the sim's
+  // fallback consumes an enchanted copy, special by definition.
+  return copies.length > 0;
 }

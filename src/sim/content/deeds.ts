@@ -207,7 +207,12 @@ export const DEEDS: Record<string, DeedDef> = {
   prog_master_gatherer: {
     id: 'prog_master_gatherer',
     name: 'Master Gatherer',
-    desc: 'Reach 100 proficiency in Mining, Logging, and Herbalism.',
+    // Desc reword (fishing joined the gathering ring, and the any-three
+    // trigger counts it): the desc names all four professions.
+    // The trigger itself is untouched (rule 9); the stale locale desc fills
+    // were dropped with the reword and refill at release (deed_i18n.locales,
+    // English fallback until then).
+    desc: 'Reach 100 proficiency in any three of Mining, Logging, Herbalism, and Fishing.',
     category: 'progression',
     renown: 25,
     trigger: { kind: 'gathering', amount: 100, count: 3 },
@@ -1261,7 +1266,7 @@ export const DEEDS: Record<string, DeedDef> = {
   col_glimmerfin: {
     id: 'col_glimmerfin',
     name: 'Glimmer of Hope',
-    desc: 'Catch a Glimmerfin Koi.',
+    desc: 'Catch a Sunglint Koi.',
     category: 'collection',
     renown: 0,
     trigger: { kind: 'collectItems', itemIds: ['glimmerfin_koi'] },
@@ -1751,7 +1756,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   exp_first_ore: {
     id: 'exp_first_ore',
-    name: 'Strike the Earth',
+    name: 'Pick Meets Stone',
     desc: 'Harvest your first ore node.',
     category: 'exploration',
     renown: 5,
@@ -1943,12 +1948,12 @@ export const DEEDS: Record<string, DeedDef> = {
   // Highwatch hub (zone3.ts), so this deed (and feat_book_complete through
   // it) is completable in live play. The vendor-to-craft-to-grant chain is
   // pinned by tests/professions_crafting_hub.test.ts. The stat key stays
-  // 'hubCraftsPerformed' (persisted): since Phase 8 it counts station-bound
+  // 'hubCraftsPerformed' (persisted): it counts station-bound
   // crafts at any station (see professions/crafting.ts craftItem).
   prog_tools_of_the_trade: {
     id: 'prog_tools_of_the_trade',
     name: 'Tools of the Trade',
-    // Phase 8 reword (stations replaced the single Highwatch hub): the stale
+    // Desc reword (stations replaced the single Highwatch hub): the stale
     // locale desc fills were dropped with it and refill at release
     // (deed_i18n.locales, English fallback until then).
     desc: 'Complete a craft at a crafting station.',
@@ -1979,6 +1984,238 @@ export const DEEDS: Record<string, DeedDef> = {
     category: 'pvp',
     renown: 5,
     trigger: { kind: 'stat', stat: 'cardDuelsWon', count: 1 },
+  },
+
+  // Professions 2.0 additions (append-only tail, grouped by category
+  // within this block only). Craft-skill thresholds reference ONLY resolved
+  // caps or below: every CRAFT_RING craft caps at 125 (craftMaxSkillFor),
+  // fishing at 200, the other gathering professions at 100
+  // (content/professions.ts maxSkill). Jewelcrafting and Inscription have no
+  // live skill-gain path yet (zero recipes, no enchanting-style action), so
+  // their milestone and Grandmaster deeds stay deferred with prog_ringwright
+  // rather than shipping visible-but-unearnable.
+  prog_guildsworn: {
+    id: 'prog_guildsworn',
+    name: 'Craftsworn',
+    desc: 'Attune yourself to an archetype pair and take up its trades in earnest.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'stat', stat: 'attunementsCompleted', count: 1 },
+    reward: { kind: 'title', text: 'Craftsworn' },
+  },
+  prog_masterwright: {
+    id: 'prog_masterwright',
+    name: 'Masterwright',
+    desc: 'Craft your first masterwork, a piece so fine the whole zone hears of it.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'stat', stat: 'masterworksCrafted', count: 1 },
+    reward: { kind: 'title', text: 'Masterwright' },
+  },
+  prog_fishing_100: {
+    id: 'prog_fishing_100',
+    name: 'Old Salt',
+    desc: 'Reach 100 Fishing proficiency.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'gathering', professionId: 'fishing', amount: 100 },
+  },
+  prog_master_angler: {
+    id: 'prog_master_angler',
+    name: 'Master Angler',
+    desc: "Reach 200 Fishing proficiency, the very top of the angler's art.",
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'gathering', professionId: 'fishing', amount: 200 },
+    reward: { kind: 'title', text: 'Master Angler' },
+  },
+  prog_engineering_50: {
+    id: 'prog_engineering_50',
+    name: 'Cogs and Sprockets',
+    desc: 'Reach 50 skill in Engineering.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'engineering', level: 50 },
+  },
+  prog_alchemy_50: {
+    id: 'prog_alchemy_50',
+    name: 'Strange Brews',
+    desc: 'Reach 50 skill in Alchemy.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'alchemy', level: 50 },
+  },
+  prog_cooking_50: {
+    id: 'prog_cooking_50',
+    name: 'Seasoned Chef',
+    desc: 'Reach 50 skill in Cooking.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'cooking', level: 50 },
+  },
+  prog_leatherworking_50: {
+    id: 'prog_leatherworking_50',
+    name: "Tanner's Trade",
+    desc: 'Reach 50 skill in Leatherworking.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'leatherworking', level: 50 },
+  },
+  prog_tailoring_50: {
+    id: 'prog_tailoring_50',
+    name: 'A Fine Seam',
+    desc: 'Reach 50 skill in Tailoring.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'tailoring', level: 50 },
+  },
+  prog_enchanting_50: {
+    id: 'prog_enchanting_50',
+    name: 'A Glimmer of Arcana',
+    desc: 'Reach 50 skill in Enchanting.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'enchanting', level: 50 },
+  },
+  prog_weaponcrafting_50: {
+    id: 'prog_weaponcrafting_50',
+    name: 'Edge and Temper',
+    desc: 'Reach 50 skill in Weaponcrafting.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'weaponcrafting', level: 50 },
+  },
+  prog_armorcrafting_50: {
+    id: 'prog_armorcrafting_50',
+    name: 'Hammer and Plate',
+    desc: 'Reach 50 skill in Armorcrafting.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'armorcrafting', level: 50 },
+  },
+  prog_grandmaster_engineering: {
+    id: 'prog_grandmaster_engineering',
+    name: 'Grandmaster Engineering',
+    desc: 'Reach 125 skill in Engineering, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'engineering', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Engineering' },
+  },
+  prog_grandmaster_alchemy: {
+    id: 'prog_grandmaster_alchemy',
+    name: 'Grandmaster Alchemy',
+    desc: 'Reach 125 skill in Alchemy, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'alchemy', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Alchemy' },
+  },
+  prog_grandmaster_cooking: {
+    id: 'prog_grandmaster_cooking',
+    name: 'Grandmaster Cooking',
+    desc: 'Reach 125 skill in Cooking, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'cooking', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Cooking' },
+  },
+  prog_grandmaster_leatherworking: {
+    id: 'prog_grandmaster_leatherworking',
+    name: 'Grandmaster Leatherworking',
+    desc: 'Reach 125 skill in Leatherworking, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'leatherworking', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Leatherworking' },
+  },
+  prog_grandmaster_tailoring: {
+    id: 'prog_grandmaster_tailoring',
+    name: 'Grandmaster Tailoring',
+    desc: 'Reach 125 skill in Tailoring, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'tailoring', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Tailoring' },
+  },
+  prog_grandmaster_enchanting: {
+    id: 'prog_grandmaster_enchanting',
+    name: 'Grandmaster Enchanting',
+    desc: 'Reach 125 skill in Enchanting, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'enchanting', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Enchanting' },
+  },
+  prog_grandmaster_weaponcrafting: {
+    id: 'prog_grandmaster_weaponcrafting',
+    name: 'Grandmaster Weaponcrafting',
+    desc: 'Reach 125 skill in Weaponcrafting, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'weaponcrafting', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Weaponcrafting' },
+  },
+  prog_grandmaster_armorcrafting: {
+    id: 'prog_grandmaster_armorcrafting',
+    name: 'Grandmaster Armorcrafting',
+    desc: 'Reach 125 skill in Armorcrafting, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'armorcrafting', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Armorcrafting' },
+  },
+  // Rare-find deeds: luck-based, so renown 0 and no title (docs/design/deeds.md
+  // rule 2), and VISIBLE like col_glimmerfin (the hid_ shelf is for spoiler
+  // delights, not public zone-wide celebrations). Each keys on the finder-only
+  // gather_event mark its announce site writes.
+  col_pristine_vein: {
+    id: 'col_pristine_vein',
+    name: 'Pristine Vein',
+    desc: 'Crack open a pristine vein and let the whole zone hear about it.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:pristine_vein' },
+  },
+  col_ancient_heartwood: {
+    id: 'col_ancient_heartwood',
+    name: 'Ancient Heartwood',
+    desc: 'Coax a length of ancient heartwood from a felled stand.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:ancient_heartwood' },
+  },
+  col_moonlit_bloom: {
+    id: 'col_moonlit_bloom',
+    name: 'Moonlit Bloom',
+    desc: 'Gather a moonlit bloom at the very moment it opens.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:moonlit_bloom' },
+  },
+  col_perfect_specimen: {
+    id: 'col_perfect_specimen',
+    name: 'A Perfect Specimen',
+    desc: 'Take a perfect specimen from a harvested beast, without a nick or a blemish.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:perfect_specimen' },
+  },
+  soc_first_salvage: {
+    id: 'soc_first_salvage',
+    name: 'Waste Not',
+    desc: 'Salvage a piece of gear back into raw materials.',
+    category: 'social',
+    renown: 5,
+    trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 1 },
+  },
+  soc_salvage_50: {
+    id: 'soc_salvage_50',
+    name: "The Breaker's Yard",
+    desc: 'Salvage 50 pieces of gear back into raw materials.',
+    category: 'social',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 50 },
   },
 };
 

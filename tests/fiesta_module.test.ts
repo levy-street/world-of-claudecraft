@@ -65,7 +65,7 @@ describe('fiesta module: createFiestaState', () => {
     expect(a.scoreA).toBe(0);
     expect(a.scoreLimit).toBe(15);
     expect(a.wave).toBe(0);
-    expect(a.ringRadius).toBe(22);
+    expect(a.ringRadius).toBe(26);
     expect(a.powerupTimer).toBe(12);
     // same tickCount + nextArenaMatchId -> identical per-match draw sequence
     expect([a.rng.next(), a.rng.next()]).toEqual([b.rng.next(), b.rng.next()]);

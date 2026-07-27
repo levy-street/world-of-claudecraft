@@ -84,9 +84,17 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
   VAR_BOW: { position: [0.0, 0.1, -0.32], euler: [0, Math.PI / 2, Math.PI] },
   // Off-hand gear from the two-slot loadout (release/v0.24.0-ptr): a left-hand
   // prop of any family above mirrors automatically via backGripFor's side
-  // argument. Families that branch introduces (shields, held off-hands like
-  // lanterns) get their own entries here when it merges; until then an unknown
-  // family falls back to DEFAULT_BACK instead of vanishing.
+  // argument.
+  // Shields (KAYKIT_SHIELD_ACCESSORIES families, held_item_grips.ts) sit flat
+  // against the spine rather than diagonal like a bladed weapon: near-zero lean
+  // (x/z close to 0) so the face reads flat-on from behind, centred on the spine
+  // (x closer to 0 than a sword's shoulder-carry) and slightly lower (negative y)
+  // so the rim clears the collar. The three shield meshes share one rig-relative
+  // proportion, so one shared spec covers all three families; only the hand-grip
+  // scale (already computed by the normal grip pass) differs per shield size.
+  Round_Shield: { position: [0, 0.24, -0.32], euler: [0, Math.PI, 0] },
+  Rectangle_Shield: { position: [0, 0.2, -0.32], euler: [0, Math.PI, 0] },
+  Badge_Shield: { position: [0, 0.24, -0.32], euler: [0, Math.PI, 0] },
 };
 
 /** The grip families that have a tuned on-back carry. Every family the character

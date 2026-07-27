@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.29.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.30.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -351,14 +351,6 @@ Every player-visible string resolves through `t()`, and the game ships in **22 l
 ## Contributing
 
 Contributions of every kind are welcome: code, translations, bug reports, and documentation. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for setup, read the [Code of Conduct](CODE_OF_CONDUCT.md), and check [SECURITY.md](SECURITY.md) before reporting a vulnerability. New here? Look for issues labeled [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), open an [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), or say hello on [Discord](https://discord.com/invite/worldofclaudecraft).
-
-<div align="center">
-
-![World of Claude](worldofclaude.png)
-
-![World of ClaudeCraft community](woc_community.png)
-
-</div>
 
 ## License
 

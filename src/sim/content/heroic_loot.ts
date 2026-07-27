@@ -52,6 +52,14 @@ const HEAL_LEATHER = ['druid'] as ItemDef['requiredClass']; // int/spi leather w
 const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
 const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
+const CASTER_WEAPON_CLASSES = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+] as ItemDef['requiredClass'];
 
 export const HEROIC_ITEMS: Record<string, ItemDef> = {
   // ================= Heroic Hollow Crypt: Morthen =================
@@ -224,7 +232,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     stats: { int: 13, spi: 9 },
     hitRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
-    requiredClass: CASTER,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   tidewoven_trousers: {
     id: 'tidewoven_trousers',

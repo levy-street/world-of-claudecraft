@@ -262,6 +262,7 @@ class FakeDailyRewardDb implements DailyRewardDb {
 
 function rewardConfig(overrides: Partial<DailyRewardRuntimeConfig> = {}): DailyRewardRuntimeConfig {
   return {
+    enabled: true,
     minUsd: 20,
     prizePoolUsd: 150,
     prizePoolSol: 0.75,
@@ -1382,32 +1383,121 @@ describe('daily rewards', () => {
   });
 
   it('builds a locked view for non-eligible status', () => {
+    const status = {
+      enabled: true,
+      day: '2026-06-30',
+      resetAt: '2026-07-01T00:00:00.000Z',
+      prizePoolUsd: 150,
+      prizePoolSol: 1,
+      eligibility: {
+        eligible: false,
+        reason: 'under_minimum' as const,
+        walletPubkey: 'Wallet',
+        wocBalance: 1,
+        wocUsdPrice: 1,
+        usdValue: 1,
+        minUsd: 20,
+      },
+      score: 0,
+      rank: null,
+      spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
+      tasks: [],
+      leaderboard: [],
+      leaderboardTotal: 0,
+    };
     const view = buildDailyRewardsView({
       kind: 'status',
       history: { payouts: [] },
-      status: {
-        day: '2026-06-30',
-        resetAt: '2026-07-01T00:00:00.000Z',
-        prizePoolUsd: 150,
-        prizePoolSol: 1,
-        eligibility: {
-          eligible: false,
-          reason: 'under_minimum',
-          walletPubkey: 'Wallet',
-          wocBalance: 1,
-          wocUsdPrice: 1,
-          usdValue: 1,
-          minUsd: 20,
-        },
-        score: 0,
-        rank: null,
-        spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
-        tasks: [],
-        leaderboard: [],
-        leaderboardTotal: 0,
-      },
+      status,
     });
     expect(view).toMatchObject({ kind: 'ready', locked: true, lockReason: 'under_minimum' });
+    expect(
+      buildDailyRewardsView({
+        kind: 'status',
+        history: { payouts: [] },
+        status: { ...status, enabled: false },
+      }),
+    ).toEqual({ kind: 'disabled' });
+  });
+
+  it('stops status reads, spins, and point accrual while daily rewards are disabled', async () => {
+    resetDailyRewardPriceCacheForTests();
+    stubRewardConfig({ enabled: false });
+    const db = new FakeDailyRewardDb();
+    const service = new DailyRewardService(db);
+    const completedAt = new Date('2026-06-30T12:34:00.000Z');
+
+    await expect(service.status(1)).resolves.toMatchObject({ enabled: false, score: 0, tasks: [] });
+    await expect(service.spin(1)).resolves.toEqual({
+      error: 'daily rewards are disabled',
+      status: 409,
+    });
+    await service.recordOnlineMinute(1, completedAt);
+    await expect(service.recordQuestCompletion(1, 101, 'wolf_hunt', completedAt)).resolves.toBe(0);
+    await expect(
+      service.recordArenaResult(1, {
+        won: true,
+        format: '2v2',
+        ratingBefore: 1_000,
+        ratingAfter: 1_010,
+        completedAt,
+      }),
+    ).resolves.toBe(0);
+    await expect(
+      service.recordDelveClear(1, 101, 'collapsed_reliquary', 'normal', completedAt),
+    ).resolves.toBe(0);
+    await expect(
+      service.recordDelveChestOpen(
+        1,
+        101,
+        'collapsed_reliquary',
+        'normal',
+        'low',
+        false,
+        completedAt,
+      ),
+    ).resolves.toBe(0);
+    await expect(
+      service.recordValeCupResult(1, {
+        won: true,
+        bracket: 3,
+        matchId: 7,
+        rated: true,
+        completedAt,
+      }),
+    ).resolves.toBe(0);
+
+    expect(db.ensureDayCalls).toBe(0);
+    expect(db.scoreForAccountCalls).toBe(0);
+    expect(db.events).toEqual([]);
+  });
+
+  it('fails closed when the configured payout service is unavailable', async () => {
+    resetDailyRewardPriceCacheForTests();
+    vi.mocked(fetch).mockRejectedValue(new Error('payout service offline'));
+    const db = new FakeDailyRewardDb();
+
+    await expect(new DailyRewardService(db).status(1)).resolves.toMatchObject({
+      enabled: false,
+      tasks: [],
+    });
+    expect(db.ensureDayCalls).toBe(0);
+  });
+
+  it('fails closed when the payout service omits the availability flag', async () => {
+    resetDailyRewardPriceCacheForTests();
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      if (url.pathname === '/daily-schedule') {
+        return new Response(JSON.stringify({ dayStartUtcMinutes: 22 * 60 }), { status: 200 });
+      }
+      const { enabled: _enabled, ...legacyConfig } = rewardConfig();
+      return new Response(JSON.stringify(legacyConfig), { status: 200 });
+    });
+    const db = new FakeDailyRewardDb();
+
+    await expect(new DailyRewardService(db).status(1)).resolves.toMatchObject({ enabled: false });
+    expect(db.ensureDayCalls).toBe(0);
   });
 
   describe('explicit finalization and ensure/seed gating', () => {

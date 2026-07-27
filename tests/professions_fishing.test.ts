@@ -1,8 +1,8 @@
-// Professions 2.0 Phase 11: fishing as a full gathering proficiency, the
+// Professions 2.0: fishing as a full gathering proficiency, the
 // catch rarity band ladder, the one-draw rng contract, the text-free
 // fishingResult SimEvent, the live-server round trip (gprof mirror + event
 // routing), and the deliberately accepted gathering-deed drift. This file is
-// the primary Phase 11 home; the shipped fishing cast lifecycle itself stays
+// this arc's primary home; the shipped fishing cast lifecycle itself stays
 // pinned in tests/sim.test.ts.
 import { describe, expect, it, vi } from 'vitest';
 
@@ -33,6 +33,7 @@ import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { bagCapacity } from '../src/sim/bags';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
+import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { FISHING_TABLES, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { DEEPFEN_SHALLOWS_LAKE, LAKE } from '../src/sim/data';
 import {
@@ -45,7 +46,13 @@ import {
   startFishing,
 } from '../src/sim/professions/fishing';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import { type Entity, FISHING_CAST_ID, type PlayerClass, type SimEvent } from '../src/sim/types';
+import {
+  type Entity,
+  FISHING_CAST_ID,
+  GATHER_CAST_ID,
+  type PlayerClass,
+  type SimEvent,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 function makeSim(seed = 4242): Sim {
@@ -110,7 +117,7 @@ function teleportToValeShore(sim: Sim): void {
   sim.player.facing = Math.atan2(0, LAKE.z - pz);
 }
 
-// Phase 12b live-loop cast: startFishing draws the ONE hidden bite delay, the
+// Live-loop cast: startFishing draws the ONE hidden bite delay, the
 // lifecycle's fishing arm fires the bite off the hidden tick deadline, and
 // the reel re-press (startFishing's reel arm) rolls the table. Ticks advance
 // by assigning sim.tickCount directly and calling the real updateCasting arm,
@@ -142,7 +149,7 @@ function catchSequenceLive(sim: Sim, meta: PlayerMeta, n: number): (string | nul
   return out;
 }
 
-// The literal band-0 catch sequence at seed 4242 under the Phase 12b LIVE
+// The literal band-0 catch sequence at seed 4242 under the shipped LIVE
 // loop (re-recorded from the shipped drive by the bite-hunt scratch script,
 // then spot-audited): each session consumes TWO draws, draw 2i the hidden
 // bite delay and draw 2i+1 the table walk against the SHIPPED Vale rows
@@ -220,8 +227,8 @@ const B1_SEQ_4242: (string | null)[] = [
 // table draw lands where band 1 yields the koi but band 2 yields tangled
 // weed (the hunted divergence index under the two-draw stream), so matching
 // this sequence proves the live path resolved FISHING_TABLES_BY_BAND[2], not
-// a band-1 collapse (Phase 11 QA: the top-band wiring was previously
-// unpinned on the live path).
+// a band-1 collapse (the top-band wiring was previously unpinned on the
+// live path).
 const B2_SEQ_4242: (string | null)[] = [
   TROUT,
   TROUT,
@@ -282,6 +289,10 @@ function teleportToDeepfenShore(sim: Sim, meta: PlayerMeta): void {
 function codfatherSim(): { sim: Sim; meta: PlayerMeta } {
   const sim = makeSim();
   const meta = sim.meta(sim.playerId)!;
+  // The shore probe drives the REAL startFishing, whose implement gate
+  // (#2343) needs tackle in bags. The pole is not a gatherTool (tier still
+  // floors to 1), so it changes no draw and no deadline.
+  sim.addItem('simple_fishing_pole', 1);
   meta.questLog.set('q_the_codfather', {
     questId: 'q_the_codfather',
     counts: [0],
@@ -295,6 +306,10 @@ describe('fishing determinism (pin 1)', () => {
   it('two fresh Sims with the same seed produce the identical 30-catch live-loop sequence', () => {
     const run = (seed: number) => {
       const sim = makeSim(seed);
+      // The implement gate (#2343) needs tackle in bags; the pole is
+      // mechanically identical to bare hands (not a gatherTool, tier floors
+      // to 1), so it perturbs no draw and no literal.
+      sim.addItem('simple_fishing_pole', 1);
       teleportToValeShore(sim);
       return catchSequenceLive(sim, sim.meta(sim.playerId)!, 30);
     };
@@ -308,16 +323,22 @@ describe('fishing determinism (pin 1)', () => {
 
   it('band 0 reproduces the shipped Vale table: literal live-loop sequence at seed 4242', () => {
     const sim = makeSim(4242);
+    // The pole satisfies the implement gate (#2343) and is mechanically
+    // identical to bare hands, so the recorded literals hold byte-identical.
+    sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
     expect(catchSequenceLive(sim, sim.meta(sim.playerId)!, 30)).toEqual(B0_SEQ_4242);
   });
 });
 
-describe('fishing draw contract (pin 2, the Phase 12b bite-and-reel shape)', () => {
+describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
   it('a full session draws exactly two rng values: the bite delay at the cast, the table at the reel', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
+    // The implement gate (#2343): the pole is a draw-free bag scan hit and
+    // never a gatherTool, so the two-draw shape below is untouched.
+    sim.addItem('simple_fishing_pole', 1);
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     const outcomes: (string | null)[] = [];
@@ -354,6 +375,7 @@ describe('fishing draw contract (pin 2, the Phase 12b bite-and-reel shape)', () 
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1); // the implement gate (#2343); draw-free, tier stays 1
     sim.events = [];
     let draws = 0;
     sim.rng.setObserver(() => draws++);
@@ -494,13 +516,13 @@ describe('fishing proficiency accrual (pin 3)', () => {
     expect(sim.professionsStateFor(sim.playerId).skills).toContainEqual({
       professionId: 'fishing',
       skill: landed,
-      // Phase 12c stage 2 appendix re-pin: fishing's enforced cap is 200.
+      // The enforced fishing cap is 200.
       maxSkill: 200,
     });
   });
 });
 
-describe('fishing catch gain schedule (Professions 2.0 Phase 12c)', () => {
+describe('fishing catch gain schedule (Professions 2.0)', () => {
   it('fishingCatchGain walks the fractional schedule AT the half-band boundaries', () => {
     expect(fishingCatchGain(0, false)).toBe(1);
     expect(fishingCatchGain(49, false)).toBe(1);
@@ -718,7 +740,7 @@ describe('fishing band selection liveness (pin 6)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 150;
-    // Phase 12: band 1 also needs the tier-2 rod in bags (the silent tool
+    // Band 1 also needs the tier-2 rod in bags (the silent tool
     // cap); the bag scan is rng-free. The rod narrows the bite-delay range
     // too, but the delay draw is consumed either way, so the table walk is
     // rod-independent given the band.
@@ -733,7 +755,7 @@ describe('fishing band selection liveness (pin 6)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 200;
-    // Phase 12: band 2 needs the tier-3 rod (band b requires tool tier b + 1).
+    // Band 2 needs the tier-3 rod (band b requires tool tier b + 1).
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
     // Index 22 sits in the hunted band-discriminating window (weed here where
@@ -744,20 +766,25 @@ describe('fishing band selection liveness (pin 6)', () => {
   });
 });
 
-// Phase 12 band tool cap: catch band b requires an owned rod of tier b + 1
+// Band tool cap: catch band b requires an owned rod of tier b + 1
 // (canGatherTier(rodTier, b + 1)); the effective band is min(proficiency
 // band, best band the owned rod covers), capped SILENTLY (no event, no
 // denial: the cast still lands a band-capped catch). The simple pole is not a
 // gatherTool, so it floors to tier 1: band 0, the shipped table, stays
-// reachable with the pole or bare hands.
-describe('fishing band tool cap (Professions 2.0 Phase 12)', () => {
-  it('proficiency 150 with NO rod silently caps to the band-0 table (literal sequence)', () => {
+// reachable with just the pole (#2343 ended bare-hands casting entirely; see
+// the denial pin below).
+describe('fishing band tool cap (Professions 2.0)', () => {
+  it('proficiency 150 with only the pole (no rod) silently caps to the band-0 table (literal sequence)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 150;
+    // The pole satisfies the implement gate (#2343) but is NOT a gatherTool,
+    // so the band cap still sees no rod (tier floors to 1): the old no-rod
+    // arm's intent, unchanged.
+    sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
     // B0 and B1 diverge at index 0 (perch vs trout) on this stream, so 12
-    // sessions are decisive: band-1 proficiency without the rod still walks
+    // sessions are decisive: band-1 proficiency without a rod still walks
     // the SHIPPED band-0 table, and nothing else changes (no error, no event).
     expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_4242.slice(0, 12));
   });
@@ -799,15 +826,46 @@ describe('fishing band tool cap (Professions 2.0 Phase 12)', () => {
     expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_4242.slice(0, 12));
   });
 
-  it('a pole-only proficiency-0 angler is byte-identical to the bare-hands live walk', () => {
+  it('a pole-only proficiency-0 angler still reproduces the B0 literal walk exactly', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
-    // The pole keeps use: { type: 'fishing' }: not a gatherTool, so the bag
-    // scan floors to tier 1: band 0 AND the tier-1 bite-delay range, so both
-    // draws of every session match the bare-hands B0 recording exactly.
+    // The pole keeps use: { type: 'fishing' }: it satisfies the implement
+    // gate (#2343) but is not a gatherTool, so the bag scan floors to tier 1:
+    // band 0 AND the tier-1 bite-delay range, so both draws of every session
+    // match the B0 recording (made bare-handed, pre-gate) byte for byte.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
     expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_4242);
+  });
+
+  it('bare hands are denied at the cast: exactly one gatherDenied, zero draws, no session (#2343)', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    // Facing fishable water with NO implement in bags: every arm before the
+    // implement gate passes and the water check would too, so the denial
+    // below is attributable to the implement arm alone (and proves it sits
+    // BEFORE the water check and the bite-delay draw).
+    teleportToValeShore(sim);
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, sim.player, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // Exactly the one text-free denial: no error, no castStart, nothing else.
+    expect(sim.events).toEqual([
+      {
+        type: 'gatherDenied',
+        pid: sim.playerId,
+        surface: 'fishing',
+        professionId: 'fishing',
+        requiredTier: 1,
+      },
+    ]);
+    expect(draws).toBe(0);
+    expect(sim.player.castingAbility).toBe(null);
   });
 
   it('useItem on each new rod starts the standard fishing cast', () => {
@@ -821,7 +879,7 @@ describe('fishing band tool cap (Professions 2.0 Phase 12)', () => {
       sim.events = [];
       sim.useItem(rodId);
       expect(sim.player.castingAbility, rodId).toBe(FISHING_CAST_ID);
-      // Phase 12b: the visible timer is the 15 s session cap (literal on
+      // The visible timer is the 15 s session cap (literal on
       // purpose), which carries no bite information.
       expect(sim.events).toContainEqual(
         expect.objectContaining({ type: 'castStart', ability: FISHING_CAST_ID, time: 15 }),
@@ -831,17 +889,49 @@ describe('fishing band tool cap (Professions 2.0 Phase 12)', () => {
     }
   });
 
-  it('useItem on a non-fishing gathering tool stays a safe no-op', () => {
-    // The re-homed half of the retired "safe no-op until the gather-node
-    // system lands" pin (tests/professions_tools.test.ts): node access gating
-    // scans bags (professions/tools.ts bestOwnedGatherToolTier), never an
-    // item USE, so using a pick does nothing, casts nothing, and keeps it.
+  it('useItem on a mining pick with no vein in range: one gatherToolNoNode, no cast, no draw (#2343)', () => {
+    // INVERTS the retired "safe no-op" pin: using a pick from the bags now
+    // behaves like the interact press, scoped to ore veins (useGatherToolItem,
+    // professions/gathering.ts). At the spawn plaza no vein sits within
+    // interact range, so the click resolves to the text-free gatherToolNoNode
+    // event (never a silent no-op), draws nothing, casts nothing, and keeps
+    // the tool.
     const sim = makeSim(4242);
     sim.addItem('copper_mining_pick', 1);
     sim.events = [];
-    expect(() => sim.useItem('copper_mining_pick')).not.toThrow();
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.useItem('copper_mining_pick');
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(sim.events).toEqual([
+      { type: 'gatherToolNoNode', pid: sim.playerId, professionId: 'mining' },
+    ]);
+    expect(draws).toBe(0);
+    expect(sim.player.castingAbility).toBe(null);
     expect(sim.countItem('copper_mining_pick')).toBe(1);
-    expect(sim.events.some((e) => (e as { type: string }).type === 'castStart')).toBe(false);
+  });
+
+  it('useItem on the pick standing at an ore vein starts the standard gather cast (#2343)', () => {
+    const sim = makeSim(4242);
+    sim.addItem('copper_mining_pick', 1);
+    const vein = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_1');
+    if (!vein) throw new Error('missing ore_eastbrook_1');
+    teleportTo(sim, vein.pos.x, vein.pos.z);
+    sim.events = [];
+    sim.useItem('copper_mining_pick');
+    // The tier-1 pick at the tier-1 vein casts the 2.5 s base (no tool-tier
+    // surplus, band 0). Asserted synchronously with zero ticks run, so the
+    // nearby camp mobs can never damage-cancel the cast mid-check.
+    expect(sim.player.castingAbility).toBe(GATHER_CAST_ID);
+    expect(sim.player.castTotal).toBe(2.5);
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({ type: 'castStart', ability: GATHER_CAST_ID, time: 2.5 }),
+    );
+    // The pick is a permanent tool: never consumed by the cast.
+    expect(sim.countItem('copper_mining_pick')).toBe(1);
   });
 });
 
@@ -895,6 +985,72 @@ describe('fishingResult event (pin 7)', () => {
   });
 });
 
+describe('landed-catch grant flags (pin 11)', () => {
+  // #2430. Fishing was the one profession grant that passed NO opts to the
+  // grant hub, so a landed catch printed the bite line, the hub's
+  // "You receive:" line AND the reel-in line, while the generic loot ding
+  // played on top of the reel cue. The catch grant now passes both stand-down
+  // flags, so the fishingResult arm owns the single line and the single cue.
+  // Nothing pinned this path before, which is how the double-cue shipped.
+  const lootIn = (events: readonly SimEvent[]) =>
+    events.filter((e) => (e as { type: string }).type === 'loot') as unknown as Array<{
+      silent?: boolean;
+      callerLogs?: boolean;
+      text: string;
+    }>;
+
+  it('a landed catch grants silent and caller-logged, so the reel line is the only line', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    sim.events = [];
+    const { caught, events } = castOnce(sim, meta);
+    expect(caught).toBe(PERCH); // B0_SEQ_4242[0], so this is never a no-bite
+    const loot = lootIn(events);
+    expect(loot).toHaveLength(1);
+    expect(loot[0].silent).toBe(true);
+    expect(loot[0].callerLogs).toBe(true);
+    // The event still CARRIES its text: only the client elides the line.
+    expect(loot[0].text).toContain('You receive:');
+    // Exactly ONE fish. Sim.addItem only appends " xN" past one unit, so the
+    // absent suffix is the count. This is what makes catchLine the one
+    // grant-line family that needs no quantity variant; a multi-fish catch
+    // would have to add one, or the count would go unreported now that the
+    // hub line no longer prints it (#2430).
+    expect(loot[0].text).not.toMatch(/ x\d+\.$/);
+  });
+
+  it('a no-bite cast grants nothing at all (no loot event to flag)', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    let sawNoBite = false;
+    for (let i = 0; i < 30 && !sawNoBite; i++) {
+      sim.events = [];
+      const { caught, events } = castOnce(sim, meta);
+      if (caught !== null) continue;
+      sawNoBite = true;
+      expect(lootIn(events)).toHaveLength(0);
+    }
+    expect(sawNoBite).toBe(true);
+  });
+
+  it('the Codfather quest catch keeps BOTH the hub line and the hub cue', () => {
+    // The once-ever quest catch returns before the fishingResult emit, so the
+    // hub line and ding are its ONLY feedback. Flagging it too (the tempting
+    // "make fishing consistent" edit) would make the grant invisible and could
+    // read as a lost quest item, so pin the ABSENCE of both flags.
+    const { sim, meta } = codfatherSim();
+    sim.events = [];
+    completeFishing(sim.ctx, sim.player, meta);
+    expect(sim.countItem('the_codfather')).toBe(1);
+    const loot = lootIn(sim.events);
+    expect(loot).toHaveLength(1);
+    expect(loot[0].silent).toBeUndefined();
+    expect(loot[0].callerLogs).toBeUndefined();
+    // And it has no result event of its own to own a line with.
+    expect(fishingResultsIn(sim.events)).toHaveLength(0);
+  });
+});
+
 describe('fishing deeds through the extracted module path (pin 9)', () => {
   it('a landed real fish via completeFishing still marks fish:<zone>', () => {
     const sim = makeSim(4242);
@@ -908,7 +1064,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     expect(meta.deedsEarned.has('chr_vale_first_cast')).toBe(true);
   });
 
-  it('ACCEPTED DRIFT (documented Phase 11 semantic): a first landed catch completes prog_first_harvest', () => {
+  it('ACCEPTED DRIFT (documented semantic): a first landed catch completes prog_first_harvest', () => {
     // prog_first_harvest ("Harvest your first gathering node", trigger
     // gathering amount 1) is now also satisfied by a first landed fishing
     // catch, without ever touching a world node: fishing is a full gathering
@@ -926,7 +1082,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     expect(meta.deedsEarned.has('prog_first_harvest')).toBe(true);
   });
 
-  it('ACCEPTED DRIFT (documented Phase 11 semantic): prog_master_gatherer counts fishing', () => {
+  it('ACCEPTED DRIFT (documented semantic): prog_master_gatherer counts fishing', () => {
     // The three-at-100 trigger counts EVERY gathering profession, so
     // mining + logging + fishing at 100 completes it without herbalism.
     const sim = makeSim(4242);
@@ -942,7 +1098,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     expect(meta.deedsEarned.has('prog_master_gatherer')).toBe(true);
   });
 
-  it('a fished glimmerfin koi logs the rare-catch line and completes col_glimmerfin', () => {
+  it('a fished sunglint koi logs the rare-catch line and completes col_glimmerfin', () => {
     // Acceptance criterion 3: the rare catch and its deed complete unchanged
     // through the extracted module path. col_glimmerfin is a collectItems
     // trigger riding the addItem collection path, so a real completeFishing
@@ -967,7 +1123,12 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
 });
 
 describe('startFishing arms through the extracted module path (pin 10)', () => {
-  it('all five deny arms refuse with the exact error and never start the cast', () => {
+  it('all five text deny arms refuse with the exact error and never start the cast', () => {
+    // The dead/combat/swimming/busy cases below run TOOLLESS on purpose:
+    // each still gets its exact text error, pinning that those arms precede
+    // the #2343 implement gate (which would otherwise emit gatherDenied).
+    // The implement arm itself is text-free and pinned in the band tool cap
+    // suite's bare-hands denial test.
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     const denyCase = (mutate: () => void, restore: () => void, text: string) => {
@@ -1028,7 +1189,10 @@ describe('startFishing arms through the extracted module path (pin 10)', () => {
       'You are busy.',
     );
     // No fishable water: the spawn plaza facing due south is dry land for
-    // every sample distance.
+    // every sample distance. Reaching this arm now requires tackle in bags
+    // (#2343: the implement gate sits between the busy arm and the water
+    // check), so the pole goes in first.
+    sim.addItem('simple_fishing_pole', 1);
     denyCase(
       () => {
         sim.player.facing = Math.PI;
@@ -1042,6 +1206,7 @@ describe('startFishing arms through the extracted module path (pin 10)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1); // the implement gate (#2343); draw-free, tier stays 1
     sim.events = [];
     let draws = 0;
     sim.rng.setObserver(() => draws++);
@@ -1050,7 +1215,7 @@ describe('startFishing arms through the extracted module path (pin 10)', () => {
     } finally {
       sim.rng.setObserver(null);
     }
-    // Phase 12b INVERTS the old zero-draw pin: the cast start now draws
+    // The live-loop cast INVERTS the old zero-draw pin: the cast start draws
     // EXACTLY the one hidden bite delay. The visible timer is the FIXED 15 s
     // session cap (literal on purpose: comparing against the imported
     // constant would pin nothing) and carries zero bite information.

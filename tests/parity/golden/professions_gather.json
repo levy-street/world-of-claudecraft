@@ -5,6 +5,7 @@
   "ticks": 5208,
   "coverage": [
     "class:warrior (gatherer)",
+    "tier-1 tools in bags satisfy the #2343 always-require-tool gate",
     "gather cast start: harvestNode begins the cast draw-free",
     "granted harvest at cast completion: exactly two rng draws (rarity roll then rare-event roll)",
     "cooldown denial: zero rng draws, no cast",
@@ -152,8 +153,8 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 416,
-      "state": "3e165a90",
-      "events": "d7001754",
+      "state": "1bd5e82a",
+      "events": "484fa78f",
       "rng": {
         "draws": 2,
         "digest": "6334bd24"
@@ -185,8 +186,11 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "copper_mining_pick",
               "copper_ore",
               "eastbrook_buckler",
+              "gathering_sickle",
+              "handaxe",
               "recruit_tunic",
               "worn_sword"
             ],
@@ -222,6 +226,18 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "copper_mining_pick"
+            },
+            {
+              "count": 1,
+              "itemId": "handaxe"
+            },
+            {
+              "count": 1,
+              "itemId": "gathering_sickle"
             },
             {
               "count": 1,
@@ -313,8 +329,8 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 416,
-      "state": "6ccb5f6b",
-      "events": "0cbf2fd6",
+      "state": "92bd7a49",
+      "events": "32073625",
       "rng": {
         "draws": 4,
         "digest": "04171508"
@@ -346,8 +362,11 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "copper_mining_pick",
               "copper_ore",
               "eastbrook_buckler",
+              "gathering_sickle",
+              "handaxe",
               "ironbark_log",
               "recruit_tunic",
               "worn_sword"
@@ -395,6 +414,18 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "copper_mining_pick"
+            },
+            {
+              "count": 1,
+              "itemId": "handaxe"
+            },
+            {
+              "count": 1,
+              "itemId": "gathering_sickle"
             },
             {
               "count": 1,
@@ -494,8 +525,8 @@
       "tick": 500,
       "time": 25,
       "nextId": 416,
-      "state": "28b07bab",
-      "events": "317c4472",
+      "state": "f300051f",
+      "events": "1f4188a3",
       "rng": {
         "draws": 18,
         "digest": "590f883b"
@@ -505,8 +536,8 @@
       "tick": 1000,
       "time": 50,
       "nextId": 416,
-      "state": "6f87f93f",
-      "events": "081d42bd",
+      "state": "1c291c4b",
+      "events": "287f0a39",
       "rng": {
         "draws": 38,
         "digest": "ad7c0780"
@@ -516,8 +547,8 @@
       "tick": 1500,
       "time": 75,
       "nextId": 416,
-      "state": "309ef361",
-      "events": "44375188",
+      "state": "c56941d9",
+      "events": "34590bee",
       "rng": {
         "draws": 58,
         "digest": "d7942c0d"
@@ -527,8 +558,8 @@
       "tick": 2000,
       "time": 100,
       "nextId": 416,
-      "state": "d944a81e",
-      "events": "1b048b0b",
+      "state": "ee43ae6c",
+      "events": "474ffbe5",
       "rng": {
         "draws": 78,
         "digest": "ed0dea11"
@@ -538,8 +569,8 @@
       "tick": 2500,
       "time": 125,
       "nextId": 416,
-      "state": "1105c6f3",
-      "events": "ad6cc66a",
+      "state": "8bad832f",
+      "events": "081332b9",
       "rng": {
         "draws": 96,
         "digest": "14285f1d"
@@ -549,8 +580,8 @@
       "tick": 3000,
       "time": 150,
       "nextId": 416,
-      "state": "04794151",
-      "events": "403b75aa",
+      "state": "74b6ef4e",
+      "events": "117e82b1",
       "rng": {
         "draws": 116,
         "digest": "2442686e"
@@ -560,8 +591,8 @@
       "tick": 3500,
       "time": 175,
       "nextId": 416,
-      "state": "0af331f6",
-      "events": "b886c6dd",
+      "state": "6464c089",
+      "events": "7a60eaee",
       "rng": {
         "draws": 136,
         "digest": "171f1198"
@@ -571,8 +602,8 @@
       "tick": 4000,
       "time": 200,
       "nextId": 416,
-      "state": "daed3017",
-      "events": "0c67840f",
+      "state": "6d625232",
+      "events": "11661d55",
       "rng": {
         "draws": 156,
         "digest": "8d6832ce"
@@ -582,8 +613,8 @@
       "tick": 4500,
       "time": 225,
       "nextId": 416,
-      "state": "b7ee38b4",
-      "events": "028d608a",
+      "state": "0d862215",
+      "events": "0c624b6b",
       "rng": {
         "draws": 176,
         "digest": "d0371544"
@@ -593,8 +624,8 @@
       "tick": 5000,
       "time": 250,
       "nextId": 416,
-      "state": "ca7ccd5f",
-      "events": "561d7bfa",
+      "state": "5c10e716",
+      "events": "133dd469",
       "rng": {
         "draws": 194,
         "digest": "2c555e3f"
@@ -604,8 +635,8 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 416,
-      "state": "f20e894f",
-      "events": "bf373fcc",
+      "state": "be71d804",
+      "events": "bb0444e5",
       "rng": {
         "draws": 204,
         "digest": "2c4a2d3d"
@@ -638,8 +669,11 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "copper_mining_pick",
               "copper_ore",
               "eastbrook_buckler",
+              "gathering_sickle",
+              "handaxe",
               "ironbark_log",
               "recruit_tunic",
               "silverleaf_herb",
@@ -658,6 +692,10 @@
           "deedsEarned": [
             [
               "chr_vale_gatherer",
+              ""
+            ],
+            [
+              "col_moonlit_bloom",
               ""
             ],
             [
@@ -701,6 +739,18 @@
           },
           "heroicDaily": {},
           "inventory": [
+            {
+              "count": 1,
+              "itemId": "copper_mining_pick"
+            },
+            {
+              "count": 1,
+              "itemId": "handaxe"
+            },
+            {
+              "count": 1,
+              "itemId": "gathering_sickle"
+            },
             {
               "count": 2,
               "instance": {
@@ -807,7 +857,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 416,
-      "state": "12d1c916",
+      "state": "f58c22c1",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -841,8 +891,11 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "copper_mining_pick",
               "copper_ore",
               "eastbrook_buckler",
+              "gathering_sickle",
+              "handaxe",
               "ironbark_log",
               "recruit_tunic",
               "silverleaf_herb",
@@ -861,6 +914,10 @@
           "deedsEarned": [
             [
               "chr_vale_gatherer",
+              ""
+            ],
+            [
+              "col_moonlit_bloom",
               ""
             ],
             [
@@ -904,6 +961,18 @@
           },
           "heroicDaily": {},
           "inventory": [
+            {
+              "count": 1,
+              "itemId": "copper_mining_pick"
+            },
+            {
+              "count": 1,
+              "itemId": "handaxe"
+            },
+            {
+              "count": 1,
+              "itemId": "gathering_sickle"
+            },
             {
               "count": 2,
               "instance": {

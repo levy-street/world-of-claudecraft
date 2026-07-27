@@ -117,6 +117,7 @@ import {
   parseHeartbeat,
   parseSimline,
 } from './lib/mob_stall_parse.mjs';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 try {
   process.loadEnvFile?.();
@@ -480,7 +481,7 @@ class Bot {
         ws.close();
       }, 10_000);
       ws.on('open', () => {
-        ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.characterId }));
+        ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));
       });
       ws.on('message', (raw) => {
         let msg;

@@ -1,8 +1,9 @@
 // The game-state half of the /metrics exporter: the live game signals that are
 // already measured in-memory by GameServer (players/accounts/ws connections online,
-// sim entity count, achieved sim Hz, per-phase loop timing) plus the three
-// throughput counters (ws frames, chat messages, characters created), all
-// registered on the SAME prom-client registry the RED exporter builds
+// sim entity count, achieved sim Hz, per-phase loop timing) plus the
+// throughput counters (ws frames handled, inbound frames dropped by cause,
+// flood kicks, input frames proven missed, chat messages, characters
+// created), all registered on the SAME prom-client registry the RED exporter builds
 // (server/http/metrics.ts). Prometheus attaches env / service=game / server_name at
 // scrape time, so nothing here emits those.
 //
@@ -15,12 +16,18 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values are the fixed tick-phase names, the two per-phase stats
-// (p95, max), and the two ws directions (in, out). Nothing per-player (account id,
+// (p95, max), the two ws directions (in, out), and the fixed six inbound drop
+// causes (WS_DROP_CAUSES). Nothing per-player (account id,
 // character id, name, ip) is ever a label. The tick-phase series count is fixed at
 // WOC_TICK_PHASES.length * 2, independent of the profiler's internal phase set.
 
 import { Counter, Gauge, type Registry } from 'prom-client';
-import type { GameMetricsCounters, WsMessageDirection } from './game_signals';
+import {
+  type GameMetricsCounters,
+  WS_DROP_CAUSES,
+  type WsDropCause,
+  type WsMessageDirection,
+} from './game_signals';
 
 /** Live characters online (joined sessions). */
 export const WOC_PLAYERS_ONLINE = 'woc_players_online';
@@ -42,6 +49,15 @@ export const WOC_SIM_TICK_PHASE_SECONDS = 'woc_sim_tick_phase_seconds';
 
 /** Total ws frames handled, labeled by direction (in/out). */
 export const WOC_WS_MESSAGES_TOTAL = 'woc_ws_messages_total';
+
+/** Total inbound ws frames dropped by the gate, a lane, or the list-read guard, by cause. */
+export const WOC_WS_MESSAGES_DROPPED_TOTAL = 'woc_ws_messages_dropped_total';
+
+/** Total sessions kicked by the inbound-flood abuse window. */
+export const WOC_WS_RATE_KICKS_TOTAL = 'woc_ws_rate_kicks_total';
+
+/** Total input frames proven missed by a parsed seq gap on the ordered socket. */
+export const WOC_INPUT_FRAMES_MISSED_TOTAL = 'woc_input_frames_missed_total';
 
 /** Total player chat messages routed to other players (any channel). */
 export const WOC_CHAT_MESSAGES_TOTAL = 'woc_chat_messages_total';
@@ -202,6 +218,28 @@ export function registerGameStateMetrics(
     registers: [registry],
   });
 
+  const wsMessagesDropped = new Counter({
+    name: WOC_WS_MESSAGES_DROPPED_TOTAL,
+    help: 'Total inbound ws frames dropped by the gate, a lane, or the list-read guard, by cause.',
+    labelNames: ['cause'],
+    registers: [registry],
+  });
+  // Prom counters cannot backfill a scrape: pre-register every cause series at
+  // zero so dashboards see each series from boot, not from its first drop.
+  for (const cause of WS_DROP_CAUSES) wsMessagesDropped.inc({ cause }, 0);
+
+  const wsRateKicks = new Counter({
+    name: WOC_WS_RATE_KICKS_TOTAL,
+    help: 'Total sessions kicked by the inbound-flood abuse window.',
+    registers: [registry],
+  });
+
+  const inputFramesMissed = new Counter({
+    name: WOC_INPUT_FRAMES_MISSED_TOTAL,
+    help: 'Total input frames proven missed by a parsed seq gap on the ordered socket.',
+    registers: [registry],
+  });
+
   const chatMessages = new Counter({
     name: WOC_CHAT_MESSAGES_TOTAL,
     help: 'Total player chat messages routed to other players (any channel).',
@@ -220,6 +258,27 @@ export function registerGameStateMetrics(
         wsMessages.inc({ direction });
       } catch {
         // Drop the sample rather than propagate into the message path.
+      }
+    },
+    wsMessageDropped(cause: WsDropCause): void {
+      try {
+        wsMessagesDropped.inc({ cause });
+      } catch {
+        // Drop the sample rather than propagate into the message path.
+      }
+    },
+    wsRateKick(): void {
+      try {
+        wsRateKicks.inc();
+      } catch {
+        // Drop the sample rather than propagate into the kick path.
+      }
+    },
+    wsInputSeqGap(missed: number): void {
+      try {
+        inputFramesMissed.inc(missed);
+      } catch {
+        // Drop the sample rather than propagate into the input path.
       }
     },
     chatMessage(): void {

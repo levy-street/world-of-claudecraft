@@ -20,6 +20,14 @@ export const CASTER_ALL: PlayerClass[] = [
   'paladin',
   'druid',
 ];
+const CASTER_WEAPON_CLASSES: PlayerClass[] = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+];
 
 // ---------------------------------------------------------------------------
 // Items
@@ -124,7 +132,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 7, max: 12, speed: 3.0 },
     stats: { int: 3, sta: 1 },
     sellValue: 120,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   keen_dirk: {
     id: 'keen_dirk',
@@ -475,7 +483,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 20,
   },
-  // Tiered fishing rods (Professions 2.0 Phase 12): gatherTool items like the
+  // Tiered fishing rods (Professions 2.0): gatherTool items like the
   // picks/axes/sickles below, same tier pricing ladder. Their use still routes
   // to startFishing (src/sim/items.ts useItem), so a rod casts exactly like
   // the simple pole; the tier caps which catch rarity band the cast can land
@@ -522,7 +530,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   mithril_mining_pick: {
     id: 'mithril_mining_pick',
-    name: 'Mithril Mining Pick',
+    name: 'Skysilver Mining Pick',
     kind: 'tool',
     quality: 'uncommon',
     use: { type: 'gatherTool', professionId: 'mining', tier: 3 },
@@ -576,7 +584,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   silverleaf_sickle: {
     id: 'silverleaf_sickle',
-    name: 'Silverleaf Sickle',
+    name: 'Sheenleaf Sickle',
     kind: 'tool',
     quality: 'uncommon',
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 3 },
@@ -597,7 +605,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // `use.tier` value is read by the gate.
   thorium_mining_pick: {
     id: 'thorium_mining_pick',
-    name: 'Thorium Mining Pick',
+    name: 'Osmium Mining Pick',
     kind: 'tool',
     quality: 'rare',
     use: { type: 'gatherTool', professionId: 'mining', tier: 4 },
@@ -605,7 +613,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   arcanite_mining_pick: {
     id: 'arcanite_mining_pick',
-    name: 'Arcanite Mining Pick',
+    name: 'Glyphsteel Mining Pick',
     kind: 'tool',
     quality: 'epic',
     use: { type: 'gatherTool', professionId: 'mining', tier: 5 },
@@ -621,7 +629,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   elderwood_axe: {
     id: 'elderwood_axe',
-    name: 'Elderwood Axe',
+    name: 'Highpine Axe',
     kind: 'tool',
     quality: 'epic',
     use: { type: 'gatherTool', professionId: 'logging', tier: 5 },
@@ -647,7 +655,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // `TOOL_RECIPE_STUBS`, de-stubbed into src/sim/content/recipes.ts once
   // #1127's crafting action existed to consume them). `kind: 'junk'`, same
   // generic-material shape as bone_fragments/linen_scrap/spider_leg below:
-  // The ore/log/herb entries are also node-gathered since Phase 4 (the
+  // The ore/log/herb entries are also node-gathered (the
   // mirefen_marsh/thornpeak_heights rows of gathering.ts NODE_MATERIAL_TABLE);
   // arcanite_bar stays vendor-only.
   // Sold by Quartermaster Bree at the Highwatch hub (zone3.ts) so every hub
@@ -661,7 +669,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // rarity color. Enforced by tests/crafting_materials_quality.test.ts.
   thorium_ore: {
     id: 'thorium_ore',
-    name: 'Thorium Ore',
+    name: 'Osmium Ore',
     kind: 'junk',
     quality: 'common',
     sellValue: 15,
@@ -669,7 +677,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   arcanite_bar: {
     id: 'arcanite_bar',
-    name: 'Arcanite Bar',
+    name: 'Glyphsteel Bar',
     kind: 'junk',
     quality: 'common',
     sellValue: 40,
@@ -685,7 +693,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   elderwood_log: {
     id: 'elderwood_log',
-    name: 'Elderwood Log',
+    name: 'Highpine Log',
     kind: 'junk',
     quality: 'common',
     sellValue: 40,
@@ -707,7 +715,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 40,
     buyValue: 160,
   },
-  // Low-tier gathering-node materials (Professions 2.0 Phase 4): the
+  // Low-tier gathering-node materials (Professions 2.0): the
   // eastbrook_vale and mirefen_marsh rows of gathering.ts NODE_MATERIAL_TABLE.
   // Node-gathered only, so no buyValue (not vendor-stocked); tier is read from
   // sellValue exactly like the reagents above, and the same common-quality
@@ -735,7 +743,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   silverleaf_herb: {
     id: 'silverleaf_herb',
-    name: 'Silverleaf Herb',
+    name: 'Sheenleaf Herb',
     kind: 'junk',
     quality: 'common',
     sellValue: 4,
@@ -816,6 +824,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     foodHp: 117,
     sellValue: 10,
   },
+  // The id/name divergence here is permanent: the id shipped in v0.28.0 (ids
+  // in live saves are frozen API, see tests/shipped_item_ids.test.ts) while
+  // the display name already carried the original Slatefin coin.
+  // Ids are never player-visible, so the display name is the one that matters.
   raw_stonescale_carp: {
     id: 'raw_stonescale_carp',
     name: 'Raw Slatefin Carp',
@@ -834,7 +846,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // The prized rare catch, reelable from any water, a lucky hook.
   glimmerfin_koi: {
     id: 'glimmerfin_koi',
-    name: 'Glimmerfin Koi',
+    name: 'Sunglint Koi',
     kind: 'food',
     quality: 'uncommon',
     foodHp: 117,
@@ -1082,7 +1094,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'common',
     stats: { armor: 40 },
-    sellValue: 160,
+    // Economy invariant: sellValue re-priced below
+    // the reworked craft input (88); buyValue is the armorer's shop price and
+    // deliberately keeps the old 10x-of-160 figure so the vendor catalog is
+    // untouched by the economy fix.
+    sellValue: 80,
     buyValue: 1600,
   },
   hobnail_boots: {
@@ -1119,7 +1135,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'uncommon',
     stats: { armor: 30, int: 2, spi: 1 },
-    sellValue: 210,
+    // Economy invariant: re-priced below the
+    // reworked craft input (85); this also retires the piece as the cheapest
+    // disenchant fodder (the evidence review's dust-mill row). Not vendored;
+    // buyValue keeps its historical figure, and its one live reader (the
+    // market suggested ask, market_view.ts) clamps to 10x sellValue.
+    sellValue: 72,
     buyValue: 2100,
   },
   eastbrook_druids_hide: {
@@ -1130,7 +1151,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'uncommon',
     stats: { armor: 52, int: 2, spi: 1 },
-    sellValue: 230,
+    // Economy invariant: re-priced below the
+    // reworked craft input (93). Not vendored; buyValue kept, read only by
+    // the market suggested ask, which clamps to 10x sellValue.
+    sellValue: 84,
     buyValue: 2300,
   },
   eastbrook_warded_leggings: {
@@ -1141,11 +1165,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 50, int: 2, spi: 1 },
-    sellValue: 220,
+    // Economy invariant: re-priced below the
+    // reworked craft input (117). Not vendored; buyValue kept, read only by
+    // the market suggested ask, which clamps to 10x sellValue.
+    sellValue: 105,
     buyValue: 2200,
   },
   // Hub-tier (level-20, crafting-hub-gated) caster pieces, one per craft,
-  // mirroring TOOL_RECIPES' thorium tier. Budgeted at the recipe's resulting ITEM
+  // mirroring TOOL_RECIPES' osmium tier. Budgeted at the recipe's resulting ITEM
   // level (source level 20 + the rare QUALITY_ILVL_BONUS of 3 = 23, see
   // item_budget.ts and item_level.ts), matching the level-20 rares in the same
   // slots (boundstone_helm, gravewyrm_gauntlets, gravewyrm_mantle; pinned by
@@ -1172,13 +1199,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   sootscale_mantle: {
     id: 'sootscale_mantle',
-    name: 'Sootscale Mantle',
+    name: 'Kilnscale Mantle',
     kind: 'armor',
     armorType: 'mail',
     slot: 'shoulder',
     quality: 'rare',
     stats: { armor: 78, int: 6, spi: 4 },
-    sellValue: 470,
+    // Economy invariant, discount-aware arm: both reagents are vendor-stocked
+    // at the forge, and a specialized crafter holding a self-signed ore
+    // consumes as little as 4 ore + 3 flux = 300c, so the old 470 vendor-back
+    // sat gold-positive. Re-priced below that cheapest achievable
+    // input (the v0.29.0 output-re-price precedent); the vendor-loop bound is
+    // pinned by tests/recipe_economy.test.ts.
+    sellValue: 280,
   },
   // --- Hollow Crypt rewards (rare/blue) ---
   // Item-level showcase: these rares are NORMALIZED to the stat budget their item
@@ -1338,7 +1371,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 11, max: 18, speed: 3.0 },
     stats: { int: 5, spi: 2 },
     sellValue: 880,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   gravewardens_shiv: {
     id: 'gravewardens_shiv',
@@ -1559,11 +1592,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 320,
   },
   // --- junk (gray) ---
+  // wolf_fang became a crafting reagent
+  // (recipe_eastbrook_arming_sword, recipe_ironbound_warplate_helm), so it
+  // follows the same convention as spider_leg/bone_fragments/linen_scrap
+  // below: common (white), NOT 'poor', or sellAllJunk would sweep it. Its
+  // sellValue is unchanged. See tests/crafting_materials_quality.test.ts.
   wolf_fang: {
     id: 'wolf_fang',
     name: 'Cracked Wolf Fang',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 4,
   },
   bandit_bandana: {
@@ -1633,27 +1671,27 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // material kind).
   arcane_dust: {
     id: 'arcane_dust',
-    name: 'Arcane Dust',
+    name: 'Chime Dust',
     kind: 'junk',
     quality: 'common',
     sellValue: 6,
   },
   arcane_essence: {
     id: 'arcane_essence',
-    name: 'Arcane Essence',
+    name: 'Chime Essence',
     kind: 'junk',
     quality: 'uncommon',
     sellValue: 18,
   },
   arcane_shard: {
     id: 'arcane_shard',
-    name: 'Arcane Shard',
+    name: 'Chime Shard',
     kind: 'junk',
     quality: 'rare',
     sellValue: 55,
   },
 
-  // --- Typed disenchant secondaries (Professions 2.0 Phase 13) -------------
+  // --- Typed disenchant secondaries (Professions 2.0) -------------
   // A rare-or-better disenchant yields, alongside the universal ladder material
   // above, exactly one typed secondary keyed by the salvaged piece's material
   // (src/sim/professions/disenchant_reagents.ts): armor by its armor class,
@@ -1871,7 +1909,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 9, max: 15, speed: 3.0 },
     stats: { int: 3, spi: 2 },
     sellValue: 175,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   caravan_warden_dirk: {
     id: 'caravan_warden_dirk',
@@ -1978,7 +2016,7 @@ export interface FishingEntry {
   weight: number;
 }
 
-// Catch rarity ladder (Professions 2.0 Phase 11): fishing proficiency selects
+// Catch rarity ladder (Professions 2.0): fishing proficiency selects
 // one of three per-zone tables (bands). As proficiency rises the weight shifts
 // out of the junk rows (tangled_weed / soggy_boot) and the empty-hook null row
 // and into the zone's food-fish rows (the cooking inputs). The moves are
@@ -1991,7 +2029,7 @@ export interface FishingEntry {
 // with the eastbrook_vale row as the fallback for any zone without its own.
 export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
   // Band 0 (proficiency 0-99): byte-identical to the shipped starter tables, so
-  // every pre-Phase-11 seed reproduces the exact same catch sequence.
+  // every existing seed reproduces the exact same catch sequence.
   {
     eastbrook_vale: [
       { itemId: 'raw_mirror_trout', weight: 45 },
@@ -2069,7 +2107,7 @@ export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
   },
 ];
 
-// The band-0 tables, kept under the original export name so pre-Phase-11
+// The band-0 tables, kept under the original export name so existing
 // consumers (the deeds zone-key guard in tests/deeds_content.test.ts) resolve
 // unchanged. Identical object as FISHING_TABLES_BY_BAND[0], so its rows are the
 // shipped rows byte for byte.

@@ -1114,6 +1114,18 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'stalkerhide_jerkin',
       'cragwalker_boots',
       'windguard_leggings',
+      // Gathering tools (#2343: every node harvest needs a matching tool, so
+      // each zone hub stocks the tiers its own nodes use; Thornpeak has
+      // tier-1 through tier-3 nodes). Tiered rods stay a Wilkes exclusive.
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'mithril_mining_pick',
+      'handaxe',
+      'felling_axe',
+      'ironbark_axe',
+      'gathering_sickle',
+      'bronze_sickle',
+      'silverleaf_sickle',
       'simple_fishing_pole',
       // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
       // trade-goods vendor, so every station-bound (stationType) recipe has
@@ -1211,7 +1223,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     questIds: [],
     greeting: 'The mountain forgets nothing, $N, and neither do I. Let us see what you have done.',
   },
-  // Crafting-station master (Professions 2.0 Phase 8): stands beside the
+  // Crafting-station master (Professions 2.0): stands beside the
   // Highwatch apothecary (content/professions.ts STATIONS), east of the
   // well with a guard-safe camp margin.
   alchemist_verane: {
@@ -1221,7 +1233,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     pos: { x: 8.5, z: 658 },
     facing: -0.4,
     color: 0x58b09c,
-    // Professions 2.0 Phase 14: the Highwatch apothecary master runs the
+    // Professions 2.0: the Highwatch apothecary master runs the
     // repeatable alchemy work order.
     questIds: ['q_prof_workorder_apothecary'],
     vendorItems: [
@@ -1274,7 +1286,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_stalker_pelts: {
     id: 'q_stalker_pelts',
-    name: 'Winter Is Coming to Highwatch',
+    name: 'First Frost at Highwatch',
     giverNpcId: 'quartermaster_bree',
     turnInNpcId: 'quartermaster_bree',
     text: 'Winter on this mountain does not knock, $N — it kicks the door in. Eight ridge stalker pelts will line enough cloaks to see the wall through the first snows. The beasts prowl the ridges flanking the road south.',
@@ -1890,7 +1902,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     minLevel: 20,
     suggestedPlayers: 10,
   },
-  // Repeatable craft work order (Professions 2.0 Phase 14): Alchemist Verane
+  // Repeatable craft work order (Professions 2.0): Alchemist Verane
   // buys goldleaf on the shared cadence (WORK_ORDER_CADENCE_TICKS); the collect
   // turn-in consumes the herbs. copperReward is floor(0.5 * summed sell value of
   // the requested herbs); xpReward matches the make-amends repeatable band.
@@ -3285,7 +3297,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   stalkerhide_jerkin: {
     id: 'stalkerhide_jerkin',
-    name: 'Stalkerhide Jerkin',
+    name: 'Prowlhide Jerkin',
     kind: 'armor',
     armorType: 'leather',
     slot: 'chest',
@@ -3709,6 +3721,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
     [28, 847],
   ],
   mudHuts: [],
+  marshReeds: [],
   ruinRings: [
     { x: -40, z: 830, ringR: 7, columns: 6 }, // Revenant Fields battlefield
     { x: 141, z: 712, ringR: 7, columns: 6 }, // Malric grave ruins

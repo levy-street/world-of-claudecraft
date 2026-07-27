@@ -16,7 +16,7 @@
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
 import { isDebuffAura, isDispellableAura } from '../aura_classify';
-import { ABILITIES, isDelvePos } from '../data';
+import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -2159,6 +2159,16 @@ export function runEffects(
               aura.kind === 'disarm' ||
               aura.kind === 'slow')
           ) {
+            // Product ruling (Avatar, the sole breakControl user): the break
+            // removes control from any source EXCEPT the caster itself and
+            // mobs whose template carries boss: true (final-boss templates).
+            // Encounter mobs without the flag are breakable; a source that
+            // cannot be resolved (despawned, since ctx.entities is the full
+            // authoritative roster here) defaults to breakable, the common
+            // case.
+            if (aura.sourceId === p.id) continue;
+            const source = ctx.entities.get(aura.sourceId);
+            if (source && MOBS[source.templateId]?.boss) continue;
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }

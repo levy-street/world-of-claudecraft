@@ -21,6 +21,7 @@ import {
   dungeonAt,
   isDelvePos,
   OVERWORLD_GRAVEYARDS,
+  PLAYER_START,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 } from './data';
@@ -58,11 +59,17 @@ export { RESURRECTION_SICKNESS_ID };
 
 // --- graveyard selection ----------------------------------------------------
 
-// Nearest overworld graveyard to a position (pure: a scan of the static list).
-export function nearestOverworldGraveyard(x: number, z: number): { x: number; z: number } {
-  let best = OVERWORLD_GRAVEYARDS[0];
+// Nearest overworld graveyard to a position. Worlds without authored graveyards
+// fall back to their own start point rather than leaking a built-in town anchor.
+export function nearestOverworldGraveyard(
+  x: number,
+  z: number,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): { x: number; z: number } {
+  let best: { x: number; z: number } = fallback;
   let bestD = Infinity;
-  for (const g of OVERWORLD_GRAVEYARDS) {
+  for (const g of graveyards) {
     const dx = g.x - x;
     const dz = g.z - z;
     const d = dx * dx + dz * dz;
@@ -79,17 +86,28 @@ export function nearestOverworldGraveyard(x: number, z: number): { x: number; z:
 // ghost runs its spirit back to the door and re-enters to resurrect at the entrance, so
 // no Spirit Healer stands inside an instance. Outdoors it is the nearest overworld
 // graveyard to where the body fell.
-function ghostGraveyard(p: Entity): { x: number; z: number } {
+function ghostGraveyard(
+  p: Entity,
+  graveyards: readonly { x: number; z: number }[],
+  fallback: { x: number; z: number },
+): { x: number; z: number } {
   const dungeon = dungeonAt(p.pos.x);
-  if (dungeon) return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z);
-  return nearestOverworldGraveyard(p.pos.x, p.pos.z);
+  if (dungeon) {
+    return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z, graveyards, fallback);
+  }
+  return nearestOverworldGraveyard(p.pos.x, p.pos.z, graveyards, fallback);
 }
 
 // --- release / resurrect ----------------------------------------------------
 
 // Release the spirit: leave the body where it fell and rise as a ghost at the
 // nearest graveyard. Replaces the old instant-respawn-at-graveyard behavior.
-export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
+export function releasePlayerSpirit(
+  ctx: SimContext,
+  pid?: number,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -104,7 +122,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
   p.corpseInstanceId = ctx.instanceClaimIdAt(p.pos);
   p.ghost = true; // p.dead stays true
-  const gy = ghostGraveyard(p);
+  const gy = ghostGraveyard(p, graveyards, fallback);
   p.pos = ctx.groundPos(gy.x, gy.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -264,6 +282,11 @@ export function spawnSpiritHealerAt(ctx: SimContext, x: number, z: number): numb
 }
 
 // Place an angel at every overworld graveyard. Called once from the Sim ctor.
-export function spawnOverworldSpiritHealers(ctx: SimContext): void {
-  for (const g of OVERWORLD_GRAVEYARDS) spawnSpiritHealerAt(ctx, g.x, g.z);
+export function spawnOverworldSpiritHealers(
+  ctx: SimContext,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+): void {
+  for (const g of graveyards) {
+    spawnSpiritHealerAt(ctx, g.x, g.z);
+  }
 }

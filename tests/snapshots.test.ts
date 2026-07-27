@@ -25,6 +25,7 @@ vi.mock('../server/db', () => ({
 
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
+import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
@@ -613,6 +614,70 @@ describe('corpse harvest claim over the wire', () => {
   });
 });
 
+// Loot owner-lock lapse (FFA) over the wire. The rights-aware corpse picker
+// (src/game/corpse_loot_availability.ts) reads mob.lootFfaTimer; offline the
+// Sim entity carries the real countdown, so online the LAPSE must ride the
+// sparse terse key `ffa` or a stranger's aged-out corpse stays unofferable
+// forever (the old hardcoded Infinity mirror). Same pin shape as the hcb suite
+// above: the REAL server emit into the REAL client mirror.
+describe('loot FFA lapse over the wire', () => {
+  const TAPPER = 42;
+
+  function strangerCorpse(id: number, lootFfaTimer: number): ReturnType<typeof createMob> {
+    const template = MOBS.forest_wolf;
+    const mob = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = TAPPER;
+    // claimed: keeps the harvest arm closed so canOpen isolates loot rights
+    mob.harvestClaimedBy = TAPPER;
+    mob.lootFfaTimer = lootFfaTimer;
+    mob.loot = { copper: 10, items: [{ itemId: 'wolf_fang', count: 1 }] };
+    return mob;
+  }
+
+  it('a fresh owner-locked corpse stays sparse (no ffa key) and unofferable to a stranger', () => {
+    const w = wireEntity(strangerCorpse(9101, 60));
+    // Absent, not `ffa: 0`: a still-locked corpse's record must be byte-unchanged
+    // by this feature, so the per-entity delta cache keeps eliding it.
+    expect(w).not.toHaveProperty('ffa');
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(9101)!;
+    expect(mirrored.lootFfaTimer).toBe(Infinity);
+    expect(corpseLootAvailability(mirrored, 1).canOpen).toBe(false);
+  });
+
+  it('the lapse rides ffa:1, mirrors as lapsed, and reopens the picker for a stranger', () => {
+    const w = wireEntity(strangerCorpse(9102, 0));
+    expect(w.ffa).toBe(1);
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(9102)!;
+    expect(corpseLootAvailability(mirrored, 1).canOpen).toBe(true);
+    expect(corpseLootAvailability(mirrored, 1).hasLoot).toBe(true);
+  });
+
+  it('a record without the flag resets a stale mirrored lapse (respawn reuses the id)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(strangerCorpse(9103, 0))] });
+    expect(corpseLootAvailability(client.entities.get(9103)!, 1).canOpen).toBe(true);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(strangerCorpse(9103, 60))] });
+    expect(client.entities.get(9103)!.lootFfaTimer).toBe(Infinity);
+    expect(corpseLootAvailability(client.entities.get(9103)!, 1).canOpen).toBe(false);
+  });
+
+  it('never emits ffa for a non-lootable entity even with a lapsed timer', () => {
+    const template = MOBS.forest_wolf;
+    const alive = createMob(9104, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    alive.lootFfaTimer = 0;
+    expect(wireEntity(alive)).not.toHaveProperty('ffa');
+  });
+});
+
 describe('combat ratings over the wire', () => {
   it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
     const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
@@ -1007,7 +1072,7 @@ describe('delta snapshots', () => {
   });
 
   it('instance payloads (masterwork and legacy quality) ride the inv snapshot verbatim', () => {
-    // Phase 2 back-compat over the wire: the server sends the live
+    // Back-compat over the wire: the server sends the live
     // meta.inventory wholesale, so a masterwork copy's full payload (signer,
     // enchant marker, rolled.masterwork plus baked stats) and a legacy copy's
     // rolled.quality must both arrive on the client mirror byte-identical.
@@ -1037,7 +1102,7 @@ describe('delta snapshots', () => {
     expect(client.inventory.find((s) => s.itemId === 'apprentice_staff')?.instance).toEqual(legacy);
   });
 
-  it('a counted identical-payload stack (Phase 12d) rides the inv snapshot as one slot', () => {
+  it('a counted identical-payload stack rides the inv snapshot as one slot', () => {
     // Three byte-equal signed grants merge server-side into a single count-3
     // slot; the wire sends the inventory wholesale, so the client mirror must
     // show the same one slot with the count AND the payload intact (a mirror
@@ -2611,7 +2676,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
 });
 
 // Worn per-slot instance payloads ride the identity wire (terse key `eqi`,
-// Professions 2.0 Phase 6) so the inspect window shows another player's
+// Professions 2.0) so the inspect window shows another player's
 // masterwork/enchant rolls. Sparse exactly like `eq`: players only, present
 // only while at least one worn piece carries a payload, absent otherwise (the
 // no-bloat tooth: an instance-less player's identity record is byte-unchanged).
@@ -2659,7 +2724,7 @@ describe('equipped instance wire (eqi)', () => {
     sim.equipItem('eastbrook_ritual_vestments', pid);
     const wired = wireEntity(e).eqi as Record<string, Record<string, unknown>>;
     // Only the cosmetic inspect fields (signer, enchant, rolled) leave the
-    // server; boundTo, charges, and the Phase 13 bindOnTrade arm are gameplay
+    // server; boundTo, charges, and the bindOnTrade arm are gameplay
     // state no inspecting client needs and must never ride the identity wire.
     expect(wired.chest.signer).toBe('Aldric');
     expect(wired.chest.rolled).toEqual({ masterwork: true, stats: { int: 3 } });
@@ -2984,6 +3049,7 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
+  'mktU',
   'mst',
   'ncd',
   'party',
@@ -3047,6 +3113,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
+  mktU: 'marketCollectPending',
   mres: 'maxResource',
   mst: 'activeMobileStationCraft',
   party: 'partyInfo',
@@ -3115,6 +3182,9 @@ function dirtyEveryDeltaField(): {
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
   const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
+  // `mktU`: credit a pending collection so the collect-indicator bit is 1 (the
+  // name key merges into the canonical seller key on first read).
+  (sim.market as any).marketCollections.set(meta.name, { copper: 95, items: [] });
   // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
   // player. `mailU` is already non-zero: every fresh character got the one-time
   // Ravenpost welcome letter (delay 0) at join.
@@ -3153,7 +3223,7 @@ function dirtyEveryDeltaField(): {
     switchCount: 2,
     amendsProgress: 4,
   };
-  // An ACTIVE mobile crafting station (Phase 8, `mst`): set directly on the
+  // An ACTIVE mobile crafting station (`mst`): set directly on the
   // meta slot (the placement command's specialization gate is pinned in
   // tests/professions_crafting_hub.test.ts; this suite pins the WIRE mirror),
   // far from expiry so the server-side liveness check reads it active.
@@ -3236,7 +3306,7 @@ function dirtyEveryDeltaField(): {
     choices: new Map(),
   });
 
-  // Enchanting-action outcomes (Professions 2.0 Phase 13): poke the exact
+  // Enchanting-action outcomes (Professions 2.0): poke the exact
   // PlayerMeta fields the denc/ench/salv encoders read
   // (lastDisenchantResultFor/lastEnchantResultFor/lastSalvageResultFor), each a
   // distinguishable non-null value so the round-trip and first-snapshot pins are
@@ -3282,11 +3352,14 @@ describe('full self-state snapshot delta fixture', () => {
       switchCount: 0,
       amendsProgress: 0,
     };
+    // Reagents for the warplate helm.
     meta.inventory = [
-      { itemId: 'bone_fragments', count: 4 },
-      { itemId: 'linen_scrap', count: 2 },
+      { itemId: 'arcanite_bar', count: 1 },
+      { itemId: 'thorium_ore', count: 5 },
+      { itemId: 'wolf_fang', count: 4 },
+      { itemId: 'smithing_flux', count: 2 },
     ];
-    // Phase 9 acquisition switch: combo recipes are trainer-taught now, so a
+    // Acquisition switch: combo recipes are trainer-taught now, so a
     // fresh test player must learn this one explicitly before crafting it.
     meta.knownRecipes.add('recipe_ironbound_warplate_helm');
 
@@ -3428,6 +3501,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
+    expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
@@ -3456,7 +3530,7 @@ describe('full self-state snapshot delta fixture', () => {
     // untouched node (never in the map) still reads ready.
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
     expect(client.nodeHarvestableByMe('not_a_real_node')).toBe(true);
-    // Phase 12c stage 2 appendix re-pin: the enforced per-profession caps
+    // Re-pin: the enforced per-profession caps
     // (mining/logging/herbalism 100, fishing 200) replace the old uniform 300.
     expect(client.professionsState).toEqual({
       skills: [
@@ -3478,7 +3552,7 @@ describe('full self-state snapshot delta fixture', () => {
       amendsRequired: 11,
     }); // cprof -> craftingIdentity
     // The pair-named archetype title derives LIVE from the mirrored
-    // craftingIdentity (Professions 2.0 Phase 1): the canonical pair id, not a
+    // craftingIdentity (Professions 2.0): the canonical pair id, not a
     // craft id, and it must reflect the cprof delta just applied.
     expect(client.archetypeTitle).toBe('weaponcrafting+armorcrafting');
     expect(client.craftSkills).toMatchObject({ armorcrafting: 31, weaponcrafting: 29 });
@@ -3486,7 +3560,7 @@ describe('full self-state snapshot delta fixture', () => {
     // (expiry resolved server-side against the sim's own tickCount).
     expect(client.activeMobileStationCraft).toBe('armorcrafting');
     // denc/ench/salv -> lastDisenchantResult/lastEnchantResult/lastSalvageResult
-    // (Professions 2.0 Phase 13): the delta arm mirrors the exact stash. JSON drops
+    // (Professions 2.0): the delta arm mirrors the exact stash. JSON drops
     // undefined fields, so each decoded object carries no undefined keys; the
     // disenchant secondary and the enchant deny reason both survive.
     expect(client.lastDisenchantResult).toEqual({
@@ -3644,9 +3718,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 55 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(55);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(55);
+  it('ALL_DELTA_KEYS contains exactly 56 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(56);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(56);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3665,7 +3739,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(55);
+    expect(scraped.size).toBe(56);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

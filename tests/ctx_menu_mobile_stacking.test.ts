@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-// Guard for the Phase 13 bag-item action menu's mobile stacking.
+// Guard for the bag-item action menu's mobile stacking.
 //
 // The mobile window sheet override forces every managed window to z-index 95
 // (hud.mobile.css, "Managed windows receive an inline desktop z-index"), which
@@ -30,7 +30,7 @@ function zIndexOf(css: string, selectorPattern: RegExp): number {
   return Number(z[1]);
 }
 
-describe('mobile #ctx-menu stacking (Phase 13 bag-item action menu)', () => {
+describe('mobile #ctx-menu stacking (bag-item action menu)', () => {
   it('the mobile popup sits above the forced mobile window-sheet z-index', () => {
     const sheetZ = zIndexOf(HUD_MOBILE_CSS, /z-index:\s*\d+\s*!important/);
     const mobileMenuZ = zIndexOf(HUD_MOBILE_CSS, /body\.mobile-touch #ctx-menu\s*\{[^}]*\}/);

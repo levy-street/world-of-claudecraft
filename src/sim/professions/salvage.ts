@@ -14,6 +14,7 @@
 // Math.random/Date.now, host-agnostic so it runs offline, on the server, and
 // in the headless RL env unchanged.
 
+import { bagCapacity, canAddItem, consumeOneScratch } from '../bags';
 import { ITEMS } from '../data';
 import { requiredLevelFor } from '../item_level_req';
 import { removePreferFungible } from '../items';
@@ -37,7 +38,7 @@ const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
 // new item ids, same rationale content/recipes.ts documents for the same
 // reason (avoids expanding the positional item-name arrays in
 // src/ui/i18n.catalog/items.ts for this issue).
-const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
+export const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
   common: 'bone_fragments',
   uncommon: 'linen_scrap',
   rare: 'spider_leg',
@@ -58,6 +59,15 @@ export function isSalvageable(def: ItemDef | undefined): boolean {
   );
 }
 
+/** The rarity/tier-scaled base yield the rng bonus rides on: the shared term
+ *  of salvageYield and maxSalvageYield, so the #2350 capacity gate's worst
+ *  case can never drift from the rolled grant. */
+function baseSalvageYield(def: ItemDef): number {
+  const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
+  const tierBonus = Math.floor(requiredLevelFor(def) / 10);
+  return qualityIdx + tierBonus + 1;
+}
+
 /**
  * The material yield for one salvage of `def`: scales with rarity (the
  * `QUALITY_ORDER` index) and tier (`requiredLevelFor`, the derived level for
@@ -67,10 +77,15 @@ export function isSalvageable(def: ItemDef | undefined): boolean {
  * deterministic. Pure aside from the rng draw.
  */
 export function salvageYield(def: ItemDef, rng: Rng): number {
-  const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
-  const tierBonus = Math.floor(requiredLevelFor(def) / 10);
   const bonus = rng.next() < 0.5 ? 0 : 1;
-  return qualityIdx + tierBonus + 1 + bonus;
+  return baseSalvageYield(def) + bonus;
+}
+
+/** The largest yield salvageYield can roll (the +1 bonus arm): the count the
+ *  #2350 capacity gate pre-fits, so a denial never draws rng and a granted
+ *  roll can never exceed what was checked. */
+export function maxSalvageYield(def: ItemDef): number {
+  return baseSalvageYield(def) + 1;
 }
 
 export interface SalvageResult {
@@ -78,7 +93,7 @@ export interface SalvageResult {
   itemId: string;
   materialItemId?: string;
   count?: number;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
+  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
 }
 
 /**
@@ -92,17 +107,42 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
   const meta = ctx.players.get(pid);
-  // Phase 12c shared action throttle (action_throttle.ts): salvage draws
+  // Shared action throttle (action_throttle.ts): salvage draws
   // from the same 10-per-60s budget as crafting, checked (no side effect
   // beyond the window's own natural rollover) before anything is consumed.
   if (meta && !withinActionThrottle(meta, ctx.time)) {
     return { ok: false, itemId, reason: 'throttled' };
   }
-  removePreferFungible(ctx, itemId, 1, pid);
   const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
+  // #2350 capacity gate: the materials must fit AFTER the salvaged copy
+  // leaves, so consume it on a scratch copy (consumeOneScratch mirrors
+  // removePreferFungible's victim order) and pre-fit the WORST-CASE yield
+  // (the +1 rng bonus arm): the denial draws nothing, and a granted roll can
+  // never exceed what was checked. Denies with no side effect, like every
+  // other arm above.
+  if (meta) {
+    const scratch = meta.inventory.map((s) => ({ ...s }));
+    consumeOneScratch(scratch, itemId);
+    if (!canAddItem(scratch, bagCapacity(meta.bags), materialItemId, maxSalvageYield(def))) {
+      return { ok: false, itemId, reason: 'no_bag_space' };
+    }
+  }
+  removePreferFungible(ctx, itemId, 1, pid);
   const count = salvageYield(def, ctx.rng);
-  ctx.addItem(materialItemId, count, pid);
-  if (meta) recordAction(meta);
+  // silent + callerLogs: the salvageResult event owns BOTH halves of the
+  // player feedback. It fires its own dedicated cue (audio.salvage in
+  // src/game/audio.ts), so the generic loot ding would stack on top of it,
+  // and it logs the yield-naming, item-linked salvage line off
+  // materialItemId/count, so the hub's "You receive:" line would repeat what
+  // that line already says (#2430).
+  ctx.addItem(materialItemId, count, pid, { silent: true, callerLogs: true });
+  if (meta) {
+    recordAction(meta);
+    // The lifetime salvage counter (soc_first_salvage /
+    // soc_salvage_50). Bumped strictly AFTER the single salvageYield rng
+    // draw above; the bump itself draws nothing.
+    ctx.bumpDeedStat(meta, 'salvagesPerformed', 1);
+  }
   return { ok: true, itemId, materialItemId, count };
 }
 

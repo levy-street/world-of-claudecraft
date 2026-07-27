@@ -536,3 +536,17 @@ describe('ActionBarController persistence seam', () => {
     });
   });
 });
+
+describe('isHotbarItemId: gathering implements are placeable (#2343)', () => {
+  it('admits every gathering implement shape alongside the consumable kinds', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    // Gathering tools (picks/axes/sickles) and the tiered rods are gatherTool
+    // items; the simple pole rides the pre-existing use.type 'fishing' arm.
+    expect(controller.isHotbarItemId('copper_mining_pick')).toBe(true);
+    expect(controller.isHotbarItemId('silverstream_fishing_rod')).toBe(true);
+    expect(controller.isHotbarItemId('simple_fishing_pole')).toBe(true);
+    // Regression companions: the consumable arms and the non-usable negative.
+    expect(controller.isHotbarItemId('lesser_healing_potion')).toBe(true);
+    expect(controller.isHotbarItemId('copper_ore')).toBe(false);
+  });
+});

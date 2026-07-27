@@ -17,7 +17,7 @@ import type { InteractionOutcome } from './interaction_autorun';
 
 export type GatherNodeVerdict = 'too_far' | 'tool_tier' | 'not_ready' | 'harvest';
 
-/** The tool-tier access gate for one node (Professions 2.0 Phase 12): the
+/** The tool-tier access gate for one node (Professions 2.0): the
  *  node's content tier plus the viewer's owned-best matching tool tier (the
  *  bare-hands floor is tier 1), with the localized denial line the caller
  *  resolved for exactly this node (tier + profession baked in). Optional so

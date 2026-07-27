@@ -551,10 +551,89 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       first.readyState = StubWebSocket.CLOSED;
       first.onclose?.(); // mid-reconnect, backoff pending
 
-      w.onMessage(JSON.stringify({ t: 'error', error: 'not authenticated' }));
+      w.onMessage(
+        JSON.stringify({
+          t: 'error',
+          error: 'Game and server versions are incompatible. Reload or update, then try again.',
+        }),
+      );
       expect(w.sessionEnded).toBe(true);
-      expect(reasons).toEqual(['not authenticated']); // verbatim server text
+      expect(reasons).toEqual([
+        'Game and server versions are incompatible. Reload or update, then try again.',
+      ]); // verbatim server text
       expect(harness.timers.length).toBe(0); // the pending retry died with the session
+    });
+  });
+
+  it('fails closed when an auth-world-3 client reaches an auth-world-2 server', () => {
+    withDomStubs((_doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      const reasons: string[] = [];
+      world.onDisconnect = (reason) => {
+        reasons.push(reason);
+      };
+      const socket = StubWebSocket.instances[0];
+
+      socket.onopen?.();
+      expect(socket.sent).toHaveLength(1);
+      expect(JSON.parse(socket.sent[0])).toEqual(
+        expect.objectContaining({
+          t: 'auth-world-3',
+          token: 't',
+          character: 1,
+        }),
+      );
+
+      // An auth-world-2 server rejects this unknown future epoch before admission.
+      w.onMessage(
+        JSON.stringify({
+          t: 'error',
+          error: 'Game and server versions are incompatible. Reload or update, then try again.',
+        }),
+      );
+
+      expect(w.sessionEnded).toBe(true);
+      expect(reasons).toEqual([
+        'Game and server versions are incompatible. Reload or update, then try again.',
+      ]);
+      expect(harness.timers.length).toBe(0);
+    });
+  });
+
+  it('upgrades a legacy server auth-required handshake rejection to the world-version reason', () => {
+    withDomStubs((_doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      const reasons: string[] = [];
+      world.onDisconnect = (reason) => {
+        reasons.push(reason);
+      };
+
+      w.onMessage(JSON.stringify({ t: 'error', error: 'authentication required' }));
+
+      expect(w.sessionEnded).toBe(true);
+      expect(reasons).toEqual([
+        'Game and server versions are incompatible. Reload or update, then try again.',
+      ]);
+      expect(harness.timers.length).toBe(0);
+    });
+  });
+
+  it('does not reinterpret auth-required on an established session as a layout mismatch', () => {
+    withDomStubs(() => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      const reasons: string[] = [];
+      world.onDisconnect = (reason) => {
+        reasons.push(reason);
+      };
+      w.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+
+      w.onMessage(JSON.stringify({ t: 'error', error: 'authentication required' }));
+
+      expect(w.sessionEnded).toBe(true);
+      expect(reasons).toEqual(['authentication required']);
     });
   });
 });

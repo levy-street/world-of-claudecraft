@@ -49,6 +49,7 @@ import type {
   DelveRun,
   DungeonDifficulty,
   Entity,
+  EquipSlot,
   ErrorReason,
   GatherNodeDef,
   ItemInstancePayload,
@@ -60,6 +61,7 @@ import type {
   SimConfig,
   SimEvent,
   SkinCatalog,
+  StationDef,
   Vec3,
 } from './types';
 
@@ -75,6 +77,8 @@ export interface SimContextPrimitives {
   // Live player roster (keyed by entity id). Stays a Sim field; exposed here so the
   // moved party machine (A1) resolves member names/metas through the seam.
   readonly players: Map<number, PlayerMeta>;
+  /** Static crafting stations owned by this Sim's authored world bundle. */
+  readonly stationPlacements: readonly StationDef[];
   // The local / RL player id (single-player + renderer contexts). Reassigned on the
   // first join and on the primary's departure, so it is a LIVE getter, not a snapshot.
   // Stays a Sim field; the moved raid-marker `markerFor` (T1) reads it through the seam.
@@ -331,6 +335,8 @@ export interface SimContextCallbacks {
   updateFiestaActive(match: ArenaMatch): void;
   fiestaRestoreChar(meta: PlayerMeta, e: Entity): void;
   clearFiestaAugments(meta: PlayerMeta, e: Entity): void;
+  // Deliberately narrower than the module function, which also takes
+  // keepValidTargetPids (fight-start target retention); no ctx caller needs it.
   readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void;
   resetForArena(e: Entity): void;
   isArenaTeamWiped(match: ArenaMatch, team: 'A' | 'B'): boolean;
@@ -626,12 +632,33 @@ export interface SimContextCallbacks {
   // I2b lockpick controller (abandonLockpick/tickLockpickTimeout), and the I2c companion
   // AI (spawnDelveCompanion/despawnDelveCompanion/maybeCompanionBark).
   partyMembersForKey(key: string): number[];
-  addItem(itemId: string, count: number, pid?: number): void;
+  // opts.silent / opts.callerLogs: see Sim.addItem's matching params, same
+  // contract (suppress the client's default loot audio cue, and its default
+  // "You receive:" text line when the caller owns the line for this grant).
+  addItem(
+    itemId: string,
+    count: number,
+    pid?: number,
+    opts?: { silent?: boolean; callerLogs?: boolean },
+  ): void;
+  // Equip passthroughs for the /dev kit presets (src/sim/dev_kit.ts), which equip
+  // bags before gear so pooled bag capacity exists before the pieces land. Plain
+  // delegations to the Sim inventory hub; every validation (class, level, slot,
+  // spec-aware dual wield) still happens there.
+  equipBag(itemId: string, socket?: number, pid?: number): void;
+  equipItem(itemId: string, pid?: number): void;
+  unequipItem(slot: EquipSlot, pid?: number): boolean;
   // #1145 signed materials: grants a single non-fungible item copy carrying an
   // instance payload (signer/charges/rolled/boundTo, #1165), never merged into a
   // plain fungible stack. Used by corpse harvest to stamp a rare+ monster
   // material with the harvester's name.
-  addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number): void;
+  addItemInstance(
+    itemId: string,
+    instance: ItemInstancePayload,
+    pid?: number,
+    count?: number,
+    opts?: { silent?: boolean; callerLogs?: boolean },
+  ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
   spawnBossAdds(boss: Entity, mobId: string, count: number): void;
@@ -665,7 +692,7 @@ export interface SimContextCallbacks {
   startAutoAttack(pid?: number): void;
   revivePet(pid?: number): void;
   completeFishing(p: Entity, meta: PlayerMeta): void;
-  // Gather cast completion (Professions 2.0 Phase 12b): updateCasting routes a
+  // Gather cast completion (Professions 2.0): updateCasting routes a
   // finished GATHER_CAST_ID cast here, exactly like completeFishing above.
   completeGatherCast(p: Entity, meta: PlayerMeta): void;
   applyDemonHealTick(owner: Entity): void;
@@ -751,7 +778,7 @@ export interface SimContextCallbacks {
   // dispatches to. W2 owns these declarations; each is a thin late-bound delegate,
   // to a still-on-Sim method or (for fishing) to the professions module.
   // startFishing now routes to the fishing module (src/sim/professions/fishing.ts,
-  // Professions 2.0 Phase 11), called with the live ctx the same way runEffects is;
+  // Professions 2.0), called with the live ctx the same way runEffects is;
   // its body no longer lives on Sim (completeFishing, declared above, moved with it).
   // unlockMechChromaFromItem / openSkinSelect are cosmetics internals (facet W7);
   // isSwimming is a shared terrain predicate. unlockMechChromaFromItem's return value
@@ -868,6 +895,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get players() {
       return host.players;
+    },
+    get stationPlacements() {
+      return host.stationPlacements;
     },
     get primaryId() {
       return host.primaryId;
@@ -1198,6 +1228,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     partyMembersForKey: host.partyMembersForKey,
     addItem: host.addItem,
     addItemInstance: host.addItemInstance,
+    equipBag: host.equipBag,
+    equipItem: host.equipItem,
+    unequipItem: host.unequipItem,
     // removeItem passed through above (P1b inventory-hub helper) - deduped, not re-added.
     spawnBossAdds: host.spawnBossAdds,
     tradeFor: host.tradeFor,

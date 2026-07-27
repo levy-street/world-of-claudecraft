@@ -5,8 +5,10 @@
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_steam_units';
 
 import * as fs from 'node:fs';
+import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { tsFilesUnder } from '../helpers/ts_files_under';
 
 // Isolate the route layer: SQL boundary, upstream verification, and the
 // mirror are each mocked (the mirror has its own suite; the routes only owe
@@ -245,14 +247,17 @@ describe('POST /api/steam/link', () => {
     ['non-hex', 'z'.repeat(80)],
     ['too short', 'a'.repeat(MIN_TICKET_HEX_CHARS - 2)],
     ['too long', 'a'.repeat(MAX_TICKET_HEX_CHARS + 2)],
-  ])('rejects a %s ticket 400 steam.invalid_ticket without an upstream call', async (_name, ticket) => {
-    enableSteam();
-    await expect(handler()(linkCtx({ ticket }))).rejects.toMatchObject({
-      status: 400,
-      code: 'steam.invalid_ticket',
-    });
-    expect(verifyMock).not.toHaveBeenCalled();
-  });
+  ])(
+    'rejects a %s ticket 400 steam.invalid_ticket without an upstream call',
+    async (_name, ticket) => {
+      enableSteam();
+      await expect(handler()(linkCtx({ ticket }))).rejects.toMatchObject({
+        status: 400,
+        code: 'steam.invalid_ticket',
+      });
+      expect(verifyMock).not.toHaveBeenCalled();
+    },
+  );
 
   it('answers 503 steam.upstream when enabled but unprovisioned (no app id / key), before any upstream call', async () => {
     process.env.STEAM_ENABLED = '1';
@@ -349,18 +354,21 @@ describe('POST /api/steam/link', () => {
   it.each([
     ['account_linked' as const, 'steam.already_linked'],
     ['steam_taken' as const, 'steam.account_taken'],
-  ])('maps a displace race arm %s to its 409 (23505 re-classified behind the reclaim)', async (arm, code) => {
-    enableSteam();
-    accountForSteamIdMock.mockResolvedValue(99);
-    displaceMock.mockResolvedValue({ result: arm, displacedAccountId: null });
-    await expect(handler()(linkCtx({ ticket: GOOD_TICKET }))).rejects.toMatchObject({
-      status: 409,
-      code,
-    });
-    // A lost race wrote nothing, so no reconcile and no cache flip.
-    expect(reconcileMock).not.toHaveBeenCalled();
-    expect(onLinkChangedMock).not.toHaveBeenCalled();
-  });
+  ])(
+    'maps a displace race arm %s to its 409 (23505 re-classified behind the reclaim)',
+    async (arm, code) => {
+      enableSteam();
+      accountForSteamIdMock.mockResolvedValue(99);
+      displaceMock.mockResolvedValue({ result: arm, displacedAccountId: null });
+      await expect(handler()(linkCtx({ ticket: GOOD_TICKET }))).rejects.toMatchObject({
+        status: 409,
+        code,
+      });
+      // A lost race wrote nothing, so no reconcile and no cache flip.
+      expect(reconcileMock).not.toHaveBeenCalled();
+      expect(onLinkChangedMock).not.toHaveBeenCalled();
+    },
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -545,19 +553,145 @@ describe('ticket helpers (pure)', () => {
 // ---------------------------------------------------------------------------
 
 describe('login with Steam does not exist', () => {
-  it('no file under server/steam/ references newToken or auth_tokens (source scan)', () => {
-    const dir = path.resolve(process.cwd(), 'server/steam');
-    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.ts'));
-    expect(files.length).toBeGreaterThanOrEqual(7);
-    for (const file of files) {
-      const source = fs.readFileSync(path.join(dir, file), 'utf8');
-      // The strings appear here only inside this scan and the routes module's
-      // rule comment; strip comments before asserting so documentation of the
-      // rule cannot mask a violation.
-      const code = source.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-      expect(code, `${file} must not mint tokens`).not.toContain('newToken');
-      expect(code, `${file} must not touch auth_tokens`).not.toContain('auth_tokens');
+  const STEAM_DIR = path.resolve(process.cwd(), 'server/steam');
+
+  // The source files the rule covers, exactly. The `>= 7` floor this replaces
+  // sat ONE under the real 8, so a module could leave the top level (deleted,
+  // renamed, or moved down into a subdirectory) and the scan would still pass
+  // over whatever was left. The #2489 shape lands squarely in that slack: a
+  // split takes the count to 7 while every file in the new folder sits outside
+  // a single-level read. A new steam module joins this list and the Layout
+  // section of server/steam/CLAUDE.md in the same change.
+  const STEAM_SOURCE_FILES = [
+    'achievement_map.ts',
+    'config.ts',
+    'index.ts',
+    'mirror.ts',
+    'routes.ts',
+    'steam_db.ts',
+    'ticket.ts',
+    'web_api.ts',
+  ];
+
+  // The credential-minting surface the steam domain may never reach for.
+  // `newToken` (server/auth.ts) only generates the random string; the MINT is
+  // `saveToken` (server/db.ts, the repo's one INSERT INTO auth_tokens) and its
+  // `createCompanionToken` wrapper, and provisioning is `createAccount`. The
+  // two-string list this replaces could not see the minimal violation
+  // `await saveToken(randomBytes(32).toString('hex'), accountId)`, which names
+  // neither string and is the established idiom elsewhere under server/.
+  const FORBIDDEN = [
+    'newToken',
+    'auth_tokens',
+    'saveToken',
+    'createCompanionToken',
+    'createAccount',
+  ];
+
+  // Source with comments removed, so the rule's own documentation cannot read
+  // as a violation of it (server/steam/routes.ts and steam_db.ts both state the
+  // rule in prose, naming the forbidden strings). BLOCK comments first, then
+  // line comments guarded by a leading non-colon: the reverse order, unguarded,
+  // deletes from the `//` inside a URL literal to end of line, which silently
+  // drops real code from the scan (server/steam/ticket.ts's PARTNER_API_HOST is
+  // exactly that shape) and would take a violation sharing that line with it.
+  // Same idiom as codeOnly in tests/professions_silent_loot.test.ts. The order
+  // trades one hazard for a rarer one: a `/*` written inside a line comment now
+  // opens a block strip that runs to the next `*/`. No file under server/steam
+  // has that shape, and the strip only ever deletes, so both hazards fail
+  // toward a quieter scan rather than a false accusation.
+  const codeOnly = (source: string): string =>
+    source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+  // Every forbidden reference under `root`, tagged with the file it came from.
+  // Takes a root rather than closing over STEAM_DIR, so the recursion case
+  // below drives the exact scanner the rule uses, not a restatement of it.
+  const mintSitesUnder = (root: string): string[] =>
+    tsFilesUnder(root).flatMap(({ file, full }) => {
+      const code = codeOnly(fs.readFileSync(full, 'utf8'));
+      return FORBIDDEN.filter((token) => code.includes(token)).map((token) => `${file}: ${token}`);
+    });
+
+  it('the scan reads every source file under server/steam (never passes vacuously)', () => {
+    expect(
+      tsFilesUnder(STEAM_DIR).map((f) => f.file),
+      'server/steam source files: a new module joins this list and stays clear of FORBIDDEN',
+    ).toEqual(STEAM_SOURCE_FILES);
+    // The strip must not eat live code. Bound to the WHOLE url literal, not to
+    // the identifier: under the old line-comments-first order this line survived
+    // as `export const PARTNER_API_HOST = 'https:`, so an identifier check
+    // passed while 25 characters of real code left the scan. Only the full
+    // literal turns that revert red.
+    expect(codeOnly(fs.readFileSync(path.join(STEAM_DIR, 'ticket.ts'), 'utf8'))).toContain(
+      "'https://partner.steam-api.com'",
+    );
+    // ... and it must still remove the prose that states the rule, or the scan
+    // reports the documentation as a violation of itself.
+    const routesSource = fs.readFileSync(path.join(STEAM_DIR, 'routes.ts'), 'utf8');
+    expect(routesSource).toContain('newToken');
+    expect(codeOnly(routesSource)).not.toContain('newToken');
+  });
+
+  it('no file under server/steam mints or touches a credential (source scan)', () => {
+    expect(
+      mintSitesUnder(STEAM_DIR),
+      'the steam domain reached for the credential surface; linking never mints a login',
+    ).toEqual([]);
+  });
+
+  it('the scan descends, so a module in a SUBDIRECTORY is covered too (#2489)', () => {
+    // server/steam is flat today, so nothing above can tell a recursive walk
+    // from the single-level one it replaces: the rule would go on passing if
+    // the read quietly went flat again, while a module in a new folder minted
+    // freely. Drive the real scanner over a fixture tree instead.
+    const fixture = fs.mkdtempSync(path.join(tmpdir(), 'woc-steam-scan-'));
+    try {
+      fs.mkdirSync(path.join(fixture, 'nested', 'deeper'), { recursive: true });
+      fs.writeFileSync(path.join(fixture, 'clean.ts'), 'export const ok = true;\n');
+      fs.writeFileSync(
+        path.join(fixture, 'nested', 'mints.ts'),
+        "import { newToken } from '../../auth';\n",
+      );
+      fs.writeFileSync(
+        path.join(fixture, 'nested', 'deeper', 'reads_table.ts'),
+        "export const q = 'SELECT 1 FROM auth_tokens';\n",
+      );
+      // A violation only the widened FORBIDDEN list can see, three levels down:
+      // it names neither newToken nor auth_tokens.
+      fs.writeFileSync(
+        path.join(fixture, 'nested', 'deeper', 'wrapper.ts'),
+        'export const t = await saveToken(random, accountId);\n',
+      );
+      // Documentation of the rule, nested: it must NOT read as a violation.
+      fs.writeFileSync(
+        path.join(fixture, 'nested', 'documented.ts'),
+        '// This module must never call newToken or touch auth_tokens.\n',
+      );
+      // A non-source sibling that would violate: the extension filter holds.
+      fs.writeFileSync(path.join(fixture, 'nested', 'notes.md'), 'newToken(auth_tokens)\n');
+
+      expect(mintSitesUnder(fixture)).toEqual([
+        'nested/deeper/reads_table.ts: auth_tokens',
+        'nested/deeper/wrapper.ts: saveToken',
+        'nested/mints.ts: newToken',
+      ]);
+    } finally {
+      fs.rmSync(fixture, { recursive: true, force: true });
     }
+  });
+
+  it('the rule reads the tree through the shared walker, with no flat reader beside it', () => {
+    // The case above pins the WALKER; nothing can pin that the rule still goes
+    // through it, because server/steam is flat, so a second inline flat read
+    // would return the identical list today with every assertion green.
+    const own = codeOnly(
+      fs.readFileSync(path.resolve(process.cwd(), 'tests/server/steam_routes.test.ts'), 'utf8'),
+    );
+    // Needle assembled from halves so it does not match itself.
+    expect(own.split(`readdir${'Sync('}`).length - 1).toBe(0);
+    // Needle split for the same reason as the one above: written whole it would
+    // match its own assertion line, so this passed even with the import gone.
+    expect(own).toContain(`helpers/ts_files${'_under'}`);
   });
 
   it('a successful link response carries no token-shaped field', async () => {

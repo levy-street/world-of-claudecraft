@@ -6,13 +6,16 @@ import {
   BARE_HANDS_TOOL_TIER,
   bestOwnedAnyGatherToolTier,
   bestOwnedGatherToolTier,
+  bestOwnedGatherToolTierOrNone,
   canGatherTier,
   canHarvestMonsterMaterial,
   depleteEffect,
   gatherToolTier,
   type HarvestOutcome,
+  hasFishingImplement,
   isGatherToolUse,
   isOriginalCrafter,
+  NO_TOOL_OWNED,
   rechargeCost,
   rechargeEffect,
   resolveToolEffectUse,
@@ -74,6 +77,51 @@ describe('gathering tool tier gating (#1123)', () => {
     }
   });
 
+  it('the zone 2 and zone 3 hubs stock the tool tiers their own nodes use (#2343)', () => {
+    // Load-bearing content under the always-require-tool rule: without these
+    // rows a toolless traveler could not gather anywhere outside Eastbrook.
+    const fenbridge = NPCS.provisioner_hale.vendorItems ?? [];
+    for (const toolId of [
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'handaxe',
+      'felling_axe',
+      'gathering_sickle',
+      'bronze_sickle',
+    ]) {
+      expect(fenbridge).toContain(toolId);
+    }
+    const highwatch = NPCS.quartermaster_bree.vendorItems ?? [];
+    for (const toolId of [
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'mithril_mining_pick',
+      'handaxe',
+      'felling_axe',
+      'ironbark_axe',
+      'gathering_sickle',
+      'bronze_sickle',
+      'silverleaf_sickle',
+    ]) {
+      expect(highwatch).toContain(toolId);
+    }
+  });
+
+  it('the tier-1 implements are the 20-copper starter purchase the #2343 rule leans on', () => {
+    // The rule's no-strand story (the guide's gatherIntro and toolsNote copy:
+    // "20 copper at any zone hub") needs the entry tools to STAY trivial
+    // one-time purchases. Literal buyValue pins so a price rebalance must
+    // consciously touch this claim rather than drift past it.
+    for (const toolId of [
+      'copper_mining_pick',
+      'handaxe',
+      'gathering_sickle',
+      'simple_fishing_pole',
+    ] as const) {
+      expect(ITEMS[toolId]?.buyValue, toolId).toBe(20);
+    }
+  });
+
   it('a base tool never becomes unusable, because this repo has no durability mechanic', () => {
     const pick = ITEMS.copper_mining_pick;
     // ItemDef (src/sim/types.ts) carries no durability field anywhere in this repo,
@@ -98,13 +146,50 @@ describe('gathering tool tier gating (#1123)', () => {
   });
 });
 
-// Sim-level access gating (Professions 2.0 Phase 12): the gather-node system
+// The toolless-state helpers behind the #2343 RuneScape rule (bare hands
+// never gather a node, casting a line always needs tackle). Pure bag scans,
+// distinct from the floored bestOwnedGatherToolTier that corpse harvesting
+// and fishing synergy keep.
+describe('toolless-state helpers (#2343)', () => {
+  it('NO_TOOL_OWNED is 0, distinct from the bare-hands floor of 1', () => {
+    expect(NO_TOOL_OWNED).toBe(0);
+    expect(NO_TOOL_OWNED).not.toBe(BARE_HANDS_TOOL_TIER);
+  });
+
+  it('bestOwnedGatherToolTierOrNone reports 0 for empty bags and the best owned tier otherwise', () => {
+    expect(bestOwnedGatherToolTierOrNone([], 'mining', ITEMS)).toBe(NO_TOOL_OWNED);
+    const copper: InvSlot[] = [{ itemId: 'copper_mining_pick', count: 1 }];
+    expect(bestOwnedGatherToolTierOrNone(copper, 'mining', ITEMS)).toBe(1);
+    const copperAndMithril: InvSlot[] = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'mithril_mining_pick', count: 1 },
+    ];
+    expect(bestOwnedGatherToolTierOrNone(copperAndMithril, 'mining', ITEMS)).toBe(3);
+    // A wrong-profession tool never counts: the picks lend logging nothing,
+    // and unlike the floored helper the answer is "none", not tier 1.
+    expect(bestOwnedGatherToolTierOrNone(copperAndMithril, 'logging', ITEMS)).toBe(NO_TOOL_OWNED);
+  });
+
+  it('hasFishingImplement accepts the simple pole and the tiered rods, never tackle-free bags', () => {
+    expect(hasFishingImplement([], ITEMS)).toBe(false);
+    // use.type 'fishing' (the pole) and a fishing-profession gatherTool (a
+    // tiered rod) both satisfy the implement gate.
+    expect(hasFishingImplement([{ itemId: 'simple_fishing_pole', count: 1 }], ITEMS)).toBe(true);
+    expect(hasFishingImplement([{ itemId: 'ironreel_fishing_rod', count: 1 }], ITEMS)).toBe(true);
+    // A non-fishing gatherTool is not tackle.
+    expect(hasFishingImplement([{ itemId: 'copper_mining_pick', count: 1 }], ITEMS)).toBe(false);
+  });
+});
+
+// Sim-level access gating (Professions 2.0): the gather-node system
 // is live, so the old "using a tool is a safe no-op" placeholder pin retired
 // into real outcome tests here (its useItem-no-op half re-homed in
 // tests/professions_fishing.test.ts beside the rod-cast arm). Owned-best
-// resolution scans bags (meta.inventory), no equip slot; bare hands floor to
-// tier 1, so only the NEW tier-2+ veins ever gate.
-describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
+// resolution scans bags (meta.inventory), no equip slot. Since #2343 (the
+// RuneScape rule) bare hands never harvest a node, so EVERY node tier gates:
+// a tier-1 vein needs a tier-1 tool, and requiredTier 1 on the denial means
+// "no tool owned at all".
+describe('sim-level node access gating (Professions 2.0)', () => {
   const T2_ORE = 'ore_mirefen_t2';
   const T3_ORE = 'ore_thornpeak_t3';
   const T2_WOOD = 'wood_thornpeak_t2';
@@ -123,7 +208,7 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     return { sim, pid };
   }
 
-  // Phase 12b: harvestNode starts a gather cast. The unlock arms tick the
+  // harvestNode starts a gather cast. The unlock arms tick the
   // REAL loop through to the grant (mobs despawned first: mob damage cancels
   // a gather cast), and every deny arm pins that the denial is rng-free AND
   // starts no cast (deny-is-rng-free holds at cast START).
@@ -176,11 +261,11 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
       sim.rng.setObserver(null);
     }
     // The gate is rng-free, sits before both harvest draws, and never
-    // starts the Phase 12b gather cast.
+    // starts the gather cast.
     expect(draws).toBe(0);
     expect(sim.entities.get(pid)?.castingAbility ?? null).toBe(null);
     // Exact field shape: text-free, personal, professionId present on the
-    // node surface (the fixed Phase 12 interface contract).
+    // node surface (the fixed interface contract).
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 2 },
     ]);
@@ -188,6 +273,46 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     expect(sim.nodeHarvestableByMeFor(T2_ORE, pid)).toBe(true);
     expect(meta.inventory).toEqual(invBefore);
     expect(sim.countItem('iron_ore', pid)).toBe(0);
+  });
+
+  it('#2343: a bare-hands harvest of a TIER-1 vein is denied too, requiredTier 1 meaning no tool owned', () => {
+    const T1_ORE = 'ore_eastbrook_1';
+    const { sim, pid } = simAtNode(T1_ORE);
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing meta');
+    const invBefore = JSON.parse(JSON.stringify(meta.inventory));
+    sim.drainEvents();
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      expect(sim.harvestNode(T1_ORE, pid)).toBe(false);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // Same rng-free, cast-free denial contract as the tier-2+ arms: the new
+    // rule reuses the one tool gate, it does not add a second code path.
+    expect(draws).toBe(0);
+    expect(sim.entities.get(pid)?.castingAbility ?? null).toBe(null);
+    // requiredTier is the node's tier (1): on a tier-1 node the toast reads
+    // as "no tool owned", never a tier shortfall.
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 1 },
+    ]);
+    // The denial never consumed the player's respawn timer or touched bags.
+    expect(sim.nodeHarvestableByMeFor(T1_ORE, pid)).toBe(true);
+    expect(meta.inventory).toEqual(invBefore);
+    expect(sim.countItem('copper_ore', pid)).toBe(0);
+  });
+
+  it('#2343: the copper (tier-1) pick in bags unlocks the same tier-1 vein (grant lands, timer set)', () => {
+    const T1_ORE = 'ore_eastbrook_1';
+    const { sim, pid } = simAtNode(T1_ORE);
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.drainEvents();
+    expect(castAndComplete(sim, T1_ORE, pid)).toBe(true);
+    expect(sim.countItem('copper_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.nodeHarvestableByMeFor(T1_ORE, pid)).toBe(false);
+    expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
   });
 
   it('the same player with the tier-2 pick in bags harvests the vein (grant lands, timer set)', () => {
@@ -331,7 +456,8 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     expect(stock).toContain('ironreel_fishing_rod');
     expect(stock).toContain('silverstream_fishing_rod');
     // The simple pole is untouched: not a gatherTool, effective tier 1 via
-    // the bare-hands floor (band 0 stays reachable with pole or bare hands).
+    // the bare-hands floor once it satisfies the #2343 implement gate (so a
+    // pole in bags never changes any draw or catch sequence).
     expect(ITEMS.simple_fishing_pole.use).toEqual({ type: 'fishing' });
   });
 });
@@ -379,14 +505,14 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
   });
 
   it('a crafted tier-4/5 tool gates monster materials the same way a vendor tier-1/2/3 tool gates nodes', () => {
-    const thorium = gatherToolTier(ITEMS.thorium_mining_pick, 'mining') ?? -1;
-    const arcanite = gatherToolTier(ITEMS.arcanite_mining_pick, 'mining') ?? -1;
-    expect(thorium).toBe(4);
-    expect(arcanite).toBe(5);
-    expect(canHarvestMonsterMaterial(thorium, 3)).toBe(true);
-    expect(canHarvestMonsterMaterial(thorium, 4)).toBe(true);
-    expect(canHarvestMonsterMaterial(thorium, 5)).toBe(false);
-    expect(canHarvestMonsterMaterial(arcanite, 5)).toBe(true);
+    const osmiumPick = gatherToolTier(ITEMS.thorium_mining_pick, 'mining') ?? -1;
+    const glyphsteelPick = gatherToolTier(ITEMS.arcanite_mining_pick, 'mining') ?? -1;
+    expect(osmiumPick).toBe(4);
+    expect(glyphsteelPick).toBe(5);
+    expect(canHarvestMonsterMaterial(osmiumPick, 3)).toBe(true);
+    expect(canHarvestMonsterMaterial(osmiumPick, 4)).toBe(true);
+    expect(canHarvestMonsterMaterial(osmiumPick, 5)).toBe(false);
+    expect(canHarvestMonsterMaterial(glyphsteelPick, 5)).toBe(true);
   });
 
   it('infinite durability holds for crafted tiers too, not just vendor tiers', () => {

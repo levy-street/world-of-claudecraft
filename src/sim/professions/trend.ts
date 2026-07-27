@@ -1,4 +1,4 @@
-// Craft-trend classification (Professions 2.0 Phase 7): which adjacent pair a
+// Craft-trend classification (Professions 2.0): which adjacent pair a
 // character's flat craft skills are trending toward, and whether that trend has
 // crossed the Guild's attention threshold. A pure leaf over wheel.ts state and
 // archetype.ts pair vocabulary: no SimContext, no rng, no clock, no mutation.

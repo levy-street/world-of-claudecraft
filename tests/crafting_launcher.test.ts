@@ -79,7 +79,7 @@ describe('shared behavior across all screen sizes', () => {
   });
 
   it('registers the crafting glyph so hydrateIcons does not silently skip it', () => {
-    expect(uiIcons).toMatch(/\|\s*'crafting';/);
+    expect(uiIcons).toMatch(/\|\s*'crafting'(?:\s*\||;)/);
     expect(uiIcons).toMatch(/crafting:\n?\s*'<path /);
   });
 

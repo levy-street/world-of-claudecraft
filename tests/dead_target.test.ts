@@ -63,6 +63,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       },
       stopFollow,
       isHostileTo: (_a: Entity, b: Entity) => b.kind === 'mob' && b.hostile === true,
+      partyOf: () => null,
     } as unknown as SimContext;
     return { ctx, entities };
   }
@@ -93,6 +94,52 @@ describe('Targeting.targetEntity with a dead pet', () => {
     targeting.targetEntity(21, 1);
 
     expect(player.targetId).toBeNull();
+  });
+
+  it('does not select a lootable corpse when the viewer has no loot or harvest rights', () => {
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const corpse = ent({
+      id: 30,
+      kind: 'mob',
+      templateId: 'kobold_miner',
+      dead: true,
+      lootable: true,
+      tappedById: 2,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: 2,
+    });
+    entities.set(1, player);
+    entities.set(30, corpse);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(30, 1);
+
+    expect(player.targetId).toBeNull();
+  });
+
+  it('selects a lootable corpse when the viewer owns the shared loot rights', () => {
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const corpse = ent({
+      id: 31,
+      kind: 'mob',
+      templateId: 'kobold_miner',
+      dead: true,
+      lootable: true,
+      tappedById: 1,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: 2,
+    });
+    entities.set(1, player);
+    entities.set(31, corpse);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(31, 1);
+
+    expect(player.targetId).toBe(31);
   });
 });
 

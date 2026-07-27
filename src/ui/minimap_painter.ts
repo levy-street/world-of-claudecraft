@@ -27,7 +27,7 @@
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, yumiMazeOriginAt } from '../sim/data';
 import { yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
-import { createMinimapMarkers, type MinimapMarker } from './minimap_markers';
+import { createMinimapMarkers, type MinimapMarker, type NpcGlyph } from './minimap_markers';
 import type { PainterHostWriters } from './painter_host';
 
 // The fixed circular minimap surface (the #minimap canvas is 162x162). Exported so Hud
@@ -70,11 +70,44 @@ const PLAYER_ARROW_TIP_Y = -7;
 const PLAYER_ARROW_HALF_X = 4.5;
 const PLAYER_ARROW_BASE_Y = 5.5;
 
-// NPC quest glyph typography (byte-faithful to `'bold 11px Georgia'` + the inline
-// fillText offset mx - 2, my + 3, drawn with the default textAlign/textBaseline).
+// NPC quest glyph typography (the glyph set drawn at `'bold 11px Georgia'` on the
+// inline site's mx - 2, my + 3 anchor, with the default textAlign/textBaseline).
+//
+// The glyphs draw from a tiny per-(glyph, color) sprite cache, never a per-marker
+// fillText. Measured in Chrome at 17 iterations per redraw against a dirty style tree
+// (the crowded-town case: ~80 nameplate transform writes land in the same frame):
+// bare `ctx.font` assignments 0.033ms, fillText with the font already set 0.037ms,
+// measureText alone 0.0368ms, drawImage 0.0062ms. On a quiet page all four are equal.
+// EVERY canvas text entry point (the font setter, fillText, measureText) re-resolves
+// font state against the document, so the cost tracks how dirty the style tree is,
+// NOT the font string and NOT the marker count: hoisting `ctx.font` above the loop
+// measures no better than leaving it inside it (0.0385 vs 0.036), and only leaving
+// the text API altogether is a fix. drawImage is flat.
+//
+// Corollary worth keeping in view when reading a profile: NPC glyph markers come only
+// from `e.kind === 'npc'` (minimap_markers.ts), so a player crowd adds circles and
+// arrows but never glyphs. The town's quest givers are on the minimap at zero players;
+// the crowd is the multiplier via the nameplate DOM, not the source of the glyphs.
+//
+// The sprite draws the glyph ONCE at the same font, then each redraw is a plain blit.
+// The sprite records where its internal fillText origin sits, and the blit subtracts
+// that origin so the glyph lands on the same anchor the inline
+// `fillText(glyph, mx - 2, my + 3)` used, rounded to a whole pixel (the drawMarkers
+// 'npc' case has the why: the rounding is load-bearing, not cosmetic).
 const NPC_GLYPH_FONT = 'bold 11px Georgia';
 const NPC_GLYPH_OFFSET_X = 2;
 const NPC_GLYPH_OFFSET_Y = 3;
+// Sprite geometry: the fillText origin inside the sprite canvas. 11px Georgia bold
+// ascends at most ~11px above the alphabetic baseline and the glyph set ('?', '!',
+// '•') has no descenders, so a 16x16 canvas with the baseline at y=12 and the left
+// edge at x=2 contains every glyph with margin (verified in Georgia and under the
+// serif/sans fallbacks Android and most Linux resolve instead).
+// COUPLED TO NPC_GLYPH_FONT: the box is sized from that font's ascent, and a sprite
+// too small CLIPS rather than fails. Re-measure these three if the font size changes;
+// the test pins the exact font string so a change has to come through here.
+const NPC_GLYPH_SPRITE_SIZE = 16;
+const NPC_GLYPH_SPRITE_ORIGIN_X = 2;
+const NPC_GLYPH_SPRITE_BASELINE_Y = 12;
 
 // Corpse marker (ghost run): a compact procedural skull, drawn from canvas
 // primitives (cranium + jaw in the corpse color, eye sockets and a nasal notch
@@ -161,6 +194,12 @@ export class MinimapPainter {
   // The Protect Yumi maze wall cache (built on first in-maze redraw; the fixed
   // competitive layout never changes, so one raster serves the session).
   private mazeBg: HTMLCanvasElement | null = null;
+  // NPC glyph sprites (see the NPC_GLYPH_* header), keyed color -> glyph. Nested rather
+  // than one map on a `${glyph}|${color}` composite so the per-marker lookup in the draw
+  // loop allocates NO key string. Bounded without eviction by construction: NpcGlyph is a
+  // closed three-member union and resolveColors freezes one color set for the session, so
+  // the live map holds at most three sprites of 16x16 each.
+  private readonly glyphSprites = new Map<string, Map<NpcGlyph, HTMLCanvasElement>>();
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -291,6 +330,38 @@ export class MinimapPainter {
     return canvas;
   }
 
+  // Rasterize (once) and return the sprite for an NPC quest glyph in `color`; the
+  // per-redraw draw is then a plain drawImage. Keyed on the resolved color as well as the
+  // glyph so a future theme/contrast cache bust naturally re-rasterizes.
+  private npcGlyphSprite(glyph: NpcGlyph, color: string): HTMLCanvasElement {
+    let byGlyph = this.glyphSprites.get(color);
+    const cached = byGlyph?.get(glyph);
+    if (cached) return cached;
+    const sprite = document.createElement('canvas');
+    sprite.width = NPC_GLYPH_SPRITE_SIZE;
+    sprite.height = NPC_GLYPH_SPRITE_SIZE;
+    const sctx = sprite.getContext('2d');
+    // A transient context failure must not be frozen: caching the blank canvas would hide
+    // every NPC glyph for the rest of the session. Returning it uncached makes this
+    // redraw's draw a no-op and self-heals on the next one.
+    if (!sctx) return sprite;
+    sctx.fillStyle = color;
+    sctx.font = NPC_GLYPH_FONT;
+    sctx.fillText(glyph, NPC_GLYPH_SPRITE_ORIGIN_X, NPC_GLYPH_SPRITE_BASELINE_Y);
+    // Same rule as resolveColors, for the same reason: a redraw before the stylesheet
+    // applies resolves '' for every token, and '' is an invalid fillStyle the canvas
+    // ignores, so the glyph rasterizes in the default black. Draw it this redraw (exactly
+    // what the inline fillText did on that frame) but never freeze it.
+    if (color) {
+      if (!byGlyph) {
+        byGlyph = new Map();
+        this.glyphSprites.set(color, byGlyph);
+      }
+      byGlyph.set(glyph, sprite);
+    }
+    return sprite;
+  }
+
   private drawMarkers(
     ctx: CanvasRenderingContext2D,
     markers: readonly MinimapMarker[],
@@ -308,9 +379,30 @@ export class MinimapPainter {
           ctx.stroke();
           break;
         case 'npc':
-          ctx.fillStyle = colors.npcQuest;
-          ctx.font = NPC_GLYPH_FONT;
-          ctx.fillText(m.glyph, m.mx - NPC_GLYPH_OFFSET_X, m.my + NPC_GLYPH_OFFSET_Y);
+          // Blit the cached glyph sprite so its internal fillText origin lands on the
+          // inline site's (mx - 2, my + 3) anchor.
+          //
+          // ROUNDED, and that is load-bearing rather than cosmetic. mx/my are continuous
+          // floats (minimap_markers.ts projects `half + dx`), so the destination is
+          // fractional nearly always, and a fractional drawImage destination is RESAMPLED.
+          // Measured in Chrome across sub-pixel phases 0.2 to 0.8, blitting this 16x16
+          // sprite: fractional with imageSmoothingEnabled OFF stays crisp (35 ink pixels,
+          // 5 fully-solid, at every phase) but fractional with smoothing ON collapses to
+          // 53 ink and ZERO fully-solid, i.e. mush. So the unrounded blit was legible only
+          // because of the `imageSmoothingEnabled = false` the two paint entry points set
+          // for the terrain background blit, several lines away and for another reason
+          // entirely, with nothing pinning that relationship. Rounded, both settings give
+          // the identical 35/5 at every phase, so legibility stops depending on it. No
+          // measurable cost.
+          //
+          // The tradeoff, deliberately taken: the glyph now snaps to whole pixels where
+          // fillText advanced it in quarter-pixel steps. At the minimap's 1.7 px/yard base
+          // scale that is a sub-pixel marker shift on a surface that redraws at 10Hz.
+          ctx.drawImage(
+            this.npcGlyphSprite(m.glyph, colors.npcQuest),
+            Math.round(m.mx - NPC_GLYPH_OFFSET_X - NPC_GLYPH_SPRITE_ORIGIN_X),
+            Math.round(m.my + NPC_GLYPH_OFFSET_Y - NPC_GLYPH_SPRITE_BASELINE_Y),
+          );
           break;
         case 'portal':
           ctx.fillStyle = colors.portal;
@@ -419,7 +511,7 @@ export class MinimapPainter {
           ctx.stroke();
           break;
         case 'gather-node':
-          // Tool-tier lock (Professions 2.0 Phase 12) composes with the
+          // Tool-tier lock (Professions 2.0) composes with the
           // respawn state: a locked node keeps the ready/cooldown silhouette
           // (radius + outline) but the locked tint replaces the state color,
           // so both dimensions stay readable at once. Actionable info on

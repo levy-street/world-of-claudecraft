@@ -220,6 +220,24 @@ export const SFX = [
     prompt:
       "A human warrior's final pained death cry as he collapses to the ground. Single death cry fading out.",
   },
+  {
+    key: 'player_eat_food',
+    custom: true,
+    duration: 2.2,
+    prompt: 'A person taking a bite of food and chewing. Single bite, no music.',
+  },
+  {
+    key: 'player_drink_water',
+    custom: true,
+    duration: 1.7,
+    prompt: 'A person drinking water from a waterskin, swallowing. Single gulp, no music.',
+  },
+  {
+    key: 'player_drink_potion',
+    custom: true,
+    duration: 1.0,
+    prompt: 'A person uncorking a small vial and quaffing a potion in one gulp. No music.',
+  },
 
   // --- Spell casts (looping while channeling) ------------------------------
   {
@@ -728,6 +746,68 @@ export const SFX = [
   { key: 'ui_card_reveal', custom: true },
   { key: 'ui_card_round_push', custom: true },
   { key: 'ui_card_shuffle', custom: true },
+
+  // --- Fishing (custom recordings, replacing the retired synth placeholders
+  // in scripts/sfx/ui_sfx.mjs) --------------------------------------------
+  // fishBite is the one gameplay-timing cue of the family (it opens the live
+  // reel window, audio.ts's ungated play() arm); fishCast/fishReel are
+  // feedback notifications. Multi-take (no-repeat-random picker).
+  { key: 'ui_fish_cast', custom: true },
+  { key: 'ui_fish_bite', custom: true },
+  { key: 'ui_fish_reel', custom: true },
+
+  // --- Gathering node harvests (custom recordings, not ElevenLabs) ----------
+  // One cue per GatherNodeType ('ore'/'wood'/'herb', src/sim/types.ts), fired
+  // from the gatherResult sim event. Multi-take (no-repeat-random picker).
+  { key: 'ui_gather_ore', custom: true },
+  { key: 'ui_gather_wood', custom: true },
+  { key: 'ui_gather_herb', custom: true },
+
+  // --- Gathering tool-out cue, per node type (custom recordings) -----------
+  // Fires at gather CAST START (audio.gatherCast(nodeType)), a "pulling the
+  // tool out" beat for the cast bar's anticipation window; distinct from the
+  // completion cue above. Falls back to the flat ui_gather_cast placeholder
+  // (scripts/sfx/ui_sfx.mjs) when no node type is known. Multi-take.
+  { key: 'ui_gather_cast_ore', custom: true },
+  { key: 'ui_gather_cast_wood', custom: true },
+  { key: 'ui_gather_cast_herb', custom: true },
+
+  // Rare-or-better gather stinger: layers ALONGSIDE the ui_gather_<nodeType>
+  // cue above, one tier per rolled MaterialRarity (common/uncommon get none).
+  { key: 'ui_gather_rare', custom: true },
+  { key: 'ui_gather_epic', custom: true },
+  { key: 'ui_gather_legendary', custom: true },
+
+  // --- Crafting completion, per craft family (custom recordings) -----------
+  // One cue per CRAFT_RING entry (src/sim/content/professions.ts), fired from
+  // the craftResult sim event keyed off recipeId's craft family.
+  { key: 'ui_craft_engineering', custom: true },
+  { key: 'ui_craft_alchemy', custom: true },
+  { key: 'ui_craft_cooking', custom: true },
+  { key: 'ui_craft_leatherworking', custom: true },
+  { key: 'ui_craft_tailoring', custom: true },
+  { key: 'ui_craft_inscription', custom: true },
+  { key: 'ui_craft_enchanting', custom: true },
+  { key: 'ui_craft_jewelcrafting', custom: true },
+  { key: 'ui_craft_weaponcrafting', custom: true },
+  { key: 'ui_craft_armorcrafting', custom: true },
+
+  // Masterwork proc (custom recording): layers ALONGSIDE the ui_craft_<family>
+  // cue above on a masterwork craft, not a replacement for it (Jamie's
+  // explicit design call, 2026-07-18).
+  { key: 'ui_masterwork', custom: true },
+
+  // Disenchant proc (custom recording): the enchanting profession's own
+  // action, separate from the craftByFamily set above since disenchant does
+  // not go through the recipe/craftResult path (src/sim/professions/
+  // enchanting.ts disenchantItem). Triggered from the bag item action menu
+  // (src/ui/bag_item_action_menu.ts).
+  { key: 'ui_craft_disenchant', custom: true },
+
+  // Salvage proc (custom recording): the enchanting profession's ungated
+  // break-any-item-for-generic-materials action (src/sim/professions/
+  // salvage.ts), separate from disenchant's rare+ arcane-materials path.
+  { key: 'ui_craft_salvage', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

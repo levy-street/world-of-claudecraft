@@ -123,7 +123,19 @@ export interface GuildRow {
 
 export interface GuildView {
   /** Null when the viewer has no guild (the tab shows the empty state). */
-  guild: { name: string; rank: string; memberCount: number; rows: GuildRow[] } | null;
+  guild: {
+    name: string;
+    rank: string;
+    memberCount: number;
+    /** The guild billboard message ('' when unset) and its setter's display
+     *  name ('' when unset). The painter escapes the text; never linkified. */
+    motd: string;
+    motdSetBy: string;
+    /** True iff the viewer may edit the billboard (rank leader or officer);
+     *  UX only, the server enforces the real gate. */
+    canEditMotd: boolean;
+    rows: GuildRow[];
+  } | null;
 }
 
 /** Guild-tab view: the header (name + viewer rank + count) and per-member rows
@@ -156,7 +168,17 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       canKick,
     };
   });
-  return { guild: { name: guild.name, rank: me, memberCount: guild.members.length, rows } };
+  return {
+    guild: {
+      name: guild.name,
+      rank: me,
+      memberCount: guild.members.length,
+      motd: guild.motd ?? '',
+      motdSetBy: guild.motdSetBy ?? '',
+      canEditMotd: me === 'leader' || me === 'officer',
+      rows,
+    },
+  };
 }
 
 export type GuildRosterGroup = 'online' | 'offline';
