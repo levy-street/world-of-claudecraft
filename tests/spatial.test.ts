@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { CAMPS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { SpatialGrid } from '../src/sim/spatial';
 import { dist2d, type Entity } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 function bruteForceInRadius(sim: Sim, x: number, z: number, radius: number): Set<number> {
   const out = new Set<number>();
@@ -76,6 +78,19 @@ describe('spatial grid', () => {
   it('player combat flag matches per-player scan semantics', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
     const p = sim.entities.get(sim.primaryId)!;
+    // Stand on open ground just outside a camp and walk AT it. Marching
+    // blindly out of spawn used to work only because the town was empty; it
+    // is furnished now (see src/sim/town_props.ts), so a blind walk parks the
+    // body against a workbench and no mob ever notices it.
+    const camp = CAMPS.find((c) => Math.hypot(c.center.x, c.center.z) < 140);
+    if (!camp) throw new Error('test fixture needs a nearby camp');
+    const len = Math.hypot(camp.center.x, camp.center.z) || 1;
+    const startX = camp.center.x - (camp.center.x / len) * 30;
+    const startZ = camp.center.z - (camp.center.z / len) * 30;
+    p.pos = { x: startX, y: terrainHeight(startX, startZ, sim.cfg.seed), z: startZ };
+    p.prevPos = { ...p.pos };
+    p.onGround = true;
+    p.facing = Math.atan2(camp.center.x - p.pos.x, camp.center.z - p.pos.z);
     // walk the player into a camp until something aggroes
     let aggroed = false;
     for (let i = 0; i < 4000 && !aggroed; i++) {

@@ -515,6 +515,7 @@ export const TEMPLE_PROPS: ZonePropsDef = {
   ],
   campfires: [[-63, 788]],
   mudHuts: [],
+  marshReeds: [],
   ruinRings: [{ x: -70, z: 792, ringR: 7, columns: 6 }],
   fences: [],
   graveyards: [],

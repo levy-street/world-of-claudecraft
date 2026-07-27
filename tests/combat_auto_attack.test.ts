@@ -18,7 +18,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { Aura, Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import { type Aura, DT, type Entity, type PlayerClass, type SimEvent } from '../src/sim/types';
 import { placePlayerInOpenField } from './helpers/open_field';
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
@@ -34,6 +34,8 @@ function makeSim(
 ): { sim: Sim; p: Entity; meta: PlayerMeta } {
   const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
+  // Ranged fixtures place their target relative to the player, so stand on
+  // empty ground: the town is furnished and would block the shot lane.
   placePlayerInOpenField(sim);
   const p = sim.player;
   const meta = sim.players.get(p.id);

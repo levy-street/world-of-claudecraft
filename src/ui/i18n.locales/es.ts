@@ -3654,6 +3654,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterTypeAll': 'Todos los tipos',
   'itemUi.market.filterTypeWeapon': 'Armas',
   'itemUi.market.filterTypeArmor': 'Armadura',
+  'itemUi.market.filterTypeBag': 'Bolsas',
   'itemUi.market.filterTypeConsumable': 'Consumibles',
   'itemUi.market.filterTypeMaterial': 'Materiales',
   'itemUi.market.filterTypeCosmetic': 'Cosméticos',
@@ -3662,6 +3663,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterArmorAll': 'Toda la armadura',
   'itemUi.market.filterWeaponType': 'Tipo de arma',
   'itemUi.market.filterWeaponAll': 'Todas las armas',
+  'itemUi.market.filterBagSize': 'Tamaño de bolsa',
+  'itemUi.market.filterBagAll': 'Todas las bolsas',
   'itemUi.market.filterRarity': 'Rareza',
   'itemUi.market.filterRarityAll': 'Todas las rarezas',
   'itemUi.market.weaponSword': 'Espadas',
@@ -7498,6 +7501,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.body':
     'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Este cadáver ya ha sido recolectado.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Nada de lo que has seleccionado se puede recolectar de este cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Recolectar {component}',
   'hudChrome.corpseHarvest.components.claw': 'Garra',
   'hudChrome.corpseHarvest.components.fang': 'Colmillo',
@@ -8245,7 +8250,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Tarjeta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20 % de descuento',
+  'hudChrome.claudium.railWocDiscount': '{percent} % de descuento',
   'hudChrome.claudium.railWocUnavailable':
     'Los precios en WOC no están disponibles en este momento.',
   'hudChrome.claudium.showAmounts': 'Mostrar todas las cantidades de Claudium',

@@ -851,9 +851,17 @@ describe('Claudium economy-service transport contract', () => {
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     const fetchMock = vi.fn(async (_input: string | URL | Request, _init?: RequestInit) =>
       Promise.resolve(
-        new Response(JSON.stringify({ rail: 'sol', claudium: 13_000, amountBase: '9999000' }), {
-          status: 200,
-        }),
+        new Response(
+          JSON.stringify({
+            rail: 'sol',
+            claudium: 13_000,
+            amountBase: '9999000',
+            discountBps: 0,
+          }),
+          {
+            status: 200,
+          },
+        ),
       ),
     );
     vi.stubGlobal('fetch', fetchMock);
@@ -872,10 +880,48 @@ describe('Claudium economy-service transport contract', () => {
       rail: 'sol',
       claudium: 13_000,
       amountBase: '9999000',
+      discountBps: 0,
     });
     expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
       'https://economy.example/v1/claudium/native/price/sol?sku=claudium_13000',
     );
+  });
+
+  it('passes the authoritative $WOC discount through to the game client', async () => {
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              rail: 'woc',
+              claudium: 500,
+              amountBase: '4000000',
+              discountBps: 5000,
+            }),
+            { status: 200 },
+          ),
+      ),
+    );
+    const res = new FakeRes();
+
+    await handleClaudiumApi(
+      makeReq({
+        method: 'GET',
+        url: '/api/claudium/native/price/woc?sku=claudium_500',
+      }),
+      res as never,
+      7,
+    );
+
+    expect(responseJson(res)).toEqual({
+      rail: 'woc',
+      claudium: 500,
+      amountBase: '4000000',
+      discountBps: 5000,
+    });
   });
 
   it('maps history responses to the economy SDK ledger-entry shape', async () => {

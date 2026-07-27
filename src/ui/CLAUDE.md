@@ -78,15 +78,44 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   `imgCache`). A painter NEVER calls `el.textContent =` / `style.*` / `setAttribute` /
   `innerHTML` directly; both the elision mechanism and the no-raw-write rule are guarded
   always-on (`tests/painter_host.test.ts` + the per-painter source scans).
+  **Where the guard actually reaches.** The rule above is the standard for anything reached
+  from `Hud.update()`; the source scan that enforces it covers the painters registered in
+  `HOT_PAINTERS` / `CANVAS_PAINTERS`, not every module `update()` touches. `Hud.update()` also
+  polls about half the `*_window.ts` painters (`spellbook_window.tickOpen()` runs every frame
+  while open; arena / dungeon_finder / vale_cup / card_duel `render()` on the 250ms band; the
+  rest get `refreshIfChanged()` on the 500ms band). Those rebuild behind their own invalidation
+  signature, which no per-file scan can see: it lives either inside the window module or on the
+  `Hud` method that polls it (`refreshOpenTownFocusIfChanged`). `town_focus_window` was the
+  standing counter-example until #2500 gave it one; a window polled from `update()` with no
+  signature is a defect, not a style choice.
+  **WHICH windows those are is now a registry**, not folklore: `tests/hud_update_drive.test.ts`
+  holds a row per call `Hud.update()` EVALUATES, with its cadence band, the exact condition text
+  gating it, what it repaints, and (for a window) the source line its invalidation guard is
+  spelled on, diffed BOTH ways against a TypeScript AST walk of the real method. Adding,
+  removing, re-banding or re-gating a call in `update()` fails it, and so does deleting a
+  guard it names. Three things it does not do, so nothing here is read as more than it is: it
+  sees `update()`'s own body only (a repaint added inside an already-registered private method
+  is invisible to it), a guard proof catches DELETION and not a guard neutered while its field
+  survives, and the band it records is the CALL SITE's, not any further self-throttling the
+  callee adds. So a window on a poll is now NAMED by the gate and still held to the
+  write-elision standard by review: give it a signature guard and keep it, and if you add a
+  genuinely per-frame write path, route it through the facet and move the module into
+  `HOT_PAINTERS`. A module that arms its own repeating driver owes the same care INSIDE the
+  callback, which is a contract nothing scans yet: `lockpick_window` re-resolved three element
+  refs on a 100ms tick until #2498, and the fix had to re-resolve them per board REBUILD
+  rather than once at construction, because `renderBoard` replaces that subtree on a signature
+  the clock does not restart on (`tests/lockpick_timer_repaint.test.ts` pins both halves).
 - **Allocation-light cores.** A per-frame view-core returns a REUSED, preallocated container +
   slots (no per-frame array/object garbage); jitter/clock stay in the painter, never the core.
   Guarded always-on by the reference-stability probe `tests/util/alloc_probe.ts`.
 - **The perf gate.** `scripts/perf_tour.mjs` (run per per-frame phase against the recorded
   baseline) asserts `frameP95 <= baseline` and a bounded AoE-burst FCT node count; each
   green-gate commit is TAGGED so a cumulative regression bisects. The STANDING vitest budget
-  is `tests/hud_perf_budget.test.ts`, split by host: it scans every hot painter for raw writes
-  AND per-frame forced-reflow layout reads (`offsetWidth`/`getBoundingClientRect`/..., the
-  layout-thrash killer); drives the non-pooled painters through a `makeWriterFacet` loop
+  is `tests/hud_perf_budget.test.ts`, split by host: it scans every painter under all three
+  DOM-adapter names for raw writes AND forced-reflow layout reads
+  (`offsetWidth`/`getBoundingClientRect`/`getComputedStyle`/..., the layout-thrash killer, and
+  note that this tree calls `getComputedStyle` BARE, never as a member); drives the non-pooled
+  painters through a `makeWriterFacet` loop
   asserting establishing-write + elision for BOTH a Sim- and a `ClientWorld`-shaped input; and
   (gated behind `HUD_PERF_BUDGET_TOUR=1`) asserts on EVERY viewport the run-length-INDEPENDENT
   elision-bypass COUNT `hudHotDomWrites` at or below the committed baseline anchor (a COUNT,
@@ -114,9 +143,33 @@ The contract above is the WHAT; reach for the matching one when you build a hot 
   by what it depends on (zone+seed, module id), then `drawImage`-blit it each redraw; only the
   dynamic markers re-stroke per frame (`delve_map_painter`, the per-zone `mapBgCache`, the
   `minimapBg` terrain canvas).
-- **Set loop-invariant canvas state once.** Assigning `ctx.font` re-parses the font string every
-  time, so set `font` / `fillStyle` / `lineWidth` before a draw loop, not per glyph
-  (`map_window_painter`).
+- **Set loop-invariant canvas state once**, and for TEXT go further. Hoisting `fillStyle` /
+  `lineWidth` above a draw loop is ordinary hygiene, but hoisting `ctx.font` does NOT fix a hot
+  text loop and the "font string re-parsing" story is wrong. Measured (17 iterations, dirty style
+  tree): bare `ctx.font` 0.033ms, `fillText` with the font already set 0.037ms, `measureText`
+  0.0368ms, `drawImage` 0.0062ms; hoisted-vs-inline `ctx.font` is 0.0385 vs 0.036, i.e. no
+  better. EVERY canvas text entry point (the `font` setter, `fillText`, `measureText`) re-resolves
+  font state against the document, so the cost tracks how dirty the style tree is, not the font
+  string. The only fix for a per-item text loop is to leave the text API: rasterize each distinct
+  (glyph, color) ONCE into an offscreen sprite and `drawImage` it, with the destination
+  `Math.round`ed (a fractional blit destination is resampled, and unrounded it silently depends on
+  whoever last set `imageSmoothingEnabled`). Reference for a CLOSED glyph set: `minimap_painter`
+  NPC glyphs, which needs no eviction because the set and the color are both fixed. For
+  LOCALIZED, open-ended labels (names, POI titles), reuse `text_sprite_cache.ts`: it measures the
+  box, bakes the outline plus fill passes into one sprite, rounds the blit, and bounds the live
+  set with an LRU trim taken at the redraw boundary, never mid-redraw (trimming mid-redraw lets a
+  label-heavy redraw evict what it is still drawing). Consumer: `map_window_painter`.
+  Two traps if you ever write another rasterizer rather than reusing that one, both of which
+  ship a plausible-looking label that is quietly cut in half, and neither of which a fake 2D
+  context can catch: (1) `TextMetrics` reports `actualBoundingBoxLeft`/`Right` RELATIVE TO the
+  current `textAlign`, so MEASURE under the same alignment and baseline you DRAW with, and take
+  the union with the plain advance/em box so a platform that ignores alignment in its metrics
+  gets a roomy box instead of a halved one; (2) an outline's mitered join at a sharp glyph apex
+  reaches `miterLimit / 2` line widths past the ink, not half a line width, so cap `miterLimit`
+  and size the padding from the same constant (at the canvas default of 10, a 3px outline
+  overruns 15px, and a substituted sans 'M' really does get its apex clipped off). Pin both in a
+  real browser: `tests/browser/text_sprite_cache.browser.test.ts` asserts no sprite's ink touches
+  its own canvas edge, which catches a box that is too small whatever the cause.
 - **DPR backing store only where it must be crisp.** A HiDPI canvas sizes its backing store to
   `devicePixelRatio` and reassigns `width`/`height` only when the DPR changes (assignment clears
   the canvas); portraits are DPR-scaled (`unit_portrait_painter`), the minimap/map/delve are 1:1.
@@ -164,10 +217,56 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   escaping the purity scan. Register it in the `UI_PURE_CORES` allowlist there. Test it
   same-input-same-output against BOTH a Sim- and a `ClientWorld`-shaped stub.
 - **Thin painter** `src/ui/<name>_window.ts` (or `_painter.ts`): paints/updates nodes and wires
-  callbacks via an injected `deps` object; owns no state and never imports `Hud`. ALL DOM writes
-  go through the `PainterHost` elided writers; it drives tokens / CSS vars, never a literal
-  hex/px/color in TS (the per-painter no-magic-values source guard). Interpolated names pass
-  through `esc()`; a pure extraction reuses existing `t()` keys and adds none.
+  callbacks via an injected `deps` object; owns no state and never imports `Hud`. It drives
+  tokens / CSS vars, never a literal hex/px/color in TS (the per-painter no-magic-values source
+  guard). Interpolated names pass through `esc()`; a pure extraction reuses existing `t()` keys
+  and adds none. BOTH names are swept by the painter gate (`tests/hud_perf_budget.test.ts`,
+  `PAINTER_FILE_RE`), which sorts every painter into exactly one of three buckets:
+  - **facet-routed** (`HOT_PAINTERS`): the painters held to the FULL write contract. Usually
+    per-frame, but membership is the contract rather than the cadence, which is why
+    `tab_strip_painter` (cold chrome wiring) is registered here and why a cold `*_painter.ts`
+    belongs here too: every `*_painter.ts` must be in this bucket or the canvas one. ALL its
+    DOM writes go through the `PainterHost` elided writers, and it makes no forced-reflow
+    layout read. Both are scanned with EXACT per-token counts, so a raw `el.textContent =` /
+    `style.*` / `setAttribute` / `innerHTML` fails unless it is a documented build-time
+    exception.
+  - **canvas** (`CANVAS_PAINTERS`): draws to a 2D context under the cadence + cached-token
+    regime (`minimap_painter` caches its resolved tokens for the session; `map_window_painter`
+    and `delve_map_painter` re-resolve per redraw). Same two scans with its own counted
+    exceptions, plus an identity proof (it must name a 2D context type AND actually draw on
+    one), so the list cannot be used to park a DOM module outside both gates.
+  - **cold**, the DEFAULT for a `*_window.ts` and needing no registration. It does NOT mean
+    nothing calls the window repeatedly (see the per-frame contract above: `Hud.update()`
+    polls about half of them); it means the gate makes no cadence claim. The raw-write scan
+    deliberately does not apply, because a COUNT cannot tell a build-time write from a
+    repeated one at any cadence, so it fails on ordinary edits and misses the real hazard.
+    The two contracts that hold whatever the cadence are enforced: **no forced-reflow layout
+    read** and **no repeating driver of its own** (`requestAnimationFrame` /
+    `requestIdleCallback`, or a `setInterval` beyond a documented, counted allowance recording
+    its cadence). A window that grows a genuinely per-frame write path moves into
+    `HOT_PAINTERS` and takes the raw-write scan with it, keeping the driver scan, which every
+    bucket runs.
+  The gate sweeps all three DOM-adapter names, `*_painter.ts`, `*_window.ts` and
+  `*_controller.ts`, so renaming between them sheds no contract. Two limits remain, so neither
+  reads as more than it is: the scans are per FILE, so a layout read one hop away in a shared
+  helper is invisible unless the helper is named as a proxy token (`getUiScale` and
+  `getComputedStyle` are; a new one would have to be added), and a BARE-named per-frame module
+  (`vale_cup_hud.ts`, `dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
+  by the module sweep in `tests/architecture.test.ts`.
+- **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
+  live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
+  (it has to touch the DOM) and is not itself a painter. Register it in `UI_PAINTER_HELPERS`
+  (`tests/architecture.test.ts`) and it holds a hard contract: host-agnostic (no `window` /
+  `navigator` / `localStorage` / `getComputedStyle` / `requestAnimationFrame` / `instanceof
+  HTMLElement`), deterministic (no `Date.now` / `performance.now` / `Math.random` / `new Date()`),
+  no literal hex/rgb color (the painter passes RESOLVED tokens), and `document` ONLY to mint its
+  own detached node via `createElement`. Exemplar: `text_sprite_cache.ts`. That sweep classifies
+  EVERY other `src/ui` module too: one that reaches a host (a browser global, a browser-only API,
+  the wall clock, an RNG) is registered in `UI_DOM_MODULES`, and anything unregistered must reach
+  no host at all. So a new module cannot escape both completeness sweeps by being named neither
+  `*_view`/`*_core` nor `*_painter`. A `<name>_window.ts` painter is covered TWICE on purpose:
+  the painter gate holds its cold contract (above), and this sweep still classifies it as a
+  module, so it is registered in `UI_DOM_MODULES` once it touches `document`.
 - **For chrome:** satisfy the HUD-chrome WCAG 2.2 AA contract above; mark the window root with
   `markDialogRoot` (`src/ui/dialog_root.ts`): role=dialog + aria-modal + exactly ONE accessible
   name (labelledBy wins and clears aria-label), cold-path raw `setAttribute` BY DESIGN (not
@@ -340,8 +439,9 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
 ## Small modules (pure-core + thin-consumer exemplars)
 Logic lifted out of `hud.ts`: a host-agnostic core a Vitest imports directly, plus a thin
 DOM/canvas consumer. EXEMPLARS only, each named for a non-obvious contract: the canonical
-index is the `UI_PURE_CORES` allowlist in `tests/architecture.test.ts`, and each module's
-header carries its own contract.
+index is the `UI_PURE_CORES` allowlist in `tests/architecture.test.ts` (a module that must
+touch the DOM is indexed in the sibling `UI_PAINTER_HELPERS` / `UI_DOM_MODULES` lists in that
+same file), and each module's header carries its own contract.
 - **unit_portrait.ts** / **unit_portrait_painter.ts**: the canonical template pair (DOM-free
   geometry + crest-id core, thin DPR-aware painter); player and target frames share it.
 - **hud/vendor/vendor_view.ts** / **vendor_window.ts**: the first window migrated out of

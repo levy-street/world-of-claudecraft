@@ -369,13 +369,25 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   } else {
     count = disenchantYield(def, ctx.rng);
   }
-  // silent on both grants below: the disenchantResult event fires its own
-  // dedicated cue (audio.disenchant in src/game/audio.ts); the generic loot
-  // ding would otherwise stack on top of it for every disenchant.
-  ctx.addItem(materialItemId, count, pid, { silent: true });
+  // silent + callerLogs on both grants below: the disenchantResult event owns
+  // BOTH halves of the player feedback. It fires its own dedicated cue
+  // (audio.disenchant in src/game/audio.ts), so the generic loot ding would
+  // stack on top of it, and it logs the yield-naming, item-linked disenchant
+  // line off materialItemId/count (plus secondaryItemId/secondaryCount), so
+  // the hub's "You receive:" lines would repeat what that line already says
+  // (#2430: an epic yield used to print FOUR lines for one action).
+  ctx.addItem(materialItemId, count, pid, { silent: true, callerLogs: true });
   if (secondaryItemId && secondaryCount) {
+    // Still one grant call per unit (the shipped payload-aliasing contract):
+    // the per-unit loot events are elided by callerLogs, and the client
+    // renders ONE secondary line off disenchantResult.secondaryCount, so
+    // batching the grant would buy nothing player-visible and would move the
+    // per-grant discovery/quest hook cadence.
     for (let i = 0; i < secondaryCount; i++) {
-      ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid, 1, { silent: true });
+      ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid, 1, {
+        silent: true,
+        callerLogs: true,
+      });
     }
   }
   // Quality-tiered gain: the disenchanted item's def quality is the input tier.
@@ -708,11 +720,14 @@ function resolveReplaceEnchantBagged(
   if (!consumed) return { ok: false, itemId, enchantId, reason: 'not_held' };
   ctx.onInventoryChangedForQuests(meta);
   for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
-  // silent, exactly like the plain apply mint below: the enchantResult event
-  // fires its own dedicated cue (audio.enchant in src/game/audio.ts), so the
-  // generic loot ding would otherwise stack on top of it for every replace.
+  // silent + callerLogs, exactly like the plain apply mint below: the
+  // enchantResult event fires its own dedicated cue (audio.enchant in
+  // src/game/audio.ts) and logs the one enchant line. This mint re-grants the
+  // player's OWN copy, so the hub's "You receive:" line told them they had
+  // received an item that never left their bags (#2430).
   ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed, enchant), pid, 1, {
     silent: true,
+    callerLogs: true,
   });
   // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
   // like the plain arms (also stamps the shared throttle).
@@ -837,10 +852,11 @@ export function resolveApplyEnchant(
   // additive bonus and marker (enchantedPayloadFor above, shared with the
   // capacity gate).
   const merged = enchantedPayloadFor(consumed, enchant);
-  // silent: the enchantResult event fires its own dedicated cue
-  // (audio.enchant in src/game/audio.ts); the generic loot ding would
-  // otherwise stack on top of it for every applied enchant.
-  ctx.addItemInstance(itemId, merged, pid, 1, { silent: true });
+  // silent + callerLogs: the enchantResult event fires its own dedicated cue
+  // (audio.enchant in src/game/audio.ts) and logs the one enchant line. This
+  // mint re-grants the player's OWN copy, so the hub's "You receive:" line
+  // told them they had received an item that never left their bags (#2430).
+  ctx.addItemInstance(itemId, merged, pid, 1, { silent: true, callerLogs: true });
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return { ok: true, itemId, enchantId };

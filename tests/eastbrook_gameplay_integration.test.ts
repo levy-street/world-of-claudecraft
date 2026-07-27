@@ -4,6 +4,7 @@ import { buildingContainsPoint } from '../src/sim/building_layout';
 import {
   colliderInternalsForTest,
   isBlocked,
+  lineOfSightClear,
   pathCrossesFence,
   resolveMovement,
 } from '../src/sim/colliders';
@@ -642,7 +643,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
       })),
       {
         id: EASTBROOK_LAYOUT.services.mailbox.id,
-        point: EASTBROOK_LAYOUT.services.mailbox.position,
+        point: EASTBROOK_LAYOUT.services.mailbox.frontStandingPoint,
       },
       {
         id: EASTBROOK_LAYOUT.services.noticeboard.id,
@@ -917,5 +918,71 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     rebuilt.ctx.respawnMob(rebuiltWolf);
     expect(stableProjection(rebuilt)).toEqual(stableProjection(legacy));
     expect(rebuilt.rng.next()).toBe(legacy.rng.next());
+  });
+});
+
+describe('the first sixty seconds: starter pull lanes from spawn', () => {
+  // The town is furnished with solid props now, so pin explicitly what the
+  // fixtures that moved to open ground implied: a new character can walk out
+  // of the spawn square to each nearby starter camp, and at the camp's edge
+  // a ranged pull has a clear 25 yd sight lane to the camp's heart.
+  it('walks out to the starter camps and sights a ranged pull at each', () => {
+    // The level-1 quest targets: the first camps a fresh character is sent
+    // at. (The spider wood is a later, longer walk whose winding route the
+    // simple follower here cannot prove; its lane is covered by the
+    // route-existence check below.)
+    const starterMobs = new Set(['wild_boar', 'forest_wolf']);
+    const nearest = [...CAMPS]
+      .map((camp) => ({
+        camp,
+        d: Math.hypot(camp.center.x - PLAYER_START.x, camp.center.z - PLAYER_START.z),
+      }))
+      .filter(({ camp }) => starterMobs.has(camp.mobId))
+      .sort((a, b) => a.d - b.d)
+      .slice(0, 2);
+    expect(nearest.length).toBe(2);
+    for (const { camp } of nearest) {
+      // The pull spot as a player finds it: walk the pathfinder's own route
+      // out of town and stop at the first waypoint inside ranged pull
+      // distance of the camp's heart. That keeps the spot on walkable
+      // ground even where the beeline crosses a rim.
+      const route = findPath(PLAYER_START, camp.center, {
+        seed: SEED,
+        bodyRadius: 0.5,
+        maxClimbSlope: PLAYER_MAX_CLIMB_SLOPE,
+        minGround: (x: number, z: number) => waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+        maxSpan: 160,
+      });
+      expect(route.length, `${camp.mobId} has a route from spawn`).toBeGreaterThan(0);
+      const pull =
+        route.find((p) => Math.hypot(p.x - camp.center.x, p.z - camp.center.z) <= 25) ??
+        route[route.length - 1];
+      expect(isBlocked(SEED, pull.x, pull.z, 0.5), `${camp.mobId} pull spot`).toBe(false);
+      expectWalkableRoute(`${camp.mobId} camp approach`, PLAYER_START, pull, 0.5);
+      expect(lineOfSightClear(SEED, pull, camp.center), `${camp.mobId} pull sight lane`).toBe(true);
+      expect(
+        Math.hypot(pull.x - camp.center.x, pull.z - camp.center.z),
+        `${camp.mobId} pull distance`,
+      ).toBeLessThanOrEqual(25);
+    }
+  });
+
+  it('every camp within 90 yd of spawn keeps a route and a pull sight lane', () => {
+    for (const camp of CAMPS) {
+      const d = Math.hypot(camp.center.x - PLAYER_START.x, camp.center.z - PLAYER_START.z);
+      if (d > 90) continue;
+      const route = findPath(PLAYER_START, camp.center, {
+        seed: SEED,
+        bodyRadius: 0.5,
+        maxClimbSlope: PLAYER_MAX_CLIMB_SLOPE,
+        minGround: (x: number, z: number) => waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+        maxSpan: 160,
+      });
+      expect(route.length, `${camp.mobId} at ${camp.center.x},${camp.center.z}`).toBeGreaterThan(0);
+      const pull =
+        route.find((p) => Math.hypot(p.x - camp.center.x, p.z - camp.center.z) <= 25) ??
+        route[route.length - 1];
+      expect(lineOfSightClear(SEED, pull, camp.center), `${camp.mobId} pull sight lane`).toBe(true);
+    }
   });
 });

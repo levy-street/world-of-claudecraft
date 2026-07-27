@@ -1,5 +1,13 @@
 import * as THREE from 'three';
-import { isBlocked } from '../sim/colliders';
+import {
+  BANKER_CHEST_HALF_DEPTH,
+  BANKER_CHEST_HALF_WIDTH,
+  BANKER_CHEST_PLACEMENTS,
+  BANKER_CHEST_TARGET_HEIGHT,
+  bankerChestCenterWorld,
+  resolveBankerChestLocalPlacement,
+} from '../sim/banker_chest_layout';
+import { bankerChestSpots, isBlocked } from '../sim/colliders';
 import { getActiveWorldContent } from '../sim/data';
 import type { Entity, NpcDef } from '../sim/types';
 import { groundHeight } from '../sim/world';
@@ -15,23 +23,11 @@ import {
 } from './eastbrook_surface_atlas';
 import { surfaceMat } from './gfx';
 
+// The chest's dimensions, ordered local candidates, and placement resolution
+// all live in the sim leaf src/sim/banker_chest_layout.ts: the sim resolves
+// the spot ONCE while building the static colliders (the chest is solid and
+// standable now), and this module places the mesh from the same record.
 const BANKER_CHEST_ASSET_URL = '/models/props/banker_chest.glb';
-const BANKER_CHEST_TARGET_HEIGHT = 1.3;
-const BANKER_CHEST_HALF_WIDTH = 1.09;
-const BANKER_CHEST_HALF_DEPTH = 0.65;
-const BANKER_CHEST_SAMPLE_COLUMNS = 9;
-const BANKER_CHEST_SAMPLE_ROWS = 5;
-
-// Local +z is the NPC's forward/approach direction. Keep the decoration behind
-// and to one side when space permits so the banker remains the clear target.
-// The ordered alternatives let cramped authored or custom-world locations use
-// the other side, then a front-side position, without moving into the banker.
-const BANKER_CHEST_PLACEMENTS = Object.freeze([
-  Object.freeze({ x: 1.15, y: 0, z: -0.7, rotationY: 0 }),
-  Object.freeze({ x: -1.15, y: 0, z: -0.7, rotationY: 0 }),
-  Object.freeze({ x: 1.15, y: 0, z: 0.7, rotationY: 0 }),
-  Object.freeze({ x: -1.15, y: 0, z: 0.7, rotationY: 0 }),
-]);
 
 let loadedBankerChestGltf: THREE.Group | null = null;
 let preparedBankerChestTemplate: THREE.Group | null = null;
@@ -61,69 +57,27 @@ type BlockedAt = (
   ignoreFences: boolean,
 ) => boolean;
 type GroundAt = (x: number, z: number, seed: number) => number;
-function placementCenterWorld(
-  entity: PlacedBankerNpcRef,
-  placement: BankerChestPlacement,
-): { x: number; z: number } {
-  const facingCos = Math.cos(entity.facing);
-  const facingSin = Math.sin(entity.facing);
-  return {
-    x: entity.pos.x + placement.x * facingCos + placement.z * facingSin,
-    z: entity.pos.z - placement.x * facingSin + placement.z * facingCos,
-  };
-}
-
-function blockedSampleCount(
-  entity: PlacedBankerNpcRef,
-  worldSeed: number,
-  placement: BankerChestPlacement,
-  blockedAt: BlockedAt,
-  bestSoFar: number,
-): number {
-  const facingCos = Math.cos(entity.facing);
-  const facingSin = Math.sin(entity.facing);
-  const localCos = Math.cos(placement.rotationY);
-  const localSin = Math.sin(placement.rotationY);
-  let blocked = 0;
-
-  for (let column = 0; column < BANKER_CHEST_SAMPLE_COLUMNS; column++) {
-    const across =
-      -BANKER_CHEST_HALF_WIDTH +
-      (2 * BANKER_CHEST_HALF_WIDTH * column) / (BANKER_CHEST_SAMPLE_COLUMNS - 1);
-    for (let row = 0; row < BANKER_CHEST_SAMPLE_ROWS; row++) {
-      const depth =
-        -BANKER_CHEST_HALF_DEPTH +
-        (2 * BANKER_CHEST_HALF_DEPTH * row) / (BANKER_CHEST_SAMPLE_ROWS - 1);
-      const localX = placement.x + across * localCos + depth * localSin;
-      const localZ = placement.z - across * localSin + depth * localCos;
-      const worldX = entity.pos.x + localX * facingCos + localZ * facingSin;
-      const worldZ = entity.pos.z - localX * facingSin + localZ * facingCos;
-      if (blockedAt(worldSeed, worldX, worldZ, 0, false)) {
-        blocked++;
-        if (blocked >= bestSoFar) return blocked;
-      }
-    }
-  }
-  return blocked;
-}
-
 function resolveBankerChestPlacement(
   entity: PlacedBankerNpcRef,
   worldSeed: number,
   blockedAt: BlockedAt = isBlocked,
   groundAt: GroundAt = groundHeight,
 ): BankerChestPlacement {
-  let best = BANKER_CHEST_PLACEMENTS[0];
-  let bestBlocked = Number.POSITIVE_INFINITY;
-  for (const placement of BANKER_CHEST_PLACEMENTS) {
-    const blocked = blockedSampleCount(entity, worldSeed, placement, blockedAt, bestBlocked);
-    if (blocked < bestBlocked) {
-      best = placement;
-      bestBlocked = blocked;
-      if (blocked === 0) break;
-    }
-  }
-  const center = placementCenterWorld(entity, best);
+  // Prefer the spot the SIM resolved while building the static colliders:
+  // that spot has the solid, standable chest collider on it, so the mesh must
+  // stand exactly there. The local fallback covers bankers the sim skipped
+  // (a custom world whose banker spawn relocated); those chests keep the old
+  // decorative, non-colliding behavior against a chest-free grid.
+  const anchor = { pos: entity.pos, facing: entity.facing };
+  const spot =
+    blockedAt === isBlocked
+      ? bankerChestSpots(worldSeed).find(
+          (s) => Math.hypot(s.anchorX - entity.pos.x, s.anchorZ - entity.pos.z) < 0.75,
+        )
+      : undefined;
+  const best =
+    spot?.localPlacement ?? resolveBankerChestLocalPlacement(anchor, worldSeed, blockedAt);
+  const center = bankerChestCenterWorld(anchor, best);
   return {
     ...best,
     y: groundAt(center.x, center.z, worldSeed) - entity.pos.y,

@@ -144,6 +144,40 @@ describe('direct corpse hits over gather nodes', () => {
     expect(shouldDeferPickedCorpseToGatherNode(openCorpse, 1)).toBe(false);
   });
 
+  it('defers an all-unmapped corpse with nothing to loot, claim or no claim (#2513)', () => {
+    // The click-path knock-on of the corpse-level harvest gate. fen_troll carries
+    // claw and tusk, neither mapped, so it has no harvest half to open for; with
+    // no loot either, `canOpen` is false and a click on the corpse mesh should
+    // fall through to a gather node sitting under it rather than being swallowed.
+    // Pinned with the claim UNSPENT, which is the state that used to keep it
+    // open, so this is the predicate talking and not the pre-existing claim arm.
+    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
+    const troll = corpse({ templateId: 'fen_troll', harvestClaimedBy: null, loot: null });
+    expect(shouldDeferPickedCorpseToGatherNode(troll, 1)).toBe(true);
+    // ...and click-to-walk no longer marches the player to it either: there is
+    // nothing to open on arrival. Same fixture, moved out of interact range.
+    const farTroll = corpse({
+      templateId: 'fen_troll',
+      harvestClaimedBy: null,
+      loot: null,
+      pos: { x: 20, y: 0, z: 0 },
+    });
+    expect(shouldApproachPickedEntity(playerAt(0), farTroll, false)).toBe(false);
+    // It still owns the click while it holds loot the viewer can take, so
+    // suppressing the dead harvest does not cost the player the live coin.
+    const withCoin = corpse({
+      templateId: 'fen_troll',
+      harvestClaimedBy: null,
+      loot: { copper: 50, items: [] },
+    });
+    expect(shouldDeferPickedCorpseToGatherNode(withCoin, 1)).toBe(false);
+    // The discriminator on the identical fixture: a MIXED template carrying the
+    // same unmapped tusk keeps its harvest half, so an empty one still opens.
+    expect(MOBS.wild_boar.componentTags).toEqual(['hide', 'tusk', 'meat']);
+    const boar = corpse({ templateId: 'wild_boar', harvestClaimedBy: null, loot: null });
+    expect(shouldDeferPickedCorpseToGatherNode(boar, 1)).toBe(false);
+  });
+
   // The defer arm shares corpseLootAvailability with the open and approach arms,
   // so it must share their party roster too: a party member's tap grants ME
   // shared rights, and that corpse is mine to open, never deferred to a node

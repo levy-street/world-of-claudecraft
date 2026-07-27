@@ -169,6 +169,8 @@ export const BASE_NEW = {
     'error.noLootPermission': 'Nemáš oprávnění to sebrat.',
     'error.corpseAlreadyHarvested': 'Tato mrtvola už byla zpracována.',
     'error.corpseNothingToHarvest': 'Na té mrtvole není co zpracovat.',
+    'error.corpseSelectionNothingToHarvest':
+      'Z té mrtvoly nelze sklidit nic z vybraných komponent.',
     'error.gatherNodeMissing': 'Takové naleziště surovin neexistuje.',
     'error.gatherNodeNotRespawned': 'Toto naleziště surovin se ti ještě neobnovilo.',
     'error.vcupDeserter': 'Správce hřiště si to pamatuje. Vrať se později.',
@@ -454,6 +456,8 @@ export const BASE_NEW = {
     'error.noLootPermission': 'Du har ikke tilladelse til at plyndre det.',
     'error.corpseAlreadyHarvested': 'Dette kadaver er allerede blevet høstet.',
     'error.corpseNothingToHarvest': 'Der er intet at høste fra dette kadaver.',
+    'error.corpseSelectionNothingToHarvest':
+      'Intet af det du har valgt kan høstes fra det kadaver.',
     'error.gatherNodeMissing': 'Det ressourcepunkt findes ikke.',
     'error.gatherNodeNotRespawned': 'Dette ressourcepunkt er endnu ikke genopstået for dig.',
     'error.vcupDeserter': 'Banemesteren husker det. Kom tilbage senere.',
@@ -745,6 +749,8 @@ export const BASE_NEW = {
     'error.noLootPermission': 'Kamu tidak punya izin untuk menjarah itu.',
     'error.corpseAlreadyHarvested': 'Bangkai ini sudah dipanen.',
     'error.corpseNothingToHarvest': 'Tidak ada yang bisa dipanen dari bangkai ini.',
+    'error.corpseSelectionNothingToHarvest':
+      'Tidak ada pilihanmu yang bisa dipanen dari bangkai itu.',
     'error.gatherNodeMissing': 'Titik sumber daya itu tidak ada.',
     'error.gatherNodeNotRespawned': 'Titik sumber daya ini belum muncul kembali untukmu.',
     'error.vcupDeserter': 'Penjaga lapangan ingat. Kembalilah nanti.',
@@ -1036,6 +1042,8 @@ export const BASE_NEW = {
     'error.noLootPermission': 'Je hebt geen toestemming om dat te plunderen.',
     'error.corpseAlreadyHarvested': 'Dit kadaver is al geoogst.',
     'error.corpseNothingToHarvest': 'Er valt niets te oogsten van dit kadaver.',
+    'error.corpseSelectionNothingToHarvest':
+      'Van dat kadaver valt niets uit je selectie te oogsten.',
     'error.gatherNodeMissing': 'Dat grondstofpunt bestaat niet.',
     'error.gatherNodeNotRespawned': 'Dit grondstofpunt is voor jou nog niet opnieuw verschenen.',
     'error.vcupDeserter': 'De terreinknecht onthoudt het. Kom later terug.',
@@ -1325,6 +1333,8 @@ export const BASE_NEW = {
     'error.noLootPermission': 'Nie masz pozwolenia, by to złupić.',
     'error.corpseAlreadyHarvested': 'Z tego truchła już wszystko zebrano.',
     'error.corpseNothingToHarvest': 'Z tego truchła nie ma nic do zebrania.',
+    'error.corpseSelectionNothingToHarvest':
+      'Z tego truchła nie zbierzesz żadnej z wybranych części.',
     'error.gatherNodeMissing': 'Ten punkt zasobów nie istnieje.',
     'error.gatherNodeNotRespawned': 'Ten punkt zasobów jeszcze się dla ciebie nie odnowił.',
     'error.vcupDeserter': 'Gospodarz boiska pamięta. Wróć później.',
@@ -1612,6 +1622,7 @@ export const BASE_NEW = {
     'error.noLootPermission': 'Du har inte tillåtelse att plundra det.',
     'error.corpseAlreadyHarvested': 'Det här kadavret har redan skördats.',
     'error.corpseNothingToHarvest': 'Det finns inget att skörda från det här kadavret.',
+    'error.corpseSelectionNothingToHarvest': 'Inget du valt kan skördas från det där kadavret.',
     'error.gatherNodeMissing': 'Den där resurspunkten finns inte.',
     'error.gatherNodeNotRespawned': 'Den här resurspunkten har ännu inte återuppstått för dig.',
     'error.vcupDeserter': 'Planvakten minns. Kom tillbaka senare.',
@@ -1896,6 +1907,7 @@ export const BASE_NEW = {
     'error.noLootPermission': 'Onu yağmalama iznin yok.',
     'error.corpseAlreadyHarvested': 'Bu leş zaten toplandı.',
     'error.corpseNothingToHarvest': 'Bu leşte toplanacak bir şey yok.',
+    'error.corpseSelectionNothingToHarvest': 'O leşten seçtiklerinin hiçbiri toplanamaz.',
     'error.gatherNodeMissing': 'Öyle bir kaynak noktası yok.',
     'error.gatherNodeNotRespawned': 'Bu kaynak noktası senin için henüz yenilenmedi.',
     'error.vcupDeserter': 'Saha bekçisi unutmaz. Sonra tekrar gel.',
@@ -2184,6 +2196,8 @@ export const BASE_NEW = {
     'error.noLootPermission': 'Bạn không có quyền nhặt chiến lợi phẩm đó.',
     'error.corpseAlreadyHarvested': 'Xác này đã bị thu hoạch rồi.',
     'error.corpseNothingToHarvest': 'Xác này không có gì để thu hoạch.',
+    'error.corpseSelectionNothingToHarvest':
+      'Không thể thu hoạch bộ phận nào bạn đã chọn từ xác đó.',
     'error.gatherNodeMissing': 'Điểm tài nguyên đó không tồn tại.',
     'error.gatherNodeNotRespawned': 'Điểm tài nguyên này chưa xuất hiện lại cho bạn.',
     'error.vcupDeserter': 'Người giữ sân vẫn nhớ. Hãy quay lại sau.',

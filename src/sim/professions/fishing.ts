@@ -266,7 +266,15 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
       pid: p.id,
     });
   }
-  ctx.addItem(caught, 1, meta.entityId);
+  // silent + callerLogs: the fishingResult event below owns BOTH halves of
+  // the player feedback for a landed catch. It plays the reel cue
+  // (audio.fishReel), so the generic loot ding stacked a second cue on top of
+  // it, and it logs the quality-colored, item-linked reel-in line, so the
+  // hub's "You receive:" line was a second line for the one catch. Together
+  // with the bite line that made a catch three lines and two cues (#2430).
+  // The Codfather quest grant above deliberately passes NEITHER: it returns
+  // before the emit below, so the hub line and cue are its only feedback.
+  ctx.addItem(caught, 1, meta.entityId, { silent: true, callerLogs: true });
   // Catch feedback event (Professions 2.0): personal (pid = the
   // angler), text-free on purpose (the gatherResult idiom): the client logs
   // its own localized reel-in line colored by the caught item's quality.

@@ -27,7 +27,14 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
-import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
+import { advanceClimb, tryStartClimb } from './climb';
+import {
+  lineOfSightClear,
+  moverHeight,
+  resolveMovement,
+  resolvePosition,
+  seatGroundedAt,
+} from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
@@ -1845,11 +1852,18 @@ export class Sim {
       }
     }
 
-    // Ravenpost mailboxes: one interactable raven pillar per town (draws no
-    // rng; findSafePos is deterministic, so the camp draws above are unmoved).
+    // Ravenpost mailboxes: one interactable raven pillar per town, spawned at
+    // its exact authored spot (the noticeboard pattern): the pillar is solid
+    // civic furniture with a static collider at this position, so the spawn
+    // must never relocate away from it (findSafePos would, since the collider
+    // sits exactly here). Draws no rng.
     for (const boxDef of worldContent.services?.mailboxes ?? []) {
-      const safe = this.findSafePos(boxDef.x, boxDef.z, waterLevel() + 0.6);
-      const box = createGroundObject(this.nextId++, '', 'Mailbox', this.groundPos(safe.x, safe.z));
+      const box = createGroundObject(
+        this.nextId++,
+        '',
+        'Mailbox',
+        this.groundPos(boxDef.x, boxDef.z),
+      );
       box.templateId = 'mailbox';
       box.objectItemId = null;
       box.lootable = true; // interactable
@@ -2448,7 +2462,11 @@ export class Sim {
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
-      meta.townFocus = { ...(s.townFocus ?? {}) };
+      // Known component families at positive integer points only: a save that
+      // predates the #2511 key check (or a corrupt one) self-heals here rather
+      // than riding back out through the panel into a request the command
+      // boundary now rejects.
+      meta.townFocus = professionsFocus.normalizeTownFocusOnLoad(s.townFocus);
       if (s.delveLoreUnlocked) for (const id of s.delveLoreUnlocked) meta.delveLoreUnlocked.add(id);
       if (s.delveDaily) {
         meta.delveDaily = {
@@ -5053,6 +5071,18 @@ export class Sim {
       clearAfkOnMove(this.ctx, meta, p);
     }
     if (advanceHeroicLeap(this.ctx, p)) return;
+    // A ledge climb owns movement while it runs, and an airborne body that
+    // gets its hands on a reachable ledge starts one. Sits after the leap arc
+    // (a leap has its own landing contract) and before charge/follow/fear so
+    // those cannot fight a pull-up already in progress.
+    if (advanceClimb(p)) return;
+    // Grabbing is AUTOMATIC, not a second button. A player who jumps at a
+    // ledge has already expressed the intent; making them also hold a key at
+    // the exact frame their hands reach it is the difference between a move
+    // that feels like traversal and one that feels like a QTE. The grab is
+    // already gated on being airborne past the apex, moving toward the ledge,
+    // and the ledge being somewhere the body fits.
+    if (tryStartClimb(p, this.cfg.seed) && advanceClimb(p)) return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
     if (this.updateFearMovement(p)) return;
@@ -5501,9 +5531,13 @@ export class Sim {
       if (blocked) break; // hit a wall: stop the shove here
     }
     if (moved <= 0) return 0;
-    target.pos.x = cx;
-    target.pos.z = cz;
-    target.pos.y = groundHeight(cx, cz, this.cfg.seed);
+    // Support-aware seat: a victim shoved along crate tops stays on them, and
+    // one shoved through a passed-over prop footprint is nudged clear instead
+    // of being embedded at terrain height inside it.
+    const seat = seatGroundedAt(this.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
+    target.pos.x = seat.x;
+    target.pos.z = seat.z;
+    target.pos.y = seat.y;
     target.vy = 0;
     target.onGround = true;
     target.fallStartY = target.pos.y;
@@ -6788,13 +6822,37 @@ export class Sim {
   // rewards) can't destroy items. Capacity is enforced by canAddItem pre-checks
   // at the command boundaries instead.
   // opts.silent suppresses only the client's default loot audio cue for this
-  // grant (the "You receive:" text line still prints); a caller with its own
-  // dedicated cue for the same grant (gathering/crafting/enchanting) sets
-  // this so the generic ding doesn't stack on top of it. Professions 2.0's
-  // later phases add new grant sites here (Phase 4 rare-event jackpot yields,
-  // Phase 13's disenchant UI wiring): pass { silent: true } from those too,
-  // or the new grants will double-ding the same way the original ones did.
-  addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void {
+  // grant; a caller with its own dedicated cue for the same grant
+  // (gathering/crafting/enchanting) sets this so the generic ding doesn't
+  // stack on top of it. opts.callerLogs is the text half of the same idea:
+  // the caller owns the player-visible line for this grant and renders a
+  // richer one off its own result event, so the hub's "You receive:" line
+  // stands down instead of printing a second line for the one grant (#2430).
+  // The two stay independent by design, but no shipped caller sets exactly one
+  // (true repo-wide today; the enforced part is professions plus corpse
+  // harvest, which tests/professions_silent_loot.test.ts sweeps, and every
+  // other grant in the game passes no opts at all). A grant whose result event
+  // owns the line owns the cue too, in one of three ways: a dedicated cue of
+  // its own (gather/craft/disenchant/salvage/enchant/fishing), the SAME
+  // generic ding replayed by the result arm exactly once for the whole
+  // command (corpse harvest, which has never had a recording of its own, so
+  // it keeps the sound it always made and only stops stacking it: #2457), or
+  // deliberate SILENCE, which is still owning it (the Maker's Bond unbind
+  // peel in professions/commission.ts, whose contract above
+  // hudChrome.unbind.unbound is no toast and no cue at all: #2458). A grant
+  // with no result event behind it sets NEITHER, or it goes invisible: the
+  // once-ever Codfather quest catch (professions/fishing.ts) returns before
+  // its emit, so the hub line and ding are its only feedback.
+  // Professions 2.0's later phases
+  // add new grant sites here (Phase 4 rare-event jackpot yields, Phase 13's
+  // disenchant UI wiring): pass the same opts from those too, or the new
+  // grants will double-ding and double-log the way the original ones did.
+  addItem(
+    itemId: string,
+    count: number,
+    pid?: number,
+    opts?: { silent?: boolean; callerLogs?: boolean },
+  ): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
@@ -6813,6 +6871,7 @@ export class Sim {
       // (the canonicalizer keeps `undefined` keys, tests/parity/trace.ts),
       // dragging goldens with no professions content into every regen.
       ...(opts?.silent ? { silent: true } : {}),
+      ...(opts?.callerLogs ? { callerLogs: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
     if (
@@ -6832,13 +6891,14 @@ export class Sim {
   // grant (a rare-event windfall) emits ONE loot line with the xN suffix
   // instead of one line and cue per unit; discovery and quest hooks fire once
   // per grant, matching addItem's per-call semantics.
-  // opts.silent: see addItem's matching param above, same contract.
+  // opts.silent / opts.callerLogs: see addItem's matching params above, same
+  // contract.
   addItemInstance(
     itemId: string,
     instance: ItemInstancePayload,
     pid?: number,
     count = 1,
-    opts?: { silent?: boolean },
+    opts?: { silent?: boolean; callerLogs?: boolean },
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -6873,6 +6933,7 @@ export class Sim {
       pid: meta.entityId,
       // Conditional, see the matching comment in addItem above.
       ...(opts?.silent ? { silent: true } : {}),
+      ...(opts?.callerLogs ? { callerLogs: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
   }
@@ -9005,7 +9066,22 @@ export class Sim {
     ignoreFences = false,
   ): { x: number; z: number } {
     const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
-    const res = resolveMovement(this.cfg.seed, fromX, fromZ, nx, nz, r, ignoreFences, run?.modules);
+    // Parkour heights are a PLAYER traversal mechanic: only players pass over
+    // low prop tops. Mobs/pets/NPCs keep full-height collision (their y rides
+    // the terrain every tick, so a height-gated pass would let them clip
+    // through protruding rock bodies and jitter at buried-rock rims).
+    const mover = e.kind === 'player' ? moverHeight(e) : undefined;
+    const res = resolveMovement(
+      this.cfg.seed,
+      fromX,
+      fromZ,
+      nx,
+      nz,
+      r,
+      ignoreFences,
+      run?.modules,
+      mover,
+    );
     if (!run) return res;
     const clamped = this.clampDelveModuleBounds(run, res.x, res.z, r);
     return this.clampDelveDoors(run, clamped.x, clamped.z, r);
@@ -9014,7 +9090,8 @@ export class Sim {
   // Point resolution for mob wander / blocked checks, with the same delve layering.
   private resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number } {
     const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
-    const res = resolvePosition(this.cfg.seed, nx, nz, r, false, run?.modules);
+    const mover = e.kind === 'player' ? moverHeight(e) : undefined;
+    const res = resolvePosition(this.cfg.seed, nx, nz, r, false, run?.modules, mover);
     if (!run) return res;
     const clamped = this.clampDelveModuleBounds(run, res.x, res.z, r);
     return this.clampDelveDoors(run, clamped.x, clamped.z, r);

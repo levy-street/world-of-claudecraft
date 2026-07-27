@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { MarketFilters } from '../src/ui/market_filters';
-import { MARKET_PAGE_SIZE } from '../src/ui/market_filters';
+import {
+  MARKET_ARMOR_TYPE_FILTERS,
+  MARKET_BAG_SIZE_FILTERS,
+  MARKET_ITEM_TYPE_FILTERS,
+  MARKET_PAGE_SIZE,
+  MARKET_WEAPON_TYPE_FILTERS,
+} from '../src/ui/market_filters';
 import {
   buildMarketBrowse,
   buildMarketCollect,
@@ -11,6 +17,7 @@ import {
   COPPER_PER_SILVER,
   marketCollectBadgeCount,
   marketCollectIndicatorView,
+  marketFilterMenus,
 } from '../src/ui/market_view';
 import type { MarketInfo, MarketListingView } from '../src/world_api';
 
@@ -354,6 +361,78 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
       });
       expect(sim).toEqual(mirror);
     }
+  });
+});
+
+// WHICH secondary menus the browse chrome shows per item type. Extracted out of the
+// painter (issue #2189) so this is a real behavioral assertion rather than a source-text
+// grep: the bag arm must bring a capacity menu WITHOUT a primary-stat menu, since bags
+// carry no str/agi/int and the stat filter is a no-op outside armor/weapon.
+describe('marketFilterMenus', () => {
+  it('gives armor all three secondary menus, weapons two, bags only capacity', () => {
+    expect(marketFilterMenus('armor')).toEqual({
+      subtype: MARKET_ARMOR_TYPE_FILTERS,
+      subtypeKind: 'armorSlot',
+      armorClass: true,
+      primaryStat: true,
+    });
+    expect(marketFilterMenus('weapon')).toEqual({
+      subtype: MARKET_WEAPON_TYPE_FILTERS,
+      subtypeKind: 'weaponFamily',
+      armorClass: false,
+      primaryStat: true,
+    });
+    expect(marketFilterMenus('bag')).toEqual({
+      subtype: MARKET_BAG_SIZE_FILTERS,
+      subtypeKind: 'bagCapacity',
+      armorClass: false,
+      primaryStat: false,
+    });
+  });
+
+  // The options and the wording that describes them must be decided together, or a type
+  // can get its list from one place and its labels from another (the failure that would
+  // have rendered a bag capacity as "Other weapons").
+  it('never hands the painter options without saying what they mean', () => {
+    for (const type of MARKET_ITEM_TYPE_FILTERS) {
+      const menus = marketFilterMenus(type);
+      expect(
+        menus.subtype === null,
+        `${type}: subtype options and subtypeKind must appear together`,
+      ).toBe(menus.subtypeKind === null);
+    }
+    // Non-vacuity: at least one type on each side of that biconditional.
+    expect(marketFilterMenus('bag').subtypeKind).not.toBeNull();
+    expect(marketFilterMenus('consumable').subtypeKind).toBeNull();
+  });
+
+  it('gives every other item type no secondary menu at all', () => {
+    const plain = MARKET_ITEM_TYPE_FILTERS.filter(
+      (type) => type !== 'armor' && type !== 'weapon' && type !== 'bag',
+    );
+    // Non-vacuity: 'all' plus the four kind buckets must actually be in the sweep.
+    expect(plain.length).toBeGreaterThanOrEqual(5);
+    for (const type of plain) {
+      expect(marketFilterMenus(type), `${type} must show no secondary menu`).toEqual({
+        subtype: null,
+        subtypeKind: null,
+        armorClass: false,
+        primaryStat: false,
+      });
+    }
+  });
+
+  it('offers a capacity option for every bag size the catalog ships, plus all', () => {
+    const menus = marketFilterMenus('bag');
+    const catalogSizes = [
+      ...new Set(
+        Object.values(ITEMS)
+          .filter((item) => item.kind === 'bag')
+          .map((item) => item.bagSlots ?? 0),
+      ),
+    ].sort((a, b) => a - b);
+    expect(catalogSizes.length).toBeGreaterThan(1);
+    expect(menus.subtype).toEqual(['all', ...catalogSizes.map((slots) => `${slots}`)]);
   });
 });
 
