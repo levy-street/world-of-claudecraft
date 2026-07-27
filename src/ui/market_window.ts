@@ -447,7 +447,11 @@ export class MarketWindow {
         rarity: this.rarityFilter,
       },
       sellItemId: this.sellItemId,
-      sellHave: this.sellItemId ? this.bagCount(this.sellItemId) : 0,
+      sellHave: this.sellItemId
+        ? this.sellInstance
+          ? 1
+          : this.fungibleBagCount(this.sellItemId)
+        : 0,
       sellInstance: this.sellInstance,
     });
     if (view.kind === 'no-data') {
@@ -729,10 +733,14 @@ export class MarketWindow {
     body.appendChild(btn);
   }
 
-  private bagCount(itemId: string): number {
+  // Fungible stock only: the plain listing form's quantity cap must match what
+  // marketList can actually escrow (an instanced copy is never swept into a
+  // bulk listing), or a qty above the fungible stock just bounces off the
+  // sim's denial. An instanced staging is single-copy and never reads this.
+  private fungibleBagCount(itemId: string): number {
     return this.deps
       .world()
-      .inventory.filter((s) => s.itemId === itemId)
+      .inventory.filter((s) => s.itemId === itemId && !s.instance)
       .reduce((n, s) => n + s.count, 0);
   }
 

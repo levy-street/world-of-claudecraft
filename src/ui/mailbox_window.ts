@@ -665,12 +665,16 @@ export class MailboxWindow {
         remove?: HTMLButtonElement;
       }
     >();
-    for (const slot of this.attachments) {
+    for (const [chipIdx, slot] of this.attachments.entries()) {
       const item = ITEMS[slot.itemId];
       if (!item) continue;
       // Per-chip focus/controls key: a plain stack and an instanced copy of the
       // same item id are distinct chips and must not collide in the focus map.
-      const chipKey = slot.instance ? `${slot.itemId}#i` : slot.itemId;
+      // The staged-array index keeps two DIFFERENTLY-instanced copies of one
+      // item id distinct too (stageParcel dedups byte-equal payloads only);
+      // the array order is stable across repaints, so the focus restore lands
+      // on the same chip.
+      const chipKey = slot.instance ? `${slot.itemId}#i${chipIdx}` : slot.itemId;
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
       const chip = document.createElement('span');
       chip.className = 'mail-parcel-chip';

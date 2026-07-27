@@ -691,9 +691,12 @@ export class PostOffice {
         subject: m.subject,
         body: m.body,
         copper: m.copper,
-        // Display projection (publicInstanceView: signer/enchant/rolled only):
-        // the chip tooltip needs the enchant line and maker's mark; the full
-        // payload stays in the book and arrives with mailTake.
+        // Display projection (publicInstanceView: signer/enchant/rolled only).
+        // Deliberately ONE projection for the whole inbox surface, the
+        // viewer's own letters included (broader than the other-players
+        // rationale the trim was named for): the chip tooltip needs only the
+        // enchant line and maker's mark, and the full payload stays in the
+        // book and arrives with mailTake.
         items: m.items.map((s) =>
           s.instance ? { ...s, instance: publicInstanceView(s.instance) } : { ...s },
         ),
