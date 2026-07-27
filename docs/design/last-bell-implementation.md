@@ -285,3 +285,22 @@ shots must poll-click #btn-offline until handlers bind (networkidle never
 settles against the dead :8787 proxy), and swiftshader world boots can
 outlast enterOfflineGame's 30 s rAF-polled __game wait: interval-poll it
 yourself (tmp/harbor_shots.mjs pattern).
+
+### H1 v3: unstuck aboard, upright gangways, the 34 yard ship (2026-07-28)
+
+Owner round 2 fixes. (1) THE STUCK-ABOARD BUG: rideSteepnessAt read the
+bare terrain under dry footing, and the strip-edge dive wall under the
+mainland berth is steeper than the climb gate, so standing on the level
+ship deck stripped all control. The footing arm returns the AUTHORED
+surface slope (0 decks, gradient ramps) whenever a harbor surface stands
+above the terrain; a motion-loop regression walks aboard and back.
+General rule minted: any authored walkable surface over wild terrain
+needs a footing arm in the steepness gate, or the terrain below leaks
+through. (2) Gangway ramps rendered tilted the wrong way: the rotation
+signs were inverted on both axes (rotateZ lifts +x, rotateX drops +z).
+(3) The ship grows to hull 34 (the basin maximum: probed floors bottom
+at -5.68/-5.72, draft 1.0), berths pushed out for the 15.6 beam,
+boarding amidships. Max's parkour physics engine (#2527, merged to
+main: swept collision, standable world, ledge climb) is the long-term
+replacement for authored shipDecks and the footing arm; adopting it here
+means a main-base migration, deliberately deferred to its own task.
