@@ -28,6 +28,26 @@ describe('classifyDiff', () => {
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual(['player-tooltip']);
   });
 
+  it('captures both the market overview and expanded armor filters for market window changes', () => {
+    const plan = classifyDiff(['src/ui/market_window.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'market-window',
+      'market-armor-filters',
+    ]);
+    expect(plan.specific[1].variants).toEqual([
+      { key: 'desktop' },
+      { key: 'mobile', mobile: true },
+    ]);
+  });
+
+  it('captures expanded armor filters when either responsive market stylesheet changes', () => {
+    for (const path of ['src/styles/components.css', 'src/styles/hud.mobile.css']) {
+      const keys = classifyDiff([path]).specific.map((target: { key: string }) => target.key);
+      expect(keys).toContain('market-armor-filters');
+    }
+  });
+
   it('maps the tank cooldown regression suite to its focused visual target', () => {
     const plan = classifyDiff(['tests/tank_defensive_cds.test.ts']);
     expect(plan.isVisual).toBe(true);
@@ -49,7 +69,7 @@ describe('classifyDiff', () => {
   });
 
   it('adds the mobile HUD when the visual change touches the mobile surface', () => {
-    const plan = classifyDiff(['src/styles/hud.mobile.css']);
+    const plan = classifyDiff(['src/game/mobile_controls.ts']);
     expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
   });
 

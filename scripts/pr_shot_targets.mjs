@@ -992,6 +992,33 @@ export const TARGETS = [
       return open ? { clip: '#market-window' } : {};
     },
   },
+  {
+    key: 'market-armor-filters',
+    label: 'World Market armor filters (responsive search and filter grid)',
+    when: ['ui/market_window', 'styles/components.css', 'styles/hud.mobile.css'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, shot) {
+      if (!(await openMarketBrowse(page))) return {};
+      const selected = await page.evaluate(() => {
+        const option = document.querySelector(
+          '[data-market-filter-menu="itemType"] [data-market-filter-option="armor"]',
+        );
+        if (!(option instanceof HTMLElement)) return false;
+        option.click();
+        document.activeElement instanceof HTMLElement && document.activeElement.blur();
+        return true;
+      });
+      if (!selected) return {};
+      await wait(250);
+      if (shot?.mobile) {
+        await page.evaluate(() => {
+          const market = document.querySelector('#market-window');
+          if (market) market.scrollTop = 150;
+        });
+      }
+      return { clip: '#market-window' };
+    },
+  },
   // The market-window target above shoots the browse grid with every dropdown CLOSED, so
   // it is blind to the filter vocabulary itself. These two open the menus. Keyed on the
   // shared query module (which holds the option lists) plus the view core (which decides
