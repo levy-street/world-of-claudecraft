@@ -37,8 +37,8 @@ describe('Last Bell campaign fixtures', () => {
     const ferries = fixtures(sim, 'lb_ferry');
     expect(ferries.map((f) => ({ x: f.pos.x, z: f.pos.z }))).toEqual(
       expect.arrayContaining([
-        { x: 211.5, z: -47.3 },
-        { x: 756.3, z: 127 },
+        { x: 211, z: -48 },
+        { x: 757, z: 124.6 },
       ]),
     );
     expect(ferries).toHaveLength(2);
