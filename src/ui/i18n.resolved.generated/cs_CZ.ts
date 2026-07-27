@@ -1463,10 +1463,12 @@ export const cs_CZ: EnTranslations = {
       "title": "Sklizeň",
       "harvestButton": "Sklidit",
       "harvestTooltip": "Sbírá zaškrtnuté součásti. Každou mrtvolu lze sklidit pouze jednou, kdo dřív přijde. Nepobírá kořist.",
-      "concentrateHint": "Méně vybraných komponent dá každé vyšší stupeň.",
+      "yieldTierHint": "Čím méně komponent sklizeň skutečně odebere, tím vyšší úroveň sklizně má každá z nich.",
       "nothingSelectedYields": "Z této mrtvoly nelze sklidit nic z vybraných komponent.",
       "alreadyHarvested": "Tato mrtvola už byla sklizena.",
       "componentAria": "Sklidit {component}",
+      "componentNoYield": "zatím nic",
+      "componentAriaNoYield": "Sklidit {component}: {note}",
       "components": {
         "hide": "Kůže",
         "fang": "Tesák",
@@ -2024,8 +2026,8 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Čeká vyzvednutí ze Světového trhu",
-      "tip": "U Obchodníka na tebe čekají zlato nebo předměty."
+      "aria": "Čekají výnosy nebo předměty ze Světového trhu",
+      "tip": "U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty."
     },
     "noticeboard": {
       "empty": "Zdá se, že tu nic nevisí."
@@ -2169,9 +2171,9 @@ export const cs_CZ: EnTranslations = {
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
       "gatherLine": "Shromažďujete: {name}.",
       "gatherLineQty": "Shromažďujete: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Sklízíte: {name}.",
+      "harvestLineQty": "Sklízíte: {name} x{qty}.",
+      "harvestSpecimenLine": "Také získáváte {name}.",
       "catchLine": "Vytahuješ: {name}",
       "biteLine": "Něco zabralo!",
       "gotAwayLine": "Ta ti unikla.",
@@ -2353,7 +2355,7 @@ export const cs_CZ: EnTranslations = {
       "empty": "Zatím nejsou známy žádné recepty.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
@@ -2446,13 +2448,13 @@ export const cs_CZ: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Rozzačaruješ {item} na {material}.",
+      "disenchantedYieldQty": "Rozzačaruješ {item} na {material} x{qty}.",
+      "disenchantedAlso": "Získáš také {material}.",
+      "disenchantedAlsoQty": "Získáš také {material} x{qty}.",
       "salvagedLine": "Rozebereš {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Rozebereš {item} na {material}.",
+      "salvagedYieldQty": "Rozebereš {item} na {material} x{qty}.",
       "enchantAppliedLine": "Okouzlíš {item} pomocí {enchant}.",
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
@@ -2477,6 +2479,7 @@ export const cs_CZ: EnTranslations = {
       "noEnchants": "Žádné okouzlení nepoužívá tuto reagencii.",
       "noTargets": "Žádný způsobilý předmět k okouzlení.",
       "wornTag": "Vybaveno ({slot})",
+      "wornTagIndexed": "Vybaveno ({slot} {index})",
       "tier": {
         "base": "Základní okouzlení",
         "runed": "Runové okouzlení",
@@ -2489,14 +2492,14 @@ export const cs_CZ: EnTranslations = {
       "sameEnchant": "Tento předmět už má toto okouzlení.",
       "replaceTag": "Nahradí {enchant}",
       "sameEnchantTag": "Již aplikováno",
-      "plainTag": "Not enchanted",
+      "plainTag": "Bez okouzlení",
       "replaceConfirmTitle": "Nahradit okouzlení na {item}?",
       "replaceConfirmBody": "Tímto nahradíš {old} na {item} za {new}.",
       "replaceConfirmNoRefund": "Staré okouzlení bude zničeno. Materiály se nevrací. Tuto akci nelze vrátit.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Zůstane: {kept}",
+      "replaceConfirmKeepsSigner": "Značka výrobce",
+      "replaceConfirmKeepsMasterwork": "Bonus mistrovského díla",
+      "replaceConfirmKeepsBond": "Vazba zakázky",
       "replaceConfirmCost": "Cena: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Nahradit"
@@ -3742,7 +3745,7 @@ export const cs_CZ: EnTranslations = {
     "professions": {
       "intro": "Kromě boje a úkolů tě svět odměňuje i za práci na poli a u výhně: za sběr surovin, jejich proměnu ve výbavu a zboží napříč deseti výrobními řemesly a za přijetí identity jednoho z deseti archetypů, které tato řemesla představují.",
       "harvestTitle": "Sklizeň ze samotného lovu",
-      "harvestBody": "Sklizeň se nezastaví u nalezišť. Z mnoha poražených bestií lze jednou sklízet každou, kdo první, ten bere, za kůže, kly, hedvábí a maso přímo z těla vedle běžné kořisti; jedno stisknutí otevře oboje. Volba je pokaždé i tvoje: strip vše, co tělo nabízí, nebo se soustřeď na méně složek a vezmi prokazatelně lepší jakost toho, co bereš.\n\nVzácný nebo lepší hod na sklizeň z rodiny nesoucí exempláře také přinese podepsaný dokonalý exemplář (Prvotřídní kůži, Prvotřídní hedvábí, Prvotřídní jedový vak nebo Prvotřídní kus) navíc k běžnému výnosu a do Knihy skutků zapíše Dokonalý exemplář. Sklízet může každá postava bez jakéhokoli výcviku a jakýkoli sběratelský nástroj, který vlastníš, se počítá k prémiové složce, bez ohledu na to, ke které profesi patří.",
+      "harvestBodyChoice": "Sklizeň se nezastaví u nalezišť. Z mnoha poražených bestií lze jednou sklízet každou, kdo první, ten bere, za kůže, kly, hedvábí a maso přímo z těla vedle běžné kořisti; jedno stisknutí otevře oboje. Pokud bestie nese více než jednu zpracovatelnou složku, volba je na tobě: vezmi si vše, co může dát, nebo se soustřeď na méně složek a vezmi prokazatelně lepší jakost toho, co bereš.\n\nVzácný nebo lepší hod na sklizeň z rodiny nesoucí exempláře také přinese podepsaný dokonalý exemplář (Prvotřídní kůži, Prvotřídní hedvábí, Prvotřídní jedový vak nebo Prvotřídní kus) navíc k běžnému výnosu a do Knihy skutků zapíše Dokonalý exemplář. Sklízet může každá postava bez jakéhokoli výcviku a jakýkoli sběratelský nástroj, který vlastníš, se počítá k prémiové složce, bez ohledu na to, ke které profesi patří.",
       "focusTitle": "Zaměření města",
       "focusBody": "Každé větší město drží panel Zaměření města pro přicházející sběrače: postav se ve městě, otevři ho vedle minimapy a namiř malý rozpočet bodů zaměření na typy komponent, na kterých ti záleží. Čím víc zaměření dáš dané komponentě, tím jemnější a bohatší padá z každého dalšího těla; tvé rozdělení následuje postavu, ať se toulá kamkoli, a můžeš ho zdarma přepracovat při každé pozdější návštěvě města.",
       "craftHowTitle": "Okno výroby",
@@ -8155,7 +8158,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Eastbrookská kroužková vesta"
       },
       "valespun_robe": {
-        "name": "Údolně tkané roucho"
+        "name": "Údolně předené roucho"
       },
       "tanned_leather_jerkin": {
         "name": "Kazajka z vydělané kůže"

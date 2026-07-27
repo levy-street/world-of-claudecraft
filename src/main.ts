@@ -3394,6 +3394,10 @@ async function startGame(
             net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
+            // A ledge climb is a server-owned scripted move the client does
+            // not re-simulate: predicting a fall through it would fight the
+            // authoritative pull-up and show the correction as a stutter.
+            pe.climbing !== true &&
             !isDelvePos(pe.pos.x),
           moveInput: resolved.mi,
           displayFacing: netFacing ?? interpServerFacing,

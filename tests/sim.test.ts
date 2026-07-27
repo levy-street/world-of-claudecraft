@@ -131,6 +131,9 @@ function despawnMobs(sim: Sim) {
 }
 
 function forwardDistance(sim: Sim, ticks = 60): number {
+  // Speed comparisons run on empty ground: the starting town is furnished
+  // (see src/sim/town_props.ts), so a run from spawn would measure a
+  // collision with a workbench rather than a movement multiplier.
   placePlayerInOpenField(sim);
   const start = { ...sim.player.pos };
   sim.moveInput.forward = true;
@@ -291,7 +294,7 @@ describe('movement directions', () => {
     expect(sim.player.pos.z).toBeCloseTo(zAfterForward, 1);
   });
 
-  it('preserves launch momentum while airborne', () => {
+  it('keeps launch momentum while airborne and steers with air control', () => {
     const sim = makeSim('warrior');
     teleportTo(sim, 0, -40);
     sim.player.facing = 0;
@@ -299,13 +302,21 @@ describe('movement directions', () => {
     sim.moveInput.jump = true;
     sim.tick();
     expect(sim.player.onGround).toBe(false);
+    // Every key released mid-air: the launch velocity carries unchanged.
     sim.moveInput.forward = false;
-    sim.moveInput.strafeRight = true;
+    sim.moveInput.jump = false;
     const xAtLaunch = sim.player.pos.x;
     const zAtLaunch = sim.player.pos.z;
-    for (let i = 0; i < 4; i++) sim.tick();
+    sim.tick();
     expect(sim.player.pos.z).toBeGreaterThan(zAtLaunch);
-    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(0.05);
+    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(1e-9);
+    // A held strafe now steers the arc (air control) while the forward
+    // momentum still carries: rightward drift is -x at facing 0.
+    sim.moveInput.strafeRight = true;
+    const zBeforeSteer = sim.player.pos.z;
+    for (let i = 0; i < 4; i++) sim.tick();
+    expect(sim.player.pos.z).toBeGreaterThan(zBeforeSteer);
+    expect(sim.player.pos.x).toBeLessThan(xAtLaunch - 0.2);
   });
 
   it('walks down a walkable slope without going airborne', () => {
@@ -1031,7 +1042,7 @@ describe('food, drink, vendor', () => {
     teleportTo(sim2, wilkes2.pos.x + 2, wilkes2.pos.z);
 
     expect(sim2.meta(pid2)?.vendorBuyback).toEqual([{ itemId: 'apprentice_staff', count: 1 }]);
-    sim2.buyBackItem('apprentice_staff', pid2);
+    sim2.buyBackItem('apprentice_staff', undefined, undefined, pid2);
     expect(sim2.countItem('apprentice_staff', pid2)).toBe(1);
     expect(sim2.meta(pid2)?.vendorBuyback).toEqual([]);
   });
@@ -1487,6 +1498,24 @@ describe('food, drink, vendor', () => {
     sim.sellItem('wolf_fang', 99);
 
     expect(sim.copper).toBe(20);
+    expect(sim.countItem('wolf_fang')).toBe(0);
+  });
+
+  // Regression: "Sell amount to NPC" (Discord #bug-reports, Corotexus). A custom
+  // amount typed into the sell-quantity dialog above one stack's size (wolf_fang
+  // has no explicit stackSize, so it defaults to 20, see sim/bags.ts stackSizeOf)
+  // must sell the FULL amount by pulling from every stack the player holds, not
+  // silently cap at one stack's worth.
+  it('vendor sells a custom amount greater than one stack size, drawing from every stack', () => {
+    const sim = makeSim('warrior');
+    const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+    teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
+    sim.addItem('wolf_fang', 100); // spread across five 20-stacks
+    expect(sim.inventory.filter((s) => s.itemId === 'wolf_fang')).toHaveLength(5);
+
+    sim.sellItem('wolf_fang', 100);
+
+    expect(sim.copper).toBe(400);
     expect(sim.countItem('wolf_fang')).toBe(0);
   });
 

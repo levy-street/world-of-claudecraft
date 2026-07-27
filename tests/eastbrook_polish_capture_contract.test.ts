@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isBlocked } from '../src/sim/colliders';
+import { isBlocked, resolvePosition } from '../src/sim/colliders';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 
 const captureContract =
@@ -359,7 +359,11 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      fingerprint: '2dd868144d11ce0dbd3c234be1e22baf7562a0420feba95c3fafeee9fb8bff14',
+      // Deliberately re-pinned for the 0.31.0 version sync: package-lock.json
+      // is in every Eastbrook source inventory, so the release version bump
+      // moved the town, mailbox, and noticeboard fingerprints (and the GLBs
+      // they stamp) even though no pipeline input changed. No recapture.
+      fingerprint: '3dd5c2b4807e25e0b9526db949dda9ce901215cb1f7dfeab6f88cc6ff127c128',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -607,8 +611,22 @@ describe('Eastbrook polish capture contract', () => {
         isBlocked(EASTBROOK_ARMOURY_CAPTURE_SEED, view.target.x, view.target.z, 0.5),
         `${view.name} target`,
       ).toBe(false);
+      // The camera is an ELEVATED point: a low standable prop (a headstone, a
+      // bench) whose top sits below the camera's altitude does not contain it.
+      // Route the check through the height-aware resolver so only full-height
+      // geometry and props reaching the camera's y count as blockers.
+      const cameraResolved = resolvePosition(
+        EASTBROOK_ARMOURY_CAPTURE_SEED,
+        view.camera.x,
+        view.camera.z,
+        0.5,
+        false,
+        undefined,
+        { y: view.camera.y, lift: 0 },
+      );
       expect(
-        isBlocked(EASTBROOK_ARMOURY_CAPTURE_SEED, view.camera.x, view.camera.z, 0.5),
+        Math.abs(cameraResolved.x - view.camera.x) > 1e-4 ||
+          Math.abs(cameraResolved.z - view.camera.z) > 1e-4,
         `${view.name} camera`,
       ).toBe(false);
     }

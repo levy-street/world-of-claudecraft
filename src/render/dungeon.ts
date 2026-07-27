@@ -20,6 +20,7 @@ import { isLitanyModuleId, polygonWallSegments } from '../sim/delve_litany_layou
 import {
   arenaMapForSlot,
   CRYPT_LAYOUT,
+  DAIS_HEIGHT,
   DUNGEON_END_WALL_HW,
   DUNGEON_WALL_HEIGHT,
   DUNGEON_WALL_HW,
@@ -30,6 +31,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
   TOMB_HD,
+  tombSlotRoll,
   type WallStub,
 } from '../sim/dungeon_layout';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
@@ -1627,7 +1629,9 @@ export class DungeonInteriors {
       return;
     }
     for (const t of layout.tombs) {
-      const r = hash2(t.x * 3.7, t.z);
+      // The shared per-slot roll: the sim builds the slot's standable collider
+      // from the SAME draw, so the prop drawn here is the surface stood on.
+      const r = tombSlotRoll(t.x, t.z);
       if (variant === 'bastion') {
         if (r < 0.5) {
           p.add('crates_stacked', t.x, 0, t.z - 1.0, hash2(t.z, t.x) * 0.4 - 0.2, 1.0);
@@ -1742,8 +1746,10 @@ export class DungeonInteriors {
     }
   }
 
-  // Boss dais: chunky circular platform of foundation blocks (0.6u high,
-  // walkable — deliberately NO collider, matching the layout contract).
+  // Boss dais: chunky circular platform of foundation blocks (DAIS_HEIGHT
+  // high). The platform is REAL elevation: the sim's interior floor rises to
+  // the same height (world.ts groundHeight via dungeon_floor.ts), so bodies
+  // stand ON these blocks; there is still no obstacle collider.
   private placeDais(
     group: THREE.Group,
     p: Placements,
@@ -1762,7 +1768,9 @@ export class DungeonInteriors {
       for (let z = -16; z <= 16; z += 4) {
         if (Math.hypot(x, z) > d.r) continue;
         const rot = Math.floor(hash2(x, z) * 4) * quarter;
-        p.add('floor_foundation_allsides', d.x + x, 0, d.z + z, rot, [1.85, 0.3, 1.85]);
+        // The foundation piece is 2u tall natively: y-scale it to exactly the
+        // sim's dais height so the visual top IS the floor the body stands on.
+        p.add('floor_foundation_allsides', d.x + x, 0, d.z + z, rot, [1.85, DAIS_HEIGHT / 2, 1.85]);
       }
     }
     // ritual glow pooled on the dais top so the boss stage never reads as a
@@ -1774,26 +1782,48 @@ export class DungeonInteriors {
       const ang = (i / 6) * Math.PI * 2 + 0.35;
       const x = d.x + Math.sin(ang) * rim;
       const z = d.z + Math.cos(ang) * rim;
-      if (variant === 'bastion') p.add('candle_triple', x, 0.6, z, hash2(x, z) * Math.PI, 1.3);
+      if (variant === 'bastion')
+        p.add('candle_triple', x, DAIS_HEIGHT, z, hash2(x, z) * Math.PI, 1.3);
       else if (variant === 'sanctum')
-        p.add(i % 2 ? 'skull_candle' : 'candle_triple', x, 0.6, z, hash2(x, z) * Math.PI, 1.4);
+        p.add(
+          i % 2 ? 'skull_candle' : 'candle_triple',
+          x,
+          DAIS_HEIGHT,
+          z,
+          hash2(x, z) * Math.PI,
+          1.4,
+        );
       else if (variant === 'temple')
-        p.add(i % 2 ? 'candle_triple' : 'shrine_candles', x, 0.6, z, hash2(x, z) * Math.PI, 1.3);
+        p.add(
+          i % 2 ? 'candle_triple' : 'shrine_candles',
+          x,
+          DAIS_HEIGHT,
+          z,
+          hash2(x, z) * Math.PI,
+          1.3,
+        );
       else if (variant === 'delve_finale' || variant === 'delve_marsh_apse')
-        p.add(i % 2 ? 'skull_candle' : 'candle_triple', x, 0.6, z, hash2(x, z) * Math.PI, 1.4);
-      else p.add(i % 2 ? 'skull' : 'candle_lit', x, 0.6, z, hash2(x, z) * Math.PI, 1.3);
+        p.add(
+          i % 2 ? 'skull_candle' : 'candle_triple',
+          x,
+          DAIS_HEIGHT,
+          z,
+          hash2(x, z) * Math.PI,
+          1.4,
+        );
+      else p.add(i % 2 ? 'skull' : 'candle_lit', x, DAIS_HEIGHT, z, hash2(x, z) * Math.PI, 1.3);
     }
     if (variant === 'bastion') {
       // the drowned keep's plunder, heaped behind the dais
-      p.add('chest_gold', d.x - 2.2, 0.6, d.z + d.r - 3.4, Math.PI + 0.3, 1.4);
-      p.add('coin_stack_medium', d.x + 1.8, 0.6, d.z + d.r - 3.2, 0.8, 1.5);
+      p.add('chest_gold', d.x - 2.2, DAIS_HEIGHT, d.z + d.r - 3.4, Math.PI + 0.3, 1.4);
+      p.add('coin_stack_medium', d.x + 1.8, DAIS_HEIGHT, d.z + d.r - 3.2, 0.8, 1.5);
       p.add('trunk_large_A', d.x + 4.6, 0, d.z + d.r + 1.2, Math.PI - 0.4, 1.5);
     }
     if (variant === 'temple') {
       // the goddess's tithe: pearls and coin heaped before the altar
-      p.add('chest_gold', d.x + 2.4, 0.6, d.z + d.r - 3.6, Math.PI - 0.3, 1.4);
-      p.add('coin_stack_medium', d.x - 2.0, 0.6, d.z + d.r - 3.4, -0.7, 1.5);
-      p.add('skull_candle', d.x, 0.68, d.z, 0, 1.6); // the moon-idol at the altar's heart
+      p.add('chest_gold', d.x + 2.4, DAIS_HEIGHT, d.z + d.r - 3.6, Math.PI - 0.3, 1.4);
+      p.add('coin_stack_medium', d.x - 2.0, DAIS_HEIGHT, d.z + d.r - 3.4, -0.7, 1.5);
+      p.add('skull_candle', d.x, DAIS_HEIGHT + 0.08, d.z, 0, 1.6); // the moon-idol at the altar's heart
     }
     if (variant === 'delve_finale' || variant === 'delve_marsh_apse') {
       // Deacon Varric's bell-chamber: low ribcage trophies flanking the south

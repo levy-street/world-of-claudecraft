@@ -4027,7 +4027,7 @@ function inventoryVendor(): Scenario {
       rec.snapshot('sold-junk');
 
       // 8) buy one back (copper spend + addItemSilent + onInventoryChangedForQuests).
-      sim.buyBackItem('wolf_fang', buyer);
+      sim.buyBackItem('wolf_fang', undefined, undefined, buyer);
       rec.snapshot('bought-back');
     },
   };

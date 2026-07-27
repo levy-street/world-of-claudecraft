@@ -166,6 +166,12 @@ export function installWindowResize(deps: WindowResizeDeps): () => void {
     session.startY = ev.clientY;
     session.engaged = true;
     el.classList.add('window-resizing');
+    // From here the window owns an explicit width/height, so its content must
+    // follow that box instead of the viewport-relative cap it was authored with.
+    // Unlike window-resizing this is permanent for the session: it drives the
+    // .window-fill contract in src/styles/components.css, and it lives on the
+    // window element, so it survives the innerHTML rebuilds the painters do.
+    el.classList.add('window-sized');
     // Opts the window into the viewport-resize re-clamp pass hud.ts runs.
     el.dataset.windowMoved = '1';
     try {

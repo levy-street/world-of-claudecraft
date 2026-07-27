@@ -21,7 +21,11 @@
 //     the swap KEEPS as well as what it destroys, and the plain twin of a mixed
 //     holding (an enchanted copy of the same id in the bags OR on the body)
 //     states its own state so the pair never differs by a sub-line alone
-//     (#2421); the pure core decides all three.
+//     (#2421); the pure core decides all three. It also decides the two
+//     discriminators that keep NO TWO ROWS of one target list sharing an
+//     accessible name (#2466): the heroic mark, because a heroic variant renders
+//     its base item's name, and the indexed worn tag, because both fingers read
+//     "Finger".
 //
 // The pure decisions live in the two view cores; this owns only DOM + dispatch,
 // talks to the world exclusively through IWorld, and never decides an outcome.
@@ -41,7 +45,9 @@ import {
   enchantNameKey,
   enchantSectionsForReagent,
   enchantTargets,
+  HEROIC_TAG_KEY,
   preservedTraitKey,
+  type WornEnchantTargetRow,
   wornEnchantTargets,
 } from './enchant_apply_view';
 import { itemDisplayName } from './entity_i18n';
@@ -112,7 +118,14 @@ export class BagItemActionMenu {
   /** Open the action menu for a bag stack. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row is
    *  byte-identical to a plain click. */
-  open(def: ItemDef, itemId: string, x: number, y: number, runDefault: () => void): void {
+  open(
+    def: ItemDef,
+    itemId: string,
+    slotIndex: number,
+    x: number,
+    y: number,
+    runDefault: () => void,
+  ): void {
     const rows = bagItemContextActions(def, itemId).map((action) => ({
       act: action.id,
       html: esc(t(action.labelKey)),
@@ -120,7 +133,7 @@ export class BagItemActionMenu {
     this.paint(rows, x, y, (act) => {
       const id = act as BagItemContextActionId;
       if (id === 'default') runDefault();
-      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId);
+      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
     });
@@ -129,11 +142,19 @@ export class BagItemActionMenu {
   // Disenchant / Salvage: both route through the one confirm-dialog family, with
   // the stronger warning body when the copy that would actually be consumed is
   // special (signed / masterwork / enchanted). The OK label reuses the menu verb.
-  private confirmDestroy(action: 'disenchant' | 'salvage', itemId: string): void {
+  private confirmDestroy(
+    action: 'disenchant' | 'salvage',
+    itemId: string,
+    slotIndex?: number,
+  ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
     const name = def ? itemDisplayName(def) : itemId;
-    const copies = world.inventory.filter((slot) => slot.itemId === itemId);
+    const selected = slotIndex === undefined ? undefined : world.inventory[slotIndex];
+    const copies =
+      action === 'disenchant' && selected?.itemId === itemId
+        ? [selected]
+        : world.inventory.filter((slot) => slot.itemId === itemId);
     const special = destroyConsumesSpecialCopy(action, copies);
     const c =
       action === 'disenchant'
@@ -163,8 +184,10 @@ export class BagItemActionMenu {
       t(c.ok),
       t('hud.chat.context.cancel'),
       () => {
-        if (action === 'disenchant') world.disenchantItem(itemId);
-        else world.salvageItem(itemId);
+        if (action === 'disenchant') {
+          if (slotIndex === undefined) world.disenchantItem(itemId);
+          else world.disenchantItem(itemId, { slotIndex });
+        } else world.salvageItem(itemId);
         this.deps.afterAction();
       },
     );
@@ -371,29 +394,53 @@ export class BagItemActionMenu {
     // an assistive-tech user or a quick scan had to go on. The enchanted twin
     // counts from EITHER family, bags or body, since this list shows both. Only
     // on that twin: an unambiguous plain row stays tag-free (enchant_apply_view
-    // mixedHolding). Scoped to the ONE-ITEM-ID pair that flag describes, not to
-    // every possible duplicate name: a base item and its heroic variant share a
-    // display name across two ids (#2466), and two rings of one id both label
-    // "Worn (Finger)". Both predate this change and neither is claimed fixed
-    // here. A function, not a const string, so an ordinary target list with no
-    // mixed holding pays no t() call at all.
+    // mixedHolding). A function, not a const string, so an ordinary target list
+    // with no mixed holding pays no t() call at all.
     const plainMeta = (): string =>
       `<span class="ctx-item-meta">${esc(t('hudChrome.enchanting.plainTag'))}</span>`;
+    // The HEROIC mark (#2466), the item's own IDENTITY rather than its state, so
+    // it leads the sub-lines. A heroic variant renders its base item's display
+    // name by design (entity_i18n itemDisplayName, classic behavior), so without
+    // this a base and its heroic twin were two rows of one byte-identical
+    // accessible name, told apart only by an invisible data-act. Same text the
+    // item tooltip's quality line already uses, and reusing the plain meta style
+    // deliberately: the distinction is the WORDS, so it survives a forced
+    // palette and needs no colour of its own.
+    const heroicMeta = (): string => `<span class="ctx-item-meta">${esc(t(HEROIC_TAG_KEY))}</span>`;
+    // The worn tag, indexed when the core says this equipment key SHARES its
+    // slot label with another (#2466): ring1 and ring2 both read "Finger", so
+    // two fingers wearing identical copies rendered two identical rows that both
+    // stayed activatable. Two keys, never the plain tag with an ordinal glued
+    // on. Nothing is numbered where a label already names its slot alone.
+    const wornMeta = (target: WornEnchantTargetRow): string =>
+      `<span class="ctx-item-meta">${esc(
+        target.slotIndex === undefined
+          ? t('hudChrome.enchanting.wornTag', { slot: this.deps.slotName(target.slot) })
+          : t('hudChrome.enchanting.wornTagIndexed', {
+              slot: this.deps.slotName(target.slot),
+              // itemNumber, not the raw ordinal: t() interpolates with String(v),
+              // so a bare number would never see Intl, unlike every other number
+              // this menu prints.
+              index: itemNumber(target.slotIndex),
+            }),
+      )}</span>`;
+    const identityOf = (target: { itemId: string; heroic?: true }): string =>
+      `${nameOf(target.itemId)}${target.heroic ? heroicMeta() : ''}`;
     const rows = [
       ...worn.map((target) => {
-        const html = `${nameOf(target.itemId)}<span class="ctx-item-meta">${esc(
-          t('hudChrome.enchanting.wornTag', { slot: this.deps.slotName(target.slot) }),
-        )}</span>${target.replace ? replaceMeta(target.replace) : ''}`;
+        const html = `${identityOf(target)}${wornMeta(target)}${
+          target.replace ? replaceMeta(target.replace) : ''
+        }`;
         return target.replace?.sameEnchant
           ? { html, disabled: true }
           : { act: `worn:${target.slot}`, html };
       }),
       ...targets.map((target) => {
         if (!target.replace) {
-          const html = `${nameOf(target.itemId)}${target.mixedHolding ? plainMeta() : ''}`;
+          const html = `${identityOf(target)}${target.mixedHolding ? plainMeta() : ''}`;
           return { act: `target:${target.itemId}`, html };
         }
-        const html = `${nameOf(target.itemId)}${replaceMeta(target.replace)}`;
+        const html = `${identityOf(target)}${replaceMeta(target.replace)}`;
         return target.replace.sameEnchant
           ? { html, disabled: true }
           : { act: `replace:${target.itemId}`, html };

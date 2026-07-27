@@ -268,7 +268,7 @@ describe('axe: spellbook window', () => {
         // (IWorld always carries a player); level 1 keeps every row locked.
         world: () =>
           ({ cfg: { playerClass: 'warrior' }, known: [], player: { level: 1 } }) as never,
-        barAbilityIds: () => [],
+        barActions: () => [],
         hasFreeSlot: () => true,
         hasFormBars: () => false,
         captureFocus: () => null,

@@ -3078,6 +3078,22 @@
     min-height: 40px;
     font-size: 16px;
   }
+  /* The corpse harvest picker's checkbox rows are the one loot-window control
+     the 40px floor above does NOT reach, and that is deliberate rather than an
+     oversight, so it is recorded here where the next person will look.
+     They are <label>s, so the whole row is the hit area, but the row is only
+     about 16px tall (a 12px line beside a UA-default ~13px checkbox). Raising
+     it to 40px was tried and reverted: at the in-game landscape metrics
+     (844x390) the corpse popup is already pinned at its cap, the
+     `body.mobile-touch .window` max-height above, which resolves to 350 of the
+     viewport's 390 CSS px and is already scrolling. Three rows going 16px to
+     40px pushes 72px of content, the Harvest button included, straight past a
+     fixed bottom edge.
+     Trading the primary action's reachability for the row's tap size is a worse
+     outcome than the gap, and closing it properly means a layout pass on the
+     popup (a denser row, or a scroll region that pins the button), which is its
+     own change. The rows do clear the WCAG 2.2 SC 2.5.8 24px minimum in the
+     horizontal axis and miss it vertically. */
   /* Short landscape phones keep only actionable roll cards (hud.ts filters the
      answered watch rows). The desktop vote monitor is useful context, but its
      multi-row strip makes one mobile card taller than the rail's usable height

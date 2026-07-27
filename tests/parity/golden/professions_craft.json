@@ -441,7 +441,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "bb62bbb0",
+      "state": "e794f41d",
       "events": "a90da3ee",
       "rng": {
         "draws": 2,
@@ -530,6 +530,7 @@
             },
             {
               "count": 1,
+              "craftedRecipeId": "recipe_eastbrook_ritual_vestments",
               "instance": {
                 "rolled": {
                   "masterwork": true,
@@ -638,7 +639,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "4b90794c",
+      "state": "71561ba5",
       "events": "055e81f3",
       "rng": {
         "draws": 3,
@@ -727,6 +728,7 @@
             },
             {
               "count": 1,
+              "craftedRecipeId": "recipe_eastbrook_ritual_vestments",
               "instance": {
                 "rolled": {
                   "masterwork": true,
@@ -833,7 +835,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "4b90794c",
+      "state": "71561ba5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -922,6 +924,7 @@
             },
             {
               "count": 1,
+              "craftedRecipeId": "recipe_eastbrook_ritual_vestments",
               "instance": {
                 "rolled": {
                   "masterwork": true,

@@ -64,6 +64,7 @@ import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon, type UiIconName } from './ui_icons';
+import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
@@ -216,6 +217,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
+    slotIndex: number,
     x: number,
     y: number,
     runDefault: () => void,
@@ -1035,7 +1037,8 @@ export class BagsWindow {
     const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
-    this.deps.openItemActionMenu(item, s.itemId, x, y, () => this.runBagAction(item, s, ev));
+    const index = bagStackIndex(this.deps.world().inventory, s);
+    this.deps.openItemActionMenu(item, s.itemId, index, x, y, () => this.runBagAction(item, s, ev));
   }
 
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
@@ -1043,7 +1046,11 @@ export class BagsWindow {
     if (ev.ctrlKey || ev.metaKey) {
       this.deps.world().sellItem(slot.itemId, count);
     } else if (ev.shiftKey && count > 1) {
-      this.showSellQuantityPrompt(slot.itemId, count);
+      // The prompt's cap is every copy of this item across the whole bag, not just
+      // the ONE slot that was clicked: a stackable item's per-slot count tops out at
+      // its stackSize (commonly 20), so a player holding more sits in other slots.
+      const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
+      this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else {
       this.deps.world().sellItem(slot.itemId);
     }

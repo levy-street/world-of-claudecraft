@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
+  addThreat,
   BEAR_FORM_THREAT_MULT,
   DEFENSIVE_STANCE_THREAT_MULT,
   dropThreat,
@@ -714,6 +715,119 @@ describe('rogue stealth', () => {
     sim.castAbility('stealth');
     expect(sim.player.auras.some((a) => a.id === 'stealth' && a.kind === 'stealth')).toBe(true);
     expect(sim.player.auras.some((a) => a.id === 'sprint' && a.kind === 'buff_speed')).toBe(true);
+  });
+
+  it('Vanish drops hostile focus and leaves combat immediately', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = sim.player.level;
+    beefUp(wolf);
+    wolf.wanderTarget = null;
+    teleport(sim, sim.player, wolf.pos.x + 3, wolf.pos.z);
+
+    hit(sim, sim.player, wolf, 30);
+    expect(sim.player.inCombat).toBe(true);
+    expect(wolf.threat.has(sim.player.id)).toBe(true);
+    expect(wolf.aggroTargetId).toBe(sim.player.id);
+
+    sim.castAbility('vanish');
+    expect(sim.player.auras.some((a) => a.id === 'vanish' && a.kind === 'stealth')).toBe(true);
+    expect(sim.player.inCombat).toBe(false);
+    expect(sim.player.combatTimer).toBeGreaterThanOrEqual(5);
+    expect(wolf.threat.has(sim.player.id)).toBe(false);
+    expect(wolf.aggroTargetId).not.toBe(sim.player.id);
+
+    sim.tick();
+    expect(sim.player.inCombat).toBe(false);
+  });
+
+  it('Vanish prevents the escaped hostile from immediately reacquiring at close range', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20);
+    const rogue = sim.player;
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = rogue.level;
+    wolf.wanderTarget = null;
+    teleport(sim, rogue, wolf.pos.x + 1, wolf.pos.z);
+
+    addThreat(wolf, rogue.id, 100);
+    wolf.aiState = 'attack';
+    wolf.inCombat = true;
+    wolf.aggroTargetId = rogue.id;
+    rogue.inCombat = true;
+    rogue.combatTimer = 0;
+
+    sim.castAbility('vanish');
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+
+    expect(rogue.auras.some((a) => a.id === 'vanish' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.inCombat).toBe(false);
+    expect(wolf.aggroTargetId).not.toBe(rogue.id);
+    expect(wolf.threat.has(rogue.id)).toBe(false);
+  });
+
+  it('Smokestep allows out-of-combat rogue actions after escaping', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = sim.player.level;
+    beefUp(wolf);
+    wolf.wanderTarget = null;
+    teleport(sim, sim.player, wolf.pos.x + 3, wolf.pos.z);
+
+    hit(sim, sim.player, wolf, 30);
+    sim.castAbility('vanish');
+    expect(sim.player.inCombat).toBe(false);
+    expect(sim.player.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+
+    sim.targetEntity(wolf.id);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('sap');
+    const events = sim.tick();
+    expect(events.some((e) => e.type === 'error' && /combat/.test(e.text))).toBe(false);
+    expect(wolf.auras.some((a) => a.kind === 'incapacitate')).toBe(true);
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
+
+  it('Smokestep clears focus and stops incoming attacks from a single Ridge Stalker', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20);
+    const rogue = sim.player;
+    const stalker = nearestMob(sim, 'ridge_stalker');
+    stalker.level = rogue.level;
+    stalker.wanderTarget = null;
+    teleport(sim, rogue, stalker.pos.x + 1, stalker.pos.z);
+
+    addThreat(stalker, rogue.id, 100);
+    stalker.aiState = 'attack';
+    stalker.inCombat = true;
+    stalker.aggroTargetId = rogue.id;
+    stalker.forcedTargetId = rogue.id;
+    stalker.forcedTargetTimer = 2;
+    stalker.swingTimer = 0;
+    rogue.inCombat = true;
+    rogue.combatTimer = 0;
+    rogue.targetId = stalker.id;
+    rogue.autoAttack = true;
+
+    const hpAfterEscape = rogue.hp;
+    sim.castAbility('vanish');
+
+    expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.cooldowns.has('vanish')).toBe(true);
+    expect(rogue.autoAttack).toBe(false);
+    expect(rogue.targetId).toBeNull();
+    expect(stalker.aggroTargetId).toBeNull();
+    expect(stalker.forcedTargetId).toBeNull();
+    expect(stalker.threat.has(rogue.id)).toBe(false);
+
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+
+    expect(rogue.hp).toBe(hpAfterEscape);
+    expect(rogue.inCombat).toBe(false);
+    expect(stalker.aggroTargetId).not.toBe(rogue.id);
+    expect(stalker.threat.has(rogue.id)).toBe(false);
   });
 });
 

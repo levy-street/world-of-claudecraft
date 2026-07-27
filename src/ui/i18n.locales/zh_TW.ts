@@ -749,12 +749,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.masterOption': '分配者：{name}',
   'hudChrome.corpseHarvest.title': '採集',
   'hudChrome.corpseHarvest.harvestButton': '採集',
-  'hudChrome.corpseHarvest.concentrateHint': '選擇的部位越少，每個部位的品質越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '這具屍體已經被採集過了。',
   'hudChrome.corpseHarvest.nothingSelectedYields': '你選擇的部位都無法從這具屍體上採集。',
   'hudChrome.corpseHarvest.harvestTooltip':
     '採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。',
   'hudChrome.corpseHarvest.componentAria': '採集{component}',
+  'hudChrome.corpseHarvest.componentNoYield': '尚無產出',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '採集{component}：{note}',
+  'hudChrome.corpseHarvest.yieldTierHint': '一次採集實際取得的部位越少，每個部位的品階就越高。',
   'hudChrome.corpseHarvest.components.hide': '獸皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',
   'hudChrome.corpseHarvest.components.silk': '絲線',
@@ -6641,8 +6643,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     '除了戰鬥與任務之外，這個世界還會獎勵你耕耘土地與鍛造：採集原材料，透過十種製作行業將其打造成裝備與物品，並在這些行業所代表的十種命途之一中確立自己的身分。',
   'guide.professions.harvestTitle': '從狩獵本身採收',
-  'guide.professions.harvestBody':
-    '採集並不止於節點。有些被擊倒的野獸可以採收出部件：獸皮、獠牙、絲線，以及更稀奇的東西，直接從屍體上取得，與它的普通戰利品並存。每次擊殺只容一位採收者：誰先動手，就全歸誰所有。每一次也都由你選擇：把屍體能給的一切盡數剝下，或專注於單一部件，換取更精細的品級。任何角色都能採收，無需入行也無需訓練，而一件特別精良的部件甚至會冠上採收者的名字。',
+  'guide.professions.harvestBodyChoice':
+    '採集並不止於節點。許多被擊倒的野獸都可以各被採收一次，先到先得，取得獸皮、尖牙、絲線與獸肉，直接從屍體上與它的普通戰利品一併取得；按下同一個鍵，兩者一同開啟。當一頭野獸身上帶有不只一種可用部件時，選擇便由你決定：把它能給的一切盡數取走，或專注於較少的部件，換取你確實取得之物明顯更精細的品級。\n\n在會產出標本的野獸族類身上擲出精良或更高的採收品質，除了普通產出之外，還會額外給予一件署名的完美標本（完美的獸皮、完美的蜘蛛絲、完美的毒液腺或上等肉塊），並在你的功績之書中記下「完美標本」。任何角色都能採收，無需訓練，而你持有的任何採集工具都會計入最上等產出的判定，無論它屬於哪一門行業。',
   'guide.professions.focusTitle': '城鎮專注',
   'guide.professions.focusBody':
     '每座主據點城鎮都為到訪的採收者備有一面城鎮專注面板：站在鎮上，從小地圖旁打開它，把一小筆專注點數投向你在意的部件類型。此後每具屍體上的專注部件都會精細一個品級、也略微豐厚一些；你的分配會跟著角色走遍天涯，而且日後任何一次回到鎮上，都能免費重新調整。',
@@ -6752,8 +6754,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.arrivedLog': '你收到了來自 {name} 的新郵件。',
   'hudChrome.mailbox.indicatorAria': '未讀郵件：{count}',
   'hudChrome.mailbox.indicatorTip': '你有 {count} 封未讀信件。請前往郵箱閱讀。',
-  'hudChrome.marketIndicator.aria': '世界市場待領取物品',
-  'hudChrome.marketIndicator.tip': '有金幣或物品正在商人處等待你領取。',
+  'hudChrome.marketIndicator.aria': '世界市場收益或物品待領取',
+  'hudChrome.marketIndicator.tip': '銷售收益或退回物品正在商人處等待你領取。',
   'hudChrome.mailbox.clickAttach': '點擊以附到信件上。',
   'hudChrome.mailbox.cannotMail': '該物品無法郵寄。',
   'hudChrome.mailbox.result.sent': '渡鴉帶著你給 {name} 的信起飛了（郵資 {postage}）。',
@@ -8757,4 +8759,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '沒有該 ID 的物品。',
   'devCommand.kitCurrentSpec': '目前專精',
   'hudChrome.enchanting.wornTag': '已裝備（{slot}）',
+  'hudChrome.enchanting.wornTagIndexed': '已裝備（{slot}{index}）',
 };

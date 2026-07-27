@@ -28,11 +28,12 @@
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
-import { ITEMS, MOBS, ZONES, zoneAt } from './data';
+import { ITEMS, MOBS, zoneAt } from './data';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
+  type DamageEventKind,
   DEED_STAT_KEYS,
   type DeedFlagId,
   type DeedMeterId,
@@ -1052,9 +1053,10 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
     if (bagId) markItemDiscovered(ctx, meta, bagId);
   }
   for (const slot of meta.vendorBuyback) {
-    // Buyback entries persist bare {itemId, count} today, but the rolled
-    // quality rides along like the sibling loops so a future instance payload
-    // cannot silently under-credit quality-first discoveries.
+    // Buyback entries can carry an instance payload (masterwork/signed sales,
+    // #2398); the rolled quality rides along like the sibling loops so
+    // quality-first discovery credit is never under-counted for a row that
+    // preserved its instance.
     markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
   }
 }
@@ -1132,7 +1134,7 @@ export function onDamageDealtForDeeds(
   target: Entity,
   amount: number,
   crit: boolean,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
 ): void {
   if (source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
@@ -1334,7 +1336,11 @@ export function onMobKillCreditForDeeds(
   eligible: PlayerMeta[],
 ): void {
   const tmpl = MOBS[mob.templateId];
-  bumpDeedStat(ctx, credited, 'kills', 1);
+  // A shared kill credits XP, quest progress, and loot to every eligible
+  // party member (damage.ts), not just the tapper: the lifetime kills
+  // counter must match, like every sibling stat in this file (dungeon
+  // clears, thunzharr kills, the rare-slain marks two lines below).
+  for (const meta of eligible) bumpDeedStat(ctx, meta, 'kills', 1);
 
   // chr_vale_packbreaker: three forest_wolf kill credits inside a rolling
   // 10 s window (session-scoped times; pruned on every push).
@@ -1642,7 +1648,7 @@ export function onCupTouchForDeeds(ctx: SimContext, match: CupMatchForDeeds, pid
 export function onCupGoalForDeeds(
   ctx: SimContext,
   match: CupMatchForDeeds,
-  team: 'A' | 'B',
+  _team: 'A' | 'B',
   scorerPid: number | null,
 ): void {
   if (!match.rated || scorerPid === null) return;

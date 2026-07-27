@@ -343,6 +343,27 @@ describe('mage choice rows (owner tree)', () => {
     expect(cap?.value).toBeCloseTo(shave, 5);
   });
 
+  it.each([
+    ['frost', 'ice_barrier', 'ice_lance'],
+    ['fire', 'blazing_barrier', 'fire_blast'],
+    ['arcane', 'temporal_barrier', 'arcane_explosion'],
+  ] as const)(
+    'Overflowing Power shaves the %s personal barrier cooldown',
+    (spec, barrierId, spenderId) => {
+      const { sim, p } = rig({ 20: 'mag_r20_overflowing_power' }, 20, spec);
+      addTargetMob(sim, 100000, 3);
+      p.cooldowns.set(barrierId, 12);
+      const before = p.resource;
+
+      sim.castAbility(spenderId);
+
+      const spent = before - p.resource;
+      expect(spent, `${spec}:${spenderId} spent mana`).toBeGreaterThan(0);
+      const shave = (spent / p.maxResource) * 10 * 2;
+      expect(p.cooldowns.get(barrierId), `${spec}:${barrierId}`).toBeCloseTo(12 - shave, 5);
+    },
+  );
+
   it('Aetherwell channels mana and STACKS spell power the longer you channel', () => {
     const { sim, p } = rig({ 20: 'mag_r20_evocation' });
     p.resource = 10;

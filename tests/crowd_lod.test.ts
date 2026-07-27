@@ -94,6 +94,23 @@ describe('animatesEveryFrame', () => {
     expect(animatesEveryFrame(STRANGER, SELF, TARGET, 'fireball')).toBe(true);
   });
 
+  it("exempts the local player's pet while it is fighting", () => {
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, SELF, TARGET, null)).toBe(true);
+  });
+
+  it("exempts a monster fighting the local player's pet", () => {
+    const PET = 4;
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, null, PET, SELF)).toBe(true);
+  });
+
+  it('exempts an ally fighting the current target', () => {
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, null, TARGET, null)).toBe(true);
+  });
+
+  it('does not exempt idle pets outside combat', () => {
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, false, SELF, TARGET, null)).toBe(false);
+  });
+
   it('does not exempt an idle, untargeted stranger', () => {
     // the only case the crowd cadence is allowed to throttle
     expect(animatesEveryFrame(STRANGER, SELF, TARGET, null)).toBe(false);

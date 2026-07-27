@@ -774,14 +774,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.masterOption': 'Мастер добычи: {name}',
   'hudChrome.corpseHarvest.title': 'Сбор',
   'hudChrome.corpseHarvest.harvestButton': 'Собрать',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Чем меньше выбрано компонентов, тем выше их качество.',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Этот труп уже был собран.',
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'С этого трупа нельзя собрать ничего из выбранного.',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Собирает отмеченные компоненты. Каждый труп можно обработать только один раз, кто успел первым. Добычу при этом не забирает.',
   'hudChrome.corpseHarvest.componentAria': 'Собрать {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'пока ничего',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Собрать {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Чем меньше компонентов забирает сбор, тем выше уровень добычи каждого из них.',
   'hudChrome.corpseHarvest.components.hide': 'Шкура',
   'hudChrome.corpseHarvest.components.fang': 'Клык',
   'hudChrome.corpseHarvest.components.silk': 'Шелк',
@@ -7101,8 +7103,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Помимо боя и заданий, мир вознаграждает тех, кто трудится на земле и у горна: собирайте сырьё, превращайте его в снаряжение и товары в десяти ремёслах и обретайте облик одного из десяти призваний, которые эти ремёсла олицетворяют.',
   'guide.professions.harvestTitle': 'Добыча с самой охоты',
-  'guide.professions.harvestBody':
-    'Сбор не кончается на узлах. С некоторых убитых зверей можно собирать компоненты, шкуры, клыки, шёлк и вещи постраннее, прямо с трупа, рядом с его обычной добычей. Один добытчик на убийство: кто собрал первым, тому и достаётся всё. И выбор всякий раз за вами: забрать всё, что предлагает труп, или сосредоточиться на одном компоненте и взять его более высокого качества. Собирать может любой персонаж, без ремесла и обучения, а особенно тонкий компонент даже носит имя того, кто его добыл.',
+  'guide.professions.harvestBodyChoice':
+    'Сбор не кончается на узлах. Со многих убитых зверей можно собрать шкуры, клыки, шёлк и мясо, по одному разу с каждого и кто успел первым, прямо с трупа, рядом с его обычной добычей: одно нажатие открывает и то и другое. Если зверь несёт больше одного пригодного компонента, выбор за вами: забрать всё, что он способен дать, или сосредоточиться на меньшем числе компонентов и взять то, что берёте, заметно более высокого уровня.\n\nРедкий или лучший результат сбора у семейства, дающего образцы, сверх обычного выхода приносит ещё и именной безупречный образец (Безупречную шкуру, Безупречный паучий шелк, Безупречную ядовитую железу или Отборную вырезку) и записывает «Безупречный трофей» в вашу Книгу деяний. Собирать может любой персонаж, без всякого обучения, а любой имеющийся у вас инструмент сбора идёт в зачёт улучшенного броска, к какому бы ремеслу он ни принадлежал.',
   'guide.professions.focusTitle': 'Фокус города',
   'guide.professions.focusBody':
     'В каждом узловом городе для заезжих добытчиков есть панель «Фокус города»: стоя в городе, откройте её рядом с миникартой и направьте небольшой запас очков фокуса на те виды компонентов, что вам важны. Компоненты под фокусом сходят с каждого следующего трупа на ступень качественнее и чуть богаче, ваше распределение следует за персонажем, куда бы он ни забрёл, а переделать его можно бесплатно при любом следующем визите в город.',
@@ -7219,8 +7221,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.indicatorAria': 'Непрочитанных писем: {count}',
   'hudChrome.mailbox.indicatorTip':
     'У вас {count} непрочитанных писем. Загляните в почтовый ящик, чтобы прочитать их.',
-  'hudChrome.marketIndicator.aria': 'Ожидает получения на Мировом рынке',
-  'hudChrome.marketIndicator.tip': 'Золото или предметы ждут вас у Торговца.',
+  'hudChrome.marketIndicator.aria': 'Выручка или предметы с Мирового рынка ожидают',
+  'hudChrome.marketIndicator.tip':
+    'Выручка от продаж или возвращенные предметы ждут вас у Торговца.',
   'hudChrome.mailbox.clickAttach': 'Нажмите, чтобы приложить к письму.',
   'hudChrome.mailbox.cannotMail': 'Это нельзя отправить почтой.',
   'hudChrome.mailbox.result.sent': 'Ворон унёс ваше письмо для {name} (сбор {postage}).',
@@ -9356,4 +9359,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
   'devCommand.kitCurrentSpec': 'Текущая специализация',
   'hudChrome.enchanting.wornTag': 'Надето ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
 };

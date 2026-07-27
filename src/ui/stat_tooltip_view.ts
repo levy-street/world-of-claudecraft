@@ -69,10 +69,13 @@ export function statEffectText(e: StatEffect, deps: StatTooltipI18n): string {
   }
 }
 
-// Crit and dodge are shown as percents (one decimal); every other stat's source
-// values are whole numbers.
+// Crit, dodge, and parry are shown as percents (one decimal); every other
+// stat's source values are whole numbers.
 const isPercentStat = (model: StatTooltipModel) =>
-  model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'warfare';
+  model.stat === 'critChance' ||
+  model.stat === 'dodge' ||
+  model.stat === 'parry' ||
+  model.stat === 'warfare';
 
 /** The catalog key for a stat's display name. Most reuse the shared
  *  itemUi.stats.* labels; Spell Power is a character-sheet-only stat whose label
@@ -198,9 +201,10 @@ export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n):
   return parts.join(' ');
 }
 
-/** The stat cell's displayed value text: a one-decimal percent for crit/dodge,
- *  a one-decimal number for the dps estimate, otherwise a whole number. Sourced
- *  from model.statValue so the cell and the tooltip it opens cannot disagree. */
+/** The stat cell's displayed value text: a one-decimal percent for
+ *  crit/dodge/parry, a one-decimal number for the dps estimate, otherwise a
+ *  whole number. Sourced from model.statValue so the cell and the tooltip it
+ *  opens cannot disagree. */
 export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): string {
   if (model.stat === 'warfare') {
     return deps.t('hudChrome.statInfo.warfareValue', {
@@ -208,7 +212,7 @@ export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): s
       reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
     });
   }
-  if (model.stat === 'critChance' || model.stat === 'dodge')
+  if (model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'parry')
     return `${dec1(deps, model.statValue)}%`;
   if (model.stat === 'dps') return dec1(deps, model.statValue);
   return int0(deps, model.statValue);

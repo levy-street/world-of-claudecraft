@@ -3,7 +3,11 @@
 // leading to the Hollow Crypt.
 
 import { EASTBROOK_GRAND_ARMOURY } from '../building_layout';
-import { EASTBROOK_LAYOUT, EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../eastbrook_layout';
+import {
+  EASTBROOK_LAYOUT,
+  EASTBROOK_NPC_PLACEMENTS_BY_ID,
+  wallSegmentMirrored,
+} from '../eastbrook_layout';
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
@@ -1633,6 +1637,9 @@ export const ZONE1_PROPS: ZonePropsDef = {
     rot: segment.footprint.rotation,
     height: segment.height,
     camGhost: false,
+    // The wing's tall lantern pillar sits gate-side on mirrored segments;
+    // the collider builder places the pylon colliders from this.
+    ...(wallSegmentMirrored(segment) ? { mirrored: true as const } : {}),
   })),
   graveyards: [{ ...EASTBROOK_LAYOUT.services.graveyard.position }, { x: 4, z: -56 }],
   delveMarkers: [{ x: -5, z: -52, delveId: 'collapsed_reliquary' }],

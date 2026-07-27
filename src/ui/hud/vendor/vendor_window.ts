@@ -7,6 +7,7 @@
 // stays in Hud because it needs Hud's private state; this module only renders
 // one panel and reports clicks back through the injected callbacks.
 
+import type { ItemInstancePayload } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
@@ -24,7 +25,12 @@ import type { VendorGoodsRow, VendorPrice, VendorView } from './vendor_view';
 export interface VendorWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
   onBuy(itemId: string): void;
-  onBuyBack(itemId: string): void;
+  onBuyBack(
+    itemId: string,
+    index: number,
+    instance: ItemInstancePayload | undefined,
+    craftedRecipeId: string | undefined,
+  ): void;
   onSellJunk(): void;
   onClose(): void;
   sellJunk: {
@@ -141,7 +147,15 @@ export function renderVendorWindow(
   }
   const buybackGrid = document.createElement('div');
   buybackGrid.className = 'vendor-goods-grid';
-  for (const { itemId, item, count, price: priceCopper } of view.buyback) {
+  for (const {
+    itemId,
+    item,
+    count,
+    price: priceCopper,
+    index,
+    instance,
+    craftedRecipeId,
+  } of view.buyback) {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'vendor-item';
@@ -149,11 +163,11 @@ export function renderVendorWindow(
     const itemName = itemDisplayName(item);
     row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: itemName, price }));
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
-    row.addEventListener('click', () => deps.onBuyBack(itemId));
+    row.addEventListener('click', () => deps.onBuyBack(itemId, index, instance, craftedRecipeId));
     deps.attachTooltip(
       row,
       () =>
-        `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuyback'))}</div>`,
+        `${deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuyback'))}</div>`,
     );
     buybackGrid.appendChild(row);
   }

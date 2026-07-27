@@ -316,15 +316,12 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the zone read behind the Town Focus button and the open panel gate; no DOM write',
   },
   {
-    call: 'this.renderTownFocus',
+    call: 'this.refreshOpenTownFocusIfChanged',
     band: 'slow',
-    gate: 'this.townFocusOpen',
+    gate: '',
     surface: 'window',
-    guard: {
-      kind: 'none',
-      why: 'the standing exception (#2500): the open check is the whole gate, so the window rebuilds its DOM twice a second and restores scrollTop but not keyboard focus',
-    },
-    why: 'a full rebuild of the Town Focus window',
+    guard: { kind: 'hud', proof: 'if (sig === this.lastTownFocusSig) return;' },
+    why: 'rebuilds the Town Focus window when the allocation draft or the in-town flag moves. The standing exception of this table until #2500, when the open check was the whole gate and an idle panel rebuilt its whole subtree twice a second, restoring scrollTop but destroying keyboard focus',
   },
   {
     call: 'this.renderCrafting',
@@ -579,9 +576,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     guard: {
       kind: 'module',
       module: 'spellbook_window.ts',
-      proof: 'if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {',
+      proof: 'if (this.knownChanged(this.deps.world().known)) {',
     },
-    why: 'the ONLY window on the per-frame band; the sig gates the rebuild, the fall-through hotbar-control refresh runs every frame',
+    why: 'the ONLY window on the per-frame band, and since #2519 BOTH of its halves are gated: the guard proved below (knownChanged, an in-place walk of the resolved-ability numbers, no signature string built per frame) gates the rebuild, and the fall-through hotbar-control refresh takes its own change check (takeControlChange) over the three bar inputs its toggles render, so an unchanged frame makes no lookup, no allocation and no DOM write',
   },
   {
     call: 'this.actionBarPainter.paint',
@@ -589,6 +586,20 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'the desktop action bar, facet-routed',
+  },
+  {
+    call: 'this.currentMobileActionPage',
+    band: 'frame',
+    gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
+    surface: 'none',
+    why: 'selects the active source page for the touch action ring; no DOM write',
+  },
+  {
+    call: 'this.mobileActionSourceSlotCount',
+    band: 'frame',
+    gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
+    surface: 'none',
+    why: 'counts the source slots that determine the touch action ring pagination; no DOM write',
   },
   {
     call: 'this.mobileActionRingPainter.paint',
@@ -1287,10 +1298,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 37, chrome: 68, none: 12 });
+    ).toEqual({ window: 37, chrome: 68, none: 14 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
-    expect(windows.map((r) => r.call)).toContain('this.renderTownFocus');
+    expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
     // The guard KINDS are pinned the same way and for the same reason: `kind` is otherwise a
     // free-text opt-out, so a row could keep `surface: 'window'`, keep the counts above
     // intact, and swap `module` for a plausible-sounding `none` while the real guard was
@@ -1300,9 +1311,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       module: 19,
-      hud: 4,
+      hud: 5,
       callsite: 9,
-      none: 5,
+      none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
     // grow quietly: every entry is a window this repo knows has no invalidation guard.
@@ -1314,7 +1325,6 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       'this.lootRolls.update',
       'this.lootWindow.updateProximity',
       'this.questDialog.updateProximity',
-      'this.renderTownFocus',
       'this.updateMapWindow',
     ]);
   });
@@ -1344,6 +1354,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
         'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',
+        'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud.ts: if (sig === this.lastTradeSig) return;',
         'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
         'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible) this.refresh();',
@@ -1352,7 +1363,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'meters.ts: if (!this.isOpen || now - this.lastRender < 250) return;',
         'professions_window.ts: if (sig === this.lastSig) return;',
         'social_window.ts: if (struct !== this.lastStruct) {',
-        'spellbook_window.ts: if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {',
+        // #2519 replaced the joined signature string this used to build every frame with
+        // an in-place comparison against the retained numbers; same guard, same place, no
+        // per-frame allocation.
+        'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'vale_cup_betting.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_briefing.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_window.ts: if (view.sig === this.lastSig) return;',

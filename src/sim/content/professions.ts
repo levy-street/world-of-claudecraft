@@ -91,9 +91,33 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 // Corpse-harvest yield map (#1141): component tag -> the item id a profession
 // harvest of a tagged corpse yields (claim logic: src/sim/professions/gathering.ts,
 // command body: src/sim/interaction.ts harvestCorpse). Only tags with a concrete
-// item wired up so far are listed here; a mob whose componentTags don't map to any
-// of these still becomes single-use claimed, it just yields no item yet (future
-// profession-harvest issues wire up the rest).
+// item wired up so far are listed here; the four families shipped content also
+// tags (claw, tusk, gills, horn) are still waiting on theirs.
+//
+// THIS TABLE IS THE HARVEST GATE, not just a yield lookup (#2513). A corpse is
+// harvestable exactly when it carries a family listed here (isHarvestableCorpse,
+// ../professions/gathering.ts), so:
+//  - A template whose tags ALL miss this table is never offered a harvest at
+//    all, and an explicit command is refused pre-claim with
+//    error.corpseNothingToHarvest, exactly like a template carrying no tags.
+//    It does NOT become single-use claimed, which is what it used to do while
+//    granting nothing and reporting nothing. `fen_troll` (claw, tusk) is the one
+//    shipped template in that state.
+//  - A template that MIXES a listed family with an unlisted one harvests
+//    normally, and only a pick naming nothing but unlisted families is refused
+//    (#2509, forfeitsEveryMappedYield). Its YIELDS, though, do depend on this
+//    table (#2514): an unlisted family is never extracted, so it is always
+//    forfeited breadth and it raises the concentration bonus on whatever the
+//    pick does extract (professions/gathering.ts harvestConcentrationBonus).
+// So wiring a new family here is neither a yield-only nor a local change. It
+// re-enables the harvest affordance on every template carrying that tag with no
+// code change, AND it re-tunes the bonus back down on every MIXED template
+// carrying that same tag (wiring `gills` moves the three murlocs and leaves
+// old_greyjaw alone, whose unmapped family is `claw`). The same
+// runs the other way: adding a decorative unlisted tag to a mob widens that
+// mob's bonus denominator, which is a balance edit. The bound that keeps it
+// honest (a corpse never out-pays the tag list it advertises) is a checked
+// property in tests/mob_component_tags.test.ts, not an assumption.
 // The v0.21.0 collision gap is closed: hide/silk/venomSac now yield the
 // dedicated profession materials (content/profession_items.ts), so a harvest
 // never grants quest-collect credit. The old quest items (boar_hide via

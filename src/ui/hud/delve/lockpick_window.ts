@@ -143,6 +143,13 @@ export class LockpickWindow {
    * follow the authoritative state (a new pin/try/page refills it; the lock
    * ending stops it). Driven by the lockpickStep event in both hosts. */
   onStep(result: StepResult): void {
+    // The guard repaintIfChanged already carries, and load-bearing since #2517 gave the panel
+    // a close-while-the-session-is-live path: requestClose's repeat arm closes without waiting
+    // for the server's lockpickEnd, so a lockpickStep still in flight would otherwise land
+    // here, rewrite the hidden panel's markup, and (because close() cleared lastTimerKey)
+    // restart the 100ms countdown against a subtree nobody can see. That is exactly the leak
+    // this issue is about, arriving from the other direction.
+    if (this.panel()?.style.display !== 'block') return;
     const fb = stepFeedback(result);
     // stepFeedback returns English text only for the known step results; localize
     // those via t() and leave the (empty) default unlocalized.

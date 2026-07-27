@@ -35,7 +35,10 @@ Subdirectories (plus one shared fixture):
   and `css_tree_under.ts`, the two source walks, `scan_guard_self_audit.ts`, the pin that
   keeps a guard from re-growing its own directory read, `method_call_sites.ts`, the
   `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
-  `if` chain guarding each, `alloc_probe.ts`).
+  `if` chain guarding each, `test_block_calls.ts`, the `ts.createSourceFile` walk that reports
+  every `describe`/`it`/`test`/`suite` call in a source tagged with the block enclosing it,
+  `driver_callback_bodies.ts`, the `ts.createSourceFile` walk that resolves a repeating
+  driver's callback and every same-module body one of its ticks can reach, `alloc_probe.ts`).
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
@@ -106,6 +109,15 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   painter-side helper, which then may only mint its own canvas and must stay deterministic and
   colorless) or in `UI_DOM_MODULES` (it owns browser state), and anything unregistered must touch
   no browser global at all.
+- **Never register the same block twice.** `duplicate_test_blocks.test.ts` walks every `.ts`
+  under `tests/` and fails on any `describe`/`it`/`test`/`suite` call whose source text repeats
+  an earlier SIBLING's byte for byte. Vitest runs duplicate titles silently, so nothing else
+  can say so, and this defect arrives through MERGES: #2506 deleted the same two
+  `gathering.test.ts` blocks that `a1a8cfd56` had already deleted once. Byte-identical and
+  sibling-scoped on purpose: the same body under two different describes is ordinary (each
+  parent brings its own setup), and a same-TITLE rule would be a different, red guard
+  (`professions_crafting.test.ts` names two distinct blocks `self-gathered crafting bonus
+  (#1145)`). A duplicate is always deleted, never renamed apart.
 - `guide.test.ts` is the wiki freshness gate: new/changed player-facing content in
   `src/sim/content/` fails it until `npm run wiki:content` regenerates (auto in `pretest`).
 - `css_corpus.test.ts` guards the CSS union corpus + brace balance (a dropped closing
@@ -119,7 +131,14 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   or cold, the registration-free default for a window (no forced-reflow read and no repeating
   driver of its own, at any cadence). The raw-write scan is waived for cold NOT because a
   window is cold, which this tree contradicts, but because a COUNT cannot tell a build-time
-  write from a repeated one; see the bucket 3 comment for the cadences involved.
+  write from a repeated one; see the bucket 3 comment for the cadences involved. Inside a
+  granted driver's callback it CAN, so a `driverAllow` entry now costs a `drivers` entry per
+  call site: the cadence, pinned against the source literal, plus exact counts of raw writes,
+  element re-queries and IDL-property writes over everything ONE TICK reaches
+  (`helpers/driver_callback_bodies.ts`). The unit is the callback body PLUS every same-module
+  function it calls, because a body-only scan is vacuous over this tree: all three live
+  callbacks are a guard and a method call, and the writes that motivated the rule are one hop
+  further in.
 - `hud_update_drive.test.ts` answers the cadence question that gate refuses to: one
   hand-written row per call `Hud.update()` evaluates, carrying its band
   (`frame`/`fast`/`medium`/`slow`), the exact condition text gating it, what it repaints, and

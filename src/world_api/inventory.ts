@@ -1,4 +1,4 @@
-import type { EquipSlot, InvSlot } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
 
 export interface IWorldInventory {
   inventory: InvSlot[];
@@ -32,5 +32,17 @@ export interface IWorldInventory {
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
-  buyBackItem(itemId: string): void;
+  // `index` addresses the exact row in vendorBuyback the player clicked
+  // (VendorView.buyback[].index); rows can share an itemId with different
+  // instance payloads, so the index disambiguates which copy comes back.
+  // `instance` is that same row's payload as last seen by the client
+  // (VendorView.buyback[].instance): the server only honors the index when
+  // the row still carries this exact payload, so a stale index that now
+  // points at a different same-itemId row cannot redeem the wrong copy (#2398).
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void;
 }

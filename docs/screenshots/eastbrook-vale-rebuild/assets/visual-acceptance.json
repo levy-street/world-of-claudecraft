@@ -30,7 +30,7 @@
     "shippingDimensions": [512, 512],
     "shippingSha256": "d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b",
     "shippingBytes": 141666,
-    "atlasFingerprint": "ae247c4f22d166408f465a64a862db259e166e97dd266baf8fd072a6c9b87e56",
+    "atlasFingerprint": "bfe3a8e8fbe3c307e9ed549b655f0d214b91488a19bc17c445980dd5d290c817",
     "grid": {
       "columns": 4,
       "rows": 4,

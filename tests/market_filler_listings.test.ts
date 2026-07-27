@@ -33,10 +33,16 @@ function merchant(sim: Sim): Entity {
   throw new Error('the Merchant was not spawned');
 }
 
+function entityOf(sim: Sim, pid: number): Entity {
+  const entity = sim.entities.get(pid);
+  if (!entity) throw new Error(`missing entity ${pid}`);
+  return entity;
+}
+
 // stand a player right on the Merchant so the proximity gate passes
 function standAtMerchant(sim: Sim, pid: number) {
   const m = merchant(sim);
-  const e = sim.entities.get(pid)!;
+  const e = entityOf(sim, pid);
   e.pos.x = m.pos.x;
   e.pos.z = m.pos.z;
   e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);

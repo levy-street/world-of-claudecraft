@@ -35,6 +35,7 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
+import { bagCapacity } from '../src/sim/bags';
 import { STATION_RADIUS, STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
@@ -49,9 +50,16 @@ import {
 import { craftItem as craftItemMod, resolveCraftForRecipe } from '../src/sim/professions/crafting';
 import { isAtAnyStation } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
-import { Sim } from '../src/sim/sim';
+import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import * as tradeMod from '../src/sim/social/trade';
-import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload, SimEvent } from '../src/sim/types';
+import type {
+  Entity,
+  EquipSlot,
+  InvSlot,
+  ItemDef,
+  ItemInstancePayload,
+  SimEvent,
+} from '../src/sim/types';
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
 const SWORD = 'eastbrook_arming_sword'; // weapon, common quality
@@ -80,40 +88,94 @@ function makeSim(seed = 7) {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 }
 
+function entityOf(sim: Sim, pid: number): Entity {
+  const entity = sim.ctx.entities.get(pid);
+  if (!entity) throw new Error(`missing entity ${pid}`);
+  return entity;
+}
+
+function metaOf(sim: Sim, pid: number): PlayerMeta {
+  const meta = sim.players.get(pid);
+  if (!meta) throw new Error(`missing player meta ${pid}`);
+  return meta;
+}
+
+function resolveOf(sim: Sim, pid: number) {
+  const resolved = sim.ctx.resolve(pid);
+  if (!resolved) throw new Error(`missing resolved player ${pid}`);
+  return resolved;
+}
+
+function serializeCharacter(sim: Sim, pid: number): CharacterState {
+  const state = sim.serializeCharacter(pid);
+  if (!state) throw new Error(`missing serialized state ${pid}`);
+  return state;
+}
+
+function instanceOf(slot: InvSlot): ItemInstancePayload {
+  if (!slot.instance) throw new Error(`missing instance for ${slot.itemId}`);
+  return slot.instance;
+}
+
+function sellValueOf(itemId: string): number {
+  const sellValue = ITEMS[itemId]?.sellValue;
+  if (sellValue === undefined) throw new Error(`missing sell value ${itemId}`);
+  return sellValue;
+}
+
+function equipSlotOf(slot: EquipSlot | undefined): EquipSlot {
+  if (slot === undefined) throw new Error('missing equipped slot');
+  return slot;
+}
+
+function vendorBuybackOf(sim: Sim, pid: number): InvSlot[] {
+  return metaOf(sim, pid).vendorBuyback;
+}
+
+function positionOf(entity: Entity | undefined, label: string): Entity['pos'] {
+  if (!entity) throw new Error(`missing ${label}`);
+  return entity.pos;
+}
+
+function pointOf(pos: { x: number; z: number } | undefined): { x: number; z: number } {
+  if (!pos) throw new Error('missing probe position');
+  return pos;
+}
+
 function makeTradeSim(seed = 42) {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false, noPlayer: true });
   const a = sim.addPlayer('warrior', 'Ayla');
   const b = sim.addPlayer('warrior', 'Borin');
-  const ea = sim.ctx.entities.get(a)!;
-  const eb = sim.ctx.entities.get(b)!;
+  const ea = entityOf(sim, a);
+  const eb = entityOf(sim, b);
   eb.pos.x = ea.pos.x + 2;
   eb.pos.z = ea.pos.z;
   return { sim, a, b };
 }
 
 function slotsOf(sim: Sim, pid: number, itemId: string): InvSlot[] {
-  return sim.ctx.resolve(pid)!.meta.inventory.filter((s) => s.itemId === itemId);
+  return resolveOf(sim, pid).meta.inventory.filter((s) => s.itemId === itemId);
 }
 
 function standAtStation(sim: Sim, pid: number, stationIdx = 0): void {
-  const e = sim.ctx.entities.get(pid)!;
+  const e = entityOf(sim, pid);
   e.pos.x = STATIONS[stationIdx].pos.x;
   e.pos.z = STATIONS[stationIdx].pos.z;
 }
 
 function standInWilds(sim: Sim, pid: number): void {
-  const e = sim.ctx.entities.get(pid)!;
+  const e = entityOf(sim, pid);
   e.pos.x = 99999;
   e.pos.z = 99999;
   expect(isAtAnyStation(STATIONS, e.pos)).toBe(false);
 }
 
 function setCopper(sim: Sim, pid: number, c: number): void {
-  sim.players.get(pid)!.copper = c;
+  metaOf(sim, pid).copper = c;
 }
 
 function copperOf(sim: Sim, pid: number): number {
-  return sim.players.get(pid)!.copper;
+  return metaOf(sim, pid).copper;
 }
 
 function countDraws<T>(sim: Sim, fn: () => T): { result: T; draws: number } {
@@ -240,7 +302,7 @@ describe('commission opt-in at craft time', () => {
     const sim = makeSim(20);
     const pid = sim.playerId;
     sim.acceptArchetypeQuest('tailoring');
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     meta.craftSkills.tailoring = 200;
     grantReagents(sim, VESTMENTS_RECIPE, pid);
     sim.drainEvents();
@@ -260,7 +322,7 @@ describe('commission opt-in at craft time', () => {
     }
     const slots = slotsOf(sim, pid, VESTMENTS);
     expect(slots).toHaveLength(1);
-    const payload = slots[0].instance!;
+    const payload = instanceOf(slots[0]);
     expect(payload.bindOnTrade).toBe(true);
     expect(payload.signer).toBe(meta.name);
     expect(payload.rolled?.masterwork).toBe(true);
@@ -281,7 +343,7 @@ describe('commission opt-in at craft time', () => {
     const sim = makeSim(21);
     const pid = sim.playerId;
     sim.acceptArchetypeQuest('tailoring');
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     meta.craftSkills.tailoring = 200;
     sim.addItem('linen_scrap', 1, pid);
     const rng = sim.ctx.rng as unknown as { next(): number };
@@ -423,9 +485,9 @@ describe('bind on first trade, refuse on the second, re-bind after unbind', () =
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: b }, b);
     standAtStation(sim, b);
     setCopper(sim, b, 5000);
-    const eb = sim.ctx.entities.get(a)!;
+    const eb = entityOf(sim, a);
     // Keep the pair adjacent for the follow-up trade: move A to B's station.
-    const stationed = sim.ctx.entities.get(b)!;
+    const stationed = entityOf(sim, b);
     eb.pos.x = stationed.pos.x + 2;
     eb.pos.z = stationed.pos.z;
 
@@ -488,7 +550,7 @@ describe('unbind fee ladder (the resolved tier-scaled ruling)', () => {
     );
     standAtStation(sim, pid);
     setCopper(sim, pid, 50000);
-    const r = sim.ctx.resolve(pid)!;
+    const r = resolveOf(sim, pid);
     const result = resolveUnbind(STATIONS, r.meta, r.e.pos, SWORD);
     expect(result.ok).toBe(true);
     expect(result.fee).toBe(2500); // the common-def sword, not the epic payload
@@ -728,12 +790,12 @@ describe('persistence: commission payloads survive save/load', () => {
     const pid = sim.playerId;
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid, signer: 'Aldric' }, pid);
     sim.ctx.addItemInstance(VESTMENTS, { bindOnTrade: true }, pid);
-    const state = sim.serializeCharacter(pid)!;
+    const state = serializeCharacter(sim, pid);
     const sim2 = makeSim();
     const pid2 = sim2.addPlayer('warrior', 'Reloaded', { state });
-    const sword = sim2.meta(pid2)!.inventory.find((s) => s.itemId === SWORD);
+    const sword = sim2.meta(pid2)?.inventory.find((s) => s.itemId === SWORD);
     expect(sword?.instance).toEqual({ bindOnTrade: true, boundTo: pid, signer: 'Aldric' });
-    const vest = sim2.meta(pid2)!.inventory.find((s) => s.itemId === VESTMENTS);
+    const vest = sim2.meta(pid2)?.inventory.find((s) => s.itemId === VESTMENTS);
     expect(vest?.instance).toEqual({ bindOnTrade: true });
   });
 });
@@ -746,8 +808,8 @@ describe('mail/market: a commissioned equipment instance never mails or lists', 
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const sender = sim.addPlayer('warrior', 'Sender');
     sim.addPlayer('mage', 'Rex');
-    const box = sim.entities.get(sim.postOffice.mailboxIds[0])!;
-    const se = sim.ctx.entities.get(sender)!;
+    const box = entityOf(sim, sim.postOffice.mailboxIds[0]);
+    const se = entityOf(sim, sender);
     se.pos.x = box.pos.x;
     se.pos.z = box.pos.z;
     setCopper(sim, sender, 10000);
@@ -769,13 +831,13 @@ describe('mail/market: a commissioned equipment instance never mails or lists', 
   it('marketList refuses armed AND bound copies with no escrow', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Lister');
-    let merchant: { pos: { x: number; z: number } } | null = null;
+    let merchant: Entity | null = null;
     for (const e of sim.entities.values()) {
       if (e.templateId === 'the_merchant') merchant = e;
     }
-    const pe = sim.ctx.entities.get(pid)!;
-    pe.pos.x = merchant!.pos.x;
-    pe.pos.z = merchant!.pos.z;
+    const pe = entityOf(sim, pid);
+    pe.pos.x = positionOf(merchant ?? undefined, 'Merchant').x;
+    pe.pos.z = positionOf(merchant ?? undefined, 'Merchant').z;
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true }, pid);
     sim.ctx.addItemInstance(VESTMENTS, { bindOnTrade: true, boundTo: pid }, pid);
     sim.drainEvents();
@@ -801,13 +863,13 @@ describe('determinism: the commission arc replays byte-identically', () => {
       grantReagents(sim, SWORD_RECIPE, pid);
       craftItemMod(sim.ctx, SWORD_RECIPE, true, pid);
       const slot = slotsOf(sim, pid, SWORD)[0];
-      slot.instance!.boundTo = pid; // stand in for the trade stamp
+      instanceOf(slot).boundTo = pid; // stand in for the trade stamp
       standAtStation(sim, pid);
       setCopper(sim, pid, 10000);
       sim.unbindItem(SWORD, pid);
       for (let i = 0; i < 40; i++) sim.tick();
       return JSON.stringify({
-        inv: sim.ctx.resolve(pid)!.meta.inventory,
+        inv: sim.ctx.resolve(pid)?.meta.inventory,
         copper: copperOf(sim, pid),
       });
     };
@@ -876,7 +938,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
   }
 
   function placeAt(server: GameServer, pid: number, pos: { x: number; z: number }): void {
-    const entity = server.sim.entities.get(pid)!;
+    const entity = entityOf(server.sim, pid);
     entity.pos.x = pos.x;
     entity.pos.z = pos.z;
     entity.prevPos = { ...entity.pos };
@@ -903,7 +965,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
   }
 
   function serverSlots(server: GameServer, pid: number, itemId: string): InvSlot[] {
-    return server.sim.players.get(pid)!.inventory.filter((s: InvSlot) => s.itemId === itemId);
+    return metaOf(server.sim, pid).inventory.filter((s) => s.itemId === itemId);
   }
 
   it('runs the full arc: craft(commission) -> trade stamps -> re-trade denied -> unbind -> re-trade re-binds', () => {
@@ -958,7 +1020,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     // it must NOT re-send inv (dirty flushed, stagger not due), proving the
     // only thing that can re-diff inv in step 5 is the unbindResult event's
     // HEAVY_SELF_EVENTS membership.
-    server.sim.players.get(sb.pid)!.copper = 10000;
+    metaOf(server.sim, sb.pid).copper = 10000;
     placeAt(server, sb.pid, STATIONS[0].pos);
     broadcast(server);
     const lastInvFrom = (fromIdx: number) => {
@@ -970,7 +1032,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     };
     const flushed = lastInvFrom(0);
     expect(flushed).not.toBeNull();
-    expect(flushed!.find((s) => s.itemId === SWORD)?.instance?.boundTo).toBe(sb.pid);
+    expect(flushed?.find((s) => s.itemId === SWORD)?.instance?.boundTo).toBe(sb.pid);
     const controlFrom = fb.sent.length;
     broadcast(server);
     expect(lastInvFrom(controlFrom), 'negative control: no dirty, no inv re-send').toBeNull();
@@ -987,7 +1049,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     expect(results).toHaveLength(1);
     expect(results[0].ok).toBe(true);
     expect(results[0].fee).toBe(2500);
-    expect(server.sim.players.get(sb.pid)!.copper).toBe(7500);
+    expect(server.sim.players.get(sb.pid)?.copper).toBe(7500);
     const freed = serverSlots(server, sb.pid, SWORD);
     expect(freed[0].instance?.boundTo).toBeUndefined();
     expect(freed[0].instance?.bindOnTrade).toBe(true);
@@ -1002,7 +1064,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     broadcast(server);
     const lastInv = lastInvFrom(afterUnbindFrom);
     expect(lastInv, 'unbindResult re-diffed the heavy inv mirror').not.toBeNull();
-    const wireSlot = lastInv!.find((s) => s.itemId === SWORD);
+    const wireSlot = lastInv?.find((s) => s.itemId === SWORD);
     expect(wireSlot?.instance?.bindOnTrade).toBe(true);
     expect(wireSlot?.instance?.boundTo).toBeUndefined();
 
@@ -1026,7 +1088,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     const st = joinServer(server, fc, 803, 'Roamer');
     placeAt(server, st.pid, { x: 99999, z: 99999 });
     server.sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: st.pid }, st.pid);
-    server.sim.players.get(st.pid)!.copper = 10000;
+    metaOf(server.sim, st.pid).copper = 10000;
     const from = fc.sent.length;
     cmd(server, st, { cmd: 'unbind_item', item: SWORD });
     routeTick(server);
@@ -1037,7 +1099,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     expect(results).toHaveLength(1);
     expect(results[0].ok).toBe(false);
     expect(results[0].reason).toBe('unbind_out_of_range');
-    expect(server.sim.players.get(st.pid)!.copper).toBe(10000);
+    expect(server.sim.players.get(st.pid)?.copper).toBe(10000);
   });
 
   it('wire type guards: non-boolean commission never arms, smuggled payloads are inert, non-string unbind ids drop', () => {
@@ -1077,13 +1139,13 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     // event, no charge, the bound copy untouched.
     server.sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: st.pid }, st.pid);
     placeAt(server, st.pid, STATIONS[0].pos);
-    server.sim.players.get(st.pid)!.copper = 10000;
+    metaOf(server.sim, st.pid).copper = 10000;
     const from = fc.sent.length;
     cmd(server, st, { cmd: 'unbind_item', item: 123 });
     cmd(server, st, { cmd: 'unbind_item' });
     routeTick(server);
     expect(eventsFor(fc.sent, 'unbindResult', from)).toHaveLength(0);
-    expect(server.sim.players.get(st.pid)!.copper).toBe(10000);
+    expect(server.sim.players.get(st.pid)?.copper).toBe(10000);
     const stillBound = serverSlots(server, st.pid, SWORD).filter(
       (s) => s.instance?.boundTo !== undefined,
     );
@@ -1114,7 +1176,7 @@ describe('bound holder lifecycle: every non-transfer right survives the bond', (
   it('equip and unequip round-trip the bound payload byte-intact: unequip is never a free unbind', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     mintBound(sim, pid);
     sim.equipItem(SWORD, pid);
     const wornSlot = (Object.entries(meta.equipment).find(([, id]) => id === SWORD) ?? [])[0] as
@@ -1122,8 +1184,8 @@ describe('bound holder lifecycle: every non-transfer right survives the bond', (
       | undefined;
     expect(wornSlot, 'the bound sword equipped (binding restricts trade only)').toBeTruthy();
     expect(slotsOf(sim, pid, SWORD)).toHaveLength(0);
-    expect(meta.equipmentInstance?.[wornSlot!]).toEqual(expectedBound(pid));
-    expect(sim.unequipItem(wornSlot!, pid)).toBe(true);
+    expect(meta.equipmentInstance?.[equipSlotOf(wornSlot)]).toEqual(expectedBound(pid));
+    expect(sim.unequipItem(equipSlotOf(wornSlot), pid)).toBe(true);
     const back = slotsOf(sim, pid, SWORD);
     expect(back).toHaveLength(1);
     // Byte-intact: boundTo AND the arm both survive, so unequipping is never
@@ -1134,7 +1196,7 @@ describe('bound holder lifecycle: every non-transfer right survives the bond', (
   it('an EQUIPPED bound piece is outside the unbind scan: the service reads bags only', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     mintBound(sim, pid);
     sim.equipItem(SWORD, pid);
     setCopper(sim, pid, 50000);
@@ -1146,14 +1208,14 @@ describe('bound holder lifecycle: every non-transfer right survives the bond', (
   it('a bound piece banks and withdraws byte-intact', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     // Stand on a banker (the pooled-bank gate needs one in reach).
     const banker = [...sim.entities.values()].find(
       (e) => e.kind === 'npc' && e.templateId === 'bursar_fernando',
     );
     expect(banker, 'the Eastbrook bursar is spawned').toBeTruthy();
-    const p = sim.entities.get(pid)!;
-    p.pos = { ...banker!.pos };
+    const p = entityOf(sim, pid);
+    p.pos = { ...positionOf(banker, 'Eastbrook bursar') };
     p.prevPos = { ...p.pos };
     sim.rebucket(p);
     mintBound(sim, pid);
@@ -1178,8 +1240,8 @@ describe('bound holder lifecycle: every non-transfer right survives the bond', (
     const pid = sim.playerId;
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes');
     expect(wilkes, 'Trader Wilkes is spawned').toBeTruthy();
-    const p = sim.entities.get(pid)!;
-    p.pos = { ...wilkes!.pos };
+    const p = entityOf(sim, pid);
+    p.pos = { ...positionOf(wilkes, 'Trader Wilkes') };
     p.prevPos = { ...p.pos };
     sim.rebucket(p);
     mintBound(sim, pid);
@@ -1190,7 +1252,7 @@ describe('bound holder lifecycle: every non-transfer right survives the bond', (
     expect(kept).toHaveLength(1);
     expect(kept[0].instance).toEqual(expectedBound(pid));
     expect(copperOf(sim, pid)).toBe(before);
-    expect(sim.players.get(pid)!.vendorBuyback.find((s) => s.itemId === SWORD)).toBeUndefined();
+    expect(vendorBuybackOf(sim, pid).find((s) => s.itemId === SWORD)).toBeUndefined();
   });
 });
 
@@ -1241,7 +1303,7 @@ describe('the vendor buyback-plain wash is closed', () => {
     const pid = sim.playerId;
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes');
     if (!wilkes) throw new Error('Trader Wilkes not spawned');
-    const p = sim.entities.get(pid)!;
+    const p = entityOf(sim, pid);
     p.pos = { ...wilkes.pos };
     p.prevPos = { ...p.pos };
     sim.rebucket(p);
@@ -1255,6 +1317,14 @@ describe('the vendor buyback-plain wash is closed', () => {
     return { bindOnTrade: true, boundTo: pid };
   }
 
+  // An UNBOUND masterwork/signed payload, the shape crafting.ts mints for a
+  // self-use masterwork proc (professions/crafting.ts resolveCraftForRecipe):
+  // signer plus rolled.masterwork/stats, no boundTo (only a commissioned
+  // craft arms bindOnTrade, and this is deliberately not one).
+  function masterworkPayload(): ItemInstancePayload {
+    return { signer: 'Ayla', rolled: { masterwork: true, stats: { strength: 5 } } };
+  }
+
   it('a bound-only holding is refused: no payout, no buyback row, payload intact', () => {
     const { sim, pid } = vendorSetup();
     setCopper(sim, pid, 0);
@@ -1266,7 +1336,7 @@ describe('the vendor buyback-plain wash is closed', () => {
     const kept = slotsOf(sim, pid, SWORD);
     expect(kept).toHaveLength(1);
     expect(kept[0].instance).toEqual(boundPayload(pid));
-    expect(sim.players.get(pid)!.vendorBuyback.find((s) => s.itemId === SWORD)).toBeUndefined();
+    expect(vendorBuybackOf(sim, pid).find((s) => s.itemId === SWORD)).toBeUndefined();
   });
 
   it('mixed plain + bound: a sell-2 request clamps to the 1 plain copy, bound copy untouched', () => {
@@ -1280,11 +1350,11 @@ describe('the vendor buyback-plain wash is closed', () => {
     // plain copy sells, the bound copy stays, the buyback row records ONLY the
     // plain copy actually sold.
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
-    expect(copperOf(sim, pid)).toBe(ITEMS[SWORD].sellValue!);
+    expect(copperOf(sim, pid)).toBe(sellValueOf(SWORD));
     const kept = slotsOf(sim, pid, SWORD);
     expect(kept).toHaveLength(1);
     expect(kept[0].instance).toEqual(boundPayload(pid));
-    expect(sim.players.get(pid)!.vendorBuyback.find((s) => s.itemId === SWORD)?.count).toBe(1);
+    expect(vendorBuybackOf(sim, pid).find((s) => s.itemId === SWORD)?.count).toBe(1);
   });
 
   it('removal order spares a bound copy sitting ABOVE an unbound instanced one', () => {
@@ -1299,7 +1369,7 @@ describe('the vendor buyback-plain wash is closed', () => {
     sim.drainEvents();
     sim.sellItem(SWORD, 1, pid);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
-    expect(copperOf(sim, pid)).toBe(ITEMS[SWORD].sellValue!);
+    expect(copperOf(sim, pid)).toBe(sellValueOf(SWORD));
     const kept = slotsOf(sim, pid, SWORD);
     expect(kept).toHaveLength(1);
     expect(kept[0].instance).toEqual(boundPayload(pid));
@@ -1312,13 +1382,185 @@ describe('the vendor buyback-plain wash is closed', () => {
     sim.drainEvents();
     sim.sellItem(SWORD, 1, pid);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
-    expect(copperOf(sim, pid)).toBe(ITEMS[SWORD].sellValue!);
-    sim.buyBackItem(SWORD, pid);
+    expect(copperOf(sim, pid)).toBe(sellValueOf(SWORD));
+    sim.buyBackItem(SWORD, undefined, undefined, pid);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
     expect(copperOf(sim, pid)).toBe(0);
     const back = slotsOf(sim, pid, SWORD);
     expect(back).toHaveLength(1);
     expect(back[0].instance).toBeUndefined();
+  });
+
+  it('selling an unbound masterwork/signed copy and buying it back restores its payload', () => {
+    // #2207 sibling gap: sellItem's only instanced guard is boundTo, so an
+    // UNBOUND self-crafted masterwork piece sells normally, but until this
+    // fix buyBackItem always re-granted a plain generic copy, permanently
+    // stripping the masterwork stats and signer attribution.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    sim.ctx.addItemInstance(SWORD, masterworkPayload(), pid);
+    sim.drainEvents();
+    sim.sellItem(SWORD, 1, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    expect(copperOf(sim, pid)).toBe(sellValueOf(SWORD));
+    expect(slotsOf(sim, pid, SWORD)).toHaveLength(0);
+    sim.buyBackItem(SWORD, undefined, undefined, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    expect(copperOf(sim, pid)).toBe(0);
+    const back = slotsOf(sim, pid, SWORD);
+    expect(back).toHaveLength(1);
+    expect(back[0].instance).toEqual(masterworkPayload());
+  });
+
+  it('a mixed plain + masterwork sale keeps distinct buyback rows: neither payload merges into the other', () => {
+    // Guards the merge-by-itemId trap: recordVendorBuyback must not blindly
+    // bump a count across differently-instanced (or plain vs instanced)
+    // rows, or a buyback could return the wrong copy's payload.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    sim.addItem(SWORD, 1, pid);
+    sim.ctx.addItemInstance(SWORD, masterworkPayload(), pid);
+    sim.drainEvents();
+    sim.sellItem(SWORD, 2, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    expect(copperOf(sim, pid)).toBe(sellValueOf(SWORD) * 2);
+    const rows = vendorBuybackOf(sim, pid).filter((s) => s.itemId === SWORD);
+    expect(rows).toHaveLength(2);
+    expect(rows.reduce((sum, r) => sum + r.count, 0)).toBe(2);
+
+    // Buy both back; one copy must come back plain and the other must come
+    // back carrying the exact masterwork payload, regardless of row order.
+    sim.buyBackItem(SWORD, undefined, undefined, pid);
+    sim.buyBackItem(SWORD, undefined, undefined, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const back = slotsOf(sim, pid, SWORD);
+    const plainCopies = back.filter((s) => s.instance === undefined);
+    const masterworkCopies = back.filter((s) => s.instance !== undefined);
+    expect(plainCopies.reduce((sum, s) => sum + s.count, 0)).toBe(1);
+    expect(masterworkCopies.reduce((sum, s) => sum + s.count, 0)).toBe(1);
+    expect(masterworkCopies[0]?.instance).toEqual(masterworkPayload());
+  });
+
+  it('buyback is addressed by row index, not first itemId match (#2398 review P2)', () => {
+    // Repro from review: sell a masterwork copy, then sell a plain copy of the
+    // same item. recordVendorBuyback unshifts, so the row order is
+    // [plain(newest), masterwork(older)] and a plain itemId-only find would
+    // always resolve the plain row first, no matter which row the caller
+    // meant. Address the masterwork row by its actual array index and confirm
+    // it, not the plain row, comes back.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    sim.ctx.addItemInstance(SWORD, masterworkPayload(), pid);
+    sim.drainEvents();
+    sim.sellItem(SWORD, 1, pid); // masterwork row lands at vendorBuyback[0]
+    sim.addItem(SWORD, 1, pid);
+    sim.sellItem(SWORD, 1, pid); // plain row unshifts to vendorBuyback[0]
+    sim.drainEvents();
+    const rows = vendorBuybackOf(sim, pid);
+    const masterworkIndex = rows.findIndex((s) => s.instance !== undefined);
+    expect(masterworkIndex).toBeGreaterThan(0); // pushed behind the newer plain row
+    sim.buyBackItem(SWORD, masterworkIndex, rows[masterworkIndex]?.instance, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const back = slotsOf(sim, pid, SWORD);
+    expect(back).toHaveLength(1);
+    expect(back[0].instance).toEqual(masterworkPayload());
+  });
+
+  it('a stale index that now points at a different payload still redeems the clicked row, not the new occupant (Rubsey review)', () => {
+    // Reviewer repro: the client snapshot the masterwork row at index 0, then
+    // another same-itemId sale unshifts a plain row in ahead of it before the
+    // buyback click lands. A bare itemId check on the stale index's new
+    // occupant (the plain row) would pass and redeem the wrong payload; the
+    // expected-instance check must reject that occupant and fall back to an
+    // (itemId, instance) scan that finds the actual masterwork row instead.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    sim.ctx.addItemInstance(SWORD, masterworkPayload(), pid);
+    sim.drainEvents();
+    sim.sellItem(SWORD, 1, pid); // masterwork row lands at vendorBuyback[0]
+    sim.drainEvents();
+    const staleIndex = 0;
+    const staleInstance = vendorBuybackOf(sim, pid)[staleIndex]?.instance;
+    sim.addItem(SWORD, 1, pid);
+    sim.sellItem(SWORD, 1, pid); // plain row unshifts to vendorBuyback[0], masterwork shifts to [1]
+    sim.drainEvents();
+    sim.buyBackItem(SWORD, staleIndex, staleInstance, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const back = slotsOf(sim, pid, SWORD);
+    expect(back).toHaveLength(1);
+    expect(back[0].instance).toEqual(masterworkPayload());
+    // The plain row the stale index now points at is untouched.
+    const remainingBuyback = vendorBuybackOf(sim, pid);
+    expect(remainingBuyback.some((s) => s.itemId === SWORD && s.instance === undefined)).toBe(true);
+  });
+
+  it('a stale/out-of-range index falls back to the first itemId match', () => {
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    sim.addItem(SWORD, 1, pid);
+    sim.drainEvents();
+    sim.sellItem(SWORD, 1, pid);
+    sim.drainEvents();
+    sim.buyBackItem(SWORD, 99, undefined, pid); // index points past the array
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    expect(slotsOf(sim, pid, SWORD)).toHaveLength(1);
+  });
+
+  it('sellAllJunk preserves an instance payload instead of washing it plain (#2398 review P3)', () => {
+    // sellAllJunk's sibling gap: it always called recordVendorBuyback with no
+    // instance, so a swept unbound instanced poor-quality copy bought back
+    // plain even though the single-item sellItem path already preserved it.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    const junkPayload: ItemInstancePayload = { signer: 'Ayla' };
+    sim.ctx.addItemInstance('tangled_weed', junkPayload, pid);
+    sim.drainEvents();
+    sim.sellAllJunk(pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const row = vendorBuybackOf(sim, pid).find((s) => s.itemId === 'tangled_weed');
+    expect(row?.instance).toEqual(junkPayload);
+    sim.buyBackItem('tangled_weed', undefined, undefined, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const back = slotsOf(sim, pid, 'tangled_weed');
+    expect(back).toHaveLength(1);
+    expect(back[0].instance).toEqual(junkPayload);
+  });
+
+  it('a full bag with a same-payload partial stack still tops up on buyback (Rubsey review)', () => {
+    // Reviewer repro: buyBackItem preflighted with ctx.canAddItem, which
+    // models a plain add (a free slot or room in a PLAIN stack). The actual
+    // regrant is addItemSilent(itemId, 1, meta, instance), which only tops up
+    // an identical-payload stack (countFit's merge rule). With bags full of
+    // one-per-slot gear plus one partial signed stack, a plain capacity check
+    // sees zero free slots and wrongly rejects a buyback that would actually
+    // fit into that partial stack.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    const meta = metaOf(sim, pid);
+    const junkPayload: ItemInstancePayload = { signer: 'Ayla' };
+    sim.ctx.addItemInstance('tangled_weed', junkPayload, pid);
+    sim.drainEvents();
+    sim.sellItem('tangled_weed', 1, pid); // records the buyback row, bag now empty
+    setCopper(sim, pid, sellValueOf('tangled_weed'));
+    // Re-grant one copy so a same-payload partial stack sits in the bag
+    // (below its stack cap), then fill every remaining slot with one-per-slot
+    // gear so no free slot remains.
+    sim.ctx.addItemInstance('tangled_weed', junkPayload, pid);
+    const cap = bagCapacity(meta.bags);
+    const gearIds = Object.values(ITEMS)
+      .filter((d) => d.kind === 'weapon' || d.kind === 'armor')
+      .map((d) => d.id);
+    let i = 0;
+    while (meta.inventory.length < cap) {
+      sim.addItem(gearIds[i % gearIds.length], 1, pid);
+      i++;
+    }
+    sim.drainEvents();
+    sim.buyBackItem('tangled_weed', undefined, undefined, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const row = meta.inventory.find((s) => s.itemId === 'tangled_weed' && s.instance !== undefined);
+    expect(row?.count).toBe(2);
+    expect(row?.instance).toEqual(junkPayload);
   });
 
   it('the full wash probe is impossible end to end: sell denied, then buyback denied', () => {
@@ -1328,7 +1570,7 @@ describe('the vendor buyback-plain wash is closed', () => {
     sim.drainEvents();
     sim.sellItem(SWORD, 1, pid);
     expect(errorTexts(sim.drainEvents())).toContain(SELL_BOUND_DENY);
-    sim.buyBackItem(SWORD, pid);
+    sim.buyBackItem(SWORD, undefined, undefined, pid);
     expect(errorTexts(sim.drainEvents())).toContain('That item is not available for buyback.');
     // The bond survives untouched: no plain copy was minted anywhere and the
     // only path to an unbound copy remains the unbind fee ladder.
@@ -1340,7 +1582,7 @@ describe('the vendor buyback-plain wash is closed', () => {
 
   it('an equipped bound piece is outside the sell scan: the vendor reads bags only', () => {
     const { sim, pid } = vendorSetup();
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     setCopper(sim, pid, 0);
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);
     sim.equipItem(SWORD, pid);
@@ -1352,7 +1594,7 @@ describe('the vendor buyback-plain wash is closed', () => {
       | EquipSlot
       | undefined;
     expect(wornSlot, 'the bound sword stayed equipped').toBeTruthy();
-    expect(meta.equipmentInstance?.[wornSlot!]).toEqual(boundPayload(pid));
+    expect(meta.equipmentInstance?.[equipSlotOf(wornSlot)]).toEqual(boundPayload(pid));
   });
 });
 
@@ -1365,18 +1607,18 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
   it('out_of_range beats cannot_afford when both fail at once', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);
     standInWilds(sim, pid);
     setCopper(sim, pid, 0);
-    const result = resolveUnbind(STATIONS, meta, sim.ctx.entities.get(pid)!.pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, sim.ctx.entities.get(pid)?.pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_out_of_range', fee: 2500 });
   });
 
   it('not_eligible beats not_bound: an ineligible id with zero bound copies reports eligibility', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     sim.addItem(POTION, 1, pid);
     setCopper(sim, pid, 50000);
     const result = resolveUnbind(STATIONS, meta, STATIONS[0].pos, POTION);
@@ -1386,7 +1628,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
   it('unbind_not_bound covers the zero-copies-held arm too', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const meta = sim.players.get(pid)!;
+    const meta = metaOf(sim, pid);
     setCopper(sim, pid, 50000);
     const result = resolveUnbind(STATIONS, meta, STATIONS[0].pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_not_bound' });
@@ -1426,14 +1668,14 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
         }),
       );
     expect(beyond, 'a just-beyond probe position clear of every station').toBeDefined();
-    expect(isAtAnyStation(STATIONS, beyond!)).toBe(false);
+    expect(isAtAnyStation(STATIONS, pointOf(beyond))).toBe(false);
   });
 
   it('an ACTIVE mobile station under the player never satisfies the unbind gate', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const meta = sim.players.get(pid)!;
-    const p = sim.ctx.entities.get(pid)!;
+    const meta = metaOf(sim, pid);
+    const p = entityOf(sim, pid);
     p.pos.x = 0;
     p.pos.z = 150;
     expect(isAtAnyStation(STATIONS, p.pos)).toBe(false);

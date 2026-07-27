@@ -144,6 +144,16 @@ describe('statSourceText', () => {
       'hudChrome.statInfo.sources.fromAttribute(stat=itemUi.stats.agi,value=+1.1)',
     );
   });
+
+  it('parry source values keep one decimal, same as dodge', () => {
+    const m = model({ stat: 'parry' });
+    expect(statSourceText({ kind: 'base', value: 5 }, m, deps)).toBe(
+      'hudChrome.statInfo.sources.base(value=5.0)',
+    );
+    expect(statSourceText({ kind: 'attributes', value: 1, fromStat: 'str' }, m, deps)).toBe(
+      'hudChrome.statInfo.sources.fromAttribute(stat=itemUi.stats.str,value=+1.0)',
+    );
+  });
 });
 
 describe('statNoteTexts', () => {
@@ -315,6 +325,7 @@ describe('statValueText', () => {
   it('shows one-decimal percents for crit and dodge and both Warfare effects', () => {
     expect(statValueText(model({ stat: 'critChance', statValue: 5.5 }), deps)).toBe('5.5%');
     expect(statValueText(model({ stat: 'dodge', statValue: 5 }), deps)).toBe('5.0%');
+    expect(statValueText(model({ stat: 'parry', statValue: 6 }), deps)).toBe('6.0%');
     expect(
       statValueText(
         model({

@@ -104,6 +104,15 @@ import {
 // costs anything) lives on in recipes.ts/types.ts.
 const CRAFT_SKILL_GAIN = 1;
 
+function isCraftedDisenchantTrackedOutput(def: ItemDef | undefined): boolean {
+  return (
+    !!def &&
+    (def.kind === 'weapon' || def.kind === 'armor') &&
+    !!def.quality &&
+    def.quality !== 'poor'
+  );
+}
+
 export interface CraftResult {
   ok: boolean;
   recipeId: string;
@@ -403,6 +412,7 @@ export function resolveCraftForRecipe(
   // the success path after consumption.
   const def: ItemDef | undefined = ITEMS[recipe.resultItemId];
   const outputQuality = defOutputQuality(def);
+  const craftedRecipeId = isCraftedDisenchantTrackedOutput(def) ? recipe.id : undefined;
   // #1129/#1148: the archetype empowerment ceiling. With deterministic
   // outputs, the only remaining quality-EXCEEDING mechanism is the masterwork
   // bump, so the ceiling now gates the masterwork effect (the proc arm
@@ -572,35 +582,50 @@ export function resolveCraftForRecipe(
       rolled: { masterwork: true, stats: bonusStats },
     };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, { silent: true, callerLogs: true });
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
+      silent: true,
+      callerLogs: true,
+      craftedRecipeId,
+    });
     if (recipe.resultCount > 1) {
       if (commissioned) {
         for (let i = 1; i < recipe.resultCount; i++) {
           ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
             silent: true,
             callerLogs: true,
+            craftedRecipeId,
           });
         }
       } else {
         ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, {
           silent: true,
           callerLogs: true,
+          craftedRecipeId,
         });
       }
     }
   } else if (meta && recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
     const payload: ItemInstancePayload = { signer: meta.name };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, { silent: true, callerLogs: true });
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
+      silent: true,
+      callerLogs: true,
+      craftedRecipeId,
+    });
   } else if (commissioned) {
     for (let i = 0; i < recipe.resultCount; i++) {
       ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
         silent: true,
         callerLogs: true,
+        craftedRecipeId,
       });
     }
   } else {
-    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid, { silent: true, callerLogs: true });
+    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid, {
+      silent: true,
+      callerLogs: true,
+      craftedRecipeId,
+    });
   }
   if (meta) {
     // The #1129/#1148 gain doctrine (archetype ceiling alone zeroes, ordinary

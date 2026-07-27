@@ -27,19 +27,75 @@ vi.mock('../server/db', () => ({
 import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
+import type { Entity, InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 const RARE_WEAPON = 'moggers_copper_cudgel'; // rare mace -> resonant_steel
 const COMMON_WEAPON = 'eastbrook_arming_sword';
+const CRAFTED_COMMON_ARMOR = 'eastbrook_chain_vest';
+const CRAFTED_COMMON_ARMOR_RECIPE = 'recipe_eastbrook_chain_vest';
 const ENCHANT = 'enchant_weapon_runed_edge'; // essence x2 + resonant_steel x1
 const ESSENCE = 'arcane_essence';
 const SECONDARY = 'resonant_steel';
+const DUST = 'arcane_dust';
 
 type WireMsg = {
   t: string;
   list?: SimEvent[];
   self?: Record<string, unknown>;
   [k: string]: unknown;
+};
+
+type SnapMsg = WireMsg & {
+  t: 'snap';
+  self: Record<string, unknown>;
+};
+
+type BareClientWorldState = {
+  cfg: { seed: number; playerClass: PlayerClass };
+  entities: Map<number, Entity>;
+  playerId: number;
+  ownPlayerId: number;
+  ownPlayerClass: PlayerClass;
+  spectating: null;
+  cupInfo: null;
+  lastVcupRemainder: null;
+  lastVcupShared: null;
+  sportRole: null;
+  moveInput: Record<string, never>;
+  inventory: InvSlot[];
+  vendorBuyback: InvSlot[];
+  equipment: Record<string, never>;
+  accountCosmetics: { completedQuestIds: string[]; mechChromaIds: string[] };
+  copper: number;
+  honor: number;
+  lifetimeHonor: number;
+  xp: number;
+  known: string[];
+  questLog: Map<string, unknown>;
+  questsDone: Set<string>;
+  pendingQuestCommands: Map<string, unknown>;
+  partyInfo: null;
+  selectedDungeonDifficulty: 'normal';
+  tradeInfo: null;
+  duelInfo: null;
+  lastSnapAt: number;
+  snapInterval: number;
+  serverTickHz: null;
+  missingSince: Map<number, number>;
+  pendingFacingDelta: number;
+  connected: boolean;
+  eventQueue: SimEvent[];
+  mouselookFacing: null;
+  lastInputSentAt: number;
+  lastInputSig: string;
+  inputSeq: number;
+  pendingInputSeqSentAt: Map<number, number>;
+  ackedInputSeq: number;
+  inputEchoSamples: unknown[];
+  spectateFacingPending: boolean;
+  pendingSpectateFacing: null;
+  nodeCooldowns: Map<string, number>;
 };
 
 function fakeWs(): { sent: WireMsg[]; ws: unknown } {
@@ -60,13 +116,11 @@ function joinServer(
 }
 
 function placeAt(server: GameServer, pid: number, pos: { x: number; z: number }): void {
-  const entity = (
-    server.sim as unknown as { entities: Map<number, { pos: any; prevPos?: any }> }
-  ).entities.get(pid);
+  const entity = (server.sim as unknown as { entities: Map<number, Entity> }).entities.get(pid);
   if (!entity) throw new Error(`no entity for pid ${pid}`);
   entity.pos.x = pos.x;
   entity.pos.z = pos.z;
-  entity.prevPos = { x: pos.x, z: pos.z };
+  entity.prevPos = { ...entity.pos };
 }
 
 function routeTick(server: GameServer): void {
@@ -77,8 +131,15 @@ function broadcast(server: GameServer): void {
   (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
 }
 
-function lastSnap(sent: WireMsg[]): { self: Record<string, unknown> } | null {
-  for (let i = sent.length - 1; i >= 0; i--) if (sent[i].t === 'snap') return sent[i] as any;
+function isSnapMsg(msg: WireMsg): msg is SnapMsg {
+  return msg.t === 'snap' && typeof msg.self === 'object' && msg.self !== null;
+}
+
+function lastSnap(sent: WireMsg[]): SnapMsg | null {
+  for (let i = sent.length - 1; i >= 0; i--) {
+    const msg = sent[i];
+    if (isSnapMsg(msg)) return msg;
+  }
   return null;
 }
 
@@ -100,8 +161,32 @@ function serverInv(server: GameServer, pid: number): InvSlot[] {
   return meta.inventory;
 }
 
+function simInv(sim: Sim, pid: number): InvSlot[] {
+  const meta = (sim as unknown as { players: Map<number, PlayerMeta> }).players.get(pid);
+  if (!meta) throw new Error(`no meta for pid ${pid}`);
+  return meta.inventory;
+}
+
+function metaFor(sim: Sim, pid: number): PlayerMeta {
+  const meta = (sim as unknown as { players: Map<number, PlayerMeta> }).players.get(pid);
+  if (!meta) throw new Error(`no meta for pid ${pid}`);
+  return meta;
+}
+
+function grantVestMaterials(sim: Sim, pid: number): void {
+  sim.addItem('copper_ore', 4, pid);
+  sim.addItem('smithing_flux', 9, pid);
+}
+
+function craftedVestSlotIndex(sim: Sim, pid: number): number {
+  return simInv(sim, pid).findIndex(
+    (slot) =>
+      slot.itemId === CRAFTED_COMMON_ARMOR && slot.craftedRecipeId === CRAFTED_COMMON_ARMOR_RECIPE,
+  );
+}
+
 function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
+  const c = Object.create(ClientWorld.prototype) as BareClientWorldState;
   c.cfg = { seed: 20061, playerClass };
   c.entities = new Map();
   c.playerId = pid;
@@ -146,14 +231,151 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
   c.spectateFacingPending = false;
   c.pendingSpectateFacing = null;
   c.nodeCooldowns = new Map();
-  return c;
+  return c as unknown as ClientWorld;
 }
 
 function applySnap(client: ClientWorld, snap: unknown): void {
   (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
 }
 
+function moveToVendor(sim: Sim): void {
+  const trader = [...sim.ctx.entities.values()].find((e) => e.templateId === 'trader_wilkes');
+  if (!trader) throw new Error('missing trader_wilkes');
+  const player = sim.ctx.entities.get(sim.playerId);
+  if (!player) throw new Error('missing player');
+  player.pos.x = trader.pos.x + 2;
+  player.pos.z = trader.pos.z;
+  player.pos.y = terrainHeight(player.pos.x, player.pos.z, sim.cfg.seed);
+  player.prevPos = { ...player.pos };
+}
+
 describe('offline Sim end-to-end (IWorld surface)', () => {
+  it('crafted Eastbrook Chainmail Vest stacks yield materials but never teach Enchanting', () => {
+    const sim = new Sim({ seed: 20260726, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const firstSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(firstSlotIndex).toBeGreaterThanOrEqual(0);
+    expect(simInv(sim, pid)[firstSlotIndex].instance).toBeUndefined();
+
+    const dustBefore = sim.countItem(DUST, pid);
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, firstSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(0);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const secondSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(secondSlotIndex).toBeGreaterThanOrEqual(0);
+
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, secondSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
+  it('crafted Eastbrook Chainmail Vest replacement keeps provenance before disenchant', () => {
+    const sim = new Sim({ seed: 20260728, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const craftedSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(craftedSlotIndex).toBeGreaterThanOrEqual(0);
+
+    sim.equipItem(CRAFTED_COMMON_ARMOR, pid);
+    expect(meta.equipment.chest).toBe(CRAFTED_COMMON_ARMOR);
+    expect(meta.equipmentInstance.chest?.craftedRecipeId).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+    expect(craftedVestSlotIndex(sim, pid)).toBe(-1);
+
+    sim.equipItem('recruit_tunic', pid);
+    expect(meta.equipment.chest).toBe('recruit_tunic');
+    const returnedSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(returnedSlotIndex).toBeGreaterThanOrEqual(0);
+
+    const dustBefore = sim.countItem(DUST, pid);
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
+  it('crafted Eastbrook Chainmail Vest unequip keeps provenance before disenchant', () => {
+    const sim = new Sim({ seed: 20260729, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+
+    sim.equipItem(CRAFTED_COMMON_ARMOR, pid);
+    expect(meta.equipmentInstance.chest?.craftedRecipeId).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+    expect(sim.unequipItem('chest', pid)).toBe(true);
+    const returnedSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(returnedSlotIndex).toBeGreaterThanOrEqual(0);
+
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
+  it('crafted Eastbrook Chainmail Vest buyback keeps provenance before disenchant', () => {
+    const sim = new Sim({ seed: 20260730, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+    moveToVendor(sim);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const craftedSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(craftedSlotIndex).toBeGreaterThanOrEqual(0);
+    expect(simInv(sim, pid)[craftedSlotIndex].instance).toBeUndefined();
+
+    sim.sellItem(CRAFTED_COMMON_ARMOR, 1, pid);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.vendorBuyback[0]).toMatchObject({
+      itemId: CRAFTED_COMMON_ARMOR,
+      count: 1,
+      craftedRecipeId: CRAFTED_COMMON_ARMOR_RECIPE,
+    });
+
+    sim.buyBackItem(CRAFTED_COMMON_ARMOR, 0, undefined, CRAFTED_COMMON_ARMOR_RECIPE);
+    const boughtBackSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(boughtBackSlotIndex).toBeGreaterThanOrEqual(0);
+
+    const dustBefore = sim.countItem(DUST, pid);
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, boughtBackSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
+  it('a non-crafted eligible item still gains Enchanting skill when disenchanted', () => {
+    const sim = new Sim({ seed: 20260727, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+
+    sim.addItem(COMMON_WEAPON, 1, pid);
+    sim.disenchantItem(COMMON_WEAPON, pid);
+
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(COMMON_WEAPON, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(1);
+  });
+
   it('disenchants a rare (typed secondary), applies a Runed enchant, salvages, with lastX mirrors', () => {
     const sim = new Sim({ seed: 20260721, playerClass: 'warrior', autoEquip: false });
     const inv = () => sim.ctx.resolve()?.meta.inventory ?? [];
@@ -212,6 +434,58 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
 });
 
 describe('online end-to-end (live GameServer, wire commands + self-deltas)', () => {
+  it('disenchants the selected duplicate slot and preserves a masterwork copy with the same item id', () => {
+    const sim = new Sim({ seed: 314, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(
+      COMMON_WEAPON,
+      { rolled: { masterwork: true, stats: { str: 2 } } },
+      pid,
+    );
+    sim.ctx.addItemInstance(COMMON_WEAPON, { signer: 'SelectedPlainCopy' }, pid);
+    const starting = simInv(sim, pid).filter((slot) => slot.itemId === COMMON_WEAPON);
+    expect(starting.map((slot) => slot.instance)).toEqual([
+      { rolled: { masterwork: true, stats: { str: 2 } } },
+      { signer: 'SelectedPlainCopy' },
+    ]);
+    const selectedIndex = simInv(sim, pid).findIndex(
+      (slot) => slot.itemId === COMMON_WEAPON && slot.instance?.signer,
+    );
+
+    sim.disenchantItem(COMMON_WEAPON, pid, selectedIndex);
+
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    const remaining = simInv(sim, pid).filter((slot) => slot.itemId === COMMON_WEAPON);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].instance).toEqual({ rolled: { masterwork: true, stats: { str: 2 } } });
+  });
+
+  it('the server honors the selected duplicate slot for disenchant_item', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 711, 'QaSlot');
+    placeAt(server, st.pid, { x: 0, z: 150 });
+    server.sim.ctx.addItemInstance(
+      COMMON_WEAPON,
+      { rolled: { masterwork: true, stats: { str: 2 } } },
+      st.pid,
+    );
+    server.sim.ctx.addItemInstance(COMMON_WEAPON, { signer: 'SelectedPlainCopy' }, st.pid);
+    const selectedIndex = serverInv(server, st.pid).findIndex(
+      (slot) => slot.itemId === COMMON_WEAPON && slot.instance?.signer,
+    );
+
+    cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON, slot: selectedIndex });
+    routeTick(server);
+
+    const dencEvents = eventsFor(fc.sent, 'disenchantResult');
+    expect(dencEvents).toHaveLength(1);
+    expect(dencEvents[0]).toMatchObject({ ok: true, itemId: COMMON_WEAPON, pid: st.pid });
+    const remaining = serverInv(server, st.pid).filter((slot) => slot.itemId === COMMON_WEAPON);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].instance).toEqual({ rolled: { masterwork: true, stats: { str: 2 } } });
+  });
+
   it('resolves the three commands server-side and mirrors denc/ench/salv into a real ClientWorld', () => {
     const server = new GameServer();
     const fc = fakeWs();

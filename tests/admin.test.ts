@@ -713,7 +713,40 @@ describe('admin api auth', () => {
     expect(associationsForIp).toHaveBeenCalledWith('203.0.113.7', 2, 50);
     expect(res.statusCode).toBe(200);
     expect(res.body.data.blocked).toBe(true);
+    expect(res.body.data.blockable).toBe(true);
     expect(res.body.data.accounts[0].online).toBe(true);
+  });
+
+  it('serves associations for the stored unknown marker without checking the block list', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(associationsForIp).mockResolvedValue({
+      ip: 'unknown',
+      accounts: [],
+      total: 0,
+      page: 1,
+      limit: 25,
+    });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/ip-associations?ip=unknown' }),
+      res,
+      fakeGame,
+    );
+
+    expect(associationsForIp).toHaveBeenCalledWith('unknown', 1, 25);
+    expect(fakeGame.isIpBlocked).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({
+      ip: 'unknown',
+      accounts: [],
+      total: 0,
+      page: 1,
+      limit: 25,
+      blocked: false,
+      blockable: false,
+    });
   });
 
   it('rejects an invalid IP association lookup', async () => {
@@ -940,6 +973,7 @@ describe('admin api auth', () => {
       expiresAt,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account is suspended.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('bans and disconnects an account', async () => {
@@ -968,6 +1002,7 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account has been banned.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('mutes account chat and sends a live warning without disconnecting', async () => {
@@ -1025,6 +1060,7 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('unsuspends without disconnecting the account', async () => {
@@ -1054,6 +1090,7 @@ describe('admin api auth', () => {
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
     expect(accountMailTarget).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('rejects suspending or banning admin accounts', async () => {
@@ -1398,6 +1435,26 @@ describe('blocked-ips admin route', () => {
       fakeGame,
     );
     expect(res.statusCode).toBe(400);
+    expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
+  });
+
+  it('refuses to block unknown before the write boundary', async () => {
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/blocked-ips',
+        body: { ip: 'unknown' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(400);
+    expect(addBlockedIp).not.toHaveBeenCalled();
+    expect(fakeGame.reloadBlockedIps).not.toHaveBeenCalled();
     expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
   });
 

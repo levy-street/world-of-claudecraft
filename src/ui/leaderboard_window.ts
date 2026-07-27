@@ -110,8 +110,14 @@ export class LeaderboardWindow {
     else this.playerPage = value;
   }
 
+  // Open is an inline display:flex, not display:block: the window is a flex COLUMN
+  // (see #leaderboard-window in src/styles/components.css) so that .lb-body, marked
+  // .window-fill, can absorb the leftover height once the user drags the window to a
+  // size. A stylesheet display can never override the inline one, so the open value
+  // itself has to carry it, the way #mailbox-window does. Closed is still 'none', and
+  // every render guard below compares against this same value.
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.deps.root().style.display === 'flex';
   }
 
   /** Open if closed, close if open (the minimap / menu leaderboard button). */
@@ -130,14 +136,14 @@ export class LeaderboardWindow {
     this.deedsPage = 0;
     this.devPage = 0;
     this.dailyPage = 0;
-    this.deps.root().style.display = 'block';
+    this.deps.root().style.display = 'flex';
     this.deps.onVisibilityChange?.();
     void this.render('open');
   }
 
   close(): void {
     const el = this.deps.root();
-    if (el.style.display !== 'block') {
+    if (el.style.display !== 'flex') {
       this.openerFocus = null;
       return;
     }
@@ -197,7 +203,7 @@ export class LeaderboardWindow {
     }
     // A newer render may own the body now, or the panel may have been closed,
     // while the fetch was in flight.
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -254,7 +260,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -301,7 +307,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -351,7 +357,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -392,7 +398,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
     if (result === null) {
@@ -438,8 +444,13 @@ export class LeaderboardWindow {
 
   // The in-flight state carries aria-busy + role=status (the lazy-load a11y
   // contract) so a screen reader announces the pending board.
+  //
+  // window-fill marks this as the child that absorbs the leftover height once the
+  // user drags the window to a size (the resized-window fill contract in
+  // src/styles/components.css). It is emitted here, not stamped once at open,
+  // because every render() rebuilds the window's innerHTML from scratch.
   private loadingBodyHtml(): string {
-    return `<div class="lb-body" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
+    return `<div class="lb-body window-fill" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
   }
 
   // The Players / Guilds / Daily tab bar. A WAI-ARIA role=tablist with roving

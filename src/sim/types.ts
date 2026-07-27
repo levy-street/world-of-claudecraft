@@ -724,11 +724,13 @@ interface BaseItemDef {
   requiredLevel?: number;
   /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
   set?: string;
-  // Heroic upgraded variant: the base item id this "Heroic X" copy was generated
+  // Heroic upgraded variant: the base item id this upgraded copy was generated
   // from (content/heroic_variants.ts). Set only on the generated variants, which
   // drop in place of their base from a heroic dungeon's normal loot table. The
-  // client composes the display name as "Heroic {base name}" from this (see
-  // itemDisplayName), so a variant carries no translated name key of its own.
+  // client resolves the display name to the BASE item's name unchanged (see
+  // itemDisplayName), classic behavior, so a variant carries no translated name
+  // key of its own and the heroic distinction shows as the separate "[HEROIC]"
+  // tag instead (the item tooltip's quality line, the Apply Enchant target row).
   heroicOf?: string;
   // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
   // tooltip chrome; these keep their own name key, unlike heroicOf variants.
@@ -918,6 +920,10 @@ export interface ItemInstancePayload {
    *  isEnchantedInstance). Legacy enchanted copies predate this field and are
    *  detected by bare rolled.stats WITHOUT rolled.masterwork instead. */
   enchant?: string;
+  /** Recipe id that minted this copy while it is worn. Inventory stacks keep
+   *  the same marker on InvSlot.craftedRecipeId so common crafted gear can
+   *  stack normally in bags; equip/unequip bridges it through this payload. */
+  craftedRecipeId?: string;
   /** Player id (Entity id) this specific copy is bound to. */
   boundTo?: number;
   /** Arms the bind-on-trade lock: a copy carrying this binds to the recipient
@@ -935,6 +941,10 @@ export interface InvSlot {
   count: number;
   /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
   instance?: ItemInstancePayload;
+  /** Recipe id that minted this stack when crafting provenance matters but the
+   *  item stays a plain bag good. Kept on the slot while in bags so common
+   *  crafted gear does not gain a signer/masterwork/enchant identity. */
+  craftedRecipeId?: string;
   /** The bag CELL this stack was dragged into (the manual arrangement). Absent for a
    *  stack that was never placed by hand, which the layout drops into the first free
    *  cell (src/sim/inventory_order.ts). Additive and advisory: an unusable value (a
@@ -1029,6 +1039,25 @@ export interface MasterLootSettings {
   enabled: boolean;
   looter: number; // pid of the master looter; 0 means "the current leader"
   threshold: MasterLootThreshold;
+}
+
+// An open master-loot assignment still in its curate phase, as its MASTER LOOTER
+// sees it. The reconcile twin of LootRollPrompt (same reason: the transient
+// `masterLoot` SimEvent is delivered once, so a client that missed it, or that
+// consumed it and then had its assignment refused, has no other way back to the
+// prompt before the 300s window runs out). `candidates` is rebuilt from the roll's
+// CURRENT candidate list on every read, not from the open-time snapshot the event
+// carried, so a re-shown prompt can never offer a player who has since left.
+// Master-looter-only by construction: activeMasterLootRolls filters on
+// `masterLooter === pid`, the exact complement of the guard that keeps a
+// curate-phase roll out of activeLootRolls / lootRollGroupStatus for candidates.
+export interface MasterLootPrompt {
+  rollId: number;
+  itemId: string;
+  itemName: string;
+  quality: ItemDef['quality'];
+  expiresAt: number;
+  candidates: { pid: number; name: string }[];
 }
 
 export interface LootStrategies {
@@ -2419,6 +2448,14 @@ export interface DungeonDef {
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
   interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis'; // renderer + collider interior builder key
+  /**
+   * What dresses this dungeon's wall-side obstacle slots (matches the render
+   * variant): coffins get one standable lid, cargo splits into the crate
+   * stack and cask the renderer draws. Absent, slots stay full-height walls
+   * (the temple's altars). Drives the physical colliders in
+   * `dungeon_layout.ts` layoutColliders.
+   */
+  tombDressing?: 'coffins' | 'cargo';
   suggestedPlayers: number;
   enterText: string;
   leaveText: string;
@@ -2472,6 +2509,12 @@ export interface StaticObbPropDef {
   height: number;
   /** False when a merged mesh cannot hide this placement independently. */
   camGhost?: boolean;
+  /**
+   * The asset renders x-mirrored (an asymmetric wing flipped end for end,
+   * e.g. a town-wall wing whose tall lantern pillar swaps sides). Collision
+   * derived from the asset's asymmetry must flip with it.
+   */
+  mirrored?: true;
 }
 
 // Static prop placement per zone — the renderer builds meshes from these and
@@ -2672,6 +2715,20 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
   return e.eating !== null || e.drinking !== null;
 }
 
+/**
+ * An in-progress ledge climb (see `src/sim/climb.ts`). While present it OWNS
+ * the body's position: the destination was validated as a surface the body
+ * fits on before the climb started, so nothing re-resolves it mid-pull.
+ * Absent until first use, so unrelated entity snapshots and deterministic
+ * traces gain no inert state.
+ */
+export interface LedgeClimb {
+  from: Vec3;
+  to: Vec3;
+  elapsed: number;
+  duration: number;
+}
+
 export interface HeroicLeapFlight {
   from: Vec3;
   to: Vec3;
@@ -2703,7 +2760,23 @@ export interface DamageTick {
   amount: number;
 }
 
-export interface Entity {
+/**
+ * Fields the SIM NEVER WRITES: client-side mirrors decoded from the wire
+ * (src/net/online.ts) so the online renderer can pose movement modes it does
+ * not simulate. Grouping them behind this one interface is the type-level
+ * registry that keeps golden traces clean by construction rather than by
+ * comment: the sim's own entities never carry these, and any NEW wire mirror
+ * lands HERE, never loose on `Entity`. The pattern's authoritative twin is
+ * the sim-side field of the same feature (`climb` for the pair below).
+ */
+export interface ClientMirroredEntityFields {
+  /** Mirror of an in-flight climb: the wire carries progress, not the arc.
+   *  0..1 through the pull at the snapshot cadence; the visual smooths it. */
+  climbing?: boolean;
+  climbProgress?: number;
+}
+
+export interface Entity extends ClientMirroredEntityFields {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };
@@ -2922,6 +2995,9 @@ export interface Entity {
   // landing area hit until touchdown. Absent until first use so unrelated entity
   // snapshots and deterministic traces do not gain inert state.
   leap?: HeroicLeapFlight | null;
+  // Authoritative ledge-climb pull-up. Like `leap`, it owns movement while it
+  // runs; see `src/sim/climb.ts`.
+  climb?: LedgeClimb | null;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   sitting: boolean;
@@ -3039,9 +3115,15 @@ export interface Entity {
   // Profession harvest: single-use, first-come claim on this corpse's componentTags
   // yield. null = unharvested; once set to a player's entity id, every later attempt
   // (same tick or later) is denied. The opposite of a world gathering node (per-player).
-  // SERVER-PRIVATE today: no snapshot delta mirrors it, so the online ClientWorld
-  // always reads null (src/net/online.ts blankEntity). Mirror it over the wire
-  // before any UI/render consumer reads it through IWorld.
+  // MIRRORED over the wire as the sparse `hcb` key (server/game.ts wireEntity,
+  // decoded in src/net/online.ts applyWire), so the online ClientWorld reads the
+  // real claim and the client-side availability gate
+  // (src/game/corpse_loot_availability.ts) is authoritative-consistent. This note
+  // used to say server-private; it stopped being true when `hcb` landed.
+  // Whether the corpse is harvestable AT ALL is a separate question and is not
+  // wired: it is answered from content by isHarvestableCorpse
+  // (src/sim/professions/gathering.ts), which the client resolves locally off
+  // `tid` (#2513).
   harvestClaimedBy: number | null;
   despawnTimer?: number;
   damageIdleDespawnTimer?: number;
@@ -3257,6 +3339,8 @@ export interface PendingResurrection {
   expiresAt: number;
 }
 
+export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist';
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -3268,7 +3352,7 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       school: string;
       ability: string | null;
-      kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
+      kind: DamageEventKind;
       absorbed?: number;
       // Presentation-only correlation: this hit belongs to a ranged shot whose
       // one-shot animation already began at projectile launch.
@@ -4017,7 +4101,14 @@ export type SimEvent = { pid?: number } & (
   //
   // `yields` is never empty: the emit is skipped entirely when a harvest
   // landed nothing (the gatherResult "granted path only" rule), so the client
-  // never renders a cue for a no-op. Entries record what LANDED, so a
+  // never renders a cue for a no-op. As of #2513 that skip is unreachable by
+  // construction rather than merely rare: harvestCorpse refuses a corpse with no
+  // mapped family and refuses a pick that names none, so every command that
+  // reaches the roll grants at least one item. The guard stays as dead defensive
+  // code and the contract is now pinned as a property instead
+  // (tests/corpse_harvest_sim.test.ts "every command that spends the claim
+  // reports at least one yield"), because an unreachable arm cannot be pinned by
+  // a fixture. Entries record what LANDED, so a
   // downgraded signed grant appears as 'plain' and a refused specimen does not
   // appear at all; the gatherDowngrade toast above still owns that half.
   | {

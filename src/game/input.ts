@@ -1,7 +1,7 @@
 // Default (Mouse Camera off): classic-MMO-style (WASD + A/D keyboard turn, Q/E strafe,
 // left-drag orbits, right-drag mouselooks, both buttons run forward).
 // Optional Mouse Camera (on): OSRS-style (WASD is camera-relative, A/D strafe,
-// mouse drag rotates the orbit (no pointer lock), no keyboard turn).
+// mouse drag rotates the orbit, no keyboard turn).
 // Shared: space jump, wheel zoom, Tab target, rebindable action bar, R autorun.
 
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
@@ -16,7 +16,6 @@ import {
   shouldEngagePointerLockOnMouseDown,
   shouldReleasePointerLock,
 } from './pointer_lock';
-import { pointerNearViewportEdge } from './pointer_lock_edge';
 import { normalizePointerLookDelta } from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
 
@@ -192,12 +191,6 @@ export class Input {
   private downX = 0;
   private downY = 0;
   private downAt = 0;
-  // Last pointer position seen in client coordinates, from any mousedown or
-  // mousemove that carried one. Drives the edge test that defers the pointer
-  // lock (pointer_lock_edge.ts): NaN until the first real event, which reads
-  // as "position unknown" and falls back to locking.
-  private pointerClientX = Number.NaN;
-  private pointerClientY = Number.NaN;
   // one-shot key capture for the rebind UI: the next keydown is delivered here
   // (Escape cancels with null) instead of being dispatched as an action
   private captureCb: ((code: string | null) => void) | null = null;
@@ -776,39 +769,16 @@ export class Input {
     );
   }
 
-  /** Remember a pointer position for {@link pointerAtEdge}; see the field. */
-  private notePointerClient(clientX: unknown, clientY: unknown): void {
-    if (typeof clientX === 'number' && Number.isFinite(clientX)) this.pointerClientX = clientX;
-    if (typeof clientY === 'number' && Number.isFinite(clientY)) this.pointerClientY = clientY;
-  }
-
-  /**
-   * True when the pointer is close enough to a viewport edge that a camera drag
-   * needs the pointer lock. Everywhere else the drag runs unlocked, which is
-   * what keeps the browser's own pointer capture notice ("press Esc to show
-   * your cursor") off the screen for ordinary looks.
-   */
-  private pointerAtEdge(): boolean {
-    return pointerNearViewportEdge({
-      clientX: this.pointerClientX,
-      clientY: this.pointerClientY,
-      viewportWidth: typeof window !== 'undefined' ? window.innerWidth : Number.NaN,
-      viewportHeight: typeof window !== 'undefined' ? window.innerHeight : Number.NaN,
-    });
-  }
-
   /**
    * Engage the pointer lock for the active camera drag if it is both wanted
-   * (setting on, not already locked, not in Firefox's forced-unlock cooldown)
-   * and needed (the cursor is in the viewport edge band, where movementX/Y
-   * would otherwise clamp to 0 and freeze the camera, or the cursor would slip
-   * onto a second monitor). Still at most one request per drag (#116), in both
-   * camera modes, with fullscreen on the same path so mouselook behaves
-   * identically there.
+   * (setting on, not already locked, not in Firefox's forced-unlock cooldown).
+   * The Lock Cursor setting means every active camera drag holds the pointer
+   * until mouseup, so the cursor cannot escape the game surface mid-look. Still
+   * at most one request per drag (#116), in both camera modes, with fullscreen
+   * on the same path so mouselook behaves identically there.
    */
   private maybeEngageDragPointerLock(): void {
     if (this.pointerLockRequestedForDrag) return;
-    if (!this.pointerAtEdge()) return;
     if (
       !shouldEngagePointerLock({
         lockOnRotate: this.lockCursorOnRotate,
@@ -826,6 +796,11 @@ export class Input {
       return;
     this.pointerLockRequestedForDrag = true;
     this.canvas.requestPointerLock?.();
+  }
+
+  private activateCameraDrag(): void {
+    this.cameraDragActive = true;
+    this.maybeEngageDragPointerLock();
   }
 
   private isBrowserFullscreen(): boolean {
@@ -1060,35 +1035,21 @@ export class Input {
     this.downButton = e.button;
     this.downX = e.clientX;
     this.downY = e.clientY;
-    this.notePointerClient(e.clientX, e.clientY);
     this.downAt = performance.now();
     this.dragDistance = 0;
     this.cameraDragActive = false;
-    // Pointer lock is requested lazily once a drag actually begins (see
-    // onMouseMove) — NOT on every press, which spammed the browser "mouse
-    // capture" banner on every right-click used to attack/look (#116). That
-    // deferred mousemove call is denied by Firefox outside fullscreen (see
+    // Pointer lock is requested lazily once a drag actually begins on browsers
+    // that allow a deferred request (see onMouseMove), not on every press, so
+    // ordinary clicks do not show the browser's capture notice (#116). Firefox
+    // denies that deferred mousemove call outside fullscreen (see
     // needsSyncPointerLockGesture), so on Firefox it is instead requested
-    // synchronously right here, for either drag-capable button (left or
-    // right), excluding the click-to-move button. That preserves #116 fully
-    // only on Chromium: on Firefox, an ordinary click on a non-click-to-move
-    // button (e.g. right-click to loot/target/interact) still takes and
-    // releases the lock on every press, a visible flicker, because we cannot
-    // tell a click from the start of a drag until it has already moved. A
-    // genuine drag started on the click-to-move button also stays unfixed on
-    // Firefox (its lock request only ever comes from the denied mousemove
-    // path). Both are accepted trade-offs of restoring working camera drag on
-    // Firefox; see shouldEngagePointerLockOnMouseDown for the full reasoning.
+    // synchronously right here for either drag-capable button (left or right),
+    // excluding the click-to-move button. That preserves #116 fully only on
+    // Chromium: on Firefox, an ordinary click on a non-click-to-move button
+    // still takes and releases the lock on every press because we cannot tell a
+    // click from a drag until it has already moved.
     this.pointerLockRequestedForDrag = false;
-    // Gecko can only take the lock from this handler, so the edge test is
-    // applied to where the press STARTS: a drag begun in the middle of the
-    // window never takes the lock there either, and if it later walks into
-    // the edge band the deferred onMouseMove request is its only (Firefox-
-    // denied) chance. Accepted: rotation still works away from the edge, and
-    // in exchange Firefox stops painting its pointer-capture notice on every
-    // ordinary look.
     if (
-      this.pointerAtEdge() &&
       shouldEngagePointerLockOnMouseDown({
         button: e.button,
         clickMoveButton: this.clickMoveMouseButton,
@@ -1144,7 +1105,6 @@ export class Input {
   }
 
   private onMouseMove(e: MouseEvent): void {
-    this.notePointerClient(e.clientX, e.clientY);
     if (e.target === this.canvas) {
       this.hoverX = e.clientX;
       this.hoverY = e.clientY;
@@ -1159,23 +1119,24 @@ export class Input {
       isGecko: this.isGeckoEngine,
       devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
     });
-    if (mx === 0 && my === 0) return;
+    if (mx === 0 && my === 0) {
+      if (this.cameraDragActive) this.maybeEngageDragPointerLock();
+      return;
+    }
     const heldMs = this.pressDurationMs();
     if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)
       return;
     this.dragDistance += Math.abs(mx) + Math.abs(my);
     if (!this.cameraDragActive) {
       if (this.dragDistance < CAMERA_DRAG_START_DISTANCE && heldMs < CAMERA_DRAG_START_MS) return;
-      this.cameraDragActive = true;
-      this.maybeEngageDragPointerLock();
+      this.activateCameraDrag();
       this.noteIntent('look');
       this.updateCursor();
       return;
     }
-    // Re-checked on every move of an already-active drag, not just at its
-    // start: the lock is deferred until the cursor actually approaches the
-    // viewport edge, which a drag that began in the middle of the window
-    // reaches mid-gesture or never.
+    // Re-checked on every move of an already-active drag in case the previous
+    // request was denied or the lock was released by the browser while the
+    // player kept holding a drag button.
     this.maybeEngageDragPointerLock();
     this.camYaw -= mx * this.lookSensitivity;
     this.camPitch = Math.min(

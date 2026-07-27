@@ -6,6 +6,17 @@
 // Sim layer: no three.js imports.
 import type { Collider } from './colliders';
 
+/**
+ * The per-slot dressing roll for a wall-side obstacle: the ONE draw both the
+ * renderer (which prop fills the slot) and the collider builder (how tall the
+ * standable top is) consume, so mesh and physics can never disagree. Same
+ * stable sine hash the renderer's prop jitter has always used.
+ */
+export function tombSlotRoll(x: number, z: number): number {
+  const s = Math.sin(x * 3.7 * 127.1 + z * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+}
+
 // Shared structural constants (instance-local coordinates, y up, z into the
 // dungeon). Values are frozen gameplay contracts: mob spawns and pathing
 // assume these exact footprints.
@@ -18,6 +29,59 @@ export const PILLAR_COLLIDER_R = 1.0; // centre-aisle pillar obstacle radius
 export const TOMB_HW = 1.1; // wall-side obstacle (sarcophagus/cargo) half extents
 export const TOMB_HD = 2.1;
 export const DUNGEON_WALL_HEIGHT = 8; // visual module height (2x KayKit 4u walls)
+/**
+ * Boss dais height (yards): the foundation blocks the renderer stacks are 2u
+ * pieces at 0.3 y-scale. The SIM treats this as real elevation (the interior
+ * floor rises by it inside the dais radius, see `daisLiftAt`), so the boss
+ * stands ON the stage instead of knee-deep in it, and a player strides up the
+ * rim exactly like an open-world kerb (it sits inside MAX_STEP_HEIGHT).
+ */
+export const DAIS_HEIGHT = 0.6;
+
+/**
+ * Standable tops for the wall-side obstacle slots, measured from the shipped
+ * dungeon-kit GLBs at the exact scales `render/dungeon.ts` places them
+ * (gltf-transform dequantized bounds), so the surface a body lands on IS the
+ * silhouette it sees. Per-slot variety keys off the SAME `hash2(x * 3.7, z)`
+ * draw the renderer uses to pick the prop, so collider and mesh can never
+ * disagree about which piece fills a slot.
+ */
+// Hollow Crypt / Nythraxis corners: coffin lids are HUMPS, not slabs. The
+// plain coffin (1.322 native x 1.3 y-scale) crests 1.72 along its centre
+// line and falls to a 1.10 plinth at the sides; the decorated one crests
+// 1.17 over a 0.71 plinth. Ridge runs along the coffin's LENGTH (local z).
+export const TOMB_COFFIN_PLAIN_TOP = 1.72;
+export const TOMB_COFFIN_PLAIN_EAVE = 1.1;
+export const TOMB_COFFIN_DECORATED_TOP = 1.17;
+export const TOMB_COFFIN_DECORATED_EAVE = 0.71;
+// Sunken Bastion cargo. The stacks are TWO TIERS, a natural staircase: a
+// broad lower tier at stride-up height from the floor's jump, then a smaller
+// top crate a stride above it (crates_stacked: 1.35 then 2.14 at 1.0 scale;
+// box_stacked: 1.20 then 1.99 at 0.6). Tier offsets are the measured GLB
+// top-crate centres. Rear casks: barrel_large 1.70 tall x 0.76 half-width at
+// 0.85, keg 1.85 x 0.81 at 0.9 (radii trimmed slightly, as everywhere).
+export const TOMB_CARGO_STACK_TOP = 2.14;
+export const TOMB_CARGO_STACK_TIER = 1.35;
+export const TOMB_CARGO_BOX_TOP = 1.99;
+export const TOMB_CARGO_BOX_TIER = 1.2;
+export const TOMB_CARGO_BARREL_TOP = 1.7;
+export const TOMB_CARGO_KEG_TOP = 1.85;
+export const TOMB_CARGO_STACK_HW = 1.0;
+export const TOMB_CARGO_BARREL_R = 0.7;
+export const TOMB_CARGO_KEG_R = 0.75;
+/** Top-crate footprint and centre offset within each stack (GLB-measured,
+ *  scaled): [dx, dz, halfW, halfD]. */
+export const TOMB_CARGO_STACK_TIER2 = [-0.15, -0.38, 0.5, 0.33] as const;
+export const TOMB_CARGO_BOX_TIER2 = [-0.48, -0.21, 0.21, 0.11] as const;
+
+/**
+ * How a dungeon dresses its wall-side obstacle slots, and therefore what the
+ * matching colliders look like. `coffins` slots are a single standable lid;
+ * `cargo` slots split into the crate stack and the cask the renderer actually
+ * draws; absent, the slot stays the legacy full-height block (the temple's
+ * candle shrines are altars, not furniture).
+ */
+export type TombDressing = 'coffins' | 'cargo';
 
 export interface GridPoint {
   x: number;
@@ -52,6 +116,12 @@ export interface DungeonLayout {
   stubs: WallStub[];
   /** boss dais — walkable, deliberately NO collider */
   dais: { x: number; z: number; r: number };
+  /**
+   * True when the renderer stacks the DAIS_HEIGHT foundation platform on the
+   * dais: the sim's interior floor rises to match (`daisLiftAt`). Absent on
+   * the flat fighting floors (arena, the Nythraxis raid).
+   */
+  daisRaised?: boolean;
   /** Optional room width override for oversized rooms. Defaults to the classic crypt width. */
   wallX?: number;
   endWallHw?: number;
@@ -87,6 +157,7 @@ export const CRYPT_LAYOUT: DungeonLayout = {
   tombs: grid(16, 92, 19, [-19, 19]),
   stubs: [],
   dais: { x: 0, z: 96, r: 9.5 },
+  daisRaised: true,
 };
 
 // Gravewyrm Sanctum: a stretched three-chamber crypt (z -19..158) with
@@ -110,6 +181,7 @@ export const SANCTUM_LAYOUT: DungeonLayout = (() => {
     tombs: [],
     stubs,
     dais: { x: 0, z: 146, r: 11.5 },
+    daisRaised: true,
   };
 })();
 
@@ -166,6 +238,7 @@ export const TEMPLE_LAYOUT: DungeonLayout = (() => {
     tombs: grid(18, 40, 22, [-19, 19]), // reliquary altars hugging the antechamber walls
     stubs,
     dais: { x: 0, z: 116, r: 10.5 },
+    daisRaised: true,
   };
 })();
 
@@ -320,8 +393,34 @@ export function arenaMapForSlot(slot: number): ArenaMapDef {
   return ARENA_MAPS[((slot % 2) + 2) % 2];
 }
 
-/** Interior collision set for a layout, in instance-local coordinates. */
-export function layoutColliders(layout: DungeonLayout): Collider[] {
+/**
+ * The interior floor's rise above the flat room floor at an instance-local
+ * point: DAIS_HEIGHT inside a raised boss dais, zero elsewhere. This is the
+ * sim half of the platform the renderer stacks; `world.ts` groundHeight adds
+ * it, so mobs, spawns, loot, landings, and the camera all stand on the stage.
+ */
+export function daisLiftAt(layout: DungeonLayout, lx: number, lz: number): number {
+  if (!layout.daisRaised) return 0;
+  const d = layout.dais;
+  const dx = lx - d.x;
+  const dz = lz - d.z;
+  return dx * dx + dz * dz <= d.r * d.r ? DAIS_HEIGHT : 0;
+}
+
+/**
+ * Interior collision set for a layout, in instance-local coordinates.
+ * `dressing` describes what the renderer stands in the tomb slots for this
+ * dungeon, and therefore what the slots' colliders are: coffins are one
+ * standable lid (per-slot height from the same hash the renderer draws),
+ * cargo splits into the crate stack and the cask, and no dressing keeps the
+ * legacy full-height block. `floorY` absolutizes the standable tops (the
+ * interior floor constant; instance-local props all sit on it).
+ */
+export function layoutColliders(
+  layout: DungeonLayout,
+  dressing?: TombDressing,
+  floorY = 0,
+): Collider[] {
   const out: Collider[] = [];
   const wallX = layout.wallX ?? DUNGEON_WALL_X;
   const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
@@ -345,9 +444,73 @@ export function layoutColliders(layout: DungeonLayout): Collider[] {
   // pillar obstacles
   for (const p of layout.pillars)
     out.push({ type: 'circle', x: p.x, z: p.z, r: PILLAR_COLLIDER_R });
-  // wall-side obstacles (the boss dais is walkable: no collider)
-  for (const t of layout.tombs)
-    out.push({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 });
+  // Wall-side obstacle slots (the boss dais is walkable: no collider). The
+  // per-slot draw is `tombSlotRoll`, the same roll the renderer picks the
+  // prop with, so the collider always matches the piece filling the slot.
+  for (const t of layout.tombs) {
+    const r = tombSlotRoll(t.x, t.z);
+    if (dressing === 'coffins') {
+      // The lid is a hump ridging along the coffin's length: standing feet
+      // ride the crest at the centre line and the plinth at the sides.
+      const plain = r < 0.55;
+      const top = plain ? TOMB_COFFIN_PLAIN_TOP : TOMB_COFFIN_DECORATED_TOP;
+      const eave = plain ? TOMB_COFFIN_PLAIN_EAVE : TOMB_COFFIN_DECORATED_EAVE;
+      out.push({
+        type: 'obb',
+        x: t.x,
+        z: t.z,
+        hw: TOMB_HW,
+        hd: TOMB_HD,
+        rot: 0,
+        moveTopY: floorY + top,
+        standable: true,
+        topSlope: {
+          kind: 'ridge',
+          axis: 'z',
+          pitch: (top - eave) / TOMB_HW,
+          eaveY: floorY + eave,
+        },
+      });
+    } else if (dressing === 'cargo') {
+      // Front stack (two tiers, the measured natural staircase) and the rear
+      // cask, at the offsets the renderer uses, with the walkable gap
+      // between them the player can now see AND use.
+      const crates = r < 0.5;
+      const tierTop = crates ? TOMB_CARGO_STACK_TIER : TOMB_CARGO_BOX_TIER;
+      const stackTop = crates ? TOMB_CARGO_STACK_TOP : TOMB_CARGO_BOX_TOP;
+      const tier2 = crates ? TOMB_CARGO_STACK_TIER2 : TOMB_CARGO_BOX_TIER2;
+      out.push({
+        type: 'obb',
+        x: t.x,
+        z: t.z - 1.0,
+        hw: TOMB_CARGO_STACK_HW,
+        hd: TOMB_CARGO_STACK_HW,
+        rot: 0,
+        moveTopY: floorY + tierTop,
+        standable: true,
+      });
+      out.push({
+        type: 'obb',
+        x: t.x + tier2[0],
+        z: t.z - 1.0 + tier2[1],
+        hw: tier2[2],
+        hd: tier2[3],
+        rot: 0,
+        moveTopY: floorY + stackTop,
+        standable: true,
+      });
+      out.push({
+        type: 'circle',
+        x: t.x + (crates ? 0.1 : -0.1),
+        z: t.z + 1.3,
+        r: crates ? TOMB_CARGO_BARREL_R : TOMB_CARGO_KEG_R,
+        moveTopY: floorY + (crates ? TOMB_CARGO_BARREL_TOP : TOMB_CARGO_KEG_TOP),
+        standable: true,
+      });
+    } else {
+      out.push({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 });
+    }
+  }
   // floor clutter props (small circle per scatter point; renderer places matching props)
   for (const c of layout.clutter ?? []) out.push({ type: 'circle', x: c.x, z: c.z, r: 0.8 });
   return out;

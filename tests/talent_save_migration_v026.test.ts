@@ -118,6 +118,14 @@ describe('v0.26 Talents V2 production save migration', () => {
     // synthetic q_fixture_done, pinning that done-history survives unknown ids.
     expect(first.questLog).toEqual(fixture.state.questLog);
     expect(first.questsDone).toEqual(fixture.state.questsDone);
+    // Same shape one field over (#2511): the fixture's townFocus is
+    // `{ eastbrook: 4 }`, a key that names no component family, and the load
+    // arm drops it so it cannot ride back out through the panel into a request
+    // the command boundary now rejects. Not vacuous, the fixture really does
+    // carry it, and the pure migration above still preserves it verbatim: the
+    // drop belongs to the load arm alone.
+    expect(fixture.state.townFocus).toEqual({ eastbrook: 4 });
+    expect(first.townFocus).toEqual({});
     expect(first.skin).toBe(3);
     expect(first.cooldowns).toEqual(fixture.state.cooldowns);
 

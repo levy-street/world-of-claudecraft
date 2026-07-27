@@ -339,6 +339,25 @@ describe('ActionBarController form persistence', () => {
 
     expect(harness.controller.actions).toEqual(bar('prowl'));
   });
+
+  it('keeps a switched loadout layout until the target talent abilities arrive', () => {
+    const harness = makeHarness('mage', ['frostbolt', 'ice_lance'], bar('frostbolt', 'ice_lance'));
+    const fireLayout = bar();
+    fireLayout[5] = { type: 'ability', id: 'pyroblast' };
+    fireLayout[10] = { type: 'ability', id: 'fireball_form' };
+    const fireKnown = new Set(['fireball', 'pyroblast', 'fireball_form']);
+
+    harness.controller.replaceActionsForLoadout(fireLayout, fireKnown);
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions[5]).toEqual({ type: 'ability', id: 'pyroblast' });
+    expect(harness.controller.actions[10]).toEqual({ type: 'ability', id: 'fireball_form' });
+
+    harness.state.known = [...fireKnown];
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(fireLayout);
+  });
 });
 
 describe('ActionBarController attack slot', () => {

@@ -77,7 +77,7 @@ describe('the attachment window at send', () => {
 
 describe('the return flight', () => {
   it('returns the unclaimed parcel AT the expiry boundary, through the normal delivery path', () => {
-    const { sim, alice, bob, raw } = setupParcel();
+    const { sim, alice, bob, aliceMeta, raw } = setupParcel();
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
     expect(raw.announced).toBe(true);
     const bobKey = raw.recipientKey;
@@ -102,8 +102,9 @@ describe('the return flight', () => {
     tickFor(sim, 1); // the boundary sweep: now === expiresAt exactly
     expect(sim.time).toBe(boundary);
     expect(raw.returned).toBe(true);
-    // Re-keyed onto the sender's name bucket, the names swapped honestly.
-    expect(raw.recipientKey).toBe('Alice');
+    // Re-keyed onto the sender's stable id (never their mutable name), the
+    // display names swapped honestly.
+    expect(raw.recipientKey).toBe(sim.postOffice.mailKeyFor(aliceMeta));
     expect(raw.recipientName).toBe('Alice');
     expect(raw.senderName).toBe('Bob');
     // Attachments ride home intact and the letter flies fresh.
@@ -135,8 +136,53 @@ describe('the return flight', () => {
     expect(back?.read).toBe(false);
   });
 
+  it('still reaches the sender by stable id if they renamed while the parcel was in flight', () => {
+    // Regression for the data-loss bug: the return flight used to re-key onto
+    // the sender's DISPLAY NAME captured at send time. If the sender renamed
+    // before the still-unclaimed parcel expired, the return could never find
+    // them again (belongsTo/mailInfoFor match on the stable id or the CURRENT
+    // name, neither of which is the stale pre-rename name), orphaning the
+    // coin and items forever.
+    const { sim, alice, aliceMeta, raw } = setupParcel();
+
+    // Alice is renamed while her still-unclaimed parcel to Bob is in flight.
+    // rekeyMailOwner migrates Alice's OWN inbox (e.g. her welcome letter, which
+    // is keyed by her own stable id already) but must leave the Parcel letter
+    // alone: Alice is only its SENDER, never its recipient, exactly like the
+    // real rename flow (server/characters.ts calls rekeyMailOwner with the
+    // renaming character's own stable key, which never matches a letter she
+    // only sent).
+    const recipientKeyBeforeRename = raw.recipientKey;
+    sim.rekeyMailOwner(alice, 'Alice', 'Alicia');
+    expect(raw.recipientKey).toBe(recipientKeyBeforeRename);
+    aliceMeta.name = 'Alicia';
+
+    // Bob never claims it; the parcel expires and flies home.
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    raw.expiresAt = sim.time;
+    tickFor(sim, 2); // the return cycle runs
+    expect(raw.returned).toBe(true);
+
+    // The return flight lands; the renamed Alice must still be able to see and
+    // collect it.
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, alice);
+    const info = sim.mailInfoFor(alice);
+    const back = info?.messages.find((m) => m.subject === 'Parcel');
+    expect(back).toBeDefined();
+    expect(back?.copper).toBe(500);
+    expect(back?.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+
+    const coinBefore = aliceMeta.copper;
+    if (back) sim.mailTake(back.id, alice);
+    expect(aliceMeta.copper).toBe(coinBefore + 500);
+    expect(sim.countItem('roasted_boar', alice)).toBe(2);
+  });
+
   it('never deletes an un-returned parcel: expiry without the flag always bounces', () => {
-    const { sim, raw } = setupParcel();
+    const { sim, bob, raw } = setupParcel();
+    const bobMeta = sim.meta(bob);
+    if (!bobMeta) throw new Error('no meta');
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
     const id = raw.id;
 
@@ -156,8 +202,9 @@ describe('the return flight', () => {
     expect(raw.returned).toBe(true);
     expect(raw.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
     expect(raw.copper).toBe(500);
-    // It bounced back the other way: recipient and sender swapped again.
-    expect(raw.recipientKey).toBe('Bob');
+    // It bounced back the other way: recipient and sender swapped again, still
+    // keyed by the stable id on both legs.
+    expect(raw.recipientKey).toBe(sim.postOffice.mailKeyFor(bobMeta));
     expect(raw.senderName).toBe('Alice');
   });
 
@@ -306,7 +353,7 @@ describe('a full sender mailbox', () => {
     raw.expiresAt = sim.time;
     tickFor(sim, 2);
     expect(raw.returned).toBe(true);
-    expect(raw.recipientKey).toBe('Alice');
+    expect(raw.recipientKey).toBe(sim.postOffice.mailKeyFor(aliceMeta));
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
     moveToMailbox(sim, alice);
     const info = sim.mailInfoFor(alice);

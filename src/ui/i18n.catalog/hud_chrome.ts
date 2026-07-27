@@ -1210,10 +1210,10 @@ export const hudChromeStrings = {
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
     guildMembers: {
-      one: 'you are {rank}, {count} member',
-      few: 'you are {rank}, {count} members',
-      many: 'you are {rank}, {count} members',
-      other: 'you are {rank}, {count} members',
+      one: 'your guild rank is {rank}; {count} member',
+      few: 'your guild rank is {rank}; {count} members',
+      many: 'your guild rank is {rank}; {count} members',
+      other: 'your guild rank is {rank}; {count} members',
     },
     finderPartySize: {
       one: '{count} player',
@@ -1408,7 +1408,15 @@ export const hudChromeStrings = {
     // one carried reviewed fills in every locale (in-place rewords go stale).
     harvestTooltip:
       'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
-    concentrateHint: 'Fewer chosen components yield a higher tier each.',
+    // #2514 reword. The retired concentrateHint said "Fewer CHOSEN components
+    // yield a higher tier each", which the new rule makes false in both
+    // directions: checking one more unmapped row lowers nothing, and checking
+    // one fewer of them raises nothing. The tier tracks what the harvest TAKES,
+    // which is the rows that can pay, so the sentence says that instead. A new
+    // key rather than an in-place edit, the harvestTooltip precedent above:
+    // rewording a key in place leaves every locale's reviewed fill silently
+    // answering the old sentence.
+    yieldTierHint: 'The fewer components a harvest takes, the higher the tier of each.',
     // #2509: claw, tusk, gills and horn are tagged on corpses but no harvest
     // item is wired to them yet, so a selection of nothing but those would
     // spend the single-use corpse for nothing. The command refuses it and the
@@ -1416,6 +1424,18 @@ export const hudChromeStrings = {
     nothingSelectedYields: 'Nothing you selected can be harvested from this corpse.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
+    // #2514: the same four families, on a corpse that ALSO carries one that
+    // pays. The row stays offered (the corpse does carry it) and checking it is
+    // now free, so this marks it rather than explaining a refusal.
+    //
+    // Two keys, and the aria one takes the visible mark as a SECOND
+    // placeholder rather than restating it. Never concatenated, and it also
+    // makes WCAG 2.2 SC 2.5.3 (Label in Name) structural: the accessible name
+    // contains the text the row shows, in every locale, instead of depending on
+    // each translator happening to reuse their own phrasing across two
+    // independent strings. Keep {note} as a placeholder if this is reworded.
+    componentNoYield: 'nothing yet',
+    componentAriaNoYield: 'Harvest {component}: {note}',
     components: {
       hide: 'Hide',
       fang: 'Fang',
@@ -2154,8 +2174,8 @@ export const hudChromeStrings = {
   // visible while sale proceeds or returned items wait at the Merchant.
   // (Wordy, M16: the five non-Latin fills land in this same change.)
   marketIndicator: {
-    aria: 'World Market collection waiting',
-    tip: 'Gold or items are waiting for you at the Merchant.',
+    aria: 'World Market proceeds or items waiting',
+    tip: 'Sale proceeds or returned items are waiting for you at the Merchant.',
   },
   noticeboard: {
     empty: 'Nothing seems posted.',
@@ -2829,9 +2849,16 @@ export const hudChromeStrings = {
     // enchanted in place, so it lists alongside the bagged copies and needs to
     // say which equipment slot it is on ({slot} resolves through the shared
     // itemUi.slots labels, so Main Hand and Off Hand separate a dual-wielded
-    // pair). Both rings share the one "Finger" label there, which is fine: two
-    // eligible identical rings take the same enchant either way.
+    // pair).
     wornTag: 'Worn ({slot})',
+    // The same tag for an equipment key whose slot label is SHARED with another
+    // key: both fingers read "Finger", so two rings listed at once produced two
+    // identical rows and the player could not tell which finger a tap would
+    // change (#2466). {index} is the 1-based position inside the shared-label
+    // group (enchant_apply_view.ts slotIndex), so this reads "Worn (Finger 1)"
+    // and "Worn (Finger 2)". One key, never the plain tag with a number glued
+    // on: the order of a slot name and its ordinal is the translator's call.
+    wornTagIndexed: 'Worn ({slot} {index})',
     // The Apply Enchant picker's three section headers, in ladder order. The
     // tier is derived from the reagents alone (enchant_apply_view.ts
     // enchantTier), so these headers name the same ladder content/enchants.ts

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { LockpickController } from '../src/ui/hud/delve/lockpick_controller';
+import { t } from '../src/ui/i18n';
 import type { LockpickView } from '../src/world_api';
 import { FakeDocument, FakeWindow } from './helpers/fake_dom';
 
@@ -134,6 +135,23 @@ describe('LockpickController', () => {
 
     expect(test.showBanner).toHaveBeenCalledTimes(1);
     expect(test.log).toHaveBeenCalledWith(expect.any(String), '#7fdc4f');
+    expect(test.panel.style.display).toBe('none');
+    expect(test.release).toHaveBeenCalledWith(true);
+  });
+
+  it('logs a withdrawal without a banner before closing the panel', () => {
+    // end() branches three ways on outcome and only 'success' was pinned, so the colour and
+    // the no-banner half of the arm that a withdrawal actually takes were free to change.
+    // This is the arm every #2517 dismissal of a live board ends on.
+    const test = harness(liveView);
+    test.controller.openBoard();
+
+    test.controller.end('abandoned');
+
+    expect(test.showBanner, 'a withdrawal is not an achievement').not.toHaveBeenCalled();
+    // The KEY, not just the colour: swapping the abandoned and fail summaries (or wiring
+    // this arm to the fail key) leaves an `expect.any(String)` version of this green.
+    expect(test.log).toHaveBeenCalledWith(t('lockpickUi.summary.abandoned'), '#ccc');
     expect(test.panel.style.display).toBe('none');
     expect(test.release).toHaveBeenCalledWith(true);
   });

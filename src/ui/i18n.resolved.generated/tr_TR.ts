@@ -1463,10 +1463,12 @@ export const tr_TR: EnTranslations = {
       "title": "Toplama",
       "harvestButton": "Topla",
       "harvestTooltip": "İşaretlenmiş bileşenleri toplar. Her leş yalnızca bir kez toplanabilir, ilk gelen alır. Yağmayı almaz.",
-      "concentrateHint": "Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.",
+      "yieldTierHint": "Bir toplama ne kadar az bileşen alırsa, her birinin kademesi o kadar yüksek olur.",
       "nothingSelectedYields": "Bu leşten seçtiklerinin hiçbiri toplanamaz.",
       "alreadyHarvested": "Bu leş zaten toplandı.",
       "componentAria": "{component} topla",
+      "componentNoYield": "henüz verim yok",
+      "componentAriaNoYield": "{component} topla: {note}",
       "components": {
         "hide": "Post",
         "fang": "Diş",
@@ -2024,8 +2026,8 @@ export const tr_TR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Dünya Pazarı toplaması bekliyor",
-      "tip": "Tüccar'da senin için bekleyen altın ya da eşyalar var."
+      "aria": "Dünya Pazarı gelirleri veya eşyaları bekliyor",
+      "tip": "Satış gelirleri veya iade edilen eşyalar Tüccar'da seni bekliyor."
     },
     "noticeboard": {
       "empty": "Görünüşe göre hiçbir şey asılmamış."
@@ -2169,9 +2171,9 @@ export const tr_TR: EnTranslations = {
       "notReady": "Bu kaynak noktası senin için henüz yeniden oluşmadı.",
       "gatherLine": "Topladığınız şey: {name}.",
       "gatherLineQty": "Şunu toplarsınız: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Yüzersiniz: {name}.",
+      "harvestLineQty": "Yüzersiniz: {name} x{qty}.",
+      "harvestSpecimenLine": "Ayrıca {name} elde edersiniz.",
       "catchLine": "Çekiyorsunuz: {name}",
       "biteLine": "Bir şey yemi aldı!",
       "gotAwayLine": "Kaçtı gitti.",
@@ -2353,7 +2355,7 @@ export const tr_TR: EnTranslations = {
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Hazırlandı: {name} x{qty}",
       "insufficientMaterials": "Bunun için malzemeleriniz yok.",
       "unknownRecipe": "O tarif mevcut değil.",
       "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin.",
@@ -2446,13 +2448,13 @@ export const tr_TR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "{item} büyüsünü bozup {material} elde ettiniz.",
+      "disenchantedYieldQty": "{item} büyüsünü bozup {material} x{qty} elde ettiniz.",
+      "disenchantedAlso": "Ayrıca {material} elde ettiniz.",
+      "disenchantedAlsoQty": "Ayrıca {material} x{qty} elde ettiniz.",
       "salvagedLine": "{item} parçaladınız.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "{item} parçalayıp {material} elde ettiniz.",
+      "salvagedYieldQty": "{item} parçalayıp {material} x{qty} elde ettiniz.",
       "enchantAppliedLine": "{item} üzerine {enchant} büyüsü uyguladınız.",
       "notHeld": "O eşya elinizde yok.",
       "notDisenchantable": "Bunun büyüsünü bozamazsınız.",
@@ -2477,6 +2479,7 @@ export const tr_TR: EnTranslations = {
       "noEnchants": "Hiçbir büyü bu malzemeyi kullanmıyor.",
       "noTargets": "Büyülenecek uygun eşya yok.",
       "wornTag": "Kuşanılı ({slot})",
+      "wornTagIndexed": "Kuşanılı ({slot} {index})",
       "tier": {
         "base": "Temel Büyüler",
         "runed": "Runlu Büyüler",
@@ -2489,14 +2492,14 @@ export const tr_TR: EnTranslations = {
       "sameEnchant": "O eşyada zaten bu büyü var.",
       "replaceTag": "{enchant} yerine geçer",
       "sameEnchantTag": "Zaten uygulandı",
-      "plainTag": "Not enchanted",
+      "plainTag": "Büyüsüz",
       "replaceConfirmTitle": "{item} üzerindeki büyü değiştirilsin mi?",
       "replaceConfirmBody": "{item} üzerindeki {old} büyüsü {new} ile değiştirilir.",
       "replaceConfirmNoRefund": "Eski büyü yok edilir. Malzemeleri iade edilmez. Bu geri alınamaz.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Korunan: {kept}",
+      "replaceConfirmKeepsSigner": "Yapımcı işareti",
+      "replaceConfirmKeepsMasterwork": "Ustalık bonusu",
+      "replaceConfirmKeepsBond": "Komisyon bağı",
       "replaceConfirmCost": "Maliyet: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Değiştir"
@@ -3742,7 +3745,7 @@ export const tr_TR: EnTranslations = {
     "professions": {
       "intro": "Dünya seni savaşın ve görevlerin ötesinde, toprağı ve ocağı işlediğin için de ödüllendirir: ham madde toplamak, on ayrı zanaat kolunda onları teçhizata ve mallara dönüştürmek ve bu zanaatların temsil ettiği on arketipten birinin kimliğine yerleşmek.",
       "harvestTitle": "Avın kendisini hasat etmek",
-      "harvestBody": "Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; cesedin olağan ganimetiyle birlikte doğrudan cesetten post, diş, ipek ve et elde edilir; tek bir basışla her ikisi de açılır. Her seferinde seçim sizindir: cesedin sunduğu her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nOrnek taşıyan bir ailede nadir veya daha iyi hasat turunda ayrıca imzalı mükemmel bir örnek (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi veya Birinci Kalite Et) olağan verimin üstüne gelir ve Yiğitlikler Kitabına Mükemmel Örnek kaydedilir. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti hangi zanaata ait olursa olsun premium kolu sayılır.",
+      "harvestBodyChoice": "Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; cesedin olağan ganimetiyle birlikte doğrudan cesetten post, diş, ipek ve et elde edilir; tek bir basışla her ikisi de açılır. Bir canavar birden fazla işlenebilir bileşen taşıyorsa seçim sizindir: verebileceği her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nOrnek taşıyan bir ailede nadir veya daha iyi hasat turunda ayrıca imzalı mükemmel bir örnek (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi veya Birinci Kalite Et) olağan verimin üstüne gelir ve Yiğitlikler Kitabına Mükemmel Örnek kaydedilir. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti hangi zanaata ait olursa olsun premium kolu sayılır.",
       "focusTitle": "Kasaba Odağı",
       "focusBody": "Her merkez kasaba, uğrayan toplayıcılar için bir Kasaba Odağı paneli tutar: kasabada dur, onu mini haritanın yanından aç ve küçük bir odak puanı bütçesini önemsediğin bileşen türlerine yönelt. Bir bileşene ne kadar çok odak verirsen, sonraki her cesetten o kadar ince ve zengin çıkar; dağılımın karakterini nereye giderse takip eder ve kasabaya sonraki her uğrayışında onu ücretsiz yeniden düzenleyebilirsin.",
       "craftHowTitle": "Üretim penceresi",
@@ -8155,7 +8158,7 @@ export const tr_TR: EnTranslations = {
         "name": "Doğudere Zincir Zırh Yeleği"
       },
       "valespun_robe": {
-        "name": "Vadidokuma Cübbesi"
+        "name": "Vadieğirme Cübbesi"
       },
       "tanned_leather_jerkin": {
         "name": "Tabaklanmış Deri Ceket"
