@@ -51,18 +51,22 @@ export const PROCEDURAL_RARITY_TABLES: Record<string, RarityTable> = {
     // The deterministic contribution campaign gates this activation. Keep the
     // very rare world rate as broad-chase excitement without displacing normal
     // progression; dungeon bosses remain the primary legendary source.
-    weights: { common: 0.7, magic: 0.245, rare: 0.05, epic: 0.0048, legendary: 0.0002 },
+    weights: { common: 0.7, magic: 0.245, rare: 0.05, epic: 0.0049, legendary: 0.0001 },
   },
   initial_rare: {
     id: 'initial_rare',
-    weights: { magic: 0.6, rare: 0.36, epic: 0.038, legendary: 0.002 },
+    weights: { magic: 0.6, rare: 0.36, epic: 0.039995, legendary: 0.000005 },
+  },
+  initial_delve_elite: {
+    id: 'initial_delve_elite',
+    // The 20% entry gate makes this a 0.0005% effective Legendary chance.
+    weights: { magic: 0.6, rare: 0.36, epic: 0.039975, legendary: 0.000025 },
   },
   initial_dungeon_boss: {
     id: 'initial_dungeon_boss',
-    // Bosses always add one procedural entry. A two-percent Legendary rate
-    // keeps the shared-corpse chase meaningful without replacing authored
-    // normal and Heroic loot, which is rolled independently.
-    weights: { magic: 0.25, rare: 0.6, epic: 0.13, legendary: 0.02 },
+    // Dungeon and delve bosses always add one procedural entry. Authored normal
+    // and Heroic loot still rolls independently from this 0.08% Legendary chase.
+    weights: { magic: 0.25, rare: 0.6, epic: 0.1492, legendary: 0.0008 },
   },
   nythraxis_raid_normal: {
     id: 'nythraxis_raid_normal',

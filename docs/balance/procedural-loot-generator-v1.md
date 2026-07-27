@@ -1,6 +1,6 @@
 # Procedural Loot Generator v1
 
-Date: 2026-07-26
+Date: 2026-07-27
 
 Release target: v0.30
 
@@ -61,8 +61,8 @@ Source routing after those guards:
 | Source | Procedural entry chance | Conditional rarity table |
 | --- | ---: | --- |
 | Ordinary outdoor mob | 5% | World |
-| Outdoor rare or non-world named boss | 100% | Rare |
-| Delve elite or rare | 20% | Rare |
+| Outdoor rare or non-world named boss | 100% | Outdoor rare |
+| Delve elite or rare | 20% | Delve elite |
 | Dungeon boss | 100% | Dungeon boss |
 | Delve boss | 100% | Dungeon boss |
 | Nythraxis Normal | 100% | Nythraxis raid Normal |
@@ -87,9 +87,10 @@ The rarity weights live in `PROCEDURAL_RARITY_TABLES` in
 
 | Table | Common | Magic | Rare | Epic | Legendary |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| World | 70% | 24.5% | 5% | 0.48% | 0.02% |
-| Rare | 0% | 60% | 36% | 3.8% | 0.2% |
-| Dungeon or delve boss | 0% | 25% | 60% | 13% | 2% |
+| World | 70% | 24.5% | 5% | 0.49% | 0.01% |
+| Outdoor rare | 0% | 60% | 36% | 3.9995% | 0.0005% |
+| Delve elite | 0% | 60% | 36% | 3.9975% | 0.0025% |
+| Dungeon or delve boss | 0% | 25% | 60% | 14.92% | 0.08% |
 | Nythraxis Normal | 0% | 0% | 65% | 33% | 2% |
 | Nythraxis Heroic | 0% | 0% | 40% | 55% | 5% |
 
@@ -99,19 +100,19 @@ These values multiply the entry chance by the conditional rarity weight.
 
 | Source | No procedural item | Common | Magic | Rare | Epic | Legendary |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Ordinary outdoor mob | 95% | 3.5% | 1.225% | 0.25% | 0.024% | 0.001% |
-| Outdoor rare or named boss | 0% | 0% | 60% | 36% | 3.8% | 0.2% |
-| Delve elite or rare | 80% | 0% | 12% | 7.2% | 0.76% | 0.04% |
-| Dungeon or delve boss | 0% | 0% | 25% | 60% | 13% | 2% |
+| Ordinary outdoor mob | 95% | 3.5% | 1.225% | 0.25% | 0.0245% | 0.0005% |
+| Outdoor rare or named boss | 0% | 0% | 60% | 36% | 3.9995% | 0.0005% |
+| Delve elite or rare | 80% | 0% | 12% | 7.2% | 0.7995% | 0.0005% |
+| Dungeon or delve boss | 0% | 0% | 25% | 60% | 14.92% | 0.08% |
 | Nythraxis Normal | 0% | 0% | 0% | 65% | 33% | 2% |
 | Nythraxis Heroic | 0% | 0% | 0% | 40% | 55% | 5% |
 
 The effective Legendary expectations are therefore:
 
-- ordinary outdoor mob: 1 in 100,000 eligible kills
-- outdoor rare or named boss: 1 in 500 eligible kills
-- delve elite or rare: 1 in 2,500 eligible kills
-- dungeon or delve boss: 1 in 50 eligible kills
+- ordinary outdoor mob: 1 in 200,000 eligible kills
+- outdoor rare or named boss: 1 in 200,000 eligible kills
+- delve elite or rare: 1 in 200,000 eligible kills
+- dungeon or delve boss: 1 in 1,250 eligible kills
 - Nythraxis Normal: 1 in 50 eligible kills
 - Nythraxis Heroic: 1 in 20 eligible kills
 
@@ -124,32 +125,34 @@ marks monsters at level 12 or below as grey.
 
 ## Boss-kill tails and grind expectations
 
-For a repeatable generic boss or Normal Nythraxis kill with a 2% Legendary
+For a repeatable generic dungeon or delve boss kill with a 0.08% Legendary
 chance, the chance of seeing at least one Legendary after `n` independent
 kills is:
 
-`1 - 0.98^n`
+`1 - 0.9992^n`
 
 | Boss kills | At least one Legendary |
 | ---: | ---: |
-| 1 | 2.000% |
-| 10 | 18.293% |
-| 25 | 39.654% |
-| 35 | 50.693% |
-| 50 | 63.583% |
-| 75 | 78.024% |
-| 100 | 86.738% |
-| 114 | 90.005% |
-| 149 | 95.072% |
-| 200 | 98.241% |
-| 228 | 99.001% |
+| 1 | 0.080% |
+| 10 | 0.797% |
+| 25 | 1.981% |
+| 50 | 3.923% |
+| 100 | 7.691% |
+| 500 | 32.979% |
+| 867 | 50.037% |
+| 1,250 | 63.227% |
+| 2,878 | 90.007% |
+| 3,744 | 95.003% |
+| 5,755 | 99.001% |
 
 This creates a meaningful long-tail chase while making bosses much more useful
 than ordinary farming. It also means an unlucky player can exceed any of these
 kill counts. Natural drops have no pity counter, including Nythraxis.
 
-Heroic Nythraxis uses 5% instead: `1 - 0.95^n`. It reaches 51.233% by 14
-kills, 90.056% by 45, 95.151% by 59, and 99.011% by 90.
+Normal Nythraxis remains 2%: `1 - 0.98^n`. It reaches 50.693% by 35 kills,
+90.005% by 114, 95.072% by 149, and 99.001% by 228. Heroic Nythraxis uses
+5%: `1 - 0.95^n`. It reaches 51.233% by 14 kills, 90.056% by 45, 95.151%
+by 59, and 99.011% by 90.
 
 Boss signature targeting makes the desired power substantially more likely
 after a Legendary occurs. It does not alter the active table's Legendary entry
@@ -383,7 +386,7 @@ dropped procedural items carry the new versioned payload.
 
 ## Current deterministic measurements
 
-The following samples were rerun against the implemented tables on 2026-07-26
+The following samples were rerun against the implemented tables on 2026-07-27
 with world seed `13371337`. Each row generated 100,000 item entries directly.
 These are conditional generator samples, not per-kill results, so the 5% and
 20% live entry gates are not applied in this table.
@@ -406,6 +409,13 @@ npx tsx scripts/procedural_loot_simulate.ts `
   --seed 13371337
 
 npx tsx scripts/procedural_loot_simulate.ts `
+  --pool initial_rare `
+  --table initial_delve_elite `
+  --level 18 `
+  --count 100000 `
+  --seed 13371337
+
+npx tsx scripts/procedural_loot_simulate.ts `
   --pool initial_dungeon_boss `
   --table initial_dungeon_boss `
   --level 20 `
@@ -415,23 +425,25 @@ npx tsx scripts/procedural_loot_simulate.ts `
 
 | Table | Common | Magic | Rare | Epic | Legendary |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| World | 69.976% | 24.498% | 5.020% | 0.485% | 0.021% |
-| Rare | 0% | 60.108% | 35.921% | 3.757% | 0.214% |
-| Dungeon boss | 0% | 24.908% | 59.910% | 13.157% | 2.025% |
+| World | 69.976% | 24.498% | 5.020% | 0.497% | 0.009% |
+| Outdoor rare | 0% | 60.108% | 35.921% | 3.971% | 0% |
+| Delve elite | 0% | 59.934% | 36.048% | 4.015% | 0.003% |
+| Dungeon boss | 0% | 24.908% | 59.910% | 15.101% | 0.081% |
 
-All 300,000 generated entries had zero duplicate UIDs, zero duplicate affix
-families, and zero values outside persisted ranges. The run generated 2,260
+All 400,000 generated entries had zero duplicate UIDs, zero duplicate affix
+families, and zero values outside persisted ranges. The run generated 93
 Legendaries through the normal rarity tables.
 
 | Table | Affix slots | Average affix budget | Average item affix budget | Maximum item affix budget |
 | --- | ---: | ---: | ---: | ---: |
-| World | 54,513 | 6.845808 | 3.731855 | 33.50 |
-| Rare | 224,929 | 6.045309 | 13.597654 | 33.59 |
-| Dungeon boss | 302,123 | 5.843939 | 17.655884 | 37.27 |
+| World | 54,526 | 6.844601 | 3.732087 | 33.50 |
+| Outdoor rare | 225,162 | 6.038874 | 13.597250 | 33.62 |
+| Delve elite | 225,490 | 6.026966 | 13.590205 | 33.50 |
+| Dungeon boss | 304,266 | 5.799399 | 17.645599 | 37.27 |
 
 The pinned 10,000-entry world digest in
 `tests/procedural_loot_distribution.test.ts` currently reports average item
-affix budget `3.662585` and maximum item affix budget `33.25`.
+affix budget `3.66261` and maximum item affix budget `33.25`.
 
 ## Automated evidence and final QA
 

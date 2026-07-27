@@ -1,6 +1,6 @@
 # Procedural Legendary v1
 
-Date: 2026-07-26
+Date: 2026-07-27
 
 Release target: v0.30
 
@@ -19,24 +19,24 @@ the exact-SHA acceptance commands documented below.
 ## Drop rate
 
 Every eligible generic dungeon or delve boss appends one procedural equipment
-entry. That entry uses a 2% Legendary weight, so the configured mean is one
-Legendary per 50 boss kills. Normal Nythraxis uses the same 2% rate at fixed
-item level 32. Heroic Nythraxis uses a dedicated 5% rate at item level 36 and
-guarantees its power magnitude to the authored upper half.
+entry. That entry uses a 0.08% Legendary weight, so the configured mean is one
+Legendary per 1,250 boss kills. Normal Nythraxis remains on its dedicated 2%
+rate at fixed item level 32. Heroic Nythraxis uses a dedicated 5% rate at item
+level 36 and guarantees its power magnitude to the authored upper half.
 
 The drop is a shared corpse entry under the existing party-loot rules. It is
-not a personal 2% roll for every group member.
+not a personal roll for every group member.
 
 Nythraxis adds one shared procedural item to the final corpse on both
 difficulties. It has no personal currency, purchase path, or pity counter.
 Exact raid behavior is specified in
 `docs/balance/nythraxis-endgame-loot-v030.md`.
 
-Outdoor rares use a 0.2% Legendary weight on a guaranteed procedural entry.
-Delve elites use that same conditional table behind a 20% entry gate, for an
-effective 0.04% Legendary chance. Ordinary outdoor mobs use a 0.02%
-conditional Legendary weight behind a 5% entry gate, for an effective 0.001%
-chance.
+Outdoor rares use a 0.0005% Legendary weight on a guaranteed procedural entry.
+Delve elites use a separate 0.0025% conditional table behind a 20% entry gate,
+for the same effective 0.0005% Legendary chance. Ordinary outdoor mobs use a
+0.01% conditional Legendary weight behind a 5% entry gate, also for an
+effective 0.0005% chance.
 
 Those rates apply only when at least one eligible recipient is not grey to the
 source under the existing XP curve. If every eligible recipient would receive
@@ -44,7 +44,7 @@ zero XP, the additive procedural entry is suppressed and its effective
 Legendary chance is zero. Authored loot is not changed by this guard.
 
 See `docs/balance/procedural-loot-generator-v1.md` for the full effective
-probability table and cumulative 2% boss-kill tails.
+probability table and cumulative boss-kill tails.
 
 ## Boss targeting
 
@@ -344,8 +344,8 @@ npm run gate
 
 The system has several independent chase axes:
 
-- generic and Normal raid bosses provide a 2% shared chase, while Heroic
-  Nythraxis provides the peak 5% shared chase
+- generic dungeon and delve bosses provide a 0.08% shared chase, Normal
+  Nythraxis remains at 2%, and Heroic Nythraxis provides the peak 5% shared chase
 - every power has one target boss
 - target bosses remain non-exclusive, so all kills can still surprise
 - item level varies with source and rarity
@@ -362,7 +362,7 @@ level, more useful affix mix, and higher power roll.
 ## Honest limitations
 
 - Natural drops have no pity counter or forced result.
-- A 2% shared-corpse drop is not a 2% personal roll for each party member.
+- A shared-corpse drop is not a separate personal roll for each party member.
 - Signature targeting is probabilistic and compatibility-dependent.
 - The contribution harness is not a full encounter simulator.
 - Baseline channel shares are representative workload inputs, not a claim that

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PROCEDURAL_RARITY_TABLES } from '../src/sim/content/procedural_loot';
 import { MOBS } from '../src/sim/data';
 import {
   generateLiveProceduralDrop,
@@ -75,8 +76,53 @@ describe('live procedural drop policy', () => {
     expect(proceduralDropProfile(elite, { inDungeon: false, inDelve: true })).toMatchObject({
       source: 'delve',
       chance: 0.2,
-      rarityTableId: 'initial_rare',
+      rarityTableId: 'initial_delve_elite',
     });
+  });
+
+  it('pins the effective Legendary chance for each requested source', () => {
+    const rare = Object.values(MOBS).find(
+      (template) => template.maxLevel >= 5 && template.rare && !template.worldBoss,
+    );
+    const boss = Object.values(MOBS).find((template) => template.boss && !template.worldBoss);
+    const elite = Object.values(MOBS).find((template) => template.elite && !template.boss);
+    if (!rare || !boss || !elite) throw new Error('expected source fixtures');
+
+    const effectiveLegendaryChance = (
+      profile: ReturnType<typeof proceduralDropProfile>,
+    ): number => {
+      if (!profile) throw new Error('expected procedural drop profile');
+      return (
+        profile.chance *
+        (PROCEDURAL_RARITY_TABLES[profile.rarityTableId].weights.legendary ?? 0)
+      );
+    };
+
+    expect(
+      effectiveLegendaryChance(
+        proceduralDropProfile(MOBS.forest_wolf, { inDungeon: false, inDelve: false }),
+      ),
+    ).toBeCloseTo(0.000005, 12);
+    expect(
+      effectiveLegendaryChance(
+        proceduralDropProfile(rare, { inDungeon: false, inDelve: false }),
+      ),
+    ).toBeCloseTo(0.000005, 12);
+    expect(
+      effectiveLegendaryChance(
+        proceduralDropProfile(elite, { inDungeon: false, inDelve: true }),
+      ),
+    ).toBeCloseTo(0.000005, 12);
+    expect(
+      effectiveLegendaryChance(
+        proceduralDropProfile(boss, { inDungeon: true, inDelve: false }),
+      ),
+    ).toBeCloseTo(0.0008, 12);
+    expect(
+      effectiveLegendaryChance(
+        proceduralDropProfile(boss, { inDungeon: false, inDelve: true }),
+      ),
+    ).toBeCloseTo(0.0008, 12);
   });
 
   it('excludes world bosses and training dummies', () => {

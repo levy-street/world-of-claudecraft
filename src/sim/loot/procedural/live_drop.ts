@@ -92,7 +92,7 @@ const PROFILE_DELVE_ELITE: ProceduralDropProfile = {
   source: 'delve',
   chance: 0.2,
   basePoolId: 'initial_rare',
-  rarityTableId: 'initial_rare',
+  rarityTableId: 'initial_delve_elite',
 };
 
 export function proceduralDropProfile(
