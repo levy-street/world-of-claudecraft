@@ -1354,7 +1354,10 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // ~-0.2 at the deck's far end; due east falls slower, due south hugs the
     // bluff). hutLocal 40/40 with zero half-extents is the "no hut" idiom the
     // other open jetties use.
-    { x: 155, z: -51, rot: -2.356, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
+    { x: 172, z: -48, rot: -1.5708, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
+    // ...second section, colinear: the pier runs east over the shelf drop so
+    // its far end stands above real water (dockSurfaceHeight composes maxima)
+    { x: 177.3, z: -48, rot: -1.5708, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
   ],
   tents: [
     { x: 62, z: -61, rot: 0.4, scale: 1 },

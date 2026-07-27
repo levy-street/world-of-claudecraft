@@ -632,8 +632,11 @@ export const FARSHORE_PROPS: ZonePropsDef = {
   // colinear docks compose into one long walkable pier), plus the Landing's
   // small fishing jetty on the west shore.
   docks: [
-    { x: 802, z: 122, rot: 1.5708, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
-    { x: 797, z: 122, rot: 1.5708, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
+    // Gullhaven's harbor pier: anchored at the bay's shoreline (dry on every
+    // seed) and running west, its far sections standing over the bay drop.
+    // ONE dock only: a deck seats on its own anchor's terrain, so a second
+    // anchor out in the bay would drown its planks.
+    { x: 781, z: 122, rot: 1.5708, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
     { x: 778, z: -36, rot: 2.4, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
   ],
   graveyards: [{ x: 836, z: 132 }],

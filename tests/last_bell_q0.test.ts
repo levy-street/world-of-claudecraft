@@ -50,13 +50,13 @@ describe('Q0 Ashore end to end', () => {
 
     // 1. Board the ferry on the mainland: quest auto-accepts, the crossing
     // lands at Gullhaven, and the arrival scene starts for this player.
-    teleport(sim, 152, -48);
+    teleport(sim, 176, -48);
     const ferry = findByName(sim, 'The Farshore Ferry');
     expect(ferry).toBeTruthy();
     sim.player.targetId = ferry?.id ?? null;
     sim.interact();
     expect(sim.questLog.get(QUEST)?.state).toBe('active');
-    expect(Math.hypot(sim.player.pos.x - 806, sim.player.pos.z - 122)).toBeLessThan(3);
+    expect(Math.hypot(sim.player.pos.x - 781, sim.player.pos.z - 124)).toBeLessThan(3);
     const arrival = collect(sim, 30);
     const sceneKinds = arrival
       .filter((e): e is Extract<SimEvent, { type: 'scene' }> => e.type === 'scene')
@@ -154,7 +154,7 @@ describe('Q0 Ashore end to end', () => {
   it('the ferry is plain travel once the quest is done or active', () => {
     const sim = makeSim();
     sim.ctx.players.get(sim.playerId)?.questsDone.add(QUEST);
-    teleport(sim, 152, -48);
+    teleport(sim, 176, -48);
     const ferry = findByName(sim, 'The Farshore Ferry');
     sim.player.targetId = ferry?.id ?? null;
     sim.interact();

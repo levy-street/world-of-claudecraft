@@ -24,8 +24,12 @@ const ARRIVAL_SCENE = 'scn_lb_q0_ashore';
 
 // The two ferry landings: the mainland dock at the vale's east point and
 // the Gullhaven harbor pier. Boarding at one lands you at the other.
-const MAINLAND_DOCK = { x: 152, z: -48 };
-const GULLHAVEN_PIER = { x: 806, z: 122 };
+// Arrival points sit on dry shore beside each pier root; the boarding
+// fixtures stand out on the pier ends over the water.
+const MAINLAND_DOCK = { x: 173, z: -48 };
+const GULLHAVEN_PIER = { x: 781, z: 124 };
+const MAINLAND_BOARD = { x: 177, z: -48 };
+const GULLHAVEN_BOARD = { x: 777, z: 122 };
 
 interface FixtureDef {
   templateId: 'lb_ferry' | 'lb_scenario_door' | 'lb_breach_maw';
@@ -36,8 +40,13 @@ interface FixtureDef {
 }
 
 const FIXTURES: readonly FixtureDef[] = [
-  { templateId: 'lb_ferry', name: 'The Farshore Ferry', x: MAINLAND_DOCK.x, z: MAINLAND_DOCK.z },
-  { templateId: 'lb_ferry', name: 'The Farshore Ferry', x: GULLHAVEN_PIER.x, z: GULLHAVEN_PIER.z },
+  { templateId: 'lb_ferry', name: 'The Farshore Ferry', x: MAINLAND_BOARD.x, z: MAINLAND_BOARD.z },
+  {
+    templateId: 'lb_ferry',
+    name: 'The Farshore Ferry',
+    x: GULLHAVEN_BOARD.x,
+    z: GULLHAVEN_BOARD.z,
+  },
   // The Tidemill door at the Watch Meadow's western edge (Q0's climax).
   {
     templateId: 'lb_scenario_door',

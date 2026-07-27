@@ -38,8 +38,8 @@ describe('Last Bell campaign fixtures', () => {
     const ferries = fixtures(sim, 'lb_ferry');
     expect(ferries.map((f) => ({ x: f.pos.x, z: f.pos.z }))).toEqual(
       expect.arrayContaining([
-        { x: 152, z: -48 },
-        { x: 806, z: 122 },
+        { x: 177, z: -48 },
+        { x: 777, z: 122 },
       ]),
     );
     expect(ferries).toHaveLength(2);
@@ -94,25 +94,25 @@ describe('Last Bell campaign fixtures', () => {
 
   it('keeps the ferries interactable: boarding still crosses the strait', () => {
     const sim = makeSim();
-    const mainlandFerry = fixtures(sim, 'lb_ferry').find((f) => f.pos.x === 152);
+    const mainlandFerry = fixtures(sim, 'lb_ferry').find((f) => f.pos.x === 177);
     expect(mainlandFerry).toBeTruthy();
     if (!mainlandFerry) return;
 
-    teleport(sim, 152, -48);
+    teleport(sim, 176, -48);
     sim.player.targetId = mainlandFerry.id;
     sim.interact();
-    expect(Math.hypot(sim.player.pos.x - 806, sim.player.pos.z - 122)).toBeLessThan(3);
+    expect(Math.hypot(sim.player.pos.x - 781, sim.player.pos.z - 124)).toBeLessThan(3);
 
-    const pierFerry = fixtures(sim, 'lb_ferry').find((f) => f.pos.x === 806);
+    const pierFerry = fixtures(sim, 'lb_ferry').find((f) => f.pos.x === 777);
     expect(pierFerry).toBeTruthy();
     if (!pierFerry) return;
     sim.player.targetId = pierFerry.id;
     sim.interact();
-    expect(Math.hypot(sim.player.pos.x - 152, sim.player.pos.z + 48)).toBeLessThan(3);
+    expect(Math.hypot(sim.player.pos.x - 173, sim.player.pos.z + 48)).toBeLessThan(3);
   });
 
   it('stands a walkable mainland jetty whose deck runs toward the falling shore', () => {
-    const dock = ZONE1_PROPS.docks.find((d) => d.x === 155 && d.z === -51);
+    const dock = ZONE1_PROPS.docks.find((d) => d.x === 172 && d.z === -48);
     expect(dock).toBeTruthy();
     if (!dock) return;
     // No hut on an open jetty (zero half-extents keep colliders.ts quiet).
@@ -134,7 +134,7 @@ describe('Last Bell campaign fixtures', () => {
     // The planks are real raised walkable ground for the sim (any seed): the
     // ground height on a deck section sits above the bare terrain under it.
     const sim = makeSim();
-    const c = dockSectionWorldCenter(dock, 1);
+    const c = dockSectionWorldCenter(dock, 0);
     expect(sim.groundPos(c.x, c.z).y).toBeGreaterThan(terrainHeight(c.x, c.z, 4242));
   });
 });

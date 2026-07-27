@@ -202,3 +202,21 @@ regen; agent B builds ferry-boat/door/breach visuals + mainland dock prop.
 Then: parity re-mint, commits, dev server, owner handoff. NOT in D1:
 town walls/villagers (D2), region ambience (D3), arrival cinematic
 re-staging (D4).
+
+### D1 shipped + the harbor program inserted (2026-07-27, later)
+
+D1 shipped (dcf397487 + c50955600 + 9bd0900b1) and the owner's dock review
+rejected the landing experience (plank-kit pier + procedural dinghy). The
+boat/dock experience is now its own three-phase program, specced with
+per-phase file manifests and acceptance criteria in
+docs/prd/last-bell-harbor.md: H1 the harbor (boardwalk system + real ship
+GLB + ferryman at the gangplank), H2 the fare (dialog purchase through the
+choice engine, gaining a personal shared-world arm), H3 the voyage
+(departure cinematic with a ship cast-off prop cue + real bell/harbor SFX
+through the sfx pipeline; absorbs D4's arrival half). Interim state on the
+branch: the small-kit piers at both landings work end to end (fare-less
+F-boarding, tests green) and are torn out by H1. Key facts for H1: the
+owned ship models are public/models/biome/sea_boat_sail_a.glb and siblings
+(CC0, credited); the 3-section dock kit seats each deck on its own anchor
+terrain, so level piers over deep water need the new harbor layout's
+authored deck heights, never chained dock anchors.

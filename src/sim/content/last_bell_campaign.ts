@@ -56,7 +56,7 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     id: 'ferryman_ewald',
     name: 'Ferryman Ewald',
     title: 'The Farshore Crossing',
-    pos: { x: 148, z: -45 },
+    pos: { x: 174, z: -47 },
     facing: Math.PI / 3,
     color: 0x4a5a7a,
     questIds: [],

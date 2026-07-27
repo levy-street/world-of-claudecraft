@@ -4813,14 +4813,14 @@ export class Renderer {
       objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId === 'lb_ferry') {
       // Last Bell ferry landing: mooring post at the fixture, the moored boat
-      // pushed offshore to the open water. On the pinned world seed the sea
-      // floor only dips under WATER_LEVEL ~30 yd east of the mainland landing
-      // and ~34 yd west of the Gullhaven pier root; the builder drops the
+      // a few yards off the PIER END the fixture stands on (the fixture sits
+      // on the pier over the shelf drop, so open water is close: 14 yd past
+      // the mainland pier, 9 yd past Gullhaven's). The builder drops the
       // boat's waterline to the sea surface from the fixture's own ground
       // height (e.pos.y), and the group is turned so local -x points at the
       // water (mainland x<400: the strait lies east, so flip by pi).
       const mainland = e.pos.x < 400;
-      const built = buildFerryLanding(e.id, mainland ? 30 : 34, e.pos.y);
+      const built = buildFerryLanding(e.id, mainland ? 10 : 9, e.pos.y);
       body = built.group;
       body.rotation.y = mainland ? Math.PI : 0;
       height = built.height;
