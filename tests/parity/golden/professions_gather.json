@@ -13,13 +13,13 @@
     "gatherResult qty/rareEvent payload fields"
   ],
   "draws": 212,
-  "drawDigest": "30ec074f",
+  "drawDigest": "85619cb5",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 824,
-      "state": "920bd021",
+      "nextId": 841,
+      "state": "a1664633",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -57,7 +57,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -94,7 +94,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 816
+              "sourceId": 832
             }
           ],
           "blockChance": 0.05,
@@ -107,7 +107,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 816,
+          "id": 832,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -151,12 +151,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 824,
-      "state": "4337fd2c",
-      "events": "bbfe9bfe",
+      "nextId": 841,
+      "state": "c1f4d3b6",
+      "events": "9e088f9e",
       "rng": {
         "draws": 2,
-        "digest": "23ad5e91"
+        "digest": "6b9ec2ea"
       },
       "label": "harvest-ore-common-and-denial",
       "players": [
@@ -196,7 +196,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -247,7 +247,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 816
+              "sourceId": 832
             }
           ],
           "blockChance": 0.05,
@@ -260,7 +260,7 @@
           "fallStartY": -1.407651,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 816,
+          "id": 832,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -304,12 +304,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 824,
-      "state": "1abc03b1",
-      "events": "9ae88e6b",
+      "nextId": 841,
+      "state": "3da36520",
+      "events": "4ce07696",
       "rng": {
         "draws": 7,
-        "digest": "9a5b7e1d"
+        "digest": "19d04500"
       },
       "label": "harvest-wood-max-proficiency",
       "players": [
@@ -329,7 +329,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 10,
+            "damageTaken": 13,
             "xpGained": 42
           },
           "craftSkills": {},
@@ -362,7 +362,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -384,7 +384,24 @@
               "itemId": "copper_ore"
             },
             {
-              "count": 2,
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "ironbark_log"
             }
           ],
@@ -422,7 +439,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 816
+              "sourceId": 832
             }
           ],
           "blockChance": 0.05,
@@ -433,8 +450,8 @@
           "dodgeChance": 0.06,
           "fallStartY": -2.328903,
           "fiveSecondRule": 99.1,
-          "hp": 90,
-          "id": 816,
+          "hp": 87,
+          "id": 832,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -452,7 +469,7 @@
             "z": 8
           },
           "potionCooldownUntil": -1,
-          "resource": 2.2,
+          "resource": 2.86,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -480,12 +497,12 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 824,
-      "state": "4dc05027",
-      "events": "5941bfe0",
+      "nextId": 841,
+      "state": "a15ba64b",
+      "events": "dd76ba28",
       "rng": {
         "draws": 212,
-        "digest": "30ec074f"
+        "digest": "85619cb5"
       },
       "label": "rare-event-window",
       "players": [
@@ -505,7 +522,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 17,
+            "damageTaken": 19,
             "levelUps": 2,
             "xpGained": 2022
           },
@@ -550,7 +567,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -572,7 +589,24 @@
               "itemId": "copper_ore"
             },
             {
-              "count": 2,
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "ironbark_log"
             },
             {
@@ -581,41 +615,6 @@
             },
             {
               "count": 20,
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
               "itemId": "silverleaf_herb"
             },
             {
@@ -628,6 +627,41 @@
             },
             {
               "count": 19,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "silverleaf_herb"
             }
           ],
@@ -1062,7 +1096,19 @@
               "name": "Battle Stance",
               "remaining": 3599.8,
               "school": "physical",
-              "sourceId": 816
+              "sourceId": 832
+            },
+            {
+              "duration": 10,
+              "id": "venom_webwood_spider",
+              "kind": "dot",
+              "name": "Spider Venom",
+              "remaining": 10,
+              "school": "nature",
+              "sourceId": 115,
+              "tickInterval": 2,
+              "tickTimer": 2,
+              "value": 2
             }
           ],
           "blockChance": 0.05,
@@ -1074,7 +1120,7 @@
           "fallStartY": -7.6,
           "fiveSecondRule": 99.2,
           "hp": 176,
-          "id": 816,
+          "id": 832,
           "inCombat": true,
           "kind": "player",
           "level": 3,
@@ -1092,7 +1138,7 @@
             "z": 90
           },
           "potionCooldownUntil": -1,
-          "resource": 4.766667,
+          "resource": 5.06,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1120,12 +1166,12 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 824,
-      "state": "87a64ac2",
-      "events": "035ce7df",
+      "nextId": 841,
+      "state": "ca3e956f",
+      "events": "685d12ff",
       "rng": {
         "draws": 212,
-        "digest": "30ec074f"
+        "digest": "85619cb5"
       },
       "label": "final",
       "players": [
@@ -1145,7 +1191,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 17,
+            "damageTaken": 19,
             "levelUps": 2,
             "xpGained": 2022
           },
@@ -1206,7 +1252,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1229,7 +1275,24 @@
               "itemId": "copper_ore"
             },
             {
-              "count": 2,
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "ironbark_log"
             },
             {
@@ -1238,41 +1301,6 @@
             },
             {
               "count": 20,
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
               "itemId": "silverleaf_herb"
             },
             {
@@ -1285,6 +1313,41 @@
             },
             {
               "count": 19,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "silverleaf_herb"
             }
           ],
@@ -1317,7 +1380,19 @@
               "name": "Battle Stance",
               "remaining": 3599.7,
               "school": "physical",
-              "sourceId": 816
+              "sourceId": 832
+            },
+            {
+              "duration": 10,
+              "id": "venom_webwood_spider",
+              "kind": "dot",
+              "name": "Spider Venom",
+              "remaining": 9.9,
+              "school": "nature",
+              "sourceId": 115,
+              "tickInterval": 2,
+              "tickTimer": 1.9,
+              "value": 2
             }
           ],
           "blockChance": 0.05,
@@ -1330,7 +1405,7 @@
           "fallStartY": -5.25,
           "fiveSecondRule": 99.3,
           "hp": 176,
-          "id": 816,
+          "id": 832,
           "inCombat": true,
           "kind": "player",
           "level": 3,
@@ -1348,7 +1423,7 @@
             "z": 90
           },
           "potionCooldownUntil": -1,
-          "resource": 4.766667,
+          "resource": 5.06,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,

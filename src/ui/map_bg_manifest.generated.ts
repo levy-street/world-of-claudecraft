@@ -10,7 +10,7 @@ export const BAKED_MAP_BG = {
   "eastbrook_vale": {
     "w": 480,
     "h": 480,
-    "rowHash": "ab8b5dee"
+    "rowHash": "c682c90f"
   },
   "mirefen_marsh": {
     "w": 480,
@@ -55,7 +55,7 @@ export const BAKED_MAP_BG = {
   "wraithwood": {
     "w": 480,
     "h": 747,
-    "rowHash": "bb7e41a8"
+    "rowHash": "b9f90873"
   },
   "palmreach": {
     "w": 480,
@@ -65,7 +65,7 @@ export const BAKED_MAP_BG = {
   "evergarden": {
     "w": 480,
     "h": 747,
-    "rowHash": "50e6f60f"
+    "rowHash": "17a11c04"
   },
   "galecrest": {
     "w": 480,
@@ -74,13 +74,13 @@ export const BAKED_MAP_BG = {
   },
   "farshore_isle": {
     "w": 480,
-    "h": 480,
-    "rowHash": "c5d89b51"
+    "h": 432,
+    "rowHash": "27bae3a0"
   },
   "world_strip": {
     "w": 140,
-    "h": 337,
-    "rowHash": "75591336"
+    "h": 203,
+    "rowHash": "1762ceef"
   }
 },
 } as const;

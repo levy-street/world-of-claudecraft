@@ -2510,6 +2510,11 @@ export const it_IT: EnTranslations = {
     }
   },
   "lb": {
+    "fixture": {
+      "ferry": "The Farshore Ferry",
+      "tidemill": "The Tidemill",
+      "breach": "The Breach"
+    },
     "speaker": {
       "tam": "Bellkeeper Tam",
       "coalfast": "Warden Coalfast",
@@ -12626,8 +12631,8 @@ export const it_IT: EnTranslations = {
       },
       "q_fs_bell_at_the_landing": {
         "title": "The Bell at the Landing",
-        "text": "You came over the Ferrywalk, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up the shore road, past the drying racks nobody tends anymore. Tell Warden Coalfast the causeway still stands, and that Tam has not rung a three-toll today. Yet.",
-        "completion": "The causeway holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands that crosses that sandbar is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
+        "text": "You came in on the ferry, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up from the harbor, past the drying racks nobody tends anymore. Tell Warden Coalfast the crossing still runs, and that Tam has not rung a three-toll today. Yet.",
+        "completion": "The crossing holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands the ferry carries over is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
         "objectives": {
           "0": {
             "label": "Report to Warden Coalfast"
@@ -12913,7 +12918,7 @@ export const it_IT: EnTranslations = {
             "label": "Il Campo della Scrofa"
           },
           "11": {
-            "label": "The Farshore Causeway"
+            "label": "The Farshore Ferry"
           }
         }
       },
@@ -13246,7 +13251,7 @@ export const it_IT: EnTranslations = {
       },
       "farshore_isle": {
         "name": "The Farshore",
-        "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
+        "welcome": "Step off the ferry and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
         "pois": {
           "0": {
             "label": "Gullhaven"
@@ -13262,6 +13267,12 @@ export const it_IT: EnTranslations = {
           },
           "4": {
             "label": "The Riftfields"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }

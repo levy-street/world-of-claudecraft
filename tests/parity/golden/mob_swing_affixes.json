@@ -10,14 +10,14 @@
     "mobSwing affix cascade: rampage stacking buff_ap (warlord_drogmar self-buff)",
     "friendly-pet mobSwing: mob.hostile=false short-circuits every proc (no debuff on its target)"
   ],
-  "draws": 356,
-  "drawDigest": "ef9628ee",
+  "draws": 361,
+  "drawDigest": "d00842fb",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 824,
-      "state": "920bd021",
+      "nextId": 841,
+      "state": "a1664633",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,7 +55,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -92,7 +92,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 816
+              "sourceId": 832
             }
           ],
           "blockChance": 0.05,
@@ -105,7 +105,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 816,
+          "id": 832,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -149,45 +149,45 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 830,
-      "state": "0414bf83",
-      "events": "e1e54266",
+      "nextId": 847,
+      "state": "d5598f9b",
+      "events": "e580f249",
       "rng": {
-        "draws": 57,
-        "digest": "ed3c4647"
+        "draws": 52,
+        "digest": "355e76ff"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 830,
-      "state": "fac9cfde",
-      "events": "246b8292",
+      "nextId": 847,
+      "state": "06e1377b",
+      "events": "926b22d1",
       "rng": {
-        "draws": 91,
-        "digest": "916dacc8"
+        "draws": 95,
+        "digest": "7ff138fb"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 830,
-      "state": "7cb9fa17",
-      "events": "f9504622",
+      "nextId": 847,
+      "state": "e8518740",
+      "events": "249872da",
       "rng": {
-        "draws": 314,
-        "digest": "f9228aba"
+        "draws": 323,
+        "digest": "c25c70b7"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 830,
-      "state": "3076320f",
+      "nextId": 847,
+      "state": "db311a94",
       "events": "741638a5",
       "rng": {
-        "draws": 314,
-        "digest": "f9228aba"
+        "draws": 323,
+        "digest": "c25c70b7"
       },
       "label": "affixes",
       "players": [
@@ -207,7 +207,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1278
+            "damageTaken": 1464
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -244,7 +244,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -283,26 +283,16 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 816
+              "sourceId": 832
             },
             {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 9.05,
+              "duration": 4,
+              "id": "silence_gravecaller_summoner",
+              "kind": "silence",
+              "name": "Silencing Shriek",
+              "remaining": 3.05,
               "school": "shadow",
-              "sourceId": 826,
-              "value": 120
-            },
-            {
-              "duration": 1,
-              "id": "stun_mogger_lackey",
-              "kind": "stun",
-              "name": "Skullthump",
-              "remaining": 0.5,
-              "school": "physical",
-              "sourceId": 824
+              "sourceId": 843
             },
             {
               "duration": 10,
@@ -311,7 +301,7 @@
               "name": "Spider Venom",
               "remaining": 9.5,
               "school": "nature",
-              "sourceId": 825,
+              "sourceId": 842,
               "tickInterval": 2,
               "tickTimer": 1.5,
               "value": 2
@@ -323,16 +313,7 @@
               "name": "Sticky Web",
               "remaining": 2.5,
               "school": "nature",
-              "sourceId": 825
-            },
-            {
-              "duration": 4,
-              "id": "silence_gravecaller_summoner",
-              "kind": "silence",
-              "name": "Silencing Shriek",
-              "remaining": 3.5,
-              "school": "shadow",
-              "sourceId": 826
+              "sourceId": 842
             }
           ],
           "blockChance": 0.05,
@@ -345,7 +326,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 1000000,
-          "id": 816,
+          "id": 832,
           "inCombat": true,
           "kind": "player",
           "level": 16,
@@ -363,7 +344,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 78.1,
+          "resource": 89.466667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -387,9 +368,9 @@
           }
         },
         {
-          "aggroTargetId": 828,
+          "aggroTargetId": 845,
           "aiState": "attack",
-          "combatTimer": 0.5,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -398,8 +379,8 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199980,
-          "id": 824,
+          "hp": 199981,
+          "id": 841,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -429,13 +410,13 @@
             "armor": 306
           },
           "swingTimer": 1.05,
-          "tappedById": 816,
-          "targetId": 816,
+          "tappedById": 832,
+          "targetId": 832,
           "templateId": "mogger_lackey",
           "threat": [
             [
-              828,
-              20
+              845,
+              19
             ]
           ],
           "weapon": {
@@ -445,7 +426,7 @@
           }
         },
         {
-          "aggroTargetId": 816,
+          "aggroTargetId": 832,
           "aiState": "attack",
           "combatTimer": 0.5,
           "comboUntil": -1,
@@ -457,7 +438,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 825,
+          "id": 842,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -480,7 +461,7 @@
             "armor": 136
           },
           "swingTimer": 0.65,
-          "targetId": 816,
+          "targetId": 832,
           "templateId": "webwood_spider",
           "weapon": {
             "max": 41,
@@ -489,9 +470,9 @@
           }
         },
         {
-          "aggroTargetId": 816,
+          "aggroTargetId": 832,
           "aiState": "attack",
-          "combatTimer": 0.5,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -501,7 +482,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 826,
+          "id": 843,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -526,7 +507,7 @@
             "armor": 272
           },
           "swingTimer": 1.05,
-          "targetId": 816,
+          "targetId": 832,
           "templateId": "gravecaller_summoner",
           "weapon": {
             "max": 66,
@@ -535,7 +516,7 @@
           }
         },
         {
-          "aggroTargetId": 816,
+          "aggroTargetId": 832,
           "aiState": "attack",
           "auras": [
             {
@@ -545,7 +526,7 @@
               "name": "Mounting Rage",
               "remaining": 9.65,
               "school": "physical",
-              "sourceId": 827,
+              "sourceId": 844,
               "stacks": 5,
               "value": 100
             }
@@ -560,7 +541,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 827,
+          "id": 844,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -586,7 +567,7 @@
             "armor": 476
           },
           "swingTimer": 2.3,
-          "targetId": 816,
+          "targetId": 832,
           "templateId": "warlord_drogmar",
           "weapon": {
             "max": 109,
@@ -595,7 +576,7 @@
           }
         },
         {
-          "aggroTargetId": 824,
+          "aggroTargetId": 841,
           "aiState": "idle",
           "combatTimer": 0.5,
           "comboUntil": -1,
@@ -605,8 +586,8 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 78,
-          "id": 828,
+          "hp": 63,
+          "id": 845,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -615,7 +596,7 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 816,
+          "ownerId": 832,
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -640,7 +621,7 @@
           }
         },
         {
-          "aggroTargetId": 828,
+          "aggroTargetId": 845,
           "aiState": "attack",
           "combatTimer": 0.5,
           "comboUntil": -1,
@@ -651,8 +632,8 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199904,
-          "id": 829,
+          "hp": 199918,
+          "id": 846,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -682,12 +663,12 @@
             "armor": 70
           },
           "swingTimer": 1.25,
-          "tappedById": 816,
+          "tappedById": 832,
           "templateId": "forest_wolf",
           "threat": [
             [
-              828,
-              97
+              845,
+              83
             ]
           ],
           "weapon": {
@@ -701,12 +682,12 @@
     {
       "tick": 64,
       "time": 3.2,
-      "nextId": 830,
-      "state": "c9de8301",
+      "nextId": 847,
+      "state": "8b3ec108",
       "events": "741638a5",
       "rng": {
-        "draws": 356,
-        "digest": "ef9628ee"
+        "draws": 361,
+        "digest": "d00842fb"
       },
       "label": "final",
       "players": [
@@ -726,7 +707,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1278
+            "damageTaken": 1464
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -763,7 +744,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -802,26 +783,16 @@
               "name": "Battle Stance",
               "remaining": 3596.8,
               "school": "physical",
-              "sourceId": 816
+              "sourceId": 832
             },
             {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 8.85,
+              "duration": 4,
+              "id": "silence_gravecaller_summoner",
+              "kind": "silence",
+              "name": "Silencing Shriek",
+              "remaining": 2.85,
               "school": "shadow",
-              "sourceId": 826,
-              "value": 120
-            },
-            {
-              "duration": 1,
-              "id": "stun_mogger_lackey",
-              "kind": "stun",
-              "name": "Skullthump",
-              "remaining": 0.3,
-              "school": "physical",
-              "sourceId": 824
+              "sourceId": 843
             },
             {
               "duration": 10,
@@ -830,7 +801,7 @@
               "name": "Spider Venom",
               "remaining": 9.3,
               "school": "nature",
-              "sourceId": 825,
+              "sourceId": 842,
               "tickInterval": 2,
               "tickTimer": 1.3,
               "value": 2
@@ -842,16 +813,7 @@
               "name": "Sticky Web",
               "remaining": 2.3,
               "school": "nature",
-              "sourceId": 825
-            },
-            {
-              "duration": 4,
-              "id": "silence_gravecaller_summoner",
-              "kind": "silence",
-              "name": "Silencing Shriek",
-              "remaining": 3.3,
-              "school": "shadow",
-              "sourceId": 826
+              "sourceId": 842
             }
           ],
           "blockChance": 0.05,
@@ -864,7 +826,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.2,
           "hp": 1000000,
-          "id": 816,
+          "id": 832,
           "inCombat": true,
           "kind": "player",
           "level": 16,
@@ -882,7 +844,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 78.1,
+          "resource": 89.466667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -906,9 +868,9 @@
           }
         },
         {
-          "aggroTargetId": 828,
+          "aggroTargetId": 845,
           "aiState": "attack",
-          "combatTimer": 0.7,
+          "combatTimer": 1.15,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -917,8 +879,8 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199980,
-          "id": 824,
+          "hp": 199981,
+          "id": 841,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -948,13 +910,13 @@
             "armor": 306
           },
           "swingTimer": 0.85,
-          "tappedById": 816,
-          "targetId": 816,
+          "tappedById": 832,
+          "targetId": 832,
           "templateId": "mogger_lackey",
           "threat": [
             [
-              828,
-              20
+              845,
+              19
             ]
           ],
           "weapon": {
@@ -964,7 +926,7 @@
           }
         },
         {
-          "aggroTargetId": 816,
+          "aggroTargetId": 832,
           "aiState": "attack",
           "combatTimer": 0.7,
           "comboUntil": -1,
@@ -976,7 +938,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 825,
+          "id": 842,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -999,7 +961,7 @@
             "armor": 136
           },
           "swingTimer": 0.45,
-          "targetId": 816,
+          "targetId": 832,
           "templateId": "webwood_spider",
           "weapon": {
             "max": 41,
@@ -1008,9 +970,9 @@
           }
         },
         {
-          "aggroTargetId": 816,
+          "aggroTargetId": 832,
           "aiState": "attack",
-          "combatTimer": 0.7,
+          "combatTimer": 1.15,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1020,7 +982,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 826,
+          "id": 843,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -1045,7 +1007,7 @@
             "armor": 272
           },
           "swingTimer": 0.85,
-          "targetId": 816,
+          "targetId": 832,
           "templateId": "gravecaller_summoner",
           "weapon": {
             "max": 66,
@@ -1054,7 +1016,7 @@
           }
         },
         {
-          "aggroTargetId": 816,
+          "aggroTargetId": 832,
           "aiState": "attack",
           "auras": [
             {
@@ -1064,7 +1026,7 @@
               "name": "Mounting Rage",
               "remaining": 9.45,
               "school": "physical",
-              "sourceId": 827,
+              "sourceId": 844,
               "stacks": 5,
               "value": 100
             }
@@ -1079,7 +1041,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 827,
+          "id": 844,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -1105,7 +1067,7 @@
             "armor": 476
           },
           "swingTimer": 2.1,
-          "targetId": 816,
+          "targetId": 832,
           "templateId": "warlord_drogmar",
           "weapon": {
             "max": 109,
@@ -1114,7 +1076,7 @@
           }
         },
         {
-          "aggroTargetId": 824,
+          "aggroTargetId": 841,
           "aiState": "idle",
           "combatTimer": 0.7,
           "comboUntil": -1,
@@ -1124,8 +1086,8 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 78,
-          "id": 828,
+          "hp": 63,
+          "id": 845,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -1134,7 +1096,7 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 816,
+          "ownerId": 832,
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -1159,7 +1121,7 @@
           }
         },
         {
-          "aggroTargetId": 828,
+          "aggroTargetId": 845,
           "aiState": "attack",
           "combatTimer": 0.7,
           "comboUntil": -1,
@@ -1170,8 +1132,8 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199904,
-          "id": 829,
+          "hp": 199918,
+          "id": 846,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1201,12 +1163,12 @@
             "armor": 70
           },
           "swingTimer": 1.05,
-          "tappedById": 816,
+          "tappedById": 832,
           "templateId": "forest_wolf",
           "threat": [
             [
-              828,
-              97
+              845,
+              83
             ]
           ],
           "weapon": {

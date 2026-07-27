@@ -4085,13 +4085,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sundered_horror.name': '찢겨진 공포',
   'entities.zones.farshore_isle.name': '먼바다 해안',
   'entities.zones.farshore_isle.welcome':
-    '모래톱을 건너면, 마을보다 먼저 걸헤이븐의 종소리가 그대를 맞이할 것이오. 균열은 아무 예고도 없이 찢어지듯 열리고, 이 보루는 그 틈으로 쏟아지는 무엇이든 맞서며 제 해안을 지켜 왔소. 그대 같은 이를 오래도록 기다려 왔다오.',
+    '나룻배에서 내리면, 마을보다 먼저 걸헤이븐의 종소리가 그대를 맞이할 것이오. 균열은 아무 예고도 없이 찢어지듯 열리고, 이 보루는 그 틈으로 쏟아지는 무엇이든 맞서며 제 해안을 지켜 왔소. 그대 같은 이를 오래도록 기다려 왔다오.',
   'entities.zones.farshore_isle.pois.0.label': '걸헤이븐',
   'entities.zones.farshore_isle.pois.1.label': '선착장',
   'entities.zones.farshore_isle.pois.2.label': '감시 초원',
   'entities.zones.farshore_isle.pois.3.label': '찢겨진 절벽',
   'entities.zones.farshore_isle.pois.4.label': '균열의 들판',
-  'entities.zones.eastbrook_vale.pois.11.label': '먼바다 해안 모래톱 둑길',
+  'entities.zones.farshore_isle.pois.5.label': '대균열',
+  'entities.zones.farshore_isle.pois.6.label': '난파선 벌판',
+  'entities.zones.eastbrook_vale.pois.11.label': '먼바다 나루터',
   'entities.mobs.moor_ram.name': '황무지 숫양',
   'entities.mobs.gale_wisp.name': '돌풍 정령',
   'entities.mobs.shoal_scuttler.name': '여울 게',
@@ -4524,9 +4526,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label': '수련 못 옆의 정원사를 찾아라',
   'entities.quests.q_fs_bell_at_the_landing.title': '선착장의 종',
   'entities.quests.q_fs_bell_at_the_landing.text':
-    '모래톱 둑길을 건너왔소, {playerName}? 그렇다면 일주일 만에 처음 온 사람이니, 워든이 그대를 직접 살펴보고 싶어 할 것이오. 걸헤이븐은 물가 길을 올라가면 나오오. 이제 아무도 돌보지 않는 건조대를 지나서 말이오. 숯불 워든에게 둑길이 아직 버티고 있다고 전하시오. 그리고 탐이 오늘은 아직 종을 세 번 울리지 않았다고. 아직은 말이오.',
+    '나룻배를 타고 왔소, {playerName}? 그렇다면 일주일 만에 처음 온 사람이니, 워든이 그대를 직접 살펴보고 싶어 할 것이오. 걸헤이븐은 선착장에서 올라가면 나오오. 이제 아무도 돌보지 않는 건조대를 지나서 말이오. 숯불 워든에게 뱃길이 아직 이어지고 있다고 전하시오. 그리고 탐이 오늘은 아직 종을 세 번 울리지 않았다고. 아직은 말이오.',
   'entities.quests.q_fs_bell_at_the_landing.completion':
-    '둑길이 버티고 있고, 탐은 아직 세 번 종을 두고 농담할 기운이 남아 있군. 좋아. 우리는 포위당한 섬일세, {playerName}. 저 모래톱을 건너오는 손 한 쌍 한 쌍이, 균열이 내 사람들에게 닿기 전에 뚫고 지나야 할 손일세. 걸헤이븐에 온 것을 환영하네.',
+    '뱃길이 이어지고 있고, 탐은 아직 세 번 종을 두고 농담할 기운이 남아 있군. 좋아. 우리는 포위당한 섬일세, {playerName}. 나룻배가 실어 오는 손 한 쌍 한 쌍이, 균열이 내 사람들에게 닿기 전에 뚫고 지나야 할 손일세. 걸헤이븐에 온 것을 환영하네.',
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': '숯불 워든에게 보고',
   'entities.quests.q_fs_bram_come_home.title': '브람아 돌아오렴',
   'entities.quests.q_fs_bram_come_home.text':
@@ -9041,16 +9043,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '제자리에 멈춘 뒤 갇힘 탈출을 사용하세요.',
   'hudChrome.unstuck.busy': '현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.',
   'hudChrome.unstuck.unavailable': '현재 상태에서는 갇힘 탈출을 사용할 수 없습니다.',
+  'lb.fixture.ferry': '먼바다 나룻배',
+  'lb.fixture.tidemill': '조수 물방앗간',
+  'lb.fixture.breach': '대균열',
   'lb.speaker.tam': '종지기 탐',
   'lb.speaker.coalfast': '수호자 콜패스트',
   'lb.speaker.ollun': '균열감시자 올룬',
   'lb.speaker.edda': '보급관 에다',
   'lb.speaker.saul': '치유사 사울',
-  'lb.q0.scene.harbor': '일하는 항구. 그물이 마르고, 별유리 인양 상자에는 본토 구매자의 인장이 찍혀 있다.',
-  'lb.q0.scene.plinth': '항구 계단 위에서 청동 수호자가 내륙을 바라본다. 대좌의 가장 새로운 이름은 백 년 전의 것. 수호자 헤일. 그 아래에는 아직 자리가 남아 있다.',
-  'lb.q0.scene.toll': '종이 한 번 울린다. 거리의 모두가 걸음을 멈추고 센다. 뒤따르는 소리는 없고, 거리 전체가 한꺼번에 숨을 내쉰다.',
+  'lb.q0.scene.harbor':
+    '일하는 항구. 그물이 마르고, 별유리 인양 상자에는 본토 구매자의 인장이 찍혀 있다.',
+  'lb.q0.scene.plinth':
+    '항구 계단 위에서 청동 수호자가 내륙을 바라본다. 대좌의 가장 새로운 이름은 백 년 전의 것. 수호자 헤일. 그 아래에는 아직 자리가 남아 있다.',
+  'lb.q0.scene.toll':
+    '종이 한 번 울린다. 거리의 모두가 걸음을 멈추고 센다. 뒤따르는 소리는 없고, 거리 전체가 한꺼번에 숨을 내쉰다.',
   'lb.q0.tam.stretchers': '지난번 저런 놈 하나에 경비대 전원의 오전과 들것 두 개가 들었지.',
-  'lb.q0.coalfast.look': '잿빛 사내는 쓰러진 짐승을 보고, 그다음 당신을 조금 더 오래 바라보았다. 그리고 절벽 쪽으로 걸어갔다.',
+  'lb.q0.coalfast.look':
+    '잿빛 사내는 쓰러진 짐승을 보고, 그다음 당신을 조금 더 오래 바라보았다. 그리고 절벽 쪽으로 걸어갔다.',
   'hudChrome.scene.skipHint': '장면 건너뛰기 (Esc)',
   'hudChrome.scene.waitingFor': '{name} 대기 중',
   'guide.abilityHook.revenge':

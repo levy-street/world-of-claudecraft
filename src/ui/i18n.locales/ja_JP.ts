@@ -4103,13 +4103,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sundered_horror.name': '引き裂かれし恐怖',
   'entities.zones.farshore_isle.name': '遠つ岸',
   'entities.zones.farshore_isle.welcome':
-    '砂州を渡れば、町に着くより先にカモメ港の鐘があなたを見つけるだろう。裂け目は前触れもなく口を開き、この砦は流れ出るものすべてから己の岸を守り続けている。あなたのような者を、ここでは長らく待ちわびていたのだ。',
+    '渡し船を降りれば、町に着くより先にカモメ港の鐘があなたを見つけるだろう。裂け目は前触れもなく口を開き、この砦は流れ出るものすべてから己の岸を守り続けている。あなたのような者を、ここでは長らく待ちわびていたのだ。',
   'entities.zones.farshore_isle.pois.0.label': 'カモメ港',
   'entities.zones.farshore_isle.pois.1.label': '船着き場',
   'entities.zones.farshore_isle.pois.2.label': '見張りの草原',
   'entities.zones.farshore_isle.pois.3.label': '引き裂かれた断崖',
   'entities.zones.farshore_isle.pois.4.label': '裂け目野',
-  'entities.zones.eastbrook_vale.pois.11.label': '遠つ岸の砂州道',
+  'entities.zones.farshore_isle.pois.5.label': '破れ目',
+  'entities.zones.farshore_isle.pois.6.label': '難破の原',
+  'entities.zones.eastbrook_vale.pois.11.label': '遠つ岸の渡し場',
   'entities.mobs.moor_ram.name': 'ムーアラム',
   'entities.mobs.gale_wisp.name': 'ゲイルウィスプ',
   'entities.mobs.shoal_scuttler.name': 'ショールスカトラー',
@@ -4542,9 +4544,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '睡蓮の泉水のそばの庭師を見つけた',
   'entities.quests.q_fs_bell_at_the_landing.title': '船着き場の鐘',
   'entities.quests.q_fs_bell_at_the_landing.text':
-    '砂州道を渡って来たのか、{playerName}？なら、この一週間で最初のひとりだ。守将がお前を検分したがるだろう。カモメ港は岸辺の道を上った先、誰も手入れしなくなった魚干し棚を過ぎたところにある。守将コールファストに伝えてくれ。堤道はまだ立っている、そしてタムは今日はまだ三打ちを鳴らしていない、とな。今のところは、だが。',
+    '渡し船で来たのか、{playerName}？なら、この一週間で最初のひとりだ。守将がお前を検分したがるだろう。カモメ港は船着き場から上った先、誰も手入れしなくなった魚干し棚を過ぎたところにある。守将コールファストに伝えてくれ。渡しはまだ通っている、そしてタムは今日はまだ三打ちを鳴らしていない、とな。今のところは、だが。',
   'entities.quests.q_fs_bell_at_the_landing.completion':
-    '堤道は保ち、タムにはまだ三打ちを冗談にする息が残っている。良し。我らは包囲された島なのだ、{playerName}。あの砂州を渡ってくる一組の手は、裂け目どもが我が民に届く前に突破せねばならん一組の手でもある。ようこそ、カモメ港へ。',
+    '渡しは保ち、タムにはまだ三打ちを冗談にする息が残っている。良し。我らは包囲された島なのだ、{playerName}。渡し船が運んでくる一組の手は、裂け目どもが我が民に届く前に突破せねばならん一組の手でもある。ようこそ、カモメ港へ。',
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': '守将コールファストに報告した',
   'entities.quests.q_fs_bram_come_home.title': 'ブラムを家へ',
   'entities.quests.q_fs_bram_come_home.text':
@@ -9055,16 +9057,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '静止してからスタック解除を使用してください。',
   'hudChrome.unstuck.busy': '現在の行動を終えてからスタック解除を使用してください。',
   'hudChrome.unstuck.unavailable': '現在の状態ではスタック解除を使用できません。',
+  'lb.fixture.ferry': '遠つ岸の渡し船',
+  'lb.fixture.tidemill': '潮の水車小屋',
+  'lb.fixture.breach': '破れ目',
   'lb.speaker.tam': '鐘守タム',
   'lb.speaker.coalfast': '守り手コールファスト',
   'lb.speaker.ollun': '裂け目見のオルン',
   'lb.speaker.edda': '兵站係エッダ',
   'lb.speaker.saul': '癒し手ソール',
   'lb.q0.scene.harbor': '働く港。網が干され、星硝子のサルベージ箱には本土の買い手の刻印がある。',
-  'lb.q0.scene.plinth': '港の石段の上で、青銅の守り手が内陸を向いて立つ。台座の最も新しい名は百年前のもの。「守り手ヘイル」。その下には、まだ余白がある。',
-  'lb.q0.scene.toll': '鐘がひとつ鳴る。通りの誰もが足を止め、数える。続く音はなく、通り全体が一斉に息を吐いた。',
+  'lb.q0.scene.plinth':
+    '港の石段の上で、青銅の守り手が内陸を向いて立つ。台座の最も新しい名は百年前のもの。「守り手ヘイル」。その下には、まだ余白がある。',
+  'lb.q0.scene.toll':
+    '鐘がひとつ鳴る。通りの誰もが足を止め、数える。続く音はなく、通り全体が一斉に息を吐いた。',
   'lb.q0.tam.stretchers': 'ああいうのが前に出たときは、見張り全員の午前と担架二台が犠牲になった。',
-  'lb.q0.coalfast.look': '灰色の男は倒れた獣を見て、それからお前を、わずかに長く見た。そして崖の方へ歩き去った。',
+  'lb.q0.coalfast.look':
+    '灰色の男は倒れた獣を見て、それからお前を、わずかに長く見た。そして崖の方へ歩き去った。',
   'hudChrome.scene.skipHint': 'シーンをスキップ（Esc）',
   'hudChrome.scene.waitingFor': '{name}を待っています',
   'guide.abilityHook.revenge':

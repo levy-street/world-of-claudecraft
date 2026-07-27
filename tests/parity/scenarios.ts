@@ -4471,6 +4471,8 @@ export const SCENARIOS: Scenario[] = [
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),
-  professionsCraft(),
+  // Seed re-hunted after the Farshore relocation world shift moved the
+  // ctor draw order (the old default seed's single proc draw stopped firing).
+  professionsCraft(11),
   professionsGather(),
 ];
