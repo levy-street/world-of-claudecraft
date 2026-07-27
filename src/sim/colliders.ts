@@ -27,6 +27,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { HARBOR_RAIL_HALF_THICK, HARBOR_RAIL_HEIGHT, harborDressingRadius } from './harbor_layout';
 import { LAST_BELL_AREAS } from './last_bell_field';
 import { ORKADIA_FIELD_COLLIDER_SPECS, ORKADIA_FIELD_WALLS } from './orkadia_field';
 import type { BuildingDef, WorldContent } from './types';
@@ -210,6 +211,37 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, x, z, 2.9),
       camGhost: true,
     });
+  }
+
+  // Harbor boardwalks are raised walkable ground too (harborWalkHeight in
+  // world.ts); what blocks is the authored dressing: the deck-edge railings
+  // (thin OBBs, so nobody strolls off the pier through them) and the chunky
+  // props. Rail points sit on deck edges, so topY reads the deck height.
+  for (const h of PROPS.harbors ?? []) {
+    for (const rail of [...h.rails, ...h.shipRails]) {
+      out.push({
+        type: 'obb',
+        x: rail.x,
+        z: rail.z,
+        hw: rail.hw,
+        hd: HARBOR_RAIL_HALF_THICK,
+        rot: rail.rot,
+        cameraTopY: topY(seed, rail.x, rail.z, HARBOR_RAIL_HEIGHT + 0.2),
+        camGhost: true,
+      });
+    }
+    for (const d of h.dressing) {
+      const r = harborDressingRadius(d.kind);
+      if (r <= 0) continue;
+      out.push({
+        type: 'circle',
+        x: d.x,
+        z: d.z,
+        r,
+        cameraTopY: topY(seed, d.x, d.z, d.kind === 'lamp' ? 2.8 : 1.4),
+        camGhost: true,
+      });
+    }
   }
 
   for (const t of PROPS.tents)

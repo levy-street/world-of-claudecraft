@@ -16,6 +16,7 @@
 // already made it through. Terrain: the ISLE_* tables in world.ts (biome
 // 'vale': the island shares the vale's sky, palette, and song).
 
+import { GULLHAVEN_HARBOR } from '../harbor_layout';
 import type {
   CampDef,
   EscortDef,
@@ -627,17 +628,14 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     { x: 829, z: 118, rot: -1.8, scale: 1 },
     { x: 807, z: 110, rot: 2.3, scale: 1 },
   ],
-  // Gullhaven's harbor pier: two chained dock sections reaching west into
-  // the bay (dockSurfaceHeight takes the max over overlapping footprints, so
-  // colinear docks compose into one long walkable pier), plus the Landing's
-  // small fishing jetty on the west shore.
-  docks: [
-    // Gullhaven's harbor pier: anchored at the bay's shoreline (dry on every
-    // seed) and running west, its far sections standing over the bay drop.
-    // ONE dock only: a deck seats on its own anchor's terrain, so a second
-    // anchor out in the bay would drown its planks.
-    { x: 781, z: 122, rot: 1.5708, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
-    { x: 778, z: -36, rot: 2.4, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
-  ],
+  // The Landing's small fishing jetty on the west shore. Gullhaven's own
+  // waterfront is the authored harbor below, which replaced the interim
+  // single-dock town pier (a dock deck seats on its anchor's terrain, so it
+  // could never reach the bay's deep water; the harbor's decks carry
+  // authored heights instead).
+  docks: [{ x: 778, z: -36, rot: 2.4, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
+  // Gullhaven's harbor: the boardwalk waterfront, the stepped pier over the
+  // bay drop, and the ship berth (src/sim/harbor_layout.ts).
+  harbors: [GULLHAVEN_HARBOR],
   graveyards: [{ x: 836, z: 132 }],
 };

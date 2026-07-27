@@ -2569,6 +2569,12 @@ export interface ZonePropsDef {
     rot: number;
     hutLocal: { x: number; z: number; hw: number; hd: number };
   }[];
+  // Authored boardwalk harbors (src/sim/harbor_layout.ts): raised walkable
+  // decks with authored heights, rail/prop colliders, a ship berth, and the
+  // campaign's gangplank/arrival anchors. The defs live in harbor_layout;
+  // zones reference them here so the world/collider arms stay content-gated
+  // (a custom map without harbors gets none).
+  harbors?: readonly import('./harbor_layout').HarborDef[];
   tents: { x: number; z: number; rot: number; scale: number }[];
   crates: [number, number][];
   campfires: [number, number][];

@@ -2,6 +2,7 @@
 // wolves and boars, the bandit camp, and Brother Aldric's Gravecaller chain
 // leading to the Hollow Crypt.
 
+import { MAINLAND_HARBOR } from '../harbor_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -40,7 +41,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: -5, z: -52, label: 'Reliquary Hill', id: 'reliquary_hill' },
     { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
     { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
-    { x: 152, z: -48, label: 'The Farshore Ferry', id: 'the_farshore_causeway' },
+    { x: 172, z: -48, label: 'The Farshore Ferry', id: 'the_farshore_causeway' },
   ],
   welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
@@ -1345,20 +1346,11 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { x: 0, z: 11.5, rot: Math.PI, r: 1.8 }, // The Merchant's World Market stall
   ],
   mines: [{ x: -88, z: -68, rot: 0.8 }],
-  docks: [
-    { x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } },
-    // The Farshore Ferry's mainland landing: a walkable jetty beside the
-    // lb_ferry fixture at (152,-48). The deck extends toward (-sin rot,
-    // -cos rot), so rot -2.356 runs it south-east, the direction the shore
-    // falls toward the strait on the pinned world seed (anchor ~1.2 down to
-    // ~-0.2 at the deck's far end; due east falls slower, due south hugs the
-    // bluff). hutLocal 40/40 with zero half-extents is the "no hut" idiom the
-    // other open jetties use.
-    { x: 172, z: -48, rot: -1.5708, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
-    // ...second section, colinear: the pier runs east over the shelf drop so
-    // its far end stands above real water (dockSurfaceHeight composes maxima)
-    { x: 177.3, z: -48, rot: -1.5708, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
-  ],
+  docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
+  // The Farshore crossing's mainland harbor (boardwalk, moored ship, ferryman
+  // at the gangplank) replaced the interim two-section landing jetty here;
+  // the layout is authored in src/sim/harbor_layout.ts.
+  harbors: [MAINLAND_HARBOR],
   tents: [
     { x: 62, z: -61, rot: 0.4, scale: 1 },
     { x: 69, z: -69, rot: 2.1, scale: 1 },

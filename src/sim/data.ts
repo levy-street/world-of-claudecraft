@@ -270,6 +270,7 @@ import {
   ZONE3_ZONE,
 } from './content/zone3';
 import { DUNGEON_WALL_HW } from './dungeon_layout';
+import { HARBOR_TERRAIN_EDITS } from './harbor_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -597,6 +598,9 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     stalls: sets.flatMap((s) => s.stalls),
     mines: sets.flatMap((s) => s.mines),
     docks: sets.flatMap((s) => s.docks),
+    // optional per-zone field (the delveMarkers trap below): forgetting the
+    // ?? [] here would silently drop every harbor from the merged world
+    harbors: sets.flatMap((s) => s.harbors ?? []),
     tents: sets.flatMap((s) => s.tents),
     crates: sets.flatMap((s) => s.crates),
     campfires: sets.flatMap((s) => s.campfires),
@@ -707,7 +711,9 @@ export const BUILTIN_WORLD: WorldContent = {
   props: PROPS,
   playerStart: PLAYER_START,
   blockers: JAIL_BLOCKERS,
-  terrainEdits: JAIL_TERRAIN_EDITS,
+  // The jail cage floor plus the harbor shore grading (harbor_layout.ts):
+  // both are pure HeightStamp data applied through terrainHeight's edit layer.
+  terrainEdits: [...JAIL_TERRAIN_EDITS, ...HARBOR_TERRAIN_EDITS],
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;

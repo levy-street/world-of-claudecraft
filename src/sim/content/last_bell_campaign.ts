@@ -10,6 +10,7 @@
 // solo-always story space, and Coalfast and Tam walk into the doorway as
 // the stalker dies.
 
+import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../harbor_layout';
 import { registerScenario } from '../scenarios/registry';
 import { registerScene } from '../scenes/scenes';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
@@ -56,12 +57,34 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     id: 'ferryman_ewald',
     name: 'Ferryman Ewald',
     title: 'The Farshore Crossing',
-    pos: { x: 174, z: -47 },
-    facing: Math.PI / 3,
+    // His post is the gangplank on the mainland harbor's pier head: he
+    // stands a step beside the boarding fixture, facing the pier walkway
+    // arrivals come down. The harbor layout is the single anchor source.
+    pos: {
+      x: MAINLAND_HARBOR.gangplank.x - 1.6,
+      z: MAINLAND_HARBOR.gangplank.z - 0.9,
+    },
+    facing: MAINLAND_HARBOR.gangplank.facing + Math.PI,
     color: 0x4a5a7a,
     questIds: [],
     greeting:
       'The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather.',
+  },
+  // The island side of the crossing: keeps the Gullhaven gangplank the way
+  // Ewald keeps the mainland one. The return leg has a face too.
+  ferrykeeper_odda: {
+    id: 'ferrykeeper_odda',
+    name: 'Ferrykeeper Odda',
+    title: 'The Farshore Crossing',
+    pos: {
+      x: GULLHAVEN_HARBOR.gangplank.x - 1.7,
+      z: GULLHAVEN_HARBOR.gangplank.z - 0.7,
+    },
+    facing: Math.PI / 2,
+    color: 0x4a5a7a,
+    questIds: [],
+    greeting:
+      'Mainland-bound? The ship goes when you are aboard, not before. And if you hear the bell start counting while we cast off, do not ask me to turn her around: nobody rows toward a three-toll.',
   },
   // Runs the militia line at the Watch Meadow. Operational, unsentimental,
   // knows exactly what his line can and cannot kill.

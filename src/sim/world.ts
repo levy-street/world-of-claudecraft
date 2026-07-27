@@ -22,6 +22,7 @@ import {
   ZONES,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import { harborSurfaceHeight } from './harbor_layout';
 import { LAST_BELL_AREAS } from './last_bell_field';
 import { orkadiaFieldHeight } from './orkadia_field';
 import { fbm2, hash2, noise2 } from './rng';
@@ -2161,9 +2162,14 @@ const FATIGUE_FREE_WATERS: readonly { x0: number; x1: number; z0: number; z1: nu
     z1: st.lakeHi + 4,
   })),
   ...ROW_MERES.map((m) => ({ x0: m.xLo, x1: m.xHi, z0: m.borderZ - 20, z1: m.borderZ + 20 })),
-  // Gullhaven's harbor bay: calm water under the town pier, never open sea
-  // (falling off the dock must not start the drowning clock).
-  { x0: 748, x1: 804, z0: 96, z1: 138 },
+  // Gullhaven's harbor bay: calm water under the town pier and the moored
+  // ship, never open sea (falling off the dock must not start the
+  // drowning clock).
+  { x0: 744, x1: 804, z0: 96, z1: 138 },
+  // The mainland harbor basin: the water around the vale's pier and ship
+  // berth, same rule. Kept south of z -36 so the strait crossing line
+  // (tests/farshore.test.ts pins it from 200,-30) stays open sea.
+  { x0: 178, x1: 220, z0: -62, z1: -36 },
 ];
 
 export function inFatigueFreeWater(x: number, z: number): boolean {
@@ -2569,6 +2575,18 @@ function dockSurfaceHeight(x: number, z: number, seed: number): number {
   return surface;
 }
 
+// The harbor boardwalks (src/sim/harbor_layout.ts) are raised walkable ground
+// like the docks, but their deck heights are AUTHORED per rect, never seated
+// on terrain: a pier runs dead level from the shore out over deep water.
+// Content-gated like the dock arm (a custom map without harbors gets none).
+function harborWalkHeight(x: number, z: number): number {
+  const harbors = getActiveWorldContent().props.harbors;
+  if (harbors === undefined) return -Infinity;
+  let surface = -Infinity;
+  for (const h of harbors) surface = Math.max(surface, harborSurfaceHeight(h, x, z));
+  return surface;
+}
+
 // ---------------------------------------------------------------------------
 // Declared-lake grading: two arms that keep inland water escapable on foot
 // (the terrain-side counterpart of the movement kernel's ride_height.ts).
@@ -2713,7 +2731,7 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // so the pitch stays flat. (The custom-map edit layer is applied inside
   // terrainHeight, so it never touches the flat instance/rift floor above.)
   const terrain = terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
-  return Math.max(terrain, dockSurfaceHeight(x, z, seed));
+  return Math.max(terrain, dockSurfaceHeight(x, z, seed), harborWalkHeight(x, z));
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {

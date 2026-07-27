@@ -12,6 +12,7 @@
 // re-minted with it, see the commit that landed this module).
 
 import { createGroundObject } from '../entity';
+import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../harbor_layout';
 import { acceptQuest } from '../quests/quest_commands';
 import { startScenario } from '../scenarios/scenarios';
 import { playSceneForPlayer } from '../scenes/scenes';
@@ -22,14 +23,15 @@ import { FARSHORE_BREACH } from '../world';
 const Q0_ID = 'q_lb_q0_ashore';
 const ARRIVAL_SCENE = 'scn_lb_q0_ashore';
 
-// The two ferry landings: the mainland dock at the vale's east point and
-// the Gullhaven harbor pier. Boarding at one lands you at the other.
-// Arrival points sit on dry shore beside each pier root; the boarding
-// fixtures stand out on the pier ends over the water.
-const MAINLAND_DOCK = { x: 173, z: -48 };
-const GULLHAVEN_PIER = { x: 781, z: 124 };
-const MAINLAND_BOARD = { x: 177, z: -48 };
-const GULLHAVEN_BOARD = { x: 777, z: 122 };
+// The two ferry landings: the mainland harbor at the vale's east point and
+// the Gullhaven harbor. Boarding at one lands you at the other. The harbor
+// layout is the single source for both anchors: the boarding fixtures stand
+// at each harbor's gangplank (the railing gap facing the ship berth), and
+// arrivals step off onto the deck near the harbor's land end.
+const MAINLAND_DOCK = MAINLAND_HARBOR.arrival;
+const GULLHAVEN_PIER = GULLHAVEN_HARBOR.arrival;
+const MAINLAND_BOARD = MAINLAND_HARBOR.boarding;
+const GULLHAVEN_BOARD = GULLHAVEN_HARBOR.boarding;
 
 interface FixtureDef {
   templateId: 'lb_ferry' | 'lb_scenario_door' | 'lb_breach_maw';
@@ -88,7 +90,9 @@ export function initLastBellCampaign(ctx: SimContext): void {
 function boardFerry(ctx: SimContext, obj: Entity, pid: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
-  const fromMainland = obj.pos.x < 200;
+  // The strait divides the world well east of the mainland harbor and well
+  // west of the island: x 400 splits the two gangplanks on any layout drift.
+  const fromMainland = obj.pos.x < 400;
   const dest = fromMainland ? GULLHAVEN_PIER : MAINLAND_DOCK;
   // First crossing: the campaign begins. acceptQuest is a no-op error path
   // when already active; gate on the log so re-rides stay silent.
