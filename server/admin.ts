@@ -15,6 +15,7 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import { cleanIpAssociationLookup } from './admin_ip_association';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
@@ -476,6 +477,12 @@ export async function handleAdminApi(
         if (action === 'suspend' || action === 'ban') {
           const statusText =
             action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+          // Every device is signed out here too, mirroring the reset-password arm
+          // above: revoke all tokens then disconnect the live socket (revocation
+          // alone leaves an already-open connection intact). Otherwise a token
+          // issued before the sanction stays valid in auth_tokens and regains
+          // access with no re-authentication once the sanction is lifted or expires.
+          await revokeTokensExcept(targetAccountId, null);
           game.disconnectAccount(targetAccountId, statusText);
           // Notify the affected account of the moderation action. Best-effort and
           // fully isolated: a mail-target lookup or send failure must never turn a
@@ -757,9 +764,11 @@ export async function handleAdminApi(
 
     if (req.method === 'POST' && path === '/admin/api/blocked-ips') {
       const body = await readBody(req);
+      const cleanedIp = cleanIp(body.ip);
+      if (!cleanedIp) return fail(res, 400, 'a valid IP address is required');
       try {
         const ip = await addBlockedIp({
-          ip: body.ip,
+          ip: cleanedIp,
           reason: body.reason,
           createdByAccountId: accountId,
           expiresAt: body.expiresAt,
@@ -932,18 +941,20 @@ export async function handleAdminApi(
       });
     }
     if (path === '/admin/api/ip-associations') {
-      const ip = cleanIp(url.searchParams.get('ip'));
+      const ip = cleanIpAssociationLookup(url.searchParams.get('ip'));
       if (!ip) return fail(res, 400, 'a valid IP address is required');
       const { page, limit } = parsePageParams(url.searchParams);
       const associations = await associationsForIp(ip, page, limit);
       const onlineAccountIds = game.liveAccountIds();
+      const blockableIp = cleanIp(ip);
       return ok(res, {
         ...associations,
         accounts: associations.accounts.map((account) => ({
           ...account,
           online: onlineAccountIds.has(account.accountId),
         })),
-        blocked: game.isIpBlocked(ip),
+        blocked: blockableIp ? game.isIpBlocked(blockableIp) : false,
+        blockable: Boolean(blockableIp),
       });
     }
     if (path === '/admin/api/moderation/queue') {
@@ -1576,21 +1587,23 @@ async function sharedIpsHandler(ctx: Ctx): Promise<void> {
   });
 }
 
-/** GET /admin/api/ip-associations: accounts tied to one IP, with live online flags. */
+/** GET /admin/api/ip-associations: accounts tied to one stored IP marker, with live flags. */
 async function ipAssociationsHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
-  const ip = adminDb().cleanIp(ctx.url.searchParams.get('ip'));
+  const ip = cleanIpAssociationLookup(ctx.url.searchParams.get('ip'));
   if (!ip) return fail(ctx.res, 400, 'a valid IP address is required');
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const associations = await adminDb().associationsForIp(ip, page, limit);
   const onlineAccountIds = rt.liveAccountIds();
+  const blockableIp = adminDb().cleanIp(ip);
   ok(ctx.res, {
     ...associations,
     accounts: associations.accounts.map((account) => ({
       ...account,
       online: onlineAccountIds.has(account.accountId),
     })),
-    blocked: rt.isIpBlocked(ip),
+    blocked: blockableIp ? rt.isIpBlocked(blockableIp) : false,
+    blockable: Boolean(blockableIp),
   });
 }
 
@@ -1603,9 +1616,11 @@ async function blockedIpsGetHandler(ctx: Ctx): Promise<void> {
 async function blockedIpsPostHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const body = await readBody(ctx.req);
+  const cleanedIp = adminDb().cleanIp(body.ip);
+  if (!cleanedIp) return fail(ctx.res, 400, 'a valid IP address is required');
   try {
     const ip = await adminDb().addBlockedIp({
-      ip: body.ip,
+      ip: cleanedIp,
       reason: body.reason,
       createdByAccountId: ctxAccountId(ctx),
       expiresAt: body.expiresAt,
@@ -1657,6 +1672,12 @@ async function moderateActionHandler(ctx: Ctx): Promise<void> {
     if (action === 'suspend' || action === 'ban') {
       const statusText =
         action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+      // Every device is signed out here too, mirroring resetPasswordHandler: revoke
+      // all tokens then disconnect the live socket (revocation alone leaves an
+      // already-open connection intact). Otherwise a token issued before the
+      // sanction stays valid in auth_tokens and regains access with no
+      // re-authentication the moment the sanction is lifted or expires.
+      await adminDb().revokeTokensExcept(targetAccountId, null);
       rt.disconnectAccount(targetAccountId, statusText);
       // Notify the affected account of the moderation action. Best-effort and fully
       // isolated: a mail-target lookup or send failure must never turn a successful

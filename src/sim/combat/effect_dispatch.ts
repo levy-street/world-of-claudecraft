@@ -33,7 +33,7 @@ import {
   hotTickBonus,
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
-import { addThreat } from '../threat';
+import { addThreat, dropThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import {
   angleTo,
@@ -122,6 +122,49 @@ function preservesStealth(ability: AbilityDef): boolean {
     ability.id === 'sap' ||
     ability.id === 'shadowstep'
   );
+}
+
+function dropsCombatOnStealth(ability: AbilityDef): boolean {
+  return ability.id === 'vanish';
+}
+
+function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
+  p.combatTimer = 5;
+  p.inCombat = false;
+  p.autoAttack = false;
+  p.targetId = null;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
+
+  const pet = ctx.petOf(p.id);
+  const escapeIds = pet ? [p.id, pet.id] : [p.id];
+  if (pet) {
+    pet.combatTimer = 5;
+    pet.inCombat = false;
+    pet.aggroTargetId = null;
+    pet.targetId = null;
+  }
+
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind !== 'mob' || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    let dropped = false;
+    for (const id of escapeIds) {
+      if (entity.threat.has(id) || entity.forcedTargetId === id) dropped = true;
+      dropThreat(entity, id);
+      if (entity.aggroTargetId === id) {
+        entity.aggroTargetId = null;
+        dropped = true;
+      }
+    }
+    if (!dropped) continue;
+    if (entity.ownerId !== null) {
+      if (entity.aggroTargetId === null) entity.inCombat = false;
+    } else if (entity.threat.size === 0 && entity.aggroTargetId === null) {
+      entity.aiState = 'evade';
+      entity.inCombat = false;
+    }
+  }
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -2294,6 +2337,9 @@ export function runEffects(
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
+        if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
+          dropSelfFromHostileFocus(ctx, p);
+        }
         recalcPlayerStats(
           p,
           meta.cls,

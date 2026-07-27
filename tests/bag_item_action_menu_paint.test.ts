@@ -57,6 +57,7 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
   const placed: { reserveRight: number; reserveBottom: number }[] = [];
   const applied: { itemId: string; enchantId: string; slot?: string; confirmReplace?: boolean }[] =
     [];
+  const disenchanted: { itemId: string; target?: { slotIndex: number } }[] = [];
   const confirms: {
     title: string;
     body: string;
@@ -76,6 +77,9 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
     equipment: stub.equipment ?? {},
     playerId: 1,
     entities: new Map([[1, { equippedInstances: stub.equippedInstances ?? {} }]]),
+    disenchantItem: (itemId: string, target?: { slotIndex: number }) => {
+      disenchanted.push({ itemId, target });
+    },
     applyEnchant: (itemId: string, enchantId: string, slot?: string, confirmReplace?: boolean) => {
       applied.push({ itemId, enchantId, slot, confirmReplace });
     },
@@ -100,7 +104,8 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
       afterActions += 1;
     },
   });
-  const openFor = (itemId: string) => menu.open(ITEMS[itemId], itemId, 10, 10, () => {});
+  const openFor = (itemId: string, slotIndex = 0) =>
+    menu.open(ITEMS[itemId], itemId, slotIndex, 10, 10, () => {});
   const openPlain = () => openFor(DUST);
   const openPicker = (reagentId = DUST) => {
     openFor(reagentId);
@@ -138,8 +143,10 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
     el,
     placed,
     applied,
+    disenchanted,
     confirms,
     afterActions: () => afterActions,
+    openFor,
     openPlain,
     openPicker,
     openTargets,
@@ -215,6 +222,21 @@ describe('BagItemActionMenu.paint placement reserves', () => {
       const short = Number(m?.[1]) < Number(m?.[2]);
       expect(span.classList.contains('unsat'), span.textContent ?? '').toBe(short);
     }
+  });
+});
+
+describe('BagItemActionMenu disenchant dispatch', () => {
+  it('sends the clicked inventory slot index through the confirm action', () => {
+    const itemId = defFor('common').id;
+    const h = harness(768, [
+      { itemId, count: 1, instance: { rolled: { masterwork: true, stats: { str: 2 } } } },
+      { itemId, count: 1, instance: { signer: 'PlainCopy' } },
+    ]);
+    h.openFor(itemId, 1);
+    h.click('disenchant');
+    expect(h.confirms).toHaveLength(1);
+    h.confirms[0].onOk();
+    expect(h.disenchanted).toEqual([{ itemId, target: { slotIndex: 1 } }]);
   });
 });
 

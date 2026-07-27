@@ -1,8 +1,10 @@
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { cssTreeUnder } from './helpers/css_tree_under';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Phase 5 mobile-HUD-parity coverage guard.
@@ -122,21 +124,26 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
 // by a flat read is a silent PASS, which is the bug #2489 is about; a src/styles
 // module missed here makes its windows read as unclassified and turns the
 // coverage assertion RED, which needs no depth fix to be noticed.
-function stylesText(): string {
-  const dir = fileURLToPath(new URL(STYLES_DIR, import.meta.url));
-  const entries = readdirSync(dir, { withFileTypes: true });
+// Takes a root, like dynamicWindowIds above, so the refusal below is reachable
+// from a fixture: src/styles is flat, so nothing asserted over the real tree can
+// tell this read from one that quietly stopped meaning anything.
+function stylesText(dir: string = fileURLToPath(new URL(STYLES_DIR, import.meta.url))): string {
+  const tree = cssTreeUnder(dir);
   // The premise, checked rather than asserted in prose: the reasoning above
   // holds only while every sheet sits at the top level. The day one lands in a
   // subdirectory this throws here, where the comment explaining the decision
   // is, so the choice gets re-made deliberately instead of quietly meaning
   // something else. Derived from the SAME read as the file list, so this file
-  // still owns exactly one directory reader.
-  if (entries.some((e) => e.isDirectory())) {
-    throw new Error('src/styles gained a subdirectory: re-read the note above stylesText()');
+  // still owns exactly one directory read (and no reader of its own: the shared
+  // walk reports the subdirectories, which the hand-rolled `e.isDirectory()`
+  // this replaces could not see through a SYMLINKED one, #2502).
+  if (tree.dirs.length > 0) {
+    throw new Error(
+      `src/styles gained a subdirectory (${tree.dirs.join(', ')}): re-read the note above stylesText()`,
+    );
   }
-  const files = entries.map((e) => e.name).filter((f) => f.endsWith('.css'));
-  return files
-    .map((f) => readFileSync(`${dir}/${f}`, 'utf8').replace(/\/\*[\s\S]*?\*\//g, ''))
+  return tree.files
+    .map(({ full }) => readFileSync(full, 'utf8').replace(/\/\*[\s\S]*?\*\//g, ''))
     .join('\n');
 }
 
@@ -272,25 +279,40 @@ describe('mobile window coverage (Phase 5 parity)', () => {
     }
   });
 
-  it('the scrape reads src/ui through the shared walker, with no flat reader beside it', () => {
+  it('both scans read through the shared walkers, with no flat reader beside them', () => {
     // The fixture pins the SCRAPER, and the file-count floor above pins that the
     // real scrape reaches the whole tree. This closes the remaining gap: a
     // second producer built on its own flat read would return the same window
     // IDS today, since every window-minting module is at the top level, so the
-    // ids and windowClassFiles pins would not notice it. Exactly one directory
-    // read is left in this file: stylesText's, single-level by design (see its
-    // comment).
-    const own = readFileSync(
-      fileURLToPath(new URL('mobile_window_coverage.test.ts', import.meta.url)),
-      'utf8',
-    )
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/(^|[^:])\/\/.*$/gm, '$1');
-    // Needle assembled from halves so it does not match itself.
-    expect(own.split(`readdir${'Sync('}`).length - 1).toBe(1);
-    // Needle split for the same reason as the one above: written whole it would
-    // match its own assertion line, so this passed even with the import gone.
-    expect(own).toContain(`helpers/ts_files${'_under'}`);
+    // ids and windowClassFiles pins would not notice it. NO hand-rolled
+    // directory read is left in this file: src/ui goes through the recursive .ts
+    // walk, and stylesText's src/styles read goes through the .css walk, whose
+    // subdirectory report is what keeps that read single-level BY DECISION (see
+    // its comment) rather than by a `Dirent` test blind to a symlinked folder.
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under', 'css_tree_under']);
+  });
+
+  it('stylesText refuses a src/styles subdirectory rather than reading past it', () => {
+    // The refusal was unreachable while stylesText hardcoded its root: the arm
+    // the #2499 ruling rests on, never once executed by the suite.
+    const fixture = mkdtempSync(path.join(tmpdir(), 'woc-mobile-styles-'));
+    try {
+      writeFileSync(
+        path.join(fixture, 'hud.mobile.css'),
+        'body.mobile-touch #bags-window { left: 0; }\n',
+      );
+      // Flat first, so a stylesText that threw unconditionally could not pass
+      // this pair, and so the read is shown to work at a fixture root at all.
+      expect(stylesText(fixture)).toContain('#bags-window');
+      mkdirSync(path.join(fixture, 'experimental'), { recursive: true });
+      writeFileSync(
+        path.join(fixture, 'experimental', 'parked.css'),
+        'body.mobile-touch #parked-window { left: 0; }\n',
+      );
+      expect(() => stylesText(fixture)).toThrow(/gained a subdirectory \(experimental\)/);
+    } finally {
+      rmSync(fixture, { recursive: true, force: true });
+    }
   });
 
   it('every window is either sheeted on mobile or an explicit exception', () => {

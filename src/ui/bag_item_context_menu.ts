@@ -9,9 +9,9 @@
 // family shape (state in, action list out) beside the bags_view.ts pure core.
 //
 // Eligibility is DEF-based (isDisenchantable / isSalvageable / an enchant
-// reagent id), matching the sim's own itemId-keyed command resolution: the
-// commands consume a PREFERRED copy (never the exact clicked slot), so the
-// menu reasons about the item, not one stack.
+// reagent id), so the menu can offer actions before a command resolves. The
+// disenchant dispatch may carry the clicked inventory slot index, but whether
+// the action exists still reasons about the item definition.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 

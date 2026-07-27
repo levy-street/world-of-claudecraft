@@ -666,7 +666,7 @@ export const en: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% off",
+      "railWocDiscount": "{percent}% off",
       "railWocUnavailable": "WOC pricing is unavailable right now.",
       "railNativeUnavailable": "Crypto off.",
       "amountLabel": "Amount",
@@ -1300,10 +1300,10 @@ export const en: EnTranslations = {
     },
     "plurals": {
       "guildMembers": {
-        "one": "you are {rank}, {count} member",
-        "few": "you are {rank}, {count} members",
-        "many": "you are {rank}, {count} members",
-        "other": "you are {rank}, {count} members"
+        "one": "your guild rank is {rank}; {count} member",
+        "few": "your guild rank is {rank}; {count} members",
+        "many": "your guild rank is {rank}; {count} members",
+        "other": "your guild rank is {rank}; {count} members"
       },
       "finderPartySize": {
         "one": "{count} player",
@@ -1464,6 +1464,7 @@ export const en: EnTranslations = {
       "harvestButton": "Harvest",
       "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
       "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "nothingSelectedYields": "Nothing you selected can be harvested from this corpse.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
       "components": {
@@ -2024,8 +2025,8 @@ export const en: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "World Market proceeds or items waiting",
+      "tip": "Sale proceeds or returned items are waiting for you at the Merchant."
     },
     "noticeboard": {
       "empty": "Nothing seems posted."

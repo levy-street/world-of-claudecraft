@@ -111,7 +111,16 @@ describe('buildVendorView buyback', () => {
     const items = table(item('sword', { sellValue: 12 }));
     const buyback: InvSlot[] = [{ itemId: 'sword', count: 3 }];
     const view = buildVendorView([], buyback, items, RICH);
-    expect(view.buyback).toEqual([{ itemId: 'sword', item: items.sword, count: 3, price: 12 }]);
+    expect(view.buyback).toEqual([
+      { itemId: 'sword', item: items.sword, count: 3, price: 12, index: 0 },
+    ]);
+  });
+
+  it('carries crafted provenance so buyback clicks can echo the exact row identity', () => {
+    const items = table(item('vest', { sellValue: 12 }));
+    const buyback: InvSlot[] = [{ itemId: 'vest', count: 1, craftedRecipeId: 'recipe_vest' }];
+    const view = buildVendorView([], buyback, items, RICH);
+    expect(view.buyback[0].craftedRecipeId).toBe('recipe_vest');
   });
 
   it('skips slots whose item no longer exists or whose count is not positive', () => {
@@ -124,6 +133,20 @@ describe('buildVendorView buyback', () => {
     const view = buildVendorView([], buyback, items, RICH);
     expect(view.buyback.map((b) => b.itemId)).toEqual(['sword']);
     expect(view.buyback[0].count).toBe(1);
+    // index is the position in the source array (what buyBackItem addresses
+    // server-side), not the position in the filtered output.
+    expect(view.buyback[0].index).toBe(0);
+  });
+
+  it("keeps each row's index anchored to its source-array position, even when earlier rows are skipped", () => {
+    const items = table(item('sword', { sellValue: 12 }));
+    const buyback: InvSlot[] = [
+      { itemId: 'ghost', count: 4 },
+      { itemId: 'sword', count: 1 },
+    ];
+    const view = buildVendorView([], buyback, items, RICH);
+    expect(view.buyback).toHaveLength(1);
+    expect(view.buyback[0].index).toBe(1);
   });
 
   it('reports an empty buyback list distinctly from goods', () => {

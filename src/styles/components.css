@@ -556,6 +556,45 @@
     }
   }
 
+  /* ---------- resized-window fill ---------- */
+  /* A window the user has dragged to a size (.window-sized, stamped by
+     src/ui/window_resize.ts once a corner drag engages) owns an explicit
+     width/height. Its scrolling body has to follow that box, and a body authored
+     with a viewport-relative cap does not: .lb-body's 56vh keeps its old height
+     inside the taller window, so the board stays truncated behind its own
+     scrollbar while a dead band opens under it (issue: leaderboard resize).
+
+     So the ONE child marked .window-fill absorbs whatever height the drag left
+     over and scrolls inside it, while the chrome around it (the sticky header, a
+     tab strip) keeps its intrinsic size. Windows with no .window-fill child are
+     left entirely alone (the shell's own overflow-y still handles their
+     overflow), and an unsized window is unaffected, so this costs nothing until a
+     drag actually engages.
+
+     The host window must be a flex COLUMN, which per the window-frame family
+     (#mailbox-window, #social-window) means it opens with an inline display:flex:
+     `.window` is opened by an inline style.display and no stylesheet display can
+     override that. A window adopting .window-fill opts into that pattern too.
+
+     It lives here in @layer components rather than beside the other window-shell
+     rules in layout.css because it has to OUTRANK the per-window body caps, and
+     those are authored in this layer: layout sits below components, so a
+     max-height reset there would silently lose. */
+  .window.window-sized > .window-fill {
+    flex: 1 1 auto;
+    /* A floor, NOT the usual min-height:0. The item still shrinks far below its
+       content height (that is what makes it scroll inside the window instead of
+       pushing the window into its own scroll), but at WINDOW_MIN_HEIGHT the chrome
+       above it (a title that wraps at 220px wide, plus a tab strip) can already
+       exceed the content box; min-height:0 would then collapse the body to nothing
+       and hide it outright. Roughly two rows, so the window's own overflow-y takes
+       the remainder and the content stays reachable. */
+    min-height: 48px;
+    /* The window height is the budget now; a leftover vh cap would re-open the
+       dead band this rule exists to close. */
+    max-height: none;
+  }
+
   /* ---------- windows ---------- */
   #quest-dialog {
     width: 440px;
@@ -743,6 +782,15 @@
   }
   .corpse-harvest-btn {
     width: 100%;
+  }
+  /* #2509: why Harvest is refused, stated in place. A disabled button takes no
+     pointer events and leaves the tab order, so its tooltip is unreachable.
+     Sits BELOW the button (see corpse_harvest_window.ts) so showing it never
+     moves the control the player is reaching for. */
+  .corpse-harvest-warning {
+    font-size: 11px;
+    color: var(--color-text-error);
+    margin-top: 6px;
   }
 
   /* ---------- town-focus ---------- */
@@ -1531,6 +1579,15 @@
   #leaderboard-window,
   #daily-rewards-window {
     width: 480px;
+  }
+  /* The leaderboard is a flex COLUMN window (the #mailbox-window / #social-window
+     family): the painter opens it with an inline display:flex, and .lb-body carries
+     .window-fill, so once the user drags the window to a size the board takes the
+     leftover height instead of staying pinned to its 56vh cap. flex-direction is
+     unconditional because the inline display:flex is; with the shell default (row)
+     the header, tabs and board would lay out side by side. */
+  #leaderboard-window {
+    flex-direction: column;
   }
   #daily-rewards-window {
     top: 24px;
@@ -2335,11 +2392,12 @@
     text-align: right;
     color: #ffe27a;
   }
-  /* Players / Guilds tab bar above the board. */
+  /* Players / Guilds tab bar above the board. No margin-top: the window is a flex
+     column, so this margin would ADD to .panel-title's 8px margin-bottom instead of
+     collapsing with it the way it did under block flow, doubling the gap. */
   .lb-tabs {
     display: flex;
     gap: 6px;
-    margin-top: 8px;
   }
   .lb-tab {
     flex: 1;
@@ -7307,6 +7365,8 @@
     font-size: 12px;
     color: #f0ead8;
     overflow-wrap: anywhere;
+    user-select: text;
+    -webkit-user-select: text;
   }
   .soc-billboard-msg.empty {
     color: #887c5c;

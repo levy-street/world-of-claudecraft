@@ -470,7 +470,7 @@ export class SocialWindow {
     if (!view.guild) return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>`;
     const g = view.guild;
     const guildCount = formatNumber(g.memberCount, { maximumFractionDigits: 0 });
-    const head = `<div class="soc-guild-head">&lt;${esc(g.name)}&gt; <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span></div>`;
+    const head = `<div class="soc-guild-head">${esc(g.name)} <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span></div>`;
     // The persisted "hide offline" toggle: a pressed-state button (a single click event
     // through the delegated body handler, unlike a label+checkbox that double-fires).
     const toggle =

@@ -1078,6 +1078,15 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  // Ledge climb: quantized progress (1..99), not the arc. The client never
+  // re-simulates the pull (the server owns it and streams the resulting
+  // positions); it needs to know a climb is running, to stop predicting a
+  // fall, and how far through it is so the pull-up pose tracks the motion.
+  // Any non-zero value reads as "climbing" on older clients.
+  if (e.climb) {
+    const t = e.climb.elapsed / e.climb.duration;
+    out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
+  }
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;
@@ -4289,16 +4298,16 @@ export class GameServer {
           sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
         }
         break;
-      case 'buyback': {
-        if (typeof msg.item !== 'string') break;
-        // Optional row selector, an equality needle only (never stored).
-        const needle =
-          msg.instance !== null && typeof msg.instance === 'object' && !Array.isArray(msg.instance)
-            ? (msg.instance as ItemInstancePayload)
-            : undefined;
-        sim.buyBackItem(msg.item, pid, needle);
+      case 'buyback':
+        if (typeof msg.item === 'string')
+          sim.buyBackItem(
+            msg.item,
+            typeof msg.index === 'number' ? msg.index : undefined,
+            msg.instance && typeof msg.instance === 'object' ? msg.instance : undefined,
+            pid,
+            typeof msg.craftedRecipeId === 'string' ? msg.craftedRecipeId : undefined,
+          );
         break;
-      }
       case 'harvest_node':
         this.sendCommandOutcome(
           session,
@@ -4324,7 +4333,10 @@ export class GameServer {
       // why `enchantResult` is itself a HEAVY_SELF_EVENTS member (the unbindResult
       // precedent): otherwise the spent reagents would linger in the bag mirror.
       case 'disenchant_item':
-        if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.disenchantItem(msg.item, pid, slot);
+        }
         break;
       case 'apply_enchant':
         if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
@@ -5761,6 +5773,8 @@ export class GameServer {
       sh: p.spellHaste,
       crit: p.critChance,
       dodge: p.dodgeChance,
+      blk: p.blockChance,
+      bval: p.blockValue,
       crat: p.critRating,
       hrat: p.hasteRating,
       hirat: p.hitRating,

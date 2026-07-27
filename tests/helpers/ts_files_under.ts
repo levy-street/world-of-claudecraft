@@ -11,12 +11,14 @@ import path from 'node:path';
 //
 // ONE argument, and it is meant to stay that way. A caller that wants less
 // filters the returned list. A caller that wants a genuinely different corpus
-// (another extension, absolute paths, a hashed record) hand-rolls its own walk
-// and keeps it local: the point of this module is one contract shared by the
-// guards that want exactly this one, not a walker framework with a knob per
-// caller. The concrete case that stays OUT is
-// tests/mobile_window_coverage.test.ts's src/styles read, which models the
-// sheets an entry actually loads rather than the files on disk.
+// (another extension, absolute paths, a hashed record) writes its own walk
+// rather than growing a knob here: the point of this module is one contract
+// shared by the guards that want exactly this one, not a walker framework with a
+// knob per caller. The concrete case that stayed OUT and then earned a sibling is
+// the `src/styles` stylesheet corpus, now helpers/css_tree_under.ts (#2502): five
+// readers over that one directory wanted the same walk, and it has to report the
+// SUBDIRECTORIES as well, because two of them are single-level by ruling (#2499)
+// and refuse rather than narrow. Sibling, still not a knob.
 
 /** One source file found by {@link tsFilesUnder}. */
 export interface TsSourceFile {

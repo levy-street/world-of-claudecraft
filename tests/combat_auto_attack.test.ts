@@ -18,7 +18,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { Aura, Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import { type Aura, DT, type Entity, type PlayerClass, type SimEvent } from '../src/sim/types';
 import { placePlayerInOpenField } from './helpers/open_field';
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
@@ -34,6 +34,8 @@ function makeSim(
 ): { sim: Sim; p: Entity; meta: PlayerMeta } {
   const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
+  // Ranged fixtures place their target relative to the player, so stand on
+  // empty ground: the town is furnished and would block the shot lane.
   placePlayerInOpenField(sim);
   const p = sim.player;
   const meta = sim.players.get(p.id);
@@ -422,6 +424,29 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
     expect(
       events.some((e) => e.type === 'damage' && e.ability === 'Wand' && e.school === 'arcane'),
     ).toBe(true);
+  });
+
+  it('a dodgy target does not dodge Auto Shot outside melee range', () => {
+    const { sim, p } = makeSim('hunter', 30);
+    const targetPid = sim.addPlayer('rogue', 'Dodgy');
+    const target = sim.entities.get(targetPid);
+    if (target?.kind !== 'player') throw new Error('test target missing');
+    target.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + 20 };
+    target.dodgeChance = 1;
+    target.stats = { ...target.stats, armor: 0 };
+    p.rangedPower = 0;
+    p.critChance = 0;
+    const events = capture(sim);
+
+    rangedSwing(sim.ctx, p, target, { min: 10, max: 10, speed: 2 });
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+
+    const shot = events.find(
+      (e): e is DamageEvent => isDamageEvent(e) && e.ability === 'Auto Shot',
+    );
+    expect(shot?.kind).toBe('hit');
+    expect(shot?.amount).toBeGreaterThan(0);
+    expect(events.some((e) => e.type === 'damage' && e.kind === 'dodge')).toBe(false);
   });
 });
 

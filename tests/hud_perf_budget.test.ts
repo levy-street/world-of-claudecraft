@@ -498,12 +498,13 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // roughly half of them: spellbook_window's tickOpen() runs EVERY FRAME while the window is
 // open and says so in its own comments; arena, dungeon_finder, vale_cup and card_duel are
 // render()ed on the 250ms medium band behind only a display check; social, market, mailbox,
-// bank, bags, deeds, professions and calendar get refreshIfChanged() on the 500ms band;
-// crafting and loot_settings are repainted behind invalidation signatures; and town_focus is
-// repainted on the 500ms band behind an OPEN check and nothing else. The repo's INTENDED
-// window pattern is POLL CHEAPLY, REBUILD ON A SIGNATURE CHANGE, the guard lives inside the
-// module where no per-file scan can see it, and town_focus is the standing proof that this is
-// a convention rather than something anything enforces.
+// bank, bags, deeds, professions and calendar get refreshIfChanged() on the 500ms band; and
+// crafting, loot_settings and town_focus are repainted behind invalidation signatures. The
+// repo's INTENDED window pattern is POLL CHEAPLY, REBUILD ON A SIGNATURE CHANGE, and the guard
+// lives where no per-file scan can see it: inside the window module, or on the Hud method that
+// polls it. town_focus was the standing proof that this is a convention rather than something
+// anything enforces, and it held that role until #2500 gave it a signature; the enforcement is
+// now tests/hud_update_drive.test.ts, which requires a guard per driven window row by name.
 //
 // So this bucket claims nothing about cadence. What it does is hold the two contracts that
 // are true whatever the cadence turns out to be, at the same exact counts every other bucket

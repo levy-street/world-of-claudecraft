@@ -421,7 +421,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'カード',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20%オフ',
+  'hudChrome.claudium.railWocDiscount': '{percent}%オフ',
   'hudChrome.claudium.solBalance': 'SOL：{amount}',
   'hudChrome.claudium.wocBalance': 'WOC：{amount}',
   'hudChrome.claudium.railWocUnavailable': 'WOC価格は現在利用できません。',
@@ -776,6 +776,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '採取',
   'hudChrome.corpseHarvest.concentrateHint': '選ぶ部位が少ないほど、各部位の品質が高くなります。',
   'hudChrome.corpseHarvest.alreadyHarvested': 'この死体はすでに採取されています。',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    '選んだ部位はどれも、この死体から採取できません。',
   'hudChrome.corpseHarvest.harvestTooltip':
     'チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。',
   'hudChrome.corpseHarvest.componentAria': '{component}を採取',
@@ -7097,8 +7099,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.arrivedLog': '{name}から新しい手紙が届きました。',
   'hudChrome.mailbox.indicatorAria': '未読の手紙：{count}',
   'hudChrome.mailbox.indicatorTip': '未読の手紙が{count}通あります。メールボックスで読めます。',
-  'hudChrome.marketIndicator.aria': '世界市場の受け取り待ち',
-  'hudChrome.marketIndicator.tip': 'ゴールドやアイテムが商人のもとで受け取りを待っています。',
+  'hudChrome.marketIndicator.aria': '世界市場の売上またはアイテムが受け取り待ち',
+  'hudChrome.marketIndicator.tip': '売上金または返品アイテムが商人のもとで受け取りを待っています。',
   'hudChrome.mailbox.clickAttach': 'クリックで手紙に添付します。',
   'hudChrome.mailbox.cannotMail': 'これは郵送できません。',
   'hudChrome.mailbox.result.sent':

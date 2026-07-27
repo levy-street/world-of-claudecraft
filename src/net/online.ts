@@ -2524,6 +2524,10 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
+      e.climbing = !!w.cl;
+      // Quantized 1..99 progress through the pull (see server snapshot);
+      // undefined when not climbing so the visual falls back to its own clock.
+      e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
@@ -2805,6 +2809,8 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
+      e.blockChance = s.blk ?? 0;
+      e.blockValue = s.bval ?? 0;
       // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
       // crit/sh above, and hit resolves server-side); sent always like the other self
       // stats so the online character sheet shows them instead of the blankEntity 0.
@@ -3411,8 +3417,12 @@ export class ClientWorld implements IWorld {
   // never predicted. The server re-validates ownership/eligibility/throttle in
   // the sim resolvers and answers with the personal disenchantResult/
   // enchantResult/salvageResult event plus the denc/ench/salv self-delta.
-  disenchantItem(itemId: string): void {
-    this.cmd({ cmd: 'disenchant_item', item: itemId });
+  disenchantItem(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) {
+      this.cmd({ cmd: 'disenchant_item', item: itemId });
+    } else {
+      this.cmd({ cmd: 'disenchant_item', item: itemId, slot: target.slotIndex });
+    }
   }
   // `slot` rides only when the target is a WORN piece (the in-place arm); a
   // bagged target sends a message byte-identical to the pre-feature form. The
@@ -3451,10 +3461,13 @@ export class ClientWorld implements IWorld {
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
   }
-  buyBackItem(itemId: string, instance?: ItemInstancePayload): void {
-    // The payload is a row SELECTOR (the market_list_instance rule): the
-    // server matches it against the buyback rows, never stores it.
-    this.cmd({ cmd: 'buyback', item: itemId, ...(instance ? { instance } : {}) });
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void {
+    this.cmd({ cmd: 'buyback', item: itemId, index, instance, craftedRecipeId });
   }
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the

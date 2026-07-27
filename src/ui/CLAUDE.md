@@ -83,13 +83,28 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   `HOT_PAINTERS` / `CANVAS_PAINTERS`, not every module `update()` touches. `Hud.update()` also
   polls about half the `*_window.ts` painters (`spellbook_window.tickOpen()` runs every frame
   while open; arena / dungeon_finder / vale_cup / card_duel `render()` on the 250ms band; the
-  rest get `refreshIfChanged()` on the 500ms band). MOST of those rebuild behind their own
-  invalidation signature, which no per-file scan can see, and `town_focus_window` does not:
-  it repaints on the open check alone, which is the standing proof that the signature guard is
-  a convention rather than something enforced. So a window on a poll is held to the
-  write-elision standard by review, not by the gate: give it a signature guard and keep it,
-  and if you add a genuinely per-frame write path, route it through the facet and move the
-  module into `HOT_PAINTERS`.
+  rest get `refreshIfChanged()` on the 500ms band). Those rebuild behind their own invalidation
+  signature, which no per-file scan can see: it lives either inside the window module or on the
+  `Hud` method that polls it (`refreshOpenTownFocusIfChanged`). `town_focus_window` was the
+  standing counter-example until #2500 gave it one; a window polled from `update()` with no
+  signature is a defect, not a style choice.
+  **WHICH windows those are is now a registry**, not folklore: `tests/hud_update_drive.test.ts`
+  holds a row per call `Hud.update()` EVALUATES, with its cadence band, the exact condition text
+  gating it, what it repaints, and (for a window) the source line its invalidation guard is
+  spelled on, diffed BOTH ways against a TypeScript AST walk of the real method. Adding,
+  removing, re-banding or re-gating a call in `update()` fails it, and so does deleting a
+  guard it names. Three things it does not do, so nothing here is read as more than it is: it
+  sees `update()`'s own body only (a repaint added inside an already-registered private method
+  is invisible to it), a guard proof catches DELETION and not a guard neutered while its field
+  survives, and the band it records is the CALL SITE's, not any further self-throttling the
+  callee adds. So a window on a poll is now NAMED by the gate and still held to the
+  write-elision standard by review: give it a signature guard and keep it, and if you add a
+  genuinely per-frame write path, route it through the facet and move the module into
+  `HOT_PAINTERS`. A module that arms its own repeating driver owes the same care INSIDE the
+  callback, which is a contract nothing scans yet: `lockpick_window` re-resolved three element
+  refs on a 100ms tick until #2498, and the fix had to re-resolve them per board REBUILD
+  rather than once at construction, because `renderBoard` replaces that subtree on a signature
+  the clock does not restart on (`tests/lockpick_timer_repaint.test.ts` pins both halves).
 - **Allocation-light cores.** A per-frame view-core returns a REUSED, preallocated container +
   slots (no per-frame array/object garbage); jitter/clock stay in the painter, never the core.
   Guarded always-on by the reference-stability probe `tests/util/alloc_probe.ts`.

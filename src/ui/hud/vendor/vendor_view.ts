@@ -41,9 +41,14 @@ export interface VendorBuybackRow {
   count: number;
   /** Copper the player pays to buy the item back (the vendor sell value). */
   price: number;
-  /** The sold copy's payload (issue 1165): buyback rows split per payload, so
-   *  the tooltip must show WHICH copy this row returns. */
+  /** Position of this row in the source vendorBuyback array: pass back to
+   *  onBuyBack so the server redeems this exact row (see buyBackItem, #2398). */
+  index: number;
+  /** Present when this row carries a masterwork/signed payload the buyback
+   *  will restore, so it can be told apart from a plain row of the same item. */
   instance?: ItemInstancePayload;
+  /** Present when this row carries crafted provenance used by disenchant. */
+  craftedRecipeId?: string;
 }
 
 export interface VendorView {
@@ -86,17 +91,19 @@ export function buildVendorView(
     });
   }
   const buyback: VendorBuybackRow[] = [];
-  for (const slot of buybackSlots) {
+  buybackSlots.forEach((slot, index) => {
     const item = items[slot.itemId];
-    if (!item || slot.count <= 0) continue;
+    if (!item || slot.count <= 0) return;
     buyback.push({
       itemId: slot.itemId,
       item,
       count: slot.count,
       price: item.sellValue,
-      ...(slot.instance ? { instance: slot.instance } : {}),
+      index,
+      ...(slot.instance && { instance: slot.instance }),
+      ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
     });
-  }
+  });
   return {
     goods,
     buyback,

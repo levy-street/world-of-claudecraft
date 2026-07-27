@@ -5,7 +5,9 @@
 //
 // Pinned directly rather than only through harvestCorpse because the merge arm
 // is not reachable from shipped content: no mob today tags two components that
-// map to the same item id. The rule exists because the command boundary's own
+// map to the same item id, and since #2474 a repeated tag in the request cannot
+// reach it either (effectiveFocusComponents collapses the pick to a set before
+// anything rolls). The rule exists because the command boundary's own
 // pre-claim capacity gate already folds that case when it reserves stack room
 // (interaction.ts `wanted.find((w) => w.itemId === wantedItemId)`), so a ledger
 // that disagreed would reserve one stack and then print two lines for it.

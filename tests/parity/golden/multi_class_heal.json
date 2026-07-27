@@ -1654,7 +1654,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 424,
-      "state": "1a6fcb12",
+      "state": "c586f613",
       "events": "c4531615",
       "rng": {
         "draws": 10,
@@ -2450,9 +2450,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 92.171262,
-            "y": -3.236049,
-            "z": -89.202696
+            "x": 92.187492,
+            "y": -3.235409,
+            "z": -89.241097
           },
           "potionCooldownUntil": -1,
           "spawnPos": {

@@ -32,8 +32,17 @@ export interface IWorldInventory {
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
-  /** `instance` selects the exact buyback row when payload-split rows share an
-   *  item id (an equality needle, the marketListInstance pattern); absent, a
-   *  plain row is preferred, then the most recent row. */
-  buyBackItem(itemId: string, instance?: ItemInstancePayload): void;
+  // `index` addresses the exact row in vendorBuyback the player clicked
+  // (VendorView.buyback[].index); rows can share an itemId with different
+  // instance payloads, so the index disambiguates which copy comes back.
+  // `instance` is that same row's payload as last seen by the client
+  // (VendorView.buyback[].instance): the server only honors the index when
+  // the row still carries this exact payload, so a stale index that now
+  // points at a different same-itemId row cannot redeem the wrong copy (#2398).
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void;
 }

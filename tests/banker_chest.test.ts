@@ -168,17 +168,23 @@ describe('banker chest model and placement', () => {
   });
 
   it('pins the candidate order and chooses an unobstructed built-in placement', () => {
+    // The chest is a SOLID standable collider now: every candidate keeps the
+    // banker's own interaction point clear (banker_chest_layout
+    // placementClearsBanker), so the old hugging offsets moved back and out.
     expect(bankerChestPreloadInternalsForTest.placements).toEqual([
-      { x: 1.15, y: 0, z: -0.7, rotationY: 0 },
-      { x: -1.15, y: 0, z: -0.7, rotationY: 0 },
-      { x: 1.15, y: 0, z: 0.7, rotationY: 0 },
-      { x: -1.15, y: 0, z: 0.7, rotationY: 0 },
+      { x: 1.15, y: 0, z: -1.6, rotationY: 0 },
+      { x: -1.15, y: 0, z: -1.6, rotationY: 0 },
+      { x: 2.0, y: 0, z: 0.9, rotationY: 0 },
+      { x: -2.0, y: 0, z: 0.9, rotationY: 0 },
     ]);
 
     const expectedOffsets: Record<string, readonly [number, number]> = {
-      bursar_fernando: [1.15, -0.7],
-      bursar_petra_vell: [-1.15, -0.7],
-      bursar_aldous_crane: [1.15, -0.7],
+      // The bank facade stands directly behind Fernando, so his behind-side
+      // candidates sample blocked and the chest takes the pushed-out front
+      // corner; the other two towns keep the behind-and-beside spot.
+      bursar_fernando: [2.0, 0.9],
+      bursar_petra_vell: [-1.15, -1.6],
+      bursar_aldous_crane: [2.0, 0.9],
     };
     for (const [templateId, expected] of Object.entries(expectedOffsets)) {
       const entity = placedBuiltInBanker(templateId);
@@ -217,12 +223,12 @@ describe('banker chest model and placement', () => {
     );
 
     expect([placement.x, placement.y, placement.z, placement.rotationY]).toEqual([
-      1.15, 3.25, -0.7, 0,
+      1.15, 3.25, -1.6, 0,
     ]);
-    expect(groundSamples).toEqual([[9.3, 18.85, 77]]);
+    expect(groundSamples).toEqual([[8.4, 18.85, 77]]);
   });
 
-  it('places a non-interactive sibling behind and lateral to the live banker transform', () => {
+  it('places a non-interactive sibling beside the live banker transform', () => {
     const viewGroup = new THREE.Group();
     const visualRoot = new THREE.Group();
     const clickProxy = new THREE.Object3D();
@@ -234,8 +240,11 @@ describe('banker chest model and placement', () => {
     const chest = attachBankerChestToNpcView(viewGroup, entity, TEST_WORLD_SEED);
     if (!chest) throw new Error('built-in banker chest was not attached');
     expect(chest.parent).toBe(viewGroup);
-    expect(chest.position.x).toBe(1.15);
-    expect(chest.position.z).toBeLessThan(0);
+    // Fernando's chest resolves to the pushed-out front corner (the bank
+    // facade blocks his behind-side candidates), matching the sim's solid
+    // collider spot exactly.
+    expect(chest.position.x).toBe(2.0);
+    expect(chest.position.z).toBeGreaterThan(0);
     expect(chest.rotation.y).toBe(0);
     expect(clickTargets).toEqual([clickProxy]);
     expect(clickProxy.getObjectByName('bankerChestDecoration')).toBeUndefined();

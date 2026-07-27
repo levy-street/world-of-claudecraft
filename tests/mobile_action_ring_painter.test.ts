@@ -18,6 +18,7 @@ import {
 } from '../src/ui/hud/action_bar/action_bar_view';
 import {
   clampMobilePage,
+  mobileActionSourceSlotCount,
   mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
@@ -380,6 +381,42 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     expect(calls).toContainEqual({ m: 'setDisplay', args: [els[4].btn, 'none'] });
     expect(calls).toContainEqual({ m: 'setDisplay', args: [els[5].btn, 'none'] });
   });
+
+  it('hides buttons outside the enabled primary-only mobile span', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        pageToggle: { tag: 'toggle' } as unknown as HTMLElement,
+        pageIndicator: { tag: 'indicator' } as unknown as HTMLElement,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const visibleSlots = mobileActionSourceSlotCount({ secondary: false, third: false });
+    const pageBox = { page: 2 };
+    const view = createActionBarView(
+      {
+        slots: ringDescriptor(
+          pageBox,
+          new Map([
+            [11, ability('slot11')],
+            [12, ability('slot12')],
+          ]),
+        ),
+      },
+      fakeDeps(),
+    );
+    const state = view.tick(idleWorld());
+
+    painter.paint(state, 2, mobilePageCount(visibleSlots), visibleSlots);
+
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[1].btn, ''] });
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[2].btn, 'none'] });
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[5].btn, 'none'] });
+  });
 });
 
 describe('MobileActionRingPainter: removable attack control', () => {
@@ -476,17 +513,13 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     // The slot click handler must call sourceSlotForMobileButton at click time
     // (reading this.mobileActionPage fresh) so a page cycle after bind still
     // routes taps to the correct source slot.
-    expect(hud).toContain('this.castSlot(sourceSlotForMobileButton(this.mobileActionPage, i));');
+    expect(hud).toContain('this.castSlot(this.mobileSourceSlotForButton(i));');
   });
 
   it('resolves every action-view getter from the current mobile page at tick time', () => {
-    expect(hud).toContain(
-      'this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null',
-    );
-    expect(hud).toContain(
-      'this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i))',
-    );
-    expect(hud).toContain('this.itemForSlot(sourceSlotForMobileButton(this.mobileActionPage, i))');
+    expect(hud).toContain('this.actionForSlot(this.mobileSourceSlotForButton(i)) !== null');
+    expect(hud).toContain('this.abilityForSlot(this.mobileSourceSlotForButton(i))');
+    expect(hud).toContain('this.itemForSlot(this.mobileSourceSlotForButton(i))');
   });
 
   it('wires the page toggle button to cycleMobileActionPage', () => {
@@ -507,7 +540,13 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
 
   it('passes the shared mobile page count into the mobile ring painter', () => {
     expect(hud).toMatch(
-      /this\.mobileActionRingPainter\.paint\([\s\S]*?mobilePageCount\(\),[\s\S]*?\);/,
+      /this\.mobileActionRingPainter\.paint\([\s\S]*?mobilePageCount\(mobileActionSourceSlotCount\),[\s\S]*?\);/,
+    );
+  });
+
+  it('passes the live mobile-visible source-slot count into the mobile ring painter', () => {
+    expect(hud).toContain(
+      'const mobileActionSourceSlotCount = this.mobileActionSourceSlotCount();',
     );
   });
 

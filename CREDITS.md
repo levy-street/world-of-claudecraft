@@ -13,7 +13,8 @@ License.** This register is still being completed, so an asset missing from it
 means we have not recorded its terms yet, not that it is free to take. If you
 want to use or redistribute something that is not listed, ask first
 (tony@levystreet.com). Source code is the other way around: everything not
-carved out here is MIT.
+carved out here is MIT. Bundled third-party runtime dependencies carry their own
+notices in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 The **Redistribution** column tells you what you may do if you fork this
 repository or redistribute a build of it:
@@ -33,8 +34,8 @@ If you fork this project, or redistribute the repository or a build of it, the
 following assets are **not** yours to pass on. Remove or replace them first, or
 get written permission.
 
-- **The CraftPix class ability icons** (`public/ui/skills/<class>/*.webp`, 246
-  files). These were **purchased by the Levy Street account**
+- **The CraftPix class ability icons** (`public/ui/skills/<class>/*.webp`, every
+  class ability icon shipped there). These were **purchased by the Levy Street account**
   (callum@levystreet.com) under a CraftPix premium royalty-free licence. That
   licence permits Levy Street to use them in this game. It does **not** permit
   you to redistribute, resell, sub-license, or otherwise pass them to a third
@@ -117,7 +118,7 @@ than free, so ask before you rely on it.
 | Eastbrook Vale rebuild master concept, nine turnaround sheets, full-color surface-atlas source, and comparison evidence (`docs/screenshots/eastbrook-vale-rebuild/concepts/`, `turnarounds/`, and `materials/`) | World of ClaudeCraft | Original project art generated with OpenAI image generation using only World of ClaudeCraft captures and project-generated style/scale anchors; the full-color atlas source and any comparison containing it are provenance evidence, not the redistributable shipping texture; prompts and provenance are committed under `docs/design/eastbrook-vale-rebuild/` | Project asset, rights reserved | **No, permission required** |
 | Eastbrook finishing-pass master concept and Ravenpost mailbox / noticeboard turnaround sheets (`docs/screenshots/eastbrook-vale-rebuild/polish/concepts/` and `polish/turnarounds/`) | World of ClaudeCraft | Original project art generated with OpenAI image generation using only accepted World of ClaudeCraft concepts, turnarounds, and in-game captures; no proprietary-game screenshots or third-party art entered the lineage; exact prompts, hashes, and provenance are committed under `docs/design/eastbrook-vale-rebuild/` | Project asset, rights reserved | **No, permission required** |
 | Eastbrook shared surface atlas (`public/textures/eastbrook_surface_atlas.webp`; accepted source and comparison under `docs/screenshots/eastbrook-vale-rebuild/materials/`) | World of ClaudeCraft | Original project art generated with OpenAI image generation from first-party World of ClaudeCraft references, then deterministically converted to a high-key grayscale detail multiplier via `scripts/assets/eastbrook_town`; exact prompt and provenance are committed under `docs/design/eastbrook-vale-rebuild/` | Project asset | With the project only |
-| Meshy creature models (edda_reedhand, reedbound_acolyte, tolling_bell, spider_egg_sac from the Drowned Litany, yumi_cat from Protect Yumi, in `public/models/creatures/`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D; the humanoids and yumi_cat rigged and animated), owned under the Meshy paid-plan license | Project asset | With the project only |
+| Meshy creature models (tolling_bell, spider_egg_sac from the Drowned Litany, yumi_cat from Protect Yumi, in `public/models/creatures/`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D; the humanoids and yumi_cat rigged and animated), owned under the Meshy paid-plan license | Project asset | With the project only |
 | Legacy Claudium prototype weapon models and source images (emberfang, Red Skull, and Purple sets, in `public/models/weapons/` and `public/ui/weapons/`) | World of ClaudeCraft | Project-generated and normalized through the PR 1405 asset pipeline | Project asset, rights reserved | **No, permission required** |
 | Bag icons (`public/ui/items/{backpack,linen_pouch,travelers_knapsack,wolfhide_satchel,gravewoven_bag,mistcallers_duffel}.webp`, encoded to 128px WebP via `scripts/convert_item_icons_webp.mjs`) | World of ClaudeCraft | Project art created for this game; provenance per icon in `public/ui/items/mapping.json` | Project asset | With the project only |
 | Professions 2.0 art set (`public/ui/professions/*.webp`, the `woc_professions_art` material icons recorded in `public/ui/items/mapping.json`, and the inline maker's-mark glyph in `src/ui/ui_icons.ts`) | World of ClaudeCraft | Maintainer-commissioned original art created for this game and normalized through the profession/item pipelines; provenance per raster in the corresponding mapping file | Project asset, rights reserved | **No, permission required** |

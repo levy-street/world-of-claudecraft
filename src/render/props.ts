@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { mineMoundFootprint } from '../sim/colliders';
+import { buildingCameraHeight } from '../sim/building_layout';
+import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
@@ -9,6 +10,16 @@ import {
   dockSurfaceLine,
   dockSurfaceYAt,
 } from '../sim/dock_layout';
+import {
+  CHAPEL_HALL,
+  CHAPEL_TOWER,
+  DELVE_ARCH_SCALE,
+  DOCK_BOAT,
+  DOCK_DRESSING,
+  delveArchMouthSign,
+  delveArchZ,
+  propPlacementRoll,
+} from '../sim/prop_layout';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
@@ -130,10 +141,12 @@ const loadedProps = new Map<string, GLTF>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
 
 // The props the renderer actually RENDERS at the low graphics tier: a subset, since
-// low gfx drops the decorative/secondary props (anvils, gravestones beyond the round
-// one, extra rocks, statues, ...). Medium and higher render every entry in
-// PROP_ASSET_DEFS. This list scopes ONLY the per-tier work (material prewarm); it is
-// deliberately NOT the preload set (see preloadPropKeys below).
+// low gfx drops the decorative/secondary props (anvils, extra rocks, statues, ...).
+// Medium and higher render every entry in PROP_ASSET_DEFS. All four headstone
+// shapes stay on every tier: their colliders carry per-shape standable heights,
+// and a tier may never desync what is drawn from what blocks. This list scopes
+// ONLY the per-tier work (material prewarm); it is deliberately NOT the preload
+// set (see preloadPropKeys below).
 const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'house1',
   'house2',
@@ -157,6 +170,9 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'dockPlatform',
   'rowboat',
   'graveRound',
+  'graveCross',
+  'graveBevel',
+  'graveDecor',
   'timberPillar',
   'marshReeds',
   'crateWooden',
@@ -446,12 +462,20 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
 // with colliders/tests via the world seed)
 // ---------------------------------------------------------------------------
 
-function propRand(x: number, z: number, n: number): number {
-  return hash2(Math.round(x * 37), Math.round(z * 37) + n * 7919, 0x517cc1);
-}
+// The shared per-prop placement roll (sim/prop_layout.ts): colliders derive
+// per-point shapes (camp crate kind and scale, relic poses) from the SAME
+// draw, so mesh and physics agree per placement.
+const propRand = propPlacementRoll;
 
 function keyRand(key: number, n: number): number {
   return hash2(Math.round(key * 97), n * 7919, 0x9e3779);
+}
+
+// Rotate a parent-local XZ offset by the parent's yaw (colliders.rotY twin).
+function rotLocal(lx: number, lz: number, rot: number): { x: number; z: number } {
+  const c = Math.cos(rot),
+    s = Math.sin(rot);
+  return { x: lx * c + lz * s, z: -lx * s + lz * c };
 }
 
 type Scale = number | [number, number, number];
@@ -823,26 +847,72 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       continue;
     }
     if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
-    // roof Y mirrors the camera collider height in colliders.ts
-    const roofY = y + (b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0);
+    // roof Y mirrors the camera collider height in colliders.ts, through the
+    // same shared helper, so an authored per-building height override cannot
+    // leave the hideable top and the camera top disagreeing.
+    const roofY = y + buildingCameraHeight(b);
     if (b.kind === 'chapel') {
-      // composed chapel: tall bell tower at the rear + squat stone entry hall
-      // in front; the hall door lands on the footprint's +z edge.
-      const g = new THREE.Group();
+      // Composed chapel: tall bell tower at the rear + squat stone entry hall
+      // in front; the hall door lands on the footprint's +z edge. Composition
+      // numbers come from sim/prop_layout.ts (CHAPEL_TOWER/CHAPEL_HALL): the
+      // collider derives the SAME shapes, so the hall roof a player climbs
+      // onto is exactly the roof drawn here.
+      //
+      // The two parts are SEPARATE hideables at their own real heights: a
+      // player STANDS on the hall roof, and one whole-chapel footprint at the
+      // tower's top would put their eye inside-and-below it, vanishing the
+      // very roof underfoot. Split, the hall never hides while stood on and
+      // the tower still ghosts when it genuinely blocks the camera.
+      const gTower = new THREE.Group();
       const tower = propAsset('bellTower');
-      addParts(g, 'bellTower', {
-        z: -0.75,
-        scale: [(b.w * 0.98) / tower.size.x, 10.6 / tower.size.y, (b.d * 0.72) / tower.size.z],
+      addParts(gTower, 'bellTower', {
+        z: CHAPEL_TOWER.dz,
+        scale: [
+          (b.w * CHAPEL_TOWER.wScale) / tower.size.x,
+          CHAPEL_TOWER.height / tower.size.y,
+          (b.d * CHAPEL_TOWER.dScale) / tower.size.z,
+        ],
       });
+      gTower.position.set(b.x, y - CHAPEL_HALL.sink, b.z);
+      gTower.rotation.y = b.rot;
+      group.add(shadowed(gTower));
+      const towerOff = rotLocal(0, CHAPEL_TOWER.dz, b.rot);
+      registerHideable(
+        gTower,
+        obbFootprint(
+          b.x + towerOff.x,
+          b.z + towerOff.z,
+          (b.w * CHAPEL_TOWER.wScale) / 2,
+          (b.d * CHAPEL_TOWER.dScale) / 2,
+          b.rot,
+          roofY,
+        ),
+      );
+      const gHall = new THREE.Group();
       const hall = propAsset('house3');
-      addParts(g, 'house3', {
-        z: b.d / 2 - 1.62,
-        scale: [(b.w * 0.9) / hall.size.x, 2.5 / hall.size.y, 3.2 / hall.size.z],
+      addParts(gHall, 'house3', {
+        z: b.d / 2 - CHAPEL_HALL.dzFromFront,
+        scale: [
+          (b.w * CHAPEL_HALL.wScale) / hall.size.x,
+          CHAPEL_HALL.height / hall.size.y,
+          CHAPEL_HALL.depth / hall.size.z,
+        ],
       });
-      g.position.set(b.x, y - 0.12, b.z);
-      g.rotation.y = b.rot;
-      group.add(shadowed(g));
-      registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
+      gHall.position.set(b.x, y - CHAPEL_HALL.sink, b.z);
+      gHall.rotation.y = b.rot;
+      group.add(shadowed(gHall));
+      const hallOff = rotLocal(0, b.d / 2 - CHAPEL_HALL.dzFromFront, b.rot);
+      registerHideable(
+        gHall,
+        obbFootprint(
+          b.x + hallOff.x,
+          b.z + hallOff.z,
+          (b.w * CHAPEL_HALL.wScale) / 2,
+          CHAPEL_HALL.depth / 2,
+          b.rot,
+          y + CHAPEL_HALL.height,
+        ),
+      );
       continue;
     }
     const asset: PropKey =
@@ -878,7 +948,13 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.position.set(s.x, ground(s.x, s.z) - 0.06, s.z);
     g.rotation.y = s.rot;
     group.add(shadowed(g));
-    registerHideable(g, circleFootprint(s.x, s.z, s.r, ground(s.x, s.z) + 3.1));
+    // Footprint mirrors the collider's true 3.1 x 2.5 box (the old circle
+    // overhung the flat sides, so a body pressed to the counter put its eye
+    // a hair from the hide surface and the stall vanished at most angles).
+    registerHideable(
+      g,
+      obbFootprint(s.x, s.z, STALL_HALF_W, STALL_HALF_D, s.rot, ground(s.x, s.z) + 3.1),
+    );
   });
 
   // ---- wells ---------------------------------------------------------------
@@ -894,9 +970,13 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- graveyards: 4 headstone shapes, leaning, instanced ------------------
-  const graveKinds: PropKey[] = lowProps
-    ? ['graveRound']
-    : ['graveRound', 'graveCross', 'graveBevel', 'graveDecor'];
+  // The SAME four stones at every graphics tier. Collision derives each
+  // headstone's height from this cycle (`sim/prop_layout.ts`) and the sim has
+  // no notion of a graphics preset, so substituting a shorter stone on low
+  // would make what blocks a player depend on their settings, which the
+  // gameplay-neutrality invariant forbids. Six stones per graveyard is a
+  // rounding error next to the instanced foliage either way.
+  const graveKinds: PropKey[] = ['graveRound', 'graveCross', 'graveBevel', 'graveDecor'];
   for (const gy of getActiveWorldContent().props.graveyards) {
     for (let i = 0; i < 6; i++) {
       const gx = gy.x + (i % 3) * 2.2,
@@ -1109,7 +1189,13 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       });
       g.position.set(x, y - 0.1, z);
       group.add(shadowed(g));
-      registerHideable(g, circleFootprint(x, z, 0.6, y + 4.3, 2.2));
+      // Hideable at the column's REAL drawn top, not the intact monolith's:
+      // broken stumps are standable now, and registering them tall would put
+      // a standing player's eye inside-and-below the footprint, vanishing
+      // the stump underfoot. Same height math as the collider (native tops
+      // 1.0 intact / 0.65 broken, times the y scale, minus the 0.1 sink).
+      const colTop = intact ? sy - 0.1 : 0.65 * sy - 0.1;
+      registerHideable(g, circleFootprint(x, z, 0.6, y + colTop, 2.2));
     }
     if (lowProps) continue;
     // toppled relics at the ring's heart: half-buried head + fallen column
@@ -1270,20 +1356,28 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       scale: [(d.hutLocal.hw * 2) / hut.size.x, 2.6 / hut.size.y, (d.hutLocal.hd * 2) / hut.size.z],
     });
     if (!lowProps) {
-      addParts(g, 'barrel', {
-        x: 0.55,
-        y: 0.52,
-        z: -0.55,
-        rot: keyRand(key, 5) * Math.PI,
-        scale: 0.95,
+      // Loose dressing from the shared DOCK_DRESSING layout (all collidable
+      // now, so they sit OFF the pinned-crossable plank walkway, on the
+      // shore around the pier entry and the hut). Each seats on its own
+      // ground sample: the shore undulates around the anchor.
+      DOCK_DRESSING.forEach((dd, i) => {
+        const off = {
+          x: dd.x * Math.cos(d.rot) + dd.z * Math.sin(d.rot),
+          z: -dd.x * Math.sin(d.rot) + dd.z * Math.cos(d.rot),
+        };
+        addParts(g, i === 2 ? 'crateWooden' : 'barrel', {
+          x: dd.x,
+          y: ground(d.x + off.x, d.z + off.z) - y,
+          z: dd.z,
+          rot: keyRand(key, 5 + i) * Math.PI,
+          scale: dd.scale ?? 1,
+        });
       });
-      addParts(g, 'barrel', { x: 1.45, z: 0.9, rot: keyRand(key, 6) * Math.PI, scale: 1.15 });
-      addParts(g, 'crateWooden', { x: -0.6, y: 0.52, z: -2.2, rot: keyRand(key, 7), scale: 0.9 });
     }
     // rowboat beside the deck's far end: floats at water level when the
     // shore dips below it, otherwise sits hauled up on the bank
-    const boatLx = 2.4,
-      boatLz = -5.0;
+    const boatLx = DOCK_BOAT.x,
+      boatLz = DOCK_BOAT.z;
     const boatWx = d.x + boatLx * Math.cos(d.rot) + boatLz * Math.sin(d.rot);
     const boatWz = d.z - boatLx * Math.sin(d.rot) + boatLz * Math.cos(d.rot);
     const boatGround = ground(boatWx, boatWz);
@@ -1293,11 +1387,11 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       x: boatLx,
       z: boatLz,
       y: (isAfloat ? wl + 0.18 : boatGround + 0.06) - y,
-      rot: 0.5 + (keyRand(key, 8) - 0.5) * 0.4,
+      rot: DOCK_BOAT.rot + (keyRand(key, 8) - 0.5) * 0.4,
       scale: 0.85,
       euler: isAfloat
         ? undefined
-        : new THREE.Euler(0.04, 0.5 + (keyRand(key, 8) - 0.5) * 0.4, 0.16),
+        : new THREE.Euler(0.04, DOCK_BOAT.rot + (keyRand(key, 8) - 0.5) * 0.4, 0.16),
     });
     g.position.set(d.x, y, d.z);
     g.rotation.y = d.rot;
@@ -1330,18 +1424,20 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     // of the drowned door (z=505), so the whole assembly (arch, void plane,
     // braziers, name slab) flips together for the drowned delve. The flip is on
     // the placed group, never baked into the asset (its geometry is cached and
-    // shared by every marker).
-    const faceSign = isDrowned ? -1 : 1;
+    // shared by every marker). Sign, scale, and slab position are the shared
+    // prop_layout constants the arch's solid collider is built from, so the
+    // drawn slab and the wall it presents are always the same box.
+    const faceSign = delveArchMouthSign(dm.delveId);
 
     // Portal-door model with its own backing slab, no separate vault sphere needed.
     const arch = propAsset('delveEntrance2');
-    const SX = 3.6,
-      SY = 3.6,
-      SZ = 3.6;
+    const SX = DELVE_ARCH_SCALE,
+      SY = DELVE_ARCH_SCALE,
+      SZ = DELVE_ARCH_SCALE;
     // The arch sits on the far side of Halven from the approach, so he greets
     // arrivals with the glowing mouth framed behind him. The leaveDelve drop
-    // (doorPos.z - 4) stays on the mouth side for both delves.
-    const archZ = dm.z - faceSign * 4;
+    // (prop_layout delveExitDropZ) lands mouth-side, clear of the slab.
+    const archZ = delveArchZ(dm.z, dm.delveId);
     // Sample ground height at the arch's OWN placement (archZ), not Halven's
     // (dm.z): marsh terrain can slope/dip between the two, and sampling the
     // wrong z left the model's normalized (min-y at 0) base floating above the
@@ -1741,6 +1837,14 @@ function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: nu
   return tmin;
 }
 
+// A crossing that begins within arm's reach of the EYE end of the segment is
+// the player standing AGAINST the prop, not the prop covering the player:
+// occlusion of the subject scales with how close the blocker sits to the
+// CAMERA end. Without this, a body pressed to a stall counter or a house
+// wall hides the whole structure at most orbit angles, because the entry
+// point sits centimetres from the eye at eye height.
+const HIDE_EYE_CLEARANCE = 1.0;
+
 function cameraSegmentHitsFootprint(
   h: Hideable,
   eyeX: number,
@@ -1761,6 +1865,7 @@ function cameraSegmentHitsFootprint(
       ? segmentCircleEntry(eyeX, eyeZ, camX, camZ, h.x, h.z, h.r)
       : segmentObbEntry(h, eyeX, eyeZ, camX, camZ);
   if (t < 0 || t > 1) return false;
+  if (t * Math.hypot(camX - eyeX, camZ - eyeZ) < HIDE_EYE_CLEARANCE) return false;
   return eyeY + (camY - eyeY) * t < h.topY;
 }
 

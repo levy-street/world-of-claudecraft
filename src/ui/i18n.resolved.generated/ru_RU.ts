@@ -666,7 +666,7 @@ export const ru_RU: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Скидка 20%",
+      "railWocDiscount": "Скидка {percent}%",
       "railWocUnavailable": "Цена WOC сейчас недоступна.",
       "railNativeUnavailable": "SOL/WOC недоступны",
       "amountLabel": "Количество",
@@ -1464,6 +1464,7 @@ export const ru_RU: EnTranslations = {
       "harvestButton": "Собрать",
       "harvestTooltip": "Собирает отмеченные компоненты. Каждый труп можно обработать только один раз, кто успел первым. Добычу при этом не забирает.",
       "concentrateHint": "Чем меньше выбрано компонентов, тем выше их качество.",
+      "nothingSelectedYields": "С этого трупа нельзя собрать ничего из выбранного.",
       "alreadyHarvested": "Этот труп уже был собран.",
       "componentAria": "Собрать {component}",
       "components": {
@@ -2024,8 +2025,8 @@ export const ru_RU: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Ожидает получения на Мировом рынке",
-      "tip": "Золото или предметы ждут вас у Торговца."
+      "aria": "Выручка или предметы с Мирового рынка ожидают",
+      "tip": "Выручка от продаж или возвращенные предметы ждут вас у Торговца."
     },
     "noticeboard": {
       "empty": "Похоже, здесь ничего не опубликовано."

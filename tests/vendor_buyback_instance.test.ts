@@ -82,7 +82,7 @@ describe('buyback preserves instance payloads', () => {
     const row = buybackOf(sim, pid).find((s) => s.itemId === BOOTS);
     expect(row?.instance).toEqual(ENCHANTED);
 
-    sim.buyBackItem(BOOTS, pid);
+    sim.buyBackItem(BOOTS, undefined, undefined, pid);
     const back = slotsOf(sim, pid, BOOTS);
     expect(back).toHaveLength(1);
     expect(back[0].count).toBe(1);
@@ -94,7 +94,7 @@ describe('buyback preserves instance payloads', () => {
     const { sim, pid } = vendorSetup();
     sim.addItemInstance(BOOTS, { ...MASTERWORK, rolled: { ...MASTERWORK.rolled } }, pid);
     sim.sellItem(BOOTS, 1, pid);
-    sim.buyBackItem(BOOTS, pid);
+    sim.buyBackItem(BOOTS, undefined, undefined, pid);
     const back = slotsOf(sim, pid, BOOTS);
     expect(back).toHaveLength(1);
     expect(back[0].instance).toEqual(MASTERWORK);
@@ -106,7 +106,7 @@ describe('buyback preserves instance payloads', () => {
     sim.sellItem(HIDE, 1, pid);
     const row = buybackOf(sim, pid).find((s) => s.itemId === HIDE);
     expect(row?.instance).toEqual(SIGNED);
-    sim.buyBackItem(HIDE, pid);
+    sim.buyBackItem(HIDE, undefined, undefined, pid);
     const back = slotsOf(sim, pid, HIDE);
     expect(back).toHaveLength(1);
     expect(back[0].instance).toEqual(SIGNED);
@@ -116,7 +116,7 @@ describe('buyback preserves instance payloads', () => {
     const { sim, pid } = vendorSetup();
     sim.addItemInstance(HIDE, { ...ARMED }, pid);
     sim.sellItem(HIDE, 1, pid);
-    sim.buyBackItem(HIDE, pid);
+    sim.buyBackItem(HIDE, undefined, undefined, pid);
     const back = slotsOf(sim, pid, HIDE);
     expect(back).toHaveLength(1);
     expect(back[0].instance).toEqual(ARMED);
@@ -137,10 +137,11 @@ describe('buyback preserves instance payloads', () => {
     expect(rows[0].instance).toEqual(enchantA);
     expect(rows[1].instance).toEqual(enchantB);
 
-    // Buyback resolves the most recent row for the itemId first.
-    sim.buyBackItem(BOOTS, pid);
+    // A selector-less redemption falls back across same-payload tiers; both
+    // rows here are instanced, so the most recent row returns first.
+    sim.buyBackItem(BOOTS, undefined, undefined, pid);
     expect(slotsOf(sim, pid, BOOTS)[0].instance).toEqual(enchantA);
-    sim.buyBackItem(BOOTS, pid);
+    sim.buyBackItem(BOOTS, undefined, undefined, pid);
     const both = slotsOf(sim, pid, BOOTS).map((s) => s.instance);
     expect(both).toContainEqual(enchantA);
     expect(both).toContainEqual(enchantB);
@@ -196,7 +197,7 @@ describe('buyback preserves instance payloads', () => {
     sim.sellItem(SCALE, 1, pid);
     const rows = buybackOf(sim, pid).filter((s) => s.itemId === SCALE);
     expect(rows).toEqual([{ itemId: SCALE, count: 3 }]);
-    sim.buyBackItem(SCALE, pid);
+    sim.buyBackItem(SCALE, undefined, undefined, pid);
     const back = slotsOf(sim, pid, SCALE);
     expect(back).toEqual([{ itemId: SCALE, count: 1 }]);
   });
@@ -214,7 +215,7 @@ describe('buyback preserves instance payloads', () => {
       sim.addItemInstance(SCALE, { signer: `F${meta.inventory.length}` }, pid);
     }
     sim.drainEvents();
-    sim.buyBackItem(HIDE, pid);
+    sim.buyBackItem(HIDE, undefined, undefined, pid);
     expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
     expect(buybackOf(sim, pid).find((s) => s.itemId === HIDE)?.instance).toEqual(SIGNED);
     expect(slotsOf(sim, pid, HIDE).some((s) => s.instance)).toBe(false);
@@ -223,7 +224,7 @@ describe('buyback preserves instance payloads', () => {
     const plainIdx = meta.inventory.findIndex((s) => s.itemId === HIDE && !s.instance);
     meta.inventory[plainIdx] = { itemId: HIDE, count: 1, instance: { ...SIGNED } };
     sim.drainEvents();
-    sim.buyBackItem(HIDE, pid);
+    sim.buyBackItem(HIDE, undefined, undefined, pid);
     expect(errorTexts(sim.drainEvents())).toHaveLength(0);
     const merged = slotsOf(sim, pid, HIDE).filter((s) => s.instance);
     expect(merged).toHaveLength(1);
@@ -231,28 +232,47 @@ describe('buyback preserves instance payloads', () => {
     expect(merged[0].instance).toEqual(SIGNED);
   });
 
-  it('the payload selector picks the exact row; selector-less clicks prefer plain', () => {
+  it('index + expected payload address the exact row when rows share an item id', () => {
     const { sim, pid } = vendorSetup();
     sim.addItem(HIDE, 1, pid);
     sim.addItemInstance(HIDE, { ...SIGNED }, pid);
-    sim.sellItem(HIDE, 2, pid); // plain row + signed row, signed sold last
-    // No selector: the PLAIN copy returns (the copy a player almost always
-    // means), even though the signed row is more recent.
-    sim.buyBackItem(HIDE, pid);
+    sim.sellItem(HIDE, 2, pid); // plain row + signed row
+    // Selector-less: the exact-payload fallback matches expectedInstance
+    // undefined against PLAIN rows only, so the plain copy returns first.
+    sim.buyBackItem(HIDE, undefined, undefined, pid);
     expect(slotsOf(sim, pid, HIDE)).toEqual([{ itemId: HIDE, count: 1 }]);
-    // Payload selector: the exact signed copy returns.
-    sim.buyBackItem(HIDE, pid, { ...SIGNED });
+    // Then the signed copy, addressed by index + payload.
+    const signedIdx = buybackOf(sim, pid).findIndex((s) => s.itemId === HIDE && s.instance);
+    sim.buyBackItem(HIDE, signedIdx, { ...SIGNED }, pid);
     const signed = slotsOf(sim, pid, HIDE).find((s) => s.instance);
     expect(signed?.instance).toEqual(SIGNED);
     expect(buybackOf(sim, pid).filter((s) => s.itemId === HIDE)).toHaveLength(0);
   });
 
-  it('a selector naming a row the player never sold is refused', () => {
+  it('a stale index whose payload no longer matches falls back to the exact-payload scan', () => {
+    const { sim, pid } = vendorSetup();
+    sim.addItemInstance(HIDE, { ...SIGNED }, pid);
+    sim.sellItem(HIDE, 1, pid);
+    // A plain sale after the client's snapshot shifts the signed row down.
+    sim.addItem(HIDE, 1, pid);
+    sim.sellItem(HIDE, 1, pid);
+    sim.drainEvents();
+    // The client still clicks index 0 expecting the signed payload: the new
+    // occupant must NOT be redeemed in its place; the scan finds the real row.
+    sim.buyBackItem(HIDE, 0, { ...SIGNED }, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const got = slotsOf(sim, pid, HIDE);
+    expect(got).toHaveLength(1);
+    expect(got[0].instance).toEqual(SIGNED);
+    expect(buybackOf(sim, pid).find((s) => s.itemId === HIDE)?.instance).toBeUndefined();
+  });
+
+  it('an expected payload the player never sold is refused', () => {
     const { sim, pid } = vendorSetup();
     sim.addItemInstance(HIDE, { ...SIGNED }, pid);
     sim.sellItem(HIDE, 1, pid);
     sim.drainEvents();
-    sim.buyBackItem(HIDE, pid, { signer: 'Forged' });
+    sim.buyBackItem(HIDE, 0, { signer: 'Forged' }, pid);
     expect(errorTexts(sim.drainEvents())).toContain('That item is not available for buyback.');
     expect(buybackOf(sim, pid)).toHaveLength(1);
   });
@@ -288,7 +308,7 @@ describe('buyback preserves instance payloads', () => {
     expect(rows.find((s) => s.itemId === BOOTS)?.instance).toEqual(ENCHANTED);
     standAt(sim2, pid2, vendorEntity(sim2));
     sim2.players.get(pid2)!.copper = 100000;
-    sim2.buyBackItem(BOOTS, pid2);
+    sim2.buyBackItem(BOOTS, undefined, undefined, pid2);
     expect(
       sim2.ctx.resolve(pid2)!.meta.inventory.find((s) => s.itemId === BOOTS)?.instance,
     ).toEqual(ENCHANTED);

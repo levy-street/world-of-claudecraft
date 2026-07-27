@@ -5397,6 +5397,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'directDamage', min: 90, max: 110 },
       { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
+      { type: 'selfBuff', kind: 'buff_armor', value: 150, duration: 10 },
     ],
     description:
       'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',

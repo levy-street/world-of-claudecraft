@@ -13,6 +13,12 @@
 // in-place mutation (the refactor's immutability waiver) are preserved exactly so the
 // parity gate's full-state trace AND rng draw-order log stay byte-identical.
 //
+// That directive governs the EXTRACTION, not the file forever: behavior fixes have
+// landed here since, each argued at its own site against its own issue (the corpse
+// grace-vs-fast arm in pruneCorpseLoot is the one to read first, #1141 then #2513).
+// Read a "verbatim" claim as "verbatim as of the move", and check `git log` before
+// treating any line below as untouched since.
+//
 // The rng draws live in two places and BOTH must keep their global stream position:
 //  - producer (rollLoot): per template.loot entry, in array order -- exactly ONE
 //    ctx.rng.next() per rollGroup (partitioned across the group), then for non-group
@@ -29,6 +35,7 @@ import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
+import { isHarvestableCorpse } from '../professions/gathering';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type {
@@ -595,8 +602,18 @@ export function assignMasterLoot(
   const roll = ctx.pendingLootRolls.get(rollId);
   if (!roll || roll.masterLooter === undefined) return;
   if (r.meta.entityId !== roll.masterLooter) return; // only the master looter decides
-  // Keep only still-eligible targets; ignore anyone no longer a candidate.
-  const targets = targetPids.filter((p) => roll.candidates.includes(p));
+  // Keep only still-eligible targets, each counted once; ignore anyone no longer
+  // a candidate. The pid list is client-supplied (the masterAssign wire case
+  // checks that pids is a non-empty array of numbers and nothing about the
+  // values), and a pid named twice would send that player two lootRoll prompts,
+  // print their reveal line twice, and can put one player in tiedWinners twice,
+  // drawing a tie-break ctx.rng.int the honest single-candidate case never draws.
+  // What is load-bearing is deduping BEFORE the length tests below, so [X, X]
+  // takes the direct-grant arm exactly like [X] instead of converting to a
+  // one-player need/greed roll (the dedupe and the filter commute, so their
+  // relative order is not). Set iterates in first-seen order, which preserves the
+  // caller's prompt and reveal order.
+  const targets = [...new Set(targetPids)].filter((p) => roll.candidates.includes(p));
   if (targets.length === 0) return; // nothing valid selected: leave the prompt open
   if (targets.length === 1) {
     // The target can have logged out during the up-to-5min curate window
@@ -811,7 +828,18 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
     // respawn gate in mob/locomotion.ts collapses it at corpseTimer 0). Only
     // a corpse with both halves consumed, or no harvest half at all, takes
     // the fast arm.
-    if (MOBS[mob.templateId]?.componentTags?.length && mob.harvestClaimedBy === null) {
+    //
+    // "A harvest half" is isHarvestableCorpse, not a tag COUNT (#2513): a corpse
+    // whose every family is unmapped (fen_troll: claw, tusk) owes nobody a
+    // harvest, because the command boundary now refuses one. Counting its tags
+    // here would hold the grace window open for 30 seconds waiting on a claim
+    // that can never be spent, which is strictly worse than the pre-#2513
+    // world, where a player could at least burn the claim and collapse it.
+    // `lootable = false` on the fast arm is the load-bearing write, not the 4:
+    // the respawn gate (mob/locomotion.ts) is `respawnTimer <= 0 && (corpseTimer
+    // <= 0 || !lootable)`, so an emptied all-unmapped corpse now clears on its
+    // respawn timer instead of sitting out the grace window first.
+    if (isHarvestableCorpse(MOBS[mob.templateId]?.componentTags) && mob.harvestClaimedBy === null) {
       mob.lootable = true;
       mob.corpseTimer = Math.min(mob.corpseTimer, CORPSE_INTERACT_GRACE_SECONDS);
       return;

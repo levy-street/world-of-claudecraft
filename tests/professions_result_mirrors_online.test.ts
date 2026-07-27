@@ -56,6 +56,10 @@ type WireMsg = {
   [k: string]: unknown;
 };
 
+type SnapWireMsg = WireMsg & { self: Record<string, unknown> };
+type BareClientHarness = ClientWorld & Record<string, unknown>;
+type PositionedEntity = Entity & { prevPos?: Entity['pos'] };
+
 function fakeWs(): { sent: WireMsg[]; ws: unknown } {
   const sent: WireMsg[] = [];
   return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
@@ -74,13 +78,11 @@ function joinServer(
 }
 
 function placeAt(server: GameServer, pid: number, pos: { x: number; z: number }): void {
-  const entity = (
-    server.sim as unknown as { entities: Map<number, { pos: any; prevPos?: any }> }
-  ).entities.get(pid);
+  const entity = server.sim.entities.get(pid) as PositionedEntity | undefined;
   if (!entity) throw new Error(`no entity for pid ${pid}`);
   entity.pos.x = pos.x;
   entity.pos.z = pos.z;
-  entity.prevPos = { x: pos.x, z: pos.z };
+  entity.prevPos = { ...entity.pos };
 }
 
 function routeTick(server: GameServer): void {
@@ -91,8 +93,11 @@ function broadcast(server: GameServer): void {
   (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
 }
 
-function snapAfter(sent: WireMsg[], fromIdx = 0): { self: Record<string, unknown> } | null {
-  for (let i = sent.length - 1; i >= fromIdx; i--) if (sent[i].t === 'snap') return sent[i] as any;
+function snapAfter(sent: WireMsg[], fromIdx = 0): SnapWireMsg | null {
+  for (let i = sent.length - 1; i >= fromIdx; i--) {
+    const msg = sent[i];
+    if (msg.t === 'snap' && msg.self !== undefined) return msg as SnapWireMsg;
+  }
   return null;
 }
 
@@ -115,51 +120,58 @@ function eventFrames(sent: WireMsg[], fromIdx = 0): WireMsg[] {
 // The tests/snapshots.test.ts bareClient shape (identical to the shipped
 // suites): a ClientWorld without WebSocket plumbing.
 function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
+  const c = Object.create(ClientWorld.prototype) as BareClientHarness;
+  Object.assign(c, {
+    cfg: { seed: 20061, playerClass },
+    entities: new Map(),
+    playerId: pid,
+    ownPlayerId: pid,
+    ownPlayerClass: playerClass,
+    spectating: null,
+    cupInfo: null,
+    lastVcupRemainder: null,
+    lastVcupShared: null,
+    sportRole: null,
+    moveInput: {},
+    inventory: [],
+    vendorBuyback: [],
+    equipment: {},
+    accountCosmetics: {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+    },
+    copper: 0,
+    honor: 0,
+    lifetimeHonor: 0,
+    xp: 0,
+    known: [],
+    questLog: new Map(),
+    questsDone: new Set(),
+    pendingQuestCommands: new Map(),
+    partyInfo: null,
+    selectedDungeonDifficulty: 'normal',
+    tradeInfo: null,
+    duelInfo: null,
+    lastSnapAt: 0,
+    snapInterval: 50,
+    serverTickHz: null,
+    missingSince: new Map(),
+    pendingFacingDelta: 0,
+    connected: true,
+    eventQueue: [],
+    mouselookFacing: null,
+    lastInputSentAt: 0,
+    lastInputSig: '',
+    inputSeq: 0,
+    pendingInputSeqSentAt: new Map(),
+    ackedInputSeq: 0,
+    inputEchoSamples: [],
+    spectateFacingPending: false,
+    pendingSpectateFacing: null,
+    nodeCooldowns: new Map(),
+  });
   return c;
 }
 

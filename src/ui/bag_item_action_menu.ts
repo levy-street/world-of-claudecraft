@@ -112,7 +112,14 @@ export class BagItemActionMenu {
   /** Open the action menu for a bag stack. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row is
    *  byte-identical to a plain click. */
-  open(def: ItemDef, itemId: string, x: number, y: number, runDefault: () => void): void {
+  open(
+    def: ItemDef,
+    itemId: string,
+    slotIndex: number,
+    x: number,
+    y: number,
+    runDefault: () => void,
+  ): void {
     const rows = bagItemContextActions(def, itemId).map((action) => ({
       act: action.id,
       html: esc(t(action.labelKey)),
@@ -120,7 +127,7 @@ export class BagItemActionMenu {
     this.paint(rows, x, y, (act) => {
       const id = act as BagItemContextActionId;
       if (id === 'default') runDefault();
-      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId);
+      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
     });
@@ -129,11 +136,19 @@ export class BagItemActionMenu {
   // Disenchant / Salvage: both route through the one confirm-dialog family, with
   // the stronger warning body when the copy that would actually be consumed is
   // special (signed / masterwork / enchanted). The OK label reuses the menu verb.
-  private confirmDestroy(action: 'disenchant' | 'salvage', itemId: string): void {
+  private confirmDestroy(
+    action: 'disenchant' | 'salvage',
+    itemId: string,
+    slotIndex?: number,
+  ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
     const name = def ? itemDisplayName(def) : itemId;
-    const copies = world.inventory.filter((slot) => slot.itemId === itemId);
+    const selected = slotIndex === undefined ? undefined : world.inventory[slotIndex];
+    const copies =
+      action === 'disenchant' && selected?.itemId === itemId
+        ? [selected]
+        : world.inventory.filter((slot) => slot.itemId === itemId);
     const special = destroyConsumesSpecialCopy(action, copies);
     const c =
       action === 'disenchant'
@@ -163,8 +178,10 @@ export class BagItemActionMenu {
       t(c.ok),
       t('hud.chat.context.cancel'),
       () => {
-        if (action === 'disenchant') world.disenchantItem(itemId);
-        else world.salvageItem(itemId);
+        if (action === 'disenchant') {
+          if (slotIndex === undefined) world.disenchantItem(itemId);
+          else world.disenchantItem(itemId, { slotIndex });
+        } else world.salvageItem(itemId);
         this.deps.afterAction();
       },
     );

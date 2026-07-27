@@ -7501,6 +7501,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.body':
     'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Este cadáver ya ha sido recolectado.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Nada de lo que has seleccionado se puede recolectar de este cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Recolectar {component}',
   'hudChrome.corpseHarvest.components.claw': 'Garra',
   'hudChrome.corpseHarvest.components.fang': 'Colmillo',
@@ -8248,7 +8250,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Tarjeta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20 % de descuento',
+  'hudChrome.claudium.railWocDiscount': '{percent} % de descuento',
   'hudChrome.claudium.railWocUnavailable':
     'Los precios en WOC no están disponibles en este momento.',
   'hudChrome.claudium.showAmounts': 'Mostrar todas las cantidades de Claudium',
@@ -9096,6 +9098,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': '¿Aceptar el Tañido del Guardián?',
   'hudChrome.gathering.gatherLine': 'Reúnes: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Reúnes: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Despiezas: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Despiezas: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'También recuperas {name}.',
   'hudChrome.mobile.professions': 'Profesiones',
   'hudChrome.options.showThirdActionBar': 'Mostrar tercera barra de acción',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer verificado',
@@ -9413,8 +9418,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} a {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Encantado',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Encantado)',
-  'hudChrome.marketIndicator.aria': 'Recogida pendiente en el Mercado Mundial',
-  'hudChrome.marketIndicator.tip': 'Oro u objetos te esperan en el Mercader.',
+  'hudChrome.marketIndicator.aria': 'Ganancias u objetos del Mercado Mundial en espera',
+  'hudChrome.marketIndicator.tip':
+    'Las ganancias de venta u objetos devueltos te esperan en el Mercader.',
   'hudChrome.materialHint.arcaneDust':
     'Reactivo de encantamiento. Se obtiene desencantando equipo común y poco común.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9452,4 +9458,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Reemplaza {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Ese objeto ya tiene ese encantamiento.',
   'hudChrome.enchanting.sameEnchantTag': 'Ya aplicado',
+  'hudChrome.crafting.craftedToastQty': 'Elaborado: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Desencantas {item} en {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Desencantas {item} en {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'También recuperas {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'También recuperas {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Desguazas {item} en {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Desguazas {item} en {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Sin encantar',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conserva: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marca del artesano',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonificación de obra maestra',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo de encargo',
 };

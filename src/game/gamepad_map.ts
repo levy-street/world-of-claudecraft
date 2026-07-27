@@ -263,7 +263,7 @@ export function stickToLook(
 ): LookDelta {
   const v = applyRadialDeadzone(x, y, dz);
   if (v.x === 0 && v.y === 0) return { yaw: 0, pitch: 0 };
-  const pitchSign = invertY ? 1 : -1;
+  const pitchSign = invertY ? -1 : 1;
   return { yaw: -v.x * speed * dt, pitch: pitchSign * v.y * speed * dt };
 }
 

@@ -360,8 +360,13 @@ describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-
   });
 
   it('the talented build still out-bursts the naked spec (over-nerf guard)', () => {
-    const naked = runShortFight('fire', FIGHT_SECONDS);
-    expect(mean).toBeGreaterThanOrEqual(naked.dps);
+    // Mean versus mean over the SAME seed panel: a single-seed naked run can
+    // high-roll past the talented mean on pure crit luck whenever the shared
+    // rng stream shifts (any world-content change forks it), which is seed
+    // noise, not an over-nerf.
+    const naked = CEILING_SEEDS.map((seed) => runShortFight('fire', FIGHT_SECONDS, seed));
+    const nakedMean = naked.reduce((a, r) => a + r.dps, 0) / naked.length;
+    expect(mean).toBeGreaterThanOrEqual(nakedMean);
   });
 });
 
@@ -375,7 +380,11 @@ describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-
 // measured). Pre-fix ratio at these seeds: ~2.8x, so both fire assertions
 // fail loudly on the old sim.
 describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', () => {
-  const SUSTAINED_SEEDS = [41, 101, 115];
+  // Five seeds: three was small enough for the parity floor below to flip on
+  // pure crit luck whenever the shared rng stream forks (any world-content
+  // change forks it). Nine-seed probes put fire at 1.05 to 1.08 over frost;
+  // five keeps the estimator honest at CI-friendly runtime.
+  const SUSTAINED_SEEDS = [41, 101, 115, 7, 57];
   const SUSTAINED_CEILING = 1.25; // x talented frost, per duration
   // Owner ruling 2026-07-25: frost is the PvP-leaning spec, so fire must
   // NEVER fall below it in PvE damage, at any fight length. The floor is

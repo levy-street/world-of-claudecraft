@@ -124,6 +124,29 @@ describe('sending a letter', () => {
     ).toBe(true);
   });
 
+  it('streams older delivered mail beyond the first fifty rows so it can be opened', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 100_000;
+    moveToMailbox(sim, alice);
+
+    for (let i = 0; i < 60; i++) {
+      sim.mailSend('Bob', `Letter ${i}`, `Body ${i}`, 0, [], alice);
+    }
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+
+    const info = sim.mailInfoFor(bob);
+    expect(info).not.toBeNull();
+    expect(info?.totalCount).toBe(61);
+    expect(info?.messages).toHaveLength(61);
+    expect(info?.messages.some((m) => m.subject === 'Letter 0')).toBe(true);
+    expect(info?.messages.some((m) => m.subject === 'Letter 59')).toBe(true);
+  });
+
   it('refuses what the post refuses', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
