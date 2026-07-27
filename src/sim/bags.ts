@@ -121,20 +121,29 @@ export function countFit(
   return Math.min(count, room);
 }
 
-/** True when ONE copy of an instanced grant fits: room in a byte-equal
- *  mergeable stack (identical-payload stacking) OR a free slot.
- *  The signed-grant guards (corpse focus-harvest, node harvest) consume this
- *  so a slot-full bag holding a same-payload stack with room keeps the
+/** True when ALL `count` copies of an instanced grant fit (one by default):
+ *  room in a byte-equal mergeable stack (identical-payload stacking) plus free
+ *  slots. The corpse focus-harvest signed guards consume this (harvestNode's
+ *  signed batch reads countFit directly for the same model) so a slot-full bag
+ *  holding a same-payload stack with room keeps the
  *  signature instead of downgrading to the plain fungible fallback (#2139:
  *  every capacity pre-check must model the merge identically, or a guard
- *  that disagrees with addStacked re-opens the overflow class). */
+ *  that disagrees with addStacked re-opens the overflow class). Counting the
+ *  WHOLE grant is what keeps that promise for a multi-unit signed yield
+ *  (#2473): a stack with room for one of three units must refuse, or the
+ *  remaining two push a fresh slot past capacity. The plain twin is
+ *  canAddItem, same all-or-nothing shape. A `count` of 0 answers true (nothing
+ *  is always grantable) and addItemInstance early-returns on it, so a caller
+ *  that can legitimately reach 0 owns that check itself; no shipped grant can
+ *  (a harvest quantity floors at 1). */
 export function canGrantItemInstance(
   inventory: readonly InvSlot[],
   capacity: number,
   itemId: string,
   instance: ItemInstancePayload,
+  count = 1,
 ): boolean {
-  return countFit(inventory, capacity, itemId, 1, instance) >= 1;
+  return countFit(inventory, capacity, itemId, count, instance) >= count;
 }
 
 /** True when all `count` copies fit. */

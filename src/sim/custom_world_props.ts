@@ -46,6 +46,7 @@ export function clonePropsWithoutEastbrookLayout(source: ZonePropsDef): ZoneProp
     mines: cloneRecords(source.mines),
     docks: source.docks.map((dock) => ({ ...dock, hutLocal: { ...dock.hutLocal } })),
     tents: cloneRecords(source.tents),
+    marshReeds: source.marshReeds.map(([x, z]) => [x, z]),
     crates: source.crates.map(([x, z]) => [x, z]),
     campfires: source.campfires.map(([x, z]) => [x, z]),
     mudHuts: source.mudHuts.map(([x, z]) => [x, z]),

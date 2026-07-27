@@ -2192,6 +2192,22 @@ export const ZONE2_PROPS: ZonePropsDef = {
     { x: -28, z: 494, rot: -0.7, scale: 1 },
     { x: -3, z: 505, rot: 2.9, scale: 1.3 },
   ],
+  // Reed clumps ringing the Deepfen Shallows lake (DEEPFEN_SHALLOWS_LAKE, above).
+  // Reeds are waterline dressing, so every entry must sit on the shore: within
+  // ~1 yard of waterLevel() and inside the lake's own neighbourhood. A clump that
+  // drifts onto the dry bank reads as a bush stranded in a field
+  // (tests/marsh_reeds_placement.test.ts pins both).
+  marshReeds: [
+    [-82, 334],
+    [-85, 337],
+    [-97, 344],
+    [-112, 338],
+    [-74, 316],
+    [-77, 295],
+    [-96, 287],
+    [-110, 274],
+    [-123, 274],
+  ],
   crates: [
     [14, 468],
     [18, 471],

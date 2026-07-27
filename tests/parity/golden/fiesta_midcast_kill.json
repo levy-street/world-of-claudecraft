@@ -10,8 +10,8 @@
     "fiesta lifesteal augment arm (~5499)",
     "multi-player fiesta meta"
   ],
-  "draws": 524,
-  "drawDigest": "1731ce7a",
+  "draws": 523,
+  "drawDigest": "1bff173c",
   "frames": [
     {
       "tick": 0,
@@ -1614,8 +1614,8 @@
       "state": "f63cef53",
       "events": "741638a5",
       "rng": {
-        "draws": 429,
-        "digest": "e468757c"
+        "draws": 428,
+        "digest": "c7d67bc3"
       }
     },
     {
@@ -1625,8 +1625,8 @@
       "state": "945ebd08",
       "events": "741638a5",
       "rng": {
-        "draws": 524,
-        "digest": "1731ce7a"
+        "draws": 523,
+        "digest": "1bff173c"
       },
       "label": "final",
       "players": [

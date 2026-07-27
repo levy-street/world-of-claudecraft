@@ -308,10 +308,20 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
 
     // The whole windfall is ONE batched loot line with the x5 suffix, never
     // one line and cue per unit (the recorded loot-burst polish).
-    const lootLines = events
-      .filter((e) => e.type === 'loot')
-      .map((e) => (e as { text: string }).text);
-    expect(lootLines).toEqual(['You receive: Copper Ore x5.']);
+    const lootEvents = events.filter((e) => e.type === 'loot') as Array<{
+      text: string;
+      silent?: boolean;
+      callerLogs?: boolean;
+    }>;
+    expect(lootEvents.map((e) => e.text)).toEqual(['You receive: Copper Ore x5.']);
+    // #2430: this is the SIGNED batched arm of the harvest grant, a different
+    // call site from the fungible one tests/professions_silent_loot.test.ts
+    // drives, and it is the arm every rare-event windfall takes. Both hub
+    // feedbacks stand down here too, so the gatherResult line above is the
+    // only line and the node cue the only cue. Without this the arm was
+    // pinned only by an opaque parity digest.
+    expect(lootEvents[0].silent).toBe(true);
+    expect(lootEvents[0].callerLogs).toBe(true);
 
     // The per-flavor deed mark (deeds.ts registers a deed per flavor).
     expect(meta.deedStats.visited.has('gather_event:pristine_vein')).toBe(true);

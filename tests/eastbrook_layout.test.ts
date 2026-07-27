@@ -935,6 +935,7 @@ describe('layout clearance and service anchors', () => {
       position: { x: 0, z: -7.5 },
       bodyRadius: 0.8,
       interactionRadius: 7,
+      frontStandingPoint: { x: 0, z: -6.4 },
     });
     expect(EASTBROOK_LAYOUT.services.noticeboard).toEqual({
       id: 'eastbrook_noticeboard',

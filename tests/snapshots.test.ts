@@ -581,6 +581,59 @@ describe('corpse harvest claim over the wire', () => {
   });
 });
 
+describe('ledge climb over the wire (cl progress)', () => {
+  function climbingPlayer(): { e: ReturnType<Sim['entities']['get']> & object } {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Scaler');
+    const e = sim.entities.get(pid)!;
+    return { e };
+  }
+
+  it('quantizes the pull progress out and mirrors it 0..1 on the client', () => {
+    const { e } = climbingPlayer();
+    expect(wireEntity(e)).not.toHaveProperty('cl');
+
+    e.climb = {
+      from: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
+      to: { x: e.pos.x, y: e.pos.y + 2, z: e.pos.z + 0.5 },
+      elapsed: 0.25,
+      duration: 0.5,
+    };
+    expect(wireEntity(e).cl).toBe(50);
+    // Just armed: still non-zero, so any client reads it as climbing.
+    e.climb.elapsed = 0;
+    expect(wireEntity(e).cl).toBe(1);
+    // Nearly done: capped inside 99, never rounding to a falsy 0 or a lying 100.
+    e.climb.elapsed = 0.499;
+    expect(wireEntity(e).cl).toBe(99);
+
+    e.climb.elapsed = 0.25;
+    const client = bareClient(9);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    const remote = client.entities.get(e.id)!;
+    expect(remote.climbing).toBe(true);
+    expect(remote.climbProgress).toBeCloseTo(0.5, 6);
+  });
+
+  it('clears the mirror when a later record arrives without cl', () => {
+    const { e } = climbingPlayer();
+    e.climb = {
+      from: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
+      to: { x: e.pos.x, y: e.pos.y + 2, z: e.pos.z + 0.5 },
+      elapsed: 0.1,
+      duration: 0.5,
+    };
+    const client = bareClient(9);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.climbing).toBe(true);
+
+    e.climb = null; // the pull completed server-side
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.climbing).toBe(false);
+    expect(client.entities.get(e.id)!.climbProgress).toBeUndefined();
+  });
+});
+
 // Loot owner-lock lapse (FFA) over the wire. The rights-aware corpse picker
 // (src/game/corpse_loot_availability.ts) reads mob.lootFfaTimer; offline the
 // Sim entity carries the real countdown, so online the LAPSE must ride the

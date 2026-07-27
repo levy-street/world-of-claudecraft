@@ -13,6 +13,7 @@ export const MARKET_ITEM_TYPE_FILTERS = [
   'all',
   'weapon',
   'armor',
+  'bag',
   'consumable',
   'material',
   'cosmetic',
@@ -40,6 +41,25 @@ export const MARKET_WEAPON_TYPE_FILTERS = [
   'axe',
   'other',
 ] as const;
+/** A bag-capacity subtype option: 'all', or a stringified `bagSlots` value from the catalog. */
+export type MarketBagSizeFilter = 'all' | `${number}`;
+// DERIVED from the item catalog, never a hardcoded list. Authoring a bag record with a
+// capacity no other bag has adds its browse option automatically, in ascending order,
+// with no code and no locale change: the option label reuses the already-translated
+// `itemUi.tooltip.bagSlots` template, which takes the number as a value.
+export const MARKET_BAG_SIZE_FILTERS: readonly MarketBagSizeFilter[] = [
+  'all',
+  ...[
+    ...new Set(
+      Object.values(ITEMS)
+        .filter((item) => item.kind === 'bag')
+        .map((item) => item.bagSlots ?? 0)
+        .filter((slots) => slots > 0),
+    ),
+  ]
+    .sort((a, b) => a - b)
+    .map((slots) => `${slots}` as const),
+];
 // Bound to the content union both ways on purpose: `satisfies` rejects an option that is not
 // a real ArmorType, and the Exclude assertion below reddens tsc if ArmorType ever gains a class
 // with no option here (which would silently make that whole armor class unbrowsable).
@@ -71,7 +91,10 @@ export const MARKET_PAGE_SIZE = 50;
 export type MarketItemTypeFilter = (typeof MARKET_ITEM_TYPE_FILTERS)[number];
 export type MarketArmorTypeFilter = (typeof MARKET_ARMOR_TYPE_FILTERS)[number];
 export type MarketWeaponTypeFilter = (typeof MARKET_WEAPON_TYPE_FILTERS)[number];
-export type MarketSubtypeFilter = MarketArmorTypeFilter | MarketWeaponTypeFilter;
+export type MarketSubtypeFilter =
+  | MarketArmorTypeFilter
+  | MarketWeaponTypeFilter
+  | MarketBagSizeFilter;
 export type MarketArmorClassFilter = (typeof MARKET_ARMOR_CLASS_FILTERS)[number];
 export type MarketPrimaryStatFilter = (typeof MARKET_PRIMARY_STAT_FILTERS)[number];
 export type MarketRarityFilter = (typeof MARKET_RARITY_FILTERS)[number];
@@ -125,7 +148,11 @@ export function sanitizeMarketQuery(
     search: typeof raw?.search === 'string' ? raw.search.slice(0, 40) : '',
     itemType: oneOf(MARKET_ITEM_TYPE_FILTERS, raw?.itemType, 'all'),
     subtype: oneOf(
-      [...MARKET_ARMOR_TYPE_FILTERS, ...MARKET_WEAPON_TYPE_FILTERS] as const,
+      [
+        ...MARKET_ARMOR_TYPE_FILTERS,
+        ...MARKET_WEAPON_TYPE_FILTERS,
+        ...MARKET_BAG_SIZE_FILTERS,
+      ] as const,
       raw?.subtype,
       'all',
     ),
@@ -152,10 +179,22 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
       item.kind === 'potion' ||
       item.kind === 'elixir'
     );
+  if (filter === 'bag') return item.kind === 'bag';
   if (filter === 'material')
     return !isCosmeticItem(item) && (item.kind === 'junk' || item.kind === 'tool');
   if (filter === 'cosmetic') return isCosmeticItem(item);
-  return item.kind === 'quest';
+  if (filter === 'other') return item.kind === 'quest';
+  // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
+  // reddens tsc here instead of silently inheriting the 'other' predicate, which is
+  // how `bag` browsed as nothing at all for its whole life before this arm existed.
+  // The runtime tail is `false`, not the asserted value: types are erased in the
+  // bundle, so returning `unhandled` would hand back the filter STRING, which is
+  // truthy, and a category that somehow slipped past tsc would match EVERY item.
+  // An empty category is the visible failure mode; one that matches everything is
+  // the silent one this arm exists to prevent.
+  const unhandled: never = filter;
+  void unhandled;
+  return false;
 }
 
 function weaponFamily(item: ItemDef): MarketWeaponTypeFilter {
@@ -174,6 +213,13 @@ function itemMatchesSubtype(item: ItemDef, query: MarketQuery): boolean {
   if (query.itemType === 'armor')
     return (item.kind === 'armor' || item.kind === 'held_offhand') && item.slot === subtype;
   if (query.itemType === 'weapon') return item.kind === 'weapon' && weaponFamily(item) === subtype;
+  // Bag capacity is exact, and the option values ARE the catalog's bagSlots numbers, so
+  // this compares against content rather than a hardcoded ladder. A subtype left over
+  // from another item type parses to NaN and matches nothing, exactly as a mismatched
+  // slot or weapon family does above. Compared as numbers: this runs per listing per
+  // browse, and stringifying the item's capacity would allocate on every one.
+  if (query.itemType === 'bag')
+    return item.kind === 'bag' && (item.bagSlots ?? 0) === Number(subtype);
   return true;
 }
 

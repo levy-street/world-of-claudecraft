@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../sim/building_layout';
 import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
-import { EASTBROOK_LAYOUT, localToWorld } from '../sim/eastbrook_layout';
+import { EASTBROOK_LAYOUT, localToWorld, wallSegmentMirrored } from '../sim/eastbrook_layout';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
@@ -555,11 +555,9 @@ function reflectedGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
 }
 
 function wallSegmentNeedsMirror(segment: (typeof EASTBROOK_LAYOUT.wall.segments)[number]): boolean {
-  return EASTBROOK_LAYOUT.wall.gates.some(
-    (gate) =>
-      Math.abs(gate.end.x - segment.start.x) < 1e-8 &&
-      Math.abs(gate.end.z - segment.start.z) < 1e-8,
-  );
+  // The one shared rule (sim/eastbrook_layout.ts): the wing's pillar
+  // colliders flip with the same mirror the instancing applies here.
+  return wallSegmentMirrored(segment);
 }
 
 interface MicroBatchBuild {

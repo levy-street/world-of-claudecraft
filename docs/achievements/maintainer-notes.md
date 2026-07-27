@@ -158,9 +158,9 @@ script-driven, off-peak only.
   would silently retune `soc_by_ravens_wing`.
 - The leaderboard header subtitle reads Lifetime XP on every tab
   (pre-existing shared chrome, not deeds-owned).
-- The nameplate stacking pass now spaces plates by their real rendered height
-  (`nameplate_extent_core.ts`), so the deed-title subtitle and the guild-tag
-  line are both modelled; the old fixed 20 px offset is gone.
+- The nameplate declutter stack offset (fixed 20 px) does not model the
+  deed-title subtitle line on a titled plate; cosmetic clustering only, the
+  same class as the guild-tag line.
 - Daily-rewards moderation writes (setDailyRewardsBan and the IP form)
   commit without firing the onAccountModerated cache-bust hook; benign today
   because that hook busts only the lifetime-XP and guild board caches;

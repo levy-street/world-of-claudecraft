@@ -4179,6 +4179,15 @@
   body.mobile-touch #ctx-menu .ctx-item-effect {
     font-size: 14px;
   }
+  /* The DESTRUCTIVE replace flag scales with them (#2421). The other meta
+     sub-lines keep the base 11px on purpose (a worn tag and a reagent count are
+     reference, read once), but this one is the warning that a tap will destroy
+     an existing enchant, and fine print at arm's length is exactly where that
+     gets missed. Only the danger variant moves, so the informational tags it
+     sits beside stay visibly lighter. */
+  body.mobile-touch #ctx-menu .ctx-item-meta.ctx-item-danger {
+    font-size: 13px;
+  }
   body.mobile-touch #ctx-menu {
     box-sizing: border-box;
     max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) - 20px);

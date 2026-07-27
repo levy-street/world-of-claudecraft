@@ -129,10 +129,13 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   }
   removePreferFungible(ctx, itemId, 1, pid);
   const count = salvageYield(def, ctx.rng);
-  // silent: the salvageResult event fires its own dedicated cue
-  // (audio.salvage in src/game/audio.ts); the generic loot ding would
-  // otherwise stack on top of it for every salvage.
-  ctx.addItem(materialItemId, count, pid, { silent: true });
+  // silent + callerLogs: the salvageResult event owns BOTH halves of the
+  // player feedback. It fires its own dedicated cue (audio.salvage in
+  // src/game/audio.ts), so the generic loot ding would stack on top of it,
+  // and it logs the yield-naming, item-linked salvage line off
+  // materialItemId/count, so the hub's "You receive:" line would repeat what
+  // that line already says (#2430).
+  ctx.addItem(materialItemId, count, pid, { silent: true, callerLogs: true });
   if (meta) {
     recordAction(meta);
     // The lifetime salvage counter (soc_first_salvage /

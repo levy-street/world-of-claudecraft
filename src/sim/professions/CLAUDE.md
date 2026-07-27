@@ -120,7 +120,13 @@ hosts, plus the pinned callback-name list in `tests/sim_context.test.ts`.
   signed instance merges only into a byte-equal same-signer stack, never a
   plain one); with neither it falls back to the unsigned fungible top-up
   (the signature truncates, the yield does not; pinned in
-  `tests/gather_node_harvest.test.ts`).
+  `tests/gather_node_harvest.test.ts`). The room is measured against the WHOLE
+  grant, not one copy: a corpse signed component carries its rolled quantity
+  (#2473), so a stack with room for one of three units refuses rather than
+  spilling the rest past capacity (#2139). All-or-nothing there, deliberately
+  unlike `harvestNode`, whose signed batch lands a PARTIAL fit: a corpse
+  downgrade is an uncapped plain grant of the full roll, so refusing costs no
+  yield. Pinned on both sides of the boundary in `tests/corpse_harvest_sim.test.ts`.
 - The economy invariant: no recipe vendors above its input value, enforced
   for EVERY recipe by `tests/recipe_economy.test.ts` (the exception list is
   empty). Author new recipes against it; the full economy model lives in

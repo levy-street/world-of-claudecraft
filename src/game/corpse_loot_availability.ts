@@ -1,8 +1,20 @@
 import { MOBS } from '../sim/data';
 import { hasSharedLootRights, lootHasGoneFfa } from '../sim/loot/loot_ffa';
+import { isHarvestableCorpse } from '../sim/professions/gathering';
 import type { Entity } from '../sim/types';
 
 /** Resolve the exact corpse content the local player can open in the loot popup.
+ *
+ *  Note on the harvest arm's data source, because it is the one thing here that
+ *  does NOT come off the wire: `isHarvestableCorpse` answers from
+ *  HARVEST_COMPONENT_ITEMS in the client's own bundle, reached through the
+ *  entity's `tid`. So a client whose content predates a change disagrees with the
+ *  server about which corpses are harvestable. Both directions are safe today: a
+ *  client that over-offers gets the server's pre-claim refusal and burns nothing,
+ *  and a client that under-offers merely hides a picker. The second direction is
+ *  the one to watch if a family is ever wired server-side without a client
+ *  deploy, since a hidden picker suppresses a harvest the server would honor.
+ *
  *  Answers "may I OPEN this corpse", not "does it have contents": the arms
  *  mirror the sim's authoritative corpseLootRights + lootCorpse loop
  *  (src/sim/interaction.ts) via the sim's own pure predicates, so a stranger's
@@ -28,8 +40,14 @@ export function corpseLootAvailability(
   partyMemberIds: readonly number[] | null = null,
 ) {
   const componentTags = MOBS[mob.templateId]?.componentTags;
+  // isHarvestableCorpse, the sim's own predicate, not a tag count of our own
+  // (#2513): a corpse whose every family is unmapped (fen_troll: claw, tusk)
+  // cannot yield anything and the command boundary refuses it, so offering the
+  // picker here would advertise a dead end. This arm was the one place in this
+  // function that restated a sim rule instead of importing it, which is exactly
+  // how it drifted: the rest already delegate (hasSharedLootRights below).
   const harvestable =
-    harvestStateReliable && !!componentTags?.length && mob.harvestClaimedBy === null;
+    harvestStateReliable && isHarvestableCorpse(componentTags) && mob.harvestClaimedBy === null;
   const tappedById = mob.tappedById ?? null;
   const tapperParty =
     tappedById !== null && partyMemberIds?.includes(tappedById) ? partyMemberIds : null;

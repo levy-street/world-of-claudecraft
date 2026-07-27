@@ -985,6 +985,72 @@ describe('fishingResult event (pin 7)', () => {
   });
 });
 
+describe('landed-catch grant flags (pin 11)', () => {
+  // #2430. Fishing was the one profession grant that passed NO opts to the
+  // grant hub, so a landed catch printed the bite line, the hub's
+  // "You receive:" line AND the reel-in line, while the generic loot ding
+  // played on top of the reel cue. The catch grant now passes both stand-down
+  // flags, so the fishingResult arm owns the single line and the single cue.
+  // Nothing pinned this path before, which is how the double-cue shipped.
+  const lootIn = (events: readonly SimEvent[]) =>
+    events.filter((e) => (e as { type: string }).type === 'loot') as unknown as Array<{
+      silent?: boolean;
+      callerLogs?: boolean;
+      text: string;
+    }>;
+
+  it('a landed catch grants silent and caller-logged, so the reel line is the only line', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    sim.events = [];
+    const { caught, events } = castOnce(sim, meta);
+    expect(caught).toBe(PERCH); // B0_SEQ_4242[0], so this is never a no-bite
+    const loot = lootIn(events);
+    expect(loot).toHaveLength(1);
+    expect(loot[0].silent).toBe(true);
+    expect(loot[0].callerLogs).toBe(true);
+    // The event still CARRIES its text: only the client elides the line.
+    expect(loot[0].text).toContain('You receive:');
+    // Exactly ONE fish. Sim.addItem only appends " xN" past one unit, so the
+    // absent suffix is the count. This is what makes catchLine the one
+    // grant-line family that needs no quantity variant; a multi-fish catch
+    // would have to add one, or the count would go unreported now that the
+    // hub line no longer prints it (#2430).
+    expect(loot[0].text).not.toMatch(/ x\d+\.$/);
+  });
+
+  it('a no-bite cast grants nothing at all (no loot event to flag)', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    let sawNoBite = false;
+    for (let i = 0; i < 30 && !sawNoBite; i++) {
+      sim.events = [];
+      const { caught, events } = castOnce(sim, meta);
+      if (caught !== null) continue;
+      sawNoBite = true;
+      expect(lootIn(events)).toHaveLength(0);
+    }
+    expect(sawNoBite).toBe(true);
+  });
+
+  it('the Codfather quest catch keeps BOTH the hub line and the hub cue', () => {
+    // The once-ever quest catch returns before the fishingResult emit, so the
+    // hub line and ding are its ONLY feedback. Flagging it too (the tempting
+    // "make fishing consistent" edit) would make the grant invisible and could
+    // read as a lost quest item, so pin the ABSENCE of both flags.
+    const { sim, meta } = codfatherSim();
+    sim.events = [];
+    completeFishing(sim.ctx, sim.player, meta);
+    expect(sim.countItem('the_codfather')).toBe(1);
+    const loot = lootIn(sim.events);
+    expect(loot).toHaveLength(1);
+    expect(loot[0].silent).toBeUndefined();
+    expect(loot[0].callerLogs).toBeUndefined();
+    // And it has no result event of its own to own a line with.
+    expect(fishingResultsIn(sim.events)).toHaveLength(0);
+  });
+});
+
 describe('fishing deeds through the extracted module path (pin 9)', () => {
   it('a landed real fish via completeFishing still marks fish:<zone>', () => {
     const sim = makeSim(4242);

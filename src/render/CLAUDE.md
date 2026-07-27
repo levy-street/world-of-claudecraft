@@ -39,6 +39,16 @@ Everything else is a sibling module in one of these families:
 - `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
   online pose extrapolation + rate-limited self yaw; never touch world state,
   see `src/net/CLAUDE.md`).
+- `step_smooth_core.ts`/`ground_tilt_core.ts`: the grounded-presentation pair
+  the entity loop drives per body. The first eases the vertical step the
+  physics solver takes inside one tick (leashed to a step, exact while
+  airborne so jumps and landings keep their impact); the second leans a body
+  toward the surface under it, in the body's own frame, partial and clamped
+  and damped. Both display-only: collision keeps using the physical pose.
+  Terrain gradients resample on a per-body TIME budget, never a frame count
+  (a frame cadence starves on a slow client). Landing dust rides the same
+  loop through `Vfx.groundPuff`, scaled by the display-derived fall speed
+  because the wire carries no vy for remote bodies.
 - `camera_boom_core.ts`/`camera_feel_core.ts`/`camera_director_core.ts`: the
   AAA chase-camera feel stack `updateCamera` composes (spring-arm pivot lag,
   look-ahead + FOV kicks + landing thump, directed zone-vista/death-drift
@@ -66,11 +76,8 @@ combo; allocation-free: `nameplatePlanInto` fills a caller-owned `NameplatePlan`
 `nameplate_painter.ts` does the Three projection, DOM writes, and ALL the
 localization (per-tier cadence via `ui_tier_knobs.nameplateIntervalSec`); the
 significant-contributor name glow lives there too. Narrow helpers:
-`nameplate_combo/threat/projection/declutter.ts` (the last one is the
-classic-style vertical stacking pass: plates only ever move UP from their own
-anchor, the current target is pinned, and separation follows each plate's real
-height from `nameplate_extent_core.ts`) plus `entity_labels.ts` (shared
-localized display names). Drive changes from `tests/nameplate_*.test.ts`.
+`nameplate_combo/threat/projection/declutter.ts` plus `entity_labels.ts`
+(shared localized display names). Drive changes from `tests/nameplate_*.test.ts`.
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives

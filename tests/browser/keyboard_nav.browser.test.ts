@@ -13,7 +13,11 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { TalentAllocation, TalentRowLevel } from '../../src/sim/content/talents';
-import type { MarketQuery } from '../../src/sim/market_query';
+import {
+  MARKET_BAG_SIZE_FILTERS,
+  MARKET_ITEM_TYPE_FILTERS,
+  type MarketQuery,
+} from '../../src/sim/market_query';
 import { FocusManager } from '../../src/ui/focus_manager';
 import { MarketWindow } from '../../src/ui/market_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -438,6 +442,88 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     pickItemType(root, 'consumable');
     expect(root.querySelector('[data-market-filter-menu="armorClass"]')).toBeNull();
     expect(root.querySelector('[data-market-filter-menu="primaryStat"]')).toBeNull();
+  });
+
+  // Issue #2189: bags matched no item-type option at all, so this asserts the whole
+  // rendered chain for the new category: the option exists, its capacity menu is built
+  // from the catalog-derived sizes, the labels are the localized bag strings (NOT the
+  // weapon-family fallthrough "Other weapons"), the stat menu stays away, and the
+  // committed query that reaches the server carries itemType 'bag' plus the size.
+  it('browses bags by capacity, with no armor-class or primary-stat menu', () => {
+    const queries: MarketQuery[] = [];
+    const root = openMarket(queries);
+
+    // Every filter option in the shared vocabulary reaches the menu, in order. A value
+    // added to MARKET_ITEM_TYPE_FILTERS that never renders would be as unbrowsable as
+    // bags were, and the sim-side never-assertion cannot see the menu.
+    expect(
+      Array.from(
+        itemTypeMenu(root).querySelectorAll<HTMLElement>('[data-market-filter-option]'),
+      ).map((option) => option.dataset.marketFilterOption),
+    ).toEqual([...MARKET_ITEM_TYPE_FILTERS]);
+
+    pickItemType(root, 'bag');
+    expect(root.querySelector('[data-market-filter-menu="armorClass"]')).toBeNull();
+    expect(
+      root.querySelector('[data-market-filter-menu="primaryStat"]'),
+      'bags carry no str/agi/int, so a primary-stat menu could only ever narrow nothing',
+    ).toBeNull();
+
+    const subtype = req(
+      root.querySelector<HTMLElement>('[data-market-filter-menu="subtype"]'),
+      'bag capacity filter menu',
+    );
+    expect(
+      Array.from(subtype.querySelectorAll<HTMLElement>('[data-market-filter-option]')).map(
+        (option) => option.dataset.marketFilterOption,
+      ),
+    ).toEqual(['all', ...MARKET_BAG_SIZE_FILTERS.slice(1)]);
+    expect(filterLabel(root, 'subtype')).toBe('Bag size');
+    expect(optionLabels(subtype)).toEqual([
+      'All bags',
+      ...MARKET_BAG_SIZE_FILTERS.slice(1).map((slots) => `${slots} Slot Bag`),
+    ]);
+    expect(
+      optionLabels(subtype),
+      'a bag size must never fall through to the weapon-family label chain',
+    ).not.toContain('Other weapons');
+    expect(
+      Array.from(itemTypeMenu(root).querySelectorAll<HTMLElement>('.mkt-select-option')).find(
+        (o) => o.dataset.marketFilterOption === 'bag',
+      )?.textContent,
+    ).toBe('Bags');
+
+    const size = MARKET_BAG_SIZE_FILTERS[1];
+    req(
+      subtype.querySelector<HTMLButtonElement>(`[data-market-filter-option="${size}"]`),
+      `${size} slot option`,
+    ).click();
+    // toEqual, not toMatchObject: a dropped or stray sibling field must redden here too.
+    expect(queries.at(-1)).toEqual({
+      search: '',
+      itemType: 'bag',
+      subtype: size,
+      armorClass: 'all',
+      primaryStat: 'all',
+      rarity: 'all',
+      page: 0,
+    });
+
+    // Leaving the bag category clears the capacity back to 'all' rather than sending a
+    // size the next item type cannot mean.
+    pickItemType(root, 'armor');
+    expect(filterLabel(root, 'subtype')).toBe('Armor slot');
+    expect(queries.at(-1)?.subtype).toBe('all');
+    // The option list swaps too, not just the caption and the committed value: a stale
+    // capacity list under an "Armor slot" caption would be unusable chrome.
+    const armorOptions = Array.from(
+      req(
+        root.querySelector<HTMLElement>('[data-market-filter-menu="subtype"]'),
+        'armor slot filter menu',
+      ).querySelectorAll<HTMLElement>('[data-market-filter-option]'),
+    ).map((option) => option.dataset.marketFilterOption);
+    expect(armorOptions).toContain('chest');
+    expect(armorOptions).not.toContain(MARKET_BAG_SIZE_FILTERS[1]);
   });
 
   it('Escape closes the listbox and returns focus to the trigger', () => {

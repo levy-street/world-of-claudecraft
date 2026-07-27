@@ -132,6 +132,15 @@ function errorTexts(events: SimEvent[]): string[] {
   return events.filter((e) => e.type === 'error').map((e) => (e as { text: string }).text);
 }
 
+function lootEvents(events: SimEvent[]) {
+  return events.filter((e) => e.type === 'loot') as Array<{
+    type: 'loot';
+    text: string;
+    silent?: boolean;
+    callerLogs?: boolean;
+  }>;
+}
+
 function unbindEvents(events: SimEvent[]) {
   return events.filter((e) => e.type === 'unbindResult') as Array<{
     type: 'unbindResult';
@@ -624,10 +633,29 @@ describe('unbind service deny order and mutation', () => {
     expect(slotsOf(sim, pid, QA_ITEM)).toHaveLength(1); // merged, count 2
     standAtStation(sim, pid);
     setCopper(sim, pid, 50000);
+    sim.drainEvents(); // drop the two seeding grants' loud loot events
     const result = unbindItemMod(sim.ctx, QA_ITEM, pid);
     expect(result.ok).toBe(true);
     expect(result.fee).toBe(10000); // rare rung
     expect(copperOf(sim, pid)).toBe(40000);
+    // #2430: the peel re-grants the player's OWN copy through the hub, so the
+    // hub's "You receive:" line claimed an acquisition that never happened AND
+    // stacked on top of the unbindResult line the client already logs. The
+    // grant carries callerLogs so the client stands that line down.
+    const loot = lootEvents(sim.drainEvents());
+    expect(loot).toHaveLength(1);
+    expect(loot[0].callerLogs).toBe(true);
+    // ...and silent (#2458). Unbind has no dedicated cue of its own, so the
+    // contract above hudChrome.unbind.unbound ("the ONE success surface: no
+    // toast, no sound cue") is NO cue at all, and the count-1 arm below never
+    // reaches the hub. Leaving the ding on here made the same action on the
+    // same item sound different purely by how many byte-equal copies shared a
+    // slot. Both the presence and the value are pinned: the conditional-spread
+    // contract (Sim.addItemInstance) is that a set flag is an OWN key valued
+    // true and an unset one is ABSENT, and a written-undefined key would move
+    // the parity digest of every grant in the game.
+    expect(Object.hasOwn(loot[0], 'silent')).toBe(true);
+    expect(loot[0].silent).toBe(true);
     const slots = slotsOf(sim, pid, QA_ITEM);
     const bound = slots.filter((s) => s.instance?.boundTo !== undefined);
     const free = slots.filter((s) => s.instance?.boundTo === undefined);
@@ -636,6 +664,24 @@ describe('unbind service deny order and mutation', () => {
     expect(free).toHaveLength(1);
     expect(free[0].count).toBe(1);
     expect(free[0].instance?.bindOnTrade).toBe(true);
+  });
+
+  it('a single-copy unbind never reaches the hub at all, so it has nothing to stand down', () => {
+    // The negative control for the pin above, and the reason the double-line
+    // only ever showed on a STACK: a lone bound copy is cleared in place, so
+    // no grant happens and unbindResult is the only event either way. Without
+    // this, flagging the peel could read as "unbind grants are flagged" when
+    // the two arms actually differ in whether a grant exists. It is also the
+    // sim half of #2458's "same action, same audio": zero hub events here, and
+    // a silent one on the stacked arm, is what makes the two arms agree.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);
+    standAtStation(sim, pid);
+    setCopper(sim, pid, 10000);
+    sim.drainEvents();
+    expect(unbindItemMod(sim.ctx, SWORD, pid).ok).toBe(true);
+    expect(lootEvents(sim.drainEvents())).toHaveLength(0);
   });
 
   it('the whole unbind path draws NO rng', () => {

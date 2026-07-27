@@ -22,6 +22,8 @@ type Ev = Record<string, any>;
 function makeSim(seed = 7): { sim: AnySim; p: AnyEntity } {
   const sim = new Sim({ seed, playerClass: 'druid', autoEquip: true }) as AnySim;
   sim.setPlayerLevel(20);
+  // Ranged fixtures place their target relative to the player, so stand on
+  // empty ground: the town is furnished and would block the shot lane.
   placePlayerInOpenField(sim);
   const p = sim.player as AnyEntity;
   p.resource = p.maxResource;

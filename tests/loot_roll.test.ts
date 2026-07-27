@@ -15,6 +15,7 @@ import {
   rollLoot,
   submitLootRoll,
 } from '../src/sim/loot/loot_roll';
+import { isHarvestableCorpse } from '../src/sim/professions/gathering';
 import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -580,6 +581,43 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     expect(mob.loot).toBeNull();
     expect(mob.lootable).toBe(false);
     expect(mob.corpseTimer).toBe(4);
+  });
+
+  it('pruneCorpseLoot collapses an emptied corpse whose every family is unmapped (#2513)', () => {
+    // The fourth arm, and the reason the harvest half is isHarvestableCorpse
+    // here and not a tag COUNT. fen_troll carries claw and tusk, neither
+    // mapped, so the command boundary refuses a harvest and the claim can never
+    // be spent. Counting tags held the 30s grace window open forever waiting on
+    // it, which is worse than the pre-#2513 world where a player could at least
+    // burn the claim to collapse the corpse.
+    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
+    expect(isHarvestableCorpse(MOBS.fen_troll.componentTags)).toBe(false);
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.fen_troll, 12, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    // The claim is UNSPENT, which is the state the grace arm used to key on:
+    // the arm is chosen by the corpse's families, not by the claim.
+    expect(mob.harvestClaimedBy).toBeNull();
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(false);
+    expect(mob.corpseTimer).toBe(4);
+    // The discriminator, identical rig and identical unspent claim: a corpse
+    // with a MAPPED family still takes the grace arm, so this is the predicate
+    // narrowing and not the grace arm being deleted.
+    const wolf = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    wolf.dead = true;
+    wolf.lootable = true;
+    wolf.corpseTimer = 60;
+    wolf.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(wolf.id, wolf);
+    pruneCorpseLoot(sim.ctx, wolf);
+    expect(wolf.lootable).toBe(true);
+    expect(wolf.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
   });
 
   it('partyLootCandidatesForMob prefers the death-time recipient snapshot', () => {

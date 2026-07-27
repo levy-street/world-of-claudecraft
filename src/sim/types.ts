@@ -3,6 +3,7 @@
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { HarvestYield } from './professions/harvest_yields';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -2417,6 +2418,14 @@ export interface DungeonDef {
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
   interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis'; // renderer + collider interior builder key
+  /**
+   * What dresses this dungeon's wall-side obstacle slots (matches the render
+   * variant): coffins get one standable lid, cargo splits into the crate
+   * stack and cask the renderer draws. Absent, slots stay full-height walls
+   * (the temple's altars). Drives the physical colliders in
+   * `dungeon_layout.ts` layoutColliders.
+   */
+  tombDressing?: 'coffins' | 'cargo';
   suggestedPlayers: number;
   enterText: string;
   leaveText: string;
@@ -2470,6 +2479,12 @@ export interface StaticObbPropDef {
   height: number;
   /** False when a merged mesh cannot hide this placement independently. */
   camGhost?: boolean;
+  /**
+   * The asset renders x-mirrored (an asymmetric wing flipped end for end,
+   * e.g. a town-wall wing whose tall lantern pillar swaps sides). Collision
+   * derived from the asset's asymmetry must flip with it.
+   */
+  mirrored?: true;
 }
 
 // Static prop placement per zone — the renderer builds meshes from these and
@@ -2514,6 +2529,7 @@ export interface ZonePropsDef {
     hutLocal: { x: number; z: number; hw: number; hd: number };
   }[];
   tents: { x: number; z: number; rot: number; scale: number }[];
+  marshReeds: [number, number][];
   crates: [number, number][];
   campfires: [number, number][];
   mudHuts: [number, number][];
@@ -2554,6 +2570,7 @@ export function emptyZoneProps(): ZonePropsDef {
     benches: [],
     walls: [],
     graveyards: [],
+    marshReeds: [],
   };
 }
 
@@ -2668,6 +2685,20 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
   return e.eating !== null || e.drinking !== null;
 }
 
+/**
+ * An in-progress ledge climb (see `src/sim/climb.ts`). While present it OWNS
+ * the body's position: the destination was validated as a surface the body
+ * fits on before the climb started, so nothing re-resolves it mid-pull.
+ * Absent until first use, so unrelated entity snapshots and deterministic
+ * traces gain no inert state.
+ */
+export interface LedgeClimb {
+  from: Vec3;
+  to: Vec3;
+  elapsed: number;
+  duration: number;
+}
+
 export interface HeroicLeapFlight {
   from: Vec3;
   to: Vec3;
@@ -2699,7 +2730,23 @@ export interface DamageTick {
   amount: number;
 }
 
-export interface Entity {
+/**
+ * Fields the SIM NEVER WRITES: client-side mirrors decoded from the wire
+ * (src/net/online.ts) so the online renderer can pose movement modes it does
+ * not simulate. Grouping them behind this one interface is the type-level
+ * registry that keeps golden traces clean by construction rather than by
+ * comment: the sim's own entities never carry these, and any NEW wire mirror
+ * lands HERE, never loose on `Entity`. The pattern's authoritative twin is
+ * the sim-side field of the same feature (`climb` for the pair below).
+ */
+export interface ClientMirroredEntityFields {
+  /** Mirror of an in-flight climb: the wire carries progress, not the arc.
+   *  0..1 through the pull at the snapshot cadence; the visual smooths it. */
+  climbing?: boolean;
+  climbProgress?: number;
+}
+
+export interface Entity extends ClientMirroredEntityFields {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };
@@ -2918,6 +2965,9 @@ export interface Entity {
   // landing area hit until touchdown. Absent until first use so unrelated entity
   // snapshots and deterministic traces do not gain inert state.
   leap?: HeroicLeapFlight | null;
+  // Authoritative ledge-climb pull-up. Like `leap`, it owns movement while it
+  // runs; see `src/sim/climb.ts`.
+  climb?: LedgeClimb | null;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   sitting: boolean;
@@ -3035,9 +3085,15 @@ export interface Entity {
   // Profession harvest: single-use, first-come claim on this corpse's componentTags
   // yield. null = unharvested; once set to a player's entity id, every later attempt
   // (same tick or later) is denied. The opposite of a world gathering node (per-player).
-  // SERVER-PRIVATE today: no snapshot delta mirrors it, so the online ClientWorld
-  // always reads null (src/net/online.ts blankEntity). Mirror it over the wire
-  // before any UI/render consumer reads it through IWorld.
+  // MIRRORED over the wire as the sparse `hcb` key (server/game.ts wireEntity,
+  // decoded in src/net/online.ts applyWire), so the online ClientWorld reads the
+  // real claim and the client-side availability gate
+  // (src/game/corpse_loot_availability.ts) is authoritative-consistent. This note
+  // used to say server-private; it stopped being true when `hcb` landed.
+  // Whether the corpse is harvestable AT ALL is a separate question and is not
+  // wired: it is answered from content by isHarvestableCorpse
+  // (src/sim/professions/gathering.ts), which the client resolves locally off
+  // `tid` (#2513).
   harvestClaimedBy: number | null;
   despawnTimer?: number;
   damageIdleDespawnTimer?: number;
@@ -3294,12 +3350,22 @@ export type SimEvent = { pid?: number } & (
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
   | { type: 'learnAbility'; abilityId: string; rank: number }
-  // silent: true suppresses only the client's default loot audio cue (the
-  // "You receive: X" text line still prints as normal); a caller with its
-  // own dedicated cue for the same grant (gathering/crafting/enchanting) sets
-  // this so the generic ding doesn't stack on top of it. See Sim.addItem/
-  // addItemInstance's opts param, the one place this gets set.
-  | { type: 'loot'; text: string; silent?: boolean }
+  // The hub grant event. Two independent stand-down flags, both set only from
+  // Sim.addItem/addItemInstance's opts param (the one place either gets set):
+  // - silent: true suppresses the client's default loot AUDIO cue; a caller
+  //   that owns the cue for this grant sets it, whether it owns a dedicated
+  //   one (gathering/crafting/enchanting) so the generic ding doesn't stack on
+  //   top of it, replays that same generic ding itself exactly once for a
+  //   command that grants several items (corpse harvest, #2457), or owns it as
+  //   SILENCE because its result event is cue-free by contract (the Maker's
+  //   Bond unbind, #2458).
+  // - callerLogs: true suppresses the client's default "You receive: X" TEXT
+  //   line, because the caller owns the player-visible line for this grant and
+  //   renders a richer one (rolled quality color, quantity, clickable item
+  //   link) off its own result event. Without it a profession action printed
+  //   two lines for one grant (#2430). Everything else the client does on a
+  //   loot event (bag refresh, loot-roll close) still runs.
+  | { type: 'loot'; text: string; silent?: boolean; callerLogs?: boolean }
   | {
       type: 'lootRoll';
       rollId: number;
@@ -3971,6 +4037,38 @@ export type SimEvent = { pid?: number } & (
       pid: number;
       surface: 'node' | 'corpse';
       lost: 'mark' | 'find';
+    }
+  // Corpse-harvest outcome (#2457): what one harvestCorpse command actually
+  // granted. Personal (pid = the harvester) and text-free on purpose (the
+  // gatherResult idiom above): ids, counts and enum arms only, so the sim and
+  // the server stay language-agnostic and no i18n matcher rule is needed.
+  //
+  // The ONE result event carrying a LIST, because corpse harvest is the one
+  // profession flow whose single command grants several DISTINCT items (one
+  // per focused component tag, plus a Pristine specimen on a rare-or-better
+  // roll). The client renders one line per entry, which is the #2430 contract
+  // (one line per distinct granted item, never one per internal grant call)
+  // restated for a multi-item command, and plays exactly ONE cue for the whole
+  // command. Every grant behind this event stands the hub's own line and ding
+  // down (silent + callerLogs, src/sim/interaction.ts harvestCorpse), so these
+  // entries are the harvest's only chat feedback.
+  //
+  // `yields` is never empty: the emit is skipped entirely when a harvest
+  // landed nothing (the gatherResult "granted path only" rule), so the client
+  // never renders a cue for a no-op. As of #2513 that skip is unreachable by
+  // construction rather than merely rare: harvestCorpse refuses a corpse with no
+  // mapped family and refuses a pick that names none, so every command that
+  // reaches the roll grants at least one item. The guard stays as dead defensive
+  // code and the contract is now pinned as a property instead
+  // (tests/corpse_harvest_sim.test.ts "every command that spends the claim
+  // reports at least one yield"), because an unreachable arm cannot be pinned by
+  // a fixture. Entries record what LANDED, so a
+  // downgraded signed grant appears as 'plain' and a refused specimen does not
+  // appear at all; the gatherDowngrade toast above still owns that half.
+  | {
+      type: 'harvestResult';
+      pid: number;
+      yields: HarvestYield[];
     }
   // Fishing catch outcome (Professions 2.0): a landed catch emits
   // this so the client can log the reel-in feedback line for the acting

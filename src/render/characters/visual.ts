@@ -97,7 +97,71 @@ const STOW_SWAP_FRACTION = 0.28;
 // the whole arm from the chase camera, so -0.85 is the readable peak.
 const STOW_ARM_BONE = 'upperarmr';
 const STOW_ARM_LIFT_RAD = -0.85;
+// Ledge climb, posed by hand: the KayKit rigs ship no climb clip, so the pull
+// up is built from the airborne base pose plus additive bone work, sequenced
+// like a real mantle: hands FLY to the lip first, the torso curls in behind
+// them and the knees tuck as the body rises, then everything releases as the
+// body vaults over and plants. The leading limbs move a beat before the
+// trailing ones; that asymmetry is what sells it as effort rather than a
+// lift. Negative X raises an arm on this rig (see the stow lift above); the
+// joints are the shared rig names with GLTF's dot-stripping applied.
+const CLIMB_ARM_BONES = ['upperarml', 'upperarmr'] as const;
+const CLIMB_FOREARM_BONES = ['lowerarml', 'lowerarmr'] as const;
+/** Deep overhead raise: the hands must read ABOVE the head, grasping the lip,
+ *  not out at the sides. Negative X swings an arm forward and up on this rig;
+ *  -2.5 carries it past vertical so the hands hang over the ledge line. */
+const CLIMB_ARM_RAISE_RAD = -2.5;
+/** Roll the raised arms toward the body's midline so the hands finish at
+ *  shoulder width above the head instead of flaring into a T. Mirrored per
+ *  side (left +, right -). */
+const CLIMB_ARM_ROLL_RAD = 0.45;
+/** Elbow hook while the hands own the lip: a straight arm reads as a plank. */
+const CLIMB_ELBOW_RAD = 0.55;
+/** Chin up at the lip while the hands fly to it: the eyes lead the grab. */
+const CLIMB_HEAD_TILT_RAD = -0.35;
+/** The off hand plants this far (in phase) behind the lead hand. */
+const CLIMB_ARM_LEAD = 0.05;
+const CLIMB_LEG_BONES = ['upperlegl', 'upperlegr'] as const;
+const CLIMB_SHIN_BONES = ['lowerlegl', 'lowerlegr'] as const;
+const CLIMB_THIGH_TUCK_RAD = -0.9;
+const CLIMB_SHIN_FOLD_RAD = 1.05;
+/** The trailing leg tucks this far (in phase) behind, at reduced depth. */
+const CLIMB_LEG_TRAIL = 0.08;
+const CLIMB_TORSO_BONE = 'chest';
+const CLIMB_TORSO_CURL_RAD = 0.45;
+const CLIMB_BODY_PITCH = 0.3;
+const CLIMB_BODY_DUCK = -0.18;
+/** Blend in/out rate for the whole climb pose (1/s). */
+const CLIMB_BLEND_RATE = 14;
+/** Fallback local clock for the pose envelope, used only when no sim phase
+ *  arrives (an older server); normally the pose tracks the climb's real,
+ *  height-scaled progress via setClimbing's phase. */
+const CLIMB_POSE_DURATION = 0.5;
+/** Chase rate toward the sim-reported phase (1/s): fast enough to track a
+ *  20 Hz feed within a frame or three, slow enough to never visibly snap. */
+const CLIMB_TRACK_RATE = 20;
+/** Smoothstep of `t` across [a, b]: the one easing all climb envelopes use. */
+const env01 = (t: number, a: number, b: number): number => {
+  const c = Math.min(1, Math.max(0, (t - a) / (b - a)));
+  return c * c * (3 - 2 * c);
+};
 const HIT_REACT_COOLDOWN = 0.9;
+
+// The climb's baked clips (player rigs all ship both): Spellcast_Raise's
+// first stretch throws the arms overhead (the reach to the lip), and
+// Sit_Floor_Down run BACKWARD is a floor-crouch rising to a stand (the
+// top-out over the lip). Scrub fractions are hand-tuned against the clips.
+const CLIMB_REACH_CLIP = 'Spellcast_Raise';
+const CLIMB_MANTLE_CLIP = 'Sit_Floor_Down';
+/** Fraction of Spellcast_Raise where the arms crest overhead; held there. */
+const CLIMB_REACH_CREST = 0.45;
+/** Climb phase by which the reach finishes rising to the crest. */
+const CLIMB_REACH_RISE_END = 0.3;
+/** Climb phase band over which reach hands off to the top-out. */
+const CLIMB_HANDOFF_START = 0.5;
+const CLIMB_HANDOFF_END = 0.72;
+/** Climb phase by which the top-out stands fully upright. */
+const CLIMB_TOPOUT_END = 0.98;
 
 // Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
 // surface glide; clip-less rigs (creatures) get the full procedural prone
@@ -220,6 +284,21 @@ export class CharacterVisual {
   private pendingDt = 0;
   private swimBlend = 0;
   private swimBobTime = 0;
+  // Ledge-climb pose: `blend` fades the whole gesture, `phase` runs 0..1 over
+  // the pull so the arms plant early and the body clears late. `target` is
+  // the sim-reported phase the local one chases (null = free-run local clock).
+  private climbOn = false;
+  private climbBlend = 0;
+  private climbPhase = 0;
+  private climbTarget: number | null = null;
+  private climbArmBones: (THREE.Object3D | null)[] | undefined;
+  private climbForearmBones: (THREE.Object3D | null)[] | undefined;
+  private climbLegBones: (THREE.Object3D | null)[] | undefined;
+  private climbShinBones: (THREE.Object3D | null)[] | undefined;
+  private climbTorsoBone: THREE.Object3D | null | undefined;
+  private climbHeadBone: THREE.Object3D | null | undefined;
+  /** True while the climb's baked clips own the mixer (restore on release). */
+  private climbClipsActive = false;
   private spinAngle = 0;
   private spinOnceTimer = 0;
 
@@ -408,10 +487,20 @@ export class CharacterVisual {
     const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
     this.swimBlend = advanceSwimBlend(this.swimBlend, s.swimming && !s.dead, dt);
     this.swimBobTime += dt;
-    this.poseWrap.rotation.x = proneAngle * this.swimBlend;
+    // Ledge climb rides the SAME pose channels rather than fighting them:
+    // these three lines are rewritten every frame, so a climb pose written
+    // anywhere else would be stomped. Blend and phase are advanced here too.
+    this.advanceClimbPose(dt, s.dead);
+    const climb = this.climbBlend;
+    // Pitch into the wall through the pull, level out as the body tops the
+    // lip so the plant lands upright.
+    const climbLevel = 1 - env01(this.climbPhase, 0.62, 0.98);
+    this.poseWrap.rotation.x = proneAngle * this.swimBlend + CLIMB_BODY_PITCH * climb * climbLevel;
     this.poseWrap.rotation.z = 0;
     this.poseWrap.position.y =
-      this.swimBlend * (SWIM_RISE + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08);
+      this.swimBlend * (SWIM_RISE + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
+      // Compress at the start of the pull, back to neutral as the body rises.
+      CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
 
     // distant corpses show the static idle far mesh — tip it over
     if (this.farMesh && this.farMesh.visible) {
@@ -426,12 +515,195 @@ export class CharacterVisual {
 
     this.pendingDt = Math.min(MIXER_DT_CAP, this.pendingDt + dt);
     if (animate) {
+      // BEFORE the mixer integrates: scrub the climb's baked clips (weights
+      // and frozen times are mixer INPUTS, unlike the additive lifts below).
+      this.driveClimbClips();
       this.mixer.update(this.pendingDt);
       this.pendingDt = 0;
       // AFTER the mixer wrote the sampled pose: the sheathe gesture's additive
       // arm raise (never applied on skipped-mixer frames, so it cannot accumulate).
       this.applyStowArmLift(dt);
+      // Same rule for the climb's overhead reach.
+      this.applyClimbPose();
     }
+  }
+
+  /**
+   * The baked half of the climb, on the rigs that ship the clips (all player
+   * archetypes): the REACH rides Spellcast_Raise scrubbed up to its
+   * arms-overhead crest and held, and the TOP-OUT rides Sit_Floor_Down played
+   * in reverse (floor-crouch rising to a stand), cross-faded at the pull's
+   * midpoint. Both actions are paused and time-scrubbed by the climb phase,
+   * so the sim's real progress (netted via `cl`) drives every frame and no
+   * clock can drift. Rigs missing either clip keep the hand-authored bone
+   * pose in applyClimbPose.
+   */
+  private driveClimbClips(): void {
+    const active = this.climbBlend > 1e-3;
+    const reach = this.action(CLIMB_REACH_CLIP);
+    const mantle = this.action(CLIMB_MANTLE_CLIP);
+    if (!reach || !mantle) return;
+    if (!active) {
+      if (this.climbClipsActive) {
+        this.climbClipsActive = false;
+        reach.stop();
+        mantle.stop();
+        this.current?.setEffectiveWeight(1);
+      }
+      return;
+    }
+    this.climbClipsActive = true;
+    const t = this.climbPhase;
+    const k = this.climbBlend;
+    for (const a of [reach, mantle]) {
+      if (!a.isRunning()) {
+        a.reset();
+        a.setLoop(THREE.LoopOnce, 1);
+        a.clampWhenFinished = true;
+        a.play();
+      }
+      a.paused = true;
+      a.timeScale = 1;
+    }
+    // Hands fly overhead early and hold the crest through the hang.
+    const reachDur = reach.getClip().duration;
+    reach.time = Math.min(
+      reachDur - 1e-3,
+      reachDur * CLIMB_REACH_CREST * env01(t, 0, CLIMB_REACH_RISE_END),
+    );
+    // The top-out unwinds the sit: seated crouch at the lip, standing at 1.
+    const mantleDur = mantle.getClip().duration;
+    const rise = env01(t, CLIMB_HANDOFF_START, CLIMB_TOPOUT_END);
+    mantle.time = Math.max(1e-3, Math.min(mantleDur - 1e-3, mantleDur * (1 - rise)));
+    // Cross-fade reach into top-out at the pull's midpoint; the base action
+    // yields while the climb owns the body and returns as the blend releases.
+    const hand = env01(t, CLIMB_HANDOFF_START, CLIMB_HANDOFF_END);
+    reach.setEffectiveWeight(k * (1 - hand));
+    mantle.setEffectiveWeight(k * hand);
+    if (this.current && this.current !== reach && this.current !== mantle) {
+      this.current.setEffectiveWeight(1 - k);
+    }
+  }
+
+  /**
+   * Advance the climb blend and phase. Kept next to the pose block that reads
+   * them so the two can never drift out of step.
+   */
+  private advanceClimbPose(dt: number, dead: boolean): void {
+    const want = this.climbOn && !dead ? 1 : 0;
+    this.climbBlend += (want - this.climbBlend) * Math.min(1, dt * CLIMB_BLEND_RATE);
+    if (this.climbBlend < 1e-3 && want === 0) {
+      this.climbBlend = 0;
+      this.climbPhase = 0;
+      return;
+    }
+    if (!this.climbOn) return;
+    if (this.climbTarget !== null) {
+      // Track the sim's real progress: chase it fast, never run backwards, so
+      // the 20 Hz feed reads as one continuous pull at any frame rate.
+      const chased =
+        this.climbPhase + (this.climbTarget - this.climbPhase) * Math.min(1, dt * CLIMB_TRACK_RATE);
+      this.climbPhase = Math.max(this.climbPhase, Math.min(1, chased));
+    } else {
+      this.climbPhase = Math.min(1, this.climbPhase + dt / CLIMB_POSE_DURATION);
+    }
+  }
+
+  /**
+   * The hand-authored half of the climb, in three overlapping beats: hands
+   * fly to the lip (lead hand a breath early), the torso curls in and the
+   * knees tuck as the body rises, then every channel releases as the body
+   * vaults over and plants. Additive on top of whatever the mixer produced,
+   * applied ONLY on frames the mixer actually ran, exactly like the stow
+   * lift, so it can never accumulate into a permanent deformation.
+   */
+  private applyClimbPose(): void {
+    if (this.climbBlend <= 1e-3) return;
+    if (this.climbClipsActive) {
+      // The baked clips own the limbs; only the eyes-lead head tilt rides on
+      // top (neither clip looks up at the lip).
+      if (this.climbHeadBone === undefined) {
+        this.climbHeadBone = this.model.getObjectByName('head') ?? null;
+      }
+      if (this.climbHeadBone) {
+        const look = env01(this.climbPhase, 0, 0.18) * (1 - env01(this.climbPhase, 0.5, 0.85));
+        this.climbHeadBone.rotation.x += CLIMB_HEAD_TILT_RAD * look * this.climbBlend;
+      }
+      return;
+    }
+    if (this.climbArmBones === undefined) {
+      this.climbArmBones = CLIMB_ARM_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+    }
+    if (this.climbLegBones === undefined) {
+      this.climbLegBones = CLIMB_LEG_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+    }
+    if (this.climbShinBones === undefined) {
+      this.climbShinBones = CLIMB_SHIN_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+    }
+    if (this.climbTorsoBone === undefined) {
+      this.climbTorsoBone = this.model.getObjectByName(CLIMB_TORSO_BONE) ?? null;
+    }
+    if (this.climbForearmBones === undefined) {
+      this.climbForearmBones = CLIMB_FOREARM_BONES.map(
+        (n) => this.model.getObjectByName(n) ?? null,
+      );
+    }
+    const t = this.climbPhase;
+    const k = this.climbBlend;
+    // Hands fly ABOVE THE HEAD to the lip (deep forward raise rolled toward
+    // the midline so they finish at shoulder width, never a T), hook the lip
+    // with a bent elbow, press through the pull, release on the vault.
+    for (let i = 0; i < this.climbArmBones.length; i++) {
+      const bone = this.climbArmBones[i];
+      if (!bone) continue;
+      const lead = i === 0 ? 0 : CLIMB_ARM_LEAD;
+      const reach = env01(t - lead, 0, 0.2) * (1 - env01(t, 0.58, 0.95));
+      bone.rotation.x += CLIMB_ARM_RAISE_RAD * reach * k;
+      bone.rotation.z += (i === 0 ? 1 : -1) * CLIMB_ARM_ROLL_RAD * reach * k;
+      const forearm = this.climbForearmBones[i];
+      if (forearm) forearm.rotation.x += CLIMB_ELBOW_RAD * reach * k;
+    }
+    // Knees tuck while the body rises and extend to plant as it tops out; the
+    // trailing leg follows a beat behind at reduced depth.
+    for (let i = 0; i < this.climbLegBones.length; i++) {
+      const trail = i === 0 ? 0 : CLIMB_LEG_TRAIL;
+      const amp = i === 0 ? 1 : 0.78;
+      const tuck = env01(t - trail, 0.14, 0.44) * (1 - env01(t - trail, 0.66, 0.96)) * amp * k;
+      const thigh = this.climbLegBones[i];
+      if (thigh) thigh.rotation.x += CLIMB_THIGH_TUCK_RAD * tuck;
+      const shin = this.climbShinBones?.[i] ?? null;
+      if (shin) shin.rotation.x += CLIMB_SHIN_FOLD_RAD * tuck;
+    }
+    // The torso curls in behind the hands and straightens over the lip.
+    if (this.climbTorsoBone) {
+      const curl = env01(t, 0.06, 0.4) * (1 - env01(t, 0.7, 1));
+      this.climbTorsoBone.rotation.x += CLIMB_TORSO_CURL_RAD * curl * k;
+    }
+    // The eyes lead: chin up at the lip while the hands fly to it.
+    if (this.climbHeadBone === undefined) {
+      this.climbHeadBone = this.model.getObjectByName('head') ?? null;
+    }
+    if (this.climbHeadBone) {
+      const look = env01(t, 0, 0.18) * (1 - env01(t, 0.5, 0.85));
+      this.climbHeadBone.rotation.x += CLIMB_HEAD_TILT_RAD * look * k;
+    }
+  }
+
+  /**
+   * Drive the ledge-climb pose. The sim owns the move; this says whether it
+   * is running and how far through it is (0..1). Both hosts feed the real
+   * phase (offline from the entity's climb arc, online from the mirrored
+   * snapshot progress), so hands plant exactly when the body reaches the lip
+   * whatever the climb's height-scaled duration. Phase omitted falls back to
+   * a local clock (an older server that only sent the boolean).
+   */
+  setClimbing(on: boolean, phase?: number): void {
+    const clamped = typeof phase === 'number' ? Math.min(1, Math.max(0, phase)) : null;
+    // Joining mid-pull (a remote climber entering interest range) seeds the
+    // pose at the right beat instead of replaying the reach from zero.
+    if (on && !this.climbOn) this.climbPhase = clamped ?? 0;
+    this.climbOn = on;
+    this.climbTarget = on ? clamped : null;
   }
 
   /** Ease the extra arm raise in toward the swap moment and back out after it;
@@ -595,6 +867,18 @@ export class CharacterVisual {
   // -------------------------------------------------------------------------
   // LOD / shadow plumbing (memoized — called every frame by the renderer)
   // -------------------------------------------------------------------------
+
+  /**
+   * Terrain lean, in the body's own frame (see `render/ground_tilt_core.ts`).
+   * Written on `root`, which nothing else transforms: `poseWrap` rewrites its
+   * own rotation every frame for the swim pose, so a lean applied there would
+   * be stomped. Two float writes, elided when the plan has not moved.
+   */
+  setGroundTilt(pitch: number, roll: number): void {
+    if (this.root.rotation.x === pitch && this.root.rotation.z === roll) return;
+    this.root.rotation.x = pitch;
+    this.root.rotation.z = roll;
+  }
 
   setShadow(on: boolean): void {
     if (on === this.shadowOn) return;

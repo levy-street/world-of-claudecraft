@@ -214,7 +214,7 @@ import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { loadCharselectNews } from './ui/charselect_news';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
-import { claudiumBalanceAddress } from './ui/claudium_view';
+import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
@@ -2315,6 +2315,7 @@ async function startGame(
             balance,
             skus,
             nativeRails,
+            wocDiscountBps: null,
             walletBalances: {
               solLamports: null,
               usdcBaseUnits: null,
@@ -2360,14 +2361,17 @@ async function startGame(
               solAmountBase: nativeAmountBase('sol', row.sku, sol?.amountBase),
               usdcAmountBase: nativeAmountBase('usdc', row.sku, usdc?.amountBase),
               wocAmountBase: nativeAmountBase('woc', row.sku, woc?.amountBase),
+              wocDiscountBps: woc?.discountBps ?? null,
             };
           }),
         );
+        const wocDiscountBps = currentWocDiscountBps(nativePrices);
         return {
           available: true,
           balance,
           skus,
           nativeRails,
+          wocDiscountBps,
           walletBalances: {
             solLamports: solBalance.lamports,
             usdcBaseUnits: usdcBalance.amountBase,
@@ -3379,6 +3383,10 @@ async function startGame(
             net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
+            // A ledge climb is a server-owned scripted move the client does
+            // not re-simulate: predicting a fall through it would fight the
+            // authoritative pull-up and show the correction as a stutter.
+            pe.climbing !== true &&
             !isDelvePos(pe.pos.x),
           moveInput: resolved.mi,
           displayFacing: netFacing ?? interpServerFacing,

@@ -39,12 +39,14 @@ talk only to the **`SimContext` seam** (`sim_context.ts`).
 - **`types.ts`**: ALL shared types AND the global tuning constants + classic-era formulas (`TICK_RATE`, `DT`, `GCD`, ranges, `XP_TABLE`, hit/armor/rage math, post-cap `virtualLevel`/prestige). Plus the `SimEvent` union and the `Entity` shape.
 - `data.ts`: merges `content/*` into the flat tables (`ABILITIES`, `MOBS`, `NPCS`, `QUESTS`, `ITEMS`, `CAMPS`, `DUNGEONS`) and owns world-layout consts (`WORLD_SIZE`, `instanceOrigin`, `arenaOrigin`, `zoneAt`, `dungeonAt`).
 - `entity.ts`: `createPlayer/createMob/createNpc/createGroundObject` + `recalcPlayerStats` (the ONE place derived stats are computed from class/level/gear/auras/talent `mods`).
-- `player_motion.ts`: the pure player-movement kernel (`stepPlayerMotion`: turn integration, wish vector, slope gates, swept static collision, the vertical pass) plus `moveSpeedMult`/`jumpMult`/`isSwimming` and the locomotion-feel constants. `Sim.updatePlayerMovement` wraps it behind `PlayerMotionDeps` (fiesta speed, delve-aware `resolveMove`, cast/damage callbacks); the online display-only self extrapolator (`src/render/self_motion.ts`) binds pure/no-op deps so BOTH hosts run the same math, pinned by `tests/player_motion.test.ts` (client-dep-shape vs live-Sim parity, bit for bit). Changing movement here means keeping that parity test green.
+- `player_motion.ts`: the pure player-movement kernel (`stepPlayerMotion`: turn integration, wish vector, slope gates, swept static collision, the vertical pass) plus `moveSpeedMult`/`jumpMult`/`isSwimming` and the locomotion-feel constants, including the parkour arms (air control, coyote time, ledge momentum, and the standable-prop support/mantle pass fed by `colliders.ts` `supportHeightAt`; behavior pinned by `tests/parkour.test.ts`). `Sim.updatePlayerMovement` wraps it behind `PlayerMotionDeps` (fiesta speed, delve-aware `resolveMove`, cast/damage callbacks); the online display-only self extrapolator (`src/render/self_motion.ts`) binds pure/no-op deps so BOTH hosts run the same math, pinned by `tests/player_motion.test.ts` (client-dep-shape vs live-Sim parity, bit for bit). Changing movement here means keeping that parity test green.
 - `entity_roster.ts`: roster ops the coordinator drives: `addEntity`/`dropEntity`/`rebucket`, despawn decay, the delayed-event drain, and the ground-AoE tick. Keeps only the delve release arm (`releaseSpiritInDelve`); the general death/release system is `spirit.ts` (see the module table).
 - `rng.ts`: `class Rng` (mulberry32) + stateless `hash2/noise2/fbm2` for terrain.
 - `world.ts`: `groundHeight`/`terrainHeight` (pure fn of x,z,seed), `WATER_LEVEL`, `generateDecorations`. **Renderer samples the same fns**: keep them identical. The voxel layer below derives from them too.
 - `voxel.ts` + `voxel_mesh.ts`: the true-3D voxel density field layered over the `world.ts` heightfield, plus its chunked mesher. Tunnels/overhangs come ONLY from hand-authored capsules in `content/tunnels.ts` subtracted from solid terrain; away from a tunnel the field's surface must stay byte-identical to `terrainHeight`, so a heightfield edit is also a voxel edit. Engine-only so far (proven by tests, not yet wired into the renderer; `colliders.ts`/`pathfind.ts` are still heightfield-only).
-- `colliders.ts`: `resolvePosition` (static collision + slide); reads `PROPS` and the dungeon/arena layouts.
+- **`physics/`**: the character physics engine (own `CLAUDE.md`): continuous swept collision against the extruded-2D collider set, multi-pass sliding, depenetration, and STEP UP so a walking body climbs low stones and kerbs with no jump. `player_motion.ts` runs it for the OPEN WORLD; instanced interiors stay on `resolveMove`. Pure leaf set (no `SimContext`), pinned by `tests/physics_character.test.ts`.
+- `decoration_dims.ts`: pure leaf, THE source of truth for scatter-decoration size (`rockHeight`/`rockRadius`/`ROCK_SINK_UNITS`). `colliders.ts` builds rock colliders from it and `src/render/foliage.ts` scales the rock GLBs to it, so a stone's silhouette and its collision top cannot drift.
+- `colliders.ts`: `resolvePosition` (static collision + slide); reads `PROPS` and the dungeon/arena layouts. Parkour heights live here: low props carry a `moveTopY` movement top (`standable` for crates/rocks and the climbable roofs: stall canopies, the dock hut), the optional `MoverHeight` param lets a mover whose feet clear a top pass over it, and `supportHeightAt` is the standable-surface query the movement kernel maxes against the terrain. Callers passing no height (mobs, pathfinding) collide full-height as before.
 - `dungeon_layout.ts`: plain-number interior layouts; single source for BOTH render geometry and `colliders.ts` interior sets.
 - `pathfind.ts`: local A* (`findPath`); the player-tuned wrapper `findPlayerPath` (body radius, climb, swim) is what warrior Charge calls via `findChargePath`.
 - `threat.ts`: classic-era hate-table math (`addThreat`, `threatModifier`, taunt, stealth detection). Already pure; modules import it directly.
@@ -124,6 +126,8 @@ legality), `cooldown_persist.ts` (cooldown save/load), `tab_target.ts`/`assist.t
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`
 (the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
+`market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus
+the load-time reissue that keeps one row per id),
 `vendor_stack.ts`, `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
 HUD), `resurrection.ts` (sickness rules shared by every death site), and the combat
 leaves `spell_resist.ts`/`ranged_shot.ts`/`aura_stacking.ts`/`aura_cancel.ts`/
@@ -218,7 +222,7 @@ persistence (`serializeCharacter`/`addPlayer`), the shared entry points above, a
   `localizeLootText` arm: `parseSimMoney` reverses the `"Ng Ns Nc"` fragment back to copper,
   then the i18n `formatMoney` formats it. Don't reach for the i18n `formatMoney`/`formatNumber`
   here, and don't hand-format with a separator a locale would change.
-- **Dev-channel text stays English.** The sim's only non-player text is a couple of
+- **Dev-channel text stays English.** The sim's only non-player text is a few
   `console.warn` diagnostics (no user-surfaced `throw`s); they are never matched. If a
   string would ever feed both a diagnostic log and a player-visible `SimEvent`, split it
   so only the player arm (`error`/`notice`) is registered in `sim_i18n.ts`.

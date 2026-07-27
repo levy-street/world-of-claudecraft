@@ -1076,6 +1076,15 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  // Ledge climb: quantized progress (1..99), not the arc. The client never
+  // re-simulates the pull (the server owns it and streams the resulting
+  // positions); it needs to know a climb is running, to stop predicting a
+  // fall, and how far through it is so the pull-up pose tracks the motion.
+  // Any non-zero value reads as "climbing" on older clients.
+  if (e.climb) {
+    const t = e.climb.elapsed / e.climb.duration;
+    out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
+  }
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;

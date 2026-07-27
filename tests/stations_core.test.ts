@@ -18,17 +18,21 @@ describe('stationPropPlacements (the pure placement core)', () => {
     expect(placedIds.size).toBe(STATIONS.length);
   });
 
-  it('each cluster carries exactly one anchor and it lands on the station pos', () => {
+  it('each cluster keeps its thematic anchor prop BESIDE the station pos', () => {
+    // The anchor prop is solid furniture now, and the station point is a
+    // gameplay interaction target (routes end on it at body radius up to
+    // 0.8), so the anchor stands clear of the point but stays close enough
+    // to read as the station itself.
     for (const station of STATIONS) {
       const cluster = STATION_PROP_CLUSTERS[station.type];
-      const anchors = cluster.filter((prop) => prop.dx === 0 && prop.dz === 0);
-      expect(anchors, `${station.type} cluster anchor count`).toHaveLength(1);
+      const anchorSpec = cluster[0];
       const placements = stationPropPlacements(STATIONS).filter((p) => p.stationId === station.id);
-      const anchorPlacement = placements.find(
-        (p) => p.x === station.pos.x && p.z === station.pos.z,
-      );
-      expect(anchorPlacement, `${station.id} anchor placement on pos`).toBeDefined();
-      expect(anchorPlacement?.kind).toBe(anchors[0].kind);
+      const anchorPlacement = placements.find((p) => p.kind === anchorSpec.kind);
+      expect(anchorPlacement, `${station.id} anchor placement`).toBeDefined();
+      if (!anchorPlacement) continue;
+      const dist = Math.hypot(anchorPlacement.x - station.pos.x, anchorPlacement.z - station.pos.z);
+      expect(dist, `${station.id} anchor clear of the point`).toBeGreaterThan(1.2);
+      expect(dist, `${station.id} anchor still beside the station`).toBeLessThan(2.2);
     }
   });
 

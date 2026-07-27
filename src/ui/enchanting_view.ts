@@ -12,8 +12,19 @@
 // names ITS OWN action and never the generic crafting-busy line, which would
 // mis-attribute a craft deny to disenchant spend or vice versa.
 //
+// The two YIELD-BEARING successes (#2430). The grant hub's "You receive:" line
+// used to be the only thing naming what a disenchant or a salvage handed back;
+// the profession's own line named only the piece that was destroyed. Now that
+// the hub line stands down for those grants (the loot event's `callerLogs`
+// flag), the success key selected here has to name the reclaimed material and
+// its count too, or the player is told nothing about the yield. A rare+
+// disenchant's typed bind-on-trade secondary is a DIFFERENT item, so it takes
+// its own extra line (disenchantSecondaryLineKey), which is also what collapses
+// its per-unit grant calls into one line.
+//
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
+import { isMultiUnitGrant } from './grant_line_view';
 import type { TranslationKey } from './i18n.catalog';
 
 export interface EnchantingToast {
@@ -24,10 +35,19 @@ export interface EnchantingToast {
 
 export interface DisenchantResultEvent {
   ok: boolean;
+  /** The reclaimed primary material and its rolled count (present on ok). */
+  materialItemId?: string;
+  count?: number;
+  /** The typed bind-on-trade secondary a rare+ yield adds (absent otherwise). */
+  secondaryItemId?: string;
+  secondaryCount?: number;
   reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
 }
 export interface SalvageResultEvent {
   ok: boolean;
+  /** The reclaimed material and its rolled count (present on ok). */
+  materialItemId?: string;
+  count?: number;
   reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
 }
 export interface ApplyEnchantResultEvent {
@@ -46,11 +66,24 @@ export interface ApplyEnchantResultEvent {
     | 'same_enchant';
 }
 
-/** The toast for one disenchantResult event. Success is a chat line ({ item });
- *  every reason is an error toast. unknown_item and not_held share the
- *  "you do not have that" copy (an unknown id reads the same to a player). */
+/** The toast for one disenchantResult event. Success is a chat line naming the
+ *  consumed piece AND the reclaimed material ({ item, material, qty }), with the
+ *  quantity variant only past one unit; every reason is an error toast.
+ *  unknown_item and not_held share the "you do not have that" copy (an unknown
+ *  id reads the same to a player). A success with no resolvable material
+ *  (unreachable from a well-formed resolveDisenchant, which always sets
+ *  materialItemId on ok) falls back to the yield-free wording rather than
+ *  rendering an empty placeholder. */
 export function disenchantResultToast(ev: DisenchantResultEvent): EnchantingToast {
-  if (ev.ok) return { key: 'hudChrome.enchanting.disenchantedLine', sink: 'log' };
+  if (ev.ok)
+    return {
+      key: !ev.materialItemId
+        ? 'hudChrome.enchanting.disenchantedLine'
+        : isMultiUnitGrant(ev.count)
+          ? 'hudChrome.enchanting.disenchantedYieldQty'
+          : 'hudChrome.enchanting.disenchantedYield',
+      sink: 'log',
+    };
   switch (ev.reason) {
     case 'throttled':
       return { key: 'hudChrome.enchanting.disenchantThrottled', sink: 'error' };
@@ -63,10 +96,18 @@ export function disenchantResultToast(ev: DisenchantResultEvent): EnchantingToas
   }
 }
 
-/** The toast for one salvageResult event. Success is a chat line ({ item });
- *  every reason is an error toast. */
+/** The toast for one salvageResult event: the disenchant shape above, same
+ *  yield-naming success keys and same yield-free fallback. */
 export function salvageResultToast(ev: SalvageResultEvent): EnchantingToast {
-  if (ev.ok) return { key: 'hudChrome.enchanting.salvagedLine', sink: 'log' };
+  if (ev.ok)
+    return {
+      key: !ev.materialItemId
+        ? 'hudChrome.enchanting.salvagedLine'
+        : isMultiUnitGrant(ev.count)
+          ? 'hudChrome.enchanting.salvagedYieldQty'
+          : 'hudChrome.enchanting.salvagedYield',
+      sink: 'log',
+    };
   switch (ev.reason) {
     case 'throttled':
       return { key: 'hudChrome.enchanting.salvageThrottled', sink: 'error' };
@@ -79,8 +120,24 @@ export function salvageResultToast(ev: SalvageResultEvent): EnchantingToast {
   }
 }
 
+/** The EXTRA line a rare-or-better disenchant prints for its typed
+ *  bind-on-trade secondary, or null when the yield had none (every sub-rare
+ *  disenchant, and a rare+ piece with no typed material). One line per DISTINCT
+ *  granted item: the secondary is a different item from the primary, so it
+ *  earns its own line, and rendering it from the event's secondaryCount is what
+ *  collapses the sim's per-unit grant calls into that single line. */
+export function disenchantSecondaryLineKey(ev: DisenchantResultEvent): TranslationKey | null {
+  if (!ev.ok || !ev.secondaryItemId || !ev.secondaryCount) return null;
+  return isMultiUnitGrant(ev.secondaryCount)
+    ? 'hudChrome.enchanting.disenchantedAlsoQty'
+    : 'hudChrome.enchanting.disenchantedAlso';
+}
+
 /** The toast for one enchantResult event. Success is a chat line ({ item,
- *  enchant }); every reason is an error toast. */
+ *  enchant }); every reason is an error toast. The apply-enchant grant re-mints
+ *  the player's OWN copy, so unlike disenchant/salvage this line has no yield
+ *  to name: eliding the hub's "You receive:" line for it strictly removes a
+ *  falsehood (#2430, it named an item that never left the bags). */
 export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): EnchantingToast {
   if (ev.ok) return { key: 'hudChrome.enchanting.enchantAppliedLine', sink: 'log' };
   switch (ev.reason) {

@@ -56,12 +56,35 @@ export interface LockpickWindowDeps {
 }
 
 const NUM0 = { maximumFractionDigits: 0 } as const;
+// The countdown's one decimal. `toFixed(1)` rendered `12.3` in every locale, where ru_RU and
+// de want a comma; English output is byte-identical through formatNumber either way.
+const NUM1 = { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false } as const;
+
+/** The three countdown nodes `renderBoard` emits, resolved once per board paint. */
+interface TimerEls {
+  readonly bar: HTMLElement;
+  readonly value: HTMLElement;
+  readonly wrap: HTMLElement;
+}
 
 export class LockpickWindow {
   private timerGen = 0;
   private timerInterval: number | null = null;
   private lastSig = '';
   private lastTimerKey = '';
+  // The countdown's element refs, and the urgent-class latch that rides with them.
+  //
+  // RESOLVED PER BOARD PAINT, not once at construction, and that distinction is the whole
+  // reason this is not the ordinary "cache refs in the constructor" of src/ui/CLAUDE.md.
+  // renderBoard() replaces the panel's entire subtree, and it runs on a DIFFERENT trigger
+  // than the clock does: lockpickRenderSig covers `row` and `visible.length` while
+  // lockpickTimerKey (sessionId:page:tries:col) covers neither, so moving the pick up a row
+  // or revealing fog rebuilds these three nodes WITHOUT restarting the interval. Refs taken
+  // at startTimer() would then paint into a detached subtree and the bar would freeze for the
+  // rest of the attempt. Re-resolving here, at the one innerHTML site that destroys them,
+  // keeps that correct while taking the three querySelector walks off the 10 Hz path.
+  private timerEls: TimerEls | null = null;
+  private lastUrgent = false;
 
   constructor(private readonly deps: LockpickWindowDeps) {}
 
@@ -96,6 +119,8 @@ export class LockpickWindow {
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('lockpickUi.closeAria'))}">${svgIcon('close')}</button></div>` +
       `<div class="lp-blurb${coffer ? ' lp-blurb-coffer' : ''}">${esc(blurb)}</div>` +
       `<div class="lp-ante-row${coffer ? ' lp-ante-row-coffer' : ''}">${buttons}</div>`;
+    // The ante markup carries no countdown, so any refs from a previous board are stale.
+    this.forgetTimerEls();
     el.querySelectorAll('[data-ante]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const ante = Number((btn as HTMLElement).dataset.ante) as Ante;
@@ -160,6 +185,12 @@ export class LockpickWindow {
     if (!el) return;
     const view = this.deps.getState();
     if (!view) {
+      // The one exit from renderBoard that leaves the subtree alone. Dropping the refs here
+      // is hygiene rather than behavior, like close()'s: every caller runs syncTimer() next,
+      // which stops the clock on a null state, so nothing can paint afterwards. It is here
+      // so the module upholds "the refs go wherever they stop being current" by itself
+      // rather than leaning on that ordering.
+      this.forgetTimerEls();
       this.deps.onClose();
       return;
     }
@@ -206,7 +237,7 @@ export class LockpickWindow {
     const timerBlock =
       timerSecs != null
         ? `<div class="lp-timer" aria-label="${esc(t('lockpickUi.timerAria'))}"><div class="lp-timer-track"><div class="lp-timer-bar" id="lp-timer-bar" style="width:100%"></div></div>` +
-          `<span class="lp-timer-value" id="lp-timer-value">${esc(t('lockpickUi.seconds', { seconds: timerSecs.toFixed(1) }))}</span></div>`
+          `<span class="lp-timer-value" id="lp-timer-value">${esc(t('lockpickUi.seconds', { seconds: formatNumber(timerSecs, NUM1) }))}</span></div>`
         : '';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('lockpickUi.boardTitle', { tier: this.deps.tierName(view.lootTier) }))}</span>` +
@@ -229,6 +260,39 @@ export class LockpickWindow {
     });
     el.querySelector('[data-withdraw]')?.addEventListener('click', () => this.deps.onAbort());
     el.querySelector('[data-close]')?.addEventListener('click', () => this.deps.onAbort());
+    this.cacheTimerEls(el);
+  }
+
+  /**
+   * Re-point the countdown at the nodes this paint just created. Called at the END of
+   * renderBoard, after the innerHTML write that destroyed the previous ones. A board with no
+   * per-step budget emits no timer block, so the refs go null and paintTimer writes nothing.
+   */
+  private cacheTimerEls(el: HTMLElement): void {
+    // By CLASS, not by the ids the markup also carries: this window is
+    // instance-parameterized on deps.panel, so a second panel would make the ids collide
+    // while a query scoped to the panel's own class stays correct.
+    const bar = el.querySelector<HTMLElement>('.lp-timer-bar');
+    const value = el.querySelector<HTMLElement>('.lp-timer-value');
+    const wrap = el.querySelector<HTMLElement>('.lp-timer');
+    this.timerEls = bar && value && wrap ? { bar, value, wrap } : null;
+    // The fresh markup carries no urgent class, so the latch starts from that.
+    this.lastUrgent = false;
+  }
+
+  /**
+   * Drop the refs when the subtree they point into is gone or replaced.
+   *
+   * From `renderAnte()` this is a real behavior and is pinned: the ante selector replaces
+   * the board's subtree and deliberately does NOT stop the clock, so stale refs would keep
+   * being painted. From `close()` and from `renderBoard()`'s state-less exit it is hygiene
+   * only, because both stop the clock (directly, or via the `syncTimer()` that follows), so
+   * nothing can paint afterwards and no test can tell the difference. Said here rather than
+   * left for the next reader to re-derive from three call sites.
+   */
+  private forgetTimerEls(): void {
+    this.timerEls = null;
+    this.lastUrgent = false;
   }
 
   // --- Countdown (generation-guarded) --------------------------------------
@@ -272,19 +336,28 @@ export class LockpickWindow {
     }
   }
 
+  /**
+   * One tick of the countdown, 10x a second for the length of an attempt. Reads the refs
+   * renderBoard cached rather than re-resolving them (three querySelector subtree walks per
+   * tick before #2498). The width and the label move every tick by definition; the urgent
+   * class flips at most once per attempt, so it rides a latch instead of a blind toggle.
+   */
   private paintTimer(remaining: number, seconds: number): void {
-    const panel = this.panel();
-    const bar = panel?.querySelector<HTMLElement>('#lp-timer-bar') ?? null;
-    if (bar) bar.style.width = `${(remaining / seconds) * 100}%`;
-    const val = panel?.querySelector<HTMLElement>('#lp-timer-value') ?? null;
-    if (val) val.textContent = t('lockpickUi.seconds', { seconds: remaining.toFixed(1) });
-    const wrap = panel?.querySelector<HTMLElement>('.lp-timer') ?? null;
-    if (wrap) wrap.classList.toggle('lp-timer-urgent', remaining < 3);
+    const els = this.timerEls;
+    if (!els) return;
+    els.bar.style.width = `${(remaining / seconds) * 100}%`;
+    els.value.textContent = t('lockpickUi.seconds', { seconds: formatNumber(remaining, NUM1) });
+    const urgent = remaining < 3;
+    if (urgent !== this.lastUrgent) {
+      this.lastUrgent = urgent;
+      els.wrap.classList.toggle('lp-timer-urgent', urgent);
+    }
   }
 
   /** Tear down on panel close: stop the clock and forget the last paint. */
   close(): void {
     this.stopTimer();
+    this.forgetTimerEls();
     this.lastSig = '';
     this.lastTimerKey = '';
   }

@@ -70,7 +70,9 @@ vein, ancient heartwood, moonlit bloom) on ONE shared cadence knob
 the overworld zone via `emitToZonePlayers`. Corpse harvesting grants ALL
 plain yields before any signed instance, specimens last, with rarity draws
 staying in the first loop in yield order (`harvestCorpse`,
-`src/sim/interaction.ts`; the draw order is golden-pinned). The premium arm
+`src/sim/interaction.ts`; the draw order is pinned by the corpse suites' own
+draw-count cases, not by the parity goldens, which drive no corpse harvest).
+The premium arm
 gates on `MONSTER_MATERIAL_TIERS` (every wave-one family is tier 1, so the
 gate is live but never fires yet). One interact press loots AND harvests an
 eligible corpse, client-composed with no new wire command
@@ -166,7 +168,11 @@ merge-aware `canGrantItemInstance` gate; a signed instance merges only into
 a byte-equal same-signer stack, never a plain one); with neither, the grant
 falls back to the unsigned fungible top-up (the signature truncates, the
 yield does not; pinned in `tests/gather_node_harvest.test.ts` and the corpse
-suites). Mail attachments expire after
+suites). That room is measured against the WHOLE grant rather than one copy,
+because a corpse signed component carries its rolled quantity: room for one
+unit of three refuses outright instead of spilling the remainder past
+capacity. A gathering node differs on purpose and lands a partial fit, since
+it has no reserved plain fallback to catch the rest. Mail attachments expire after
 `MAIL_ATTACHMENT_EXPIRY_SECONDS` with exactly one return-to-sender cycle
 (system and work-order mail exempt). A character rename re-keys market and
 mail but sweeps only the renamed character's own blob for instance signers
@@ -371,9 +377,12 @@ the lever is material quantities per craft.
 - Sim purity and 20 Hz determinism everywhere; all randomness through
   `ctx.rng`. Draw-count contracts are golden-pinned: gathering draws exactly
   2 per granted harvest and 0 on denial; fishing draws 1 hidden delay per
-  cast plus 1 table draw per landed reel; corpse rarity draws stay in the
-  first grant loop in yield order; unbind draws none. Any change near these
-  paths re-verifies against `tests/parity/` before touching goldens.
+  cast plus 1 table draw per landed reel; unbind draws none. The corpse rule,
+  that rarity draws stay in the first grant loop in yield order, is pinned by
+  the draw-count cases in the corpse suites instead: no parity scenario
+  harvests a corpse, so a green parity run says nothing about that path. Any
+  change near these paths re-verifies against `tests/parity/` before touching
+  goldens.
 - Adding any static NPC shifts the world-ctor entity-id counter and moves
   parity goldens: regenerate deliberately (UPDATE_PARITY=1) in its own
   reviewed commit, never hand-edit.

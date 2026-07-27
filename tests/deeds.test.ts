@@ -1220,7 +1220,10 @@ describe('meter triggers (negative then positive per resolver)', () => {
           meta.townFocus = {};
         },
         at: () => {
-          meta.townFocus = { forge: 1 };
+          // A real component family: since #2511 no reachable path can put a
+          // key like 'forge' in an allocation, so a fixture using one would
+          // pin a shape the game cannot produce.
+          meta.townFocus = { hide: 1 };
         },
       },
       {
