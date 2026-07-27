@@ -51,6 +51,7 @@ import {
   partyFrameRole,
 } from '../src/sim/party_frame_info';
 import {
+  ownerInvSlotView,
   ownerItemInstanceView,
   publicItemInstanceView,
   publicProceduralItemView,
@@ -6405,9 +6406,9 @@ export class GameServer {
     if (heavyDue) {
       session.selfHeavyDirty = false;
       session.lastWireRev = meta.wireRev;
-      maybe('inv', meta.inventory);
+      maybe('inv', meta.inventory.map(ownerInvSlotView));
       maybe('bags', meta.bags);
-      maybe('buyback', meta.vendorBuyback);
+      maybe('buyback', meta.vendorBuyback.map(ownerInvSlotView));
       maybe('equip', meta.equipment);
       maybe('cosmetics', anchorSession.accountCosmetics);
       maybe('qlog', [...meta.questLog.values()]);

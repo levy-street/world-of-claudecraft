@@ -163,3 +163,22 @@ describe('mailbox_window: house style', () => {
     expect(painter.includes('\u2013'), 'en dash found').toBe(false);
   });
 });
+
+describe('mailbox_window: received procedural attachment accessibility', () => {
+  const reading = painter.slice(
+    painter.indexOf('private renderReading('),
+    painter.indexOf('private renderSend('),
+  );
+
+  it('makes received item tooltips keyboard reachable with a descriptive label', () => {
+    expect(reading).toContain('chip.tabIndex = 0');
+    expect(reading).toContain('hudChrome.bags.itemAriaProcedural');
+    expect(reading).toContain('proceduralRarityLabel(slot.instance)');
+    expect(reading).toContain('slot.instance.procedural.itemLevel');
+    expect(reading).toContain('attachTooltip(chip');
+  });
+
+  it('exposes procedural rarity for forced-colors styling', () => {
+    expect(reading).toContain('chip.dataset.proceduralRarity');
+  });
+});

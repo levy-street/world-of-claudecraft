@@ -1128,7 +1128,6 @@ async function capturePresentationEvidence(page) {
   await capturePresentationScreenshot(page, '14-tooltip-seeded-roll-comparison-alt.png');
   await captureFullContextScreenshot(page, '34-full-context-seeded-comparison-alt.png');
   if (!PREFLIGHT_ONLY) {
-    await page.evaluate(() => window.__game.hud.toggleChar());
     await sleep(180);
     rootAltRangesPng = await page.screenshot({
       type: 'png',
@@ -1136,7 +1135,6 @@ async function capturePresentationEvidence(page) {
       captureBeyondViewport: false,
       omitBackground: false,
     });
-    await page.evaluate(() => window.__game.hud.toggleChar());
   }
   await page.keyboard.up('Alt');
   await page.waitForFunction(() => !document.body.classList.contains('item-details-advanced'));
@@ -1448,13 +1446,19 @@ async function capturePresentationEvidence(page) {
     '#dungeon-finder-window .df-raid-rewards',
     (element) => element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
   );
+  const normalFinderDetailState = await page.$eval(
+    '#dungeon-finder-window .df-detail',
+    (element) => element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+  );
   check(
     'Normal Nythraxis Finder rewards',
     normalFinderState.includes('Rare 65% · Epic 33% · Legendary 2%') &&
       normalFinderState.includes('Rare 27 · Epic 28 · Legendary 32') &&
       normalFinderState.includes('one shared procedural item') &&
       !normalFinderState.includes('Raid-forged and guaranteed'),
-    normalFinderState,
+    !normalFinderState.includes('Heroic Marks') &&
+      !normalFinderDetailState.includes('Heroic Marks') &&
+      JSON.stringify({ rewards: normalFinderState, detail: normalFinderDetailState }),
   );
   await capturePresentationScreenshot(page, '31-finder-nythraxis-normal-rewards.png', [
     '#dungeon-finder-window',
@@ -1481,7 +1485,9 @@ async function capturePresentationEvidence(page) {
       heroicFinderState.includes('one shared procedural item') &&
       heroicFinderState.includes('Raid-forged and guaranteed in the upper half') &&
       !heroicFinderDetailState.includes('Locked for about'),
-    JSON.stringify({ rewards: heroicFinderState, detail: heroicFinderDetailState }),
+    !heroicFinderState.includes('Heroic Marks') &&
+      !heroicFinderDetailState.includes('Heroic Marks') &&
+      JSON.stringify({ rewards: heroicFinderState, detail: heroicFinderDetailState }),
   );
   await capturePresentationScreenshot(page, '32-finder-nythraxis-heroic-rewards.png', [
     '#dungeon-finder-window',
@@ -1495,18 +1501,16 @@ async function capturePresentationEvidence(page) {
   });
   await page.evaluate(() => {
     document.body.classList.add('mobile-touch');
+    window.__game.hud.closeAll?.();
+  });
+  await sleep(180);
+  await page.evaluate(() => {
     const game = window.__game;
-    const sim = game.sim;
-    game.hud.closeAll?.();
-    const meta = sim.players.get(sim.player.id);
-    const copies = (meta?.inventory ?? []).filter(
-      (slot) => slot.instance?.procedural?.rarity === 'legendary',
-    );
-    const first = copies[0];
-    if (first?.instance?.procedural?.uid) {
-      sim.equipItem(first.itemId, first.instance.procedural.uid);
+    const bags = document.querySelector('#bags');
+    if (!bags || getComputedStyle(bags).display === 'none') {
+      game.hud.toggleBags();
     }
-    game.hud.toggleBags();
+    game.hud.renderBags?.();
   });
   await page.waitForSelector('#bags', { visible: true, timeout: 10000 });
   await focusProceduralComparisonRow(page, '.bag-item[data-procedural-rarity=legendary]');
@@ -1517,6 +1521,7 @@ async function capturePresentationEvidence(page) {
       viewport: { width: innerWidth, height: innerHeight },
       hasComparison: tooltip.querySelector('.tt-cmp') !== null,
       scrollable: tooltip.scrollHeight >= tooltip.clientHeight,
+      visible: getComputedStyle(tooltip).display !== 'none' && rect.width > 0 && rect.height > 0,
     };
   });
   check(
@@ -1524,6 +1529,7 @@ async function capturePresentationEvidence(page) {
     mobileTooltipState.hasComparison &&
       mobileTooltipState.scrollable &&
       mobileTooltipState.bounds.left >= 0 &&
+      mobileTooltipState.visible &&
       mobileTooltipState.bounds.top >= 0 &&
       mobileTooltipState.bounds.right <= mobileTooltipState.viewport.width &&
       mobileTooltipState.bounds.bottom <= mobileTooltipState.viewport.height,

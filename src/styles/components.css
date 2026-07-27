@@ -5801,6 +5801,8 @@
     .bank-item[data-procedural-rarity],
     .loot-item[data-procedural-rarity],
     .loot-roll[data-procedural-rarity],
+    .trade-item[data-procedural-rarity],
+    .mail-attachment-item[data-procedural-rarity],
     .equip-slot[data-procedural-rarity] .item-icon {
       outline: 1px solid CanvasText;
       outline-offset: -1px;
@@ -7115,7 +7117,8 @@
   .soc-hide-offline:focus-visible,
   .soc-name.soc-link:focus-visible,
   .soc-sugg-item:focus-visible,
-  .trade-item.mine:focus-visible {
+  .mail-attachment-item:focus-visible,
+  .trade-item:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }

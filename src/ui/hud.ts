@@ -444,6 +444,7 @@ import {
   type ItemPresentationInstance,
   itemPresentationName,
   itemPresentationQuality,
+  proceduralRarityLabel,
 } from './procedural_item_presentation';
 import { maskProfanity } from './profanity';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
@@ -13759,8 +13760,22 @@ export class Hud {
       const label = `${name}${
         s.count > 1 ? ` x${formatNumber(s.count, { maximumFractionDigits: 0 })}` : ''
       }`;
+      const procedural = s.instance?.procedural;
+      const ariaLabel = procedural
+        ? t('hudChrome.bags.itemAriaProcedural', {
+            item: name,
+            rarity: proceduralRarityLabel(s.instance) ?? procedural.rarity,
+            level: formatNumber(procedural.itemLevel, {
+              maximumFractionDigits: 0,
+            }),
+            count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+          })
+        : label;
+      const proceduralAttr = procedural
+        ? ` data-procedural-rarity="${esc(procedural.rarity)}"`
+        : '';
       const inner = `${this.itemIcon(item, s.instance)}<span>${esc(label)}</span>`;
-      return `<button type="button" class="trade-item ${mine ? 'mine' : 'theirs'} q-${quality}" data-offer-index="${index}" aria-label="${esc(label)}">${inner}</button>`;
+      return `<button type="button" class="trade-item ${mine ? 'mine' : 'theirs'} q-${quality}"${proceduralAttr} data-offer-index="${index}" aria-label="${esc(ariaLabel)}">${inner}</button>`;
     };
     el.innerHTML = `
       <div class="panel-title"><span>${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>

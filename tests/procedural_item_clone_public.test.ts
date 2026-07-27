@@ -4,7 +4,7 @@ import {
   type ProceduralItemInstance,
   proceduralQuality,
 } from '../src/sim/procedural_item';
-import { publicItemInstanceView } from '../src/sim/procedural_item_public';
+import { ownerInvSlotView, publicItemInstanceView } from '../src/sim/procedural_item_public';
 import type { ItemInstancePayload } from '../src/sim/types';
 
 function fixture(): ItemInstancePayload {
@@ -125,5 +125,30 @@ describe('procedural item clone and public projection', () => {
     expect(proceduralQuality('epic')).toBe('epic');
     expect(proceduralQuality('legendary')).toBe('legendary');
     expect(proceduralQuality('mythic')).toBeNull();
+  });
+});
+
+describe('owner inventory wire projection', () => {
+  it('redacts deterministic roll secrets while preserving owner-required payload fields', () => {
+    const instance = fixture();
+    instance.bindOnTrade = true;
+    const view = ownerInvSlotView({
+      itemId: 'gravecaller_ring',
+      count: 2,
+      slot: 7,
+      instance,
+    });
+
+    expect(view.count).toBe(2);
+    expect(view.slot).toBe(7);
+    expect(view.instance?.procedural?.uid).toBe('pi1:test:42');
+    expect(view.instance?.signer).toBe('Ayla');
+    expect(view.instance?.charges).toEqual({ test_power: 2 });
+    expect(view.instance?.rolled).toEqual({ quality: 'rare', stats: { int: 1 } });
+    expect(view.instance?.enchant).toBe('greater_intellect');
+    expect(view.instance?.boundTo).toBe(9);
+    expect(view.instance?.bindOnTrade).toBe(true);
+    expect(JSON.stringify(view)).not.toContain('"seed"');
+    expect(JSON.stringify(view)).not.toContain('"dropContext"');
   });
 });

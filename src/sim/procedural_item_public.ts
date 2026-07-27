@@ -6,7 +6,7 @@ import {
   type ProceduralRarity,
   type RolledAffix,
 } from './procedural_item';
-import type { ItemInstancePayload } from './types';
+import { cloneItemInstancePayload, type InvSlot, type ItemInstancePayload } from './types';
 
 export interface PublicProceduralItemView {
   version: 1;
@@ -91,15 +91,20 @@ export function publicItemInstanceView(payload: ItemInstancePayload): PublicItem
  * as the public projection. Never send this view to another player.
  */
 export function ownerItemInstanceView(payload: ItemInstancePayload): ItemInstancePayload {
-  const view = publicItemInstanceView(payload);
+  const view = cloneItemInstancePayload(payload);
+  if (payload.procedural) {
+    view.procedural = {
+      ...publicProceduralItemView(payload.procedural),
+      uid: payload.procedural.uid,
+    } as ProceduralItemInstance;
+  }
+  return view;
+}
+
+/** Owner-only inventory/bank projection that also preserves cell ordering. */
+export function ownerInvSlotView(slot: InvSlot): InvSlot {
   return {
-    ...view,
-    ...(payload.procedural &&
-      view.procedural && {
-        procedural: {
-          ...view.procedural,
-          uid: payload.procedural.uid,
-        },
-      }),
-  } as ItemInstancePayload;
+    ...slot,
+    ...(slot.instance && { instance: ownerItemInstanceView(slot.instance) }),
+  };
 }

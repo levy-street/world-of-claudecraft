@@ -393,6 +393,24 @@ export class MailboxWindow {
           const displayName = itemPresentationName({ name: itemDisplayName(item) }, slot.instance);
           const stack =
             slot.count > 1 ? ` x${formatNumber(slot.count, { maximumFractionDigits: 0 })}` : '';
+          chip.className = `mail-attachment-item q-${quality}`;
+          chip.tabIndex = 0;
+          if (slot.instance?.procedural) {
+            chip.dataset.proceduralRarity = slot.instance.procedural.rarity;
+          }
+          chip.setAttribute(
+            'aria-label',
+            slot.instance?.procedural
+              ? t('hudChrome.bags.itemAriaProcedural', {
+                  item: displayName,
+                  rarity: proceduralRarityLabel(slot.instance) ?? slot.instance.procedural.rarity,
+                  level: formatNumber(slot.instance.procedural.itemLevel, {
+                    maximumFractionDigits: 0,
+                  }),
+                  count: formatNumber(slot.count, { maximumFractionDigits: 0 }),
+                })
+              : `${displayName}${stack}`,
+          );
           chip.innerHTML = `${this.deps.itemIcon(item, slot.instance)}<span style="color:${qColor}">${esc(displayName)}${esc(stack)}</span>`;
           this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item, slot.instance));
         } else {

@@ -335,3 +335,22 @@ describe('bags_window: per-copy instance tooltip forwarding (Professions 2.0)', 
     expect(painter).toContain('this.deps.itemTooltip(item, s.instance)');
   });
 });
+
+describe('trade window: procedural item accessibility', () => {
+  const tradePainter = hud.slice(
+    hud.indexOf('private updateTradeWindow()'),
+    hud.indexOf('private updateFriendRequestWindow()'),
+  );
+
+  it('announces procedural rarity and item level for both offer columns', () => {
+    expect(tradePainter).toContain('hudChrome.bags.itemAriaProcedural');
+    expect(tradePainter).toContain('proceduralRarityLabel(s.instance)');
+    expect(tradePainter).toContain('procedural.itemLevel');
+    expect(tradePainter).toContain('esc(ariaLabel)');
+  });
+
+  it('exposes rarity as a forced-colors-safe data attribute', () => {
+    expect(tradePainter).toContain('data-procedural-rarity');
+    expect(components).toContain('.trade-item[data-procedural-rarity]');
+  });
+});

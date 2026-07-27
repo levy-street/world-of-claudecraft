@@ -19,6 +19,7 @@ import type { BankInfo } from '../world_api';
 import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
+import { ownerInvSlotView } from './procedural_item_public';
 import { sanitizePersistedItemInstance } from './procedural_persistence';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
@@ -275,7 +276,7 @@ export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
   const nextExpansionCost =
     purchases < BANK_EXPANSION_PRICES.length ? BANK_EXPANSION_PRICES[purchases] : null;
   return {
-    slots: bank.inventory.map(cloneInvSlot),
+    slots: bank.inventory.map(ownerInvSlotView),
     capacity: bankCapacity(bank),
     purchasedSlots: bank.purchasedSlots,
     bonusSlots: bank.bonusSlots,
