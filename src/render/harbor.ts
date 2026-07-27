@@ -240,17 +240,20 @@ function buildRamp(wood: WoodBuckets, r: HarborRamp): void {
   const slopeLen = Math.hypot(run, drop);
   const pitch = Math.atan2(drop, run);
   const midY = (r.highY + r.lowY) / 2 - BOARD_THICK / 2;
-  // descent sign along the axis: +1 when lowY sits at the +axis edge
+  // descent sign along the axis: +1 when lowY sits at the +axis edge.
+  // rotateZ(theta) lifts the +x end (right-hand rule about +z), so a
+  // descent toward +x needs -pitch; rotateX(phi) DROPS the +z end
+  // (+z rotates toward -y), so a descent toward +z needs +pitch.
   const sign = r.dir === 'x+' || r.dir === 'z+' ? 1 : -1;
+  const rotZ = alongX ? -sign * pitch : 0;
   const rotX = alongX ? 0 : sign * pitch;
-  const rotZ = alongX ? sign * pitch : 0;
   const surface = new THREE.BoxGeometry(
     alongX ? slopeLen : width - 0.06,
     BOARD_THICK,
     alongX ? width - 0.06 : slopeLen,
   );
   if (rotZ) surface.rotateZ(rotZ);
-  if (rotX) surface.rotateX(-rotX);
+  if (rotX) surface.rotateX(rotX);
   surface.translate(r.x, midY, r.z);
   // route through the bucket by wrapping: cheap trick, reuse box() path
   // not possible for a pre-rotated geometry, so push it directly
@@ -278,7 +281,7 @@ function buildRamp(wood: WoodBuckets, r: HarborRamp): void {
   for (const side of [-1, 1]) {
     const stringer = new THREE.BoxGeometry(alongX ? slopeLen : 0.18, 0.3, alongX ? 0.18 : slopeLen);
     if (rotZ) stringer.rotateZ(rotZ);
-    if (rotX) stringer.rotateX(-rotX);
+    if (rotX) stringer.rotateX(rotX);
     stringer.translate(
       r.x + (alongX ? 0 : (side * (width - 0.18)) / 2),
       midY - 0.12,
