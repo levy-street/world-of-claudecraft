@@ -23,6 +23,7 @@ import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
 import { GAMEPAD_NONE, gamepadButtonLabel } from '../game/gamepad_map';
 import {
+  actionAcceptsCode,
   BIND_ACTIONS,
   BIND_CATEGORIES,
   isReservedCode,
@@ -1672,7 +1673,7 @@ export class OptionsWindow {
           key: keyLabel(this.deps.keybinds().codeAt(actionId, index)),
         });
         this.deps.refreshKeybindLabels();
-      } else if (isReservedCode(code)) {
+      } else if (isReservedCode(code) || !actionAcceptsCode(actionId, code)) {
         this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
       }
       // re-render only if the menu is still open (player may have closed it)

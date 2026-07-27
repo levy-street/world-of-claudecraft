@@ -42,6 +42,9 @@ describe('keyLabel', () => {
     expect(keyLabel('Numpad3')).toBe('Num3');
     expect(keyLabel('Space')).toBe('Space');
     expect(keyLabel('ArrowUp')).toBe('↑');
+    expect(keyLabel('Mouse4')).toBe('Mouse 4');
+    expect(keyLabel('WheelUp')).toBe('Wheel Up');
+    expect(keyLabel('Shift+WheelDown')).toBe('Shift+Wheel Down');
     expect(keyLabel(null)).toBe('');
   });
 });
@@ -53,6 +56,9 @@ describe('keyCapLabel', () => {
     expect(keyCapLabel('Alt+Q')).toBe('a-q');
     expect(keyCapLabel('Meta+1')).toBe('m-1');
     expect(keyCapLabel('Ctrl+Alt+A')).toBe('c-a-a');
+    expect(keyCapLabel('Mouse 4')).toBe('m4');
+    expect(keyCapLabel('Wheel Up')).toBe('wu');
+    expect(keyCapLabel('Shift+Wheel Down')).toBe('s-wd');
   });
 
   it('leaves unmodified labels as plain lowercase', () => {
@@ -210,6 +216,40 @@ describe('binding', () => {
     expect(kb.actionForCode('Semicolon')).toBe('slot1');
   });
 
+  it('binds mouse buttons and wheel directions with normal conflict resolution', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot0', 0, 'Mouse4')).toBe(true);
+    expect(kb.bind('slot1', 0, 'WheelUp')).toBe(true);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot0');
+    expect(kb.edgeActionForCombo('WheelUp')).toBe('slot1');
+    expect(kb.primaryLabel('slot0')).toBe('Mouse 4');
+    expect(kb.primaryLabel('slot1')).toBe('Wheel Up');
+
+    expect(kb.bind('bags', 0, 'Mouse4')).toBe(true);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('bags');
+    expect(kb.codeAt('slot0', 0)).toBe(null);
+  });
+
+  it('keeps modifier layers distinct for mouse buttons and wheel directions', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot1', 0, 'Mouse4')).toBe(true);
+    expect(kb.bind('slot2', 0, 'Shift+Mouse4')).toBe(true);
+    expect(kb.bind('slot3', 0, 'WheelDown')).toBe(true);
+    expect(kb.bind('slot4', 0, 'Ctrl+WheelDown')).toBe(true);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot1');
+    expect(kb.edgeActionForCombo('Shift+Mouse4')).toBe('slot2');
+    expect(kb.edgeActionForCombo('WheelDown')).toBe('slot3');
+    expect(kb.edgeActionForCombo('Ctrl+WheelDown')).toBe('slot4');
+  });
+
+  it('rejects wheel directions for actions that require a held input', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('forward', 0, 'WheelUp')).toBe(false);
+    expect(kb.codeAt('forward', 0)).toBe('KeyW');
+    expect(kb.bind('emoteWheel', 0, 'WheelDown')).toBe(false);
+    expect(kb.codeAt('emoteWheel', 0)).toBe('KeyX');
+  });
+
   it('rejects the reserved Escape key', () => {
     const kb = new Keybinds();
     expect(kb.bind('jump', 0, 'Escape')).toBe(false);
@@ -279,9 +319,13 @@ describe('persistence', () => {
     const a = new Keybinds();
     a.bind('slot0', 0, 'KeyR');
     a.bind('jump', 0, 'KeyJ');
+    a.bind('slot1', 0, 'Mouse4');
+    a.bind('slot2', 0, 'WheelDown');
     const b = new Keybinds();
     expect(b.actionForCode('KeyR')).toBe('slot0');
     expect(b.actionForCode('KeyJ')).toBe('jump');
+    expect(b.actionForCode('Mouse4')).toBe('slot1');
+    expect(b.actionForCode('WheelDown')).toBe('slot2');
     expect(b.actionForCode('Space')).toBe(null);
   });
 
@@ -337,6 +381,21 @@ describe('persistence', () => {
     const kb = new Keybinds();
     expect(kb.actionForCode('KeyR')).toBe('slot0');
     expect(kb.codeAt('slot1', 0)).toBe(null);
+  });
+
+  it('drops wheel bindings loaded for actions that require a held input', () => {
+    localStorage.setItem(
+      'woc_keybinds',
+      JSON.stringify({
+        forward: ['WheelUp', null],
+        emoteWheel: ['WheelDown', null],
+      }),
+    );
+    const kb = new Keybinds();
+    expect(kb.codeAt('forward', 0)).toBe(null);
+    expect(kb.codeAt('emoteWheel', 0)).toBe(null);
+    expect(kb.actionForCode('WheelUp')).toBe(null);
+    expect(kb.actionForCode('WheelDown')).toBe(null);
   });
 
   it('does not let stored Space action-bar bindings also keep default Jump', () => {
