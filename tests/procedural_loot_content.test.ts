@@ -80,10 +80,10 @@ describe('procedural loot content', () => {
 
   it('keeps active rarity table weights normalized with conservative live legendary rates', () => {
     const expectedLegendaryRates: Record<string, number> = {
-      initial_world: 0.0001,
-      initial_rare: 0.000005,
-      initial_delve_elite: 0.000025,
-      initial_dungeon_boss: 0.0008,
+      initial_world: 0.00004,
+      initial_rare: 0.000002,
+      initial_delve_elite: 0.000045,
+      initial_dungeon_boss: 0.00008,
       nythraxis_raid_normal: 0.02,
       nythraxis_raid_heroic: 0.05,
     };

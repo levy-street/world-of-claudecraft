@@ -102,27 +102,27 @@ describe('live procedural drop policy', () => {
       effectiveLegendaryChance(
         proceduralDropProfile(MOBS.forest_wolf, { inDungeon: false, inDelve: false }),
       ),
-    ).toBeCloseTo(0.000005, 12);
+    ).toBeCloseTo(0.000002, 12);
     expect(
       effectiveLegendaryChance(
         proceduralDropProfile(rare, { inDungeon: false, inDelve: false }),
       ),
-    ).toBeCloseTo(0.000005, 12);
+    ).toBeCloseTo(0.000002, 12);
     expect(
       effectiveLegendaryChance(
         proceduralDropProfile(elite, { inDungeon: false, inDelve: true }),
       ),
-    ).toBeCloseTo(0.000005, 12);
+    ).toBeCloseTo(0.000009, 12);
     expect(
       effectiveLegendaryChance(
         proceduralDropProfile(boss, { inDungeon: true, inDelve: false }),
       ),
-    ).toBeCloseTo(0.0008, 12);
+    ).toBeCloseTo(0.00008, 12);
     expect(
       effectiveLegendaryChance(
         proceduralDropProfile(boss, { inDungeon: false, inDelve: true }),
       ),
-    ).toBeCloseTo(0.0008, 12);
+    ).toBeCloseTo(0.00008, 12);
   });
 
   it('excludes world bosses and training dummies', () => {

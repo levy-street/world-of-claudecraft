@@ -19,8 +19,8 @@ the exact-SHA acceptance commands documented below.
 ## Drop rate
 
 Every eligible generic dungeon or delve boss appends one procedural equipment
-entry. That entry uses a 0.08% Legendary weight, so the configured mean is one
-Legendary per 1,250 boss kills. Normal Nythraxis remains on its dedicated 2%
+entry. That entry uses a 0.008% Legendary weight, so the configured mean is one
+Legendary per 12,500 boss kills. Normal Nythraxis remains on its dedicated 2%
 rate at fixed item level 32. Heroic Nythraxis uses a dedicated 5% rate at item
 level 36 and guarantees its power magnitude to the authored upper half.
 
@@ -32,11 +32,11 @@ difficulties. It has no personal currency, purchase path, or pity counter.
 Exact raid behavior is specified in
 `docs/balance/nythraxis-endgame-loot-v030.md`.
 
-Outdoor rares use a 0.0005% Legendary weight on a guaranteed procedural entry.
-Delve elites use a separate 0.0025% conditional table behind a 20% entry gate,
-for the same effective 0.0005% Legendary chance. Ordinary outdoor mobs use a
-0.01% conditional Legendary weight behind a 5% entry gate, also for an
-effective 0.0005% chance.
+Outdoor rares use a 0.0002% Legendary weight on a guaranteed procedural entry.
+Delve elites use a separate 0.0045% conditional table behind a 20% entry gate,
+for an effective 0.0009% Legendary chance. Ordinary outdoor mobs use a 0.004%
+conditional Legendary weight behind a 5% entry gate, for an effective 0.0002%
+chance.
 
 Those rates apply only when at least one eligible recipient is not grey to the
 source under the existing XP curve. If every eligible recipient would receive
@@ -344,7 +344,7 @@ npm run gate
 
 The system has several independent chase axes:
 
-- generic dungeon and delve bosses provide a 0.08% shared chase, Normal
+- generic dungeon and delve bosses provide a 0.008% shared chase, Normal
   Nythraxis remains at 2%, and Heroic Nythraxis provides the peak 5% shared chase
 - every power has one target boss
 - target bosses remain non-exclusive, so all kills can still surprise
