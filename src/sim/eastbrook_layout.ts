@@ -832,6 +832,21 @@ const WALL_GATES = [
 
 const WALL_SEGMENTS = generateCircularWallSegments(WALL_CONFIG, WALL_GATES);
 
+/**
+ * A wall wing is MIRRORED when its segment starts at a gate's end, putting
+ * the wing's tall lantern pillar on the gate side. This is the one rule both
+ * the renderer's instancing (render/eastbrook_town.ts) and the wall's
+ * pillar colliders (sim/colliders.ts) hang the wing's asymmetry on, so the
+ * lantern you see is the pylon that blocks.
+ */
+export function wallSegmentMirrored(segment: CircularWallSegment): boolean {
+  return WALL_GATES.some(
+    (gate) =>
+      Math.abs(gate.end.x - segment.start.x) < 1e-8 &&
+      Math.abs(gate.end.z - segment.start.z) < 1e-8,
+  );
+}
+
 function gateCrossing(id: string): Point2 {
   const gate = WALL_GATES.find((candidate) => candidate.id === id);
   if (!gate) throw new Error(`missing Eastbrook wall gate ${id}`);
@@ -1074,6 +1089,9 @@ const SERVICES = {
     position: { x: 0, z: -7.5 },
     bodyRadius: 0.8,
     interactionRadius: 7,
+    // The pillar is a solid collider (the noticeboard pattern), so walkers
+    // aim for the posting spot in front of it, not the pillar's own point.
+    frontStandingPoint: { x: 0, z: -6.4 },
   },
   noticeboard: {
     id: 'eastbrook_noticeboard',
@@ -1127,10 +1145,12 @@ const SERVICES = {
     {
       id: 'eastbrook_mailbox_route',
       bodyRadius: 0.5,
+      // Ends at the pillar's standing point, not inside it: the Ravenpost
+      // is a solid collider now, and mail opens from interactionRadius 7.
       points: [
         { x: 2, z: -2 },
         { x: 1, z: -5 },
-        { x: 0, z: -7.5 },
+        { x: 0, z: -6.4 },
       ],
     },
     {
@@ -1141,11 +1161,16 @@ const SERVICES = {
     {
       id: 'eastbrook_graveyard_route',
       bodyRadius: 0.5,
+      // The final approach threads the gap between the headstone columns
+      // (x -14 and -11.8): the stones are solid colliders now, so the walk
+      // may no longer run down the x -14 column straight through the middle
+      // stone. The Spirit Healer's anchor stone itself stays scenery.
       points: [
         { x: -2.85, z: -1.8 },
         { x: -6, z: -6 },
         { x: -10, z: -8 },
-        { x: -14, z: -10 },
+        { x: -12.9, z: -10 },
+        { x: -12.9, z: -12.6 },
         { x: -14, z: -14 },
       ],
     },

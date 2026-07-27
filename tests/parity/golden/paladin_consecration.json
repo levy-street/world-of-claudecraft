@@ -8,8 +8,8 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 932,
-  "drawDigest": "34d01e34",
+  "draws": 917,
+  "drawDigest": "c562b118",
   "frames": [
     {
       "tick": 0,
@@ -207,8 +207,8 @@
       "state": "97e06a68",
       "events": "75a4e964",
       "rng": {
-        "draws": 501,
-        "digest": "9e9280f3"
+        "draws": 500,
+        "digest": "9999daa2"
       }
     },
     {
@@ -218,41 +218,41 @@
       "state": "764c91f6",
       "events": "741638a5",
       "rng": {
-        "draws": 627,
-        "digest": "ee13bd7f"
+        "draws": 623,
+        "digest": "4137b89c"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 417,
-      "state": "3b84aa25",
-      "events": "2f266e06",
+      "state": "59c275dc",
+      "events": "51950d8d",
       "rng": {
-        "draws": 765,
-        "digest": "84d7375c"
+        "draws": 769,
+        "digest": "b4c31b7c"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 417,
-      "state": "a9885ccc",
+      "state": "0d56376d",
       "events": "741638a5",
       "rng": {
-        "draws": 931,
-        "digest": "5764acf5"
+        "draws": 915,
+        "digest": "09b14084"
       }
     },
     {
       "tick": 201,
       "time": 10.05,
       "nextId": 417,
-      "state": "3b2fa49a",
+      "state": "16c06d39",
       "events": "741638a5",
       "rng": {
-        "draws": 932,
-        "digest": "34d01e34"
+        "draws": 917,
+        "digest": "c562b118"
       },
       "label": "final",
       "players": [
@@ -273,14 +273,14 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 164,
-            "damageTaken": 22
+            "damageDealt": 163,
+            "damageTaken": 20
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 164
+              "damageDealt": 163
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -361,7 +361,7 @@
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 10,
-          "hp": 49978,
+          "hp": 49980,
           "id": 415,
           "inCombat": true,
           "kind": "player",
@@ -415,7 +415,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39836,
+          "hp": 39837,
           "id": 416,
           "inCombat": true,
           "kind": "mob",
@@ -451,7 +451,7 @@
           "threat": [
             [
               415,
-              165
+              164
             ]
           ],
           "wanderTarget": {

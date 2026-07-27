@@ -44,7 +44,16 @@ export function renderCorpseHarvestPicker(
   view: CorpseHarvestViewModel,
   deps: CorpseHarvestPainterDeps,
 ): void {
-  if (view.rows.length === 0) return;
+  // No rows, or no family on this corpse with an item behind it (#2513): draw
+  // nothing at all rather than a section whose Harvest button can only ever be
+  // dead. The reason line below reports a FORFEIT, which is a statement about
+  // the player's selection, so it would be false here and stays hidden; a
+  // section with live checkboxes, a disabled button and no explanation is worse
+  // than no section, which is exactly what an untagged corpse already shows.
+  // The shipped caller (loot_window_controller.openCorpse) already refuses to
+  // draw the picker for such a corpse; this is the same rule one layer down, for
+  // a caller that gets here anyway.
+  if (view.rows.length === 0 || !view.corpseHarvestable) return;
   const document = container.ownerDocument;
   const section = document.createElement('div');
   section.className = 'corpse-harvest';

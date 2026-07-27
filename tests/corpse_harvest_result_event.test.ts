@@ -367,18 +367,36 @@ describe('the worst case in shipped content (#2457)', () => {
   });
 });
 
-describe('a harvest that lands nothing stays silent (#2457)', () => {
-  it('a corpse whose every tag maps to no item emits no result event and no loot line', () => {
+describe('a harvest that lands nothing never gets that far (#2457, #2513)', () => {
+  it('a corpse whose every tag maps to no item is refused, so there is nothing to report', () => {
     // fen_troll carries claw and tusk, neither of which is in
-    // HARVEST_COMPONENT_ITEMS. The claim is still spent (the pre-#2457
-    // behavior), but there is nothing to report, so the client is never asked
-    // to render a cue for a no-op.
+    // HARVEST_COMPONENT_ITEMS. The "no result event, no loot line" half of this
+    // pin is the #2457 contract and still holds; what changed is WHY. Pre-#2513
+    // the claim was spent and the ledger was skipped, so the client got a
+    // no-op it could not distinguish from a lost keypress. Now the command is
+    // refused at the corpse-level gate before the claim, and the one thing the
+    // player gets is the refusal.
     expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
     const { sim, a, mob } = setup(3, 'fen_troll');
-    const { results, loots } = harvest(sim, mob.id, undefined, a);
-    expect(mob.harvestClaimedBy).toBe(a);
+    const { results, loots, events } = harvest(sim, mob.id, undefined, a);
+    expect(mob.harvestClaimedBy).toBeNull();
     expect(results).toHaveLength(0);
     expect(loots).toHaveLength(0);
+    // Exactly one event, and it is the refusal: no cue is ever cued for a no-op.
+    expect(events).toEqual([
+      { type: 'error', pid: a, text: 'That corpse has nothing to harvest.' },
+    ]);
+  });
+
+  it('still emits the ledger on the mixed corpse next door, so the gate is not a mute button', () => {
+    // The discriminator on the same rig: mire_prowler also carries the unmapped
+    // `claw`, but it carries hide and meat too, so it harvests and reports.
+    expect(MOBS.mire_prowler.componentTags).toEqual(['hide', 'claw', 'meat']);
+    const { sim, a, mob } = setup(3, 'mire_prowler');
+    const { results, loots } = harvest(sim, mob.id, undefined, a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(results).toHaveLength(1);
+    expect(loots.length).toBeGreaterThan(0);
   });
 });
 

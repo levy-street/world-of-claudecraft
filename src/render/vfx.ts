@@ -1208,6 +1208,36 @@ export class Vfx {
     }
   }
 
+  /**
+   * Ground impact puff: the visual weight of a landing, and the scuff of a
+   * body striding up onto a ledge. `power` (0..1) scales count, spread, and
+   * lift, so a hop kicks a wisp and a real drop throws a ring of dust.
+   * Tinted by surface so grass, stone, and snow do not all throw brown dirt.
+   */
+  groundPuff(at: THREE.Vector3, power: number, color: number): void {
+    const p = Math.min(1, Math.max(0, power));
+    const count = Math.round((2 + p * 7) * (0.4 + 0.6 * this.quality));
+    for (let i = 0; i < count; i++) {
+      // Ring outward, barely rising: dust rolls away from the feet, it does
+      // not fountain up like a spell effect.
+      const a = (i / count) * Math.PI * 2 + Math.random() * 0.6;
+      const speed = (0.7 + Math.random() * 1.1) * (0.5 + p);
+      this.spawn(
+        at.x + Math.sin(a) * 0.22,
+        at.y + 0.07,
+        at.z + Math.cos(a) * 0.22,
+        Math.sin(a) * speed,
+        0.35 + Math.random() * 0.45 * p,
+        Math.cos(a) * speed,
+        color,
+        0.3 + 0.45 * p + Math.random() * 0.15,
+        0.35 + 0.35 * p,
+        1.6,
+        SPR.smoke,
+      );
+    }
+  }
+
   campfireEmber(at: THREE.Vector3, dt: number): void {
     if (!this.emitChance(6, dt)) return;
     if (Math.random() < 0.3) {

@@ -99,18 +99,44 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
     expect(corpseHarvestView(tags, pick('hide', 'claw', 'horn')).harvestDisabled).toBe(false);
   });
 
-  it('leaves an all-unmapped corpse alone, exactly as the sim does', () => {
-    // fen_troll forfeits nothing whatever the player checks, because no pick
-    // could have paid out. The sim deliberately keeps its documented
-    // zero-yield path there, so the picker must keep offering it. A mirror
-    // written as "no checked family maps" without the third term would
-    // disable this corpse and diverge from the command it is mirroring.
+  it('disables an all-unmapped corpse on the OTHER term, exactly as the sim does (#2513)', () => {
+    // The two terms of harvestDisabled, pinned apart. fen_troll forfeits
+    // nothing whatever the player checks, because no pick could have paid out,
+    // so the #2509 mirror (forfeitsEveryYield) stays FALSE here and must: a
+    // mirror written as "no checked family maps" without its third term would
+    // make this corpse report a forfeit that is not happening, and would move
+    // the concentration bonus on nine mixed mobs. What disables the button is
+    // isHarvestableCorpse (#2513), which the sim's own command gate reads
+    // first. A fixture where both terms fired would let either one rot.
     expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
     for (const selected of [pick(), pick('claw'), pick('tusk'), pick('claw', 'tusk')]) {
       const view = corpseHarvestView(['claw', 'tusk'], selected);
       expect(view.forfeitsEveryYield, JSON.stringify([...selected])).toBe(false);
-      expect(view.harvestDisabled, JSON.stringify([...selected])).toBe(false);
+      expect(view.harvestDisabled, JSON.stringify([...selected])).toBe(true);
     }
+    // An EMPTY tag list produces the same MODEL, which is why no new warning
+    // copy is owed here. Note it is only the model: the painter early-returns on
+    // `rows.length === 0`, so an empty tag list never rendered a section at all,
+    // and an all-unmapped corpse has rows. That is what `corpseHarvestable`
+    // exists for, and the painter refuses the section on it
+    // (tests/corpse_harvest_window.test.ts), so neither case draws a dead button.
+    const empty = corpseHarvestView([], pick());
+    expect(empty.harvestDisabled).toBe(true);
+    expect(empty.forfeitsEveryYield).toBe(false);
+    expect(empty.corpseHarvestable).toBe(false);
+    // The new field is the discriminator the painter reads, so it is asserted
+    // separately from harvestDisabled: on a MIXED corpse it is true even when the
+    // pick disables the button, which is exactly the pair that must not coincide.
+    const forfeited = corpseHarvestView(['hide', 'claw'], pick('claw'));
+    expect(forfeited.corpseHarvestable).toBe(true);
+    expect(forfeited.harvestDisabled).toBe(true);
+    for (const selected of [pick(), pick('claw'), pick('tusk'), pick('claw', 'tusk')]) {
+      expect(corpseHarvestView(['claw', 'tusk'], selected).corpseHarvestable).toBe(false);
+    }
+    // ...and the discriminating contrast: one mapped family among the same
+    // unmapped ones re-enables the button, so the term reads the yield table
+    // rather than the tag count.
+    expect(corpseHarvestView(['claw', 'hide', 'tusk'], pick()).harvestDisabled).toBe(false);
   });
 
   it('never fires on a full cover, because a full cover spreads', () => {
@@ -130,13 +156,21 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
     // The mirror stated as the property it has to hold rather than as a list
     // of hand-picked rows: for every tagged template and every subset of its
     // tags, the picker disables exactly when the sim's own gate would refuse.
-    // The oracle calls the REAL effectiveFocusComponents rather than restating
-    // its spread rule, so moving that threshold in
-    // src/sim/professions/gathering.ts reds this sweep instead of quietly
-    // letting the picker and the command drift apart. (It deliberately does
-    // NOT call forfeitsEveryMappedYield, which the view itself now calls: that
-    // would be the predicate compared against itself.)
+    // The oracle deliberately does NOT call forfeitsEveryMappedYield or
+    // isHarvestableCorpse, which the view itself calls: that would be the
+    // predicate compared against itself. It DOES call the real
+    // effectiveFocusComponents, and that half is knowingly self-referential (the
+    // view reaches the same function through forfeitsEveryMappedYield), so a
+    // moved spread threshold shifts both sides together and this sweep would
+    // stay green on the equality alone. The three literal counts below are what
+    // catch it: a threshold change drives byPickGate off 11.
+    //
+    // The oracle has BOTH of the sim's gates, in the order harvestCorpse runs
+    // them (#2513 first, #2509 second), and counts them separately so a change
+    // that moved every refusal onto one gate could not pass the total.
     let disabledSeen = 0;
+    let byCorpseGate = 0;
+    let byPickGate = 0;
     for (const m of Object.values(MOBS)) {
       const tags = m.componentTags;
       if (!tags?.length) continue;
@@ -144,15 +178,23 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
       for (let mask = 0; mask < 1 << tags.length; mask++) {
         const selected = tags.filter((_, i) => mask & (1 << i));
         const effective = effectiveFocusComponents(tags, selected);
-        const simWouldRefuse = !effective.some((t) => HARVEST_COMPONENT_ITEMS[t]) && mappedOnCorpse;
+        // Gate 1 (#2513): the corpse itself has no mapped family.
+        const corpseGate = !mappedOnCorpse;
+        // Gate 2 (#2509): the pick throws away everything the corpse had.
+        const pickGate = !corpseGate && !effective.some((t) => HARVEST_COMPONENT_ITEMS[t]);
+        const simWouldRefuse = corpseGate || pickGate;
         const view = corpseHarvestView(tags, new Set(selected));
         expect(view.harvestDisabled, `${m.id} ${JSON.stringify(selected)}`).toBe(simWouldRefuse);
         if (simWouldRefuse) disabledSeen++;
+        if (corpseGate) byCorpseGate++;
+        if (pickGate) byPickGate++;
       }
     }
-    // The sweep has to actually VISIT the disabled arm. A content retag that
+    // The sweep has to actually VISIT both disabled arms. A content retag that
     // left no mixed template would otherwise pass it all-false with the mirror
     // never exercised at all.
-    expect(disabledSeen).toBe(11);
+    expect(disabledSeen).toBe(15);
+    expect(byPickGate).toBe(11);
+    expect(byCorpseGate).toBe(4);
   });
 });

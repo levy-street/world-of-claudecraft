@@ -14,7 +14,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import type { CorpseHarvestViewModel } from '../src/ui/hud/loot/corpse_harvest_view';
+import {
+  type CorpseHarvestViewModel,
+  corpseHarvestView,
+} from '../src/ui/hud/loot/corpse_harvest_view';
 import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_window';
 
 function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestViewModel {
@@ -26,6 +29,7 @@ function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestVie
     harvestDisabled: false,
     concentrated: true,
     forfeitsEveryYield: false,
+    corpseHarvestable: true,
     ...overrides,
   };
 }
@@ -122,17 +126,17 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const container = document.createElement('div');
     const onHarvest = vi.fn();
     const attachTooltip = vi.fn();
-    const forfeits = checked.length > 0 && checked.every((t) => t === 'claw' || t === 'horn');
-    renderCorpseHarvestPicker(
-      container,
-      view({
-        rows: rowsFor(tags, checked),
-        harvestDisabled: forfeits,
-        concentrated: checked.length > 0 && checked.length < tags.length,
-        forfeitsEveryYield: forfeits,
-      }),
-      { onHarvest, attachTooltip },
-    );
+    // The REAL view core for the initial model, not a hand-rolled guess at it.
+    // The painter re-derives through corpseHarvestView on every `change` event
+    // anyway (corpse_harvest_window.ts), so a second, approximate copy of the
+    // rule here only created a first render that could disagree with every
+    // render after it: the old inline `checked.every(t => t === 'claw' ...)`
+    // answered TRUE for an all-unmapped corpse where the core answers false
+    // (nothing is forfeited there; #2513's separate term is what disables it).
+    renderCorpseHarvestPicker(container, corpseHarvestView(tags, new Set(checked)), {
+      onHarvest,
+      attachTooltip,
+    });
     const boxes = [...container.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
     return {
       container,
@@ -228,15 +232,73 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     expect(t.onHarvest).toHaveBeenLastCalledWith([]);
   });
 
-  it('leaves an all-unmapped corpse clickable, exactly as the sim leaves it', () => {
-    // fen_troll (claw, tusk) forfeits nothing whatever is checked, so the
-    // picker must keep submitting there.
-    const t = render(['claw', 'tusk'], []);
-    t.toggle('claw');
+  it('draws NO section at all for an all-unmapped corpse (#2513)', () => {
+    // fen_troll (claw, tusk). The sim refuses the command at its corpse-level
+    // gate, so there is nothing for the picker to submit. Drawing the section
+    // with a dead button would be a NEW state and a bad one: the reason line
+    // reports a FORFEIT, which is a statement about the selection, and nothing
+    // is being forfeited here, so it stays hidden and the player would get a
+    // disabled control with no explanation and two checkboxes that do nothing.
+    // An untagged corpse already shows no section; this matches it.
+    const container = document.createElement('div');
+    const onHarvest = vi.fn();
+    renderCorpseHarvestPicker(container, corpseHarvestView(['claw', 'tusk'], new Set()), {
+      onHarvest,
+      attachTooltip: () => {},
+    });
+    expect(container.querySelector('.corpse-harvest')).toBeNull();
+    expect(container.querySelector('.corpse-harvest-btn')).toBeNull();
+    expect(container.querySelector('.corpse-harvest-check')).toBeNull();
+    expect(container.children).toHaveLength(0);
+    // The discriminator on the identical call: a MIXED corpse carrying the same
+    // unmapped families still draws its section, so this is the predicate and
+    // not the painter refusing everything.
+    const mixed = document.createElement('div');
+    renderCorpseHarvestPicker(mixed, corpseHarvestView(['hide', 'tusk', 'meat'], new Set()), {
+      onHarvest,
+      attachTooltip: () => {},
+    });
+    expect(mixed.querySelector('.corpse-harvest')).not.toBeNull();
+    expect(mixed.querySelectorAll('.corpse-harvest-check')).toHaveLength(3);
+  });
+
+  it('refuses the section on the view model FIELD, not on the tag list it came from', () => {
+    // The painter reads `corpseHarvestable`, so a caller that hands it a model
+    // built some other way still gets the refusal. Rows are non-empty here, so
+    // the pre-existing `rows.length === 0` early return cannot be what fires:
+    // the two arms are pinned apart.
+    const container = document.createElement('div');
+    renderCorpseHarvestPicker(
+      container,
+      view({ rows: [{ tag: 'hide', checked: false }], corpseHarvestable: false }),
+      { onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    expect(container.querySelector('.corpse-harvest')).toBeNull();
+    // Same rows, field flipped: the section appears. Without this the assertion
+    // above would pass against a painter that never drew anything.
+    const on = document.createElement('div');
+    renderCorpseHarvestPicker(
+      on,
+      view({ rows: [{ tag: 'hide', checked: false }], corpseHarvestable: true }),
+      { onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    expect(on.querySelector('.corpse-harvest')).not.toBeNull();
+  });
+
+  it('still submits on a MIXED corpse carrying the same unmapped families', () => {
+    // The discriminator for the case above: wild_boar's real tags carry tusk
+    // beside hide and meat, so the button lives and the pick goes through.
+    const t = render(['hide', 'tusk', 'meat'], []);
+    expect(t.btn.disabled).toBe(false);
+    t.toggle('tusk');
+    // tusk alone forfeits every yield: that is the #2509 arm, with its line.
+    expect(t.btn.disabled).toBe(true);
+    expect(t.warning.hidden).toBe(false);
+    t.toggle('hide');
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
     t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['claw']);
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', 'tusk']);
   });
 
   it('registers the tooltip exactly once, however many times the selection changes', () => {

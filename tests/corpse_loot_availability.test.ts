@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
+import { MOBS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
 
 function corpse(overrides: Partial<Entity>): Entity {
@@ -49,6 +50,44 @@ describe('corpseLootAvailability', () => {
     expect(result.hasLoot).toBe(false);
     expect(result.harvestable).toBe(true);
     expect(result.canOpen).toBe(true);
+  });
+
+  it('closes a depleted corpse whose every component family is unmapped (#2513)', () => {
+    // fen_troll carries claw and tusk and HARVEST_COMPONENT_ITEMS maps neither,
+    // so the sim refuses a harvest there. This arm used to answer on the tag
+    // COUNT and reported the corpse harvestable, which kept the popup open on
+    // an empty body with an enabled Harvest button whose every submit the server
+    // refused. It now reads the sim's own isHarvestableCorpse.
+    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
+    const depleted = corpseLootAvailability(
+      corpse({ templateId: 'fen_troll', loot: null, harvestClaimedBy: null }),
+      1,
+    );
+    expect(depleted.hasLoot).toBe(false);
+    expect(depleted.harvestable).toBe(false);
+    expect(depleted.canOpen).toBe(false);
+    // The corpse is NOT orphaned while it still holds loot: fen_troll drops
+    // copper at 100%, so the popup still opens for the coin, only without the
+    // picker section. Suppressing the dead affordance must not cost the player
+    // the live one.
+    const withCoin = corpseLootAvailability(
+      corpse({ templateId: 'fen_troll', loot: { copper: 50, items: [] }, harvestClaimedBy: null }),
+      1,
+    );
+    expect(withCoin.harvestable).toBe(false);
+    expect(withCoin.hasLoot).toBe(true);
+    expect(withCoin.canOpen).toBe(true);
+    expect(withCoin.visibleCopper).toBe(50);
+    // The discriminator on the identical fixture: a template carrying the same
+    // unmapped families beside a mapped one stays harvestable, so this is the
+    // yield table talking and not a fen_troll special case.
+    expect(MOBS.wild_boar.componentTags).toEqual(['hide', 'tusk', 'meat']);
+    const boar = corpseLootAvailability(
+      corpse({ templateId: 'wild_boar', loot: null, harvestClaimedBy: null }),
+      1,
+    );
+    expect(boar.harvestable).toBe(true);
+    expect(boar.canOpen).toBe(true);
   });
 
   it('refuses a corpse the viewing player claimed themselves', () => {

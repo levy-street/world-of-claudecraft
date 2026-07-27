@@ -700,9 +700,81 @@ export interface HarvestClaim {
   readonly claimedBy: number | null;
 }
 
-/** Does this mob's corpse support profession harvest at all? */
+/**
+ * The one way to read HARVEST_COMPONENT_ITEMS. Every question about "what does
+ * this component family yield" goes through here: the two predicates below, the
+ * pre-claim capacity gate, and the grant loop (src/sim/interaction.ts
+ * harvestCorpse). That is the whole point, because the family of bugs #2509 and
+ * #2513 close is a disagreement between two of those readers.
+ *
+ * `Object.hasOwn` first: HARVEST_COMPONENT_ITEMS is a plain object literal, so a
+ * bare `table[component]` answers with Object.prototype for `constructor`,
+ * `toString`, `valueOf` and the rest. A bare lookup made that truthy in the
+ * gate AND in the grant loop, which would try to grant an item id that is a
+ * function. Guarding one reader and not the others would just move the
+ * disagreement, so the guard lives in the single accessor they all share.
+ */
+export function harvestItemForFamily(component: string): string | undefined {
+  return Object.hasOwn(HARVEST_COMPONENT_ITEMS, component)
+    ? HARVEST_COMPONENT_ITEMS[component]
+    : undefined;
+}
+
+/**
+ * Does one component family have a harvest item behind it? A TRUTHINESS test,
+ * not `!== undefined`, so it stays byte-equivalent to the `if (!itemId)
+ * continue` the grant loop and the pre-claim capacity gate use over the SAME
+ * accessor: an empty-string mapping must read as unyieldable everywhere, or it
+ * reads as harvestable here and as grantable nowhere, which is the exact bug the
+ * two predicates below refuse. One rule, one place, because isHarvestableCorpse
+ * and forfeitsEveryMappedYield both ask it and a copy in either would be a copy
+ * that can drift. Written as `in` or `!== undefined` it reintroduces the bug, so
+ * do not "tidy" it; pinned in tests/gathering.test.ts against an empty-string
+ * mapping and against the Object.prototype keys.
+ */
+export function harvestFamilyYieldsItem(component: string): boolean {
+  return !!harvestItemForFamily(component);
+}
+
+/**
+ * Does this mob's corpse support profession harvest at all? Answers on the
+ * MAPPED families the corpse carries, not on its tag COUNT (#2513).
+ *
+ * The count answer was a lie on exactly one shipped template: fen_troll carries
+ * `claw` and `tusk` and HARVEST_COMPONENT_ITEMS maps neither, so its corpse
+ * advertised a harvest it could never pay, accepted the command, spent the
+ * single-use claim, drew one tier roll per effective family, granted nothing,
+ * and emitted NOTHING AT ALL (the harvestResult ledger is gated on
+ * `granted.length > 0`). Measured pre-fix: an omitted pick, `[]` and
+ * `['claw','tusk']` each drew 2 and `['claw']` drew 1, all of them silent, with
+ * the claim spent and the corpse timer clamped from 9999 to 4. Those counts are
+ * seed-INDEPENDENT, not a golden: an unmapped family costs its tier roll and
+ * then `continue`s before the rarity roll, so the count is just the effective
+ * pick's length.
+ *
+ * Answering on mapped families instead retires that whole class rather than
+ * reporting it: the corpse takes the SAME path as the 101 shipped templates
+ * that carry no component tags at all, so the picker and the interact prompt
+ * never offer it (src/sim/corpse_interaction.ts, src/game/corpse_loot_availability.ts,
+ * src/ui/hud/loot/corpse_harvest_view.ts all read this predicate), and an
+ * explicit command that arrives anyway (a stale client bundle, the headless env,
+ * a hand-built wire frame) hits harvestCorpse's pre-existing pre-claim, rng-free
+ * `error.corpseNothingToHarvest` refusal instead of burning the corpse in
+ * silence. No new string, no new event, no new wire or IWorld member.
+ *
+ * Deliberately NOT a narrowing inside effectiveFocusComponents: this one moves
+ * nothing on a MIXED corpse, so the concentration-bonus denominator
+ * (`taggedComponents.length - effectiveChosen.length`) and the #2509 refusal are
+ * untouched on all nine of them. The one knock-on it does have is wanted:
+ * pruneCorpseLoot (loot/loot_roll.ts) reads the same predicate, so an emptied
+ * all-unmapped corpse now takes the fast collapse arm instead of holding a
+ * 30-second grace window open for a harvest that can never come.
+ *
+ * `.some` covers the empty array, so the former length test is subsumed rather
+ * than dropped.
+ */
 export function isHarvestableCorpse(componentTags: readonly string[] | undefined): boolean {
-  return !!componentTags && componentTags.length > 0;
+  return !!componentTags && componentTags.some(harvestFamilyYieldsItem);
 }
 
 /**
@@ -828,27 +900,27 @@ export function effectiveFocusComponents(
  * and the spread threshold it depends on lives in effectiveFocusComponents
  * above rather than in either caller.
  *
- * Both halves matter. Without the first, a pick that yields something would be
- * refused. Without the second, a corpse whose families ALL map to nothing
- * (fen_troll: claw, tusk) would become permanently unharvestable instead of
- * keeping its documented zero-yield path: no pick forfeits anything there,
- * because no pick could have paid out.
+ * Both halves matter, and the second one is kept deliberately after #2513 even
+ * though isHarvestableCorpse now excludes an all-unmapped corpse UPSTREAM of
+ * both callers (harvestCorpse refuses at its own gate first; the picker never
+ * renders for such a corpse). It stays because it is what this predicate MEANS:
+ * "a different pick on this corpse would have paid out". Drop it and the
+ * function starts answering a question nobody asked it, and the two gates would
+ * be one narrowing away from disagreeing. Its second half is now belt and
+ * braces rather than the load-bearing term it was for #2509, and both states
+ * are pinned separately (tests/corpse_harvest_view.test.ts holds
+ * forfeitsEveryYield FALSE on fen_troll while harvestDisabled is TRUE, so the
+ * two terms can never quietly coincide).
  *
  * Pure and rng-free, so the refusal it drives draws nothing.
- *
- * `yields` is a TRUTHINESS test, not `!== undefined`, to stay byte-equivalent
- * to the `if (!itemId) continue` the grant loop and the capacity gate already
- * use. An empty-string mapping would otherwise read as yieldable here and as
- * grantable nowhere, which is the exact bug this refuses.
  */
 export function forfeitsEveryMappedYield(
   taggedComponents: readonly string[],
   chosen: readonly string[],
 ): boolean {
-  const yields = (component: string) => !!HARVEST_COMPONENT_ITEMS[component];
   return (
-    !effectiveFocusComponents(taggedComponents, chosen).some(yields) &&
-    taggedComponents.some(yields)
+    !effectiveFocusComponents(taggedComponents, chosen).some(harvestFamilyYieldsItem) &&
+    taggedComponents.some(harvestFamilyYieldsItem)
   );
 }
 

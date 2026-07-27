@@ -96,10 +96,21 @@ export class LootWindowController {
         attachTooltip: (element, html) => this.deps.attachTooltip(element, html),
       });
     }
-    const hint = this.deps.document.createElement('div');
-    hint.className = 'town-focus-hint';
-    hint.textContent = t('hudChrome.loot.unifiedPressHint');
-    this.deps.element.appendChild(hint);
+    // Only where the sentence is TRUE. It says the interact key "loots and
+    // harvests in one press, using your town focus", which is a claim about a
+    // harvest half this corpse may not have: it was appended unconditionally, so
+    // every one of the 101 untagged templates promised a harvest that does not
+    // exist, and #2513 would have added fen_troll to that list right after
+    // removing its picker. Gated rather than reworded because the sentence is
+    // correct as written wherever a harvest is actually on offer, and a
+    // loot-only corpse needs no hint at all (the press does the one obvious
+    // thing). Both arms are pinned in tests/loot_window_controller.test.ts.
+    if (harvestable) {
+      const hint = this.deps.document.createElement('div');
+      hint.className = 'town-focus-hint';
+      hint.textContent = t('hudChrome.loot.unifiedPressHint');
+      this.deps.element.appendChild(hint);
+    }
     this.bindClose();
     this.deps.element.style.display = 'block';
     if (this.deps.document.body.classList.contains('mobile-touch')) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isBlocked } from '../src/sim/colliders';
+import { isBlocked, resolvePosition } from '../src/sim/colliders';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 
 const captureContract =
@@ -359,7 +359,11 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      fingerprint: '3035df4eb93fe6575c01381d6e4e5901bcdf9b4d0babbf300290b99b4436bf6a',
+      // Deliberately re-pinned for the v0.31 physics merge: renderer.ts and
+      // eastbrook_layout.ts are fingerprinted inputs and both changed (the
+      // landing fall-speed reset; the graveyard walk threading the headstone
+      // gap), and the after-evidence was recaptured against them.
+      fingerprint: '47c5c88a4721df474d94786b1d56c6c0a9d00a9eedd7bb71b8a90e93f4d45d8f',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -607,8 +611,22 @@ describe('Eastbrook polish capture contract', () => {
         isBlocked(EASTBROOK_ARMOURY_CAPTURE_SEED, view.target.x, view.target.z, 0.5),
         `${view.name} target`,
       ).toBe(false);
+      // The camera is an ELEVATED point: a low standable prop (a headstone, a
+      // bench) whose top sits below the camera's altitude does not contain it.
+      // Route the check through the height-aware resolver so only full-height
+      // geometry and props reaching the camera's y count as blockers.
+      const cameraResolved = resolvePosition(
+        EASTBROOK_ARMOURY_CAPTURE_SEED,
+        view.camera.x,
+        view.camera.z,
+        0.5,
+        false,
+        undefined,
+        { y: view.camera.y, lift: 0 },
+      );
       expect(
-        isBlocked(EASTBROOK_ARMOURY_CAPTURE_SEED, view.camera.x, view.camera.z, 0.5),
+        Math.abs(cameraResolved.x - view.camera.x) > 1e-4 ||
+          Math.abs(cameraResolved.z - view.camera.z) > 1e-4,
         `${view.name} camera`,
       ).toBe(false);
     }

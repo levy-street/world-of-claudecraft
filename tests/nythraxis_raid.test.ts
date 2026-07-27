@@ -568,13 +568,20 @@ describe('Nythraxis raid encounter', () => {
       .filter(isTimedChatEvent)
       .filter((row) => row.event.text === 'Kneel before your king' && row.event.from === boss.name);
 
-    // Releases ride landed swings now: cadence-driven but swing-quantized. At
-    // least 5 releases fit in 66s, each a full cadence apart, and the kneel
-    // line lands on every third RELEASE.
+    // Releases ride landed swings now: cadence-driven (12s) but
+    // swing-quantized (2.6s swings that can miss). A release the previous
+    // wait DELAYED compresses the next gap by that wait, so the per-gap
+    // floor is the cadence minus two swings of quantization slack (one
+    // phase, one miss), and the telescoped first-to-last span pins the true
+    // cadence RATE without any per-gap stream luck. At least 5 releases fit
+    // in 66s, and the kneel line lands on every third RELEASE.
     expect(gravebreakerFx.length).toBeGreaterThanOrEqual(5);
     for (let i = 1; i < gravebreakerFx.length; i++) {
-      expect(gravebreakerFx[i].at - gravebreakerFx[i - 1].at).toBeGreaterThanOrEqual(9);
+      expect(gravebreakerFx[i].at - gravebreakerFx[i - 1].at).toBeGreaterThanOrEqual(12 - 2 * 2.6);
     }
+    const first = gravebreakerFx[0];
+    const last = gravebreakerFx[gravebreakerFx.length - 1];
+    expect(last.at - first.at).toBeGreaterThanOrEqual((gravebreakerFx.length - 1) * 12 - 2 * 2.6);
     expect(kneelYells).toHaveLength(Math.floor(gravebreakerFx.length / 3));
     kneelYells.forEach((yell, i) => {
       expect(yell.at).toBeCloseTo(gravebreakerFx[i * 3 + 2].at, 5);

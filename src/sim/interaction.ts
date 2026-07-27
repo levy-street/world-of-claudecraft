@@ -48,8 +48,8 @@ import { applyFocusBonus, applyFocusTierBonus, type FocusAllocation } from './pr
 import {
   effectiveFocusComponents,
   forfeitsEveryMappedYield,
-  HARVEST_COMPONENT_ITEMS,
   type HarvestTier,
+  harvestItemForFamily,
   harvestTierQuantity,
   isHarvestableCorpse,
   isSignableMaterialRarity,
@@ -231,6 +231,14 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * A pick that survives sanitization but names only families with no item
  * behind them is REFUSED pre-claim instead (#2509, see the gate below), so no
  * selection can spend a single-use corpse for nothing.
+ *
+ * The corpse-level half of that rule is isHarvestableCorpse (#2513): it answers
+ * on the MAPPED families the template carries, so a corpse that could never pay
+ * anything is refused up front (error.corpseNothingToHarvest) instead of
+ * advertising a harvest, taking the command, spending the claim and reporting
+ * nothing. Between the two gates, every command that reaches the roll below
+ * yields at least one item, so no path through this function can spend a
+ * single-use claim in silence.
  */
 export function harvestCorpse(
   ctx: SimContext,
@@ -312,27 +320,32 @@ export function harvestCorpse(
   // Scope, the other half of the #2504 comment: that one covers a tag the
   // corpse does not CARRY, which sanitizes away and spreads. This covers a tag
   // it carries that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills,
-  // horn). A corpse whose tags ALL map to nothing (fen_troll: claw, tusk) is
-  // untouched on purpose: no pick forfeits anything there, so it keeps the
-  // documented deferred-design path (claim spent, zero yield, zero emits) that
-  // tests/corpse_harvest_sim.test.ts and
-  // tests/corpse_harvest_result_event.test.ts both pin. That is what the
-  // predicate's second half buys, and it is why the pin stays green rather
-  // than being re-argued away.
+  // horn) on a corpse that ALSO carries a mapped one. A corpse whose tags ALL
+  // map to nothing never reaches this gate at all any more (#2513): the
+  // isHarvestableCorpse check above answers on mapped families, so fen_troll
+  // (claw, tusk) is refused there with error.corpseNothingToHarvest, exactly
+  // like the 101 shipped templates that carry no component tags. That closed
+  // the last path to a claim spent in silence, and it is why this predicate's
+  // second half (`taggedComponents.some(yields)`) is now belt and braces here
+  // rather than the term that kept an all-unmapped corpse claimable.
   //
   // This also covers the DERIVED pick, not just an explicit one: an omitted
-  // `components` resolves through meta.townFocus, and set_town_focus does not
-  // validate that a key is a real component tag (#2511), so a persisted
-  // `{ claw: 5 }` makes the plain interact press take this arm too. Refusing
-  // is the better outcome there as well: the corpse survives for a pick that
-  // can pay out, instead of being burned by a focus the player cannot see.
+  // `components` resolves through meta.townFocus, so a persisted `{ claw: 5 }`
+  // makes the plain interact press take this arm too. Refusing is the better
+  // outcome there as well: the corpse survives for a pick that can pay out,
+  // instead of being burned by a focus the player cannot see. #2511 has since
+  // closed the route that could WRITE such a focus (set_town_focus rejects a
+  // key outside HARVEST_COMPONENT_ITEMS, and the load arm drops one an older
+  // save carries), so this arm is now defense in depth on the derived pick
+  // rather than a reachable path; tests/corpse_harvest_sim.test.ts still
+  // drives it by poking meta directly, which is what a pre-#2511 save was.
   if (forfeitsEveryMappedYield(componentTags ?? [], chosen)) {
     ctx.error(meta.entityId, 'Nothing you selected can be harvested from that corpse.');
     return;
   }
   const wanted: InvSlot[] = [];
   for (const component of effectiveFocusComponents(componentTags ?? [], chosen)) {
-    const wantedItemId = HARVEST_COMPONENT_ITEMS[component];
+    const wantedItemId = harvestItemForFamily(component);
     if (!wantedItemId) continue;
     const maxQty = focusedHarvestQuantity('legendary', component, meta.townFocus);
     const existing = wanted.find((w) => w.itemId === wantedItemId);
@@ -395,7 +408,7 @@ export function harvestCorpse(
     rarity: MaterialRarity;
   }[] = [];
   for (const y of yields) {
-    const itemId = HARVEST_COMPONENT_ITEMS[y.component];
+    const itemId = harvestItemForFamily(y.component);
     if (!itemId) continue;
     // #1143: the player's persistent town focus adds a bonus on top of the
     // #1142 roll for a focused component; an unfocused component's tier is
@@ -570,10 +583,26 @@ export function harvestCorpse(
   // #2457: one result event for the whole command, after every grant has
   // landed, so the client prints one line per distinct granted item and plays
   // exactly one cue instead of the per-grant burst the hub used to produce.
-  // Skipped entirely on a harvest that landed nothing (a corpse whose only
-  // tags map to no item, the gatherResult "granted path only" rule), so the
-  // client never renders a cue for a no-op. Draws no rng and reads no world
-  // state, so it cannot perturb the pinned draw sequence or the grant order.
+  // The guard is the gatherResult "granted path only" rule, so the client is
+  // never asked to render a cue for a no-op. Its FALSE arm is unreachable BY
+  // CONSTRUCTION as of #2513, not merely absent from shipped content, and it is
+  // deliberately kept as dead defensive code. The proof, because "unreachable"
+  // is a claim worth being able to check: the corpse-level gate above
+  // guarantees at least one tag maps to an item; the #2509 gate then guarantees
+  // at least one member of the EFFECTIVE pick does; the `wanted` loop and the
+  // roll loop both iterate that same effective set, so at least one iteration
+  // clears `if (!itemId) continue`; `harvestTierQuantity` is `indexOf + 1 >= 1`
+  // and applyFocusBonus never lowers it, so that iteration's qty is >= 1; and
+  // every arm of the loop plus both signedGrants loops call recordHarvestYield,
+  // which pushes or merge-sums and never drops. So a spent claim always leaves
+  // `granted` non-empty. That direction is what is pinned, as a property over
+  // every subset of every tagged template (tests/corpse_harvest_sim.test.ts
+  // "every command that spends the claim reports at least one yield"), which is
+  // the live pin for the src/sim/types.ts harvestResult "yields is never empty"
+  // contract now that fen_troll no longer exercises the other arm. The guard
+  // stays so a future third way of landing nothing stays quiet instead of
+  // cueing an empty ledger. Draws no rng and reads no world state, so it cannot
+  // perturb the pinned draw sequence or the grant order.
   if (granted.length > 0) ctx.emit({ type: 'harvestResult', pid: meta.entityId, yields: granted });
   // Lifecycle decoupling, the harvested half: with the claim spent
   // the corpse owes nobody a harvest window anymore, so exhausted loot

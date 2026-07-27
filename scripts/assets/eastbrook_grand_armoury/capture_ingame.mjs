@@ -354,7 +354,16 @@ function summarizePerfBlock(raw) {
     observed: raw.observed,
     ...evidence,
     rafFrameIntervalStats: frameStats(raw.rafDeltasMs, 60),
-    perfReportSummary: normalizeReport(raw.report),
+    perfReportSummary: {
+      ...normalizeReport(raw.report),
+      // The report's texture counter is an instantaneous end-of-block read,
+      // but the committed attribution the integrity gate pins is the block's
+      // sampled MEDIAN. A transient texture straddling the report instant (a
+      // water-wake height field waking as a wanderer crosses the stream) can
+      // split the two by one; the median is the block's honest resource
+      // attribution, so align the summary to it.
+      textures: evidence.resourcesMedian.textures,
+    },
   };
 }
 
