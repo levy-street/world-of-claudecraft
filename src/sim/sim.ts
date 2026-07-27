@@ -2197,7 +2197,10 @@ export class Sim {
       cls,
       name,
       skin: savedState?.skin ?? 0,
-      skinCatalog: savedState?.skinCatalog === 'mech' ? 'mech' : 'class',
+      skinCatalog:
+        savedState?.skinCatalog === 'mech' || savedState?.skinCatalog === 'armored'
+          ? savedState.skinCatalog
+          : 'class',
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
@@ -3194,7 +3197,7 @@ export class Sim {
     const meta = this.players.get(pid);
     const e = this.entities.get(pid);
     if (!meta || !e) return false;
-    const maxSkin = catalog === 'mech' ? MECH_CHROMAS.length - 1 : 7;
+    const maxSkin = catalog === 'mech' ? MECH_CHROMAS.length - 1 : catalog === 'armored' ? 0 : 7;
     const idx = Math.max(0, Math.min(maxSkin, Math.floor(skin)));
     meta.skin = idx;
     meta.skinCatalog = catalog;

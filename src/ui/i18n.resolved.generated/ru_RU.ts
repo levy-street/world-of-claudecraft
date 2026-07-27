@@ -4625,6 +4625,8 @@ export const ru_RU: EnTranslations = {
     "close": "Закрыть",
     "unlocked": "Косметика разблокирована!",
     "unequip": "Снять",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Только предпросмотр — полная разблокировка скоро",
     "mech": {
       "amber_crimson": "Янтарно-багровый",

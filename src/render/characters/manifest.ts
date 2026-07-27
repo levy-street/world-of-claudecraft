@@ -792,7 +792,7 @@ export const VISUALS: Record<string, VisualDef> = {
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-    skinMeshNames: ['tripo_node_494a91d4'],
+    skinMeshNames: ['Arms', 'Torso', 'Shoulders', 'Legs'],
     cosmetics: V02_HEAD_COSMETICS,
   },
   player_mage: {
@@ -1404,6 +1404,46 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 };
 
+// --- Level-20 armored cosmetic bodies -------------------------------------
+// A per-class plate overlay the player can toggle on as a cosmetic (the
+// 'armored' skin catalog), kept as its own visual key `player_<class>_armored`
+// exactly like the Combat Mech's `player_mech`. Each armored body is a separate
+// GLB of Armor_* meshes on the SAME donor rig as its base class body, so it
+// carries no clips of its own (it binds the base body's clips by name via
+// animUrls) and holds the same weapons (handslot bones grafted in). The base
+// bodies and the Mech are left untouched.
+const ARMOR_MESHES = ['Armor_Helm', 'Armor_Torso', 'Armor_Arms', 'Armor_Legs', 'Armor_Shoulders'];
+
+/** Derive a class's armored variant from its base body VisualDef: same rig,
+ *  clips, weapons and halo; swap in the armor GLB, source clips from the base
+ *  body, retarget the recolour set to the plates, and drop the head cosmetics
+ *  and body show-list (the helm fully encloses the head). */
+function armoredVariant(base: VisualDef, armorUrl: string): VisualDef {
+  return {
+    ...base,
+    url: armorUrl,
+    animUrls: [...(base.animUrls ?? []), base.url],
+    skinMeshNames: ARMOR_MESHES,
+    cosmetics: undefined,
+    show: undefined,
+  };
+}
+
+for (const cls of [
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'priest',
+  'shaman',
+  'mage',
+  'warlock',
+  'druid',
+] as const) {
+  const base = VISUALS[`player_${cls}`];
+  if (base) VISUALS[`player_${cls}_armored`] = armoredVariant(base, `${PLAYERS}/${cls}_lvl20.glb`);
+}
+
 // ---------------------------------------------------------------------------
 // Dispatch: entity -> visual key (mirrors the old buildRigFor selection:
 // e.kind + e.templateId + MOBS[id].family)
@@ -1547,8 +1587,13 @@ const NPC_KEYS: Record<string, string> = {
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (e.skinCatalog === 'mech') return 'player_mech';
+    if (e.skinCatalog === 'armored') {
+      const armored = `player_${e.templateId}_armored`;
+      if (VISUALS[armored]) return armored;
+    }
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
+
   if (e.kind === 'mob') {
     const override = MOB_KEYS[e.templateId];
     if (override) return override;

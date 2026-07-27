@@ -9,7 +9,12 @@ import { CharacterVisual } from './visual';
 
 export { writeCastingAnimState } from './anim_state';
 export { CharacterPreview } from './preview';
-export { DEFAULT_HEAD_APPEARANCE, type PreviewAppearance } from './preview_appearance';
+export {
+  CLASS_DEFAULT_HEAD,
+  DEFAULT_HEAD_APPEARANCE,
+  defaultHeadFor,
+  type PreviewAppearance,
+} from './preview_appearance';
 export type { PreviewFramingName } from './preview_framing';
 export type { AnimState } from './visual';
 export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';

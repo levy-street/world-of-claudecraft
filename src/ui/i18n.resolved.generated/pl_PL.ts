@@ -4625,6 +4625,8 @@ export const pl_PL: EnTranslations = {
     "close": "Zamknij",
     "unlocked": "Kosmetyk odblokowany!",
     "unequip": "Zdejmij",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Tylko podgląd — pełne odblokowanie już wkrótce",
     "mech": {
       "amber_crimson": "Bursztynowa karmazynowa",

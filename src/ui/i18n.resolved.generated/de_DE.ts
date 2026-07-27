@@ -4625,6 +4625,8 @@ export const de_DE: EnTranslations = {
     "close": "Schließen",
     "unlocked": "Kosmetik freigeschaltet!",
     "unequip": "Ablegen",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Nur Vorschau — vollständige Freischaltung folgt in Kürze",
     "mech": {
       "amber_crimson": "Bernstein-Karmesin",

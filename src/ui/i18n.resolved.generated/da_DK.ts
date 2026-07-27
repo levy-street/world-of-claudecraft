@@ -4625,6 +4625,8 @@ export const da_DK: EnTranslations = {
     "close": "Luk",
     "unlocked": "Kosmetik låst op!",
     "unequip": "Tag af",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Kun forhåndsvisning — fuld oplåsning kommer snart",
     "mech": {
       "amber_crimson": "Ravgul Karmoisin",

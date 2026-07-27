@@ -4625,6 +4625,8 @@ export const cs_CZ: EnTranslations = {
     "close": "Zavřít",
     "unlocked": "Kosmetika odemčena!",
     "unequip": "Sundat",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Pouze náhled - plné odemčení dorazí brzy",
     "mech": {
       "amber_crimson": "Jantarově karmínová",

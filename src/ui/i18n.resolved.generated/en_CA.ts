@@ -4625,6 +4625,8 @@ export const en_CA: EnTranslations = {
     "close": "Close",
     "unlocked": "Cosmetic unlocked!",
     "unequip": "Unequip",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Preview only — full unlock coming soon",
     "mech": {
       "amber_crimson": "Amber Crimson",

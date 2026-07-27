@@ -612,7 +612,7 @@ export const ALL_EQUIP_SLOTS: readonly EquipSlot[] = [
 // equipment slot directly. Items never carry 'ring1'/'ring2'.
 export type ItemSlot = EquipSlot | 'ring';
 
-export type SkinCatalog = 'class' | 'mech';
+export type SkinCatalog = 'class' | 'mech' | 'armored';
 
 // Season 1 Armory weapon-skin cosmetics (src/sim/content/weapon_skins.ts). The
 // loadout is the account-wide "applied skin per weapon type" selection; a skin

@@ -4625,6 +4625,8 @@ export const ja_JP: EnTranslations = {
     "close": "閉じる",
     "unlocked": "装いを解除しました！",
     "unequip": "外す",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "プレビューのみ — 完全解除は近日公開",
     "mech": {
       "amber_crimson": "アンバークリムゾン",

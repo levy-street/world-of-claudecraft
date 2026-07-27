@@ -24,9 +24,9 @@ const classCss = (cls: string): string =>
 export interface CharSkinPainterHost {
   readonly sim: {
     cfg: { playerClass: PlayerClass };
-    player: { skin?: number; skinCatalog?: 'class' | 'mech' };
+    player: { skin?: number; skinCatalog?: 'class' | 'mech' | 'armored' };
     accountCosmetics: { mechChromaIds: string[] };
-    changeSkin(skin: number, catalog: 'class' | 'mech'): void;
+    changeSkin(skin: number, catalog: 'class' | 'mech' | 'armored'): void;
     unequipMechChroma(id: string): void;
   };
   preloadMechAssets(): Promise<void>;
@@ -69,7 +69,9 @@ export function paintCharSkinPicker(host: CharSkinPainterHost): void {
       'aria-label',
       option.kind === 'class'
         ? t('auth.chromaOption', { n: labelNumber })
-        : mechChromaName(option.chromaId),
+        : option.kind === 'armored'
+          ? t('skinEvent.armoredAria')
+          : mechChromaName(option.chromaId),
     );
     b.addEventListener('click', () => {
       row.querySelectorAll('.skin-swatch').forEach((x) => {
@@ -89,6 +91,22 @@ export function paintCharSkinPicker(host: CharSkinPainterHost): void {
           preview.skin,
           preview.visualKey,
         );
+        return;
+      }
+      if (option.kind === 'armored') {
+        host.sim.changeSkin(option.skin, 'armored');
+        const preview = activeCharacterAppearancePreview(
+          host.sim.cfg.playerClass,
+          option.skin,
+          'armored',
+        );
+        host.mountCharPreview(
+          $('#char-model-preview'),
+          host.sim.cfg.playerClass,
+          preview.skin,
+          preview.visualKey,
+        );
+        audio.click();
         return;
       }
       host.sim.changeSkin(option.skin, 'mech');
@@ -121,6 +139,9 @@ export function paintCharSkinPicker(host: CharSkinPainterHost): void {
         () =>
           `<div class="tt-name">${esc(mechChromaName(option.chromaId))}</div><div class="tt-sub">${esc(t('skinEvent.unlocked'))}</div>`,
       );
+    }
+    if (option.kind === 'armored') {
+      host.attachTooltip(b, () => `<div class="tt-name">${esc(t('skinEvent.armored'))}</div>`);
     }
     row.appendChild(b);
   }

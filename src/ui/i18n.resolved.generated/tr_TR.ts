@@ -4625,6 +4625,8 @@ export const tr_TR: EnTranslations = {
     "close": "Kapat",
     "unlocked": "Kozmetik açıldı!",
     "unequip": "Çıkar",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Yalnızca önizleme — tam kilit açma yakında geliyor",
     "mech": {
       "amber_crimson": "Kehribar Kızıl",

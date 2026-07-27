@@ -9,7 +9,7 @@ import { mechHeldWeaponOverride } from './manifest';
 export interface PreviewAppearance {
   cls: PlayerClass;
   skin: number;
-  skinCatalog: 'class' | 'mech';
+  skinCatalog: 'class' | 'mech' | 'armored';
   mainhandItemId: string | null;
   /** The active Armory weapon-skin cosmetic, or null/absent for none. */
   weaponSkinId?: string | null;
@@ -33,6 +33,35 @@ export const DEFAULT_HEAD_APPEARANCE: Readonly<{
   beard: false,
 });
 
+/** Per-class starting head look for the character creator, so the class roster
+ *  reads with variety instead of every class sharing hairStyle 0. Any field left
+ *  out falls back to DEFAULT_HEAD_APPEARANCE, and the player can still pick any
+ *  option in the head picker. Indices map to the picker buttons (button N shows
+ *  index N-1). face: 0 = male (button 1), 1 = female (button 2). hairStyle (for
+ *  the male face): 0 = Hair_04, 1 = Hair_01, 2 = Hair_02, 3 = Hair_03, 4 = bald.
+ *  (see V02_HEAD_COSMETICS in manifest.ts.) */
+export const CLASS_DEFAULT_HEAD: Readonly<
+  Partial<Record<PlayerClass, Readonly<{ face?: number; hairStyle?: number; beard?: boolean }>>>
+> = Object.freeze({
+  rogue: { face: 1 },
+  druid: { face: 1 },
+  priest: { face: 1 },
+  paladin: { hairStyle: 2 },
+  warrior: { hairStyle: 3, beard: true },
+  hunter: { hairStyle: 2 },
+  mage: { hairStyle: 3 },
+});
+
+/** The character creator's starting head look for a class: the per-class default
+ *  merged over the global default. */
+export function defaultHeadFor(cls: PlayerClass): {
+  face: number;
+  hairStyle: number;
+  beard: boolean;
+} {
+  return { ...DEFAULT_HEAD_APPEARANCE, ...(CLASS_DEFAULT_HEAD[cls] ?? {}) };
+}
+
 /** The model key + held-weapon layout the appearance resolves to. */
 export interface PreviewVisual {
   visualKey: string;
@@ -47,8 +76,9 @@ export interface PreviewVisual {
  *  `player_<class>` with no override. Kept DOM/Three-free so it is unit-tested. */
 export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
   const mech = a.skinCatalog === 'mech';
+  const armored = a.skinCatalog === 'armored';
   return {
-    visualKey: mech ? 'player_mech' : `player_${a.cls}`,
+    visualKey: mech ? 'player_mech' : armored ? `player_${a.cls}_armored` : `player_${a.cls}`,
     weaponItemId: a.mainhandItemId ?? null,
     offhandItemId: a.offhandItemId ?? null,
     weaponOverride: mech ? mechHeldWeaponOverride(a.cls) : null,

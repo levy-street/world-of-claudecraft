@@ -7494,6 +7494,8 @@ export type TranslationKeyFlat =
   | 'sim.lockpick.tierMedium'
   | 'sim.lockpick.tierPremium'
   | 'sim.lockpick.toolSlips'
+  | 'skinEvent.armored'
+  | 'skinEvent.armoredAria'
   | 'skinEvent.close'
   | 'skinEvent.lockIn'
   | 'skinEvent.locked'

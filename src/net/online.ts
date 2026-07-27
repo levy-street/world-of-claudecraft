@@ -178,7 +178,7 @@ export interface CharacterSummary {
   // Real, in-world appearance so the char-select preview matches the game. Both
   // optional for back-compat with an older server that omits them: absent
   // skinCatalog defaults to the class rig, absent hand fields show no item.
-  skinCatalog?: 'class' | 'mech';
+  skinCatalog?: 'class' | 'mech' | 'armored';
   mainhandItemId?: string | null;
   offhandItemId?: string | null;
   /** The account's active Armory weapon skin for this character (server-resolved
@@ -3473,7 +3473,7 @@ export class ClientWorld implements IWorld {
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
   // server re-validates and the self-snapshot reconciles. ---
-  changeSkin(skin: number, catalog: 'class' | 'mech' = 'class'): void {
+  changeSkin(skin: number, catalog: 'class' | 'mech' | 'armored' = 'class'): void {
     const idx =
       catalog === 'mech'
         ? Math.max(0, Math.floor(skin))

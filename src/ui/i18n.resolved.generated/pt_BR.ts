@@ -4625,6 +4625,8 @@ export const pt_BR: EnTranslations = {
     "close": "Fechar",
     "unlocked": "Cosmético desbloqueado!",
     "unequip": "Desequipar",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Apenas prévia — desbloqueio completo em breve",
     "mech": {
       "amber_crimson": "Âmbar Carmesim",

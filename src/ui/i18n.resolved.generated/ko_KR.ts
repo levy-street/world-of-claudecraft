@@ -4625,6 +4625,8 @@ export const ko_KR: EnTranslations = {
     "close": "닫기",
     "unlocked": "장식이 잠금 해제되었습니다!",
     "unequip": "장착 해제",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "미리 보기만 가능 — 전체 잠금 해제 곧 출시",
     "mech": {
       "amber_crimson": "호박빛 진홍",

@@ -4625,6 +4625,8 @@ export const vi_VN: EnTranslations = {
     "close": "Đóng",
     "unlocked": "Đã mở khóa trang phục!",
     "unequip": "Tháo Trang Bị",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Chỉ xem trước — sắp có thể mở khóa đầy đủ",
     "mech": {
       "amber_crimson": "Hổ Phách Đỏ Thắm",

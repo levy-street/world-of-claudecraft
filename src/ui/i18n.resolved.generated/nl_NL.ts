@@ -4625,6 +4625,8 @@ export const nl_NL: EnTranslations = {
     "close": "Sluiten",
     "unlocked": "Cosmetisch item ontgrendeld!",
     "unequip": "Afleggen",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Alleen voorvertoning — volledige ontgrendeling komt binnenkort",
     "mech": {
       "amber_crimson": "Amber Karmozijn",

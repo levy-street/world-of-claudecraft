@@ -164,6 +164,7 @@ import { assetsReady } from './render/assets/preload';
 import {
   CharacterPreview,
   DEFAULT_HEAD_APPEARANCE,
+  defaultHeadFor,
   type PreviewAppearance,
 } from './render/characters';
 import { charactersReady, preloadMechAssets } from './render/characters/assets';
@@ -3866,14 +3867,16 @@ function refreshOfflineSkins(cls: PlayerClass): void {
     offlineSkin = i;
     characterPreview?.setSkin(i);
   });
-  // Head look: reset to default (male face, styled hair, no beard, baked colours).
-  offlineFace = DEFAULT_HEAD_APPEARANCE.face;
-  offlineHairStyle = DEFAULT_HEAD_APPEARANCE.hairStyle;
-  offlineBeard = DEFAULT_HEAD_APPEARANCE.beard;
+  // Head look: reset to this class's starting look (its per-class default merged
+  // over the global default); the player can still pick any option in the picker.
+  const offlineHead = defaultHeadFor(cls);
+  offlineFace = offlineHead.face;
+  offlineHairStyle = offlineHead.hairStyle;
+  offlineBeard = offlineHead.beard;
   offlineHairColor = undefined;
   offlineFaceColor = undefined;
   characterPreview?.setCosmetics(offlineHairStyle, offlineBeard, undefined, undefined, offlineFace);
-  renderHeadPicker('#offline-head-row', cls, { ...DEFAULT_HEAD_APPEARANCE }, (s) => {
+  renderHeadPicker('#offline-head-row', cls, { ...offlineHead }, (s) => {
     offlineFace = s.face;
     offlineHairStyle = s.hairStyle;
     offlineBeard = s.beard;
@@ -3892,13 +3895,14 @@ function refreshOnlineSkins(cls: PlayerClass): void {
     onlineSkin = i;
     characterPreview?.setSkin(i);
   });
-  onlineFace = DEFAULT_HEAD_APPEARANCE.face;
-  onlineHairStyle = DEFAULT_HEAD_APPEARANCE.hairStyle;
-  onlineBeard = DEFAULT_HEAD_APPEARANCE.beard;
+  const onlineHead = defaultHeadFor(cls);
+  onlineFace = onlineHead.face;
+  onlineHairStyle = onlineHead.hairStyle;
+  onlineBeard = onlineHead.beard;
   onlineHairColor = undefined;
   onlineFaceColor = undefined;
   characterPreview?.setCosmetics(onlineHairStyle, onlineBeard, undefined, undefined, onlineFace);
-  renderHeadPicker('#charcreate-head-row', cls, { ...DEFAULT_HEAD_APPEARANCE }, (s) => {
+  renderHeadPicker('#charcreate-head-row', cls, { ...onlineHead }, (s) => {
     onlineFace = s.face;
     onlineHairStyle = s.hairStyle;
     onlineBeard = s.beard;

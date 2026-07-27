@@ -34,7 +34,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "es_ES": [
     "auth.bald",
@@ -61,7 +63,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "fr_FR": [
     "auth.bald",
@@ -88,7 +92,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "fr_CA": [
     "auth.bald",
@@ -115,7 +121,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -143,7 +151,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "de_DE": [
     "auth.bald",
@@ -170,7 +180,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "zh_CN": [
     "auth.bald",
@@ -178,7 +190,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "zh_TW": [
     "auth.bald",
@@ -186,7 +200,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "ko_KR": [
     "auth.bald",
@@ -194,7 +210,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "ja_JP": [
     "auth.bald",
@@ -202,7 +220,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "pt_BR": [
     "auth.bald",
@@ -229,7 +249,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "ru_RU": [
     "auth.bald",
@@ -237,7 +259,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "cs_CZ": [
     "auth.bald",
@@ -264,7 +288,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "nl_NL": [
     "auth.bald",
@@ -291,7 +317,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "pl_PL": [
     "auth.bald",
@@ -318,7 +346,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "id_ID": [
     "auth.bald",
@@ -345,7 +375,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "tr_TR": [
     "auth.bald",
@@ -372,7 +404,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "sv_SE": [
     "auth.bald",
@@ -399,7 +433,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "vi_VN": [
     "auth.bald",
@@ -426,7 +462,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ],
   "da_DK": [
     "auth.bald",
@@ -453,6 +491,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "skinEvent.armored",
+    "skinEvent.armoredAria"
   ]
 };

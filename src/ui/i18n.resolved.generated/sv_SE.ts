@@ -4625,6 +4625,8 @@ export const sv_SE: EnTranslations = {
     "close": "Stäng",
     "unlocked": "Kosmetik upplåst!",
     "unequip": "Ta av",
+    "armored": "Armored",
+    "armoredAria": "Level 20 armored plate cosmetic",
     "previewOnly": "Endast förhandsvisning, fullständig upplåsning kommer snart",
     "mech": {
       "amber_crimson": "Bärnsten Karmosin",

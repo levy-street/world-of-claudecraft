@@ -12,7 +12,7 @@ export interface AccountCosmetics {
 
 export interface IWorldCosmetics {
   accountCosmetics: AccountCosmetics;
-  changeSkin(skin: number, catalog?: 'class' | 'mech'): void;
+  changeSkin(skin: number, catalog?: 'class' | 'mech' | 'armored'): void;
   // Lock in a skin from the cosmetic skin-select event overlay. The server
   // re-validates the choice against the rank it rolled (skinEvent) and consumes
   // the event token; the offline Sim resolves it directly.

@@ -3,7 +3,8 @@ import { MECH_CHROMAS, SKIN_COUNTS } from '../sim/content/skins';
 
 export type CharacterAppearanceOption =
   | { kind: 'class'; label: number; skin: number }
-  | { kind: 'mech'; label: number; skin: number; chromaId: string };
+  | { kind: 'mech'; label: number; skin: number; chromaId: string }
+  | { kind: 'armored'; label: number; skin: number };
 
 export interface ActiveCharacterAppearancePreview {
   skin: number;
@@ -31,7 +32,16 @@ export function characterAppearanceOptions(
       chromaId: chroma.id,
     }));
 
-  return [...classOptions, ...mechOptions];
+  // The level-20 armored look: a single always-available cosmetic body (no
+  // unlock gate and no chroma set of its own yet, so skin 0). Kept last so the
+  // class/mech option labels stay stable.
+  const armoredOption = {
+    kind: 'armored' as const,
+    label: classCount + mechOptions.length + 1,
+    skin: 0,
+  };
+
+  return [...classOptions, ...mechOptions, armoredOption];
 }
 
 export function activeCharacterAppearancePreview(
@@ -41,6 +51,11 @@ export function activeCharacterAppearancePreview(
 ): ActiveCharacterAppearancePreview {
   return {
     skin: Math.max(0, Math.floor(skin)),
-    visualKey: catalog === 'mech' ? 'player_mech' : `player_${cls}`,
+    visualKey:
+      catalog === 'mech'
+        ? 'player_mech'
+        : catalog === 'armored'
+          ? `player_${cls}_armored`
+          : `player_${cls}`,
   };
 }
