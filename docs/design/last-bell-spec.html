@@ -1,0 +1,1592 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Last Bell of Gullhaven: Campaign Spec</title>
+<style>
+:root {
+  --paper: #f3f4f2;
+  --ink: #22302f;
+  --verdigris: #3e7268;
+  --bronze: #9a7b2e;
+  --mist: #dce1de;
+  --dim: #5c6b68;
+  --tint: #eaf0ed;
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+html { font-size: 17px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  line-height: 1.66;
+  margin: 0;
+  padding: 2.5rem 1.25rem 5rem;
+}
+.doc { max-width: 45rem; margin: 0 auto; }
+.doc > p, .doc li, .doc blockquote { max-width: 65ch; }
+
+.masthead {
+  border-bottom: 4px double var(--verdigris);
+  padding-bottom: 1.1rem;
+  margin-bottom: 1.4rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+.masthead .bell { color: var(--verdigris); flex: none; margin-top: 0.5rem; }
+h1 { font-size: 1.9rem; line-height: 1.2; margin: 0; font-weight: 600; text-wrap: balance; }
+h2 {
+  font-size: 1.42rem;
+  font-weight: 600;
+  margin: 3.1rem 0 0.8rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--mist);
+  text-wrap: balance;
+}
+h3 { font-size: 1.14rem; font-weight: 700; color: var(--verdigris); margin: 2.3rem 0 0.6rem; text-wrap: balance; }
+h4 { font-size: 1.02rem; font-weight: 700; color: var(--verdigris); margin: 1.9rem 0 0.55rem; }
+p { margin: 0.8rem 0; }
+a { color: var(--verdigris); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--verdigris); outline-offset: 2px; }
+
+.label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin: 0 0 0.5rem;
+}
+.revision {
+  background: var(--tint);
+  border: 1px solid var(--verdigris);
+  border-radius: 2px;
+  padding: 1rem 1.15rem;
+  margin: 1.8rem 0;
+  font-size: 0.93rem;
+}
+.revision ul { margin: 0; padding-left: 1.1rem; }
+.revision li { margin: 0.35rem 0; }
+
+.toc { margin: 1.8rem 0 2.2rem; font-size: 0.95rem; }
+.toc > ul { list-style: none; margin: 0; padding: 0; }
+.toc.cols > ul { columns: 2; column-gap: 2.5rem; }
+.toc > ul > li { margin: 0.28rem 0; break-inside: avoid; }
+.toc > ul > li > a { font-weight: 700; color: var(--ink); text-decoration: none; }
+.toc ul ul { list-style: none; margin: 0.15rem 0 0.4rem; padding-left: 1.2rem; }
+.toc ul ul li { margin: 0.12rem 0; }
+.toc ul ul a { color: var(--dim); text-decoration: none; }
+.toc a:hover { color: var(--verdigris); text-decoration: underline; }
+@media (max-width: 560px) { .toc.cols > ul { columns: 1; } }
+
+ul, ol { padding-left: 1.5rem; margin: 0.8rem 0; }
+li { margin: 0.3rem 0; }
+li > ul, li > ol { margin: 0.3rem 0; }
+ol ol { list-style: lower-roman; }
+
+blockquote {
+  margin: 1.05rem 0 1.05rem 0.35rem;
+  padding: 0.6rem 1.05rem;
+  border-left: 2px solid var(--bronze);
+  background: rgba(154, 123, 46, 0.06);
+  font-size: 0.97rem;
+}
+blockquote p { margin: 0.5rem 0; }
+li blockquote { margin-left: 0; }
+
+.quest-card {
+  border: 1px solid var(--verdigris);
+  border-left-width: 4px;
+  background: var(--tint);
+  border-radius: 3px;
+  padding: 0.85rem 1.15rem;
+  margin: 1.3rem 0;
+  font-size: 0.94rem;
+}
+.quest-card > p:first-child { margin-top: 0; }
+.quest-card > p:last-child { margin-bottom: 0; }
+.quest-card > p:first-child strong {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--verdigris);
+}
+.quest-card em { color: var(--dim); }
+.quest-card ul { list-style: none; padding-left: 0.15rem; margin: 0.55rem 0; }
+.quest-card ul li { margin: 0.28rem 0; }
+.quest-card ul li::before {
+  content: "";
+  display: inline-block;
+  width: 0.58em;
+  height: 0.58em;
+  border: 1.5px solid var(--verdigris);
+  border-radius: 1px;
+  margin-right: 0.6em;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  background: #e7ece9;
+  border-radius: 3px;
+  padding: 0.08em 0.3em;
+}
+pre {
+  overflow-x: auto;
+  background: #e7ece9;
+  padding: 0.9rem 1rem;
+  border-radius: 3px;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+pre code { background: none; padding: 0; font-size: 1em; }
+
+.tw { overflow-x: auto; margin: 1rem 0; }
+table { border-collapse: collapse; font-size: 0.92rem; min-width: 24rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 0.4rem 0.9rem 0.4rem 0; border-bottom: 1px solid var(--mist); vertical-align: top; }
+th {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  font-weight: 600;
+}
+hr { border: 0; border-top: 1px solid var(--mist); margin: 2.3rem 0; }
+</style>
+</head>
+<body>
+<main class="doc">
+
+<header class="masthead">
+  <svg class="bell" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+    <path d="M4 16.5 C4 9.5 6.5 5 12 5 s8 4.5 8 11.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <line x1="2.2" y1="16.5" x2="21.8" y2="16.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <circle cx="12" cy="19.4" r="1.7" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  </svg>
+  <h1>The Last Bell of Gullhaven: Campaign Spec and Story-Scenario Layer</h1>
+</header>
+<p>Status: working spec for the Farshore campaign on <code>feature/procedural-dungeons</code>.
+This document supersedes <code>farshore-last-bell-quest-arc.md</code> (the original concept
+note) and is the single spec the implementation works to. It covers the story
+guide, the storyboard, the cast, the multiplayer model, and the technical
+design of the reusable story-scenario layer the campaign requires.</p>
+<p>Target length: roughly 3 to 4 hours for the campaign (a pacing guide, not a
+hard budget), plus an optional 20 to 30 minute Willowfen epilogue and a
+separate repeatable five-player aftermath dungeon.</p>
+<p>Target players: solo or a party of up to five.</p>
+
+<aside class="revision">
+  <p class="label">Revision notes, 2026-07-21 (round 2)</p>
+  <ul>
+    <li><strong>The reveal restructured:</strong> the interior precedent (Warden Hale) is public knowledge; the outer seal's failure plays as recognition, the squad enters composed expecting one death, and the five-anchor discovery in Q9 is the real reveal ("One each, then.").</li>
+    <li><strong>Geometry:</strong> "The island at a glance" added; the playthrough carries the map and every quest names its route and purpose.</li>
+    <li><strong>Q5/Q6 logic:</strong> dawn landing beyond the shoals; Edda rings the fleet in through night water when the line fails; fighting on the beach and tidal flats, never in open surf; the breach pulses explain both the surge and the wrong-feeling quiet.</li>
+    <li><strong>Dialogue:</strong> aftermath scene rewritten (weight instead of wit); Edda's Q9 line cut; Nell's closing line replaced.</li>
+    <li><strong>The Last Watch:</strong> the solitary ending now has a verb: end-of-watch duties and the watch log.</li>
+    <li><strong>Drowned Relief attunement:</strong> a three-step diegetic chain (the salvagers' rumor, the fleet logs reveal, Edda's spare star-glass shard).</li>
+    <li><strong>Conventions:</strong> cutscene budget (under ~8 min input-locked total) and concrete, countable objectives everywhere.</li>
+  </ul>
+</aside>
+
+<aside class="revision">
+  <p class="label">Revision notes, 2026-07-21 (round 3: pacing pass)</p>
+  <ul>
+    <li><strong>Q2 rebuilt as post shifts:</strong> the fetch card is gone; the player proofs Edda&#39;s charge casings, treats Saul&#39;s patients by name, and drills the bell changes with Tam, each shift a quiet rehearsal of a finale mechanic.</li>
+    <li><strong>Q11 spends what Q2 taught:</strong> the final strike is the same timed-strike interaction from Tam&#39;s drill; the climax teaches nothing new.</li>
+    <li><strong>Q8 varied, not repeated:</strong> the four ward sites escalate by variation (by the book, the misfire, the hunter on Edda, the silent fourth).</li>
+    <li><strong>Q6 mop-up cut:</strong> the 30-kill grind is now a short mercy-kill beat that protects the wrong-feeling quiet.</li>
+    <li><strong>Q10 authored:</strong> five capped rotations, each distinct, including the all-five slip (the player answers one station and listens to the squad hold the rest).</li>
+    <li><strong>The east-hedge callback:</strong> Coalfast&#39;s final order closes the Q1 test.</li>
+    <li><strong>The Last Watch:</strong> the tower duty hangs Tam&#39;s iron clapper and rings the all-clear; the keepsake becomes his bell-striker.</li>
+    <li><strong>Attunement merged:</strong> the rumor and the proof are one quest (the chain is now two steps).</li>
+  </ul>
+</aside>
+
+<aside class="revision">
+  <p class="label">Revision notes, 2026-07-21 (round 4: structure and dialogue)</p>
+  <ul>
+    <li><strong>Reinforcements re-framed as relief:</strong> the council asks for breathing room (five doing the work of six, evacuation hands, time on the seal), not seal-math; the flare rings them in early when the pulse crests.</li>
+    <li><strong>The false final stand:</strong> Coalfast walks into the breakwater stair alone in Q6 with death-flag orders ("Tam commands, and you ring three") and barely walks back out; the bait makes the real sacrifice land harder.</li>
+    <li><strong>The live division reveal:</strong> Q9&#39;s survey exposition is gone; the wound divides under their hands, one anchor at a time, and one of the squad steps in at each split until it stops at five ("It counted us.").</li>
+    <li><strong>Dialogue rewrite:</strong> Marsh operational and pre-seeded in Q0, Tam&#39;s bell code without the personification, Ollun&#39;s chapel confession plain, the Hale&#39;s-year exchange terse; Q2 tightened hard.</li>
+    <li><strong>Q3 exit:</strong> a running fight against the rising tide, never held waves.</li>
+    <li><strong>Q6 re-sequenced:</strong> waves five and six are fought while the fleet dies; the aftermath is walked, not watched.</li>
+    <li><strong>Playable-first convention:</strong> cutscenes only where the camera itself is the point.</li>
+  </ul>
+</aside>
+
+<nav class="toc cols" aria-label="Contents">
+  <p class="label">Contents</p>
+  <ul>
+    <li><a href="#1-vision">1. Vision</a></li>
+    <li><a href="#2-the-promise">2. The promise</a></li>
+    <li><a href="#3-content-topology-and-the-balance-rule">3. Content topology and the balance rule</a></li>
+    <li><a href="#4-lore-foundation">4. Lore foundation</a></li>
+    <li><a href="#5-principal-cast">5. Principal cast</a></li>
+    <li><a href="#6-storyboard">6. Storyboard</a></li>
+    <li><a href="#7-endings-and-epilogues">7. Endings and epilogues</a></li>
+    <li><a href="#8-the-drowned-relief-aftermath-dungeon">8. The Drowned Relief (aftermath dungeon)</a></li>
+    <li><a href="#9-multiplayer-model">9. Multiplayer model</a></li>
+    <li><a href="#10-rewards-and-deeds">10. Rewards and deeds</a></li>
+    <li><a href="#11-audio-and-music-direction">11. Audio and music direction</a></li>
+    <li><a href="#12-technical-implementation-the-story-scenario-layer">12. Technical implementation: the story-scenario layer</a></li>
+    <li><a href="#13-build-order">13. Build order</a></li>
+    <li><a href="#14-emotional-guardrails-binding">14. Emotional guardrails (binding)</a></li>
+    <li><a href="#15-open-questions">15. Open questions</a></li>
+    <li><a href="#references">References</a></li>
+  </ul>
+</nav>
+<hr>
+<h2 id="1-vision">1. Vision</h2>
+<p>The Last Bell is the game&#39;s first story-heavy campaign: closer to a Final
+Fantasy XIV main-scenario arc or a Guild Wars personal-story chapter than to a
+kill-and-collect quest hub. The pillars, in priority order:</p>
+<ol>
+<li><strong>The story is the reward.</strong> Cutscenes, interactive dialogue, playable
+quiet moments, and an authored emotional arc. Gear comes from the aftermath
+dungeon, never from the grief.</li>
+<li><strong>The player should genuinely cry.</strong> Not through melodrama: through an hour
+of ordinary affection, competence under pressure, and a sacrifice that is
+earned, chosen, and permanent.</li>
+<li><strong>The squad fights beside you.</strong> Most of the campaign&#39;s combat is fought
+together with the five named defenders, not alone.</li>
+<li><strong>Everything new is reusable.</strong> Every system built for this arc (story
+instances, the squad roster, the scenario sequencer, the scene system,
+dialogue choices) is a general layer future arcs will use. This is the
+first campaign, not the only one.</li>
+</ol>
+<h2 id="2-the-promise">2. The promise</h2>
+<p>Gullhaven can be saved for another century, but the people who seal its great
+breach will not come home.</p>
+<p>The player is not told this at the beginning. More importantly, the defenders
+do not begin the story knowing that all five of them must die. They believe
+the breach can be sealed from outside, and they believe it with reason:
+sealing is the Vigil&#39;s oldest recurring duty, and the outer rite has held for
+most of twelve centuries (section 4). The darker precedent is public
+knowledge too, carved above the harbor steps: when the outer rite fails, one
+warden carries the seal inside and does not come out. Every warden on this
+island grew up beneath Warden Hale&#39;s statue. Coalfast has privately settled
+only one thing: if it comes to that, the one who goes in will be him.</p>
+<p>What nobody knows, because it has never happened in twelve centuries, is
+that this time the price is five.</p>
+<p>When the outer seal fails, the squad carries the rite inside expecting one
+death, Coalfast&#39;s. At the heart the wound divides under their hands, one
+anchor at a time, and at each division one of his squad steps in, one by
+one and without hesitation, until five living minds hold five anchors and
+nobody is walking back out.</p>
+<p>The player is forced to escape because the seal requires one final hand on the
+outside. Their survival is not a reward. It is the last and hardest part of the
+mission.</p>
+<h2 id="3-content-topology-and-the-balance-rule">3. Content topology and the balance rule</h2>
+<p>The Farshore is a permanent shared overworld realm. The arc uses three spaces:</p>
+<ol>
+<li><strong>The Farshore overworld:</strong> the shared island (Gullhaven, the Landing,
+Watch Meadow, Sundered Cliffs, Riftfields, Wreckfields). Multiple players
+and parties quest there simultaneously.</li>
+<li><strong>Story instances:</strong> private copies of a bounded area (interior or
+outdoor), created per solo player or per party from the existing dungeon
+instance pool. All decisive narrative beats happen here.</li>
+<li><strong>The Drowned Relief:</strong> a separate repeatable five-player dungeon unlocked
+after the campaign.</li>
+</ol>
+<h3 id="the-island-at-a-glance">The island at a glance</h3>
+<p>The Farshore is a real zone, already shipped on <code>feature/procedural-dungeons</code>
+(<code>src/sim/content/farshore.ts</code>, levels 3 to 7): a besieged island east of
+Eastbrook Vale, reached on foot across the Ferrywalk sandbar causeway (no
+portals, no boat). All six campaign NPCs already stand at posts there, and
+the zone&#39;s quest table is empty, waiting for this campaign. The campaign&#39;s
+movement is legible: the player arrives across the Ferrywalk from the
+southwest, and every act pulls them east and upward, toward the wound.</p>
+<ul>
+<li><strong>The Landing</strong> is the west shore where the Ferrywalk arrives; Tam keeps
+the watchbell brazier at the causeway&#39;s island end, and the fleet&#39;s
+landing beach faces the strait here.</li>
+<li><strong>Gullhaven</strong> is on the northwest coast: the fishing harbor (too small
+for ships of size), Warden Hale&#39;s statue above the harbor steps, and the
+redoubt (a war camp and barricade ring in the old market). Coalfast,
+Edda, Saul, and Nell post here.</li>
+<li><strong>Watch Meadow</strong> is the farmland at the island&#39;s center, where Ollun
+keeps the signal fire vigil. One toll means here. The Tidemill (campaign
+addition) stands at its western edge.</li>
+<li><strong>The Riftfields</strong> are the scarred eastern reach, where the great breach
+(campaign addition) opens.</li>
+<li><strong>The Sundered Cliffs</strong> are the southeast coast; two tolls means here.
+The drowned first redoubt lies in the tidal vault (campaign addition)
+beneath them.</li>
+<li><strong>The Wreckfields</strong> (campaign addition) are the shoal flats in the strait
+off the Landing, flanking the Ferrywalk, walkable at low tide.</li>
+</ul>
+<p>The playthrough document (<code>farshore-last-bell-playthrough.md</code>) carries the
+drawn map, and every quest there names its route and purpose.</p>
+<h3 id="the-balance-rule">The balance rule</h3>
+<blockquote>
+<p>The shared world is where the island lives. Instances are where the story
+happens.</p>
+</blockquote>
+<p>A beat goes into a private story instance whenever any of these is true:</p>
+<ul>
+<li>Named NPCs fight beside the player.</li>
+<li>A cutscene or dialogue choice plays.</li>
+<li>The world state visibly changes.</li>
+<li>The emotional pacing matters (music, silence, timing).</li>
+</ul>
+<p>Everything ambient, repeatable, or social stays in the shared world. Privacy
+is a prerequisite for the tone: an unrelated player cannot be allowed to
+disrupt a memorial scene.</p>
+<h3 id="the-two-forms-of-every-squad-npc">The two forms of every squad NPC</h3>
+<p>Each named defender exists in two forms, and the campaign is built on the
+distinction:</p>
+<ul>
+<li><strong>Home form:</strong> a persistent shared NPC at a fixed post in Gullhaven or the
+redoubt. Every player on the island sees the same five people in the same
+places. Interaction dialogue reflects the interacting character&#39;s own quest
+stage (quest state is already per character).</li>
+<li><strong>Encounter actor:</strong> a private copy of the NPC spawned inside a party&#39;s
+story instance, scripted and combat-capable, despawned when the instance
+ends. This generalizes the pattern the Nythraxis encounter already uses for
+Brother Aldric.</li>
+</ul>
+<p>The home NPCs never physically leave town for anyone. Two unrelated players at
+different campaign stages never wait on each other and never see each other&#39;s
+story actors; the only shared contention is instance-slot availability, same
+as dungeons today.</p>
+<h3 id="the-bell-code-as-a-live-shared-world-system">The bell code as a live shared-world system</h3>
+<p>The bell code is taught by the shared world, not only by the campaign:</p>
+<ul>
+<li><strong>One toll: danger in the fields.</strong> A recurring public Rift event in the
+Riftfields and Watch Meadow that any player on the island can answer.</li>
+<li><strong>Two tolls: danger at the cliffs.</strong> The same, at the Sundered Cliffs.</li>
+<li><strong>Three tolls: the enemy is within the walls.</strong> Reserved. It never fires as
+a public event. Players hear it exactly once, inside the campaign.</li>
+</ul>
+<p>Everyone on the Farshore learns the language through play; the campaign gives
+it meaning; the finale spends it. Public bell events are ordinary repeatable
+content (waves, a rare elite, small rewards) and require none of the story
+systems.</p>
+<h3 id="space-assignment-per-beat">Space assignment per beat</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Beat</th>
+<th>Space</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Arrival, Gullhaven hub life, side content</td>
+<td>Shared world</td>
+</tr>
+<tr>
+<td>Island histories side quests</td>
+<td>Shared world</td>
+</tr>
+<tr>
+<td>Q0 Ashore (arrival, public bell event)</td>
+<td>Shared world</td>
+</tr>
+<tr>
+<td>Q0 Ashore (the mill climax)</td>
+<td>Story instance (solo, per character)</td>
+</tr>
+<tr>
+<td>Q1 One Toll for the Fields (patrol climax)</td>
+<td>Story instance</td>
+</tr>
+<tr>
+<td>Q2 Steel, Salt and Names</td>
+<td>Shared world</td>
+</tr>
+<tr>
+<td>Q3 The Bell Below</td>
+<td>Story instance</td>
+</tr>
+<tr>
+<td>Q4 A Question of Reinforcements (council, vote, meal)</td>
+<td>Story instance</td>
+</tr>
+<tr>
+<td>Q5 Lights on the Water</td>
+<td>Shared world</td>
+</tr>
+<tr>
+<td>Q6 The Sundered Arrival</td>
+<td>Story instance</td>
+</tr>
+<tr>
+<td>Q7 On Our Own</td>
+<td>Shared world</td>
+</tr>
+<tr>
+<td>Q8 The Outer Seal (duplicated breach surroundings)</td>
+<td>Story instance</td>
+</tr>
+<tr>
+<td>Q9 to Q11 The finale</td>
+<td>Story instance</td>
+</tr>
+<tr>
+<td>The last watch (the quiet redoubt)</td>
+<td>Story instance</td>
+</tr>
+<tr>
+<td>Old Beacon delivery</td>
+<td>Shared world (Galecrest)</td>
+</tr>
+<tr>
+<td>Willowfen epilogue</td>
+<td>Story instance</td>
+</tr>
+<tr>
+<td>The Drowned Relief</td>
+<td>Dungeon</td>
+</tr>
+<tr>
+<td>Public bell events</td>
+<td>Shared world</td>
+</tr>
+</tbody></table></div>
+<h2 id="4-lore-foundation">4. Lore foundation</h2>
+<p>The Farshore sits beneath a wound left by the Night of Glass. Shards of the
+Loom passed low over the island, and its sky never healed. Rifts are
+unfinished rooms from the Dreamer&#39;s Sleeping World pressing into the waking
+world.</p>
+<p>Gullhaven is a forgotten daughter-house of the Vigil. Its founders came from
+the Old Beacon in the Galecrest and carried a piece of shaped star-glass with
+them. They called it the Bellheart.</p>
+<p>For twelve centuries the Bellheart has resonated before a Rift opens. That is
+why Gullhaven&#39;s bell can warn of a breach before anyone sees it. The people no
+longer remember where the Bellheart came from, but they still know the warning
+code.</p>
+<p>The Bellheart is not merely a bell clapper. It is a Court-made star-glass
+resonator, shaped around a splinter of the broken Loom. A bell is simply the
+safest way mortals found to make it speak.</p>
+<h3 id="the-recurring-seal-and-the-statue">The recurring seal and the statue</h3>
+<p>Sealing is not a desperate improvisation; it is the Vigil&#39;s oldest recurring
+duty. Small rifts open constantly (the daily bell-code work), and the great
+breach beneath the Riftfields opens roughly once a century. Each generation
+of wardens raised the outer rite and closed it from outside, and the
+histories say it held. A handful of times in twelve centuries the outer rite
+did not take, and one warden carried the seal inside alone and did not come
+out. The most recent was Warden Hale, one hundred years ago. His statue
+stands above the harbor steps in Gullhaven; the plinth carries one name for
+every warden who went inside, and it has room for more. That is how the town
+knows this history without anyone lecturing: the statue is simply there, and
+children can count the names.</p>
+<p>This grounds both of Coalfast&#39;s positions. His confidence in the outer seal
+is precedent (it almost always works), and his private contingency is also
+precedent (sometimes one warden goes in). He has studied Hale&#39;s account. The
+player can learn Hale&#39;s story before the campaign ever mentions it (see the
+island histories layer in section 6).</p>
+<h3 id="why-this-breach-is-worse">Why this breach is worse</h3>
+<p>The squad knows this one is the worst in living memory, and the campaign
+shows the evidence rather than asserting it. For the past year the rifts have
+opened more often, the spawn have come bigger and stranger, and the bell has
+rung more in one season than the oldest sailors can remember. The squad is
+overworked, down a member (Outrider Bren, section 5), and staring at counts
+Ollun cannot reconcile with any recorded breach. Overworked, undermanned, and
+up against a harder foe: that is the state of the squad when the player
+arrives.</p>
+<p>The breach also behaves in pulses: pressure crests and ebbs over hours
+rather than flowing steadily. Q6 is built on a pulse cresting early, and the
+wrong-feeling quiet after the disaster is the trough.</p>
+<p>The cause is named exactly once. In Q9, when the rupture has divided into
+five harmonics, Ollun observes that wounds do not divide themselves:
+something inside has learned the rite that closed this breach for twelve
+centuries and has split the wound to defeat it. The campaign says this
+plainly one time and never elaborates. The intelligence behind the division
+is a deliberately open thread for a future arc.</p>
+<h3 id="why-gullhaven-exists">Why Gullhaven exists</h3>
+<p>The island is dangerous and irreplaceable for the same reason. The wounded
+sky still sheds star-glass: after storms, shards of the Night of Glass wash
+up on the Farshore tidelines and nowhere else in the known world, and
+star-glass is what the mainland&#39;s wards, beacons, and the Vigil&#39;s own
+instruments are made from. The wound stirs the sea, so the shoals off the
+Farshore are the richest in the region. The founders came from the Old Beacon
+to keep watch over fisherfolk who would not leave; the town grew around the
+catch and the salvage trade (which also grounds Edda&#39;s mainland supplier
+letters and the star-glass salvage in Q7).</p>
+<p>Gullhaven is not ignorant of its danger. The danger is priced in, the living
+is good, and for twelve centuries the bell has kept the price of staying
+payable. Until now, the price has always been paid by the wardens.</p>
+<h3 id="the-bellheart-as-an-acquired-object">The Bellheart as an acquired object</h3>
+<p>The Bellheart is acquired during the campaign rather than sitting conveniently
+in Tam&#39;s current watchbell. The original Gullhaven bell tower collapsed into a
+tidal vault beneath the Sundered Cliffs generations ago. The modern warning
+bell has an ordinary iron clapper and repeats only a faint echo conducted
+through the redoubt&#39;s old stonework. Ollun believes the original Bellheart can
+power a proper seal if it is recovered.</p>
+<p>The object should feel dangerous and sacred:</p>
+<ul>
+<li>It vibrates before enemies appear.</li>
+<li>Reflections inside it show rooms that do not exist yet.</li>
+<li>When Tam strikes it, every open Rift on the island answers.</li>
+<li>Its founding inscription names the Old Beacon as Gullhaven&#39;s mother-house.</li>
+</ul>
+<h2 id="5-principal-cast">5. Principal cast</h2>
+<p>The group has the closeness, friction and black humour of a veteran war crew.
+Their affection is expressed through competence, arguments and insults, not
+speeches about friendship.</p>
+<p>They are also elite, and the campaign keeps that legible at all times. The
+squad is the most decorated unit the island has produced in a generation;
+ambient town dialogue defers to them, and the militia treats their arrival as
+the problem being solved. In encounters they visibly outperform the island&#39;s
+ordinary defenders: Coalfast holds a line alone that would kill a militia
+squad, and Tam&#39;s wards shrug off waves civilians run from. Their mortality
+reads as the scale of the enemy, never their frailty: when these people are
+worried, the player should be. The squad keeps six chairs, and one is empty.</p>
+<h3 id="warden-coalfast-the-commander">Warden Coalfast: the commander</h3>
+<p>Warm when he has time to be and frighteningly decisive when he does not. He
+remembers every defender he has lost. He opposed calling for mainland
+reinforcements because the crossing would expose them to whatever was moving
+inside the breach. He has studied Warden Hale&#39;s account of the last interior
+sealing. The precedent is public knowledge on this island; what is private
+is Coalfast&#39;s settled decision that if the rite must be carried inside, the
+carrier will be him.</p>
+<ul>
+<li>Combat role: shield-bearing front line and battlefield commands.</li>
+<li>Voice: short sentences, orders phrased as facts, praise that sounds like
+logistics (&quot;You held the east line. Good. Hold it again.&quot;).</li>
+<li>Arc: the man who planned to die alone learns, in the last hour, that his
+squad never intended to let him.</li>
+</ul>
+<h3 id="riftwatch-ollun-the-scholar">Riftwatch Ollun: the scholar</h3>
+<p>Ollun can hear changes in a breach before they become visible. He discovers
+the great rupture and designs the outer seal around the recovered Bellheart.
+He genuinely hopes the outer seal will work. His calculations cannot prove
+that it will. Throughout the campaign he gives possessions away, measures
+evacuation routes, avoids future tense and looks ill whenever someone
+celebrates a successful test.</p>
+<ul>
+<li>Combat role: interrupts Rift effects and reads the changing anchor pattern.</li>
+<li>Voice: precise, hedged, allergic to false comfort.</li>
+<li>Arc: the one who suspected first, and said nothing, because hope was also a
+calculation.</li>
+<li>Replay detail: across the whole campaign, Ollun is the only squad member who
+never describes his own future.</li>
+</ul>
+<h3 id="quartermaster-edda-the-engineer">Quartermaster Edda: the engineer</h3>
+<p>Edda repairs the same battered equipment so often that she treats it like part
+of the family. She is abrasive, practical and very funny when afraid. She
+builds the star-glass charges that will collapse the breach after it is
+anchored. Edda voted to request reinforcements, and in Q6 it is her hand
+that puts the flare up and brings the ships into the Riftjaw&#39;s water.
+Their deaths weigh heavily on her.</p>
+<ul>
+<li>Combat role: heavy ranged damage, demolitions and charge placement.</li>
+<li>Voice: insults as endearments; the more scared she is, the funnier she gets.</li>
+<li>Arc: guilt over the relief force, answered not by absolution but by work.
+Atonement colors her choice to stay at the charge station (she called them;
+she answers when called), but the stated reason is always that only she can
+arm the charge. She stays to finish a job, not to be punished.</li>
+</ul>
+<h3 id="mender-saul-the-conscience">Mender Saul: the conscience</h3>
+<p>Gentle, exhausted and harder to frighten than the others. He made peace with
+the precedent before anyone else, and he is the one who makes sure the
+newcomer understands the histories before the histories happen to them: it
+is Saul who sends the player to read the statue&#39;s plinth (Q7). He also
+accepts that the mission cannot succeed if the player abandons it early to
+search for a solution that does not exist.</p>
+<ul>
+<li>Combat role: healing, cleansing dream-corruption and keeping the anchor
+holders alive until detonation.</li>
+<li>Voice: quiet, unhurried, asks questions instead of arguing.</li>
+<li>Arc: the one who knew the cost first and made peace with it first.</li>
+</ul>
+<h3 id="bellkeeper-tam-the-old-soldier">Bellkeeper Tam: the old soldier</h3>
+<p>Coalfast&#39;s oldest friend. He uses humour to keep fear from becoming the most
+important person in the room. He claims not to believe in the old Vigil rites,
+yet knows every word. Tam is the only person who can reliably read and answer
+the Bellheart&#39;s changing tone.</p>
+<ul>
+<li>Combat role: protective wards, crowd control and maintaining the Bellheart&#39;s
+counter-note.</li>
+<li>Voice: jokes with perfect timing, sincerity only when it counts.</li>
+<li>Arc: the unbeliever who performs the rite perfectly at the end.</li>
+</ul>
+<h3 id="outrider-bren-the-empty-chair">Outrider Bren: the empty chair</h3>
+<p>Bren never appears alive. He was the squad&#39;s scout and vanguard, killed on a
+routine rift-sealing run in the Riftfields a few weeks before the player
+arrives. His gear is still on Edda&#39;s bench, maintained as if he might collect
+it; his bunk is unclaimed; the squad mentions him the way working crews do,
+mid-task and without ceremony. His death is why the squad is undermanned for
+the worst breach in a century, part of why the reinforcements council happens
+at all, and why a proven newcomer gets recruited (Q0 to Q1). Bren has a grave
+in Gullhaven. The five who go inside will not.</p>
+<h3 id="nell-the-bell-runner">Nell: the bell-runner</h3>
+<p>Nell is Bren&#39;s daughter and the squad&#39;s bell-runner: she carries messages
+between the posts and the tower. She is not part of the final expedition. Her
+father&#39;s death is weeks old, she is terrified of the work, and she does it
+anyway; her courage is not the absence of fear, it is returning to the shore
+despite it. She helps evacuate Gullhaven and survives. Nell gives the losses
+a human aftermath: after the finale she takes over the bell post, and she is
+the person who later asks the player to take five empty name-stones to
+Willowfen. Her father has a grave; the five do not.</p>
+<h2 id="6-storyboard">6. Storyboard</h2>
+<p>Conventions used below:</p>
+<ul>
+<li><strong>Space</strong> is Shared world or Story instance (per the table in section 3).</li>
+<li><strong>Scenes</strong> are authored sequences played by the scene system: cutscenes
+(camera control, input locked, skippable) or staged dialogue (in-world,
+player retains control).</li>
+<li><strong>Choices</strong> are dialogue options. Choices color the story (variant lines,
+acknowledgements later) and never branch it. In a party, the leader answers
+and the choice is broadcast; it creates no personal story state for one
+member.</li>
+<li>Every scene is skippable on replay and viewable again from a story journal.</li>
+<li>Combat and traversal carry the campaign. Dialogue plays during gameplay
+lulls wherever possible, and total input-locked cutscene time across the
+campaign stays under roughly eight minutes.</li>
+<li>Playable-first: a beat defaults to staged dialogue or a walkable scene
+(the player approaches each character to trigger their piece); an
+input-locked cutscene is reserved for beats where the camera itself is
+the point (the Riftjaw taking the fleet, the geometry change at the
+outer seal).</li>
+<li>Every quest objective is concrete and countable (kill N, collect N, light
+N, hold for N waves); the playthrough document shows the quest cards.</li>
+</ul>
+<h3 id="act-i-learn-their-rhythm">Act I: Learn their rhythm</h3>
+<p>The opening hour establishes the cast before asking the player to grieve for
+them. Every squad member gets a personal beat unrelated to dying.</p>
+<h4 id="q0-ashore">Q0. Ashore</h4>
+<ul>
+<li>Space: shared world, with a solo story-instance climax. The climax instance
+is per character even in a party (the recruitment must be earned
+personally); everything else is normal shared-world play.</li>
+<li>Squad present: none until the final scene (Coalfast and Tam arrive at the
+end).</li>
+<li>Beats:<ol>
+<li>Arrival in Gullhaven. Scene: the bell tolls once as the player steps off
+the boat; everyone in the street stops walking, counts, exhales,
+resumes. The player has been taught that the bell matters before anyone
+says a word about it. Warden Hale&#39;s statue stands above the harbor steps
+on the walk in.</li>
+<li>The player answers the one-toll public bell event in the Watch Meadow
+beside the town militia: ordinary Riftspawn, ordinary work (the standard
+public event doing double duty as the tutorial). Sergeant Marsh marks
+the player&#39;s work mid-event and makes an arrangement: his line holds
+the road, and if the rift coughs up something the militia cannot put
+down, he points at the player.</li>
+<li>A larger spawn erupts and digs into the mill at the meadow&#39;s edge,
+and the militia line folds back around it. The wardens are committed
+at the cliffs; there is nobody else to point at. Marsh points: the
+mill is the player&#39;s, and the militia holds the road at their back.</li>
+<li>Solo instance at the mill: put down the rift-stalker. Tuned to
+demonstrate the gap between the player and the island&#39;s ordinary
+defenders, not to be a wall.</li>
+<li>Scene (short): Coalfast and Tam arrive as it dies. Tam, looking at the
+stalker: &quot;The last one of those cost the whole watch a morning and two
+stretchers.&quot; Coalfast says nothing yet; the recruitment lands in Q1.</li>
+</ol>
+</li>
+<li>Emotional purpose: the player is demonstrably above the island&#39;s ordinary
+defenses and earns the introduction. The squad recruits a proven hand, not
+a stray.</li>
+<li>Systems: public bell event (section 3), one small solo story instance,
+sequencer.</li>
+</ul>
+<h4 id="q1-one-toll-for-the-fields">Q1. One Toll for the Fields</h4>
+<ul>
+<li>Space: shared-world intro, story-instance climax.</li>
+<li>Squad present: Coalfast, Tam.</li>
+<li>Beats:<ol>
+<li>Coalfast recruits the player for a Watch Meadow patrol, naming the mill
+kill and, without ceremony, the fact that the squad is down a scout
+(shared world: walk to the meadow edge, where Coalfast and Tam hold a
+fixed post).</li>
+<li>Instance transition at the meadow gate. Inside, the patrol proper: the
+player fights Riftspawn waves beside Coalfast and Tam. Tam teaches the
+bell code between waves (staged dialogue during combat lulls).</li>
+<li>Coalfast tests whether the newcomer can follow an order while
+frightened: he orders the player to hold a position while he takes the
+harder one. Choice: obey silently, question the order, or ask to swap.
+Coalfast&#39;s response differs; the tactic does not.</li>
+<li>Scene (short): after the last wave, Tam rings the all-clear. Coalfast to
+Tam, about the player: &quot;Keep this one.&quot;</li>
+</ol>
+</li>
+<li>Emotional purpose: competence and trust. The player is useful, not chosen.</li>
+<li>Systems: story instance (outdoor), squad roster (2 actors), sequencer,
+staged dialogue, one choice.</li>
+</ul>
+<h4 id="q2-steel-salt-and-names">Q2. Steel, Salt and Names</h4>
+<ul>
+<li>Space: shared world.</li>
+<li>Squad present: Edda, Saul (home forms, fixed posts).</li>
+<li>Beats: the player works a shift at each post. Every objective is that
+post&#39;s real work, never a fetch counter, and each shift is a quiet
+rehearsal of a finale mechanic:<ol>
+<li>Edda&#39;s forge: proof the charge casings with her (clamp, seat, strike
+the test tone, listen). The hands that proof the casings shield them
+at the charge station in Q10. Edda names every battered piece of
+equipment like a relative.</li>
+<li>Saul&#39;s infirmary: treat the wounded fishermen with him, and the
+interaction asks for each patient&#39;s name before it hands over the
+bandage; his philosophy is the mechanic. A small public wave event
+runs at the infirmary door behind it (answerable by anyone).</li>
+<li>Tam&#39;s tower: Tam puts the striker in the player&#39;s hand and drills the
+changes (timed strokes: the field code, the cliff code, the
+all-clear). This is the same timed-strike interaction Q11 spends at
+the climax; the campaign&#39;s last verb is taught in its second quest,
+so the finale never needs tutorial text.</li>
+<li>Each squad member gets a personal beat unrelated to dying: Edda&#39;s
+unsendable letter to a mainland supplier and Bren&#39;s maintained rack,
+Saul&#39;s habit of learning every patient&#39;s name, Nell at a dead run,
+Tam claiming not to believe in the rites while maintaining the bell
+perfectly.</li>
+</ol>
+</li>
+<li>Choices: small conversational options at each post; they change replies,
+not outcomes.</li>
+<li>Emotional purpose: ordinary affection. This is the hour that makes the
+finale cost something.</li>
+<li>Systems: the timed-strike interaction (shared with Q11: taught here,
+spent there) and a name-prompt interaction; otherwise standard quests
+plus one public event.</li>
+</ul>
+<h4 id="q3-the-bell-below">Q3. The Bell Below</h4>
+<ul>
+<li>Space: story instance (the drowned first redoubt, interior; delve-like).</li>
+<li>Squad present: Tam, Ollun.</li>
+<li>Beats:<ol>
+<li>Descent into the tidal vault beneath the Sundered Cliffs. Void Stalkers
+and unstable dream-things; Ollun reads the walls, Tam covers the rear.</li>
+<li>Mid-dungeon staged dialogue: Ollun admits the coming breach is larger
+than he has said publicly. Choice: press him for numbers, reassure him,
+or say nothing. He deflects all three differently.</li>
+<li>The founding bell chamber. Scene: recovering the Bellheart. It vibrates
+before the chamber&#39;s guardians wake. Reflections inside it show rooms
+that do not exist yet. Its inscription names the Old Beacon.</li>
+<li>Fighting exit, moving, never held: the tide rises below while the
+party climbs, and the chokepoints are killed through in motion, not
+defended as waves. At the top, when Tam strikes the Bellheart once to
+test it, every open Rift on the island answers (audible even in the
+shared world as a one-time ambient event for the player&#39;s party).</li>
+</ol>
+</li>
+<li>Emotional purpose: the object gets history before it becomes the mechanism.
+Ollun&#39;s fear becomes visible.</li>
+<li>Systems: story instance (interior), squad roster (2), sequencer, scenes,
+choices.</li>
+</ul>
+<h4 id="q4-a-question-of-reinforcements">Q4. A Question of Reinforcements</h4>
+<ul>
+<li>Space: story instance (the redoubt council room, then the mess table).</li>
+<li>Squad present: all five.</li>
+<li>Beats:<ol>
+<li>Scene: the council. Coalfast argues against sending the signal: the
+relief route is exposed across open water and the old causeway; a major
+signal may attract the intelligence within the Rift; an untrained relief
+force may add bodies without adding time. Ollun, Edda, Saul and Tam
+argue to send it, and the case is relief, not rescue: five are doing
+the work of six against the worst breach in the records (the sixth
+chair is empty, and everyone at the table knows it); the town must be
+evacuated while the rite is raised; every night the squad spends
+holding walls is a night nobody spends on the seal.</li>
+<li><strong>The vote, including the player.</strong> The player is given a real vote: for
+the signal or against it. The tally is authored so the player is always
+narrowly on the losing or winning side of a decision that carries
+anyway: player votes for, it passes 5 to 1; player votes against, it
+passes 4 to 2. Either way the signal is sent, the player is part of the
+decision, and the player owns a share of what follows. The vote is
+recorded and acknowledged in later variant lines (see Q6 aftermath).</li>
+<li>Coalfast honours the vote. He helps carry out the decision without
+sulking or undermining it. The player climbs the Watch Meadow mast with
+Tam and physically raises the signal (interactive, not a cutscene).</li>
+<li><strong>The quiet meal.</strong> Playable, not a cutscene. The squad eats together;
+the player can sit, eat, and talk to each member in any order. Each
+describes an ordinary plan for after the mission. Ollun, if asked about
+his, changes the subject (the replay detail). The scene ends when the
+player chooses to leave the table.</li>
+</ol>
+</li>
+<li>Emotional purpose: agency in the tragedy, and the calm before it.</li>
+<li>Systems: full scene system (council cutscene), dialogue choice UI (the
+vote), staged free-roam scene (the meal), sequencer.</li>
+</ul>
+<h3 id="act-ii-hope-and-responsibility">Act II: Hope and responsibility</h3>
+<h4 id="q5-lights-on-the-water">Q5. Lights on the Water</h4>
+<ul>
+<li>Space: shared world.</li>
+<li>Squad present: home forms, repositioned to the Landing for players at this
+stage&#39;s interactions.</li>
+<li>Beats:<ol>
+<li>The relief force appears as lights on the water. The harbor cannot
+take ships of size, so the fleet will land on the Landing beach at
+first light; overnight it anchors beyond the shoals, because nobody
+runs shoal water in the dark. The player clears the beach and lights
+the guide fires that mark the safe channel and the cleared landing
+zone (kill and interact objectives along the shore).</li>
+<li>Staged dialogue at the last fire: for the first time, the squad allows
+itself to believe that everyone might live. Tam starts a bad joke about
+mainland soldiers. He does not get to finish it.</li>
+</ol>
+</li>
+<li>Emotional purpose: hope, priced for demolition.</li>
+</ul>
+<h4 id="q6-the-sundered-arrival">Q6. The Sundered Arrival</h4>
+<ul>
+<li><p>Space: story instance (the Landing and the water approach, outdoor).</p>
+</li>
+<li><p>Squad present: all five.</p>
+</li>
+<li><p>Beats:</p>
+<ol>
+<li><p>The plan is a dawn landing: the fleet anchors beyond the shoals
+overnight, because nobody runs shoal water in the dark, and comes in
+at first light to the beach the player cleared. The squad and player
+hold the landing zone through the night.</p>
+</li>
+<li><p>The breach surges hours early (a pulse cresting): two tolls sound from
+Gullhaven, danger at the cliffs, and the code the player learned in
+the fields does its real job. Waves of Riftspawn and larger
+dream-things, far past Ollun&#39;s counts; by the middle waves the line is
+visibly failing.</p>
+</li>
+<li><p>The false final stand, then the call. At the fourth wave the
+breakwater stair goes quiet in the wrong way and Coalfast walks in
+alone, leaving death-flag orders behind him (if he is not out by the
+next wave: Tam commands, and they ring three). He barely walks back
+out (&quot;Not tonight. Positions.&quot;). The bait is deliberate: the campaign
+shows a last stand, lets the player believe it, and gives him back,
+so the real one lands harder. Then the call (staged dialogue,
+mid-fight):</p>
+<blockquote>
+<p><strong>Edda:</strong> &quot;The line will not hold to first light. They are anchored
+behind the shoals waiting for dawn. The flare is rigged and they
+know what it means. I can bring them in now.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;Night water, on this coast.&quot;</p>
+<p><strong>Edda:</strong> &quot;Night water, or they anchor off a beach we no longer
+hold.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;Send it up.&quot;</p>
+</blockquote>
+<p>Edda pulls the lanyard herself, in front of the player, and the flare
+blooms red over the shoals. A defensible call, made under pressure,
+by the people who will have to live with it.</p>
+</li>
+<li><p>The Riftjaw is waiting in the shoal channel, and the fleet dies while
+waves five and six are still on the beach: the player fights with
+their back to the water and sees it in pieces between strokes. Only
+when the sixth wave breaks does a short scene take the camera (the
+quest&#39;s one cutscene): the last ships going down in full view, the
+sailors&#39; souls drawn out of the water and swallowed, points of light
+pulled under in rows.</p>
+</li>
+<li><p>The failed rescue, on ground the player can actually fight on: the
+beach and the knee-deep tidal flats, among wreck debris, as survivors
+and wreckage wash in. The objective text is honest: &quot;Rescue
+survivors&quot;; the counter asks for twenty, and the sea gives seven.</p>
+</li>
+<li><p>The pulse ebbs, and the trough leaves a small scatter of strandlings
+on the flats: broken, half-rewritten, not a threat but work. Putting
+them down is a short scripted count, ugly and brief, the squad
+walking the tideline beside the player, nobody talking; never a
+farm. The quiet that follows is the
+trough, and it is written to feel wrong rather than restful. Ollun,
+watching where the wounded Riftjaw went down with its stolen light:
+&quot;It took the light down with it. A wound fed like that does not
+close.&quot; (Seeding the aftermath dungeon and its attunement.)</p>
+</li>
+<li><p>First light, playable, weight instead of wit: the player walks the
+tideline past the rows of sailcloth and goes to each of them in any
+order. Saul with the seven survivors (&quot;Seven.&quot;); Tam on the
+breakwater stair saying nothing at all, which is how the player knows
+how bad it is; Edda at the waterline, where Coalfast&#39;s only job is to
+turn her away from the water:</p>
+<blockquote>
+<p><strong>Coalfast:</strong> &quot;Edda. Look at me, not at the water.&quot;</p>
+<p><strong>Edda:</strong> &quot;You needed a quartermaster an hour ago.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;I need one now. The seal still needs its charges, and
+the charges need their maker.&quot;</p>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p>Emotional purpose: the disaster as the consequence of a defensible call
+made under pressure, with no villain in the room. Nobody was wrong;
+everybody pays.</p>
+</li>
+<li><p>Systems: story instance (outdoor, water edge), squad roster (5, first full
+deployment), sequencer, scenes.</p>
+</li>
+</ul>
+<h4 id="q7-on-our-own">Q7. On Our Own</h4>
+<ul>
+<li><p>Space: shared world.</p>
+</li>
+<li><p>Squad present: home forms.</p>
+</li>
+<li><p>A short aftermath quest rather than another action sequence. The player
+collects the relief banner from the surf, carries names to Saul, and helps
+Edda salvage enough star-glass for the outer seal.</p>
+</li>
+<li><p>The responsibility scenes play as staged dialogue at the posts, with the
+vote acknowledged. Nobody says &quot;we killed them.&quot; Coalfast does not use the
+disaster to prove he was right:</p>
+<blockquote>
+<p><strong>Edda:</strong> &quot;You told us not to call them.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;I told you what I thought. Then we made the call together.&quot;</p>
+<p><strong>Edda:</strong> &quot;They came because we asked.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;I know. This is not yours to carry alone.&quot;</p>
+</blockquote>
+<p>Later, Ollun tries to take the entire decision onto himself:</p>
+<blockquote>
+<p><strong>Ollun:</strong> &quot;I gave them the approach.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;I approved it.&quot;</p>
+<p><strong>Ollun:</strong> &quot;You voted against it.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;Then I lost the vote. After that, it was my order.&quot;</p>
+</blockquote>
+<p>Edda&#39;s guilt is specific: she voted for the signal, and her hand pulled
+the lanyard. Nobody lets her carry it alone, and nobody pretends it
+away:</p>
+<blockquote>
+<p><strong>Edda:</strong> &quot;I sent the flare up.&quot;</p>
+<p><strong>Tam:</strong> &quot;From a mortar I rigged, off a beach I promised we would
+hold. Keep going; there is plenty.&quot;</p>
+</blockquote>
+<p>Variant lines by the player&#39;s vote: if the player voted for the signal,
+Edda tells them, unprompted, &quot;You voted with me. Remember that I asked you
+to.&quot; If the player voted against, Tam says, &quot;You and the Warden were right.
+I would vote the same way again anyway.&quot; Same scene, different wound.</p>
+<p>As the quest closes, Saul, without explanation: &quot;Have you read the names
+above the harbor steps? Read them tonight.&quot; A player who skipped the
+island histories gets the statue&#39;s meaning planted here, ahead of Q8.</p>
+</li>
+<li><p>The squad decides to continue. Not framed as revenge: the civilians are
+still alive, and the breach is still opening.</p>
+</li>
+<li><p>Emotional purpose: guilt distributed honestly, including to the player.</p>
+</li>
+</ul>
+<h3 id="act-iii-the-plan-fails">Act III: The plan fails</h3>
+<h4 id="q8-the-outer-seal">Q8. The Outer Seal</h4>
+<ul>
+<li>Space: story instance. <strong>This is the duplicated breach surroundings:</strong> a
+private outdoor copy of the Riftfields approach, per party, so the
+operation is undisturbed and its world-state changes (wards, the
+contracting breach) are owned by the party.</li>
+<li>Squad present: all five.</li>
+<li>Beats:<ol>
+<li><p>The player and squad place Bellheart wards around the Riftfields
+(Edda places, Tam tunes, the player and Coalfast hold the line, Saul
+keeps everyone standing, Ollun calls the pattern). The four ward
+sites escalate by variation, never by repetition:</p>
+<ul>
+<li>Site 1 raises by the book: the standard defense, establishing the
+loop (three waves while Tam tunes).</li>
+<li>Site 2 misfires mid-tune, and the player holds Tam&#39;s counter-note
+themselves with the striker while he restarts the verse (the same
+stage-object work Q10 asks for at the Bellheart station).</li>
+<li>Site 3 sends no wave: one fast hunter goes straight for Edda
+mid-placement, a moving protect fight, not a line fight.</li>
+<li>Site 4 is silent. Nothing attacks; the ward goes up without a drop
+of blood; the silence is the escalation, and it feeds directly
+into Ollun&#39;s false dawn.</li>
+</ul>
+</li>
+<li><p>The operation initially works. The breach contracts, the creatures
+weaken, and Ollun allows himself to say, &quot;We have it.&quot;</p>
+</li>
+<li><p>Scene: the inner geometry changes. The wards pull apart because they are
+trying to anchor a wound whose centre is not fully inside the waking
+world. Ollun delivers the truth plainly:</p>
+<blockquote>
+<p><strong>Ollun:</strong> &quot;The seal will not take. Its heart is inside.&quot;</p>
+</blockquote>
+</li>
+<li><p>Recognition, not shock. The squad has read the same histories and grown
+up beneath the same statue; the player is the only one present who did
+not:</p>
+<blockquote>
+<p><strong>Tam:</strong> &quot;Hale&#39;s year.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;Ollun. From the heart. Can it be closed?&quot;</p>
+<p><strong>Ollun:</strong> &quot;Carried in, with the Bellheart. Yes.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;Then it closes.&quot;</p>
+</blockquote>
+<p>Nobody asks who carries it in; on this island that question was
+answered a hundred years ago, in bronze. (Staged in-world; the
+quest&#39;s one camera moment is the geometry change itself.)</p>
+<blockquote>
+<p><strong>Player:</strong> &quot;How do you get back out?&quot;</p>
+<p><strong>Coalfast:</strong> &quot;I do not.&quot;</p>
+</blockquote>
+<p>Choice: the player&#39;s follow-up is selectable (accusatory, pleading, or
+silent), and Coalfast&#39;s answer holds the same ground in all three:</p>
+<blockquote>
+<p><strong>Coalfast:</strong> &quot;I knew it might come to this. I hoped it would not.&quot;</p>
+</blockquote>
+<p>Around them, calm preparation: Tam checking his weapon, Edda dividing
+the charges, Saul packing his kit. Nobody argues about whether to go
+in. The argument about who stays has not happened yet, because everyone
+present believes the answer is one, and that it is Coalfast.</p>
+</li>
+<li><p>The squad and the player enter the breach together, composed, expecting
+to escort one man to his death.</p>
+</li>
+</ol>
+</li>
+<li>Emotional purpose: the plan has a precedent, and the precedent has a price
+everyone thinks they already know: one. The real reveal is still ahead.</li>
+<li>Systems: outdoor story instance at scale, squad roster (5) with scripted
+work loops, sequencer with a mid-quest reversal, scenes, choices.</li>
+</ul>
+<h3 id="act-iv-five-to-hold-one-to-close">Act IV: Five to hold, one to close</h3>
+<h4 id="q9-the-inside-plan">Q9. The Inside Plan</h4>
+<ul>
+<li><p>Space: story instance (the breach interior; continuous with Q10 and Q11 as
+one scenario with ordered stages).</p>
+</li>
+<li><p>Beats:</p>
+<ol>
+<li><p>The breach interior is one readable space, not a maze: a vast hollow
+of dream-stone with the heart at its centre and open ground all the
+way to it. The wrongness lives in the light and the sky, never in the
+navigation. The squad escorts Coalfast and the charge toward the
+heart, fighting through its defenders, expecting one death.</p>
+</li>
+<li><p>At the heart there is a single anchor: a standing collar of
+dream-stone where the rite must be held while Edda&#39;s charges do
+their work. Coalfast takes it and orders the rest out. One carrier,
+one death: the precedent everyone walked in expecting.</p>
+</li>
+<li><p>The wound answers by dividing, live, under their hands. One anchor
+becomes two, and Tam takes the second over Coalfast&#39;s objection
+(only he can hear the counter-note). It divides again, and Ollun
+goes to the drifting north anchor (only he can read it), naming the
+cause exactly once as he goes: wounds do not divide themselves; it
+has learned the rite; it is answering them (section 4, never
+elaborated). It divides again, and Saul takes the life anchor
+(somebody has to hold the holders). It divides once more, to five,
+and stops. Edda: &quot;It counted us.&quot; She sets the last charge and takes
+the fifth anchor with the detonator in her fist.</p>
+<p>Machines cannot substitute at an anchor (unfinished dream-matter
+rewrites their shape and instructions; a living mind can recognise
+that the world has gone wrong and force it back): this stays design
+rationale, and at most one line of Ollun&#39;s if a player asks.</p>
+</li>
+<li><p>There is no survey scene, no speech, and no call for volunteers. The
+reveal is dramatized as escalation: the wound asks one at a time,
+and one at a time, without hesitating, they answer.</p>
+</li>
+<li><p>Coalfast looks at each of them at their stones, the argument lost
+before it could be had, and gives the only useful order left. The
+player has heard the word all campaign: at the meadow gate, the
+guide fires, the breakwater stair:</p>
+<blockquote>
+<p><strong>Coalfast:</strong> &quot;Positions.&quot;</p>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p>Emotional purpose: their affection is communicated by how quickly they
+understand one another, not by a farewell speech.</p>
+</li>
+</ul>
+<h4 id="q10-the-last-bell">Q10. The Last Bell</h4>
+<ul>
+<li><p>The finale combat: a staged scenario, not a kill quest. The five stations
+form a pentagon around the charge. Each squad member performs an
+indispensable task at their station; the player (and any party members)
+move between stations, relieving pressure and killing priority targets.</p>
+</li>
+<li><p>Station gameplay: five authored rotations, capped, each with a distinct
+beat, rising in pressure. Saul calls the squad&#39;s status between them and
+Edda reports arming progress as the scenario clock:</p>
+<ol>
+<li>A single harmonic slips; the player rotates, clears the adds, and
+steadies the ward (the loop as taught; the only by-the-book
+rotation).</li>
+<li>Interference bends the counter-note; the player holds it with the
+striker while Tam corrects (taught at Q8&#39;s second ward, spent here).</li>
+<li>The dream-matter answers Saul with a copy of himself: a
+priority-target kill at the life anchor while the real Saul keeps
+cleansing.</li>
+<li>All five harmonics slip at once. The player can answer exactly one
+and must listen to the squad absorb the other four. The finale
+breaks its own loop exactly once, to teach the player they cannot
+hold everything, minutes before Coalfast orders them out.</li>
+<li>Everything converges on the charge for the final arming; the player
+shields the casings they proofed at Edda&#39;s bench in Q2.</li>
+</ol>
+</li>
+<li><p>When the charge is armed, Coalfast orders the player out with the
+Bellheart. The player offers to take an anchor:</p>
+<blockquote>
+<p><strong>Player:</strong> &quot;I can take a station.&quot;</p>
+<p><strong>Ollun:</strong> &quot;No. The outside lock must be turned after the charge fires.&quot;</p>
+<p><strong>Player:</strong> &quot;Send one of you.&quot;</p>
+<p><strong>Coalfast:</strong> &quot;Every person in here has a job only they can do. So do
+you.&quot;</p>
+<p><strong>Player:</strong> &quot;You expect me to leave you?&quot;</p>
+<p><strong>Coalfast:</strong> &quot;I expect you to close the breach. This is our post. Yours
+is outside. You held the east hedge when I asked. Hold this one. Go.&quot;</p>
+</blockquote>
+<p>The final order is the Q1 test, asked again at maximum stakes: can this
+person follow an order while frightened. The campaign opens and closes
+on the same question.</p>
+</li>
+<li><p>The retreat is played, not shown: the player runs the exit path while the
+squad&#39;s communication goes clipped and professional behind them. Nobody
+performs a final monologue. Edda reports the charge, Ollun calls changes in
+the harmonics, Tam corrects the Bellheart, Saul counts who is still
+standing. Coalfast waits until the player crosses the threshold before
+ordering the detonation.</p>
+</li>
+</ul>
+<h4 id="q11-close-the-door">Q11. Close the Door</h4>
+<ul>
+<li>The player emerges alone. The Bellheart must be placed into the exterior
+watchstone and struck at the exact moment the interior charge detonates
+(a timed interaction cued by the Bellheart&#39;s vibration, readable without
+UI text; generous but real timing). It is the same timed-strike
+interaction Tam drills in Q2, so the climax teaches nothing new: the
+player&#39;s hands already know the job.</li>
+<li>This is an active final objective. The player does not merely survive a
+cutscene. If they miss the moment, the sequence holds at the brink and the
+cue repeats; the sacrifice cannot land until the player closes the door.</li>
+<li>The Bellheart rings. The breach collapses. Gullhaven is safe for roughly
+one hundred years.</li>
+<li>The music stops.</li>
+</ul>
+<h3 id="the-island-histories-optional-lore-layer">The island histories (optional lore layer)</h3>
+<p>How the backstory reaches the player without a lecture. Town NPCs offer
+short interaction snippets that point at landmarks (&quot;ask the statue-keeper
+why the plinth has room for more names&quot;), and the landmarks carry a small
+set of optional side quests, one per zone, each unfolding one piece of
+history at the place it happened:</p>
+<ul>
+<li>Gullhaven: Warden Hale&#39;s statue. The statue-keeper tells the story of the
+last interior sacrifice and the names on the plinth.</li>
+<li>Sundered Cliffs: the collapsed first bell tower, a survey quest that
+breadcrumbs into Q3 (The Bell Below).</li>
+<li>The Landing: the founders&#39; inscription, the Old Beacon connection, and the
+star-glass salvage trade that keeps the town paid.</li>
+<li>Wreckfields: what the tides have taken over twelve centuries, and why the
+salvagers still go out.</li>
+</ul>
+<p>All of it is optional and skippable; a player who does it enters the finale
+knowing exactly what the squad is walking into. Each quest carries a small
+deed. Snippets and quest text follow the standard i18n rules; no new systems
+are required (standard quests plus interactable lore objects).</p>
+<h2 id="7-endings-and-epilogues">7. Endings and epilogues</h2>
+<h3 id="the-last-watch-solitary-ending">The last watch (solitary ending)</h3>
+<p>The final campaign quest is completed alone, always, even for a full party
+(each member walks their own copy). It has a verb, not just a mood: the
+player is the only person left who served with the squad, so the player
+walks the warden&#39;s night rounds through the quiet redoubt and performs each
+member&#39;s end-of-watch duty, each one learned or seen during Act I:</p>
+<ul>
+<li>Bank Edda&#39;s forge (it is found cold; Grandmother sleeps under canvas).</li>
+<li>Close Saul&#39;s book of names (open to the relief force&#39;s pages, every name
+written in full).</li>
+<li>Weight Ollun&#39;s papers (the calculations end in the middle of a sentence).</li>
+<li>Secure Tam&#39;s tower ropes, hang his ordinary iron clapper (waiting on
+the bench, tagged in his hand, since the Bellheart displaced it after
+Q3), and ring the all-clear once, one long soft stroke, the way he
+taught. The bell gets an ordinary heart back; the island still works.</li>
+<li>Turn Coalfast&#39;s chair to face the door, the way he left it every night
+(it is found facing the sea).</li>
+</ul>
+<p>Each duty is a silent interaction that plays one memory line. No objective
+markers beyond the duties; no music. The rounds end with the player writing
+five names into the redoubt&#39;s watch log in their own hand.</p>
+<p>The player then carries the Bellheart and Ollun&#39;s breach record to the Old
+Beacon in Galecrest (shared world travel; the delivery scene is instanced).
+Its keepers recognise the founding mark and learn that their forgotten
+daughter-house maintained the Vigil for twelve centuries without relief or
+recognition. When the Bellheart is placed beside the Old Beacon, it rings
+once without a bell around it. The combined record gives the surviving Vigil
+a way to detect the next great breach before it opens.</p>
+<p>The squad bought a century for Gullhaven and a warning for everyone else.</p>
+<h3 id="willowfen-epilogue-names-without-graves">Willowfen epilogue: Names Without Graves</h3>
+<p>Nell asks the player to carry five empty name-stones to Willowweep. The
+Willowfen is the only realm where the dead still find the Dreamer&#39;s sleep
+without assistance.</p>
+<p>The player plants one stone for each member of the final expedition: Warden
+Coalfast, Riftwatch Ollun, Quartermaster Edda, Mender Saul, Bellkeeper Tam.
+After each name is spoken, a distant bell note sounds. After Coalfast&#39;s name,
+the insects and frogs become silent. Five lights settle beneath the willow
+and fade.</p>
+<p>Nell says:</p>
+<blockquote>
+<p>&quot;The bell only ever asks one question: who will come? For twelve hundred
+years the answer was them. Now it is me.&quot;</p>
+</blockquote>
+<p>There is no boss, reward fanfare or immediate joke after this scene. The
+player is allowed to leave in silence.</p>
+<h3 id="post-campaign-gullhaven">Post-campaign Gullhaven</h3>
+<p>After the finale, the player&#39;s view of the squad changes permanently:</p>
+<ul>
+<li>The five home NPCs no longer appear for that character. Their posts stand
+empty, with small memorial objects (v1 mechanism: the interiors are
+micro-instances keyed to campaign state; the shared exterior town gains a
+permanent memorial that reads correctly at any campaign stage).</li>
+<li>Nell takes over the bell. One toll and two tolls keep sounding for public
+events: the island still works, because they made it work.</li>
+</ul>
+<p>Stated plainly, because it is a common question: nobody is replaced, and
+there is no successor squad in v1. Every squad post is indoors (forge,
+infirmary, bell chamber, council room), and each interior is a micro-instance
+keyed to the visiting character&#39;s campaign state. A mid-campaign character
+walks into the forge and Edda is there; a finished character walks through
+the same door and the forge is cold. The shared exterior street is identical
+for everyone at every stage. A character who has finished the campaign can
+never see the living squad again and cannot re-accept the quests; when they
+group with a friend who has not finished, the friend picks up and drives the
+quests, and the finished player joins the friend&#39;s story instances in replay
+mode (full participation, no second reward, no overwrite of their own
+post-campaign state; see section 9).</p>
+<h2 id="8-the-drowned-relief-aftermath-dungeon">8. The Drowned Relief (aftermath dungeon)</h2>
+<p>The Riftjaw that destroyed the reinforcement force is expelled into the
+waking world when the great breach closes. It retreats into a fused maze of
+ships and Rift architecture beneath the Wreckfields. It still holds the
+souls it took.</p>
+<h3 id="attunement-the-way-down">Attunement: the way down</h3>
+<p>The dungeon is per-character attuned, classic style: finishing the campaign
+is necessary but not sufficient. A short shared-world chain does the
+attuning, so the unlock is diegetic:</p>
+<ol>
+<li><strong>The lights.</strong> The Wreckfield salvagers stop going out: at low tide
+there are lights under the flats, and the lights move. Nell passes the
+word through the bell posts. The player walks the flats at low tide,
+sees the lights for themselves, and recovers the fleet&#39;s sailing logs
+from the flagship wreckage, where the lights crowd thickest. The logs
+show course corrections beginning days before landfall: something
+shadowed the relief force from the moment the signal went up, which is
+exactly what Coalfast warned the council about. The squad never
+learned this; the player does. (One quest: the rumor and the proof are
+the same walk.)</li>
+<li><strong>The key.</strong> The Riftjaw&#39;s pocket sits half inside dream-matter, and
+only star-glass opens the way. Edda&#39;s outer-seal work left finished
+spare resonance shards in the redoubt stores, tagged in her handwriting.
+Setting one at the mouth of the wreck-maze is the attunement; each party
+member runs the chain once and carries their own shard.</li>
+</ol>
+<p>A repeatable five-player dungeon unlocked after the campaign, about justice
+and release, not reversing the sacrifice:</p>
+<ul>
+<li>Enter the fused relief flagship.</li>
+<li>Fight dream-echoes wearing the sailors&#39; memories: the taken souls, given
+shape by the Riftjaw.</li>
+<li>Recover the relief banner and final dispatches.</li>
+<li>Kill the Riftjaw. Its death releases the souls it holds: lights rise out
+of the wreck-maze and disperse, free to find the Dreamer&#39;s sleep (the same
+imagery the Willowfen epilogue uses).</li>
+<li>Return the recovered names to the mainland.</li>
+</ul>
+<p>Releasing the taken souls lays the sailors to rest; it resurrects no one.
+The dungeon must not resurrect the squad, reveal that they escaped, or turn
+their deaths into a fake-out. A five-player dungeon is the cleanest first
+version (normal party structure); a ten-player raid variant is possible later
+but out of scope.</p>
+<h2 id="9-multiplayer-model">9. Multiplayer model</h2>
+<p>The campaign supports one to five human players while keeping all five named
+squad members present.</p>
+<ul>
+<li><strong>Solo:</strong> the NPC squad supplies the visual and combat presence of a full
+unit. Encounter tuning makes their support sufficient without letting them
+complete objectives unattended.</li>
+<li><strong>Party:</strong> human players add combat power but never replace named
+characters at the five anchors. The anchors belong to the story cast
+because their decision to stay is the emotional climax. All human players
+form the outside team: the five specialists are required inside, while the
+outside team must carry the Bellheart, defend the watchstone, and close the
+seal after detonation. The reason for survival holds at any party size.</li>
+</ul>
+<p>The Q0 climax instance is the one exception to the party model: it is solo
+and per character even in a party, because the recruitment must be earned
+personally. Every other story instance follows the rules below.</p>
+<p>Scenario rules:</p>
+<ul>
+<li>Grouped players enter the same private scenario and see the same squad,
+dialogue, stages and sacrifice. Ungrouped players entering at the same time
+receive separate instances and cannot disrupt one another&#39;s story actors.</li>
+<li>The named NPCs are encounter actors and consume no party slots.</li>
+<li>Enemy health and wave pressure scale with human player count; the squad
+stays competent but its damage share falls proportionally so extra players
+do not trivialise encounters.</li>
+<li>One party member operates a stage object; every eligible member present
+receives the stage credit.</li>
+<li>Every living player must reach the outside seal before it can activate; any
+one of them performs the final Bellheart interaction.</li>
+<li>Dialogue is broadcast to the party. Where a response is required, the party
+leader answers; the response creates no personal story branch.</li>
+<li>Campaign completion and rewards are recorded per member, not per leader.</li>
+<li>Before launch, the scenario runs a ready check showing each member&#39;s
+eligibility. V1 requires every unfinished player to be on the same finale
+step. A member who has completed the campaign may enter in replay mode to
+help a friend: no second campaign reward, no overwrite of their
+post-campaign state.</li>
+<li>No mid-scene joins. A late player joins before the scenario begins or waits
+for the next run. A disconnected player may resume the party&#39;s still-live
+instance, following the existing dungeon-instance model.</li>
+</ul>
+<h2 id="10-rewards-and-deeds">10. Rewards and deeds</h2>
+<p>Rewards memorialize; they do not pay out grief.</p>
+<ul>
+<li>Campaign completion: a title (from the Book of Deeds), the squad&#39;s banner
+(cosmetic), Renown, and Tam&#39;s bell-striker as a keepsake item (the one he
+taught the changes with; his iron clapper goes back into the bell during
+The Last Watch).</li>
+<li>The vote, the meal conversations, and each act completion carry deed
+records; the Willowfen epilogue carries its own quiet deed.</li>
+<li>Gear progression comes from the Drowned Relief dungeon.</li>
+<li>Per the repo content rule, all new conquerable content here (the story
+scenarios, the Drowned Relief, any new rares on the Farshore) authors its
+Book of Deeds records in <code>src/sim/content/deeds.ts</code> in the same change,
+following <code>docs/design/deeds.md</code>. Deeds stay cosmetic-only.</li>
+</ul>
+<h2 id="11-audio-and-music-direction">11. Audio and music direction</h2>
+<ul>
+<li><strong>The bell leitmotif.</strong> A short motif introduced in Q1, threaded through
+the procedural music whenever the story advances, carried by the Bellheart
+itself in Q3, rung at full voice for the last time in Q11, and answered
+once more, small and ordinary, by the diegetic all-clear stroke in The
+Last Watch.</li>
+<li><strong>Scene-driven music state.</strong> The scenario system can direct the procedural
+music engine (state, intensity, motif, silence). &quot;The music stops&quot; after
+the breach closes is an authored event, not a fade.</li>
+<li><strong>Silence is a deliberate register.</strong> The solitary ending and the Willowfen
+epilogue have no music. Ambient sound (surf, wind, insects) carries them;
+the insects stopping after Coalfast&#39;s name is an audio event.</li>
+<li>Squad dialogue is text with existing SFX conventions (no voice acting
+assumed by this spec).</li>
+</ul>
+<h2 id="12-technical-implementation-the-story-scenario-layer">12. Technical implementation: the story-scenario layer</h2>
+<p>Everything in this section is reusable; the campaign is its first consumer.
+All of it obeys the repo invariants: the sim stays deterministic and
+DOM-free, all randomness through <code>Rng</code>, the server stays authoritative,
+render/ui consume <code>IWorld</code> facets only, and every player-visible string is a
+stable key (the sim emits keys plus values, never English prose; see the
+i18n rules in the root and <code>src/ui/</code> CLAUDE.md files).</p>
+<h3 id="12-1-what-exists-today-verified-against-code">12.1 What exists today (verified against code)</h3>
+<ul>
+<li><strong>Instance pool:</strong> dungeons pre-allocate <code>INSTANCE_SLOT_COUNT</code> (24) private
+copies at reserved world positions (<code>src/sim/data.ts</code>,
+<code>src/sim/instances/dungeons.ts</code>). Claims are keyed per party or per durable
+character id (<code>instanceKeyFor</code>), which is what makes disconnect-resume work.</li>
+<li><strong>Companion NPC:</strong> delves spawn exactly one combat companion per run
+(<code>src/sim/delves/companion.ts</code>, definitions in
+<code>src/sim/content/delves/companions.ts</code>): follow, fight, heal, despawn on
+exit. It is a single-ally model today.</li>
+<li><strong>Scheduled encounter dialogue:</strong> the Nythraxis encounter
+(<code>src/sim/encounters/nythraxis.ts</code>) spawns a friendly NPC mid-fight and
+plays multi-line, delay-staggered dialogue through the sim&#39;s delayed-event
+queue, with per-encounter state on the entity. This is the seed of the
+scene system.</li>
+<li><strong>Quest state:</strong> per character (<code>QuestProgress</code> in <code>src/sim/types.ts</code>).</li>
+<li><strong>Not present today:</strong> escort quests, overworld phasing of any kind, camera
+control or cutscenes, dialogue choices, multi-NPC squads, ordered scenario
+stages.</li>
+</ul>
+<h3 id="12-2-system-1-story-instances">12.2 System 1: Story instances</h3>
+<p>Instance content that can be a bounded outdoor area (terrain, sky, water) as
+well as an interior, stamped into the existing 24-slot pool exactly like a
+dungeon. A story instance differs from a dungeon in what fills it, not how it
+is claimed:</p>
+<ul>
+<li>Claim, occupancy, disconnect-resume, and recycling reuse the dungeon
+instance model unchanged.</li>
+<li>A story instance is populated by a scenario definition (12.4), not a
+static mob table.</li>
+<li>Entry is gated by quest state (the giver NPC or a world portal checks the
+party&#39;s eligibility; ready check per section 9).</li>
+<li>New module behind the existing instances seam (sibling of
+<code>src/sim/instances/dungeons.ts</code>), never new methods on the <code>sim.ts</code>
+coordinator; sim system logic goes behind the <code>SimContext</code> seam per
+<code>src/sim/CLAUDE.md</code>.</li>
+</ul>
+<h3 id="12-3-system-2-squad-roster">12.3 System 2: Squad roster</h3>
+<p>Generalize the delve companion from one ally to N named actors:</p>
+<ul>
+<li>A squad definition: list of actor ids, each with a combat kit (role,
+abilities, target priorities), follow/hold/position directives, and story
+identity (name key, portrait, bark set).</li>
+<li>Actors are entities owned by the instance, not by a player; they scale
+as a group (their damage share falls as human player count rises).</li>
+<li>Scripted positioning: an actor can be ordered to a point, to a station
+object, or to follow a unit; the scenario sequencer issues these orders.</li>
+<li>Survivability during scripted sections: actors in a story-critical stage
+cannot be killed by ambient damage (they can be pressured, downed to a
+scripted floor, and must be relieved by the player, which is the Q10 loop).</li>
+<li>Implementation extends the companion brain pattern
+(<code>src/sim/delves/companion.ts</code>) into a <code>src/sim/squad/</code> module cluster with
+its own tests; content lives declaratively in <code>src/sim/content/</code>.</li>
+</ul>
+<h3 id="12-4-system-3-scenario-sequencer">12.4 System 3: Scenario sequencer</h3>
+<p>The spine: ordered stages with party-wide progress.</p>
+<ul>
+<li>A scenario definition is data-as-code in <code>src/sim/content/</code>: a list of
+stages, each with entry conditions, objectives (kill, interact, escort,
+survive, reach), actor directives, scene triggers, music directives, and an
+on-complete transition.</li>
+<li>Stage state is per instance, mirrored to every member (party-wide
+progress); credit rules per section 9.</li>
+<li>Failure handling per stage: retry from stage start (combat stages), hold
+and re-cue (timed interactions like Q11), never a full-campaign reset.</li>
+<li>Deterministic: stage transitions are tick-driven sim logic; all randomness
+through <code>Rng</code>; no wall-clock time.</li>
+<li>Lands as a <code>src/sim/scenarios/</code> module cluster behind the <code>SimContext</code>
+seam, with the scenario definitions in <code>src/sim/content/scenarios/</code>.</li>
+</ul>
+<h3 id="12-5-system-4-scene-system-cutscenes-and-staged-dialogue">12.5 System 4: Scene system (cutscenes and staged dialogue)</h3>
+<p>Split across the sim/client seam, which the architecture requires anyway
+(the sim can never touch a camera):</p>
+<ul>
+<li><strong>Sim side:</strong> a scene is a scripted sequence of sim events (dialogue lines
+as stable keys, actor movement/facing orders, music directives, camera
+directives as abstract data) scheduled through the existing delayed-event
+queue, generalizing the Nythraxis dialogue scheduler into a reusable
+<code>src/sim/scenes/</code> module. The sim knows a scene is playing (it can gate
+combat and objectives); it does not know what a camera is.</li>
+<li><strong>Client side:</strong> the renderer and game layer receive scene events via a new
+<code>IWorld</code> facet (add the facet member in <code>src/world_api/</code>, implement in both
+<code>Sim</code> and <code>ClientWorld</code>, update <code>tests/world_api_parity.test.ts</code> in the
+same change) and interpret them: camera moves and framing, letterboxing,
+input lock, subtitle presentation. All presentation, zero authority.</li>
+<li><strong>Skippable and replayable:</strong> skip is a client request the server honors
+per player (a skipped player waits at a hold point until the party&#39;s scene
+resolves; solo skip advances the scenario). A story journal lists watched
+scenes for replay (client-side playback of the same scene script).</li>
+<li><strong>Cutscene fairness:</strong> scenes never hide actionable combat information; a
+scene either plays in a safe stage or locks the stage into a safe state
+first (consistent with the graphics-fairness invariant&#39;s spirit).</li>
+</ul>
+<h3 id="12-6-system-5-dialogue-choice-ui">12.6 System 5: Dialogue choice UI</h3>
+<ul>
+<li>A HUD component following the repo recipe: a pure DOM-free view core
+(choice list, timing, selection state) registered in <code>UI_PURE_CORES</code>, plus
+a thin painter on the <code>PainterHost</code> seam (<code>src/ui/CLAUDE.md</code>).</li>
+<li>Party semantics: the leader answers; the selection broadcasts; a
+configurable response window with a default choice so a scene never
+deadlocks.</li>
+<li>Choices color, never branch: a choice writes a small per-character record
+(for example <code>lastBellVote: for | against</code>) that later scenes read to pick
+variant lines. No branching quest graphs.</li>
+<li>Every line and choice is a <code>t()</code> key in the matching
+<code>src/ui/i18n.catalog/</code> domain; sim-side dialogue emits keys plus values per
+the S3 rule (<code>tests/localization_fixes.test.ts</code>).</li>
+</ul>
+<h3 id="12-7-system-6-post-campaign-state">12.7 System 6: Post-campaign state</h3>
+<ul>
+<li>V1: interiors that must differ per player (the squad&#39;s posts, the solitary
+ending) are micro-instances keyed to campaign state; the shared exterior
+town shows a permanent memorial that reads correctly at any stage; home
+NPCs simply have campaign-stage-aware interaction dialogue (already
+supported by per-character quest state).</li>
+<li>Later, if arcs keep needing it: true per-party overworld visibility
+filtering. The server already interest-scopes snapshots per player, so a
+visibility predicate on entities is the natural extension point; it is
+deliberately out of scope for v1.</li>
+</ul>
+<h3 id="12-8-cross-cutting-engineering-rules-for-this-program">12.8 Cross-cutting engineering rules for this program</h3>
+<ul>
+<li>Sim purity and determinism guards must stay green
+(<code>tests/architecture.test.ts</code>); every new sim module is behind
+<code>SimContext</code>; every randomness draw through <code>Rng</code>.</li>
+<li>Every new <code>IWorld</code> member: facet file + both implementations + parity pin
+in the same change (<code>src/world_api/CLAUDE.md</code>).</li>
+<li>All squad dialogue, choice text, objective text, and item/deed strings are
+stable keys with English catalog entries; the sim and server stay
+language-agnostic.</li>
+<li>New content feeds the <code>/wiki</code> guide (<code>npm run wiki:content</code>) with
+spoiler-safety reviewed for this arc specifically: the guide must not
+reveal the sacrifice (guide prose for the campaign stays at the &quot;a story
+campaign on the Farshore&quot; altitude).</li>
+<li>Sim and server changes always land with tests; the scenario sequencer and
+squad roster get dedicated unit suites plus a headless end-to-end scenario
+run (the RL env host makes a scripted full-campaign smoke test cheap).</li>
+<li>Every phase ends green through <code>npm run gate</code> and the <code>/qa</code> review.</li>
+</ul>
+<h2 id="13-build-order">13. Build order</h2>
+<p>Phases 1 to 3 make the campaign playable end to end with placeholder
+presentation; phases 4 to 6 layer the cinematic quality on top. The story is
+testable long before the tears are.</p>
+<ol>
+<li><strong>Story instances.</strong> Outdoor-capable instance content on the existing
+pool. Acceptance: a party enters a private copy of a Riftfields slice,
+disconnect-resume works, 24-slot contention behaves like dungeons.</li>
+<li><strong>Squad roster.</strong> N named actors with roles, positioning, and group
+scaling. Acceptance: five actors fight beside a party in a story
+instance; damage share scales with player count; scripted floor works.</li>
+<li><strong>Scenario sequencer.</strong> Ordered stages, party-wide progress, failure
+handling. Acceptance: a full placeholder Last Bell scenario (Q9 to Q11)
+runs end to end solo and with five players, including the outside-seal
+gate, in the headless host.</li>
+<li><strong>Scene system.</strong> Sim scene scripts + client camera/letterbox/skip +
+story journal. Acceptance: the Q8 reveal plays as an authored cutscene,
+is skippable, replayable, and identical across offline and online hosts.</li>
+<li><strong>Dialogue choice UI + music direction.</strong> The vote works with party
+semantics and variant-line payoff; scene-driven music state including
+authored silence.</li>
+<li><strong>Campaign content.</strong> The Q0 prologue, all eleven quests, the island
+histories side quests, both epilogues, post-campaign state, public bell
+events, deeds, wiki prose, i18n catalog entries, and the Drowned Relief
+dungeon.</li>
+</ol>
+<h2 id="14-emotional-guardrails-binding">14. Emotional guardrails (binding)</h2>
+<ul>
+<li>The squad does not know that all five must die until the wound divides
+under their hands inside (Q9).</li>
+<li>The campaign baits one false last stand (the breakwater stair in Q6) and
+gives him back; it never fakes the real sacrifice afterward.</li>
+<li>The interior precedent is public knowledge (Warden Hale). Coalfast&#39;s
+private certainty is only that if the rite must be carried in, the carrier
+will be him.</li>
+<li>The other four recognise the contingency and choose to join him when one
+person proves insufficient.</li>
+<li>The reinforcements die because of a defensible collective decision (the
+vote) followed by a defensible battlefield call (Edda&#39;s flare), and the
+player&#39;s vote is really counted in it. Coalfast warned against it, but he
+never uses their deaths to win the argument afterward.</li>
+<li>The player contributes to the victory: they kill enemies, carry the
+Bellheart out, and physically close the breach.</li>
+<li>The squad dies to achieve something concrete: a century of safety.</li>
+<li>Nobody is secretly alive afterward. The Drowned Relief releases the taken
+souls to rest; it resurrects no one and never walks the deaths back.</li>
+<li>The player is not called the chosen one. They survive because the
+mechanism requires an outside closer and because the squad refuses to
+assign their oath to a newcomer.</li>
+<li>Dialogue choices color the story; they never branch it, and no choice can
+avert the sacrifice.</li>
+<li>The story spends at least an hour establishing ordinary affection before
+the fatal reveal.</li>
+<li>The squad reads as elite at all times. Their fear measures the enemy&#39;s
+scale, never their own frailty.</li>
+<li>Edda&#39;s atonement colors her choice; the stated reason she stays is always
+that only she can arm the charge.</li>
+<li>The cause of the five-fold division is named once, plainly, in Q9, and
+never elaborated in this campaign.</li>
+<li>The ending is allowed to remain quiet.</li>
+</ul>
+<h2 id="15-open-questions">15. Open questions</h2>
+<ul>
+<li>Zone budget for the Farshore itself (terrain, mob population, side content
+beyond the island histories layer) is not specced here.</li>
+<li>Tuning targets for the finale&#39;s station loop (wave cadence, rotation
+timing at each party size) need a playtest pass once phase 3 exists.</li>
+<li>Whether the public bell events grant a small currency or feed an existing
+reputation is open; they must stay rewarding without becoming the reason
+the island exists.</li>
+<li>Voice acting is assumed absent; if that changes, scene timing needs a
+second pass.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li>Original concept note: <code>docs/design/farshore-last-bell-quest-arc.md</code>
+(superseded by this spec).</li>
+<li>Comparable structure in World of Warcraft: outdoor quest chain + instanced
+story scenario + repeatable dungeon; scenarios, Follower Dungeons, Story
+Mode encounters, and Party Sync are the relevant precedents.</li>
+<li>Repo precedents: the Nythraxis encounter (dynamic friendly NPC, scheduled
+dialogue, encounter state), delve companions (ally combat AI), the dungeon
+instance pool (private copies, disconnect-resume).</li>
+</ul>
+
+</main>
+</body>
+</html>
