@@ -7371,6 +7371,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': 'Gruvdrift',
   'hudChrome.gathering.title': 'Insamling',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Det här kadavret har redan skördats.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Inget du valt kan skördas från det här kadavret.',
   'hudChrome.corpseHarvest.componentAria': 'Skörda {component}',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Huggtand',
@@ -8134,7 +8136,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kort',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% rabatt',
+  'hudChrome.claudium.railWocDiscount': '{percent}% rabatt',
   'hudChrome.claudium.railWocUnavailable': 'WOC-priser är inte tillgängliga just nu.',
   'hudChrome.claudium.showAmounts': 'Visa alla Claudium-belopp',
   'hudChrome.claudium.skuRow': '{usd} för {claudium} Claudium',

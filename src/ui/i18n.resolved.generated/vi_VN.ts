@@ -666,7 +666,7 @@ export const vi_VN: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Giảm 20%",
+      "railWocDiscount": "Giảm {percent}%",
       "railWocUnavailable": "Giá WOC hiện không có sẵn.",
       "railNativeUnavailable": "SOL/WOC hiện không khả dụng.",
       "amountLabel": "Số lượng",
@@ -1464,6 +1464,7 @@ export const vi_VN: EnTranslations = {
       "harvestButton": "Thu Hoạch",
       "harvestTooltip": "Thu thập các bộ phận đã chọn. Mỗi xác chỉ có thể thu hoạch một lần, ai đến trước được trước. Không lấy chiến lợi phẩm.",
       "concentrateHint": "Chọn càng ít bộ phận, mỗi bộ phận thu được sẽ có bậc chất lượng càng cao.",
+      "nothingSelectedYields": "Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.",
       "alreadyHarvested": "Xác này đã bị thu hoạch rồi.",
       "componentAria": "Thu hoạch {component}",
       "components": {

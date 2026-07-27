@@ -1,4 +1,5 @@
 import * as fs from 'node:fs';
+import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
@@ -44,6 +45,7 @@ import {
   renderTalentManifestEntry,
   talentTranslationManifest,
 } from '../src/ui/talent_i18n';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Lazy locale flip: the non-en game locales are no longer statically resident. Every
 // describe below setLanguage(non-en)s and reads synchronously through t() / localizeSimText /
@@ -911,14 +913,24 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // through SimContext. Scan ALL of them alongside sim.ts so every language-agnostic sim
   // emit stays under the drift guard; they are re-localized client-side by the same
   // matchers. When a slice moves emit literals out of the monolith, append its path here.
+  // The one automatic input in a hand-curated list, and so the one whose
+  // disappearance nobody would catch by reading a diff. It walks to any depth
+  // (#2489): the single-level read this replaces would have dropped every emit
+  // in a src/sim/social subdirectory the day one appeared, leaving this guard
+  // green over a quietly smaller corpus. Takes a root rather than closing over
+  // socialDir, so the recursion case at the end of this file drives the exact
+  // producer the corpus uses, not a restatement of it.
   const socialDir = path.resolve(process.cwd(), 'src/sim/social');
-  const socialSrc = fs.existsSync(socialDir)
-    ? fs
-        .readdirSync(socialDir)
-        .filter((f) => f.endsWith('.ts'))
-        .map((f) => fs.readFileSync(path.join(socialDir, f), 'utf8'))
-        .join('\n')
-    : '';
+  const socialSourceUnder = (root: string): string =>
+    tsFilesUnder(root)
+      .map(({ full }) => fs.readFileSync(full, 'utf8'))
+      .join('\n');
+  // No existsSync fallback to ''. That arm made a MOVED or renamed
+  // src/sim/social scan NOTHING with this guard still green, which is the same
+  // silence #2489 is about wearing a different hat; a directory that is gone
+  // now throws where a reader can see it.
+  const socialFiles = tsFilesUnder(socialDir);
+  const socialSrc = socialSourceUnder(socialDir);
   const simSrc = [
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/sim.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/damage.ts'), 'utf8'),
@@ -1197,13 +1209,84 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   it('s3_registered: every sim.ts emit maps to a registered key/RULE (PR tier)', () => {
     setLanguage('en');
     const cands = candidateStrings();
-    expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(80);
+    expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(400);
     const leaks: string[] = [];
     for (const { type, s } of cands) {
       if (!recognized(type, s)) leaks.push(`(${type}) ${JSON.stringify(s)}`);
     }
     setLanguage('en');
     expect(leaks, 'unregistered sim emit strings (add a key/RULE to sim_i18n.ts)').toEqual([]);
+  });
+
+  it('the src/sim/social glob still reaches its modules and feeds the corpus', () => {
+    // These bind the GLOB, where the floor above binds the total. Measured, so
+    // the difference is on the record: the corpus is 428 with the glob and 290
+    // without it, so the 400 floor does now catch a glob that empties
+    // completely (the 80 it replaced did not, which is what let this input be
+    // the quiet one). What the floor still cannot localize is a PARTIAL loss,
+    // and it cannot say which input went missing; these can, and they are the
+    // input a subdirectory or a rename would empty.
+    expect(
+      socialFiles.map((f) => f.file),
+      'the src/sim/social walk reaches every module in the directory',
+    ).toEqual([
+      'arena.ts',
+      'away.ts',
+      'card_duel.ts',
+      'card_duel_queue.ts',
+      'chat.ts',
+      'chat_readouts.ts',
+      'duel.ts',
+      'dungeon_finder.ts',
+      'fiesta.ts',
+      'fiesta_bots.ts',
+      'party.ts',
+      'ready_check.ts',
+      'trade.ts',
+      'vale_cup.ts',
+      'vale_cup_bots.ts',
+      'yumi.ts',
+    ]);
+    expect(
+      scanEmitCandidates(socialSrc, '').length,
+      'the social glob still contributes its emits to the S3 corpus',
+    ).toBeGreaterThan(220);
+  });
+
+  it('the corpus reads the tree through the shared walker, with no flat reader beside it', () => {
+    // The sibling of the pins in steam_routes / mobile_window_coverage /
+    // professions_silent_loot, and the same reasoning: src/sim/social is flat,
+    // so a second producer for socialSrc built on its own flat read would join
+    // the identical text to the corpus today and nothing here would notice.
+    const own = fs
+      .readFileSync(path.resolve(process.cwd(), 'tests/localization_fixes.test.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    // Both needles assembled from halves so neither matches its own line.
+    expect(own.split(`readdir${'Sync('}`).length - 1).toBe(0);
+    expect(own).toContain(`helpers/ts_files${'_under'}`);
+  });
+
+  it('the social glob descends, so an emit in a SUBDIRECTORY is scanned too (#2489)', () => {
+    // src/sim/social is flat today, so no assertion over the real tree can tell
+    // a recursive read from the single-level one it replaces. Drive the real
+    // producer over a fixture tree and hand its output to the real scanner: a
+    // nested emit has to arrive as a candidate, or the day social grows a
+    // folder its player text leaves the drift guard unnoticed.
+    const fixture = fs.mkdtempSync(path.join(tmpdir(), 'woc-social-scan-'));
+    try {
+      fs.mkdirSync(path.join(fixture, 'cards', 'deeper'), { recursive: true });
+      fs.writeFileSync(
+        path.join(fixture, 'cards', 'deeper', 'nested_emit.ts'),
+        "export function f(ctx: Ctx, pid: number) {\n  ctx.error(pid, 'Fixture nested social emit.');\n}\n",
+      );
+      fs.writeFileSync(path.join(fixture, 'notes.md'), "ctx.error(pid, 'Not source.');\n");
+      const found = scanEmitCandidates(socialSourceUnder(fixture), '').map((c) => c.tmpl);
+      expect(found).toContain('Fixture nested social emit.');
+      expect(found).not.toContain('Not source.');
+    } finally {
+      fs.rmSync(fixture, { recursive: true, force: true });
+    }
   });
 
   // RELEASE TIER: the same coverage across all 21 locales, and where a real matcher
@@ -1213,7 +1296,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     's3_localized: every emit is recognized in all 21 locales and not left English where a matcher resolves it',
     () => {
       const cands = candidateStrings();
-      expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(80);
+      expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(400);
       const leaks: string[] = [];
       for (const lang of supportedLanguages) {
         setLanguage(lang);

@@ -6229,6 +6229,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.title': 'Kontroler',
   'hudChrome.controller.vibration': 'Wibracje',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Z tego truchła już wszystko zebrano.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Z tego truchła nie zbierzesz żadnej z wybranych części.',
   'hudChrome.corpseHarvest.componentAria': 'Zbierz: {component}',
   'hudChrome.corpseHarvest.components.claw': 'Pazur',
   'hudChrome.corpseHarvest.components.fang': 'Kieł',
@@ -8320,7 +8322,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Karta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% zniżki',
+  'hudChrome.claudium.railWocDiscount': '{percent}% zniżki',
   'hudChrome.claudium.railWocUnavailable': 'Ceny WOC są obecnie niedostępne.',
   'hudChrome.claudium.showAmounts': 'Pokaż wszystkie ilości Claudium',
   'hudChrome.claudium.skuRow': '{usd} dla {claudium} Claudium',

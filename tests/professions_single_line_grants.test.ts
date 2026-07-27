@@ -146,22 +146,54 @@ const professionGrant = (itemId: string, count = 1): SimEvent =>
     callerLogs: true,
   }) as SimEvent;
 
+// Every cue this file stubs, as ONE list the beforeEach installs and
+// firedCues() reads back, so the two can never cover different sets.
+const STUBBED_CUES = [
+  'lootItem',
+  'coin',
+  'gather',
+  'gatherRareTier',
+  'craftSuccess',
+  'masterwork',
+  'disenchant',
+  'salvage',
+  'enchant',
+  'fishReel',
+] as const;
+
+/** The names of every STUBBED cue that actually fired, in list order. Asking
+ *  about the whole set is what makes #2458's "same action, same audio" more
+ *  than a two-name claim: naming lootItem and coin alone would miss a cue
+ *  added on some other arm later.
+ *
+ *  Its reach stops at STUBBED_CUES, and deliberately so rather than by
+ *  oversight: a cue reached through an idiom this file does not stub
+ *  (sfx.playUi, sfx.crowdRoar, voice.play, audio.click) would fire for real
+ *  in jsdom and read as absent here. The complement that closes that is the
+ *  source pin over the whole unbindResult arm in
+ *  tests/unbind_window_hud.test.ts, which forbids every audio/sfx/voice call
+ *  in it outright. Read the two together, not this one alone. */
+const firedCues = (): string[] =>
+  STUBBED_CUES.filter((name) => {
+    const spy = audio[name] as unknown as { mock?: { calls: unknown[] } };
+    return (spy.mock?.calls.length ?? 0) > 0;
+  });
+
+/** The exact event burst the sim emits for one successful unbind, per arm.
+ *  The stacked arm peels a copy back through the grant hub (both stand-down
+ *  flags since #2458); the lone arm clears boundTo in place, never reaches the
+ *  hub, and so has no grant event at all. That asymmetry in the BURST is the
+ *  whole reason the two arms could ever have sounded different. */
+const unbindBurst = (arm: 'stacked' | 'lone'): SimEvent[] => [
+  ...(arm === 'stacked' ? [professionGrant(SWORD, 1)] : []),
+  { type: 'unbindResult', pid: PLAYER_ID, ok: true, itemId: SWORD, fee: 2500 } as SimEvent,
+];
+
 beforeEach(() => {
   mountBags();
   // Every cue is stubbed: this file is about lines, and the cue contract has
   // its own file. The fishing arm's cue count is asserted below, though.
-  for (const name of [
-    'lootItem',
-    'coin',
-    'gather',
-    'gatherRareTier',
-    'craftSuccess',
-    'masterwork',
-    'disenchant',
-    'salvage',
-    'enchant',
-    'fishReel',
-  ] as const) {
+  for (const name of STUBBED_CUES) {
     vi.spyOn(audio, name).mockImplementation(() => {});
   }
 });
@@ -329,31 +361,54 @@ describe('one profession action prints exactly one grant line', () => {
     ]);
   });
 
-  it('unbinding one copy out of a stack prints the unbind line only', () => {
+  it('unbinding one copy out of a stack prints the unbind line only, with no cue', () => {
     // The sweep's last grant site (commission.ts unbindItem). A bound stack of
     // byte-equal copies is SPLIT: one copy is peeled off and re-granted through
     // the hub, so the player was told they received an item they already held,
     // stacked on top of the unbind line. A single-copy unbind clears in place
     // and never reaches the hub, so only the stacked arm ever double-logged.
     const hud = makeHud();
-    hud.handleEvents([
-      {
-        type: 'loot',
-        text: `You receive: ${ITEMS[SWORD]?.name}.`,
-        pid: PLAYER_ID,
-        callerLogs: true,
-      } as SimEvent,
-      { type: 'unbindResult', pid: PLAYER_ID, ok: true, itemId: SWORD, fee: 2500 } as SimEvent,
-    ]);
+    hud.handleEvents(unbindBurst('stacked'));
     const rendered = lines(hud);
     expect(rendered).toHaveLength(1);
     expect(rendered[0]).not.toContain('You receive');
     expect(rendered[0]).toContain(itemDisplayName(ITEMS[SWORD]));
-    // The cue is deliberately NOT stood down for this one: unbind has no
-    // dedicated cue of its own, so the grant sets callerLogs without silent.
-    expect(audio.lootItem).toHaveBeenCalledTimes(1);
+    // #2458: the cue stands down too. Unbind has no dedicated cue of its own,
+    // so hudChrome.unbind.unbound is documented as the ONE success surface (no
+    // toast, no sound cue, the trainResult rule) and the grant carries silent
+    // alongside callerLogs. Asked across every stubbed cue, not just the two
+    // the hub loot arm can reach, so a cue routed through some OTHER arm of
+    // the burst does not slip in under a narrower assertion. What that cannot
+    // see is an unstubbed idiom, which is why the arm's own source pin in
+    // tests/unbind_window_hud.test.ts forbids the whole audio/sfx/voice
+    // receiver set rather than a cue list.
+    expect(firedCues()).toEqual([]);
     // The peel still moved items, so the bag mirror still repaints.
     expect(hud.renderBags).toHaveBeenCalled();
+  });
+
+  it('unbinding a lone copy sounds exactly like unbinding out of a stack', () => {
+    // #2458's acceptance criterion, stated as one comparison rather than two
+    // separate single-arm claims. The count-1 arm clears boundTo in place, so
+    // its burst is the unbindResult event ALONE with no hub grant to flag,
+    // which is why the two arms could ever have differed. This is a negative
+    // control, not the regression guard for the fix: it passes on the old code
+    // too. What it adds is the cross-arm equality, so the sim pin in
+    // tests/professions_commissions.test.ts stays the decisive one.
+    const stacked = makeHud();
+    stacked.handleEvents(unbindBurst('stacked'));
+    const stackedCues = firedCues();
+    vi.clearAllMocks();
+
+    const lone = makeHud();
+    lone.handleEvents(unbindBurst('lone'));
+    const loneCues = firedCues();
+
+    const rendered = lines(lone);
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]).toContain(itemDisplayName(ITEMS[SWORD]));
+    expect(loneCues).toEqual(stackedCues);
+    expect(loneCues).toEqual([]);
   });
 
   it('a yield-free disenchant success renders no dangling empty operand', () => {
@@ -499,6 +554,24 @@ describe('a corpse harvest prints one line per DISTINCT granted item (#2457)', (
     expect(signed).toEqual([`You harvest: [${itemDisplayName(ITEMS[FANG])}].`]);
   });
 
+  it('a MULTI-UNIT signed component takes the quantity line, like its plain twin', () => {
+    // A signed corpse yield carries the roll's own quantity (#2473), so the
+    // signed-plus-quantity combination is reachable for the first time: before
+    // it, that arm could only ever land one unit. The ruling above is unchanged
+    // (a signed line reads exactly like a plain one), but the key choice now
+    // has to survive a count, and a line that dropped it would under-report
+    // what the player just received.
+    const hud = makeHud();
+    hud.handleEvents(harvestBurst([{ itemId: FANG, qty: 3, rarity: 'rare', kind: 'signed' }]));
+    const signed = lines(hud);
+    document.body.replaceChildren();
+    mountBags();
+    const plainHud = makeHud();
+    plainHud.handleEvents(harvestBurst([{ itemId: FANG, qty: 3, rarity: 'rare', kind: 'plain' }]));
+    expect(signed).toEqual(lines(plainHud));
+    expect(signed).toEqual([`You harvest: [${itemDisplayName(ITEMS[FANG])}] x3.`]);
+  });
+
   it('each line paints from its ROLLED rarity while the link paints from the item def', () => {
     // The gatherResult rule, and the arm no source-text pin can settle. Rough
     // Hide is a COMMON item granted at every roll, so a rare roll must color
@@ -597,7 +670,19 @@ describe('non-profession grants are untouched', () => {
     // LINE without owning the CUE, so the ding must still fire. Merging the
     // two guards into `if (!(ev.silent || ev.callerLogs))` is behaviorally the
     // regression those pins exist to stop, and it passes them; it fails here.
+    // Deliberately SYNTHETIC since #2458: no production emitter sets the two
+    // flags apart any more, so this fixture is the only thing keeping the hub's
+    // two independent guards from being collapsed into one condition. Do not
+    // delete it as unreachable.
     expect(audio.lootItem).toHaveBeenCalledTimes(1);
+    // Positive control for firedCues(), which the unbind symmetry pins above
+    // read as an EMPTY set. A helper that could never observe a call would
+    // make those pass vacuously, so at least one burst has to read back
+    // NON-empty through the same spies, and this is the burst where that is
+    // done. (Several other cases in this file also fire exactly one cue, but
+    // they assert it per-cue with toHaveBeenCalledTimes and so anchor
+    // nothing about the helper.)
+    expect(firedCues()).toEqual(['lootItem']);
   });
 });
 

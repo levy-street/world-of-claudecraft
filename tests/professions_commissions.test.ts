@@ -645,12 +645,17 @@ describe('unbind service deny order and mutation', () => {
     const loot = lootEvents(sim.drainEvents());
     expect(loot).toHaveLength(1);
     expect(loot[0].callerLogs).toBe(true);
-    // NOT silent: unbind has no dedicated cue of its own, so this is the one
-    // production grant that owns the line without owning the cue. Written as
-    // an own-key check, not toBeUndefined(): the conditional-spread contract
-    // (Sim.addItem) is that an unset flag is ABSENT, and a written-undefined
-    // key would move the parity digest of every grant in the game.
-    expect(Object.hasOwn(loot[0], 'silent')).toBe(false);
+    // ...and silent (#2458). Unbind has no dedicated cue of its own, so the
+    // contract above hudChrome.unbind.unbound ("the ONE success surface: no
+    // toast, no sound cue") is NO cue at all, and the count-1 arm below never
+    // reaches the hub. Leaving the ding on here made the same action on the
+    // same item sound different purely by how many byte-equal copies shared a
+    // slot. Both the presence and the value are pinned: the conditional-spread
+    // contract (Sim.addItemInstance) is that a set flag is an OWN key valued
+    // true and an unset one is ABSENT, and a written-undefined key would move
+    // the parity digest of every grant in the game.
+    expect(Object.hasOwn(loot[0], 'silent')).toBe(true);
+    expect(loot[0].silent).toBe(true);
     const slots = slotsOf(sim, pid, QA_ITEM);
     const bound = slots.filter((s) => s.instance?.boundTo !== undefined);
     const free = slots.filter((s) => s.instance?.boundTo === undefined);
@@ -661,12 +666,14 @@ describe('unbind service deny order and mutation', () => {
     expect(free[0].instance?.bindOnTrade).toBe(true);
   });
 
-  it('a single-copy unbind reaches the hub at all, so it has no line to stand down', () => {
+  it('a single-copy unbind never reaches the hub at all, so it has nothing to stand down', () => {
     // The negative control for the pin above, and the reason the double-line
     // only ever showed on a STACK: a lone bound copy is cleared in place, so
     // no grant happens and unbindResult is the only event either way. Without
     // this, flagging the peel could read as "unbind grants are flagged" when
-    // the two arms actually differ in whether a grant exists.
+    // the two arms actually differ in whether a grant exists. It is also the
+    // sim half of #2458's "same action, same audio": zero hub events here, and
+    // a silent one on the stacked arm, is what makes the two arms agree.
     const sim = makeSim();
     const pid = sim.playerId;
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);

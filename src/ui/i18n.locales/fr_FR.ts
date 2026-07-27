@@ -1259,7 +1259,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Carte',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20 % de réduction',
+  'hudChrome.claudium.railWocDiscount': '{percent} % de réduction',
   'hudChrome.claudium.railWocUnavailable': 'Les prix en WOC sont indisponibles pour le moment.',
   'hudChrome.claudium.showAmounts': 'Afficher tous les montants de Claudium',
   'hudChrome.claudium.skuRow': '{claudium} Claudium pour {usd}',
@@ -6107,6 +6107,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Ce cadavre a déjà été dépecé.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
   'hudChrome.corpseHarvest.componentAria': 'Prélever {component}',
   'hudChrome.corpseHarvest.components.claw': 'Griffe',
   'hudChrome.corpseHarvest.components.fang': 'Croc',

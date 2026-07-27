@@ -666,7 +666,7 @@ export const nl_NL: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% korting",
+      "railWocDiscount": "{percent}% korting",
       "railWocUnavailable": "WOC-prijzen zijn momenteel niet beschikbaar.",
       "railNativeUnavailable": "SOL/WOC staat uit.",
       "amountLabel": "Hoeveelheid",
@@ -1464,6 +1464,7 @@ export const nl_NL: EnTranslations = {
       "harvestButton": "Oogsten",
       "harvestTooltip": "Verzamelt de aangevinkte onderdelen. Elk lijk kan eenmaal worden geoogst, wie het eerst komt. Neemt de buit niet mee.",
       "concentrateHint": "Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.",
+      "nothingSelectedYields": "Van dit kadaver valt niets uit je selectie te oogsten.",
       "alreadyHarvested": "Dit kadaver is al geoogst.",
       "componentAria": "Oogst {component}",
       "components": {

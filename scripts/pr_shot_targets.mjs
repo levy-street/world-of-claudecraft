@@ -511,6 +511,11 @@ export const TARGETS = [
       'render/terrain',
       'render/world',
     ],
+    // Desktop and mobile variants: the touch layout downscales the fixed 560px
+    // map canvas (hud.mobile.css --mobile-map-size), so every on-canvas label is
+    // resampled on the way to the screen. Label legibility therefore has to be
+    // checked on both, not just at the desktop 1:1.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     // Teleport to a known landmark (offline, no dev command), open the world-map window,
     // and clip to it; fall back to the full frame if the window did not open.
     async capture(page) {

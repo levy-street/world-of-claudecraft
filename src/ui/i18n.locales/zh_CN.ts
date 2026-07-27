@@ -430,7 +430,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': '银行卡',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '优惠 20%',
+  'hudChrome.claudium.railWocDiscount': '优惠 {percent}%',
   'hudChrome.claudium.solBalance': 'SOL：{amount}',
   'hudChrome.claudium.wocBalance': 'WOC：{amount}',
   'hudChrome.claudium.railWocUnavailable': 'WOC 定价暂时不可用。',
@@ -759,6 +759,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '采集',
   'hudChrome.corpseHarvest.concentrateHint': '选择的部位越少，每个部位的品质越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '这具尸体已经被采集过了。',
+  'hudChrome.corpseHarvest.nothingSelectedYields': '你选择的部位都无法从这具尸体上采集。',
   'hudChrome.corpseHarvest.harvestTooltip':
     '采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。',
   'hudChrome.corpseHarvest.componentAria': '采集{component}',

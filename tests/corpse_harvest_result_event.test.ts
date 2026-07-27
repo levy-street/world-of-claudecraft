@@ -177,16 +177,32 @@ describe('one harvestResult per harvest command (#2457)', () => {
     // signed row's fang lands as an instance.
     expect(arms[0].loots).toHaveLength(2);
     expect(arms[2].loots).toHaveLength(3);
+    // The signed row's multi-unit grant is ONE batched call, so it is one loot
+    // event and one cue (#2473). A regression that looped the grant per unit
+    // would keep the site-count sweep in tests/professions_silent_loot.test.ts
+    // green while quietly firing a burst here.
+    expect(arms[1].loots).toHaveLength(2);
   });
 
   it('reports quantities that match what actually landed in the bags', () => {
     // A ledger that drifted from the grants would print a line for units the
     // player never received. Checked against the inventory, not the roll.
-    const { sim, a, mob } = setup(3);
-    const { results } = harvest(sim, mob.id, undefined, a);
-    for (const y of results[0].yields) {
-      expect(sim.countItem(y.itemId, a)).toBe(y.qty);
+    // Driven on the plain roll AND on the signed arm, whose entry carries the
+    // rolled quantity of its own (#2473): a count passed to addItemInstance
+    // that disagreed with the recorded one would otherwise go unseen.
+    const seen: HarvestResultEvent['yields'] = [];
+    for (const seed of [3, 30]) {
+      const { sim, a, mob } = setup(seed);
+      const { results } = harvest(sim, mob.id, undefined, a);
+      expect(results[0].yields.length, `seed ${seed}`).toBeGreaterThan(0);
+      for (const y of results[0].yields) {
+        expect(sim.countItem(y.itemId, a), `seed ${seed} ${y.itemId}`).toBe(y.qty);
+        seen.push(y);
+      }
     }
+    // Never vacuous on the arm this case was widened for: seed 30 must really
+    // have reached the multi-unit signed grant.
+    expect(seen.some((y) => y.kind === 'signed' && y.qty > 1)).toBe(true);
   });
 
   it('adds no rng draw: the event is composed from grants that already happened', () => {
@@ -222,7 +238,9 @@ describe('the four grant arms each report themselves (#2457)', () => {
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results[0].yields).toEqual([
       { itemId: 'rough_hide', qty: 1, rarity: 'common', kind: 'plain' },
-      { itemId: 'wolf_fang', qty: 1, rarity: 'rare', kind: 'signed' },
+      // The signed entry carries the roll's own quantity (#2473), which is what
+      // makes the client's quantity key reachable on this arm at all.
+      { itemId: 'wolf_fang', qty: 4, rarity: 'rare', kind: 'signed' },
     ]);
     // The arm identity: a signed instance really did land, stamped with the
     // harvester's name, so 'signed' is not just a label on a plain grant.
@@ -253,7 +271,9 @@ describe('the four grant arms each report themselves (#2457)', () => {
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results[0].yields).toEqual([
       { itemId: 'rough_hide', qty: 2, rarity: 'rare', kind: 'plain' },
-      { itemId: 'wolf_fang', qty: 1, rarity: 'rare', kind: 'signed' },
+      { itemId: 'wolf_fang', qty: 2, rarity: 'rare', kind: 'signed' },
+      // The specimen stays exactly one whatever the component rolled (#2473):
+      // it is a jackpot, not a quantity.
       { itemId: 'pristine_hide', qty: 1, rarity: 'rare', kind: 'specimen' },
     ]);
   });

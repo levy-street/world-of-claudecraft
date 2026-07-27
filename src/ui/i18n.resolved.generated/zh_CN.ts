@@ -666,7 +666,7 @@ export const zh_CN: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "优惠 20%",
+      "railWocDiscount": "优惠 {percent}%",
       "railWocUnavailable": "WOC 定价暂时不可用。",
       "railNativeUnavailable": "SOL/WOC 不可用",
       "amountLabel": "数量",
@@ -1464,6 +1464,7 @@ export const zh_CN: EnTranslations = {
       "harvestButton": "采集",
       "harvestTooltip": "采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。",
       "concentrateHint": "选择的部位越少，每个部位的品质越高。",
+      "nothingSelectedYields": "你选择的部位都无法从这具尸体上采集。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
       "components": {

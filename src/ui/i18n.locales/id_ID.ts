@@ -2062,6 +2062,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.title': 'Kalender Acara',
   'hudChrome.calendar.titlePlaceholder': 'Judul acara',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Bangkai ini sudah dipanen.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.',
   'hudChrome.corpseHarvest.componentAria': 'Panen {component}',
   'hudChrome.corpseHarvest.components.claw': 'Cakar',
   'hudChrome.corpseHarvest.components.fang': 'Taring',
@@ -8276,7 +8278,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kartu',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Diskon 20%.',
+  'hudChrome.claudium.railWocDiscount': 'Diskon {percent}%.',
   'hudChrome.claudium.railWocUnavailable': 'Harga WOC tidak tersedia saat ini.',
   'hudChrome.claudium.showAmounts': 'Tampilkan semua jumlah Claudium',
   'hudChrome.claudium.skuRow': '{usd} untuk {claudium} Claudium',

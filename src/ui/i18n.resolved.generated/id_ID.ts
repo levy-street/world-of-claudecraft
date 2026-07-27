@@ -666,7 +666,7 @@ export const id_ID: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Diskon 20%.",
+      "railWocDiscount": "Diskon {percent}%.",
       "railWocUnavailable": "Harga WOC tidak tersedia saat ini.",
       "railNativeUnavailable": "SOL/WOC tidak tersedia.",
       "amountLabel": "Jumlah",
@@ -1464,6 +1464,7 @@ export const id_ID: EnTranslations = {
       "harvestButton": "Panen",
       "harvestTooltip": "Mengumpulkan komponen yang dicentang. Setiap bangkai hanya bisa dipanen sekali, siapa cepat dia dapat. Tidak mengambil jarahan.",
       "concentrateHint": "Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.",
+      "nothingSelectedYields": "Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.",
       "alreadyHarvested": "Bangkai ini sudah dipanen.",
       "componentAria": "Panen {component}",
       "components": {

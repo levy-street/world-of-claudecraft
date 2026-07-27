@@ -666,7 +666,7 @@ export const ja_JP: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20%オフ",
+      "railWocDiscount": "{percent}%オフ",
       "railWocUnavailable": "WOC価格は現在利用できません。",
       "railNativeUnavailable": "SOL/WOCは利用不可",
       "amountLabel": "数量",
@@ -1464,6 +1464,7 @@ export const ja_JP: EnTranslations = {
       "harvestButton": "採取",
       "harvestTooltip": "チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。",
       "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
+      "nothingSelectedYields": "選んだ部位はどれも、この死体から採取できません。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
       "components": {

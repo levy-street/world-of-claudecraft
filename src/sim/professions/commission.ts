@@ -211,17 +211,19 @@ export function unbindItem(
     slot.count -= 1;
     const freed = cloneItemInstancePayload(instance);
     delete freed.boundTo;
-    // callerLogs, and deliberately NOT silent (#2430). This peel is an
-    // internal stack split, not an acquisition: the player already held every
-    // copy, so the hub's "You receive:" line here was the same falsehood the
-    // apply-enchant re-mint printed, stacked on top of the unbindResult line
-    // the client already logs (hudChrome.unbind.unbound, documented there as
-    // the ONE success surface). The single-copy arm above clears boundTo in
-    // place and never reaches the hub, so before this only a STACKED unbind
-    // printed two lines. `silent` stays unset because unbind has no dedicated
-    // cue of its own to protect the ding from: this is the asymmetric case the
-    // two flags are separate for.
-    ctx.addItemInstance(itemId, freed, meta.entityId, 1, { callerLogs: true });
+    // silent + callerLogs (#2430, #2458). This peel is an internal stack
+    // split, not an acquisition: the player already held every copy, so the
+    // hub's "You receive:" line here was the same falsehood the apply-enchant
+    // re-mint printed, stacked on top of the unbindResult line the client
+    // already logs (hudChrome.unbind.unbound, documented there as the ONE
+    // success surface: no toast, no sound cue). `silent` stands the hub's
+    // generic ding down for the same reason the line goes: the single-copy arm
+    // above clears boundTo in place and never reaches the hub at all, so
+    // leaving the cue on made ONE action sound different purely by how many
+    // byte-equal copies happened to share a slot. Unbind owning the cue means
+    // owning it as SILENCE (the trainResult single-surface rule), not as a cue
+    // of its own.
+    ctx.addItemInstance(itemId, freed, meta.entityId, 1, { silent: true, callerLogs: true });
   }
   return result;
 }

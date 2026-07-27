@@ -666,7 +666,7 @@ export const zh_TW: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "優惠 20%",
+      "railWocDiscount": "優惠 {percent}%",
       "railWocUnavailable": "WOC 定價目前無法使用。",
       "railNativeUnavailable": "SOL/WOC 無法使用",
       "amountLabel": "數量",
@@ -1464,6 +1464,7 @@ export const zh_TW: EnTranslations = {
       "harvestButton": "採集",
       "harvestTooltip": "採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。",
       "concentrateHint": "選擇的部位越少，每個部位的品質越高。",
+      "nothingSelectedYields": "你選擇的部位都無法從這具屍體上採集。",
       "alreadyHarvested": "這具屍體已經被採集過了。",
       "componentAria": "採集{component}",
       "components": {

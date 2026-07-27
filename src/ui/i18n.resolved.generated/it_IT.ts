@@ -666,7 +666,7 @@ export const it_IT: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% di sconto",
+      "railWocDiscount": "{percent}% di sconto",
       "railWocUnavailable": "I prezzi WOC non sono disponibili al momento.",
       "railNativeUnavailable": "SOL/WOC non disponibile.",
       "amountLabel": "Quantità",
@@ -1464,6 +1464,7 @@ export const it_IT: EnTranslations = {
       "harvestButton": "Raccogli",
       "harvestTooltip": "Raccoglie i componenti selezionati. Ogni carcassa puo essere raccolta una volta, chi prima arriva. Non prende il bottino.",
       "concentrateHint": "Meno componenti scegli, più alta sarà la qualità di ciascuno.",
+      "nothingSelectedYields": "Questo cadavere non ha nulla da raccogliere tra i componenti selezionati.",
       "alreadyHarvested": "Questo cadavere è già stato raccolto.",
       "componentAria": "Raccogli {component}",
       "components": {

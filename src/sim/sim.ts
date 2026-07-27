@@ -2566,7 +2566,11 @@ export class Sim {
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
-      meta.townFocus = { ...(s.townFocus ?? {}) };
+      // Known component families at positive integer points only: a save that
+      // predates the #2511 key check (or a corrupt one) self-heals here rather
+      // than riding back out through the panel into a request the command
+      // boundary now rejects.
+      meta.townFocus = professionsFocus.normalizeTownFocusOnLoad(s.townFocus);
       if (s.delveLoreUnlocked) for (const id of s.delveLoreUnlocked) meta.delveLoreUnlocked.add(id);
       if (s.delveDaily) {
         meta.delveDaily = {
@@ -7002,14 +7006,21 @@ export class Sim {
   // the caller owns the player-visible line for this grant and renders a
   // richer one off its own result event, so the hub's "You receive:" line
   // stands down instead of printing a second line for the one grant (#2430).
-  // The two are independent by design, so set exactly the halves the caller
-  // owns: a profession grant whose result event carries BOTH its own cue and
-  // its own line sets both (gather/craft/disenchant/salvage/enchant/fishing),
-  // while a caller that owns only the line sets only callerLogs (the Maker's
-  // Bond unbind peel in professions/commission.ts, which has no cue of its
-  // own). A grant with no result event behind it sets NEITHER, or it goes
-  // invisible: the once-ever Codfather quest catch (professions/fishing.ts)
-  // returns before its emit, so the hub line and ding are its only feedback.
+  // The two stay independent by design, but no shipped caller sets exactly one
+  // (true repo-wide today; the enforced part is professions plus corpse
+  // harvest, which tests/professions_silent_loot.test.ts sweeps, and every
+  // other grant in the game passes no opts at all). A grant whose result event
+  // owns the line owns the cue too, in one of three ways: a dedicated cue of
+  // its own (gather/craft/disenchant/salvage/enchant/fishing), the SAME
+  // generic ding replayed by the result arm exactly once for the whole
+  // command (corpse harvest, which has never had a recording of its own, so
+  // it keeps the sound it always made and only stops stacking it: #2457), or
+  // deliberate SILENCE, which is still owning it (the Maker's Bond unbind
+  // peel in professions/commission.ts, whose contract above
+  // hudChrome.unbind.unbound is no toast and no cue at all: #2458). A grant
+  // with no result event behind it sets NEITHER, or it goes invisible: the
+  // once-ever Codfather quest catch (professions/fishing.ts) returns before
+  // its emit, so the hub line and ding are its only feedback.
   // Professions 2.0's later phases
   // add new grant sites here (Phase 4 rare-event jackpot yields, Phase 13's
   // disenchant UI wiring): pass the same opts from those too, or the new

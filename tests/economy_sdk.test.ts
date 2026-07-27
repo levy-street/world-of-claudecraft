@@ -212,6 +212,61 @@ describe('EconomyClient pack snapshot', () => {
   });
 });
 
+describe('EconomyClient native price', () => {
+  it('preserves the service-provided $WOC discount for the store badge', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              rail: 'woc',
+              claudium: 500,
+              amountBase: '4000000',
+              discountBps: 5000,
+            }),
+            { status: 200 },
+          ),
+      ),
+    );
+
+    const price = await new EconomyClient({
+      token: () => 'token',
+      base: 'https://game.example',
+    }).nativePrice('woc', 'claudium_500');
+
+    expect(price.discountBps).toBe(5000);
+  });
+
+  it.each([-1, 9001, 2000.5, Number.NaN])(
+    'fails closed when the service returns malformed discount basis points: %s',
+    async (discountBps) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(
+          async () =>
+            new Response(
+              JSON.stringify({
+                rail: 'woc',
+                claudium: 500,
+                amountBase: '4000000',
+                discountBps,
+              }),
+              { status: 200 },
+            ),
+        ),
+      );
+
+      const price = await new EconomyClient({
+        token: () => 'token',
+        base: 'https://game.example',
+      }).nativePrice('woc', 'claudium_500');
+
+      expect(price.discountBps).toBeNull();
+    },
+  );
+});
+
 describe('startClaudiumPurchase', () => {
   it('signs and confirms a service-built USDC transaction through Wallet Standard', async () => {
     const client = new EconomyClient({ token: () => 'token', base: 'https://game.example' });

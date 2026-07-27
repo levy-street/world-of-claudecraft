@@ -436,7 +436,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': '카드',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% 할인',
+  'hudChrome.claudium.railWocDiscount': '{percent}% 할인',
   'hudChrome.claudium.solBalance': 'SOL: {amount}',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
   'hudChrome.claudium.railWocUnavailable': '현재 WOC 가격을 이용할 수 없습니다.',
@@ -785,6 +785,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '채집',
   'hudChrome.corpseHarvest.concentrateHint': '선택한 부위가 적을수록 부위당 등급이 더 높아집니다.',
   'hudChrome.corpseHarvest.alreadyHarvested': '이 시체는 이미 채집되었습니다.',
+  'hudChrome.corpseHarvest.nothingSelectedYields': '선택한 부위는 이 시체에서 채집할 수 없습니다.',
   'hudChrome.corpseHarvest.harvestTooltip':
     '선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.',
   'hudChrome.corpseHarvest.componentAria': '{component} 채집',

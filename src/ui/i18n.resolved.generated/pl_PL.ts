@@ -666,7 +666,7 @@ export const pl_PL: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% zniżki",
+      "railWocDiscount": "{percent}% zniżki",
       "railWocUnavailable": "Ceny WOC są obecnie niedostępne.",
       "railNativeUnavailable": "SOL/WOC są obecnie niedostępne.",
       "amountLabel": "Kwota",
@@ -1464,6 +1464,7 @@ export const pl_PL: EnTranslations = {
       "harvestButton": "Zbierz",
       "harvestTooltip": "Zbiera zaznaczone komponenty. Każde zwloki można zebrać raz, pierwszemu podejdzie. Nie zabiera łupów.",
       "concentrateHint": "Im mniej części wybierzesz, tym wyższa jakość każdej z nich.",
+      "nothingSelectedYields": "Z tego truchła nie zbierzesz żadnej z wybranych części.",
       "alreadyHarvested": "Z tego truchła już wszystko zebrano.",
       "componentAria": "Zbierz: {component}",
       "components": {

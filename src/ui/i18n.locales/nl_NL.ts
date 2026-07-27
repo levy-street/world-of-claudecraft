@@ -7630,6 +7630,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.concentrateHint':
     'Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Dit kadaver is al geoogst.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Van dit kadaver valt niets uit je selectie te oogsten.',
   'hudChrome.corpseHarvest.componentAria': 'Oogst {component}',
   'hudChrome.corpseHarvest.components.hide': 'Huid',
   'hudChrome.corpseHarvest.components.fang': 'Tand',
@@ -8356,7 +8358,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kaart',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% korting',
+  'hudChrome.claudium.railWocDiscount': '{percent}% korting',
   'hudChrome.claudium.railWocUnavailable': 'WOC-prijzen zijn momenteel niet beschikbaar.',
   'hudChrome.claudium.showAmounts': 'Toon alle Claudium-bedragen',
   'hudChrome.claudium.skuRow': '{usd} voor {claudium} Claudium',

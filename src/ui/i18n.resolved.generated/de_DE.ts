@@ -666,7 +666,7 @@ export const de_DE: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% Rabatt",
+      "railWocDiscount": "{percent}% Rabatt",
       "railWocUnavailable": "WOC-Preise sind derzeit nicht verfügbar.",
       "railNativeUnavailable": "SOL/WOC deaktiviert.",
       "amountLabel": "Menge",
@@ -1464,6 +1464,7 @@ export const de_DE: EnTranslations = {
       "harvestButton": "Verwerten",
       "harvestTooltip": "Verwirft die markierten Komponenten. Jeder Kadaver kann einmal verwertet werden, wer zuerst kommt. Nimmt nicht die Beute.",
       "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
+      "nothingSelectedYields": "An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
       "components": {

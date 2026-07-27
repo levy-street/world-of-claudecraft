@@ -66,11 +66,8 @@ combo; allocation-free: `nameplatePlanInto` fills a caller-owned `NameplatePlan`
 `nameplate_painter.ts` does the Three projection, DOM writes, and ALL the
 localization (per-tier cadence via `ui_tier_knobs.nameplateIntervalSec`); the
 significant-contributor name glow lives there too. Narrow helpers:
-`nameplate_combo/threat/projection/declutter.ts` (the last one is the
-classic-style vertical stacking pass: plates only ever move UP from their own
-anchor, the current target is pinned, and separation follows each plate's real
-height from `nameplate_extent_core.ts`) plus `entity_labels.ts` (shared
-localized display names). Drive changes from `tests/nameplate_*.test.ts`.
+`nameplate_combo/threat/projection/declutter.ts` plus `entity_labels.ts`
+(shared localized display names). Drive changes from `tests/nameplate_*.test.ts`.
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives

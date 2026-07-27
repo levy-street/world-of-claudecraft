@@ -762,8 +762,18 @@ export function assignMasterLoot(
   const roll = ctx.pendingLootRolls.get(rollId);
   if (!roll || roll.masterLooter === undefined) return;
   if (r.meta.entityId !== roll.masterLooter) return; // only the master looter decides
-  // Keep only still-eligible targets; ignore anyone no longer a candidate.
-  const targets = targetPids.filter((p) => roll.candidates.includes(p));
+  // Keep only still-eligible targets, each counted once; ignore anyone no longer
+  // a candidate. The pid list is client-supplied (the masterAssign wire case
+  // checks that pids is a non-empty array of numbers and nothing about the
+  // values), and a pid named twice would send that player two lootRoll prompts,
+  // print their reveal line twice, and can put one player in tiedWinners twice,
+  // drawing a tie-break ctx.rng.int the honest single-candidate case never draws.
+  // What is load-bearing is deduping BEFORE the length tests below, so [X, X]
+  // takes the direct-grant arm exactly like [X] instead of converting to a
+  // one-player need/greed roll (the dedupe and the filter commute, so their
+  // relative order is not). Set iterates in first-seen order, which preserves the
+  // caller's prompt and reveal order.
+  const targets = [...new Set(targetPids)].filter((p) => roll.candidates.includes(p));
   if (targets.length === 0) return; // nothing valid selected: leave the prompt open
   if (targets.length === 1) {
     // The target can have logged out during the up-to-5min curate window

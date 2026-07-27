@@ -6090,6 +6090,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.title': 'Controller',
   'hudChrome.controller.vibration': 'Vibration',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Dette kadaver er allerede blevet høstet.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Intet af det du har valgt kan høstes fra dette kadaver.',
   'hudChrome.corpseHarvest.componentAria': 'Høst {component}',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Hugtand',
@@ -8290,7 +8292,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kort',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% rabat',
+  'hudChrome.claudium.railWocDiscount': '{percent}% rabat',
   'hudChrome.claudium.railWocUnavailable': 'WOC-priser er ikke tilgængelige lige nu.',
   'hudChrome.claudium.showAmounts': 'Vis alle Claudium-beløb',
   'hudChrome.claudium.skuRow': '{usd} til {claudium} Claudium',

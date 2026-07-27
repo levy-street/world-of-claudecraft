@@ -11,6 +11,8 @@
 // timed harvest in professions/gathering, so the mapping is the "timing" the brief
 // requires stay untouched), the harvest-disabled state, and the empty short-circuit.
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { CorpseHarvestViewModel } from '../src/ui/hud/loot/corpse_harvest_view';
 import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_window';
@@ -23,6 +25,7 @@ function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestVie
     ],
     harvestDisabled: false,
     concentrated: true,
+    forfeitsEveryYield: false,
     ...overrides,
   };
 }
@@ -55,6 +58,12 @@ describe('renderCorpseHarvestPicker: picker section', () => {
       attachTooltip: () => {},
     });
     expect(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.disabled).toBe(true);
+    // The ONE fixture where the two model fields disagree, so it is the only
+    // place that can tell which field each write reads. `harvestDisabled` is
+    // true here and `forfeitsEveryYield` is false, so the reason line must
+    // stay hidden: a painter that keyed the line off `harvestDisabled` would
+    // be invisible to every other case, where the two always coincide.
+    expect(container.querySelector<HTMLElement>('.corpse-harvest-warning')?.hidden).toBe(true);
   });
 
   it('exposes what Harvest does via the shared tooltip idiom, distinct from Take Loot', () => {
@@ -95,5 +104,148 @@ describe('renderCorpseHarvestPicker: picker section', () => {
     );
     container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
     expect(onHarvest).toHaveBeenLastCalledWith([]);
+  });
+});
+
+// #2509: the picker's mirror of the command-boundary refusal. Checking only
+// families with no harvest item behind them (claw, tusk, gills, horn) is a
+// command the sim refuses pre-claim, so the button goes dead and the section
+// says why IN PLACE: a `disabled` button takes no pointer events and leaves the
+// tab order (src/ui/focus_manager.ts), so a tooltip on it is unreachable.
+describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#2509)', () => {
+  // old_greyjaw's real tags. Only claw is unmapped.
+  const GREYJAW = ['hide', 'fang', 'claw'];
+  const rowsFor = (tags: string[], checked: string[] = []) =>
+    tags.map((tag) => ({ tag, checked: checked.includes(tag) }));
+
+  function render(tags: string[], checked: string[] = []) {
+    const container = document.createElement('div');
+    const onHarvest = vi.fn();
+    const attachTooltip = vi.fn();
+    const forfeits = checked.length > 0 && checked.every((t) => t === 'claw' || t === 'horn');
+    renderCorpseHarvestPicker(
+      container,
+      view({
+        rows: rowsFor(tags, checked),
+        harvestDisabled: forfeits,
+        concentrated: checked.length > 0 && checked.length < tags.length,
+        forfeitsEveryYield: forfeits,
+      }),
+      { onHarvest, attachTooltip },
+    );
+    const boxes = [...container.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
+    return {
+      container,
+      onHarvest,
+      attachTooltip,
+      boxes,
+      btn: container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')!,
+      warning: container.querySelector<HTMLElement>('.corpse-harvest-warning')!,
+      // The real user gesture. Setting `.checked` fires no `change`, so a test
+      // that mutated the property directly would assert a stale button and
+      // pass whatever the handler did.
+      toggle(tag: string) {
+        const box = boxes.find((b) => b.value === tag)!;
+        box.checked = !box.checked;
+        box.dispatchEvent(new Event('change', { bubbles: true }));
+      },
+    };
+  }
+
+  it('hides the reason line while the selection can still yield something', () => {
+    const t = render(GREYJAW, ['hide']);
+    expect(t.btn.disabled).toBe(false);
+    expect(t.warning.hidden).toBe(true);
+  });
+
+  it('kills the button and states why when the last mapped box is unchecked', () => {
+    const t = render(GREYJAW, ['hide', 'claw']);
+    expect(t.btn.disabled).toBe(false);
+    t.toggle('hide');
+    expect(t.btn.disabled).toBe(true);
+    expect(t.warning.hidden).toBe(false);
+    expect(t.warning.textContent).toBe('Nothing you selected can be harvested from this corpse.');
+    // The dead button really is dead: a click submits nothing.
+    t.btn.click();
+    expect(t.onHarvest).not.toHaveBeenCalled();
+  });
+
+  it('announces the reason, since the button silently leaves the tab order', () => {
+    // A `disabled` button takes no pointer events and is not focusable, so
+    // neither the shared tooltip nor an aria-label on it is reachable at the
+    // moment the action dies. The live region is what carries the why.
+    const t = render(GREYJAW, ['hide']);
+    expect(t.warning.getAttribute('role')).toBe('status');
+    expect(t.warning.getAttribute('aria-live')).toBe('polite');
+    // Said once, not twice: the sentence lives on the line alone, never also
+    // on the button, so browse mode does not read it back to back.
+    t.toggle('hide');
+    t.toggle('claw');
+    expect(t.warning.hidden).toBe(false);
+    expect(t.btn.getAttribute('aria-label')).toBeNull();
+  });
+
+  it('keeps the reason line BELOW the button, so showing it never moves the control', () => {
+    // The line appears and disappears on a checkbox toggle. Above the button
+    // it would shove Harvest down at the exact moment the player is reaching
+    // for it; below, only the popup's bottom edge moves. Pinned because the
+    // whole layout-stability argument is invisible to every other assertion.
+    const t = render(GREYJAW, ['claw']);
+    expect(t.btn.nextElementSibling).toBe(t.warning);
+  });
+
+  it('styles the reason line as an error, from the shared token', () => {
+    // The class is otherwise pinned only by this file's own querySelector, so
+    // renaming it on one side would leave the line rendering as ordinary body
+    // text with every test still green.
+    const css = readFileSync(
+      path.resolve(process.cwd(), 'src/styles/components.css'),
+      'utf8',
+    ).replace(/\/\*[\s\S]*?\*\//g, '');
+    const rule = /\.corpse-harvest-warning\s*\{([^}]*)\}/.exec(css);
+    expect(rule, '.corpse-harvest-warning has no rule in components.css').not.toBeNull();
+    expect(rule?.[1]).toContain('var(--color-text-error)');
+  });
+
+  it('comes back to life the moment a mapped family is checked again', () => {
+    const t = render(GREYJAW, ['claw']);
+    expect(t.btn.disabled).toBe(true);
+    expect(t.warning.hidden).toBe(false);
+    t.toggle('fang');
+    expect(t.btn.disabled).toBe(false);
+    expect(t.warning.hidden).toBe(true);
+    t.btn.click();
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['fang', 'claw']);
+  });
+
+  it('never disables on the way back to an empty selection, which spreads', () => {
+    const t = render(GREYJAW, ['claw']);
+    expect(t.btn.disabled).toBe(true);
+    t.toggle('claw');
+    expect(t.btn.disabled).toBe(false);
+    expect(t.warning.hidden).toBe(true);
+    t.btn.click();
+    expect(t.onHarvest).toHaveBeenLastCalledWith([]);
+  });
+
+  it('leaves an all-unmapped corpse clickable, exactly as the sim leaves it', () => {
+    // fen_troll (claw, tusk) forfeits nothing whatever is checked, so the
+    // picker must keep submitting there.
+    const t = render(['claw', 'tusk'], []);
+    t.toggle('claw');
+    expect(t.btn.disabled).toBe(false);
+    expect(t.warning.hidden).toBe(true);
+    t.btn.click();
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['claw']);
+  });
+
+  it('registers the tooltip exactly once, however many times the selection changes', () => {
+    // Hud.attachTooltip binds a fresh listener set per call, so re-attaching
+    // per toggle would stack them silently.
+    const t = render(GREYJAW, ['hide']);
+    t.toggle('hide');
+    t.toggle('claw');
+    t.toggle('claw');
+    expect(t.attachTooltip.mock.calls.filter(([target]) => target === t.btn)).toHaveLength(1);
   });
 });

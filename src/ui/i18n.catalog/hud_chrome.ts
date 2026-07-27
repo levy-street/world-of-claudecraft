@@ -238,7 +238,7 @@ export const hudChromeStrings = {
     railSol: 'SOL',
     railUsdc: 'USDC',
     railWoc: 'WOC',
-    railWocDiscount: '20% off',
+    railWocDiscount: '{percent}% off',
     railWocUnavailable: 'WOC pricing is unavailable right now.',
     railNativeUnavailable: 'Crypto off.',
     amountLabel: 'Amount',
@@ -1409,6 +1409,11 @@ export const hudChromeStrings = {
     harvestTooltip:
       'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
     concentrateHint: 'Fewer chosen components yield a higher tier each.',
+    // #2509: claw, tusk, gills and horn are tagged on corpses but no harvest
+    // item is wired to them yet, so a selection of nothing but those would
+    // spend the single-use corpse for nothing. The command refuses it and the
+    // picker says why, in place: a disabled button's tooltip is unreachable.
+    nothingSelectedYields: 'Nothing you selected can be harvested from this corpse.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
     components: {

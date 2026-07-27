@@ -490,7 +490,7 @@ import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_EDGE_MARGIN, tooltipPosition } from './tooltip_position_core';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
-import { buildTownFocusView, stepTownFocus } from './town_focus_view';
+import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
@@ -4734,6 +4734,10 @@ export class Hud {
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
+    // The world map rasterizes its labels into sprites keyed on the RESOLVED
+    // string, so a switch can never draw the old language; clearing is about not
+    // carrying dead rasters in the sprite budget.
+    this.mapPainter.relocalize();
     // The unit-frame move/lock buttons' labels are set once at construction + on
     // toggle, so re-localize them in place on a language switch (same reason as
     // the party rows above).
@@ -4750,6 +4754,12 @@ export class Hud {
       this.renderTrain();
     if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
       this.renderUnbind();
+    // The Town Focus signature is text-independent (the allocation, the budget
+    // and the in-town flag), so a language switch alone never moves it and the
+    // slow-band probe would leave the panel in the old locale until the player
+    // edited it. Force one rebuild with fresh t(), the arena / Vale Cup
+    // relocalize arm (#2500).
+    if (this.townFocusOpen) this.renderTownFocus();
     if (this.marketWindow.isOpen) this.marketWindow.render();
     if (this.bankWindow.isOpen) this.bankWindow.render();
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
@@ -6842,7 +6852,11 @@ export class Hud {
       const inTown = this.isInTown();
       const townFocusBtn = document.getElementById('mm-town-focus');
       if (townFocusBtn) townFocusBtn.style.display = inTown ? '' : 'none';
-      if (this.townFocusOpen) this.renderTownFocus();
+      // An open panel converges on the same band, behind its own invalidation
+      // signature (#2500): the probe reads cheaply and rebuilds only when what
+      // the panel shows moves. Walking in or out of town is one of the inputs
+      // it carries, so the panel's disabled state follows the button above.
+      this.refreshOpenTownFocusIfChanged();
       // Crafting window staleness: the
       // window is a cold painter, so an open window repaints only when the
       // in-range station-type set changes (walking in/out of a station's
@@ -8847,8 +8861,12 @@ export class Hud {
             this.lootRolls.closeForItem(ev.text);
           // silent: the audio half of the same idea, and independent of it (a
           // caller can own the cue without owning the line). A professions
-          // grant with its own dedicated cue sets this so the generic ding
-          // doesn't stack on top of it.
+          // grant sets this when it owns the cue for the same grant: it has a
+          // dedicated one and the generic ding would stack on top, or it
+          // replays that same ding itself exactly once for a whole multi-item
+          // command (the harvestResult arm below), or its result event is
+          // cue-free by contract and the ding would be the only sound at all
+          // (the Maker's Bond unbind, #2458).
           if (!ev.silent) {
             if (
               ev.text.includes('loot') ||
@@ -11524,6 +11542,11 @@ export class Hud {
 
   private townFocusDraft: Record<string, number> | null = null;
 
+  /** The signature of what the panel currently shows (#2500). `''` until the
+   *  first paint arms it, which no real signature can spell (every one carries
+   *  the in-town flag, the budget and a row per component). */
+  private lastTownFocusSig = '';
+
   private isInTown(): boolean {
     const pos = this.sim.player.pos;
     return isInTownZone(pos, zoneAt(pos.z));
@@ -11543,27 +11566,49 @@ export class Hud {
   private renderTownFocus(): void {
     const inTown = this.isInTown();
     const allocation = this.townFocusDraft ?? this.sim.townFocus;
-    renderTownFocusWindow(
-      $('#town-focus-window'),
-      buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown),
-      {
-        onStep: (component, delta) => {
-          this.townFocusDraft = stepTownFocus(
-            this.townFocusDraft ?? this.sim.townFocus,
-            component,
-            delta,
-            FOCUS_POINT_BUDGET,
-          );
-          this.renderTownFocus();
-        },
-        onSave: () => {
-          this.sim.setTownFocus(this.townFocusDraft ?? {});
-          this.townFocusDraft = null;
-          this.closeTownFocus();
-        },
-        onClose: () => this.closeTownFocus(),
+    const view = buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown);
+    // Re-arm the latch on EVERY paint, whatever caused it (the open, a step, a
+    // language switch), so the slow-band probe below elides against the state
+    // actually on screen rather than against the last thing the probe itself
+    // painted.
+    this.lastTownFocusSig = townFocusRenderSig(view);
+    renderTownFocusWindow($('#town-focus-window'), view, {
+      onStep: (component, delta) => {
+        this.townFocusDraft = stepTownFocus(
+          this.townFocusDraft ?? this.sim.townFocus,
+          component,
+          delta,
+          FOCUS_POINT_BUDGET,
+        );
+        this.renderTownFocus();
       },
+      onSave: () => {
+        this.sim.setTownFocus(this.townFocusDraft ?? {});
+        this.townFocusDraft = null;
+        this.closeTownFocus();
+      },
+      onClose: () => this.closeTownFocus(),
+    });
+  }
+
+  /** Slow-band staleness check for an OPEN panel (#2500). The panel used to
+   *  repaint on the open check alone, so an idle one discarded and rebuilt its
+   *  entire subtree twice a second: wasted work, and it destroyed the keyboard
+   *  user's focused control on a timer. Rebuild only when what the panel shows
+   *  actually moves (an edit to the draft, or walking in or out of town). The
+   *  open check comes FIRST so a closed panel costs nothing at all, and
+   *  renderTownFocus() owns the re-arm so every other paint cause arms it too. */
+  private refreshOpenTownFocusIfChanged(): void {
+    if (!this.townFocusOpen) return;
+    const sig = townFocusRenderSig(
+      buildTownFocusView(
+        this.townFocusDraft ?? this.sim.townFocus,
+        FOCUS_POINT_BUDGET,
+        this.isInTown(),
+      ),
     );
+    if (sig === this.lastTownFocusSig) return;
+    this.renderTownFocus();
   }
 
   closeTownFocus(): void {

@@ -744,6 +744,15 @@
   .corpse-harvest-btn {
     width: 100%;
   }
+  /* #2509: why Harvest is refused, stated in place. A disabled button takes no
+     pointer events and leaves the tab order, so its tooltip is unreachable.
+     Sits BELOW the button (see corpse_harvest_window.ts) so showing it never
+     moves the control the player is reaching for. */
+  .corpse-harvest-warning {
+    font-size: 11px;
+    color: var(--color-text-error);
+    margin-top: 6px;
+  }
 
   /* ---------- town-focus ---------- */
   /* town focus (#1143): persistent town-set component harvest focus */

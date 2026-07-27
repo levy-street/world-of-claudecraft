@@ -26,18 +26,9 @@ export interface CastBarState {
 
 const HIDDEN: CastBarState = { visible: false, channel: false, fill: 0, label: '', fishing: false };
 
-/**
- * Whether the overhead cast bar shows at all. Split out so callers that only
- * need the row's presence (the nameplate stacking pass, which asks for every
- * visible plate every frame) can skip building a CastBarState object.
- */
-export function castBarVisible(e: Entity): e is Entity & { castingAbility: string } {
-  // corpses, doors/crates, and idle entities show nothing; guard the divide too
-  return !e.dead && e.kind !== 'object' && !!e.castingAbility && e.castTotal > 0;
-}
-
 export function castBarState(e: Entity): CastBarState {
-  if (!castBarVisible(e)) return HIDDEN;
+  // corpses, doors/crates, and idle entities show nothing; guard the divide too
+  if (e.dead || e.kind === 'object' || !e.castingAbility || e.castTotal <= 0) return HIDDEN;
   const remaining = Math.max(0, Math.min(1, e.castRemaining / e.castTotal));
   // Fishing (Professions 2.0) renders a CONSTANT full waiting bar:
   // the bite moment is the bobber + cue, and the bar must carry no bite (or
