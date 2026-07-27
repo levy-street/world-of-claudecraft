@@ -469,6 +469,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
       };
     };
 
+    // With an 8px column gap: (832 - 2 * 8) / 3 = 272, (596 - 8) / 2 = 294.
     const wide = layout(832);
     expect(wide.columns).toBe(3);
     expect(new Set([...wide.fieldWidths, wide.searchWidth])).toEqual(new Set([272]));

@@ -995,7 +995,7 @@ export const TARGETS = [
   {
     key: 'market-armor-filters',
     label: 'World Market armor filters (responsive search and filter grid)',
-    when: ['ui/market_window', 'styles/components.css', 'styles/hud.mobile.css'],
+    when: ['ui/market_window', 'ui/market_view', 'ui/market_filters'],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page, shot) {
       if (!(await openMarketBrowse(page))) return {};

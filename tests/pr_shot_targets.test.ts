@@ -41,8 +41,12 @@ describe('classifyDiff', () => {
     ]);
   });
 
-  it('captures expanded armor filters when either responsive market stylesheet changes', () => {
-    for (const path of ['src/styles/components.css', 'src/styles/hud.mobile.css']) {
+  it('captures expanded armor filters for every market-specific UI module', () => {
+    for (const path of [
+      'src/ui/market_window.ts',
+      'src/ui/market_view.ts',
+      'src/ui/market_filters.ts',
+    ]) {
       const keys = classifyDiff([path]).specific.map((target: { key: string }) => target.key);
       expect(keys).toContain('market-armor-filters');
     }
@@ -69,8 +73,14 @@ describe('classifyDiff', () => {
   });
 
   it('adds the mobile HUD when the visual change touches the mobile surface', () => {
-    const plan = classifyDiff(['src/game/mobile_controls.ts']);
+    const plan = classifyDiff(['src/styles/hud.mobile.css']);
     expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
+  });
+
+  it('keeps the desktop HUD fallback for the shared component stylesheet', () => {
+    const plan = classifyDiff(['src/styles/components.css']);
+    expect(plan.specific).toHaveLength(0);
+    expect(plan.generic).toEqual(['hud-desktop']);
   });
 
   it('does not treat an i18n text-table change as visual', () => {
