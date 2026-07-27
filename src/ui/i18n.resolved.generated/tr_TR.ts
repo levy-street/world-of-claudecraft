@@ -1547,6 +1547,11 @@ export const tr_TR: EnTranslations = {
       "itemAriaEnchanted": "{item}, adet {count}, büyülü kopya",
       "itemAriaBound": "{item}, adet {count}, bağlı kopya",
       "itemAriaMasterwork": "{item}, adet {count}, şaheser",
+      "itemAriaProcedural": "{item}, {rarity}, eşya seviyesi {level}, adet {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, eşya seviyesi {level}, adet {count}, şaheser",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, eşya seviyesi {level}, adet {count}, büyülenmiş kopya",
+      "itemAriaProceduralSigned": "{item}, {rarity}, eşya seviyesi {level}, adet {count}, üretici damgalı kopya",
+      "itemAriaProceduralBound": "{item}, {rarity}, eşya seviyesi {level}, adet {count}, bağlı kopya",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",
@@ -2169,9 +2174,9 @@ export const tr_TR: EnTranslations = {
       "notReady": "Bu kaynak noktası senin için henüz yeniden oluşmadı.",
       "gatherLine": "Topladığınız şey: {name}.",
       "gatherLineQty": "Şunu toplarsınız: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Hasat ettiniz: {name}.",
+      "harvestLineQty": "Hasat ettiniz: {name} x{qty}.",
+      "harvestSpecimenLine": "Ayrıca {name} elde edersiniz.",
       "catchLine": "Çekiyorsunuz: {name}",
       "biteLine": "Bir şey yemi aldı!",
       "gotAwayLine": "Kaçtı gitti.",
@@ -2353,7 +2358,7 @@ export const tr_TR: EnTranslations = {
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Üretildi: {name} x{qty}",
       "insufficientMaterials": "Bunun için malzemeleriniz yok.",
       "unknownRecipe": "O tarif mevcut değil.",
       "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin.",
@@ -2446,13 +2451,13 @@ export const tr_TR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "{item} büyüsünü bozarak {material} elde edersiniz.",
+      "disenchantedYieldQty": "{item} büyüsünü bozarak {material} x{qty} elde edersiniz.",
+      "disenchantedAlso": "Ayrıca {material} elde edersiniz.",
+      "disenchantedAlsoQty": "Ayrıca {material} x{qty} elde edersiniz.",
       "salvagedLine": "{item} parçaladınız.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "{item} parçalayarak {material} elde edersiniz.",
+      "salvagedYieldQty": "{item} parçalayarak {material} x{qty} elde edersiniz.",
       "enchantAppliedLine": "{item} üzerine {enchant} büyüsü uyguladınız.",
       "notHeld": "O eşya elinizde yok.",
       "notDisenchantable": "Bunun büyüsünü bozamazsınız.",
@@ -2489,14 +2494,14 @@ export const tr_TR: EnTranslations = {
       "sameEnchant": "O eşyada zaten bu büyü var.",
       "replaceTag": "{enchant} yerine geçer",
       "sameEnchantTag": "Zaten uygulandı",
-      "plainTag": "Not enchanted",
+      "plainTag": "Büyülenmemiş",
       "replaceConfirmTitle": "{item} üzerindeki büyü değiştirilsin mi?",
       "replaceConfirmBody": "{item} üzerindeki {old} büyüsü {new} ile değiştirilir.",
       "replaceConfirmNoRefund": "Eski büyü yok edilir. Malzemeleri iade edilmez. Bu geri alınamaz.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Korunan: {kept}",
+      "replaceConfirmKeepsSigner": "Üreticinin işareti",
+      "replaceConfirmKeepsMasterwork": "Ustalık eseri bonusu",
+      "replaceConfirmKeepsBond": "Sipariş bağı",
       "replaceConfirmCost": "Maliyet: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Değiştir"
@@ -2568,6 +2573,12 @@ export const tr_TR: EnTranslations = {
       "lockedFor": "Yaklaşık {minutes} dakika kilitli",
       "attunement": "Uyum gerektirir: {quest}",
       "heroicMarks": "Heroik İşaretler: oyuncu başına {count}",
+      "raidRewards": "Nythraxis ödül önizlemesi",
+      "raidSharedDrop": "Son ceset, akının zar atması için bir ortak yöntemsel eşya ekler.",
+      "raidRarityLine": "Nadir %{rare} · Destansı %{epic} · Efsanevi %{legendary}",
+      "raidItemLevels": "Eşya seviyesi: Nadir {rare} · Destansı {epic} · Efsanevi {legendary}",
+      "raidSignatures": "Özgün Efsanevi güçler: {signatures}",
+      "raidForgedLegendary": "Kahramanca Efsanevi güçler akında dövülür ve tasarlanmış sonuç aralıklarının üst yarısında olacağı garantidir.",
       "entrance": "Giriş: {zone}",
       "showOnMap": "Haritada Göster",
       "encounters": "Karşılaşmalar",
@@ -6640,7 +6651,113 @@ export const tr_TR: EnTranslations = {
       "dps": "Hasar/sn",
       "critChance": "Kritik Şansı",
       "dodge": "Sıyırma",
-      "parry": "Savuşturma"
+      "parry": "Savuşturma",
+      "weaponMin": "Asgari silah hasarı",
+      "weaponMax": "Azami silah hasarı",
+      "weaponDps": "Saniye başına silah hasarı",
+      "healthOnKill": "Öldürmede sağlık",
+      "manaOnKill": "Öldürmede mana",
+      "blockValue": "Engelleme değeri"
+    },
+    "procedural": {
+      "rollRangeAria": "{min} ile {max} arasında olası atış",
+      "advancedDetailsHint": "Olası atış aralıklarını göstermek için {key} tuşunu basılı tut.",
+      "powerRollPercent": "Güç atışı: {value}%",
+      "powerRollMilliseconds": "Güç atışı: {value} ms",
+      "powerRollResource": "Güç atışı: {value} kaynak",
+      "powerRollNumber": "Güç atışı: {value}",
+      "legendaryPower": "Efsanevi güç",
+      "legendaryLimit": "Benzersiz kuşanım: {count} efsanevi güç",
+      "rarity": {
+        "common": "Sıradan",
+        "magic": "Büyülü",
+        "rare": "Nadir",
+        "epic": "Destansı",
+        "legendary": "Efsanevi",
+        "mythic": "Mitik"
+      },
+      "nameFragment": {
+        "mighty": "Kudretli",
+        "deft": "Becerikli",
+        "stalwart": "Metin",
+        "sages": "Bilgenin",
+        "spiritual": "Ruhani",
+        "of_focus": "Odağın",
+        "of_striking": "Vuruşun",
+        "of_alacrity": "Atikliğin",
+        "of_precision": "Kesinliğin",
+        "warded": "Korunaklı",
+        "of_reaping": "Hasadın",
+        "of_remembrance": "Hatıranın"
+      },
+      "rareWord": {
+        "ashen": "Külrengi",
+        "blackfen": "Karakır",
+        "doom": "Felaket",
+        "grave": "Mezar",
+        "mire": "Bataklık",
+        "storm": "Fırtına",
+        "thorn": "Diken",
+        "wyrm": "Ejder",
+        "bite": "Isırık",
+        "brand": "Dağlama",
+        "promise": "Söz",
+        "thread": "İplik",
+        "vigil": "Nöbet",
+        "ward": "Koruma",
+        "whisper": "Fısıltı",
+        "oath": "Yemin"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Son Cenaze Ateşinin Tacı",
+          "description": "Her üçüncü Köz Oku hedefin yakınındaki düşmanları kavurur."
+        },
+        "greyjaws_edge": {
+          "name": "Bozçene’nin Keskin Ucu",
+          "description": "Her üçüncü silah vuruşu hedefi kanatır ve biraz kaynak yeniler."
+        },
+        "hushwood_longbow": {
+          "name": "Sessizorman Uzun Yayı",
+          "description": "Uzun Çekiş veya Uğursuz Atış hedefini kısa süreliğine susturabilir."
+        },
+        "nightglass_fang": {
+          "name": "Gececamı Dişi",
+          "description": "Bir öldürme kısa süreli hız kazandırır."
+        },
+        "ysoleis_vigil": {
+          "name": "Ysolei’nin Nöbeti",
+          "description": "Kritik iyileştirme yerde kısa süreli onarıcı bir alan oluşturur."
+        },
+        "stormwake_idol": {
+          "name": "Fırtına Uyanışı Putu",
+          "description": "Her dördüncü Ark Oku yakındaki düşmanlara sıçrar."
+        },
+        "ashbinders_seal": {
+          "name": "Külbağlayanın Mührü",
+          "description": "Her dördüncü Kasvet Oku hedefini ek Gölge hasarı için işaretler."
+        },
+        "dawnward_signet": {
+          "name": "Şafak Muhafızı Mührü",
+          "description": "Onaran Işık alıcısını iyileştirmenin bir kısmı kadar kalkanla korur."
+        },
+        "feral_moonclasp": {
+          "name": "Vahşi Ay Tokası",
+          "description": "Her üçüncü Yaban Oku birincil kaynağı yeniler."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Dokuzuncu Çan",
+          "description": "Her ikinci hasar büyüsü hedefin çevresinde çınlar."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Çalınmış Saatlerin Pelerini",
+          "description": "Sağlık 35% altına düştüğünde kısa süreli savunma koruması kazanırsın."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Kırılmaz Yolun Çizmeleri",
+          "description": "15 yarda hareket etmek kısa süreli hareket hızı artışı sağlar."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const tr_TR: EnTranslations = {
       "greed": "Açgözlülük",
       "pass": "Pas",
       "needAria": "{item} için ihtiyaç",
+      "needUnavailable": "Sınıfın bu eşyayı kuşanamadığı için İhtiyaç kullanılamıyor.",
+      "needUnavailablePower": "Bu efsanevi güç başka bir sınıfa özel olduğu için İhtiyaç kullanılamıyor.",
       "greedAria": "{item} için açgözlülük",
       "passAria": "{item} için pas geç",
       "everyonePassed": "Herkes {item} için pas geçti.",
@@ -9170,6 +9289,108 @@ export const tr_TR: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Tınıtlı Kereste"
+      },
+      "ashwood_staff": {
+        "name": "Dişbudak asası"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Mezarçağıranın kumaş el sargıları"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Mezarçağıranın kumaş başlığı"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Mezarçağıranın kumaş bacaklığı"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Mezarçağıranın kumaş omuzluğu"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Mezarçağıranın kumaş cübbesi"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Mezarçağıranın kumaş kuşağı"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Mezarçağıranın kumaş terlikleri"
+      },
+      "gravecaller_focus": {
+        "name": "Mezarçağıranın odağı"
+      },
+      "gravecaller_pendant": {
+        "name": "Mezarçağıranın kolyesi"
+      },
+      "gravecaller_ring": {
+        "name": "Mezarçağıranın yüzüğü"
+      },
+      "gravecaller_wand": {
+        "name": "Mezarçağıranın asası"
+      },
+      "iron_broadsword": {
+        "name": "Demir geniş kılıç"
+      },
+      "iron_flanged_mace": {
+        "name": "Demir flanşlı topuz"
+      },
+      "mirefen_dirk": {
+        "name": "Mirefen hançeri"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Mirefen av yayı"
+      },
+      "mirefen_leather_belt": {
+        "name": "Mirefen deri kemeri"
+      },
+      "mirefen_leather_boots": {
+        "name": "Mirefen deri çizmeleri"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Mirefen deri eldivenleri"
+      },
+      "mirefen_leather_hood": {
+        "name": "Mirefen deri başlığı"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Mirefen deri yeleği"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Mirefen deri bacaklığı"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Mirefen deri omuzlukları"
+      },
+      "thornpeak_bulwark": {
+        "name": "Thornpeak siperi"
+      },
+      "thornpeak_crossbow": {
+        "name": "Thornpeak arbaleti"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Thornpeak zincir göğüslüğü"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Thornpeak zincir eldivenleri"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Thornpeak zincir kuşağı"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Thornpeak zincir miğferi"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Thornpeak zincir bacaklığı"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Thornpeak zincir omuzlukları"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Thornpeak zincir sabatonları"
+      },
+      "thornpeak_polearm": {
+        "name": "Thornpeak sırıklı silahı"
+      },
+      "thornpeak_war_axe": {
+        "name": "Thornpeak savaş baltası"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

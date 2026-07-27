@@ -3,6 +3,7 @@
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { ProceduralItemUidLease } from './procedural_item_uid';
 import type { HarvestYield } from './professions/harvest_yields';
 
 export const TICK_RATE = 20; // sim ticks per second
@@ -465,6 +466,8 @@ export interface Aura {
   tickTimer?: number;
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  /** Equipment-generated periodic effects retain their bounded proc-chain depth. */
+  equipmentProcDepth?: number;
   // Encounter-authored control that must land through immunity and cannot be
   // removed by player counters. Natural expiry and encounter cleanup still own it.
   unbreakableControl?: true;
@@ -928,6 +931,9 @@ export interface ItemInstancePayload {
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
+  /** Versioned deterministic procedural-equipment state. Definitions describe
+   *  what may roll; this payload records the exact copy that did roll. */
+  procedural?: import('./procedural_item').ProceduralItemInstance;
 }
 
 export interface InvSlot {
@@ -957,6 +963,44 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
       ...src.rolled,
       ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
     };
+  if (src.procedural) {
+    instance.procedural = {
+      ...src.procedural,
+      affixes: src.procedural.affixes.map((affix) => ({
+        ...affix,
+        values: { ...affix.values },
+        ranges: Object.fromEntries(
+          Object.entries(affix.ranges).map(([key, range]) => [key, { ...range }]),
+        ),
+      })),
+      ...(src.procedural.implicits && {
+        implicits: src.procedural.implicits.map((affix) => ({
+          ...affix,
+          values: { ...affix.values },
+          ranges: Object.fromEntries(
+            Object.entries(affix.ranges).map(([key, range]) => [key, { ...range }]),
+          ),
+        })),
+      }),
+      ...(src.procedural.legendaryRolls && {
+        legendaryRolls: { ...src.procedural.legendaryRolls },
+      }),
+      generatedName: {
+        ...src.procedural.generatedName,
+        ...(src.procedural.generatedName.rareWordIds && {
+          rareWordIds: [...src.procedural.generatedName.rareWordIds] as [string, string],
+        }),
+      },
+      ...(src.procedural.dropContext && {
+        dropContext: {
+          ...src.procedural.dropContext,
+          ...(src.procedural.dropContext.sourceTags && {
+            sourceTags: [...src.procedural.dropContext.sourceTags],
+          }),
+        },
+      }),
+    };
+  }
   return instance;
 }
 
@@ -997,7 +1041,9 @@ export interface LootRollPrompt {
   itemId: string;
   itemName: string;
   quality: ItemDef['quality'];
+  instance?: import('./procedural_item_public').PublicItemInstanceView;
   expiresAt: number;
+  canNeed: boolean;
 }
 
 // One candidate's live vote on an open need-greed roll, as the whole group sees
@@ -1018,6 +1064,7 @@ export interface LootRollGroupStatus {
   itemId: string;
   itemName: string;
   quality: ItemDef['quality'];
+  instance?: import('./procedural_item_public').PublicItemInstanceView;
   expiresAt: number;
   entries: LootRollStatusEntry[];
 }
@@ -3319,7 +3366,9 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       itemName: string;
       quality: ItemDef['quality'];
+      instance?: import('./procedural_item_public').PublicItemInstanceView;
       expiresAt: number;
+      canNeed: boolean;
     }
   // master loot: sent only to the master looter; candidates are the eligible recipients
   | {
@@ -3328,6 +3377,7 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       itemName: string;
       quality: ItemDef['quality'];
+      instance?: import('./procedural_item_public').PublicItemInstanceView;
       expiresAt: number;
       candidates: { pid: number; name: string }[];
     }
@@ -4315,6 +4365,9 @@ export interface WorldContent {
 export interface SimConfig {
   seed: number;
   playerClass: PlayerClass;
+  /** Server-only 128-bit hex key for unpredictable live procedural drops. */
+  proceduralLootSecret?: string;
+  proceduralItemUidLease?: ProceduralItemUidLease;
   respawnSeconds?: number; // mob respawn time (default 25)
   autoEquip?: boolean; // auto-equip better gear on loot (headless convenience)
   playerName?: string;

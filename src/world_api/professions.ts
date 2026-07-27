@@ -228,7 +228,7 @@ export interface IWorldProfessions {
   // (src/sim/professions/enchanting.ts and salvage.ts) and nothing is trusted from
   // the client; ClientWorld sends the disenchant_item/apply_enchant/salvage_item
   // wire command and never decides the outcome.
-  disenchantItem(itemId: string): void;
+  disenchantItem(itemId: string, instanceUid?: string): void;
   // `slot` targets the copy WORN in that equipment slot, enchanting it in place
   // (no unequip / enchant / re-equip round trip). Omitted, the enchant applies to
   // a bagged copy exactly as before. It is a SLOT and not an item id because
@@ -242,8 +242,14 @@ export interface IWorldProfessions {
   // precedent: omitted/false sends a wire message byte-identical to the
   // pre-feature form, and the sim re-validates the target either way (the flag
   // can never overwrite anything the dedicated replace arm would not).
-  applyEnchant(itemId: string, enchantId: string, slot?: EquipSlot, confirmReplace?: boolean): void;
-  salvageItem(itemId: string): void;
+  applyEnchant(
+    itemId: string,
+    enchantId: string,
+    slot?: EquipSlot,
+    confirmReplace?: boolean,
+    instanceUid?: string,
+  ): void;
+  salvageItem(itemId: string, instanceUid?: string): void;
   // Maker's Bond unbind service (Professions 2.0): clear the
   // boundTo lock on ONE held bound copy of `itemId`, for the tier-scaled
   // gold fee, while standing at any static crafting station (every station
@@ -254,7 +260,7 @@ export interface IWorldProfessions {
   // the outcome. The result surfaces through the personal text-free
   // `unbindResult` event; the cleared payload converges via the self
   // inventory mirror.
-  unbindItem(itemId: string): void;
+  unbindItem(itemId: string, instanceUid?: string): void;
   // The local viewer's most recent enchanting-action outcomes, mirrored from the
   // pid-scoped disenchantResult/enchantResult/salvageResult event and the
   // denc/ench/salv self-delta (both feed the same field: the event is the

@@ -32,6 +32,9 @@ import {
 import { formatMoney } from '../format_money';
 import { MARKET_MAX_LISTINGS } from '../market';
 import * as petCommands from '../pet/pet_commands';
+import { proceduralQuality } from '../procedural_item';
+import { proceduralItemContentName } from '../procedural_item_name';
+import { itemVendorSellValue } from '../procedural_vendor_value';
 import { FALL_SAFE_DISTANCE, type PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { threatEntries } from '../threat';
@@ -74,16 +77,25 @@ export function statsReadout(meta: PlayerMeta, e: Entity): string {
 export function bagsReadout(meta: PlayerMeta): string {
   const purse = `Purse: ${formatMoney(meta.copper)}.`;
   if (meta.inventory.length === 0) return `Your bags are empty. ${purse}`;
-  const rank: Record<string, number> = { epic: 0, rare: 1, uncommon: 2, common: 3, poor: 4 };
+  const rank: Record<string, number> = {
+    legendary: 0,
+    epic: 1,
+    rare: 2,
+    uncommon: 3,
+    common: 4,
+    poor: 5,
+  };
+  const qualityOf = (slot: PlayerMeta['inventory'][number]): string => {
+    const def = ITEMS[slot.itemId];
+    const rarity = slot.instance?.procedural?.rarity;
+    return (rarity ? proceduralQuality(rarity) : null) ?? def?.quality ?? 'common';
+  };
   const sorted = meta.inventory
     .map((s, i) => ({ s, i }))
-    .sort((a, b) => {
-      const qa = rank[ITEMS[a.s.itemId]?.quality ?? 'common'] ?? 3;
-      const qb = rank[ITEMS[b.s.itemId]?.quality ?? 'common'] ?? 3;
-      return qa - qb || a.i - b.i;
-    });
+    .sort((a, b) => (rank[qualityOf(a.s)] ?? 4) - (rank[qualityOf(b.s)] ?? 4) || a.i - b.i);
   const parts = sorted.map(({ s }) => {
-    const name = ITEMS[s.itemId]?.name ?? s.itemId;
+    const def = ITEMS[s.itemId];
+    const name = def ? proceduralItemContentName(def, s.instance) : s.itemId;
     return s.count > 1 ? `${name} x${s.count}` : name;
   });
   return `Bags (${parts.length}): ${parts.join(', ')}. ${purse}`;
@@ -136,7 +148,7 @@ export function buybackReadout(meta: PlayerMeta): string {
   const parts = slots.map((s) => {
     const def = ITEMS[s.itemId];
     const qty = s.count > 1 ? ` x${s.count}` : '';
-    return `${def.name}${qty} (${formatMoney(def.sellValue)} each)`;
+    return `${def.name}${qty} (${formatMoney(itemVendorSellValue(def, s.instance))} each)`;
   });
   return `Vendor buyback (${slots.length}): ${parts.join(', ')}. Repurchase at any merchant.`;
 }

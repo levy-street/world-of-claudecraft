@@ -277,6 +277,9 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // Banks copied from resolved damage (Ignite) skip the source-output
             // multipliers so the payout equals what was banked, once.
             a.finalDamage === true,
+            null,
+            false,
+            a.equipmentProcDepth ?? 0,
           );
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);

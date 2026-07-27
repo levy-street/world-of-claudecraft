@@ -23,7 +23,8 @@ import {
   isDisenchantable,
   maxDisenchantYield,
 } from '../sim/professions/enchanting';
-import type { ItemDef } from '../sim/types';
+import { professionItemQuality } from '../sim/professions/item_instance';
+import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import { itemDisplayName } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 
@@ -45,15 +46,22 @@ export interface DisenchantYieldPreview {
 /** The material yield one disenchant of `def` can produce, or null when the
  *  piece is not disenchantable at all (the confirm never opens for those, but
  *  the null keeps the core total). Pure: no rng draw, no side effects. */
-export function disenchantYieldPreview(def: ItemDef | undefined): DisenchantYieldPreview | null {
+export function disenchantYieldPreview(
+  def: ItemDef | undefined,
+  instance?: ItemInstancePayload,
+): DisenchantYieldPreview | null {
   if (!isDisenchantable(def) || !def) return null;
-  const quality = def.quality ?? 'common';
+  const quality = professionItemQuality(def, instance);
   const isRarePlus = quality === 'rare' || quality === 'epic' || quality === 'legendary';
   const primaryItemId = DISENCHANT_MATERIAL_BY_QUALITY[quality] ?? 'arcane_dust';
   const primary: DisenchantYieldLine = isRarePlus
     ? { itemId: primaryItemId, min: 1, max: 1 }
-    : { itemId: primaryItemId, min: baseDisenchantYield(def), max: maxDisenchantYield(def) };
-  const secondaryItemId = typedSecondaryFor(def);
+    : {
+        itemId: primaryItemId,
+        min: baseDisenchantYield(def, instance),
+        max: maxDisenchantYield(def, instance),
+      };
+  const secondaryItemId = typedSecondaryFor(def, quality);
   if (!secondaryItemId) return { primary };
   // rare grants exactly one secondary with no rng draw; epic/legendary rolls
   // one or two off a single draw.
@@ -88,8 +96,11 @@ export function disenchantYieldLineText(line: DisenchantYieldLine): string {
 /** The full preview as localized plain-text lines (header first), or an empty
  *  array when the item yields nothing previewable. The caller joins them into
  *  the confirm body. */
-export function disenchantYieldLines(def: ItemDef | undefined): string[] {
-  const preview = disenchantYieldPreview(def);
+export function disenchantYieldLines(
+  def: ItemDef | undefined,
+  instance?: ItemInstancePayload,
+): string[] {
+  const preview = disenchantYieldPreview(def, instance);
   if (!preview) return [];
   const lines = [t('hudChrome.enchanting.yieldHeader')];
   lines.push(disenchantYieldLineText(preview.primary));

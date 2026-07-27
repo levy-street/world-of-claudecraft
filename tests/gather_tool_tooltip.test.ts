@@ -80,17 +80,17 @@ describe('gatherToolTooltipLines: everything else', () => {
   });
 });
 
-describe('hud composition source pin', () => {
-  it('Hud.itemTooltip composes the module (one line, never inline logic)', () => {
+describe('item presentation controller composition source pin', () => {
+  it('the extracted tooltip controller composes the module once', () => {
     // Whole-line // comments are stripped before scanning so the negative pin
     // is not tripped by prose (the comment-gameable trap; block comments are
     // left alone: a /* strip would misfire on string and regex literals).
-    const hudSrc = readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8').replace(
-      /^\s*\/\/.*$/gm,
-      '',
-    );
-    expect(hudSrc).toContain('gatherToolTooltipLines(item)');
+    const source = readFileSync(
+      path.join(__dirname, '../src/ui/item_presentation_controller.ts'),
+      'utf8',
+    ).replace(/^\s*\/\/.*$/gm, '');
+    expect(source).toContain('gatherToolTooltipLines(item)');
     // The legacy inline pole arm is gone: the module owns the fishing lines.
-    expect(hudSrc).not.toContain("item.use?.type === 'fishing'");
+    expect(source).not.toContain("item.use?.type === 'fishing'");
   });
 });

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
-import type { InvSlot, ItemSlot } from '../src/sim/types';
+import type { InvSlot, ItemInstancePayload, ItemSlot } from '../src/sim/types';
 import {
   ENCHANT_PRESERVED_TRAITS,
   ENCHANT_TIER_ORDER,
@@ -37,6 +37,21 @@ function itemForSlot(slot: ItemSlot, skip = new Set<string>()): string {
   );
   if (!id) throw new Error(`no item found for slot ${slot}`);
   return id;
+}
+
+function generatedInstance(uid: string): ItemInstancePayload {
+  return {
+    procedural: {
+      version: 1,
+      uid,
+      baseId: 'test-base',
+      itemLevel: 40,
+      rarity: 'epic',
+      affixes: [],
+      generatedName: { baseId: 'test-base' },
+      seed: 1,
+    },
+  };
 }
 
 describe('enchant_apply_view: enchantNameKey', () => {
@@ -311,6 +326,23 @@ describe('enchant_apply_view: enchantTargets', () => {
     ];
     const targets = enchantTargets(inventory, 'enchant_chest_stamina');
     expect(targets).toEqual([{ itemId: chestId, count: 2 }]);
+  });
+
+  it('keeps same-base generated copies separate and carries each exact UID', () => {
+    const first = generatedInstance('pi1:enchant-target:first');
+    const second = generatedInstance('pi1:enchant-target:second');
+    expect(
+      enchantTargets(
+        [
+          { itemId: chestId, count: 1, instance: first },
+          { itemId: chestId, count: 1, instance: second },
+        ],
+        'enchant_chest_stamina',
+      ),
+    ).toEqual([
+      { itemId: chestId, count: 1, instanceUid: 'pi1:enchant-target:first', instance: first },
+      { itemId: chestId, count: 1, instanceUid: 'pi1:enchant-target:second', instance: second },
+    ]);
   });
 
   it('surfaces an already-enchanted copy as a flagged replace row, and keeps a masterwork copy plain', () => {

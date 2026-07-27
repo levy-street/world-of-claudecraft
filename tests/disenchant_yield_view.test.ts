@@ -13,7 +13,7 @@ import {
   isDisenchantable,
   maxDisenchantYield,
 } from '../src/sim/professions/enchanting';
-import type { ItemDef } from '../src/sim/types';
+import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 import { disenchantYieldLines, disenchantYieldPreview } from '../src/ui/disenchant_yield_view';
 
 /** A live disenchantable def of the requested quality and kind, so every arm is
@@ -65,12 +65,28 @@ describe('disenchantYieldPreview', () => {
   it('a rare+ piece with NO typed material (jewelry) previews the primary alone', () => {
     // Jewelry carries no armor class, so typedSecondaryFor returns null and the
     // preview must not promise a secondary. Live jewelry is epic-tier here.
-    const def = defFor('epic', (d) => typedSecondaryFor(d) === null);
+    const def = defFor(
+      'epic',
+      (d) => (d.slot === 'ring' || d.slot === 'neck') && typedSecondaryFor(d) === null,
+    );
     expect(def.slot === 'ring' || def.slot === 'neck').toBe(true);
     const preview = disenchantYieldPreview(def);
     expect(preview?.primary).toEqual({ itemId: 'arcane_shard', min: 1, max: 1 });
     expect(preview?.secondary).toBeUndefined();
     expect(disenchantYieldLines(def).length).toBe(2);
+  });
+
+  it('previews a generated Legendary held off-hand from its exact payload', () => {
+    const instance = {
+      procedural: { rarity: 'legendary', itemLevel: 36 },
+    } as ItemInstancePayload;
+    const def = ITEMS.gravecaller_focus;
+
+    expect(isDisenchantable(def)).toBe(true);
+    expect(disenchantYieldPreview(def, instance)).toEqual({
+      primary: { itemId: 'arcane_shard', min: 1, max: 1 },
+    });
+    expect(disenchantYieldLines(def, instance).length).toBe(2);
   });
 
   it('names the same primary material the sim would grant, for every quality', () => {

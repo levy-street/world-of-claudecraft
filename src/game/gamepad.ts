@@ -52,6 +52,7 @@ export class GamepadManager {
   private cursorX = 0;
   private cursorY = 0;
   private cursorInit = false;
+  private cursorHoverEl: HTMLElement | null = null;
   private boundConnect = (e: GamepadEvent) => this.onConnect(e);
   private boundDisconnect = (e: GamepadEvent) => this.onDisconnect(e);
 
@@ -150,7 +151,7 @@ export class GamepadManager {
   private activePad(): Gamepad | null {
     if (this.index === null || typeof navigator === 'undefined') return null;
     const pad = navigator.getGamepads()[this.index];
-    return pad && pad.connected ? pad : null;
+    return pad?.connected ? pad : null;
   }
 
   /** Called once per animation frame from the main loop. */
@@ -280,6 +281,7 @@ export class GamepadManager {
       this.cursorY = window.innerHeight / 2;
       this.cursorInit = true;
     }
+    document.body.classList.add('gamepad-pointer-mode');
     el.style.display = 'block';
     // Left stick (or d-pad) moves the pointer.
     let mx = pad.axes[AXIS.LEFT_X] ?? 0;
@@ -296,12 +298,37 @@ export class GamepadManager {
     this.cursorY = Math.min(window.innerHeight, Math.max(0, this.cursorY + my * CURSOR_SPEED * dt));
     el.style.left = `${this.cursorX}px`;
     el.style.top = `${this.cursorY}px`;
+    this.updateCursorHover();
 
     for (const idx of risingEdges(this.prevPressed, cur)) {
       this.cb.onInputEdge();
       if (idx === GP.A) this.clickAtCursor();
       else if (idx === GP.B || idx === GP.START) this.cb.onAction('escape');
     }
+  }
+
+  // A software pointer does not make the browser synthesize mouseenter/move.
+  // Mirror those events explicitly so the shared tooltip path works before an
+  // action click: controller users can inspect an item and its advanced roll
+  // ranges without equipping, consuming, or looting it.
+  private updateCursorHover(): void {
+    const target = document.elementFromPoint(this.cursorX, this.cursorY) as HTMLElement | null;
+    const opts = {
+      bubbles: true,
+      cancelable: false,
+      clientX: this.cursorX,
+      clientY: this.cursorY,
+    };
+    if (target !== this.cursorHoverEl) {
+      this.cursorHoverEl?.dispatchEvent(
+        new MouseEvent('mouseleave', { ...opts, relatedTarget: target }),
+      );
+      target?.dispatchEvent(
+        new MouseEvent('mouseenter', { ...opts, relatedTarget: this.cursorHoverEl }),
+      );
+      this.cursorHoverEl = target;
+    }
+    target?.dispatchEvent(new MouseEvent('mousemove', opts));
   }
 
   // Synthesizes mousedown/mouseup/click at the cursor, reusing every existing DOM
@@ -318,6 +345,18 @@ export class GamepadManager {
 
   private hideCursor(): void {
     if (this.cursorEl) this.cursorEl.style.display = 'none';
+    // Unit/server-side imports have no DOM; the runtime client always does.
+    if (typeof document !== 'undefined') document.body?.classList.remove('gamepad-pointer-mode');
+    if (this.cursorHoverEl) {
+      this.cursorHoverEl.dispatchEvent(
+        new MouseEvent('mouseleave', {
+          bubbles: true,
+          clientX: this.cursorX,
+          clientY: this.cursorY,
+        }),
+      );
+      this.cursorHoverEl = null;
+    }
     this.cursorInit = false;
   }
 }

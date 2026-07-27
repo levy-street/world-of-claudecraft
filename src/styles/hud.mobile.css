@@ -3061,6 +3061,9 @@
   body.mobile-touch .vendor-goods-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  body.mobile-touch .df-raid-line {
+    font-size: 12px;
+  }
   body.mobile-touch .vendor-item,
   body.mobile-touch .bag-item,
   body.mobile-touch .mkt-tab,

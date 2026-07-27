@@ -907,6 +907,9 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
       client.applyEnchant('sword_x', 'ench_y', 'offhand', true);
       client.applyEnchant('sword_x', 'ench_y', undefined, false);
       client.salvageItem('sword_z');
+      client.disenchantItem('sword_uid', 'pi1:profession-wire:1');
+      client.applyEnchant('sword_uid', 'ench_y', undefined, true, 'pi1:profession-wire:1');
+      client.salvageItem('sword_uid', 'pi1:profession-wire:1');
       expect(sent).toEqual([
         { t: 'cmd', cmd: 'disenchant_item', item: 'sword_x' },
         // No slot given: an undefined field drops out of the JSON entirely, so a
@@ -928,6 +931,26 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
         // ...and an explicit false sends the pre-feature form, byte-identical.
         { t: 'cmd', cmd: 'apply_enchant', item: 'sword_x', enchant: 'ench_y' },
         { t: 'cmd', cmd: 'salvage_item', item: 'sword_z' },
+        {
+          t: 'cmd',
+          cmd: 'disenchant_item',
+          item: 'sword_uid',
+          uid: 'pi1:profession-wire:1',
+        },
+        {
+          t: 'cmd',
+          cmd: 'apply_enchant',
+          item: 'sword_uid',
+          enchant: 'ench_y',
+          confirm: true,
+          uid: 'pi1:profession-wire:1',
+        },
+        {
+          t: 'cmd',
+          cmd: 'salvage_item',
+          item: 'sword_uid',
+          uid: 'pi1:profession-wire:1',
+        },
       ]);
     } finally {
       (globalThis as { WebSocket?: unknown }).WebSocket = prevWs;

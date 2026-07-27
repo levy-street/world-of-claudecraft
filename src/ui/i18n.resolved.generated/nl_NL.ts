@@ -1547,6 +1547,11 @@ export const nl_NL: EnTranslations = {
       "itemAriaEnchanted": "{item}, aantal {count}, betoverd exemplaar",
       "itemAriaBound": "{item}, aantal {count}, gebonden exemplaar",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
+      "itemAriaProcedural": "{item}, {rarity}, itemniveau {level}, aantal {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, itemniveau {level}, aantal {count}, meesterwerk",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, itemniveau {level}, aantal {count}, betoverd exemplaar",
+      "itemAriaProceduralSigned": "{item}, {rarity}, itemniveau {level}, aantal {count}, door maker gemerkt exemplaar",
+      "itemAriaProceduralBound": "{item}, {rarity}, itemniveau {level}, aantal {count}, gebonden exemplaar",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",
@@ -2169,9 +2174,9 @@ export const nl_NL: EnTranslations = {
       "notReady": "Dit grondstoffenpunt is voor jou nog niet teruggekeerd.",
       "gatherLine": "Jij verzamelt: {name}.",
       "gatherLineQty": "Je verzamelt: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Je oogst: {name}.",
+      "harvestLineQty": "Je oogst: {name} x{qty}.",
+      "harvestSpecimenLine": "Je krijgt ook {name}.",
       "catchLine": "Je trekt in: {name}",
       "biteLine": "Er hapt iets naar het aas!",
       "gotAwayLine": "Hij ontsnapte.",
@@ -2353,7 +2358,7 @@ export const nl_NL: EnTranslations = {
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Gemaakt: {name} x{qty}",
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
       "unknownRecipe": "Dat recept bestaat niet.",
       "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
@@ -2446,13 +2451,13 @@ export const nl_NL: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Je onttovert {item} en verkrijgt {material}.",
+      "disenchantedYieldQty": "Je onttovert {item} en verkrijgt {material} x{qty}.",
+      "disenchantedAlso": "Je krijgt ook {material} terug.",
+      "disenchantedAlsoQty": "Je krijgt ook {material} x{qty} terug.",
       "salvagedLine": "Je salvaged {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Je ontmantelt {item} tot {material}.",
+      "salvagedYieldQty": "Je ontmantelt {item} tot {material} x{qty}.",
       "enchantAppliedLine": "Je betoverd {item} met {enchant}.",
       "notHeld": "Je hebt dat voorwerp niet.",
       "notDisenchantable": "Je kunt dat niet onbetoveren.",
@@ -2489,14 +2494,14 @@ export const nl_NL: EnTranslations = {
       "sameEnchant": "Dat voorwerp heeft die betovering al.",
       "replaceTag": "Vervangt {enchant}",
       "sameEnchantTag": "Al toegepast",
-      "plainTag": "Not enchanted",
+      "plainTag": "Niet betoverd",
       "replaceConfirmTitle": "Betovering op {item} vervangen?",
       "replaceConfirmBody": "Dit vervangt {old} op {item} door {new}.",
       "replaceConfirmNoRefund": "De oude betovering wordt vernietigd. De materialen worden niet teruggegeven. Dit kan niet ongedaan worden gemaakt.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Behouden: {kept}",
+      "replaceConfirmKeepsSigner": "Makersmerk",
+      "replaceConfirmKeepsMasterwork": "Meesterwerkbonus",
+      "replaceConfirmKeepsBond": "Opdrachtbinding",
       "replaceConfirmCost": "Kosten: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Vervangen"
@@ -2568,6 +2573,12 @@ export const nl_NL: EnTranslations = {
       "lockedFor": "Vergrendeld voor ongeveer {minutes} min",
       "attunement": "Vereist afstemming: {quest}",
       "heroicMarks": "Heroïsche Merktekens: {count} per speler",
+      "raidRewards": "Voorbeeld van Nythraxis-beloningen",
+      "raidSharedDrop": "Het lijk van de eindbaas voegt één gedeeld procedureel voorwerp toe waarop de raid kan rollen.",
+      "raidRarityLine": "Zeldzaam {rare}% · Episch {epic}% · Legendarisch {legendary}%",
+      "raidItemLevels": "Itemniveau: Zeldzaam {rare} · Episch {epic} · Legendarisch {legendary}",
+      "raidSignatures": "Kenmerkende legendarische krachten: {signatures}",
+      "raidForgedLegendary": "Heroïsche legendarische krachten zijn raid-gesmeed en vallen gegarandeerd in de bovenste helft van hun vooraf bepaalde worpbereik.",
       "entrance": "Ingang: {zone}",
       "showOnMap": "Tonen op Kaart",
       "encounters": "Ontmoetingen",
@@ -6640,7 +6651,113 @@ export const nl_NL: EnTranslations = {
       "dps": "Schade/sec",
       "critChance": "Kritieke Kans",
       "dodge": "Ontwijken",
-      "parry": "Pareren"
+      "parry": "Pareren",
+      "weaponMin": "Minimale wapenschade",
+      "weaponMax": "Maximale wapenschade",
+      "weaponDps": "Wapenschade per seconde",
+      "healthOnKill": "Gezondheid bij doden",
+      "manaOnKill": "Mana bij doden",
+      "blockValue": "Blokkeerwaarde"
+    },
+    "procedural": {
+      "rollRangeAria": "Mogelijke worp van {min} tot {max}",
+      "advancedDetailsHint": "Houd {key} ingedrukt om de mogelijke worpbereiken te tonen.",
+      "powerRollPercent": "Krachtworp: {value}%",
+      "powerRollMilliseconds": "Krachtworp: {value} ms",
+      "powerRollResource": "Krachtworp: {value} hulpbron",
+      "powerRollNumber": "Krachtworp: {value}",
+      "legendaryPower": "Legendarische kracht",
+      "legendaryLimit": "Uniek uitgerust: {count} legendarische kracht",
+      "rarity": {
+        "common": "Gewoon",
+        "magic": "Magisch",
+        "rare": "Zeldzaam",
+        "epic": "Episch",
+        "legendary": "Legendarisch",
+        "mythic": "Mythisch"
+      },
+      "nameFragment": {
+        "mighty": "Machtig",
+        "deft": "Bedreven",
+        "stalwart": "Standvastig",
+        "sages": "van de Wijze",
+        "spiritual": "Spiritueel",
+        "of_focus": "van Focus",
+        "of_striking": "van Slagkracht",
+        "of_alacrity": "van Voortvarendheid",
+        "of_precision": "van Precisie",
+        "warded": "Beschermd",
+        "of_reaping": "van de Oogst",
+        "of_remembrance": "van Herinnering"
+      },
+      "rareWord": {
+        "ashen": "Asgrauw",
+        "blackfen": "Zwartveen",
+        "doom": "Doem",
+        "grave": "Graf",
+        "mire": "Moeras",
+        "storm": "Storm",
+        "thorn": "Doorn",
+        "wyrm": "Wyrm",
+        "bite": "Beet",
+        "brand": "Brandmerk",
+        "promise": "Belofte",
+        "thread": "Draad",
+        "vigil": "Wake",
+        "ward": "Bescherming",
+        "whisper": "Fluistering",
+        "oath": "Eed"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Kroon van de Laatste Brandstapel",
+          "description": "Elke derde Sintelbout verschroeit vijanden in de buurt van het doelwit."
+        },
+        "greyjaws_edge": {
+          "name": "Snede van Grijskaak",
+          "description": "Elke derde wapentreffer laat het doelwit bloeden en herstelt een beetje hulpbron."
+        },
+        "hushwood_longbow": {
+          "name": "Langboog van het Stille Woud",
+          "description": "Lange Trek of Boosaardig Schot kan het doelwit kort het zwijgen opleggen."
+        },
+        "nightglass_fang": {
+          "name": "Nachtglastand",
+          "description": "Een gedode vijand geeft kort haast."
+        },
+        "ysoleis_vigil": {
+          "name": "Ysoleis Wake",
+          "description": "Kritieke genezing maakt kort een herstellend gebied op de grond."
+        },
+        "stormwake_idol": {
+          "name": "Idool van Stormontwaken",
+          "description": "Elke vierde Boogbliksem springt over naar vijanden in de buurt."
+        },
+        "ashbinders_seal": {
+          "name": "Zegel van de Asbinder",
+          "description": "Elke vierde Duisterbout markeert zijn doelwit voor extra Schaduwschade."
+        },
+        "dawnward_signet": {
+          "name": "Zegelring van de Dageraad",
+          "description": "Helend Licht beschermt de ontvanger met een schild voor een deel van de genezing."
+        },
+        "feral_moonclasp": {
+          "name": "Gesp van de Wilde Maan",
+          "description": "Elke derde Wildbout herstelt de primaire hulpbron."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Bel van de Negende Slag",
+          "description": "Elke tweede schadelijke spreuk galmt rond het doelwit."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Mantel van Gestolen Uren",
+          "description": "Onder 35% gezondheid komen geeft kort een defensieve bescherming."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Laarzen van de Ongebroken Weg",
+          "description": "15 meter bewegen geeft kort een hogere bewegingssnelheid."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const nl_NL: EnTranslations = {
       "greed": "Hebzucht",
       "pass": "Passeren",
       "needAria": "Nodig voor {item}",
+      "needUnavailable": "Nodig is niet beschikbaar omdat je klasse dit voorwerp niet kan uitrusten.",
+      "needUnavailablePower": "Nodig is niet beschikbaar omdat deze legendarische kracht tot een andere klasse is beperkt.",
       "greedAria": "Hebzucht voor {item}",
       "passAria": "{item} passeren",
       "everyonePassed": "Iedereen passeerde {item}.",
@@ -9170,6 +9289,108 @@ export const nl_NL: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Resonerend Hout"
+      },
+      "ashwood_staff": {
+        "name": "Essenhouten staf"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Gravecaller-stoffen handwikkels"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Gravecaller-stoffen kap"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Gravecaller-stoffen beenstukken"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Gravecaller-stoffen mantel"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Gravecaller-stoffen gewaad"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Gravecaller-stoffen sjerp"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Gravecaller-stoffen sloffen"
+      },
+      "gravecaller_focus": {
+        "name": "Gravecaller-focus"
+      },
+      "gravecaller_pendant": {
+        "name": "Gravecaller-hanger"
+      },
+      "gravecaller_ring": {
+        "name": "Gravecaller-ring"
+      },
+      "gravecaller_wand": {
+        "name": "Gravecaller-toverstaf"
+      },
+      "iron_broadsword": {
+        "name": "IJzeren slagzwaard"
+      },
+      "iron_flanged_mace": {
+        "name": "IJzeren flensknots"
+      },
+      "mirefen_dirk": {
+        "name": "Mirefen-dolk"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Mirefen-jachtboog"
+      },
+      "mirefen_leather_belt": {
+        "name": "Mirefen-leren riem"
+      },
+      "mirefen_leather_boots": {
+        "name": "Mirefen-leren laarzen"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Mirefen-leren handschoenen"
+      },
+      "mirefen_leather_hood": {
+        "name": "Mirefen-leren kap"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Mirefen-leren wambuis"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Mirefen-leren beenstukken"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Mirefen-leren schouderbeschermers"
+      },
+      "thornpeak_bulwark": {
+        "name": "Thornpeak-bolwerk"
+      },
+      "thornpeak_crossbow": {
+        "name": "Thornpeak-kruisboog"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Thornpeak-maliënkolder"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Thornpeak-maliënhandschoenen"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Thornpeak-maliëngordel"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Thornpeak-maliënhelm"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Thornpeak-maliënbeenplaten"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Thornpeak-maliënschouderplaten"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Thornpeak-maliënschoenen"
+      },
+      "thornpeak_polearm": {
+        "name": "Thornpeak-stokwapen"
+      },
+      "thornpeak_war_axe": {
+        "name": "Thornpeak-strijdbijl"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

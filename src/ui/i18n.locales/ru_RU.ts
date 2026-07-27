@@ -13,6 +13,18 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.finder.raidRewards': 'Предпросмотр наград Никсраксиса',
+  'hudChrome.finder.raidRarityLine':
+    'Редкий {rare}% · Эпический {epic}% · Легендарный {legendary}%',
+  'hudChrome.finder.raidItemLevels':
+    'Уровень предмета: редкий {rare} · эпический {epic} · легендарный {legendary}',
+  'hudChrome.finder.raidSignatures': 'Особые легендарные силы: {signatures}',
+  'hudChrome.finder.raidSharedDrop':
+    'На последнем трупе появится один общий процедурный предмет, за который бросает весь рейд.',
+  'hudChrome.finder.raidForgedLegendary':
+    'Героические легендарные силы имеют рейдовую ковку и гарантированно попадают в верхнюю половину заданного диапазона.',
+  'itemUi.lootRoll.needUnavailable':
+    'Нельзя выбрать «Нужно»: ваш класс не может экипировать этот предмет.',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -9297,6 +9309,135 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsBody':
     'Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.',
   'hudChrome.corpseHarvest.components.meat': 'Мясо',
+  'hudChrome.bags.itemAriaProcedural':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}',
+  'hudChrome.bags.itemAriaProceduralMasterwork':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}, шедевр',
+  'hudChrome.bags.itemAriaProceduralEnchanted':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}, зачарованный экземпляр',
+  'hudChrome.bags.itemAriaProceduralSigned':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}, экземпляр с подписью мастера',
+  'hudChrome.bags.itemAriaProceduralBound':
+    '{item}, {rarity}, уровень предмета {level}, количество {count}, привязанный экземпляр',
+  'itemUi.stats.weaponMin': 'Минимальный урон оружия',
+  'itemUi.stats.weaponMax': 'Максимальный урон оружия',
+  'itemUi.stats.weaponDps': 'Урон оружия в секунду',
+  'itemUi.stats.healthOnKill': 'Здоровье за убийство',
+  'itemUi.stats.manaOnKill': 'Мана за убийство',
+  'itemUi.stats.blockValue': 'Сила блока',
+  'itemUi.procedural.rollRangeAria': 'Возможное значение от {min} до {max}',
+  'itemUi.procedural.advancedDetailsHint':
+    'Удерживайте {key}, чтобы показать диапазоны возможных значений.',
+  'itemUi.procedural.powerRollPercent': 'Значение свойства: {value}%',
+  'itemUi.procedural.powerRollMilliseconds': 'Значение свойства: {value} мс',
+  'itemUi.procedural.powerRollResource': 'Значение свойства: {value} ресурса',
+  'itemUi.procedural.powerRollNumber': 'Значение свойства: {value}',
+  'itemUi.procedural.legendaryPower': 'Легендарное свойство',
+  'itemUi.procedural.legendaryLimit': 'Уникально экипировано: {count} легендарное свойство',
+  'itemUi.procedural.rarity.common': 'Обычный',
+  'itemUi.procedural.rarity.magic': 'Магический',
+  'itemUi.procedural.rarity.rare': 'Редкий',
+  'itemUi.procedural.rarity.epic': 'Эпический',
+  'itemUi.procedural.rarity.legendary': 'Легендарный',
+  'itemUi.procedural.rarity.mythic': 'Мифический',
+  'itemUi.procedural.nameFragment.mighty': 'Могучий',
+  'itemUi.procedural.nameFragment.deft': 'Ловкий',
+  'itemUi.procedural.nameFragment.stalwart': 'Стойкий',
+  'itemUi.procedural.nameFragment.sages': 'Мудреца',
+  'itemUi.procedural.nameFragment.spiritual': 'Духовный',
+  'itemUi.procedural.nameFragment.of_focus': 'сосредоточения',
+  'itemUi.procedural.nameFragment.of_striking': 'удара',
+  'itemUi.procedural.nameFragment.of_alacrity': 'проворства',
+  'itemUi.procedural.nameFragment.of_precision': 'точности',
+  'itemUi.procedural.nameFragment.warded': 'Оберегаемый',
+  'itemUi.procedural.nameFragment.of_reaping': 'жатвы',
+  'itemUi.procedural.nameFragment.of_remembrance': 'памяти',
+  'itemUi.procedural.rareWord.ashen': 'Пепельный',
+  'itemUi.procedural.rareWord.blackfen': 'Чернотопь',
+  'itemUi.procedural.rareWord.doom': 'Рок',
+  'itemUi.procedural.rareWord.grave': 'Могила',
+  'itemUi.procedural.rareWord.mire': 'Трясина',
+  'itemUi.procedural.rareWord.storm': 'Буря',
+  'itemUi.procedural.rareWord.thorn': 'Шип',
+  'itemUi.procedural.rareWord.wyrm': 'Змей',
+  'itemUi.procedural.rareWord.bite': 'Укус',
+  'itemUi.procedural.rareWord.brand': 'Клеймо',
+  'itemUi.procedural.rareWord.promise': 'Обещание',
+  'itemUi.procedural.rareWord.thread': 'Нить',
+  'itemUi.procedural.rareWord.vigil': 'Дозор',
+  'itemUi.procedural.rareWord.ward': 'Оберег',
+  'itemUi.procedural.rareWord.whisper': 'Шёпот',
+  'itemUi.procedural.rareWord.oath': 'Клятва',
+  'itemUi.procedural.legendary.crown_last_pyre.name': 'Корона последнего костра',
+  'itemUi.procedural.legendary.crown_last_pyre.description':
+    'Каждый третий Cinderbolt обжигает врагов рядом с целью.',
+  'itemUi.procedural.legendary.greyjaws_edge.name': 'Кромка Серой Челюсти',
+  'itemUi.procedural.legendary.greyjaws_edge.description':
+    'Каждый третий удар оружием вызывает кровотечение у цели и восстанавливает немного основного ресурса.',
+  'itemUi.procedural.legendary.hushwood_longbow.name': 'Длинный лук Тихолесья',
+  'itemUi.procedural.legendary.hushwood_longbow.description':
+    'Long Draw или Fell Shot может ненадолго лишить цель возможности произносить заклинания.',
+  'itemUi.procedural.legendary.nightglass_fang.name': 'Клык ночного стекла',
+  'itemUi.procedural.legendary.nightglass_fang.description':
+    'Убийство ненадолго повышает скорость.',
+  'itemUi.procedural.legendary.ysoleis_vigil.name': 'Дозор Исолеи',
+  'itemUi.procedural.legendary.ysoleis_vigil.description':
+    'Критическое исцеление ненадолго создает восстанавливающую область.',
+  'itemUi.procedural.legendary.stormwake_idol.name': 'Идол следа бури',
+  'itemUi.procedural.legendary.stormwake_idol.description':
+    'Каждый четвертый Arc Bolt переходит на ближайших врагов.',
+  'itemUi.procedural.legendary.ashbinders_seal.name': 'Печать Связующего Пепел',
+  'itemUi.procedural.legendary.ashbinders_seal.description':
+    'Каждый четвертый Gloom Bolt отмечает цель для дополнительного урона от Тьмы.',
+  'itemUi.procedural.legendary.dawnward_signet.name': 'Перстень Рассветного Стража',
+  'itemUi.procedural.legendary.dawnward_signet.description':
+    'Mending Light создает на цели щит на часть объема исцеления.',
+  'itemUi.procedural.legendary.feral_moonclasp.name': 'Лунная застежка зверя',
+  'itemUi.procedural.legendary.feral_moonclasp.description':
+    'Каждый третий Lunar Tempest восстанавливает основной ресурс.',
+  'itemUi.procedural.legendary.bell_of_the_ninth_peal.name': 'Колокол девятого звона',
+  'itemUi.procedural.legendary.bell_of_the_ninth_peal.description':
+    'Каждое второе наносящее урон заклинание звонит вокруг цели.',
+  'itemUi.procedural.legendary.mantle_of_borrowed_time.name': 'Мантия украденных часов',
+  'itemUi.procedural.legendary.mantle_of_borrowed_time.description':
+    'При падении здоровья ниже 35% ненадолго дает защитный оберег.',
+  'itemUi.procedural.legendary.boots_of_the_unbroken_road.name': 'Сапоги неразрывной дороги',
+  'itemUi.procedural.legendary.boots_of_the_unbroken_road.description':
+    'После перемещения на 15 ярдов ненадолго повышает скорость передвижения.',
+  'entities.items.ashwood_staff.name': 'Ясеневый посох',
+  'entities.items.gravecaller_cloth_handwraps.name': 'Матерчатые обмотки Могильного призывателя',
+  'entities.items.gravecaller_cloth_hood.name': 'Матерчатый капюшон Могильного призывателя',
+  'entities.items.gravecaller_cloth_leggings.name': 'Матерчатые поножи Могильного призывателя',
+  'entities.items.gravecaller_cloth_mantle.name': 'Матерчатое наплечье Могильного призывателя',
+  'entities.items.gravecaller_cloth_raiment.name': 'Матерчатое облачение Могильного призывателя',
+  'entities.items.gravecaller_cloth_sash.name': 'Матерчатый кушак Могильного призывателя',
+  'entities.items.gravecaller_cloth_slippers.name': 'Матерчатые туфли Могильного призывателя',
+  'entities.items.gravecaller_focus.name': 'Фокус Могильного призывателя',
+  'entities.items.gravecaller_pendant.name': 'Подвеска Могильного призывателя',
+  'entities.items.gravecaller_ring.name': 'Кольцо Могильного призывателя',
+  'entities.items.gravecaller_wand.name': 'Жезл Могильного призывателя',
+  'entities.items.iron_broadsword.name': 'Железный палаш',
+  'entities.items.iron_flanged_mace.name': 'Железная фланцевая булава',
+  'entities.items.mirefen_dirk.name': 'Кортик Топей',
+  'entities.items.mirefen_hunting_bow.name': 'Охотничий лук Топей',
+  'entities.items.mirefen_leather_belt.name': 'Кожаный пояс Топей',
+  'entities.items.mirefen_leather_boots.name': 'Кожаные сапоги Топей',
+  'entities.items.mirefen_leather_gloves.name': 'Кожаные перчатки Топей',
+  'entities.items.mirefen_leather_hood.name': 'Кожаный капюшон Топей',
+  'entities.items.mirefen_leather_jerkin.name': 'Кожаный колет Топей',
+  'entities.items.mirefen_leather_leggings.name': 'Кожаные поножи Топей',
+  'entities.items.mirefen_leather_shoulderguards.name': 'Кожаные наплечники Топей',
+  'entities.items.thornpeak_bulwark.name': 'Оплот Шипастого пика',
+  'entities.items.thornpeak_crossbow.name': 'Арбалет Шипастого пика',
+  'entities.items.thornpeak_mail_chest.name': 'Кольчужный нагрудник Шипастого пика',
+  'entities.items.thornpeak_mail_gauntlets.name': 'Кольчужные рукавицы Шипастого пика',
+  'entities.items.thornpeak_mail_girdle.name': 'Кольчужный пояс Шипастого пика',
+  'entities.items.thornpeak_mail_helm.name': 'Кольчужный шлем Шипастого пика',
+  'entities.items.thornpeak_mail_legguards.name': 'Кольчужные набедренники Шипастого пика',
+  'entities.items.thornpeak_mail_pauldrons.name': 'Кольчужные наплечники Шипастого пика',
+  'entities.items.thornpeak_mail_sabatons.name': 'Кольчужные сабатоны Шипастого пика',
+  'entities.items.thornpeak_polearm.name': 'Древковое оружие Шипастого пика',
+  'entities.items.thornpeak_war_axe.name': 'Боевой топор Шипастого пика',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (зачаровано)',
   'hudChrome.materialHint.arcaneDust':
     'Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.',
@@ -9352,4 +9493,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
   'devCommand.kitCurrentSpec': 'Текущая специализация',
   'hudChrome.enchanting.wornTag': 'Надето ({slot})',
+  'itemUi.lootRoll.needUnavailablePower':
+    'Выбрать «Нужно» нельзя: эта легендарная сила предназначена для другого класса.',
 };

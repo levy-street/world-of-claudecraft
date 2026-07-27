@@ -35,7 +35,13 @@ import { bagCapacity, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { cloneItemInstancePayload, type ItemDef, type StationDef } from '../types';
+import {
+  cloneItemInstancePayload,
+  type ItemDef,
+  type ItemInstancePayload,
+  type StationDef,
+} from '../types';
+import { exactInventoryIndex, professionItemQuality } from './item_instance';
 import { MASTERWORK_QUALITY_LADDER } from './masterwork';
 import { isAtAnyStation } from './stations';
 
@@ -57,12 +63,12 @@ export function isCommissionEligible(def: ItemDef | undefined): boolean {
 // (the ruling's wording), clamp-to-first below (see the header rationale).
 export const UNBIND_FEE_BY_QUALITY_TIER: readonly number[] = Object.freeze([2500, 10000, 40000]);
 
-/** The unbind fee for one item def, in copper: DEF quality only ('poor' and
- *  absent normalize to 'common', the defOutputQuality convention; a legacy
- *  rolled.quality payload never moves the fee, matching the masterwork
- *  discovery-deed DEF-quality ruling). */
-export function unbindFeeFor(def: ItemDef): number {
-  const quality = def.quality === undefined || def.quality === 'poor' ? 'common' : def.quality;
+/** The unbind fee for one concrete copy, in copper. Generated gear uses its
+ *  authoritative procedural rarity; legacy gear uses authored quality
+ *  ('poor' and absent normalize to 'common'). */
+export function unbindFeeFor(def: ItemDef, instance?: ItemInstancePayload): number {
+  const resolved = instance?.procedural ? professionItemQuality(def, instance) : def.quality;
+  const quality = resolved === undefined || resolved === 'poor' ? 'common' : resolved;
   const ladderIdx = (MASTERWORK_QUALITY_LADDER as readonly string[]).indexOf(quality);
   const feeIdx = Math.min(Math.max(ladderIdx - 1, 0), UNBIND_FEE_BY_QUALITY_TIER.length - 1);
   return UNBIND_FEE_BY_QUALITY_TIER[feeIdx];
@@ -92,8 +98,12 @@ export interface UnbindResult {
 /** The first (lowest bag index) inventory slot holding a bound copy of
  *  `itemId`, or -1. Deterministic selection: when several bound copies of the
  *  same item exist, the earliest slot is always the one unbound. */
-function firstBoundSlotIndex(meta: PlayerMeta, itemId: string): number {
+function firstBoundSlotIndex(meta: PlayerMeta, itemId: string, instanceUid?: string): number {
   const inventory = meta.inventory ?? [];
+  if (instanceUid !== undefined) {
+    const index = exactInventoryIndex(inventory, itemId, instanceUid);
+    return index >= 0 && inventory[index].instance?.boundTo !== undefined ? index : -1;
+  }
   for (let i = 0; i < inventory.length; i++) {
     const slot = inventory[i];
     if (slot.itemId === itemId && slot.instance?.boundTo !== undefined) return i;
@@ -130,17 +140,19 @@ export function resolveUnbind(
   meta: PlayerMeta | undefined,
   pos: { x: number; z: number } | undefined,
   itemId: string,
+  instanceUid?: string,
 ): UnbindResult {
   const def = ITEMS[itemId];
   if (!def) return { ok: false, itemId, fee: 0 };
-  const fee = unbindFeeFor(def);
+  const baseFee = unbindFeeFor(def);
   if (!isCommissionEligible(def)) {
-    return { ok: false, itemId, reason: 'unbind_not_eligible', fee };
+    return { ok: false, itemId, reason: 'unbind_not_eligible', fee: baseFee };
   }
-  const boundIdx = meta ? firstBoundSlotIndex(meta, itemId) : -1;
+  const boundIdx = meta ? firstBoundSlotIndex(meta, itemId, instanceUid) : -1;
   if (!meta || boundIdx === -1) {
-    return { ok: false, itemId, reason: 'unbind_not_bound', fee };
+    return { ok: false, itemId, reason: 'unbind_not_bound', fee: baseFee };
   }
+  const fee = unbindFeeFor(def, meta.inventory[boundIdx].instance);
   if (!pos || !isAtAnyStation(stations, pos)) {
     return { ok: false, itemId, reason: 'unbind_out_of_range', fee };
   }
@@ -173,13 +185,18 @@ export function resolveUnbind(
  * are never aliased across slots). No other payload field is touched.
  * Runs on the deterministic tick the wire command arrives on, never off-tick.
  */
-export function unbindItem(ctx: SimContext, itemId: string, pid?: number): UnbindResult {
+export function unbindItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  instanceUid?: string,
+): UnbindResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, fee: 0 };
   const meta = r.meta;
-  const result = resolveUnbind(ctx.stationPlacements, meta, r.e.pos, itemId);
+  const result = resolveUnbind(ctx.stationPlacements, meta, r.e.pos, itemId, instanceUid);
   if (!result.ok) return result;
-  const slotIdx = firstBoundSlotIndex(meta, itemId);
+  const slotIdx = firstBoundSlotIndex(meta, itemId, instanceUid);
   const slot = meta.inventory[slotIdx];
   const instance = slot?.instance;
   // Unreachable: the resolver found a bound slot on this same meta within the

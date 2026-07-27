@@ -22,6 +22,8 @@ import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 
 export interface UnbindRow {
   itemId: string;
+  /** Exact generated-copy selector when this row represents one procedural item. */
+  instanceUid?: string;
   /** The item def when the item table resolves it (display name/icon). */
   item?: ItemDef;
   /** Total bound copies held across all slots (the row unbinds ONE per use). */
@@ -49,9 +51,10 @@ export interface UnbindViewDeps {
 }
 
 /**
- * Build the unbind view: one row per distinct bound eligible item id, in
- * first-bound-slot bag order (the same earliest-slot order the resolver
- * unbinds in), carrying the total bound count and the DEF-quality fee.
+ * Build the unbind view in bag order. Generated copies receive one row per
+ * server-issued UID with their own rarity-derived fee; legacy fungible copies
+ * remain grouped by item id. Each row carries only the count sharing that
+ * exact selector and payload.
  */
 export function buildUnbindView(deps: UnbindViewDeps): UnbindView {
   const byItemId = new Map<string, UnbindRow>();
@@ -59,14 +62,17 @@ export function buildUnbindView(deps: UnbindViewDeps): UnbindView {
     if (slot.instance?.boundTo === undefined) continue;
     const def = deps.items[slot.itemId];
     if (!isCommissionEligible(def)) continue;
-    const existing = byItemId.get(slot.itemId);
+    const instanceUid = slot.instance.procedural?.uid;
+    const key = instanceUid ? `${slot.itemId}:${instanceUid}` : slot.itemId;
+    const existing = byItemId.get(key);
     if (existing) {
       existing.boundCount += slot.count;
       continue;
     }
-    const feeCopper = unbindFeeFor(def);
-    byItemId.set(slot.itemId, {
+    const feeCopper = unbindFeeFor(def, slot.instance);
+    byItemId.set(key, {
       itemId: slot.itemId,
+      instanceUid,
       item: def,
       boundCount: slot.count,
       instance: slot.instance,

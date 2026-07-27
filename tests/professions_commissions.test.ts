@@ -842,9 +842,11 @@ describe('ClientWorld command send shapes', () => {
     const { client, sent } = clientWithCapture();
     client.craftItem(SWORD_RECIPE, true);
     client.unbindItem(SWORD);
+    client.unbindItem(SWORD, 'pi1:profession-wire:2');
     expect(sent).toEqual([
       { cmd: 'craft_item', recipe: SWORD_RECIPE, commission: true },
       { cmd: 'unbind_item', item: SWORD },
+      { cmd: 'unbind_item', item: SWORD, uid: 'pi1:profession-wire:2' },
     ]);
   });
 });
@@ -906,7 +908,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     return server.sim.players.get(pid)!.inventory.filter((s: InvSlot) => s.itemId === itemId);
   }
 
-  it('runs the full arc: craft(commission) -> trade stamps -> re-trade denied -> unbind -> re-trade re-binds', () => {
+  it('runs the full arc: craft(commission) -> trade stamps -> re-trade denied -> unbind -> re-trade re-binds', async () => {
     const server = new GameServer();
     const fa = fakeWs();
     const fb = fakeWs();
@@ -1005,6 +1007,11 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     const wireSlot = lastInv!.find((s) => s.itemId === SWORD);
     expect(wireSlot?.instance?.bindOnTrade).toBe(true);
     expect(wireSlot?.instance?.boundTo).toBeUndefined();
+
+    // The first trade's atomic save is deliberately a backpressure barrier:
+    // wait for the resolved DB mock and its queue finalizer before another
+    // economy mutation involving the same characters.
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
     // 6. The freed piece trades back and RE-binds to the crafter.
     placeAt(server, sb.pid, { x: 2, z: 150 });

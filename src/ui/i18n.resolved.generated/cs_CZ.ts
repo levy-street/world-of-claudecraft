@@ -1547,6 +1547,11 @@ export const cs_CZ: EnTranslations = {
       "itemAriaEnchanted": "{item}, množství {count}, okouzlená kopie",
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
+      "itemAriaProcedural": "{item}, {rarity}, úroveň předmětu {level}, množství {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, úroveň předmětu {level}, množství {count}, mistrovské dílo",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, úroveň předmětu {level}, množství {count}, očarovaná kopie",
+      "itemAriaProceduralSigned": "{item}, {rarity}, úroveň předmětu {level}, množství {count}, kopie se značkou výrobce",
+      "itemAriaProceduralBound": "{item}, {rarity}, úroveň předmětu {level}, množství {count}, vázaná kopie",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -2169,9 +2174,9 @@ export const cs_CZ: EnTranslations = {
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
       "gatherLine": "Shromažďujete: {name}.",
       "gatherLineQty": "Shromažďujete: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Sklidíš: {name}.",
+      "harvestLineQty": "Sklidíš: {name} x{qty}.",
+      "harvestSpecimenLine": "Navíc získáš {name}.",
       "catchLine": "Vytahuješ: {name}",
       "biteLine": "Něco zabralo!",
       "gotAwayLine": "Ta ti unikla.",
@@ -2353,7 +2358,7 @@ export const cs_CZ: EnTranslations = {
       "empty": "Zatím nejsou známy žádné recepty.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
@@ -2446,13 +2451,13 @@ export const cs_CZ: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Rozzačarováním {item} získáš {material}.",
+      "disenchantedYieldQty": "Rozzačarováním {item} získáš {material} x{qty}.",
+      "disenchantedAlso": "Také získáš zpět {material}.",
+      "disenchantedAlsoQty": "Také získáš zpět {material} x{qty}.",
       "salvagedLine": "Rozebereš {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Rozebráním {item} získáš {material}.",
+      "salvagedYieldQty": "Rozebráním {item} získáš {material} x{qty}.",
       "enchantAppliedLine": "Okouzlíš {item} pomocí {enchant}.",
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
@@ -2489,14 +2494,14 @@ export const cs_CZ: EnTranslations = {
       "sameEnchant": "Tento předmět už má toto okouzlení.",
       "replaceTag": "Nahradí {enchant}",
       "sameEnchantTag": "Již aplikováno",
-      "plainTag": "Not enchanted",
+      "plainTag": "Bez očarování",
       "replaceConfirmTitle": "Nahradit okouzlení na {item}?",
       "replaceConfirmBody": "Tímto nahradíš {old} na {item} za {new}.",
       "replaceConfirmNoRefund": "Staré okouzlení bude zničeno. Materiály se nevrací. Tuto akci nelze vrátit.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Zachováno: {kept}",
+      "replaceConfirmKeepsSigner": "Značka výrobce",
+      "replaceConfirmKeepsMasterwork": "Bonus mistrovského díla",
+      "replaceConfirmKeepsBond": "Vazba zakázky",
       "replaceConfirmCost": "Cena: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Nahradit"
@@ -2568,6 +2573,12 @@ export const cs_CZ: EnTranslations = {
       "lockedFor": "Uzamčeno přibližně na {minutes} min",
       "attunement": "Vyžaduje naladění: {quest}",
       "heroicMarks": "Hrdinská znamení: {count} za hráče",
+      "raidRewards": "Náhled odměn z Nythraxis",
+      "raidSharedDrop": "Závěrečná mrtvola přidá jeden společný procedurální předmět, o který bude nájezd losovat.",
+      "raidRarityLine": "Vzácný {rare} % · epický {epic} % · legendární {legendary} %",
+      "raidItemLevels": "Úroveň předmětu: vzácný {rare} · epický {epic} · legendární {legendary}",
+      "raidSignatures": "Charakteristické legendární síly: {signatures}",
+      "raidForgedLegendary": "Síly hrdinských legendárních předmětů jsou vykované v nájezdu a zaručeně leží v horní polovině svého navrženého rozsahu.",
       "entrance": "Vstup: {zone}",
       "showOnMap": "Zobrazit na mapě",
       "encounters": "Střety",
@@ -6640,7 +6651,113 @@ export const cs_CZ: EnTranslations = {
       "dps": "Poškození/s",
       "critChance": "Šance na kritický zásah",
       "dodge": "Vyhnutí",
-      "parry": "Odražení"
+      "parry": "Odražení",
+      "weaponMin": "Minimální poškození zbraně",
+      "weaponMax": "Maximální poškození zbraně",
+      "weaponDps": "Poškození zbraně za sekundu",
+      "healthOnKill": "Zdraví za zabití",
+      "manaOnKill": "Mana za zabití",
+      "blockValue": "Hodnota blokování"
+    },
+    "procedural": {
+      "rollRangeAria": "Možný hod od {min} do {max}",
+      "advancedDetailsHint": "Podržením {key} zobrazíš možné rozsahy hodů.",
+      "powerRollPercent": "Hod moci: {value}%",
+      "powerRollMilliseconds": "Hod moci: {value} ms",
+      "powerRollResource": "Hod moci: {value} zdroje",
+      "powerRollNumber": "Hod moci: {value}",
+      "legendaryPower": "Legendární moc",
+      "legendaryLimit": "Unikátní výbava: {count} legendární moc",
+      "rarity": {
+        "common": "Běžná",
+        "magic": "Magická",
+        "rare": "Vzácná",
+        "epic": "Epická",
+        "legendary": "Legendární",
+        "mythic": "Mýtická"
+      },
+      "nameFragment": {
+        "mighty": "Mocný",
+        "deft": "Obratný",
+        "stalwart": "Neochvějný",
+        "sages": "Mudrcův",
+        "spiritual": "Duchovní",
+        "of_focus": "Soustředění",
+        "of_striking": "Úderu",
+        "of_alacrity": "Hbitosti",
+        "of_precision": "Přesnosti",
+        "warded": "Chráněný",
+        "of_reaping": "Sklizně",
+        "of_remembrance": "Vzpomínání"
+      },
+      "rareWord": {
+        "ashen": "Popelavý",
+        "blackfen": "Černá bažina",
+        "doom": "Zkáza",
+        "grave": "Hrob",
+        "mire": "Močál",
+        "storm": "Bouře",
+        "thorn": "Trn",
+        "wyrm": "Drak",
+        "bite": "Kousnutí",
+        "brand": "Znamení",
+        "promise": "Slib",
+        "thread": "Vlákno",
+        "vigil": "Stráž",
+        "ward": "Ochrana",
+        "whisper": "Šepot",
+        "oath": "Přísaha"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Koruna Poslední hranice",
+          "description": "Každý třetí Škvárový šíp sežehne nepřátele poblíž cíle."
+        },
+        "greyjaws_edge": {
+          "name": "Ostří Šedé čelisti",
+          "description": "Každý třetí zásah zbraní způsobí cíli krvácení a obnoví trochu zdroje."
+        },
+        "hushwood_longbow": {
+          "name": "Dlouhý luk Tichého lesa",
+          "description": "Dlouhý nátah nebo Prokletý výstřel mohou cíl krátce umlčet."
+        },
+        "nightglass_fang": {
+          "name": "Tesák Nočního skla",
+          "description": "Zabití krátce zvýší spěch."
+        },
+        "ysoleis_vigil": {
+          "name": "Ysoleina stráž",
+          "description": "Kritické léčení krátce vytvoří na zemi obnovující oblast."
+        },
+        "stormwake_idol": {
+          "name": "Modla Probuzení bouře",
+          "description": "Každý čtvrtý Bleskový šíp přeskočí na blízké nepřátele."
+        },
+        "ashbinders_seal": {
+          "name": "Pečeť Poutače popela",
+          "description": "Každý čtvrtý Šíp šera označí cíl, který pak utrpí dodatečné stínové poškození."
+        },
+        "dawnward_signet": {
+          "name": "Pečetní prsten Úsvitu",
+          "description": "Léčivé světlo ochrání příjemce štítem za část vyléčeného zdraví."
+        },
+        "feral_moonclasp": {
+          "name": "Spona Divokého měsíce",
+          "description": "Každý třetí Šíp divočiny obnoví primární zdroj."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Zvon Devátého úderu",
+          "description": "Každé druhé kouzlo způsobující poškození zazní kolem cíle."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Plášť Ukradených hodin",
+          "description": "Pokles pod 35% zdraví krátce poskytne obrannou ochranu."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Boty Nepřerušené cesty",
+          "description": "Překonání 15 yardů krátce zvýší rychlost pohybu."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const cs_CZ: EnTranslations = {
       "greed": "Chamtivost",
       "pass": "Vzdát se",
       "needAria": "Potřeba pro {item}",
+      "needUnavailable": "Potřeba není dostupná, protože tvá třída nemůže tento předmět vybavit.",
+      "needUnavailablePower": "Potřeba není dostupná, protože tato legendární moc je vyhrazena jiné třídě.",
       "greedAria": "Chamtivost pro {item}",
       "passAria": "Vzdát se nároku na {item}",
       "everyonePassed": "Všichni se vzdali nároku na {item}.",
@@ -9170,6 +9289,108 @@ export const cs_CZ: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Rezonující dřevo"
+      },
+      "ashwood_staff": {
+        "name": "Jasanová hůl"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Látkové oviny Hrobaře"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Látková kápě Hrobaře"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Látkové nohavice Hrobaře"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Látkový plášť Hrobaře"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Látkové roucho Hrobaře"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Látková šerpa Hrobaře"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Látkové střevíce Hrobaře"
+      },
+      "gravecaller_focus": {
+        "name": "Fokus Hrobaře"
+      },
+      "gravecaller_pendant": {
+        "name": "Přívěsek Hrobaře"
+      },
+      "gravecaller_ring": {
+        "name": "Prsten Hrobaře"
+      },
+      "gravecaller_wand": {
+        "name": "Hůlka Hrobaře"
+      },
+      "iron_broadsword": {
+        "name": "Železný široký meč"
+      },
+      "iron_flanged_mace": {
+        "name": "Železný přírubový palcát"
+      },
+      "mirefen_dirk": {
+        "name": "Dýka z Mirefenu"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Lovecký luk z Mirefenu"
+      },
+      "mirefen_leather_belt": {
+        "name": "Kožený opasek z Mirefenu"
+      },
+      "mirefen_leather_boots": {
+        "name": "Kožené boty z Mirefenu"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Kožené rukavice z Mirefenu"
+      },
+      "mirefen_leather_hood": {
+        "name": "Kožená kápě z Mirefenu"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Kožený kabátec z Mirefenu"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Kožené nohavice z Mirefenu"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Kožené nárameníky z Mirefenu"
+      },
+      "thornpeak_bulwark": {
+        "name": "Bašta Thornpeaku"
+      },
+      "thornpeak_crossbow": {
+        "name": "Kuše Thornpeaku"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Kroužkový hrudní plát Thornpeaku"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Kroužkové rukavice Thornpeaku"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Kroužkový pás Thornpeaku"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Kroužková přilba Thornpeaku"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Kroužkové chrániče nohou Thornpeaku"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Kroužkové nárameníky Thornpeaku"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Kroužkové sabatony Thornpeaku"
+      },
+      "thornpeak_polearm": {
+        "name": "Dřevcová zbraň Thornpeaku"
+      },
+      "thornpeak_war_axe": {
+        "name": "Válečná sekera Thornpeaku"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

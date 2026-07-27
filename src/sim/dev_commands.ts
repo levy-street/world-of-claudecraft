@@ -2,6 +2,7 @@ import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS } from './data';
 import { applyDevKit } from './dev_kit';
+import { grantDevRolledItem } from './dev_rollitem';
 import { createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
@@ -181,6 +182,30 @@ export function handleDevChat(
       ctx.handleDeath(target, player ?? null);
       emitDevLog(ctx, pid, `[dev] Killed ${target.name}.`);
     }
+    return null;
+  }
+
+  const rollItemMatch =
+    /^\/(?:dev\s+rollitem|devrollitem)\s+(\S+)\s+(\S+)\s+(\d+)(?:\s+(\d+))?\s*$/i.exec(raw);
+  if (rollItemMatch) {
+    const result = grantDevRolledItem(ctx, pid, {
+      baseId: rollItemMatch[1],
+      rarity: rollItemMatch[2],
+      itemLevel: Number(rollItemMatch[3]),
+      ...(rollItemMatch[4] !== undefined && { seed: Number(rollItemMatch[4]) }),
+    });
+    if (!result.ok) ctx.error(pid, `[dev] ${result.error}`);
+    else {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Rolled ${result.rarity} ${result.baseId} at item level ${result.itemLevel} (${result.uid}, seed ${result.seed}).`,
+      );
+    }
+    return null;
+  }
+  if (/^\/(?:dev\s+rollitem|devrollitem)\b/i.test(raw)) {
+    ctx.error(pid, '[dev] Usage: /dev rollitem <base> <rarity> <ilevel> [seed].');
     return null;
   }
 
@@ -432,7 +457,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev rollitem, /dev give, /dev kit, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

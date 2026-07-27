@@ -282,6 +282,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       rejectHandshake(ws, WS_AUTH_ERROR.forceRename);
       return;
     }
+    let activeCharacter = character;
     const chatMute = await chatMuteStatusForAccount(accountId);
     // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
     // is handled inside game.join(); this guard blocks egregious bot farms before
@@ -341,11 +342,11 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         result = game.join(
           ws,
           accountId,
-          character.id,
-          character.name,
-          character.class,
-          character.state,
-          character.is_gm,
+          activeCharacter.id,
+          activeCharacter.name,
+          activeCharacter.class,
+          activeCharacter.state,
+          activeCharacter.is_gm,
           joinMeta,
         );
       } else {
@@ -396,16 +397,61 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             rejectHandshake(ws, WS_AUTH_ERROR.alreadyInWorld);
             return;
           }
-          result = game.join(
-            ws,
-            accountId,
-            character.id,
-            character.name,
-            character.class,
-            character.state,
-            character.is_gm,
-            { ...joinMeta, leaseNonce, bankBonus },
-          );
+          // Re-read only after our nonce is installed. A prior holder may have
+          // committed while this acquire waited on its locked lease row, so the
+          // ownership pre-read above must never seed a fresh live session.
+          try {
+            const refreshed = await getCharacter(accountId, character.id);
+            if (!refreshed) {
+              await releaseCharacterLease(character.id, leaseNonce).catch((err) =>
+                console.error('lease release failed:', err),
+              );
+              leaseNonce = undefined;
+              rejectHandshake(ws, WS_AUTH_ERROR.noSuchCharacter);
+              return;
+            }
+            if (refreshed.force_rename) {
+              await releaseCharacterLease(character.id, leaseNonce).catch((err) =>
+                console.error('lease release failed:', err),
+              );
+              leaseNonce = undefined;
+              rejectHandshake(ws, WS_AUTH_ERROR.forceRename);
+              return;
+            }
+            activeCharacter = refreshed;
+          } catch (err) {
+            await releaseCharacterLease(character.id, leaseNonce).catch((releaseErr) =>
+              console.error('lease release failed:', releaseErr),
+            );
+            leaseNonce = undefined;
+            throw err;
+          }
+          try {
+            result = game.join(
+              ws,
+              accountId,
+              activeCharacter.id,
+              activeCharacter.name,
+              activeCharacter.class,
+              activeCharacter.state,
+              activeCharacter.is_gm,
+              {
+                ...joinMeta,
+                hotbarLayout: activeCharacter.hotbar_layout ?? null,
+                leaseNonce,
+                bankBonus,
+              },
+            );
+          } catch (err) {
+            // addPlayer validates persisted state during join and can throw. The
+            // lease already belongs to this handshake, so release it before the
+            // error escapes to onConnection's classified retryable rejection.
+            await releaseCharacterLease(character.id, leaseNonce).catch((releaseErr) =>
+              console.error('lease release failed:', releaseErr),
+            );
+            leaseNonce = undefined;
+            throw err;
+          }
         } finally {
           // Decrement on every fresh-arm exit path (join completed, lease refused,
           // or a thrown DB error): a successful join is now counted by
@@ -429,7 +475,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         return;
       }
       const session = result;
-      console.log(`+ ${character.name} (${character.class}) joined, ${game.clients.size} online`);
+      console.log(
+        `+ ${activeCharacter.name} (${activeCharacter.class}) joined, ${game.clients.size} online`,
+      );
       ws.on('message', (data) => {
         game.handleMessage(session, String(data));
       });

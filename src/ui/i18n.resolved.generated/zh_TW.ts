@@ -1547,6 +1547,11 @@ export const zh_TW: EnTranslations = {
       "itemAriaEnchanted": "{item}，數量 {count}，已附魔的副本",
       "itemAriaBound": "{item}，數量 {count}，已綁定的副本",
       "itemAriaMasterwork": "{item}，數量 {count}，傑作",
+      "itemAriaProcedural": "{item}，{rarity}，物品等級 {level}，數量 {count}",
+      "itemAriaProceduralMasterwork": "{item}，{rarity}，物品等級 {level}，數量 {count}，傑作",
+      "itemAriaProceduralEnchanted": "{item}，{rarity}，物品等級 {level}，數量 {count}，附魔副本",
+      "itemAriaProceduralSigned": "{item}，{rarity}，物品等級 {level}，數量 {count}，製作者簽名副本",
+      "itemAriaProceduralBound": "{item}，{rarity}，物品等級 {level}，數量 {count}，綁定副本",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -2568,6 +2573,12 @@ export const zh_TW: EnTranslations = {
       "lockedFor": "鎖定約 {minutes} 分鐘",
       "attunement": "需要完成前置任務：{quest}",
       "heroicMarks": "英雄徽記：每人 {count} 枚",
+      "raidRewards": "尼瑟拉克西斯獎勵預覽",
+      "raidSharedDrop": "最終首領的屍體會額外提供一件由整個團隊共同擲骰的隨機生成物品。",
+      "raidRarityLine": "稀有 {rare}% · 史詩 {epic}% · 傳奇 {legendary}%",
+      "raidItemLevels": "物品等級：稀有 {rare} · 史詩 {epic} · 傳奇 {legendary}",
+      "raidSignatures": "專屬傳奇威能：{signatures}",
+      "raidForgedLegendary": "英雄難度的傳奇威能必定為團隊鍛造，其數值保證位於設計範圍的上半區。",
       "entrance": "入口：{zone}",
       "showOnMap": "在地圖上顯示",
       "encounters": "首領戰",
@@ -6640,7 +6651,113 @@ export const zh_TW: EnTranslations = {
       "dps": "每秒傷害",
       "critChance": "暴擊機率",
       "dodge": "閃躲",
-      "parry": "招架"
+      "parry": "招架",
+      "weaponMin": "最低武器傷害",
+      "weaponMax": "最高武器傷害",
+      "weaponDps": "武器每秒傷害",
+      "healthOnKill": "擊殺恢復生命",
+      "manaOnKill": "擊殺恢復法力",
+      "blockValue": "格擋值"
+    },
+    "procedural": {
+      "rollRangeAria": "可能的數值範圍：{min} 至 {max}",
+      "advancedDetailsHint": "按住 {key} 顯示可能的數值範圍。",
+      "powerRollPercent": "威能數值：{value}%",
+      "powerRollMilliseconds": "威能數值：{value} 毫秒",
+      "powerRollResource": "威能數值：{value} 點資源",
+      "powerRollNumber": "威能數值：{value}",
+      "legendaryPower": "傳奇威能",
+      "legendaryLimit": "唯一裝備：{count} 個傳奇威能",
+      "rarity": {
+        "common": "普通",
+        "magic": "魔法",
+        "rare": "稀有",
+        "epic": "史詩",
+        "legendary": "傳奇",
+        "mythic": "神話"
+      },
+      "nameFragment": {
+        "mighty": "強力",
+        "deft": "靈巧",
+        "stalwart": "堅毅",
+        "sages": "賢者之",
+        "spiritual": "靈性",
+        "of_focus": "專注",
+        "of_striking": "猛擊",
+        "of_alacrity": "迅捷",
+        "of_precision": "精準",
+        "warded": "守護",
+        "of_reaping": "收割",
+        "of_remembrance": "追憶"
+      },
+      "rareWord": {
+        "ashen": "灰燼",
+        "blackfen": "黑沼",
+        "doom": "厄運",
+        "grave": "墓塚",
+        "mire": "泥沼",
+        "storm": "風暴",
+        "thorn": "荊棘",
+        "wyrm": "巨龍",
+        "bite": "噬痕",
+        "brand": "烙印",
+        "promise": "諾言",
+        "thread": "絲縷",
+        "vigil": "守望",
+        "ward": "護符",
+        "whisper": "低語",
+        "oath": "誓言"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "末焰之冠",
+          "description": "每第三次施放火球術會灼燒目標附近的敵人。"
+        },
+        "greyjaws_edge": {
+          "name": "灰顎之刃",
+          "description": "每第三次武器命中會使目標流血，並恢復少量主要資源。"
+        },
+        "hushwood_longbow": {
+          "name": "寂林長弓",
+          "description": "瞄準射擊或秘法射擊可使目標短暫沉默。"
+        },
+        "nightglass_fang": {
+          "name": "夜晶之牙",
+          "description": "擊殺敵人會短暫提高加速。"
+        },
+        "ysoleis_vigil": {
+          "name": "伊索蕾的守望",
+          "description": "暴擊治療會短暫生成一片恢復區域。"
+        },
+        "stormwake_idol": {
+          "name": "喚風神像",
+          "description": "每第四次閃電箭會彈射至附近的敵人。"
+        },
+        "ashbinders_seal": {
+          "name": "縛灰者之印",
+          "description": "每第四次暗影箭會標記目標，使其受到額外暗影傷害。"
+        },
+        "dawnward_signet": {
+          "name": "晨衛璽戒",
+          "description": "聖光術會為目標施加護盾，吸收相當於部分治療量的傷害。"
+        },
+        "feral_moonclasp": {
+          "name": "野性月扣",
+          "description": "每第三次月火術會恢復主要資源。"
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "九鳴之鐘",
+          "description": "每第二次傷害法術都會在目標周圍敲響鐘聲。"
+        },
+        "mantle_of_borrowed_time": {
+          "name": "竊時披肩",
+          "description": "生命值降至 35% 以下時，會獲得一道短暫的防護結界。"
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "不息之路長靴",
+          "description": "移動 15 碼後，移動速度會短暫提高。"
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality}{kind}",
@@ -6816,6 +6933,8 @@ export const zh_TW: EnTranslations = {
       "greed": "貪婪",
       "pass": "放棄",
       "needAria": "需求 {item}",
+      "needUnavailable": "你的職業無法裝備此物品，因此不能選擇需求。",
+      "needUnavailablePower": "此傳奇能力僅限其他職業使用，因此不能選擇需求。",
       "greedAria": "貪婪 {item}",
       "passAria": "放棄 {item}",
       "everyonePassed": "所有人都放棄了 {item}。",
@@ -9170,6 +9289,108 @@ export const zh_TW: EnTranslations = {
       },
       "resonant_timber": {
         "name": "共鳴木材"
+      },
+      "ashwood_staff": {
+        "name": "灰木法杖"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "喚墓者布質裹手"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "喚墓者布帽"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "喚墓者布質護腿"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "喚墓者布質披肩"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "喚墓者布袍"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "喚墓者布質腰帶"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "喚墓者布鞋"
+      },
+      "gravecaller_focus": {
+        "name": "喚墓者法器"
+      },
+      "gravecaller_pendant": {
+        "name": "喚墓者吊墜"
+      },
+      "gravecaller_ring": {
+        "name": "喚墓者指環"
+      },
+      "gravecaller_wand": {
+        "name": "喚墓者魔杖"
+      },
+      "iron_broadsword": {
+        "name": "鐵製闊劍"
+      },
+      "iron_flanged_mace": {
+        "name": "鐵製凸緣釘錘"
+      },
+      "mirefen_dirk": {
+        "name": "泥沼短匕"
+      },
+      "mirefen_hunting_bow": {
+        "name": "泥沼獵弓"
+      },
+      "mirefen_leather_belt": {
+        "name": "泥沼皮帶"
+      },
+      "mirefen_leather_boots": {
+        "name": "泥沼皮靴"
+      },
+      "mirefen_leather_gloves": {
+        "name": "泥沼皮手套"
+      },
+      "mirefen_leather_hood": {
+        "name": "泥沼皮帽"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "泥沼皮甲"
+      },
+      "mirefen_leather_leggings": {
+        "name": "泥沼皮護腿"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "泥沼皮護肩"
+      },
+      "thornpeak_bulwark": {
+        "name": "荊峰壁壘"
+      },
+      "thornpeak_crossbow": {
+        "name": "荊峰弩"
+      },
+      "thornpeak_mail_chest": {
+        "name": "荊峰鎖甲胸鎧"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "荊峰鎖甲手鎧"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "荊峰鎖甲腰帶"
+      },
+      "thornpeak_mail_helm": {
+        "name": "荊峰鎖甲頭盔"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "荊峰鎖甲護腿"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "荊峰鎖甲肩鎧"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "荊峰鎖甲戰靴"
+      },
+      "thornpeak_polearm": {
+        "name": "荊峰長柄武器"
+      },
+      "thornpeak_war_axe": {
+        "name": "荊峰戰斧"
       },
       "conjured_water4": {
         "name": "魔法泉水"

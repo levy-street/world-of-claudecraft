@@ -1547,6 +1547,11 @@ export const en_CA: EnTranslations = {
       "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
       "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
+      "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, item level {level}, quantity {count}, masterwork",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, item level {level}, quantity {count}, enchanted copy",
+      "itemAriaProceduralSigned": "{item}, {rarity}, item level {level}, quantity {count}, maker-marked copy",
+      "itemAriaProceduralBound": "{item}, {rarity}, item level {level}, quantity {count}, bound copy",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -2568,6 +2573,12 @@ export const en_CA: EnTranslations = {
       "lockedFor": "Locked for about {minutes} min",
       "attunement": "Requires attunement: {quest}",
       "heroicMarks": "Heroic Marks: {count} per player",
+      "raidRewards": "Nythraxis reward preview",
+      "raidSharedDrop": "The final corpse adds one shared procedural item for the raid to roll on.",
+      "raidRarityLine": "Rare {rare}% · Epic {epic}% · Legendary {legendary}%",
+      "raidItemLevels": "Item level: Rare {rare} · Epic {epic} · Legendary {legendary}",
+      "raidSignatures": "Signature Legendary powers: {signatures}",
+      "raidForgedLegendary": "Heroic Legendary powers are Raid-forged and guaranteed in the upper half of their authored roll range.",
       "entrance": "Entrance: {zone}",
       "showOnMap": "Show on Map",
       "encounters": "Encounters",
@@ -6640,7 +6651,113 @@ export const en_CA: EnTranslations = {
       "dps": "Damage/sec",
       "critChance": "Crit Chance",
       "dodge": "Dodge",
-      "parry": "Parry"
+      "parry": "Parry",
+      "weaponMin": "Minimum weapon damage",
+      "weaponMax": "Maximum weapon damage",
+      "weaponDps": "Weapon damage per second",
+      "healthOnKill": "Health on kill",
+      "manaOnKill": "Mana on kill",
+      "blockValue": "Block value"
+    },
+    "procedural": {
+      "rollRangeAria": "Possible roll from {min} to {max}",
+      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
+      "powerRollPercent": "Power roll: {value}%",
+      "powerRollMilliseconds": "Power roll: {value} ms",
+      "powerRollResource": "Power roll: {value} resource",
+      "powerRollNumber": "Power roll: {value}",
+      "legendaryPower": "Legendary power",
+      "legendaryLimit": "Unique-equipped: {count} Legendary power",
+      "rarity": {
+        "common": "Common",
+        "magic": "Magic",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary",
+        "mythic": "Mythic"
+      },
+      "nameFragment": {
+        "mighty": "Mighty",
+        "deft": "Deft",
+        "stalwart": "Stalwart",
+        "sages": "Sage's",
+        "spiritual": "Spiritual",
+        "of_focus": "of Focus",
+        "of_striking": "of Striking",
+        "of_alacrity": "of Alacrity",
+        "of_precision": "of Precision",
+        "warded": "Warded",
+        "of_reaping": "of Reaping",
+        "of_remembrance": "of Remembrance"
+      },
+      "rareWord": {
+        "ashen": "Ashen",
+        "blackfen": "Blackfen",
+        "doom": "Doom",
+        "grave": "Grave",
+        "mire": "Mire",
+        "storm": "Storm",
+        "thorn": "Thorn",
+        "wyrm": "Wyrm",
+        "bite": "Bite",
+        "brand": "Brand",
+        "promise": "Promise",
+        "thread": "Thread",
+        "vigil": "Vigil",
+        "ward": "Ward",
+        "whisper": "Whisper",
+        "oath": "Oath"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Crown of the Last Pyre",
+          "description": "Every third Cinderbolt scorches enemies near the target."
+        },
+        "greyjaws_edge": {
+          "name": "Greyjaw's Edge",
+          "description": "Every third weapon hit bleeds the target and restores a little resource."
+        },
+        "hushwood_longbow": {
+          "name": "Hushwood Longbow",
+          "description": "Long Draw or Fell Shot can briefly silence its target."
+        },
+        "nightglass_fang": {
+          "name": "Nightglass Fang",
+          "description": "A kill grants a short burst of haste."
+        },
+        "ysoleis_vigil": {
+          "name": "Ysolei's Vigil",
+          "description": "Critical healing creates a brief restorative ground area."
+        },
+        "stormwake_idol": {
+          "name": "Stormwake Idol",
+          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+        },
+        "ashbinders_seal": {
+          "name": "Ashbinder's Seal",
+          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+        },
+        "dawnward_signet": {
+          "name": "Dawnward Signet",
+          "description": "Mending Light shields its recipient for a portion of the heal."
+        },
+        "feral_moonclasp": {
+          "name": "Feral Moonclasp",
+          "description": "Every third Lunar Tempest restores primary resource."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Bell of the Ninth Peal",
+          "description": "Every second damaging spell tolls around the target."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Mantle of Stolen Hours",
+          "description": "Falling below 35% health grants a brief defensive ward."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Boots of the Unbroken Road",
+          "description": "Moving 15 yards grants a short movement-speed burst."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const en_CA: EnTranslations = {
       "greed": "Greed",
       "pass": "Pass",
       "needAria": "Need for {item}",
+      "needUnavailable": "Need is unavailable because your class cannot equip this item.",
+      "needUnavailablePower": "Need is unavailable because this Legendary power is restricted to another class.",
       "greedAria": "Greed for {item}",
       "passAria": "Pass on {item}",
       "everyonePassed": "Everyone passed on {item}.",
@@ -9170,6 +9289,108 @@ export const en_CA: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Resonant Timber"
+      },
+      "ashwood_staff": {
+        "name": "Ashwood Staff"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Gravecaller Cloth Handwraps"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Gravecaller Cloth Hood"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Gravecaller Cloth Leggings"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Gravecaller Cloth Mantle"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Gravecaller Cloth Raiment"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Gravecaller Cloth Sash"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Gravecaller Cloth Slippers"
+      },
+      "gravecaller_focus": {
+        "name": "Gravecaller Focus"
+      },
+      "gravecaller_pendant": {
+        "name": "Gravecaller Pendant"
+      },
+      "gravecaller_ring": {
+        "name": "Gravecaller Ring"
+      },
+      "gravecaller_wand": {
+        "name": "Gravecaller Wand"
+      },
+      "iron_broadsword": {
+        "name": "Iron Broadsword"
+      },
+      "iron_flanged_mace": {
+        "name": "Iron Flanged Mace"
+      },
+      "mirefen_dirk": {
+        "name": "Mirefen Dirk"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Mirefen Hunting Bow"
+      },
+      "mirefen_leather_belt": {
+        "name": "Mirefen Leather Belt"
+      },
+      "mirefen_leather_boots": {
+        "name": "Mirefen Leather Boots"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Mirefen Leather Gloves"
+      },
+      "mirefen_leather_hood": {
+        "name": "Mirefen Leather Hood"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Mirefen Leather Jerkin"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Mirefen Leather Leggings"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Mirefen Leather Shoulderguards"
+      },
+      "thornpeak_bulwark": {
+        "name": "Thornpeak Bulwark"
+      },
+      "thornpeak_crossbow": {
+        "name": "Thornpeak Crossbow"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Thornpeak Mail Chest"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Thornpeak Mail Gauntlets"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Thornpeak Mail Girdle"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Thornpeak Mail Helm"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Thornpeak Mail Legguards"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Thornpeak Mail Pauldrons"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Thornpeak Mail Sabatons"
+      },
+      "thornpeak_polearm": {
+        "name": "Thornpeak Polearm"
+      },
+      "thornpeak_war_axe": {
+        "name": "Thornpeak War Axe"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"

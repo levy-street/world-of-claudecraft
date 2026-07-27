@@ -9256,7 +9256,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "5464e636",
+      "state": "e6f16ed6",
       "events": "90b86b6a",
       "rng": {
         "draws": 3027,
@@ -10103,6 +10103,9 @@
         },
         {
           "aiState": "dead",
+          "bossDamagers": [
+            415
+          ],
           "comboUntil": -1,
           "corpseTimer": 59.95,
           "critChance": 0.05,
@@ -10139,6 +10142,109 @@
               {
                 "count": 1,
                 "itemId": "nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "instance": {
+                  "procedural": {
+                    "affixes": [
+                      {
+                        "affixId": "reaping",
+                        "budget": 8.5,
+                        "family": "resource.health_on_kill",
+                        "position": "suffix",
+                        "ranges": {
+                          "healthOnKill": {
+                            "max": 32,
+                            "min": 7
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 4,
+                        "values": {
+                          "healthOnKill": 17
+                        }
+                      },
+                      {
+                        "affixId": "stalwart",
+                        "budget": 9,
+                        "family": "primary.stamina",
+                        "position": "prefix",
+                        "ranges": {
+                          "sta": {
+                            "max": 10,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "sta": 9
+                        }
+                      },
+                      {
+                        "affixId": "deft",
+                        "budget": 9,
+                        "family": "primary.agility",
+                        "position": "prefix",
+                        "ranges": {
+                          "agi": {
+                            "max": 10,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "agi": 9
+                        }
+                      },
+                      {
+                        "affixId": "alacrity",
+                        "budget": 7.56,
+                        "family": "rating.haste",
+                        "position": "suffix",
+                        "ranges": {
+                          "hasteRating": {
+                            "max": 35,
+                            "min": 8
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "hasteRating": 27
+                        }
+                      }
+                    ],
+                    "baseId": "thornpeak_war_axe",
+                    "dropContext": {
+                      "source": "raid",
+                      "sourceEntityId": 420,
+                      "sourceTags": [
+                        "undead",
+                        "raid",
+                        "normal",
+                        "elite",
+                        "boss"
+                      ],
+                      "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
+                    },
+                    "generatedName": {
+                      "baseId": "thornpeak_war_axe",
+                      "rareWordIds": [
+                        "procedural.rare.doom",
+                        "procedural.rare.promise"
+                      ]
+                    },
+                    "itemLevel": 28,
+                    "rarity": "epic",
+                    "seed": 2997339309,
+                    "uid": "pi1:offline_1031:1",
+                    "version": 1
+                  }
+                },
+                "itemId": "thornpeak_war_axe"
               }
             ]
           },
@@ -10520,7 +10626,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "fa709958",
+      "state": "f7e68312",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10531,7 +10637,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "ba3993c8",
+      "state": "f47ac650",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10542,7 +10648,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "335b01e4",
+      "state": "7680641c",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10553,7 +10659,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "79d3c7b0",
+      "state": "9d6bf462",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10564,7 +10670,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "66077d58",
+      "state": "ea513332",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10575,7 +10681,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "21d55208",
+      "state": "5e2c6e34",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10586,7 +10692,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "1224c02e",
+      "state": "4cbfcc7c",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -11433,6 +11539,9 @@
         },
         {
           "aiState": "dead",
+          "bossDamagers": [
+            415
+          ],
           "comboUntil": -1,
           "corpseTimer": 56.95,
           "critChance": 0.05,
@@ -11469,6 +11578,109 @@
               {
                 "count": 1,
                 "itemId": "nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "instance": {
+                  "procedural": {
+                    "affixes": [
+                      {
+                        "affixId": "reaping",
+                        "budget": 8.5,
+                        "family": "resource.health_on_kill",
+                        "position": "suffix",
+                        "ranges": {
+                          "healthOnKill": {
+                            "max": 32,
+                            "min": 7
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 4,
+                        "values": {
+                          "healthOnKill": 17
+                        }
+                      },
+                      {
+                        "affixId": "stalwart",
+                        "budget": 9,
+                        "family": "primary.stamina",
+                        "position": "prefix",
+                        "ranges": {
+                          "sta": {
+                            "max": 10,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "sta": 9
+                        }
+                      },
+                      {
+                        "affixId": "deft",
+                        "budget": 9,
+                        "family": "primary.agility",
+                        "position": "prefix",
+                        "ranges": {
+                          "agi": {
+                            "max": 10,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "agi": 9
+                        }
+                      },
+                      {
+                        "affixId": "alacrity",
+                        "budget": 7.56,
+                        "family": "rating.haste",
+                        "position": "suffix",
+                        "ranges": {
+                          "hasteRating": {
+                            "max": 35,
+                            "min": 8
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "hasteRating": 27
+                        }
+                      }
+                    ],
+                    "baseId": "thornpeak_war_axe",
+                    "dropContext": {
+                      "source": "raid",
+                      "sourceEntityId": 420,
+                      "sourceTags": [
+                        "undead",
+                        "raid",
+                        "normal",
+                        "elite",
+                        "boss"
+                      ],
+                      "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
+                    },
+                    "generatedName": {
+                      "baseId": "thornpeak_war_axe",
+                      "rareWordIds": [
+                        "procedural.rare.doom",
+                        "procedural.rare.promise"
+                      ]
+                    },
+                    "itemLevel": 28,
+                    "rarity": "epic",
+                    "seed": 2997339309,
+                    "uid": "pi1:offline_1031:1",
+                    "version": 1
+                  }
+                },
+                "itemId": "thornpeak_war_axe"
               }
             ]
           },

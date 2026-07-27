@@ -1547,6 +1547,11 @@ export const ko_KR: EnTranslations = {
       "itemAriaEnchanted": "{item}, 수량 {count}, 마법부여된 사본",
       "itemAriaBound": "{item}, 수량 {count}, 귀속된 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
+      "itemAriaProcedural": "{item}, {rarity}, 아이템 레벨 {level}, 수량 {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, 아이템 레벨 {level}, 수량 {count}, 걸작",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, 아이템 레벨 {level}, 수량 {count}, 마법부여된 사본",
+      "itemAriaProceduralSigned": "{item}, {rarity}, 아이템 레벨 {level}, 수량 {count}, 제작자 서명 사본",
+      "itemAriaProceduralBound": "{item}, {rarity}, 아이템 레벨 {level}, 수량 {count}, 귀속 사본",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -2568,6 +2573,12 @@ export const ko_KR: EnTranslations = {
       "lockedFor": "약 {minutes}분 동안 귀속됨",
       "attunement": "선행 퀘스트 필요: {quest}",
       "heroicMarks": "영웅의 징표: 1인당 {count}개",
+      "raidRewards": "니스락시스 보상 미리 보기",
+      "raidSharedDrop": "마지막 시체에 공격대가 함께 주사위를 굴릴 절차 생성 아이템 한 개가 추가됩니다.",
+      "raidRarityLine": "희귀 {rare}% · 영웅 {epic}% · 전설 {legendary}%",
+      "raidItemLevels": "아이템 레벨: 희귀 {rare} · 영웅 {epic} · 전설 {legendary}",
+      "raidSignatures": "고유 전설 위력: {signatures}",
+      "raidForgedLegendary": "영웅 전설 위력은 공격대 제련 상태이며, 설정된 수치 범위의 상위 절반이 보장됩니다.",
       "entrance": "입구: {zone}",
       "showOnMap": "지도에 표시",
       "encounters": "우두머리 전투",
@@ -6640,7 +6651,113 @@ export const ko_KR: EnTranslations = {
       "dps": "초당 피해",
       "critChance": "치명타율",
       "dodge": "회피",
-      "parry": "무기 막기"
+      "parry": "무기 막기",
+      "weaponMin": "최소 무기 피해",
+      "weaponMax": "최대 무기 피해",
+      "weaponDps": "초당 무기 피해",
+      "healthOnKill": "처치 시 생명력",
+      "manaOnKill": "처치 시 마나",
+      "blockValue": "방패 막기 수치"
+    },
+    "procedural": {
+      "rollRangeAria": "가능한 수치 범위: {min}~{max}",
+      "advancedDetailsHint": "가능한 수치 범위를 보려면 {key} 키를 누르세요.",
+      "powerRollPercent": "능력 변동값: {value}%",
+      "powerRollMilliseconds": "능력 변동값: {value} ms",
+      "powerRollResource": "능력 변동값: 자원 {value}",
+      "powerRollNumber": "능력 변동값: {value}",
+      "legendaryPower": "전설 능력",
+      "legendaryLimit": "고유 장착: 전설 능력 {count}개",
+      "rarity": {
+        "common": "일반",
+        "magic": "마법",
+        "rare": "희귀",
+        "epic": "영웅",
+        "legendary": "전설",
+        "mythic": "신화"
+      },
+      "nameFragment": {
+        "mighty": "강력한",
+        "deft": "날렵한",
+        "stalwart": "굳건한",
+        "sages": "현자의",
+        "spiritual": "영적인",
+        "of_focus": "집중의",
+        "of_striking": "일격의",
+        "of_alacrity": "기민함의",
+        "of_precision": "정밀함의",
+        "warded": "수호받는",
+        "of_reaping": "수확의",
+        "of_remembrance": "기억의"
+      },
+      "rareWord": {
+        "ashen": "잿빛",
+        "blackfen": "검은늪",
+        "doom": "파멸",
+        "grave": "무덤",
+        "mire": "수렁",
+        "storm": "폭풍",
+        "thorn": "가시",
+        "wyrm": "용",
+        "bite": "송곳니",
+        "brand": "낙인",
+        "promise": "약속",
+        "thread": "실",
+        "vigil": "파수",
+        "ward": "수호",
+        "whisper": "속삭임",
+        "oath": "서약"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "최후 장작불의 왕관",
+          "description": "세 번째 Cinderbolt마다 대상 주변의 적들을 불태웁니다."
+        },
+        "greyjaws_edge": {
+          "name": "회색턱의 칼날",
+          "description": "세 번째 무기 공격마다 대상에게 출혈을 일으키고 주 자원을 조금 회복합니다."
+        },
+        "hushwood_longbow": {
+          "name": "침묵숲 장궁",
+          "description": "Long Draw 또는 Fell Shot이 대상을 잠시 침묵시킬 수 있습니다."
+        },
+        "nightglass_fang": {
+          "name": "밤유리 송곳니",
+          "description": "적을 처치하면 잠시 가속이 증가합니다."
+        },
+        "ysoleis_vigil": {
+          "name": "이솔레이의 파수",
+          "description": "치유가 치명타로 적중하면 잠시 회복의 지대를 만듭니다."
+        },
+        "stormwake_idol": {
+          "name": "폭풍의 여운 우상",
+          "description": "네 번째 Arc Bolt마다 주변 적들에게 연쇄됩니다."
+        },
+        "ashbinders_seal": {
+          "name": "잿불결속자의 인장",
+          "description": "네 번째 Gloom Bolt마다 대상에게 추가 암흑 피해를 받는 징표를 남깁니다."
+        },
+        "dawnward_signet": {
+          "name": "새벽수호 인장",
+          "description": "Mending Light가 치유량의 일부만큼 대상을 보호막으로 감쌉니다."
+        },
+        "feral_moonclasp": {
+          "name": "야성의 달고리",
+          "description": "세 번째 Lunar Tempest마다 주 자원을 회복합니다."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "아홉 번째 울림의 종",
+          "description": "두 번째 공격 주문마다 대상 주변에 종소리가 울립니다."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "훔친 시간의 어깨망토",
+          "description": "생명력이 35% 아래로 떨어지면 잠시 방어 수호막을 얻습니다."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "끊이지 않는 길의 장화",
+          "description": "15야드를 이동하면 잠시 이동 속도가 증가합니다."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const ko_KR: EnTranslations = {
       "greed": "탐욕",
       "pass": "포기",
       "needAria": "{item} 필요",
+      "needUnavailable": "현재 직업으로 이 아이템을 착용할 수 없어 필요 주사위를 선택할 수 없습니다.",
+      "needUnavailablePower": "이 전설 능력은 다른 직업 전용이므로 필요를 선택할 수 없습니다.",
       "greedAria": "{item} 탐욕",
       "passAria": "{item} 포기",
       "everyonePassed": "모두 {item}을(를) 포기했습니다.",
@@ -9170,6 +9289,108 @@ export const ko_KR: EnTranslations = {
       },
       "resonant_timber": {
         "name": "공명의 목재"
+      },
+      "ashwood_staff": {
+        "name": "물푸레나무 지팡이"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "무덤소환사 천 손목싸개"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "무덤소환사 천 두건"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "무덤소환사 천 다리보호구"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "무덤소환사 천 어깨덧옷"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "무덤소환사 천 예복"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "무덤소환사 천 허리띠"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "무덤소환사 천 덧신"
+      },
+      "gravecaller_focus": {
+        "name": "무덤소환사 마력집중기"
+      },
+      "gravecaller_pendant": {
+        "name": "무덤소환사 목걸이"
+      },
+      "gravecaller_ring": {
+        "name": "무덤소환사 반지"
+      },
+      "gravecaller_wand": {
+        "name": "무덤소환사 마법봉"
+      },
+      "iron_broadsword": {
+        "name": "철제 대검"
+      },
+      "iron_flanged_mace": {
+        "name": "철제 플랜지 철퇴"
+      },
+      "mirefen_dirk": {
+        "name": "수렁늪 단검"
+      },
+      "mirefen_hunting_bow": {
+        "name": "수렁늪 사냥활"
+      },
+      "mirefen_leather_belt": {
+        "name": "수렁늪 가죽 허리띠"
+      },
+      "mirefen_leather_boots": {
+        "name": "수렁늪 가죽 장화"
+      },
+      "mirefen_leather_gloves": {
+        "name": "수렁늪 가죽 장갑"
+      },
+      "mirefen_leather_hood": {
+        "name": "수렁늪 가죽 두건"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "수렁늪 가죽 조끼"
+      },
+      "mirefen_leather_leggings": {
+        "name": "수렁늪 가죽 다리보호구"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "수렁늪 가죽 어깨보호대"
+      },
+      "thornpeak_bulwark": {
+        "name": "가시봉우리 방벽"
+      },
+      "thornpeak_crossbow": {
+        "name": "가시봉우리 석궁"
+      },
+      "thornpeak_mail_chest": {
+        "name": "가시봉우리 사슬 흉갑"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "가시봉우리 사슬 건틀릿"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "가시봉우리 사슬 허리띠"
+      },
+      "thornpeak_mail_helm": {
+        "name": "가시봉우리 사슬 투구"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "가시봉우리 사슬 다리보호대"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "가시봉우리 사슬 견갑"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "가시봉우리 사슬 철갑장화"
+      },
+      "thornpeak_polearm": {
+        "name": "가시봉우리 장창"
+      },
+      "thornpeak_war_axe": {
+        "name": "가시봉우리 전투도끼"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

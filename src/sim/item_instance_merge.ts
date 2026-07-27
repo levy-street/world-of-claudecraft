@@ -45,13 +45,11 @@ export function itemInstancePayloadsEqual(
   return structurallyEqual(a, b);
 }
 
-/** False when the payload carries `charges`: charges is the one payload field
- *  with mutate-in-place per-unit semantics, and a counted stack shares ONE
- *  payload object, so charge-bearing payloads stay one-per-slot as a
- *  structural safety (no shipped stackable item carries charges today; this
- *  is a forward guard). An absent payload is trivially mergeable. */
+/** False when a payload carries per-copy mutable state or a procedural UID.
+ * A counted stack shares one payload object, so either shape must remain
+ * one-copy-per-slot or one identity could be minted into many copies. */
 export function isMergeableInstancePayload(p: ItemInstancePayload | undefined): boolean {
-  return p?.charges === undefined;
+  return p?.charges === undefined && p?.procedural === undefined;
 }
 
 /** The single merge predicate every stacking site consumes: both payloads

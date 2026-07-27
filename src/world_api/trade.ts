@@ -1,8 +1,17 @@
 import type { InvSlot } from '../sim/types';
 
 export interface TradeOffer {
+  /** Authoritative, presentation-ready offer. Instances are server-resolved. */
   items: InvSlot[];
   copper: number;
+}
+
+/** Client request for one offered line. instanceUid selects one generated
+ * copy; clients never send an ItemInstancePayload. */
+export interface TradeOfferRequestItem {
+  itemId: string;
+  count: number;
+  instanceUid?: string;
 }
 
 export interface TradeInfo {
@@ -18,7 +27,7 @@ export interface IWorldTrade {
   tradeInfo: TradeInfo | null;
   tradeRequest(targetPid: number): void;
   tradeAccept(): void;
-  tradeSetOffer(items: InvSlot[], copper: number): void;
+  tradeSetOffer(items: TradeOfferRequestItem[], copper: number): void;
   tradeConfirm(): void;
   tradeCancel(): void;
 }

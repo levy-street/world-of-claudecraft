@@ -4,6 +4,7 @@ import { DEFAULT_BAG_FILTER, type ItemLookup } from '../src/ui/bag_filter';
 import {
   type BagMode,
   bagDestroyAction,
+  bagDiscardInstance,
   bagItemAction,
   bagQualityKey,
   bagShiftLinks,
@@ -358,6 +359,40 @@ describe('resolveDepositSubmit (prompt re-resolve + clamp)', () => {
     // A GROWN live stack (loot landed under the prompt) still clamps to the max
     // captured at prompt-open: maxCount binds even as the strict smallest term.
     expect(resolveDepositSubmit({ itemId: 'cloth', count: 10 }, captured, 8, 5)).toBe(5);
+  });
+});
+
+describe('bagDiscardInstance', () => {
+  it('selects the exact generated copy among duplicate base items', () => {
+    const firstProcedural = {
+      version: 1 as const,
+      uid: 'first-copy',
+      baseId: 'sword',
+      itemLevel: 20,
+      rarity: 'rare' as const,
+      affixes: [],
+      generatedName: { baseId: 'sword' },
+      seed: 1,
+    };
+    const first: InvSlot = {
+      itemId: 'sword',
+      count: 1,
+      instance: { procedural: firstProcedural },
+    };
+    const second: InvSlot = {
+      ...first,
+      instance: {
+        procedural: {
+          ...firstProcedural,
+          uid: 'second-copy',
+          rarity: 'legendary',
+          seed: 2,
+        },
+      },
+    };
+
+    expect(bagDiscardInstance([first, second], 'sword', 'second-copy')).toBe(second.instance);
+    expect(bagDiscardInstance([first, second], 'sword', 'missing-copy')).toBeUndefined();
   });
 });
 

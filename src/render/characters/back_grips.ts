@@ -80,6 +80,7 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
   VAR_HAMMER: { position: [0.16, 0.14, -0.27], euler: [0.1, 0, Math.PI * 0.72] },
   VAR_WAND: { position: [0.5, -0.38, -0.08], euler: [0.05, 0.15, Math.PI * 0.72] },
   VAR_BOOK: { position: [0.5, -0.38, -0.08], euler: [0.05, 0.15, Math.PI * 0.72] },
+  Spellbook_open: { position: [0.5, -0.38, -0.08], euler: [0.05, 0.15, Math.PI * 0.72] },
   VAR_CROSSBOW: { position: [0.0, 0.1, -0.3], euler: [0, Math.PI / 2, Math.PI] },
   VAR_BOW: { position: [0.0, 0.1, -0.32], euler: [0, Math.PI / 2, Math.PI] },
   // Off-hand gear from the two-slot loadout (release/v0.24.0-ptr): a left-hand

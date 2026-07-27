@@ -57,6 +57,7 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   staff: '2H_Staff',
   dagger: 'Knife',
   wand: '1H_Wand',
+  spellbook_open: 'Spellbook_open',
   // Per-item weapon variants (ITEM_WEAPON_VARIANTS / public/models/weapons/<key>.glb)
   // come from a different pack than the KayKit generics. Crucially, each variant's
   // mesh ORIGIN is authored AT the grip (the handle/guard): minY is consistent

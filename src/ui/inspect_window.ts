@@ -47,6 +47,12 @@ import {
 } from './inspect_view';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import {
+  itemPresentationName,
+  itemPresentationQuality,
+  proceduralRarityLabel,
+} from './procedural_item_presentation';
+import { legendaryPowerRuneSvg } from './procedural_loot_icons';
 import { qualityGlowShadow } from './quality_glow';
 import { svgIcon } from './ui_icons';
 
@@ -269,12 +275,34 @@ export class InspectWindow {
     const { slot, item } = cell;
     const row = document.createElement('div');
     row.className = 'equip-slot';
-    const qColor = item ? (QUALITY_COLOR[item.quality ?? 'common'] ?? '') : '';
+    const quality = item ? itemPresentationQuality(item, instance) : 'common';
+    const qColor = item ? (QUALITY_COLOR[quality] ?? '') : '';
+    const itemName = item
+      ? itemPresentationName({ name: itemDisplayName(item) }, instance)
+      : t('itemUi.equipment.empty');
     const icon = item
-      ? this.deps.itemIcon(item)
+      ? this.deps.itemIcon(item, instance)
       : `<img class="item-icon" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
-    row.innerHTML = `${icon}<div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item"${item ? ` style="color:${qColor}"` : ''}>${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+    const powerRune = instance?.procedural?.legendaryPowerId
+      ? legendaryPowerRuneSvg('inspect-power-rune')
+      : '';
+    if (instance?.procedural) row.dataset.proceduralRarity = instance.procedural.rarity;
+    if (item) row.style.setProperty('--item-power-rarity', qColor);
+    row.innerHTML = `<span class="equip-icon-wrap">${icon}${powerRune}</span><div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item"${item ? ` style="color:${qColor}"` : ''}>${esc(itemName)}</div></div>`;
     if (item) {
+      const procedural = instance?.procedural;
+      row.tabIndex = 0;
+      row.setAttribute(
+        'aria-label',
+        procedural
+          ? t('hudChrome.bags.itemAriaProcedural', {
+              item: itemName,
+              rarity: proceduralRarityLabel(instance) ?? procedural.rarity,
+              level: formatNumber(procedural.itemLevel, { maximumFractionDigits: 0 }),
+              count: formatNumber(1, { maximumFractionDigits: 0 }),
+            })
+          : itemName,
+      );
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
       if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));

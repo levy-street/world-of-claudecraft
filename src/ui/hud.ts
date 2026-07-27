@@ -58,9 +58,6 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { canEquipItem, weaponHand } from '../sim/equipment_rules';
-import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
-import { requiredLevelFor } from '../sim/item_level_req';
 import { junkSellableSlot } from '../sim/items';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
@@ -75,7 +72,6 @@ import type {
   HonorReason,
   InvSlot,
   ItemInstancePayload,
-  ItemSlot,
   MailResultCode,
   MotdResultCode,
   PetMode,
@@ -86,7 +82,6 @@ import type {
 import {
   type AbilityEffect,
   type AuraKind,
-  CONSUME_DURATION,
   canPrestige,
   dist2d,
   type Entity,
@@ -113,6 +108,7 @@ import {
   OVERHEAD_EMOTES,
   type OverheadEmoteId,
   type PartyInfo,
+  type TradeOfferRequestItem,
 } from '../world_api';
 import {
   type AbilityScaling,
@@ -233,7 +229,6 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
-import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
@@ -367,19 +362,8 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
-import { itemArmorTypeLabelKey } from './item_armor_type';
-import { requiredClassesForTooltip } from './item_class_restriction';
-import { itemStatDeltas } from './item_compare';
 import { ItemDragState } from './item_drag_state';
-import {
-  instanceBadgeLines,
-  instanceBindingLines,
-  instanceBonusStatLines,
-  instanceMakersMarkLine,
-  itemNumber,
-  itemStatName,
-} from './item_instance_tooltip';
-import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import { ItemPresentationController, itemSlotName } from './item_presentation_controller';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -400,7 +384,6 @@ import {
 } from './map_window_view';
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
-import { materialHintLine } from './material_hint_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -457,6 +440,12 @@ import {
   frostOverlayCharges,
   procOverlayState,
 } from './proc_overlay_view';
+import {
+  type ItemPresentationInstance,
+  itemPresentationName,
+  itemPresentationQuality,
+  proceduralRarityLabel,
+} from './procedural_item_presentation';
 import { maskProfanity } from './profanity';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { type ProfessionEventInput, planProfessionEvent } from './profession_event_lines_core';
@@ -485,12 +474,7 @@ import {
   type StatTooltipModel,
   weaponDps,
 } from './stat_tooltip';
-import {
-  type StatTooltipI18n,
-  statCellHtml,
-  statNameKey,
-  statTooltipHtml,
-} from './stat_tooltip_view';
+import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
@@ -503,6 +487,7 @@ import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { SharedTooltipOwner } from './tooltip_owner';
+import { TOOLTIP_EDGE_MARGIN, tooltipPosition } from './tooltip_position_core';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
@@ -535,8 +520,6 @@ import {
   wocBalance,
   wocBalanceVerified,
 } from './wallet_balance';
-import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
-import { weaponTypeLabelKey } from './weapon_type_label';
 import {
   installWindowDrag,
   isWindowDragPreviewMutation,
@@ -824,45 +807,6 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passiveDesc',
   defensive: 'hud.pet.defensiveDesc',
   aggressive: 'hud.pet.aggressiveDesc',
-};
-type ItemQuality = NonNullable<ItemDef['quality']>;
-const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
-  mainhand: 'itemUi.slots.mainhand',
-  offhand: 'itemUi.slots.offhand',
-  helmet: 'itemUi.slots.helmet',
-  neck: 'itemUi.slots.neck',
-  shoulder: 'itemUi.slots.shoulder',
-  chest: 'itemUi.slots.chest',
-  waist: 'itemUi.slots.waist',
-  legs: 'itemUi.slots.legs',
-  gloves: 'itemUi.slots.gloves',
-  feet: 'itemUi.slots.feet',
-  // The three ring forms share one player-facing label ("Finger"): items
-  // declare 'ring', the paperdoll cells are the concrete ring1/ring2 keys.
-  ring: 'itemUi.slots.ring',
-  ring1: 'itemUi.slots.ring',
-  ring2: 'itemUi.slots.ring',
-};
-const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
-  poor: 'itemUi.quality.poor',
-  common: 'itemUi.quality.common',
-  uncommon: 'itemUi.quality.uncommon',
-  rare: 'itemUi.quality.rare',
-  epic: 'itemUi.quality.epic',
-  legendary: 'itemUi.quality.legendary',
-};
-const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
-  weapon: 'itemUi.kind.weapon',
-  armor: 'itemUi.kind.armor',
-  held_offhand: 'itemUi.kind.armor',
-  quest: 'itemUi.kind.quest',
-  junk: 'itemUi.kind.junk',
-  food: 'itemUi.kind.food',
-  drink: 'itemUi.kind.drink',
-  tool: 'itemUi.kind.tool',
-  potion: 'itemUi.kind.potion',
-  elixir: 'itemUi.kind.elixir',
-  bag: 'itemUi.kind.bag',
 };
 // Classic class colors (CLASSES[cls].color is a 0xRRGGBB number) as a CSS
 // string, used to color-code party members on the minimap and in the frames.
@@ -1302,6 +1246,7 @@ export class Hud {
   // keyed by module id, redrawn only when the module changes.
   private readonly lootWindow: LootWindowController;
   private readonly lootRolls: LootRollController;
+  private readonly itemPresentation: ItemPresentationController;
   private openVendorNpcId: number | null = null;
   private openHeroicVendorNpcId: number | null = null;
   private openTrainNpcId: number | null = null;
@@ -1367,7 +1312,10 @@ export class Hud {
   private lastSwingTimer = 0;
   private lastLowResourceSig = '';
   // trading: locally staged offer, pushed to the server on change
-  private stagedTrade: { items: InvSlot[]; copper: number } = { items: [], copper: 0 };
+  private stagedTrade: { items: TradeOfferRequestItem[]; copper: number } = {
+    items: [],
+    copper: 0,
+  };
   private tradeWasOpen = false;
   private lastTradeSig = '';
   // Card Duel: latches the prior in-match state so a false->true transition
@@ -1515,6 +1463,16 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     this.localIgnoredNames = this.loadLocalIgnoredNames();
+    this.itemPresentation = new ItemPresentationController({
+      items: ITEMS,
+      playerClass: () => this.sim.cfg.playerClass,
+      playerLevel: () => this.sim.player.level,
+      showItemLevel: () => this.optionsHooks?.settings.get('showItemLevel') ?? false,
+      equippedItemId: (slot) => this.sim.equipment[slot],
+      equippedInstance: (slot) => this.sim.player.equippedInstances?.[slot],
+      equippedItemIds: () => Object.values(this.sim.equipment),
+    });
+
     this.meters = new Meters(sim);
     this.actionBarController = new ActionBarController({
       storage: localStorage,
@@ -1664,7 +1622,7 @@ export class Hud {
       entityName: entityDisplayName,
       money: (copper) => this.moneyHtml(copper),
       coinIconUrl: () => iconDataUrl('item', 'coin_gold'),
-      itemIcon: (item) => this.itemIcon(item),
+      itemIcon: (item, instance) => this.itemIcon(item, instance),
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       centerPopup: (element) => this.centerPopupInViewport(element),
@@ -1676,7 +1634,8 @@ export class Hud {
       world: () => this.sim,
       now: () => performance.now(),
       isMobileLayout: () => this.isMobileLayout(),
-      itemIcon: (item) => this.itemIcon(item),
+      playerClass: () => this.sim.cfg.playerClass,
+      itemIcon: (item, instance) => this.itemIcon(item, instance),
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       writers: this.writerFacet,
@@ -2230,7 +2189,8 @@ export class Hud {
       root: () => $('#game-canvas'),
       state: this.itemDragState,
       destroyAction: (itemId) => this.bagsWindow.destroyAction(itemId),
-      promptDestroy: (itemId, count) => this.bagsWindow.promptDestroy(itemId, count),
+      promptDestroy: (itemId, count, instanceUid) =>
+        this.bagsWindow.promptDestroy(itemId, count, instanceUid),
       showBlocked: () => this.bagsWindow.showDestroyBlocked(),
     });
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
@@ -3593,7 +3553,7 @@ export class Hud {
     zoneDisplayName(zoneId),
   );
   private readonly presentationBag: PainterHostPresentation = {
-    itemIcon: (item) => this.itemIcon(item),
+    itemIcon: (item, instance) => this.itemIcon(item, instance),
     moneyHtml: (copper) => this.moneyHtml(copper),
     itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
@@ -3686,9 +3646,9 @@ export class Hud {
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),
     onClosed: () => this.onBagsClosed(),
-    addItemToTrade: (itemId) => this.addItemToTrade(itemId),
+    addItemToTrade: (itemId, instanceUid) => this.addItemToTrade(itemId, instanceUid),
     stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
-    stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
+    stageMailParcel: (itemId, instanceUid) => this.mailboxWindow.stageParcel(itemId, instanceUid),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
@@ -3706,9 +3666,10 @@ export class Hud {
     dragState: this.itemDragState,
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
     markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
-    dropOnEquipSlot: (itemId, slot) => this.charWindow.dropOnEquipSlot(itemId, slot),
-    openItemActionMenu: (def, itemId, x, y, runDefault) =>
-      this.bagItemActionMenu.open(def, itemId, x, y, runDefault),
+    dropOnEquipSlot: (itemId, slot, instanceUid) =>
+      this.charWindow.dropOnEquipSlot(itemId, slot, instanceUid),
+    openItemActionMenu: (def, itemId, x, y, runDefault, instance) =>
+      this.bagItemActionMenu.open(def, itemId, x, y, runDefault, instance),
   });
   // Bag-item action menu (Professions 2.0): the right-click / touch
   // menu that surfaces Disenchant / Salvage / Apply Enchant on a bag stack.
@@ -3953,6 +3914,8 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#char-window'),
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#char-window'),
+    focusFirstInteractive: (root, preferredSelector) =>
+      this.focusManager.focusFirst(root, preferredSelector),
     slotName: (slot) => itemSlotName(slot),
     statCellHtml: (stat) => statCellHtml(this.statModel(stat), STAT_VIEW_DEPS, { colon: false }),
     statTooltipHtml: (stat) => statTooltipHtml(this.statModel(stat), STAT_VIEW_DEPS),
@@ -4279,9 +4242,8 @@ export class Hud {
     this.showTargetOfTarget = on;
   }
 
-  private itemIcon(item: ItemDef): string {
-    const q = item.quality ?? 'common';
-    return `<img class="item-icon q-${q}" src="${iconDataUrl('item', item.id)}" alt="" draggable="false">`;
+  private itemIcon(item: ItemDef, instance?: ItemPresentationInstance): string {
+    return this.itemPresentation.icon(item, instance);
   }
 
   moneyHtml(copper: number): string {
@@ -4422,8 +4384,17 @@ export class Hud {
       // reuse the box size measured in showAt: same content, no forced reflow
       const tw = ttW,
         th = ttH;
-      this.tooltipEl.style.left = `${Math.min(window.innerWidth / z - tw - 8, e.clientX / z + 14)}px`;
-      this.tooltipEl.style.top = `${Math.max(8, e.clientY / z - th - 10)}px`;
+      const position = tooltipPosition({
+        pointerX: e.clientX,
+        pointerY: e.clientY,
+        tooltipWidth: tw,
+        tooltipHeight: th,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        uiScale: z,
+      });
+      this.tooltipEl.style.left = `${position.left}px`;
+      this.tooltipEl.style.top = `${position.top}px`;
     });
     el.addEventListener('mouseleave', () => {
       clearTouchTimer();
@@ -4548,10 +4519,20 @@ export class Hud {
     // arrive in visual (zoomed) space, so map x/y into author space (÷ scale)
     // before clamping against the author-space tooltip box + viewport.
     const z = getUiScale();
+    this.tooltipEl.style.maxHeight = `${Math.max(0, window.innerHeight / z - TOOLTIP_EDGE_MARGIN * 2)}px`;
     const tw = this.tooltipEl.offsetWidth,
       th = this.tooltipEl.offsetHeight;
-    this.tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, x / z + 14))}px`;
-    this.tooltipEl.style.top = `${Math.max(8, y / z - th - 10)}px`;
+    const position = tooltipPosition({
+      pointerX: x,
+      pointerY: y,
+      tooltipWidth: tw,
+      tooltipHeight: th,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      uiScale: z,
+    });
+    this.tooltipEl.style.left = `${position.left}px`;
+    this.tooltipEl.style.top = `${position.top}px`;
     return { w: tw, h: th };
   }
 
@@ -4566,6 +4547,7 @@ export class Hud {
     this.tooltipEl.innerHTML = html;
     this.tooltipEl.style.display = 'block';
     const z = getUiScale();
+    this.tooltipEl.style.maxHeight = `${Math.max(0, window.innerHeight / z - TOOLTIP_EDGE_MARGIN * 2)}px`;
     const tw = this.tooltipEl.offsetWidth,
       th = this.tooltipEl.offsetHeight;
     const isMobileTouch = document.body.classList.contains('mobile-touch');
@@ -4659,304 +4641,10 @@ export class Hud {
     this.hideTooltip();
   }
 
-  // `instance` is the optional per-copy payload (#1165): a masterwork seal, a
-  // maker's mark, or baked bonus stats specific to THIS copy. Absent for
-  // fungible stacks and def-only surfaces (the crafting window's result rows),
-  // so those render exactly as before.
-  private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
-    const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-    let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
-    // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
-    // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
-    // "[HEROIC]" tag here (never in the name) so the drop reads "Epic Armor [HEROIC]".
-    let qualityKindHtml = esc(
-      t('itemUi.tooltip.qualityKind', {
-        quality: itemQualityLabel(item.quality),
-        kind: itemKindLabel(item.kind),
-      }),
-    );
-    if (item.heroicOf || item.heroic) {
-      qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
-    }
-    html += `<div class="tt-sub">${qualityKindHtml}</div>`;
-    // Weapon type (Sword/Dagger/Mace/...) as its own plain line under the
-    // quality/kind line and above the slot/handedness line, classic-style, so a
-    // player can tell a dagger from a sword at a glance (rogues need daggers). It
-    // is NOT colored by class the way armor weight is: any class can equip most
-    // weapon types and the class/weapon rules are archetype-based, not type-based,
-    // so a red type label would mislead. Null only for a non-weapon or
-    // unclassified id (the map is guarded), which simply shows no type line.
-    if (item.kind === 'weapon') {
-      const weaponTypeKey = weaponTypeLabelKey(item.id);
-      if (weaponTypeKey) {
-        html += `<div class="tt-sub tt-weapon-type">${esc(t(weaponTypeKey))}</div>`;
-      }
-    }
-    if (item.slot) {
-      // Classic layout: slot name on the left, armor subtype (Cloth/Leather/Mail)
-      // right-aligned on the same line so it is clear which classes the gear suits.
-      // A two-handed weapon reads "Two-Hand" (the classic label), not its
-      // mainhand slot: the hand, not the paperdoll cell, is what the player needs.
-      const slotName =
-        item.kind === 'weapon' && weaponHand(item) === 'twohand'
-          ? t('itemUi.slots.twoHand')
-          : itemSlotName(item.slot);
-      const armorTypeKey = itemArmorTypeLabelKey(item);
-      if (armorTypeKey) {
-        // Red armor type = the viewing player's class cannot wear this armor weight
-        // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
-        const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
-        html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
-      } else {
-        html += `<div class="tt-sub">${esc(slotName)}</div>`;
-      }
-    }
-    // Optional item-level readout (off by default; src/sim/item_level.ts derives it
-    // from where the item drops). Read live, so toggling it takes effect on the next
-    // hover. Combat gear only: sourceless items (vendor/starter) have no level,
-    // and non-combat items never get an item-level line.
-    if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
-      const level = itemLevel(item);
-      if (level !== undefined) {
-        html += `<div class="tt-stat" style="color:var(--gold)">${esc(
-          t('hudChrome.options.itemLevelLine', { level: itemNumber(level) }),
-        )}</div>`;
-        html += `<div class="tt-sub">${esc(
-          t('hudChrome.options.itemScoreLine', { score: itemNumber(itemScore(item), 1) }),
-        )}</div>`;
-      }
-    }
-    // Bound-to-owner marker (marks and other soulbound tokens): shown like the
-    // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
-    if (item.soulbound) {
-      html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
-    }
-    // Maker's Bond lines (Professions 2.0): the commission
-    // binds-on-first-trade warning or the bound lock, beside the def-level
-    // soulbound line it parallels (item_instance_tooltip.ts owns the copy
-    // rules, incl. the equipment-kind scope and the no-name doctrine).
-    html += instanceBindingLines(instance, item.kind);
-    // Per-copy instance badges (Professions 2.0): the masterwork
-    // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
-    // rules, incl. never claiming a quality-rank upgrade).
-    html += instanceBadgeLines(instance);
-    if (item.weapon) {
-      const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
-      html += `<div class="tt-stat">${esc(
-        t('itemUi.tooltip.damageSpeed', {
-          min: itemNumber(item.weapon.min),
-          max: itemNumber(item.weapon.max),
-          speed: itemNumber(item.weapon.speed, 1),
-        }),
-      )}</div>`;
-      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.dps', { dps: itemNumber(dps, 1) }))}</div>`;
-      // The weapon type (incl. Dagger) now appears on the slot line above like
-      // every other weapon, so the old standalone "Dagger" sub-line is gone. The
-      // item.weapon.dagger DATA field still drives Backstab; only this line went.
-    }
-    if (item.stats) {
-      for (const [k, v] of Object.entries(item.stats)) {
-        if (v === undefined) continue;
-        if (k === 'armor') {
-          html += `<div class="tt-stat">${esc(t('itemUi.tooltip.armorStat', { value: itemNumber(v) }))}</div>`;
-        } else {
-          html += `<div class="tt-green">${esc(
-            t('itemUi.tooltip.stat', {
-              value: itemNumber(v),
-              stat: itemStatName(k),
-            }),
-          )}</div>`;
-        }
-      }
-    }
-    html += instanceBonusStatLines(instance);
-    const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
-    if (warfareRating > 0) {
-      html += `<div class="tt-green">${esc(
-        t('itemUi.tooltip.stat', {
-          value: itemNumber(warfareRating),
-          stat: t(statNameKey('warfare') as TranslationKey),
-        }),
-      )}</div>`;
-    }
-    // Combat ratings (hit / crit / haste): shown as classic "+N Rating" affix lines,
-    // sharing the character-sheet HUD-chrome labels. Hit answers the higher-level
-    // miss/resist penalty; crit and haste add throughput.
-    for (const ratingStat of ['hitRating', 'critRating', 'hasteRating'] as const) {
-      const value = item[ratingStat] ?? 0;
-      if (value <= 0) continue;
-      html += `<div class="tt-green">${esc(
-        t('itemUi.tooltip.stat', {
-          value: itemNumber(value),
-          stat: t(statNameKey(ratingStat) as TranslationKey),
-        }),
-      )}</div>`;
-    }
-    if (item.foodHp)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
-    if (item.drinkMana)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
-    // Gathering implements (#2343): picks/axes/sickles/rods and the simple
-    // pole render their kind, requirement, use, and bonus lines from the
-    // pure sibling module (the item_instance_tooltip.ts pattern).
-    html += gatherToolTooltipLines(item);
-    // Purpose hint for the eight enchanting materials (material_hint_view.ts
-    // keys the table by item id): what the reagent is for and which gear
-    // disenchants into it. Every other item id renders nothing here.
-    html += materialHintLine(item.id);
-    if (item.potionHp)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
-    if (item.potionMana)
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
-    if (item.kind === 'quest')
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
-    if (item.kind === 'bag' && item.bagSlots)
-      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
-    const requiredClasses = requiredClassesForTooltip(item);
-    if (requiredClasses) {
-      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
-    }
-    // Classic "Requires Level N" line for equippable gear gated above level 1.
-    // Red when the viewer is below the requirement (cannot equip yet), otherwise
-    // a normal sub line. Level math/data lives in the pure sim leaf.
-    const req = requiredLevelFor(item);
-    if ((item.kind === 'weapon' || item.kind === 'armor') && req > 1) {
-      const meets = this.sim.player.level >= req;
-      html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }))}</div>`;
-    }
-    html += this.itemProcBlock(item);
-    html += this.itemSetBlock(item);
-    html += instanceMakersMarkLine(instance, item.kind);
-    if (item.sellValue > 0)
-      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
-    if (compare) html += this.itemCompareBlock(item);
-    return html;
-  }
-
-  // Legendary "chance on action" procs: one green trigger line per proc, each
-  // wrapping its joined effect fragments. Reads ItemDef.weaponProcs through the
-  // pure weapon_proc_view core so the derived numbers stay unit-tested.
-  private itemProcBlock(item: ItemDef): string {
-    const lines = weaponProcLines(item.kind === 'weapon' ? item.weaponProcs : undefined);
-    if (!lines.length) return '';
-    let html = '';
-    for (const line of lines) {
-      const effect = line.effects.map((e) => this.procEffectText(e)).join(' ');
-      const triggerKey =
-        // onMeleeHit is the legacy key id; its English reads the generic "Chance on
-        // hit", correct for a weaponHit proc that fires on melee AND hunter ranged.
-        line.trigger === 'weaponHit'
-          ? 'hudChrome.itemProc.onMeleeHit'
-          : line.trigger === 'spellDamage'
-            ? 'hudChrome.itemProc.onSpellDamage'
-            : 'hudChrome.itemProc.onHeal';
-      html += `<div class="tt-green">${esc(
-        t(triggerKey, {
-          chance: formatNumber(line.chancePct, { maximumFractionDigits: 0 }),
-          effect,
-        }),
-      )}</div>`;
-    }
-    return html;
-  }
-
-  // One effect fragment (chain arc / attack slow / dot / hot) as localized text.
-  private procEffectText(e: WeaponProcEffectDesc): string {
-    const n = (v: number | undefined): string => formatNumber(v ?? 0, { maximumFractionDigits: 0 });
-    switch (e.kind) {
-      case 'chainArc':
-        return t('hudChrome.itemProc.chainArc', {
-          school: e.school ?? '',
-          name: e.name ?? '',
-          damage: n(e.damage),
-          jumps: n(e.jumps),
-        });
-      case 'attackSlow':
-        return t('hudChrome.itemProc.attackSlow', { pct: n(e.slowPct), duration: n(e.duration) });
-      case 'dot':
-        return t('hudChrome.itemProc.dot', {
-          name: e.name ?? '',
-          school: e.school ?? '',
-          total: n(e.total),
-          duration: n(e.duration),
-        });
-      case 'hot':
-        return t('hudChrome.itemProc.hot', {
-          name: e.name ?? '',
-          total: n(e.total),
-          duration: n(e.duration),
-        });
-    }
-  }
-
-  // How many equipped pieces belong to the given set (read from IWorld.equipment
-  // so it is identical offline and online).
-  private equippedSetPieces(setId: string): number {
-    let n = 0;
-    for (const equippedId of Object.values(this.sim.equipment)) {
-      if (equippedId && ITEMS[equippedId]?.set === setId) n += 1;
-    }
-    return n;
-  }
-
-  // Classic tier-set block: the set name with the live (have/total) piece count,
-  // then each bonus tier - lit when its threshold is met, greyed otherwise. Set
-  // name and bonus text localize through entity_i18n (English source in
-  // content/item_sets.ts).
-  private itemSetBlock(item: ItemDef): string {
-    if (!item.set) return '';
-    const model = itemSetTooltipModel({
-      itemSetId: item.set,
-      equippedPieces: this.equippedSetPieces(item.set),
-      itemSetMembers: itemSetMemberCounts(),
-    });
-    if (!model) return '';
-    const name = tEntity({ kind: 'itemSet', id: model.setId, field: 'name' });
-    let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(model.equippedPieces, { maximumFractionDigits: 0 }), total: formatNumber(model.totalPieces, { maximumFractionDigits: 0 }) }))}</div>`;
-    for (const tier of model.bonusTiers) {
-      const field = tier.pieces === 2 ? 'bonus2' : tier.pieces === 3 ? 'bonus3' : 'bonus4';
-      const text = tEntity({ kind: 'itemSet', id: model.setId, field });
-      html += `<div class="tt-set-bonus${tier.active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
-    }
-    return html;
-  }
-
-  // Classic-style item comparison: when hovering an equippable item, append the
-  // item currently worn in that slot plus the stat change you'd see if you
-  // swapped to it (green = gain, red = loss). Reads IWorld.equipment, so it
-  // works identically offline and online.
-  private itemCompareBlock(item: ItemDef): string {
-    if (!item.slot) return '';
-    // A hovered ring compares against BOTH worn rings (classic behavior); every
-    // other slot kind is its own single equipment key.
-    const slots: readonly EquipSlot[] = item.slot === 'ring' ? ['ring1', 'ring2'] : [item.slot];
-    return slots.map((slot) => this.itemCompareBlockForSlot(item, slot)).join('');
-  }
-
-  private itemCompareBlockForSlot(item: ItemDef, slot: EquipSlot): string {
-    const equippedId = this.sim.equipment[slot];
-    if (!equippedId || equippedId === item.id) return '';
-    const equipped = ITEMS[equippedId];
-    if (!equipped) return '';
-    const deltas = itemStatDeltas(item, equipped)
-      .map((d) => {
-        const cls = d.delta > 0 ? 'tt-green' : 'tt-red';
-        const sign = d.delta > 0 ? '+' : '−'; // proper minus sign
-        const magnitude = formatNumber(Math.abs(d.delta), {
-          minimumFractionDigits: d.decimals,
-          maximumFractionDigits: d.decimals,
-        });
-        return `<div class="${cls}">${sign}${magnitude} ${esc(
-          t(statNameKey(d.stat) as TranslationKey),
-        )}</div>`;
-      })
-      .join('');
-    let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
-    html += `<div class="tt-cmp-body">${this.itemTooltip(equipped, false)}</div>`;
-    if (deltas)
-      html += `<div class="tt-cmp-head">${esc(t('itemUi.tooltip.ifYouEquip'))}</div>${deltas}`;
-    html += `</div>`;
-    return html;
+  // Item HTML is owned by the executable presentation controller; Hud exposes
+  // only the shared host delegate consumed by windows and action surfaces.
+  private itemTooltip(item: ItemDef, compare = true, instance?: ItemPresentationInstance): string {
+    return this.itemPresentation.tooltip(item, compare, instance);
   }
 
   // Build the pure stat-breakdown model for the currently-shown player, the bridge
@@ -9696,9 +9384,11 @@ export class Hud {
           this.log(deedBroadcastLine(ev.characterName, ev.deedId), '#40d264');
           break;
         }
-        case 'error':
-          this.showError(this.localizeErrorText(ev.text));
+        case 'error': {
+          const message = this.localizeErrorText(ev.text);
+          this.showError(message);
           break;
+        }
         case 'questAccepted':
           sfx.playUi('quest_accept');
           this.questDialog.refresh();
@@ -11642,7 +11332,8 @@ export class Hud {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
         onBuy: (itemId) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId)),
-        onBuyBack: (itemId) => buyAndRefresh(() => this.sim.buyBackItem(itemId)),
+        onBuyBack: (itemId, instanceUid) =>
+          buyAndRefresh(() => this.sim.buyBackItem(itemId, instanceUid)),
         onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
         onClose: () => this.closeVendor(),
         sellJunk: {
@@ -11810,8 +11501,11 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onUnbind: (itemId, feeCopper) => {
+        onUnbind: (itemId, feeCopper, instanceUid) => {
           const item = ITEMS[itemId];
+          const unbind = instanceUid
+            ? () => this.sim.unbindItem(itemId, instanceUid)
+            : () => this.sim.unbindItem(itemId);
           this.confirmDialog(
             t('hudChrome.unbind.confirmTitle'),
             t('hudChrome.unbind.confirmBody', {
@@ -11820,7 +11514,7 @@ export class Hud {
             }),
             t('hudChrome.unbind.confirmOk'),
             t('hudChrome.unbind.confirmCancel'),
-            () => this.sim.unbindItem(itemId),
+            unbind,
           );
         },
         onClose: () => this.closeUnbind(),
@@ -14047,18 +13741,29 @@ export class Hud {
     return this.sim.tradeInfo !== null;
   }
 
-  addItemToTrade(itemId: string): void {
-    if (!this.tradeOpen || this.stagedTrade.items.length >= 6) return;
-    const existing = this.stagedTrade.items.find((s) => s.itemId === itemId);
-    const have = this.sim.inventory.find((s) => s.itemId === itemId)?.count ?? 0;
-    if (existing) {
-      if (existing.count < have) existing.count++;
+  addItemToTrade(itemId: string, instanceUid?: string): void {
+    if (!this.tradeOpen) return;
+    const existing = this.stagedTrade.items.find(
+      (slot) => slot.itemId === itemId && slot.instanceUid === instanceUid,
+    );
+    if (instanceUid) {
+      const held = this.sim.inventory.some(
+        (slot) => slot.itemId === itemId && slot.instance?.procedural?.uid === instanceUid,
+      );
+      if (!held || existing || this.stagedTrade.items.length >= 6) return;
+      this.stagedTrade.items.push({ itemId, count: 1, instanceUid });
     } else {
-      this.stagedTrade.items.push({ itemId, count: 1 });
+      const have = this.sim.inventory
+        .filter((slot) => slot.itemId === itemId && !slot.instance)
+        .reduce((total, slot) => total + slot.count, 0);
+      if (existing) {
+        if (existing.count < have) existing.count++;
+      } else if (have > 0 && this.stagedTrade.items.length < 6) {
+        this.stagedTrade.items.push({ itemId, count: 1 });
+      }
     }
     this.pushTradeOffer();
   }
-
   private pushTradeOffer(): void {
     this.sim.tradeSetOffer(this.stagedTrade.items, this.stagedTrade.copper);
   }
@@ -14092,20 +13797,37 @@ export class Hud {
     if (sig === this.lastTradeSig) return;
     this.lastTradeSig = sig;
 
-    const itemRow = (s: InvSlot, mine: boolean) => {
+    const itemRow = (s: InvSlot, mine: boolean, index: number) => {
       const item = ITEMS[s.itemId];
-      const label = `${item ? itemDisplayName(item) : s.itemId}${s.count > 1 ? ` x${formatNumber(s.count, { maximumFractionDigits: 0 })}` : ''}`;
-      const inner = `${this.itemIcon(item)}<span>${esc(label)}</span>`;
-      return mine
-        ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
-        : `<div class="trade-item">${inner}</div>`;
+      if (!item) return '';
+      const quality = itemPresentationQuality(item, s.instance);
+      const name = itemPresentationName({ name: itemDisplayName(item) }, s.instance);
+      const label = `${name}${
+        s.count > 1 ? ` x${formatNumber(s.count, { maximumFractionDigits: 0 })}` : ''
+      }`;
+      const procedural = s.instance?.procedural;
+      const ariaLabel = procedural
+        ? t('hudChrome.bags.itemAriaProcedural', {
+            item: name,
+            rarity: proceduralRarityLabel(s.instance) ?? procedural.rarity,
+            level: formatNumber(procedural.itemLevel, {
+              maximumFractionDigits: 0,
+            }),
+            count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+          })
+        : label;
+      const proceduralAttr = procedural
+        ? ` data-procedural-rarity="${esc(procedural.rarity)}"`
+        : '';
+      const inner = `${this.itemIcon(item, s.instance)}<span>${esc(label)}</span>`;
+      return `<button type="button" class="trade-item ${mine ? 'mine' : 'theirs'} q-${quality}"${proceduralAttr} data-offer-index="${index}" aria-label="${esc(ariaLabel)}">${inner}</button>`;
     };
     el.innerHTML = `
       <div class="panel-title"><span>${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
       <div class="trade-cols">
         <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
           <h4>${esc(t('hud.trade.yourOffer'))}</h4>
-          <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
+          <div class="trade-items">${info.myOffer.items.map((s, index) => itemRow(s, true, index)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
           <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>
             <span class="trade-coins">
               <input class="coininput" id="trade-g" type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
@@ -14116,7 +13838,7 @@ export class Hud {
         </div>
         <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
           <h4>${esc(t('hud.trade.theirOffer', { name: info.otherName }))}</h4>
-          <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyTheirs'))}</div>`}</div>
+          <div class="trade-items">${info.theirOffer.items.map((s, index) => itemRow(s, false, index)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyTheirs'))}</div>`}</div>
           <div class="trade-money">${esc(t('hud.trade.money'))}: <span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span></div>
         </div>
       </div>
@@ -14132,15 +13854,33 @@ export class Hud {
     cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
     el.append(acceptBtn, cancelBtn);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
-    el.querySelectorAll('.trade-item.mine').forEach((row) => {
+    el.querySelectorAll<HTMLElement>('.trade-item').forEach((row) => {
+      const index = Number(row.dataset.offerIndex);
+      const offered = row.classList.contains('mine')
+        ? info.myOffer.items[index]
+        : info.theirOffer.items[index];
+      const item = offered ? ITEMS[offered.itemId] : undefined;
+      if (item) {
+        this.attachTooltip(row, () => this.itemTooltip(item, true, offered.instance));
+      }
+      if (!row.classList.contains('mine')) return;
       row.addEventListener('click', () => {
-        const itemId = (row as HTMLElement).dataset.item ?? '';
-        const idx = this.stagedTrade.items.findIndex((s) => s.itemId === itemId);
-        if (idx >= 0) {
-          this.stagedTrade.items[idx].count--;
-          if (this.stagedTrade.items[idx].count <= 0) this.stagedTrade.items.splice(idx, 1);
-          this.pushTradeOffer();
+        if (!offered) return;
+        const offeredUid = offered.instance?.procedural?.uid;
+        // The authority layer canonicalizes exact rows before merged generic
+        // rows, so server indices are not stable staged indices. Remove by the
+        // owner-only exact identity (or by the plain item line) instead.
+        const stagedIndex = this.stagedTrade.items.findIndex(
+          (slot) => slot.itemId === offered.itemId && slot.instanceUid === offeredUid,
+        );
+        if (stagedIndex < 0) return;
+        const staged = this.stagedTrade.items[stagedIndex];
+        if (staged.instanceUid || staged.count <= 1) {
+          this.stagedTrade.items.splice(stagedIndex, 1);
+        } else {
+          staged.count--;
         }
+        this.pushTradeOffer();
       });
     });
     const goldInput = el.querySelector('#trade-g') as HTMLInputElement;
@@ -14457,18 +14197,6 @@ function combatAbilityName(name: string | null): string {
 
 function resourceDisplayName(resourceType: ResourceType | null): string {
   return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
-}
-
-function itemSlotName(slot: ItemSlot): string {
-  return t(ITEM_SLOT_LABEL_KEYS[slot]);
-}
-
-function itemQualityLabel(quality: ItemDef['quality']): string {
-  return t(ITEM_QUALITY_LABEL_KEYS[quality ?? 'common']);
-}
-
-function itemKindLabel(kind: ItemDef['kind']): string {
-  return t(ITEM_KIND_LABEL_KEYS[kind]);
 }
 
 function parseSimMoney(text: string): number | null {

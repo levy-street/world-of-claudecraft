@@ -541,7 +541,7 @@ describe('vale cup: online integration (GameServer)', () => {
     // persisted state already carries it (and the pre-match return position,
     // never mid-pitch coordinates)
     await server.leave(sa, 'test disconnect');
-    const saveMock = vi.mocked(db.saveCharacterAndMarketState);
+    const saveMock = vi.mocked(db.saveCharacterState);
     const saved = saveMock.mock.calls.find((c) => c[0] === sa.characterId);
     expect(saved, 'leave save landed').toBeTruthy();
     const state = saved![2] as any;

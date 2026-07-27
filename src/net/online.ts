@@ -102,6 +102,7 @@ import {
   type LeaderboardEntry,
   type LeaderboardPage,
   type LockpickView,
+  type MailAttachmentRequest,
   type MailInfo,
   type MarketInfo,
   ONLINE_WORLD_AUTH_TYPE,
@@ -114,6 +115,7 @@ import {
   type RecipeDef,
   type SocialInfo,
   type TradeInfo,
+  type TradeOfferRequestItem,
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../world_api';
@@ -3352,16 +3354,21 @@ export class ClientWorld implements IWorld {
   // IWorldInventory facet (W2): the eight item/vendor command senders. Each is a thin
   // cmd() emit whose offline counterpart is the moved src/sim/items.ts body resolved on
   // the server. The move changes no wire field or command string.
-  equipItem(itemId: string): void {
-    this.cmd({ cmd: 'equip', item: itemId });
+  equipItem(itemId: string, instanceUid?: string): void {
+    this.cmd({ cmd: 'equip', item: itemId, ...(instanceUid && { uid: instanceUid }) });
   }
   moveInventoryItem(from: number, to: number): void {
     this.cmd({ cmd: 'inv_move', from, to });
   }
   // Same 'equip' wire token with the aimed slot attached: an older server that
   // ignores the field simply resolves the slot itself, so the field is additive.
-  equipItemToSlot(itemId: string, slot: EquipSlot): void {
-    this.cmd({ cmd: 'equip', item: itemId, slot });
+  equipItemToSlot(itemId: string, slot: EquipSlot, instanceUid?: string): void {
+    this.cmd({
+      cmd: 'equip',
+      item: itemId,
+      slot,
+      ...(instanceUid && { uid: instanceUid }),
+    });
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
@@ -3378,8 +3385,8 @@ export class ClientWorld implements IWorld {
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });
   }
-  discardItem(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'discard', item: itemId, count });
+  discardItem(itemId: string, count?: number, instanceUid?: string): void {
+    this.cmd({ cmd: 'discard', item: itemId, count, uid: instanceUid });
   }
   buyItem(npcId: number, itemId: string): void {
     this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
@@ -3411,8 +3418,8 @@ export class ClientWorld implements IWorld {
   // never predicted. The server re-validates ownership/eligibility/throttle in
   // the sim resolvers and answers with the personal disenchantResult/
   // enchantResult/salvageResult event plus the denc/ench/salv self-delta.
-  disenchantItem(itemId: string): void {
-    this.cmd({ cmd: 'disenchant_item', item: itemId });
+  disenchantItem(itemId: string, instanceUid?: string): void {
+    this.cmd({ cmd: 'disenchant_item', item: itemId, uid: instanceUid });
   }
   // `slot` rides only when the target is a WORN piece (the in-place arm); a
   // bagged target sends a message byte-identical to the pre-feature form. The
@@ -3427,32 +3434,40 @@ export class ClientWorld implements IWorld {
     enchantId: string,
     slot?: EquipSlot,
     confirmReplace?: boolean,
+    instanceUid?: string,
   ): void {
     if (confirmReplace === true) {
-      this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot, confirm: true });
+      this.cmd({
+        cmd: 'apply_enchant',
+        item: itemId,
+        enchant: enchantId,
+        slot,
+        confirm: true,
+        uid: instanceUid,
+      });
     } else {
-      this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot });
+      this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot, uid: instanceUid });
     }
   }
-  salvageItem(itemId: string): void {
-    this.cmd({ cmd: 'salvage_item', item: itemId });
+  salvageItem(itemId: string, instanceUid?: string): void {
+    this.cmd({ cmd: 'salvage_item', item: itemId, uid: instanceUid });
   }
   // Maker's Bond unbind service (Professions 2.0): command only,
   // never predicted. The server re-validates eligibility/bound-ness/station
   // range/fee in src/sim/professions/commission.ts and answers with the
   // personal unbindResult event; the cleared payload mirrors back via the
   // self inv delta.
-  unbindItem(itemId: string): void {
-    this.cmd({ cmd: 'unbind_item', item: itemId });
+  unbindItem(itemId: string, instanceUid?: string): void {
+    this.cmd({ cmd: 'unbind_item', item: itemId, uid: instanceUid });
   }
-  sellItem(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'sell', item: itemId, count });
+  sellItem(itemId: string, count?: number, instanceUid?: string): void {
+    this.cmd({ cmd: 'sell', item: itemId, count, uid: instanceUid });
   }
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
   }
-  buyBackItem(itemId: string): void {
-    this.cmd({ cmd: 'buyback', item: itemId });
+  buyBackItem(itemId: string, instanceUid?: string): void {
+    this.cmd({ cmd: 'buyback', item: itemId, uid: instanceUid });
   }
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
@@ -3686,7 +3701,7 @@ export class ClientWorld implements IWorld {
   tradeAccept(): void {
     this.cmd({ cmd: 'trade_accept' });
   }
-  tradeSetOffer(items: InvSlot[], copper: number): void {
+  tradeSetOffer(items: TradeOfferRequestItem[], copper: number): void {
     this.cmd({ cmd: 'trade_offer', items, copper });
   }
   tradeConfirm(): void {
@@ -3965,14 +3980,24 @@ export class ClientWorld implements IWorld {
   }
   // --- IWorldMail: Ravenpost letter sends (snake_case wire strings). mailInfo /
   // mailUnread are snapshot reads (mirror fields above). ---
-  mailSend(to: string, subject: string, body: string, copper: number, items: InvSlot[]): void {
+  mailSend(
+    to: string,
+    subject: string,
+    body: string,
+    copper: number,
+    items: MailAttachmentRequest[],
+  ): void {
     this.cmd({
       cmd: 'mail_send',
       to,
       subject,
       body,
       copper,
-      items: items.map((s) => ({ itemId: s.itemId, count: s.count })),
+      items: items.map((slot) => ({
+        itemId: slot.itemId,
+        count: slot.instanceUid ? 1 : slot.count,
+        ...(slot.instanceUid && { instanceUid: slot.instanceUid }),
+      })),
     });
   }
   mailTake(mailId: number): void {
@@ -4046,6 +4071,7 @@ export class ClientWorld implements IWorld {
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
   }
+
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};

@@ -740,6 +740,22 @@ describe('createWsAuth: realm admission cap', () => {
     logSpy.mockRestore();
   });
 
+  it('h2. releases the acquired lease when game.join throws', async () => {
+    const { ws, game, deps, req } = setup();
+    const joinError = new Error('persisted character state rejected');
+    game.join.mockImplementationOnce(() => {
+      throw joinError;
+    });
+    const { authenticateWebSocket } = createWsAuth(deps);
+
+    await expect(authenticateWebSocket(asWs(ws), authRaw(), req)).rejects.toBe(joinError);
+
+    expect(deps.acquireCharacterLease).toHaveBeenCalledTimes(1);
+    expect(deps.releaseCharacterLease).toHaveBeenCalledTimes(1);
+    expect(deps.releaseCharacterLease).toHaveBeenCalledWith(7, expect.any(String));
+    expect(game.hasSessionForCharacter(7)).toBe(false);
+  });
+
   it('i. a successful fresh join releases its in-flight admission (no capacity leak)', async () => {
     const { game, deps, req } = setup();
     deps.maxPlayersPerRealm = 5;

@@ -233,6 +233,7 @@ const W10_TAGS: Readonly<Record<string, string>> = {
   leave_dungeon: 'IWorldDungeons',
   set_dungeon_difficulty: 'IWorldDungeons',
   heroic_buy: 'IWorldDungeons',
+
   enter_delve: 'IWorldDelves',
   leave_delve: 'IWorldDelves',
   delve_interact: 'IWorldDelves',

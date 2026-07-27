@@ -1395,7 +1395,7 @@ function partyLoot(): Scenario {
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aaa');
-      const b = sim.addPlayer('mage', 'Bbb');
+      const b = sim.addPlayer('rogue', 'Bbb');
       sim.partyInvite(b, a);
       sim.partyAccept(b);
       teleport(sim, sim.entities.get(a)!, 20, 20);

@@ -341,6 +341,9 @@ function replaceInfoFor(
 
 export interface EnchantTargetRow {
   itemId: string;
+  /** Exact generated-copy selector and payload for honest name/dispatch. */
+  instanceUid?: string;
+  instance?: ItemInstancePayload;
   /** How many eligible copies are held: enchantable copies for a plain row,
    *  already-enchanted copies for a replace row. */
   count: number;
@@ -390,35 +393,64 @@ export interface EnchantTargetRow {
  *  Already-enchanted copies surface as FLAGGED replace rows (#2415) appended
  *  after the plain rows, each describing the pinned victim the sim would
  *  consume (replaceVictimIndex, the same function the sim's replace arm
- *  walks). Grouped by item id (the apply command is itemId-keyed), each family
- *  in first-seen inventory order.
+ *  walks). Generated copies are separate UID-addressed rows; legacy fungible
+ *  copies remain grouped by item id, all in first-seen inventory order.
  *
  *  `worn` is the WORN family the same picker paints above these rows
  *  (wornEnchantTargets), passed in for ONE reason: so the mixedHolding flag can
  *  see an enchanted copy that happens to be on the body rather than in the bags.
  *  The two families are one list to the reader, so an enchanted worn copy leaves
  *  its bagged plain twin just as bare as an enchanted bagged one would. Nothing
- *  else reads it, and the default (none) is the bagged-pair-only behavior. */
-export function enchantTargets(
+ *  else reads it, and the default (none) is the bagged-pair-only behavior. */ export function enchantTargets(
   inventory: readonly InvSlot[],
   enchantId: string,
   worn: readonly WornEnchantTargetRow[] = [],
 ): EnchantTargetRow[] {
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
-  const byItem = new Map<string, number>();
-  const enchantedByItem = new Map<string, number>();
+  const rows: EnchantTargetRow[] = [];
+  const plainLegacy = new Map<string, EnchantTargetRow>();
+  const enchantedLegacy = new Map<string, number>();
   for (const slot of inventory) {
     const def = ITEMS[slot.itemId];
     if (!def || def.slot !== enchant.itemSlot) continue;
-    if (slot.instance && isEnchantedInstance(slot.instance)) {
-      enchantedByItem.set(slot.itemId, (enchantedByItem.get(slot.itemId) ?? 0) + slot.count);
+    const instanceUid = slot.instance?.procedural?.uid;
+    const enchanted = !!slot.instance && isEnchantedInstance(slot.instance);
+    if (instanceUid && slot.instance) {
+      if (enchanted) {
+        const replace = replaceInfoFor(slot.instance, enchantId, false);
+        if (replace) {
+          rows.push({
+            itemId: slot.itemId,
+            count: 1,
+            instanceUid,
+            instance: slot.instance,
+            replace,
+          });
+        }
+      } else {
+        rows.push({
+          itemId: slot.itemId,
+          count: 1,
+          instanceUid,
+          instance: slot.instance,
+        });
+      }
       continue;
     }
-    byItem.set(slot.itemId, (byItem.get(slot.itemId) ?? 0) + slot.count);
+    if (enchanted) {
+      enchantedLegacy.set(slot.itemId, (enchantedLegacy.get(slot.itemId) ?? 0) + slot.count);
+      continue;
+    }
+    const existing = plainLegacy.get(slot.itemId);
+    if (existing) existing.count += slot.count;
+    else {
+      const row = { itemId: slot.itemId, count: slot.count };
+      plainLegacy.set(slot.itemId, row);
+      rows.push(row);
+    }
   }
-  const rows: EnchantTargetRow[] = [...byItem].map(([itemId, count]) => ({ itemId, count }));
-  for (const [itemId, count] of enchantedByItem) {
+  for (const [itemId, count] of enchantedLegacy) {
     const victimIdx = replaceVictimIndex(inventory, itemId);
     const victim = victimIdx >= 0 ? inventory[victimIdx].instance : undefined;
     if (!victim) continue;
@@ -437,13 +469,15 @@ export function enchantTargets(
   const enchantedIds = new Set<string>();
   for (const row of rows) if (row.replace !== undefined) enchantedIds.add(row.itemId);
   for (const row of worn) if (row.replace !== undefined) enchantedIds.add(row.itemId);
-  const mixed = new Set([...enchantedIds].filter((itemId) => byItem.has(itemId)));
+  const mixed = new Set([...enchantedIds].filter((itemId) => plainLegacy.has(itemId)));
   for (const row of rows) if (mixed.has(row.itemId)) row.mixedHolding = true;
   return rows;
 }
 
 export interface WornEnchantTargetRow {
   itemId: string;
+  instanceUid?: string;
+  instance?: ItemInstancePayload;
   /** The exact equipment key this copy is worn in, and the discriminator the
    *  apply command carries: ring1/ring2 and mainhand/offhand can be wearing
    *  identical copies of one item id, so the id alone cannot name the target. */
@@ -483,15 +517,22 @@ export function wornEnchantTargets(
     if (!def || def.slot !== enchant.itemSlot) continue;
     const instance = equippedInstances[slot];
     if (instance && isEnchantedInstance(instance)) {
-      // wireTrimmed: this arm reads the WORN mirror, whose online form is the
-      // stripped eqi allowlist (signer/enchant/rolled). See
-      // preservedReplaceTraits: claiming a bind state here would make the
-      // confirm dialog say different things offline and online.
+      // The WORN online mirror is stripped; do not claim bind-state
+      // preservation that its payload cannot prove.
       const replace = replaceInfoFor(instance, enchantId, true);
-      if (replace) rows.push({ itemId, slot, replace });
+      if (replace) {
+        const instanceUid = instance.procedural?.uid;
+        rows.push({
+          itemId,
+          slot,
+          ...(instanceUid && { instanceUid, instance }),
+          replace,
+        });
+      }
       continue;
     }
-    rows.push({ itemId, slot });
+    const instanceUid = instance?.procedural?.uid;
+    rows.push({ itemId, slot, ...(instanceUid && { instanceUid, instance }) });
   }
   return rows;
 }

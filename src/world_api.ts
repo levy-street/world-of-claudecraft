@@ -186,7 +186,12 @@ export type {
 } from './world_api/dungeon_finder';
 export type { RaidLockout } from './world_api/dungeons';
 export type { WorldInteractionOutcome } from './world_api/interaction';
-export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
+export type {
+  MailAttachmentRequest,
+  MailInfo,
+  MailKindView,
+  MailMessageView,
+} from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type {
@@ -212,7 +217,7 @@ export type {
   PresenceStatus,
   SocialInfo,
 } from './world_api/social_graph';
-export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type { TradeInfo, TradeOffer, TradeOfferRequestItem } from './world_api/trade';
 export type {
   CupInfo,
   VcBetInfo,
@@ -424,6 +429,7 @@ export const COMMAND_NAMES = [
   'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
+
   'vcup_queue',
   'vcup_leave',
   'vcup_role',
@@ -681,6 +687,7 @@ export const COMMAND_FACETS = {
   leave_dungeon: 'IWorldDungeons',
   set_dungeon_difficulty: 'IWorldDungeons',
   heroic_buy: 'IWorldDungeons',
+
   // IWorldDelves: delve enter/leave + interact + companion upgrade + Marks-vendor buy
   // + lockpick lifecycle + chest collect. Note the wire-name skew: delveBuyShopItem
   // sends `delve_buy`, so the tag is keyed on the WIRE string `delve_buy`. The reads

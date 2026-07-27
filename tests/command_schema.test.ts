@@ -35,6 +35,8 @@ const EXPECTED_SEND_COUNT = 164;
 const EXPECTED_DISPATCH_COUNT = 173;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
+const REMOVED_PROGRESSION_COMMANDS = ['nythraxis_forge', 'nythraxis_tune'] as const;
+
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must
 // never enter the command universe. Used to prove the dispatch scan is bounded.
@@ -179,6 +181,18 @@ describe('command schema parity (W0b)', () => {
         tableSet.has(label as CommandName),
         `chat-channel label in COMMAND_NAMES: ${label}`,
       ).toBe(false);
+    }
+  });
+
+  it('keeps the removed Nythraxis progression commands out of every wire surface', () => {
+    for (const command of REMOVED_PROGRESSION_COMMANDS) {
+      expect(sendSet.has(command), `${command} leaked into the client send set`).toBe(false);
+      expect(dispatchSet.has(command), `${command} leaked into the server dispatch set`).toBe(
+        false,
+      );
+      expect(tableSet.has(command as CommandName), `${command} leaked into COMMAND_NAMES`).toBe(
+        false,
+      );
     }
   });
 });

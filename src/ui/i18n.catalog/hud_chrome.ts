@@ -1555,6 +1555,16 @@ export const hudChromeStrings = {
     // Accessible-name sibling for the authored masterwork seal. Keep the whole
     // phrase in one key so punctuation and status placement remain localizable.
     itemAriaMasterwork: '{item}, quantity {count}, masterwork',
+    // One atomic announcement for a unique copy. Rarity and level are not
+    // encoded in color or the decorative rune, so assistive tech gets both.
+    itemAriaProcedural: '{item}, {rarity}, item level {level}, quantity {count}',
+    itemAriaProceduralMasterwork:
+      '{item}, {rarity}, item level {level}, quantity {count}, masterwork',
+    itemAriaProceduralEnchanted:
+      '{item}, {rarity}, item level {level}, quantity {count}, enchanted copy',
+    itemAriaProceduralSigned:
+      '{item}, {rarity}, item level {level}, quantity {count}, maker-marked copy',
+    itemAriaProceduralBound: '{item}, {rarity}, item level {level}, quantity {count}, bound copy',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -2994,6 +3004,14 @@ export const hudChromeStrings = {
     lockedFor: 'Locked for about {minutes} min',
     attunement: 'Requires attunement: {quest}',
     heroicMarks: 'Heroic Marks: {count} per player',
+    raidRewards: 'Nythraxis reward preview',
+    raidSharedDrop: 'The final corpse adds one shared procedural item for the raid to roll on.',
+    raidRarityLine: 'Rare {rare}% · Epic {epic}% · Legendary {legendary}%',
+    raidItemLevels: 'Item level: Rare {rare} · Epic {epic} · Legendary {legendary}',
+
+    raidSignatures: 'Signature Legendary powers: {signatures}',
+    raidForgedLegendary:
+      'Heroic Legendary powers are Raid-forged and guaranteed in the upper half of their authored roll range.',
     entrance: 'Entrance: {zone}',
     showOnMap: 'Show on Map',
     encounters: 'Encounters',

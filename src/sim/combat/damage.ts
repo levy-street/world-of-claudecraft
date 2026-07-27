@@ -29,7 +29,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
-import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
+import { dungeonFinalBossInstance, lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
@@ -120,6 +120,7 @@ export function dealDamage(
   // Arcane damage converts to healing at a reduced rate. Defaults false, so
   // every single-target caller is unchanged and byte-identical.
   aoe = false,
+  equipmentProcDepth = 0,
 ): void {
   if (target.dead) return;
   if (
@@ -229,7 +230,7 @@ export function dealDamage(
   if (source && amount > 0) {
     let sourceVulnerability = 0;
     for (const aura of target.auras) {
-      if (aura.kind === 'vuln_source' && aura.sourceId === source.id) {
+      if (aura.kind === 'vuln_source' && aura.sourceId === source.id && aura.school === school) {
         sourceVulnerability += aura.value;
       }
     }
@@ -614,7 +615,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, equipmentProcDepth);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
@@ -709,6 +710,46 @@ export function dealDamage(
   // above (duel/fiesta/arena) intentionally skip conversion (PRD 13.9 defers PvP
   // tuning to a later phase).
   chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe);
+
+  const effectiveDamage = preHp - target.hp;
+  // Equipment-created damage is terminal unless a future power explicitly opts
+  // into chaining. This keeps one proc from advancing its own cadence (or a
+  // different equipped trigger) through the normal combat event bridge.
+  const canTriggerEquipmentEffects = equipmentProcDepth === 0;
+  if (
+    canTriggerEquipmentEffects &&
+    effectiveDamage > 0 &&
+    direct &&
+    source?.kind === 'player' &&
+    school !== 'physical'
+  ) {
+    ctx.triggerEquipmentEffects(source, {
+      kind: 'spell_damage',
+      targetId: target.id,
+      abilityId: abilityId ?? undefined,
+      critical: crit,
+      amount: effectiveDamage,
+      procDepth: equipmentProcDepth,
+    });
+  }
+  if (canTriggerEquipmentEffects && effectiveDamage > 0 && target.kind === 'player') {
+    ctx.triggerEquipmentEffects(target, {
+      kind: 'damage_taken',
+      targetId: source?.id,
+      abilityId: abilityId ?? undefined,
+      critical: crit,
+      amount: effectiveDamage,
+      procDepth: equipmentProcDepth,
+    });
+    ctx.triggerEquipmentEffects(target, {
+      kind: 'health_changed',
+      targetId: target.id,
+      healthBefore: preHp,
+      healthAfter: target.hp,
+      maxHealth: target.maxHp,
+      procDepth: equipmentProcDepth,
+    });
+  }
 
   if (amount > 0) {
     if (target.kind === 'mob' && DAMAGE_IDLE_DESPAWN_MOB_IDS.has(target.templateId)) {
@@ -827,7 +868,9 @@ export function dealDamage(
   if (
     source &&
     amount > 0 &&
-    (MOBS[target.templateId]?.worldBoss || MOBS[target.templateId]?.rare)
+    (MOBS[target.templateId]?.worldBoss ||
+      MOBS[target.templateId]?.rare ||
+      dungeonFinalBossInstance(ctx, target) !== null)
   ) {
     const contributorId = source.kind === 'player' ? source.id : source.ownerId;
     if (contributorId !== null) target.bossDamagers.add(contributorId);
@@ -923,7 +966,7 @@ export function dealDamage(
       // the permanent death + graveyard flow.
       ctx.yumiPlayerDown(fmatch, target, null);
     } else {
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, equipmentProcDepth);
     }
   }
 }
@@ -1012,7 +1055,12 @@ function reflectSpellWard(
   );
 }
 
-export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+export function handleDeath(
+  ctx: SimContext,
+  e: Entity,
+  killer: Entity | null,
+  equipmentProcDepth = 0,
+): void {
   resetProcState(e);
   e.dead = true;
   e.hp = 0;
@@ -1055,6 +1103,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   }
 
   if (e.kind === 'player') {
+    ctx.clearEquipmentEffectState(e.id);
     // Chronomancy: a dead mage feeds no more Arcane damage, so drop any Temporal
     // Echo marks it placed on living allies (a mark on a dying ally is already
     // shed by aurasSurvivingDeath above). Keyed by sourceId, so marks THIS player
@@ -1092,7 +1141,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // Route it through handleDeath so the owned-mob branch below applies: warlock
     // demons unravel, a hunter's beast leaves a revivable corpse (Revive Pet).
     const pet = ctx.petOf(e.id);
-    if (pet) handleDeath(ctx, pet, killer);
+    if (pet) handleDeath(ctx, pet, killer, equipmentProcDepth);
     return;
   }
 
@@ -1147,6 +1196,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // clearThreat below, exactly like worldBossContribs.
     const rareContribs =
       !template?.worldBoss && template?.rare ? worldBossLootContributors(ctx, e) : null;
+
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;
@@ -1163,6 +1213,19 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       // a slain summoned demon lingers only briefly, then unravels (updateMob)
       if (MOBS[e.templateId]?.family === 'demon') e.corpseTimer = 3;
       return; // owned pets drop no loot/credit; demons unravel, hunters revive or abandon
+    }
+    const killerPlayer =
+      killer?.kind === 'player'
+        ? killer
+        : killer?.ownerId !== null && killer?.ownerId !== undefined
+          ? (ctx.entities.get(killer.ownerId) ?? null)
+          : null;
+    if (equipmentProcDepth === 0 && killerPlayer?.kind === 'player' && !killerPlayer.dead) {
+      ctx.triggerEquipmentEffects(killerPlayer, {
+        kind: 'kill',
+        targetId: e.id,
+        procDepth: equipmentProcDepth,
+      });
     }
     ctx.frenzyPackmates(e); // wild packmates fly into a frenzy when one falls
     ctx.armDeathThroes(e); // volatile corpses begin to destabilize, then burst
@@ -1311,15 +1374,11 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
     }
-    // Settle the heroic reward and its realm-reset lockout together. This runs
-    // even without player credit so the owning group cannot dodge the lockout;
-    // only the participation snapshot above receives marks.
+    // Settle the realm-reset lockout even without player credit so the owning
+    // group cannot dodge it. Nythraxis progression comes only from corpse loot.
     lockNormalDungeonResetOnBossKill(ctx, e);
-    ctx.awardHeroicMarks(e, heroicRewardRecipients);
-    // Nythraxis normal and heroic raid lockouts use a wider room sweep than
-    // generic dungeon claims. Run it after heroic settlement so its lock stamp
-    // cannot make first-clear participants look previously rewarded.
-    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
+    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e, heroicRewardRecipients);
+    else ctx.awardHeroicMarks(e, heroicRewardRecipients);
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.
     if (worldBossContribs) {

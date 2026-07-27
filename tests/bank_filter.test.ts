@@ -42,7 +42,7 @@ const LOCALIZED: Record<string, string> = {
   keystone: 'Sleutelsteen',
   relic: 'Relikwie',
 };
-const nameOf = (id: string): string => LOCALIZED[id] ?? id;
+const nameOf = (model: BankSlotModel): string => LOCALIZED[model.itemId] ?? model.itemId;
 
 // slotIndex is intentionally NOT the array position, so a filter/sort that dropped or
 // reordered it would visibly corrupt the pinned slotIndex sequences below.
@@ -135,6 +135,39 @@ describe('filterBankSlots: search matches the LOCALIZED name, not item.name', ()
       MODELS.length,
     );
   });
+
+  it('matches a generated per-copy name instead of collapsing to the base item id', () => {
+    const generated = {
+      slotIndex: 12,
+      itemId: 'blade',
+      count: 1,
+      showCount: false,
+      qualityKey: 'legendary',
+      instance: {
+        procedural: {
+          version: 1,
+          uid: 'generated-bank-copy',
+          baseId: 'blade',
+          itemLevel: 30,
+          rarity: 'legendary',
+          affixes: [],
+          generatedName: { baseId: 'blade' },
+          seed: 2,
+        },
+      },
+    } as BankSlotModel;
+    const generatedName = (model: BankSlotModel): string =>
+      model.instance ? 'Ashbinder Seal' : nameOf(model);
+
+    expect(
+      filterBankSlots(
+        [MODELS[5], generated],
+        lookup,
+        state({ search: 'ashbinder' }),
+        generatedName,
+      ),
+    ).toEqual([generated]);
+  });
 });
 
 describe('filterBankSlots: sorting preserves slotIndex', () => {
@@ -163,6 +196,12 @@ describe('filterBankSlots: sorting preserves slotIndex', () => {
     );
     expect(ids(out)).toEqual(['relic', 'helm']);
     expect(indices(out)).toEqual([7, 3]);
+  });
+
+  it('sorts by the model procedural quality rather than the static base quality', () => {
+    const generated = { ...MODELS[1], slotIndex: 12, qualityKey: 'legendary' };
+    const out = filterBankSlots([MODELS[5], generated], lookup, state({ sort: 'quality' }), nameOf);
+    expect(indices(out)).toEqual([12, 3]);
   });
 
   it('does not mutate the input array', () => {

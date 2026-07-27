@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEV_KIT_ROLE_COUNT, DEV_KIT_ROLES, devKitRole } from '../src/sim/content/dev_kit_roles';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_ITEMS } from '../src/sim/content/heroic_vendor';
+import { PROCEDURAL_ITEM_BASES } from '../src/sim/content/procedural_loot';
 import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
 import { talentsFor } from '../src/sim/content/talents';
 import { ITEMS } from '../src/sim/data';
@@ -143,6 +144,16 @@ describe('fresh-20 item pool', () => {
     // is not allowed to leak, so it fails closed.
     const unset = Object.values(ITEMS).filter((item) => item.quality === undefined && item.slot);
     for (const item of unset) {
+      for (const cls of ALL_CLASSES) expect(isFreshTwentyItem(cls, item)).toBe(false);
+    }
+  });
+
+  it('never grants a raw procedural base without its required instance payload', () => {
+    const templates = Object.keys(PROCEDURAL_ITEM_BASES).map((id) => ITEMS[id]);
+    expect(templates).toHaveLength(34);
+    for (const item of templates) {
+      expect(item).toBeDefined();
+      if (!item) continue;
       for (const cls of ALL_CLASSES) expect(isFreshTwentyItem(cls, item)).toBe(false);
     }
   });

@@ -93,6 +93,8 @@ describe('held weapon models', () => {
   it('resolves actual offhands independently from the mainhand model', () => {
     expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_round.glb');
     expect(itemOffhandModelUrl('highwatch_wallshield')).toBe('models/weapons/shield_square.glb');
+    expect(itemOffhandModelUrl('thornpeak_bulwark')).toBe('models/weapons/shield_square.glb');
+    expect(itemOffhandModelUrl('gravecaller_focus')).toBe('models/weapons/spellbook_open.glb');
     expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_a.glb');
     expect(itemOffhandModelUrl('heroic_fang_of_korzul')).toBe('models/weapons/dagger_c.glb');
     expect(itemOffhandModelUrl('chest_armor_not_an_offhand')).toBeNull();

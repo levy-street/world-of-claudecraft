@@ -19,7 +19,7 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
-import { saveCharacterAndMarketState } from '../server/db';
+import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
@@ -62,7 +62,7 @@ describe('quest progress survives logout/login (server save -> load)', () => {
 
     // Leave => server saves the serialized character state.
     await server.leave(s1, 'disconnected');
-    const saved = (saveCharacterAndMarketState as any).mock.calls.at(-1)?.[2] as CharacterState;
+    const saved = (saveCharacterState as any).mock.calls.at(-1)?.[2] as CharacterState;
     expect(saved).toBeTruthy();
 
     // Rejoin with exactly what the DB would have stored.
@@ -89,7 +89,7 @@ describe('quest progress survives logout/login (server save -> load)', () => {
     meta.questLog.set('q_ogre_totems', { questId: 'q_ogre_totems', counts: [4], state: 'active' });
 
     await server.leave(s1, 'disconnected');
-    const saved = (saveCharacterAndMarketState as any).mock.calls.at(-1)?.[2] as CharacterState;
+    const saved = (saveCharacterState as any).mock.calls.at(-1)?.[2] as CharacterState;
 
     const fc2 = fakeWs();
     const s2 = join(server, fc2, 102, 'Annihilator', saved);

@@ -110,8 +110,8 @@ describe('dev command advert wiring', () => {
     expect(hud).toContain('private devCommandsAdvertised = false;');
     // One-way: no path sets it back to true from a false advert or vice versa,
     // so a mid-session status blip cannot toggle the surface.
-    expect(hud).toContain(
-      'noteDevCommandsAdvertised(): void {\n    this.devCommandsAdvertised = true;',
+    expect(hud).toMatch(
+      /noteDevCommandsAdvertised\(\): void \{\s*this\.devCommandsAdvertised = true;/,
     );
   });
 });

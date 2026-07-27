@@ -36,6 +36,7 @@ import {
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
+import { PROCEDURAL_ITEM_UID_SCHEMA } from './procedural_item_uid_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -1050,6 +1051,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SET LOCAL statement_timeout = 0');
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
+    await client.query(PROCEDURAL_ITEM_UID_SCHEMA);
     // Compact player analytics facts depend on accounts, characters, and
     // play_sessions from the core schema. The tables start empty and collect
     // lifecycle facts prospectively, so boot never runs a production backfill.
@@ -2807,20 +2809,23 @@ export async function saveCharacterState(
           JSON.stringify(cleanState),
         ])
       : query(
-          `UPDATE characters SET level = $2, state = $3, updated_at = now()
+          `WITH held_lease AS MATERIALIZED (
+             SELECT character_id FROM character_leases
+              WHERE character_id = $1 AND holder = $4 AND nonce = $5
+              FOR UPDATE
+           )
+           UPDATE characters SET level = $2, state = $3, updated_at = now()
             WHERE id = $1
-              AND EXISTS (
-                SELECT 1 FROM character_leases
-                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
-              )`,
+              AND EXISTS (SELECT 1 FROM held_lease)`,
           [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
         ),
   );
   return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
 }
 
-// Persist a character row AND this realm's World Market + Ravenpost mail blobs
-// in ONE transaction. They live in different tables (characters / world_state),
+// Persist one character row (and, for direct trades, an optional peer) AND this
+// realm's World Market + Ravenpost mail blobs in ONE transaction. They live in
+// different tables (characters / world_state),
 // but a Market listing and a mail attachment are both escrows: the item leaves
 // the character's bags (character state) and becomes a listing / a letter
 // parcel (world state) in the same Sim action. Saving them as independent
@@ -2831,15 +2836,43 @@ export async function saveCharacterAndMarketState(
   characterId: number,
   level: number,
   state: CharacterState,
-  market: MarketSave,
-  mail: MailSave,
+  market: MarketSave | null,
+  mail: MailSave | null,
   leaseNonce?: string,
+  peer?:
+    | {
+        characterId: number;
+        level: number;
+        state: CharacterState;
+        leaseNonce?: string;
+      }
+    | readonly {
+        characterId: number;
+        level: number;
+        state: CharacterState;
+        leaseNonce?: string;
+      }[],
 ): Promise<boolean> {
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
   // has confirmed the marker and opened the gate. Checked before any pool work.
-  assertMarketWriteGateOpen();
+  if (market !== null) assertMarketWriteGateOpen();
   const cleanState = sanitizeRemovedZone1Content(state).state;
+  const peers = peer === undefined ? [] : Array.isArray(peer) ? [...peer] : [peer];
+  const cleanPeers = peers.map((candidate) => ({
+    ...candidate,
+    state: sanitizeRemovedZone1Content(candidate.state).state,
+  }));
+  const characterIds = new Set([characterId]);
+  for (const candidate of cleanPeers) {
+    if (characterIds.has(candidate.characterId)) {
+      throw new Error('atomic character transfer requires distinct character ids');
+    }
+    characterIds.add(candidate.characterId);
+  }
+  const candidates = [{ characterId, level, state: cleanState, leaseNonce }, ...cleanPeers].sort(
+    (a, b) => a.characterId - b.characterId,
+  );
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -2848,6 +2881,39 @@ export async function saveCharacterAndMarketState(
     // raise this transaction to the heavy allowance; still bounded so shutdown
     // cannot hang past the container stop grace. SET LOCAL reverts at COMMIT.
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
+    // Acquire every supplied lease row in stable character-id order and keep
+    // those locks through COMMIT. Without this, a same-account takeover could
+    // rotate a nonce after an UPDATE sampled it but before the remaining
+    // character/world writes became durable.
+    const fenced = candidates.filter(
+      (candidate): candidate is typeof candidate & { leaseNonce: string } =>
+        candidate.leaseNonce !== undefined,
+    );
+    if (fenced.length > 0) {
+      const locked = await client.query(
+        `SELECT character_id, holder, nonce
+           FROM character_leases
+          WHERE character_id = ANY($1::int[])
+          ORDER BY character_id
+          FOR UPDATE`,
+        [fenced.map((candidate) => candidate.characterId)],
+      );
+      const held = new Map(
+        locked.rows.map((row) => [
+          Number(row.character_id),
+          { holder: String(row.holder), nonce: String(row.nonce) },
+        ]),
+      );
+      if (
+        fenced.some((candidate) => {
+          const lease = held.get(candidate.characterId);
+          return lease?.holder !== PROCESS_LEASE_HOLDER || lease.nonce !== candidate.leaseNonce;
+        })
+      ) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+    }
     // Fence the bag half on the current lease holder+nonce when one is given (same
     // in-statement fence as saveCharacterState). If a same-account takeover rotated
     // the nonce out from under this displaced session, the character UPDATE matches
@@ -2873,19 +2939,48 @@ export async function saveCharacterAndMarketState(
       await client.query('ROLLBACK');
       return false;
     }
-    await client.query(
-      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-      // Same realm-scoped key loadMarketState/saveMarketState use: the leave
-      // flush must land where the market is read back, or the escrowed listing
-      // is written to a key nothing loads and the item is stranded on next boot.
-      [marketStateKey(REALM), JSON.stringify(market)],
-    );
-    await client.query(
-      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-      [mailStateKey(REALM), JSON.stringify(mail)],
-    );
+    for (const candidate of cleanPeers) {
+      const peerRes =
+        candidate.leaseNonce === undefined
+          ? await client.query(
+              'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+              [candidate.characterId, candidate.level, JSON.stringify(candidate.state)],
+            )
+          : await client.query(
+              `UPDATE characters SET level = $2, state = $3, updated_at = now()
+                WHERE id = $1
+                  AND EXISTS (
+                    SELECT 1 FROM character_leases
+                     WHERE character_id = $1 AND holder = $4 AND nonce = $5
+                  )`,
+              [
+                candidate.characterId,
+                candidate.level,
+                JSON.stringify(candidate.state),
+                PROCESS_LEASE_HOLDER,
+                candidate.leaseNonce,
+              ],
+            );
+      if (candidate.leaseNonce !== undefined && (peerRes.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+    }
+    if (market !== null) {
+      await client.query(
+        `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+        // Same realm-scoped key loadMarketState/saveMarketState use.
+        [marketStateKey(REALM), JSON.stringify(market)],
+      );
+    }
+    if (mail !== null) {
+      await client.query(
+        `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+        [mailStateKey(REALM), JSON.stringify(mail)],
+      );
+    }
     await client.query('COMMIT');
     return true;
   } catch (err) {

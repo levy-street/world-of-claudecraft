@@ -5,6 +5,7 @@
 // and owns the world-layout constants.
 
 import { BASE_ITEMS } from './content/items';
+import { PROCEDURAL_BASE_ITEMS } from './content/procedural_loot';
 import type {
   CampDef,
   DelveDef,
@@ -166,6 +167,7 @@ export { STATIONS };
 
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
+  PROCEDURAL_BASE_ITEMS,
   PROFESSION_ITEMS,
   ZONE2_ITEMS,
   ZONE3_ITEMS,

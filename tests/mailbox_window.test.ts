@@ -146,9 +146,14 @@ describe('mailbox_window: parcel quantity stepper (#1444, PR #1695 review)', () 
 
   it('rebuilding the parcel list restores focus to the equivalent control by item + role', () => {
     expect(painter).toContain('focusKey');
-    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:minus`/);
-    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:plus`/);
-    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:remove`/);
+    // Exact rows use their UID and plain rows use their item id. Encoding the
+    // row key keeps the role delimiter unambiguous even when a UID contains ':'.
+    expect(painter).toMatch(/const rowKey = slot\.instanceUid \?\? `plain:\$\{slot\.itemId\}`;/);
+    expect(painter).toContain('const focusPrefix = encodeURIComponent(rowKey);');
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{focusPrefix\}:minus`/);
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{focusPrefix\}:plus`/);
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{focusPrefix\}:remove`/);
+    expect(painter).toContain('decodeURIComponent(focusKey.slice(0, separator))');
   });
 });
 
@@ -156,5 +161,24 @@ describe('mailbox_window: house style', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('\u2014'), 'em dash found').toBe(false);
     expect(painter.includes('\u2013'), 'en dash found').toBe(false);
+  });
+});
+
+describe('mailbox_window: received procedural attachment accessibility', () => {
+  const reading = painter.slice(
+    painter.indexOf('private renderReading('),
+    painter.indexOf('private renderSend('),
+  );
+
+  it('makes received item tooltips keyboard reachable with a descriptive label', () => {
+    expect(reading).toContain('chip.tabIndex = 0');
+    expect(reading).toContain('hudChrome.bags.itemAriaProcedural');
+    expect(reading).toContain('proceduralRarityLabel(slot.instance)');
+    expect(reading).toContain('slot.instance.procedural.itemLevel');
+    expect(reading).toContain('attachTooltip(chip');
+  });
+
+  it('exposes procedural rarity for forced-colors styling', () => {
+    expect(reading).toContain('chip.dataset.proceduralRarity');
   });
 });

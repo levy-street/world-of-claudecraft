@@ -11,7 +11,7 @@ const core = readFileSync(new URL('../src/ui/market_view.ts', import.meta.url), 
 const componentsCss = readFileSync(
   new URL('../src/styles/components.css', import.meta.url),
   'utf8',
-);
+).replace(/\r\n/g, '\n');
 const mobileCss = readFileSync(
   new URL('../src/styles/hud.mobile.css', import.meta.url),
   'utf8',

@@ -16,7 +16,7 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { saveCharacterAndMarketState } from '../server/db';
+import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { RANKED_ARENA_WIN_HONOR } from '../src/sim/pvp';
 import type { PlayerClass } from '../src/sim/types';
@@ -85,7 +85,7 @@ describe('arena: online integration (GameServer)', () => {
 
   beforeEach(() => {
     server = new GameServer();
-    vi.mocked(saveCharacterAndMarketState).mockClear();
+    vi.mocked(saveCharacterState).mockClear();
   });
 
   it('routes arena_queue format=2v2 and seats four solos with wire-safe arena snapshots', () => {
@@ -199,7 +199,7 @@ describe('arena: online integration (GameServer)', () => {
     await server.leave(sb, 'disconnect');
 
     const victorSave = vi
-      .mocked(saveCharacterAndMarketState)
+      .mocked(saveCharacterState)
       .mock.calls.find(([characterId]) => characterId === sb.characterId);
     expect(victorSave?.[2].honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
     expect(victorSave?.[2].lifetimeHonor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);

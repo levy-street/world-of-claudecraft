@@ -32,7 +32,7 @@ import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass } from '../src/sim/types';
+import { type Aura, DT, type ItemInstancePayload, type PlayerClass } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -1067,6 +1067,68 @@ describe('delta snapshots', () => {
       client.inventory.find((s) => s.itemId === 'eastbrook_ritual_vestments')?.instance,
     ).toEqual(masterwork);
     expect(client.inventory.find((s) => s.itemId === 'apprentice_staff')?.instance).toEqual(legacy);
+  });
+
+  it('redacts roll secrets from inventory and buyback snapshots without losing owner data', () => {
+    const exact = (uid: string): ItemInstancePayload => ({
+      signer: 'Wireowner',
+      charges: { echo: 2 },
+      rolled: { quality: 'rare', stats: { int: 3 } },
+      enchant: 'greater_intellect',
+      boundTo: session.pid,
+      bindOnTrade: true,
+      procedural: {
+        version: 1,
+        uid,
+        baseId: 'gravecaller_ring',
+        itemLevel: 20,
+        rarity: 'rare',
+        affixes: [],
+        generatedName: { baseId: 'gravecaller_ring' },
+        seed: 912345,
+        dropContext: {
+          source: 'dungeon',
+          sourceEntityId: 77,
+          sourceSpawnSequence: 4,
+          lootSlotIndex: 1,
+        },
+      },
+    });
+    const bagExact = exact('pi1:wire:1001');
+    const buybackExact = exact('pi1:wire:1002');
+    const meta = server.sim.meta(session.pid)!;
+    meta.inventory.push({ itemId: 'gravecaller_ring', count: 1, instance: bagExact });
+    meta.vendorBuyback.push({ itemId: 'gravecaller_ring', count: 1, instance: buybackExact });
+    session.selfHeavyDirty = true;
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    const bagWire = snap.self.inv.find((s: any) => s.instance?.procedural?.uid === 'pi1:wire:1001');
+    const buybackWire = snap.self.buyback.find(
+      (s: any) => s.instance?.procedural?.uid === 'pi1:wire:1002',
+    );
+    for (const wire of [bagWire, buybackWire]) {
+      expect(wire.instance.signer).toBe('Wireowner');
+      expect(wire.instance.charges).toEqual({ echo: 2 });
+      expect(wire.instance.rolled).toEqual({ quality: 'rare', stats: { int: 3 } });
+      expect(wire.instance.enchant).toBe('greater_intellect');
+      expect(wire.instance.boundTo).toBe(session.pid);
+      expect(wire.instance.bindOnTrade).toBe(true);
+      expect(wire.instance.procedural).not.toHaveProperty('seed');
+      expect(wire.instance.procedural).not.toHaveProperty('dropContext');
+    }
+    expect(meta.inventory.find((s) => s.instance === bagExact)?.instance?.procedural?.seed).toBe(
+      912345,
+    );
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    const clientPayload = JSON.stringify([client.inventory, client.vendorBuyback]);
+    expect(clientPayload).toContain('pi1:wire:1001');
+    expect(clientPayload).toContain('pi1:wire:1002');
+    expect(clientPayload).not.toContain('"seed"');
+    expect(clientPayload).not.toContain('"dropContext"');
+    expect(clientPayload).not.toContain('sourceEntityId');
   });
 
   it('a counted identical-payload stack rides the inv snapshot as one slot', () => {

@@ -86,11 +86,21 @@ function clearResetLocksForClaim(ctx: SimContext, claimId: number): void {
   }
 }
 
-export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): void {
+export function dungeonFinalBossInstance(ctx: SimContext, mob: Entity): InstanceSlot | null {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-  if (inst?.difficulty !== 'normal' || RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId)) return;
+  if (!inst) return null;
   const finalBossId = HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId;
-  if (mob.templateId !== finalBossId || inst.exitId === null) return;
+  return mob.templateId === finalBossId ? inst : null;
+}
+
+export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): void {
+  const inst = dungeonFinalBossInstance(ctx, mob);
+  if (
+    inst?.difficulty !== 'normal' ||
+    RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId) ||
+    inst.exitId === null
+  )
+    return;
   for (const meta of instanceLockoutMetas(ctx, inst)) {
     ctx.dungeonResetLocks.set(resetCooldownKey(ctx, meta.entityId, inst.dungeonId), {
       availableAt: Number.POSITIVE_INFINITY,
@@ -553,6 +563,7 @@ function claimInstance(
     applyDungeonMobTuning(mob, inst.dungeonId, difficulty);
     mob.facing = Math.PI; // face the entrance
     mob.prevFacing = mob.facing;
+    ctx.registerProceduralLootSource(mob);
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);
   }

@@ -189,6 +189,11 @@ export function onCastCompleted(
   // Phoenix Trance restokes one Cinderfall charge (designer rule 2026-07-25);
   // same reasoning: the one seam every completed cast passes. Draws no rng.
   combustionRestokesCinderfall(ctx, player, abilityId);
+  ctx.triggerEquipmentEffects?.(player, {
+    kind: 'ability_cast',
+    abilityId,
+    targetId: target?.id,
+  });
   if (wasEmpowered) return;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

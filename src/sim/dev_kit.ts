@@ -23,6 +23,7 @@ import { BAG_SOCKETS } from './bags';
 import { type DevKitRole, devKitRole } from './content/dev_kit_roles';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { PROCEDURAL_ITEM_BASES } from './content/procedural_loot';
 import { WARFARE_ITEMS } from './content/pvp_honor';
 import { DUNGEONS, ITEMS, MOBS } from './data';
 import { canEquipItem, canEquipItemInSlot, isShieldItem, weaponHand } from './equipment_rules';
@@ -137,6 +138,10 @@ export function resetDevKitCache(): void {
 export function isFreshTwentyItem(cls: PlayerClass, item: ItemDef): boolean {
   if (!item.slot) return false;
   if (item.kind !== 'weapon' && item.kind !== 'armor' && item.kind !== 'held_offhand') return false;
+  // Procedural base ids are templates, not standalone gear. Their power, level,
+  // rarity, affixes, identity, and vendor value live on an ItemInstancePayload.
+  // Granting one raw would create a zero-roll counterfeit that can never drop.
+  if (PROCEDURAL_ITEM_BASES[item.id]) return false;
   // QUALITY CAP, and the single most important rule here. A fresh 20 wears quest
   // greens and blues; epics are what you go INTO a dungeon to get, not what you
   // arrive in. Source filtering alone cannot express this: the scorer maximizes
@@ -369,7 +374,7 @@ export function applyDevKit(
   ctx.unequipItem('offhand', pid);
 
   let slots = 0;
-  for (const [slot, itemId] of Object.entries(kit.equip)) {
+  for (const itemId of Object.values(kit.equip)) {
     ctx.addItem(itemId, 1, pid);
     ctx.equipItem(itemId, pid);
     slots++;

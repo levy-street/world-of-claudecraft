@@ -135,6 +135,61 @@ describe('bank wire round-trip', () => {
     expect(snap.self.bank.bonusSources).toEqual([]); // no bankBonus stamped on this join
   });
 
+  it('redacts roll secrets from bank snapshots while retaining exact owner identity', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const s = joinAt(server, fw, 1, 'Vaultsecret');
+    const pid = s.pid;
+    const sim = server.sim as any;
+    bringBankerToPlayer(sim, pid);
+    const exact = {
+      signer: 'Vaultkeeper',
+      charges: { echo: 2 },
+      rolled: { quality: 'rare', stats: { int: 3 } },
+      enchant: 'greater_intellect',
+      boundTo: pid,
+      bindOnTrade: true,
+      procedural: {
+        version: 1,
+        uid: 'pi1:wire:1003',
+        baseId: 'gravecaller_ring',
+        itemLevel: 20,
+        rarity: 'rare',
+        affixes: [],
+        generatedName: { baseId: 'gravecaller_ring' },
+        seed: 812345,
+        dropContext: {
+          source: 'dungeon',
+          sourceEntityId: 88,
+          sourceSpawnSequence: 5,
+          lootSlotIndex: 2,
+        },
+      },
+    };
+    sim.players.get(pid).bank.inventory = [
+      { itemId: 'gravecaller_ring', count: 1, slot: 6, instance: exact },
+    ];
+
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    const snap = lastSnap(fw.sent);
+    const wire = snap.self.bank.slots[0];
+    expect(wire.slot).toBe(6);
+    expect(wire.instance.procedural.uid).toBe('pi1:wire:1003');
+    expect(wire.instance.charges).toEqual({ echo: 2 });
+    expect(wire.instance.boundTo).toBe(pid);
+    expect(wire.instance.procedural).not.toHaveProperty('seed');
+    expect(wire.instance.procedural).not.toHaveProperty('dropContext');
+    expect(exact.procedural.seed).toBe(812345);
+
+    const client = bareClient(pid);
+    (client as any).applySnapshot(snap);
+    const clientPayload = JSON.stringify(client.bankInfo?.slots);
+    expect(clientPayload).toContain('pi1:wire:1003');
+    expect(clientPayload).not.toContain('"seed"');
+    expect(clientPayload).not.toContain('"dropContext"');
+  });
+
   it('deposit, withdraw, and buy-slots resolve over the wire and the snapshot mirrors each step', () => {
     const server = new GameServer();
     const fw = fakeWs();

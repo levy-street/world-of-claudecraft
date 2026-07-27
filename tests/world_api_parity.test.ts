@@ -314,6 +314,7 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
+
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
   { name: 'devLeaderboard', kind: 'method' }, // async
@@ -467,6 +468,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), and the commissions unbindItem command.
+    // Nythraxis loot-only progression carries no Forge or tuning methods.
     expect(IWORLD_MEMBERS.length).toBe(256);
     expect(DATA_MEMBERS.length).toBe(69);
     expect(METHOD_MEMBERS.length).toBe(187);
@@ -579,6 +581,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'feedPet',
       'forfeitCardDuel',
+
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
@@ -721,6 +724,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeRequest',
       'tradeSetOffer',
       'trainRecipe',
+
       'turnInQuest',
       'unbindItem',
       'unequipBag',
@@ -885,6 +889,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipItemToSlot',
       'feedPet',
       'forfeitCardDuel',
+
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
@@ -990,6 +995,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeRequest',
       'tradeSetOffer',
       'trainRecipe',
+
       'turnInQuest',
       'unbindItem',
       'unequipBag',

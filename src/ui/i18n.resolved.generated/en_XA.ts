@@ -1547,6 +1547,11 @@ export const en_XA: EnTranslations = {
       "itemAriaEnchanted": "[{item}, ɋúáñţíţý {count}, éñçĥáñţéð çóþý]",
       "itemAriaBound": "[{item}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
       "itemAriaMasterwork": "[{item}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
+      "itemAriaProcedural": "[{item}, {rarity}, íţéɱ ļéʋéļ {level}, ɋúáñţíţý {count}]",
+      "itemAriaProceduralMasterwork": "[{item}, {rarity}, íţéɱ ļéʋéļ {level}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
+      "itemAriaProceduralEnchanted": "[{item}, {rarity}, íţéɱ ļéʋéļ {level}, ɋúáñţíţý {count}, éñçĥáñţéð çóþý]",
+      "itemAriaProceduralSigned": "[{item}, {rarity}, íţéɱ ļéʋéļ {level}, ɋúáñţíţý {count}, ɱáķéŕ-ɱáŕķéð çóþý]",
+      "itemAriaProceduralBound": "[{item}, {rarity}, íţéɱ ļéʋéļ {level}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",
@@ -2568,6 +2573,12 @@ export const en_XA: EnTranslations = {
       "lockedFor": "[Ļóçķéð ƒóŕ áƀóúţ {minutes} ɱíñ]",
       "attunement": "[Ŕéɋúíŕéš áţţúñéɱéñţ: {quest}]",
       "heroicMarks": "[Ĥéŕóíç Ɱáŕķš: {count} þéŕ þļáýéŕ]",
+      "raidRewards": "[Ñýţĥŕáẋíš ŕéŵáŕð þŕéʋíéŵ]",
+      "raidSharedDrop": "[Ţĥé ƒíñáļ çóŕþšé áððš óñé šĥáŕéð þŕóçéðúŕáļ íţéɱ ƒóŕ ţĥé ŕáíð ţó ŕóļļ óñ.]",
+      "raidRarityLine": "[Ŕáŕé {rare}% · Éþíç {epic}% · Ļéĝéñðáŕý {legendary}%]",
+      "raidItemLevels": "[Íţéɱ ļéʋéļ: Ŕáŕé {rare} · Éþíç {epic} · Ļéĝéñðáŕý {legendary}]",
+      "raidSignatures": "[Šíĝñáţúŕé Ļéĝéñðáŕý þóŵéŕš: {signatures}]",
+      "raidForgedLegendary": "[Ĥéŕóíç Ļéĝéñðáŕý þóŵéŕš áŕé Ŕáíð-ƒóŕĝéð áñð ĝúáŕáñţééð íñ ţĥé úþþéŕ ĥáļƒ óƒ ţĥéíŕ áúţĥóŕéð ŕóļļ ŕáñĝé.]",
       "entrance": "[Éñţŕáñçé: {zone}]",
       "showOnMap": "[Šĥóŵ óñ Ɱáþ]",
       "encounters": "[Éñçóúñţéŕš]",
@@ -6640,7 +6651,113 @@ export const en_XA: EnTranslations = {
       "dps": "[Ðáɱáĝé/šéç]",
       "critChance": "[Çŕíţ Çĥáñçé]",
       "dodge": "[Ðóðĝé]",
-      "parry": "[Þáŕŕý]"
+      "parry": "[Þáŕŕý]",
+      "weaponMin": "[Ɱíñíɱúɱ ŵéáþóñ ðáɱáĝé]",
+      "weaponMax": "[Ɱáẋíɱúɱ ŵéáþóñ ðáɱáĝé]",
+      "weaponDps": "[Ŵéáþóñ ðáɱáĝé þéŕ šéçóñð]",
+      "healthOnKill": "[Ĥéáļţĥ óñ ķíļļ]",
+      "manaOnKill": "[Ɱáñá óñ ķíļļ]",
+      "blockValue": "[Ɓļóçķ ʋáļúé]"
+    },
+    "procedural": {
+      "rollRangeAria": "[Þóššíƀļé ŕóļļ ƒŕóɱ {min} ţó {max}]",
+      "advancedDetailsHint": "[Ĥóļð {key} ţó šĥóŵ þóššíƀļé ŕóļļ ŕáñĝéš.]",
+      "powerRollPercent": "[Þóŵéŕ ŕóļļ: {value}%]",
+      "powerRollMilliseconds": "[Þóŵéŕ ŕóļļ: {value} ɱš]",
+      "powerRollResource": "[Þóŵéŕ ŕóļļ: {value} ŕéšóúŕçé]",
+      "powerRollNumber": "[Þóŵéŕ ŕóļļ: {value}]",
+      "legendaryPower": "[Ļéĝéñðáŕý þóŵéŕ]",
+      "legendaryLimit": "[Úñíɋúé-éɋúíþþéð: {count} Ļéĝéñðáŕý þóŵéŕ]",
+      "rarity": {
+        "common": "[Çóɱɱóñ]",
+        "magic": "[Ɱáĝíç]",
+        "rare": "[Ŕáŕé]",
+        "epic": "[Éþíç]",
+        "legendary": "[Ļéĝéñðáŕý]",
+        "mythic": "[Ɱýţĥíç]"
+      },
+      "nameFragment": {
+        "mighty": "[Ɱíĝĥţý]",
+        "deft": "[Ðéƒţ]",
+        "stalwart": "[Šţáļŵáŕţ]",
+        "sages": "[Šáĝé'š]",
+        "spiritual": "[Šþíŕíţúáļ]",
+        "of_focus": "[óƒ Ƒóçúš]",
+        "of_striking": "[óƒ Šţŕíķíñĝ]",
+        "of_alacrity": "[óƒ Áļáçŕíţý]",
+        "of_precision": "[óƒ Þŕéçíšíóñ]",
+        "warded": "[Ŵáŕðéð]",
+        "of_reaping": "[óƒ Ŕéáþíñĝ]",
+        "of_remembrance": "[óƒ Ŕéɱéɱƀŕáñçé]"
+      },
+      "rareWord": {
+        "ashen": "[Ášĥéñ]",
+        "blackfen": "[Ɓļáçķƒéñ]",
+        "doom": "[Ðóóɱ]",
+        "grave": "[Ĝŕáʋé]",
+        "mire": "[Ɱíŕé]",
+        "storm": "[Šţóŕɱ]",
+        "thorn": "[Ţĥóŕñ]",
+        "wyrm": "[Ŵýŕɱ]",
+        "bite": "[Ɓíţé]",
+        "brand": "[Ɓŕáñð]",
+        "promise": "[Þŕóɱíšé]",
+        "thread": "[Ţĥŕéáð]",
+        "vigil": "[Ʋíĝíļ]",
+        "ward": "[Ŵáŕð]",
+        "whisper": "[Ŵĥíšþéŕ]",
+        "oath": "[Óáţĥ]"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "[Çŕóŵñ óƒ ţĥé Ļášţ Þýŕé]",
+          "description": "[Éʋéŕý ţĥíŕð Çíñðéŕƀóļţ šçóŕçĥéš éñéɱíéš ñéáŕ ţĥé ţáŕĝéţ.]"
+        },
+        "greyjaws_edge": {
+          "name": "[Ĝŕéýĵáŵ'š Éðĝé]",
+          "description": "[Éʋéŕý ţĥíŕð ŵéáþóñ ĥíţ ƀļééðš ţĥé ţáŕĝéţ áñð ŕéšţóŕéš á ļíţţļé ŕéšóúŕçé.]"
+        },
+        "hushwood_longbow": {
+          "name": "[Ĥúšĥŵóóð Ļóñĝƀóŵ]",
+          "description": "[Ļóñĝ Ðŕáŵ óŕ Ƒéļļ Šĥóţ çáñ ƀŕíéƒļý šíļéñçé íţš ţáŕĝéţ.]"
+        },
+        "nightglass_fang": {
+          "name": "[Ñíĝĥţĝļášš Ƒáñĝ]",
+          "description": "[Á ķíļļ ĝŕáñţš á šĥóŕţ ƀúŕšţ óƒ ĥášţé.]"
+        },
+        "ysoleis_vigil": {
+          "name": "[Ýšóļéí'š Ʋíĝíļ]",
+          "description": "[Çŕíţíçáļ ĥéáļíñĝ çŕéáţéš á ƀŕíéƒ ŕéšţóŕáţíʋé ĝŕóúñð áŕéá.]"
+        },
+        "stormwake_idol": {
+          "name": "[Šţóŕɱŵáķé Íðóļ]",
+          "description": "[Éʋéŕý ƒóúŕţĥ Áŕç Ɓóļţ áŕçš ţó ñéáŕƀý éñéɱíéš.]"
+        },
+        "ashbinders_seal": {
+          "name": "[Ášĥƀíñðéŕ'š Šéáļ]",
+          "description": "[Éʋéŕý ƒóúŕţĥ Ĝļóóɱ Ɓóļţ ɱáŕķš íţš ţáŕĝéţ ƒóŕ áððéð Šĥáðóŵ ðáɱáĝé.]"
+        },
+        "dawnward_signet": {
+          "name": "[Ðáŵñŵáŕð Šíĝñéţ]",
+          "description": "[Ɱéñðíñĝ Ļíĝĥţ šĥíéļðš íţš ŕéçíþíéñţ ƒóŕ á þóŕţíóñ óƒ ţĥé ĥéáļ.]"
+        },
+        "feral_moonclasp": {
+          "name": "[Ƒéŕáļ Ɱóóñçļášþ]",
+          "description": "[Éʋéŕý ţĥíŕð Ļúñáŕ Ţéɱþéšţ ŕéšţóŕéš þŕíɱáŕý ŕéšóúŕçé.]"
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "[Ɓéļļ óƒ ţĥé Ñíñţĥ Þéáļ]",
+          "description": "[Éʋéŕý šéçóñð ðáɱáĝíñĝ šþéļļ ţóļļš áŕóúñð ţĥé ţáŕĝéţ.]"
+        },
+        "mantle_of_borrowed_time": {
+          "name": "[Ɱáñţļé óƒ Šţóļéñ Ĥóúŕš]",
+          "description": "[Ƒáļļíñĝ ƀéļóŵ 35% ĥéáļţĥ ĝŕáñţš á ƀŕíéƒ ðéƒéñšíʋé ŵáŕð.]"
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "[Ɓóóţš óƒ ţĥé Úñƀŕóķéñ Ŕóáð]",
+          "description": "[Ɱóʋíñĝ 15 ýáŕðš ĝŕáñţš á šĥóŕţ ɱóʋéɱéñţ-šþééð ƀúŕšţ.]"
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "[{quality} {kind}]",
@@ -6816,6 +6933,8 @@ export const en_XA: EnTranslations = {
       "greed": "[Ĝŕééð]",
       "pass": "[Þášš]",
       "needAria": "[Ñééð ƒóŕ {item}]",
+      "needUnavailable": "[Ñééð íš úñáʋáíļáƀļé ƀéçáúšé ýóúŕ çļášš çáññóţ éɋúíþ ţĥíš íţéɱ.]",
+      "needUnavailablePower": "[Ñééð íš úñáʋáíļáƀļé ƀéçáúšé ţĥíš Ļéĝéñðáŕý þóŵéŕ íš ŕéšţŕíçţéð ţó áñóţĥéŕ çļášš.]",
       "greedAria": "[Ĝŕééð ƒóŕ {item}]",
       "passAria": "[Þášš óñ {item}]",
       "everyonePassed": "[Éʋéŕýóñé þáššéð óñ {item}.]",
@@ -9170,6 +9289,108 @@ export const en_XA: EnTranslations = {
       },
       "resonant_timber": {
         "name": "[Ŕéšóñáñţ Ţíɱƀéŕ]"
+      },
+      "ashwood_staff": {
+        "name": "[Ášĥŵóóð Šţáƒƒ]"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "[Ĝŕáʋéçáļļéŕ Çļóţĥ Ĥáñðŵŕáþš]"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "[Ĝŕáʋéçáļļéŕ Çļóţĥ Ĥóóð]"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "[Ĝŕáʋéçáļļéŕ Çļóţĥ Ļéĝĝíñĝš]"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "[Ĝŕáʋéçáļļéŕ Çļóţĥ Ɱáñţļé]"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "[Ĝŕáʋéçáļļéŕ Çļóţĥ Ŕáíɱéñţ]"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "[Ĝŕáʋéçáļļéŕ Çļóţĥ Šášĥ]"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "[Ĝŕáʋéçáļļéŕ Çļóţĥ Šļíþþéŕš]"
+      },
+      "gravecaller_focus": {
+        "name": "[Ĝŕáʋéçáļļéŕ Ƒóçúš]"
+      },
+      "gravecaller_pendant": {
+        "name": "[Ĝŕáʋéçáļļéŕ Þéñðáñţ]"
+      },
+      "gravecaller_ring": {
+        "name": "[Ĝŕáʋéçáļļéŕ Ŕíñĝ]"
+      },
+      "gravecaller_wand": {
+        "name": "[Ĝŕáʋéçáļļéŕ Ŵáñð]"
+      },
+      "iron_broadsword": {
+        "name": "[Íŕóñ Ɓŕóáðšŵóŕð]"
+      },
+      "iron_flanged_mace": {
+        "name": "[Íŕóñ Ƒļáñĝéð Ɱáçé]"
+      },
+      "mirefen_dirk": {
+        "name": "[Ɱíŕéƒéñ Ðíŕķ]"
+      },
+      "mirefen_hunting_bow": {
+        "name": "[Ɱíŕéƒéñ Ĥúñţíñĝ Ɓóŵ]"
+      },
+      "mirefen_leather_belt": {
+        "name": "[Ɱíŕéƒéñ Ļéáţĥéŕ Ɓéļţ]"
+      },
+      "mirefen_leather_boots": {
+        "name": "[Ɱíŕéƒéñ Ļéáţĥéŕ Ɓóóţš]"
+      },
+      "mirefen_leather_gloves": {
+        "name": "[Ɱíŕéƒéñ Ļéáţĥéŕ Ĝļóʋéš]"
+      },
+      "mirefen_leather_hood": {
+        "name": "[Ɱíŕéƒéñ Ļéáţĥéŕ Ĥóóð]"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "[Ɱíŕéƒéñ Ļéáţĥéŕ Ĵéŕķíñ]"
+      },
+      "mirefen_leather_leggings": {
+        "name": "[Ɱíŕéƒéñ Ļéáţĥéŕ Ļéĝĝíñĝš]"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "[Ɱíŕéƒéñ Ļéáţĥéŕ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "thornpeak_bulwark": {
+        "name": "[Ţĥóŕñþéáķ Ɓúļŵáŕķ]"
+      },
+      "thornpeak_crossbow": {
+        "name": "[Ţĥóŕñþéáķ Çŕóššƀóŵ]"
+      },
+      "thornpeak_mail_chest": {
+        "name": "[Ţĥóŕñþéáķ Ɱáíļ Çĥéšţ]"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "[Ţĥóŕñþéáķ Ɱáíļ Ĝáúñţļéţš]"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "[Ţĥóŕñþéáķ Ɱáíļ Ĝíŕðļé]"
+      },
+      "thornpeak_mail_helm": {
+        "name": "[Ţĥóŕñþéáķ Ɱáíļ Ĥéļɱ]"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "[Ţĥóŕñþéáķ Ɱáíļ Ļéĝĝúáŕðš]"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "[Ţĥóŕñþéáķ Ɱáíļ Þáúļðŕóñš]"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "[Ţĥóŕñþéáķ Ɱáíļ Šáƀáţóñš]"
+      },
+      "thornpeak_polearm": {
+        "name": "[Ţĥóŕñþéáķ Þóļéáŕɱ]"
+      },
+      "thornpeak_war_axe": {
+        "name": "[Ţĥóŕñþéáķ Ŵáŕ Áẋé]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

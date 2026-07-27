@@ -64,6 +64,7 @@ const prompt = (rollId = 7): LootRollPrompt => ({
   itemName: 'Greyjaw Hide Boots',
   quality: 'uncommon',
   expiresAt: 60_000,
+  canNeed: true,
 });
 
 const rollEvent = (rollId = 7): Extract<SimEvent, { type: 'lootRoll' }> => ({
@@ -71,7 +72,21 @@ const rollEvent = (rollId = 7): Extract<SimEvent, { type: 'lootRoll' }> => ({
   ...prompt(rollId),
 });
 
-function harness() {
+const legendaryInstance: NonNullable<LootRollPrompt['instance']> = {
+  procedural: {
+    version: 1,
+    baseId: 'iron_broadsword',
+    itemLevel: 20,
+    rarity: 'legendary',
+    affixes: [],
+    legendaryPowerId: 'greyjaws_edge',
+    powerRevision: 1,
+    legendaryRolls: { potencyPct: 20 },
+    generatedName: { baseId: 'iron_broadsword' },
+  },
+};
+
+function harness(playerClass: 'warrior' | 'paladin' = 'warrior') {
   const document = new LootDocument();
   const ui = document.element('ui');
   const root = document.element('loot-rolls') as LootElement;
@@ -105,6 +120,7 @@ function harness() {
     world: () => world,
     now: () => now,
     isMobileLayout: () => false,
+    playerClass: () => playerClass,
     itemIcon: () => '<img class="test-item-icon">',
     itemTooltip: () => 'tooltip',
     attachTooltip: () => {},
@@ -130,6 +146,30 @@ function harness() {
 }
 
 describe('LootRollController', () => {
+  it('renders a keyboard-inspectable legendary roll with a local rune anchor', () => {
+    const test = harness();
+    test.controller.showRoll({
+      type: 'lootRoll',
+      rollId: 88,
+      itemId: 'iron_broadsword',
+      itemName: 'Iron Broadsword',
+      quality: 'legendary',
+      instance: legendaryInstance,
+      expiresAt: 60_000,
+      canNeed: true,
+    });
+
+    const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement | null;
+    expect(row?.dataset.proceduralRarity).toBe('legendary');
+    expect(row?.style.getPropertyValue('--loot-roll-quality')).toBe('#ff8000');
+    expect(row?.innerHTML).toContain('class="loot-roll-icon-wrap"');
+    expect(row?.innerHTML).toContain('class="item-power-rune loot-roll-power-rune"');
+    expect(row?.innerHTML).toContain('tabindex="0"');
+    expect(row?.innerHTML).toContain(
+      'aria-label="Greyjaw&#39;s Edge, Legendary, item level 20, quantity 1"',
+    );
+  });
+
   it('recovers a missed event from the authoritative mirror and retires it after resolution', () => {
     const test = harness();
     test.setOpen([prompt()]);
@@ -166,6 +206,49 @@ describe('LootRollController', () => {
     test.advance(LOOT_ROLL_REGRACE_MS);
     test.controller.update(test.now());
     expect(test.root.style.display).toBe('flex');
+  });
+
+  it('keeps an ineligible Need prompt open, exposes the reason, and still allows Greed', () => {
+    const test = harness();
+    const blocked = { ...prompt(29), canNeed: false };
+    test.setOpen([blocked]);
+    test.controller.showRoll({ type: 'lootRoll', ...blocked });
+    const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement;
+    expect(row.innerHTML).toContain('data-choice="need" disabled aria-disabled=');
+    expect(row.innerHTML).toContain('aria-describedby=');
+    expect(row.innerHTML).toContain(
+      'Need is unavailable because your class cannot equip this item.',
+    );
+    const buttons = row.querySelectorAll<HTMLElement>('[data-choice]') as unknown as LootElement[];
+
+    buttons.find((button) => button.dataset.choice === 'need')?.dispatchEvent(new Event('click'));
+
+    expect(test.submitLootRoll).not.toHaveBeenCalled();
+    expect(test.root.style.display).toBe('flex');
+    expect(test.root.querySelector<HTMLElement>('.loot-roll')).not.toBeNull();
+
+    buttons.find((button) => button.dataset.choice === 'greed')?.dispatchEvent(new Event('click'));
+    expect(test.submitLootRoll).toHaveBeenCalledWith(29, 'greed');
+    expect(test.root.style.display).toBe('none');
+  });
+
+  it('explains a class-restricted Legendary power separately from base equipment', () => {
+    const test = harness('paladin');
+    const blocked = {
+      rollId: 31,
+      itemId: 'iron_broadsword',
+      itemName: 'Iron Broadsword',
+      quality: 'legendary' as const,
+      instance: legendaryInstance,
+      expiresAt: 60_000,
+      canNeed: false,
+    };
+    test.controller.showRoll({ type: 'lootRoll', ...blocked });
+    const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement;
+
+    expect(row.innerHTML).toContain(
+      'Need is unavailable because this Legendary power is restricted to another class.',
+    );
   });
 
   it('replaces a master-loot prompt when the server converts the same roll to need-greed', () => {

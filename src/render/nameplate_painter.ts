@@ -36,7 +36,7 @@ import {
   holderTierDisplayName,
   holderTierIsRegalia,
 } from '../ui/holder_tier';
-import { formatNumber, getLanguage, t } from '../ui/i18n';
+import { formatNumber, getLanguage, type TranslationKey, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
@@ -49,6 +49,7 @@ import {
   nameplateScreenTransform,
 } from './nameplate_projection';
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
+import { proceduralCorpseLootMarker } from './procedural_loot_marker';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
@@ -340,17 +341,28 @@ export class NameplatePainter {
         // Quest-target marking lives in the mob's hover tooltip (Questie-style
         // quest + progress lines), not as an overhead glyph: the marker slot
         // stays the classic lootable '$' / elite diamond pair.
-        const marker = e.lootable ? '$' : elite && !e.dead ? '◆' : '';
+        const proceduralMarker =
+          e.dead && e.lootable ? proceduralCorpseLootMarker(e.loot, p.id) : null;
+        const marker = e.lootable
+          ? proceduralMarker
+            ? `\u25c6 ${t(proceduralMarker.labelKey as TranslationKey)}`
+            : '$'
+          : elite && !e.dead
+            ? '\u25c6'
+            : '';
+        const markerClass = proceduralMarker
+          ? `np-marker loot procedural-loot q-${proceduralMarker.quality}`
+          : 'np-marker loot';
         // classic "dragon frame" cue: gold bar frame for elites, red for bosses (live mobs only)
         const frame = e.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
         this.setNameplateStatic(
           v,
-          `mob|${displayName}|${levelText}|${color}|${hpDisplay}|${marker}|${frame}`,
+          `mob|${displayName}|${levelText}|${color}|${hpDisplay}|${marker}|${markerClass}|${frame}`,
           displayName,
           deadEnemy ? null : '#fff',
           hpDisplay,
           marker,
-          'np-marker loot',
+          markerClass,
           '1',
           frame,
         );

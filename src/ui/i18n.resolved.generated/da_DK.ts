@@ -1547,6 +1547,11 @@ export const da_DK: EnTranslations = {
       "itemAriaEnchanted": "{item}, antal {count}, fortryllet kopi",
       "itemAriaBound": "{item}, antal {count}, bundet kopi",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
+      "itemAriaProcedural": "{item}, {rarity}, genstandsniveau {level}, antal {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, genstandsniveau {level}, antal {count}, mesterværk",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, genstandsniveau {level}, antal {count}, fortryllet kopi",
+      "itemAriaProceduralSigned": "{item}, {rarity}, genstandsniveau {level}, antal {count}, signeret kopi",
+      "itemAriaProceduralBound": "{item}, {rarity}, genstandsniveau {level}, antal {count}, bundet kopi",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -2169,9 +2174,9 @@ export const da_DK: EnTranslations = {
       "notReady": "Denne ressourcekilde er endnu ikke genskabt for dig.",
       "gatherLine": "Du samler: {name}.",
       "gatherLineQty": "Du samler: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Du høster: {name}.",
+      "harvestLineQty": "Du høster: {name} x{qty}.",
+      "harvestSpecimenLine": "Du får også {name}.",
       "catchLine": "Du hiver ind: {name}",
       "biteLine": "Noget tager madden!",
       "gotAwayLine": "Det slap væk.",
@@ -2353,7 +2358,7 @@ export const da_DK: EnTranslations = {
       "empty": "Ingen opskrifter kendt endnu.",
       "resultAria": "Håndværk {name}",
       "craftedToast": "Udformet: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Fremstillet: {name} x{qty}",
       "insufficientMaterials": "Det har du ikke materialerne til.",
       "unknownRecipe": "Den opskrift findes ikke.",
       "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift.",
@@ -2446,13 +2451,13 @@ export const da_DK: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Du affortrylles {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Du affortryller {item} til {material}.",
+      "disenchantedYieldQty": "Du affortryller {item} til {material} x{qty}.",
+      "disenchantedAlso": "Du får også {material} tilbage.",
+      "disenchantedAlsoQty": "Du får også {material} x{qty} tilbage.",
       "salvagedLine": "Du bjærger {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Du genvinder {material} fra {item}.",
+      "salvagedYieldQty": "Du genvinder {material} x{qty} fra {item}.",
       "enchantAppliedLine": "Du fortrylles {item} med {enchant}.",
       "notHeld": "Du har ikke den genstand.",
       "notDisenchantable": "Du kan ikke affortrylle det.",
@@ -2489,14 +2494,14 @@ export const da_DK: EnTranslations = {
       "sameEnchant": "Den genstand har allerede den fortryllelse.",
       "replaceTag": "Erstatter {enchant}",
       "sameEnchantTag": "Allerede anvendt",
-      "plainTag": "Not enchanted",
+      "plainTag": "Ikke fortryllet",
       "replaceConfirmTitle": "Erstat fortryllelsen på {item}?",
       "replaceConfirmBody": "Dette erstatter {old} på {item} med {new}.",
       "replaceConfirmNoRefund": "Den gamle fortryllelse ødelægges. Dens materialer refunderes ikke. Dette kan ikke fortrydes.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Beholdt: {kept}",
+      "replaceConfirmKeepsSigner": "Skaberens mærke",
+      "replaceConfirmKeepsMasterwork": "Mesterværksbonus",
+      "replaceConfirmKeepsBond": "Bestillingsbinding",
       "replaceConfirmCost": "Pris: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Erstat"
@@ -2568,6 +2573,12 @@ export const da_DK: EnTranslations = {
       "lockedFor": "Låst i ca. {minutes} min.",
       "attunement": "Kræver indstilling: {quest}",
       "heroicMarks": "Heroiske mærker: {count} pr. spiller",
+      "raidRewards": "Forhåndsvisning af Nythraxis-belønninger",
+      "raidSharedDrop": "Slutbossens lig tilføjer én fælles procedurel genstand, som raidet kan rulle om.",
+      "raidRarityLine": "Sjælden {rare}% · Episk {epic}% · Legendarisk {legendary}%",
+      "raidItemLevels": "Genstandsniveau: Sjælden {rare} · Episk {epic} · Legendarisk {legendary}",
+      "raidSignatures": "Legendariske signaturkræfter: {signatures}",
+      "raidForgedLegendary": "Heroiske legendariske kræfter er raidsmedede og garanteres et rul i den øverste halvdel af deres fastlagte interval.",
       "entrance": "Indgang: {zone}",
       "showOnMap": "Vis på kortet",
       "encounters": "Møder",
@@ -6640,7 +6651,113 @@ export const da_DK: EnTranslations = {
       "dps": "Skade/sek",
       "critChance": "Kritisk chance",
       "dodge": "Undvigelse",
-      "parry": "Parering"
+      "parry": "Parering",
+      "weaponMin": "Minimal våbenskade",
+      "weaponMax": "Maksimal våbenskade",
+      "weaponDps": "Våbenskade pr. sekund",
+      "healthOnKill": "Helbred ved drab",
+      "manaOnKill": "Mana ved drab",
+      "blockValue": "Blokeringsværdi"
+    },
+    "procedural": {
+      "rollRangeAria": "Muligt rul fra {min} til {max}",
+      "advancedDetailsHint": "Hold {key} nede for at vise de mulige rulintervaller.",
+      "powerRollPercent": "Kraftrul: {value}%",
+      "powerRollMilliseconds": "Kraftrul: {value} ms",
+      "powerRollResource": "Kraftrul: {value} ressource",
+      "powerRollNumber": "Kraftrul: {value}",
+      "legendaryPower": "Legendarisk kraft",
+      "legendaryLimit": "Unikt udstyret: {count} legendarisk kraft",
+      "rarity": {
+        "common": "Almindelig",
+        "magic": "Magisk",
+        "rare": "Sjælden",
+        "epic": "Episk",
+        "legendary": "Legendarisk",
+        "mythic": "Mytisk"
+      },
+      "nameFragment": {
+        "mighty": "Mægtig",
+        "deft": "Behændig",
+        "stalwart": "Standhaftig",
+        "sages": "Den Vises",
+        "spiritual": "Åndelig",
+        "of_focus": "af Fokus",
+        "of_striking": "af Slagkraft",
+        "of_alacrity": "af Hurtighed",
+        "of_precision": "af Præcision",
+        "warded": "Beskyttet",
+        "of_reaping": "af Høst",
+        "of_remembrance": "af Erindring"
+      },
+      "rareWord": {
+        "ashen": "Askegrå",
+        "blackfen": "Sortkær",
+        "doom": "Undergang",
+        "grave": "Grav",
+        "mire": "Mose",
+        "storm": "Storm",
+        "thorn": "Torn",
+        "wyrm": "Drageorm",
+        "bite": "Bid",
+        "brand": "Brændemærke",
+        "promise": "Løfte",
+        "thread": "Tråd",
+        "vigil": "Vågen",
+        "ward": "Værn",
+        "whisper": "Hvisken",
+        "oath": "Ed"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Det sidste ligbåls krone",
+          "description": "Hvert tredje Glødlyn svider fjender nær målet."
+        },
+        "greyjaws_edge": {
+          "name": "Gråkæbes æg",
+          "description": "Hvert tredje våbentræf får målet til at bløde og genopretter lidt ressource."
+        },
+        "hushwood_longbow": {
+          "name": "Stilskovens langbue",
+          "description": "Langt Optræk eller Grumt Skud kan gøre målet tavst i kort tid."
+        },
+        "nightglass_fang": {
+          "name": "Natglastand",
+          "description": "Et drab giver kortvarigt hast."
+        },
+        "ysoleis_vigil": {
+          "name": "Ysoleis vågen",
+          "description": "Kritisk heling skaber kortvarigt et genoprettende område på jorden."
+        },
+        "stormwake_idol": {
+          "name": "Stormvækkelsens afgud",
+          "description": "Hvert fjerde Lysbuelyn springer til fjender i nærheden."
+        },
+        "ashbinders_seal": {
+          "name": "Askebinderens segl",
+          "description": "Hvert fjerde Dysterlyn mærker sit mål for yderligere Skyggeskade."
+        },
+        "dawnward_signet": {
+          "name": "Daggryvagtens signet",
+          "description": "Lægende Lys beskytter modtageren med et skjold svarende til en del af helingen."
+        },
+        "feral_moonclasp": {
+          "name": "Vildmånens spænde",
+          "description": "Hvert tredje Vildlyn genopretter den primære ressource."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Klokken med det niende slag",
+          "description": "Hver anden skadevoldende besværgelse ringer omkring målet."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "De stjålne timers kappe",
+          "description": "At falde under 35% helbred giver kortvarig defensiv beskyttelse."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Støvlerne fra den ubrudte vej",
+          "description": "At bevæge sig 15 yards giver kortvarigt øget bevægelseshastighed."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const da_DK: EnTranslations = {
       "greed": "Grådighed",
       "pass": "Stå over",
       "needAria": "Behov for {item}",
+      "needUnavailable": "Behov er ikke tilgængeligt, fordi din klasse ikke kan udstyre denne genstand.",
+      "needUnavailablePower": "Behov er ikke tilgængeligt, fordi denne legendariske kraft er begrænset til en anden klasse.",
       "greedAria": "Grådighed efter {item}",
       "passAria": "Stå over {item}",
       "everyonePassed": "Alle stod over {item}.",
@@ -9170,6 +9289,108 @@ export const da_DK: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Resonant Tømmer"
+      },
+      "ashwood_staff": {
+        "name": "Asketræsstav"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Gravkalderens stofhåndvikler"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Gravkalderens stofhætte"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Gravkalderens stofbenklæder"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Gravkalderens stofkappe"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Gravkalderens stofdragt"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Gravkalderens stofskærf"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Gravkalderens stoffutter"
+      },
+      "gravecaller_focus": {
+        "name": "Gravkalderens fokus"
+      },
+      "gravecaller_pendant": {
+        "name": "Gravkalderens vedhæng"
+      },
+      "gravecaller_ring": {
+        "name": "Gravkalderens ring"
+      },
+      "gravecaller_wand": {
+        "name": "Gravkalderens tryllestav"
+      },
+      "iron_broadsword": {
+        "name": "Jernbredsværd"
+      },
+      "iron_flanged_mace": {
+        "name": "Jernflangekølle"
+      },
+      "mirefen_dirk": {
+        "name": "Mirefen-dolk"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Mirefen-jagtbue"
+      },
+      "mirefen_leather_belt": {
+        "name": "Mirefen-læderbælte"
+      },
+      "mirefen_leather_boots": {
+        "name": "Mirefen-læderstøvler"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Mirefen-læderhandsker"
+      },
+      "mirefen_leather_hood": {
+        "name": "Mirefen-læderhætte"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Mirefen-lædervams"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Mirefen-læderbenklæder"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Mirefen-læderskulderværn"
+      },
+      "thornpeak_bulwark": {
+        "name": "Thornpeak-bolværk"
+      },
+      "thornpeak_crossbow": {
+        "name": "Thornpeak-armbrøst"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Thornpeak-ringbrynje"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Thornpeak-ringhandsker"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Thornpeak-ringbælte"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Thornpeak-ringhjelm"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Thornpeak-ringbenværn"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Thornpeak-ringskulderplader"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Thornpeak-ringsabatons"
+      },
+      "thornpeak_polearm": {
+        "name": "Thornpeak-stangvåben"
+      },
+      "thornpeak_war_axe": {
+        "name": "Thornpeak-krigsøkse"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

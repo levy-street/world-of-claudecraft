@@ -53,6 +53,7 @@ const baseEnTable = {
   'error.noLoadout': 'No such loadout.',
   'error.loadoutLevel': 'That loadout needs a higher level.',
   'error.cannotEquip': 'You cannot equip that.',
+  'error.legendaryPowerLimit': 'You can equip only one Legendary power at a time.',
   // Refusal when an aimed equip slot (a paperdoll drop target) does not accept the
   // dragged piece, e.g. a helm dropped on a ring finger (src/sim/items.ts equipItem).
   'error.wrongEquipSlot': 'That does not go in that slot.',
@@ -81,6 +82,7 @@ const baseEnTable = {
   'error.talentsInCombat': 'You cannot change talents in combat.',
   'error.talentsArena': 'You cannot change talents during an arena match.',
   'error.noItem': "You don't have that item.",
+  'error.itemNoLongerInBags': 'That item is no longer in your bags.',
   'error.cantWhileDead': "You can't do that while dead.",
   'error.cantWhileSwimming': "You can't do that while swimming.",
   'error.tameThat': 'You cannot tame that.',
@@ -219,6 +221,8 @@ const baseEnTable = {
   'log.dungeonDifficultyIsHeroic': 'Dungeon difficulty: Heroic. Use /dungeon normal to change it.',
   'log.dungeonDifficultyIsNormal': 'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
   'error.heroicMarksNeeded': 'You need {marks} Heroic Marks to buy {name}.',
+  'error.lootNeedClass': 'Your class cannot Need that item.',
+
   'error.channelUsage': 'Usage: /{action} <channel>. Channels: {list}.',
   'error.generalAlwaysOn': 'The General channel is always on - just use /general.',
   'error.noSuchChannel': "There is no channel named '{name}'. Channels: {list}.",
@@ -502,6 +506,8 @@ export type SimMessageKey = keyof typeof enTable;
 // back to English here until the release localization pass fills them.
 const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>> = {
   en: {
+    'error.legendaryPowerLimit': 'You can equip only one Legendary power at a time.',
+    'error.lootNeedClass': 'Your class cannot Need that item.',
     'log.deathwardSaves': 'A deathward saves you!',
     'error.lineOfSight': 'Line of sight.',
     'error.bagsFull': 'Your bags are full.',
@@ -540,6 +546,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'You cannot change talents in combat.',
     'error.talentsArena': 'You cannot change talents during an arena match.',
     'error.noItem': "You don't have that item.",
+    'error.itemNoLongerInBags': 'That item is no longer in your bags.',
     'error.cantWhileDead': "You can't do that while dead.",
     'error.cantWhileSwimming': "You can't do that while swimming.",
     'error.tameThat': 'You cannot tame that.',
@@ -680,6 +687,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.resurrectionSickness': "The Keeper's Toll",
   },
   es: {
+    'error.legendaryPowerLimit': 'Solo puedes equipar un poder legendario a la vez.',
+    'error.lootNeedClass': 'Tu clase no puede elegir Necesidad para ese objeto.',
     'error.notInGroup': 'Ese aliado no está en tu grupo.',
     'error.noDeadAlly': 'Debes seleccionar a un aliado muerto de tu grupo.',
     'error.professionChoiceUnavailable': 'Esa elección de profesión no está disponible.',
@@ -923,6 +932,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'No puedes cambiar de talentos en combate.',
     'error.talentsArena': 'No puedes cambiar de talentos durante un combate de arena.',
     'error.noItem': 'No tienes ese objeto.',
+    'error.itemNoLongerInBags': 'Ese objeto ya no está en tus bolsas.',
     'error.cantWhileDead': 'No puedes hacer eso estando muerto.',
     'error.cantWhileSwimming': 'No puedes hacer eso mientras nadas.',
     'error.tameThat': 'No puedes domesticar eso.',
@@ -1074,6 +1084,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento perfecto',
   },
   es_ES: {
+    'error.legendaryPowerLimit': 'Solo puedes equipar un poder legendario a la vez.',
+    'error.lootNeedClass': 'Tu clase no puede elegir Necesidad para ese objeto.',
     'error.notInGroup': 'Ese aliado no está en tu grupo.',
     'error.noDeadAlly': 'Debes seleccionar a un aliado muerto de tu grupo.',
     'error.professionChoiceUnavailable': 'Esa elección de profesión no está disponible.',
@@ -1314,6 +1326,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'No puedes cambiar de talentos en combate.',
     'error.talentsArena': 'No puedes cambiar de talentos durante un combate de arena.',
     'error.noItem': 'No tienes ese objeto.',
+    'error.itemNoLongerInBags': 'Ese objeto ya no está en tus bolsas.',
     'error.cantWhileDead': 'No puedes hacer eso mientras estás muerto.',
     'error.cantWhileSwimming': 'No puedes hacer eso mientras nadas.',
     'error.tameThat': 'No puedes domar eso.',
@@ -1468,6 +1481,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento perfecto',
   },
   fr_FR: {
+    'error.legendaryPowerLimit': "Vous ne pouvez équiper qu'un seul pouvoir légendaire à la fois.",
+    'error.lootNeedClass': 'Votre classe ne peut pas choisir Besoin pour cet objet.',
     'error.notInGroup': "Cet allié n'est pas dans votre groupe.",
     'error.noDeadAlly': 'Vous devez cibler un allié mort dans votre groupe.',
     'error.professionChoiceUnavailable': "Ce choix de profession n'est pas disponible.",
@@ -1712,6 +1727,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'Vous ne pouvez pas modifier vos talents en combat.',
     'error.talentsArena': "Vous ne pouvez pas modifier vos talents pendant un combat d'arène.",
     'error.noItem': "Vous n'avez pas cet objet.",
+    'error.itemNoLongerInBags': "Cet objet n'est plus dans vos sacs.",
     'error.cantWhileDead': 'Vous ne pouvez pas faire cela en étant mort.',
     'error.cantWhileSwimming': 'Vous ne pouvez pas faire cela en train de nager.',
     'error.tameThat': 'Vous ne pouvez pas apprivoiser cela.',
@@ -1867,6 +1883,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Moment parfait',
   },
   fr_CA: {
+    'error.legendaryPowerLimit': "Vous ne pouvez équiper qu'un seul pouvoir légendaire à la fois.",
+    'error.lootNeedClass': 'Votre classe ne peut pas choisir Besoin pour cet objet.',
     'error.notInGroup': "Cet allié n'est pas dans votre groupe.",
     'error.noDeadAlly': 'Vous devez cibler un allié mort dans votre groupe.',
     'error.professionChoiceUnavailable': "Ce choix de profession n'est pas disponible.",
@@ -2111,6 +2129,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'Vous ne pouvez pas modifier vos talents en combat.',
     'error.talentsArena': "Vous ne pouvez pas modifier vos talents pendant un combat d'arène.",
     'error.noItem': "Vous n'avez pas cet objet.",
+    'error.itemNoLongerInBags': "Cet objet n'est plus dans vos sacs.",
     'error.cantWhileDead': 'Vous ne pouvez pas faire cela en étant mort.',
     'error.cantWhileSwimming': 'Vous ne pouvez pas faire cela en nageant.',
     'error.tameThat': 'Vous ne pouvez pas apprivoiser cela.',
@@ -2266,6 +2285,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Moment parfait',
   },
   en_CA: {
+    'error.legendaryPowerLimit': 'You can equip only one Legendary power at a time.',
+    'error.lootNeedClass': 'Your class cannot Need that item.',
     'log.deathwardSaves': 'A deathward saves you!',
     'log.learnedAbility': 'You have learned a new ability: {name}.',
     'log.abilityRankUp': 'Your {name} has improved to Rank {rank}.',
@@ -2384,6 +2405,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'You cannot change talents in combat.',
     'error.talentsArena': 'You cannot change talents during an arena match.',
     'error.noItem': "You don't have that item.",
+    'error.itemNoLongerInBags': 'That item is no longer in your bags.',
     'error.cantWhileDead': "You can't do that while dead.",
     'error.cantWhileSwimming': "You can't do that while swimming.",
     'error.tameThat': 'You cannot tame that.',
@@ -2444,6 +2466,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'error.legendaryPowerLimit': 'Puoi equipaggiare un solo potere Leggendario alla volta.',
+    'error.lootNeedClass': 'La tua classe non può scegliere Bisogno per quell’oggetto.',
     'error.notInGroup': "Quell'alleato non è nel gruppo.",
     'error.noDeadAlly': 'Devi bersagliare un alleato del gruppo che sia morto.',
     'error.professionChoiceUnavailable': 'Quella scelta di professione non è disponibile.',
@@ -2685,6 +2709,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'Non puoi cambiare i talenti in combattimento.',
     'error.talentsArena': 'Non puoi cambiare i talenti durante uno scontro in arena.',
     'error.noItem': "Non hai quell'oggetto.",
+    'error.itemNoLongerInBags': "Quell'oggetto non è più nelle tue borse.",
     'error.cantWhileDead': 'Non puoi farlo da morto.',
     'error.cantWhileSwimming': 'Non puoi farlo mentre nuoti.',
     'error.tameThat': 'Non puoi addomesticare quello.',
@@ -2838,6 +2863,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento Perfetto',
   },
   de_DE: {
+    'error.legendaryPowerLimit': 'Du kannst nur eine legendäre Macht gleichzeitig ausrüsten.',
+    'error.lootNeedClass': 'Deine Klasse kann auf diesen Gegenstand nicht Bedarf würfeln.',
     'error.notInGroup': 'Dieser Verbündete ist nicht in deiner Gruppe.',
     'error.noDeadAlly': 'Du musst einen toten Verbündeten in deiner Gruppe als Ziel wählen.',
     'error.professionChoiceUnavailable': 'Diese Berufsauswahl ist nicht verfügbar.',
@@ -3081,6 +3108,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'Ihr könnt im Kampf keine Talente ändern.',
     'error.talentsArena': 'Ihr könnt während eines Arenakampfes keine Talente ändern.',
     'error.noItem': 'Diesen Gegenstand habt Ihr nicht.',
+    'error.itemNoLongerInBags': 'Dieser Gegenstand ist nicht mehr in Euren Taschen.',
     'error.cantWhileDead': 'Das könnt Ihr nicht tun, solange Ihr tot seid.',
     'error.cantWhileSwimming': 'Das könnt Ihr nicht tun, solange Ihr schwimmt.',
     'error.tameThat': 'Das könnt Ihr nicht zähmen.',
@@ -3236,6 +3264,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekter Moment',
   },
   zh_CN: {
+    'error.legendaryPowerLimit': '你一次只能装备一个传奇能力。',
+    'error.lootNeedClass': '你的职业不能对该物品选择需求。',
     'error.notInGroup': '该盟友不在你的队伍中。',
     'error.noDeadAlly': '你必须以队伍中一名死亡的盟友为目标。',
     'error.professionChoiceUnavailable': '该专业选项不可用。',
@@ -3534,6 +3564,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': '战斗中不能更改天赋。',
     'error.talentsArena': '竞技场比赛中不能更改天赋。',
     'error.noItem': '你没有那件物品。',
+    'error.itemNoLongerInBags': '那件物品已不在你的背包中。',
     'error.cantWhileDead': '死亡时不能这样做。',
     'error.cantWhileSwimming': '游泳时不能这样做。',
     'error.tameThat': '你无法驯服它。',
@@ -3613,6 +3644,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完美时刻',
   },
   zh_TW: {
+    'error.legendaryPowerLimit': '你一次只能裝備一個傳奇能力。',
+    'error.lootNeedClass': '你的職業不能對該物品選擇需求。',
     'error.notInGroup': '該盟友不在你的隊伍中。',
     'error.noDeadAlly': '你必須鎖定隊伍中一名陣亡的盟友。',
     'error.professionChoiceUnavailable': '該專業選擇目前無法使用。',
@@ -3911,6 +3944,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': '戰鬥中無法變更天賦。',
     'error.talentsArena': '競技場比賽進行中無法變更天賦。',
     'error.noItem': '你沒有那件物品。',
+    'error.itemNoLongerInBags': '該物品已不在你的背包中。',
     'error.cantWhileDead': '死亡時無法這樣做。',
     'error.cantWhileSwimming': '游泳時無法這樣做。',
     'error.tameThat': '你無法馴服那個目標。',
@@ -3990,6 +4024,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完美時刻',
   },
   ko_KR: {
+    'error.legendaryPowerLimit': '한 번에 전설 능력 하나만 장착할 수 있습니다.',
+    'error.lootNeedClass': "현재 직업은 해당 아이템에 입찰할 때 '필요'를 선택할 수 없습니다.",
     'error.notInGroup': '그 아군은 당신의 그룹에 속해 있지 않습니다.',
     'error.noDeadAlly': '그룹 내 죽은 아군을 대상으로 지정해야 합니다.',
     'error.professionChoiceUnavailable': '해당 전문 기술 선택지는 사용할 수 없습니다.',
@@ -4294,6 +4330,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': '전투 중에는 특성을 변경할 수 없습니다.',
     'error.talentsArena': '투기장 시합 중에는 특성을 변경할 수 없습니다.',
     'error.noItem': '그 아이템이 없습니다.',
+    'error.itemNoLongerInBags': '해당 아이템은 더 이상 가방에 없습니다.',
     'error.cantWhileDead': '죽은 상태에서는 할 수 없습니다.',
     'error.cantWhileSwimming': '수영 중에는 할 수 없습니다.',
     'error.tameThat': '그것을 길들일 수 없습니다.',
@@ -4376,6 +4413,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '완벽한 순간',
   },
   ja_JP: {
+    'error.legendaryPowerLimit': 'レジェンダリーパワーは一度に1つしか装備できません。',
+    'error.lootNeedClass': 'あなたのクラスはそのアイテムに「必要」を選べません。',
     'error.notInGroup': 'その仲間はあなたのグループに入っていません。',
     'error.noDeadAlly': 'グループ内の死亡した仲間をターゲットしてください。',
     'error.professionChoiceUnavailable': 'その職業選択は利用できません。',
@@ -4689,6 +4728,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': '戦闘中はタレントを変更できません。',
     'error.talentsArena': 'アリーナ試合中はタレントを変更できません。',
     'error.noItem': 'そのアイテムを持っていません。',
+    'error.itemNoLongerInBags': 'そのアイテムはもうバッグにありません。',
     'error.cantWhileDead': '死亡中はそれを実行できません。',
     'error.cantWhileSwimming': '泳いでいる間はそれを実行できません。',
     'error.tameThat': 'それは仲間にできません。',
@@ -4771,6 +4811,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完璧な瞬間',
   },
   pt_BR: {
+    'error.legendaryPowerLimit': 'Você só pode equipar um poder Lendário por vez.',
+    'error.lootNeedClass': 'Sua classe não pode escolher Necessidade para esse item.',
     'error.notInGroup': 'Esse aliado não está no seu grupo.',
     'error.noDeadAlly': 'Você deve ter como alvo um aliado morto do seu grupo.',
     'error.professionChoiceUnavailable': 'Essa escolha de profissão não está disponível.',
@@ -5010,6 +5052,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'Você não pode mudar talentos em combate.',
     'error.talentsArena': 'Você não pode mudar talentos durante uma luta de arena.',
     'error.noItem': 'Você não tem esse item.',
+    'error.itemNoLongerInBags': 'Esse item não está mais nas suas bolsas.',
     'error.cantWhileDead': 'Você não pode fazer isso enquanto está morto.',
     'error.cantWhileSwimming': 'Você não pode fazer isso enquanto está nadando.',
     'error.tameThat': 'Você não pode domar isso.',
@@ -5164,6 +5207,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento Perfeito',
   },
   ru_RU: {
+    'error.legendaryPowerLimit': 'Одновременно можно экипировать только одну легендарную силу.',
+    'error.lootNeedClass': 'Ваш класс не может выбрать «Нужно» для этого предмета.',
     'error.notInGroup': 'Этот союзник не состоит в вашей группе.',
     'error.noDeadAlly': 'Выберите погибшего союзника из своей группы.',
     'error.professionChoiceUnavailable': 'Этот выбор профессии недоступен.',
@@ -5475,6 +5520,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'Нельзя менять таланты в бою.',
     'error.talentsArena': 'Нельзя менять таланты во время боя на арене.',
     'error.noItem': 'У вас нет такого предмета.',
+    'error.itemNoLongerInBags': 'Этого предмета больше нет в ваших сумках.',
     'error.cantWhileDead': 'Вы не можете сделать это, будучи мёртвым.',
     'error.cantWhileSwimming': 'Вы не можете делать это во время плавания.',
     'error.tameThat': 'Это нельзя приручить.',
@@ -5560,6 +5606,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   cs_CZ: {
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
+    'error.legendaryPowerLimit': 'Můžeš mít vybavenou jen jednu legendární moc najednou.',
+    'error.lootNeedClass': 'Tvoje třída nemůže u tohoto předmětu zvolit Potřebu.',
     'log.readyCheckNotReady': '{name} není připraven(a).',
     'log.readyCheckNoResponse': '{name} neodpověděl(a) na kontrolu připravenosti.',
     'error.notInGroup': 'Tento spojenec není ve vaší skupině.',
@@ -5665,6 +5713,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   nl_NL: {
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
+    'error.legendaryPowerLimit': 'Je kunt maar één legendarische kracht tegelijk uitrusten.',
+    'error.lootNeedClass': 'Jouw klasse kan voor dit voorwerp niet Behoefte kiezen.',
     'log.readyCheckNotReady': '{name} is niet gereed.',
     'log.readyCheckNoResponse': '{name} heeft niet gereageerd op de gereedheidscontrole.',
     'error.notInGroup': 'Die bondgenoot zit niet in jouw groep.',
@@ -5769,6 +5819,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   pl_PL: {
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
+    'error.legendaryPowerLimit': 'Możesz wyposażyć tylko jedną legendarną moc naraz.',
+    'error.lootNeedClass': 'Twoja klasa nie może wybrać opcji Potrzeba dla tego przedmiotu.',
     'log.readyCheckNotReady': '{name} nie jest gotowy(-a).',
     'log.readyCheckNoResponse': '{name} nie odpowiedział(a) na sprawdzanie gotowości.',
     'error.notInGroup': 'Ten sojusznik nie należy do twojej grupy.',
@@ -5875,6 +5927,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   id_ID: {
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
+    'error.legendaryPowerLimit':
+      'Kamu hanya dapat memasang satu kekuatan Legendaris dalam satu waktu.',
+    'error.lootNeedClass': 'Kelasmu tidak dapat memilih Butuh untuk item itu.',
     'log.readyCheckNotReady': '{name} belum siap.',
     'log.readyCheckNoResponse': '{name} tidak menanggapi pemeriksaan kesiapan.',
     'error.notInGroup': 'Sekutu itu tidak ada dalam grupmu.',
@@ -5979,6 +6034,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   tr_TR: {
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
     ...BASE_NEW.tr_TR,
+    'error.legendaryPowerLimit': 'Aynı anda yalnızca bir Efsanevi güç kuşanabilirsiniz.',
+    'error.lootNeedClass': 'Sınıfınız bu eşya için İhtiyaç seçemez.',
     'log.readyCheckNotReady': '{name} hazır değil.',
     'log.readyCheckNoResponse': '{name} hazırlık kontrolüne yanıt vermedi.',
     'error.notInGroup': 'O müttefik grubunda değil.',
@@ -6084,6 +6141,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   sv_SE: {
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
     ...BASE_NEW.sv_SE,
+    'error.legendaryPowerLimit': 'Du kan bara utrusta en legendarisk kraft åt gången.',
+    'error.lootNeedClass': 'Din klass kan inte välja Behov för det föremålet.',
     'log.readyCheckNotReady': '{name} är inte redo.',
     'log.readyCheckNoResponse': '{name} svarade inte på beredskapskontrollen.',
     'error.notInGroup': 'Den allierade är inte i din grupp.',
@@ -6188,6 +6247,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   vi_VN: {
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
     ...BASE_NEW.vi_VN,
+    'error.legendaryPowerLimit':
+      'Bạn chỉ có thể trang bị một sức mạnh Huyền Thoại tại một thời điểm.',
+    'error.lootNeedClass': 'Lớp nhân vật của bạn không thể chọn Cần cho vật phẩm đó.',
     'log.readyCheckNotReady': '{name} chưa sẵn sàng.',
     'log.readyCheckNoResponse': '{name} không phản hồi kiểm tra sẵn sàng.',
     'error.notInGroup': 'Đồng minh đó không ở trong nhóm của bạn.',
@@ -6291,6 +6353,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   da_DK: {
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
     ...BASE_NEW.da_DK,
+    'error.legendaryPowerLimit': 'Du kan kun udstyre én legendarisk kraft ad gangen.',
+    'error.lootNeedClass': 'Din klasse kan ikke vælge Behov for den genstand.',
     'log.readyCheckNotReady': '{name} er ikke klar.',
     'log.readyCheckNoResponse': '{name} svarede ikke på klar-tjekket.',
     'error.notInGroup': 'Den allierede er ikke i din gruppe.',

@@ -70,6 +70,10 @@ import {
 } from './combat/damage';
 import { damageTakenWithin } from './combat/damage_history';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import {
+  EquipmentEffectsController,
+  type EquipmentEffectTriggerEvent,
+} from './combat/equipment_effects';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -277,6 +281,17 @@ import {
   swimSurfaceY,
 } from './player_motion';
 import {
+  deterministicOfflineProceduralItemUidLease,
+  ProceduralItemUidAllocator,
+  type ProceduralItemUidLease,
+} from './procedural_item_uid';
+import {
+  assertProceduralUidAvailable,
+  assertUniqueProceduralItemUids,
+  sanitizePersistedItemInstance,
+  sanitizeProceduralGrant,
+} from './procedural_persistence';
+import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
   advanceAmendsProgress as advanceAmendsProgressImpl,
@@ -412,6 +427,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -1492,7 +1508,7 @@ function freshCounters(): RewardCounters {
 export class Sim {
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
+  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'proceduralItemUidLease'>> &
     Pick<SimConfig, 'world' | 'perfLap'>;
   /**
    * The authored world this simulation owns. The active registry is a host/render
@@ -1515,6 +1531,7 @@ export class Sim {
   // (fiesta-aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/
   // dealDamage). Built once in the ctor; draws no rng and mutates nothing.
   private playerMotionDeps!: PlayerMotionDeps;
+  private equipmentEffects!: EquipmentEffectsController;
   // Party/raid state machine (A1): owns parties/partyByPid/partyInvites/nextPartyId
   // and the invite/accept/convert/move/leave/kick/disband logic, moved off Sim
   // behind SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates
@@ -1686,12 +1703,47 @@ export class Sim {
   // the sim runs at 20 Hz wall speed, so the interval is real hours.
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
+  private proceduralItemUidAllocator: ProceduralItemUidAllocator;
+  private readonly proceduralLootSources = new WeakSet<Entity>();
+  private readonly proceduralLootAttemptSequences = new WeakMap<Entity, number>();
+
+  configureProceduralItemUidLease(lease: ProceduralItemUidLease): void {
+    if (this.proceduralItemUidAllocator.allocatedCount !== 0n) {
+      throw new Error('cannot replace a procedural item UID lease after allocation');
+    }
+    this.proceduralItemUidAllocator = new ProceduralItemUidAllocator(lease);
+  }
+
+  allocateProceduralItemUid(): string {
+    return this.proceduralItemUidAllocator.allocate();
+  }
+
+  private registerProceduralLootSource(mob: Entity): void {
+    this.proceduralLootSources.add(mob);
+  }
+
+  private isProceduralLootSource(mob: Entity): boolean {
+    return this.proceduralLootSources.has(mob);
+  }
+
+  private nextProceduralLootSourceSequence(mob: Entity): number {
+    if (!this.proceduralLootSources.has(mob)) {
+      throw new Error('procedural loot sequence requested for an unregistered source');
+    }
+    const sequence = this.proceduralLootAttemptSequences.get(mob) ?? 0;
+    this.proceduralLootAttemptSequences.set(mob, sequence + 1);
+    return sequence;
+  }
 
   constructor(cfg: SimConfig) {
+    this.proceduralItemUidAllocator = new ProceduralItemUidAllocator(
+      cfg.proceduralItemUidLease ?? deterministicOfflineProceduralItemUidLease(cfg.seed),
+    );
     this.devCommands = cfg.devCommands ?? false;
     this.cfg = {
       seed: cfg.seed,
       playerClass: cfg.playerClass,
+      proceduralLootSecret: cfg.proceduralLootSecret ?? '',
       respawnSeconds: cfg.respawnSeconds ?? 25,
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
@@ -1723,6 +1775,7 @@ export class Sim {
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
     this.ctx = this.buildSimContext();
+    this.equipmentEffects = new EquipmentEffectsController(() => this.rng.next());
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
       seed: this.cfg.seed,
@@ -1828,6 +1881,7 @@ export class Sim {
         mob.facing = this.rng.range(-Math.PI, Math.PI);
         mob.prevFacing = mob.facing;
         mob.wanderTimer = this.rng.range(2, 10);
+        this.registerProceduralLootSource(mob);
         this.addEntity(mob);
       }
     }
@@ -2040,6 +2094,7 @@ export class Sim {
         mob.facing = pending.facing;
         mob.prevFacing = pending.facing;
         mob.dungeonId = pending.dungeonId;
+        this.registerProceduralLootSource(mob);
         this.addEntity(mob);
       }
       this.pendingMobRespawns.splice(i, 1);
@@ -2115,6 +2170,44 @@ export class Sim {
   // -------------------------------------------------------------------------
 
   addPlayer(
+    cls: PlayerClass,
+    name: string,
+    opts?: {
+      autoEquip?: boolean;
+      state?: CharacterState;
+      characterId?: number;
+      bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+    },
+  ): number {
+    const playerIdsBefore = new Set(this.players.keys());
+    const entityIdsBefore = new Set(this.entities.keys());
+    const primaryIdBefore = this.primaryId;
+    const eventCountBefore = this.events.length;
+    try {
+      return this.addPlayerUnchecked(cls, name, opts);
+    } catch (error) {
+      // Persisted-state validation happens after the entity and PlayerMeta are
+      // created. Treat the whole add as a transaction so a rejected save never
+      // leaves a ghost player, pet, queued event, or changed primary player.
+      for (const pid of [...this.players.keys()]) {
+        if (playerIdsBefore.has(pid)) continue;
+        try {
+          this.removePlayer(pid);
+        } catch {
+          this.players.delete(pid);
+          if (this.entities.has(pid)) this.dropEntity(pid);
+        }
+      }
+      for (const id of [...this.entities.keys()]) {
+        if (!entityIdsBefore.has(id)) this.dropEntity(id);
+      }
+      this.primaryId = primaryIdBefore;
+      this.events.length = eventCountBefore;
+      throw error;
+    }
+  }
+
+  private addPlayerUnchecked(
     cls: PlayerClass,
     name: string,
     opts?: {
@@ -2322,18 +2415,28 @@ export class Sim {
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
       meta.equipmentInstance = Object.fromEntries(
-        Object.entries(s.equipmentInstance ?? {}).map(([slot, inst]) => [
-          slot,
-          cloneItemInstancePayload(inst),
-        ]),
+        Object.entries(s.equipmentInstance ?? {}).map(([slot, inst]) => {
+          const itemId = meta.equipment[slot as EquipSlot];
+          if (!itemId) {
+            throw new Error(`Invalid persisted item instance at equipment.${slot}: no item`);
+          }
+          return [slot, sanitizePersistedItemInstance(inst, itemId, `equipment.${slot}`)];
+        }),
       );
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
       // bank arm below): a counted instanced slot loads capped at what
       // identical-payload merges could legitimately have built, and a
       // charge-bearing payload stays one-per-slot, so a hand-edited count can
       // never launder into independent copies via a later deposit or trade.
-      meta.inventory = s.inventory.map((raw) => {
+      meta.inventory = s.inventory.map((raw, index) => {
         const slot = cloneInvSlot(raw);
+        if (slot.instance) {
+          slot.instance = sanitizePersistedItemInstance(
+            slot.instance,
+            slot.itemId,
+            `inventory[${index}]`,
+          );
+        }
         slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
         return slot;
       });
@@ -2354,10 +2457,25 @@ export class Sim {
           meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
         }
       }
-      meta.vendorBuyback = (s.vendorBuyback ?? []).map(cloneInvSlot);
-      // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
-      // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
+      meta.vendorBuyback = (s.vendorBuyback ?? []).map((raw, index) => {
+        const slot = cloneInvSlot(raw);
+        if (slot.instance) {
+          slot.instance = sanitizePersistedItemInstance(
+            slot.instance,
+            slot.itemId,
+            `vendorBuyback[${index}]`,
+          );
+        }
+        slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
+        return slot;
+      });
       meta.bank = sanitizeBankState(s.bank);
+      assertUniqueProceduralItemUids({
+        inventory: meta.inventory,
+        bank: meta.bank.inventory,
+        buyback: meta.vendorBuyback,
+        equipmentInstance: meta.equipmentInstance,
+      });
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save
         // mid a since-deleted quest (e.g. the retirement of
@@ -2606,6 +2724,7 @@ export class Sim {
     deedsMod.evaluateDeedsFor(this.ctx, meta, player, true);
     this.deedDirtyPids.delete(player.id);
     this.deedDirtyKeys.delete(player.id);
+    this.refreshEquipmentEffectPower(player.id);
     return player.id;
   }
 
@@ -2823,6 +2942,7 @@ export class Sim {
   removePlayer(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
+    this.equipmentEffects.clearActor(pid, true);
     // If the leaver owns a live lockpick session, abandon it (preserves
     // attemptAvailable so a remaining party member can still pick the chest).
     // Must run before party removal / dropEntity, since delveRunForPlayer
@@ -2976,6 +3096,12 @@ export class Sim {
     // character on the Sowfield). The stowed pet persists via serializePet's
     // delvePetStash fallback; known/sportRole are session-derived, not saved.
     const cupReturn = valeCupMod.vcupReturnFor(this.ctx, pid);
+    assertUniqueProceduralItemUids({
+      inventory: meta.inventory,
+      bank: meta.bank.inventory,
+      buyback: meta.vendorBuyback,
+      equipmentInstance: meta.equipmentInstance,
+    });
     const state: CharacterState = {
       contentRevision: CURRENT_CHARACTER_CONTENT_REVISION,
       level: restore ? restore.level : e.level,
@@ -3970,9 +4096,16 @@ export class Sim {
       isArenaTeamWiped: sim.isArenaTeamWiped.bind(sim),
       arenaIsDown: sim.arenaIsDown.bind(sim),
       arenaAllPids: sim.arenaAllPids.bind(sim),
+      allocateProceduralItemUid: sim.allocateProceduralItemUid.bind(sim),
+      registerProceduralLootSource: sim.registerProceduralLootSource.bind(sim),
+      isProceduralLootSource: sim.isProceduralLootSource.bind(sim),
+      nextProceduralLootSourceSequence: sim.nextProceduralLootSourceSequence.bind(sim),
       rollLoot: sim.rollLoot.bind(sim),
       rollWorldBossLoot: sim.rollWorldBossLoot.bind(sim),
       applyHeal: sim.applyHeal.bind(sim),
+      triggerEquipmentEffects: sim.triggerEquipmentEffects.bind(sim),
+      refreshEquipmentEffectPower: sim.refreshEquipmentEffectPower.bind(sim),
+      clearEquipmentEffectState: sim.clearEquipmentEffectState.bind(sim),
       spellCrit: sim.spellCrit.bind(sim),
       applyAura: sim.applyAura.bind(sim),
       // General control-aura predicate (stays on Sim); the extracted Nythraxis
@@ -4068,7 +4201,8 @@ export class Sim {
       applyNonPlayerStatAura: sim.applyNonPlayerStatAura.bind(sim),
       // N1: grantNythraxisLockout now lives in encounters/nythraxis.ts; late-bound arrow
       // (handleDeath in combat/damage.ts reaches it via ctx on the boss-death path).
-      grantNythraxisLockout: (boss) => nythraxis.grantNythraxisLockout(sim.ctx, boss),
+      grantNythraxisLockout: (boss, recipients) =>
+        nythraxis.grantNythraxisLockout(sim.ctx, boss, recipients),
       // frenzyPackmates / armDeathThroes flipped points-at to mob/lifecycle (M4); their
       // late-bound lifecycle arrows live in the death-lifecycle block below.
       refreshKnownAbilities: sim.refreshKnownAbilities.bind(sim),
@@ -5040,6 +5174,14 @@ export class Sim {
   }
 
   private updatePlayerMovement(p: Entity, meta: PlayerMeta): void {
+    const beforeX = p.pos.x;
+    const beforeZ = p.pos.z;
+    const finishMovement = (): void => {
+      const movementDistance = Math.hypot(p.pos.x - beforeX, p.pos.z - beforeZ);
+      if (movementDistance > 0) {
+        this.triggerEquipmentEffects(p, { kind: 'movement', movementDistance });
+      }
+    };
     // Any locomotion key counts as a deliberate action for the anti-AFK pet gate.
     const mv = meta.moveInput;
     if (
@@ -5056,10 +5198,22 @@ export class Sim {
       // no-op unless the player is currently AFK. Do Not Disturb survives.
       clearAfkOnMove(this.ctx, meta, p);
     }
-    if (advanceHeroicLeap(this.ctx, p)) return;
-    if (this.updateChargeMovement(p)) return;
-    if (this.updateFollowMovement(p, meta)) return;
-    if (this.updateFearMovement(p)) return;
+    if (advanceHeroicLeap(this.ctx, p)) {
+      finishMovement();
+      return;
+    }
+    if (this.updateChargeMovement(p)) {
+      finishMovement();
+      return;
+    }
+    if (this.updateFollowMovement(p, meta)) {
+      finishMovement();
+      return;
+    }
+    if (this.updateFearMovement(p)) {
+      finishMovement();
+      return;
+    }
     // The rest of the step (turn integration, wish vector, slope gates, swept
     // static collision, the vertical pass with fall damage) moved VERBATIM to
     // player_motion.ts (MV1), which also eases the body off terrain walls at the
@@ -5067,6 +5221,7 @@ export class Sim {
     // aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/dealDamage)
     // so behavior and the rng draw order are unchanged.
     stepPlayerMotion(this.playerMotionDeps, p, meta.moveInput);
+    finishMovement();
   }
 
   private standUp(p: Entity): void {
@@ -5103,6 +5258,38 @@ export class Sim {
       school: effect.school,
       fx: 'tick',
     });
+    if (effect.equipmentAllyHeal) {
+      const heal = effect.equipmentAllyHeal;
+      const allies = this.friendliesInRadius(source, effect.pos, effect.radius)
+        .filter(
+          (ally) =>
+            !ally.dead && ally.hp > 0 && ally.hp < ally.maxHp && this.hasLineOfSight(source, ally),
+        )
+        .sort((a, b) => {
+          if (a.id === heal.primaryTargetId) return b.id === heal.primaryTargetId ? 0 : -1;
+          if (b.id === heal.primaryTargetId) return 1;
+          const healthOrder = a.hp / a.maxHp - b.hp / b.maxHp;
+          if (healthOrder !== 0) return healthOrder;
+          const aDist = (a.pos.x - effect.pos.x) ** 2 + (a.pos.z - effect.pos.z) ** 2;
+          const bDist = (b.pos.x - effect.pos.x) ** 2 + (b.pos.z - effect.pos.z) ** 2;
+          return aDist - bDist || a.id - b.id;
+        });
+      const targets =
+        heal.maxTargets === undefined ? allies : allies.slice(0, Math.max(0, heal.maxTargets));
+      for (const ally of targets) {
+        this.applyHeal(
+          source,
+          ally,
+          heal.amount,
+          effect.ability,
+          heal.powerId,
+          false,
+          false,
+          heal.procDepth,
+        );
+      }
+      return;
+    }
     // Rune of Power (mage choice row): a FRIENDLY zone pulse. Buffs every ally
     // standing inside (refresh keeps it while they stay near, and it falls off
     // one pulse after they leave) and returns before the hostile loop, so the
@@ -5160,6 +5347,11 @@ export class Sim {
         false,
         threatOpts,
         direct,
+        false,
+        false,
+        effect.equipmentPowerId ?? null,
+        effect.equipmentPowerId !== undefined,
+        effect.equipmentProcDepth ?? 0,
       );
     }
     // Blizzard: every enemy this pulse struck shaves the running Frozen Orb
@@ -5303,6 +5495,7 @@ export class Sim {
     abilityId: string | null = null,
     canCrit = true,
     canTriggerWeaponProcs = true,
+    equipmentProcDepth = 0,
   ): number {
     return applyHealImpl(
       this.ctx,
@@ -5313,7 +5506,20 @@ export class Sim {
       abilityId,
       canCrit,
       canTriggerWeaponProcs,
+      equipmentProcDepth,
     );
+  }
+
+  private triggerEquipmentEffects(actor: Entity, event: EquipmentEffectTriggerEvent): void {
+    this.equipmentEffects.trigger(this.ctx, actor, event);
+  }
+
+  private refreshEquipmentEffectPower(pid: number): void {
+    this.equipmentEffects.refresh(this.ctx, pid);
+  }
+
+  private clearEquipmentEffectState(pid: number): void {
+    this.equipmentEffects.clearActor(pid);
   }
 
   private healingThreat(source: Entity, target: Entity, healed: number): void {
@@ -5793,6 +5999,7 @@ export class Sim {
     alreadyFinal = false,
     abilityId: string | null = null,
     aoe = false,
+    equipmentProcDepth = 0,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -5810,6 +6017,7 @@ export class Sim {
       alreadyFinal,
       abilityId,
       aoe,
+      equipmentProcDepth,
     );
   }
 
@@ -5843,10 +6051,10 @@ export class Sim {
     }
   }
 
-  private handleDeath(e: Entity, killer: Entity | null): void {
+  private handleDeath(e: Entity, killer: Entity | null, equipmentProcDepth = 0): void {
     // Body moved to combat/damage.ts (C1). The moved copy routes its quest-credit
     // call through ctx.onMobKilledForQuests (points-at quest_credit, Q1).
-    handleDeathImpl(this.ctx, e, killer);
+    handleDeathImpl(this.ctx, e, killer, equipmentProcDepth);
   }
 
   grantXp(amount: number, meta: PlayerMeta = this.primary, opts?: { fromKill?: boolean }): void {
@@ -6875,11 +7083,26 @@ export class Sim {
     if (count < 1) return;
     const { meta } = r;
     const def = ITEMS[itemId];
+    const grantedInstance = sanitizeProceduralGrant(itemId, instance);
+    if (grantedInstance.procedural && count !== 1) {
+      throw new Error('A procedural item grant must contain exactly one unique copy');
+    }
+    assertProceduralUidAvailable(
+      {
+        inventory: meta.inventory,
+        bank: meta.bank.inventory,
+        buyback: meta.vendorBuyback,
+        equipmentInstance: meta.equipmentInstance,
+      },
+      grantedInstance,
+    );
     const stack = stackSizeOf(def);
     for (let i = 0; i < count; i++) {
       const mergeTarget = meta.inventory.find(
         (s) =>
-          s.itemId === itemId && s.count < stack && canStackInstancePayloads(s.instance, instance),
+          s.itemId === itemId &&
+          s.count < stack &&
+          canStackInstancePayloads(s.instance, grantedInstance),
       );
       if (mergeTarget) mergeTarget.count += 1;
       // The first pushed slot holds the caller's payload object (the shipped
@@ -6890,12 +7113,12 @@ export class Sim {
         meta.inventory.push({
           itemId,
           count: 1,
-          instance: i === 0 ? instance : cloneItemInstancePayload(instance),
+          instance: i === 0 ? grantedInstance : cloneItemInstancePayload(grantedInstance),
         });
     }
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
     // the static def quality for the quality-first marks.
-    deedsMod.markItemDiscovered(this.ctx, meta, itemId, instance.rolled?.quality);
+    deedsMod.markItemDiscovered(this.ctx, meta, itemId, grantedInstance);
     this.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -7046,12 +7269,16 @@ export class Sim {
     bagsMod.unequipBag(this.ctx, socket, pid);
   }
 
-  discardItem(itemId: string, count = 1, pid?: number): void {
-    items.discardItem(this.ctx, itemId, count, pid);
+  discardItem(itemId: string, count = 1, pidOrUid?: number | string, instanceUid?: string): void {
+    const pid = typeof pidOrUid === 'number' ? pidOrUid : undefined;
+    const uid = typeof pidOrUid === 'string' ? pidOrUid : instanceUid;
+    items.discardItem(this.ctx, itemId, count, pid, uid);
   }
 
-  equipItem(itemId: string, pid?: number): void {
-    items.equipItem(this.ctx, itemId, pid);
+  equipItem(itemId: string, pidOrUid?: number | string, instanceUid?: string): void {
+    const pid = typeof pidOrUid === 'number' ? pidOrUid : undefined;
+    const uid = typeof pidOrUid === 'string' ? pidOrUid : instanceUid;
+    items.equipItem(this.ctx, itemId, pid, undefined, uid);
   }
 
   // Manual bag order: the player dragged the stack at `from` onto the cell at `to`.
@@ -7062,8 +7289,15 @@ export class Sim {
   // Equip into the exact slot the player aimed at (the paperdoll drop target),
   // rather than letting the resolver pick. items.equipItem re-validates the slot
   // against the item, so this is a request, never a bypass.
-  equipItemToSlot(itemId: string, slot: EquipSlot, pid?: number): void {
-    items.equipItem(this.ctx, itemId, pid, slot);
+  equipItemToSlot(
+    itemId: string,
+    slot: EquipSlot,
+    pidOrUid?: number | string,
+    instanceUid?: string,
+  ): void {
+    const pid = typeof pidOrUid === 'number' ? pidOrUid : undefined;
+    const uid = typeof pidOrUid === 'string' ? pidOrUid : instanceUid;
+    items.equipItem(this.ctx, itemId, pid, slot, uid);
   }
 
   unequipItem(slot: EquipSlot, pid?: number): boolean {
@@ -7078,16 +7312,20 @@ export class Sim {
     items.buyItem(this.ctx, npcId, itemId, pid);
   }
 
-  sellItem(itemId: string, count = 1, pid?: number): void {
-    items.sellItem(this.ctx, itemId, count, pid);
+  sellItem(itemId: string, count = 1, pidOrUid?: number | string, instanceUid?: string): void {
+    const pid = typeof pidOrUid === 'number' ? pidOrUid : undefined;
+    const uid = typeof pidOrUid === 'string' ? pidOrUid : instanceUid;
+    items.sellItem(this.ctx, itemId, count, pid, uid);
   }
 
   sellAllJunk(pid?: number): void {
     items.sellAllJunk(this.ctx, pid);
   }
 
-  buyBackItem(itemId: string, pid?: number): void {
-    items.buyBackItem(this.ctx, itemId, pid);
+  buyBackItem(itemId: string, pidOrUid?: number | string, instanceUid?: string): void {
+    const pid = typeof pidOrUid === 'number' ? pidOrUid : undefined;
+    const uid = typeof pidOrUid === 'string' ? pidOrUid : instanceUid;
+    items.buyBackItem(this.ctx, itemId, pid, uid);
   }
 
   // Gather-node harvest (#1121): a thin delegate onto
@@ -7226,9 +7464,11 @@ export class Sim {
   // single-surface doctrine: no ctx.error toast, or the deny would print
   // twice); the payload change itself converges through the self inventory
   // mirror in both hosts.
-  unbindItem(itemId: string, pid?: number): void {
-    const result = unbindItemImpl(this.ctx, itemId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
+  unbindItem(itemId: string, instanceUidOrPid?: string | number, pid?: number): void {
+    const instanceUid = typeof instanceUidOrPid === 'string' ? instanceUidOrPid : undefined;
+    const resolvedPid = typeof instanceUidOrPid === 'number' ? instanceUidOrPid : pid;
+    const result = unbindItemImpl(this.ctx, itemId, resolvedPid, instanceUid);
+    const meta = this.players.get(resolvedPid ?? this.primaryId);
     this.emit({
       type: 'unbindResult',
       ok: result.ok,
@@ -7274,9 +7514,11 @@ export class Sim {
   // src/sim/professions/salvage.ts, resolved on the deterministic tick the
   // command arrives on, same shape as craftItem above. Stashes the outcome
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
-  salvageItem(itemId: string, pid?: number): void {
-    const result = salvageItemImpl(this.ctx, itemId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
+  salvageItem(itemId: string, instanceUidOrPid?: string | number, pid?: number): void {
+    const instanceUid = typeof instanceUidOrPid === 'string' ? instanceUidOrPid : undefined;
+    const resolvedPid = typeof instanceUidOrPid === 'number' ? instanceUidOrPid : pid;
+    const result = salvageItemImpl(this.ctx, itemId, resolvedPid, instanceUid);
+    const meta = this.players.get(resolvedPid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
     // Emit the pid-scoped, text-free outcome, same immediacy arm as
     // craftItem's craftResult: the online client mirrors it into lastSalvageResult
@@ -7307,9 +7549,11 @@ export class Sim {
 
   // Enchanting profession commands (IWorldProfessions): same thin-
   // delegate/stash-result/emit shape as salvageItem/craftItem above.
-  disenchantItem(itemId: string, pid?: number): void {
-    const result = disenchantItemImpl(this.ctx, itemId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
+  disenchantItem(itemId: string, instanceUidOrPid?: string | number, pid?: number): void {
+    const instanceUid = typeof instanceUidOrPid === 'string' ? instanceUidOrPid : undefined;
+    const resolvedPid = typeof instanceUidOrPid === 'number' ? instanceUidOrPid : pid;
+    const result = disenchantItemImpl(this.ctx, itemId, resolvedPid, instanceUid);
+    const meta = this.players.get(resolvedPid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
     this.emit({
       type: 'disenchantResult',
@@ -7343,10 +7587,21 @@ export class Sim {
     enchantId: string,
     slot?: EquipSlot,
     confirmReplace?: boolean,
+    instanceUidOrPid?: string | number,
     pid?: number,
   ): void {
-    const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
-    const meta = this.players.get(pid ?? this.primaryId);
+    const instanceUid = typeof instanceUidOrPid === 'string' ? instanceUidOrPid : undefined;
+    const resolvedPid = typeof instanceUidOrPid === 'number' ? instanceUidOrPid : pid;
+    const result = applyEnchantImpl(
+      this.ctx,
+      itemId,
+      enchantId,
+      resolvedPid,
+      slot,
+      confirmReplace,
+      instanceUid,
+    );
+    const meta = this.players.get(resolvedPid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
     this.emit({
       type: 'enchantResult',
@@ -8563,12 +8818,16 @@ export class Sim {
     tradeMod.tradeAccept(this.ctx, pid);
   }
 
-  tradeSetOffer(items: InvSlot[], copper: number, pid?: number): void {
+  tradeSetOffer(
+    items: import('../world_api').TradeOfferRequestItem[],
+    copper: number,
+    pid?: number,
+  ): void {
     tradeMod.tradeSetOffer(this.ctx, items, copper, pid);
   }
 
-  tradeConfirm(pid?: number): void {
-    tradeMod.tradeConfirm(this.ctx, pid);
+  tradeConfirm(pid?: number): tradeMod.TradeCompletion | null {
+    return tradeMod.tradeConfirm(this.ctx, pid);
   }
 
   tradeCancel(pid?: number): void {
@@ -8686,7 +8945,7 @@ export class Sim {
     subject: string,
     body: string,
     copper: number,
-    items: InvSlot[],
+    items: import('../world_api').MailAttachmentRequest[],
     pid?: number,
   ): void {
     this.postOffice.mailSend(to, subject, body, copper, items, pid);
@@ -8698,7 +8957,7 @@ export class Sim {
     subject: string,
     body: string,
     copper: number,
-    items: InvSlot[],
+    items: import('../world_api').MailAttachmentRequest[],
     pid?: number,
   ): void {
     this.postOffice.mailSendResolved(recipient, subject, body, copper, items, pid);

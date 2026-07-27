@@ -1547,6 +1547,11 @@ export const pl_PL: EnTranslations = {
       "itemAriaEnchanted": "{item}, ilość {count}, zaklęta kopia",
       "itemAriaBound": "{item}, ilość {count}, związana kopia",
       "itemAriaMasterwork": "{item}, ilość {count}, arcydzieło",
+      "itemAriaProcedural": "{item}, {rarity}, poziom przedmiotu {level}, liczba {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, poziom przedmiotu {level}, liczba {count}, arcydzieło",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, poziom przedmiotu {level}, liczba {count}, zaklęta kopia",
+      "itemAriaProceduralSigned": "{item}, {rarity}, poziom przedmiotu {level}, liczba {count}, kopia ze znakiem twórcy",
+      "itemAriaProceduralBound": "{item}, {rarity}, poziom przedmiotu {level}, liczba {count}, przypisana kopia",
       "filterGroupAria": "Filtruj torby według kategorii",
       "filterAll": "Wszystko",
       "filterWeapon": "Bronie",
@@ -2169,9 +2174,9 @@ export const pl_PL: EnTranslations = {
       "notReady": "Ten węzeł zasobu jeszcze nie odrósł dla ciebie.",
       "gatherLine": "Zbierasz: {name}.",
       "gatherLineQty": "Zbierasz: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Pozyskujesz: {name}.",
+      "harvestLineQty": "Pozyskujesz: {name} x{qty}.",
+      "harvestSpecimenLine": "Odzyskujesz również {name}.",
       "catchLine": "Wyciągasz: {name}",
       "biteLine": "Coś wzięło przynętę!",
       "gotAwayLine": "Uciekło.",
@@ -2353,7 +2358,7 @@ export const pl_PL: EnTranslations = {
       "empty": "Nie są jeszcze znane żadne przepisy.",
       "resultAria": "Craft {name}",
       "craftedToast": "Wykonane: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Wykonane: {name} x{qty}",
       "insufficientMaterials": "Nie masz na to materiałów.",
       "unknownRecipe": "Ten przepis nie istnieje.",
       "comboRequirementUnmet": "Nie masz obu wymaganych rzemiosł na wymaganym poziomie dla tego przepisu.",
@@ -2446,13 +2451,13 @@ export const pl_PL: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Rozbrajasz {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Odczarowujesz {item}, uzyskując {material}.",
+      "disenchantedYieldQty": "Odczarowujesz {item}, uzyskując {material} x{qty}.",
+      "disenchantedAlso": "Odzyskujesz również {material}.",
+      "disenchantedAlsoQty": "Odzyskujesz również {material} x{qty}.",
       "salvagedLine": "Odzyskujesz {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Odzyskujesz {material} z {item}.",
+      "salvagedYieldQty": "Odzyskujesz {material} x{qty} z {item}.",
       "enchantAppliedLine": "Zaklinasz {item} za pomocą {enchant}.",
       "notHeld": "Nie posiadasz tego przedmiotu.",
       "notDisenchantable": "Nie możesz tego rozbroić.",
@@ -2489,14 +2494,14 @@ export const pl_PL: EnTranslations = {
       "sameEnchant": "Ten przedmiot już ma to zaklęcie.",
       "replaceTag": "Zastępuje {enchant}",
       "sameEnchantTag": "Już zastosowane",
-      "plainTag": "Not enchanted",
+      "plainTag": "Bez zaklęcia",
       "replaceConfirmTitle": "Zastąpić zaklęcie na {item}?",
       "replaceConfirmBody": "Zastępuje {old} na {item} zaklęciem {new}.",
       "replaceConfirmNoRefund": "Stare zaklęcie zostaje zniszczone. Jego materiały nie są zwracane. Nie można tego cofnąć.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Zachowano: {kept}",
+      "replaceConfirmKeepsSigner": "Znak twórcy",
+      "replaceConfirmKeepsMasterwork": "Premia mistrzowska",
+      "replaceConfirmKeepsBond": "Więź zlecenia",
       "replaceConfirmCost": "Koszt: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Zastąp"
@@ -2568,6 +2573,12 @@ export const pl_PL: EnTranslations = {
       "lockedFor": "Zablokowany na około {minutes} min",
       "attunement": "Wymaga dostrojenia: {quest}",
       "heroicMarks": "Heroiczne Znaczniki: {count} na gracza",
+      "raidRewards": "Podgląd nagród z Nythraxis",
+      "raidSharedDrop": "Zwłoki ostatniego bossa dodają jeden wspólny przedmiot proceduralny, o który rajd może rzucić kośćmi.",
+      "raidRarityLine": "Rzadki {rare}% · epicki {epic}% · legendarny {legendary}%",
+      "raidItemLevels": "Poziom przedmiotu: rzadki {rare} · epicki {epic} · legendarny {legendary}",
+      "raidSignatures": "Charakterystyczne moce legendarne: {signatures}",
+      "raidForgedLegendary": "Moce heroicznych przedmiotów legendarnych są wykute w rajdzie i gwarantowane w górnej połowie ich zaprojektowanego zakresu.",
       "entrance": "Wejście: {zone}",
       "showOnMap": "Pokaż na mapie",
       "encounters": "Starcia",
@@ -6640,7 +6651,113 @@ export const pl_PL: EnTranslations = {
       "dps": "Obrażenia/s",
       "critChance": "Szansa na trafienie krytyczne",
       "dodge": "Unik",
-      "parry": "Parowanie"
+      "parry": "Parowanie",
+      "weaponMin": "Minimalne obrażenia broni",
+      "weaponMax": "Maksymalne obrażenia broni",
+      "weaponDps": "Obrażenia broni na sekundę",
+      "healthOnKill": "Zdrowie za zabicie",
+      "manaOnKill": "Mana za zabicie",
+      "blockValue": "Wartość bloku"
+    },
+    "procedural": {
+      "rollRangeAria": "Możliwe losowanie od {min} do {max}",
+      "advancedDetailsHint": "Przytrzymaj {key}, aby wyświetlić możliwe zakresy losowania.",
+      "powerRollPercent": "Losowanie mocy: {value}%",
+      "powerRollMilliseconds": "Losowanie mocy: {value} ms",
+      "powerRollResource": "Losowanie mocy: {value} zasobu",
+      "powerRollNumber": "Losowanie mocy: {value}",
+      "legendaryPower": "Legendarna moc",
+      "legendaryLimit": "Unikatowe wyposażenie: {count} legendarna moc",
+      "rarity": {
+        "common": "Pospolita",
+        "magic": "Magiczna",
+        "rare": "Rzadka",
+        "epic": "Epicka",
+        "legendary": "Legendarna",
+        "mythic": "Mityczna"
+      },
+      "nameFragment": {
+        "mighty": "Potężny",
+        "deft": "Zręczny",
+        "stalwart": "Niezłomny",
+        "sages": "Mędrca",
+        "spiritual": "Duchowy",
+        "of_focus": "Skupienia",
+        "of_striking": "Uderzenia",
+        "of_alacrity": "Żwawości",
+        "of_precision": "Precyzji",
+        "warded": "Chroniony",
+        "of_reaping": "Żniw",
+        "of_remembrance": "Pamięci"
+      },
+      "rareWord": {
+        "ashen": "Popielaty",
+        "blackfen": "Czarne Mokradło",
+        "doom": "Zguba",
+        "grave": "Grób",
+        "mire": "Trzęsawisko",
+        "storm": "Burza",
+        "thorn": "Cierń",
+        "wyrm": "Żmij",
+        "bite": "Ugryzienie",
+        "brand": "Piętno",
+        "promise": "Obietnica",
+        "thread": "Nić",
+        "vigil": "Czuwanie",
+        "ward": "Osłona",
+        "whisper": "Szept",
+        "oath": "Przysięga"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Korona Ostatniego Stosu",
+          "description": "Co trzeci Żarowy pocisk przypala wrogów w pobliżu celu."
+        },
+        "greyjaws_edge": {
+          "name": "Ostrze Szarej Szczęki",
+          "description": "Co trzecie trafienie bronią wywołuje krwawienie celu i odnawia trochę zasobu."
+        },
+        "hushwood_longbow": {
+          "name": "Długi Łuk Cichego Lasu",
+          "description": "Długie naciągnięcie lub Plugawy strzał mogą na krótko uciszyć cel."
+        },
+        "nightglass_fang": {
+          "name": "Kieł Nocnego Szkła",
+          "description": "Zabicie zapewnia krótki przypływ pośpiechu."
+        },
+        "ysoleis_vigil": {
+          "name": "Czuwanie Ysolei",
+          "description": "Leczenie krytyczne tworzy na krótko odnawiający obszar na ziemi."
+        },
+        "stormwake_idol": {
+          "name": "Idol Przebudzenia Burzy",
+          "description": "Co czwarty Łukowy pocisk przeskakuje na pobliskich wrogów."
+        },
+        "ashbinders_seal": {
+          "name": "Pieczęć Wiążącego Popioły",
+          "description": "Co czwarty Pocisk mroku oznacza cel, zwiększając otrzymywane przez niego obrażenia Cienia."
+        },
+        "dawnward_signet": {
+          "name": "Sygnet Straży Świtu",
+          "description": "Kojące Światło osłania odbiorcę tarczą równą części leczenia."
+        },
+        "feral_moonclasp": {
+          "name": "Klamra Dzikiego Księżyca",
+          "description": "Co trzeci Dziki pocisk odnawia główny zasób."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Dzwon Dziewiątego Uderzenia",
+          "description": "Co drugie zaklęcie zadające obrażenia rozbrzmiewa wokół celu."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Płaszcz Skradzionych Godzin",
+          "description": "Spadek poniżej 35% zdrowia zapewnia krótką osłonę obronną."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Buty Nieprzerwanej Drogi",
+          "description": "Przebycie 15 jardów zapewnia krótkie zwiększenie szybkości ruchu."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const pl_PL: EnTranslations = {
       "greed": "Chciwość",
       "pass": "Pasuj",
       "needAria": "Potrzeba na {item}",
+      "needUnavailable": "Potrzeba jest niedostępna, ponieważ twoja klasa nie może wyposażyć tego przedmiotu.",
+      "needUnavailablePower": "Potrzeba jest niedostępna, ponieważ ta legendarna moc jest przeznaczona dla innej klasy.",
       "greedAria": "Chciwość na {item}",
       "passAria": "Pasuj na {item}",
       "everyonePassed": "Wszyscy spasowali na {item}.",
@@ -9170,6 +9289,108 @@ export const pl_PL: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Rezonujące drewno"
+      },
+      "ashwood_staff": {
+        "name": "Jesionowa laska"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Płócienne owijacze Grobowego Przywoływacza"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Płócienny kaptur Grobowego Przywoływacza"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Płócienne nogawice Grobowego Przywoływacza"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Płócienny płaszcz Grobowego Przywoływacza"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Płócienna szata Grobowego Przywoływacza"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Płócienna szarfa Grobowego Przywoływacza"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Płócienne pantofle Grobowego Przywoływacza"
+      },
+      "gravecaller_focus": {
+        "name": "Fokus Grobowego Przywoływacza"
+      },
+      "gravecaller_pendant": {
+        "name": "Wisiorek Grobowego Przywoływacza"
+      },
+      "gravecaller_ring": {
+        "name": "Pierścień Grobowego Przywoływacza"
+      },
+      "gravecaller_wand": {
+        "name": "Różdżka Grobowego Przywoływacza"
+      },
+      "iron_broadsword": {
+        "name": "Żelazny pałasz"
+      },
+      "iron_flanged_mace": {
+        "name": "Żelazna buława kołnierzowa"
+      },
+      "mirefen_dirk": {
+        "name": "Sztylet z Mirefen"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Łuk myśliwski z Mirefen"
+      },
+      "mirefen_leather_belt": {
+        "name": "Skórzany pas z Mirefen"
+      },
+      "mirefen_leather_boots": {
+        "name": "Skórzane buty z Mirefen"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Skórzane rękawice z Mirefen"
+      },
+      "mirefen_leather_hood": {
+        "name": "Skórzany kaptur z Mirefen"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Skórzany kaftan z Mirefen"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Skórzane nogawice z Mirefen"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Skórzane naramienniki z Mirefen"
+      },
+      "thornpeak_bulwark": {
+        "name": "Bastion Thornpeak"
+      },
+      "thornpeak_crossbow": {
+        "name": "Kusza Thornpeak"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Kolczy napierśnik Thornpeak"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Kolcze rękawice Thornpeak"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Kolczy pas Thornpeak"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Kolczy hełm Thornpeak"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Kolcze nogawice Thornpeak"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Kolcze naramienniki Thornpeak"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Kolcze sabatony Thornpeak"
+      },
+      "thornpeak_polearm": {
+        "name": "Broń drzewcowa Thornpeak"
+      },
+      "thornpeak_war_axe": {
+        "name": "Topór bojowy Thornpeak"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

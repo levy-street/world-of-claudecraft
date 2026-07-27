@@ -134,7 +134,7 @@ function standAtMerchant(server: GameServer, pid: number): void {
 }
 
 describe('market collect indicator wire round-trip (mktU)', () => {
-  it('streams true after a sale (even away from the Merchant) and false after collecting', () => {
+  it('streams true after a sale (even away from the Merchant) and false after collecting', async () => {
     const server = new GameServer();
     const sellerWs = fakeWs();
     const buyerWs = fakeWs();
@@ -158,6 +158,7 @@ describe('market collect indicator wire round-trip (mktU)', () => {
     cmd(server, seller, { cmd: 'market_list', item: 'wolf_fang', count: 1, price: 200 });
     const listing = sim.marketListings.find((l: any) => !l.house && l.itemId === 'wolf_fang');
     expect(listing).toBeTruthy();
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
     // the seller walks far from the Merchant BEFORE the sale is broadcast: the
     // full market payload must drop off the wire while mktU still streams
@@ -165,6 +166,7 @@ describe('market collect indicator wire round-trip (mktU)', () => {
     e.pos = { ...e.pos, x: e.pos.x + 500, z: e.pos.z + 500 };
     e.prevPos = { ...e.pos };
     cmd(server, buyer, { cmd: 'market_buy', id: listing.id });
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
     sellerWs.sent.length = 0;
     broadcast(server);
@@ -177,6 +179,7 @@ describe('market collect indicator wire round-trip (mktU)', () => {
     // back at the Merchant, collecting clears the bit on the next snapshot
     standAtMerchant(server, seller.pid);
     cmd(server, seller, { cmd: 'market_collect' });
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
     expect(sim.players.get(seller.pid).copper).toBe(190); // 200 less the 5% cut
     sellerWs.sent.length = 0;
     broadcast(server);

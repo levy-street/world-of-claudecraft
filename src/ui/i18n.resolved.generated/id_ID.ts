@@ -1547,6 +1547,11 @@ export const id_ID: EnTranslations = {
       "itemAriaEnchanted": "{item}, jumlah {count}, salinan dimantrai",
       "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
+      "itemAriaProcedural": "{item}, {rarity}, level item {level}, jumlah {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, level item {level}, jumlah {count}, mahakarya",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, level item {level}, jumlah {count}, salinan terpesona",
+      "itemAriaProceduralSigned": "{item}, {rarity}, level item {level}, jumlah {count}, salinan bertanda pembuat",
+      "itemAriaProceduralBound": "{item}, {rarity}, level item {level}, jumlah {count}, salinan terikat",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -2169,9 +2174,9 @@ export const id_ID: EnTranslations = {
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Kamu memanen: {name}.",
+      "harvestLineQty": "Kamu memanen: {name} x{qty}.",
+      "harvestSpecimenLine": "Kamu juga memperoleh {name}.",
       "catchLine": "Kamu menarik: {name}",
       "biteLine": "Sesuatu menggigit umpannya!",
       "gotAwayLine": "Ikannya kabur.",
@@ -2353,7 +2358,7 @@ export const id_ID: EnTranslations = {
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Dibuat: {name} x{qty}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
       "unknownRecipe": "Resep itu tidak ada.",
       "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
@@ -2446,13 +2451,13 @@ export const id_ID: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Kamu menghancurkan pemantraan {item} menjadi {material}.",
+      "disenchantedYieldQty": "Kamu menghancurkan pemantraan {item} menjadi {material} x{qty}.",
+      "disenchantedAlso": "Kamu juga memperoleh kembali {material}.",
+      "disenchantedAlsoQty": "Kamu juga memperoleh kembali {material} x{qty}.",
       "salvagedLine": "Kamu menyalvasi {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Kamu membongkar {item} menjadi {material}.",
+      "salvagedYieldQty": "Kamu membongkar {item} menjadi {material} x{qty}.",
       "enchantAppliedLine": "Kamu memantrai {item} dengan {enchant}.",
       "notHeld": "Kamu tidak memiliki barang itu.",
       "notDisenchantable": "Kamu tidak bisa menghancurkan pemantraan itu.",
@@ -2489,14 +2494,14 @@ export const id_ID: EnTranslations = {
       "sameEnchant": "Barang itu sudah memiliki mantra itu.",
       "replaceTag": "Menggantikan {enchant}",
       "sameEnchantTag": "Sudah diterapkan",
-      "plainTag": "Not enchanted",
+      "plainTag": "Belum dimantrai",
       "replaceConfirmTitle": "Ganti mantra pada {item}?",
       "replaceConfirmBody": "Ini mengganti {old} pada {item} dengan {new}.",
       "replaceConfirmNoRefund": "Mantra lama dihancurkan. Bahannya tidak dikembalikan. Tindakan ini tidak dapat dibatalkan.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Dipertahankan: {kept}",
+      "replaceConfirmKeepsSigner": "Tanda pembuat",
+      "replaceConfirmKeepsMasterwork": "Bonus mahakarya",
+      "replaceConfirmKeepsBond": "Ikatan pesanan",
       "replaceConfirmCost": "Biaya: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ganti"
@@ -2568,6 +2573,12 @@ export const id_ID: EnTranslations = {
       "lockedFor": "Terkunci sekitar {minutes} menit",
       "attunement": "Memerlukan penyelarasan: {quest}",
       "heroicMarks": "Tanda Heroik: {count} per pemain",
+      "raidRewards": "Pratinjau hadiah Nythraxis",
+      "raidSharedDrop": "Mayat terakhir menambahkan satu item prosedural bersama untuk diperebutkan dalam raid.",
+      "raidRarityLine": "Langka {rare}% · Epik {epic}% · Legendaris {legendary}%",
+      "raidItemLevels": "Level item: Langka {rare} · Epik {epic} · Legendaris {legendary}",
+      "raidSignatures": "Kekuatan Legendaris khas: {signatures}",
+      "raidForgedLegendary": "Kekuatan Legendaris Heroik ditempa dalam raid dan dijamin berada di separuh atas rentang hasil rancangannya.",
       "entrance": "Pintu masuk: {zone}",
       "showOnMap": "Tampilkan di Peta",
       "encounters": "Pertemuan",
@@ -6640,7 +6651,113 @@ export const id_ID: EnTranslations = {
       "dps": "Kerusakan/detik",
       "critChance": "Peluang Kritis",
       "dodge": "Mengelak",
-      "parry": "Tangkis"
+      "parry": "Tangkis",
+      "weaponMin": "Kerusakan senjata minimum",
+      "weaponMax": "Kerusakan senjata maksimum",
+      "weaponDps": "Kerusakan senjata per detik",
+      "healthOnKill": "Kesehatan saat membunuh",
+      "manaOnKill": "Mana saat membunuh",
+      "blockValue": "Nilai tangkisan"
+    },
+    "procedural": {
+      "rollRangeAria": "Kemungkinan guliran dari {min} sampai {max}",
+      "advancedDetailsHint": "Tahan {key} untuk menampilkan kemungkinan rentang guliran.",
+      "powerRollPercent": "Guliran kekuatan: {value}%",
+      "powerRollMilliseconds": "Guliran kekuatan: {value} ms",
+      "powerRollResource": "Guliran kekuatan: {value} sumber daya",
+      "powerRollNumber": "Guliran kekuatan: {value}",
+      "legendaryPower": "Kekuatan Legendaris",
+      "legendaryLimit": "Unik dipakai: {count} kekuatan Legendaris",
+      "rarity": {
+        "common": "Umum",
+        "magic": "Magis",
+        "rare": "Langka",
+        "epic": "Epik",
+        "legendary": "Legendaris",
+        "mythic": "Mitologis"
+      },
+      "nameFragment": {
+        "mighty": "Perkasa",
+        "deft": "Tangkas",
+        "stalwart": "Teguh",
+        "sages": "Milik Sang Bijak",
+        "spiritual": "Rohani",
+        "of_focus": "Fokus",
+        "of_striking": "Serangan",
+        "of_alacrity": "Ketangkasan",
+        "of_precision": "Ketepatan",
+        "warded": "Terlindungi",
+        "of_reaping": "Penuaian",
+        "of_remembrance": "Kenangan"
+      },
+      "rareWord": {
+        "ashen": "Kelabu Abu",
+        "blackfen": "Rawa Hitam",
+        "doom": "Malapetaka",
+        "grave": "Makam",
+        "mire": "Rawa",
+        "storm": "Badai",
+        "thorn": "Duri",
+        "wyrm": "Naga",
+        "bite": "Gigitan",
+        "brand": "Cap",
+        "promise": "Janji",
+        "thread": "Benang",
+        "vigil": "Vigili",
+        "ward": "Perlindungan",
+        "whisper": "Bisikan",
+        "oath": "Sumpah"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Mahkota Tumpukan Api Terakhir",
+          "description": "Setiap Panah Bara ketiga membakar musuh di dekat target."
+        },
+        "greyjaws_edge": {
+          "name": "Mata Pedang Rahang Kelabu",
+          "description": "Setiap serangan senjata ketiga membuat target berdarah dan memulihkan sedikit sumber daya."
+        },
+        "hushwood_longbow": {
+          "name": "Busur Panjang Kayu Sunyi",
+          "description": "Tarikan Panjang atau Tembakan Bengis dapat membungkam target sejenak."
+        },
+        "nightglass_fang": {
+          "name": "Taring Kaca Malam",
+          "description": "Satu pembunuhan memberikan peningkatan singkat kecepatan serang."
+        },
+        "ysoleis_vigil": {
+          "name": "Vigili Ysolei",
+          "description": "Penyembuhan kritis menciptakan area pemulihan singkat di tanah."
+        },
+        "stormwake_idol": {
+          "name": "Berhala Bangkitnya Badai",
+          "description": "Setiap Sambaran Busur keempat melompat ke musuh di sekitar."
+        },
+        "ashbinders_seal": {
+          "name": "Segel Pengikat Abu",
+          "description": "Setiap Panah Suram keempat menandai target agar menerima tambahan kerusakan Bayangan."
+        },
+        "dawnward_signet": {
+          "name": "Cincin Meterai Penjaga Fajar",
+          "description": "Cahaya Pemulih melindungi penerimanya dengan perisai senilai sebagian penyembuhan."
+        },
+        "feral_moonclasp": {
+          "name": "Pengait Bulan Liar",
+          "description": "Setiap Panah Liar ketiga memulihkan sumber daya utama."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Lonceng Dentang Kesembilan",
+          "description": "Setiap mantra perusak kedua berdentang di sekitar target."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Mantel Jam Curian",
+          "description": "Turun di bawah 35% kesehatan memberikan perlindungan defensif singkat."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Sepatu Jalan Tak Terputus",
+          "description": "Bergerak 15 yard memberikan peningkatan singkat kecepatan gerak."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const id_ID: EnTranslations = {
       "greed": "Tamak",
       "pass": "Lewati",
       "needAria": "Butuh untuk {item}",
+      "needUnavailable": "Pilihan Butuh tidak tersedia karena kelasmu tidak dapat memakai barang ini.",
+      "needUnavailablePower": "Pilihan Butuh tidak tersedia karena kekuatan Legendaris ini terbatas untuk kelas lain.",
       "greedAria": "Tamak untuk {item}",
       "passAria": "Lewati {item}",
       "everyonePassed": "Semua orang melewatkan {item}.",
@@ -9170,6 +9289,108 @@ export const id_ID: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Kayu Beresonansi"
+      },
+      "ashwood_staff": {
+        "name": "Tongkat kayu ash"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Kain pembungkus tangan Pemanggil Makam"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Tudung kain Pemanggil Makam"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Pelindung kaki kain Pemanggil Makam"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Mantel kain Pemanggil Makam"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Jubah kain Pemanggil Makam"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Selempang kain Pemanggil Makam"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Selop kain Pemanggil Makam"
+      },
+      "gravecaller_focus": {
+        "name": "Fokus Pemanggil Makam"
+      },
+      "gravecaller_pendant": {
+        "name": "Liontin Pemanggil Makam"
+      },
+      "gravecaller_ring": {
+        "name": "Cincin Pemanggil Makam"
+      },
+      "gravecaller_wand": {
+        "name": "Tongkat sihir Pemanggil Makam"
+      },
+      "iron_broadsword": {
+        "name": "Pedang lebar besi"
+      },
+      "iron_flanged_mace": {
+        "name": "Gada besi berflensa"
+      },
+      "mirefen_dirk": {
+        "name": "Belati Mirefen"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Busur berburu Mirefen"
+      },
+      "mirefen_leather_belt": {
+        "name": "Sabuk kulit Mirefen"
+      },
+      "mirefen_leather_boots": {
+        "name": "Sepatu bot kulit Mirefen"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Sarung tangan kulit Mirefen"
+      },
+      "mirefen_leather_hood": {
+        "name": "Tudung kulit Mirefen"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Jaket kulit Mirefen"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Pelindung kaki kulit Mirefen"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Pelindung bahu kulit Mirefen"
+      },
+      "thornpeak_bulwark": {
+        "name": "Benteng Thornpeak"
+      },
+      "thornpeak_crossbow": {
+        "name": "Busur silang Thornpeak"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Zirah dada rantai Thornpeak"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Sarung tangan rantai Thornpeak"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Korset rantai Thornpeak"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Helm rantai Thornpeak"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Pelindung kaki rantai Thornpeak"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Pelindung bahu rantai Thornpeak"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Sepatu zirah rantai Thornpeak"
+      },
+      "thornpeak_polearm": {
+        "name": "Senjata galah Thornpeak"
+      },
+      "thornpeak_war_axe": {
+        "name": "Kapak perang Thornpeak"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

@@ -10,6 +10,7 @@
 // variety; art is limited so daggers/maces still share a model across a few items.
 export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // ---- swords (sword_a..g + the adv set; legendary/epic kept distinct) --------
+  iron_broadsword: 'sword_b',
   worn_sword: 'sword_a',
   eastbrook_arming_sword: 'sword_b',
   ironedge_longsword: 'sword_b', // crafted (weaponcrafting tier 2)
@@ -35,6 +36,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   direfang_greatblade: 'adv_sword_2handed_color', // EPIC: Nythraxis hunter 2H
 
   // ---- daggers (only 4 models for ~21 daggers; spread as evenly as art allows)-
+  mirefen_dirk: 'dagger_b',
   rusty_dagger: 'dagger_a',
   vale_carving_knife: 'dagger_a',
   mirefen_skinner: 'dagger_a',
@@ -63,6 +65,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
+  ashwood_staff: 'staff_b',
   gnarled_staff: 'staff_a',
   hickory_shortstaff: 'staff_a',
   fenreed_staff: 'staff_a',
@@ -88,6 +91,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   lunar_tide_greatstaff: 'adv_staff', // EPIC: Heroic Ysolei staff
 
   // ---- wands (1H caster: scepters / rods / foci) ------------------------------
+  gravecaller_wand: 'wand_a',
   drowned_tide_scepter: 'wand_a',
   drownedmoon_scepter: 'wand_b',
   palecoil_rod: 'adv_wand',
@@ -97,6 +101,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   scepter_of_the_deathless_court: 'adv_wand', // EPIC: Nythraxis raid scepter
 
   // ---- maces (only 4 hammer models for ~9 maces) -----------------------------
+  iron_flanged_mace: 'hammer_b',
   training_mace: 'hammer_a',
   bronzework_mace: 'hammer_a',
   copper_flanged_mace: 'hammer_a', // crafted (weaponcrafting tier 1)
@@ -115,6 +120,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   wildsoul_maul: 'hammer_d', // feral ladder, heroic-only ilvl 31 rung
 
   // ---- axes (axe_a..d + adv axes) --------------------------------------------
+  thornpeak_war_axe: 'axe_b',
   rusty_hatchet: 'axe_a',
   copper_bearded_axe: 'axe_a', // crafted (weaponcrafting tier 1)
   drogmars_skullcleaver: 'axe_b',
@@ -127,7 +133,12 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   tunnelkings_spade: 'adv_axe_2handed',
 
   // ---- polearms --------------------------------------------------------------
+  thornpeak_polearm: 'spear_a',
   fen_reaver_glaive: 'scythe', // "Reaver" -> reaper scythe
   tidereaver_gaff: 'spear_a', // a gaff is a hooked spear
   ironbark_boar_spear: 'spear_a', // crafted 2H spear
+
+  // ---- hunter ranged weapons --------------------------------------------------
+  mirefen_hunting_bow: 'fletcher_s_guild_bow',
+  thornpeak_crossbow: 'simple_farmhand_crossbow',
 };

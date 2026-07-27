@@ -211,7 +211,7 @@ function applySnap(client: ClientWorld, snap: unknown): void {
 // Arm 1: the two-session bind-on-trade arc over a live GameServer.
 // ---------------------------------------------------------------------------
 describe('online bind-on-trade arc (two sessions, live GameServer)', () => {
-  it('first trade stamps the recipient, the reverse trade is refused, and A keeps an offerable copy', () => {
+  it('first trade stamps the recipient, the reverse trade is refused, and A keeps an offerable copy', async () => {
     const server = new GameServer();
     const fcA = fakeWs();
     const fcB = fakeWs();
@@ -238,6 +238,7 @@ describe('online bind-on-trade arc (two sessions, live GameServer)', () => {
     cmd(server, a, { cmd: 'trade_confirm' });
     cmd(server, b, { cmd: 'trade_confirm' });
     routeTick(server);
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
     // The stamp landed on B's granted copy (boundTo === B), and A keeps exactly
     // one still-unstamped armed copy.
@@ -284,6 +285,7 @@ describe('online bind-on-trade arc (two sessions, live GameServer)', () => {
     cmd(server, b, { cmd: 'trade_confirm' });
     cmd(server, a, { cmd: 'trade_confirm' });
     routeTick(server);
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
     expect(server.sim.countItem(SECONDARY, b.pid)).toBe(1);
     expect(server.sim.countItem(SECONDARY, a.pid)).toBe(1); // still just A's own unbound copy
 

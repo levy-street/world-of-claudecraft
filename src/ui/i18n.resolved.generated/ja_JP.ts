@@ -1547,6 +1547,11 @@ export const ja_JP: EnTranslations = {
       "itemAriaEnchanted": "{item}、数量 {count}、エンチャント済みの品",
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
+      "itemAriaProcedural": "{item}、{rarity}、アイテムレベル {level}、数量 {count}",
+      "itemAriaProceduralMasterwork": "{item}、{rarity}、アイテムレベル {level}、数量 {count}、傑作",
+      "itemAriaProceduralEnchanted": "{item}、{rarity}、アイテムレベル {level}、数量 {count}、エンチャント済み",
+      "itemAriaProceduralSigned": "{item}、{rarity}、アイテムレベル {level}、数量 {count}、製作者の署名入り",
+      "itemAriaProceduralBound": "{item}、{rarity}、アイテムレベル {level}、数量 {count}、帰属済み",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -2568,6 +2573,12 @@ export const ja_JP: EnTranslations = {
       "lockedFor": "約 {minutes} 分ロック中",
       "attunement": "前提クエストが必要：{quest}",
       "heroicMarks": "ヒロイックの証：1 人 {count} 個",
+      "raidRewards": "ニスラクシス報酬プレビュー",
+      "raidSharedDrop": "最後の死体には、レイド全員でロールする共有の手続き生成アイテムが1個追加されます。",
+      "raidRarityLine": "レア {rare}% · エピック {epic}% · レジェンダリー {legendary}%",
+      "raidItemLevels": "アイテムレベル：レア {rare} · エピック {epic} · レジェンダリー {legendary}",
+      "raidSignatures": "固有レジェンダリー威力：{signatures}",
+      "raidForgedLegendary": "英雄レジェンダリーの威力はレイド鍛造となり、設定されたロール範囲の上半分が保証されます。",
       "entrance": "入口：{zone}",
       "showOnMap": "マップに表示",
       "encounters": "ボス戦",
@@ -6640,7 +6651,113 @@ export const ja_JP: EnTranslations = {
       "dps": "秒間ダメージ",
       "critChance": "クリティカル率",
       "dodge": "回避",
-      "parry": "受け流し"
+      "parry": "受け流し",
+      "weaponMin": "武器の最小ダメージ",
+      "weaponMax": "武器の最大ダメージ",
+      "weaponDps": "武器の秒間ダメージ",
+      "healthOnKill": "撃破時に体力回復",
+      "manaOnKill": "撃破時にマナ回復",
+      "blockValue": "ブロック値"
+    },
+    "procedural": {
+      "rollRangeAria": "変動範囲：{min}から{max}",
+      "advancedDetailsHint": "{key} を押している間、変動範囲を表示します。",
+      "powerRollPercent": "パワーの変動値：{value}%",
+      "powerRollMilliseconds": "パワーの変動値：{value} ms",
+      "powerRollResource": "パワーの変動値：{value} リソース",
+      "powerRollNumber": "パワーの変動値：{value}",
+      "legendaryPower": "レジェンダリーパワー",
+      "legendaryLimit": "ユニーク装備：レジェンダリーパワー {count} 個",
+      "rarity": {
+        "common": "コモン",
+        "magic": "マジック",
+        "rare": "レア",
+        "epic": "エピック",
+        "legendary": "レジェンダリー",
+        "mythic": "ミシック"
+      },
+      "nameFragment": {
+        "mighty": "強力な",
+        "deft": "巧みな",
+        "stalwart": "堅牢な",
+        "sages": "賢者の",
+        "spiritual": "霊妙な",
+        "of_focus": "集中",
+        "of_striking": "強打",
+        "of_alacrity": "迅速",
+        "of_precision": "精密",
+        "warded": "守護された",
+        "of_reaping": "刈り取り",
+        "of_remembrance": "追憶"
+      },
+      "rareWord": {
+        "ashen": "灰燼",
+        "blackfen": "黒沼",
+        "doom": "破滅",
+        "grave": "墓",
+        "mire": "沼",
+        "storm": "嵐",
+        "thorn": "棘",
+        "wyrm": "竜",
+        "bite": "牙痕",
+        "brand": "烙印",
+        "promise": "約束",
+        "thread": "糸",
+        "vigil": "見張り",
+        "ward": "護符",
+        "whisper": "囁き",
+        "oath": "誓い"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "最後の葬火の冠",
+          "description": "ファイアボールを3回使用するごとに、対象の周囲の敵を焼きます。"
+        },
+        "greyjaws_edge": {
+          "name": "灰顎の刃",
+          "description": "武器攻撃が3回命中するごとに、対象を出血させ、主リソースを少量回復します。"
+        },
+        "hushwood_longbow": {
+          "name": "静寂の森の長弓",
+          "description": "エイムショットまたはアーケインショットは、対象を短時間沈黙させることがあります。"
+        },
+        "nightglass_fang": {
+          "name": "夜硝子の牙",
+          "description": "敵を倒すと、短時間ヘイストが上昇します。"
+        },
+        "ysoleis_vigil": {
+          "name": "イソレイの見張り",
+          "description": "クリティカル回復が発生すると、短時間持続する回復エリアを作り出します。"
+        },
+        "stormwake_idol": {
+          "name": "嵐呼びの偶像",
+          "description": "ライトニングボルトを4回使用するごとに、近くの敵へ連鎖します。"
+        },
+        "ashbinders_seal": {
+          "name": "灰縛りの印章",
+          "description": "シャドウボルトを4回使用するごとに対象へ印を付け、追加の暗黒ダメージを与えます。"
+        },
+        "dawnward_signet": {
+          "name": "暁守りの印章",
+          "description": "ホーリーライトは、回復量の一部に相当するシールドを対象に付与します。"
+        },
+        "feral_moonclasp": {
+          "name": "野生の月留め",
+          "description": "ムーンファイアを3回使用するごとに、主リソースを回復します。"
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "九度目の鐘",
+          "description": "ダメージ呪文を2回使うごとに、対象の周囲で鐘が鳴ります。"
+        },
+        "mantle_of_borrowed_time": {
+          "name": "奪われた時のマント",
+          "description": "体力が35%未満になると、短時間持続する防護の結界を得ます。"
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "果てなき道のブーツ",
+          "description": "15ヤード移動すると、移動速度が短時間上昇します。"
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const ja_JP: EnTranslations = {
       "greed": "強欲",
       "pass": "パス",
       "needAria": "{item}を必要",
+      "needUnavailable": "あなたのクラスではこのアイテムを装備できないため、「必要」は選択できません。",
+      "needUnavailablePower": "このレジェンダリー能力は別のクラス専用のため、「必要」を選択できません。",
       "greedAria": "{item}を強欲",
       "passAria": "{item}をパス",
       "everyonePassed": "全員が{item}をパスしました。",
@@ -9170,6 +9289,108 @@ export const ja_JP: EnTranslations = {
       },
       "resonant_timber": {
         "name": "共鳴の木材"
+      },
+      "ashwood_staff": {
+        "name": "トネリコの杖"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "墓呼びの布手袋"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "墓呼びの布頭巾"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "墓呼びの布脚衣"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "墓呼びの布肩衣"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "墓呼びの布装束"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "墓呼びの布帯"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "墓呼びの布靴"
+      },
+      "gravecaller_focus": {
+        "name": "墓呼びの焦点具"
+      },
+      "gravecaller_pendant": {
+        "name": "墓呼びの首飾り"
+      },
+      "gravecaller_ring": {
+        "name": "墓呼びの指輪"
+      },
+      "gravecaller_wand": {
+        "name": "墓呼びの魔杖"
+      },
+      "iron_broadsword": {
+        "name": "鉄の大剣"
+      },
+      "iron_flanged_mace": {
+        "name": "鉄のフランジメイス"
+      },
+      "mirefen_dirk": {
+        "name": "泥沼の短剣"
+      },
+      "mirefen_hunting_bow": {
+        "name": "泥沼の狩猟弓"
+      },
+      "mirefen_leather_belt": {
+        "name": "泥沼の革帯"
+      },
+      "mirefen_leather_boots": {
+        "name": "泥沼の革ブーツ"
+      },
+      "mirefen_leather_gloves": {
+        "name": "泥沼の革手袋"
+      },
+      "mirefen_leather_hood": {
+        "name": "泥沼の革頭巾"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "泥沼の革胴衣"
+      },
+      "mirefen_leather_leggings": {
+        "name": "泥沼の革脚衣"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "泥沼の革肩当て"
+      },
+      "thornpeak_bulwark": {
+        "name": "茨峰の防壁"
+      },
+      "thornpeak_crossbow": {
+        "name": "茨峰のクロスボウ"
+      },
+      "thornpeak_mail_chest": {
+        "name": "茨峰の鎖帷子"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "茨峰の鎖籠手"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "茨峰の鎖帯"
+      },
+      "thornpeak_mail_helm": {
+        "name": "茨峰の鎖兜"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "茨峰の鎖脚甲"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "茨峰の鎖肩当て"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "茨峰の鎖鉄靴"
+      },
+      "thornpeak_polearm": {
+        "name": "茨峰の長柄武器"
+      },
+      "thornpeak_war_axe": {
+        "name": "茨峰の戦斧"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

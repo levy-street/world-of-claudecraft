@@ -25,6 +25,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { dungeonFinalBossInstance } from '../instances/dungeons';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
@@ -101,11 +102,13 @@ export function applyHeal(
   // can suppress either source of rng independently without bypassing normal
   // healing, threat, absorbs, or emitted combat text.
   canTriggerWeaponProcs = true,
+  equipmentProcDepth = 0,
   // Returns the effective heal applied (post-crit, post-mult, post-overheal-clamp,
   // the same number emitted). Callers that ignore it are unaffected; Power Echo
   // reads it to repeat a direct heal at a fraction of the resolved amount.
 ): number {
   if (target.dead) return 0;
+  const healthBefore = target.hp;
   const crit = canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
   let healed = Math.round(
     amount *
@@ -130,6 +133,26 @@ export function applyHeal(
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   if (canTriggerWeaponProcs) runWeaponProcs(ctx, source, target, 'heal');
+  if (healed > 0 && source.kind === 'player') {
+    ctx.triggerEquipmentEffects(source, {
+      kind: 'heal',
+      targetId: target.id,
+      abilityId: abilityId ?? undefined,
+      critical: crit,
+      amount: healed,
+      procDepth: equipmentProcDepth,
+    });
+  }
+  if (healed > 0 && target.kind === 'player') {
+    ctx.triggerEquipmentEffects(target, {
+      kind: 'health_changed',
+      targetId: target.id,
+      healthBefore,
+      healthAfter: target.hp,
+      maxHealth: target.maxHp,
+      procDepth: equipmentProcDepth,
+    });
+  }
   return healed;
 }
 
@@ -151,7 +174,10 @@ export function healingThreat(
   }
   if (aware.length === 0) return;
   const per = total / aware.length;
-  for (const m of aware) addThreat(m, source.id, per);
+  for (const m of aware) {
+    addThreat(m, source.id, per);
+    if (dungeonFinalBossInstance(ctx, m)) m.bossDamagers.add(source.id);
+  }
 }
 
 /** True when a hate-table entry belongs to the healed entity or its pet. */

@@ -1547,6 +1547,11 @@ export const pt_BR: EnTranslations = {
       "itemAriaEnchanted": "{item}, quantidade {count}, cópia encantada",
       "itemAriaBound": "{item}, quantidade {count}, cópia vinculada",
       "itemAriaMasterwork": "{item}, quantidade {count}, obra-prima",
+      "itemAriaProcedural": "{item}, {rarity}, nível do item {level}, quantidade {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, nível do item {level}, quantidade {count}, obra-prima",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, nível do item {level}, quantidade {count}, cópia encantada",
+      "itemAriaProceduralSigned": "{item}, {rarity}, nível do item {level}, quantidade {count}, cópia marcada pelo criador",
+      "itemAriaProceduralBound": "{item}, {rarity}, nível do item {level}, quantidade {count}, cópia vinculada",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
@@ -2169,9 +2174,9 @@ export const pt_BR: EnTranslations = {
       "notReady": "Este nó de recursos ainda não se regenerou para você.",
       "gatherLine": "Você coleta: {name}.",
       "gatherLineQty": "Você coleta: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Você colhe: {name}.",
+      "harvestLineQty": "Você colhe: {name} x{qty}.",
+      "harvestSpecimenLine": "Você também recupera {name}.",
       "catchLine": "Você recolhe: {name}",
       "biteLine": "Algo morde a isca!",
       "gotAwayLine": "Ele escapou.",
@@ -2353,7 +2358,7 @@ export const pt_BR: EnTranslations = {
       "empty": "Nenhuma receita conhecida ainda.",
       "resultAria": "Artesanato {name}",
       "craftedToast": "Feito: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Feito: {name} x{qty}",
       "insufficientMaterials": "Você não tem os materiais para isso.",
       "unknownRecipe": "Essa receita não existe.",
       "comboRequirementUnmet": "Você não possui os dois ofícios exigidos no nível necessário para essa receita.",
@@ -2446,13 +2451,13 @@ export const pt_BR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Você desencanta {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Você desencanta {item} e obtém {material}.",
+      "disenchantedYieldQty": "Você desencanta {item} e obtém {material} x{qty}.",
+      "disenchantedAlso": "Você também recupera {material}.",
+      "disenchantedAlsoQty": "Você também recupera {material} x{qty}.",
       "salvagedLine": "Você recupera {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Você desmonta {item} e obtém {material}.",
+      "salvagedYieldQty": "Você desmonta {item} e obtém {material} x{qty}.",
       "enchantAppliedLine": "Você encanta {item} com {enchant}.",
       "notHeld": "Você não tem esse item.",
       "notDisenchantable": "Você não pode desencantar isso.",
@@ -2489,14 +2494,14 @@ export const pt_BR: EnTranslations = {
       "sameEnchant": "Esse item já tem esse encantamento.",
       "replaceTag": "Substitui {enchant}",
       "sameEnchantTag": "Já aplicado",
-      "plainTag": "Not enchanted",
+      "plainTag": "Sem encantamento",
       "replaceConfirmTitle": "Substituir o encantamento de {item}?",
       "replaceConfirmBody": "Isso substitui {old} em {item} por {new}.",
       "replaceConfirmNoRefund": "O encantamento antigo é destruído. Os materiais dele não são reembolsados. Não pode ser desfeito.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Mantido: {kept}",
+      "replaceConfirmKeepsSigner": "Marca do artesão",
+      "replaceConfirmKeepsMasterwork": "Bônus de obra-prima",
+      "replaceConfirmKeepsBond": "Vínculo de encomenda",
       "replaceConfirmCost": "Custo: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Substituir"
@@ -2568,6 +2573,12 @@ export const pt_BR: EnTranslations = {
       "lockedFor": "Bloqueado por cerca de {minutes} min",
       "attunement": "Requer sintonia: {quest}",
       "heroicMarks": "Marcas Heroicas: {count} por jogador",
+      "raidRewards": "Prévia das recompensas de Nythraxis",
+      "raidSharedDrop": "O cadáver do chefe final adiciona um item procedural compartilhado para a raide disputar em uma rolagem.",
+      "raidRarityLine": "Raro {rare}% · Épico {epic}% · Lendário {legendary}%",
+      "raidItemLevels": "Nível do item: Raro {rare} · Épico {epic} · Lendário {legendary}",
+      "raidSignatures": "Poderes Lendários distintivos: {signatures}",
+      "raidForgedLegendary": "Os poderes Lendários Heroicos são forjados em raide e têm rolagem garantida na metade superior do intervalo definido.",
       "entrance": "Entrada: {zone}",
       "showOnMap": "Mostrar no Mapa",
       "encounters": "Encontros",
@@ -6640,7 +6651,113 @@ export const pt_BR: EnTranslations = {
       "dps": "Dano/s",
       "critChance": "Chance crítica",
       "dodge": "Esquiva",
-      "parry": "Aparar"
+      "parry": "Aparar",
+      "weaponMin": "Dano mínimo da arma",
+      "weaponMax": "Dano máximo da arma",
+      "weaponDps": "Dano de arma por segundo",
+      "healthOnKill": "Vida ao matar",
+      "manaOnKill": "Mana ao matar",
+      "blockValue": "Valor de bloqueio"
+    },
+    "procedural": {
+      "rollRangeAria": "Rolagem possível de {min} a {max}",
+      "advancedDetailsHint": "Segure {key} para mostrar os intervalos de rolagem possíveis.",
+      "powerRollPercent": "Rolagem de poder: {value}%",
+      "powerRollMilliseconds": "Rolagem de poder: {value} ms",
+      "powerRollResource": "Rolagem de poder: {value} de recurso",
+      "powerRollNumber": "Rolagem de poder: {value}",
+      "legendaryPower": "Poder lendário",
+      "legendaryLimit": "Único equipado: {count} poder lendário",
+      "rarity": {
+        "common": "Comum",
+        "magic": "Mágico",
+        "rare": "Raro",
+        "epic": "Épico",
+        "legendary": "Lendário",
+        "mythic": "Mítico"
+      },
+      "nameFragment": {
+        "mighty": "Poderoso",
+        "deft": "Hábil",
+        "stalwart": "Resoluto",
+        "sages": "do Sábio",
+        "spiritual": "Espiritual",
+        "of_focus": "do Foco",
+        "of_striking": "do Golpe",
+        "of_alacrity": "da Presteza",
+        "of_precision": "da Precisão",
+        "warded": "Protegido",
+        "of_reaping": "da Colheita",
+        "of_remembrance": "da Lembrança"
+      },
+      "rareWord": {
+        "ashen": "Cinzento",
+        "blackfen": "Pântano Negro",
+        "doom": "Perdição",
+        "grave": "Túmulo",
+        "mire": "Lamaçal",
+        "storm": "Tempestade",
+        "thorn": "Espinho",
+        "wyrm": "Serpe",
+        "bite": "Mordida",
+        "brand": "Marca",
+        "promise": "Promessa",
+        "thread": "Fio",
+        "vigil": "Vigília",
+        "ward": "Proteção",
+        "whisper": "Sussurro",
+        "oath": "Juramento"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Coroa da Última Pira",
+          "description": "Cada terceiro Raio de Brasa incendeia os inimigos próximos do alvo."
+        },
+        "greyjaws_edge": {
+          "name": "Gume de Maxilacinzento",
+          "description": "Cada terceiro acerto com arma faz o alvo sangrar e restaura um pouco de recurso."
+        },
+        "hushwood_longbow": {
+          "name": "Arco Longo da Mata Silente",
+          "description": "Puxada Longa ou Tiro Vil podem silenciar brevemente o alvo."
+        },
+        "nightglass_fang": {
+          "name": "Presa de Vidro Noturno",
+          "description": "Uma morte concede um breve aumento de aceleração."
+        },
+        "ysoleis_vigil": {
+          "name": "Vigília de Ysolei",
+          "description": "Uma cura crítica cria brevemente uma área restauradora no chão."
+        },
+        "stormwake_idol": {
+          "name": "Ídolo do Despertar da Tempestade",
+          "description": "Cada quarto Raio em Arco salta para inimigos próximos."
+        },
+        "ashbinders_seal": {
+          "name": "Selo do Vinculacinzas",
+          "description": "Cada quarto Raio Lúgubre marca o alvo para receber dano de Sombra adicional."
+        },
+        "dawnward_signet": {
+          "name": "Sinete da Alvorada",
+          "description": "Luz Restauradora protege o alvo com um escudo equivalente a uma parte da cura."
+        },
+        "feral_moonclasp": {
+          "name": "Fecho da Lua Feral",
+          "description": "Cada terceiro Raio Selvagem restaura o recurso primário."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Sino do Nono Toque",
+          "description": "Cada segundo feitiço de dano ressoa ao redor do alvo."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Manto das Horas Roubadas",
+          "description": "Ficar abaixo de 35% de vida concede uma breve proteção defensiva."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Botas da Estrada Inquebrável",
+          "description": "Percorrer 15 jardas concede um breve aumento de velocidade de movimento."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{kind} {quality}",
@@ -6816,6 +6933,8 @@ export const pt_BR: EnTranslations = {
       "greed": "Ganância",
       "pass": "Passar",
       "needAria": "Necessidade por {item}",
+      "needUnavailable": "Necessidade está indisponível porque sua classe não pode equipar este item.",
+      "needUnavailablePower": "Necessidade está indisponível porque este poder lendário é restrito a outra classe.",
       "greedAria": "Ganância por {item}",
       "passAria": "Passar em {item}",
       "everyonePassed": "Todos passaram em {item}.",
@@ -9170,6 +9289,108 @@ export const pt_BR: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Madeira Ressonante"
+      },
+      "ashwood_staff": {
+        "name": "Cajado de freixo"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Munhequeiras de tecido do Chamador de Túmulos"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Capuz de tecido do Chamador de Túmulos"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Calças de tecido do Chamador de Túmulos"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Manto de tecido do Chamador de Túmulos"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Vestes de tecido do Chamador de Túmulos"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Faixa de tecido do Chamador de Túmulos"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Sapatilhas de tecido do Chamador de Túmulos"
+      },
+      "gravecaller_focus": {
+        "name": "Foco do Chamador de Túmulos"
+      },
+      "gravecaller_pendant": {
+        "name": "Pingente do Chamador de Túmulos"
+      },
+      "gravecaller_ring": {
+        "name": "Anel do Chamador de Túmulos"
+      },
+      "gravecaller_wand": {
+        "name": "Varinha do Chamador de Túmulos"
+      },
+      "iron_broadsword": {
+        "name": "Espadão de ferro"
+      },
+      "iron_flanged_mace": {
+        "name": "Maça flangeada de ferro"
+      },
+      "mirefen_dirk": {
+        "name": "Punhal de Mirefen"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Arco de caça de Mirefen"
+      },
+      "mirefen_leather_belt": {
+        "name": "Cinto de couro de Mirefen"
+      },
+      "mirefen_leather_boots": {
+        "name": "Botas de couro de Mirefen"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Luvas de couro de Mirefen"
+      },
+      "mirefen_leather_hood": {
+        "name": "Capuz de couro de Mirefen"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Gibão de couro de Mirefen"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Calças de couro de Mirefen"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Ombreiras de couro de Mirefen"
+      },
+      "thornpeak_bulwark": {
+        "name": "Baluarte de Thornpeak"
+      },
+      "thornpeak_crossbow": {
+        "name": "Besta de Thornpeak"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Peitoral de malha de Thornpeak"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Manoplas de malha de Thornpeak"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Cinturão de malha de Thornpeak"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Elmo de malha de Thornpeak"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Guarda-pernas de malha de Thornpeak"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Espaldeiras de malha de Thornpeak"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Escarpes de malha de Thornpeak"
+      },
+      "thornpeak_polearm": {
+        "name": "Arma de haste de Thornpeak"
+      },
+      "thornpeak_war_axe": {
+        "name": "Machado de guerra de Thornpeak"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

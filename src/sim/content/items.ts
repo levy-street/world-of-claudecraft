@@ -775,6 +775,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
   },
+
   raw_mirror_trout: {
     id: 'raw_mirror_trout',
     name: 'Raw Mirror Trout',

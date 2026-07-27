@@ -10,7 +10,7 @@
 
 import { ABILITIES, ITEMS } from '../sim/data';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
-import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
+import { professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
 export { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
@@ -3968,13 +3968,51 @@ export function abilityImageUrl(id: string): string | null {
 // Served for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Every real non-weapon
 // item must ship a WebP: the derive loop below adds every non-weapon ITEMS id, so a new item
 // without art reds the gate instead of regressing to the procedural compositor. Weapons keep
-// their rendered-model thumbnails via WEAPON_ICON_DIR; procedural item recipes remain available
-// only for UI fallbacks and development-time unknown ids.
+// their rendered-model thumbnails via WEAPON_ICON_DIR, except the 34 Procedural Loot v1 bases,
+// which deliberately prefer project-owned rarity and Legendary art. Procedural item recipes
+// remain available only for UI fallbacks and development-time unknown ids.
 // For armor the icon is purely cosmetic (rarity colour still comes from item.quality), and the
 // flashier icons are reserved for higher-rarity pieces. WebP only, like the skill icons. Add
 // art via `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
 const ITEM_ICON_DIR = '/ui/items';
 export const ITEM_IMAGE_IDS = new Set<string>([
+  // Procedural Loot v1 launch bases. These 34 project-owned paintings deliberately
+  // override shared armor art and rendered weapon thumbnails; held weapon models remain
+  // selected independently through ITEM_WEAPON_VARIANTS.
+  'iron_broadsword',
+  'ashwood_staff',
+  'mirefen_leather_gloves',
+  'thornpeak_mail_chest',
+  'gravecaller_cloth_hood',
+  'gravecaller_ring',
+  'gravecaller_cloth_mantle',
+  'gravecaller_cloth_raiment',
+  'gravecaller_cloth_sash',
+  'gravecaller_cloth_leggings',
+  'gravecaller_cloth_handwraps',
+  'gravecaller_cloth_slippers',
+  'mirefen_leather_hood',
+  'mirefen_leather_shoulderguards',
+  'mirefen_leather_jerkin',
+  'mirefen_leather_belt',
+  'mirefen_leather_leggings',
+  'mirefen_leather_boots',
+  'thornpeak_mail_helm',
+  'thornpeak_mail_pauldrons',
+  'thornpeak_mail_girdle',
+  'thornpeak_mail_legguards',
+  'thornpeak_mail_gauntlets',
+  'thornpeak_mail_sabatons',
+  'thornpeak_war_axe',
+  'iron_flanged_mace',
+  'mirefen_dirk',
+  'gravecaller_wand',
+  'thornpeak_polearm',
+  'mirefen_hunting_bow',
+  'thornpeak_crossbow',
+  'gravecaller_pendant',
+  'thornpeak_bulwark',
+  'gravecaller_focus',
   // food
   'baked_bread',
   'brightwood_venison',
@@ -4392,10 +4430,12 @@ export function iconCanvas(
 // data URL. Both forms work as an <img src> or CSS background-image.
 export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
   if (kind === 'item') {
-    const weapon = weaponIconUrl(id);
-    if (weapon) return weapon;
+    // Explicit painted art wins over the model-rendered weapon thumbnail. This lets the
+    // procedural launch weapons keep honest held models while using their dedicated icon set.
     const img = itemImageUrl(id);
     if (img) return img;
+    const weapon = weaponIconUrl(id);
+    if (weapon) return weapon;
   }
   // Abilities, and auras that carry a real ability id (a DoT/buff applied by that
   // ability), share the same image-based skill art. abilityImageUrl returns null

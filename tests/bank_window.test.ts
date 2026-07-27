@@ -265,6 +265,9 @@ describe('bank_window: search / sort / deposit-all', () => {
 
   it('runs the pure bank filter core, never a re-derived bag filter', () => {
     expect(painter).toContain('filterBankSlots(');
+    expect(painter).toContain(
+      'itemPresentationName({ name: itemDisplayName(item) }, slot.instance)',
+    );
     expect(painter).toContain('bagFilterIsDefault(');
     expect(painter).not.toContain('applyBagFilter(');
   });
@@ -438,7 +441,7 @@ describe('bank_window: touch peek suppression', () => {
     // reds this. A plain tap / desktop click returns false and falls through.
     expect(painter).toContain('consumePeek(): boolean;');
     expect(painter).toMatch(
-      /cell\.addEventListener\('click', \(ev\) => \{[\s\S]{0,260}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}\s*this\.onSlotClick\(slot\.slotIndex, ev\.shiftKey\);/,
+      /cell\.addEventListener\('click', \(ev\) => \{[\s\S]{0,520}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}\s*this\.onSlotClick\(slot\.slotIndex, ev\.shiftKey\);/,
     );
   });
 
@@ -459,8 +462,8 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     // uiScale 1 (halves gap above 1, overlap below 1; the 2026-07-07 QA finding).
     // The split must divide the shared --app-vw box by the live scale.
     const split = 'calc(var(--app-vw) / var(--ui-scale, 1) / 2)';
-    expect(mobileCss).toContain(
-      `body.mobile-touch.bank-open #bank-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: ${split};`,
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch\.bank-open #bank-window \{\s*left: max\(10px, env\(safe-area-inset-left\)\);\s*right: calc\(var\(--app-vw\) \/ var\(--ui-scale, 1\) \/ 2\);/,
     );
     // The bags RIGHT half is shared with the market cluster (the market docks
     // #bags the same way on touch, see market_window.test.ts). Pin against a

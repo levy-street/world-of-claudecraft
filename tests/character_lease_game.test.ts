@@ -30,11 +30,15 @@ vi.mock('../server/db', () => ({
 
 import {
   heartbeatCharacterLeases,
+  loadMailState,
   releaseCharacterLease,
   saveCharacterAndMarketState,
   saveCharacterState,
+  saveMailState,
 } from '../server/db';
 import { GameServer } from '../server/game';
+import { generateProceduralItem } from '../src/sim/loot/procedural';
+import { type CharacterState, Sim } from '../src/sim/sim';
 
 function fakeWs() {
   const sent: any[] = [];
@@ -62,11 +66,102 @@ function join(
 // Flush the microtask queue so an awaited leave() reaches its post-save steps.
 const flushMicrotasks = () => new Promise((r) => setTimeout(r, 0));
 
+const CORRUPT_MAIL = {
+  mail: [
+    {
+      id: 1,
+      recipientKey: '7',
+      recipientName: 'Keeper',
+      senderName: 'Corruptor',
+      kind: 'system',
+      subject: 'Invalid persisted parcel',
+      body: '',
+      copper: 0,
+      items: [{ itemId: 'roasted_boar', count: 1, instance: {} }],
+      deliverIn: 0,
+      secondsLeft: -1,
+      read: false,
+    },
+  ],
+  nextMailId: 2,
+} as never;
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe('character load lease, GameServer wiring', () => {
+  it('rolls back a partially added player when persisted item validation rejects the join', () => {
+    const fixture = new Sim({ seed: 90, playerClass: 'warrior', noPlayer: true });
+    const fixturePid = fixture.addPlayer('warrior', 'Corrupt');
+    const state = structuredClone(fixture.serializeCharacter(fixturePid)) as CharacterState;
+    const generated = generateProceduralItem({
+      seed: 701,
+      uid: 'pi1:join-rollback:1',
+      context: {
+        source: 'dungeon',
+        sourceEntityId: 40,
+        sourceSpawnSequence: 2,
+        lootSlotIndex: 0,
+      },
+      basePoolId: 'initial_dungeon_boss',
+      rarityTableId: 'initial_dungeon_boss',
+      sourceItemLevel: 20,
+      forcedBaseId: 'gravecaller_ring',
+      forcedRarity: 'magic',
+    }).instance;
+    if (!generated.procedural) throw new Error('missing procedural fixture');
+    generated.procedural.seed = 0;
+    state.inventory.push({ itemId: 'gravecaller_ring', count: 1, instance: generated });
+
+    const server = new GameServer();
+    const beforeEntityIds = [...server.sim.entities.keys()];
+    const beforePrimaryId = server.sim.primaryId;
+
+    expect(() =>
+      server.join(fakeWs().ws as any, 100, 7, 'Corrupt', 'warrior', state, false, {
+        leaseNonce: 'nonce-corrupt',
+      }),
+    ).toThrow('Invalid persisted item instance at inventory');
+
+    expect(server.clients.size).toBe(0);
+    expect(server.hasSessionForCharacter(7)).toBe(false);
+    expect([...server.sim.players.values()].some((meta) => meta.name === 'Corrupt')).toBe(false);
+    expect([...server.sim.entities.keys()]).toEqual(beforeEntityIds);
+    expect(server.sim.primaryId).toBe(beforePrimaryId);
+  });
+
+  it('quarantines mail writes after a failed load', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      vi.mocked(loadMailState).mockResolvedValueOnce(CORRUPT_MAIL);
+      const server = new GameServer();
+      await expect(server.loadMail()).rejects.toThrow('empty item instance payload');
+
+      // Periodic and shutdown both call saveMail. Both must remain no-ops even
+      // when their queued callback runs after the load failure.
+      (server as any).flushPeriodicSaves(1000);
+      await server.saveMail();
+      await flushMicrotasks();
+      expect(vi.mocked(saveMailState)).not.toHaveBeenCalled();
+
+      // Leave normally writes character+market+mail together. Quarantine falls
+      // back to the lease-fenced character write so the bad realm blob survives.
+      const session = join(server, 100, 7, 'Keeper', 'nonce-mail');
+      expect('error' in session).toBe(false);
+      await server.leave(session, 'test');
+      expect(vi.mocked(saveCharacterAndMarketState)).not.toHaveBeenCalled();
+      expect(vi.mocked(saveCharacterState)).toHaveBeenCalled();
+
+      // Only a later verified load clears the write quarantine.
+      await server.loadMail();
+      await server.saveMail();
+      expect(vi.mocked(saveMailState)).toHaveBeenCalledTimes(1);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
   it("leave() releases the lease exactly once with the session's own nonce", async () => {
     const server = new GameServer();
     const s = join(server, 100, 7, 'Leaver', 'nonce-1');

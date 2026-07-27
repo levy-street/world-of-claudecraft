@@ -48,6 +48,18 @@ export function bagOrderIsManual(filter: BagFilterState): boolean {
 // live ITEMS table (and tests can supply a synthetic one).
 export type ItemLookup = (itemId: string) => ItemDef | undefined;
 
+export interface BagSlotPresentation {
+  name: string;
+  quality: string;
+}
+
+export type BagSlotPresentationResolver = (slot: InvSlot, item: ItemDef) => BagSlotPresentation;
+
+const defaultPresentation: BagSlotPresentationResolver = (_slot, item) => ({
+  name: item.name,
+  quality: item.quality ?? 'common',
+});
+
 // Shared with the bank filter (bank_filter.ts): the bank reuses the same category
 // predicate so a "material"/"weapon"/... chip means the same thing in both windows.
 export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
@@ -84,8 +96,9 @@ const QUALITY_RANK: Record<string, number> = {
 };
 
 // Shared with the bank filter (bank_filter.ts) so both windows sort quality identically.
-export function qualityRank(item: ItemDef): number {
-  return QUALITY_RANK[item.quality ?? 'common'] ?? QUALITY_RANK.common;
+export function qualityRank(itemOrQuality: ItemDef | string): number {
+  const quality = typeof itemOrQuality === 'string' ? itemOrQuality : itemOrQuality.quality;
+  return QUALITY_RANK[quality ?? 'common'] ?? QUALITY_RANK.common;
 }
 
 // Filter, then sort. Returns a new array; never mutates the input. Sorts are
@@ -95,21 +108,24 @@ export function applyBagFilter(
   slots: readonly InvSlot[],
   lookup: ItemLookup,
   state: BagFilterState,
+  presentationOf: BagSlotPresentationResolver = defaultPresentation,
 ): InvSlot[] {
   const query = state.search.trim().toLowerCase();
-  const filtered = slots.filter((slot) => {
+  const filtered = slots.flatMap((slot) => {
     const item = lookup(slot.itemId);
-    if (!item) return false;
-    if (!matchesCategory(item, state.category)) return false;
-    if (query && !item.name.toLowerCase().includes(query)) return false;
-    return true;
+    if (!item || !matchesCategory(item, state.category)) return [];
+    const presentation = presentationOf(slot, item);
+    if (query && !presentation.name.toLowerCase().includes(query)) return [];
+    return [{ slot, presentation }];
   });
   if (state.sort === 'quality') {
-    filtered.sort((a, b) => qualityRank(lookup(a.itemId)!) - qualityRank(lookup(b.itemId)!));
+    filtered.sort(
+      (a, b) => qualityRank(a.presentation.quality) - qualityRank(b.presentation.quality),
+    );
   } else if (state.sort === 'name') {
-    filtered.sort((a, b) => lookup(a.itemId)!.name.localeCompare(lookup(b.itemId)!.name));
+    filtered.sort((a, b) => a.presentation.name.localeCompare(b.presentation.name));
   }
-  return filtered;
+  return filtered.map(({ slot }) => slot);
 }
 
 export function serializeBagFilter(state: BagFilterState): string {

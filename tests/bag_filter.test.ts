@@ -113,6 +113,45 @@ describe('applyBagFilter — search', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'recent', search: '   ' });
     expect(out.length).toBe(INV.length);
   });
+
+  it('matches and sorts by the injected per-copy procedural presentation', () => {
+    const proceduralBlade = {
+      itemId: 'blade',
+      count: 1,
+      instance: {
+        procedural: {
+          version: 1,
+          uid: 'named-blade',
+          baseId: 'blade',
+          itemLevel: 30,
+          rarity: 'legendary',
+          affixes: [],
+          generatedName: { baseId: 'blade' },
+          seed: 1,
+        },
+      },
+    } as InvSlot;
+    const inventory = [{ itemId: 'helm', count: 1 }, proceduralBlade];
+    const presentationOf = (slot: InvSlot, item: ItemDef) =>
+      slot === proceduralBlade
+        ? { name: 'Ashbinder Seal', quality: 'legendary' }
+        : { name: item.name, quality: item.quality ?? 'common' };
+
+    const searched = applyBagFilter(
+      inventory,
+      lookup,
+      { category: 'all', sort: 'recent', search: 'ashbinder' },
+      presentationOf,
+    );
+    expect(ids(searched)).toEqual(['blade']);
+    const sorted = applyBagFilter(
+      inventory,
+      lookup,
+      { category: 'all', sort: 'quality', search: '' },
+      presentationOf,
+    );
+    expect(sorted).toEqual([proceduralBlade, inventory[0]]);
+  });
 });
 
 describe('applyBagFilter — sorting', () => {

@@ -21,6 +21,13 @@ import {
   finderActivity,
 } from '../sim/content/dungeon_finder';
 import { HEROIC_BOSS_LOOT } from '../sim/content/heroic_loot';
+import { proceduralBossLegendarySignatures } from '../sim/content/procedural_legendary_sources';
+import { PROCEDURAL_RARITY_TABLES } from '../sim/content/procedural_loot';
+import {
+  NYTHRAXIS_PROCEDURAL_RAID_PROFILES,
+  NYTHRAXIS_RAID_BOSS_ID,
+  NYTHRAXIS_RAID_DUNGEON_ID,
+} from '../sim/content/procedural_raid_loot';
 import { FIRST_TALENT_LEVEL, type Role } from '../sim/content/talents';
 import { DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
 import { compatibleFinderRoles } from '../sim/social/dungeon_finder';
@@ -109,9 +116,19 @@ export interface FinderActivityDetailView {
   lockedMinutes: number;
   attunementQuestId: string | null;
   heroicMarks: number; // marks per participant on the heroic final boss (0 = none)
+  proceduralRaid: FinderProceduralRaidRewardView | null;
   eligible: boolean;
   blocked: FinderBlockReason;
   encounters: FinderEncounterViewModel[];
+}
+
+export interface FinderProceduralRaidRewardView {
+  rarity: { rare: number; epic: number; legendary: number };
+  itemLevels: { rare: number; epic: number; legendary: number };
+
+  raidForgedLegendary: boolean;
+  legendaryMagnitudeFloor: number;
+  signaturePowerIds: string[];
 }
 
 export interface FinderRoleOptionView {
@@ -292,6 +309,25 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
   return out;
 }
 
+function buildProceduralRaidRewards(
+  activity: FinderActivity,
+): FinderProceduralRaidRewardView | null {
+  if (activity.dungeonId !== NYTHRAXIS_RAID_DUNGEON_ID) return null;
+  const profile = NYTHRAXIS_PROCEDURAL_RAID_PROFILES[activity.difficulty];
+  const table = PROCEDURAL_RARITY_TABLES[profile.rarityTableId];
+  return {
+    rarity: {
+      rare: table.weights.rare ?? 0,
+      epic: table.weights.epic ?? 0,
+      legendary: table.weights.legendary ?? 0,
+    },
+    itemLevels: { ...profile.itemLevels },
+    raidForgedLegendary: profile.legendaryMagnitudeFloor >= 0.5,
+    legendaryMagnitudeFloor: profile.legendaryMagnitudeFloor,
+    signaturePowerIds: [...proceduralBossLegendarySignatures(NYTHRAXIS_RAID_BOSS_ID)],
+  };
+}
+
 function buildDetail(
   activity: FinderActivity,
   level: number,
@@ -300,6 +336,7 @@ function buildDetail(
 ): FinderActivityDetailView {
   const door = DUNGEONS[activity.entranceDungeonId]?.doorPos ?? { x: 0, z: 0 };
   const tuning = HEROIC_DUNGEON_TUNING[activity.dungeonId];
+  const heroicMarks = activity.difficulty === 'heroic' && tuning ? tuning.marksPerParticipant : 0;
   const blocked = blockReasonFor(activity, level, specRole);
   return {
     id: activity.id,
@@ -315,7 +352,8 @@ function buildDetail(
     lockout: activity.lockout,
     lockedMinutes: lockoutMinutesFor(activity, lockouts),
     attunementQuestId: activity.attunementQuestId ?? null,
-    heroicMarks: activity.difficulty === 'heroic' && tuning ? tuning.marksPerParticipant : 0,
+    heroicMarks,
+    proceduralRaid: buildProceduralRaidRewards(activity),
     eligible: blocked === null,
     blocked,
     encounters: buildEncounters(activity),

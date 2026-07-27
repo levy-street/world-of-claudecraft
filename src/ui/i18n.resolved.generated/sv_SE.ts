@@ -1547,6 +1547,11 @@ export const sv_SE: EnTranslations = {
       "itemAriaEnchanted": "{item}, antal {count}, förtrollad kopia",
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
+      "itemAriaProcedural": "{item}, {rarity}, föremålsnivå {level}, antal {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, föremålsnivå {level}, antal {count}, mästerverk",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, föremålsnivå {level}, antal {count}, förtrollad kopia",
+      "itemAriaProceduralSigned": "{item}, {rarity}, föremålsnivå {level}, antal {count}, tillverkarmärkt kopia",
+      "itemAriaProceduralBound": "{item}, {rarity}, föremålsnivå {level}, antal {count}, bunden kopia",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -2169,9 +2174,9 @@ export const sv_SE: EnTranslations = {
       "notReady": "Den här resursnoden har inte återspawnats för dig ännu.",
       "gatherLine": "Du samlar: {name}.",
       "gatherLineQty": "Du samlar in: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Du skördar: {name}.",
+      "harvestLineQty": "Du skördar: {name} x{qty}.",
+      "harvestSpecimenLine": "Du återvinner även {name}.",
       "catchLine": "Du drar in: {name}",
       "biteLine": "Något nappar på betet!",
       "gotAwayLine": "Det kom undan.",
@@ -2353,7 +2358,7 @@ export const sv_SE: EnTranslations = {
       "empty": "Inga recept kända än.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Tillverkad: {name} x{qty}",
       "insufficientMaterials": "Du har inte materialet för det.",
       "unknownRecipe": "Det receptet finns inte.",
       "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver.",
@@ -2446,13 +2451,13 @@ export const sv_SE: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Du avförtrollar {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Du avförtrollar {item} till {material}.",
+      "disenchantedYieldQty": "Du avförtrollar {item} till {material} x{qty}.",
+      "disenchantedAlso": "Du återvinner även {material}.",
+      "disenchantedAlsoQty": "Du återvinner även {material} x{qty}.",
       "salvagedLine": "Du bärgar {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Du återvinner {material} från {item}.",
+      "salvagedYieldQty": "Du återvinner {material} x{qty} från {item}.",
       "enchantAppliedLine": "Du förtrollar {item} med {enchant}.",
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
@@ -2489,14 +2494,14 @@ export const sv_SE: EnTranslations = {
       "sameEnchant": "Det föremålet har redan den förtrollningen.",
       "replaceTag": "Ersätter {enchant}",
       "sameEnchantTag": "Redan applicerad",
-      "plainTag": "Not enchanted",
+      "plainTag": "Inte förtrollad",
       "replaceConfirmTitle": "Ersätt förtrollningen på {item}?",
       "replaceConfirmBody": "Detta ersätter {old} på {item} med {new}.",
       "replaceConfirmNoRefund": "Den gamla förtrollningen förstörs. Dess material återbetalas inte. Det kan inte ångras.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Bevarat: {kept}",
+      "replaceConfirmKeepsSigner": "Tillverkarens märke",
+      "replaceConfirmKeepsMasterwork": "Mästerverksbonus",
+      "replaceConfirmKeepsBond": "Beställningsbindning",
       "replaceConfirmCost": "Kostnad: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ersätt"
@@ -2568,6 +2573,12 @@ export const sv_SE: EnTranslations = {
       "lockedFor": "Låst i ungefär {minutes} min",
       "attunement": "Kräver länkning: {quest}",
       "heroicMarks": "Heroiska märken: {count} per spelare",
+      "raidRewards": "Förhandsvisning av Nythraxis-belöningar",
+      "raidSharedDrop": "Slutbossens lik lägger till ett delat procedurellt föremål som raiden får slå om.",
+      "raidRarityLine": "Sällsynt {rare}% · Episk {epic}% · Legendarisk {legendary}%",
+      "raidItemLevels": "Föremålsnivå: Sällsynt {rare} · Episk {epic} · Legendarisk {legendary}",
+      "raidSignatures": "Legendariska signaturkrafter: {signatures}",
+      "raidForgedLegendary": "Heroiska legendariska krafter är raidsmidda och garanteras ett slag i den övre halvan av sitt fastställda intervall.",
       "entrance": "Ingång: {zone}",
       "showOnMap": "Visa på kartan",
       "encounters": "Möten",
@@ -6640,7 +6651,113 @@ export const sv_SE: EnTranslations = {
       "dps": "Skada/sek",
       "critChance": "Kritisk chans",
       "dodge": "Undvikande",
-      "parry": "Parering"
+      "parry": "Parering",
+      "weaponMin": "Minimal vapenskada",
+      "weaponMax": "Maximal vapenskada",
+      "weaponDps": "Vapenskada per sekund",
+      "healthOnKill": "Hälsa vid dödande",
+      "manaOnKill": "Mana vid dödande",
+      "blockValue": "Blockeringsvärde"
+    },
+    "procedural": {
+      "rollRangeAria": "Möjligt slag från {min} till {max}",
+      "advancedDetailsHint": "Håll ned {key} för att visa möjliga slagintervall.",
+      "powerRollPercent": "Kraftslag: {value}%",
+      "powerRollMilliseconds": "Kraftslag: {value} ms",
+      "powerRollResource": "Kraftslag: {value} resurs",
+      "powerRollNumber": "Kraftslag: {value}",
+      "legendaryPower": "Legendarisk kraft",
+      "legendaryLimit": "Unikt utrustad: {count} legendarisk kraft",
+      "rarity": {
+        "common": "Vanlig",
+        "magic": "Magisk",
+        "rare": "Sällsynt",
+        "epic": "Episk",
+        "legendary": "Legendarisk",
+        "mythic": "Mytisk"
+      },
+      "nameFragment": {
+        "mighty": "Mäktig",
+        "deft": "Skicklig",
+        "stalwart": "Ståndaktig",
+        "sages": "Visemannens",
+        "spiritual": "Andlig",
+        "of_focus": "av Fokus",
+        "of_striking": "av Slagkraft",
+        "of_alacrity": "av Raskhet",
+        "of_precision": "av Precision",
+        "warded": "Beskyddad",
+        "of_reaping": "av Skörd",
+        "of_remembrance": "av Hågkomst"
+      },
+      "rareWord": {
+        "ashen": "Askgrå",
+        "blackfen": "Svartkärr",
+        "doom": "Undergång",
+        "grave": "Grav",
+        "mire": "Dy",
+        "storm": "Storm",
+        "thorn": "Törn",
+        "wyrm": "Drakorm",
+        "bite": "Bett",
+        "brand": "Brännmärke",
+        "promise": "Löfte",
+        "thread": "Tråd",
+        "vigil": "Vaka",
+        "ward": "Skydd",
+        "whisper": "Viskning",
+        "oath": "Ed"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Sista bålets krona",
+          "description": "Var tredje Glödbult sveder fiender nära målet."
+        },
+        "greyjaws_edge": {
+          "name": "Gråkäkes egg",
+          "description": "Var tredje vapenträff får målet att blöda och återställer lite resurs."
+        },
+        "hushwood_longbow": {
+          "name": "Tystskogens långbåge",
+          "description": "Långt drag eller Ondskeskott kan tysta målet en kort stund."
+        },
+        "nightglass_fang": {
+          "name": "Nattglasets huggtand",
+          "description": "Ett dödande ger en kort ökning av snabbhet."
+        },
+        "ysoleis_vigil": {
+          "name": "Ysoleis vaka",
+          "description": "Kritisk läkning skapar kortvarigt ett återställande område på marken."
+        },
+        "stormwake_idol": {
+          "name": "Stormuppvaknandets avgud",
+          "description": "Var fjärde Bågblixt hoppar till fiender i närheten."
+        },
+        "ashbinders_seal": {
+          "name": "Askbindarens sigill",
+          "description": "Var fjärde Dysterbult märker sitt mål för ytterligare Skuggskada."
+        },
+        "dawnward_signet": {
+          "name": "Gryningsvaktens signet",
+          "description": "Lagande ljus skyddar mottagaren med en sköld motsvarande en del av läkningen."
+        },
+        "feral_moonclasp": {
+          "name": "Vildmånens spänne",
+          "description": "Var tredje Vildbult återställer den primära resursen."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Nionde klangens klocka",
+          "description": "Varannan skadlig besvärjelse klämtar runt målet."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "De stulna timmarnas mantel",
+          "description": "Att falla under 35% hälsa ger ett kort defensivt skydd."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Den obrutna vägens stövlar",
+          "description": "Att röra sig 15 yard ger en kort ökning av rörelsehastigheten."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const sv_SE: EnTranslations = {
       "greed": "Girighet",
       "pass": "Avstå",
       "needAria": "Behov av {item}",
+      "needUnavailable": "Behov är inte tillgängligt eftersom din klass inte kan utrusta föremålet.",
+      "needUnavailablePower": "Behov är inte tillgängligt eftersom den här legendariska kraften är begränsad till en annan klass.",
       "greedAria": "Girighet för {item}",
       "passAria": "Avstå från {item}",
       "everyonePassed": "Alla avstod från {item}.",
@@ -9170,6 +9289,108 @@ export const sv_SE: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Resonant timmer"
+      },
+      "ashwood_staff": {
+        "name": "Askstav"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Gravkallarens tyghandlindor"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Gravkallarens tygkapuschong"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Gravkallarens tygbenkläder"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Gravkallarens tygmantel"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Gravkallarens tygskrud"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Gravkallarens tygskärp"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Gravkallarens tygtofflor"
+      },
+      "gravecaller_focus": {
+        "name": "Gravkallarens fokus"
+      },
+      "gravecaller_pendant": {
+        "name": "Gravkallarens hänge"
+      },
+      "gravecaller_ring": {
+        "name": "Gravkallarens ring"
+      },
+      "gravecaller_wand": {
+        "name": "Gravkallarens trollstav"
+      },
+      "iron_broadsword": {
+        "name": "Järnbredsvärd"
+      },
+      "iron_flanged_mace": {
+        "name": "Järnflänsklubba"
+      },
+      "mirefen_dirk": {
+        "name": "Mirefen-dolk"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Mirefen-jaktbåge"
+      },
+      "mirefen_leather_belt": {
+        "name": "Mirefen-läderbälte"
+      },
+      "mirefen_leather_boots": {
+        "name": "Mirefen-läderstövlar"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Mirefen-läderhandskar"
+      },
+      "mirefen_leather_hood": {
+        "name": "Mirefen-läderhuva"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Mirefen-läderjacka"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Mirefen-läderbenkläder"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Mirefen-läderaxelskydd"
+      },
+      "thornpeak_bulwark": {
+        "name": "Thornpeak-bålverk"
+      },
+      "thornpeak_crossbow": {
+        "name": "Thornpeak-armborst"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Thornpeak-ringbrynja"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Thornpeak-ringhandskar"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Thornpeak-ringbälte"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Thornpeak-ringhjälm"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Thornpeak-ringbenskydd"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Thornpeak-ringaxelskydd"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Thornpeak-ringsabatonger"
+      },
+      "thornpeak_polearm": {
+        "name": "Thornpeak-stångvapen"
+      },
+      "thornpeak_war_axe": {
+        "name": "Thornpeak-stridsyxa"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

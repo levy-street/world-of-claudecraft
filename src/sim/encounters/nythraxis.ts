@@ -26,6 +26,7 @@
 // through the seam.
 
 import { isStunned, isUnbreakableControlAura } from '../combat/cc';
+
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
@@ -583,16 +584,21 @@ export function nythraxisRoomMetas(ctx: SimContext, boss: Entity): PlayerMeta[] 
   return out;
 }
 
-export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
+export function grantNythraxisLockout(
+  ctx: SimContext,
+  boss: Entity,
+  recipients: PlayerMeta[] = [],
+): void {
   // Daily raid reset: lock until the next reset boundary the host supplies through the
   // lockout seam (the authoritative server uses its realm-local 3 AM daily reset, so a
   // realm's raids share one boundary; offline/headless fall back to a flat 24h day).
-  const until = ctx.raidResetMs(ctx.lockoutNowMs());
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+  const heroic = inst?.difficulty === 'heroic';
+  const now = ctx.lockoutNowMs();
+  const until = ctx.raidResetMs(now);
   // Difficulty-scoped: a heroic kill locks the :heroic key only, so the raid
   // can still run the normal difficulty the same day (and vice versa).
-  const lockId = isHeroicNythraxis(ctx, boss)
-    ? heroicLockoutId('nythraxis_boss_arena')
-    : 'nythraxis_boss_arena';
+  const lockId = heroic ? heroicLockoutId('nythraxis_boss_arena') : 'nythraxis_boss_arena';
   // The kill locks the UNION of the room and the claim sweep. The claim sweep
   // (instanceLockoutMetas) covers the whole owning raid group plus anyone
   // inside the generic instance footprint: a raider who released, camped the
@@ -601,15 +607,21 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
   // because the arena interior is WIDER than the generic 120-yd footprint
   // (walls at roughly +/-230 local x): a raider who left the raid while parked
   // in a side wing sits outside both claim arms yet can still hold the tap and
-  // its rewards, so the 260-yd boss room must keep locking them.
+  // its loot, so the 260-yd boss room must keep locking them.
   const roomMetas = nythraxisRoomMetas(ctx, boss);
   const lockoutMetas = new Map<number, PlayerMeta>();
   for (const meta of roomMetas) lockoutMetas.set(meta.entityId, meta);
-  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   if (inst) {
     for (const meta of instanceLockoutMetas(ctx, inst)) lockoutMetas.set(meta.entityId, meta);
   }
+  for (const meta of recipients) lockoutMetas.set(meta.entityId, meta);
+
   for (const meta of lockoutMetas.values()) {
+    const lockedUntil = meta.raidLockouts.get(lockId) ?? 0;
+    const alreadyLocked = lockedUntil > now;
+    if (lockedUntil > 0 && !alreadyLocked) meta.raidLockouts.delete(lockId);
+
+    if (!alreadyLocked && heroic) inst?.clearedBy.add(meta.entityId);
     meta.raidLockouts.set(lockId, until);
   }
   // Raid deed credit stays scoped to the boss room roster.

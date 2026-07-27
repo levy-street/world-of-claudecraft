@@ -1,9 +1,19 @@
 import { createHash } from 'node:crypto';
-import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
+import {
+  closeSync,
+  existsSync,
+  openSync,
+  readdirSync,
+  readFileSync,
+  readSync,
+  statSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { PROCEDURAL_LEGENDARY_POWERS } from '../src/sim/content/procedural_legendary_powers';
+import { PROCEDURAL_ITEM_BASES } from '../src/sim/content/procedural_loot';
 import { ITEMS } from '../src/sim/data';
 import { ITEM_IMAGE_IDS, iconDataUrl, itemImageUrl, UI_ITEM_IMAGE_IDS } from '../src/ui/icons';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
@@ -14,9 +24,11 @@ import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 // a scope check (wired ids are real, non-equipment items):
 //   A) every id in ITEM_IMAGE_IDS resolves to a committed, VALID .webp;
 //   B) only .webp art (+ mapping.json) is committed under public/ui/items;
-//   C) every committed .webp is a WIRED id (an item id, or a UI pseudo-item id);
-//   D) every wired ITEM id is a real ITEMS entry that is not a weapon (weapons ship rendered
-//      model thumbnails via WEAPON_ICON_DIR; everything else, armor included, lives here),
+//   C) every committed top-level .webp is a WIRED id (an item id, or a UI pseudo-item id);
+//   H) Procedural Loot v1 is exactly 34 legacy aliases plus 212 nested static states, all
+//      schema-pinned, provenance-mapped, image-valid, orphan-free, and budgeted;
+//   D) every wired ITEM id is a real ITEMS entry; only procedural-launch weapons may opt out of the rendered
+//      thumbnail pipeline; everything else, armor included, lives here),
 //      and every UI pseudo-item id is deliberately NOT an item (the two sets stay disjoint);
 //   E) the whole bag family (the 5 equippable bags + the implicit backpack) is image-backed,
 //      so the bag bar never mixes painted art with a procedural fallback.
@@ -27,7 +39,8 @@ const publicDir = path.join(repoRoot, 'public');
 const itemsDir = path.join(publicDir, 'ui/items');
 
 const isDotfile = (p: string): boolean => path.basename(p).startsWith('.');
-const isMapping = (p: string): boolean => path.basename(p) === 'mapping.json';
+const isMapping = (p: string): boolean =>
+  path.basename(p) === 'mapping.json' && path.dirname(p) === itemsDir;
 
 function walk(dir: string): string[] {
   const out: string[] = [];
@@ -135,8 +148,35 @@ function isValidWebp(file: string): boolean {
 const webpFiles = (): string[] =>
   walk(itemsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
 
+const relativeItemPath = (file: string): string =>
+  path.relative(itemsDir, file).split(path.sep).join('/');
+
+const topLevelWebpFiles = (): string[] =>
+  webpFiles().filter((file) => path.dirname(file) === itemsDir);
+
+const PROCEDURAL_SET_ROOT = 'procedural/v1';
+const PROCEDURAL_RARITY_FALLBACKS = [
+  { rarity: 'common', path: 'common.webp' },
+  { rarity: 'magic', path: 'magic.webp' },
+  { rarity: 'rare', path: 'rare.webp' },
+  { rarity: 'epic', path: 'epic.webp' },
+  { rarity: 'legendary', path: 'legendary/_fallback.webp' },
+] as const;
+
+type ProceduralSetMapping = {
+  version: number;
+  root: string;
+  baseIds: string[];
+  rarityFallbacks: { rarity: string; path: string }[];
+  legendaryPowers: { baseId: string; powerId: string; revision: number }[];
+  sourcePack: string;
+  sourceFile: string;
+  license: string;
+};
+
 type Mapping = {
   iconSize: number;
+  proceduralSets: ProceduralSetMapping[];
   entries: {
     itemId: string;
     name: string;
@@ -154,6 +194,191 @@ type Mapping = {
 };
 const mapping = (): Mapping =>
   JSON.parse(readFileSync(path.join(itemsDir, 'mapping.json'), 'utf8')) as Mapping;
+
+const canonicalProceduralBaseIds = (): string[] => Object.keys(PROCEDURAL_ITEM_BASES).sort();
+
+const canonicalProceduralPowers = (): ProceduralSetMapping['legendaryPowers'] =>
+  Object.values(PROCEDURAL_LEGENDARY_POWERS)
+    .flatMap((power) =>
+      power.compatibleBaseIds.map((baseId) => ({
+        baseId,
+        powerId: power.id,
+        revision: power.revision,
+      })),
+    )
+    .sort(
+      (a, b) =>
+        a.baseId.localeCompare(b.baseId) ||
+        a.powerId.localeCompare(b.powerId) ||
+        a.revision - b.revision,
+    );
+
+function expectedAscendantProceduralPaths(): string[] {
+  return canonicalProceduralPowers().map(
+    ({ baseId, powerId, revision }) =>
+      `${PROCEDURAL_SET_ROOT}/${baseId}/legendary/${powerId}.r${revision}.ascendant.webp`,
+  );
+}
+
+function expectedNestedProceduralPaths(): string[] {
+  const rarityPaths = canonicalProceduralBaseIds().flatMap((baseId) =>
+    PROCEDURAL_RARITY_FALLBACKS.map(
+      (fallback) => `${PROCEDURAL_SET_ROOT}/${baseId}/${fallback.path}`,
+    ),
+  );
+  const powerPaths = canonicalProceduralPowers().map(
+    ({ baseId, powerId, revision }) =>
+      `${PROCEDURAL_SET_ROOT}/${baseId}/legendary/${powerId}.r${revision}.webp`,
+  );
+  return [...rarityPaths, ...powerPaths, ...expectedAscendantProceduralPaths()].sort();
+}
+
+const proceduralAssetFiles = (): string[] => {
+  const baseIds = new Set(canonicalProceduralBaseIds());
+  return webpFiles().filter((file) => {
+    const relative = relativeItemPath(file);
+    return (
+      relative.startsWith(`${PROCEDURAL_SET_ROOT}/`) ||
+      (!relative.includes('/') && baseIds.has(path.basename(file, '.webp')))
+    );
+  });
+};
+
+type SmallIconVisibilityGate = {
+  relative: string;
+  minUsefulPixels: number;
+  minP90Delta: number;
+};
+
+const P1_SMALL_ICON_PATHS = [
+  'gravecaller_cloth_raiment/magic.webp',
+  'gravecaller_cloth_leggings/rare.webp',
+  'gravecaller_cloth_leggings/epic.webp',
+  'gravecaller_cloth_leggings/legendary/_fallback.webp',
+  'mirefen_leather_hood/magic.webp',
+  'mirefen_leather_hood/rare.webp',
+  'mirefen_leather_hood/legendary/_fallback.webp',
+  'mirefen_leather_jerkin/magic.webp',
+  'mirefen_leather_jerkin/rare.webp',
+  'mirefen_leather_belt/rare.webp',
+  'mirefen_leather_belt/legendary/_fallback.webp',
+  'mirefen_leather_leggings/magic.webp',
+  'mirefen_leather_leggings/rare.webp',
+  'mirefen_leather_leggings/epic.webp',
+  'mirefen_leather_leggings/legendary/_fallback.webp',
+  'thornpeak_mail_chest/magic.webp',
+  'thornpeak_mail_chest/rare.webp',
+  'thornpeak_mail_chest/epic.webp',
+  'thornpeak_mail_chest/legendary/_fallback.webp',
+  'thornpeak_mail_helm/magic.webp',
+  'thornpeak_mail_helm/rare.webp',
+  'thornpeak_mail_helm/epic.webp',
+  'thornpeak_mail_helm/legendary/_fallback.webp',
+  'thornpeak_mail_girdle/rare.webp',
+  'thornpeak_mail_girdle/epic.webp',
+  'thornpeak_mail_girdle/legendary/_fallback.webp',
+  'thornpeak_mail_legguards/magic.webp',
+  'thornpeak_mail_legguards/rare.webp',
+  'thornpeak_mail_legguards/epic.webp',
+  'thornpeak_mail_legguards/legendary/_fallback.webp',
+  'gravecaller_pendant/rare.webp',
+  'gravecaller_pendant/epic.webp',
+  'gravecaller_pendant/legendary/_fallback.webp',
+  'thornpeak_bulwark/rare.webp',
+  'gravecaller_focus/rare.webp',
+  'gravecaller_focus/epic.webp',
+].map((relative) => `${PROCEDURAL_SET_ROOT}/${relative}`);
+
+// These production-background gates pin the P0 remasters that were unreadable at the HUD's
+// 28px floor. Long weapons need 7.5 percent of the square to carry useful contrast; the
+// broader focus and shield silhouettes need 12 percent. P1 armor and accessories need nearly
+// 20 percent; P2 and Ascendant gates pin their authored silhouettes too. The percentile floor
+// prevents an icon from passing on a few isolated hot pixels while the rest collapses into
+// black.
+const SMALL_ICON_VISIBILITY_GATES: SmallIconVisibilityGate[] = [
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/ashwood_staff/magic.webp`,
+    minUsefulPixels: 59,
+    minP90Delta: 60,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/gravecaller_wand/magic.webp`,
+    minUsefulPixels: 59,
+    minP90Delta: 60,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/mirefen_hunting_bow/magic.webp`,
+    minUsefulPixels: 59,
+    minP90Delta: 60,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/thornpeak_polearm/magic.webp`,
+    minUsefulPixels: 59,
+    minP90Delta: 60,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/gravecaller_focus/legendary/_fallback.webp`,
+    minUsefulPixels: 94,
+    minP90Delta: 65,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/thornpeak_bulwark/common.webp`,
+    minUsefulPixels: 94,
+    minP90Delta: 35,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/mirefen_hunting_bow/epic.webp`,
+    minUsefulPixels: 75,
+    minP90Delta: 70,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/thornpeak_polearm/epic.webp`,
+    minUsefulPixels: 65,
+    minP90Delta: 70,
+  },
+  {
+    relative: `${PROCEDURAL_SET_ROOT}/mirefen_hunting_bow/legendary/hushwood_longbow.r1.webp`,
+    minUsefulPixels: 75,
+    minP90Delta: 70,
+  },
+  ...P1_SMALL_ICON_PATHS.map((relative) => ({
+    relative,
+    minUsefulPixels: 155,
+    minP90Delta: 60,
+  })),
+  ...expectedAscendantProceduralPaths().map((relative) => ({
+    relative,
+    minUsefulPixels: 85,
+    minP90Delta: 60,
+  })),
+];
+
+async function smallIconVisibility(file: string): Promise<{
+  usefulPixels: number;
+  p90Delta: number;
+}> {
+  const background = { r: 8, g: 9, b: 11 };
+  const { data, info } = await sharp(file)
+    .resize(28, 28, { fit: 'fill', kernel: sharp.kernel.lanczos3 })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const deltas: number[] = [];
+  let usefulPixels = 0;
+  for (let offset = 0; offset < data.length; offset += info.channels) {
+    const alpha = data[offset + 3] / 255;
+    if (alpha < 0.25) continue;
+    const red = background.r * (1 - alpha) + data[offset] * alpha;
+    const green = background.g * (1 - alpha) + data[offset + 1] * alpha;
+    const blue = background.b * (1 - alpha) + data[offset + 2] * alpha;
+    const delta = Math.hypot(red - background.r, green - background.g, blue - background.b);
+    deltas.push(delta);
+    if (delta >= 18) usefulPixels++;
+  }
+  deltas.sort((a, b) => a - b);
+  const p90Delta = deltas[Math.max(0, Math.ceil(deltas.length * 0.9) - 1)] ?? 0;
+  return { usefulPixels, p90Delta };
+}
 
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
@@ -188,9 +413,9 @@ describe('item webp icons', () => {
     );
   });
 
-  it('C) every committed webp is a wired item id', () => {
+  it('C) every committed top-level webp is a wired item id', () => {
     const orphans: string[] = [];
-    for (const file of webpFiles()) {
+    for (const file of topLevelWebpFiles()) {
       const id = path.basename(file, '.webp');
       if (!ITEM_IMAGE_IDS.has(id) && !UI_ITEM_IMAGE_IDS.has(id))
         orphans.push(`${path.relative(repoRoot, file)} (not in ITEM_IMAGE_IDS/UI_ITEM_IMAGE_IDS)`);
@@ -198,16 +423,17 @@ describe('item webp icons', () => {
     expect(orphans, 'remove dead-weight art or wire the id into ITEM_IMAGE_IDS').toEqual([]);
   });
 
-  it('D) every wired id is a real, non-weapon item', () => {
+  it('D) every wired id is a real item, with only procedural-launch weapon exceptions', () => {
     const bad: string[] = [];
     for (const id of ITEM_IMAGE_IDS) {
       const def = (ITEMS as Record<string, { kind?: string }>)[id];
       if (!def) bad.push(`${id} (no such item)`);
-      else if (def.kind === 'weapon') bad.push(`${id} (weapon: has its own rendered-JPG pipeline)`);
+      else if (def.kind === 'weapon' && !PROCEDURAL_ITEM_BASES[id])
+        bad.push(`${id} (weapon: has its own rendered-JPG pipeline)`);
     }
     expect(
       bad,
-      'ITEM_IMAGE_IDS covers real items only; weapons use WEAPON_ICON_DIR thumbnails instead',
+      'ITEM_IMAGE_IDS covers real items; only procedural-launch weapons may override thumbnails',
     ).toEqual([]);
   });
 
@@ -258,7 +484,7 @@ describe('item webp icons', () => {
 
   it('F) every committed icon has a provenance entry in mapping.json, and vice versa', () => {
     const m = mapping();
-    const files = webpFiles().map((f) => path.basename(f, '.webp'));
+    const files = topLevelWebpFiles().map((f) => path.basename(f, '.webp'));
     const curated = m.entries.map((e) => e.itemId);
     const generated = (m.generatedBatches ?? []).flatMap((batch) => batch.itemIds);
     const listed = [...curated, ...generated];
@@ -366,13 +592,206 @@ describe('item webp icons', () => {
     expect(wrong, 'run `npm run assets:items`; item art is served at one fixed square').toEqual([]);
   });
 
-  it('H) every non-weapon item resolves to committed painted art', () => {
+  it('H) mapping.json declares the exact Procedural Loot v1 provenance contract', () => {
+    const sets = mapping().proceduralSets;
+    expect(sets, 'mapping.json must carry one scalable proceduralSets record').toHaveLength(1);
+    const set = sets[0];
+    expect(set.version).toBe(1);
+    expect(set.root).toBe(PROCEDURAL_SET_ROOT);
+    expect([...set.baseIds].sort()).toEqual(canonicalProceduralBaseIds());
+    expect(set.baseIds).toHaveLength(34);
+    expect(set.rarityFallbacks).toEqual(PROCEDURAL_RARITY_FALLBACKS);
+    expect(set.legendaryPowers).toEqual(canonicalProceduralPowers());
+    expect(set.legendaryPowers).toHaveLength(21);
+    expect(set.sourcePack).toBe('woc_procedural_loot_art');
+    expect(set.sourceFile).toContain('OpenAI image generation');
+    expect(set.license).toContain('World of ClaudeCraft original art');
+    expect(set.license).toContain('AI-assisted');
+  });
+
+  it('H2) has an exact 246-file procedural inventory: 34 aliases plus 212 nested states', () => {
+    const expectedLegacy = canonicalProceduralBaseIds().map((baseId) => `${baseId}.webp`);
+    const expectedNested = expectedNestedProceduralPaths();
+    expect(expectedLegacy).toHaveLength(34);
+    expect(expectedNested).toHaveLength(34 * 5 + 21 * 2);
+
+    const actualLegacy = topLevelWebpFiles()
+      .map(relativeItemPath)
+      .filter((relative) => expectedLegacy.includes(relative))
+      .sort();
+    const actualNested = webpFiles()
+      .map(relativeItemPath)
+      .filter((relative) => relative.startsWith(`${PROCEDURAL_SET_ROOT}/`))
+      .sort();
+
+    expect({
+      missingLegacy: expectedLegacy.filter((relative) => !actualLegacy.includes(relative)),
+      unexpectedLegacy: actualLegacy.filter((relative) => !expectedLegacy.includes(relative)),
+      missingNested: expectedNested.filter((relative) => !actualNested.includes(relative)),
+      unexpectedNested: actualNested.filter((relative) => !expectedNested.includes(relative)),
+    }).toEqual({
+      missingLegacy: [],
+      unexpectedLegacy: [],
+      missingNested: [],
+      unexpectedNested: [],
+    });
+  });
+
+  it('H3) keeps every committed procedural file WebP-only, 128px, alpha, and sRGB', async () => {
+    const invalid: string[] = [];
+    for (const file of proceduralAssetFiles()) {
+      const meta = await sharp(file).metadata();
+      const relative = relativeItemPath(file);
+      if (meta.format !== 'webp') invalid.push(`${relative} (format ${meta.format ?? 'unknown'})`);
+      if (meta.width !== 128 || meta.height !== 128)
+        invalid.push(`${relative} (${meta.width ?? '?'}x${meta.height ?? '?'})`);
+      if (!meta.hasAlpha) invalid.push(`${relative} (missing alpha channel)`);
+      if (meta.space !== 'srgb')
+        invalid.push(`${relative} (colorspace ${meta.space ?? 'unknown'})`);
+    }
+    expect(invalid).toEqual([]);
+  });
+
+  it('H4) keeps procedural delivery below p95 20 KiB and 10 MiB total', () => {
+    const sizes = proceduralAssetFiles()
+      .map((file) => statSync(file).size)
+      .sort((a, b) => a - b);
+    expect(sizes.length).toBeGreaterThan(0);
+    const p95 = sizes[Math.max(0, Math.ceil(sizes.length * 0.95) - 1)];
+    const total = sizes.reduce((sum, size) => sum + size, 0);
+    expect(p95, 'procedural icon p95 must stay at or below 20 KiB').toBeLessThanOrEqual(20 * 1024);
+    expect(total, 'all 246 procedural icons must stay at or below 10 MiB').toBeLessThanOrEqual(
+      10 * 1024 * 1024,
+    );
+  });
+
+  it('H5) gives all 212 nested rarity and Legendary states unique decoded RGBA art', async () => {
+    const nestedPaths = expectedNestedProceduralPaths();
+    expect(nestedPaths).toHaveLength(212);
+    const byPixelHash = new Map<string, string[]>();
+    for (const relative of nestedPaths) {
+      const { data, info } = await sharp(path.join(itemsDir, relative))
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      expect(info).toMatchObject({ width: 128, height: 128, channels: 4 });
+      const hash = createHash('sha256').update(data).digest('hex');
+      const paths = byPixelHash.get(hash) ?? [];
+      paths.push(relative);
+      byPixelHash.set(hash, paths);
+    }
+    expect(
+      [...byPixelHash.values()].filter((paths) => paths.length > 1),
+      'rarity and named Legendary states must remain visually distinct after decoding',
+    ).toEqual([]);
+  });
+
+  it('H5a) gives every compatible named Legendary a distinct Ascendant art pair', async () => {
+    const failures: string[] = [];
+    const powers = canonicalProceduralPowers();
+    expect(powers).toHaveLength(21);
+    for (const { baseId, powerId, revision } of powers) {
+      const normal = `${PROCEDURAL_SET_ROOT}/${baseId}/legendary/${powerId}.r${revision}.webp`;
+      const ascendant =
+        `${PROCEDURAL_SET_ROOT}/${baseId}/legendary/` + `${powerId}.r${revision}.ascendant.webp`;
+      if (!existsSync(path.join(itemsDir, normal)) || !existsSync(path.join(itemsDir, ascendant))) {
+        failures.push(`${baseId}/${powerId}.r${revision} (missing normal or Ascendant art)`);
+        continue;
+      }
+      const [normalPixels, ascendantPixels] = await Promise.all(
+        [normal, ascendant].map(async (relative) => {
+          const { data, info } = await sharp(path.join(itemsDir, relative))
+            .ensureAlpha()
+            .raw()
+            .toBuffer({ resolveWithObject: true });
+          expect(info).toMatchObject({ width: 128, height: 128, channels: 4 });
+          return createHash('sha256').update(data).digest('hex');
+        }),
+      );
+      if (normalPixels === ascendantPixels) {
+        failures.push(`${baseId}/${powerId}.r${revision} (decoded pixels are identical)`);
+      }
+    }
+    expect(
+      failures,
+      'each named Legendary needs both normal and visually distinct Ascendant art',
+    ).toEqual([]);
+  });
+
+  it('H6) keeps every procedural silhouette inside its hard-alpha safety margin', async () => {
+    const violations: string[] = [];
+    const strictTwoPixelPaths = new Set([
+      ...SMALL_ICON_VISIBILITY_GATES.map((gate) => gate.relative),
+      ...expectedAscendantProceduralPaths(),
+      'thornpeak_bulwark.webp',
+    ]);
+    for (const file of proceduralAssetFiles()) {
+      const relative = relativeItemPath(file);
+      const margin = strictTwoPixelPaths.has(relative) ? 2 : 1;
+      const { data, info } = await sharp(file)
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      let hardEdgePixels = 0;
+      let maxEdgeAlpha = 0;
+      for (let y = 0; y < info.height; y++) {
+        for (let x = 0; x < info.width; x++) {
+          if (x >= margin && x < info.width - margin && y >= margin && y < info.height - margin)
+            continue;
+          const alpha = data[(y * info.width + x) * info.channels + 3];
+          if (alpha >= 128) hardEdgePixels++;
+          maxEdgeAlpha = Math.max(maxEdgeAlpha, alpha);
+        }
+      }
+      if (hardEdgePixels > 0) {
+        violations.push(
+          `${relative} (${margin}px margin, ${hardEdgePixels} hard pixels, ` +
+            `max alpha ${maxEdgeAlpha})`,
+        );
+      }
+    }
+    expect(
+      violations,
+      'all procedural art needs one transparent pixel; P0 remasters need two',
+    ).toEqual([]);
+  });
+
+  it('H7) keeps the P0, P1, P2, and Ascendant remasters readable at the 28px HUD floor', async () => {
+    const failures: string[] = [];
+    expect(P1_SMALL_ICON_PATHS).toHaveLength(36);
+    for (const gate of SMALL_ICON_VISIBILITY_GATES) {
+      const result = await smallIconVisibility(path.join(itemsDir, gate.relative));
+      if (result.usefulPixels < gate.minUsefulPixels || result.p90Delta < gate.minP90Delta) {
+        failures.push(
+          `${gate.relative} (` +
+            `${result.usefulPixels}/${gate.minUsefulPixels} useful pixels, ` +
+            `${result.p90Delta.toFixed(1)}/${gate.minP90Delta} p90 delta)`,
+        );
+      }
+    }
+    expect(
+      failures,
+      'authored icon silhouettes must stay visible against the production #08090b slot background',
+    ).toEqual([]);
+  });
+
+  it('I) recursively discovers nested converter inputs', () => {
+    const source = readFileSync(path.join(repoRoot, 'scripts/convert_item_icons_webp.mjs'), 'utf8');
+    expect(source).toMatch(/function sourceImages\(dir\)/);
+    expect(source).toMatch(
+      /if \(ent\.isDirectory\(\)\)\s*sources\.push\(\.\.\.sourceImages\(candidate\)\)/,
+    );
+    expect(source).toMatch(/const sources = sourceImages\(itemsDir\)\.sort\(\)/);
+  });
+
+  it('J) every non-weapon item resolves to committed painted art', () => {
     const expected = Object.values(ITEMS)
       .filter((item) => item.kind !== 'weapon')
       .map((item) => item.id)
       .sort();
+    const actual = [...ITEM_IMAGE_IDS].filter((id) => ITEMS[id]?.kind !== 'weapon').sort();
     expect(
-      [...ITEM_IMAGE_IDS].sort(),
+      actual,
       'non-weapon items must never fall back to the legacy procedural compositor',
     ).toEqual(expected);
     for (const id of expected) {
@@ -382,9 +801,9 @@ describe('item webp icons', () => {
     }
   });
 
-  it('I) every item icon has distinct committed artwork', () => {
+  it('K) every top-level item icon has distinct committed artwork', () => {
     const byHash = new Map<string, string[]>();
-    for (const file of webpFiles()) {
+    for (const file of topLevelWebpFiles()) {
       const hash = createHash('sha256').update(readFileSync(file)).digest('hex');
       const ids = byHash.get(hash) ?? [];
       ids.push(path.basename(file, '.webp'));
@@ -392,21 +811,50 @@ describe('item webp icons', () => {
     }
     expect(
       [...byHash.values()].filter((ids) => ids.length > 1),
-      'different item ids must not ship byte-identical placeholder art',
+      'different item ids must not ship byte-identical top-level placeholder art',
     ).toEqual([]);
   });
 
-  it('J) mapped weapons keep their rendered model thumbnails', () => {
+  it('L) each procedural alias deliberately mirrors its matching common state', () => {
+    const mismatches: string[] = [];
+    for (const baseId of canonicalProceduralBaseIds()) {
+      const alias = readFileSync(path.join(itemsDir, `${baseId}.webp`));
+      const common = readFileSync(path.join(itemsDir, PROCEDURAL_SET_ROOT, baseId, 'common.webp'));
+      if (!alias.equals(common)) mismatches.push(baseId);
+    }
+    expect(mismatches).toEqual([]);
+  });
+
+  it('M) mapped weapons keep thumbnails except for the nine painted procedural bases', () => {
     const weaponIds = new Set(
       Object.values(ITEMS)
         .filter((item) => item.kind === 'weapon')
         .map((item) => item.id),
     );
+    const paintedProceduralWeapons = new Set([
+      'ashwood_staff',
+      'gravecaller_wand',
+      'iron_broadsword',
+      'mirefen_dirk',
+      'mirefen_hunting_bow',
+      'thornpeak_crossbow',
+      'iron_flanged_mace',
+      'thornpeak_polearm',
+      'thornpeak_war_axe',
+    ]);
+    expect([...paintedProceduralWeapons].sort()).toEqual(
+      Object.keys(PROCEDURAL_ITEM_BASES)
+        .filter((id) => ITEMS[id]?.kind === 'weapon')
+        .sort(),
+    );
     const strayMappings = Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !weaponIds.has(id));
     expect(strayMappings, 'thumbnail mappings must only target real weapons').toEqual([]);
     for (const id of Object.keys(ITEM_WEAPON_VARIANTS)) {
-      expect(iconDataUrl('item', id), `${id} must keep its rendered weapon thumbnail`).toBe(
-        `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`,
+      const expected = paintedProceduralWeapons.has(id)
+        ? `/ui/items/${id}.webp`
+        : `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`;
+      expect(iconDataUrl('item', id), `${id} must resolve to its approved weapon art`).toBe(
+        expected,
       );
     }
   });

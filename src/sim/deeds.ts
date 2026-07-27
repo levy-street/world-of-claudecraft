@@ -29,6 +29,7 @@ import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, ZONES, zoneAt } from './data';
+import { proceduralQuality } from './procedural_item';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -43,6 +44,7 @@ import {
   type Entity,
   type EquipSlot,
   type ItemDef,
+  type ItemInstancePayload,
   MAX_LEVEL,
   NYTHRAXIS_ROOM_RADIUS,
 } from './types';
@@ -481,7 +483,7 @@ export function markItemDiscovered(
   ctx: SimContext,
   meta: PlayerMeta,
   itemId: string,
-  rolledQuality?: string,
+  rolledQualityOrInstance?: string | ItemInstancePayload,
 ): void {
   // A heroic instance drops the generated heroic_<base> variant in place of
   // the base item (same display name, same set membership); collection deeds
@@ -500,7 +502,18 @@ export function markItemDiscovered(
       meta.deedStats.itemsDiscovered.add(id);
       markDeedDirtyKey(ctx, meta.entityId, 'items');
     }
-    const quality = (id === itemId ? rolledQuality : undefined) ?? def.quality;
+    const instance =
+      id === itemId && typeof rolledQualityOrInstance === 'object'
+        ? rolledQualityOrInstance
+        : undefined;
+    const rolledQuality =
+      id === itemId && typeof rolledQualityOrInstance === 'string'
+        ? rolledQualityOrInstance
+        : instance?.rolled?.quality;
+    const quality =
+      (instance?.procedural
+        ? (proceduralQuality(instance.procedural.rarity) ?? rolledQuality)
+        : rolledQuality) ?? def.quality;
     if (quality === 'rare' || quality === 'epic' || quality === 'legendary') {
       markVisited(ctx, meta, `quality:${quality}`);
     }
@@ -705,8 +718,8 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   },
 };
 
-// The heroic-mark daily circuit reads the four launch heroics, PINNED (the
-// Nythraxis arena also pays marks but is deliberately not required).
+// The heroic-mark daily circuit reads the four launch heroics. Nythraxis is
+// loot-only and deliberately outside this circuit.
 const MARK_CIRCUIT_DUNGEONS = [
   'hollow_crypt',
   'sunken_bastion',
@@ -1036,17 +1049,16 @@ export function recomputeRenown(meta: PlayerMeta): void {
  *  every join; the set only grows, so re-seeding is idempotent. */
 export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
   for (const slot of meta.inventory) {
-    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance);
   }
   for (const slot of meta.bank.inventory) {
-    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance);
   }
   for (const [slot, itemId] of Object.entries(meta.equipment) as [
     EquipSlot,
     string | undefined,
   ][]) {
-    if (itemId)
-      markItemDiscovered(ctx, meta, itemId, meta.equipmentInstance[slot]?.rolled?.quality);
+    if (itemId) markItemDiscovered(ctx, meta, itemId, meta.equipmentInstance[slot]);
   }
   for (const bagId of meta.bags) {
     if (bagId) markItemDiscovered(ctx, meta, bagId);
@@ -1055,7 +1067,7 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
     // Buyback entries persist bare {itemId, count} today, but the rolled
     // quality rides along like the sibling loops so a future instance payload
     // cannot silently under-credit quality-first discoveries.
-    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance);
   }
 }
 

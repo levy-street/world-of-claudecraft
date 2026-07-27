@@ -437,6 +437,25 @@ export function formatNumber(
   return numberFormatFor(languageTag(lang), options).format(value);
 }
 
+const listFormatCache = new Map<string, Intl.ListFormat>();
+
+/** Format a player-visible list with the active locale's conjunction and
+ * punctuation rules. `unit` lists are useful for compact metadata rows. */
+export function formatList(
+  values: readonly string[],
+  options: Intl.ListFormatOptions = { style: 'long', type: 'conjunction' },
+  lang: SupportedLanguage = currentLanguage,
+): string {
+  const tag = languageTag(lang);
+  const key = `${tag}${JSON.stringify(options)}`;
+  let formatter = listFormatCache.get(key);
+  if (!formatter) {
+    formatter = new Intl.ListFormat(tag, options);
+    listFormatCache.set(key, formatter);
+  }
+  return formatter.format(values);
+}
+
 // A localized "N seconds" duration phrase (the API rate-limit error renders a
 // server-supplied retry delay this way; the server sends the raw seconds and never
 // localizes). Uses Intl's unit style so each locale's plural rules apply, including

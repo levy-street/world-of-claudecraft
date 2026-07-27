@@ -17,6 +17,7 @@ export type ItemWeaponType = WeaponSkinType | 'polearm';
 
 export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   // Swords
+  iron_broadsword: 'sword',
   worn_sword: 'sword',
   ironedge_longsword: 'sword',
   thorium_warblade: 'sword',
@@ -41,6 +42,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   bonewrought_greatsword: 'sword',
   direfang_greatblade: 'sword',
   // Daggers
+  mirefen_dirk: 'dagger',
   rusty_dagger: 'dagger',
   whetted_iron_dirk: 'dagger',
   keen_dirk: 'dagger',
@@ -68,6 +70,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   mistcallers_fang: 'dagger',
   first_blood_razor: 'dagger',
   // Maces
+  iron_flanged_mace: 'mace',
   training_mace: 'mace',
   copper_flanged_mace: 'mace',
   ironshod_maul: 'mace',
@@ -85,6 +88,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   maul_of_the_scourged_wilds: 'mace',
   wildsoul_maul: 'mace',
   // Axes
+  thornpeak_war_axe: 'axe',
   rusty_hatchet: 'axe',
   copper_bearded_axe: 'axe',
   arcanite_war_axe: 'axe',
@@ -96,6 +100,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   drogmars_skullcleaver: 'axe',
   gravewyrm_cleaver: 'axe',
   // Staves
+  ashwood_staff: 'staff',
   gnarled_staff: 'staff',
   elderwood_battle_staff: 'staff',
   apprentice_staff: 'staff',
@@ -120,6 +125,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   cragthorn_greatstaff: 'staff',
   nightfangs_greatstaff: 'staff',
   // Wands
+  gravecaller_wand: 'wand',
   drowned_tide_scepter: 'wand',
   palecoil_rod: 'wand',
   drownedmoon_scepter: 'wand',
@@ -128,9 +134,13 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   scepter_of_the_deathless_court: 'wand',
   stormcallers_focus: 'wand',
   // Polearms (no skins target these)
+  thornpeak_polearm: 'polearm',
   tidereaver_gaff: 'polearm',
   ironbark_boar_spear: 'polearm',
   fen_reaver_glaive: 'polearm',
+  // Hunter ranged weapons
+  mirefen_hunting_bow: 'bow',
+  thornpeak_crossbow: 'crossbow',
 };
 
 /**

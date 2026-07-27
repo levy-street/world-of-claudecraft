@@ -18,6 +18,7 @@ import {
   instanceBonusStatLines,
   instanceMakersMarkLine,
   isGatheredProvenanceKind,
+  itemAdaptiveNumber,
   itemNumber,
   itemStatName,
   wornTooltipInstance,
@@ -25,6 +26,13 @@ import {
 import { svgIcon } from '../src/ui/ui_icons';
 
 describe('item_instance_tooltip', () => {
+  it('keeps effective Legendary fractions without padding whole values', () => {
+    expect(itemAdaptiveNumber(20)).toBe('20');
+    expect(itemAdaptiveNumber(19.5)).toBe('19.5');
+    expect(itemAdaptiveNumber(13.65)).toBe('13.65');
+    expect(itemAdaptiveNumber(1.2349)).toBe('1.235');
+  });
+
   it('masterwork copy gets the gold seal and no enchanted marker', () => {
     const html = instanceBadgeLines({
       signer: 'Anna',
@@ -303,6 +311,27 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
     ).toBe('');
   });
 
+  it('retains procedural identity while omitting private worn-state fields', () => {
+    const projected = wornTooltipInstance({
+      procedural: {
+        version: 1,
+        uid: 'pi1:worn:1',
+        baseId: 'ironedge_longsword',
+        itemLevel: 20,
+        rarity: 'rare',
+        affixes: [],
+        generatedName: {
+          baseId: 'ironedge_longsword',
+          rareWordIds: ['procedural.rare.storm', 'procedural.rare.vigil'],
+        },
+        seed: 7,
+      },
+      boundTo: 7,
+    });
+    expect(projected?.procedural?.uid).toBe('pi1:worn:1');
+    expect(projected).not.toHaveProperty('boundTo');
+  });
+
   it('char_window routes the paperdoll tooltip through the projection (source pin)', () => {
     const charWindow = readFileSync(new URL('../src/ui/char_window.ts', import.meta.url), 'utf8');
     expect(charWindow).toContain('wornTooltipInstance(');
@@ -353,30 +382,33 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
   });
 });
 
-// Composition ORDER inside hud.itemTooltip (the builders are pinned above,
-// the composed placement is hud.ts glue): badges under the soulbound line,
+// Composition order inside ItemPresentationController (the builders are pinned above):
+// badges under the soulbound line,
 // baked bonus stats after the def's own stat lines, the maker's mark near the
 // bottom (after the set block, before the sell price).
 import { readFileSync } from 'node:fs';
 
-describe('hud.itemTooltip composition order (source pins)', () => {
-  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+describe('ItemPresentationController composition order (source pins)', () => {
+  const source = readFileSync(
+    new URL('../src/ui/item_presentation_controller.ts', import.meta.url),
+    'utf8',
+  );
   const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
-  const badges = hud.indexOf('instanceBadgeLines(instance)');
-  const bonus = hud.indexOf('instanceBonusStatLines(instance)');
+  const badges = source.indexOf('instanceBadgeLines(resolverInstance)');
+  const bonus = source.indexOf('instanceBonusStatLines(resolverInstance)');
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
-  const mark = hud.indexOf('instanceMakersMarkLine(instance, item.kind)');
-  const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
-  const setBlock = hud.indexOf('this.itemSetBlock(item)');
+  const mark = source.indexOf('instanceMakersMarkLine(resolverInstance, item.kind)');
+  const soulbound = source.indexOf("t('hudChrome.itemSoulbound')");
+  const setBlock = source.indexOf('this.itemSetBlock(item)');
 
   it('composes all three instance line sets exactly once each', () => {
     expect(badges).toBeGreaterThan(-1);
     expect(bonus).toBeGreaterThan(-1);
     expect(mark).toBeGreaterThan(-1);
-    expect(hud.indexOf('instanceBadgeLines(instance)', badges + 1)).toBe(-1);
-    expect(hud.indexOf('instanceBonusStatLines(instance)', bonus + 1)).toBe(-1);
-    expect(hud.indexOf('instanceMakersMarkLine(', mark + 1)).toBe(-1);
+    expect(source.indexOf('instanceBadgeLines(resolverInstance)', badges + 1)).toBe(-1);
+    expect(source.indexOf('instanceBonusStatLines(resolverInstance)', bonus + 1)).toBe(-1);
+    expect(source.indexOf('instanceMakersMarkLine(', mark + 1)).toBe(-1);
   });
 
   it('orders them badge lines, then bonus stats, then the makers mark', () => {

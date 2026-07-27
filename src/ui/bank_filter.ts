@@ -14,13 +14,14 @@
 // the sweep's /_(?:view|core)\.ts$/ regex + the BARE_NAMED forward-completeness
 // cross-check, which only lists REGISTERED bare cores).
 
+import type { ItemDef } from '../sim/types';
 import { type BagFilterState, type ItemLookup, matchesCategory, qualityRank } from './bag_filter';
 import type { BankSlotModel } from './bank_view';
 
 // Resolve an item id to its localized display name (itemDisplayName in the painter).
 // Injected so the pure core never imports the i18n/entity layer; the bank matches
 // and sorts on this string so search and the name-sort agree with what the player sees.
-export type BankNameResolver = (itemId: string) => string;
+export type BankNameResolver = (model: BankSlotModel, item: ItemDef) => string;
 
 // Filter, then sort a bank grid model. Returns a NEW array; never mutates the input.
 // slotIndex is preserved verbatim through both filter and sort (it is the exact
@@ -42,13 +43,18 @@ export function filterBankSlots(
     const item = lookup(m.itemId);
     if (!item) return false;
     if (!matchesCategory(item, state.category)) return false;
-    if (query && !nameOf(m.itemId).toLowerCase().includes(query)) return false;
+    if (query && !nameOf(m, item).toLowerCase().includes(query)) return false;
     return true;
   });
   if (state.sort === 'quality') {
-    filtered.sort((a, b) => qualityRank(lookup(a.itemId)!) - qualityRank(lookup(b.itemId)!));
+    filtered.sort((a, b) => qualityRank(a.qualityKey) - qualityRank(b.qualityKey));
   } else if (state.sort === 'name') {
-    filtered.sort((a, b) => nameOf(a.itemId).localeCompare(nameOf(b.itemId)));
+    filtered.sort((a, b) => {
+      const aItem = lookup(a.itemId);
+      const bItem = lookup(b.itemId);
+      if (!aItem || !bItem) return 0;
+      return nameOf(a, aItem).localeCompare(nameOf(b, bItem));
+    });
   }
   return filtered;
 }

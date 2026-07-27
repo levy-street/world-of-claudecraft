@@ -1547,6 +1547,11 @@ export const ru_RU: EnTranslations = {
       "itemAriaEnchanted": "{item}, количество {count}, зачарованный экземпляр",
       "itemAriaBound": "{item}, количество {count}, привязанный экземпляр",
       "itemAriaMasterwork": "{item}, количество {count}, шедевр",
+      "itemAriaProcedural": "{item}, {rarity}, уровень предмета {level}, количество {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, уровень предмета {level}, количество {count}, шедевр",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, уровень предмета {level}, количество {count}, зачарованный экземпляр",
+      "itemAriaProceduralSigned": "{item}, {rarity}, уровень предмета {level}, количество {count}, экземпляр с подписью мастера",
+      "itemAriaProceduralBound": "{item}, {rarity}, уровень предмета {level}, количество {count}, привязанный экземпляр",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
@@ -2568,6 +2573,12 @@ export const ru_RU: EnTranslations = {
       "lockedFor": "Закрыто еще примерно {minutes} мин",
       "attunement": "Требуется допуск: {quest}",
       "heroicMarks": "Героические знаки: {count} на игрока",
+      "raidRewards": "Предпросмотр наград Никсраксиса",
+      "raidSharedDrop": "На последнем трупе появится один общий процедурный предмет, за который бросает весь рейд.",
+      "raidRarityLine": "Редкий {rare}% · Эпический {epic}% · Легендарный {legendary}%",
+      "raidItemLevels": "Уровень предмета: редкий {rare} · эпический {epic} · легендарный {legendary}",
+      "raidSignatures": "Особые легендарные силы: {signatures}",
+      "raidForgedLegendary": "Героические легендарные силы имеют рейдовую ковку и гарантированно попадают в верхнюю половину заданного диапазона.",
       "entrance": "Вход: {zone}",
       "showOnMap": "Показать на карте",
       "encounters": "Босс-схватки",
@@ -6640,7 +6651,113 @@ export const ru_RU: EnTranslations = {
       "dps": "Урон/сек",
       "critChance": "Шанс крита",
       "dodge": "Уклонение",
-      "parry": "Парирование"
+      "parry": "Парирование",
+      "weaponMin": "Минимальный урон оружия",
+      "weaponMax": "Максимальный урон оружия",
+      "weaponDps": "Урон оружия в секунду",
+      "healthOnKill": "Здоровье за убийство",
+      "manaOnKill": "Мана за убийство",
+      "blockValue": "Сила блока"
+    },
+    "procedural": {
+      "rollRangeAria": "Возможное значение от {min} до {max}",
+      "advancedDetailsHint": "Удерживайте {key}, чтобы показать диапазоны возможных значений.",
+      "powerRollPercent": "Значение свойства: {value}%",
+      "powerRollMilliseconds": "Значение свойства: {value} мс",
+      "powerRollResource": "Значение свойства: {value} ресурса",
+      "powerRollNumber": "Значение свойства: {value}",
+      "legendaryPower": "Легендарное свойство",
+      "legendaryLimit": "Уникально экипировано: {count} легендарное свойство",
+      "rarity": {
+        "common": "Обычный",
+        "magic": "Магический",
+        "rare": "Редкий",
+        "epic": "Эпический",
+        "legendary": "Легендарный",
+        "mythic": "Мифический"
+      },
+      "nameFragment": {
+        "mighty": "Могучий",
+        "deft": "Ловкий",
+        "stalwart": "Стойкий",
+        "sages": "Мудреца",
+        "spiritual": "Духовный",
+        "of_focus": "сосредоточения",
+        "of_striking": "удара",
+        "of_alacrity": "проворства",
+        "of_precision": "точности",
+        "warded": "Оберегаемый",
+        "of_reaping": "жатвы",
+        "of_remembrance": "памяти"
+      },
+      "rareWord": {
+        "ashen": "Пепельный",
+        "blackfen": "Чернотопь",
+        "doom": "Рок",
+        "grave": "Могила",
+        "mire": "Трясина",
+        "storm": "Буря",
+        "thorn": "Шип",
+        "wyrm": "Змей",
+        "bite": "Укус",
+        "brand": "Клеймо",
+        "promise": "Обещание",
+        "thread": "Нить",
+        "vigil": "Дозор",
+        "ward": "Оберег",
+        "whisper": "Шёпот",
+        "oath": "Клятва"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Корона последнего костра",
+          "description": "Каждый третий Cinderbolt обжигает врагов рядом с целью."
+        },
+        "greyjaws_edge": {
+          "name": "Кромка Серой Челюсти",
+          "description": "Каждый третий удар оружием вызывает кровотечение у цели и восстанавливает немного основного ресурса."
+        },
+        "hushwood_longbow": {
+          "name": "Длинный лук Тихолесья",
+          "description": "Long Draw или Fell Shot может ненадолго лишить цель возможности произносить заклинания."
+        },
+        "nightglass_fang": {
+          "name": "Клык ночного стекла",
+          "description": "Убийство ненадолго повышает скорость."
+        },
+        "ysoleis_vigil": {
+          "name": "Дозор Исолеи",
+          "description": "Критическое исцеление ненадолго создает восстанавливающую область."
+        },
+        "stormwake_idol": {
+          "name": "Идол следа бури",
+          "description": "Каждый четвертый Arc Bolt переходит на ближайших врагов."
+        },
+        "ashbinders_seal": {
+          "name": "Печать Связующего Пепел",
+          "description": "Каждый четвертый Gloom Bolt отмечает цель для дополнительного урона от Тьмы."
+        },
+        "dawnward_signet": {
+          "name": "Перстень Рассветного Стража",
+          "description": "Mending Light создает на цели щит на часть объема исцеления."
+        },
+        "feral_moonclasp": {
+          "name": "Лунная застежка зверя",
+          "description": "Каждый третий Lunar Tempest восстанавливает основной ресурс."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Колокол девятого звона",
+          "description": "Каждое второе наносящее урон заклинание звонит вокруг цели."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Мантия украденных часов",
+          "description": "При падении здоровья ниже 35% ненадолго дает защитный оберег."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Сапоги неразрывной дороги",
+          "description": "После перемещения на 15 ярдов ненадолго повышает скорость передвижения."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const ru_RU: EnTranslations = {
       "greed": "Жадность",
       "pass": "Пас",
       "needAria": "Нужно: {item}",
+      "needUnavailable": "Нельзя выбрать «Нужно»: ваш класс не может экипировать этот предмет.",
+      "needUnavailablePower": "Выбрать «Нужно» нельзя: эта легендарная сила предназначена для другого класса.",
       "greedAria": "Жадность: {item}",
       "passAria": "Пас: {item}",
       "everyonePassed": "Все отказались от {item}.",
@@ -9170,6 +9289,108 @@ export const ru_RU: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Резонирующая древесина"
+      },
+      "ashwood_staff": {
+        "name": "Ясеневый посох"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Матерчатые обмотки Могильного призывателя"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Матерчатый капюшон Могильного призывателя"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Матерчатые поножи Могильного призывателя"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Матерчатое наплечье Могильного призывателя"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Матерчатое облачение Могильного призывателя"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Матерчатый кушак Могильного призывателя"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Матерчатые туфли Могильного призывателя"
+      },
+      "gravecaller_focus": {
+        "name": "Фокус Могильного призывателя"
+      },
+      "gravecaller_pendant": {
+        "name": "Подвеска Могильного призывателя"
+      },
+      "gravecaller_ring": {
+        "name": "Кольцо Могильного призывателя"
+      },
+      "gravecaller_wand": {
+        "name": "Жезл Могильного призывателя"
+      },
+      "iron_broadsword": {
+        "name": "Железный палаш"
+      },
+      "iron_flanged_mace": {
+        "name": "Железная фланцевая булава"
+      },
+      "mirefen_dirk": {
+        "name": "Кортик Топей"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Охотничий лук Топей"
+      },
+      "mirefen_leather_belt": {
+        "name": "Кожаный пояс Топей"
+      },
+      "mirefen_leather_boots": {
+        "name": "Кожаные сапоги Топей"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Кожаные перчатки Топей"
+      },
+      "mirefen_leather_hood": {
+        "name": "Кожаный капюшон Топей"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Кожаный колет Топей"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Кожаные поножи Топей"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Кожаные наплечники Топей"
+      },
+      "thornpeak_bulwark": {
+        "name": "Оплот Шипастого пика"
+      },
+      "thornpeak_crossbow": {
+        "name": "Арбалет Шипастого пика"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Кольчужный нагрудник Шипастого пика"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Кольчужные рукавицы Шипастого пика"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Кольчужный пояс Шипастого пика"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Кольчужный шлем Шипастого пика"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Кольчужные набедренники Шипастого пика"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Кольчужные наплечники Шипастого пика"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Кольчужные сабатоны Шипастого пика"
+      },
+      "thornpeak_polearm": {
+        "name": "Древковое оружие Шипастого пика"
+      },
+      "thornpeak_war_axe": {
+        "name": "Боевой топор Шипастого пика"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

@@ -1547,6 +1547,11 @@ export const fr_CA: EnTranslations = {
       "itemAriaEnchanted": "{item}, quantité {count}, copie enchantée",
       "itemAriaBound": "{item}, quantité {count}, copie liée",
       "itemAriaMasterwork": "{item}, quantité {count}, chef-d'oeuvre",
+      "itemAriaProcedural": "{item}, {rarity}, niveau d'objet {level}, quantité {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, niveau d'objet {level}, quantité {count}, chef-d'œuvre",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, niveau d'objet {level}, quantité {count}, copie enchantée",
+      "itemAriaProceduralSigned": "{item}, {rarity}, niveau d'objet {level}, quantité {count}, copie marquée par le fabricant",
+      "itemAriaProceduralBound": "{item}, {rarity}, niveau d'objet {level}, quantité {count}, copie liée",
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
       "filterWeapon": "Armes",
@@ -2169,9 +2174,9 @@ export const fr_CA: EnTranslations = {
       "notReady": "Ce nœud de ressource n'a pas encore réapparu pour vous.",
       "gatherLine": "Vous rassemblez : {name}.",
       "gatherLineQty": "Vous rassemblez : {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Vous récoltez : {name}.",
+      "harvestLineQty": "Vous récoltez : {name} x{qty}.",
+      "harvestSpecimenLine": "Vous récupérez également {name}.",
       "catchLine": "Vous remontez : {name}",
       "biteLine": "Quelque chose mord à l'hameçon !",
       "gotAwayLine": "Il s'est échappé.",
@@ -2353,7 +2358,7 @@ export const fr_CA: EnTranslations = {
       "empty": "Aucune recette connue pour l'instant.",
       "resultAria": "Artisanat {name}",
       "craftedToast": "Fabriqué$1 {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Fabriqué : {name} x{qty}",
       "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
       "unknownRecipe": "Cette recette n'existe pas.",
       "comboRequirementUnmet": "Vous ne possédez pas les deux métiers requis au palier nécessaire pour cette recette.",
@@ -2446,13 +2451,13 @@ export const fr_CA: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Vous désenchantez {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Vous désenchantez {item} pour obtenir {material}.",
+      "disenchantedYieldQty": "Vous désenchantez {item} pour obtenir {material} x{qty}.",
+      "disenchantedAlso": "Vous récupérez également {material}.",
+      "disenchantedAlsoQty": "Vous récupérez également {material} x{qty}.",
       "salvagedLine": "Vous récupérez {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Vous récupérez {material} à partir de {item}.",
+      "salvagedYieldQty": "Vous récupérez {material} x{qty} à partir de {item}.",
       "enchantAppliedLine": "Vous enchantez {item} avec {enchant}.",
       "notHeld": "Vous n'avez pas cet objet.",
       "notDisenchantable": "Vous ne pouvez pas désenchanter cela.",
@@ -2489,14 +2494,14 @@ export const fr_CA: EnTranslations = {
       "sameEnchant": "Cet objet a déjà cet enchantement.",
       "replaceTag": "Remplace {enchant}",
       "sameEnchantTag": "Déjà appliqué",
-      "plainTag": "Not enchanted",
+      "plainTag": "Non enchanté",
       "replaceConfirmTitle": "Remplacer l'enchantement sur {item} ?",
       "replaceConfirmBody": "Cela remplace {old} sur {item} par {new}.",
       "replaceConfirmNoRefund": "L'ancien enchantement est détruit sans remboursement. Cette action est irréversible.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Conservé : {kept}",
+      "replaceConfirmKeepsSigner": "Marque de l'artisan",
+      "replaceConfirmKeepsMasterwork": "Bonus de chef-d'œuvre",
+      "replaceConfirmKeepsBond": "Lien de commande",
       "replaceConfirmCost": "Coût : {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Remplacer"
@@ -2568,6 +2573,12 @@ export const fr_CA: EnTranslations = {
       "lockedFor": "Verrouillé environ {minutes} min",
       "attunement": "Harmonisation requise: {quest}",
       "heroicMarks": "Marques héroïques: {count} par joueur",
+      "raidRewards": "Aperçu des récompenses de Nythraxis",
+      "raidSharedDrop": "Le cadavre du boss final ajoute un objet procédural partagé pour lequel le raid peut effectuer un jet.",
+      "raidRarityLine": "Rare {rare}% · Épique {epic}% · Légendaire {legendary}%",
+      "raidItemLevels": "Niveau d'objet : Rare {rare} · Épique {epic} · Légendaire {legendary}",
+      "raidSignatures": "Pouvoirs légendaires emblématiques : {signatures}",
+      "raidForgedLegendary": "Les pouvoirs légendaires héroïques sont forgés en raid et leur jet est garanti dans la moitié supérieure de la plage définie.",
       "entrance": "Entrée: {zone}",
       "showOnMap": "Afficher sur la carte",
       "encounters": "Rencontres",
@@ -6640,7 +6651,113 @@ export const fr_CA: EnTranslations = {
       "dps": "Dégâts/s",
       "critChance": "Chances de critique",
       "dodge": "Esquive",
-      "parry": "Parade"
+      "parry": "Parade",
+      "weaponMin": "Dégâts d’arme minimum",
+      "weaponMax": "Dégâts d’arme maximum",
+      "weaponDps": "Dégâts d’arme par seconde",
+      "healthOnKill": "Points de vie par victime",
+      "manaOnKill": "Mana par victime",
+      "blockValue": "Valeur de blocage"
+    },
+    "procedural": {
+      "rollRangeAria": "Jet possible de {min} à {max}",
+      "advancedDetailsHint": "Maintenez {key} pour afficher les plages de jets possibles.",
+      "powerRollPercent": "Jet de pouvoir : {value}%",
+      "powerRollMilliseconds": "Jet de pouvoir : {value} ms",
+      "powerRollResource": "Jet de pouvoir : {value} de ressource",
+      "powerRollNumber": "Jet de pouvoir : {value}",
+      "legendaryPower": "Pouvoir légendaire",
+      "legendaryLimit": "Unique équipé : {count} pouvoir légendaire",
+      "rarity": {
+        "common": "Commun",
+        "magic": "Magique",
+        "rare": "Rare",
+        "epic": "Épique",
+        "legendary": "Légendaire",
+        "mythic": "Mythique"
+      },
+      "nameFragment": {
+        "mighty": "Puissant",
+        "deft": "Habile",
+        "stalwart": "Robuste",
+        "sages": "du Sage",
+        "spiritual": "Spirituel",
+        "of_focus": "de Focalisation",
+        "of_striking": "de Frappe",
+        "of_alacrity": "d’Alacrité",
+        "of_precision": "de Précision",
+        "warded": "Protégé",
+        "of_reaping": "de Moisson",
+        "of_remembrance": "du Souvenir"
+      },
+      "rareWord": {
+        "ashen": "Cendré",
+        "blackfen": "Marais-Noir",
+        "doom": "Fléau",
+        "grave": "Tombe",
+        "mire": "Bourbe",
+        "storm": "Tempête",
+        "thorn": "Épine",
+        "wyrm": "Wyrm",
+        "bite": "Morsure",
+        "brand": "Marque",
+        "promise": "Promesse",
+        "thread": "Fil",
+        "vigil": "Veille",
+        "ward": "Protection",
+        "whisper": "Murmure",
+        "oath": "Serment"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Couronne du Dernier Bûcher",
+          "description": "Chaque troisième Trait de braises brûle les ennemis proches de la cible."
+        },
+        "greyjaws_edge": {
+          "name": "Tranchant de Mâchoire-Grise",
+          "description": "Un coup d’arme sur trois fait saigner la cible et rend un peu de ressource."
+        },
+        "hushwood_longbow": {
+          "name": "Arc long du Bois-sourd",
+          "description": "Tir tendu ou Tir funeste peut brièvement réduire sa cible au silence."
+        },
+        "nightglass_fang": {
+          "name": "Croc de Verre nocturne",
+          "description": "Tuer un ennemi confère une brève accélération."
+        },
+        "ysoleis_vigil": {
+          "name": "Veille d’Ysolei",
+          "description": "Un soin critique crée brièvement une zone réparatrice au sol."
+        },
+        "stormwake_idol": {
+          "name": "Idole de l’Éveil de la tempête",
+          "description": "Chaque quatrième Éclair d’arc se propage aux ennemis proches."
+        },
+        "ashbinders_seal": {
+          "name": "Sceau du Lieur de cendres",
+          "description": "Chaque quatrième Trait de pénombre marque sa cible, qui subit des dégâts d’Ombre supplémentaires."
+        },
+        "dawnward_signet": {
+          "name": "Chevalière de l’Aube",
+          "description": "Lumière guérisseuse protège son bénéficiaire avec un bouclier proportionnel aux soins."
+        },
+        "feral_moonclasp": {
+          "name": "Fermoir de Lune farouche",
+          "description": "Chaque troisième Trait sauvage rend de la ressource principale."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Cloche du Neuvième Glas",
+          "description": "Un sort de dégâts sur deux résonne autour de la cible."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Mantelet des Heures volées",
+          "description": "Passer sous 35% de points de vie confère une brève protection défensive."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Bottes de la Route ininterrompue",
+          "description": "Parcourir 15 mètres confère une brève accélération de déplacement."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{kind} {quality}",
@@ -6816,6 +6933,8 @@ export const fr_CA: EnTranslations = {
       "greed": "Cupidité",
       "pass": "Passer",
       "needAria": "Besoin pour {item}",
+      "needUnavailable": "L’option Besoin est indisponible, car votre classe ne peut pas équiper cet objet.",
+      "needUnavailablePower": "L’option Besoin est indisponible, car ce pouvoir légendaire est réservé à une autre classe.",
       "greedAria": "Cupidité pour {item}",
       "passAria": "Passer pour {item}",
       "everyonePassed": "Tout le monde a passé pour {item}.",
@@ -9170,6 +9289,108 @@ export const fr_CA: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Bois résonnant"
+      },
+      "ashwood_staff": {
+        "name": "Bâton de frêne"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Bandelettes en tissu de Gravecaller"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Capuche en tissu de Gravecaller"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Jambières en tissu de Gravecaller"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Mantelet en tissu de Gravecaller"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Atours en tissu de Gravecaller"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Ceinture en tissu de Gravecaller"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Chaussons en tissu de Gravecaller"
+      },
+      "gravecaller_focus": {
+        "name": "Focalisateur de Gravecaller"
+      },
+      "gravecaller_pendant": {
+        "name": "Pendentif de Gravecaller"
+      },
+      "gravecaller_ring": {
+        "name": "Anneau de Gravecaller"
+      },
+      "gravecaller_wand": {
+        "name": "Baguette de Gravecaller"
+      },
+      "iron_broadsword": {
+        "name": "Espadon en fer"
+      },
+      "iron_flanged_mace": {
+        "name": "Masse à ailettes en fer"
+      },
+      "mirefen_dirk": {
+        "name": "Dague de Mirefen"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Arc de chasse de Mirefen"
+      },
+      "mirefen_leather_belt": {
+        "name": "Ceinture en cuir de Mirefen"
+      },
+      "mirefen_leather_boots": {
+        "name": "Bottes en cuir de Mirefen"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Gants en cuir de Mirefen"
+      },
+      "mirefen_leather_hood": {
+        "name": "Capuche en cuir de Mirefen"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Pourpoint en cuir de Mirefen"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Jambières en cuir de Mirefen"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Garde-épaules en cuir de Mirefen"
+      },
+      "thornpeak_bulwark": {
+        "name": "Rempart de Thornpeak"
+      },
+      "thornpeak_crossbow": {
+        "name": "Arbalète de Thornpeak"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Plastron en mailles de Thornpeak"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Gantelets en mailles de Thornpeak"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Ceinturon en mailles de Thornpeak"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Heaume en mailles de Thornpeak"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Jambières en mailles de Thornpeak"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Espauliers en mailles de Thornpeak"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Solerets en mailles de Thornpeak"
+      },
+      "thornpeak_polearm": {
+        "name": "Arme d'hast de Thornpeak"
+      },
+      "thornpeak_war_axe": {
+        "name": "Hache de guerre de Thornpeak"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

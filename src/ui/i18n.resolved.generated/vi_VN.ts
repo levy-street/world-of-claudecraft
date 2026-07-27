@@ -1547,6 +1547,11 @@ export const vi_VN: EnTranslations = {
       "itemAriaEnchanted": "{item}, số lượng {count}, bản đã pháp khắc",
       "itemAriaBound": "{item}, số lượng {count}, bản sao ràng buộc",
       "itemAriaMasterwork": "{item}, số lượng {count}, kiệt tác",
+      "itemAriaProcedural": "{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}",
+      "itemAriaProceduralMasterwork": "{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}, kiệt tác",
+      "itemAriaProceduralEnchanted": "{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}, bản sao được phù phép",
+      "itemAriaProceduralSigned": "{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}, bản sao có dấu người chế tác",
+      "itemAriaProceduralBound": "{item}, {rarity}, cấp vật phẩm {level}, số lượng {count}, bản sao đã khóa",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",
@@ -2169,9 +2174,9 @@ export const vi_VN: EnTranslations = {
       "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
       "gatherLine": "Bạn tập hợp: {name}.",
       "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Bạn thu hoạch: {name}.",
+      "harvestLineQty": "Bạn thu hoạch: {name} x{qty}.",
+      "harvestSpecimenLine": "Bạn cũng thu hồi {name}.",
       "catchLine": "Bạn giật cần: {name}",
       "biteLine": "Có thứ gì đó cắn mồi!",
       "gotAwayLine": "Nó thoát mất rồi.",
@@ -2353,7 +2358,7 @@ export const vi_VN: EnTranslations = {
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Đã chế tác: {name} x{qty}",
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
       "unknownRecipe": "Công thức đó không tồn tại.",
       "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
@@ -2446,13 +2451,13 @@ export const vi_VN: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Bạn hủy pháp khắc {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Bạn hủy pháp khắc {item} thành {material}.",
+      "disenchantedYieldQty": "Bạn hủy pháp khắc {item} thành {material} x{qty}.",
+      "disenchantedAlso": "Bạn cũng thu hồi {material}.",
+      "disenchantedAlsoQty": "Bạn cũng thu hồi {material} x{qty}.",
       "salvagedLine": "Bạn tháo dỡ {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Bạn tháo dỡ {item} thành {material}.",
+      "salvagedYieldQty": "Bạn tháo dỡ {item} thành {material} x{qty}.",
       "enchantAppliedLine": "Bạn pháp khắc {item} với {enchant}.",
       "notHeld": "Bạn không có vật phẩm đó.",
       "notDisenchantable": "Bạn không thể hủy pháp khắc vật phẩm đó.",
@@ -2489,14 +2494,14 @@ export const vi_VN: EnTranslations = {
       "sameEnchant": "Vật phẩm đó đã có phép khắc đó rồi.",
       "replaceTag": "Thay Thế {enchant}",
       "sameEnchantTag": "Đã Áp Dụng",
-      "plainTag": "Not enchanted",
+      "plainTag": "Chưa khắc phép",
       "replaceConfirmTitle": "Thay Thế Pháp Khắc Trên {item}?",
       "replaceConfirmBody": "Thao tác này thay thế {old} trên {item} bằng {new}.",
       "replaceConfirmNoRefund": "Pháp khắc cũ sẽ bị phá hủy. Nguyên liệu của nó sẽ không được hoàn lại. Không thể hoàn tác.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Được giữ lại: {kept}",
+      "replaceConfirmKeepsSigner": "Dấu của người chế tác",
+      "replaceConfirmKeepsMasterwork": "Thưởng kiệt tác",
+      "replaceConfirmKeepsBond": "Ràng buộc đơn đặt hàng",
       "replaceConfirmCost": "Chi phí: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Thay Thế"
@@ -2568,6 +2573,12 @@ export const vi_VN: EnTranslations = {
       "lockedFor": "Bị khóa khoảng {minutes} phút",
       "attunement": "Yêu cầu điều chỉnh: {quest}",
       "heroicMarks": "Dấu Anh Hùng: {count} mỗi người chơi",
+      "raidRewards": "Xem trước phần thưởng Nythraxis",
+      "raidSharedDrop": "Xác cuối cùng thêm một vật phẩm theo thủ tục dùng chung để cả nhóm đột kích cùng gieo xúc xắc.",
+      "raidRarityLine": "Hiếm {rare}% · Sử Thi {epic}% · Huyền Thoại {legendary}%",
+      "raidItemLevels": "Cấp vật phẩm: Hiếm {rare} · Sử Thi {epic} · Huyền Thoại {legendary}",
+      "raidSignatures": "Sức mạnh Huyền Thoại đặc trưng: {signatures}",
+      "raidForgedLegendary": "Sức mạnh Huyền Thoại Anh Hùng được rèn trong đột kích và bảo đảm nằm ở nửa trên của khoảng kết quả được thiết kế.",
       "entrance": "Lối vào: {zone}",
       "showOnMap": "Hiển Thị Trên Bản Đồ",
       "encounters": "Cuộc Đối Đầu",
@@ -6640,7 +6651,113 @@ export const vi_VN: EnTranslations = {
       "dps": "Sát thương/giây",
       "critChance": "Tỉ Lệ Chí Mạng",
       "dodge": "Né Tránh",
-      "parry": "Đỡ Đòn"
+      "parry": "Đỡ Đòn",
+      "weaponMin": "Sát thương vũ khí tối thiểu",
+      "weaponMax": "Sát thương vũ khí tối đa",
+      "weaponDps": "Sát thương vũ khí mỗi giây",
+      "healthOnKill": "Máu khi hạ gục",
+      "manaOnKill": "Năng lượng khi hạ gục",
+      "blockValue": "Giá trị chặn"
+    },
+    "procedural": {
+      "rollRangeAria": "Chỉ số có thể từ {min} đến {max}",
+      "advancedDetailsHint": "Giữ {key} để hiển thị các khoảng chỉ số có thể nhận.",
+      "powerRollPercent": "Chỉ số sức mạnh: {value}%",
+      "powerRollMilliseconds": "Chỉ số sức mạnh: {value} ms",
+      "powerRollResource": "Chỉ số sức mạnh: {value} tài nguyên",
+      "powerRollNumber": "Chỉ số sức mạnh: {value}",
+      "legendaryPower": "Sức mạnh Huyền Thoại",
+      "legendaryLimit": "Trang bị duy nhất: {count} sức mạnh Huyền Thoại",
+      "rarity": {
+        "common": "Thường",
+        "magic": "Ma Thuật",
+        "rare": "Hiếm",
+        "epic": "Sử Thi",
+        "legendary": "Huyền Thoại",
+        "mythic": "Thần Thoại"
+      },
+      "nameFragment": {
+        "mighty": "Hùng Mạnh",
+        "deft": "Khéo Léo",
+        "stalwart": "Kiên Cường",
+        "sages": "của Hiền Giả",
+        "spiritual": "Tâm Linh",
+        "of_focus": "của Tập Trung",
+        "of_striking": "của Đả Kích",
+        "of_alacrity": "của Nhanh Nhẹn",
+        "of_precision": "của Chính Xác",
+        "warded": "Được Bảo Hộ",
+        "of_reaping": "của Gặt Hái",
+        "of_remembrance": "của Tưởng Nhớ"
+      },
+      "rareWord": {
+        "ashen": "Tro Tàn",
+        "blackfen": "Đầm Đen",
+        "doom": "Diệt Vong",
+        "grave": "Mộ Phần",
+        "mire": "Bùn Lầy",
+        "storm": "Bão Tố",
+        "thorn": "Gai Nhọn",
+        "wyrm": "Cự Long",
+        "bite": "Vết Cắn",
+        "brand": "Dấu Ấn",
+        "promise": "Lời Hứa",
+        "thread": "Sợi Chỉ",
+        "vigil": "Canh Thức",
+        "ward": "Bảo Hộ",
+        "whisper": "Lời Thì Thầm",
+        "oath": "Lời Thề"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Vương Miện Giàn Hỏa Cuối Cùng",
+          "description": "Mỗi Tia Tàn Lửa thứ ba thiêu đốt kẻ địch gần mục tiêu."
+        },
+        "greyjaws_edge": {
+          "name": "Lưỡi Cạnh Hàm Xám",
+          "description": "Mỗi đòn vũ khí thứ ba khiến mục tiêu chảy máu và hồi một ít tài nguyên."
+        },
+        "hushwood_longbow": {
+          "name": "Cung Dài Rừng Tĩnh Lặng",
+          "description": "Kéo Cung Dài hoặc Bắn Tà Ác có thể khiến mục tiêu câm lặng trong thời gian ngắn."
+        },
+        "nightglass_fang": {
+          "name": "Nanh Thủy Tinh Đêm",
+          "description": "Hạ gục một kẻ địch giúp tăng nhanh nhẹn trong thời gian ngắn."
+        },
+        "ysoleis_vigil": {
+          "name": "Canh Thức của Ysolei",
+          "description": "Hồi phục chí mạng tạo một vùng phục hồi ngắn trên mặt đất."
+        },
+        "stormwake_idol": {
+          "name": "Thần Tượng Bão Thức Tỉnh",
+          "description": "Mỗi Tia Hồ Quang thứ tư lan sang kẻ địch ở gần."
+        },
+        "ashbinders_seal": {
+          "name": "Ấn của Kẻ Buộc Tro",
+          "description": "Mỗi Tia U Ám thứ tư đánh dấu mục tiêu để chịu thêm sát thương Bóng Tối."
+        },
+        "dawnward_signet": {
+          "name": "Nhẫn Ấn Canh Giữ Bình Minh",
+          "description": "Thánh Quang Chữa Lành tạo lá chắn cho người nhận bằng một phần lượng hồi phục."
+        },
+        "feral_moonclasp": {
+          "name": "Khuy Cài Trăng Hoang Dã",
+          "description": "Mỗi Tia Hoang Dã thứ ba hồi phục tài nguyên chính."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Chuông Ngân Thứ Chín",
+          "description": "Mỗi phép gây sát thương thứ hai ngân vang quanh mục tiêu."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Áo Choàng Những Giờ Bị Đánh Cắp",
+          "description": "Khi máu giảm dưới 35%, nhận một lớp bảo hộ phòng thủ ngắn."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Ủng Con Đường Bất Đoạn",
+          "description": "Di chuyển 15 thước giúp tăng tốc độ di chuyển trong thời gian ngắn."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6816,6 +6933,8 @@ export const vi_VN: EnTranslations = {
       "greed": "Tham Lam",
       "pass": "Bỏ Qua",
       "needAria": "Cần Dùng {item}",
+      "needUnavailable": "Không thể chọn Cần Dùng vì lớp nhân vật của bạn không thể trang bị vật phẩm này.",
+      "needUnavailablePower": "Không thể chọn Cần Dùng vì sức mạnh Huyền Thoại này chỉ dành cho lớp nhân vật khác.",
       "greedAria": "Tham Lam giành {item}",
       "passAria": "Bỏ qua {item}",
       "everyonePassed": "Mọi người đều bỏ qua {item}.",
@@ -9170,6 +9289,108 @@ export const vi_VN: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Gỗ Cộng Hưởng"
+      },
+      "ashwood_staff": {
+        "name": "Trượng gỗ tần bì"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Băng tay vải của Kẻ Gọi Mộ"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Mũ trùm vải của Kẻ Gọi Mộ"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Quần vải của Kẻ Gọi Mộ"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Áo choàng vai vải của Kẻ Gọi Mộ"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Lễ phục vải của Kẻ Gọi Mộ"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Đai vải của Kẻ Gọi Mộ"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Dép vải của Kẻ Gọi Mộ"
+      },
+      "gravecaller_focus": {
+        "name": "Pháp khí của Kẻ Gọi Mộ"
+      },
+      "gravecaller_pendant": {
+        "name": "Mặt dây của Kẻ Gọi Mộ"
+      },
+      "gravecaller_ring": {
+        "name": "Nhẫn của Kẻ Gọi Mộ"
+      },
+      "gravecaller_wand": {
+        "name": "Đũa phép của Kẻ Gọi Mộ"
+      },
+      "iron_broadsword": {
+        "name": "Trọng kiếm sắt"
+      },
+      "iron_flanged_mace": {
+        "name": "Chùy sắt có vành"
+      },
+      "mirefen_dirk": {
+        "name": "Dao găm Mirefen"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Cung săn Mirefen"
+      },
+      "mirefen_leather_belt": {
+        "name": "Thắt lưng da Mirefen"
+      },
+      "mirefen_leather_boots": {
+        "name": "Ủng da Mirefen"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Găng tay da Mirefen"
+      },
+      "mirefen_leather_hood": {
+        "name": "Mũ trùm da Mirefen"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Áo gi-lê da Mirefen"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Quần da Mirefen"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Giáp vai da Mirefen"
+      },
+      "thornpeak_bulwark": {
+        "name": "Thành lũy Thornpeak"
+      },
+      "thornpeak_crossbow": {
+        "name": "Nỏ Thornpeak"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Giáp ngực xích Thornpeak"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Găng giáp xích Thornpeak"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Đai giáp xích Thornpeak"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Mũ giáp xích Thornpeak"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Giáp chân xích Thornpeak"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Giáp vai xích Thornpeak"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Ủng giáp xích Thornpeak"
+      },
+      "thornpeak_polearm": {
+        "name": "Vũ khí cán dài Thornpeak"
+      },
+      "thornpeak_war_axe": {
+        "name": "Rìu chiến Thornpeak"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
