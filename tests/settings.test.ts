@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   clickMoveButtonLabel,
   normalizeClickMoveButton,
+  perCharacterSettingKey,
   SETTING_RANGES,
   Settings,
 } from '../src/game/settings';
@@ -374,5 +375,130 @@ describe('click-to-move mouse button setting', () => {
     expect(normalizeClickMoveButton(2)).toBe(2);
     expect(clickMoveButtonLabel(0)).toBe('Left Click');
     expect(clickMoveButtonLabel(2)).toBe('Right Click');
+  });
+});
+
+// The Attack button and attack-on-cast toggles are PER-CHARACTER: a mage that
+// drops the Attack button and turns off attack-on-cast must not force those on a
+// paladin. They keep the same keys/defs in BOOL_SETTINGS, but once a character
+// context is bound (Settings.setCharacter, wired from startGame) they resolve to
+// a per-character localStorage entry keyed by class+name like the action bar.
+describe('per-character combat settings (Attack button / attack-on-cast)', () => {
+  it('lets two characters hold independent values that persist across sessions', () => {
+    const mage = new Settings();
+    mage.setCharacter('mage', 'Gandalf');
+    // The mage drops the Attack button and turns off attack-on-cast.
+    mage.set('showAttackButton', false);
+    mage.set('startAttackOnAbilityUse', false);
+    expect(mage.get('showAttackButton')).toBe(false);
+    expect(mage.get('startAttackOnAbilityUse')).toBe(false);
+
+    // The paladin, bound on the same device, keeps the classic defaults and can
+    // set its own value without disturbing the mage's.
+    const paladin = new Settings();
+    paladin.setCharacter('paladin', 'Uther');
+    expect(paladin.get('showAttackButton')).toBe(true);
+    expect(paladin.get('startAttackOnAbilityUse')).toBe(true);
+    paladin.set('showAttackButton', true);
+
+    // A fresh session for each reads back its OWN stored value.
+    const mageAgain = new Settings();
+    mageAgain.setCharacter('mage', 'Gandalf');
+    expect(mageAgain.get('showAttackButton')).toBe(false);
+    expect(mageAgain.get('startAttackOnAbilityUse')).toBe(false);
+
+    const paladinAgain = new Settings();
+    paladinAgain.setCharacter('paladin', 'Uther');
+    expect(paladinAgain.get('showAttackButton')).toBe(true);
+    expect(paladinAgain.get('startAttackOnAbilityUse')).toBe(true);
+  });
+
+  it('keys per-character storage by class+name and leaves the global blob out of it', () => {
+    const s = new Settings();
+    s.setCharacter('mage', 'Gandalf');
+    s.set('showAttackButton', false);
+    expect(
+      localStorage.getItem(perCharacterSettingKey('showAttackButton', 'mage', 'Gandalf')),
+    ).toBe('false');
+    // Same-named characters of a different class do not collide.
+    expect(
+      localStorage.getItem(perCharacterSettingKey('showAttackButton', 'paladin', 'Gandalf')),
+    ).toBeNull();
+  });
+
+  it('migrates the existing GLOBAL value into each character on first read (no visible change on upgrade)', () => {
+    // A returning player had turned the Attack button OFF globally before the split.
+    localStorage.setItem(
+      'woc_settings',
+      JSON.stringify({ showAttackButton: false, startAttackOnAbilityUse: false }),
+    );
+
+    // First time each character is bound with nothing stored yet, it inherits the
+    // player's current global value, so their setup does not visibly change.
+    const mage = new Settings();
+    mage.setCharacter('mage', 'Gandalf');
+    expect(mage.get('showAttackButton')).toBe(false);
+    expect(mage.get('startAttackOnAbilityUse')).toBe(false);
+
+    const paladin = new Settings();
+    paladin.setCharacter('paladin', 'Uther');
+    expect(paladin.get('showAttackButton')).toBe(false);
+    expect(paladin.get('startAttackOnAbilityUse')).toBe(false);
+
+    // After migration each character owns its value: flipping the paladin on does
+    // not change the mage.
+    paladin.set('showAttackButton', true);
+    const mageAgain = new Settings();
+    mageAgain.setCharacter('mage', 'Gandalf');
+    expect(mageAgain.get('showAttackButton')).toBe(false);
+  });
+
+  it('does not leak one character onto a not-yet-migrated character via the global blob', () => {
+    // The global seed starts at the defaults (on). The mage plays first, turns the
+    // Attack button off, and also changes an unrelated GLOBAL setting (which calls
+    // save()). That save must NOT rewrite the blob's showAttackButton to the mage's
+    // off, or a paladin logging in later would wrongly inherit off.
+    const mage = new Settings();
+    mage.setCharacter('mage', 'Gandalf');
+    mage.set('showAttackButton', false);
+    mage.set('sfxVolume', 0.3); // unrelated global write -> save()
+
+    const paladin = new Settings();
+    paladin.setCharacter('paladin', 'Uther');
+    expect(paladin.get('showAttackButton')).toBe(true); // still the original global seed
+  });
+
+  it('without a bound character, resolves to the global blob exactly as before', () => {
+    const s = new Settings();
+    expect(s.get('showAttackButton')).toBe(true);
+    s.set('showAttackButton', false);
+    // Stored on the global blob (no per-character context), read back by a fresh instance.
+    expect(new Settings().get('showAttackButton')).toBe(false);
+  });
+
+  it("reset() restores the bound character's per-character keys to their defaults", () => {
+    const mage = new Settings();
+    mage.setCharacter('mage', 'Gandalf');
+    mage.set('showAttackButton', false);
+    mage.set('startAttackOnAbilityUse', false);
+    mage.reset();
+    expect(mage.get('showAttackButton')).toBe(true);
+    expect(mage.get('startAttackOnAbilityUse')).toBe(true);
+    // The restore persists for the next session too.
+    const mageAgain = new Settings();
+    mageAgain.setCharacter('mage', 'Gandalf');
+    expect(mageAgain.get('showAttackButton')).toBe(true);
+    expect(mageAgain.get('startAttackOnAbilityUse')).toBe(true);
+  });
+
+  it('scoped reset(keys) restores a per-character key on the bound character', () => {
+    const mage = new Settings();
+    mage.setCharacter('mage', 'Gandalf');
+    mage.set('showAttackButton', false);
+    mage.reset(['showAttackButton']);
+    expect(mage.get('showAttackButton')).toBe(true);
+    const next = new Settings();
+    next.setCharacter('mage', 'Gandalf');
+    expect(next.get('showAttackButton')).toBe(true);
   });
 });
