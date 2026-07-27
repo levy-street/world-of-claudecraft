@@ -20,6 +20,19 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'mailbox') {
     return t('worldContent.mailboxName');
   }
+  // Last Bell campaign fixtures (src/sim/last_bell/campaign.ts spawns them with
+  // English sim names; the nameplate localizes like the mailbox). The one
+  // scenario door today is the Tidemill; when a second door lands, key the
+  // label off the fixture's scenarioId instead of the templateId.
+  if (entity.templateId === 'lb_ferry') {
+    return t('lb.fixture.ferry');
+  }
+  if (entity.templateId === 'lb_scenario_door') {
+    return t('lb.fixture.tidemill');
+  }
+  if (entity.templateId === 'lb_breach_maw') {
+    return t('lb.fixture.breach');
+  }
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');
   }

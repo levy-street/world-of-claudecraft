@@ -6,6 +6,14 @@
 // values carry their five non-Latin fills in the same change).
 
 export const lastBellStrings = {
+  // Campaign world-fixture nameplates (src/render/entity_labels.ts): the sim
+  // spawns these ground objects with English names; the renderer labels them
+  // through these keys, mailbox style.
+  fixture: {
+    ferry: 'The Farshore Ferry',
+    tidemill: 'The Tidemill',
+    breach: 'The Breach',
+  },
   speaker: {
     tam: 'Bellkeeper Tam',
     coalfast: 'Warden Coalfast',

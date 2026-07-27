@@ -141,6 +141,7 @@ import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './imp
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
+import { buildBreachMaw, buildFerryLanding, buildScenarioDoor } from './last_bell_fixtures';
 import { LAST_BELL_MOOD_AMBIENCE, type LastBellMood, lastBellMood } from './last_bell_props';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
@@ -4687,6 +4688,24 @@ export class Renderer {
   // dungeon door/portal resources moved to door_portal.ts (same shared tagging).
   private sparkleMat: THREE.SpriteMaterial | null = null;
 
+  // The standard F-interactable gold glint (the same lazy shared material and
+  // placement the delve/ground-object branches build inline).
+  private attachInteractSparkle(group: THREE.Group): THREE.Sprite {
+    if (!this.sparkleMat) {
+      this.sparkleMat = new THREE.SpriteMaterial({
+        map: sparkleTexture(),
+        transparent: true,
+        depthWrite: false,
+      });
+      if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST);
+    }
+    const sparkle = new THREE.Sprite(this.sparkleMat);
+    sparkle.scale.set(0.9, 0.9, 1);
+    sparkle.position.y = 1.35;
+    group.add(sparkle);
+    return sparkle;
+  }
+
   private buildDoorPrewarmGroup(): THREE.Group {
     const group = new THREE.Group();
     const entrance = buildDoorBody(true, null, this.lowGfx).body;
@@ -4792,6 +4811,37 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body!;
+    } else if (e.kind === 'object' && e.templateId === 'lb_ferry') {
+      // Last Bell ferry landing: mooring post at the fixture, the moored boat
+      // pushed offshore to the open water. On the pinned world seed the sea
+      // floor only dips under WATER_LEVEL ~30 yd east of the mainland landing
+      // and ~34 yd west of the Gullhaven pier root; the builder drops the
+      // boat's waterline to the sea surface from the fixture's own ground
+      // height (e.pos.y), and the group is turned so local -x points at the
+      // water (mainland x<400: the strait lies east, so flip by pi).
+      const mainland = e.pos.x < 400;
+      const built = buildFerryLanding(e.id, mainland ? 30 : 34, e.pos.y);
+      body = built.group;
+      body.rotation.y = mainland ? Math.PI : 0;
+      height = built.height;
+      objectMesh = body;
+      sparkle = this.attachInteractSparkle(group);
+    } else if (e.kind === 'object' && e.templateId === 'lb_scenario_door') {
+      // Last Bell scenario door: the stone doorframe marking the way in (the
+      // building it belongs to lands later). Interactable, so it sparkles.
+      const built = buildScenarioDoor(e.id);
+      body = built.group;
+      height = built.height;
+      objectMesh = body;
+      sparkle = this.attachInteractSparkle(group);
+    } else if (e.kind === 'object' && e.templateId === 'lb_breach_maw') {
+      // The Breach: pure scenery (non-interactable in the sim), so no sparkle;
+      // its membrane rides the shared portal swirl/pulse below.
+      const built = buildBreachMaw(this.lowGfx);
+      body = built.group;
+      portal = built.portal;
+      height = built.height;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
       // Delve interactables: skip the object pool (each is unique/stateful) and
       // build a dedicated procedural mesh that matches the crypt aesthetic.
