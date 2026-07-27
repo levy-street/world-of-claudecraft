@@ -18,8 +18,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 841,
-      "state": "a1664633",
+      "nextId": 842,
+      "state": "c77b4344",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -57,7 +57,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 833,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -94,7 +94,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 832
+              "sourceId": 833
             }
           ],
           "blockChance": 0.05,
@@ -107,7 +107,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 832,
+          "id": 833,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -151,9 +151,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 841,
-      "state": "c1f4d3b6",
-      "events": "9e088f9e",
+      "nextId": 842,
+      "state": "ff6f1bdd",
+      "events": "823f5fc8",
       "rng": {
         "draws": 2,
         "digest": "6b9ec2ea"
@@ -196,7 +196,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 833,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -247,7 +247,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 832
+              "sourceId": 833
             }
           ],
           "blockChance": 0.05,
@@ -260,7 +260,7 @@
           "fallStartY": -1.407651,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 832,
+          "id": 833,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -304,9 +304,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 841,
-      "state": "3da36520",
-      "events": "4ce07696",
+      "nextId": 842,
+      "state": "b838c745",
+      "events": "0114b007",
       "rng": {
         "draws": 7,
         "digest": "19d04500"
@@ -362,7 +362,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 833,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -439,7 +439,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 832
+              "sourceId": 833
             }
           ],
           "blockChance": 0.05,
@@ -451,7 +451,7 @@
           "fallStartY": -2.328903,
           "fiveSecondRule": 99.1,
           "hp": 87,
-          "id": 832,
+          "id": 833,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -497,9 +497,9 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 841,
-      "state": "a15ba64b",
-      "events": "dd76ba28",
+      "nextId": 842,
+      "state": "67d8b8cb",
+      "events": "784ebdab",
       "rng": {
         "draws": 212,
         "digest": "85619cb5"
@@ -567,7 +567,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 833,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1096,7 +1096,7 @@
               "name": "Battle Stance",
               "remaining": 3599.8,
               "school": "physical",
-              "sourceId": 832
+              "sourceId": 833
             },
             {
               "duration": 10,
@@ -1105,7 +1105,7 @@
               "name": "Spider Venom",
               "remaining": 10,
               "school": "nature",
-              "sourceId": 115,
+              "sourceId": 116,
               "tickInterval": 2,
               "tickTimer": 2,
               "value": 2
@@ -1120,7 +1120,7 @@
           "fallStartY": -7.6,
           "fiveSecondRule": 99.2,
           "hp": 176,
-          "id": 832,
+          "id": 833,
           "inCombat": true,
           "kind": "player",
           "level": 3,
@@ -1166,9 +1166,9 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 841,
-      "state": "ca3e956f",
-      "events": "685d12ff",
+      "nextId": 842,
+      "state": "daf6ca91",
+      "events": "f64bd4cb",
       "rng": {
         "draws": 212,
         "digest": "85619cb5"
@@ -1252,7 +1252,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 832,
+          "entityId": 833,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1380,7 +1380,7 @@
               "name": "Battle Stance",
               "remaining": 3599.7,
               "school": "physical",
-              "sourceId": 832
+              "sourceId": 833
             },
             {
               "duration": 10,
@@ -1389,7 +1389,7 @@
               "name": "Spider Venom",
               "remaining": 9.9,
               "school": "nature",
-              "sourceId": 115,
+              "sourceId": 116,
               "tickInterval": 2,
               "tickTimer": 1.9,
               "value": 2
@@ -1405,7 +1405,7 @@
           "fallStartY": -5.25,
           "fiveSecondRule": 99.3,
           "hp": 176,
-          "id": 832,
+          "id": 833,
           "inCombat": true,
           "kind": "player",
           "level": 3,
