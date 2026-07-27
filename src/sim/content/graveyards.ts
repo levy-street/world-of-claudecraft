@@ -41,7 +41,7 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // the nearest, so death in any new realm returns you locally, not to a far-off
   // strip graveyard across a sealed border.
   { id: 'gy_veiled_hollow', name: 'Eldergleam Rest', x: -60, z: 1004 },
-  { id: 'gy_farshore', name: 'Gullhaven Rest', x: 290, z: 86 },
+  { id: 'gy_farshore', name: 'Gullhaven Rest', x: 836, z: 132 },
   { id: 'gy_willowfen', name: 'Willowfen Barrow', x: -346, z: 338 },
   { id: 'gy_galecrest', name: 'Galecrest Rest', x: 404, z: 344 },
   { id: 'gy_palmreach', name: 'Palmreach Rest', x: -318, z: 802 },

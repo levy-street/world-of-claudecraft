@@ -1,15 +1,17 @@
-// The Farshore: the island in the starter sea, joined to the mainland only
-// by the Ferrywalk causeway. What these tests pin is the island's contract:
-// a rectangle all but ringed by open ocean, NO teleport, a walkable sandbar
-// causeway as the one way over, a dry town and road net, and higher ground
-// inland; plus the vale's new organic coast around it.
+// The Farshore: a LARGE island far out in the eastern sea, boat-only. What
+// these tests pin is the island's contract: a rectangle in open ocean far
+// past the mainland coast, NO portal and NO land link (deep fatiguing sea
+// the whole way across), a dry town and road net, higher ground inland, the
+// authored topology (cliffs wall the east, the breach crater sits dry
+// inside its rim, the Wreckfields lie low), and the vale's organic coast on
+// the mainland side.
 
 import { describe, expect, it } from 'vitest';
 import { FARSHORE_PORTALS, FARSHORE_ROADS, FARSHORE_ZONE } from '../src/sim/content/farshore';
 import { zoneAt } from '../src/sim/data';
 import {
+  FARSHORE_BREACH,
   inHollowOpenSea,
-  onCauseway,
   terrainHeight,
   valeLandness,
   WATER_LEVEL,
@@ -18,14 +20,14 @@ import {
 const SEED = 1337; // matches the fixed client seed in src/main.ts
 
 describe('Farshore zone registration', () => {
-  it('is a rectangle in the starter sea beside the vale', () => {
-    expect(FARSHORE_ZONE.xMin).toBe(180);
-    expect(FARSHORE_ZONE.xMax).toBe(540);
-    expect(FARSHORE_ZONE.zMin).toBe(-180);
-    expect(FARSHORE_ZONE.zMax).toBe(180);
+  it('is a rectangle far offshore in the eastern sea', () => {
+    expect(FARSHORE_ZONE.xMin).toBe(700);
+    expect(FARSHORE_ZONE.xMax).toBe(1300);
+    expect(FARSHORE_ZONE.zMin).toBe(-250);
+    expect(FARSHORE_ZONE.zMax).toBe(290);
     expect(zoneAt(0, 0).id).toBe('eastbrook_vale');
-    expect(zoneAt(360, 0).id).toBe('farshore_isle');
-    expect(zoneAt(360, 0).biome).toBe('vale'); // shares the vale's sky and song
+    expect(zoneAt(1000, 10).id).toBe('farshore_isle');
+    expect(zoneAt(1000, 10).biome).toBe('vale'); // shares the vale's sky and song
   });
 
   it('keeps its hub, graveyard, and every road on dry ground', () => {
@@ -49,46 +51,70 @@ describe('Farshore zone registration', () => {
     }
   });
 
-  it('rises inland: the Watch Meadow stands above the town and the shores', () => {
-    const crown = terrainHeight(375, -5, SEED);
-    expect(crown).toBeGreaterThan(terrainHeight(305, 70, SEED) + 4); // Gullhaven
-    expect(crown).toBeGreaterThan(terrainHeight(256, 16, SEED) + 6); // the Landing
+  it('rises inland with the authored topology', () => {
+    const meadow = terrainHeight(990, 10, SEED);
+    // the Watch Meadow stands above the town and the Landing beach
+    expect(meadow).toBeGreaterThan(terrainHeight(822, 118, SEED) + 3);
+    expect(meadow).toBeGreaterThan(terrainHeight(780, -30, SEED) + 5);
+    // the Sundered Cliffs wall the east coast: real mountains
+    expect(terrainHeight(1170, -35, SEED)).toBeGreaterThan(35);
+    // the breach crater floor is dry and sits inside a raised rim
+    const crater = terrainHeight(FARSHORE_BREACH.x, FARSHORE_BREACH.z, SEED);
+    expect(crater).toBeGreaterThan(WATER_LEVEL + 2);
+    expect(terrainHeight(FARSHORE_BREACH.x, FARSHORE_BREACH.z + 26, SEED)).toBeGreaterThan(
+      crater + 3,
+    );
+    // the Wreckfields lie low near the tide line
+    expect(terrainHeight(885, 200, SEED)).toBeLessThan(4);
+    expect(terrainHeight(885, 200, SEED)).toBeGreaterThan(WATER_LEVEL);
   });
 });
 
-describe('the Ferrywalk: a walk-in causeway, no teleport', () => {
-  it('has no portal: the island is reached on foot', () => {
+describe('the crossing: boat-only, no land link', () => {
+  it('has no portal: the ferry is the one way over', () => {
     expect(FARSHORE_PORTALS).toHaveLength(0);
   });
 
-  it('the causeway is walkable, dry, end to end from the vale point to the Landing', () => {
-    // the causeway road IS the sandbar; sample it at footstep scale
-    const bar = FARSHORE_ROADS[0]; // the Ferrywalk polyline
-    let prev = terrainHeight(bar[0].x, bar[0].z, SEED);
-    let maxSlope = 0;
-    for (let i = 0; i < bar.length - 1; i++) {
-      const a = bar[i];
-      const b = bar[i + 1];
-      const steps = Math.max(2, Math.ceil(Math.hypot(b.x - a.x, b.z - a.z)));
-      for (let k = 1; k <= steps; k++) {
-        const x = a.x + ((b.x - a.x) * k) / steps;
-        const z = a.z + ((b.z - a.z) * k) / steps;
-        const h = terrainHeight(x, z, SEED);
-        expect(h, `causeway ${Math.round(x)},${Math.round(z)}`).toBeGreaterThan(WATER_LEVEL);
-        maxSlope = Math.max(maxSlope, Math.abs(h - prev));
-        prev = h;
+  it('the strait is deep, fatiguing ocean the whole way across', () => {
+    // walk a straight line from the mainland dock toward Gullhaven: every
+    // underwater sample between the two shores is fatiguing open sea
+    const from = { x: 200, z: -30 };
+    const to = { x: 760, z: 60 };
+    let wet = 0;
+    let total = 0;
+    for (let k = 0; k <= 60; k++) {
+      const x = from.x + ((to.x - from.x) * k) / 60;
+      const z = from.z + ((to.z - from.z) * k) / 60;
+      const h = terrainHeight(x, z, SEED);
+      total++;
+      if (h < WATER_LEVEL) {
+        wet++;
+        expect(inHollowOpenSea(x, z), `fatigue at ${Math.round(x)},${Math.round(z)}`).toBe(true);
       }
     }
-    expect(maxSlope).toBeLessThan(1.5); // PLAYER_MAX_CLIMB_SLOPE
-    expect(onCauseway(200, -14)).toBe(true);
+    // nearly the entire crossing is water (only the shore aprons are dry)
+    expect(wet / total).toBeGreaterThan(0.85);
+    // and the middle of the strait is deep
+    expect(terrainHeight(480, 10, SEED)).toBeLessThan(WATER_LEVEL - 1);
   });
 
-  it('the strait to either side of the causeway is open sea', () => {
-    // off the sandbar, north and south, the world is deep water with fatigue
-    expect(terrainHeight(200, 55, SEED)).toBeLessThan(WATER_LEVEL);
-    expect(terrainHeight(205, -70, SEED)).toBeLessThan(WATER_LEVEL);
-    expect(inHollowOpenSea(200, 60)).toBe(true);
-    expect(onCauseway(200, 60)).toBe(false);
+  it("Gullhaven's harbor bay is calm water (no drowning off the town pier)", () => {
+    expect(terrainHeight(775, 118, SEED)).toBeLessThan(WATER_LEVEL);
+    expect(inHollowOpenSea(775, 118)).toBe(false);
+  });
+
+  it('no dry backdoor rings the island: north, east, and south are open sea', () => {
+    for (const [x, z] of [
+      [1000, -320],
+      [1330, 0],
+      [1366, -100],
+      [1395, -100],
+      [1000, 330],
+      [640, -150],
+    ]) {
+      expect(terrainHeight(x, z, SEED), `sea at ${x},${z}`).toBeLessThan(WATER_LEVEL);
+      expect(inHollowOpenSea(x, z), `fatigue at ${x},${z}`).toBe(true);
+    }
   });
 });
 

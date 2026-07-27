@@ -108,12 +108,13 @@ describe('collision & terrain', () => {
     // The vale's east rim range became coastline (the Farshore's strait):
     // walking east now wades into open water, and the sea itself guards
     // the border: the swimmer takes the fatigue warning and damage long
-    // before the far shore. This walk happens to run near the Ferrywalk, so
-    // the walker can legitimately catch the sandbar partway: the pins are
-    // that the shore ENTERED open water (swimming happened) and the sea
-    // warned, and that no invisible wall pinned the walker at the old vale
-    // coast cutoff (a final-tick "still swimming" check used to pass only
-    // because the x = 178 window cliff trapped the swimmer against it).
+    // before the far shore (the island is ~520 yd out and the Ferrywalk
+    // causeway is gone, so there is no sandbar to catch: the ferry is the
+    // only crossing). The pins are that the shore ENTERED open water
+    // (swimming happened) and the sea warned, and that no invisible wall
+    // pinned the walker at the old vale coast cutoff (a final-tick "still
+    // swimming" check used to pass only because the x = 178 window cliff
+    // trapped the swimmer against it).
     const sim = makeSim();
     const p = sim.player;
     teleportTo(sim, 150, 0);
@@ -627,10 +628,17 @@ describe('dungeon instance placement and targetability', () => {
           (e.objectItemId || e.templateId === 'dungeon_door') &&
           e.pos.x > DUNGEON_X_THRESHOLD,
       );
-      expect(
-        mobs.length + objects.length,
-        `${dungeon.id} spawned no instance encounters`,
-      ).toBeGreaterThan(0);
+      // The Last Bell story spaces (interior 'farshore_story') are DungeonDefs
+      // only in the plumbing sense: they have spawns: [] BY DESIGN (the
+      // campaign scenario populates a claim at runtime) and no overworld door,
+      // so an empty encounter roster is their correct static state. Entry
+      // placement and the blocked-ground checks above still apply to them.
+      if (dungeon.interior !== 'farshore_story') {
+        expect(
+          mobs.length + objects.length,
+          `${dungeon.id} spawned no instance encounters`,
+        ).toBeGreaterThan(0);
+      }
       for (const mob of mobs) {
         expect(mob.hostile, `${dungeon.id} ${mob.name} is not hostile`).toBe(true);
         expect(

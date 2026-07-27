@@ -294,9 +294,12 @@ describe('player motion kernel parity with the live Sim', () => {
 // tests/terrain_wall_standoff.test.ts): committing a push once it strictly
 // improves on the player's current steepness, not only once it fully clears
 // the climb limit. Pinned at a concave pocket (production seed 20061, 2D
-// atlas-grid world) where a single standoff resolves the player to steepness
-// ~1.56, well over the ~1.5 climb limit, but a strict improvement over the
-// ~10.14 the player started at. The OLD gate (accept only if standSteep <=
+// atlas-grid world) on the sealed Hollow wall's western shoulder, where a
+// single standoff resolves the player to steepness ~3.5, well over the ~1.5
+// climb limit, but a strict improvement over the ~5.4 the player started at.
+// (The pin used to sit on the far-west void rim at (-620, -172); the Farshore
+// relocation widened the rim-zero gate over the whole z <= 368 band, so that
+// rim no longer exists.) The OLD gate (accept only if standSteep <=
 // climb limit) would have discarded this push outright, leaving the player
 // wedged; the NEW gate (accept if standSteep <= climb limit OR standSteep <=
 // current steepness) commits it.
@@ -304,7 +307,7 @@ describe('stepPlayerMotion wall-standoff acceptance gate', () => {
   const GATE_SEED = 20061; // the fixed production seed (src/main.ts, server/game.ts)
   const GATE_R = PLAYER_BODY_RADIUS;
   const GATE_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
-  const PIN = { x: -620, z: -172 };
+  const PIN = { x: -177, z: 900 };
 
   it('commits a standoff push that strictly improves steepness but stays above the climb limit', () => {
     const steepStart = terrainSteepnessAt(PIN.x, PIN.z, GATE_SEED);

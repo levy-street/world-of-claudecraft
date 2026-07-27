@@ -56,7 +56,7 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     id: 'ferryman_ewald',
     name: 'Ferryman Ewald',
     title: 'The Farshore Crossing',
-    pos: { x: 144, z: -54 },
+    pos: { x: 148, z: -45 },
     facing: Math.PI / 3,
     color: 0x4a5a7a,
     questIds: [],
@@ -69,7 +69,7 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     id: 'sergeant_marsh',
     name: 'Sergeant Marsh',
     title: 'Town Militia',
-    pos: { x: 377, z: -4 },
+    pos: { x: 992, z: 2 },
     facing: -Math.PI / 2,
     color: 0x6a5a3a,
     questIds: [],
@@ -134,14 +134,14 @@ registerScene({
     {
       at: 0.2,
       kind: 'camera',
-      shot: { kind: 'focus', x: 296, z: 84, dist: 26, pitch: 0.42, yaw: 2.6, dur: 5 },
+      shot: { kind: 'focus', x: 795, z: 132, dist: 26, pitch: 0.42, yaw: 2.6, dur: 5 },
     },
     { at: 1.0, kind: 'line', speaker: '', key: 'lb.q0.scene.harbor', dur: 4.5 },
     // The statue above the harbor steps, close: the plinth and its names.
     {
       at: 6.0,
       kind: 'camera',
-      shot: { kind: 'focus', x: 303, z: 72, dist: 6, pitch: 0.18, yaw: -0.6, dur: 4 },
+      shot: { kind: 'focus', x: 818, z: 120, dist: 6, pitch: 0.18, yaw: -0.6, dur: 4 },
     },
     { at: 6.5, kind: 'line', speaker: '', key: 'lb.q0.scene.plinth', dur: 4.5 },
     // The bell tolls once; the street stops, counts, exhales.
@@ -149,7 +149,7 @@ registerScene({
     {
       at: 11.8,
       kind: 'camera',
-      shot: { kind: 'focus', x: 305, z: 70, dist: 14, pitch: 0.3, yaw: 0.8, dur: 5 },
+      shot: { kind: 'focus', x: 822, z: 118, dist: 14, pitch: 0.3, yaw: 0.8, dur: 5 },
     },
     { at: 12.2, kind: 'line', speaker: '', key: 'lb.q0.scene.toll', dur: 5 },
     { at: 17.5, kind: 'camera', shot: { kind: 'release' } },

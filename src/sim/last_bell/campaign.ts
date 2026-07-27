@@ -17,17 +17,18 @@ import { startScenario } from '../scenarios/scenarios';
 import { playSceneForPlayer } from '../scenes/scenes';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { FARSHORE_BREACH } from '../world';
 
 const Q0_ID = 'q_lb_q0_ashore';
 const ARRIVAL_SCENE = 'scn_lb_q0_ashore';
 
 // The two ferry landings: the mainland dock at the vale's east point and
 // the Gullhaven harbor pier. Boarding at one lands you at the other.
-const MAINLAND_DOCK = { x: 146, z: -52 };
-const GULLHAVEN_PIER = { x: 299, z: 78 };
+const MAINLAND_DOCK = { x: 152, z: -48 };
+const GULLHAVEN_PIER = { x: 806, z: 122 };
 
 interface FixtureDef {
-  templateId: 'lb_ferry' | 'lb_scenario_door';
+  templateId: 'lb_ferry' | 'lb_scenario_door' | 'lb_breach_maw';
   name: string;
   x: number;
   z: number;
@@ -41,9 +42,18 @@ const FIXTURES: readonly FixtureDef[] = [
   {
     templateId: 'lb_scenario_door',
     name: 'The Tidemill',
-    x: 352,
-    z: -8,
+    x: 930,
+    z: 12,
     scenarioId: 'sc_lb_q0_tidemill',
+  },
+  // The Breach: the campaign's wound in the world, anchored on the terrain
+  // crater (FARSHORE_BREACH in world.ts, the single source of the coords).
+  // Scenery, never a device: spawned non-lootable below so interact ignores it.
+  {
+    templateId: 'lb_breach_maw',
+    name: 'The Breach',
+    x: FARSHORE_BREACH.x,
+    z: FARSHORE_BREACH.z,
   },
 ];
 
@@ -53,7 +63,14 @@ export function initLastBellCampaign(ctx: SimContext): void {
     const obj = createGroundObject(ctx.nextId++, '', def.name, ctx.groundPos(def.x, def.z));
     obj.templateId = def.templateId;
     obj.objectItemId = null;
-    obj.lootable = true; // interactable
+    // interaction.ts only considers ground objects with lootable=true, so the
+    // breach maw (pure scenery) is spawned non-lootable and can never be
+    // interacted with; tryLastBellInteract has no lb_breach_maw arm either.
+    obj.lootable = def.templateId !== 'lb_breach_maw';
+    // The sim's object-respawn pass re-arms every non-lootable object once its
+    // respawnTimer runs out, so park the breach's timer effectively forever
+    // (finite on purpose: it stays JSON-safe wherever entities get serialized).
+    if (!obj.lootable) obj.respawnTimer = Number.MAX_SAFE_INTEGER;
     if (def.scenarioId !== undefined) obj.scenarioId = def.scenarioId;
     ctx.addEntity(obj);
   }

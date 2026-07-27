@@ -1,6 +1,6 @@
 import { MOUNT_KEYS, MOUNTS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
-import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
+import { DUNGEONS, ITEMS, MOBS, NPCS, ZONES } from './data';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
 import { enterStoryInstance, isStoryDungeonId } from './instances/story_instances';
@@ -145,6 +145,43 @@ export function handleDevChat(
       entity.prevPos = { ...pos };
       ctx.rebucket(entity);
       emitDevLog(ctx, pid, `[dev] Teleported to ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`);
+    }
+    return null;
+  }
+
+  // [dev] Teleport by NAME: a zone id (drops you at its hub or center) or a
+  // POI id from any zone (e.g. /dev tp gullhaven, /dev tp the_breach,
+  // /dev tp farshore_isle). Ids match with or without underscores.
+  const namedTpMatch = /^\/(?:dev\s+tp|devtp)\s+([a-z][\w]*)\s*$/i.exec(raw);
+  if (namedTpMatch) {
+    const q = namedTpMatch[1].toLowerCase().replace(/_/g, '');
+    let dest: { x: number; z: number; label: string } | null = null;
+    for (const zone of ZONES) {
+      if (zone.id.toLowerCase().replace(/_/g, '') === q) {
+        const at = zone.hub ?? {
+          x: (zone.xMin ?? -180) / 2 + (zone.xMax ?? 180) / 2,
+          z: zone.zMin / 2 + zone.zMax / 2,
+        };
+        dest = { x: at.x, z: at.z, label: zone.name };
+        break;
+      }
+      const poi = (zone.pois ?? []).find((p) => (p.id ?? '').toLowerCase().replace(/_/g, '') === q);
+      if (poi) {
+        dest = { x: poi.x, z: poi.z, label: poi.label };
+        break;
+      }
+    }
+    if (!dest) {
+      ctx.error(pid, `[dev] Unknown place '${namedTpMatch[1]}'.`);
+      return null;
+    }
+    const entity = ctx.entities.get(pid);
+    if (entity) {
+      const pos = ctx.groundPos(dest.x, dest.z);
+      entity.pos = pos;
+      entity.prevPos = { ...pos };
+      ctx.rebucket(entity);
+      emitDevLog(ctx, pid, `[dev] Teleported to ${dest.label}.`);
     }
     return null;
   }

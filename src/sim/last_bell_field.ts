@@ -137,7 +137,7 @@ export const LAST_BELL_AREAS: Record<string, StoryAreaDef> = {
   // lower fields, walked at dusk with Coalfast and Tam.
   lb_riftline: {
     dungeonId: 'lb_riftline',
-    mirror: { srcX: 372, srcZ: 2 },
+    mirror: { srcX: 988, srcZ: 6 },
     bounds: { minX: -100, maxX: 100, minZ: -80, maxZ: 120 },
     walls: perimeterWalls({ minX: -100, maxX: 100, minZ: -80, maxZ: 120 }),
     props: [],
@@ -170,7 +170,7 @@ export const LAST_BELL_AREAS: Record<string, StoryAreaDef> = {
   // Gullhaven's headland so the council can sit while the town lives on.
   lb_council: {
     dungeonId: 'lb_council',
-    mirror: { srcX: 306, srcZ: 66 },
+    mirror: { srcX: 822, srcZ: 114 },
     bounds: { minX: -80, maxX: 80, minZ: -80, maxZ: 80 },
     walls: perimeterWalls({ minX: -80, maxX: 80, minZ: -80, maxZ: 80 }),
     props: [],
@@ -180,7 +180,7 @@ export const LAST_BELL_AREAS: Record<string, StoryAreaDef> = {
   // Q6: the Landing beach and the tidal flats among the wrecks.
   lb_landing: {
     dungeonId: 'lb_landing',
-    mirror: { srcX: 250, srcZ: 10 },
+    mirror: { srcX: 780, srcZ: -30 },
     bounds: { minX: -90, maxX: 60, minZ: -60, maxZ: 80 },
     walls: perimeterWalls({ minX: -90, maxX: 60, minZ: -60, maxZ: 80 }),
     props: [],
@@ -190,7 +190,7 @@ export const LAST_BELL_AREAS: Record<string, StoryAreaDef> = {
   // Q8: the Riftfields approach, ward site to ward site.
   lb_riftfields: {
     dungeonId: 'lb_riftfields',
-    mirror: { srcX: 434, srcZ: 58 },
+    mirror: { srcX: 1005, srcZ: -125 },
     bounds: { minX: -100, maxX: 100, minZ: -60, maxZ: 100 },
     walls: perimeterWalls({ minX: -100, maxX: 100, minZ: -60, maxZ: 100 }),
     props: [
@@ -224,7 +224,7 @@ export const LAST_BELL_AREAS: Record<string, StoryAreaDef> = {
   // END: the quiet redoubt, post to post. Solo, always.
   lb_lastwatch: {
     dungeonId: 'lb_lastwatch',
-    mirror: { srcX: 306, srcZ: 66 },
+    mirror: { srcX: 822, srcZ: 114 },
     bounds: { minX: -100, maxX: 100, minZ: -80, maxZ: 100 },
     walls: perimeterWalls({ minX: -100, maxX: 100, minZ: -80, maxZ: 100 }),
     props: [],

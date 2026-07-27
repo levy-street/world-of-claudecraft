@@ -148,3 +148,57 @@ budget. Q10/Q11 have zero cutscenes on purpose: the ending is played.
   client scene presentation (director/letterbox/subtitles/choice window,
   in flight), the lb.* i18n catalog entries for Q0's scene lines, and
   npm run dev. Q1 onward (tasks 8 to 14) intentionally NOT started.
+
+## Program reset after the first playtest (owner, 2026-07-27)
+
+The owner's verdict on the playtest: the WORLD is the gap, not the systems.
+Demi's Farshore is a small starter island fused to the mainland by a
+walkable sandbar; the campaign doc describes a large, remote island with a
+walled harbor town, mountains, a visible breach, and a boat as the only way
+in. The engine work above (instances, squad, scenarios, scenes, choices)
+survives unchanged; the MAP must be rebuilt to AAA standard before any more
+quest content lands, one testable deliverable at a time:
+
+- D1 The island, the ocean, the boat: relocate + enlarge farshore_isle far
+  off the coast across deep fatigue ocean; terrain rewrite with the doc's
+  topology (harbor bay + town flat, the Landing, Watch Meadow, Sundered
+  Cliffs mountain wall, Riftfields plateau + breach crater, Wreckfields
+  flats, hilltop spring); real dock piers + a visible moored ferry both
+  sides; remove the causeway; move every coordinate consumer (content,
+  campaign fixtures, scene coords, terrain mirrors, tests); named /dev tp.
+- D2 Gullhaven town pass: walls + gate, pier district, redoubt, statue,
+  bell tower, market dressing, ambient wandering villagers.
+- D3 The wilds and the breach: per-region monster populations, the breach
+  landmark visible from afar, patrols, ambience.
+- D4 Ferry arrival cinematic + Q0 restaged on the new geography.
+- D5+ the quest acts (the old tasks 8 to 14), then reviews + gate.
+
+Each deliverable ends with a playable hand-off and waits for the owner's
+eyes before the next begins.
+
+### D1 state (2026-07-27, in progress)
+
+Terrain landed in src/sim/world.ts: farshore_isle rect is x 700..1300 /
+z -250..290; new ISLE lobes/bays; applyFarshoreSea owns the whole eastern
+sea (near arm smoothstep(182,200,x) with z fade 160..180, far arm 552..570,
+east fade 1352..1372, z window -400..-380 to 348..368; deep floor
+WATER_LEVEL-9; beach apron; Wreckfields flats; Riftfields plateau; breach
+crater at exported FARSHORE_BREACH (1012,-172); Sundered Cliffs domes 34/50/36
+with jag noise; interior dome +8 at (1000,10); town shelf +4 at (828,124)).
+Causeway REMOVED (onCauseway/applyCauseway/CAUSEWAY gone; starter moat kept
+minus the skip). Fatigue: starter branch to x 1372 / z -390, plus a
+z<368 && x>552 island-sea branch; Gullhaven bay calm via FATIGUE_FREE_WATERS
+rect {748..804, 96..138} (CAREFUL: a second, grading array shares the
+ROW_MERES tail anchor). Rim-zero gate widened to (x<=1372 && z<=368).
+Content moved: farshore.ts (zone/POIs incl. the_breach + the_wreckfields,
+town cluster at (820,118) delta +515/+48, 9 camps, 3 bells, escort, 6 roads,
+chained pier docks), graveyards, 6 gather nodes, zone1 POI label 'The
+Farshore Ferry', campaign docks MAINLAND_DOCK (152,-48) / GULLHAVEN_PIER
+(806,122), tidemill door (930,12), scene camera coords, 9 story doorPos,
+5 field mirrors. Named /dev tp <zoneOrPoiId> added. tests/farshore.test.ts
+re-pinned (9/9) and last_bell_q0 green. In flight: agent A re-pins
+terrain_window_seams/world_grid/zone_streaming/fixes + mapbg/wiki/i18n
+regen; agent B builds ferry-boat/door/breach visuals + mainland dock prop.
+Then: parity re-mint, commits, dev server, owner handoff. NOT in D1:
+town walls/villagers (D2), region ambience (D3), arrival cinematic
+re-staging (D4).

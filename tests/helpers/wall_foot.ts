@@ -37,7 +37,13 @@ export interface WallFoot {
 
 const cache = new Map<string, WallFoot | null>();
 
-const WALL_FOOT_ANCHORS = new Map<number, { x: number; z: number }>([[20061, { x: 704, z: 624 }]]);
+// Seed 20061: the north foot of the sealed Hollow wall (the z = 915 sealed
+// border ridge). The previous anchor (704, 624) stood against the eastern
+// world rim, which the Farshore relocation zeroed and drowned under the new
+// eastern sea (applyFarshoreSea), so that cell is open water now.
+const WALL_FOOT_ANCHORS = new Map<number, { x: number; z: number }>([
+  [20061, { x: 158.5, z: 937.5 }],
+]);
 
 /** Return a pinned wall foot after proving it still satisfies the live terrain
  * contract. `minPush` rejects a wall that is only barely in reach. */

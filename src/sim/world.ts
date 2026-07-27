@@ -1231,56 +1231,6 @@ function applyValeCoast(x: number, z: number, h: number): number {
   return h + (floor + (h - floor) * t - h) * w;
 }
 
-// The Ferrywalk: a natural sandbar causeway from the vale's east point across
-// the strait to the Farshore's Landing, so the island is reached on foot (no
-// teleport). A curving spit of low ground raised out of the shallows; the
-// deeper water to either side keeps its swim fatigue.
-const CAUSEWAY = [
-  { x: 150, z: -46 },
-  { x: 173, z: -30 },
-  { x: 195, z: -14 },
-  { x: 217, z: 1 },
-  { x: 238, z: 12 },
-  { x: 256, z: 16 },
-] as const;
-function causewayDistance(x: number, z: number): number {
-  let best = Infinity;
-  for (let i = 0; i + 1 < CAUSEWAY.length; i++) {
-    const a = CAUSEWAY[i];
-    const b = CAUSEWAY[i + 1];
-    const dx = b.x - a.x;
-    const dz = b.z - a.z;
-    const len2 = dx * dx + dz * dz;
-    let t = len2 > 0 ? ((x - a.x) * dx + (z - a.z) * dz) / len2 : 0;
-    t = Math.max(0, Math.min(1, t));
-    const px = a.x + dx * t;
-    const pz = a.z + dz * t;
-    best = Math.min(best, Math.hypot(x - px, z - pz));
-  }
-  return best;
-}
-export function onCauseway(x: number, z: number): boolean {
-  // The WEST edge must contain the distance test's full support (every point
-  // with d < 22 of the spit): the old x > 140 edge clipped the sandbar lift
-  // mid slope near the mainland root at (150, -46), leaving a step wall
-  // along x = 140 (tests/terrain_window_seams.test.ts). The EAST x < 262
-  // edge is a deliberate trim, kept: it ends the spit's no-fatigue water and
-  // lift just past the Landing so the open sea beyond guards the island
-  // (tests/fixes.test.ts, the open-shore fatigue pin); the surrounding isle
-  // shelf sits near the bar height there, so the trim never steps.
-  return z < 60 && z > -80 && x > 126 && x < 262 && causewayDistance(x, z) < 22;
-}
-function applyCauseway(x: number, z: number, h: number): number {
-  if (!onCauseway(x, z)) return h;
-  const d = causewayDistance(x, z);
-  const w = 1 - smoothstep(9, 22, d);
-  if (w <= 0) return h;
-  // a low sandbar (walkable ~2.2), roughened so it reads as drifted sand
-  const bar = 2.2 + (noise2(x * 0.09, z * 0.09, 613) - 0.5) * 1.2;
-  const lifted = Math.max(h, bar);
-  return h + (lifted - h) * w;
-}
-
 // Clean open water framing the Farshore: the island touches the mainland
 // only at the causeway, so its shared edges read as sea, with no border
 // ridge or neighbour coast bleeding into the island's map. A channel to the
@@ -1293,7 +1243,7 @@ function applyStarterMoat(x: number, z: number, h: number): number {
   // window edge is a fade, never a cut (the old hard z < 150 and x <= 194
   // edges left step walls along both lines; the seabed now ramps up onto the
   // vale's north-corner land instead): tests/terrain_window_seams.test.ts.
-  if (x >= 177 && x <= 196 && z < 158 && z > -184 && !onCauseway(x, z)) {
+  if (x >= 177 && x <= 196 && z < 158 && z > -184) {
     // the north fade starts at z = 148 so the carve keeps FULL depth through
     // every guarded strait row (the deep-water barrier must not shallow),
     // then ramps out as a continuous bank under the vale's north-corner land
@@ -1323,51 +1273,105 @@ function applyStarterMoat(x: number, z: number, h: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// The Farshore: a small island in the starter sea east of Eastbrook Vale
-// (map-left of it, under the compass mirror). No land border and no pass:
-// the only way over is the ferry portal, and swim fatigue guards the
-// strait. Beaches all around, rising to the Crown Meadow inland.
+// The Farshore: a LARGE island far out in the eastern sea, past the edge of
+// every mainland column. No land link of any kind: the strait is deep,
+// fatiguing ocean and the only way over is the ferry. The island carries the
+// campaign's authored topology: Gullhaven's harbor bay on the south-west
+// shelf, the Landing beach on the west shore facing the mainland, the Watch
+// Meadow heart, the Sundered Cliffs range walling the east coast, the
+// Riftfields plateau in the north with the breach crater, and the low
+// Wreckfields tidal flats in the south.
 // ---------------------------------------------------------------------------
 const ISLE_LAND_LOBES = [
-  { x: 375, z: -5, r: 95 }, // the island's heart, rising to the Crown Meadow
-  { x: 305, z: 70, r: 55 }, // Gullhaven's shelf on the northwest strand
-  { x: 256, z: 15, r: 42 }, // the Landing's shelf
-  { x: 430, z: 55, r: 65 }, // the east downs
-  { x: 400, z: -70, r: 70 }, // the south headland
-  { x: 320, z: -55, r: 55 }, // the coves' shoulder
-  { x: 356, z: 88, r: 60 }, // the north point
-  { x: 275, z: 44, r: 42 }, // the ferry road's rise
+  { x: 1000, z: 10, r: 150 }, // the island's heart: the Watch Meadow
+  { x: 960, z: -110, r: 105 }, // the north rise toward the Riftfields
+  { x: 1015, z: -175, r: 85 }, // the Riftfields and the breach ground
+  { x: 838, z: 122, r: 95 }, // Gullhaven's shelf on the south-west shore
+  { x: 780, z: -30, r: 70 }, // the Landing's shelf, facing the mainland
+  { x: 885, z: 195, r: 80 }, // the Wreckfields flats
+  { x: 1150, z: -30, r: 95 }, // the Sundered Cliffs' base
+  { x: 1175, z: -125, r: 70 }, // the north-east shoulder
+  { x: 1120, z: 135, r: 85 }, // the south-east downs
+  { x: 765, z: 62, r: 48 }, // the harbor headland (the redoubt)
+  { x: 806, z: 40, r: 58 }, // the west shore road, joining the Landing to Gullhaven
+  { x: 882, z: -16, r: 55 }, // the inland shelf under the meadow-to-Landing road
+  { x: 1085, z: -82, r: 62 }, // the cliffs' saddle, joining the range to the Riftfields
 ] as const;
 const ISLE_BAYS = [
-  { x: 292, z: -108, r: 40 }, // the south cove
-  { x: 472, z: -30, r: 40 }, // the east bight
+  { x: 752, z: 116, r: 44 }, // Gullhaven's harbor bay, biting west into the shelf
+  { x: 945, z: 268, r: 62 }, // the south bight
+  { x: 1252, z: 40, r: 55 }, // the east bight under the cliffs
+  { x: 872, z: -228, r: 60 }, // the north cove west of the breach ground
 ] as const;
 
 export function isleLandness(x: number, z: number): number {
   return metaballLandness(ISLE_LAND_LOBES, ISLE_BAYS, x, z);
 }
 
-// The island coast: beaches all around, and the interior climbs with the
-// landness field itself, so the highest ground is the farthest inland.
-function applyIsleCoast(x: number, z: number, h: number): number {
-  if (x < 166 || x > 566) return h;
-  const zSeam = smoothstep(-188, -172, z) * (1 - smoothstep(172, 188, z));
-  if (zSeam <= 0) return h;
-  const seam = smoothstep(172, 188, x);
-  if (seam <= 0) return h;
+// A soft radial mask: 1 inside rIn, easing to 0 at rOut.
+function isleDome(x: number, z: number, cx: number, cz: number, rIn: number, rOut: number): number {
+  return 1 - smoothstep(rIn, rOut, Math.hypot(x - cx, z - cz));
+}
+
+// The breach: the campaign's wound in the world, a crater on the Riftfields
+// plateau. Shared with content placement (the landmark object, camps) and the
+// map, so the crater and its dressing can never drift apart.
+export const FARSHORE_BREACH = { x: 1012, z: -172 } as const;
+
+// The eastern sea and the island in it. One applier owns everything east of
+// the mainland coasts in the starter rows: the deep fatiguing strait, the
+// island's shores, and the island's authored relief (cliffs, plateau,
+// crater, flats). Everything below the landness shore threshold becomes
+// honest ocean, so the old dry soft-floored shelf past the world columns
+// cannot reappear.
+function applyFarshoreSea(x: number, z: number, h: number): number {
+  // Window: the starter-sea arm starts just off the vale coast (the moat
+  // applier owns x <= 196); north of the Galecrest's south edge the sea
+  // starts past that column's own coast instead. East and north/south edges
+  // fade well past the island so the rect never prints a seam.
+  const wz = smoothstep(-400, -380, z) * (1 - smoothstep(348, 368, z));
+  if (wz <= 0) return h;
+  const nearArm = smoothstep(182, 200, x) * (1 - smoothstep(160, 180, z));
+  const farArm = smoothstep(552, 570, x);
+  const w = Math.max(nearArm, farArm) * (1 - smoothstep(1490, 1520, x)) * wz;
+  if (w <= 0) return h;
   const land = isleLandness(x, z);
   const t = smoothstep(0.02, 0.3, land);
-  const shelf = smoothstep(-0.4, 0.06, land);
-  const floor = WATER_LEVEL - 3.2 + (WATER_LEVEL - 0.8 - (WATER_LEVEL - 3.2)) * shelf;
+  // Deep mid-ocean rising over the island shelf: the strait floor sits well
+  // below the drowning line so the crossing reads as real sea, not a wade.
+  const shelf = smoothstep(-0.35, 0.06, land);
+  const floor = WATER_LEVEL - 9 + (WATER_LEVEL - 0.8 - (WATER_LEVEL - 9)) * shelf;
   let out = floor + (h - floor) * t;
-  // the beach apron: low shores pressed flat, the Palmreach recipe
+  // the beach apron: low shores pressed flat (the Palmreach recipe)
   const beachT = 1 - smoothstep(0.05, 0.28, land);
   if (beachT > 0 && out > 1.4) out = out + (1.4 + (out - 1.4) * 0.2 - out) * beachT;
-  // higher land more inland: a broad dome under the Crown Meadow, so the
-  // shore is always the low ground and the center the high
-  const dCrown = Math.hypot(x - 375, z + 5);
-  out += 14 * (1 - smoothstep(18, 128, dCrown)) * smoothstep(0.02, 0.2, land);
-  return h + (out - h) * seam * zSeam;
+  // Past the island the floor converges to the legacy beyond-the-columns
+  // dive's exact level (WATER_LEVEL - 6): that carve still fires here (its
+  // first gate's west disjunct is true for every starter row) and BLENDS
+  // toward that level, so matching it turns the blend into an identity and
+  // its hard x = WORLD_MAX_X + 60 stop line cannot print a step.
+  out = out + (WATER_LEVEL - 6 - out) * smoothstep(1296, 1330, x);
+  const landGate = smoothstep(0.02, 0.2, land);
+  // the island rises inland: a broad gentle dome under the Watch Meadow so
+  // shores are always the low ground, plus a firm shelf under Gullhaven
+  out += 8 * isleDome(x, z, 1000, 10, 60, 150) * landGate;
+  out += 4 * isleDome(x, z, 828, 124, 26, 64) * landGate;
+  // the Wreckfields: tidal flats pressed almost to the waterline
+  const flats = isleDome(x, z, 885, 205, 45, 95) * landGate;
+  if (flats > 0) out = out + (0.9 + (out - 0.9) * 0.15 - out) * flats;
+  // the Riftfields plateau, and the breach crater punched into it
+  out += 9 * isleDome(x, z, 1005, -155, 55, 120) * landGate;
+  const dBreach = Math.hypot(x - FARSHORE_BREACH.x, z - FARSHORE_BREACH.z);
+  // raised rim ring, then the bowl pulled to a fixed dry floor
+  out += 6 * smoothstep(14, 22, dBreach) * (1 - smoothstep(22, 34, dBreach)) * landGate;
+  out = out + (3.0 - out) * (1 - smoothstep(4, 16, dBreach)) * landGate;
+  // the Sundered Cliffs: a broken range walling the east coast, its crests
+  // swelling and dropping so it reads as massifs, not a berm
+  const jag = 0.8 + 0.4 * noise2(x * 0.05, z * 0.05, 9113);
+  out += 34 * isleDome(x, z, 1155, -130, 40, 78) * jag * landGate;
+  out += 50 * isleDome(x, z, 1170, -35, 42, 88) * jag * landGate;
+  out += 36 * isleDome(x, z, 1150, 70, 38, 72) * jag * landGate;
+  return h + (out - h) * w;
 }
 
 // The border meres between columns: the seam blend of two adjacent coasts
@@ -2157,6 +2161,9 @@ const FATIGUE_FREE_WATERS: readonly { x0: number; x1: number; z0: number; z1: nu
     z1: st.lakeHi + 4,
   })),
   ...ROW_MERES.map((m) => ({ x0: m.xLo, x1: m.xHi, z0: m.borderZ - 20, z1: m.borderZ + 20 })),
+  // Gullhaven's harbor bay: calm water under the town pier, never open sea
+  // (falling off the dock must not start the drowning clock).
+  { x0: 748, x1: 804, z0: 96, z1: 138 },
 ];
 
 export function inFatigueFreeWater(x: number, z: number): boolean {
@@ -2183,12 +2190,15 @@ export function inHollowOpenSea(x: number, z: number): boolean {
   if (inFatigueFreeWater(x, z)) return false;
   const seaXb = worldXBoundsAt(z);
   if (z < 180) {
-    // the starter sea: open water past the vale's and the island's organic
-    // shores carries the fatigue turnback. The Ferrywalk sandbar is land you
-    // walk, never open sea.
-    if (Math.abs(x) > 620 || z < -215) return false; // the far void keeps legacy rules
-    if (onCauseway(x, z)) return false;
+    // the starter sea: open water from the vale's shore all the way across
+    // the strait to the Farshore's beaches carries the fatigue turnback.
+    // There is no sandbar anymore: the ferry is the only crossing.
+    if (x < -620 || x > 1400 || z < -390) return false; // the far void keeps legacy rules
     return valeLandness(x, z) < 0.02 && isleLandness(x, z) < 0.02;
+  }
+  if (z < 368 && x > 552 && x <= 1400) {
+    // the Farshore sea east of the Galecrest: fatigue right up to the shore
+    return isleLandness(x, z) < 0.02 && galeLandness(x, z) < 0.02;
   }
   if (z <= 960) {
     // the columns' southern outer coasts: open ocean to the world edge
@@ -2867,8 +2877,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyGardenCoast(x, z, h);
   h = applyGaleCoast(x, z, h);
   h = applyValeCoast(x, z, h);
-  h = applyIsleCoast(x, z, h);
-  h = applyCauseway(x, z, h);
+  h = applyFarshoreSea(x, z, h);
   h = applyStarterMoat(x, z, h);
   h = applyColumnStraits(x, z, h);
   h = applyStripFlankCoast(x, z, h);
@@ -2903,6 +2912,14 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   if (z <= 1260 && Math.abs(x) <= 600) {
     rimX = 0;
     rimS = 0;
+  } else if (z <= 368 && x > 600) {
+    // the Farshore sea band: no wall over the island or its ocean; past the
+    // sea the world-edge rim RAMPS back in on top of the deep floor, so the
+    // containment wall climbs continuously out of the seabed (the rim is
+    // added after the coast appliers, so any hard gate here would print)
+    const rise = smoothstep(1400, 1460, x);
+    rimX *= rise;
+    rimS *= rise;
   }
   if (inHollowOpenSea(x, z)) {
     // no ranges over the open sea: the flanks read as water to the map edge

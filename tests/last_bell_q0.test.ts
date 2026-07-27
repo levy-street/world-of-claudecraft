@@ -50,13 +50,13 @@ describe('Q0 Ashore end to end', () => {
 
     // 1. Board the ferry on the mainland: quest auto-accepts, the crossing
     // lands at Gullhaven, and the arrival scene starts for this player.
-    teleport(sim, 146, -52);
+    teleport(sim, 152, -48);
     const ferry = findByName(sim, 'The Farshore Ferry');
     expect(ferry).toBeTruthy();
     sim.player.targetId = ferry?.id ?? null;
     sim.interact();
     expect(sim.questLog.get(QUEST)?.state).toBe('active');
-    expect(Math.hypot(sim.player.pos.x - 299, sim.player.pos.z - 78)).toBeLessThan(3);
+    expect(Math.hypot(sim.player.pos.x - 806, sim.player.pos.z - 122)).toBeLessThan(3);
     const arrival = collect(sim, 30);
     const sceneKinds = arrival
       .filter((e): e is Extract<SimEvent, { type: 'scene' }> => e.type === 'scene')
@@ -92,7 +92,7 @@ describe('Q0 Ashore end to end', () => {
     expect(questCounts(sim)[1]).toBe(12);
 
     // 4. The Tidemill door starts the solo scenario.
-    teleport(sim, 351, -9);
+    teleport(sim, 929, 11);
     const door = findByName(sim, 'The Tidemill');
     expect(door).toBeTruthy();
     sim.player.targetId = door?.id ?? null;
@@ -154,7 +154,7 @@ describe('Q0 Ashore end to end', () => {
   it('the ferry is plain travel once the quest is done or active', () => {
     const sim = makeSim();
     sim.ctx.players.get(sim.playerId)?.questsDone.add(QUEST);
-    teleport(sim, 146, -52);
+    teleport(sim, 152, -48);
     const ferry = findByName(sim, 'The Farshore Ferry');
     sim.player.targetId = ferry?.id ?? null;
     sim.interact();

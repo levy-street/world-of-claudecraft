@@ -33,11 +33,12 @@ function zone(partial: Partial<ZoneDef> & { id: string; zMin: number; zMax: numb
 describe('the continent derives the right border set', () => {
   const edges = computeBorderEdges(ZONES);
 
-  it('has eleven horizontal borders and fifteen column edges', () => {
-    // the Farshore adds a v-edge against the vale and an h-line under the
-    // Galecrest: both are open-sea borders with no isthmus (ferry only)
-    expect(edges.filter((e) => e.kind === 'h').length).toBe(11);
-    expect(edges.filter((e) => e.kind === 'v').length).toBe(15);
+  it('has ten horizontal borders and fourteen column edges', () => {
+    // the Farshore rect floats far offshore and shares NO border line with
+    // any other zone (deep sea all around, ferry only), so it contributes
+    // no edges at all: the counts are the mainland grid's alone
+    expect(edges.filter((e) => e.kind === 'h').length).toBe(10);
+    expect(edges.filter((e) => e.kind === 'v').length).toBe(14);
   });
 
   it('every crossing sits where the atlas says', () => {
@@ -76,9 +77,13 @@ describe('the continent derives the right border set', () => {
 
   it('row bounds widen exactly where columns live', () => {
     for (const z of [-100, 100]) {
-      // the Farshore widens the starter row east
-      expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: 540 });
+      // the Farshore widens the starter row far east, to the island's edge
+      expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: 1300 });
     }
+    // the island's southern strip (z -250..-180) is the only zone in its row
+    expect(worldXBoundsAt(-200)).toEqual({ min: 700, max: 1300 });
+    // north of the vale the island still spans the row up to its zMax 290
+    expect(worldXBoundsAt(250)).toEqual({ min: -540, max: 1300 });
     for (const z of [300, 800, 1100, 1700, 1900]) {
       expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });
     }
