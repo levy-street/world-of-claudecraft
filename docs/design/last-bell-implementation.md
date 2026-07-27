@@ -220,3 +220,68 @@ owned ship models are public/models/biome/sea_boat_sail_a.glb and siblings
 (CC0, credited); the 3-section dock kit seats each deck on its own anchor
 terrain, so level piers over deep water need the new harbor layout's
 authored deck heights, never chained dock anchors.
+
+### H1 built: the two harbors (2026-07-27, later still)
+
+H1 is in: src/sim/harbor_layout.ts is the layout contract (per harbor:
+deck rects with AUTHORED heights, rail segments, stair flights, dressing
+points, ship berth, gangplank + arrival anchors; bounds precomputed for
+the groundHeight hot path). Both defs live there: the mainland harbor
+(shore apron y 1.2 at the old landing, level pier y 0.5 east over the
+shelf drop, pier head y -0.3 at x 196..204 with the ship berthed off its
+east end at (208,-48) on the dive plateau) and Gullhaven's (waterfront
+apron y 5.9 on tall pilings, stepped pier 4.2 / 2.6 / 1.1 west over the
+bay drop, ship at (757,124)). Wiring: ZonePropsDef.harbors (optional,
+content-gated like docks) -> data.ts merge -> harborWalkHeight arm in
+groundHeight beside dockSurfaceHeight; colliders.ts builds rail OBBs +
+dressing circles; FATIGUE_FREE_WATERS gained the mainland basin rect
+{178..214, -58..-36} (kept south of the farshore pin-6 crossing line).
+Render: src/render/harbor.ts (dockPlatform-tiled decks, pilings, rails,
+stairs, lamps/crates/barrels/bollards, shipSail GLB scaled to the berth
+length with waterline on the sea, gangplank plank), built once in the
+renderer ctor after props; props.ts exports propAsset and adds the
+shipSail def (preload is derived, low-tier landmark list extended); the
+lb_ferry branch slims to buildFerryMooring (sparkle + nameplate + post).
+Campaign anchors read the layout (fixtures at the gangplanks, Ewald
+beside the mainland one); the interim docks are torn out of zone1/
+farshore and the ferry POI moved to the apron. Traps learned: authored
+edges need an epsilon in the rect test (float representation of 2.6
+drops exact edge points, which rail topY reads); the mainland shelf
+tail stays above WATER_LEVEL until x ~196 on some seeds, so the head
+starts there; the arrival deck is a real 25 yd walk from the Gullhaven
+gangplank now, so return-boarding tests teleport to the pier head
+first. Tests: tests/last_bell_harbor.test.ts (multi-seed walkability,
+level-pier-over-deep-water, berth depth, gangplank/arrival on deck,
+rail blocking + open gangplank gap, calm basins, edge-point pins);
+fixtures/q0 re-pinned. NOT in H1 (per the PRD): the fare dialog (H2),
+the departure cinematic + SFX (H3).
+
+### H1 v2: the walkable ship and the ramp system (2026-07-27, owner review round)
+
+The owner's walk rejected v1 (small dock, buried stairs, toy boat, deck
+floating over grass, no keeper on the island side). v2 rebuilds the
+experience: (1) STAIRS ARE OUT, RAMPS ARE IN: HarborRamp rects interpolate
+walkable height between decks and down to the shore, because the movement
+kernel gates climbing at PLAYER_MAX_CLIMB_SLOPE 1.5 and a raised deck edge
+is a wall (this was why the dock could not be walked onto); every entry
+and seam is a planked gangway with cleats. (2) Terrain grading:
+HARBOR_TERRAIN_EDITS (level stamps through the world edit layer) hug the
+mainland apron to the shore and level each entry pocket so ramp lips meet
+ground within a step on every seed. (3) THE SHIP IS REAL AND WALKABLE:
+public/models/props/harbor_ferry_ship.glb, generated with Max's Tripo
+asset pipeline ($0.55, QA PASS, prompt-engineered for a flat open main
+deck), moored at both berths at hull length 22; its measured deck plane
+(1.9 of 11 normalized, so -2.68 world at draft 1.0) is authored as
+shipDecks walkable rects with shipRails hull colliders, and the boarding
+fixture spawns ON the deck: walk the pier, cross the gangplank ramp, and
+board like the FFX Besaid ferry. (4) Ferrykeeper Odda keeps the Gullhaven
+gangplank (both sides have a keeper). (5) The deck look is procedural
+long planks in muted driftwood tones merged per tone (a few draw calls
+per harbor), chunky post-and-cap rails, skirt beams, pilings.
+tests/last_bell_harbor.test.ts gained ramp-slope/flush pins, entry-step
+pins, and a 4-seed end-to-end walk (grass to ship deck, no step over
+0.35). Traps learned: the marketing shell fronts the game so headless
+shots must poll-click #btn-offline until handlers bind (networkidle never
+settles against the dead :8787 proxy), and swiftshader world boots can
+outlast enterOfflineGame's 30 s rAF-polled __game wait: interval-poll it
+yourself (tmp/harbor_shots.mjs pattern).
