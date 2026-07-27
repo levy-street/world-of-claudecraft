@@ -134,6 +134,7 @@ import {
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
+import { buildHarbors } from './harbor';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -141,7 +142,7 @@ import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './imp
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
-import { buildBreachMaw, buildFerryLanding, buildScenarioDoor } from './last_bell_fixtures';
+import { buildBreachMaw, buildFerryMooring, buildScenarioDoor } from './last_bell_fixtures';
 import { LAST_BELL_MOOD_AMBIENCE, type LastBellMood, lastBellMood } from './last_bell_props';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
@@ -1695,6 +1696,12 @@ export class Renderer {
     // flames, whose flicker rescales them every frame: re-enable those.
     freezeStaticMatrices(props.group);
     for (const flame of this.flames) flame.matrixAutoUpdate = true;
+    // The authored harbors (boardwalk + moored ship, src/sim/harbor_layout.ts):
+    // static world geometry like the props above.
+    const harbors = buildHarbors(this.sim.cfg.seed);
+    setRenderCategory(harbors.group, 'props');
+    this.scene.add(harbors.group);
+    freezeStaticMatrices(harbors.group);
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
@@ -4812,17 +4819,11 @@ export class Renderer {
       height = built.height;
       objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId === 'lb_ferry') {
-      // Last Bell ferry landing: mooring post at the fixture, the moored boat
-      // a few yards off the PIER END the fixture stands on (the fixture sits
-      // on the pier over the shelf drop, so open water is close: 14 yd past
-      // the mainland pier, 9 yd past Gullhaven's). The builder drops the
-      // boat's waterline to the sea surface from the fixture's own ground
-      // height (e.pos.y), and the group is turned so local -x points at the
-      // water (mainland x<400: the strait lies east, so flip by pi).
-      const mainland = e.pos.x < 400;
-      const built = buildFerryLanding(e.id, mainland ? 10 : 9, e.pos.y);
+      // Last Bell boarding point: the harbor builder owns the ship and the
+      // boardwalk (src/render/harbor.ts), so the fixture keeps only its
+      // minimal mooring marker plus the sparkle and nameplate.
+      const built = buildFerryMooring(e.id);
       body = built.group;
-      body.rotation.y = mainland ? Math.PI : 0;
       height = built.height;
       objectMesh = body;
       sparkle = this.attachInteractSparkle(group);

@@ -77,131 +77,21 @@ function stripMat(): THREE.MeshBasicMaterial {
 }
 
 // ---------------------------------------------------------------------------
-// The Farshore Ferry landing
+// The Farshore Ferry boarding point
 // ---------------------------------------------------------------------------
 
-// The single-mast ferry, built with its WATERLINE at the sub-group's local
-// y = 0 (hull draft below, freeboard and deck above), so the caller can drop
-// the whole boat to the sea surface with one offset.
-function buildFerryBoat(entityId: number): THREE.Group {
-  const boat = new THREE.Group();
-  const hullWood = woodMat(0x4f3a24);
-  const trimWood = woodMat(0x6b512f);
-  const deckWood = woodMat(0x7a6238);
-  const canvas = canvasMat(0xd8cfb6);
-  const iron = surfaceMat({
-    color: 0x3a3f46,
-    roughness: 0.5,
-    metalness: 0.6,
-    flatShading: !GFX.standardMaterials,
-  });
-
-  // Hull: ~7 yd stem to stern (5.4 yd midbody + a 1.6 yd bow wedge), 0.6 yd
-  // draft below the waterline so the boat reads as floating, not perched.
-  const hull = new THREE.Mesh(new THREE.BoxGeometry(5.4, 1.5, 2.3), hullWood);
-  hull.position.set(-0.4, 0.15, 0);
-  hull.castShadow = true;
-  boat.add(hull);
-  const bow = new THREE.Mesh(new THREE.ConeGeometry(1.1, 1.6, 4), hullWood);
-  bow.rotation.z = -Math.PI / 2;
-  bow.rotation.x = Math.PI / 4; // square cone aligned with the hull's box faces
-  bow.position.set(3.1, 0.15, 0);
-  bow.castShadow = true;
-  boat.add(bow);
-  // Gunwale trim: two rails along the sheer line.
-  for (const side of [-1, 1]) {
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.18, 0.18), trimWood);
-    rail.position.set(-0.4, 0.95, side * 1.15);
-    boat.add(rail);
-  }
-  // Deck plank surface.
-  const deck = new THREE.Mesh(new THREE.BoxGeometry(5.3, 0.1, 2.1), deckWood);
-  deck.position.set(-0.4, 0.86, 0);
-  boat.add(deck);
-
-  // Mast (just forward of midships) with a yard and the furled sail: the sail
-  // is a canvas roll lashed to the yard with three rope ties.
-  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 7.2, 8), trimWood);
-  mast.position.set(0.4, 0.9 + 3.6, 0);
-  mast.castShadow = true;
-  boat.add(mast);
-  const yard = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 4.2, 6), trimWood);
-  yard.rotation.x = Math.PI / 2;
-  yard.position.set(0.4, 6.4, 0);
-  boat.add(yard);
-  const furl = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 3.8, 8), canvas);
-  furl.rotation.x = Math.PI / 2;
-  furl.position.set(0.4, 6.15, 0);
-  furl.castShadow = true;
-  boat.add(furl);
-  for (const tz of [-1.2, 0, 1.2]) {
-    const tie = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.035, 6, 10), trimWood);
-    tie.rotation.y = Math.PI / 2;
-    tie.position.set(0.4, 6.15, tz);
-    boat.add(tie);
-  }
-
-  // Stern lantern on a short post: the emissive ember is the landing's
-  // night-time beacon (a static material glow, deliberately not a light).
-  const lampPost = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 1.1, 6), trimWood);
-  lampPost.position.set(-3.0, 1.45, 0);
-  boat.add(lampPost);
-  const lampBox = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.4, 0.34), iron);
-  lampBox.position.set(-3.0, 2.15, 0);
-  boat.add(lampBox);
-  const ember = new THREE.Mesh(
-    new THREE.SphereGeometry(0.12, 8, 6),
-    surfaceMat({
-      color: 0xffd27a,
-      roughness: 0.3,
-      metalness: 0,
-      emissive: 0xffb84d,
-      emissiveIntensity: 1.8,
-      flatShading: !GFX.standardMaterials,
-    }),
-  );
-  ember.position.set(-3.0, 2.15, 0);
-  boat.add(ember);
-  const halo = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.1), haloMat());
-  halo.position.set(-3.0, 2.15, 0);
-  boat.add(halo);
-
-  // Moored broadside: the hull lies parallel to the shore (long axis across
-  // the local out-direction), with a small per-landing yaw so the two
-  // landings' boats do not sit identically.
-  boat.rotation.y = Math.PI / 2 + ((entityId % 5) - 2) * 0.07;
-  return boat;
-}
-
 /**
- * The ferry landing for one 'lb_ferry' fixture. The fixture entity stands on
- * shore ground (roughly 0.5 to 5 yd above the sea), while the sea surface is
- * the world WATER_LEVEL (-4.5): the terrain only dips under water 28+ yd off
- * either landing (measured on the pinned world seed 20061), so the boat is
- * pushed `outDist` yd toward local -x AND dropped so its waterline sits
- * exactly at the sea surface. The caller supplies:
- *   - outDist: how far offshore the open water starts (30 mainland, 34 pier)
- *   - groundY: the fixture entity's ground height (e.pos.y), so the drop
- *     WATER_LEVEL - groundY is exact for either landing
- * and rotates the returned group so local -x points at the water. The mast
- * tops out ~11 yd above the waterline, so the landing reads well past 40 yd.
+ * The minimal mooring marker for one 'lb_ferry' fixture. The harbor builder
+ * (src/render/harbor.ts) owns the ship and the boardwalk now; the fixture
+ * keeps only the leaning bollard and rope collar that mark where boarding is
+ * hailed from, plus the sparkle and nameplate the renderer attaches.
  */
-export function buildFerryLanding(
-  entityId: number,
-  outDist: number,
-  groundY: number,
-): { group: THREE.Group; height: number } {
+export function buildFerryMooring(entityId: number): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
-
-  const boat = buildFerryBoat(entityId);
-  boat.position.set(-outDist, WATER_LEVEL - groundY, 0);
-  group.add(boat);
-
-  // The short mooring post at the landing itself: a leaning timber bollard
-  // with a rope collar, marking where the ferry is hailed from.
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 1.4, 8), woodMat(0x5b4226));
   post.position.set(-0.7, 0.7, 0.5);
-  post.rotation.z = 0.12;
+  // a small per-landing lean so the two gangplank posts do not sit identically
+  post.rotation.z = 0.09 + (entityId % 3) * 0.03;
   post.castShadow = true;
   group.add(post);
   const collar = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.05, 6, 12), canvasMat(0xb3a37f));
@@ -212,9 +102,8 @@ export function buildFerryLanding(
   stump.position.set(0.35, 0.35, -0.4);
   group.add(stump);
 
-  // Nameplate anchor stays at the shore fixture (the interact point), not the
-  // boat: height 6 clears the mooring post and reads over the shoreline.
-  return { group, height: 6 };
+  // Nameplate anchor: clears the post while staying near the gangplank.
+  return { group, height: 3.2 };
 }
 
 // ---------------------------------------------------------------------------

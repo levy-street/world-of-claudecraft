@@ -3,6 +3,7 @@
 
 import { DUNGEON_X_THRESHOLD, getActiveWorldContent, PROPS } from '../sim/data';
 import { dockSectionAt } from '../sim/dock_layout';
+import { harborSurfaceHeight } from '../sim/harbor_layout';
 import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { AmbientPointSource, Surface } from './audio_sink';
@@ -10,6 +11,9 @@ import type { AmbientPointSource, Surface } from './audio_sink';
 export function isOnDockDeck(x: number, z: number): boolean {
   for (const dock of getActiveWorldContent().props.docks)
     if (dockSectionAt(dock, x, z) >= 0) return true;
+  // The harbor boardwalks are planks too: same wood underfoot.
+  for (const h of getActiveWorldContent().props.harbors ?? [])
+    if (harborSurfaceHeight(h, x, z) > -Infinity) return true;
   return false;
 }
 
