@@ -15,6 +15,11 @@
 //     [--prompt "..."] [--image ...] [--rotate-y 90] [--apply] [--job id]
 //   node scripts/asset_pipeline/pipeline.mjs creature --name bog_lurker \
 //     [--prompt "..."] [--image ...] [--rig-type biped] [--height 2.0] [--job id]
+//   node scripts/asset_pipeline/pipeline.mjs armor --name frost_guard --char shaman \
+//     --prompt "ice crystal armor, glowing frost runes" [--image ...] [--job id]
+//     (generates a full T-pose suit, auto-splits it into Helm/Torso/Arms/Legs
+//      against the class body, forges it on via armor/forge.mjs; the set goes
+//      live in the Armory picker, :5181)
 //   node scripts/asset_pipeline/pipeline.mjs skin --class warrior --suffix lava \
 //     --tripo --prompt "molten obsidian armor, glowing lava cracks" [--apply]  (real gen)
 //     (or --recolor hue=..[,sat=..][,light=..] fallback, or --prompt with OPENAI_API_KEY)
@@ -149,6 +154,7 @@ const STEP_ORDER = {
     'preview_held_all',
   ],
   prop: ['concept', 'generate', 'texture', 'normalize', 'preview'],
+  armor: ['concept', 'generate', 'texture', 'split', 'forge', 'preview'],
   creature: ['concept', 'generate', 'texture', 'rig', 'retarget', 'assemble', 'preview'],
   skin: ['texture', 'composite', 'render', 'recolor', 'repaint'],
   skinmodel: [
@@ -593,6 +599,122 @@ async function cmdProp() {
   };
   console.log(`\n${propSnippet({ name, height, footprint, building: flag('building') })}`);
   printReport(job, { ok: true, glb: built, footprint, actions });
+}
+
+// Armor set for one class: generate a full T-pose suit (concept + Tripo),
+// auto-split the fused mesh into forge slots against the class body, then
+// forge it onto that body (fit anchored, gate-verified) so it appears in the
+// Armory picker (:5181) exactly like the artist sets. The armored GLB is also
+// copied into the job dir as <name>.glb so the wizard/live viewer previews it.
+const ARMOR_CLASSES = [
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'druid',
+];
+const ARMORY_WORKSPACE = resolve(REPO_ROOT, 'tmp/asset_pipeline/armor_picker');
+
+async function cmdArmor() {
+  const name = opt('name');
+  if (!name) throw new Error('armor needs --name <snake_case>');
+  const job = Job.open({ job: opt('job'), kind: 'armor', name, create: flag('new-job') });
+  // Resumed runs (the wizard's finish/apply) may omit --char; the job recorded
+  // it on the first invocation.
+  const char = opt('char') ?? job.state.char;
+  if (!char) throw new Error('armor needs --char <class>');
+  if (!ARMOR_CLASSES.includes(char)) {
+    throw new Error(`--char must be one of ${ARMOR_CLASSES.join(', ')}`);
+  }
+  if (!existsSync(resolve(ARMORY_WORKSPACE, `work/bodies/${char}.glb`))) {
+    throw new Error(
+      `Armory body for '${char}' missing; run scripts/asset_pipeline/armor/forge.mjs bootstrap first`,
+    );
+  }
+  applyRedo(job, 'armor');
+  job.set('kind', 'armor');
+  job.set('name', name);
+  job.set('char', char);
+  if (opt('prompt')) job.set('prompt', opt('prompt'));
+
+  const concept = await conceptStage(job, {
+    kind: 'armor',
+    description: opt('prompt'),
+    image: opt('image'),
+  });
+  const gen = await generateStage(job, {
+    input: concept.conceptPath ?? concept.input,
+    prompt: opt('prompt') ? conceptPrompt({ kind: 'armor', description: opt('prompt') }) : null,
+    model: opt('model') === 'hifi' ? tripo.MODEL_HIFI : tripo.MODEL_LOWPOLY,
+    faceLimit: faceLimitOpt(6000),
+  });
+  if (await reviewStop(job, 'generate', gen.raw)) return;
+  const tex = await textureStage(job, gen);
+  if (await reviewStop(job, 'texture', tex?.glb ?? gen.raw)) return;
+
+  const { autoSplitArmor } = await import('./armor/auto_split.mjs');
+  const splitGlb = job.path(`${name}_slots.glb`);
+  const split = await job.step(`split_${char}`, () =>
+    autoSplitArmor(tex?.glb ?? gen.raw, char, splitGlb, {
+      workspace: ARMORY_WORKSPACE,
+      log: (m) => job.log(m),
+    }),
+  );
+
+  const label = (opt('prompt') ?? name)
+    .split(/[\s,_]+/)
+    .slice(0, 3)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  await job.step(`forge_${char}`, async () => {
+    const { spawnSync } = await import('node:child_process');
+    const forge = resolve(REPO_ROOT, 'scripts/asset_pipeline/armor/forge.mjs');
+    const args = [
+      forge,
+      'forge',
+      '--set',
+      splitGlb,
+      '--name',
+      name,
+      '--label',
+      label,
+      '--char',
+      char,
+      '--fit',
+      'anchored',
+    ];
+    const res = spawnSync(process.execPath, args, { cwd: REPO_ROOT, encoding: 'utf8' });
+    job.log(res.stdout ?? '');
+    if (res.status !== 0) {
+      job.log(res.stderr ?? '');
+      throw new Error(`forge failed (gate or fit error); see job log`);
+    }
+    return { label, slots: split.slots };
+  });
+
+  // The forged artifact is the deliverable: copy into the job dir so the
+  // wizard's live viewer + previews render it, and downloads work.
+  const armored = resolve(ARMORY_WORKSPACE, `work/armored/${char}__${name}.glb`);
+  const built = job.path(`${name}.glb`);
+  copyFileSync(armored, built);
+  await previewStage(job, built);
+
+  const actions = [
+    `set '${label}' forged onto ${char}: live in the Armory picker (armory-picker, :5181)`,
+  ];
+  if (flag('apply')) {
+    actions.push(
+      ...appendCreditsRow({
+        assets: `Generated armor set (${name}, ${char})`,
+        source: 'Project-generated via scripts/asset_pipeline (Tripo AI 3D)',
+      }),
+    );
+  }
+  printReport(job, { ok: true, glb: built, char, slots: split.slots, actions });
 }
 
 async function cmdCreature() {
@@ -1412,6 +1534,7 @@ const COMMANDS = {
   weapon: cmdWeapon,
   prop: cmdProp,
   creature: cmdCreature,
+  armor: cmdArmor,
   skin: cmdSkin,
   skinset: cmdSkinset,
   skinmodel: cmdSkinmodel,

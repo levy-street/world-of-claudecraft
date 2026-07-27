@@ -773,8 +773,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_shaman",
-    "tint": "#6f8fc9",
-    "still": "/guide-stills/player_shaman__6f8fc9.webp"
+    "still": "/guide-stills/player_shaman.webp"
   },
   {
     "id": "mage",
@@ -1804,19 +1803,15 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "tintStrength": 0.5
   },
   "player_shaman": {
-    "url": "models/chars/players/barbarian.glb",
+    "url": "models/chars/players/shaman_male_v03.glb",
     "idle": "Idle",
     "height": 2.6,
-    "show": [
-      "Barbarian_BearHat"
-    ],
     "attach": [
       {
         "url": "models/weapons/axe_1handed.glb",
         "bone": "handslot.r"
       }
-    ],
-    "tintStrength": 0.4
+    ]
   },
   "player_mage": {
     "url": "models/chars/players/mage.glb",

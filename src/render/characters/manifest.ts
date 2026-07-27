@@ -327,14 +327,10 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
     `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
-  player_shaman: [
-    null,
-    `${SKINS_DIR}/barbarian/alt_a.png`,
-    `${SKINS_DIR}/barbarian/alt_b.png`,
-    `${SKINS_DIR}/barbarian/alt_c.png`,
-    `${SKINS_DIR}/barbarian/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/barbarian/alt_suit_chrome.png`,
-  ],
+  // v03 body ships its own embedded texture; the barbarian alt atlases were
+  // authored for the retired barbarian UVs (they scramble on the new model).
+  // Slot COUNT stays 6 so saved skin picks remain valid indices.
+  player_shaman: [null, null, null, null, null, null],
   player_druid: [
     null,
     `${SKINS_DIR}/druid/alt_a.png`,
@@ -422,14 +418,22 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.5,
   },
   player_shaman: {
-    url: `${PLAYERS}/barbarian.glb`,
+    // v03 artist body (own rig + full self-contained track pack, embedded
+    // texture; revert by pointing back at barbarian.glb + BearHat show/tint).
+    // Cast-time spells (lightning_bolt, heals, chain, ghost_wolf) animate via
+    // the base cast state (Spellcasting); every instant (shocks, imbues,
+    // buffs) plays nothing, per the no-anim-on-instant rule. Jump clip is
+    // trimmed to the airborne segment, so no jumpLandT.
+    url: `${PLAYERS}/shaman_male_v03.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
+    // mainhand only: the shield is a FIXED offhand (no dual wield; slot 1 in
+    // weaponSlots would mirror the equipped weapon into the shield hand).
     weaponSlots: [0],
-    tint: 0x6f8fc9,
-    tintStrength: 0.4,
   },
   player_mage: {
     url: `${PLAYERS}/mage.glb`,

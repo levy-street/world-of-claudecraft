@@ -19,7 +19,19 @@ import { REPO_ROOT } from './env.mjs';
 import { JOBS_ROOT } from './job.mjs';
 
 const PIPELINE = join(REPO_ROOT, 'scripts/asset_pipeline/pipeline.mjs');
-const LANES = new Set(['creature', 'weapon', 'prop']);
+const LANES = new Set(['creature', 'weapon', 'prop', 'armor']);
+export const ARMOR_CLASSES = [
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'druid',
+];
+const ARMOR_CLASS_SET = new Set(ARMOR_CLASSES);
 
 // In-memory registry of the currently-running child per jobId. A job with no
 // live child is idle (finished, failed, or awaiting the next operator action).
@@ -115,6 +127,10 @@ export function genArgs(lane, options = {}) {
     const ryRaw = Number(o.rotateY);
     if (o.rotateY !== '' && o.rotateY != null && Number.isFinite(ryRaw))
       args.push('--rotate-y', String(((ryRaw % 360) + 360) % 360));
+  } else if (lane === 'armor') {
+    // The target class is REQUIRED by the pipeline; allowlisted here so the
+    // value can never smuggle a flag.
+    if (ARMOR_CLASS_SET.has(o.char)) args.push('--char', o.char);
   }
   return args;
 }

@@ -181,9 +181,25 @@ export async function manualRigOntoReference(rawGlbPath, referenceGlbPath, outPa
   // Bind-frame anchors (the bind space can be offset AND scaled relative to
   // the rest pose; the knight's is ~2.18x with the body axis at x=-1.11):
   // ground = the root joint's bind height, body axis = hips XZ, and the
-  // T-pose arm line = wrist height above ground.
-  const P = (name) => jointPos[byName.get(name)];
-  const groundY = P('root')?.[1] ?? 0;
+  // T-pose arm line = wrist height above ground. Anchors resolve KayKit names
+  // first, then the Mixamo-style names Tripo rigs use, so any of the shipped
+  // character families can serve as the reference.
+  const ALIAS = {
+    hips: ['mixamorigHips'],
+    'wrist.r': ['mixamorigRightHand'],
+    head: ['mixamorigHead'],
+  };
+  const P = (name) => {
+    let i = byName.get(name);
+    for (const alt of ALIAS[name] ?? []) i ??= byName.get(alt);
+    return i === undefined ? undefined : jointPos[i];
+  };
+  // Mixamo rigs carry no ground-level root joint: fall back to the lowest
+  // foot/toe joint's bind height.
+  const feetY = joints
+    .map((j, i) => (/foot|toe/i.test(j.getName()) ? jointPos[i][1] : Infinity))
+    .reduce((a, b) => Math.min(a, b), Infinity);
+  const groundY = P('root')?.[1] ?? (Number.isFinite(feetY) ? feetY : 0);
   const centerX = P('hips')?.[0] ?? 0;
   const centerZ = P('hips')?.[2] ?? 0;
   const wristAbove = (P('wrist.r')?.[1] ?? 1.11) - groundY;
@@ -204,14 +220,16 @@ export async function manualRigOntoReference(rawGlbPath, referenceGlbPath, outPa
       // Synthetic leaf segments, sized relative to the bind frame: the chibi
       // head is a big rigid blob above its joint; toes extend forward (+Z).
       const p = jointPos[i];
-      const dir = name === 'head' ? [0, 0.4 * wristAbove, 0] : [0, 0, 0.05 * wristAbove];
+      const dir = /^(head|mixamorigHead)$/.test(name)
+        ? [0, 0.4 * wristAbove, 0]
+        : [0, 0, 0.05 * wristAbove];
       segments.push({ joint: i, a: p, b: [p[0] + dir[0], p[1] + dir[1], p[2] + dir[2]] });
     }
   }
   const sideGuard = 0.02 * wristAbove;
   const side = (i) => {
     const n = joints[i].getName();
-    return n.endsWith('.l') ? 1 : n.endsWith('.r') ? -1 : 0;
+    return n.endsWith('.l') || /Left/.test(n) ? 1 : n.endsWith('.r') || /Right/.test(n) ? -1 : 0;
   };
 
   // --- Raw mesh: read arrays, transform into reference bind space ----------

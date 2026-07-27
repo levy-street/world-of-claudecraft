@@ -14,6 +14,19 @@ const LANES = [
   { id: 'creature', label: 'Creature / mob', animated: true },
   { id: 'weapon', label: 'Weapon', animated: false },
   { id: 'prop', label: 'Prop', animated: false },
+  { id: 'armor', label: 'Armor set (for a class)', animated: false },
+];
+
+const ARMOR_CLASSES = [
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'druid',
 ];
 
 function laneOf(asset) {
@@ -189,6 +202,7 @@ class Wizard {
         family: '',
         rotateY: '',
         faceLimit: '',
+        char: 'warrior',
         ...(preset.options || {}),
       },
       texturePrompt: '',
@@ -296,6 +310,10 @@ class Wizard {
               }
               if (s.lane === 'prop' && !(Number(s.options.height) > 0)) {
                 alert('Props need a height in world units (the prop lane requires it).');
+                return;
+              }
+              if (s.lane === 'armor' && !ARMOR_CLASSES.includes(s.options.char)) {
+                alert('Armor sets need a target character class.');
                 return;
               }
               this.submitPrompt();
@@ -454,7 +472,9 @@ class Wizard {
         ? regen
           ? 'Re-rigging and re-generating the animations...'
           : 'Rigging and generating the animations...'
-        : 'Finishing the model (normalize, icon, previews)...',
+        : s.lane === 'armor'
+          ? 'Splitting the suit into pieces and forging it onto the character (free, local)...'
+          : 'Finishing the model (normalize, icon, previews)...',
     );
     const r = await api('/api/wizard/finish', {
       lane: s.lane,
@@ -479,7 +499,9 @@ class Wizard {
         { class: 'wz-sub' },
         s.lane === 'creature'
           ? 'Pick a clip from the dropdown to watch it play. Approve to save into the game, or regenerate.'
-          : 'Drag to rotate, scroll to zoom. Approve to save into the game, or regenerate.',
+          : s.lane === 'armor'
+            ? 'This is the character wearing the forged set (pick a clip to see it move). It is already live in the Armory picker (:5181); approve to record it, or regenerate.'
+            : 'Drag to rotate, scroll to zoom. Approve to save into the game, or regenerate.',
       ),
       this.stepsBar('finish'),
       this.reviewPreview(this._status.finalGlb, finals, 'No finished asset yet.'),
@@ -544,7 +566,9 @@ class Wizard {
       el(
         'div',
         { class: 'wz-sub' },
-        'The model was copied into public/models/ and CREDITS.md updated. For creatures, wire the printed VisualDef/MOB_KEYS snippet (in the log) into src/render/characters/manifest.ts.',
+        this.state?.lane === 'armor'
+          ? 'The armor set is live in the Armory picker (armory-picker, :5181) on its class, with per-piece toggles and GLB downloads. CREDITS.md updated.'
+          : 'The model was copied into public/models/ and CREDITS.md updated. For creatures, wire the printed VisualDef/MOB_KEYS snippet (in the log) into src/render/characters/manifest.ts.',
       ),
       this.stepsBar('save'),
       this.logBox(true),
@@ -721,6 +745,16 @@ class Wizard {
       fields.push(
         field('Height (world units)', txt('height', 'e.g. 2.4', 'number')),
         field('Rotate Y (degrees)', txt('rotateY', 'e.g. 90', 'number')),
+      );
+    } else if (s.lane === 'armor') {
+      fields.push(
+        field(
+          'Character (the class this set is forged onto)',
+          sel(
+            'char',
+            ARMOR_CLASSES.map((c) => [c, c.charAt(0).toUpperCase() + c.slice(1)]),
+          ),
+        ),
       );
     }
     fields.push(

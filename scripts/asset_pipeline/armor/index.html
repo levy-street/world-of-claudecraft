@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Armory: armour variant picker</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg0: #0c0a08;
+    --bg1: #191410;
+    --panel: rgba(22, 17, 12, 0.94);
+    --panel-edge: #3a2e1e;
+    --gold: #c9a35c;
+    --gold-bright: #eccf8f;
+    --parchment: #e8d9b0;
+    --ink-dim: #9c8c6a;
+    --steel: #8a93a5;
+    --danger: #b3502e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: "Alegreya Sans", "Gill Sans", "Segoe UI", sans-serif;
+    background:
+      radial-gradient(1200px 800px at 50% 30%, #241c13 0%, var(--bg1) 45%, var(--bg0) 100%);
+    color: var(--parchment);
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 40;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+  #stage { position: fixed; inset: 0; }
+  #stage canvas { display: block; }
+
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+    display: flex; align-items: baseline; gap: 18px;
+    padding: 18px 28px 14px;
+    background: linear-gradient(to bottom, rgba(10,8,6,0.85), transparent);
+    pointer-events: none;
+  }
+  header h1 {
+    font-family: Cinzel, "Times New Roman", serif;
+    font-weight: 900; font-size: 26px; letter-spacing: 0.22em;
+    color: var(--gold-bright);
+    text-shadow: 0 2px 12px rgba(201, 163, 92, 0.35);
+  }
+  header .rule { flex: 1; height: 1px; background: linear-gradient(to right, var(--gold), transparent); opacity: .5; }
+  header .sub {
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim);
+  }
+
+  /* Character roster, left rail */
+  #roster {
+    position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 20;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .char-tile {
+    width: 108px; padding: 10px 12px 8px;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 3px;
+    color: var(--parchment);
+    font-family: Cinzel, serif; font-weight: 700; font-size: 13px; letter-spacing: .08em;
+    text-align: left; cursor: pointer;
+    transition: border-color .18s, transform .18s, box-shadow .18s;
+    position: relative;
+  }
+  .char-tile small { display: block; font-family: "Alegreya Sans", sans-serif; font-weight: 400; font-size: 10px; color: var(--ink-dim); letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; }
+  .char-tile:hover { border-color: var(--gold); transform: translateX(3px); }
+  .char-tile.active {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 0 1px rgba(236,207,143,.4), 0 6px 18px rgba(0,0,0,.5);
+    background: linear-gradient(120deg, rgba(64,48,24,.95), var(--panel) 70%);
+  }
+  .char-tile.active::before {
+    content: ""; position: absolute; left: -20px; top: 50%; transform: translateY(-50%);
+    border: 6px solid transparent; border-right-color: var(--gold-bright);
+  }
+
+  /* Ledger panel, right rail */
+  #ledger {
+    position: fixed; right: 20px; top: 72px; bottom: 20px; width: 320px; z-index: 20;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 4px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.55);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  #ledger::before {
+    content: ""; position: absolute; inset: 6px; pointer-events: none;
+    border: 1px solid rgba(201,163,92,.22); border-radius: 2px;
+  }
+  #ledger h2 {
+    font-family: Cinzel, serif; font-size: 14px; font-weight: 700; letter-spacing: .2em;
+    color: var(--gold); text-align: center;
+    padding: 16px 0 4px;
+  }
+  #ledger .hint { text-align: center; font-size: 11px; color: var(--ink-dim); letter-spacing: .06em; padding-bottom: 10px; }
+  #setrow {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 8px 14px 12px; border-bottom: 1px solid var(--panel-edge);
+  }
+  #setrow .setlabel { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); margin-right: 2px; }
+  #pieces { flex: 1; overflow-y: auto; padding: 8px 14px 12px; scrollbar-width: thin; scrollbar-color: #4a3a22 transparent; }
+  .piece-row { padding: 10px 4px 12px; border-bottom: 1px solid rgba(58,46,30,.55); }
+  .piece-row:last-child { border-bottom: none; }
+  .piece-name {
+    font-family: Cinzel, serif; font-size: 13px; font-weight: 700; letter-spacing: .1em;
+    color: var(--parchment); margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .piece-name .variant-tag { font-family: "Alegreya Sans", sans-serif; font-weight: 400; font-style: italic; font-size: 11px; color: var(--ink-dim); letter-spacing: .04em; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    width: 34px; height: 26px; border-radius: 3px; cursor: pointer;
+    border: 1px solid rgba(0,0,0,.6);
+    outline: 1px solid rgba(255,255,255,.08);
+    position: relative;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .chip:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,.5); }
+  .chip.selected { outline: 2px solid var(--gold-bright); box-shadow: 0 0 10px rgba(236,207,143,.45); }
+  .chip.base { background: linear-gradient(135deg, #a7afbd 0%, #59606e 100%); }
+  .chip.obsidian { background: linear-gradient(135deg, #3a2f28 0%, #16110e 60%); }
+  .chip.obsidian::after { content: ""; position: absolute; right: 4px; bottom: 4px; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffb066, #ff6a1e); box-shadow: 0 0 6px #ff7a26; }
+  .chip.frost { background: linear-gradient(135deg, #d9efff 0%, #5f8fc0 100%); }
+  .chip.gilded { background: linear-gradient(135deg, #f8efd6 0%, #caa74f 65%, #8a6d2c 100%); }
+  .chip.verdant { background: linear-gradient(135deg, #8fb56b 0%, #3d5c32 100%); }
+  .chip.none { background: #14100d; }
+  .chip.plate { background: linear-gradient(135deg, #7c8697 0%, #2f3540 100%); border-color: #9aa3b2; }
+  .chip.dragonscale { background: linear-gradient(135deg, #a32c26 0%, #4a1210 65%, #2a2320 100%); }
+  .chip.dragonscale::after { content: ""; position: absolute; right: 4px; top: 4px; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 7px solid #3a3f47; }
+  .chip.bonewrought { background: linear-gradient(135deg, #efe8d2 0%, #b7ac8c 55%, #58503c 100%); }
+  .chip.bonewrought::after { content: ""; position: absolute; right: 4px; bottom: 4px; width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #7fe9d9, #1fa38f); }
+  .chip.stormcrystal { background: linear-gradient(135deg, #c9f2ff 0%, #47a4e8 55%, #1d4f8f 100%); }
+  .chip.head-hunter { background: linear-gradient(135deg, #e8b98a 0%, #7d5a3a 60%, #4f5d43 100%); }
+  .chip.wing-butterfly { background: linear-gradient(135deg, #ffd1f0 0%, #a55bd6 60%, #4b2a78 100%); }
+  .chip.wing-angel { background: linear-gradient(135deg, #ffffff 0%, #e8e2c8 55%, #b7a45e 100%); }
+  .chip.wing-dragon { background: linear-gradient(135deg, #8c2f24 0%, #4a1210 60%, #1d0c0a 100%); }
+  .chip.wing-jetpack { background: linear-gradient(135deg, #9aa3b2 0%, #5c6470 55%, #e06a1f 100%); }
+  .rowselect {
+    width: 100%; margin-top: 4px;
+    background: #1d1712; color: var(--parchment);
+    border: 1px solid var(--panel-edge); border-radius: 3px;
+    font-family: "Alegreya Sans", sans-serif; font-size: 13px; padding: 6px 8px;
+  }
+  .rowselect:focus { outline: 1px solid var(--gold); }
+  a.dl {
+    display: block; margin-top: 6px; padding: 6px 10px;
+    background: #1d1712; color: var(--gold-bright);
+    border: 1px solid var(--panel-edge); border-radius: 3px;
+    font-size: 12px; letter-spacing: .06em; text-decoration: none;
+  }
+  a.dl:hover { border-color: var(--gold); }
+  .chip.stormcrystal::after { content: ""; position: absolute; right: 3px; top: 3px; width: 5px; height: 9px; background: #e8fbff; clip-path: polygon(50% 0, 100% 35%, 65% 100%, 0 55%); }
+  .chip.none::after {
+    content: ""; position: absolute; left: 4px; right: 4px; top: 50%; height: 1px;
+    background: var(--danger); transform: rotate(-18deg);
+  }
+  #controls {
+    display: flex; gap: 10px; align-items: center;
+    padding: 12px 14px; border-top: 1px solid var(--panel-edge);
+    background: rgba(14,11,8,.6);
+  }
+  #controls label { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); }
+  #anim {
+    flex: 1; background: #1d1712; color: var(--parchment);
+    border: 1px solid var(--panel-edge); border-radius: 3px;
+    font-family: "Alegreya Sans", sans-serif; font-size: 13px; padding: 6px 8px;
+  }
+  #anim:focus { outline: 1px solid var(--gold); }
+
+  #status {
+    position: fixed; left: 24px; bottom: 18px; z-index: 20;
+    font-size: 12px; letter-spacing: .08em; color: var(--ink-dim);
+    background: rgba(12,9,7,.7); border: 1px solid var(--panel-edge);
+    padding: 6px 12px; border-radius: 3px;
+  }
+  #status b { color: var(--gold); font-weight: 500; }
+
+  #loading {
+    position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center;
+    background: rgba(10,8,6,.75); backdrop-filter: blur(2px);
+    font-family: Cinzel, serif; letter-spacing: .3em; color: var(--gold);
+    transition: opacity .4s; font-size: 14px;
+  }
+  #loading.hidden { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <header>
+    <h1>THE ARMORY</h1>
+    <div class="rule"></div>
+    <div class="sub">World of ClaudeCraft &middot; armour variant picker</div>
+  </header>
+  <nav id="roster" aria-label="Characters"></nav>
+  <aside id="ledger">
+    <h2>ARMOUR LEDGER</h2>
+    <div class="hint">Choose a forged set, toggle pieces, style the head</div>
+    <div id="setrow"><span class="setlabel">Full set</span></div>
+    <div id="pieces"></div>
+    <div id="controls">
+      <label for="anim">Anim</label>
+      <select id="anim"></select>
+    </div>
+  </aside>
+  <div id="status">Loading manifest&hellip;</div>
+  <div id="loading">FORGING&hellip;</div>
+  <script type="module" src="./picker.js"></script>
+</body>
+</html>

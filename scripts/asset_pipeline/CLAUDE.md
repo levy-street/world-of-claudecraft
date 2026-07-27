@@ -95,6 +95,25 @@ VisualDef snippet for `VISUALS` plus the `MOB_KEYS` wiring (`src/render/characte
 is printed for the agent to place by hand: set the real world-unit `height` (tune against
 similar mobs) and the tint.
 
+### 3b. armor (generated armor set forged onto a class body)
+```
+node scripts/asset_pipeline/pipeline.mjs armor --name frost_guard --char shaman \
+  --prompt "ice crystal armor, glowing frost runes" [--image ...] [--job id] [--apply]
+```
+Generates a full T-pose armor SUIT (gpt-image-2 concept from the armor template,
+Tripo image-to-model, ~45-65 cr), AUTO-SPLITS the fused mesh into the Armor
+Forge's slots (Helm/Torso/Arms/Legs, plus Shoulders on bodies with pads) by
+classifying triangles against the chosen class body (alignment is a grid-search
+fit of scale + y-offset minimizing suit-to-body distance, immune to crests and
+icicle decorations), then runs `armor/forge.mjs forge --fit anchored --char
+<class>` so the set lands gate-verified in the Armory picker (:5181) with
+per-piece toggles and GLB downloads, exactly like the artist sets. The armored
+GLB is also copied into the job dir for the wizard's live review. `--apply`
+appends the CREDITS.md row (the Armory registration already happened at forge).
+The web wizard (library --serve) exposes this as the "Armor set (for a class)"
+asset type with a 9-class character dropdown. Requires the Armory workspace
+(`armor/forge.mjs bootstrap` + ingested bodies) to exist.
+
 ### 4. skin (real AI-generated texture-swap skins)
 ```
 node scripts/asset_pipeline/pipeline.mjs skin --class warrior --suffix lava \

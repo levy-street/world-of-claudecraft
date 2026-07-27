@@ -40,6 +40,21 @@ export function conceptPrompt({ kind, description, family, rigType }) {
   if (kind === 'prop') {
     return `${description}, fantasy environment prop, resting on the ground, upright, ${STYLE_CORE}, ${LAYOUT_OBJECT}`;
   }
+  if (kind === 'armor') {
+    // A FULL armor set worn head to toe by a chibi figure. The rules mirror
+    // tmp/ARMOR_PROMPT.md (learned on the ice/skeleton sets): T-pose so it
+    // drops onto the rig bind, full coverage with an enclosed helm (the picker
+    // hides the body under worn pieces, so no skin may show), chibi
+    // proportions so the suit fits the class bodies without distortion.
+    return (
+      `${description}, a complete fantasy ARMOR SET worn head-to-toe by a single chibi ` +
+      'character: a fully enclosed helmet covering the whole head and face (no visible skin ' +
+      'anywhere), large shoulder pauldrons, a chest piece flowing into a waist skirt, full arm ' +
+      'sleeves ending in gauntlet fists, and legs with heavy boots, ' +
+      'chibi proportions, large rounded head about one third of total height, short stubby ' +
+      `body and limbs, ${STYLE_CORE}, ${LAYOUT_CHARACTER}`
+    );
+  }
   if (kind === 'creature') {
     // The game's humanoids are CHIBI (KayKit/Quaternius mini proportions): a big
     // rounded head on a short stubby body. Tripo defaults to realistic
