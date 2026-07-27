@@ -30,8 +30,8 @@ describe('Last Bell harbors', () => {
     // Pin the anchors so the campaign cannot silently drift.
     expect(MAINLAND_HARBOR.gangplank).toEqual({ x: 205.4, z: -48, facing: Math.PI / 2 });
     expect(GULLHAVEN_HARBOR.gangplank).toEqual({ x: 757, z: 120.5, facing: 0 });
-    expect(MAINLAND_HARBOR.boarding).toEqual({ x: 211.5, z: -47.3 });
-    expect(GULLHAVEN_HARBOR.boarding).toEqual({ x: 756.3, z: 127 });
+    expect(MAINLAND_HARBOR.boarding).toEqual({ x: 211, z: -48 });
+    expect(GULLHAVEN_HARBOR.boarding).toEqual({ x: 757, z: 124.6 });
     expect(MAINLAND_HARBOR.arrival).toEqual({ x: 173, z: -48 });
     expect(GULLHAVEN_HARBOR.arrival).toEqual({ x: 782, z: 116 });
   });
@@ -96,7 +96,7 @@ describe('Last Bell harbors', () => {
         prev = g;
       }
       // and the walk ends on the ship's deck
-      expect(groundHeight(211.5, -48, seed)).toBe(-2.68);
+      expect(groundHeight(211.5, -48, seed)).toBe(-1.14);
     }
   });
 
@@ -224,9 +224,37 @@ describe('Last Bell harbors', () => {
     // edge (x 206) onto the gangplank ramp is not blocked by a rail.
     const throughGap = resolveMovement(seed, 205, -48, 207.5, -48);
     expect(throughGap.x).toBeGreaterThan(206.5);
-    // Aboard, the far hull rail stops a walk off the seaward side.
-    const hullRail = resolveMovement(seed, 211.5, -47.3, 216.5, -47.3);
-    expect(hullRail.x).toBeLessThan(214.3);
+    // Aboard, the deck is open water-side until the far hull rail stops it.
+    const hullRail = resolveMovement(seed, 211, -48, 221, -48);
+    expect(hullRail.x).toBeGreaterThan(216);
+    expect(hullRail.x).toBeLessThan(219.9);
+  });
+
+  it('keeps control on the ship deck: walk aboard and back through the motion loop', () => {
+    // Regression: rideSteepnessAt used to read the BARE TERRAIN under the
+    // deck (the strip-edge dive wall under the mainland berth is steeper
+    // than the climb gate), so the steep-ground gate stripped control the
+    // moment a player stepped aboard. The footing arm returns the authored
+    // surface slope instead; this drives the REAL motion loop both ways.
+    const sim = makeSim();
+    const tp = (x: number, z: number) => {
+      const pos = sim.groundPos(x, z);
+      sim.player.pos = { ...pos };
+      sim.player.prevPos = { ...pos };
+      sim.rebucket(sim.player);
+    };
+    tp(204.5, -48);
+    sim.player.facing = Math.PI / 2;
+    sim.moveInput.forward = true;
+    for (let i = 0; i < 100; i++) sim.tick();
+    // aboard, well past the gangplank landing
+    expect(sim.player.pos.x).toBeGreaterThan(212);
+    expect(sim.player.pos.y).toBeCloseTo(-1.14, 3);
+    // and back west up the plank to the pier head: control never strips
+    sim.player.facing = -Math.PI / 2;
+    for (let i = 0; i < 160; i++) sim.tick();
+    sim.moveInput.forward = false;
+    expect(sim.player.pos.x).toBeLessThan(206.5);
   });
 
   it('keeps the water around the piers calm: falling off is no drowning clock', () => {

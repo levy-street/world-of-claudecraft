@@ -9,7 +9,15 @@
 // applies this clamp for swimming path queries; this module gives the movement
 // kernel (player_motion.ts) the same view. `src/sim`-pure; draws no rng.
 
-import { groundHeight, STEEPNESS_SAMPLE, terrainSteepnessAt, waterLevelAt } from './world';
+import { getActiveWorldContent } from './data';
+import { harborFootingSlope, harborSurfaceHeight } from './harbor_layout';
+import {
+  groundHeight,
+  STEEPNESS_SAMPLE,
+  terrainHeight,
+  terrainSteepnessAt,
+  waterLevelAt,
+} from './world';
 
 // Clamp an already-sampled ground height to the local waterline.
 export function rideHeight(x: number, z: number, h: number): number {
@@ -41,12 +49,26 @@ export function isSubmergedAt(x: number, z: number, seed: number): boolean {
   return wl !== -Infinity && groundHeight(x, z, seed) < wl;
 }
 
-// Steepness of the ridden surface. Dry ground defers to the memoized
-// terrainSteepnessAt view, keeping the pre-existing dry-land gates
-// bit-identical; a submerged point measures the exact clamped gradient
-// instead, so bed bumps flatten to the waterline and a shore reads as the
-// true waterline-to-bank rise.
+// Steepness of the ridden surface. An authored harbor deck or ramp that
+// stands above the terrain IS the footing there, and carries its own
+// authored slope (0 on decks, the gradient on ramps): without this arm the
+// bare-terrain view below a deck (the strip-edge dive wall under the
+// mainland ship berth) reads as an unwalkable cliff and the steep-ground
+// gate strips control from a player standing on perfectly level planks.
+// Dry ground otherwise defers to the memoized terrainSteepnessAt view,
+// keeping the pre-existing dry-land gates bit-identical; a submerged point
+// measures the exact clamped gradient instead, so bed bumps flatten to the
+// waterline and a shore reads as the true waterline-to-bank rise.
 export function rideSteepnessAt(x: number, z: number, seed: number): number {
+  const harbors = getActiveWorldContent().props.harbors;
+  if (harbors !== undefined) {
+    for (const h of harbors) {
+      const slope = harborFootingSlope(h, x, z);
+      if (slope !== null && harborSurfaceHeight(h, x, z) >= terrainHeight(x, z, seed)) {
+        return slope;
+      }
+    }
+  }
   if (!isSubmergedAt(x, z, seed)) return terrainSteepnessAt(x, z, seed);
   const e = STEEPNESS_SAMPLE;
   const hx = (rideHeightAt(x + e, z, seed) - rideHeightAt(x - e, z, seed)) / (2 * e);

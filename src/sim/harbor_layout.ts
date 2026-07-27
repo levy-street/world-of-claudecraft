@@ -175,7 +175,7 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     { x: 180.5, z: -48, hw: 1.5, hd: 2, dir: 'x+', highY: 0.9, lowY: 0.4 },
     { x: 196.75, z: -48, hw: 1.25, hd: 2, dir: 'x+', highY: 0.4, lowY: -0.2 },
     // the gangplank: down from the head's east gap onto the ship's deck
-    { x: 207.35, z: -48, hw: 1.35, hd: 1.4, dir: 'x+', highY: -0.2, lowY: -2.68 },
+    { x: 207.05, z: -48, hw: 1.05, hd: 1.4, dir: 'x+', highY: -0.2, lowY: -1.14 },
   ],
   dressing: [
     { kind: 'lamp', x: 167, z: -54.2 },
@@ -193,24 +193,27 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     { kind: 'bollard', x: 197.5, z: -53.7 },
   ],
   // rot is the ship's long-axis yaw (the hull lies north-south along the
-  // head's east rail, on the dive plateau; pushed out so the 9.6 beam
-  // clears the head deck, leaving the gangplank's 0.7 yd water gap).
-  berth: { x: 211.5, z: -48, rot: Math.PI / 2, draft: 1.0, length: 22 },
+  // head's east rail, on the dive plateau, hull center south of the
+  // gangplank so the plank lands amidships; the 15.6 beam clears the head
+  // deck with a 0.6 yd water gap). Probed floor under the whole hull:
+  // -5.68 worst across seeds, so draft 1.0 keeps the keel clear.
+  berth: { x: 214, z: -54, rot: Math.PI / 2, draft: 1.0, length: 34 },
   shipDecks: [
-    // the main deck (model x -4.5..3.5 at plane 1.9, mapped along world z)
-    { x: 211.5, z: -47.3, hw: 2.8, hd: 5.95, y: -2.68 },
+    // the main deck (model x -4.5..3.5 at plane 1.9, mapped along world z;
+    // scale 2.293: deck 4.36 above the keel at WATER_LEVEL - 1)
+    { x: 214, z: -52.85, hw: 5.9, hd: 9.17, y: -1.14 },
   ],
   shipRails: [
     // hull rails at the walkable deck's edges; the pier-side edge leaves
     // the gangplank opening (z -49.4..-46.6)
-    { x: 214.3, z: -47.3, hw: 5.95, rot: Math.PI / 2 },
-    { x: 208.7, z: -51.3, hw: 1.9, rot: Math.PI / 2 },
-    { x: 208.7, z: -44.95, hw: 1.65, rot: Math.PI / 2 },
-    { x: 211.5, z: -53.25, hw: 2.8, rot: 0 },
-    { x: 211.5, z: -41.35, hw: 2.8, rot: 0 },
+    { x: 219.9, z: -52.85, hw: 9.17, rot: Math.PI / 2 },
+    { x: 208.1, z: -55.71, hw: 6.31, rot: Math.PI / 2 },
+    { x: 208.1, z: -45.14, hw: 1.46, rot: Math.PI / 2 },
+    { x: 214, z: -62.02, hw: 5.9, rot: 0 },
+    { x: 214, z: -43.68, hw: 5.9, rot: 0 },
   ],
   gangplank: { x: 205.4, z: -48, facing: Math.PI / 2 },
-  boarding: { x: 211.5, z: -47.3 },
+  boarding: { x: 211, z: -48 },
   arrival: { x: 173, z: -48 },
 });
 
@@ -266,7 +269,7 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { x: 768.75, z: 116, hw: 1.25, hd: 2.5, dir: 'x-', highY: 4.2, lowY: 2.6 },
     { x: 761.75, z: 116, hw: 2.25, hd: 2.5, dir: 'x-', highY: 2.6, lowY: 0.2 },
     // the gangplank: down from the head's north gap onto the ship's deck
-    { x: 757, z: 122.85, hw: 1.4, hd: 1.35, dir: 'z+', highY: 0.2, lowY: -2.68 },
+    { x: 757, z: 122.5, hw: 1.4, hd: 1, dir: 'z+', highY: 0.2, lowY: -1.14 },
   ],
   dressing: [
     { kind: 'lamp', x: 779, z: 108 },
@@ -283,25 +286,26 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { kind: 'bollard', x: 759.4, z: 121.2 },
     { kind: 'bollard', x: 753.4, z: 111.4 },
   ],
-  // The bay floor is -13.5 under the whole hull; the ship lies along the
-  // head's north rail with the gangplank gap facing it (pushed out so the
-  // 9.6 beam clears the head deck).
-  berth: { x: 757, z: 127, rot: 0, draft: 1.0, length: 22 },
+  // The bay floor is -13.5 under most of the hull (-5.72 at the worst
+  // shoreward corner across seeds); the ship lies along the head's north
+  // rail with the gangplank gap facing it, pushed out so the 15.6 beam
+  // clears the head deck.
+  berth: { x: 757, z: 129.4, rot: 0, draft: 1.0, length: 34 },
   shipDecks: [
     // the main deck (model x -4.5..3.5 at plane 1.9, along world x)
-    { x: 756.3, z: 127, hw: 5.95, hd: 2.8, y: -2.68 },
+    { x: 755.85, z: 129.4, hw: 9.17, hd: 5.9, y: -1.14 },
   ],
   shipRails: [
     // hull rails at the walkable deck's edges; the pier-side edge leaves
     // the gangplank opening (x 755.6..758.4)
-    { x: 756.3, z: 129.8, hw: 5.95, rot: 0 },
-    { x: 752.45, z: 124.2, hw: 2.15, rot: 0 },
-    { x: 760.35, z: 124.2, hw: 1.9, rot: 0 },
-    { x: 750.35, z: 127, hw: 2.8, rot: Math.PI / 2 },
-    { x: 762.25, z: 127, hw: 2.8, rot: Math.PI / 2 },
+    { x: 755.85, z: 135.3, hw: 9.17, rot: 0 },
+    { x: 751.14, z: 123.5, hw: 4.46, rot: 0 },
+    { x: 761.71, z: 123.5, hw: 3.31, rot: 0 },
+    { x: 746.68, z: 129.4, hw: 5.9, rot: Math.PI / 2 },
+    { x: 765.02, z: 129.4, hw: 5.9, rot: Math.PI / 2 },
   ],
   gangplank: { x: 757, z: 120.5, facing: 0 },
-  boarding: { x: 756.3, z: 127 },
+  boarding: { x: 757, z: 124.6 },
   arrival: { x: 782, z: 116 },
 });
 
@@ -352,27 +356,8 @@ export function harborDeckAt(harbor: HarborDef, x: number, z: number): HarborDec
 export function harborRampHeight(harbor: HarborDef, x: number, z: number): number {
   let surface = -Infinity;
   for (const r of harbor.ramps) {
-    const dx = x - r.x;
-    const dz = z - r.z;
-    if (Math.abs(dx) > r.hw + 1e-6 || Math.abs(dz) > r.hd + 1e-6) continue;
-    // t: 0 at the high edge, 1 at the low (descent) edge
-    let t: number;
-    switch (r.dir) {
-      case 'x+':
-        t = (dx + r.hw) / (2 * r.hw);
-        break;
-      case 'x-':
-        t = (r.hw - dx) / (2 * r.hw);
-        break;
-      case 'z+':
-        t = (dz + r.hd) / (2 * r.hd);
-        break;
-      case 'z-':
-        t = (r.hd - dz) / (2 * r.hd);
-        break;
-    }
-    const clamped = Math.min(1, Math.max(0, t));
-    surface = Math.max(surface, r.highY + (r.lowY - r.highY) * clamped);
+    if (Math.abs(x - r.x) > r.hw + 1e-6 || Math.abs(z - r.z) > r.hd + 1e-6) continue;
+    surface = Math.max(surface, rampSurfaceY(r, x, z));
   }
   return surface;
 }
@@ -386,6 +371,54 @@ export function harborSurfaceHeight(harbor: HarborDef, x: number, z: number): nu
   const deck = harborDeckAt(harbor, x, z);
   const deckY = deck === null ? -Infinity : deck.y;
   return Math.max(deckY, harborRampHeight(harbor, x, z));
+}
+
+// The slope of the harbor surface UNDER FOOT at (x, z), or null outside
+// every walkable rect: 0 on decks and ship decks, the authored gradient on
+// ramps (whichever surface rules by height). The movement kernel's
+// steepness gate consumes this so a deck over a steep seabed (the strip
+// edge dive wall under the mainland ship) never reads as an unwalkable
+// cliff: the footing is the AUTHORED surface, not the terrain below it.
+export function harborFootingSlope(harbor: HarborDef, x: number, z: number): number | null {
+  const b = harbor.bounds;
+  if (x < b.x0 || x > b.x1 || z < b.z0 || z > b.z1) return null;
+  const deck = harborDeckAt(harbor, x, z);
+  const deckY = deck === null ? -Infinity : deck.y;
+  let rampY = -Infinity;
+  let rampSlope = 0;
+  for (const r of harbor.ramps) {
+    if (Math.abs(x - r.x) > r.hw + 1e-6 || Math.abs(z - r.z) > r.hd + 1e-6) continue;
+    const alongX = r.dir === 'x+' || r.dir === 'x-';
+    const y = rampSurfaceY(r, x, z);
+    if (y > rampY) {
+      rampY = y;
+      rampSlope = (r.highY - r.lowY) / ((alongX ? r.hw : r.hd) * 2);
+    }
+  }
+  if (deckY === -Infinity && rampY === -Infinity) return null;
+  return rampY > deckY ? rampSlope : 0;
+}
+
+function rampSurfaceY(r: HarborRamp, x: number, z: number): number {
+  const dx = x - r.x;
+  const dz = z - r.z;
+  let t: number;
+  switch (r.dir) {
+    case 'x+':
+      t = (dx + r.hw) / (2 * r.hw);
+      break;
+    case 'x-':
+      t = (r.hw - dx) / (2 * r.hw);
+      break;
+    case 'z+':
+      t = (dz + r.hd) / (2 * r.hd);
+      break;
+    case 'z-':
+      t = (r.hd - dz) / (2 * r.hd);
+      break;
+  }
+  const clamped = Math.min(1, Math.max(0, t));
+  return r.highY + (r.lowY - r.highY) * clamped;
 }
 
 // Movement collider radius for a dressing prop; 0 means walk-through.
