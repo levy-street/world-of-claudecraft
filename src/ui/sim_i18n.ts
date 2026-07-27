@@ -10031,14 +10031,21 @@ const RULES: Rule[] = [
     re: /^Are you sure you want to proceed\? Ensure you gather your resources before you push\.$/,
     build: () => t('sim.sourceCave.rebootConfirm'),
   },
-  // Source Cave (Phase 4 clear): per-contributor kill progress + the clear line. The
+  // Source Cave (Phase 4 clear): per-contributor kill feedback + the clear line. The
   // {name} is a contributor login, spliced verbatim (partyLeaves precedent: m[1]
   // directly, never through locMob).
   {
-    re: /^(.+) has fallen\. \((\d+) of (\d+) defeated in The Open Source\)$/,
-    build: (m) => t('sim.sourceCave.killProgress', { name: m[1], killed: m[2], total: m[3] }),
+    re: /^(.+) has returned to the source\.$/,
+    build: (m) => t('sim.sourceCave.killProgress', { name: m[1] }),
   },
-  { re: /^The Open Source has been cleared\.$/, build: () => t('sim.sourceCave.cleared') },
+  {
+    re: /^(.+) encountered a fatal exception\.$/,
+    build: (m) => t('sim.sourceCave.bossDefeated', { name: m[1] }),
+  },
+  {
+    re: /^The Open Source is now closed\. Congratulations\?$/,
+    build: () => t('sim.sourceCave.cleared'),
+  },
   // The sealed reward chest's interaction deny (source_cave/clear.ts).
   { re: /^Access denied\.$/, build: () => t('sim.sourceCave.accessDenied') },
   // The well's banter gate (source_cave/well_banter.ts): emitted via ctx.emit with

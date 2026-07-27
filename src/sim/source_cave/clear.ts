@@ -40,6 +40,7 @@
 
 import { onSourceCaveClearedForDeeds } from '../deeds';
 import { createGroundObject } from '../entity';
+import { mobTemplateOf } from '../mob/mob_template';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
@@ -208,11 +209,11 @@ function grantSourceCaveLockout(ctx: SimContext, recipients: PlayerMeta[]): void
 }
 
 /**
- * Kill-progress hook (called from handleDeath when a cave mob dies): emit a personal
- * progress line to every player currently in the instance, and, when the last mob falls,
- * a distinct "cleared" line. The mob name is the contributor login, spliced verbatim
- * (D7). Draws no rng. The chest + lockout land on the next 1 Hz updateSourceCaveClear
- * pass; this is the instant on-death feedback.
+ * Kill-feedback hook (called from handleDeath when a cave mob dies): emit a personal
+ * contributor line to every player currently in the instance, with a distinct fatal
+ * exception for the boss, and, when the last mob dies, a cave-closed line. The mob name
+ * is the contributor login, spliced verbatim (D7). Draws no rng. The chest + lockout
+ * land on the next 1 Hz updateSourceCaveClear pass; this is the instant on-death feedback.
  */
 export function onSourceCaveMobKilled(ctx: SimContext, mob: Entity): void {
   // Cheap early-out for the global common case: every non-cave mob death reaches this
@@ -233,10 +234,13 @@ export function onSourceCaveMobKilled(ctx: SimContext, mob: Entity): void {
     if (!e || e.dead) killedCount++;
   }
   const recipients = playersInSourceCaveInstance(ctx, inst);
+  const feedback = mobTemplateOf(ctx, mob)?.boss
+    ? `${mob.name} encountered a fatal exception.`
+    : `${mob.name} has returned to the source.`;
   for (const meta of recipients) {
     ctx.emit({
       type: 'log',
-      text: `${mob.name} has fallen. (${killedCount} of ${totalCount} defeated in The Open Source)`,
+      text: feedback,
       color: '#b9f',
       pid: meta.entityId,
     });
@@ -250,7 +254,7 @@ function emitSourceCaveCleared(ctx: SimContext, inst: InstanceSlot): void {
   for (const meta of playersInSourceCaveInstance(ctx, inst)) {
     ctx.emit({
       type: 'log',
-      text: 'The Open Source has been cleared.',
+      text: 'The Open Source is now closed. Congratulations?',
       color: '#fd6',
       pid: meta.entityId,
     });

@@ -64,10 +64,64 @@ describe('Source Cave Phase 3/4 catalog keys are still resolvable (confirmed, no
     expect(t('sim.sourceCave.locked', { name: 'The Open Source' })).toContain('The Open Source');
     expect(t('sim.sourceCave.enter')).toBe('You step into The Open Source.');
     expect(t('sim.sourceCave.leave')).toBe('You leave The Open Source.');
-    expect(
-      t('sim.sourceCave.killProgress', { name: 'octocat', killed: '3', total: '8' }),
-    ).toContain('octocat');
-    expect(t('sim.sourceCave.cleared')).toBe('The Open Source has been cleared.');
+    expect(t('sim.sourceCave.killProgress', { name: 'octocat' })).toBe(
+      'octocat has returned to the source.',
+    );
+    expect(localizeSimText('octocat has returned to the source.')).toBe(
+      'octocat has returned to the source.',
+    );
+    expect(t('sim.sourceCave.bossDefeated', { name: 'octocat' })).toBe(
+      'octocat encountered a fatal exception.',
+    );
+    expect(localizeSimText('octocat encountered a fatal exception.')).toBe(
+      'octocat encountered a fatal exception.',
+    );
+    expect(t('sim.sourceCave.cleared')).toBe('The Open Source is now closed. Congratulations?');
+    expect(localizeSimText('The Open Source is now closed. Congratulations?')).toBe(
+      'The Open Source is now closed. Congratulations?',
+    );
+  });
+
+  it('localizes the three kill-feedback beats without exposing combat counts', async () => {
+    const expected = {
+      zh_CN: {
+        contributor: 'octocat已回归源代码。',
+        boss: 'octocat遇到了致命异常。',
+        cleared: '开放之源现已关闭。恭喜？',
+      },
+      zh_TW: {
+        contributor: 'octocat已回歸原始碼。',
+        boss: 'octocat遭遇了致命例外。',
+        cleared: '開放之源現已關閉。恭喜？',
+      },
+      ja_JP: {
+        contributor: 'octocatはソースコードへ還った。',
+        boss: 'octocatで致命的な例外が発生した。',
+        cleared: '開かれた源は閉じられた。おめでとう？',
+      },
+      ko_KR: {
+        contributor: 'octocat이(가) 소스 코드로 돌아갔습니다.',
+        boss: 'octocat에게 치명적인 예외가 발생했습니다.',
+        cleared: '열린 근원은 이제 닫혔습니다. 축하할 일인가요?',
+      },
+      ru_RU: {
+        contributor: 'octocat снова в исходном коде.',
+        boss: 'У octocat возникло фатальное исключение.',
+        cleared: 'Открытый Исток теперь закрыт. Поздравляем?',
+      },
+    } as const;
+    for (const lang of M16_LOCALES) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      expect(localizeSimText('octocat has returned to the source.')).toBe(
+        expected[lang].contributor,
+      );
+      expect(localizeSimText('octocat encountered a fatal exception.')).toBe(expected[lang].boss);
+      expect(localizeSimText('The Open Source is now closed. Congratulations?')).toBe(
+        expected[lang].cleared,
+      );
+    }
+    setLanguage('en');
   });
 
   it('sim.dungeon.levelRequired (the generic level-gate matcher) still resolves', () => {

@@ -9090,8 +9090,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.sourceCave.leave': 'あなたは開かれた源を後にする。',
   'sim.sourceCave.rebootConfirm':
     '本当に続行しますか？押す前に、必要なリソースを集めておいてください。',
-  'sim.sourceCave.killProgress': '{name}が倒れた。（開かれた源で{total}体中{killed}体を撃破）',
-  'sim.sourceCave.cleared': '開かれた源を制圧した。',
+  'sim.sourceCave.killProgress': '{name}はソースコードへ還った。',
+  'sim.sourceCave.bossDefeated': '{name}で致命的な例外が発生した。',
+  'sim.sourceCave.cleared': '開かれた源は閉じられた。おめでとう？',
   'sim.sourceCave.accessDenied': 'アクセスが拒否されました。',
   'sim.sourceCave.wellBanter1': 'ただの井戸だよ。水を溜めてるだけ。行きな。',
   'sim.sourceCave.wellBanter2': 'なんでそんな目でレンガを見てるんだ？',

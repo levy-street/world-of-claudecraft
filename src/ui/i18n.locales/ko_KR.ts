@@ -9079,9 +9079,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'sim.sourceCave.leave': '당신은 열린 근원을 떠납니다.',
   'sim.sourceCave.rebootConfirm':
     '정말 계속하시겠습니까? 누르기 전에 필요한 자원을 모두 모아 두세요.',
-  'sim.sourceCave.killProgress':
-    '{name}이(가) 쓰러졌습니다. (열린 근원에서 {total}명 중 {killed}명 처치)',
-  'sim.sourceCave.cleared': '열린 근원을 정복했습니다.',
+  'sim.sourceCave.killProgress': '{name}이(가) 소스 코드로 돌아갔습니다.',
+  'sim.sourceCave.bossDefeated': '{name}에게 치명적인 예외가 발생했습니다.',
+  'sim.sourceCave.cleared': '열린 근원은 이제 닫혔습니다. 축하할 일인가요?',
   'sim.sourceCave.accessDenied': '접근이 거부되었습니다.',
   'sim.sourceCave.wellBanter1': '그냥 우물이야. 물을 담아두는 곳이지. 가던 길이나 가.',
   'sim.sourceCave.wellBanter2': '왜 그렇게 내 벽돌을 쳐다보는 거야?',

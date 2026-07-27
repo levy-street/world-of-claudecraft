@@ -13,7 +13,7 @@ import {
   sourceCaveDefeatMobIds,
   sourceCaveOrigin,
 } from '../src/sim/source_cave';
-import type { Entity, SimEvent } from '../src/sim/types';
+import type { Entity, MobTemplate, SimEvent } from '../src/sim/types';
 import { INSTANCE_EMPTY_TIMEOUT } from '../src/sim/types';
 
 // biome-ignore lint/suspicious/noExplicitAny: tests reach ctx / private helpers.
@@ -40,6 +40,10 @@ function claimedCave(sim: AnySim) {
     (i: { dungeonId: string; partyKey: string | null }) =>
       i.dungeonId === SOURCE_CAVE_DUNGEON_ID && i.partyKey !== null,
   );
+}
+
+function sourceCaveBossTemplateId(sim: AnySim): string | undefined {
+  return sim.sourceCave?.templates.find((template: MobTemplate) => template.boss)?.id;
 }
 
 function killAll(sim: AnySim, inst: { mobIds: number[] }): void {
@@ -456,14 +460,22 @@ describe('source cave clear: guard resets when the instance frees', () => {
   });
 });
 
-describe('source cave clear: kill-progress SimEvents', () => {
+describe('source cave clear: kill-feedback SimEvents', () => {
   function progressLines(events: SimEvent[]): string[] {
     return events
       .filter((e): e is SimEvent & { type: 'log'; text: string } => e.type === 'log')
       .map((e) => e.text);
   }
 
-  it('each cave-mob kill emits a verbatim-login progress line to those inside', () => {
+  function killFeedbackLines(lines: string[]): string[] {
+    return lines.filter(
+      (line) =>
+        line.includes('has returned to the source.') ||
+        line.includes('encountered a fatal exception.'),
+    );
+  }
+
+  it('gives each cave-mob kill its contributor or boss feedback', () => {
     const sim = makeSim();
     const pid = addLvl20(sim, 'Alice');
     sim.enterDungeon(SOURCE_CAVE_DUNGEON_ID, pid);
@@ -472,6 +484,8 @@ describe('source cave clear: kill-progress SimEvents', () => {
     // roster: the overflow guardians retire with their waves (encounter.ts).
     const requiredIds = sourceCaveDefeatMobIds(inst);
     const total = requiredIds.length;
+    const bossTemplateId = sourceCaveBossTemplateId(sim);
+    expect(bossTemplateId).toBeDefined();
     expect(total).toBeLessThan(inst.mobIds.length);
     sim.drainEvents(); // clear enter/setup emits
 
@@ -482,17 +496,41 @@ describe('source cave clear: kill-progress SimEvents', () => {
       onSourceCaveMobKilled(sim.ctx, mob);
       const lines = progressLines(sim.drainEvents());
       const killed = i + 1;
-      const progress = lines.find((l) => l.includes('has fallen.'));
-      expect(progress, `progress line for kill ${killed}`).toBe(
-        `${mob.name} has fallen. (${killed} of ${total} defeated in The Open Source)`,
-      );
+      const expectedFeedback =
+        mob.templateId === bossTemplateId
+          ? `${mob.name} encountered a fatal exception.`
+          : `${mob.name} has returned to the source.`;
+      expect(killFeedbackLines(lines), `feedback line for kill ${killed}`).toEqual([
+        expectedFeedback,
+      ]);
       // The distinct clear line appears only on the final kill.
-      const cleared = lines.includes('The Open Source has been cleared.');
+      const cleared = lines.includes('The Open Source is now closed. Congratulations?');
       expect(cleared).toBe(killed === total);
     }
   });
 
-  it('the progress hook is wired into handleDeath and is a no-op for non-cave mobs', () => {
+  it('gives the boss a fatal exception without closing the cave while guardians remain', () => {
+    const sim = makeSim();
+    const pid = addLvl20(sim, 'Alice');
+    sim.enterDungeon(SOURCE_CAVE_DUNGEON_ID, pid);
+    const inst = claimedCave(sim);
+    const bossTemplateId = sourceCaveBossTemplateId(sim);
+    const bossId = sourceCaveDefeatMobIds(inst).find(
+      (id) => sim.entities.get(id)?.templateId === bossTemplateId,
+    );
+    const boss = sim.entities.get(bossId as number) as Entity;
+    const killer = sim.entities.get(pid) as Entity;
+    expect(boss).toBeDefined();
+    sim.drainEvents();
+
+    sim.handleDeath(boss, killer);
+
+    expect(killFeedbackLines(progressLines(sim.drainEvents()))).toEqual([
+      `${boss.name} encountered a fatal exception.`,
+    ]);
+  });
+
+  it('wires normal contributor feedback through handleDeath', () => {
     const sim = makeSim();
     const pid = addLvl20(sim, 'Alice');
     sim.enterDungeon(SOURCE_CAVE_DUNGEON_ID, pid);
@@ -503,14 +541,10 @@ describe('source cave clear: kill-progress SimEvents', () => {
     const requiredIds = sourceCaveDefeatMobIds(inst);
     const mob = sim.entities.get(requiredIds[0]) as Entity;
     const login = mob.name;
+    expect(mob.templateId).not.toBe(sourceCaveBossTemplateId(sim));
     sim.handleDeath(mob, killer);
     const lines = progressLines(sim.drainEvents());
-    expect(
-      lines.some(
-        (l) =>
-          l === `${login} has fallen. (1 of ${requiredIds.length} defeated in The Open Source)`,
-      ),
-    ).toBe(true);
+    expect(killFeedbackLines(lines)).toEqual([`${login} has returned to the source.`]);
   });
 
   it('ignores a visible non-combatant death in progress and clear accounting', () => {

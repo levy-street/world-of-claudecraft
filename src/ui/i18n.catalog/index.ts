@@ -796,11 +796,12 @@ export const en = {
       leave: 'You leave The Open Source.',
       rebootConfirm:
         'Are you sure you want to proceed? Ensure you gather your resources before you push.',
-      // {name} is a contributor login, spliced verbatim (D7); {killed}/{total} count
-      // the cave's cleared mobs. Emitted on every cave-mob kill; the clear line follows
-      // on the last one.
-      killProgress: '{name} has fallen. ({killed} of {total} defeated in The Open Source)',
-      cleared: 'The Open Source has been cleared.',
+      // {name} is a contributor login, spliced verbatim (D7). Emitted on every
+      // cave-mob kill; aggregate progress stays in the percentage HUD banner.
+      killProgress: '{name} has returned to the source.',
+      // {name} is the boss contributor login, spliced verbatim (D7).
+      bossDefeated: '{name} encountered a fatal exception.',
+      cleared: 'The Open Source is now closed. Congratulations?',
       // The always-present reward chest denies interaction until the clear
       // (source_cave/clear.ts trySourceCaveChestDeny), EXACT-matched in sim_i18n.ts.
       accessDenied: 'Access denied.',

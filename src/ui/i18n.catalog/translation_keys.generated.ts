@@ -8937,6 +8937,7 @@ export type TranslationKeyFlat =
   | 'sim.rift.stepBack'
   | 'sim.rift.wayDownOpens'
   | 'sim.sourceCave.accessDenied'
+  | 'sim.sourceCave.bossDefeated'
   | 'sim.sourceCave.cleared'
   | 'sim.sourceCave.enter'
   | 'sim.sourceCave.killProgress'
