@@ -20,7 +20,7 @@ import {
   addStacked,
   bagCapacity,
   bagsFullError,
-  canGrantItemInstance,
+  canGrantCopies,
   equipBag as equipBagCmd,
 } from './bags';
 import { ITEMS } from './data';
@@ -828,14 +828,11 @@ export function buyBackItem(
     return;
   }
   // An instanced row's copy re-enters the bags with its payload, so the
-  // capacity model must be payload-aware (the #2139 rule: a pre-check that
-  // disagrees with the grant re-opens the overflow class): plain-stack top-up
-  // room is not room for an instanced copy, and a byte-equal instanced stack
-  // with room is. The plain arm keeps ctx.canAddItem byte-identical.
-  const fits = slot.instance
-    ? canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), itemId, slot.instance)
-    : ctx.canAddItem(itemId, 1, meta.entityId);
-  if (!fits) {
+  // capacity model is the shared payload-aware check (bags.ts canGrantCopies,
+  // the #2139 rule): plain-stack top-up room is not room for an instanced
+  // copy, and a byte-equal instanced stack with room is. The grant stays the
+  // silent add below (buyback owns its own player-visible line).
+  if (!canGrantCopies(meta.inventory, bagCapacity(meta.bags), itemId, 1, slot.instance)) {
     bagsFullError(ctx, meta.entityId);
     return;
   }

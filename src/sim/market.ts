@@ -9,11 +9,12 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). The market draws NO rng.
 
-import { bagCapacity, canGrantItemInstance, instancedCountCap } from './bags';
+import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
 import {
   countMatchingUnlocked,
+  grantCopies,
   holdsMatchingLocked,
   publicInstanceView,
   removeMatchingInstance,
@@ -428,33 +429,6 @@ export class Market {
     });
   }
 
-  // Instanced-grant capacity gate: an instanced stack's room is not a plain
-  // stack's room (#2139: every capacity pre-check must model the grant
-  // identically or the overflow class re-opens). The plain arm keeps
-  // ctx.canAddItem byte-identical.
-  private fitsListing(
-    meta: PlayerMeta,
-    itemId: string,
-    count: number,
-    instance?: ItemInstancePayload,
-  ): boolean {
-    if (!instance) return this.ctx.canAddItem(itemId, count, meta.entityId);
-    return canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), itemId, instance, count);
-  }
-
-  // Payload-aware grant twin: the instanced arm routes through addItemInstance
-  // so the payload survives (and merges only byte-equal); the plain arm keeps
-  // ctx.addItem byte-identical.
-  private grantListing(
-    pid: number,
-    itemId: string,
-    count: number,
-    instance?: ItemInstancePayload,
-  ): void {
-    if (instance) this.ctx.addItemInstance(itemId, instance, pid, count);
-    else this.ctx.addItem(itemId, count, pid);
-  }
-
   // Buy a listing outright. Coin leaves the buyer, goods enter their bags, and
   // the seller's proceeds (less the Merchant's cut) wait in their collection.
   marketBuy(listingId: number, pid?: number): void {
@@ -488,12 +462,20 @@ export class Market {
       this.ctx.error(meta.entityId, 'You cannot afford that.');
       return;
     }
-    if (!this.fitsListing(meta, listing.itemId, listing.count, listing.instance)) {
+    if (
+      !canGrantCopies(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        listing.itemId,
+        listing.count,
+        listing.instance,
+      )
+    ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
     meta.copper -= listing.price;
-    this.grantListing(meta.entityId, listing.itemId, listing.count, listing.instance);
+    grantCopies(this.ctx, meta.entityId, listing.itemId, listing.count, listing.instance);
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
       this.collectionFor(listing.sellerKey).copper += proceeds;
@@ -531,12 +513,20 @@ export class Market {
       this.ctx.error(meta.entityId, 'That is not your listing.');
       return;
     }
-    if (!this.fitsListing(meta, listing.itemId, listing.count, listing.instance)) {
+    if (
+      !canGrantCopies(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        listing.itemId,
+        listing.count,
+        listing.instance,
+      )
+    ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
     this.marketListings.splice(idx, 1);
-    this.grantListing(meta.entityId, listing.itemId, listing.count, listing.instance);
+    grantCopies(this.ctx, meta.entityId, listing.itemId, listing.count, listing.instance);
     const def = ITEMS[listing.itemId];
     this.ctx.emit({
       type: 'loot',
@@ -577,8 +567,8 @@ export class Market {
     // arms so a returned instanced listing keeps its payload here too.
     const kept: typeof col.items = [];
     for (const s of col.items) {
-      if (this.fitsListing(meta, s.itemId, s.count, s.instance)) {
-        this.grantListing(meta.entityId, s.itemId, s.count, s.instance);
+      if (canGrantCopies(meta.inventory, bagCapacity(meta.bags), s.itemId, s.count, s.instance)) {
+        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance);
       } else {
         kept.push(s);
       }

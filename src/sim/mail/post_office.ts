@@ -16,7 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
-import { bagCapacity, canGrantItemInstance, instancedCountCap } from '../bags';
+import { bagCapacity, canGrantCopies, instancedCountCap } from '../bags';
 import {
   HEROIC_MARK_LETTER,
   type LetterDef,
@@ -27,6 +27,7 @@ import { ITEMS } from '../data';
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
   countMatchingUnlocked,
+  grantCopies,
   isTransferLockedInstance,
   publicInstanceView,
   removeMatchingInstance,
@@ -502,21 +503,11 @@ export class PostOffice {
     // against the live inventory, so cumulative capacity is honoured.
     const kept: InvSlot[] = [];
     for (const s of m.items) {
-      // Payload-aware on both arms (#2139: the capacity model must match the
-      // grant): an instanced parcel needs instanced room and lands through
+      // The shared payload-aware pair (bags.ts canGrantCopies + grantCopies):
+      // an instanced parcel needs instanced room and lands through
       // addItemInstance so its payload survives delivery.
-      const fits = s.instance
-        ? canGrantItemInstance(
-            meta.inventory,
-            bagCapacity(meta.bags),
-            s.itemId,
-            s.instance,
-            s.count,
-          )
-        : this.ctx.canAddItem(s.itemId, s.count, meta.entityId);
-      if (fits) {
-        if (s.instance) this.ctx.addItemInstance(s.itemId, s.instance, meta.entityId, s.count);
-        else this.ctx.addItem(s.itemId, s.count, meta.entityId);
+      if (canGrantCopies(meta.inventory, bagCapacity(meta.bags), s.itemId, s.count, s.instance)) {
+        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance);
       } else {
         kept.push(s);
       }

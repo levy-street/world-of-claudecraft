@@ -114,6 +114,26 @@ export function removeMatchingInstance(
   return null;
 }
 
+/** The ONE grant the exchange pipes share (market buy/cancel/collect, mail
+ *  claim), payload-aware on both arms: an instanced copy routes through
+ *  addItemInstance so its payload survives (merging only byte-equal), a plain
+ *  count through addItem. The instanced arm always grants a DEEP CLONE:
+ *  addItemInstance parks the caller's object in the first bag slot, and while
+ *  every current source row is destroyed after the grant, a surviving source
+ *  (a future instanced house listing, which never depletes) must never alias
+ *  one payload object into every buyer's bags. Capacity is the caller's
+ *  pre-check (bags.ts canGrantCopies, this function's twin). */
+export function grantCopies(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  count: number,
+  instance?: ItemInstancePayload,
+): void {
+  if (instance) ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count);
+  else ctx.addItem(itemId, count, pid);
+}
+
 /** Rebuild a persisted exchange-escrow slot (market collection item, mail
  *  attachment): unknown ids stay dormant recoverable data, counts clamp to
  *  what identical-payload merges could legitimately have built (the character

@@ -7,8 +7,10 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { canGrantCopies } from '../src/sim/bags';
 import {
   countMatchingUnlocked,
+  grantCopies,
   holdsMatchingLocked,
   isTransferLockedInstance,
   publicInstanceView,
@@ -142,6 +144,49 @@ describe('removeMatchingInstance', () => {
     expect(removeMatchingInstance(ctx, 'hide', SIGNED, 1)).toBeNull();
     expect(inventory).toHaveLength(3);
     expect(hookFired()).toBe(0);
+  });
+});
+
+describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
+  it('capacity: plain-stack room is not instanced room, and the reverse', () => {
+    const inventory: InvSlot[] = [{ itemId: 'pristine_hide', count: 1 }];
+    // One free slot short: the plain stack tops up, the instanced copy needs
+    // its own slot.
+    expect(canGrantCopies(inventory, 1, 'pristine_hide', 1)).toBe(true);
+    expect(canGrantCopies(inventory, 1, 'pristine_hide', 1, SIGNED)).toBe(false);
+    const signedStack: InvSlot[] = [
+      { itemId: 'pristine_hide', count: 1, instance: { signer: 'Ayla' } },
+    ];
+    expect(canGrantCopies(signedStack, 1, 'pristine_hide', 1, SIGNED)).toBe(true);
+    expect(canGrantCopies(signedStack, 1, 'pristine_hide', 1)).toBe(false);
+  });
+
+  it('grant routes instanced copies through addItemInstance with a DEEP CLONE', () => {
+    const calls: { kind: string; instance?: ItemInstancePayload }[] = [];
+    const ctx = {
+      addItem: (_itemId: string, _count: number, _pid?: number) => {
+        calls.push({ kind: 'plain' });
+      },
+      addItemInstance: (
+        _itemId: string,
+        instance: ItemInstancePayload,
+        _pid?: number,
+        _count?: number,
+      ) => {
+        calls.push({ kind: 'instanced', instance });
+      },
+    } as unknown as SimContext;
+    grantCopies(ctx, 1, 'pristine_hide', 3);
+    expect(calls).toEqual([{ kind: 'plain' }]);
+    // The clone claim: a surviving source row (a future instanced house
+    // listing, which never depletes) must never alias the granted payload.
+    const source: ItemInstancePayload = { signer: 'Ayla', rolled: { stats: { agi: 2 } } };
+    grantCopies(ctx, 1, 'pristine_hide', 1, source);
+    const granted = calls[1].instance;
+    expect(granted).toEqual(source);
+    expect(granted).not.toBe(source);
+    granted!.rolled!.stats!.agi = 99;
+    expect(source.rolled!.stats!.agi).toBe(2);
   });
 });
 
