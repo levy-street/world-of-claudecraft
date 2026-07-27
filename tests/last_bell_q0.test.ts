@@ -48,15 +48,16 @@ describe('Q0 Ashore end to end', () => {
   it('plays the whole quest from the mainland dock to the recruitment', () => {
     const sim = makeSim();
 
-    // 1. Board the ferry on the mainland: quest auto-accepts, the crossing
-    // lands at Gullhaven, and the arrival scene starts for this player.
-    teleport(sim, 176, -48);
+    // 1. Board the ferry on the mainland ship's deck: quest
+    // auto-accepts, the crossing lands on Gullhaven's harbor deck, and the
+    // arrival scene starts for this player.
+    teleport(sim, 210.5, -47.5);
     const ferry = findByName(sim, 'The Farshore Ferry');
     expect(ferry).toBeTruthy();
     sim.player.targetId = ferry?.id ?? null;
     sim.interact();
     expect(sim.questLog.get(QUEST)?.state).toBe('active');
-    expect(Math.hypot(sim.player.pos.x - 781, sim.player.pos.z - 124)).toBeLessThan(3);
+    expect(Math.hypot(sim.player.pos.x - 782, sim.player.pos.z - 116)).toBeLessThan(3);
     const arrival = collect(sim, 30);
     const sceneKinds = arrival
       .filter((e): e is Extract<SimEvent, { type: 'scene' }> => e.type === 'scene')
@@ -154,14 +155,16 @@ describe('Q0 Ashore end to end', () => {
   it('the ferry is plain travel once the quest is done or active', () => {
     const sim = makeSim();
     sim.ctx.players.get(sim.playerId)?.questsDone.add(QUEST);
-    teleport(sim, 176, -48);
+    teleport(sim, 210.5, -47.5);
     const ferry = findByName(sim, 'The Farshore Ferry');
     sim.player.targetId = ferry?.id ?? null;
     sim.interact();
     expect(sim.questLog.has(QUEST)).toBe(false);
     const events = collect(sim, 10);
     expect(events.some((e) => e.type === 'scene')).toBe(false);
-    // And the Gullhaven pier ferries back.
+    // And boarding on the Gullhaven ship's deck (out past the pier head, a
+    // walk from the arrival deck at the harbor's land end) ferries back.
+    teleport(sim, 756.5, 126);
     const back = findByName(sim, 'The Farshore Ferry');
     sim.player.targetId = back?.id ?? null;
     sim.interact();

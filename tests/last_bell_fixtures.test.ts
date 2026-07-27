@@ -1,18 +1,17 @@
-// The Last Bell world fixtures through the real Sim: the two ferry landings,
-// the Tidemill scenario door, and the Breach maw spawn as ground objects with
-// their pinned templateIds and positions; the breach is pure scenery (interact
-// must ignore it) while the ferries stay interactable. Also pins the mainland
-// jetty added to ZONE1_PROPS: its deck runs toward falling shore ground on the
-// pinned client world seed, and its planks are raised walkable ground.
+// The Last Bell world fixtures through the real Sim: the two ferry boarding
+// points (at the harbors' gangplanks), the Tidemill scenario door, and the
+// Breach maw spawn as ground objects with their pinned templateIds and
+// positions; the breach is pure scenery (interact must ignore it) while the
+// ferries stay interactable. Also pins the H1 tear-out: the interim landing
+// docks are gone (the authored harbors replaced them, see
+// tests/last_bell_harbor.test.ts) while the fishing jetties survive.
 import { describe, expect, it } from 'vitest';
+import { FARSHORE_PROPS } from '../src/sim/content/farshore';
 import { ZONE1_PROPS } from '../src/sim/content/zone1';
-import { dockSectionWorldCenter } from '../src/sim/dock_layout';
+import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
-import { FARSHORE_BREACH, terrainHeight, WATER_LEVEL } from '../src/sim/world';
-
-// The persistent client world seed (WORLD_SEED in src/main.ts).
-const CLIENT_SEED = 20061;
+import { FARSHORE_BREACH } from '../src/sim/world';
 
 function makeSim(): Sim {
   const sim = new Sim({ seed: 4242, playerClass: 'warrior', playerName: 'Ash', devCommands: true });
@@ -38,11 +37,19 @@ describe('Last Bell campaign fixtures', () => {
     const ferries = fixtures(sim, 'lb_ferry');
     expect(ferries.map((f) => ({ x: f.pos.x, z: f.pos.z }))).toEqual(
       expect.arrayContaining([
-        { x: 177, z: -48 },
-        { x: 777, z: 122 },
+        { x: 211.5, z: -47.3 },
+        { x: 756.3, z: 127 },
       ]),
     );
     expect(ferries).toHaveLength(2);
+    // The fixtures stand at the harbors' gangplanks: the layout is the single
+    // source for the boarding anchors, so pin the identity, not a copy.
+    expect(ferries.map((f) => ({ x: f.pos.x, z: f.pos.z }))).toEqual(
+      expect.arrayContaining([
+        { x: MAINLAND_HARBOR.boarding.x, z: MAINLAND_HARBOR.boarding.z },
+        { x: GULLHAVEN_HARBOR.boarding.x, z: GULLHAVEN_HARBOR.boarding.z },
+      ]),
+    );
     for (const ferry of ferries) {
       expect(ferry.name).toBe('The Farshore Ferry');
       expect(ferry.lootable).toBe(true); // interactable
@@ -94,47 +101,48 @@ describe('Last Bell campaign fixtures', () => {
 
   it('keeps the ferries interactable: boarding still crosses the strait', () => {
     const sim = makeSim();
-    const mainlandFerry = fixtures(sim, 'lb_ferry').find((f) => f.pos.x === 177);
+    const mainlandFerry = fixtures(sim, 'lb_ferry').find(
+      (f) => f.pos.x === MAINLAND_HARBOR.boarding.x,
+    );
     expect(mainlandFerry).toBeTruthy();
     if (!mainlandFerry) return;
 
-    teleport(sim, 176, -48);
+    teleport(sim, 210.5, -47.5);
     sim.player.targetId = mainlandFerry.id;
     sim.interact();
-    expect(Math.hypot(sim.player.pos.x - 781, sim.player.pos.z - 124)).toBeLessThan(3);
+    expect(
+      Math.hypot(
+        sim.player.pos.x - GULLHAVEN_HARBOR.arrival.x,
+        sim.player.pos.z - GULLHAVEN_HARBOR.arrival.z,
+      ),
+    ).toBeLessThan(3);
 
-    const pierFerry = fixtures(sim, 'lb_ferry').find((f) => f.pos.x === 777);
+    // The arrival deck is at the harbor's land end; walking back out along
+    // the pier and aboard is part of the flow, so step onto the ship first.
+    teleport(sim, 756.5, 126);
+    const pierFerry = fixtures(sim, 'lb_ferry').find(
+      (f) => f.pos.x === GULLHAVEN_HARBOR.boarding.x,
+    );
     expect(pierFerry).toBeTruthy();
     if (!pierFerry) return;
     sim.player.targetId = pierFerry.id;
     sim.interact();
-    expect(Math.hypot(sim.player.pos.x - 173, sim.player.pos.z + 48)).toBeLessThan(3);
+    expect(
+      Math.hypot(
+        sim.player.pos.x - MAINLAND_HARBOR.arrival.x,
+        sim.player.pos.z - MAINLAND_HARBOR.arrival.z,
+      ),
+    ).toBeLessThan(3);
   });
 
-  it('stands a walkable mainland jetty whose deck runs toward the falling shore', () => {
-    const dock = ZONE1_PROPS.docks.find((d) => d.x === 172 && d.z === -48);
-    expect(dock).toBeTruthy();
-    if (!dock) return;
-    // No hut on an open jetty (zero half-extents keep colliders.ts quiet).
-    expect(dock.hutLocal.hw).toBe(0);
-    expect(dock.hutLocal.hd).toBe(0);
-
-    // The deck extends toward (-sin rot, -cos rot); on the pinned client seed
-    // the shore must FALL along it toward the strait, and the anchor itself
-    // must stand on dry land above the sea.
-    const anchorH = terrainHeight(dock.x, dock.z, CLIENT_SEED);
-    expect(anchorH).toBeGreaterThan(WATER_LEVEL);
-    const endX = dock.x - Math.sin(dock.rot) * 5.31; // far deck section center
-    const endZ = dock.z - Math.cos(dock.rot) * 5.31;
-    const endH = terrainHeight(endX, endZ, CLIENT_SEED);
-    expect(endH).toBeLessThan(anchorH);
-    // It reaches toward the strait east of the vale, where the ferry moors.
-    expect(endX).toBeGreaterThan(dock.x);
-
-    // The planks are real raised walkable ground for the sim (any seed): the
-    // ground height on a deck section sits above the bare terrain under it.
-    const sim = makeSim();
-    const c = dockSectionWorldCenter(dock, 0);
-    expect(sim.groundPos(c.x, c.z).y).toBeGreaterThan(terrainHeight(c.x, c.z, 4242));
+  it('tore out the interim landing docks and kept the fishing jetties', () => {
+    // H1 replaced the plank-kit landings with the authored harbors: the two
+    // colinear mainland sections at (172 / 177.3, -48) and Gullhaven's town
+    // pier dock at (781, 122) are gone.
+    expect(ZONE1_PROPS.docks.filter((d) => d.z === -48)).toHaveLength(0);
+    expect(FARSHORE_PROPS.docks.filter((d) => d.x === 781 && d.z === 122)).toHaveLength(0);
+    // The fishing flavor stays: Demi's vale jetty and the Landing's jetty.
+    expect(ZONE1_PROPS.docks.some((d) => d.x === -64 && d.z === 60)).toBe(true);
+    expect(FARSHORE_PROPS.docks.some((d) => d.x === 778 && d.z === -36)).toBe(true);
   });
 });
