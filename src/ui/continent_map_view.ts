@@ -83,8 +83,9 @@ export interface ContinentMapInput {
 
 /** Aspect (width / height) used to lay out the regions when no art has decoded
  *  yet (matches the shipped world_overview.webp so the layout does not jump when
- *  the plate arrives). */
-export const CONTINENT_FALLBACK_ASPECT = 600 / 698;
+ *  the plate arrives; pinned to the file's real pixel size by
+ *  tests/continent_map_view.test.ts, so re-cropping the plate must update this). */
+export const CONTINENT_FALLBACK_ASPECT = 543 / 1100;
 
 /** A zone's east-west extent: its own column, or the original full-width strip. */
 function zoneXBounds(zone: ZoneDef): [number, number] {

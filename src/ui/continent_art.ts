@@ -9,6 +9,16 @@
 // east-west mirroring as the game map, no baked text or labels (the localized
 // zone names + markers are drawn on top by the painter). Swap the file in place
 // to change the art; the loader keys on the fixed path, nothing else.
+//
+// FRAMING contract, because the zone regions are projected onto the whole plate
+// rect: the image must be cropped so its FRAME equals the world bounds, i.e. the
+// painted land runs edge to edge (only the coastline's own surf outside it), with
+// the three zone columns thirds of the width and the zone bands their real share
+// of the height. Ocean padding baked into the crop shifts every clickable region
+// off the land it labels. Two things track the file and must be updated with it:
+// CONTINENT_FALLBACK_ASPECT (continent_map_view.ts, pinned to the real pixels by
+// tests/continent_map_view.test.ts) and --color-map-continent-ocean (tokens.css,
+// the flat fill the plate is letterboxed into, sampled from its deep water).
 
 type ArtState = HTMLImageElement | 'loading' | 'missing';
 

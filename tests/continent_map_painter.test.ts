@@ -22,7 +22,7 @@ const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 
 const CONTINENT_COLOR_TOKENS = [
-  '--color-map-ocean',
+  '--color-map-continent-ocean',
   '--color-map-label',
   '--color-map-outline',
   '--color-map-player',
@@ -132,6 +132,15 @@ describe('continent_map_painter: no magic values', () => {
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
     }
   });
+
+  it('letterboxes into its own continent ocean, not the zone map backdrop', () => {
+    // The plate is a tall portrait crop, so the flat fill beside it is a wide,
+    // very visible band that has to match the sea the plate paints; the per-zone
+    // map's --color-map-ocean is a separate (dark, off-map) backdrop. Reverting
+    // the painter to that token reds this.
+    expect(code).not.toContain("'--color-map-ocean'");
+    expect(tokens).toContain('--color-map-continent-ocean:');
+  });
 });
 
 describe('continent_map_painter: token-driven draw behavior', () => {
@@ -148,7 +157,7 @@ describe('continent_map_painter: token-driven draw behavior', () => {
     for (const tok of CONTINENT_COLOR_TOKENS) expect(trace.styleReads).toContain(tok);
 
     // Ocean floods under everything, and the hovered zone gets a translucent fill.
-    expect(trace.fillRects).toContain('paint:--color-map-ocean');
+    expect(trace.fillRects).toContain('paint:--color-map-continent-ocean');
     expect(trace.fillRects).toContain('paint:--color-map-region-hover-fill');
 
     // Region borders: idle on most, the hovered one brighter, the current one distinct.
@@ -175,7 +184,7 @@ describe('continent_map_painter: token-driven draw behavior', () => {
       canvasSize: 560,
       hoveredZoneId: null,
     });
-    expect(trace.fillRects).toContain('paint:--color-map-ocean');
+    expect(trace.fillRects).toContain('paint:--color-map-continent-ocean');
     expect(trace.fillRects).not.toContain('paint:--color-map-region-hover-fill');
     expect(trace.strokeRects).not.toContain('paint:--color-map-region-hover-stroke');
   });

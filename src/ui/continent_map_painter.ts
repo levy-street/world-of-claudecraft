@@ -42,10 +42,13 @@ const HERE_DOT_RADIUS = 3.5;
 const HERE_RING_RADIUS = 6.5;
 const HERE_RING_LINE_WIDTH = 2;
 
-// The --color-map-* design tokens the painter resolves once per redraw. The base
-// group is shared with the per-zone map painter; the region group is new.
+// The --color-map-* design tokens the painter resolves once per redraw. The
+// label/outline/player group is shared with the per-zone map painter; the ocean
+// and region groups are this level's own (the continent ocean is a wide visible
+// letterbox beside the plate, so it tracks the plate art, not the zone map's
+// off-map backdrop).
 const CONTINENT_COLOR_TOKENS = {
-  ocean: '--color-map-ocean',
+  ocean: '--color-map-continent-ocean',
   label: '--color-map-label',
   outline: '--color-map-outline',
   player: '--color-map-player',

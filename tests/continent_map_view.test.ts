@@ -9,6 +9,7 @@
 // painter's canvas draws (continent_map_painter.ts) need a real 2D context and
 // getComputedStyle and are exercised in the game, not here.
 
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, zoneAt } from '../src/sim/data';
 import {
@@ -89,6 +90,30 @@ describe('buildContinentMapModel: image contain-fit rect', () => {
       expect(m.image.my).toBe(0);
     },
   );
+});
+
+describe('CONTINENT_FALLBACK_ASPECT tracks the shipped plate', () => {
+  // The constant exists so the region layout does not JUMP when the plate
+  // finishes decoding: it has to be the real file's width / height. Re-cropping
+  // world_overview.webp without updating it would ship that jump, so pin the
+  // constant to the asset's actual pixels (read from the file, never from the
+  // constant itself).
+  it('equals the real pixel aspect of public/map_art/world_overview.webp', async () => {
+    const meta = await sharp(
+      new URL('../public/map_art/world_overview.webp', import.meta.url).pathname,
+    ).metadata();
+    expect(meta.format).toBe('webp');
+    expect(meta.width).toBeGreaterThan(0);
+    expect(meta.height).toBeGreaterThan(0);
+    expect(CONTINENT_FALLBACK_ASPECT).toBeCloseTo(
+      (meta.width as number) / (meta.height as number),
+      6,
+    );
+    // The plate is a portrait crop of the (very tall) world bounds: assert the
+    // orientation too, so a landscape replacement cannot silently pass by
+    // matching a hand-edited constant.
+    expect(CONTINENT_FALLBACK_ASPECT).toBeLessThan(1);
+  });
 });
 
 describe('buildContinentMapModel: zone regions', () => {
