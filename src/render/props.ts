@@ -111,6 +111,11 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   statueBlock: { url: '/models/props/statue_block.glb', kit: 'nature' },
   dockPlatform: { url: '/models/props/dock_platform.glb', kit: 'pirate' },
   rowboat: { url: '/models/props/rowboat.glb', kit: 'pirate' },
+  // The harbor ferry ship (docs/prd/last-bell-harbor.md H1): pipeline-generated
+  // (Tripo, see CREDITS.md), flat walkable main deck; moored at each harbor's
+  // berth and placed by render/harbor.ts, whose walkable shipDecks in
+  // src/sim/harbor_layout.ts are measured from THIS model's deck plane.
+  harborShip: { url: '/models/props/harbor_ferry_ship.glb', kit: 'pirate' },
   graveRound: { url: '/models/props/gravestone_round.glb', kit: 'grave' },
   graveCross: { url: '/models/props/gravestone_cross.glb', kit: 'grave' },
   graveBevel: { url: '/models/props/gravestone_bevel.glb', kit: 'grave' },
@@ -153,7 +158,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   shrubFlowering: { url: '/models/props/shrub_flowering.glb', kit: 'hollow' },
 };
 
-type PropKey = keyof typeof PROP_ASSET_DEFS;
+export type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
@@ -196,6 +201,9 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'courseArch',
   'jumpVertical',
   'jumpOxer',
+  // The harbor ship is a LANDMARK (the harbor must read as a harbor from
+  // 40 yd on every tier), so low gfx renders it like the race fixtures.
+  'harborShip',
 ];
 
 /**
@@ -278,11 +286,11 @@ const MAT_OVERRIDES: Record<
 // for any other consumer, and the static merge may freely dispose ours.
 // ---------------------------------------------------------------------------
 
-interface AssetPart {
+export interface AssetPart {
   geo: THREE.BufferGeometry;
   mat: THREE.Material;
 }
-interface PropAsset {
+export interface PropAsset {
   parts: AssetPart[];
   size: THREE.Vector3;
 }
@@ -363,8 +371,11 @@ function convertMaterial(
 }
 
 /** parts of a loaded asset, world-baked (incl. yaw), origin centered at the
- *  footprint center with min-y at 0, materials converted + deduped */
-function propAsset(key: PropKey): PropAsset {
+ *  footprint center with min-y at 0, materials converted + deduped.
+ *  Exported for sibling builders (render/harbor.ts) that assemble kit pieces
+ *  outside buildProps; browser-only callers must respect the preload contract
+ *  (throws when the GLB has not landed). */
+export function propAsset(key: PropKey): PropAsset {
   const cached = extractCache.get(key);
   if (cached) return cached;
   const def = PROP_ASSET_DEFS[key];
