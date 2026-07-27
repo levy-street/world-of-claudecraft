@@ -17,6 +17,7 @@ const {
   EASTBROOK_ARMOURY_CAPTURE_SEED,
   EASTBROOK_ARMOURY_PLAYER_STATE,
   EASTBROOK_POLISH_BASELINE_REVISION,
+  EASTBROOK_TOWN_CAPTURE_CONTRACTS,
   EASTBROOK_TOWN_CAPTURE_PROFILES,
   EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
   EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
@@ -608,15 +609,15 @@ function readJsonFile<T>(filePath: string): T {
 }
 
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '76e5620c78069b209a58d99ab7670c26a0edcc4f240f571f3dd130a859d97c6a';
+  '928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '1d1993b3c7040a041d30d3bb1066e4b69236259e28721d966dadc14e2fbda8f9';
+  'eb27bfd749448bc97537f087b4992c866d554ef12b63dbef439c198329d162a1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '2dd868144d11ce0dbd3c234be1e22baf7562a0420feba95c3fafeee9fb8bff14';
+  '3dd5c2b4807e25e0b9526db949dda9ce901215cb1f7dfeab6f88cc6ff127c128';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -909,6 +910,16 @@ describe('Eastbrook polish committed capture artifacts', () => {
   it('pins the historical metadata authority independently', () => {
     expect(sha256File(ACCEPTED_POLISH_V2_METADATA_PATH)).toBe(ACCEPTED_POLISH_V2_METADATA_SHA256);
     expect(ACCEPTED_POLISH_V2_PROVENANCE.fingerprint).toBe(ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE);
+  });
+
+  // The frozen polish-v2 evidence intentionally predates the bank rebuild: it
+  // was never recaptured, so its town contract snapshot still carries the
+  // pre-rebuild triangle count while the live capture contract carries the
+  // rebuilt one. This pair makes that divergence a literal instead of an
+  // implicit fact resting on two sha comparisons above.
+  it('declares the frozen evidence triangle count as deliberately stale against the live contract', () => {
+    expect(ACCEPTED_POLISH_V2_TOWN_CONTRACT.townTriangles).toBe(28_330);
+    expect(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2'].townTriangles).toBe(29_110);
   });
 
   it('pins the exact historical metadata inventory to every base capture and motion frame', () => {

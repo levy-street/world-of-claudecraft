@@ -2,7 +2,7 @@
 
 Status: the settled polish-v2 layout and current bank assets, interaction, parity, and rendering
 match the implementation. The matched visual captures and CPU/requestAnimationFrame measurements
-below are historical polish-v2 evidence from before the bank rebuild, not current WSL bank
+below are historical polish-v2 evidence from before the bank rebuild, not current bank
 performance evidence. Current deterministic geometry budgets, focused tests, web/native builds,
 deterministic rebuilds, and specialist review results are recorded below. Authenticated
 physical-device play and representative native-GPU performance remain explicit `VERIFY` items;
@@ -263,9 +263,9 @@ with the current bank rebuild's hashes or measurements.
 The bank was rebuilt from its Eastbrook turnaround while retaining its exact
 `7 x 7.8 x 5.5` runtime envelope, two materials, two primitives, and two named sockets. The
 shipping bank is `52,504` bytes and `3,104` triangles (`2,928` opaque and `176` emissive), with
-SHA-256 `e3f1556331a8edaae40671642b4fa341bcc302a7094d2cf3f0cbb0afecd165c7`.
+SHA-256 `0307318abca6a245c47bd9f1dc5b411960adbf0f3b6f06340e36fdc1a53e2409`.
 Its source fingerprint is
-`4d024c2fbe74b73f3e4a46ee17aca9858e9cacd29760abd2789f46a80874541e`.
+`68fd598d1794136685b8d0dd401fe12b9f6db390580a44938709a611a3412597`.
 
 The rebuilt facade keeps the arched entrance visible, aligns the teller counter with its awning,
 posts, and socket, and leaves the secure alcove empty so the separate runtime banker chest is not
