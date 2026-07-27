@@ -5320,8 +5320,9 @@
   :root[data-combat-text="enhanced"] body.mobile-touch .fct-dodge-other,
   :root[data-combat-text="enhanced"] body.mobile-touch .fct-parry-self,
   :root[data-combat-text="enhanced"] body.mobile-touch .fct-parry-other,
-  :root[data-combat-text="enhanced"] body.mobile-touch .fct-block-self,
-  :root[data-combat-text="enhanced"] body.mobile-touch .fct-block-other {
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-block-done-ability,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-block-done-auto,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-block-taken {
     font-size: calc(var(--font-size-fct-enhanced-mobile) * var(--fct-scale, 1));
     animation-name: fct-enhanced-deflect-mobile;
   }

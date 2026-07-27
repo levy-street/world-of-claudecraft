@@ -8985,12 +8985,12 @@ export class Hud {
             }
             break;
           }
-          // A landed hit: the mapper resolves damage-done (player dealt to other) vs
-          // damage-taken (player took) vs null (a hit between two non-player entities, which
-          // floats nothing). The amount text + target entity stay at the call site.
+          // Landed damage: the mapper resolves damage-done (player dealt to other) vs
+          // damage-taken (player took), keeps partial blocks distinct, or returns null for
+          // damage between two non-player entities. Amount text + target stay at the call site.
           const hitShape = fctSpawnShape({
             type: 'damage',
-            damageKind: 'hit',
+            damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,
             crit: ev.crit,
             isPlayerSource,
@@ -8998,7 +8998,10 @@ export class Hud {
           });
           if (
             hitShape &&
-            (hitShape.kind === 'damage-done-ability' || hitShape.kind === 'damage-done-auto')
+            (hitShape.kind === 'damage-done-ability' ||
+              hitShape.kind === 'damage-done-auto' ||
+              hitShape.kind === 'block-done-ability' ||
+              hitShape.kind === 'block-done-auto')
           ) {
             this.fctPainter.spawn(
               { ...hitShape, text: `${formatNumber(ev.amount)}${ev.crit ? '!' : ''}`, target: tgt },
@@ -9016,7 +9019,10 @@ export class Hud {
             // see playEventSfx, which runs for every damage event above.
             // Fiesta: every blow you land kicks the camera (bigger on a crit).
             if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.3 : 0.12);
-          } else if (hitShape && hitShape.kind === 'damage-taken') {
+          } else if (
+            hitShape &&
+            (hitShape.kind === 'damage-taken' || hitShape.kind === 'block-taken')
+          ) {
             this.fctPainter.spawn(
               { ...hitShape, text: `-${formatNumber(ev.amount)}`, target: tgt },
               now,

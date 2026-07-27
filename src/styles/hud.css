@@ -3570,17 +3570,22 @@
      xp (#6db8ff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
      .fct.crit class. */
   .fct-miss-self,
-  .fct-dodge-self {
+  .fct-dodge-self,
+  .fct-parry-self {
     color: #bbb;
   }
   .fct-miss-other,
   .fct-dodge-other,
+  .fct-parry-other,
+  .fct-block-done-auto,
   .fct-damage-done-auto {
     color: #fff;
   }
+  .fct-block-done-ability,
   .fct-damage-done-ability {
     color: #ffe97a;
   }
+  .fct-block-taken,
   .fct-damage-taken {
     color: #ff5544;
   }
@@ -3682,8 +3687,9 @@
   :root[data-combat-text="enhanced"] .fct-parry-other {
     color: var(--color-mana);
   }
-  :root[data-combat-text="enhanced"] .fct-block-self,
-  :root[data-combat-text="enhanced"] .fct-block-other {
+  :root[data-combat-text="enhanced"] .fct-block-done-ability,
+  :root[data-combat-text="enhanced"] .fct-block-done-auto,
+  :root[data-combat-text="enhanced"] .fct-block-taken {
     color: var(--color-accent);
   }
   :root[data-combat-text="enhanced"] .fct.crit {
@@ -3747,8 +3753,9 @@
   :root[data-combat-text="enhanced"] .fct-dodge-other,
   :root[data-combat-text="enhanced"] .fct-parry-self,
   :root[data-combat-text="enhanced"] .fct-parry-other,
-  :root[data-combat-text="enhanced"] .fct-block-self,
-  :root[data-combat-text="enhanced"] .fct-block-other {
+  :root[data-combat-text="enhanced"] .fct-block-done-ability,
+  :root[data-combat-text="enhanced"] .fct-block-done-auto,
+  :root[data-combat-text="enhanced"] .fct-block-taken {
     font-size: calc(var(--font-size-fct-enhanced-avoidance) * var(--fct-scale, 1));
     animation-name: fct-enhanced-deflect;
   }

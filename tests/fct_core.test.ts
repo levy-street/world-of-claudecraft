@@ -73,7 +73,12 @@ describe('describeFct: color token by kind + flags', () => {
     resist: { self: 'miss-self', other: 'miss-other' },
     'damage-done-ability': { self: 'damage-done-ability', other: 'damage-done-ability' },
     parry: { self: 'parry-self', other: 'parry-other' },
-    block: { self: 'block-self', other: 'block-other' },
+    'block-done-ability': {
+      self: 'block-done-ability',
+      other: 'block-done-ability',
+    },
+    'block-done-auto': { self: 'block-done-auto', other: 'block-done-auto' },
+    'block-taken': { self: 'block-taken', other: 'block-taken' },
     'damage-done-auto': { self: 'damage-done-auto', other: 'damage-done-auto' },
     'damage-taken': { self: 'damage-taken', other: 'damage-taken' },
     absorb: { self: 'absorb', other: 'absorb' },
@@ -104,8 +109,7 @@ describe('describeFct: color token by kind + flags', () => {
         kind === 'miss' ||
         kind === 'dodge' ||
         kind === 'resist' ||
-        kind === 'parry' ||
-        kind === 'block'
+        kind === 'parry'
       )
         expect(selfToken).not.toBe(otherToken);
       else expect(selfToken).toBe(otherToken);
@@ -134,7 +138,9 @@ describe('describeFct: ttl is a pure function of kind (constant across kinds, ex
       'damage-done-auto',
       'resist',
       'parry',
-      'block',
+      'block-done-ability',
+      'block-done-auto',
+      'block-taken',
       'damage-taken',
       'absorb',
       'heal',
@@ -223,8 +229,11 @@ describe('describeFct: ClientWorld-vs-Sim parity', () => {
 });
 
 describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)', () => {
-  it('classifies exactly the three damage-number kinds as damage', () => {
+  it('classifies exactly the six damage-number kinds as damage', () => {
     expect([...DAMAGE_FCT_KINDS].sort()).toEqual([
+      'block-done-ability',
+      'block-done-auto',
+      'block-taken',
       'damage-done-ability',
       'damage-done-auto',
       'damage-taken',
@@ -240,7 +249,6 @@ describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)
       'dodge',
       'resist',
       'parry',
-      'block',
       'absorb',
       'heal',
       'xp',

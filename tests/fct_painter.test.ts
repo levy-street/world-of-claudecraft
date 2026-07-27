@@ -588,10 +588,15 @@ describe('FCT colour tokens: the .fct-<token> hex stays byte-faithful to the old
   const PINNED: Record<string, string> = {
     'fct-miss-self': '#bbb',
     'fct-dodge-self': '#bbb',
+    'fct-parry-self': '#bbb',
     'fct-miss-other': '#fff',
     'fct-dodge-other': '#fff',
+    'fct-parry-other': '#fff',
+    'fct-block-done-auto': '#fff',
     'fct-damage-done-auto': '#fff',
+    'fct-block-done-ability': '#ffe97a',
     'fct-damage-done-ability': '#ffe97a',
+    'fct-block-taken': '#ff5544',
     'fct-damage-taken': '#ff5544',
     'fct-absorb': '#9fd7ff',
     'fct-heal': '#3ce63c',
@@ -648,7 +653,9 @@ describe('Enhanced FCT visual language', () => {
     expect(css).toMatch(/\.fct-damage-taken\s*\{[^}]*color:\s*var\(--color-text-error\)/);
     expect(css).toMatch(/\.fct-heal\s*\{[^}]*color:\s*var\(--color-text-success\)/);
     expect(css).toMatch(/\.fct-parry-other\s*\{[^}]*color:\s*var\(--color-mana\)/);
-    expect(css).toMatch(/\.fct-block-other\s*\{[^}]*color:\s*var\(--color-accent\)/);
+    expect(css).toMatch(
+      /\.fct-block-done-auto,[\s\S]*?\.fct-block-taken\s*\{[^}]*color:\s*var\(--color-accent\)/,
+    );
   });
 
   it('gives avoidance words their own deflection motion and makes low-tier crit static', () => {
