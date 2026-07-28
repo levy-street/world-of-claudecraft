@@ -42,6 +42,17 @@ import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
 import { castBarState } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
+import {
+  admitNameplates,
+  createNameplateAdmissionScratch,
+  NAMEPLATE_CASTING,
+  NAMEPLATE_COMBAT,
+  NAMEPLATE_HOSTILE,
+  NAMEPLATE_PARTY,
+  NAMEPLATE_SELF_EMOTE,
+  NAMEPLATE_TARGET,
+  type NameplateAdmissionCandidate,
+} from './nameplate_budget_core';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
 import {
@@ -76,6 +87,8 @@ export interface NameplatePainterDeps {
   showPlayerNameplates: () => boolean;
   /** PvP reaction check, owned by the renderer (duel/arena state) */
   isHostilePlayer: (e: Entity) => boolean;
+  /** Ordinary cosmetic plates admitted alongside every actionable plate. */
+  maxOrdinaryNameplates?: () => number;
 }
 
 export class NameplatePainter {
@@ -88,6 +101,7 @@ export class NameplatePainter {
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
   private readonly isHostilePlayer: (e: Entity) => boolean;
+  private readonly maxOrdinaryNameplates: () => number;
   // scratch reused every frame (no per-frame alloc); was renderer.tmpV/tmpV2.
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
@@ -101,6 +115,11 @@ export class NameplatePainter {
   // proportional to the player count. `anchorCount` is the live prefix length.
   private readonly anchorScratch: NameplateAnchor[] = [];
   private anchorCount = 0;
+  private readonly admissionCandidates: NameplateAdmissionCandidate[] = [];
+  private readonly admissionCandidatePool: NameplateAdmissionCandidate[] = [];
+  private readonly admissionScratch = createNameplateAdmissionScratch();
+  private readonly admittedIds: number[] = [];
+  private readonly admitted = new Set<number>();
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -112,6 +131,60 @@ export class NameplatePainter {
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
     this.isHostilePlayer = deps.isHostilePlayer;
+    this.maxOrdinaryNameplates = deps.maxOrdinaryNameplates ?? (() => Number.MAX_SAFE_INTEGER);
+  }
+
+  private refreshAdmission(
+    showNameplates: boolean,
+    showOwnNameplate: boolean,
+    showPlayerNameplates: boolean,
+  ): void {
+    const p = this.world.player;
+    const party = this.world.partyInfo?.members ?? [];
+    let count = 0;
+    for (const [id, v] of this.views) {
+      const e = this.world.entities.get(id);
+      if (!e) continue;
+      const plan = nameplatePlanInto(
+        this.plan,
+        e,
+        p,
+        v.height,
+        showNameplates,
+        showOwnNameplate,
+        showPlayerNameplates,
+      );
+      const dx = e.pos.x - p.pos.x;
+      const dz = e.pos.z - p.pos.z;
+      let flags = 0;
+      if (id === p.targetId) flags |= NAMEPLATE_TARGET;
+      if (id === p.id && plan.hasOverheadEmote) flags |= NAMEPLATE_SELF_EMOTE;
+      if (e.hostile || (e.kind === 'player' && this.isHostilePlayer(e))) {
+        flags |= NAMEPLATE_HOSTILE;
+      }
+      if (e.inCombat) flags |= NAMEPLATE_COMBAT;
+      if (e.castingAbility !== null) flags |= NAMEPLATE_CASTING;
+      if (party.some((member) => member.pid === id)) flags |= NAMEPLATE_PARTY;
+      let candidate = this.admissionCandidatePool[count];
+      if (!candidate) {
+        candidate = { id, flags, distanceSq: 0, inViewport: false };
+        this.admissionCandidatePool.push(candidate);
+      }
+      candidate.id = id;
+      candidate.flags = flags;
+      candidate.distanceSq = dx * dx + dz * dz;
+      candidate.inViewport = !plan.hidden && v.group.visible;
+      this.admissionCandidates[count++] = candidate;
+    }
+    this.admissionCandidates.length = count;
+    admitNameplates(
+      this.admissionCandidates,
+      Math.max(0, Math.floor(this.maxOrdinaryNameplates())),
+      this.admittedIds,
+      this.admissionScratch,
+    );
+    this.admitted.clear();
+    for (const id of this.admittedIds) this.admitted.add(id);
   }
 
   // Project and refresh every nameplate. On a throttled pass (fullPass=false) only
@@ -125,6 +198,9 @@ export class NameplatePainter {
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
+    if (fullPass || this.admitted.size === 0) {
+      this.refreshAdmission(showNameplates, showOwnNameplate, showPlayerNameplates);
+    }
     this.anchorCount = 0;
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
@@ -139,6 +215,10 @@ export class NameplatePainter {
         showPlayerNameplates,
       );
       if (plan.hidden) {
+        this.hideNameplate(v);
+        continue;
+      }
+      if (!this.admitted.has(id)) {
         this.hideNameplate(v);
         continue;
       }

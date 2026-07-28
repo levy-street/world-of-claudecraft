@@ -62,6 +62,21 @@ type _AdminMirrorCarriesMobScanFields = AssertTrue<
     : false
 >;
 
+type TickDebtCaptureFields = 'cappedCallbacks' | 'droppedDebtSeconds';
+type _AdminMirrorCarriesTickDebtFields = AssertTrue<
+  Pick<ServerPerfCaptureResult, TickDebtCaptureFields> extends Pick<
+    AdminPerfCaptureResult,
+    TickDebtCaptureFields
+  >
+    ? Pick<AdminPerfCaptureResult, TickDebtCaptureFields> extends Pick<
+        ServerPerfCaptureResult,
+        TickDebtCaptureFields
+      >
+      ? true
+      : false
+    : false
+>;
+
 // Drive 60 nominal samples into the capture, then move its wall deadline to now and
 // finalize. Production closes on wall time; this helper keeps the percentile sample
 // assertions deterministic without making the unit test wait three seconds.
@@ -185,12 +200,15 @@ describe('tick perf capture lifecycle', () => {
     const server = new GameServer();
     server.startPerfCapture(3000);
     const internal = server as unknown as {
-      recordPerfCaptureCallback: (ticksRun: number) => void;
+      recordPerfCaptureCallback: (
+        ticksRun: number,
+        debtPlan?: { capped: boolean; droppedSeconds: number },
+      ) => void;
       perfCaptureDeadlineNs: bigint;
       finalizePerfCaptureIfDue: () => void;
     };
     internal.recordPerfCaptureCallback(1);
-    internal.recordPerfCaptureCallback(3);
+    internal.recordPerfCaptureCallback(3, { capped: true, droppedSeconds: 0.15 });
     internal.recordPerfCaptureCallback(0);
     internal.perfCaptureDeadlineNs = 0n;
     internal.finalizePerfCaptureIfDue();
@@ -200,6 +218,8 @@ describe('tick perf capture lifecycle', () => {
       simTicks: 4,
       catchUpCallbacks: 1,
       maxTicksPerCallback: 3,
+      cappedCallbacks: 1,
+      droppedDebtSeconds: 0.15,
     });
   });
 

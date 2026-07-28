@@ -205,11 +205,13 @@ import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { createSerialWriter } from './serial_writer';
+import { encodeSnapshotBinary } from './snapshot_binary';
 import {
   jsonWithField,
   StableAuraWireCache,
   StableSelfTimerWireCache,
 } from './snapshot_timer_wire';
+import type { SnapshotTransport } from './snapshot_transport';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
@@ -218,6 +220,7 @@ import { PgSocialDb } from './social_db';
 // load-time requireAccount over the db module) into every test that
 // partial-mocks the db, the known overlay-mock breakage class.
 import { reconcileOnLogin } from './steam/mirror';
+import { planTickDebt } from './tick_debt';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { holderInfoForPubkey } from './woc_balance';
@@ -719,6 +722,7 @@ export interface ClientSession {
   // old and unknown clients throughout a rolling deploy.
   timerWireVersion: 1 | StableTimerWireVersion;
   timerWireCache: StableSelfTimerWireCache;
+  snapshotTransport: SnapshotTransport;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
@@ -835,6 +839,11 @@ export interface AdminLiveLocation {
   poiIndex: number | null;
   poi: string | null;
   poiDistance: number | null;
+}
+
+export interface RuntimePlacement {
+  kind: 'overworld' | 'dungeon' | 'delve' | 'arena';
+  claimId: string;
 }
 
 export interface AdminLivePlayer {
@@ -1285,6 +1294,8 @@ export interface PerfCaptureResult {
   simTicks: number; // authoritative sim ticks run across those callbacks
   catchUpCallbacks: number; // callbacks that ran more than one sim tick
   maxTicksPerCallback: number;
+  cappedCallbacks: number; // callbacks where overdue whole ticks were discarded
+  droppedDebtSeconds: number; // overdue wall time discarded to prevent a death spiral
   online: number; // live sessions at capture close
   simEntities: number; // sim entity count at capture close
   aggroVisitsTotal: number; // aggro-scan player visits summed across the window
@@ -1307,6 +1318,7 @@ export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
+  private runtimeDetachedHook: ((session: ClientSession) => void) | null = null;
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
   private readonly botDetector: BotDetector = createBotDetector();
   readonly chatLog = new ChatLogger(insertChatLogs);
@@ -1450,6 +1462,8 @@ export class GameServer {
   private perfCaptureSimTicks = 0;
   private perfCaptureCatchUpCallbacks = 0;
   private perfCaptureMaxTicksPerCallback = 0;
+  private perfCaptureCappedCallbacks = 0;
+  private perfCaptureDroppedDebtSeconds = 0;
   private lastPerfCapture: PerfCaptureResult | null = null;
   private bcastGridNs = 0n;
   private bcastSelfNs = 0n;
@@ -1968,7 +1982,8 @@ export class GameServer {
           let dt = Number(now - last) / 1e9;
           last = now;
           if (dt > 0.5) dt = 0.5;
-          acc += dt;
+          const debtPlan = planTickDebt(acc, dt, DT);
+          acc = debtPlan.debtAfterSeconds;
           // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
           // works without the sim reading the wall clock itself (determinism invariant).
           this.sim.utcDay = new Date().toISOString().slice(0, 10);
@@ -1987,7 +2002,7 @@ export class GameServer {
             mark = t;
           };
           let ticksRun = 0;
-          while (acc >= DT) {
+          for (let tickIndex = 0; tickIndex < debtPlan.ticks; tickIndex++) {
             this.clearStaleInputs();
             lap('stale');
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
@@ -2010,9 +2025,8 @@ export class GameServer {
             this.runAntibotTick();
             lap('antibot');
             ticksRun++;
-            acc -= DT;
           }
-          this.recordPerfCaptureCallback(ticksRun);
+          this.recordPerfCaptureCallback(ticksRun, debtPlan);
           this.expireLinkdeadSessions();
           // Anchor the achieved-rate meter to the wall clock (hrtime), never to
           // callback counts: late timer fires and the dt clamp are exactly the
@@ -2716,6 +2730,7 @@ export class GameServer {
         sourceUrl?: string | null;
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
+        snapshotTransport?: SnapshotTransport;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
@@ -2830,6 +2845,7 @@ export class GameServer {
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
       timerWireCache: new StableSelfTimerWireCache(),
+      snapshotTransport: meta.snapshotTransport === 'binary-v1' ? 'binary-v1' : 'json',
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
@@ -2994,6 +3010,7 @@ export class GameServer {
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
     session.timerWireCache = new StableSelfTimerWireCache();
+    session.snapshotTransport = meta.snapshotTransport === 'binary-v1' ? 'binary-v1' : 'json';
     session.sentEnts = new Map();
     session.selfHeavyDirty = true;
     session.lastWireRev = -1;
@@ -3112,6 +3129,7 @@ export class GameServer {
     if (session.jailVisit) this.exitJailVisit(session, false);
     session.left = true;
     this.clients.delete(session.pid);
+    this.runtimeDetachedHook?.(session);
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
     this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
@@ -3472,6 +3490,8 @@ export class GameServer {
     this.perfCaptureSimTicks = 0;
     this.perfCaptureCatchUpCallbacks = 0;
     this.perfCaptureMaxTicksPerCallback = 0;
+    this.perfCaptureCappedCallbacks = 0;
+    this.perfCaptureDroppedDebtSeconds = 0;
     resetMobScanCaptureAccumulators(this.mobScanTickStats);
     this.perfCaptureEndsAtMs = Date.now() + clamped;
     this.perfCaptureDeadlineNs = process.hrtime.bigint() + BigInt(clamped) * 1_000_000n;
@@ -3490,12 +3510,20 @@ export class GameServer {
     };
   }
 
-  private recordPerfCaptureCallback(ticksRun: number): void {
+  private recordPerfCaptureCallback(
+    ticksRun: number,
+    debtPlan: { capped: boolean; droppedSeconds: number } = {
+      capped: false,
+      droppedSeconds: 0,
+    },
+  ): void {
     if (this.perfCaptureDeadlineNs === null) return;
     this.perfCaptureLoopCallbacks++;
     this.perfCaptureSimTicks += ticksRun;
     if (ticksRun > 1) this.perfCaptureCatchUpCallbacks++;
     this.perfCaptureMaxTicksPerCallback = Math.max(this.perfCaptureMaxTicksPerCallback, ticksRun);
+    if (debtPlan.capped) this.perfCaptureCappedCallbacks++;
+    this.perfCaptureDroppedDebtSeconds += debtPlan.droppedSeconds;
   }
 
   // Resolve (and memoize) the registered profiler bucket for a mob template. A
@@ -3526,6 +3554,8 @@ export class GameServer {
       simTicks: this.perfCaptureSimTicks,
       catchUpCallbacks: this.perfCaptureCatchUpCallbacks,
       maxTicksPerCallback: this.perfCaptureMaxTicksPerCallback,
+      cappedCallbacks: this.perfCaptureCappedCallbacks,
+      droppedDebtSeconds: this.perfCaptureDroppedDebtSeconds,
       online: this.clients.size,
       simEntities: this.sim.entities.size,
       aggroVisitsTotal: this.mobScanTickStats.aggroVisitsTotal,
@@ -3659,6 +3689,36 @@ export class GameServer {
       poi: poi?.label ?? null,
       poiDistance: poi ? round2(bestDistance) : null,
     };
+  }
+
+  runtimePlacement(session: ClientSession): RuntimePlacement {
+    const arena = this.sim.arenaMatchFor(session.pid);
+    if (arena) return { kind: 'arena', claimId: `arena:${arena.id}` };
+    const cup = this.sim.vcupMatchOf(session.pid);
+    if (cup) return { kind: 'arena', claimId: `vcup:${cup.id}` };
+
+    const e = this.sim.entities.get(session.pid);
+    if (!e) return { kind: 'overworld', claimId: 'unknown' };
+    const instance = this.sim.instanceInfoAt(e.pos);
+    const dungeonId = e.dungeonId ?? instance?.dungeonId ?? null;
+    if (dungeonId) {
+      return {
+        kind: 'dungeon',
+        claimId: `${dungeonId}:${instance?.slot ?? 0}`,
+      };
+    }
+    const delve = this.sim.delveRunForPlayer(session.pid);
+    if (delve) {
+      return {
+        kind: 'delve',
+        claimId: `${delve.delveId}:${delve.slot}`,
+      };
+    }
+    return { kind: 'overworld', claimId: zoneAt(e.pos.z).id ?? 'unknown' };
+  }
+
+  setRuntimeDetachedHook(hook: ((session: ClientSession) => void) | null): void {
+    this.runtimeDetachedHook = hook;
   }
 
   liveSessions(): AdminLivePlayer[] {
@@ -5593,7 +5653,7 @@ export class GameServer {
         const temporalHourglassesJson =
           temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
-        this.sendRaw(
+        this.sendSnapshotRaw(
           session,
           `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
         );
@@ -7110,6 +7170,26 @@ export class GameServer {
   }
 
   private sendRaw(session: ClientSession, payload: string): void {
+    this.sendFrame(session, payload);
+  }
+
+  private sendSnapshotRaw(session: ClientSession, payload: string): void {
+    if (session.snapshotTransport !== 'binary-v1') {
+      this.sendRaw(session, payload);
+      return;
+    }
+    try {
+      this.sendFrame(session, encodeSnapshotBinary(JSON.parse(payload)));
+    } catch (error) {
+      // Fail soft per session. The exact JSON payload that would have been sent
+      // without negotiation remains the rollback frame.
+      session.snapshotTransport = 'json';
+      console.error(`[snap] binary encode failed for pid ${session.pid}; using JSON:`, error);
+      this.sendRaw(session, payload);
+    }
+  }
+
+  private sendFrame(session: ClientSession, payload: string | Uint8Array): void {
     if (session.ws.readyState !== 1) return;
     // A client that has stopped draining its socket lets ws.bufferedAmount grow
     // without bound (send() never blocks); left unchecked one stuck reader OOMs

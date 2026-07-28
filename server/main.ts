@@ -285,6 +285,8 @@ import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } fro
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
+import { AuthoritativeRuntimeCoordinator } from './runtime/coordinator';
+import { parseRuntimeMode } from './runtime/runtime_mode';
 import { resolveSfxOverlayFile } from './sfx_overlay';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
@@ -2839,6 +2841,9 @@ export async function startServer(): Promise<http.Server> {
   await ensureSchema();
   await seedOAuthClients();
   const game = liveGame();
+  const runtimeMode = parseRuntimeMode(process.env.MMO_RUNTIME_MODE);
+  const runtime = new AuthoritativeRuntimeCoordinator(game, REALM, runtimeMode);
+  game.setRuntimeDetachedHook((session) => runtime.detached(session));
   // Inject the game-session methods the ported admin routes (server/admin.ts) call
   // for their live reads + side effects (adminStats/liveSessions/disconnectAccount/
   // muteAccountChat/reloadChatFilter/reloadBlockedIps/disconnectByIp/...), and the
@@ -2961,6 +2966,7 @@ export async function startServer(): Promise<http.Server> {
   const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
   const wsAuth = createWsAuth({
     game,
+    runtime,
     accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
@@ -3014,6 +3020,7 @@ export async function startServer(): Promise<http.Server> {
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
+    console.log(`  Runtime: ${runtimeMode}`);
     console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
 
@@ -3107,6 +3114,7 @@ export async function startServer(): Promise<http.Server> {
     await retentionSweep.stop();
     game.stop();
     await game.saveAll('shutdown');
+    await runtime.stop();
     await game.saveMarket();
     await game.saveMail();
     await game.endAllPlaySessions();

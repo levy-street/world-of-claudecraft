@@ -2,6 +2,7 @@
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
+import type { WebGLRenderer } from 'three';
 import { startDiscordLogin } from './discord_login_start';
 import { syncAppViewport as syncAppViewportShared } from './game/app_viewport';
 import { audio } from './game/audio';
@@ -161,6 +162,10 @@ import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/w
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
 import { assetsReady } from './render/assets/preload';
+import {
+  createBrowserRenderBackend,
+  type RenderBackendFactoryResult,
+} from './render/backend/backend_factory';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import { charactersReady, preloadMechAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
@@ -1160,8 +1165,34 @@ async function startGame(
     `[entry-guard] world entry: preset=${settings.get('graphicsPreset')} ` +
       `(${graphicsPresetLabel(settings.get('graphicsPreset'))}) native=${isNativeRuntime()}`,
   );
+  let renderBackend: RenderBackendFactoryResult | null = null;
   try {
-    renderer = new Renderer(world, canvas, nameplates);
+    renderBackend = await createBrowserRenderBackend({
+      canvas,
+      search: location.search,
+      // The full game still uses WebGL-only postprocessing, PMREM, water, and
+      // onBeforeCompile materials. Keep the experimental backend opt-in but
+      // fail closed until the complete forward profile reaches visual parity.
+      forwardProfileCompatible: false,
+      forceWebGl2: NATIVE_APP || String(import.meta.env.VITE_WEBGPU_DISABLED ?? '').trim() === '1',
+    });
+    canvas.dataset.renderBackend = renderBackend.backend.kind;
+    canvas.dataset.renderBackendRequested = renderBackend.selection.requested;
+    canvas.dataset.renderBackendFallback = String(renderBackend.selection.fallback);
+    console.info(
+      `[render-backend] active=${renderBackend.backend.kind} ` +
+        `requested=${renderBackend.selection.requested} ` +
+        `fallback=${renderBackend.selection.fallback} ` +
+        `reason=${renderBackend.selection.reason}`,
+    );
+    if (renderBackend.backend.kind !== 'webgl2') {
+      renderBackend.backend.dispose();
+      throw new Error('The full scene selected WebGPU before its forward profile was compatible.');
+    }
+    renderer = new Renderer(world, canvas, nameplates, {
+      webgl: renderBackend.backend.renderer as WebGLRenderer,
+      backendSelection: renderBackend.selection,
+    });
     rendererReady = true;
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
@@ -1197,6 +1228,7 @@ async function startGame(
     applyMinimapOrnamentVars(); // minimap disc's gilded ring
     entryDiagnostics.checkpoint('hud-built');
   } catch (err) {
+    if (!rendererReady) renderBackend?.backend.dispose();
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever. A HANDLED failure is not a process kill, so the
     // crash probe must not survive to cost the player a graphics tier next boot.

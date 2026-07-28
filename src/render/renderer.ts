@@ -40,7 +40,16 @@ import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import {
+  articulatedRigLimit,
+  type CharacterRenderMode,
+  createRigBudgetScratch,
+  planArticulatedRigs,
+  type RigBudgetCandidate,
+  type RigBudgetDecision,
+} from './articulated_rig_budget_core';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
+import type { RenderBackendSelection } from './backend/types';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
@@ -82,8 +91,11 @@ import {
   mechAssetsReady,
   preloadMechAssets,
   preloadTrainingDummyAssets,
+  prepareVisual,
+  tintedFarMaterials,
   trainingDummyAssetsReady,
 } from './characters/assets';
+import { CharacterCrowdBatch } from './characters/crowd_batch';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import {
   playerRangedAttackAlreadyStarted,
@@ -92,6 +104,7 @@ import {
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
+import { CompileBatch } from './compile_batch';
 import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
@@ -190,6 +203,7 @@ import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
+import { RenderWorldCore } from './runtime';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor } from './self_motion';
@@ -224,6 +238,7 @@ import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { SCHOOL_COLORS, Vfx } from './vfx';
+import { type ViewCreateBudget, viewCreateBudget } from './view_create_budget_core';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { type WarriorCastVisualPlan, warriorCastVisualPlan } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
@@ -913,6 +928,11 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
 }
 
+export interface RendererOptions {
+  webgl?: THREE.WebGLRenderer;
+  backendSelection?: RenderBackendSelection;
+}
+
 export class Renderer {
   scene = new THREE.Scene();
   // A soft light pillar marking the local player's corpse during the ghost run.
@@ -920,6 +940,7 @@ export class Renderer {
   private corpseBeacon: THREE.Mesh | null = null;
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
+  private readonly backendSelection: RenderBackendSelection;
   views = new Map<number, EntityView>();
   private viewCreateRetry = new ViewCreateRetryGate(VIEW_CREATE_FAIL_RETRY_MS);
   // view groups that own a budgeted point light: exempt from the hidden-view
@@ -1178,9 +1199,66 @@ export class Renderer {
   private frameIdx = 0;
   // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
   private lastVisibleRigCount = 0;
+  private readonly crowdBatch = new CharacterCrowdBatch();
+  private readonly crowdVariantKeys = new Set<string>();
+  private readonly crowdMatrix = new THREE.Matrix4();
+  private readonly crowdScale = new THREE.Vector3();
+  private readonly crowdRigCandidates: RigBudgetCandidate[] = [];
+  private readonly crowdRigCandidatePool: RigBudgetCandidate[] = [];
+  private readonly crowdRigDecisions: RigBudgetDecision[] = [];
+  private readonly crowdRigScratch = createRigBudgetScratch();
+  private readonly crowdRenderModes = new Map<number, CharacterRenderMode>();
+  private crowdArticulatedCount = 0;
+  private crowdLocalFarCount = 0;
   // KHR_parallel_shader_compile present: lets us link new programs off-thread and
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
+  private readonly compileBatch = new CompileBatch<THREE.Object3D>();
+  private prewarmActive = false;
+  private readonly renderWorld = new RenderWorldCore<Entity>();
+  private readonly compileRuntimeViewBatch = async (
+    targets: readonly THREE.Object3D[],
+  ): Promise<void> => {
+    // Compiling the live scene here turns a single streamed view into a whole-world
+    // traversal and produced a 1.5s movement hitch. Flatten shallow renderable
+    // clones into a temporary root instead; geometry/material/skeleton resources
+    // remain shared and the live scene still supplies its exact light environment.
+    const compileRoot = new THREE.Group();
+    const seen = new Set<string>();
+    for (const target of targets) {
+      target.traverse((object) => {
+        const renderable = object as THREE.Object3D & {
+          isMesh?: boolean;
+          isLine?: boolean;
+          isPoints?: boolean;
+          isSprite?: boolean;
+          geometry?: THREE.BufferGeometry;
+          material?: THREE.Material | THREE.Material[];
+        };
+        if (
+          !renderable.isMesh &&
+          !renderable.isLine &&
+          !renderable.isPoints &&
+          !renderable.isSprite
+        ) {
+          return;
+        }
+        const key = `${renderable.geometry?.uuid ?? 'sprite'}:${
+          Array.isArray(renderable.material)
+            ? renderable.material.map((material) => material.uuid).join(',')
+            : (renderable.material?.uuid ?? 'none')
+        }`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        compileRoot.add(renderable.clone(false));
+      });
+    }
+    try {
+      await this.webgl.compileAsync(compileRoot, this.camera, this.scene);
+    } finally {
+      compileRoot.clear();
+    }
+  };
   vfx: Vfx;
   private lightPulses: LightPulses;
   // Flash a pooled talent-moment point light at an entity's feet (see
@@ -1289,6 +1367,7 @@ export class Renderer {
     private sim: IWorld,
     canvas: HTMLCanvasElement,
     nameplateLayer: HTMLDivElement,
+    options: RendererOptions = {},
   ) {
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
@@ -1305,11 +1384,21 @@ export class Renderer {
     // composer's MSAA HalfFloat target, low is meant to run without AA — and
     // requesting it here would hit software GL (the autodetect can only run
     // after the context exists) with the most expensive setting there is.
-    this.webgl = new THREE.WebGLRenderer({
-      canvas,
-      antialias: false,
-      powerPreference: 'high-performance',
-    });
+    this.webgl =
+      options.webgl ??
+      new THREE.WebGLRenderer({
+        canvas,
+        antialias: false,
+        powerPreference: 'high-performance',
+      });
+    this.backendSelection =
+      options.backendSelection ??
+      ({
+        kind: 'webgl2',
+        requested: 'webgl2',
+        fallback: false,
+        reason: 'WebGL2 is the production default',
+      } satisfies RenderBackendSelection);
     // Release this context promptly on page teardown so repeated logout/login
     // reloads (location.reload) don't exhaust the browser's WebGL context pool.
     trackWebGLContext(this.webgl);
@@ -1382,7 +1471,16 @@ export class Renderer {
       showOwnNameplate: () => this.showOwnNameplate,
       showPlayerNameplates: () => this.showPlayerNameplates,
       isHostilePlayer: (e) => this.isHostilePlayer(e),
+      maxOrdinaryNameplates: () => {
+        if (GFX.constrainedMemory) return 16;
+        if (GFX.tier === 'low') return 20;
+        if (GFX.tier === 'medium') return 28;
+        if (GFX.tier === 'high') return 36;
+        return 44;
+      },
     });
+    setRenderCategory(this.crowdBatch.group, 'character-crowd');
+    this.scene.add(this.crowdBatch.group);
 
     this.scene.fog = new THREE.Fog(
       LOW_GFX ? 0xb6cddd : 0xa6c6e0,
@@ -2074,6 +2172,10 @@ export class Renderer {
   }
 
   perfStats(): {
+    backend: 'webgl2';
+    backendRequested: 'webgl2' | 'webgpu';
+    backendFallback: boolean;
+    backendReason: string;
     graphicsConfigVersion: number;
     tier: string;
     qualityBuckets: {
@@ -2110,6 +2212,12 @@ export class Renderer {
     programs: number;
     views: number;
     pooledVisuals: number;
+    crowd?: {
+      articulated: number;
+      localFar: number;
+      batched: number;
+      variants: number;
+    };
     foliage: FoliagePerfStats;
     glVendor: string;
     glRenderer: string;
@@ -2123,6 +2231,10 @@ export class Renderer {
     const info = this.webgl.info;
     const renderBudget = this.renderBudgetGovernor.state();
     return {
+      backend: 'webgl2',
+      backendRequested: this.backendSelection.requested,
+      backendFallback: this.backendSelection.fallback,
+      backendReason: this.backendSelection.reason,
       graphicsConfigVersion: GFX.graphicsConfigVersion,
       tier: GFX.tier,
       qualityBuckets: {
@@ -2168,6 +2280,12 @@ export class Renderer {
       programs: info.programs?.length ?? 0,
       views: this.views.size,
       pooledVisuals: this.pooledVisualCount,
+      crowd: {
+        articulated: this.crowdArticulatedCount,
+        localFar: this.crowdLocalFarCount,
+        batched: this.crowdBatch.instanceCount,
+        variants: this.crowdBatch.variantCount,
+      },
       foliage: this.foliage.perfStats(),
       glVendor: this.glVendor,
       glRenderer: this.glRenderer,
@@ -2429,25 +2547,36 @@ export class Renderer {
     this.applyRenderBudgetState(state);
   }
 
-  private runtimeViewCreateBudget(dt: number): number {
+  private runtimeViewCreateBudget(dt: number): ViewCreateBudget {
     const normalBase = this.lowGfx ? VIEW_CREATE_BUDGET_LOW : VIEW_CREATE_BUDGET_HIGH;
     const base = constrainedEntryViewCreateBudget(
       GFX.constrainedMemory,
       this.runtimeEntryElapsedMs,
       normalBase,
     );
-    if (base === 0) return 0;
-    if (!Number.isFinite(dt) || dt <= 0) return base;
+    if (base === 0) return { maxViews: 0, maxStartWorkMs: 0 };
+    const planned = viewCreateBudget({
+      dtSeconds: dt,
+      constrained: GFX.constrainedMemory,
+      budgetPressure: this.lastBudgetPressure,
+      entryElapsedMs: this.runtimeEntryElapsedMs,
+    });
+    if (!Number.isFinite(dt) || dt <= 0) {
+      return { ...planned, maxViews: Math.min(base, planned.maxViews) };
+    }
     const frameMs = Math.min(250, dt * 1000);
     if (frameMs >= VIEW_CREATE_HITCH_FRAME_MS) this.viewCreateBackoff = VIEW_CREATE_BACKOFF_SECONDS;
     if (this.viewCreateBackoff > 0) {
       this.viewCreateBackoff = Math.max(0, this.viewCreateBackoff - dt);
-      return 1;
+      return { maxViews: 1, maxStartWorkMs: Math.min(1, planned.maxStartWorkMs) };
     }
     if (frameMs >= VIEW_CREATE_SLOW_FRAME_MS || this.frameMsEma >= GFX.budget.dropFrameMs) {
-      return Math.max(1, Math.ceil(base / 2));
+      return {
+        maxViews: Math.min(planned.maxViews, Math.max(1, Math.ceil(base / 2))),
+        maxStartWorkMs: planned.maxStartWorkMs,
+      };
     }
-    return base;
+    return { ...planned, maxViews: Math.min(base, planned.maxViews) };
   }
 
   private viewCandidatePriority(e: Entity, p: Entity, d2: number): number {
@@ -2487,6 +2616,141 @@ export class Renderer {
     if (this.viewCandidates.length > 1) {
       this.viewCandidates.sort((a, b) => a.priority - b.priority || a.d2 - b.d2 || a.e.id - b.e.id);
     }
+  }
+
+  private collectRuntimeViewCandidates(center: Entity, includeRequired: boolean): void {
+    this.viewCandidates.length = 0;
+    for (let index = 0; index < this.renderWorld.admissionCount; index++) {
+      const id = this.renderWorld.admissionIds[index];
+      const e = this.sim.entities.get(id);
+      if (!e || this.views.has(id)) continue;
+      const required = id === center.id || id === center.targetId;
+      if (required && !includeRequired) continue;
+      const slot = this.renderWorld.slotFor(id);
+      if (slot < 0) continue;
+      const d2 = this.renderWorld.distanceSq[slot];
+      this.viewCandidates.push({
+        e,
+        d2,
+        priority: this.viewCandidatePriority(e, center, d2),
+      });
+    }
+    if (this.viewCandidates.length > 1) {
+      this.viewCandidates.sort((a, b) => a.priority - b.priority || a.d2 - b.d2 || a.e.id - b.e.id);
+    }
+  }
+
+  private crowdCharacterActionable(e: Entity, player: Entity): boolean {
+    if (e.id === player.id || e.id === player.targetId) return true;
+    if (e.dead || e.inCombat || e.castingAbility !== null || e.overheadEmoteId !== null)
+      return true;
+    if (e.auras.length > 0 || e.hostile || this.isHostilePlayer(e)) return true;
+    return this.sim.partyInfo?.members.some((member) => member.pid === e.id) ?? false;
+  }
+
+  private planCrowdCharacterModes(player: Entity): void {
+    let candidateCount = 0;
+    for (const [id, view] of this.views) {
+      const e = this.sim.entities.get(id);
+      if (e?.kind !== 'player' || !view.visual) continue;
+      const slot = this.renderWorld.slotFor(id);
+      if (slot < 0) continue;
+      let candidate = this.crowdRigCandidatePool[candidateCount];
+      if (!candidate) {
+        candidate = { id, distanceSq: 0, actionable: false };
+        this.crowdRigCandidatePool.push(candidate);
+      }
+      candidate.id = id;
+      candidate.distanceSq = this.renderWorld.distanceSq[slot];
+      candidate.actionable = this.crowdCharacterActionable(e, player);
+      this.crowdRigCandidates[candidateCount++] = candidate;
+    }
+    this.crowdRigCandidates.length = candidateCount;
+    const localFarLimit =
+      GFX.tier === 'low' ? 2 : GFX.tier === 'medium' ? 4 : GFX.tier === 'high' ? 6 : 8;
+    planArticulatedRigs(
+      this.crowdRigCandidates,
+      articulatedRigLimit(GFX.tier, GFX.constrainedMemory, this.lastBudgetPressure),
+      localFarLimit,
+      this.crowdRigDecisions,
+      this.crowdRigScratch,
+    );
+    this.crowdRenderModes.clear();
+    this.crowdArticulatedCount = 0;
+    this.crowdLocalFarCount = 0;
+    for (const decision of this.crowdRigDecisions) {
+      this.crowdRenderModes.set(decision.id, decision.mode);
+      if (decision.mode === 'rig') this.crowdArticulatedCount++;
+      else if (decision.mode === 'localFar') this.crowdLocalFarCount++;
+    }
+  }
+
+  private crowdVariantFor(e: Entity): string | null {
+    const visualKey = visualKeyFor(e);
+    const key = `${visualKey}:${e.color >>> 0}`;
+    if (this.crowdVariantKeys.has(key)) return key;
+    try {
+      const prepared = prepareVisual(visualKey);
+      if (!prepared.idleGeo) return null;
+      const materials = tintedFarMaterials(prepared.def, e.color, prepared.idleSrcMats);
+      this.crowdBatch.registerVariant(key, {
+        geometry: prepared.idleGeo,
+        material: materials,
+        capacity: 256,
+        ownsMaterial: true,
+      });
+      this.crowdVariantKeys.add(key);
+      this.compileBatch.request(this.crowdBatch.group);
+      return key;
+    } catch {
+      return null;
+    }
+  }
+
+  private syncBatchedCrowdView(
+    e: Entity,
+    v: EntityView,
+    player: Entity,
+    alpha: number,
+    now: number,
+  ): boolean {
+    if (e.kind !== 'player' || !v.visual) return false;
+    const dx = e.pos.x - player.pos.x;
+    const dz = e.pos.z - player.pos.z;
+    const d2 = dx * dx + dz * dz;
+    const showCutoff = v.group.visible
+      ? this.entityViewDestroyRangeSq
+      : this.entityViewCreateRangeSq;
+    if (d2 > showCutoff) {
+      v.group.visible = false;
+      return true;
+    }
+    const variant = this.crowdVariantFor(e);
+    if (!variant) return false;
+    const ea = remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
+    const x = e.prevPos.x + (e.pos.x - e.prevPos.x) * ea;
+    const y = e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
+    const z = e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
+    const facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
+    this.crowdMatrix.makeRotationY(facing);
+    this.crowdScale.setScalar(e.scale);
+    this.crowdMatrix.scale(this.crowdScale);
+    this.crowdMatrix.setPosition(x, y, z);
+    if (!this.crowdBatch.addMatrix(variant, this.crowdMatrix.elements)) return false;
+
+    v.group.visible = true;
+    v.group.position.set(x, y, z);
+    v.group.rotation.y = facing;
+    v.group.scale.setScalar(e.scale);
+    v.visual.root.visible = false;
+    if (v.sheepVisual) v.sheepVisual.root.visible = false;
+    if (v.bearVisual) v.bearVisual.root.visible = false;
+    if (v.catVisual) v.catVisual.root.visible = false;
+    if (v.travelVisual) v.travelVisual.root.visible = false;
+    v.visual.setShadow(false);
+    v.visual.setProxyShadow(false);
+    v.isFar = true;
+    return true;
   }
 
   private createdViewType(e: Entity): string {
@@ -2538,6 +2802,7 @@ export class Renderer {
     // Parallel compile resolves, rejects, or clears through the per-view 1500ms
     // fail-soft guard. Without parallel compile there are no promises and the
     // views begin ready for the per-entry synchronous link pass.
+    this.compileBatch.flush(this.compileRuntimeViewBatch);
     await Promise.all(compileWaits);
     if (!mandatoryLandmarkViewsReady(ids, this.views)) {
       throw new Error('Mandatory interaction landmark views did not become ready');
@@ -3510,6 +3775,7 @@ export class Renderer {
       manifest.map((entry) => entry.id),
       policy,
     ).map((id) => byId.get(id) as PrewarmManifestEntry);
+    this.prewarmActive = true;
     try {
       for (const entry of orderedManifest) {
         // Skip everything outside the minimal keep-list (prewarm_policy.ts),
@@ -3552,6 +3818,7 @@ export class Renderer {
         }
       }
     } finally {
+      this.prewarmActive = false;
       this.vfx.clear();
       if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
       if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
@@ -4603,6 +4870,7 @@ export class Renderer {
       tiltGradZ: 0,
       tiltOnProp: false,
     });
+    this.renderWorld.markViewAttached(e.id, true);
     const view = this.views.get(e.id);
     // Never gate the player's OWN view: it must be on screen immediately, its
     // class is already prewarmed, and the self render path does not re-evaluate
@@ -4626,6 +4894,13 @@ export class Renderer {
     if (!this.asyncCompileSupported) return null;
     view.compilePending = true;
     group.visible = false;
+    // Boot prewarm already owns one explicit whole-scene compile. Preserve the
+    // previous parallel per-group gate there so mandatory landmark views do not
+    // each wait on another whole-scene batch. Runtime streaming uses the batch
+    // to coalesce many same-frame arrivals into one compile.
+    const compileReady = this.prewarmActive
+      ? this.webgl.compileAsync(group, this.camera, this.scene).then(() => undefined)
+      : this.compileBatch.request(group);
     return new Promise<void>((resolve) => {
       let settled = false;
       const clear = (): void => {
@@ -4636,10 +4911,7 @@ export class Renderer {
       };
       const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);
       try {
-        this.webgl
-          .compileAsync(group, this.camera, this.scene)
-          .then(clear, clear)
-          .finally(() => clearTimeout(guard));
+        compileReady.then(clear, clear).finally(() => clearTimeout(guard));
       } catch {
         clearTimeout(guard);
         clear();
@@ -5080,6 +5352,7 @@ export class Renderer {
   private removeView(id: number): void {
     const v = this.views.get(id);
     if (!v) return;
+    this.renderWorld.markViewAttached(id, false);
     this.scene.remove(v.group);
     this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
@@ -5263,14 +5536,28 @@ export class Renderer {
     const now = performance.now();
     this.viewCreateRetry.prune(now, sim.entities);
     const selfPos = this.updateSelfRenderPosition(alpha, dt, selfAlphaLead, selfMotion);
+    this.renderWorld.update(sim.entities, {
+      originX: p.pos.x,
+      originZ: p.pos.z,
+      selfId: p.id,
+      targetId: p.targetId,
+      createRangeSq: this.entityViewCreateRangeSq,
+      destroyRangeSq: this.entityViewDestroyRangeSq,
+    });
     markPhase('setup');
 
     // dynamic worlds: create nearby views lazily and drop views for leavers or
     // entities that moved well outside the draw band. This avoids building
     // rig/nameplate DOM for the whole sim on the first rendered frame.
     createdViews += this.createRequiredViews(p, createdViewTypes);
-    this.collectMissingViewCandidates(p, this.entityViewCreateRangeSq, false);
-    createdViews += this.createCandidateViews(this.runtimeViewCreateBudget(dt), createdViewTypes);
+    this.collectRuntimeViewCandidates(p, false);
+    const createBudget = this.runtimeViewCreateBudget(dt);
+    createdViews += this.createCandidateViews(
+      createBudget.maxViews,
+      createdViewTypes,
+      performance.now() + createBudget.maxStartWorkMs,
+    );
+    this.compileBatch.flush(this.compileRuntimeViewBatch);
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
       const e = sim.entities.get(id);
@@ -5288,6 +5575,8 @@ export class Renderer {
       this.removeView(id);
       removedViews++;
     }
+    this.planCrowdCharacterModes(p);
+    this.crowdBatch.beginFrame();
 
     // frame parity for distance-tiered mixer throttling
     this.frameIdx = (this.frameIdx + 1) & 0xffff;
@@ -5320,6 +5609,11 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
+      const plannedCharacterMode = this.crowdRenderModes.get(id);
+      if (plannedCharacterMode === 'batchedFar' && this.syncBatchedCrowdView(e, v, p, alpha, now)) {
+        continue;
+      }
+      if (v.visual) v.visual.root.visible = true;
       // form swaps (polymorph sheep, druid forms) — computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of six .some() scans per entity per
@@ -5424,9 +5718,12 @@ export class Renderer {
         const wantShadow = d2 < shadowRangeSq;
         const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
         if (v.visual) {
-          visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
+          if (plannedCharacterMode === undefined || plannedCharacterMode === 'rig') {
+            visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
+          }
           v.visual.setShadow(wantShadow);
-          v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
+          v.isFar =
+            plannedCharacterMode === 'localFar' || showsStaticFarMesh(d2, lodBands, actionablePose);
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
@@ -6105,6 +6402,8 @@ export class Renderer {
       // skip the draw for off-screen rigs (pose/audio above already ran)
       if (!charOnScreen) v.group.visible = false;
     }
+    this.crowdBatch.endFrame();
+    this.compileBatch.flush(this.compileRuntimeViewBatch);
     this.lastVisibleRigCount = visibleRigCount;
 
     // Hidden views skip their whole matrix subtree: three recomposes even

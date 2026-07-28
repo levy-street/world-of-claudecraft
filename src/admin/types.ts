@@ -566,6 +566,8 @@ export interface PerfCaptureResult {
   simTicks: number;
   catchUpCallbacks: number;
   maxTicksPerCallback: number;
+  cappedCallbacks: number;
+  droppedDebtSeconds: number;
   online: number;
   simEntities: number;
   aggroVisitsTotal: number;

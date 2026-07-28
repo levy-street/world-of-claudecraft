@@ -10,7 +10,7 @@ describe('character visual pool residency policy', () => {
     expect(shouldRetainPooledCharacterVisual(7, 6)).toBe(false);
   });
 
-  it('preserves the desktop unbounded-pool behavior', () => {
+  it('keeps an explicit unbounded compatibility mode for external callers', () => {
     expect(shouldRetainPooledCharacterVisual(10_000, Number.POSITIVE_INFINITY)).toBe(true);
   });
 

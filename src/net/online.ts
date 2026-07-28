@@ -134,6 +134,7 @@ import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_c
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { SNAPSHOT_BINARY_WIRE_VERSION } from './snapshot_binary';
 import {
   type SnapshotTimerWireMode,
   STABLE_TIMER_WIRE_VERSION,
@@ -142,6 +143,11 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import {
+  type SnapshotDecodeWorkerLike,
+  SnapshotTransportDecoder,
+  type SnapshotTransportFrameMeta,
+} from './snapshot_transport';
 
 interface ClientWireAura {
   id: string;
@@ -228,19 +234,26 @@ export function buildWebSocketAuthMessage(
   token: string,
   characterId: number,
   clientSeed = '',
+  ...snapshotCapability: [] | [snapshotWire: typeof SNAPSHOT_BINARY_WIRE_VERSION | undefined]
 ): {
   t: typeof ONLINE_WORLD_AUTH_TYPE;
   token: string;
   character: number;
   clientSeed: string;
   timerWire: typeof STABLE_TIMER_WIRE_VERSION;
+  snapshotWire?: typeof SNAPSHOT_BINARY_WIRE_VERSION;
 } {
+  const offeredSnapshotWire =
+    snapshotCapability.length === 0 ? SNAPSHOT_BINARY_WIRE_VERSION : snapshotCapability[0];
   return {
     t: ONLINE_WORLD_AUTH_TYPE,
     token,
     character: characterId,
     clientSeed,
     timerWire: STABLE_TIMER_WIRE_VERSION,
+    ...(offeredSnapshotWire === SNAPSHOT_BINARY_WIRE_VERSION
+      ? { snapshotWire: offeredSnapshotWire }
+      : {}),
   };
 }
 
@@ -1578,6 +1591,8 @@ export class ClientWorld implements IWorld {
 
   // assigned by openSocket() from the ctor, and reassigned on every reconnect
   private ws!: WebSocket;
+  private readonly snapshotDecoder: SnapshotTransportDecoder;
+  private binarySnapshotsEnabled = true;
   private readonly token: string;
   private readonly base: string;
   private readonly clientSeed: string;
@@ -1637,6 +1652,18 @@ export class ClientWorld implements IWorld {
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
+    this.snapshotDecoder = new SnapshotTransportDecoder(
+      {
+        apply: (message, meta) => this.onDecodedMessage(message, meta),
+        downgrade: (reason) => this.downgradeBinarySnapshots(reason),
+      },
+      () =>
+        new Worker(new URL('./snapshot_decode_worker.ts', import.meta.url), {
+          type: 'module',
+          name: 'woc-snapshot-decoder',
+        }) as unknown as SnapshotDecodeWorkerLike,
+    );
+    this.binarySnapshotsEnabled = this.snapshotDecoder.workerAvailable;
     this.openSocket();
     // unconditional input stream beat; constants + gate shared with the
     // cadence-model matrix via input_send_cadence.ts (R13)
@@ -1703,12 +1730,25 @@ export class ClientWorld implements IWorld {
       ? `${this.base.replace(/^http/, 'ws')}/ws`
       : buildWebSocketUrl(location.protocol, location.host);
     this.ws = new WebSocket(wsUrl);
+    this.ws.binaryType = 'arraybuffer';
+    this.snapshotDecoder.beginSocket();
     this.ws.onopen = () => {
       this.ws.send(
-        JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
+        JSON.stringify(
+          buildWebSocketAuthMessage(
+            this.token,
+            this.characterId,
+            this.clientSeed,
+            this.binarySnapshotsEnabled ? SNAPSHOT_BINARY_WIRE_VERSION : undefined,
+          ),
+        ),
       );
     };
-    this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
+    this.ws.onmessage = (ev) => {
+      if (typeof ev.data === 'string') this.snapshotDecoder.receiveString(ev.data);
+      else if (ev.data instanceof ArrayBuffer) this.snapshotDecoder.receiveBinary(ev.data);
+      else this.downgradeBinarySnapshots('unsupported WebSocket frame type');
+    };
     this.ws.onclose = () => this.socketClosed();
   }
 
@@ -1760,6 +1800,19 @@ export class ClientWorld implements IWorld {
     this.onConnectionLost?.(this.reconnectAttempts, RECONNECT_MAX_ATTEMPTS, Date.now() + delayMs);
   }
 
+  private downgradeBinarySnapshots(reason: string): void {
+    if (!this.binarySnapshotsEnabled || this.sessionEnded) return;
+    this.binarySnapshotsEnabled = false;
+    console.warn(`binary snapshots disabled for this session: ${reason}`);
+    // Use the normal linkdead/reconnect path so the server observes the old
+    // transport closing before the fresh auth omits the binary capability.
+    try {
+      this.ws.close();
+    } catch {
+      this.socketClosed();
+    }
+  }
+
   private endSession(): void {
     // Flush a pending layout save BEFORE teardown, while the socket is still open
     // and `connected` is still true: close() calls this before ws.close() and
@@ -1767,6 +1820,7 @@ export class ClientWorld implements IWorld {
     // lost to a deliberate logout within the debounce window.
     this.flushActionBarLayoutSave();
     this.sessionEnded = true;
+    this.snapshotDecoder?.dispose();
     this.failPendingCommandOutcomes();
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
@@ -1971,6 +2025,11 @@ export class ClientWorld implements IWorld {
       return;
     }
     const parseMs = performance.now() - parseStart;
+    this.onDecodedMessage(msg, { approxBytes: raw.length, decodeMs: parseMs, binary: false });
+  }
+
+  private onDecodedMessage(msg: any, frame: SnapshotTransportFrameMeta): void {
+    const parseMs = frame.decodeMs;
     if (
       msg.t === 'commandOutcome' &&
       Number.isSafeInteger(msg.rid) &&
@@ -2152,7 +2211,7 @@ export class ClientWorld implements IWorld {
       this.applySnapshot(msg);
       this.netPipeline().recordSnapshot({
         nowMs: applyStart,
-        approxBytes: raw.length,
+        approxBytes: frame.approxBytes,
         parseMs,
         applyMs: performance.now() - applyStart,
         entCount: Array.isArray(msg.ents) ? msg.ents.length : 0,

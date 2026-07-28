@@ -28,7 +28,8 @@ import type {
   CharacterRow,
   TokenScope,
 } from './db';
-import type { GameServer } from './game';
+import type { ClientSession, GameServer } from './game';
+import { selectSnapshotTransport } from './snapshot_transport';
 
 // The {t:'error', error} rejection strings, by the exact value the client reads
 // and localizes. Each is part of the wire contract (see the module header).
@@ -76,6 +77,11 @@ function rejectHandshake(ws: WebSocket, error: string): void {
 
 export interface WsAuthDeps {
   game: GameServer;
+  runtime?: {
+    attach(session: ClientSession): void;
+    handleMessage(session: ClientSession, raw: string): void;
+    socketClosed(session: ClientSession, ws: WebSocket): boolean;
+  };
   accountAndScopeForToken: (
     token: string,
   ) => Promise<{ accountId: number; scope: TokenScope } | null>;
@@ -143,6 +149,7 @@ export interface WsAuthHandlers {
 export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
   const {
     game,
+    runtime,
     accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
@@ -262,6 +269,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // strings, booleans, and unknown future versions stay on the legacy wire.
     const timerWireVersion: 1 | typeof STABLE_TIMER_WIRE_VERSION =
       msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
+    const snapshotTransport = selectSnapshotTransport(
+      msg.snapshotWire,
+      process.env.MMO_BINARY_SNAPSHOTS !== '0',
+    );
     const account = await accountAndScopeForToken(token);
     if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
@@ -315,6 +326,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       adminPermissions,
       clientSeed,
       timerWireVersion,
+      snapshotTransport,
       // The character's stored action-bar layout, sent once to the owning client
       // so it restores at login on any device (game.join re-validates it).
       hotbarLayout: character.hotbar_layout ?? null,
@@ -429,9 +441,11 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         return;
       }
       const session = result;
+      runtime?.attach(session);
       console.log(`+ ${character.name} (${character.class}) joined, ${game.clients.size} online`);
       ws.on('message', (data) => {
-        game.handleMessage(session, String(data));
+        if (runtime) runtime.handleMessage(session, String(data));
+        else game.handleMessage(session, String(data));
       });
       // A dropped socket starts the linkdead grace instead of logging the
       // character out: the session is held in-world so the client's
@@ -440,12 +454,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       // socket that a resume has already replaced; the grace-expiry sweep in
       // game.ts runs the eventual leave().
       ws.on('close', () => {
-        if (game.socketClosed(session, ws)) {
+        if ((runtime ?? game).socketClosed(session, ws)) {
           console.log(`~ ${character.name} linkdead, ${game.clients.size} online`);
         }
       });
       ws.on('error', () => {
-        game.socketClosed(session, ws);
+        (runtime ?? game).socketClosed(session, ws);
       });
       // Clears the keepalive liveness flag (game.ts pingLiveSessions). Guarded
       // on socket identity so a late pong from a pre-resume socket cannot mask

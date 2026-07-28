@@ -218,6 +218,10 @@ function snapshot(): PerfSnapshot {
     },
     mainMs: { renderer: { count: 1, avg: 5, p95: 5, max: 5 } },
     renderer: {
+      backend: 'webgl2',
+      backendRequested: 'webgl2',
+      backendFallback: false,
+      backendReason: 'WebGL2 is the production default',
       graphicsConfigVersion: 16,
       tier: 'high',
       qualityBuckets: qualityBuckets(),

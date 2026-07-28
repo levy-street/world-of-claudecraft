@@ -96,6 +96,7 @@ describe('websocket authentication', () => {
       character: 42,
       clientSeed: '',
       timerWire: 2,
+      snapshotWire: 1,
     });
   });
 
@@ -106,7 +107,13 @@ describe('websocket authentication', () => {
       character: 42,
       clientSeed: 'seed-123',
       timerWire: 2,
+      snapshotWire: 1,
     });
+  });
+
+  it('omits binary capability when the decode worker is unavailable', () => {
+    const message = buildWebSocketAuthMessage('a'.repeat(64), 42, '', undefined);
+    expect(JSON.stringify(message)).not.toContain('snapshotWire');
   });
 });
 

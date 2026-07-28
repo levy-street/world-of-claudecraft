@@ -472,6 +472,43 @@ describe('createWsAuth: timer-wire capability negotiation', () => {
   });
 });
 
+describe('createWsAuth: binary snapshot capability negotiation', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('selects binary only for the exact numeric v1 capability', async () => {
+    const binary = setup();
+    await createWsAuth(binary.deps).authenticateWebSocket(
+      asWs(binary.ws),
+      authRaw({ snapshotWire: 1 }),
+      binary.req,
+    );
+    expect(joinedMeta(binary.game)).toMatchObject({ snapshotTransport: 'binary-v1' });
+
+    for (const offered of [undefined, '1', true, 2]) {
+      const fallback = setup();
+      await createWsAuth(fallback.deps).authenticateWebSocket(
+        asWs(fallback.ws),
+        authRaw({ snapshotWire: offered }),
+        fallback.req,
+      );
+      expect(joinedMeta(fallback.game)).toMatchObject({ snapshotTransport: 'json' });
+    }
+  });
+
+  it('honors the server kill switch even for a capable client', async () => {
+    vi.stubEnv('MMO_BINARY_SNAPSHOTS', '0');
+    const fallback = setup();
+    await createWsAuth(fallback.deps).authenticateWebSocket(
+      asWs(fallback.ws),
+      authRaw({ snapshotWire: 1 }),
+      fallback.req,
+    );
+    expect(joinedMeta(fallback.game)).toMatchObject({ snapshotTransport: 'json' });
+  });
+});
+
 describe('createWsAuth: realm admission cap', () => {
   it('a. refuses an at-cap fresh join with "realm is full", before the lease and the join', async () => {
     const { ws, game, deps, req } = setup();

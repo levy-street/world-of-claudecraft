@@ -27,6 +27,7 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
+import { decodeSnapshotBinary } from '../src/net/snapshot_binary';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
@@ -100,6 +101,34 @@ function eventTexts(sent: any[]): string[] {
 function broadcast(server: GameServer): void {
   (server as any).broadcastSnapshots();
 }
+
+describe('binary snapshot live broadcast', () => {
+  it('emits a decodable binary frame for a negotiated session', () => {
+    const sent: (string | Uint8Array)[] = [];
+    const ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string | Uint8Array) => sent.push(payload),
+      terminate: vi.fn(),
+    };
+    const server = new GameServer();
+    const joined = server.join(ws as never, 1, 1, 'Binary', 'warrior', null, false, {
+      snapshotTransport: 'binary-v1',
+    });
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+    sent.length = 0;
+
+    broadcast(server);
+
+    const frame = sent.find((payload): payload is Uint8Array => payload instanceof Uint8Array);
+    expect(frame).toBeInstanceOf(Uint8Array);
+    const snapshot = decodeSnapshotBinary(frame!);
+    expect(snapshot.t).toBe('snap');
+    expect((snapshot.self as { id?: unknown }).id).toBe(joined.pid);
+    expect(Array.isArray(snapshot.ents)).toBe(true);
+  });
+});
 
 // A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
 function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
