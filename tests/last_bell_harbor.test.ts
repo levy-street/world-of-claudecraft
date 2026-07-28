@@ -28,10 +28,10 @@ describe('Last Bell harbors', () => {
   it('ships both harbors', () => {
     expect(HARBORS.map((h) => h.id)).toEqual(['mainland', 'gullhaven']);
     // Pin the anchors so the campaign cannot silently drift.
-    expect(MAINLAND_HARBOR.gangplank).toEqual({ x: 205.4, z: -48, facing: Math.PI / 2 });
-    expect(GULLHAVEN_HARBOR.gangplank).toEqual({ x: 757, z: 120.5, facing: 0 });
-    expect(MAINLAND_HARBOR.boarding).toEqual({ x: 211, z: -48 });
-    expect(GULLHAVEN_HARBOR.boarding).toEqual({ x: 757, z: 124.6 });
+    expect(MAINLAND_HARBOR.gangplank).toEqual({ x: 230.4, z: -48, facing: Math.PI / 2 });
+    expect(GULLHAVEN_HARBOR.gangplank).toEqual({ x: 727.5, z: 122, facing: 0 });
+    expect(MAINLAND_HARBOR.boarding).toEqual({ x: 239, z: -48 });
+    expect(GULLHAVEN_HARBOR.boarding).toEqual({ x: 727.5, z: 130 });
     expect(MAINLAND_HARBOR.arrival).toEqual({ x: 173, z: -48 });
     expect(GULLHAVEN_HARBOR.arrival).toEqual({ x: 782, z: 116 });
   });
@@ -84,7 +84,7 @@ describe('Last Bell harbors', () => {
     // never demand a climb steeper than the movement gate.
     const path: [number, number][] = [];
     for (let t = 0; t <= 1; t += 0.01) path.push([172, -59.5 + t * 11.5]); // grass to apron center
-    for (let t = 0; t <= 1; t += 0.005) path.push([172 + t * 39.5, -48]); // apron to ship center
+    for (let t = 0; t <= 1; t += 0.003) path.push([172 + t * 67.5, -48]); // apron to ship deck
     for (const seed of SEEDS) {
       let prev: number | null = null;
       for (const [x, z] of path) {
@@ -96,7 +96,7 @@ describe('Last Bell harbors', () => {
         prev = g;
       }
       // and the walk ends on the ship's deck
-      expect(groundHeight(211.5, -48, seed)).toBe(-1.14);
+      expect(groundHeight(239, -48, seed)).toBe(0.72);
     }
   });
 
@@ -194,7 +194,9 @@ describe('Last Bell harbors', () => {
       );
       expect(onShip, `${harbor.id} boarding must be on the ship deck`).toBe(true);
     }
-    // The crossing keepers hold their posts beside each gangplank, on deck.
+    // The crossing keepers stand ON DECK at the top of each gangplank,
+    // close enough to the boarding point to hand out the crossing quest
+    // (acceptQuest requires the giver nearby).
     for (const [name, harbor] of [
       ['Ferryman Ewald', MAINLAND_HARBOR],
       ['Ferrykeeper Odda', GULLHAVEN_HARBOR],
@@ -202,8 +204,8 @@ describe('Last Bell harbors', () => {
       const npc = [...sim.entities.values()].find((e) => e.name === name);
       expect(npc, name).toBeTruthy();
       if (npc) {
-        const gp = harbor.gangplank;
-        expect(Math.hypot(npc.pos.x - gp.x, npc.pos.z - gp.z), name).toBeLessThan(3);
+        const b = harbor.boarding;
+        expect(Math.hypot(npc.pos.x - b.x, npc.pos.z - b.z), name).toBeLessThan(6);
         expect(harborDeckAt(harbor, npc.pos.x, npc.pos.z), name).toBeTruthy();
       }
     }
@@ -217,17 +219,23 @@ describe('Last Bell harbors', () => {
     // Walking off the pier's south edge stops at the rail (z -51.4).
     const railed = resolveMovement(seed, 188, -50.2, 188, -54);
     expect(railed.z).toBeGreaterThan(-51.4);
-    // Gullhaven: the head's west rail (x 753) stops a walk off the end.
-    const westRail = resolveMovement(seed, 756, 116, 751, 116);
-    expect(westRail.x).toBeGreaterThan(753);
+    // Gullhaven: the walkway now runs on west past the old head onto the
+    // outer run, and the berth head's west rail stops the walk at the end.
+    const openRun = resolveMovement(seed, 756, 116, 745, 116);
+    expect(Math.abs(openRun.x - 745)).toBeLessThan(0.2);
+    const westRail = resolveMovement(seed, 727, 116.5, 719, 116.5);
+    expect(westRail.x).toBeGreaterThan(722.5);
     // The gangplank gap is genuinely open: stepping off the head's east
     // edge (x 206) onto the gangplank ramp is not blocked by a rail.
     const throughGap = resolveMovement(seed, 205, -48, 207.5, -48);
     expect(throughGap.x).toBeGreaterThan(206.5);
     // Aboard, the deck is open water-side until the far hull rail stops it.
-    const hullRail = resolveMovement(seed, 211, -48, 221, -48);
-    expect(hullRail.x).toBeGreaterThan(216);
-    expect(hullRail.x).toBeLessThan(219.9);
+    const hullRail = resolveMovement(seed, 239, -48, 249, -48);
+    expect(hullRail.x).toBeGreaterThan(243);
+    expect(hullRail.x).toBeLessThan(246.7);
+    // The berth-head gap onto the gangplank is open.
+    const ontoPlank = resolveMovement(seed, 229.5, -48, 232.5, -48);
+    expect(ontoPlank.x).toBeGreaterThan(231.5);
   });
 
   it('keeps control on the ship deck: walk aboard and back through the motion loop', () => {
@@ -246,15 +254,15 @@ describe('Last Bell harbors', () => {
     tp(204.5, -48);
     sim.player.facing = Math.PI / 2;
     sim.moveInput.forward = true;
-    for (let i = 0; i < 100; i++) sim.tick();
+    for (let i = 0; i < 420; i++) sim.tick();
     // aboard, well past the gangplank landing
-    expect(sim.player.pos.x).toBeGreaterThan(212);
-    expect(sim.player.pos.y).toBeCloseTo(-1.14, 3);
-    // and back west up the plank to the pier head: control never strips
+    expect(sim.player.pos.x).toBeGreaterThan(236);
+    expect(sim.player.pos.y).toBeCloseTo(0.72, 3);
+    // and back west down the plank to the berth head: control never strips
     sim.player.facing = -Math.PI / 2;
-    for (let i = 0; i < 160; i++) sim.tick();
+    for (let i = 0; i < 500; i++) sim.tick();
     sim.moveInput.forward = false;
-    expect(sim.player.pos.x).toBeLessThan(206.5);
+    expect(sim.player.pos.x).toBeLessThan(228);
   });
 
   it('keeps the water around the piers calm: falling off is no drowning clock', () => {

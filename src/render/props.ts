@@ -115,7 +115,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // (Tripo, see CREDITS.md), flat walkable main deck; moored at each harbor's
   // berth and placed by render/harbor.ts, whose walkable shipDecks in
   // src/sim/harbor_layout.ts are measured from THIS model's deck plane.
-  harborShip: { url: '/models/props/harbor_ferry_ship.glb', kit: 'pirate' },
+  harborShip: { url: '/models/props/grand_ferry_ship.glb', kit: 'pirate' },
   graveRound: { url: '/models/props/gravestone_round.glb', kit: 'grave' },
   graveCross: { url: '/models/props/gravestone_cross.glb', kit: 'grave' },
   graveBevel: { url: '/models/props/gravestone_bevel.glb', kit: 'grave' },

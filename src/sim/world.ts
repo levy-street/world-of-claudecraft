@@ -2165,11 +2165,11 @@ const FATIGUE_FREE_WATERS: readonly { x0: number; x1: number; z0: number; z1: nu
   // Gullhaven's harbor bay: calm water under the town pier and the moored
   // ship, never open sea (falling off the dock must not start the
   // drowning clock).
-  { x0: 736, x1: 804, z0: 96, z1: 140 },
+  { x0: 696, x1: 804, z0: 96, z1: 148 },
   // The mainland harbor basin: the water around the vale's pier and ship
-  // berth, same rule. Kept south of z -36 so the strait crossing line
+  // berth, same rule. Kept south of z -33 so the strait crossing line
   // (tests/farshore.test.ts pins it from 200,-30) stays open sea.
-  { x0: 178, x1: 226, z0: -76, z1: -36 },
+  { x0: 178, x1: 252, z0: -80, z1: -33 },
 ];
 
 export function inFatigueFreeWater(x: number, z: number): boolean {

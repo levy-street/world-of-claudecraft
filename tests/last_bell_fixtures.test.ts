@@ -37,8 +37,8 @@ describe('Last Bell campaign fixtures', () => {
     const ferries = fixtures(sim, 'lb_ferry');
     expect(ferries.map((f) => ({ x: f.pos.x, z: f.pos.z }))).toEqual(
       expect.arrayContaining([
-        { x: 211, z: -48 },
-        { x: 757, z: 124.6 },
+        { x: 239, z: -48 },
+        { x: 727.5, z: 130 },
       ]),
     );
     expect(ferries).toHaveLength(2);
@@ -107,7 +107,7 @@ describe('Last Bell campaign fixtures', () => {
     expect(mainlandFerry).toBeTruthy();
     if (!mainlandFerry) return;
 
-    teleport(sim, 210.5, -47.5);
+    teleport(sim, 238, -47.5);
     sim.player.targetId = mainlandFerry.id;
     sim.interact();
     expect(
@@ -119,7 +119,7 @@ describe('Last Bell campaign fixtures', () => {
 
     // The arrival deck is at the harbor's land end; walking back out along
     // the pier and aboard is part of the flow, so step onto the ship first.
-    teleport(sim, 756.5, 126);
+    teleport(sim, 727, 131);
     const pierFerry = fixtures(sim, 'lb_ferry').find(
       (f) => f.pos.x === GULLHAVEN_HARBOR.boarding.x,
     );

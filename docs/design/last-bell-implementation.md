@@ -304,3 +304,23 @@ boarding amidships. Max's parkour physics engine (#2527, merged to
 main: swept collision, standable world, ledge climb) is the long-term
 replacement for authored shipDecks and the footing arm; adopting it here
 means a main-base migration, deliberately deferred to its own task.
+
+### H1 v4: the grand ferry ship and the outer piers (2026-07-28)
+
+The ship becomes the landmark the program asked for: grand_ferry_ship.glb
+(Tripo, replacing harbor_ferry_ship.glb) at hull 60, beam wider than the
+old basins allowed, so both harbors grow a long outer pier and berth head
+running the boardwalk out to a CARVED berth basin (terrain level stamps
+under the hull; the old "probe the floor, fit the draft" sizing is gone,
+the basin is authored to the draft instead). Draft 2.5 puts the main deck
+at +0.72, ABOVE pier height, so both gangplanks now run UP onto the deck
+(dir flipped, highY on the ship side). Mainland: outer pier x 205..231,
+berth head, ship berthed at (240.5,-44) lying north-south. Gullhaven: the
+boardwalk runs west over the deep bay (outer run x 732..750), berth head,
+ship at (732,132.5) bow west (rot PI flips the model's +x bow). Ewald and
+Odda move to ON-DECK posts at the top of their gangplanks. Fatigue-free
+rects widened around both new basins (mainland kept south of z -33; the
+farshore.test.ts crossing line at z -30 stays open sea). Deck plane
+measured from the new model: 4.68 of its 24-unit normalized height,
+scale 1.649. harbor/fixtures/q0 suites re-pinned; parity goldens hold
+(the carve stamps sit outside the golden probe set).

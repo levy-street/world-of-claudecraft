@@ -57,14 +57,14 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     id: 'ferryman_ewald',
     name: 'Ferryman Ewald',
     title: 'The Farshore Crossing',
-    // His post is the gangplank on the mainland harbor's pier head: he
-    // stands a step beside the boarding fixture, facing the pier walkway
-    // arrivals come down. The harbor layout is the single anchor source.
+    // His post is ON DECK at the top of the gangplank: he greets riders as
+    // they step aboard, and stands close enough to the boarding point to
+    // hand out Q0. The harbor layout is the single anchor source.
     pos: {
-      x: MAINLAND_HARBOR.gangplank.x - 1.6,
-      z: MAINLAND_HARBOR.gangplank.z - 0.9,
+      x: MAINLAND_HARBOR.boarding.x - 2,
+      z: MAINLAND_HARBOR.boarding.z - 0.9,
     },
-    facing: MAINLAND_HARBOR.gangplank.facing + Math.PI,
+    facing: MAINLAND_HARBOR.gangplank.facing,
     color: 0x4a5a7a,
     questIds: [],
     greeting:
@@ -77,8 +77,8 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     name: 'Ferrykeeper Odda',
     title: 'The Farshore Crossing',
     pos: {
-      x: GULLHAVEN_HARBOR.gangplank.x - 1.7,
-      z: GULLHAVEN_HARBOR.gangplank.z - 0.7,
+      x: GULLHAVEN_HARBOR.boarding.x - 0.9,
+      z: GULLHAVEN_HARBOR.boarding.z + 1.5,
     },
     facing: Math.PI / 2,
     color: 0x4a5a7a,
