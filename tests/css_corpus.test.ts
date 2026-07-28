@@ -209,6 +209,28 @@ describe('css_corpus section completeness (inline UNION src/styles)', () => {
   });
 });
 
+describe('cinematic mode notice policy', () => {
+  it('hides the informational GPU notice but leaves the critical reconnect overlay visible', () => {
+    const hudCss = readFileSync(join(stylesDir, 'hud.css'), 'utf8').replace(
+      /\/\*[\s\S]*?\*\//g,
+      '',
+    );
+    const cinematicHideRules = [...hudCss.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(
+      ([, selectors, declarations]) =>
+        selectors.includes('body.cinematic-mode') &&
+        declarations.includes('display: none !important'),
+    );
+    const hideRule = cinematicHideRules.find(([, selectors]) =>
+      selectors.includes('body.cinematic-mode #nameplates'),
+    );
+    expect(hideRule, 'the cinematic-mode HUD hide rule must exist').toBeDefined();
+    expect(hideRule?.[1]).toContain('body.cinematic-mode #gpu-notice');
+    expect(cinematicHideRules.map((rule) => rule[1]).join('\n')).not.toContain(
+      'body.cinematic-mode #reconnect-overlay',
+    );
+  });
+});
+
 describe('css_corpus guard has teeth (fixture-proven, touches no product files)', () => {
   // A self-contained corpus fragment exercising the boundary rules: two real
   // ten-dash banners, a bare prose comment, and a four-dash decoy fence.

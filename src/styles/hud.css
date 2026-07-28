@@ -5435,7 +5435,9 @@
      on <body>. #mobile-controls hides in hud.mobile.css (its owning module).
      Two entries are BROAD-MATCH classes, not ids: .window (every feature window)
      and .fct (floating combat text); a future component adopting either class
-     opts into cinematic hiding.
+     opts into cinematic hiding. #gpu-notice is informational, unlike the
+     #reconnect-overlay, which stays visible because connection loss is critical,
+     so the GPU notice hides during scenes.
      DELIBERATELY NOT hidden, each a decision, not an oversight:
      - #reconnect-overlay (a <body> child appended by reconnect_overlay.ts): a
        player must never sit through a cutscene unaware the connection died;
@@ -5475,6 +5477,7 @@
   body.cinematic-mode #mount-race-strip,
   body.cinematic-mode #race-start-btn,
   body.cinematic-mode #race-countdown,
+  body.cinematic-mode #gpu-notice,
   body.cinematic-mode .window,
   body.cinematic-mode .fct {
     display: none !important;

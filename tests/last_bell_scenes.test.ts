@@ -385,7 +385,7 @@ describe('the voyage cinematic', () => {
     expect(attachSpecs(out)).toEqual([
       {
         target: 'harbor_ship_mainland',
-        offset: { x: -12, y: 11, z: 8 },
+        offset: { x: -24, y: 17, z: 17 },
         lookAt: { x: 6.6, y: 8.6, z: 0 },
       },
       {
@@ -402,7 +402,7 @@ describe('the voyage cinematic', () => {
     expect(attachSpecs(back)).toEqual([
       {
         target: 'harbor_ship_gullhaven',
-        offset: { x: -12, y: 11, z: -8 },
+        offset: { x: -24, y: 17, z: -17 },
         lookAt: { x: 6.6, y: 8.6, z: 0 },
       },
       {
