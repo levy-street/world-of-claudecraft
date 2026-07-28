@@ -125,6 +125,15 @@ export function sceneRigCameraPosition(pose: SceneRigPose, out?: SceneRigPoint):
   return point;
 }
 
+/** Recover the world look-at point represented by a ScenePose. */
+export function sceneRigLookAtPosition(pose: SceneRigPose, out?: SceneRigPoint): SceneRigPoint {
+  const point = out ?? { x: 0, y: 0, z: 0 };
+  point.x = pose.focusX;
+  point.y = pose.focusY + SCENE_FOCUS_HEIGHT;
+  point.z = pose.focusZ;
+  return point;
+}
+
 /** The established scene-camera ease shared by authored motion and release. */
 export function sceneCameraEase(value: number): number {
   return 0.5 - Math.cos(Math.PI * value) / 2;
@@ -165,6 +174,9 @@ function localToWorld(
   out.z = frame.position.z - local.x * sin + local.z * cos;
   return out;
 }
+
+/** Transform one point from an attachment's local frame into world coordinates. */
+export { localToWorld as sceneRigLocalToWorld };
 
 function knotInterval(a: SceneRigPoint, b: SceneRigPoint): number {
   const chord = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);

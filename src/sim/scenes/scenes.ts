@@ -132,6 +132,11 @@ export function sceneById(id: string): SceneDef | undefined {
   return SCENES[id];
 }
 
+/** Sorted read-only snapshot of every scene registered in this host. */
+export function registeredSceneIds(): readonly string[] {
+  return Object.freeze(Object.keys(SCENES).sort());
+}
+
 export function sceneActiveFor(ctx: SimContext, claimId: number): boolean {
   return ctx.scenePlaybacks.has(claimId);
 }
