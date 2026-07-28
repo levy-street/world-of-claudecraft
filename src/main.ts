@@ -155,7 +155,7 @@ import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
 import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
-import { cueHarborShip, resetHarborShipCues } from './render/harbor';
+import { cueHarborShip, harborShipAttachFrame, resetHarborShipCues } from './render/harbor';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -1576,6 +1576,7 @@ async function startGame(
     playDirective: (directive) => playSceneDirectiveSfx(directive),
     propCue: (target, cue) => cueHarborShip(target, cue),
     propReset: () => resetHarborShipCues(),
+    attachmentFrame: (target, out) => harborShipAttachFrame(target, out),
   });
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),

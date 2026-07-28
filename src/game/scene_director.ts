@@ -5,7 +5,7 @@
 // into its gates, and produces the per-frame camera override pose that is
 // applied over the input camera exactly like the first-spawn introCameraTick.
 
-import type { SceneAttachFrame, SimEvent } from '../sim/types';
+import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   applySceneOp,
@@ -16,6 +16,7 @@ import {
   sceneMusicAction,
   scenePose,
 } from './scene_director_core';
+import type { SceneAttachmentResolver } from './scene_rig_core';
 
 export interface SceneDirectorDeps {
   world: () => IWorld;
@@ -30,7 +31,7 @@ export interface SceneDirectorDeps {
   /** Scene teardown: every prop cue back to rest. */
   propReset?: () => void;
   /** Live world frame of a scene attachment target, when its renderer owns one. */
-  attachmentFrame?: (target: string) => SceneAttachFrame | null;
+  attachmentFrame?: SceneAttachmentResolver;
 }
 
 export class SceneDirector {

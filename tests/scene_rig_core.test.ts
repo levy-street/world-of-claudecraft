@@ -1,9 +1,17 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { evaluateSceneRigPose, sceneRigCameraPosition } from '../src/game/scene_rig_core';
+import {
+  evaluateSceneRigPose,
+  type SceneRigPose,
+  sampleCatmullRom,
+  sceneRigCameraPosition,
+} from '../src/game/scene_rig_core';
 import type { SceneAttachFrame, SceneRigCameraShot, SceneRigPoint } from '../src/sim/types';
+import { assertAllocationStable } from './util/alloc_probe';
 
 const noEntities = (): null => null;
 const noAttachments = (): null => null;
+const RIG_SOURCE = readFileSync(new URL('../src/game/scene_rig_core.ts', import.meta.url), 'utf8');
 
 function cameraPosition(
   shot: SceneRigCameraShot,
@@ -21,6 +29,43 @@ function expectPointClose(actual: SceneRigPoint, expected: SceneRigPoint): void 
 }
 
 describe('dolly rig', () => {
+  it('reuses the caller pose across live dolly frames', () => {
+    const shot: SceneRigCameraShot = {
+      kind: 'dolly',
+      points: [
+        { x: 0, y: 5, z: 0 },
+        { x: 10, y: 6, z: 4 },
+        { x: 20, y: 5, z: 0 },
+      ],
+      lookAt: { kind: 'point', point: { x: 10, y: 2, z: 10 } },
+      dur: 4,
+    };
+    const out: SceneRigPose = {
+      yaw: 0,
+      pitch: 0,
+      dist: 0,
+      focusX: 0,
+      focusY: 0,
+      focusZ: 0,
+    };
+
+    const first = evaluateSceneRigPose(shot, 0.5, noEntities, noAttachments, out);
+    const firstYaw = first.yaw;
+    const second = evaluateSceneRigPose(shot, 2.5, noEntities, noAttachments, out);
+
+    expect(first).toBe(out);
+    expect(second).toBe(out);
+    expect(second.yaw).not.toBe(firstYaw);
+
+    let elapsed = 0;
+    expect(() =>
+      assertAllocationStable(() => {
+        elapsed = (elapsed + 0.125) % shot.dur;
+        return evaluateSceneRigPose(shot, elapsed, noEntities, noAttachments, out);
+      }),
+    ).not.toThrow();
+  });
+
   it('stays continuous when sampled densely inside one shot', () => {
     const shot: SceneRigCameraShot = {
       kind: 'dolly',
@@ -130,6 +175,50 @@ describe('dolly rig', () => {
     });
   });
 
+  it('reuses the caller pose across spline look-at dolly frames', () => {
+    const shot: SceneRigCameraShot = {
+      kind: 'dolly',
+      points: [
+        { x: -4, y: 5, z: 0 },
+        { x: 6, y: 8, z: 3 },
+        { x: 14, y: 4, z: -2 },
+      ],
+      lookAt: {
+        kind: 'spline',
+        points: [
+          { x: 0, y: 2, z: 10 },
+          { x: 8, y: 3, z: 12 },
+          { x: 16, y: 2, z: 8 },
+        ],
+      },
+      dur: 4,
+    };
+    const out: SceneRigPose = {
+      yaw: 0,
+      pitch: 0,
+      dist: 0,
+      focusX: 0,
+      focusY: 0,
+      focusZ: 0,
+    };
+
+    const first = evaluateSceneRigPose(shot, 0.25, noEntities, noAttachments, out);
+    const firstFocusX = first.focusX;
+    const second = evaluateSceneRigPose(shot, 3.25, noEntities, noAttachments, out);
+
+    expect(first).toBe(out);
+    expect(second).toBe(out);
+    expect(second.focusX).not.toBe(firstFocusX);
+
+    let elapsed = 0;
+    expect(() =>
+      assertAllocationStable(() => {
+        elapsed = (elapsed + 0.125) % shot.dur;
+        return evaluateSceneRigPose(shot, elapsed, noEntities, noAttachments, out);
+      }),
+    ).not.toThrow();
+  });
+
   it('tracks a live subject and falls back when it is unavailable', () => {
     const shot: SceneRigCameraShot = {
       kind: 'dolly',
@@ -163,6 +252,58 @@ describe('dolly rig', () => {
 });
 
 describe('attach rig', () => {
+  it('reuses caller-owned pose and attachment scratch across live frames', () => {
+    const shot: SceneRigCameraShot = {
+      kind: 'attach',
+      target: 'test_ship',
+      fallbackFrame: { position: { x: 0, y: 0, z: 0 }, yaw: 0 },
+      offset: { x: 2, y: 3, z: 0 },
+      lookAt: { x: 0, y: 1, z: 4 },
+    };
+    const out: SceneRigPose = {
+      yaw: 0,
+      pitch: 0,
+      dist: 0,
+      focusX: 0,
+      focusY: 0,
+      focusZ: 0,
+    };
+    let frameNumber = 0;
+    let attachmentScratch: SceneAttachFrame | undefined;
+    const resolveAttachment = (
+      target: string,
+      frameOut?: SceneAttachFrame,
+    ): SceneAttachFrame | null => {
+      expect(target).toBe('test_ship');
+      expect(frameOut).toBeDefined();
+      if (!frameOut) return null;
+      if (attachmentScratch) expect(frameOut).toBe(attachmentScratch);
+      else attachmentScratch = frameOut;
+      frameNumber += 1;
+      frameOut.position.x = 10 + frameNumber;
+      frameOut.position.y = 5;
+      frameOut.position.z = 20;
+      frameOut.yaw = Math.PI / 2;
+      return frameOut;
+    };
+
+    const first = evaluateSceneRigPose(shot, 0, noEntities, resolveAttachment, out);
+    const firstFocusX = first.focusX;
+    const second = evaluateSceneRigPose(shot, 1, noEntities, resolveAttachment, out);
+
+    expect(first).toBe(out);
+    expect(second).toBe(out);
+    expect(second.focusX).not.toBe(firstFocusX);
+
+    let elapsed = 1;
+    expect(() =>
+      assertAllocationStable(() => {
+        elapsed += 1;
+        return evaluateSceneRigPose(shot, elapsed, noEntities, resolveAttachment, out);
+      }),
+    ).not.toThrow();
+  });
+
   it('rotates the camera offset and local look-at through the prop frame', () => {
     const shot: SceneRigCameraShot = {
       kind: 'attach',
@@ -222,5 +363,56 @@ describe('degenerate rig inputs', () => {
       dur: 0,
     };
     expectPointClose(cameraPosition(shot, 0), { x: 7, y: 8, z: 9 });
+  });
+});
+
+describe('allocation plumbing', () => {
+  it('samples a spline into the caller-owned point across progress changes', () => {
+    const points: readonly SceneRigPoint[] = [
+      { x: 0, y: 2, z: 4 },
+      { x: 8, y: 6, z: 10 },
+      { x: 16, y: 3, z: 2 },
+    ];
+    const out: SceneRigPoint = { x: 0, y: 0, z: 0 };
+
+    const first = sampleCatmullRom(points, 0.2, out);
+    const firstX = first.x;
+    const second = sampleCatmullRom(points, 0.8, out);
+
+    expect(first).toBe(out);
+    expect(second).toBe(out);
+    expect(second.x).not.toBe(firstX);
+  });
+
+  it('routes every live rig point through the module scratch containers', () => {
+    expect(RIG_SOURCE).toContain(
+      'const frame = resolveAttachment(shot.target, ATTACH_FRAME) ?? shot.fallbackFrame;',
+    );
+    expect(RIG_SOURCE).toContain('const camera = localToWorld(frame, shot.offset, CAMERA_POINT);');
+    expect(RIG_SOURCE).toContain('const lookAt = localToWorld(frame, shot.lookAt, LOOK_AT_POINT);');
+    expect(RIG_SOURCE).toContain(
+      'const camera = sampleCatmullRom(shot.points, eased, CAMERA_POINT);',
+    );
+    expect(RIG_SOURCE).toContain(
+      'lookAt = sampleCatmullRom(shot.lookAt.points, eased, LOOK_AT_POINT);',
+    );
+    expect(RIG_SOURCE).toContain('LOOK_AT_POINT.x = subject.x + shot.lookAt.offset.x;');
+    expect(RIG_SOURCE).toContain('LOOK_AT_POINT.y = subject.y + shot.lookAt.offset.y;');
+    expect(RIG_SOURCE).toContain('LOOK_AT_POINT.z = subject.z + shot.lookAt.offset.z;');
+    expect(RIG_SOURCE).toContain('lookAt = LOOK_AT_POINT;');
+  });
+
+  it('keeps local-to-world conversion on its provided output', () => {
+    const start = RIG_SOURCE.indexOf('function localToWorld');
+    const end = RIG_SOURCE.indexOf('function knotInterval', start);
+    const source = RIG_SOURCE.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(source).toContain('out.x =');
+    expect(source).toContain('out.y =');
+    expect(source).toContain('out.z =');
+    expect(source).toContain('return out;');
+    expect(source).not.toContain('return {');
   });
 });

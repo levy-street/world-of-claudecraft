@@ -12,7 +12,7 @@
 // ALWAYS releases the input lock and the music silence and starts the camera
 // release, whatever state the scene was in.
 
-import type { SceneAttachFrame, SceneCameraShot, SceneWireOp } from '../sim/types';
+import type { SceneCameraShot, SceneWireOp } from '../sim/types';
 import {
   evaluateSceneRigPose,
   type SceneAttachmentResolver,
@@ -156,7 +156,7 @@ export function scenePose(
   nowSec: number,
   live: SceneLivePose,
   resolveEntity: (id: number) => { x: number; y: number; z: number } | null,
-  resolveAttachment?: (target: string) => SceneAttachFrame | null,
+  resolveAttachment?: SceneAttachmentResolver,
 ): ScenePose | null {
   if (!sceneCameraActive(s)) return null;
   const out = s.pose;

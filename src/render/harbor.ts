@@ -27,8 +27,10 @@ import {
   type HarborRamp,
   harborSurfaceHeight,
 } from '../sim/harbor_layout';
+import type { SceneAttachFrame } from '../sim/types';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { GFX, surfaceMat } from './gfx';
+import { harborShipAttachFrameFrom } from './harbor_ship_attach_core';
 import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './prop_path_core';
 import { type PropAsset, propAsset } from './props';
 import { radialGlowTexture } from './textures';
@@ -378,6 +380,19 @@ const SHIPS = new Map<string, HarborShipHandle>();
 const PROP_PATH_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
   LAST_BELL_PROP_PATH_SEGMENTS;
 const CUE_POSE: PropPathSample = { x: 0, y: 0, z: 0, yaw: 0, done: false };
+const SHIP_ATTACH_FRAME: SceneAttachFrame = {
+  position: { x: 0, y: 0, z: 0 },
+  yaw: 0,
+};
+
+/** Read the ship's current world transform without touching its freeze state.
+ * The yaw convention is shared with scene_rig_core.localToWorld. */
+export function harborShipAttachFrame(
+  target: string,
+  out: SceneAttachFrame = SHIP_ATTACH_FRAME,
+): SceneAttachFrame | null {
+  return harborShipAttachFrameFrom(SHIPS, target, out);
+}
 
 /** Route a scene prop cue to a ship. Unknown targets are ignored and unknown
  *  cues park a known ship, so authored mistakes never crash the client. The

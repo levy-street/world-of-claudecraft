@@ -14,12 +14,21 @@ export interface SceneRigPose {
 }
 
 export type SceneEntityResolver = (id: number) => SceneRigPoint | null;
-export type SceneAttachmentResolver = (target: string) => SceneAttachFrame | null;
+export type SceneAttachmentResolver = (
+  target: string,
+  out?: SceneAttachFrame,
+) => SceneAttachFrame | null;
 
 const EPSILON = 1e-8;
 // The renderer aims two yards above a ScenePose focus anchor. Rig look-at
 // tracks are exact world points, so the handoff removes that renderer offset.
 const SCENE_FOCUS_HEIGHT = 2;
+const CAMERA_POINT: SceneRigPoint = { x: 0, y: 0, z: 0 };
+const LOOK_AT_POINT: SceneRigPoint = { x: 0, y: 0, z: 0 };
+const ATTACH_FRAME: SceneAttachFrame = {
+  position: { x: 0, y: 0, z: 0 },
+  yaw: 0,
+};
 
 /**
  * Evaluate one dolly or attach shot at an injected elapsed time. The optional
@@ -34,32 +43,33 @@ export function evaluateSceneRigPose(
 ): SceneRigPose {
   const pose = out ?? emptyPose();
   if (shot.kind === 'attach') {
-    const frame = resolveAttachment(shot.target) ?? shot.fallbackFrame;
-    const camera = localToWorld(frame, shot.offset);
-    const lookAt = localToWorld(frame, shot.lookAt);
+    const frame = resolveAttachment(shot.target, ATTACH_FRAME) ?? shot.fallbackFrame;
+    const camera = localToWorld(frame, shot.offset, CAMERA_POINT);
+    const lookAt = localToWorld(frame, shot.lookAt, LOOK_AT_POINT);
     return poseFromWorldPoints(camera, lookAt, pose);
   }
 
   const t = shot.dur > 0 ? clamp01(elapsedSec / shot.dur) : 1;
   const eased = sceneCameraEase(t);
-  const camera = sampleCatmullRom(shot.points, eased);
+  const camera = sampleCatmullRom(shot.points, eased, CAMERA_POINT);
   let lookAt: SceneRigPoint;
   switch (shot.lookAt.kind) {
     case 'point':
       lookAt = shot.lookAt.point;
       break;
     case 'spline':
-      lookAt = sampleCatmullRom(shot.lookAt.points, eased);
+      lookAt = sampleCatmullRom(shot.lookAt.points, eased, LOOK_AT_POINT);
       break;
     case 'subject': {
       const subject = shot.lookAt.entityId !== null ? resolveEntity(shot.lookAt.entityId) : null;
-      lookAt = subject
-        ? {
-            x: subject.x + shot.lookAt.offset.x,
-            y: subject.y + shot.lookAt.offset.y,
-            z: subject.z + shot.lookAt.offset.z,
-          }
-        : shot.lookAt.fallback;
+      if (!subject) {
+        lookAt = shot.lookAt.fallback;
+        break;
+      }
+      LOOK_AT_POINT.x = subject.x + shot.lookAt.offset.x;
+      LOOK_AT_POINT.y = subject.y + shot.lookAt.offset.y;
+      LOOK_AT_POINT.z = subject.z + shot.lookAt.offset.z;
+      lookAt = LOOK_AT_POINT;
       break;
     }
   }
@@ -143,14 +153,17 @@ function poseFromWorldPoints(
   return out;
 }
 
-function localToWorld(frame: SceneAttachFrame, local: SceneRigPoint): SceneRigPoint {
+function localToWorld(
+  frame: SceneAttachFrame,
+  local: SceneRigPoint,
+  out: SceneRigPoint,
+): SceneRigPoint {
   const cos = Math.cos(frame.yaw);
   const sin = Math.sin(frame.yaw);
-  return {
-    x: frame.position.x + local.x * cos + local.z * sin,
-    y: frame.position.y + local.y,
-    z: frame.position.z - local.x * sin + local.z * cos,
-  };
+  out.x = frame.position.x + local.x * cos + local.z * sin;
+  out.y = frame.position.y + local.y;
+  out.z = frame.position.z - local.x * sin + local.z * cos;
+  return out;
 }
 
 function knotInterval(a: SceneRigPoint, b: SceneRigPoint): number {
