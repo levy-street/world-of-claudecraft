@@ -172,8 +172,15 @@ describe('Q0 Ashore end to end', () => {
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_out', 'pay')).toBe(true);
     expect(sim.questLog.has(QUEST)).toBe(false);
+    // A re-ride plays the short departure cinematic (H3), never the Q0
+    // arrival narrative: no dialogue lines, and not the voyage scene.
     const events = collect(sim, 10);
-    expect(events.some((e) => e.type === 'scene')).toBe(false);
+    const sceneEvents = events.filter(
+      (e): e is Extract<SimEvent, { type: 'scene' }> => e.type === 'scene',
+    );
+    expect(sceneEvents.length).toBeGreaterThan(0);
+    expect(sceneEvents.every((e) => e.sceneId === 'scn_lb_ferry_depart_out')).toBe(true);
+    expect(sceneEvents.some((e) => e.op.kind === 'line')).toBe(false);
     // And boarding on the Gullhaven ship's deck (out past the pier head, a
     // walk from the arrival deck at the harbor's land end) ferries back.
     teleport(sim, 727, 131);

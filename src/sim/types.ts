@@ -3563,7 +3563,10 @@ export type SceneWireOp =
   | { kind: 'inputLock'; on: boolean }
   | { kind: 'fade'; to: 'black' | 'clear'; dur: number }
   | { kind: 'music'; directive: string }
-  | { kind: 'anim'; entityId: number; anim: string };
+  | { kind: 'anim'; entityId: number; anim: string }
+  // A render-prop motion cue (the harbor ship casting off): pure
+  // presentation, client-resolved by target key; the end op resets all cues.
+  | { kind: 'prop'; target: string; cue: string };
 
 export type SimEvent = { pid?: number } & (
   | {

@@ -23,6 +23,12 @@ export interface SceneDirectorDeps {
   nowSec: () => number;
   /** Hard-silence / restore the music engine (MusicDirector.setSceneSilence). */
   musicSilence: (on: boolean) => void;
+  /** Sampled interpretation of a music directive (scene_sfx.ts). */
+  playDirective?: (directive: string) => void;
+  /** Route a prop motion cue to the renderer (the harbor ship cast-off). */
+  propCue?: (target: string, cue: string) => void;
+  /** Scene teardown: every prop cue back to rest. */
+  propReset?: () => void;
 }
 
 export class SceneDirector {
@@ -43,10 +49,16 @@ export class SceneDirector {
         const action = sceneMusicAction(directive);
         if (action === 'silence') this.deps.musicSilence(true);
         else if (action === 'resume') this.deps.musicSilence(false);
+        else this.deps.playDirective?.(directive);
       }
+      if (ev.op.kind === 'prop') this.deps.propCue?.(ev.op.target, ev.op.cue);
       // A skipped scene drops its remaining presentation ops (a scheduled
-      // 'resume' included), so the end op always restores the music.
-      if (ev.op.kind === 'end') this.deps.musicSilence(false);
+      // 'resume' included), so the end op always restores the music and
+      // parks every prop cue.
+      if (ev.op.kind === 'end') {
+        this.deps.musicSilence(false);
+        this.deps.propReset?.();
+      }
     }
   }
 

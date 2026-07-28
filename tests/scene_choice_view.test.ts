@@ -89,3 +89,19 @@ describe('scene choice view', () => {
     expect(sceneChoiceView(s, 0, 1)).toBe(sceneChoiceView(s, 1, 1));
   });
 });
+
+describe('prompt interpolation values (the fare price)', () => {
+  it('passes values through to the model and clears them with the prompt', () => {
+    const s = createSceneChoiceState();
+    choicePromptOpen(s, { ...PROMPT, values: { price: 10 } }, 100);
+    expect(sceneChoiceView(s, 100, 42).values).toEqual({ price: 10 });
+    choiceResolve(s, 'lb_c1');
+    expect(sceneChoiceView(s, 101, 42).values).toBeNull();
+  });
+
+  it('a prompt without values models null', () => {
+    const s = createSceneChoiceState();
+    choicePromptOpen(s, PROMPT, 100);
+    expect(sceneChoiceView(s, 100, 42).values).toBeNull();
+  });
+});

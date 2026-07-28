@@ -246,6 +246,7 @@ const UI_PURE_CORES = [
 // moment of the cycle.
 const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
+  'src/render/harbor_cast_off.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/nameplate_view.ts',
@@ -272,6 +273,7 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/render/foliage_lod.ts',
+  'src/render/harbor_cast_off.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/ui/mob_idle_sfx.ts',

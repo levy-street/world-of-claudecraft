@@ -5,6 +5,7 @@
 // sequencer's scene stage gating on playback state.
 import { beforeAll, describe, expect, it } from 'vitest';
 import { registerScenario, scenarioRunFor, startScenario } from '../src/sim/scenarios/scenarios';
+import { answerSceneChoice } from '../src/sim/scenes/choices';
 import { registerScene, requestSceneSkip, sceneActiveFor } from '../src/sim/scenes/scenes';
 import { Sim } from '../src/sim/sim';
 import { squadActorEntity } from '../src/sim/squad/squad';
@@ -146,5 +147,99 @@ describe('scene playback', () => {
     expect(sceneActiveFor(sim.ctx, claimIdOf(sim))).toBe(true); // b has not skipped
     expect(requestSceneSkip(sim.ctx, b)).toBe(true);
     expect(sceneActiveFor(sim.ctx, claimIdOf(sim))).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The voyage cinematic (H3): the paid crossing plays a personal scene that
+// cues the harbor ship prop and the bell, splices the Q0 arrival after the
+// held black on the first crossing, stays line-free on re-rides, and tears
+// down to consistent state on a skip at any point (the sim teleported the
+// rider before the scene started, so skip changes nothing authoritative).
+// ---------------------------------------------------------------------------
+
+describe('the voyage cinematic', () => {
+  const Q0 = 'q_lb_q0_ashore';
+
+  function makeRider(): Sim {
+    const sim = new Sim({
+      seed: 4242,
+      playerClass: 'warrior',
+      playerName: 'Ash',
+      devCommands: true,
+    });
+    sim.player.level = 6;
+    const meta = sim.ctx.players.get(sim.playerId);
+    if (meta) meta.copper = 100;
+    return sim;
+  }
+
+  function board(sim: Sim, x: number, z: number, choiceId: string): void {
+    const pos = sim.groundPos(x, z);
+    sim.player.pos = { ...pos };
+    sim.player.prevPos = { ...pos };
+    sim.rebucket(sim.player);
+    const ferry = [...sim.entities.values()].find(
+      (e) => e.templateId === 'lb_ferry' && Math.abs(e.pos.x - x) < 12,
+    );
+    expect(ferry).toBeTruthy();
+    sim.player.targetId = ferry?.id ?? null;
+    sim.interact();
+    expect(answerSceneChoice(sim.ctx, choiceId, 'pay')).toBe(true);
+  }
+
+  it('the first paid crossing plays the spliced voyage: ship cue, bell, then the arrival', () => {
+    const sim = makeRider();
+    board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
+    const ops = sceneOps(collect(sim, 13 * 20));
+    expect(ops.every((e) => e.sceneId === 'scn_lb_q0_voyage')).toBe(true);
+    const prop = ops.find((e) => e.op.kind === 'prop');
+    expect(prop?.op.kind === 'prop' ? prop.op.target : '').toBe('harbor_ship_mainland');
+    expect(prop?.op.kind === 'prop' ? prop.op.cue : '').toBe('cast_off');
+    const directives = ops
+      .filter((e): e is typeof e & { op: { kind: 'music'; directive: string } } => {
+        return e.op.kind === 'music';
+      })
+      .map((e) => e.op.directive);
+    expect(directives).toContain('lb_harbor_ambience');
+    expect(directives).toContain('lb_bell_toll_one');
+    expect(directives).toContain('lb_ship_castoff');
+    // The arrival half: its first line lands after the splice point.
+    const line = ops.find((e) => e.op.kind === 'line');
+    expect(line?.op.kind === 'line' ? line.op.key : '').toBe('lb.q0.scene.harbor');
+    // The whole voyage ends as one scene.
+    const tail = sceneOps(collect(sim, 20 * 20));
+    expect(tail.some((e) => e.op.kind === 'end')).toBe(true);
+    expect(sim.ctx.scenePlaybacks.size).toBe(0);
+  });
+
+  it('a re-ride departure cues the ship on its own side and stays line-free', () => {
+    const sim = makeRider();
+    sim.ctx.players.get(sim.playerId)?.questsDone.add(Q0);
+    board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
+    // Let the outbound departure finish before riding back.
+    collect(sim, 12 * 20);
+    board(sim, 727, 131, 'ch_lb_ferry_fare_back');
+    const ops = sceneOps(collect(sim, 6 * 20));
+    expect(ops.length).toBeGreaterThan(0);
+    expect(ops.every((e) => e.sceneId === 'scn_lb_ferry_depart_back')).toBe(true);
+    const prop = ops.find((e) => e.op.kind === 'prop');
+    expect(prop?.op.kind === 'prop' ? prop.op.target : '').toBe('harbor_ship_gullhaven');
+    expect(ops.some((e) => e.op.kind === 'line')).toBe(false);
+  });
+
+  it('skipping the voyage tears down cleanly with the rider already ashore', () => {
+    const sim = makeRider();
+    board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
+    collect(sim, 4);
+    expect(sim.ctx.scenePlaybacks.size).toBe(1);
+    expect(requestSceneSkip(sim.ctx)).toBe(true);
+    const ops = sceneOps(collect(sim, 2));
+    expect(ops.some((e) => e.op.kind === 'end')).toBe(true);
+    expect(sim.ctx.scenePlaybacks.size).toBe(0);
+    // The crossing happened at pay time: the skip leaves the rider ashore
+    // with the quest accepted, identical to a watched voyage.
+    expect(sim.player.pos.x).toBeGreaterThan(600);
+    expect(sim.questLog.get(Q0)?.state).toBe('active');
   });
 });

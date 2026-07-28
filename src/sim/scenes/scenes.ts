@@ -53,6 +53,7 @@ export type SceneOpDef = { at: number } & (
   | { kind: 'actorMove'; actorId: string; x: number; z: number }
   | { kind: 'actorFace'; actorId: string; facing: number }
   | { kind: 'anim'; actorId: string; anim: string }
+  | { kind: 'prop'; target: string; cue: string }
 );
 
 export interface SceneDef {
@@ -239,6 +240,10 @@ function resolveAndApply(
       const actor = actorEntity(op.actorId);
       return applyOnly || !actor ? null : { kind: 'anim', entityId: actor.id, anim: op.anim };
     }
+    case 'prop':
+      // Pure presentation: the client resolves the target key to a render
+      // prop (the harbor ship) and runs the motion cue.
+      return applyOnly ? null : { kind: 'prop', target: op.target, cue: op.cue };
   }
 }
 

@@ -73,6 +73,7 @@ import { tryNearbyInteraction } from './game/nearby_interaction';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
 import { SceneDirector } from './game/scene_director';
+import { playSceneDirectiveSfx } from './game/scene_sfx';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import {
   type GameSettings,
@@ -154,6 +155,7 @@ import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
 import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
+import { cueHarborShip, resetHarborShipCues } from './render/harbor';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -1564,12 +1566,16 @@ async function startGame(
     keybinds,
   );
   input.camYaw = world.player.facing;
-  // Last Bell scene director (camera shots, input lock, music directives).
-  // Presentation only: skips and choice answers go back through IWorld.
+  // Last Bell scene director (camera shots, input lock, music directives,
+  // prop cues). Presentation only: skips and choice answers go back through
+  // IWorld.
   const sceneDirector = new SceneDirector({
     world: () => world,
     nowSec: () => performance.now() / 1000,
     musicSilence: (on) => music.setSceneSilence(on),
+    playDirective: (directive) => playSceneDirectiveSfx(directive),
+    propCue: (target, cue) => cueHarborShip(target, cue),
+    propReset: () => resetHarborShipCues(),
   });
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),

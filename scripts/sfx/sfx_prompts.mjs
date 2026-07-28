@@ -610,6 +610,31 @@ export const SFX = [
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
 
+  // --- The Last Bell harbor (the H3 voyage cinematic) -----------------------
+  // Baked placeholder takes come from scripts/gen_last_bell_harbor_sfx.mjs
+  // (deterministic local synthesis, gen_ui_sfx.mjs style) until an
+  // ElevenLabs run or a CC0 recording replaces them; the prompts below are
+  // ready for that run. The bell is the campaign's signature sound and ships
+  // only with the owner's sign-off.
+  {
+    key: 'lb_bell_toll',
+    duration: 6,
+    prompt:
+      'A single strike of a large bronze harbor bell, deep and resonant, with a long natural decay over open water. One toll only, no music, no voice.',
+  },
+  {
+    key: 'lb_harbor_ambience',
+    duration: 10,
+    prompt:
+      'A quiet working harbor: small waves lapping against wooden pilings, sparse distant seagulls, soft rope and timber creaks. No music, no voice.',
+  },
+  {
+    key: 'lb_ship_castoff',
+    duration: 4,
+    prompt:
+      'A large wooden sailing ship casting off: heavy timber groan, rope strain, and a slow push of water along the hull. One event, no music, no voice.',
+  },
+
   // --- Custom recordings (not ElevenLabs) ----------------------------------
   { key: 'quest_accept', custom: true },
   { key: 'quest_ready', custom: true },

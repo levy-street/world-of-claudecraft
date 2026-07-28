@@ -28,6 +28,7 @@ import {
 } from '../sim/harbor_layout';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { GFX, surfaceMat } from './gfx';
+import { castOffPose } from './harbor_cast_off';
 import { type PropAsset, propAsset } from './props';
 import { radialGlowTexture } from './textures';
 
@@ -356,6 +357,64 @@ function buildBollard(
   parent.add(collar);
 }
 
+// The scene-cued ships (H3): each moored ship registers under the prop
+// target key the departure scenes cue ('harbor_ship_<harborId>'). A cast-off
+// cue eases the hull out of the berth along its bow axis; the scene end
+// resets every cue (nobody but the cued rider ever receives the ops, so the
+// motion is per-client presentation, never shared state).
+interface HarborShipHandle {
+  group: THREE.Group;
+  baseX: number;
+  baseY: number;
+  baseZ: number;
+  baseRot: number;
+  /** performance.now()/1000 when the cast-off cue started, or null. */
+  cueStartSec: number | null;
+}
+
+const SHIPS = new Map<string, HarborShipHandle>();
+const CUE_POSE = { forward: 0, yawDrift: 0, done: false };
+
+/** Route a scene prop cue to a ship. Unknown targets/cues are ignored (an
+ *  authored scene must never crash the client). */
+export function cueHarborShip(target: string, cue: string): void {
+  const handle = SHIPS.get(target);
+  if (!handle) return;
+  if (cue === 'cast_off') handle.cueStartSec = performance.now() / 1000;
+  else resetShip(handle);
+}
+
+/** Scene teardown: every ship back at its berth. */
+export function resetHarborShipCues(): void {
+  for (const handle of SHIPS.values()) resetShip(handle);
+}
+
+function resetShip(handle: HarborShipHandle): void {
+  handle.cueStartSec = null;
+  handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
+  handle.group.rotation.y = handle.baseRot;
+}
+
+/** Per-frame cue drive (renderer.sync). Zero work while no cue is live. */
+export function updateHarborShips(): void {
+  for (const handle of SHIPS.values()) {
+    if (handle.cueStartSec === null) continue;
+    const pose = castOffPose(performance.now() / 1000 - handle.cueStartSec, CUE_POSE);
+    handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
+    handle.group.rotation.y = handle.baseRot + pose.yawDrift;
+    // Local +x is the bow, so the heading owns the direction of travel.
+    handle.group.translateX(pose.forward);
+  }
+}
+
+/** Re-enable matrix auto-update on the cued ships. MUST run after the
+ *  renderer's freezeStaticMatrices pass over the harbor group (the freeze
+ *  contract in static_matrix.ts: transform-animated descendants re-enable
+ *  themselves right after the freeze). */
+export function markHarborShipsDynamic(): void {
+  for (const handle of SHIPS.values()) handle.group.matrixAutoUpdate = true;
+}
+
 // The moored ferry ship: the generated GLB (long axis x, base at the keel)
 // scaled so the hull matches the authored berth length, yawed to the berth
 // heading, keel sunk draft yards below the sea surface. The walkable
@@ -370,12 +429,21 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
     scale,
   });
   g.rotation.y = harbor.berth.rot;
+  SHIPS.set(`harbor_ship_${harbor.id}`, {
+    group: g,
+    baseX: harbor.berth.x,
+    baseY: WATER_LEVEL - harbor.berth.draft,
+    baseZ: harbor.berth.z,
+    baseRot: harbor.berth.rot,
+    cueStartSec: null,
+  });
 }
 
 /** Build every authored harbor of the active world into one static group. */
 export function buildHarbors(seed: number): { group: THREE.Group } {
   const group = new THREE.Group();
   group.name = 'harbors';
+  SHIPS.clear();
   const harbors = getActiveWorldContent().props.harbors ?? [];
   for (const harbor of harbors) {
     const g = new THREE.Group();

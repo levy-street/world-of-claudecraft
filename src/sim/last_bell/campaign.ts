@@ -22,7 +22,11 @@ import type { Entity } from '../types';
 import { FARSHORE_BREACH } from '../world';
 
 const Q0_ID = 'q_lb_q0_ashore';
-const ARRIVAL_SCENE = 'scn_lb_q0_ashore';
+// The first crossing plays the spliced voyage (departure + Q0 arrival, one
+// Esc skips both halves); re-rides get the short departure cinematic.
+const VOYAGE_SCENE = 'scn_lb_q0_voyage';
+const DEPART_OUT_SCENE = 'scn_lb_ferry_depart_out';
+const DEPART_BACK_SCENE = 'scn_lb_ferry_depart_back';
 
 // The fare (H2): each rider pays their own passage at the dock dialog. Kept
 // low on purpose; the campaign is never money-gated at its front door (a
@@ -127,7 +131,11 @@ function crossFerry(ctx: SimContext, fromMainland: boolean, pid: number): void {
     color: '#b9f',
     pid: r.meta.entityId,
   });
-  if (firstCrossing) playSceneForPlayer(ctx, r.meta.entityId, ARRIVAL_SCENE);
+  // The voyage presentation (H3): the rider already stands at the arrival
+  // dock (teleported above), so the cinematic is pure world-coordinate
+  // presentation and a skip at any point leaves consistent state.
+  const departure = fromMainland ? DEPART_OUT_SCENE : DEPART_BACK_SCENE;
+  playSceneForPlayer(ctx, r.meta.entityId, firstCrossing ? VOYAGE_SCENE : departure);
 }
 
 // The pay answer. A broke FIRST crossing rides free (with its own log line)
