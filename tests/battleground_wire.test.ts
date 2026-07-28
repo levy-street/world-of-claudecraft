@@ -39,8 +39,8 @@ vi.mock('../server/db', () => ({
 
 import { BG_MATCH_INTEREST_RADIUS, type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
-import { BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
-import { battlegroundOrigin } from '../src/sim/data';
+import { BG_FLAG_Z, BG_PLAY_HALF_X, BG_PLAY_HALF_Z } from '../src/sim/battleground_layout';
+import { battlegroundOrigin, bgOriginAt } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
 
 interface FakeClient {
@@ -224,24 +224,28 @@ describe('immersive-scale interest: the whole match stays tracked', () => {
       expect(matchA).toBeTruthy();
       expect(matchC).toBeTruthy();
       expect(matchA.slot).not.toBe(matchC.slot);
-      // stand the two probes 260yd apart across the slot boundary: INSIDE the
-      // 300/320 match radius, beyond the 90/100 default, each 100yd from its
-      // own origin so slot classification is unambiguous
+      // Stand the probes just across the slot midpoint. They remain inside the
+      // widened match radius, so only the explicit same-slot predicate can
+      // keep them out of one another's snapshots.
       const [southMatch, northMatch] =
         battlegroundOrigin(matchA.slot).z < battlegroundOrigin(matchC.slot).z
           ? [matchA, matchC]
           : [matchC, matchA];
       const southProbe = server.sim.entities.get(southMatch === matchA ? a.pid : c.pid)!;
       const northProbe = server.sim.entities.get(northMatch === matchA ? a.pid : c.pid)!;
-      southProbe.pos = { ...southProbe.pos, z: battlegroundOrigin(southMatch.slot).z + 100 };
+      const midpoint =
+        (battlegroundOrigin(southMatch.slot).z + battlegroundOrigin(northMatch.slot).z) / 2;
+      southProbe.pos = { ...southProbe.pos, z: midpoint - 100 };
       southProbe.prevPos = { ...southProbe.pos };
       server.sim.ctx.rebucket(southProbe);
-      northProbe.pos = { ...northProbe.pos, z: battlegroundOrigin(northMatch.slot).z - 100 };
+      northProbe.pos = { ...northProbe.pos, z: midpoint + 100 };
       northProbe.prevPos = { ...northProbe.pos };
       server.sim.ctx.rebucket(northProbe);
       const gap = Math.abs(southProbe.pos.z - northProbe.pos.z);
-      expect(gap).toBeGreaterThan(100); // beyond the default drop radius
-      expect(gap).toBeLessThan(300); // inside the match radius: decisive
+      expect(gap).toBeGreaterThan(100); // beyond normal-world interest and drop radii
+      expect(gap).toBeLessThan(BG_MATCH_INTEREST_RADIUS);
+      expect(bgOriginAt(southProbe.pos.z).slot).toBe(southMatch.slot);
+      expect(bgOriginAt(northProbe.pos.z).slot).toBe(northMatch.slot);
       (server as any).broadcastSnapshots();
       const idsForA = (lastSnap(fa.sent).ents as { id: number }[]).map((row) => row.id);
       const idsForC = (lastSnap(fc.sent).ents as { id: number }[]).map((row) => row.id);
@@ -254,12 +258,17 @@ describe('immersive-scale interest: the whole match stays tracked', () => {
   });
 
   it('the field diagonal keeps headroom inside the match interest radius', () => {
-    // The whole-match-tracked design rests on the diagonal fitting the raised
+    // The whole-match-tracked design rests on the field fitting the raised
     // radius. Pin the radius itself AND compute the check from the exported
-    // constant, so lowering the server radius fails here instead of silently
-    // shrinking the guarantee under a still-green hardcoded 300.
-    expect(BG_MATCH_INTEREST_RADIUS).toBe(300);
-    expect(Math.hypot(2 * BG_HALF_X, 2 * BG_HALF_Z)).toBeLessThan(BG_MATCH_INTEREST_RADIUS);
+    // constants, so lowering the server radius fails here instead of silently
+    // shrinking the guarantee under a still-green hardcoded number.
+    expect(BG_MATCH_INTEREST_RADIUS).toBe(420);
+    // Players fight inside the walkable hollow, not the dressed outer rect:
+    // that diagonal is what has to fit, and it does with real headroom.
+    const playDiagonal = Math.hypot(2 * BG_PLAY_HALF_X, 2 * BG_PLAY_HALF_Z);
+    expect(playDiagonal).toBeLessThan(BG_MATCH_INTEREST_RADIUS);
+    // The flag-to-flag carry, the longest run the mode asks for, fits too.
+    expect(2 * BG_FLAG_Z).toBeLessThan(BG_MATCH_INTEREST_RADIUS);
   });
 
   it('stealth filters BEFORE the widened match radius: a hidden enemy ships nowhere', () => {

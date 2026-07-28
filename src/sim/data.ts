@@ -599,9 +599,10 @@ export const BG_BAND_X_MAX = 20000;
 export const BG_X = 16400; // battleground instances share this x; slots stack along z
 export const BG_SLOT_COUNT = 3; // concurrent 5v5 matches the world can host
 const BG_Z0 = -1500;
-const BG_SLOT_SPACING = 460; // > the 100x280 field, with enough margin that
-// cross-slot player pairs (>= 180yd apart) stay beyond the DEFAULT interest
-// radii: the raised in-band radius applies to SAME-slot pairs only
+const BG_SLOT_SPACING = 920; // > the 240x452 Thornhollow field, with enough
+// margin that cross-slot player pairs (over 550yd apart, the walkable hollow
+// being 364yd deep) stay beyond the RAISED in-band interest radius, which
+// applies to SAME-slot pairs only (server/game.ts BG_MATCH_DROP_RADIUS)
 
 export function battlegroundOrigin(slot: number): { x: number; z: number } {
   return { x: BG_X, z: BG_Z0 + slot * BG_SLOT_SPACING };

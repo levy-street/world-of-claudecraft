@@ -24,7 +24,7 @@
 // radii, rect size, outline width, the NPC glyph font + offsets, the arrow geometry) is a
 // named constant.
 
-import { BG_HALF_Z, battlegroundWallSegments } from '../sim/battleground_layout';
+import { BG_HALF_X, BG_HALF_Z, bgFieldPlanWalls } from '../sim/battleground_layout';
 import {
   bgOriginAt,
   isBgPos,
@@ -35,6 +35,7 @@ import {
 } from '../sim/data';
 import { yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
+import { paintBgFieldRelief } from './bg_field_relief_core';
 import { createMinimapMarkers, type MinimapMarker, type NpcGlyph } from './minimap_markers';
 import type { PainterHostWriters } from './painter_host';
 
@@ -137,10 +138,26 @@ const MAZE_BG_MARGIN_YD = 24;
 const MAZE_BG_WALL_ALPHA = 0.75;
 
 // Ravenrift battleground background: the same cached-raster technique over
-// battlegroundWallSegments() (the layout the sim collides against), so the
-// minimap shows exactly what blocks movement. Same raster constants as the
-// maze; the pad is the field's long half-extent plus the shared margin.
-const BG_MAP_PAD_YD = BG_HALF_Z + MAZE_BG_MARGIN_YD;
+// bgFieldPlanWalls() (every REAL box collider of the authored Thornhollow
+// field, so the minimap shows exactly what blocks movement) laid over a shaded
+// relief underlay sampled from the field's own heightfield. The relief is what
+// makes the raster carry information away from the keeps: Thornhollow's walls
+// are concentrated in the two fortresses, so a walls-only sheet leaves the
+// whole flag run, the flank ridges and the Fightpit blank.
+//
+// The field is 240x452yd, so this raster does NOT reuse the maze's constants:
+// one square pad off the long half-extent at 3px/yd would be 1500x1500 (2.25M
+// px, over twice the old field's 984x984 sheet). A PER-AXIS pad at 2.5px/yd is
+// 720x1250 (900k px), under the old sheet, and 1:1 or finer at the two lower
+// zoom presets (1.7 and 2.55px/yd); the two closest presets magnify it, which
+// is the trade taken for a sheet that stays under the old one on a field three
+// times the size.
+const BG_FIELD_PX_PER_YARD = 2.5;
+const BG_FIELD_PAD_X_YD = BG_HALF_X + MAZE_BG_MARGIN_YD;
+const BG_FIELD_PAD_Z_YD = BG_HALF_Z + MAZE_BG_MARGIN_YD;
+// Walls sit on the relief rather than on bare canvas, so they carry a touch
+// more weight than the maze's stubs do.
+const BG_FIELD_WALL_ALPHA = 0.85;
 
 // Draw the corpse skull centered at (x, y): `fill` paints the bone, `socket` the
 // dark eye/nose hollows so the shape reads even over light terrain.
@@ -208,7 +225,8 @@ export class MinimapPainter {
   // The Protect Yumi maze wall cache (built on first in-maze redraw; the fixed
   // competitive layout never changes, so one raster serves the session).
   private mazeBg: HTMLCanvasElement | null = null;
-  // The Ravenrift battleground wall cache (same lifecycle as mazeBg).
+  // The Ravenrift field cache, relief plus wall plan (same lifecycle as mazeBg:
+  // the authored field never changes, so one raster serves the session).
   private battlegroundBg: HTMLCanvasElement | null = null;
   // NPC glyph sprites (see the NPC_GLYPH_* header), keyed color -> glyph. Nested rather
   // than one map on a `${glyph}|${color}` composite so the per-marker lookup in the draw
@@ -357,9 +375,10 @@ export class MinimapPainter {
 
   /**
    * Ravenrift battleground render: the ordinary overworld marker set (party
-   * discs, players, mob dots) over a cached raster of the field's walls (the
-   * paintYumiMaze technique). The '#zone-label' keeps the localized committed
-   * zone (the arena-band precedent; the band has no dedicated zone entry).
+   * discs, players, mob dots) over a cached raster of the Thornhollow field's
+   * relief and wall plan (the paintYumiMaze technique). The '#zone-label' keeps
+   * the localized committed zone (the arena-band precedent; the band has no
+   * dedicated zone entry).
    */
   paintBattleground(
     ctx: CanvasRenderingContext2D,
@@ -382,39 +401,52 @@ export class MinimapPainter {
     ctx.arc(S / 2, S / 2, S / 2 - CLIP_INSET, 0, FULL_CIRCLE);
     ctx.clip();
     ctx.imageSmoothingEnabled = false;
-    // Sub-rect blit centered on the player's field-local position (+X map-left,
-    // matching the marker projection).
-    const sw = S / (pxPerYard / MAZE_BG_PX_PER_YARD);
-    const sx = (BG_MAP_PAD_YD - (p.pos.x - o.x)) * MAZE_BG_PX_PER_YARD - sw / 2;
-    const sy = (p.pos.z - o.z + BG_MAP_PAD_YD) * MAZE_BG_PX_PER_YARD - sw / 2;
+    // Sub-rect blit centered on the player's field-local position. BOTH axes
+    // follow the marker projection (+X map-left, +Z map-UP), which is also what
+    // the overworld terrain blit above does: the raster is built with the same
+    // two negations, so a wall north of you draws above you.
+    const s = BG_FIELD_PX_PER_YARD;
+    const sw = S / (pxPerYard / s);
+    const sx = (BG_FIELD_PAD_X_YD - (p.pos.x - o.x)) * s - sw / 2;
+    const sy = (BG_FIELD_PAD_Z_YD - (p.pos.z - o.z)) * s - sw / 2;
     ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
     this.drawMarkers(ctx, model.markers, colors);
     ctx.restore();
   }
 
-  // Rasterize the fixed battleground layout once: every wall segment (the
-  // perimeter, both sealed keeps, the cover walls and the
-  // heart-ruin block) as a rect in the outline token (mirrored on x like the
-  // live projection). Tier-identical: walls are actionable cover.
+  // Rasterize the fixed Thornhollow field once: the shaded terrain relief (the
+  // pure core writes it straight into an ImageData; the ramp is sampled ground,
+  // not chrome, so it is the one thing here that is not a token) with the
+  // field's real wall plan over it in the outline token. Both are drawn in the
+  // live projection's axes, +X map-left and +Z map-up.
+  //
+  // Tier-identical: walls are actionable cover, so no preset or governor gates
+  // any of this (the graphics-settings fairness invariant).
   private ensureBattlegroundBg(colors: MinimapColors): HTMLCanvasElement {
     if (this.battlegroundBg) return this.battlegroundBg;
-    const pad = BG_MAP_PAD_YD;
-    const s = MAZE_BG_PX_PER_YARD;
-    const side = Math.ceil(pad * 2 * s);
+    const s = BG_FIELD_PX_PER_YARD;
+    const w = Math.ceil(BG_FIELD_PAD_X_YD * 2 * s);
+    const h = Math.ceil(BG_FIELD_PAD_Z_YD * 2 * s);
     const canvas = document.createElement('canvas');
-    canvas.width = side;
-    canvas.height = side;
+    canvas.width = w;
+    canvas.height = h;
     const bctx = canvas.getContext('2d');
     if (!bctx) return canvas;
-    bctx.globalAlpha = MAZE_BG_WALL_ALPHA;
+    const relief = bctx.createImageData(w, h);
+    paintBgFieldRelief(relief.data, w, h, s, BG_FIELD_PAD_X_YD, BG_FIELD_PAD_Z_YD);
+    bctx.putImageData(relief, 0, 0);
+    bctx.globalAlpha = BG_FIELD_WALL_ALPHA;
     bctx.fillStyle = colors.outline;
-    for (const wall of battlegroundWallSegments()) {
-      bctx.fillRect(
-        (pad - wall.x - wall.hw) * s,
-        (wall.z - wall.hd + pad) * s,
-        wall.hw * 2 * s,
-        wall.hd * 2 * s,
-      );
+    // Thornhollow's walls are placed structures, not axis-aligned segments, so
+    // each box is stroked under its own yaw. Canvas y grows downward while the
+    // raster negates both field axes, which is a 180 degree rotation: it
+    // preserves the rectangle but reverses the sense of the angle, hence -rot.
+    for (const wall of bgFieldPlanWalls()) {
+      bctx.save();
+      bctx.translate((BG_FIELD_PAD_X_YD - wall.x) * s, (BG_FIELD_PAD_Z_YD - wall.z) * s);
+      bctx.rotate(-wall.rot);
+      bctx.fillRect(-wall.hw * s, -wall.hd * s, wall.hw * 2 * s, wall.hd * 2 * s);
+      bctx.restore();
     }
     this.battlegroundBg = canvas;
     return canvas;

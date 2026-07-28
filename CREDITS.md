@@ -99,7 +99,7 @@ than free, so ask before you rely on it.
 | Pirate Kit (palm trees, docks, ship, chests, cannon, anchor, beach rocks, beach house) | Quaternius | https://quaternius.com/packs/piratekit.html | CC0 1.0 | Yes |
 | LowPoly Animated Fish (dolphin, shark, manta ray, whale, clownfish, blue tang, puffer, swordfish, anglerfish, koi) | Quaternius | https://poly.pizza/u/Quaternius | CC0 1.0 | Yes |
 | Modular Dungeons Pack (stone walls, arches, pillar, floor tile, wall banner, trap door, horse statue, cobweb, coin piles) | Quaternius | https://poly.pizza/u/Quaternius | CC0 1.0 | Yes |
-| Medieval Village MegaKit (wagon, crate, fences, vines, arch, exterior stairs) | Quaternius | https://quaternius.com/packs/medievalvillagemegakit.html | CC0 1.0 | Yes |
+| Medieval Village MegaKit (wagon, crate, fences, vines, arch, exterior stairs, castle bases, castle stairs) | Quaternius | https://quaternius.com/packs/medievalvillagemegakit.html | CC0 1.0 | Yes |
 | Survival Kit (tents, bedrolls, campfires, signpost, sand rocks) | Kenney | https://kenney.nl/assets/survival-kit | CC0 1.0 | Yes |
 | Watercraft Kit (sail boats, fishing boat, rowboat, buoys) | Kenney | https://kenney.nl/assets/watercraft-kit | CC0 1.0 | Yes |
 | Modular Dungeon Kit (corridor and room tiles, stairs, gates) | Kenney | https://kenney.nl/assets/modular-dungeon-kit | CC0 1.0 | Yes |
@@ -109,6 +109,9 @@ than free, so ask before you rely on it.
 | Mines and Cave Modular Set (mine carts, rails, ladder, cave rocks, entrances, supports, platforms) | loafbrr | https://loafbrr.itch.io/mines-and-cave-set | CC0 1.0 | Yes |
 | Terrain PBR textures (Grass001, Ground048, Rock051, Ground071, Ground080, PavingStones046, Snow010A) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Terrain PBR textures, biome set (Ground054, Ground095A, Ground093A, Rock029, Lava004, Gravel024, Rock035) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
+| Thornhollow battleground terrain textures (`public/textures/battleground/*.jpg`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
+| Thornhollow wall tower (`public/models/city/wall_tower.glb`) | World of ClaudeCraft | Project-generated deterministic geometry via the map editor's `scripts/gen_wall_tower.mjs` | Project asset | With the project only |
+| Thornhollow ground decals (`public/textures/battleground/decals/*.webp`) | World of ClaudeCraft | Project-generated deterministic shape and noise synthesis via the map editor's `scripts/gen_decals.mjs` | Project asset | With the project only |
 | HDRI environment maps (kloofendal_48d_partly_cloudy_puresky, belfast_open_field, kiara_1_dawn, dikhololo_night) | Poly Haven | https://polyhaven.com | CC0 1.0 | Yes |
 | Vale Cup practice-pitch skybox (env/space_galaxy.jpg, the 360 degree Milky Way panorama) | ESO / S. Brunier | https://www.eso.org/public/images/eso0932a/ | CC BY 4.0 | Yes, attribution required |
 | Water normal maps (waternormals.jpg, Water_1/2_M_Normal.jpg) | three.js authors | https://github.com/mrdoob/three.js (r165, examples/textures) | MIT | Yes, attribution required |

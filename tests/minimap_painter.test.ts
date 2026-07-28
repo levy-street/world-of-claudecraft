@@ -10,6 +10,7 @@
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
 import { QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { MinimapPainter } from '../src/ui/minimap_painter';
@@ -108,6 +109,47 @@ describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
 
   it("routes the '#zone-label' text through the elided setText (the one DOM write)", () => {
     expect(code).toContain('this.writers.setText(zoneLabelEl');
+  });
+
+  it('keeps the cached Ravenrift field sheet bounded for the 240x452yd field', () => {
+    // The battleground raster is built ONCE per session and held for it, so its
+    // size is a memory decision, not a per-frame one. Thornhollow is over three
+    // times the old code-defined field, and the maze arm's shape (one square pad
+    // off the LONG half-extent) squares that growth: the pin is that the sheet
+    // stays under what the maze constants would mint for this field, and under
+    // the pre-Thornhollow sheet, while still sampling finer than the minimap's
+    // own base scale so a zoom-1 blit never magnifies.
+    const constant = (name: string): number => {
+      const m = code.match(new RegExp(`const ${name} = ([0-9.]+);`));
+      if (!m) throw new Error(`minimap_painter.ts no longer defines ${name}`);
+      return Number(m[1]);
+    };
+    const px = constant('BG_FIELD_PX_PER_YARD');
+    const margin = constant('MAZE_BG_MARGIN_YD');
+    const base = constant('MINIMAP_BASE_SCALE');
+    const sheet =
+      Math.ceil((BG_HALF_X + margin) * 2 * px) * Math.ceil((BG_HALF_Z + margin) * 2 * px);
+    const squarePad = Math.ceil((BG_HALF_Z + margin) * 2 * constant('MAZE_BG_PX_PER_YARD')) ** 2;
+    expect(sheet).toBeLessThan(squarePad / 2);
+    expect(sheet).toBeLessThan(1_000_000);
+    expect(px).toBeGreaterThanOrEqual(base);
+    // Per-axis, not one square pad: the sheet is taller than it is wide.
+    expect(code).toContain('BG_FIELD_PAD_X_YD');
+    expect(code).toContain('BG_FIELD_PAD_Z_YD');
+  });
+
+  it('rasterizes the field from the collider-backed plan, honouring each wall yaw', () => {
+    // The plan is a projection of the real collider set (bgFieldPlanWalls), so
+    // the minimap can never show cover that does not block; and Thornhollow's
+    // walls are placed structures, so the raster rotates each box instead of
+    // filling an axis-aligned rect.
+    expect(code).toContain('bgFieldPlanWalls()');
+    expect(code).not.toContain('battlegroundWallSegments');
+    const bgRaster = sliceFrom(code, 'private ensureBattlegroundBg(', '\n  }');
+    expect(bgRaster).toContain('bctx.rotate(-wall.rot)');
+    // The relief underlay comes from the shared pure core, never from a second
+    // copy of the hillshade math living in this painter.
+    expect(bgRaster).toContain('paintBgFieldRelief(');
   });
 });
 

@@ -31,6 +31,7 @@ import { advanceClimb, tryStartClimb } from './climb';
 import {
   lineOfSightClear,
   moverHeight,
+  placementFloorHeight,
   resolveMovement,
   resolvePosition,
   seatGroundedAt,
@@ -3701,7 +3702,9 @@ export class Sim {
   }
 
   groundPos(x: number, z: number): Vec3 {
-    return { x, y: groundHeight(x, z, this.cfg.seed), z };
+    // The floor, not the terrain: on the battleground field an authored deck
+    // (a flag podium, a stair landing) IS the ground a flag or a body rests on.
+    return { x, y: placementFloorHeight(this.cfg.seed, x, z), z };
   }
 
   // Deterministic outward spiral to the nearest spot that is on dry-enough

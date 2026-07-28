@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BG_GRAVEYARDS } from '../src/sim/battleground_layout';
+import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, isBgPos } from '../src/sim/data';
 import { BATTLEGROUND_LOSS_HONOR, BATTLEGROUND_WIN_HONOR } from '../src/sim/pvp';
@@ -495,18 +495,23 @@ describe('Ravenrift: power runes (Battle / Ward)', () => {
       sim.tick();
       return { sim, match: sim.bgMatchFor(pids[0])! };
     };
+    // The sprint pads are spawned first, the power pads after, so the field's
+    // own pad counts decide where the power block starts.
+    const firstPower = BG_SPEED_RUNES.length;
     const a = face(42);
     const b = face(42);
-    expect(a.match.runes[4].type).toBe(b.match.runes[4].type);
-    // the four sprint pads stay sprint; both power pads share one opening face
-    expect(a.match.runes.slice(0, 4).every((r) => r.type === 'sprint')).toBe(true);
-    expect(a.match.runes[4].type).toBe(a.match.runes[5].type);
-    expect(['damage', 'defense']).toContain(a.match.runes[4].type);
+    expect(a.match.runes.length).toBe(BG_SPEED_RUNES.length + BG_POWER_RUNES.length);
+    expect(a.match.runes[firstPower].type).toBe(b.match.runes[firstPower].type);
+    // every sprint pad stays sprint; all power pads share one opening face
+    expect(a.match.runes.slice(0, firstPower).every((r) => r.type === 'sprint')).toBe(true);
+    const powerFaces = a.match.runes.slice(firstPower).map((r) => r.type);
+    expect(new Set(powerFaces).size).toBe(1);
+    expect(['damage', 'defense']).toContain(powerFaces[0]);
 
     const { sim, match } = a;
     toActive(sim, match);
     const runner = match.teams[0][0];
-    const power = match.runes[4];
+    const power = match.runes[firstPower];
     const openingFace = power.type;
     tp(sim, runner, power.pos.x, power.pos.z);
     sim.tick();
@@ -1053,9 +1058,9 @@ describe('Ravenrift: runes, hostility, and the match clock', () => {
   it('pins the whole live tune as literals (re-pin deliberately when retuning)', () => {
     // The behavior suites use these constants symbolically, so THIS block is
     // what actually fails on a silent retune: every tuned number ships pinned.
-    expect(BG_CARRIER_VULN_DELAY).toBe(75); // ~two 236yd flag runs
+    expect(BG_CARRIER_VULN_DELAY).toBe(105); // ~two 334yd Thornhollow flag runs
     expect(BG_CARRIER_VULN_INTERVAL).toBe(15);
-    expect(BG_MAX_DURATION).toBe(720); // 12 minute cap
+    expect(BG_MAX_DURATION).toBe(1020); // 17 minute cap, scaled with the field
     expect(BG_WAVE_PERIOD).toBe(10);
     expect(BG_WAVE_OFFSET).toBe(5);
     expect(BG_POWER_RUNE_VALUE).toBeCloseTo(0.15, 10);

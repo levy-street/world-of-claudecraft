@@ -1,4 +1,14 @@
 import { describe, expect, it } from 'vitest';
+import {
+  BG_BASES,
+  BG_FLAG_Z,
+  BG_GRAVEYARDS,
+  BG_HALF_X,
+  BG_HALF_Z,
+  BG_POWER_RUNES,
+  BG_SPEED_RUNES,
+  bgFieldPlanWalls,
+} from '../src/sim/battleground_layout';
 import { battlegroundOrigin } from '../src/sim/data';
 import {
   BG_KILL_FEED_MAX,
@@ -308,5 +318,71 @@ describe('battleground map view (pure core)', () => {
     const asAzure = buildBgMapModel(worldSlice(1, players2));
     expect(asAzure.self).toMatchObject({ x: -10, z: 100 });
     expect(asAzure.mates[0]).toMatchObject({ x: 5, z: 90 });
+  });
+
+  it('reads home-down for BOTH teams: standing on your own stand maps to the bottom', () => {
+    // The orientation contract stated against the real Thornhollow anchors
+    // rather than against fixture numbers: whichever team you are, your own
+    // flag stand is at negative z (the bottom of the drawn plan) and inside
+    // the rect the painter fits, and the enemy stand is the same distance up.
+    for (const myTeam of [0, 1] as const) {
+      const stand = BG_BASES[myTeam].flag;
+      const model = buildBgMapModel({
+        ...worldSlice(myTeam, baseMatch().players),
+        player: { pos: { x: origin.x + stand.x, z: origin.z + stand.z }, facing: 0 },
+      });
+      expect(model.active).toBe(true);
+      expect(model.self?.z).toBeCloseTo(-BG_FLAG_Z);
+      expect(Math.abs(model.self?.z ?? 0)).toBeLessThan(model.halfZ);
+      expect(Math.abs(model.self?.x ?? 0)).toBeLessThan(model.halfX);
+    }
+  });
+
+  it('spans the authored Thornhollow rect, and every mapped anchor falls inside it', () => {
+    const model = buildBgMapModel(worldSlice(0, []));
+    // The 240x452yd field, not the old code-defined 100x280 one.
+    expect([model.halfX, model.halfZ]).toEqual([BG_HALF_X, BG_HALF_Z]);
+    expect(model.halfX * 2).toBe(240);
+    expect(model.halfZ * 2).toBe(452);
+    const inside = (x: number, z: number, pad = 0): boolean =>
+      Math.abs(x) + pad <= model.halfX && Math.abs(z) + pad <= model.halfZ;
+    for (const base of BG_BASES) expect(inside(base.flag.x, base.flag.z)).toBe(true);
+    for (const plot of BG_GRAVEYARDS) expect(inside(plot.x, plot.z, plot.hw + plot.hd)).toBe(true);
+    for (const pad of [...BG_SPEED_RUNES, ...BG_POWER_RUNES]) {
+      expect(inside(pad.x, pad.z)).toBe(true);
+    }
+  });
+
+  it('draws a wall plan that reaches both keeps, stays inside the rect, and is rotated', () => {
+    const model = buildBgMapModel(worldSlice(0, []));
+    const walls = bgFieldPlanWalls();
+    // The authored keeps alone are hundreds of boxes; a plan that collapsed to
+    // a handful means the projection dropped the real colliders.
+    expect(walls.length).toBeGreaterThan(100);
+    // The perimeter blockers are centred ON the map edge and run its full
+    // length, so their own depth legitimately straddles it; everything else
+    // must sit inside the rect. Use the box's TRUE rotated extent, not the
+    // hw+hd bound, which is hopelessly loose for a long wall laid along an axis.
+    const EDGE_SLACK = 1.5;
+    for (const w of walls) {
+      const c = Math.abs(Math.cos(w.rot));
+      const s = Math.abs(Math.sin(w.rot));
+      const ex = w.hw * c + w.hd * s;
+      const ez = w.hw * s + w.hd * c;
+      expect(Math.abs(w.x) + ex).toBeLessThanOrEqual(model.halfX + EDGE_SLACK);
+      expect(Math.abs(w.z) + ez).toBeLessThanOrEqual(model.halfZ + EDGE_SLACK);
+      // Nothing may be centred outside the field at all.
+      expect(Math.abs(w.x)).toBeLessThanOrEqual(model.halfX);
+      expect(Math.abs(w.z)).toBeLessThanOrEqual(model.halfZ);
+    }
+    // Both keeps are walled: the keep rects start at |z| 130 and each carries
+    // real boxes past that line, which is what the plan must show at the two
+    // ends of the map.
+    const keepLineZ = 130;
+    expect(walls.some((w) => w.z <= -keepLineZ)).toBe(true);
+    expect(walls.some((w) => w.z >= keepLineZ)).toBe(true);
+    // Thornhollow's walls are placed structures, not axis-aligned segments: a
+    // painter that filled plain rects and ignored `rot` would draw a lie.
+    expect(walls.some((w) => Math.abs(Math.sin(w.rot * 2)) > 1e-3)).toBe(true);
   });
 });

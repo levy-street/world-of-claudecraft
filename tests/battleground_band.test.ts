@@ -1,34 +1,45 @@
+// Ravenrift at THORNHOLLOW: the sim-side pins for the authored field.
+//
+// The field is no longer code-defined geometry: it is compiled from
+// data/battleground/thornhollow.map.json into src/sim/thornhollow_field.generated.ts,
+// so these tests pin the four things that can actually regress:
+//   1. terrain fidelity   - the compile-time chain, the runtime chain and the
+//                           baked 1yd grid all agree, and groundHeight's band
+//                           arm reads that same grid;
+//   2. generated freshness - recompiling the map reproduces the committed module;
+//   3. anchors            - the game-mode record the mode reasons about;
+//   4. walkability        - a flood fill through the REAL collider grid reaches
+//                           every anchor, both flags and the keep ramparts.
+// Plus collision honesty (walls block, the keep mouth is open, what blocks a
+// cast is taller than the eye line) and the band's slot isolation.
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { BG_MATCH_DROP_RADIUS, BG_MATCH_INTEREST_RADIUS } from '../server/game';
+import { bgFieldExactHeight, bgFieldHeightLocal } from '../src/sim/battleground_field';
 import {
   BG_BASES,
-  BG_COVER_CRATES,
-  BG_COVER_PILLARS,
-  BG_CURTAIN_WALLS,
   BG_FLAG_Z,
-  BG_GATEHOUSE_WALLS,
-  BG_GRAVEYARD_FENCE_TOP,
-  BG_GRAVEYARD_FENCES,
   BG_GRAVEYARDS,
   BG_HALF_X,
   BG_HALF_Z,
-  BG_KEEP_BARRICADES,
+  BG_PLAY_HALF_X,
+  BG_PLAY_HALF_Z,
   BG_POWER_RUNES,
-  BG_RUBBLE_PILES,
   BG_SPEED_RUNES,
-  BG_WALL_HEIGHT,
-  BG_WALL_T,
   battlegroundColliders,
-  battlegroundWallSegments,
-  KEEP_MOUTH_DZ,
-  keepInteriorBounds,
-  keepWallSegments,
+  bgFieldPlanWalls,
 } from '../src/sim/battleground_layout';
 import {
   cameraOcclusion,
+  isBlocked,
   lineOfSightClear,
-  resolveMovement,
   resolvePosition,
   SIGHT_HEIGHT,
+  supportHeightAt,
 } from '../src/sim/colliders';
 import {
   BG_BAND_X_MAX,
@@ -44,9 +55,28 @@ import {
   isYumiMazePos,
   YUMI_BAND_X_MAX,
 } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import { BG_PICKUP_RADIUS } from '../src/sim/social/battleground';
 import { bgGraveyardSpot } from '../src/sim/spirit';
+import {
+  TH_HEIGHT_PROBES,
+  TH_LOCATIONS,
+  TH_PLACEMENTS,
+} from '../src/sim/thornhollow_field.generated';
+import { groundHeight } from '../src/sim/world';
 
 const SEED = 42;
+const ORIGIN = battlegroundOrigin(0);
+
+const locationRect = (name: string) => {
+  const rect = TH_LOCATIONS.find((l) => l.name === name);
+  if (!rect) throw new Error(`no authored location named ${name}`);
+  return rect;
+};
+const locationCentre = (name: string) => {
+  const r = locationRect(name);
+  return { x: (r.minX + r.maxX) / 2, z: (r.minZ + r.maxZ) / 2 };
+};
 
 describe('Ravenrift band: non-overlap with every other instance band', () => {
   it('claims a band past the Yumi cap and stays west of the Vale Cup pitches', () => {
@@ -85,408 +115,229 @@ describe('Ravenrift band: non-overlap with every other instance band', () => {
       expect(bgOriginAt(o.z).slot).toBe(i);
       if (i > 0) {
         const prev = battlegroundOrigin(i - 1);
-        // slot spacing exceeds the full 280yd field length
+        // slot spacing clears the full authored field length (2 x 226yd)
         expect(Math.abs(o.z - prev.z)).toBeGreaterThan(BG_HALF_Z * 2);
       }
     }
   });
 });
 
-describe('Ravenrift layout: sealed keeps + point symmetry', () => {
-  it('the whole collider set is point-symmetric ((x,z) -> (-x,-z)), so neither team is favored', () => {
-    const colliders = battlegroundColliders();
-    const key = (x: number, z: number, a: number, b: number) =>
-      `${x.toFixed(3)}|${z.toFixed(3)}|${a.toFixed(3)}|${b.toFixed(3)}`;
-    const set = new Set(
-      colliders.map((c) => (c.type === 'obb' ? key(c.x, c.z, c.hw, c.hd) : key(c.x, c.z, c.r, 0))),
-    );
-    for (const c of colliders) {
-      const mirrored = c.type === 'obb' ? key(-c.x, -c.z, c.hw, c.hd) : key(-c.x, -c.z, c.r, 0);
-      expect(set.has(mirrored), `collider at (${c.x},${c.z}) has no point mirror`).toBe(true);
+describe('Thornhollow terrain: one surface for the compiler, the sim and the grid', () => {
+  it('the runtime stamp chain reproduces every build-time probe to 1e-3', () => {
+    // TH_HEIGHT_PROBES are heights the COMPILER measured with its own copy of
+    // the stamp chain. bgFieldExactHeight is the sim's copy. If the two ports
+    // ever drift (a brush falloff, the splatter mask, the level/add mode),
+    // every collider seat and placement seat the compiler baked is wrong.
+    expect(TH_HEIGHT_PROBES.length).toBeGreaterThanOrEqual(24);
+    let worst = 0;
+    for (const p of TH_HEIGHT_PROBES) {
+      const d = Math.abs(bgFieldExactHeight(p.x, p.z) - p.h);
+      if (d > worst) worst = d;
+      expect(d, `exact chain at (${p.x}, ${p.z})`).toBeLessThan(1e-3);
     }
+    // Measured max: 2.24e-4 (pure float/rounding). Pin the observed order of
+    // magnitude too, so a real drift cannot hide under the 1e-3 gate.
+    expect(worst).toBeLessThan(5e-4);
   });
 
-  it('each keep is sealed except the mouth: one solid segment per side, both teams', () => {
-    // The owner's two-routes rule: into a base area you come through the main
-    // gate or the gatehouse room, never a side gap, so each keep is exactly a
-    // back wall plus two single unbroken side walls.
-    for (const team of [0, 1] as const) {
-      const segs = keepWallSegments(team);
-      expect(segs).toHaveLength(3);
-      expect(segs.filter((s) => s.x === -16)).toHaveLength(1);
-      expect(segs.filter((s) => s.x === 16)).toHaveLength(1);
-      expect(segs.filter((s) => s.hw > s.hd)).toHaveLength(1); // the back wall
+  it('the baked 1yd grid reproduces every build-time probe within 0.1yd', () => {
+    // The shipped heightfield is a 1yd, 1cm-quantized bilinear grid, so it
+    // rounds curvature between nodes. Measured max error over the 42 authored
+    // probes: 0.0644yd; the pin sits just above it.
+    let worst = 0;
+    for (const p of TH_HEIGHT_PROBES) {
+      const d = Math.abs(bgFieldHeightLocal(p.x, p.z) - p.h);
+      if (d > worst) worst = d;
+      expect(d, `baked grid at (${p.x}, ${p.z})`).toBeLessThan(0.1);
     }
+    expect(worst).toBeGreaterThan(0); // interpolation error is real, not a stub
+    expect(worst).toBeLessThan(0.08);
   });
 
-  it('the keep side walls span back wall to mouth line exactly (containment = walls)', () => {
-    for (const team of [0, 1] as const) {
-      const solidSide = keepWallSegments(team).find(
-        (s) => s.hd > s.hw && s.x === (team === 0 ? 16 : -16),
-      )!;
-      const mouthLine = BG_FLAG_Z - KEEP_MOUTH_DZ;
-      const backLine = BG_FLAG_Z + 10; // KEEP_BACK_DZ
-      expect(
-        Math.min(Math.abs(solidSide.z - solidSide.hd), Math.abs(solidSide.z + solidSide.hd)),
-      ).toBe(mouthLine);
-      expect(
-        Math.max(Math.abs(solidSide.z - solidSide.hd), Math.abs(solidSide.z + solidSide.hd)),
-      ).toBe(backLine);
+  it('at a grid NODE the baked value is the exact chain to within quantization', () => {
+    // Between nodes the grid interpolates; ON a node it must be the chain
+    // itself, give or take the 1cm store. This is what proves the bake is the
+    // same surface rather than a plausible-looking second one.
+    let worst = 0;
+    for (let x = -110; x <= 110; x += 7) {
+      for (let z = -220; z <= 220; z += 11) {
+        worst = Math.max(worst, Math.abs(bgFieldExactHeight(x, z) - bgFieldHeightLocal(x, z)));
+      }
     }
+    expect(worst).toBeLessThan(0.011); // 1cm quantization plus float slop
   });
 
-  it('the keep side walls block everywhere: the mouth is the only way out', () => {
-    const o = battlegroundOrigin(0);
-    const sideZ = o.z + BG_BASES[0].flag.z - 1; // Crimson west-wall midline (z - 119 local)
-    // at the wall midline (where the postern gap used to open): solid now
-    const mid = resolveMovement(SEED, o.x - 14, sideZ, o.x - 19, sideZ, 0.5);
-    expect(mid.x).toBeGreaterThan(o.x - 16);
-    // and 5yd along the same wall: also solid
-    const blocked = resolveMovement(SEED, o.x - 14, sideZ + 5, o.x - 19, sideZ + 5, 0.5);
-    expect(blocked.x).toBeGreaterThan(o.x - 16);
-  });
-
-  it('rubble heaps block movement but sit below the eye line (casts pass over)', () => {
-    const o = battlegroundOrigin(0);
-    const rb = BG_RUBBLE_PILES[0];
-    // walking straight at the heap stops at its face
-    const blocked = resolveMovement(
-      SEED,
-      o.x + rb.x - 4,
-      o.z + rb.z,
-      o.x + rb.x + 4,
-      o.z + rb.z,
-      0.5,
-    );
-    expect(blocked.x).toBeLessThan(o.x + rb.x - 1);
-    // but the cast crosses it: the pile top is under SIGHT_HEIGHT, honestly
+  it('groundHeight in the band IS the field grid, at every landmark', () => {
+    // The whole design rests on one surface: sim movement, sight, the camera,
+    // the renderer and the server all sample groundHeight. Probe the landmarks
+    // the mode is built around, in WORLD coordinates, through the real arm.
+    const keep = locationCentre('Crimson Keep');
+    const marks: [string, number, number, number][] = [
+      // name, local x, local z, expected height
+      ['Crimson flag plateau', 0, -BG_FLAG_Z, 11],
+      ['Azure flag plateau', 0, BG_FLAG_Z, 11],
+      ['Crimson keep centre', keep.x, keep.z, 11],
+      ['Fightpit floor', 0, 0, -8.99],
+      ['Whistlerock Ridge', -70, 0, 7.21],
+      ['Sablepine Ridge', 70, 0, 7.09],
+    ];
+    for (const [name, lx, lz, expected] of marks) {
+      const world = groundHeight(ORIGIN.x + lx, ORIGIN.z + lz, SEED);
+      expect(world, `${name} world height`).toBeCloseTo(bgFieldHeightLocal(lx, lz), 9);
+      expect(world, `${name} authored height`).toBeCloseTo(expected, 1);
+    }
+    // The keeps stand two storeys over the Fightpit: that relief is the field.
     expect(
-      lineOfSightClear(
-        SEED,
-        { x: o.x + rb.x - 4, z: o.z + rb.z },
-        { x: o.x + rb.x + 4, z: o.z + rb.z },
-      ),
-    ).toBe(true);
-  });
-
-  it('flag stands and rune pads are walkable (no collider on them)', () => {
-    const o = battlegroundOrigin(1);
-    for (const base of BG_BASES) {
-      const p = resolvePosition(SEED, o.x + base.flag.x, o.z + base.flag.z, 0.5);
-      expect(p.x).toBeCloseTo(o.x + base.flag.x, 5);
-      expect(p.z).toBeCloseTo(o.z + base.flag.z, 5);
-    }
-    for (const r of [...BG_SPEED_RUNES, ...BG_POWER_RUNES]) {
-      const p = resolvePosition(SEED, o.x + r.x, o.z + r.z, 0.5);
-      expect(p.x).toBeCloseTo(o.x + r.x, 5);
-      expect(p.z).toBeCloseTo(o.z + r.z, 5);
-    }
-    // the two power pads are exact point mirrors
-    expect(BG_POWER_RUNES).toHaveLength(2);
-    expect(BG_POWER_RUNES[1].x).toBeCloseTo(-BG_POWER_RUNES[0].x, 5);
-    expect(BG_POWER_RUNES[1].z).toBeCloseTo(-BG_POWER_RUNES[0].z, 5);
-  });
-
-  it('pins the wall/pillar/crate manifest counts (the three-chambers field)', () => {
-    // 4 perimeter + (1 back + 3 side segs) x 2 keeps + 11 cover walls
-    // + 8 curtain segments + 8 gatehouse walls + 2 barricades
-    // + 8 graveyard fence rails (4 per corner yard)
-    expect(BG_CURTAIN_WALLS).toHaveLength(6);
-    expect(BG_GATEHOUSE_WALLS).toHaveLength(8);
-    expect(BG_KEEP_BARRICADES).toHaveLength(2);
-    expect(BG_GRAVEYARD_FENCES).toHaveLength(8);
-    expect(battlegroundWallSegments()).toHaveLength(4 + 3 * 2 + 11 + 6 + 8 + 2 + 8);
-    expect(BG_COVER_PILLARS).toHaveLength(6);
-    expect(BG_RUBBLE_PILES).toHaveLength(16);
-    expect(BG_COVER_CRATES).toHaveLength(12);
-  });
-
-  it('only the two mouth barricades are low; every other segment is full height', () => {
-    const low = battlegroundWallSegments().filter((s) => s.low);
-    expect(low).toEqual(BG_KEEP_BARRICADES);
-    for (const b of BG_KEEP_BARRICADES) expect(b.low).toBe(true);
-  });
-
-  it('the low/fence flags never change a collider footprint, only its visual top', () => {
-    const segs = battlegroundWallSegments();
-    const obbs = battlegroundColliders().filter((c) => c.type === 'obb');
-    expect(obbs).toHaveLength(segs.length);
-    segs.forEach((s, i) => {
-      const c = obbs[i];
-      expect([c.x, c.z, c.hw, c.hd]).toEqual([s.x, s.z, s.hw, s.hd]);
-      expect(c.cameraTopY).toBe(
-        s.fence ? BG_GRAVEYARD_FENCE_TOP : s.low ? BG_WALL_HEIGHT / 2 : BG_WALL_HEIGHT,
-      );
-    });
-    // the fence top stays above the eye line: what blocks a cast is never
-    // renderable-below-sight (the band's honesty rule)
-    expect(BG_GRAVEYARD_FENCE_TOP).toBeGreaterThan(SIGHT_HEIGHT);
-  });
-
-  it('every real wall run is exactly BG_WALL_T thin; the heart is the one thick block', () => {
-    const segs = battlegroundWallSegments();
-    const thick = segs.filter((s) => Math.min(s.hw, s.hd) > BG_WALL_T);
-    expect(thick).toHaveLength(1); // the heart ruin
-    for (const s of segs) {
-      if (!thick.includes(s)) expect(Math.min(s.hw, s.hd)).toBe(BG_WALL_T);
+      groundHeight(ORIGIN.x, ORIGIN.z - BG_FLAG_Z, SEED) - groundHeight(ORIGIN.x, ORIGIN.z, SEED),
+    ).toBeGreaterThan(18);
+    // Every slot reads the SAME field (the arm resolves the origin by z band).
+    for (let slot = 0; slot < BG_SLOT_COUNT; slot++) {
+      const o = battlegroundOrigin(slot);
+      expect(groundHeight(o.x, o.z, SEED)).toBeCloseTo(bgFieldHeightLocal(0, 0), 9);
+      expect(groundHeight(o.x - 40, o.z + 90, SEED)).toBeCloseTo(bgFieldHeightLocal(-40, 90), 9);
     }
   });
 
-  it('the chase camera clears what it is visually above; casts stay blocked at eye height', () => {
-    const o = battlegroundOrigin(0);
-    // below the barricade top (3yd): the camera ray is occluded
-    const blockedLow = cameraOcclusion(SEED, o.x, 1.0, o.z - 102, o.x, 1.0, o.z - 110);
-    expect(blockedLow).toBeLessThan(1);
-    // above the barricade top but below the rampart top: it clears the low wall
-    expect(cameraOcclusion(SEED, o.x, 4.0, o.z - 102, o.x, 4.0, o.z - 110)).toBe(1);
-    // the full-height heart ruin still occludes at that height, and clears above
-    expect(cameraOcclusion(SEED, o.x, 4.0, o.z - 14, o.x, 4.0, o.z + 4)).toBeLessThan(1);
-    expect(
-      cameraOcclusion(SEED, o.x, BG_WALL_HEIGHT + 1, o.z - 14, o.x, BG_WALL_HEIGHT + 1, o.z + 4),
-    ).toBe(1);
-    // spell sight runs at eye height and the barricade top stays above it, so
-    // a cast straight across the barricade is blocked
-    expect(BG_WALL_HEIGHT / 2).toBeGreaterThan(SIGHT_HEIGHT);
-    expect(lineOfSightClear(SEED, { x: o.x, z: o.z - 102 }, { x: o.x, z: o.z - 110 })).toBe(false);
-    // and an unobstructed lane stays castable
-    expect(
-      lineOfSightClear(SEED, { x: o.x - 13, z: o.z - 102 }, { x: o.x - 13, z: o.z - 110 }),
-    ).toBe(true);
+  it('pins the authored 334-yard flag run', () => {
+    expect(BG_FLAG_Z).toBe(167);
+    expect(BG_FLAG_Z * 2).toBe(334);
+  });
+
+  it('the field outside the band is untouched: groundHeight only branches on x', () => {
+    // A band arm that leaked into the open world would break every other zone.
+    expect(isBgPos(BG_BAND_X_MIN - 1)).toBe(false);
+    expect(groundHeight(0, 0, SEED)).not.toBeCloseTo(bgFieldHeightLocal(0, 0), 3);
   });
 });
 
-describe('Ravenrift chamber routes: curtains, gates, gatehouses, barricades', () => {
-  const o = battlegroundOrigin(0);
-  // Walk a chain of straight legs with body radius 0.5, asserting every leg
-  // arrives at its waypoint (so the whole route is genuinely traversable).
-  function walk(from: { x: number; z: number }, waypoints: { x: number; z: number }[]) {
-    let at = { x: o.x + from.x, z: o.z + from.z };
-    for (const wp of waypoints) {
-      const res = resolveMovement(SEED, at.x, at.z, o.x + wp.x, o.z + wp.z, 0.5);
-      expect(res.x, `leg to (${wp.x}, ${wp.z}) x`).toBeCloseTo(o.x + wp.x, 1);
-      expect(res.z, `leg to (${wp.x}, ${wp.z}) z`).toBeCloseTo(o.z + wp.z, 1);
-      at = res;
-    }
-    return at;
-  }
-
-  it('the curtain wall is solid; only the main gate threads it', () => {
-    // straight into the south curtain between the crossings: stopped at its face
-    const blocked = resolveMovement(SEED, o.x, o.z - 62, o.x, o.z - 50, 0.5);
-    expect(blocked.z).toBeLessThan(o.z - 57.4);
-    // the 10yd main gate (x 8..18) passes
-    walk({ x: 13, z: -62 }, [{ x: 13, z: -50 }]);
-    // where the old flank arch opened (x 38..43): sealed solid now
-    const sealedArch = resolveMovement(SEED, o.x + 40.5, o.z - 62, o.x + 40.5, o.z - 50, 0.5);
-    expect(sealedArch.z).toBeLessThan(o.z - 57.4);
-    // the rampart-side run is solid
-    const stub = resolveMovement(SEED, o.x + 46, o.z - 62, o.x + 46, o.z - 50, 0.5);
-    expect(stub.z).toBeLessThan(o.z - 57.4);
-    // north curtain mirrors: main gate at x -18..-8 passes, the mirror arch line is sealed
-    walk({ x: -13, z: 62 }, [{ x: -13, z: 50 }]);
-    const sealedNorth = resolveMovement(SEED, o.x - 40.5, o.z + 62, o.x - 40.5, o.z + 50, 0.5);
-    expect(sealedNorth.z).toBeGreaterThan(o.z + 57.4);
-  });
-
-  it('the gatehouse is a jogged through-route; its walls block everything else', () => {
-    // in the field door (x -25..-20), west around the ambush crates, out the
-    // courtyard door (x -32..-28): the offset-door S-jog
-    walk({ x: -22.5, z: -69 }, [
-      { x: -22.5, z: -62 }, // in through the field-side door
-      { x: -24.5, z: -57 }, // jog west around the mid-room ambush crate
-      { x: -30, z: -54 },
-      { x: -30, z: -43 }, // out through the courtyard-side door
-    ]);
-    // the mid-room crate's own line is a dead stop (probed radially)
-    const crate = resolveMovement(SEED, o.x - 26, o.z - 62, o.x - 26, o.z - 52, 0.5);
-    expect(crate.z).toBeLessThan(o.z - 59.2);
-    // the gatehouse east wall is solid from the field side
-    const wall = resolveMovement(SEED, o.x - 19, o.z - 68, o.x - 19, o.z - 62, 0.5);
-    expect(wall.z).toBeLessThan(o.z - 65.4);
-    // the north gatehouse mirrors: in at x 20..25, out at x 28..32
-    walk({ x: 22.5, z: 69 }, [
-      { x: 22.5, z: 62 },
-      { x: 24.5, z: 57 },
-      { x: 30, z: 54 },
-      { x: 30, z: 43 },
-    ]);
-  });
-
-  it('chambers are sight-sealed: casts cross only at the crossings', () => {
-    // across the curtain between crossings: no line of sight, probed along
-    // BOTH curtains at every walled stretch
-    for (const [x, z] of [
-      [0, -56],
-      [-40, -56],
-      [25, -56],
-      [46, -56],
-      [0, 56],
-      [40, 56],
-      [-25, 56],
-      [-46, 56],
-    ]) {
+describe('Thornhollow generated module: fresh against the authored map', () => {
+  it('recompiling data/battleground/*.json reproduces the committed field module', () => {
+    // The generated module is the only thing the game reads, so a map edit that
+    // was never recompiled is invisible until someone walks through a wall.
+    // Recompile into a temp path (the compiler takes an out-path argument for
+    // exactly this) and diff; the working tree is never touched.
+    const root = fileURLToPath(new URL('..', import.meta.url));
+    const dir = mkdtempSync(join(tmpdir(), 'thornhollow-'));
+    try {
+      const out = join(dir, 'thornhollow_field.generated.ts');
+      execFileSync(process.execPath, [join(root, 'scripts/assets/compile_thornhollow.mjs'), out], {
+        cwd: root,
+        stdio: 'pipe',
+        timeout: 120000,
+      });
+      const fresh = readFileSync(out, 'utf8');
+      const committed = readFileSync(join(root, 'src/sim/thornhollow_field.generated.ts'), 'utf8');
+      expect(fresh.length).toBeGreaterThan(10000); // the compiler really ran
       expect(
-        lineOfSightClear(SEED, { x: o.x + x, z: o.z + z - 4 }, { x: o.x + x, z: o.z + z + 4 }),
-        `curtain sealed at (${x}, ${z})`,
-      ).toBe(false);
+        fresh === committed,
+        'src/sim/thornhollow_field.generated.ts is stale: re-run ' +
+          '`node scripts/assets/compile_thornhollow.mjs` and commit the result',
+      ).toBe(true);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
     }
-    // through the main gate: clear; across the sealed old arch line: blocked
-    expect(lineOfSightClear(SEED, { x: o.x + 13, z: o.z - 60 }, { x: o.x + 13, z: o.z - 52 })).toBe(
-      true,
-    );
-    expect(
-      lineOfSightClear(SEED, { x: o.x + 40.5, z: o.z - 60 }, { x: o.x + 40.5, z: o.z - 52 }),
-    ).toBe(false);
-    // the heart's 16yd core crosses every main-gate-to-main-gate ray, so the
-    // two gates can never see each other; flag to flag is sealed too
-    expect(lineOfSightClear(SEED, { x: o.x + 13, z: o.z - 56 }, { x: o.x - 13, z: o.z + 56 })).toBe(
-      false,
-    );
-    expect(
-      lineOfSightClear(SEED, { x: o.x, z: o.z - BG_FLAG_Z }, { x: o.x, z: o.z + BG_FLAG_Z }),
-    ).toBe(false);
+  }, 180000);
+});
+
+describe('Thornhollow anchors: the game-mode record, authored symmetric', () => {
+  const mirrorDist = (a: { x: number; z: number }, b: { x: number; z: number }) =>
+    Math.hypot(a.x + b.x, a.z + b.z);
+  // Worst "nearest point mirror" over a whole set: the anchors mirror as SETS
+  // (the spawn ring's two wings are authored in opposite index order).
+  const setMirrorError = (list: readonly { x: number; z: number }[]) => {
+    let worst = 0;
+    for (const a of list) {
+      let best = Infinity;
+      for (const b of list) best = Math.min(best, mirrorDist(a, b));
+      worst = Math.max(worst, best);
+    }
+    return worst;
+  };
+
+  it('both teams get exactly one flag, five spawns, one banner and one plot', () => {
+    expect(BG_BASES).toHaveLength(2);
+    expect(BG_BASES.map((b) => b.team).sort()).toEqual([0, 1]);
+    for (const base of BG_BASES) {
+      expect(base.spawns, `team ${base.team} spawn ring`).toHaveLength(5);
+      // Distinct spots: a duplicated spawn would stack two fighters.
+      const spots = new Set(base.spawns.map((s) => `${s.x}|${s.z}`));
+      expect(spots.size).toBe(5);
+      expect(Math.sign(base.flag.z)).toBe(base.team === 0 ? -1 : 1);
+      expect(Math.sign(base.banner.z)).toBe(Math.sign(base.flag.z));
+      for (const s of base.spawns) expect(Math.sign(s.z)).toBe(Math.sign(base.flag.z));
+    }
+    expect(BG_GRAVEYARDS).toHaveLength(2);
+    expect(Math.sign(BG_GRAVEYARDS[0].z)).toBe(-1);
+    expect(Math.sign(BG_GRAVEYARDS[1].z)).toBe(1);
   });
 
-  it('pins the crossing spans exactly: one 10yd gate per curtain, gatehouse doors 5 and 4', () => {
-    const spans = (z: number) =>
-      BG_CURTAIN_WALLS.filter((s) => s.z === z)
-        .map((s) => [s.x - s.hw, s.x + s.hw])
-        .sort((a, b) => a[0] - b[0]);
-    // south curtain walls: rampart..gatehouse west, gatehouse east..main gate,
-    // main gate..rampart in ONE sealed run (openings are the gaps)
-    expect(spans(-56)).toEqual([
-      [-49, -34],
-      [-18, 8],
-      [18, 49],
-    ]);
-    // the north curtain is the exact point mirror
-    expect(spans(56)).toEqual([
-      [-49, -18],
-      [-8, 18],
-      [34, 49],
-    ]);
-    // gatehouse doors: field-side door x -25..-20 (5yd), courtyard-side door
-    // x -32..-28 (4yd); the walls end exactly at those door edges
-    const field = BG_GATEHOUSE_WALLS.find((s) => s.z === -65);
-    const court = BG_GATEHOUSE_WALLS.find((s) => s.z === -47);
-    expect(field ? field.x + field.hw : null).toBe(-25);
-    expect(court ? court.x - court.hw : null).toBe(-28);
-  });
-
-  it('the mouth barricade blocks the straight charge and both gaps stay open', () => {
-    // Crimson barricade spans x -11..5 at z -107..-105: the flag-line charge stops
-    const blocked = resolveMovement(SEED, o.x, o.z - 102, o.x, o.z - 110, 0.5);
-    expect(blocked.z).toBeGreaterThan(o.z - 105);
-    // narrow (west) gap: x = -13 threads it
-    walk({ x: -13, z: -102 }, [{ x: -13, z: -109 }]);
-    // wide (east) gap: x = 10 threads it
-    walk({ x: 10, z: -102 }, [{ x: 10, z: -109 }]);
-    // the barricade sits field-side of the form-up containment line (the keep
-    // interior spans |z| in [BG_FLAG_Z - KEEP_MOUTH_DZ, back wall]), with at
-    // least 1yd of clearance so tickCountdown never reads it
-    for (const b of BG_KEEP_BARRICADES) {
-      expect(Math.abs(b.z) + b.hd).toBeLessThanOrEqual(BG_FLAG_Z - KEEP_MOUTH_DZ - 1);
+  it('flags sit on the |z| = BG_FLAG_Z line, centred and inside the play rect', () => {
+    for (const base of BG_BASES) {
+      expect(Math.abs(base.flag.z)).toBe(BG_FLAG_Z);
+      expect(base.flag.x).toBe(0);
+      expect(Math.abs(base.flag.z)).toBeLessThan(BG_PLAY_HALF_Z);
+    }
+    // The flag stands are inside their authored keep rects.
+    for (const [team, name] of [
+      [0, 'Crimson Keep'],
+      [1, 'Azure Keep'],
+    ] as const) {
+      const r = locationRect(name);
+      const f = BG_BASES[team].flag;
+      expect(f.x).toBeGreaterThan(r.minX);
+      expect(f.x).toBeLessThan(r.maxX);
+      expect(f.z).toBeGreaterThan(r.minZ);
+      expect(f.z).toBeLessThan(r.maxZ);
     }
   });
 
-  it('the courtyard sightline breakers block their line and leave the lanes open', () => {
-    // crossing the northeast breaker foot (x 9..23, z 21..23) head-on is blocked
-    const blocked = resolveMovement(SEED, o.x + 16, o.z + 18, o.x + 16, o.z + 26, 0.5);
-    expect(blocked.z).toBeLessThan(o.z + 20.6);
-    // the lane between the heart's north face (z=8) and that breaker passes
-    walk({ x: 20, z: 14 }, [{ x: -20, z: 14 }]);
-  });
-
-  it('each flag is reachable from the enemy keep with body radius 0.5, both routes', () => {
-    // Route A, the main gates: out the wide mouth gap, through the south main
-    // gate, across the courtyard between the heart and the breakers, out the
-    // north main gate, and in through Azure's narrow mouth gap.
-    walk({ x: 0, z: -BG_FLAG_Z }, [
-      { x: 10, z: -114 },
-      { x: 10, z: -104 }, // the wide mouth gap
-      { x: 10, z: -95 },
-      { x: 24, z: -92 }, // around the first S-approach wall
-      { x: 26, z: -80 },
-      { x: 24, z: -70 }, // around the second
-      { x: 14, z: -62 },
-      { x: 13, z: -50 }, // the south main gate
-      { x: 13, z: -26 },
-      { x: 13, z: -12 },
-      { x: 13, z: 2 }, // east of the heart
-      { x: 10, z: 14 },
-      { x: 0, z: 24 }, // between the northern breaker pairs
-      { x: -13, z: 32 },
-      { x: -13, z: 50 },
-      { x: -13, z: 62 }, // the north main gate
-      { x: -13, z: 70 },
-      { x: -24, z: 78 }, // around the mirrored S-approach
-      { x: -26, z: 90 },
-      { x: -14, z: 100 },
-      { x: -10, z: 104 }, // Azure's narrow mouth gap
-      { x: -10, z: 110 },
-      { x: -6, z: 114 },
-      { x: 0, z: BG_FLAG_Z },
-    ]);
-    // Route B, the sneak: out the narrow west mouth gap, around the wing
-    // baffle, the gatehouse S-jog, up the courtyard's west flank past the
-    // rune, then across to the north main gate (the old flank arch is
-    // sealed), and home through the far mouth gap.
-    walk({ x: 0, z: -BG_FLAG_Z }, [
-      { x: -10, z: -114 },
-      { x: -13, z: -109 }, // out the narrow west mouth gap past the barricade
-      { x: -13, z: -104 },
-      { x: -18, z: -106 },
-      { x: -44, z: -104 }, // the rampart-side gap past the wing baffle
-      { x: -44, z: -98 },
-      { x: -44, z: -84 },
-      { x: -36, z: -74 },
-      { x: -33, z: -67.5 }, // the corridor between S-wall and gatehouse
-      { x: -22.5, z: -67.5 }, // to the field door
-      { x: -22.5, z: -62 }, // the gatehouse S-jog
-      { x: -24.5, z: -57 },
-      { x: -30, z: -54 },
-      { x: -30, z: -43 },
-      { x: -38, z: -30 }, // the courtyard west flank, over the rune pad
-      { x: -38, z: 0 },
-      { x: -38, z: 20 },
-      { x: -38, z: 44 }, // past the west breaker, still on the flank
-      { x: -13, z: 50 }, // cut across to the north main gate
-      { x: -13, z: 62 },
-      { x: -13, z: 70 },
-      { x: -24, z: 78 }, // around the mirrored S-approach
-      { x: -26, z: 90 },
-      { x: -14, z: 100 },
-      { x: -10, z: 104 }, // Azure's narrow mouth gap
-      { x: -10, z: 110 },
-      { x: -4, z: 114 },
-      { x: 0, z: BG_FLAG_Z },
-    ]);
-  });
-
-  it('graveyard plots: inside the keeps, exact mirrors, spots and ward clear of colliders', () => {
-    // plots are point mirrors and sit fully inside their keep interiors
-    expect(BG_GRAVEYARDS[1].x).toBeCloseTo(-BG_GRAVEYARDS[0].x, 5);
-    expect(BG_GRAVEYARDS[1].z).toBeCloseTo(-BG_GRAVEYARDS[0].z, 5);
+  it('flags, spawn rings, graveyards and banners point-mirror between the teams', () => {
+    // Unlike the organic art scatter, the ANCHORS are authored symmetric: this
+    // is the "neither team is favoured" pin, and it is the one that catches a
+    // map edit that moved one side only.
+    expect(mirrorDist(BG_BASES[0].flag, BG_BASES[1].flag)).toBeLessThan(1e-6);
+    expect(mirrorDist(BG_GRAVEYARDS[0], BG_GRAVEYARDS[1])).toBeLessThan(1e-6);
     expect(BG_GRAVEYARDS[1].hw).toBe(BG_GRAVEYARDS[0].hw);
     expect(BG_GRAVEYARDS[1].hd).toBe(BG_GRAVEYARDS[0].hd);
-    for (const team of [0, 1] as const) {
-      const plot = BG_GRAVEYARDS[team];
-      // The yard lives in the map corner BESIDE the keep: inside the
-      // perimeter with wall clearance, fully OUTSIDE the keep interior
-      // (never in the flag room), on the gatehouse-opposite flank.
-      expect(Math.abs(plot.x) + plot.hw).toBeLessThanOrEqual(BG_HALF_X - 2);
-      expect(Math.abs(plot.z) + plot.hd).toBeLessThanOrEqual(BG_HALF_Z - 2);
-      const bounds = keepInteriorBounds(team);
-      const overlapsKeep =
-        plot.x + plot.hw > bounds.minX &&
-        plot.x - plot.hw < bounds.maxX &&
-        plot.z + plot.hd > bounds.minZ &&
-        plot.z - plot.hd < bounds.maxZ;
-      expect(overlapsKeep).toBe(false);
+    // Spawn rings mirror as SETS, exactly (measured worst 0).
+    for (const s of BG_BASES[0].spawns) {
+      const twin = BG_BASES[1].spawns.find((t) => mirrorDist(s, t) < 1e-6);
+      expect(twin, `spawn (${s.x}, ${s.z}) has no mirrored twin`).toBeTruthy();
     }
-    // every release spot (5 roster slots x 2 teams) resolves in place at body
-    // radius: a spirit is never teleported into a fence rail
-    const o = battlegroundOrigin(0);
+    expect(setMirrorError([...BG_BASES[0].spawns, ...BG_BASES[1].spawns])).toBeLessThan(1e-6);
+    // The banners are placed art, seated by hand: measured mirror offset 0.90yd.
+    // Pinned at 1.5yd so a banner that wandered to the wrong side of a keep
+    // fails while the authored jitter passes.
+    expect(mirrorDist(BG_BASES[0].banner, BG_BASES[1].banner)).toBeLessThan(1.5);
+  });
+
+  it('six speed pads and four power pads, point-mirrored as sets', () => {
+    expect(BG_SPEED_RUNES).toHaveLength(6);
+    expect(BG_POWER_RUNES).toHaveLength(4);
+    // Measured set-mirror error: speed 0.0075yd (one pad seated by hand),
+    // power 0. A pad moved to one team's half breaks these by yards.
+    expect(setMirrorError(BG_SPEED_RUNES)).toBeLessThan(0.05);
+    expect(setMirrorError(BG_POWER_RUNES)).toBeLessThan(1e-6);
+    // Every pad inside the play rect, and none of them buried in a collider.
+    for (const r of [...BG_SPEED_RUNES, ...BG_POWER_RUNES]) {
+      expect(Math.abs(r.x), `rune (${r.x}, ${r.z}) x`).toBeLessThanOrEqual(BG_PLAY_HALF_X);
+      expect(Math.abs(r.z), `rune (${r.x}, ${r.z}) z`).toBeLessThanOrEqual(BG_PLAY_HALF_Z);
+      const p = resolvePosition(SEED, ORIGIN.x + r.x, ORIGIN.z + r.z, 0.5);
+      expect(p.x, `rune (${r.x}, ${r.z}) is walkable`).toBeCloseTo(ORIGIN.x + r.x, 5);
+      expect(p.z, `rune (${r.x}, ${r.z}) is walkable`).toBeCloseTo(ORIGIN.z + r.z, 5);
+    }
+    // The two lane pads and the two ridge pads are on opposite halves.
+    expect(BG_SPEED_RUNES.filter((r) => r.z < 0)).toHaveLength(2);
+    expect(BG_SPEED_RUNES.filter((r) => r.z > 0)).toHaveLength(2);
+    expect(BG_POWER_RUNES.filter((r) => r.z < 0)).toHaveLength(2);
+    expect(BG_POWER_RUNES.filter((r) => r.z > 0)).toHaveLength(2);
+  });
+
+  it('graveyard release spots settle inside their own plot, clear of geometry', () => {
+    for (const plot of BG_GRAVEYARDS) {
+      expect(Math.abs(plot.x) + plot.hw).toBeLessThanOrEqual(BG_PLAY_HALF_X);
+      expect(Math.abs(plot.z) + plot.hd).toBeLessThanOrEqual(BG_PLAY_HALF_Z);
+    }
     const fakeMatch = {
       slot: 0,
       teams: [
@@ -497,62 +348,414 @@ describe('Ravenrift chamber routes: curtains, gates, gatehouses, barricades', ()
     for (const pid of [...fakeMatch.teams[0], ...fakeMatch.teams[1]]) {
       const spot = bgGraveyardSpot(fakeMatch, pid);
       const r = resolvePosition(SEED, spot.x, spot.z, 0.5);
-      expect(r.x, `spot for ${pid}`).toBeCloseTo(spot.x, 5);
-      expect(r.z, `spot for ${pid}`).toBeCloseTo(spot.z, 5);
-      // and inside the ward box the clamp enforces (plot inset by 1.6)
+      // Two of the five spots per team sit inside a headstone footprint and
+      // get pushed clear (measured 0.91yd and 0.66yd). That is survivable, a
+      // spirit never lands INSIDE the stone; what is not survivable is a spot
+      // the solver cannot settle, or one shoved out of its own plot.
+      const nudge = Math.hypot(r.x - spot.x, r.z - spot.z);
+      expect(nudge, `spot for ${pid} nudge`).toBeLessThan(1);
+      const settled = resolvePosition(SEED, r.x, r.z, 0.5);
+      expect(settled.x, `spot for ${pid} settles`).toBeCloseTo(r.x, 6);
+      expect(settled.z, `spot for ${pid} settles`).toBeCloseTo(r.z, 6);
       const team = pid >= 200 ? 1 : 0;
       const plot = BG_GRAVEYARDS[team];
-      expect(Math.abs(spot.x - (o.x + plot.x))).toBeLessThanOrEqual(plot.hw - 1.6 + 1e-9);
-      expect(Math.abs(spot.z - (o.z + plot.z))).toBeLessThanOrEqual(plot.hd - 1.6 + 1e-9);
+      expect(Math.abs(r.x - (ORIGIN.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+      expect(Math.abs(r.z - (ORIGIN.z + plot.z))).toBeLessThanOrEqual(plot.hd);
     }
-    // the ward corners themselves resolve in place: the clamp can never park
-    // a spirit inside a rail or keep wall
-    for (const team of [0, 1] as const) {
-      const plot = BG_GRAVEYARDS[team];
-      for (const sx of [-1, 1]) {
-        for (const sz of [-1, 1]) {
-          const wx = o.x + plot.x + sx * (plot.hw - 1.6);
-          const wz = o.z + plot.z + sz * (plot.hd - 1.6);
-          const r = resolvePosition(SEED, wx, wz, 0.5);
-          expect(r.x, `ward corner ${team}/${sx}/${sz}`).toBeCloseTo(wx, 5);
-          expect(r.z, `ward corner ${team}/${sx}/${sz}`).toBeCloseTo(wz, 5);
-        }
+  });
+
+  it('spawn rings and flag stands are seated on the keep plateau', () => {
+    for (const base of BG_BASES) {
+      for (const s of base.spawns) {
+        const p = resolvePosition(SEED, ORIGIN.x + s.x, ORIGIN.z + s.z, 0.5);
+        expect(p.x, `spawn (${s.x}, ${s.z})`).toBeCloseTo(ORIGIN.x + s.x, 5);
+        expect(p.z, `spawn (${s.x}, ${s.z})`).toBeCloseTo(ORIGIN.z + s.z, 5);
+        // On the plateau, not down the keep face, and never on the flag stand.
+        expect(bgFieldHeightLocal(s.x, s.z), `spawn (${s.x}, ${s.z}) height`).toBeGreaterThan(9);
+        expect(Math.hypot(s.x - base.flag.x, s.z - base.flag.z)).toBeGreaterThan(BG_PICKUP_RADIUS);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Walkability: the decisive test. A breadth-first flood over the play rect,
+// through the SAME collider grid, ground arm and standable-support query the
+// movement kernel uses, at the body radius and the physics step-up limit.
+// ---------------------------------------------------------------------------
+
+const FLOOD_CELL = 0.5; // fine enough to thread the keep-gate mouth and the
+// stair runs onto the flag plinth (a 1yd lattice misses the plinth steps by
+// half a cell and reports the Azure flag 6yd out of reach); the whole flood
+// still runs in about 0.6s.
+const BODY_RADIUS = 0.5;
+const STEP_UP = 0.9; // src/sim/physics/character.ts MAX_STEP_HEIGHT
+const MANTLE = 0.7; // src/sim/colliders.ts MANTLE_REACH
+const MAX_DROP = 6;
+
+interface Flood {
+  cols: number;
+  rows: number;
+  /** Distance from (x, z) to the nearest cell the flood reached. */
+  nearest: (x: number, z: number) => number;
+  /** Did the flood reach the cell that (x, z) itself falls in? */
+  visitedAt: (x: number, z: number) => boolean;
+  reached: number;
+}
+
+function floodPlayRect(): Flood {
+  const cols = Math.round((BG_PLAY_HALF_X * 2) / FLOOD_CELL) + 1;
+  const rows = Math.round((BG_PLAY_HALF_Z * 2) / FLOOD_CELL) + 1;
+  const idx = (c: number, r: number) => c * rows + r;
+  const cellX = (c: number) => -BG_PLAY_HALF_X + c * FLOOD_CELL;
+  const cellZ = (r: number) => -BG_PLAY_HALF_Z + r * FLOOD_CELL;
+  // The surface a body would stand on: terrain, or an authored deck top within
+  // reach of the feet (what the movement kernel maxes against the terrain).
+  const surfaceAt = (lx: number, lz: number, feetY: number) =>
+    Math.max(
+      groundHeight(ORIGIN.x + lx, ORIGIN.z + lz, SEED),
+      supportHeightAt(SEED, ORIGIN.x + lx, ORIGIN.z + lz, BODY_RADIUS, feetY + MANTLE),
+    );
+  const freeAt = (lx: number, lz: number, feetY: number) => {
+    const wx = ORIGIN.x + lx;
+    const wz = ORIGIN.z + lz;
+    const res = resolvePosition(SEED, wx, wz, BODY_RADIUS, false, undefined, {
+      y: feetY + 0.05,
+      lift: 0,
+    });
+    return Math.abs(res.x - wx) < 1e-3 && Math.abs(res.z - wz) < 1e-3;
+  };
+
+  const visited = new Uint8Array(cols * rows);
+  const heightOf = new Float32Array(cols * rows);
+  const start = BG_BASES[0].spawns[0];
+  const c0 = Math.round((start.x + BG_PLAY_HALF_X) / FLOOD_CELL);
+  const r0 = Math.round((start.z + BG_PLAY_HALF_Z) / FLOOD_CELL);
+  const stack: number[] = [idx(c0, r0)];
+  visited[idx(c0, r0)] = 1;
+  heightOf[idx(c0, r0)] = surfaceAt(cellX(c0), cellZ(r0), Number.POSITIVE_INFINITY);
+  const NB = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ];
+  let reached = 1;
+  while (stack.length) {
+    const cur = stack.pop() as number;
+    const c = Math.floor(cur / rows);
+    const r = cur % rows;
+    const y = heightOf[cur];
+    for (const [dc, dr] of NB) {
+      const nc = c + dc;
+      const nr = r + dr;
+      if (nc < 0 || nr < 0 || nc >= cols || nr >= rows) continue;
+      const ni = idx(nc, nr);
+      if (visited[ni]) continue;
+      const lx = cellX(nc);
+      const lz = cellZ(nr);
+      const ny = surfaceAt(lx, lz, y + STEP_UP);
+      if (ny - y > STEP_UP) continue; // too tall to stride onto
+      if (y - ny > MAX_DROP) continue; // a fall, not a walk
+      if (!freeAt(lx, lz, ny)) continue; // a collider stands there
+      visited[ni] = 1;
+      heightOf[ni] = ny;
+      reached++;
+      stack.push(ni);
+    }
+  }
+  const nearest = (x: number, z: number) => {
+    let best = Number.POSITIVE_INFINITY;
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < rows; r++) {
+        if (!visited[idx(c, r)]) continue;
+        const d = Math.hypot(cellX(c) - x, cellZ(r) - z);
+        if (d < best) best = d;
+      }
+    }
+    return best;
+  };
+  const visitedAt = (x: number, z: number) => {
+    const c = Math.round((x + BG_PLAY_HALF_X) / FLOOD_CELL);
+    const r = Math.round((z + BG_PLAY_HALF_Z) / FLOOD_CELL);
+    if (c < 0 || r < 0 || c >= cols || r >= rows) return false;
+    return visited[idx(c, r)] === 1;
+  };
+  return { cols, rows, nearest, visitedAt, reached };
+}
+
+describe('Thornhollow walkability: one connected field, both keeps included', () => {
+  const flood = floodPlayRect();
+  // "Standable" = the flood reached a cell inside one flood cell of the point.
+  const reaches = (x: number, z: number) => flood.nearest(x, z) <= FLOOD_CELL + 1e-9;
+
+  it('the flood covers most of the play rect from a single Crimson spawn', () => {
+    // A field that fell into disconnected pockets (a wall closed a lane, the
+    // ravine sealed a ridge) collapses this number; a field that lost its
+    // colliders entirely would push it near 100%.
+    const share = flood.reached / (flood.cols * flood.rows);
+    expect(share).toBeGreaterThan(0.6);
+    expect(share).toBeLessThan(0.95);
+  });
+
+  it('reaches BOTH spawn rings, so the two teams share one field', () => {
+    for (const base of BG_BASES) {
+      for (const s of base.spawns) {
+        expect(reaches(s.x, s.z), `team ${base.team} spawn (${s.x}, ${s.z})`).toBe(true);
+      }
+      // The banner point is the pole itself (a collider), so what has to be
+      // walkable is the ground beside it.
+      expect(
+        flood.nearest(base.banner.x, base.banner.z),
+        `team ${base.team} banner surround`,
+      ).toBeLessThan(2);
+    }
+  });
+
+  it('reaches both graveyards and every rune pad', () => {
+    for (const [i, g] of BG_GRAVEYARDS.entries()) {
+      expect(reaches(g.x, g.z), `graveyard ${i}`).toBe(true);
+    }
+    for (const r of [...BG_SPEED_RUNES, ...BG_POWER_RUNES]) {
+      expect(reaches(r.x, r.z), `rune (${r.x}, ${r.z})`).toBe(true);
+    }
+  });
+
+  it('reaches the Fightpit floor and both flank ridges', () => {
+    for (const name of ['The Fightpit', 'Whistlerock Ridge', 'Sablepine Ridge']) {
+      const c = locationCentre(name);
+      expect(reaches(c.x, c.z), name).toBe(true);
+    }
+    // The Fightpit really is the sunken middle and the ridges really are high:
+    // reaching a flat field would pass the check above but not this one.
+    expect(bgFieldHeightLocal(0, 0)).toBeLessThan(-8);
+    expect(bgFieldHeightLocal(-70, 0)).toBeGreaterThan(6);
+    expect(bgFieldHeightLocal(70, 0)).toBeGreaterThan(6);
+  });
+
+  it('a stand within the flag pickup radius is reachable at BOTH flags', () => {
+    // The flag sits on an authored plinth; only the plinth stairs put a body
+    // in reach. Measured nearest reachable stand: Crimson 3.00yd, Azure 3.50yd
+    // against a 4yd reach, so a plinth step that stopped working fails here.
+    for (const base of BG_BASES) {
+      const d = flood.nearest(base.flag.x, base.flag.z);
+      expect(d, `team ${base.team} flag reach`).toBeLessThanOrEqual(BG_PICKUP_RADIUS);
+    }
+  });
+
+  it('the keep rampart decks are reachable, proving the authored stairs work', () => {
+    // The rampart deck over each keep gate sits at moveTopY 16.7, 5.7yd over
+    // the keep plateau: unreachable without the authored stair runs, so this
+    // is the standable-deck path end to end (support query, step-up, mantle).
+    for (const [lx, lz] of [
+      [-26, -137.5],
+      [26, 137.5],
+    ]) {
+      expect(reaches(lx, lz), `rampart deck (${lx}, ${lz})`).toBe(true);
+      // and it really is a deck ABOVE the plateau, not just open ground
+      expect(supportHeightAt(SEED, ORIGIN.x + lx, ORIGIN.z + lz, BODY_RADIUS, 999)).toBeGreaterThan(
+        groundHeight(ORIGIN.x + lx, ORIGIN.z + lz, SEED) + 5,
+      );
+    }
+  });
+
+  it('the flood is bounded by real geometry, not by the rect edge', () => {
+    // Sanity that the walk is honest: the cells inside a keep curtain
+    // footprint are NOT reached even though they sit well inside the play
+    // rect, and neither is the deep ravine wall behind the west ridge.
+    for (const [lx, lz] of [
+      [-20, -134],
+      [20, -134],
+      [-20, 134],
+      [20, 134],
+    ]) {
+      expect(flood.visitedAt(lx, lz), `curtain footprint (${lx}, ${lz})`).toBe(false);
+      expect(isBlocked(SEED, ORIGIN.x + lx, ORIGIN.z + lz, BODY_RADIUS)).toBe(true);
+    }
+    // and the flood really did stop somewhere: a fully open rect would be 100%
+    expect(flood.reached).toBeLessThan(flood.cols * flood.rows);
+  });
+});
+
+describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens', () => {
+  it('keeps ordinary movers from climbing both authored ridge walls', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    for (const sign of [-1, 1]) {
+      const start = {
+        x: ORIGIN.x + sign * 87,
+        y: groundHeight(ORIGIN.x + sign * 87, ORIGIN.z + sign * 54, SEED),
+        z: ORIGIN.z + sign * 54,
+      };
+      const mover = { templateId: 'forest_wolf', pos: start, facing: 0 };
+      const dest = { x: ORIGIN.x + sign * 94, y: 30, z: ORIGIN.z + sign * 54 };
+      for (let tick = 0; tick < 20; tick++) {
+        (
+          sim as unknown as { moveToward(e: typeof mover, d: typeof dest, speed: number): boolean }
+        ).moveToward(mover, dest, 7);
+      }
+      expect(mover.pos.y, `ridge side ${sign}`).toBeLessThan(10);
+      expect(Math.abs(mover.pos.x - ORIGIN.x), `ridge side ${sign}`).toBeLessThan(89);
+    }
+  });
+
+  it('uses elevated deck height for battleground spell sight', () => {
+    const from = { x: ORIGIN.x - 26, z: ORIGIN.z - 137.5 };
+    const to = { x: ORIGIN.x - 43.5, z: ORIGIN.z - 144 };
+    const fromY = supportHeightAt(SEED, from.x, from.z, 0.45, 999);
+    const toY = supportHeightAt(SEED, to.x, to.z, 0.45, 999);
+    expect(fromY).toBeCloseTo(16.7, 4);
+    expect(toY).toBeCloseTo(16.7, 4);
+    expect(lineOfSightClear(SEED, { ...from, y: fromY }, { ...to, y: toY })).toBe(true);
+    expect(lineOfSightClear(SEED, from, to)).toBe(false);
+  });
+
+  it('routes the chase-camera sweep through battleground colliders', () => {
+    const zFrom = ORIGIN.z - 130;
+    const zTo = ORIGIN.z - 137;
+    const wall = cameraOcclusion(SEED, ORIGIN.x - 5.13, 13, zFrom, ORIGIN.x - 5.13, 13, zTo);
+    const gate = cameraOcclusion(SEED, ORIGIN.x, 13, zFrom, ORIGIN.x, 13, zTo);
+    expect(wall).toBeGreaterThan(0);
+    expect(wall).toBeLessThan(1);
+    expect(gate).toBe(1);
+  });
+
+  it('the keep curtain blocks along its whole run, both keeps', () => {
+    for (const z of [-134, -136, -138, -140, 134, 136, 138, 140]) {
+      for (const x of [-40, -30, -20, -10, 10, 20, 30, 40]) {
+        expect(isBlocked(SEED, ORIGIN.x + x, ORIGIN.z + z, 0.5), `curtain at (${x}, ${z})`).toBe(
+          true,
+        );
       }
     }
   });
 
-  it('the form-up spots and spawn rings stay walkable under the new geometry', () => {
-    for (const base of BG_BASES) {
-      for (const sp of base.spawns) {
-        // The ring sits in open keep floor (moved off the back wall so the
-        // spawn-in camera has clearance): exact resolution, no face-nudge.
-        const p = resolvePosition(SEED, o.x + sp.x, o.z + sp.z, 0.5);
-        expect(p.x).toBeCloseTo(o.x + sp.x, 5);
-        expect(p.z).toBeCloseTo(o.z + sp.z, 5);
-        // Never on the flag stand itself, and clear of the keep back wall
-        // (|z| = 128, BG_FLAG_Z + KEEP_BACK_DZ) by the camera's working room.
-        expect(Math.hypot(sp.x - base.flag.x, sp.z - base.flag.z)).toBeGreaterThanOrEqual(4);
-        expect(128 - Math.abs(sp.z)).toBeGreaterThanOrEqual(10);
-      }
-      // The two rings mirror under the point symmetry like everything else.
-      const mirror = BG_BASES[1 - base.team];
-      for (const [i, sp] of base.spawns.entries()) {
-        expect(mirror.spawns[i].x).toBeCloseTo(-sp.x, 5);
-        expect(mirror.spawns[i].z).toBeCloseTo(-sp.z, 5);
+  it('the keep gate mouth is open through the curtain', () => {
+    for (const z of [-134, -136, -138, -140, 134, 136, 138, 140]) {
+      for (const x of [-2, 0, 2]) {
+        expect(isBlocked(SEED, ORIGIN.x + x, ORIGIN.z + z, 0.5), `gate mouth at (${x}, ${z})`).toBe(
+          false,
+        );
       }
     }
-    // the mechanics suites stage in-match players at flag-relative offsets;
-    // pin the two staging spots nearest new geometry: the mouth line and the
-    // carrier's off-stand spot inside the keep
-    for (const [sx2, sz2] of [
-      [0, -104], // the mouth line
-      [6, 110], // the carrier's off-stand spot (battleground.test.ts:444)
-      [10, -98], // home + (10, 20) staging
-      [12, -93], // home + (12, 25) staging
-    ]) {
-      const p = resolvePosition(SEED, o.x + sx2, o.z + sz2, 0.5);
-      expect(p.x).toBeCloseTo(o.x + sx2, 5);
-      expect(p.z).toBeCloseTo(o.z + sz2, 5);
+  });
+
+  it('every structural wall stands above the eye line where it stands', () => {
+    // bgFieldPlanWalls is the projection the minimap draws: the blocking boxes
+    // that stand taller than a step. A wall whose camera top sat under
+    // SIGHT_HEIGHT would block a cast the player can see straight over (issue
+    // #1668's shape). Standable decks are exempt: a tread is meant to be low.
+    const walls = bgFieldPlanWalls();
+    expect(walls.length).toBeGreaterThan(300);
+    for (const w of walls) {
+      const ground = bgFieldHeightLocal(w.x, w.z);
+      expect(w.top - ground).toBeCloseTo(w.height, 6); // the plan reports its own rise
+      expect(w.top, `wall at (${w.x}, ${w.z}) tops out under the eye line`).toBeGreaterThan(
+        ground + SIGHT_HEIGHT,
+      );
+    }
+  });
+
+  it('camera-solid colliders are only the pieces a body genuinely cannot see over', () => {
+    // The chase camera pulls in on real walls and glides over everything else.
+    // Getting this wrong is not cosmetic: when the flag podium's own stone base
+    // counted as camera-solid, the boom collapsed to first person in the flag
+    // court, the most contested ground in the mode.
+    const solid = battlegroundColliders().filter((c) => !c.camGhost);
+    expect(solid.length).toBeGreaterThan(100);
+    for (const c of solid) {
+      const ground = bgFieldHeightLocal(c.x, c.z);
+      expect(
+        (c.cameraTopY ?? 0) - ground,
+        `camera-solid collider at (${c.x}, ${c.z}) is too short to occlude`,
+      ).toBeGreaterThanOrEqual(3.5);
+    }
+    // Nothing inside the flag stands' own footprint occludes: standing at a
+    // stand must never jam the camera.
+    for (const base of BG_BASES) {
+      const near = solid.filter((c) => Math.hypot(c.x - base.flag.x, c.z - base.flag.z) < 8);
+      expect(near, `camera-solid geometry sits on team ${base.team}'s stand`).toHaveLength(0);
+    }
+  });
+
+  it('the standable decks exist in useful numbers and carry a movement top', () => {
+    const decks = battlegroundColliders().filter((c) => c.standable);
+    expect(decks.length).toBeGreaterThan(500);
+    for (const d of decks) {
+      expect(d.moveTopY, `standable at (${d.x}, ${d.z}) has no moveTopY`).toBeTypeOf('number');
+    }
+    // Every collider carrying a movement top is standable and vice versa: a
+    // moveTopY without `standable` is a prop a body passes over but cannot
+    // land on, which is not a thing this field authors.
+    expect(battlegroundColliders().filter((c) => c.moveTopY !== undefined)).toHaveLength(
+      decks.length,
+    );
+    // The keep ramparts are among them, at the authored deck height.
+    const rampart = decks.find((c) => c.x === -26 && c.z === -137.5);
+    expect(rampart?.moveTopY).toBeCloseTo(16.7, 3);
+    expect(rampart?.standable).toBe(true);
+  });
+
+  it('every collider is a box, seated inside the field rect', () => {
+    const cs = battlegroundColliders();
+    expect(cs.length).toBeGreaterThan(2000);
+    for (const c of cs) {
+      expect(c.type, `collider at (${c.x}, ${c.z})`).toBe('obb');
+      expect(Math.abs(c.x)).toBeLessThanOrEqual(BG_HALF_X + 4);
+      expect(Math.abs(c.z)).toBeLessThanOrEqual(BG_HALF_Z + 4);
+    }
+    // Mutating the returned set never touches the generated record.
+    const first = cs[0];
+    const before = first.x;
+    first.x += 100;
+    expect(battlegroundColliders()[0].x).toBe(before);
+  });
+
+  it('the art the map placed is seated inside the rect too', () => {
+    expect(TH_PLACEMENTS.length).toBeGreaterThan(1000);
+    for (const p of TH_PLACEMENTS) {
+      expect(Math.abs(p.x), `placement ${p.assetId}`).toBeLessThanOrEqual(BG_HALF_X + 8);
+      expect(Math.abs(p.z), `placement ${p.assetId}`).toBeLessThanOrEqual(BG_HALF_Z + 8);
+      expect(Number.isFinite(p.seatY), `placement ${p.assetId} seat`).toBe(true);
+      expect(p.scale).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('Ravenrift slots: isolated from each other, whole inside one match', () => {
+  it('a same-slot match fits inside the raised interest radius', () => {
+    // Whole-match interest is the design: every fighter is in every other
+    // fighter's mirror. The two longest same-slot spans have to fit.
+    const o = battlegroundOrigin(0);
+    const crimson = { x: o.x + BG_BASES[0].flag.x, z: o.z + BG_BASES[0].flag.z };
+    const azure = { x: o.x + BG_BASES[1].flag.x, z: o.z + BG_BASES[1].flag.z };
+    expect(Math.hypot(crimson.x - azure.x, crimson.z - azure.z)).toBeLessThan(
+      BG_MATCH_INTEREST_RADIUS,
+    );
+    const playDiagonal = Math.hypot(2 * BG_PLAY_HALF_X, 2 * BG_PLAY_HALF_Z);
+    expect(playDiagonal).toBeLessThan(BG_MATCH_INTEREST_RADIUS);
+    expect(BG_MATCH_DROP_RADIUS).toBeGreaterThan(BG_MATCH_INTEREST_RADIUS);
+  });
+
+  it('cross-slot pairs stay beyond the drop radius, corner to corner', () => {
+    // Slot spacing must clear the WIDENED radius even for the two nearest
+    // corners of adjacent slots, or one match would leak into the next.
+    for (let slot = 1; slot < BG_SLOT_COUNT; slot++) {
+      const a = battlegroundOrigin(slot - 1);
+      const b = battlegroundOrigin(slot);
+      const nearestGap = Math.abs(b.z - a.z) - 2 * BG_PLAY_HALF_Z;
+      expect(nearestGap, `slots ${slot - 1}/${slot} play-rect gap`).toBeGreaterThan(
+        BG_MATCH_DROP_RADIUS,
+      );
+      // and the same for the full dressed rect the renderer draws
+      expect(Math.abs(b.z - a.z) - 2 * BG_HALF_Z).toBeGreaterThan(0);
+    }
+    // A fighter at each slot's Azure flag and the next slot's Crimson flag:
+    // the closest cross-slot pair the mode can actually produce.
+    for (let slot = 1; slot < BG_SLOT_COUNT; slot++) {
+      const a = battlegroundOrigin(slot - 1);
+      const b = battlegroundOrigin(slot);
+      const d = Math.abs(b.z + BG_BASES[0].flag.z - (a.z + BG_BASES[1].flag.z));
+      expect(d, `cross-slot flag pair ${slot - 1}/${slot}`).toBeGreaterThan(BG_MATCH_DROP_RADIUS);
     }
   });
 });

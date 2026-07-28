@@ -1,284 +1,315 @@
 // Headless pins for the Ravenrift battleground RENDER manifest
-// (src/render/battleground_core.ts): the pure placement record the Three
-// builder (src/render/battleground.ts) instantiates verbatim. The manifest
-// derives from src/sim/battleground_layout.ts, the SAME record the collider
-// set reads, so these pins are the see-what-you-collide-with guarantee:
-// every solid wall segment yields wall modules, the keep side walls seal solid,
-// the heart ruin renders hollow over its solid collider footprint, and the
-// field's dressing (rune pads, flag pedestals, banners) is present and
-// point-symmetric like the layout itself.
-import { readFileSync } from 'node:fs';
+// (src/render/battleground_core.ts): the pure projection of the authored
+// Thornhollow map that the Three builder (src/render/battleground.ts, via
+// battleground_terrain.ts and battleground_placements.ts) instantiates
+// verbatim.
+//
+// The field is authored art, not generated geometry, so the manifest's job is
+// no longer "derive walls from a layout record": it is to hand the Three layer
+// a complete, loadable, gap-free plan. These tests pin exactly that:
+//   - the terrain chunk plan tiles the whole rect once, sharing seams;
+//   - every asset group resolves to a GLB that exists on disk;
+//   - every paint swatch resolves to a texture that exists on disk, and the
+//     decoded index grid is the right size with only valid layer indices;
+//   - grass is procedural and never leaks into the GLB groups;
+//   - the authored lights and decals are present and their textures exist.
+// A missing file here is a field that renders as holes in the live game.
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
+import { battlegroundPreloadAssetPaths } from '../src/render/battleground';
 import {
-  BG_BANNER_FLANK_DX,
-  BG_FENCE_Y_SCALE,
-  BG_LOW_WALL_Y_SCALE,
-  BG_WALL_Y_SCALE,
-  BG_ZONE_KEEP_MIN_Z,
-  BG_ZONE_MID_HALF_Z,
-  type BgModulePlacement,
-  battlegroundRenderManifest,
-  bgZoneAt,
-  isRuinBlock,
+  BG_FIELD_HALF_X,
+  BG_FIELD_HALF_Z,
+  BG_GRASS_ASSET,
+  BG_HEIGHT_COLS,
+  BG_HEIGHT_ROWS,
+  BG_TERRAIN_CELL,
+  BG_TERRAIN_CHUNK,
+  BG_TEXTURE_DIR,
+  bgAssetGroups,
+  bgFieldDecals,
+  bgFieldLights,
+  bgGrassPatches,
+  bgPaintLookup,
+  bgPaintTextureFiles,
+  bgTerrainChunks,
 } from '../src/render/battleground_core';
+import { isPrimaryBattlegroundMeshName } from '../src/render/battleground_placements';
+import { BG_HALF_X, BG_HALF_Z } from '../src/sim/battleground_layout';
 import {
-  BG_BASES,
-  BG_COVER_CRATES,
-  BG_COVER_PILLARS,
-  BG_GATEHOUSE_WALLS,
-  BG_GRAVEYARD_FENCES,
-  BG_KEEP_BARRICADES,
-  BG_POWER_RUNES,
-  BG_SPEED_RUNES,
-  BG_WALL_T,
-  type BgWallSeg,
-  battlegroundWallSegments,
-} from '../src/sim/battleground_layout';
-import { SIGHT_HEIGHT } from '../src/sim/colliders';
+  TH_HEIGHT_CELL,
+  TH_PAINT_CELL,
+  TH_PAINT_COLS,
+  TH_PAINT_ORIGIN_X,
+  TH_PAINT_ORIGIN_Z,
+  TH_PAINT_RLE,
+  TH_PAINT_ROWS,
+  TH_PAINT_SWATCHES,
+  TH_PLACEMENTS,
+} from '../src/sim/thornhollow_field.generated';
 
-// KayKit wall module is 4u long and 4u tall at scale 1 (dungeon.ts convention),
-// so scale[0] * 4 is a module's run length and scale[1] * 4 its height.
-const WALL_MODULE_LEN = 4;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
+const publicFile = (rel: string) => `${ROOT}public/${rel}`;
 
-function ruinBlock(): BgWallSeg {
-  const blocks = battlegroundWallSegments().filter(isRuinBlock);
-  expect(blocks).toHaveLength(1);
-  return blocks[0];
-}
+describe('Thornhollow terrain plan: one gap-free tiling of the whole rect', () => {
+  const chunks = bgTerrainChunks();
 
-// A placement covers a point when the point lies inside the module's own
-// footprint along its run axis (ry quarter-turn: local x maps to world z).
-function moduleSpan(p: BgModulePlacement): { min: number; max: number; axis: 'x' | 'z' } {
-  const half = (p.scale[0] * WALL_MODULE_LEN) / 2;
-  const alongZ = Math.abs(Math.sin(p.ry)) > 0.5;
-  return alongZ
-    ? { min: p.z - half, max: p.z + half, axis: 'z' }
-    : { min: p.x - half, max: p.x + half, axis: 'x' };
-}
+  it('the chunk plan covers the rect exactly once, with no gaps or overlaps', () => {
+    expect(chunks.length).toBeGreaterThan(0);
+    // Area accounting catches BOTH failure modes at once: a gap loses area, an
+    // overlap gains it, and the rect area is fixed by the map extents.
+    let area = 0;
+    for (const c of chunks) {
+      expect(c.maxX).toBeGreaterThan(c.minX);
+      expect(c.maxZ).toBeGreaterThan(c.minZ);
+      area += (c.maxX - c.minX) * (c.maxZ - c.minZ);
+    }
+    expect(area).toBe(2 * BG_FIELD_HALF_X * (2 * BG_FIELD_HALF_Z));
+    // Column/row count follows the chunk size, and the outer edges are the rect.
+    expect(Math.min(...chunks.map((c) => c.minX))).toBe(-BG_FIELD_HALF_X);
+    expect(Math.min(...chunks.map((c) => c.minZ))).toBe(-BG_FIELD_HALF_Z);
+    expect(Math.max(...chunks.map((c) => c.maxX))).toBe(BG_FIELD_HALF_X);
+    expect(Math.max(...chunks.map((c) => c.maxZ))).toBe(BG_FIELD_HALF_Z);
+    // The manifest's extents ARE the sim's, so the drawn ground and the walked
+    // ground can never be different rects.
+    expect(BG_FIELD_HALF_X).toBe(BG_HALF_X);
+    expect(BG_FIELD_HALF_Z).toBe(BG_HALF_Z);
+  });
 
-describe('battleground render manifest derives from the layout', () => {
-  const m = battlegroundRenderManifest();
-
-  it('every solid wall segment yields wall modules covering its full run', () => {
-    const solid = battlegroundWallSegments().filter((s) => !isRuinBlock(s));
-    expect(solid.length).toBeGreaterThan(0);
-    for (const s of solid) {
-      const alongZ = s.hd >= s.hw;
-      const lo = alongZ ? s.z - s.hd : s.x - s.hw;
-      const hi = alongZ ? s.z + s.hd : s.x + s.hw;
-      // Modules whose center sits on this segment's centerline.
-      const mods = m.walls.filter((p) => (alongZ ? p.x === s.x : p.z === s.z));
-      const covering = mods.filter((p) => {
-        const span = moduleSpan(p);
-        return span.min >= lo - 1e-6 && span.max <= hi + 1e-6;
-      });
-      expect(covering.length, `segment at (${s.x}, ${s.z})`).toBeGreaterThan(0);
-      // The tiled modules jointly span the segment end to end.
-      const min = Math.min(...covering.map((p) => moduleSpan(p).min));
-      const max = Math.max(...covering.map((p) => moduleSpan(p).max));
-      expect(min, `segment start at (${s.x}, ${s.z})`).toBeCloseTo(lo, 6);
-      expect(max, `segment end at (${s.x}, ${s.z})`).toBeCloseTo(hi, 6);
+  it('neighbouring chunks SHARE their seam, so the ground has no cracks', () => {
+    // Every interior edge is some other chunk's opposite edge, exactly. The
+    // vertex loops build [min..max] inclusive, so a shared seam means shared
+    // vertices; a chunk plan with a half-cell offset would tear visibly.
+    const minXs = new Set(chunks.map((c) => c.minX));
+    const minZs = new Set(chunks.map((c) => c.minZ));
+    for (const c of chunks) {
+      if (c.maxX < BG_FIELD_HALF_X) {
+        expect(minXs.has(c.maxX), `x seam at ${c.maxX} is unshared`).toBe(true);
+      }
+      if (c.maxZ < BG_FIELD_HALF_Z) {
+        expect(minZs.has(c.maxZ), `z seam at ${c.maxZ} is unshared`).toBe(true);
+      }
+      // No chunk overhangs the rect.
+      expect(c.minX).toBeGreaterThanOrEqual(-BG_FIELD_HALF_X);
+      expect(c.maxX).toBeLessThanOrEqual(BG_FIELD_HALF_X);
+      expect(c.minZ).toBeGreaterThanOrEqual(-BG_FIELD_HALF_Z);
+      expect(c.maxZ).toBeLessThanOrEqual(BG_FIELD_HALF_Z);
+      // Every chunk lands on the heightfield lattice, so its vertices sample
+      // grid NODES rather than interpolating between them.
+      expect(((c.minX + BG_FIELD_HALF_X) / BG_TERRAIN_CELL) % 1).toBe(0);
+      expect(((c.minZ + BG_FIELD_HALF_Z) / BG_TERRAIN_CELL) % 1).toBe(0);
+      expect((c.maxX - c.minX) % BG_TERRAIN_CELL).toBe(0);
+      expect((c.maxZ - c.minZ) % BG_TERRAIN_CELL).toBe(0);
+      expect(c.maxX - c.minX).toBeLessThanOrEqual(BG_TERRAIN_CHUNK);
+      expect(c.maxZ - c.minZ).toBeLessThanOrEqual(BG_TERRAIN_CHUNK);
     }
   });
 
-  it('keeps are sealed: each side-wall column is one solid, gap-free module run', () => {
-    for (const base of BG_BASES) {
-      for (const sideX of [-16, 16]) {
-        // A keep side column: a z-run at x = +/-16 on this keep's half.
-        const column = battlegroundWallSegments().filter(
-          (s) =>
-            !isRuinBlock(s) &&
-            s.hd > s.hw && // a z-run: courtyard x-runs sharing the x are not walls of this column
-            s.x === sideX &&
-            Math.sign(s.z) === Math.sign(base.flag.z),
+  it('the drawn mesh resolution is the baked heightfield resolution', () => {
+    // The terrain builder samples the sim's heightfield per vertex; if the
+    // mesh cell and the bake cell disagree the drawn surface interpolates a
+    // different curve from the one the body walks on.
+    expect(BG_TERRAIN_CELL).toBe(TH_HEIGHT_CELL);
+    expect(BG_HEIGHT_COLS).toBe((2 * BG_FIELD_HALF_X) / TH_HEIGHT_CELL + 1);
+    expect(BG_HEIGHT_ROWS).toBe((2 * BG_FIELD_HALF_Z) / TH_HEIGHT_CELL + 1);
+  });
+});
+
+describe('Thornhollow art manifest: every group loads a model that exists', () => {
+  const groups = bgAssetGroups();
+
+  it('groups every GLB placement, sorted, non-empty, with no duplicate asset', () => {
+    expect(groups.length).toBeGreaterThan(20);
+    const ids = groups.map((g) => g.assetId);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect([...ids].sort()).toEqual(ids); // stable draw order
+    for (const g of groups) {
+      expect(g.placements.length, `group ${g.assetId} is empty`).toBeGreaterThan(0);
+      expect(g.path).toBe(`/models/${g.assetId}.glb`);
+    }
+    // Grouping is a partition of the non-grass placements: nothing dropped,
+    // nothing counted twice.
+    const grouped = groups.reduce((n, g) => n + g.placements.length, 0);
+    const grass = bgGrassPatches().length;
+    expect(grouped + grass).toBe(TH_PLACEMENTS.length);
+  });
+
+  it('every assetId resolves to a real GLB under public/models', () => {
+    const missing = groups
+      .map((g) => g.assetId)
+      .filter((id) => !existsSync(publicFile(`models/${id}.glb`)));
+    expect(missing, 'asset ids with no GLB on disk').toEqual([]);
+  });
+
+  it('boot-preloads every field model and texture before collision can become active', () => {
+    const preload = battlegroundPreloadAssetPaths();
+    expect(preload.models).toEqual(groups.map((g) => g.path));
+    expect(preload.textures).toEqual([
+      ...bgPaintTextureFiles().map((path) => ({ path, srgb: false })),
+      ...[...new Set(bgFieldDecals().map((d) => `${BG_TEXTURE_DIR}/decals/${d.tex}.webp`))].map(
+        (path) => ({ path, srgb: true }),
+      ),
+    ]);
+    expect(new Set(preload.models).size).toBe(preload.models.length);
+    expect(new Set(preload.textures.map((t) => t.path)).size).toBe(preload.textures.length);
+  });
+
+  it('ships new Thornhollow GLBs meshopt-compressed with fresh media hashes', () => {
+    const assets = {
+      'models/city/wall_tower.glb':
+        'f492b537c35f217e38f409f7e53fa76dee62db29b651f7f5c6a94b078a83517f',
+      'models/medieval_village_v2/buildings/CastleBase_03.glb':
+        '18552bdfc917d62fb990010690e322bfbf07e26589fb2f6fefe218a354b0d24c',
+      'models/medieval_village_v2/buildings/CastleStairs_03.glb':
+        'e99bbf698849f8058d55392086b5b1c7bc9ccfa5d9e10ac605e8e8e63dbbc3c1',
+      'models/medieval_village_v2/buildings/Stairs_01.glb':
+        '29884dce6ba49138c71cae9d4deaf2424e43a0172ea657eaf6344bf38c56bbfc',
+    } as const;
+    for (const [asset, expectedHash] of Object.entries(assets)) {
+      const bytes = readFileSync(publicFile(asset));
+      expect(bytes.toString('utf8')).toContain('EXT_meshopt_compression');
+      const fullHash = createHash('sha256').update(bytes).digest('hex');
+      expect(fullHash).toBe(expectedHash);
+      const hash = fullHash.slice(0, 12);
+      expect(MEDIA_ASSETS[asset]).toBe(`/media/${asset.replace(/\.glb$/, `.${hash}.glb`)}`);
+    }
+  });
+
+  it('selects only the primary mesh when a source GLB contains authored LODs', () => {
+    expect(isPrimaryBattlegroundMeshName('CastleBase_03_LOD0')).toBe(true);
+    expect(isPrimaryBattlegroundMeshName('wall_tower')).toBe(true);
+    expect(isPrimaryBattlegroundMeshName('CastleBase_03_LOD1')).toBe(false);
+    expect(isPrimaryBattlegroundMeshName('CastleBase_03_LOD2')).toBe(false);
+    expect(isPrimaryBattlegroundMeshName('CastleBase_03_LOD12.001')).toBe(false);
+  });
+
+  it('grass is procedural: never a group, always its own bucket', () => {
+    const patches = bgGrassPatches();
+    expect(patches.length).toBeGreaterThan(0);
+    for (const p of patches) expect(p.assetId).toBe(BG_GRASS_ASSET);
+    expect(groups.some((g) => g.assetId === BG_GRASS_ASSET)).toBe(false);
+    // Grass carries the procedural knobs the tuft builder reads.
+    expect(patches.some((p) => p.hue !== undefined || p.lum !== undefined)).toBe(true);
+    // ...and there is deliberately no grass GLB to load.
+    expect(existsSync(publicFile(`models/${BG_GRASS_ASSET}.glb`))).toBe(false);
+  });
+
+  it('every placement carries a finite transform the instancer can use', () => {
+    for (const g of groups) {
+      for (const p of g.placements) {
+        expect(Number.isFinite(p.x) && Number.isFinite(p.z), `${g.assetId} position`).toBe(true);
+        expect(Number.isFinite(p.seatY), `${g.assetId} seat`).toBe(true);
+        expect(Number.isFinite(p.rotY), `${g.assetId} rotation`).toBe(true);
+        expect(p.scale, `${g.assetId} scale`).toBeGreaterThan(0);
+        expect(Math.abs(p.x), `${g.assetId} inside the rect`).toBeLessThanOrEqual(
+          BG_FIELD_HALF_X + 8,
         );
-        expect(column.length, `team ${base.team} side column x=${sideX}`).toBe(1);
-        const seg = column[0];
-        // The modules tiling that column leave NO gap: sorted spans chain
-        // contiguously from the mouth line to the back wall.
-        const spans = m.walls
-          .filter((p) => p.x === sideX)
-          .map(moduleSpan)
-          .filter(
-            (sp) =>
-              sp.axis === 'z' && sp.min >= seg.z - seg.hd - 1e-6 && sp.max <= seg.z + seg.hd + 1e-6,
-          )
-          .sort((s1, s2) => s1.min - s2.min);
-        expect(spans.length, `team ${base.team} side x=${sideX} modules`).toBeGreaterThan(0);
-        let cursor = seg.z - seg.hd;
-        for (const sp of spans) {
-          expect(sp.min, `gap in team ${base.team} side x=${sideX}`).toBeLessThanOrEqual(
-            cursor + 1e-6,
-          );
-          cursor = Math.max(cursor, sp.max);
-        }
-        expect(cursor, `team ${base.team} side x=${sideX} reaches the back wall`).toBeCloseTo(
-          seg.z + seg.hd,
-          6,
+        expect(Math.abs(p.z), `${g.assetId} inside the rect`).toBeLessThanOrEqual(
+          BG_FIELD_HALF_Z + 8,
         );
       }
     }
   });
+});
 
-  it('leaves every curtain crossing open and dresses the gatehouses in one kind', () => {
-    // no wall or ruin module may intrude into a crossing span on the curtain
-    // line (the render-side twin of the sealed-keep pin)
-    const crossings: { z: number; lo: number; hi: number }[] = [
-      { z: -56, lo: -34, hi: -18 }, // south gatehouse span (its room walls own it)
-      { z: -56, lo: 8, hi: 18 }, // south main gate
-      { z: 56, lo: 18, hi: 34 }, // north mirrors
-      { z: 56, lo: -18, hi: -8 },
-    ];
-    for (const c of crossings) {
-      const intruders = [...m.walls, ...m.ruin].filter((p) => {
-        if (p.z !== c.z) return false;
-        const span = moduleSpan(p);
-        return span.max > c.lo + 1e-6 && span.min < c.hi - 1e-6;
-      });
-      expect(intruders, `crossing at z=${c.z}, x ${c.lo}..${c.hi}`).toEqual([]);
+describe('Thornhollow ground paint: a complete, decodable index grid', () => {
+  it('every swatch texture exists under public/textures/battleground', () => {
+    const files = bgPaintTextureFiles();
+    expect(files).toHaveLength(TH_PAINT_SWATCHES.length);
+    expect(files.length).toBeGreaterThan(1);
+    const missing = files.filter((f) => !existsSync(publicFile(f)));
+    expect(missing, 'paint textures with no file on disk').toEqual([]);
+    for (const [i, f] of files.entries()) {
+      expect(f).toBe(`${BG_TEXTURE_DIR}/${TH_PAINT_SWATCHES[i].texture}.jpg`);
+      expect(TH_PAINT_SWATCHES[i].tileSize).toBeGreaterThan(0);
+      expect(Math.abs(TH_PAINT_SWATCHES[i].light)).toBeLessThanOrEqual(1);
     }
-    // gatehouse walls dress in the one fixed kind, so the mirrored landmark
-    // pair always reads identically (never a hash coin-flip)
-    for (const s of BG_GATEHOUSE_WALLS) {
-      const alongZ = s.hd >= s.hw;
-      const mods = m.walls.filter((p) =>
-        alongZ
-          ? p.x === s.x && Math.abs(p.z - s.z) <= s.hd
-          : p.z === s.z && Math.abs(p.x - s.x) <= s.hw,
-      );
-      expect(mods.length, `gatehouse wall at (${s.x}, ${s.z})`).toBeGreaterThan(0);
-      for (const p of mods) expect(p.kind).toBe('wall');
-    }
+    // Swatch ids are distinct: the id -> layer remap below depends on it.
+    expect(new Set(TH_PAINT_SWATCHES.map((s) => s.id)).size).toBe(TH_PAINT_SWATCHES.length);
   });
 
-  it('renders the heart ruin hollow: shell on the footprint, nothing inside', () => {
-    const block = ruinBlock();
-    expect(m.ruin.length).toBeGreaterThan(0);
-    // Nothing (shell or ordinary wall) sits strictly inside the open interior.
-    const inLo = { x: block.hw - 2 * BG_WALL_T, z: block.hd - 2 * BG_WALL_T };
-    const intruders = [...m.ruin, ...m.walls].filter(
-      (p) => Math.abs(p.x - block.x) < inLo.x - 1e-6 && Math.abs(p.z - block.z) < inLo.z - 1e-6,
-    );
-    expect(intruders).toEqual([]);
-    // The shell keeps the collider's exact footprint: every module inside the
-    // block's bounds, and the outer faces reached on all four sides.
-    for (const p of m.ruin) {
-      expect(Math.abs(p.x - block.x)).toBeLessThanOrEqual(block.hw);
-      expect(Math.abs(p.z - block.z)).toBeLessThanOrEqual(block.hd);
+  it('the decoded index grid is cols x rows and holds only valid layers or 255', () => {
+    const lookup = bgPaintLookup();
+    expect(lookup.cols).toBe(TH_PAINT_COLS);
+    expect(lookup.rows).toBe(TH_PAINT_ROWS);
+    expect(lookup.ids).toHaveLength(TH_PAINT_COLS * TH_PAINT_ROWS);
+    expect(lookup.cell).toBe(TH_PAINT_CELL);
+    expect(lookup.originX).toBe(TH_PAINT_ORIGIN_X);
+    expect(lookup.originZ).toBe(TH_PAINT_ORIGIN_Z);
+    expect(lookup.swatches).toBe(TH_PAINT_SWATCHES);
+    // The paint rect covers the field rect exactly.
+    expect(lookup.originX).toBe(-BG_FIELD_HALF_X);
+    expect(lookup.originZ).toBe(-BG_FIELD_HALF_Z);
+    expect((lookup.cols - 1) * lookup.cell).toBe(2 * BG_FIELD_HALF_X);
+    expect((lookup.rows - 1) * lookup.cell).toBe(2 * BG_FIELD_HALF_Z);
+    // Every value is a texture-array layer or the unpainted sentinel. An
+    // out-of-range index samples garbage in the shader.
+    const seen = new Set<number>();
+    for (const v of lookup.ids) seen.add(v);
+    for (const v of seen) {
+      expect(v === 255 || (v >= 0 && v < TH_PAINT_SWATCHES.length), `layer ${v}`).toBe(true);
     }
-    expect(Math.max(...m.ruin.map((p) => p.z))).toBeCloseTo(block.z + block.hd - BG_WALL_T, 6);
-    expect(Math.min(...m.ruin.map((p) => p.z))).toBeCloseTo(block.z - block.hd + BG_WALL_T, 6);
-    expect(Math.max(...m.ruin.map((p) => p.x))).toBeCloseTo(block.x + block.hw - BG_WALL_T, 6);
-    expect(Math.min(...m.ruin.map((p) => p.x))).toBeCloseTo(block.x - block.hw + BG_WALL_T, 6);
+    // The paint is real: more than one layer in play, and most cells painted.
+    expect([...seen].filter((v) => v !== 255).length).toBeGreaterThan(3);
+    let painted = 0;
+    for (const v of lookup.ids) if (v !== 255) painted++;
+    expect(painted / lookup.ids.length).toBeGreaterThan(0.5);
+    // The lookup is cached, so the terrain builder decodes once.
+    expect(bgPaintLookup()).toBe(lookup);
   });
 
-  it('places a rune pad at every rune (speed + power) and a pedestal at both flags', () => {
-    expect(m.runePads).toEqual(
-      [...BG_SPEED_RUNES, ...BG_POWER_RUNES].map((r) => ({ x: r.x, z: r.z })),
-    );
-    expect(m.flagPedestals).toHaveLength(2);
-    for (const base of BG_BASES) {
-      expect(m.flagPedestals).toContainEqual({
-        team: base.team,
-        x: base.flag.x,
-        z: base.flag.z,
-      });
-      // Two banner poles flank each keep's banner point.
-      const poles = m.banners.filter((b) => b.team === base.team);
-      expect(poles.map((b) => b.x).sort((x1, x2) => x1 - x2)).toEqual([
-        base.banner.x - BG_BANNER_FLANK_DX,
-        base.banner.x + BG_BANNER_FLANK_DX,
-      ]);
-      for (const pole of poles) expect(pole.z).toBe(base.banner.z);
+  it('the run-length source covers every cell exactly once', () => {
+    expect(TH_PAINT_RLE.length % 2).toBe(0);
+    let total = 0;
+    for (let i = 1; i < TH_PAINT_RLE.length; i += 2) {
+      expect(TH_PAINT_RLE[i], 'a zero-length run is a compiler bug').toBeGreaterThan(0);
+      total += TH_PAINT_RLE[i];
     }
+    expect(total).toBe(TH_PAINT_COLS * TH_PAINT_ROWS);
+  });
+});
+
+describe('Thornhollow dressing: authored lights and decals', () => {
+  it('the map authored point lights, all inside the rect and usable', () => {
+    const lights = bgFieldLights();
+    expect(lights.length).toBeGreaterThan(0);
+    for (const l of lights) {
+      expect(Math.abs(l.x)).toBeLessThanOrEqual(BG_FIELD_HALF_X);
+      expect(Math.abs(l.z)).toBeLessThanOrEqual(BG_FIELD_HALF_Z);
+      expect(l.intensity).toBeGreaterThan(0);
+      expect(l.range).toBeGreaterThan(0);
+      expect(l.color).toBeGreaterThanOrEqual(0);
+      expect(l.color).toBeLessThanOrEqual(0xffffff);
+    }
+    // Both keeps are lit: a light budget that only served one side would be a
+    // visible advantage, so the two halves each carry lights.
+    expect(lights.some((l) => l.z < 0)).toBe(true);
+    expect(lights.some((l) => l.z > 0)).toBe(true);
   });
 
-  it('places the cover pillars and crates from the layout', () => {
-    expect(m.pillars.map((p) => ({ x: p.x, z: p.z }))).toEqual(
-      BG_COVER_PILLARS.map((p) => ({ x: p.x, z: p.z })),
-    );
-    expect(m.pillars.every((p) => p.kind === 'pillar')).toBe(true);
-    expect(m.crates.map((c) => ({ x: c.x, z: c.z }))).toEqual(
-      BG_COVER_CRATES.map((c) => ({ x: c.x, z: c.z })),
-    );
-    expect(m.crates.every((c) => c.kind === 'crates_stacked' || c.kind === 'box_stacked')).toBe(
-      true,
-    );
-  });
-
-  it('is point-symmetric under (x,z) -> (-x,-z) for the wall placements', () => {
-    // The layout mirrors the two halves of the field, so the tiled wall
-    // transforms must mirror too (kinds may differ: they are hash-varied
-    // cosmetics). Ruin heights are hash-varied, so the shell mirrors on
-    // position only.
-    const key = (p: BgModulePlacement): string =>
-      `${p.x.toFixed(4)}|${p.z.toFixed(4)}|${p.scale.map((s) => s.toFixed(4)).join(',')}`;
-    const wallKeys = new Set(m.walls.map(key));
-    for (const p of m.walls) {
-      const mirrored = key({ ...p, x: -p.x, z: -p.z });
-      expect(wallKeys.has(mirrored), `mirror of wall at (${p.x}, ${p.z})`).toBe(true);
+  it('every decal texture exists under the decals folder the builder loads', () => {
+    const decals = bgFieldDecals();
+    expect(decals.length).toBeGreaterThan(0);
+    for (const d of decals) {
+      expect(d.size).toBeGreaterThan(0);
+      expect(Math.abs(d.x)).toBeLessThanOrEqual(BG_FIELD_HALF_X);
+      expect(Math.abs(d.z)).toBeLessThanOrEqual(BG_FIELD_HALF_Z);
+      expect(
+        existsSync(publicFile(`${BG_TEXTURE_DIR}/decals/${d.tex}.webp`)),
+        `decal texture ${d.tex}`,
+      ).toBe(true);
     }
-    const ruinPos = new Set(m.ruin.map((p) => `${p.x.toFixed(4)}|${p.z.toFixed(4)}`));
-    for (const p of m.ruin) {
-      expect(ruinPos.has(`${(-p.x).toFixed(4)}|${(-p.z).toFixed(4)}`)).toBe(true);
-    }
-  });
-
-  it('keeps floor tiles inside the walled field and wall heights on the collider height', () => {
-    expect(m.floors.length).toBeGreaterThan(0);
-    for (const f of m.floors) {
-      expect(Math.abs(f.x)).toBeLessThan(50);
-      expect(Math.abs(f.z)).toBeLessThan(140);
-    }
-    // Solid walls render at the collider's full height, EXCEPT the low mouth
-    // barricades (half height) and the graveyard fence rails (fence height);
-    // both collider tops match their render tops.
-    const isBarricadeModule = (p: BgModulePlacement) =>
-      BG_KEEP_BARRICADES.some(
-        (b) => p.z === b.z && Math.abs(p.x - b.x) <= b.hw && (b.low ?? false),
-      );
-    const isFenceModule = (p: BgModulePlacement) =>
-      BG_GRAVEYARD_FENCES.some((f) => Math.abs(p.x - f.x) <= f.hw && Math.abs(p.z - f.z) <= f.hd);
-    const lowMods = m.walls.filter((p) => p.scale[1] === BG_LOW_WALL_Y_SCALE);
-    // exactly two modules per barricade, nothing else low, and the mirrored
-    // barricades dress identically (one fixed rubble kind, no hash coin-flip)
-    expect(lowMods).toHaveLength(4);
-    for (const p of lowMods) {
-      expect(isBarricadeModule(p)).toBe(true);
-      expect(p.kind).toBe('wall_cracked');
-    }
-    const fenceMods = m.walls.filter((p) => p.scale[1] === BG_FENCE_Y_SCALE);
-    expect(fenceMods.length).toBeGreaterThanOrEqual(4); // two rails per plot
-    for (const p of fenceMods) {
-      expect(isFenceModule(p)).toBe(true);
-      expect(p.kind).toBe('wall_cracked'); // fixed kind: mirrored plots dress identically
-    }
-    for (const p of m.walls) {
-      expect(p.scale[1]).toBe(
-        isBarricadeModule(p)
-          ? BG_LOW_WALL_Y_SCALE
-          : isFenceModule(p)
-            ? BG_FENCE_Y_SCALE
-            : BG_WALL_Y_SCALE,
-      );
-    }
-    expect(BG_LOW_WALL_Y_SCALE).toBeLessThan(BG_WALL_Y_SCALE);
-    // the low render height still tops out above the spell sight line, so a
-    // barricade that blocks casts is never drawn short enough to see over
-    expect(BG_LOW_WALL_Y_SCALE * WALL_MODULE_LEN).toBeGreaterThan(SIGHT_HEIGHT);
-    // ...and so does the graveyard fence: what blocks a cast is never
-    // rendered below the eye line
-    expect(BG_FENCE_Y_SCALE * WALL_MODULE_LEN).toBeGreaterThan(SIGHT_HEIGHT);
-    // the graveyard dressing mirrors exactly, plot to plot
-    const gravePos = new Set(m.graves.map((g) => `${g.x.toFixed(4)}|${g.z.toFixed(4)}`));
-    expect(m.graves.length).toBeGreaterThanOrEqual(12);
-    for (const g of m.graves) {
-      expect(gravePos.has(`${(-g.x).toFixed(4)}|${(-g.z).toFixed(4)}`)).toBe(true);
-    }
-    for (const p of m.ruin) {
-      expect(p.scale[1]).toBeGreaterThan(0);
-      expect(p.scale[1]).toBeLessThanOrEqual(BG_WALL_Y_SCALE);
-    }
+    // The folder and extension the files sit under must be the ones the
+    // builder asks for; that pairing is the whole point of the check above,
+    // and a silent .png/.jpg swap in the builder would otherwise leave these
+    // decals loading nothing at all (the builder swallows the failure).
+    const src = readFileSync(`${ROOT}src/render/battleground.ts`, 'utf8');
+    const loadLine = src.split('\n').find((l) => l.includes('/decals/'));
+    expect(loadLine, 'the field builder no longer loads from the decals folder').toBeTruthy();
+    expect(loadLine).toContain('.webp');
   });
 });
 
@@ -287,7 +318,7 @@ describe('the band fog is view distance, tier-identical (source pin)', () => {
     // A tier-conditional fog here would be a live see-farther exploit: pin
     // that the branch is unconditional and its values are the view-distance
     // pair the design names.
-    const src = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const src = readFileSync(`${ROOT}src/render/renderer.ts`, 'utf8');
     const start = src.indexOf("desired === 'battleground'");
     expect(start).toBeGreaterThan(-1);
     const branch = src.slice(start, src.indexOf('} else if', start + 1));
@@ -295,107 +326,5 @@ describe('the band fog is view distance, tier-identical (source pin)', () => {
     expect(branch).toContain('fog.far = 210');
     expect(branch).not.toContain('lowGfx');
     expect(branch).not.toContain('Governor');
-  });
-});
-
-describe('zone theming (visual only; colliders never move)', () => {
-  const m = battlegroundRenderManifest();
-  const dirtShare = (floors: { kind: string }[]) =>
-    floors.filter((f) => f.kind.startsWith('floor_dirt')).length / Math.max(1, floors.length);
-
-  it('the ruin courtyard is decisively more broken than the keep grounds', () => {
-    const mid = m.floors.filter((f) => bgZoneAt(f.z) === 'mid');
-    const keep = m.floors.filter((f) => bgZoneAt(f.z) === 'keep');
-    expect(mid.length).toBeGreaterThan(0);
-    expect(keep.length).toBeGreaterThan(0);
-    expect(dirtShare(mid)).toBeGreaterThan(dirtShare(keep) + 0.2);
-  });
-
-  it('rubble accents stay inside the courtyard band and clear of every rune pad', () => {
-    expect(m.accents.length).toBeGreaterThan(10);
-    for (const a of m.accents) {
-      expect(Math.abs(a.z)).toBeLessThanOrEqual(BG_ZONE_MID_HALF_Z + 1);
-      for (const r of m.runePads) {
-        expect(Math.hypot(r.x - a.x, r.z - a.z)).toBeGreaterThan(1.4);
-      }
-    }
-  });
-
-  it('the floor bands land exactly on the chamber lines', () => {
-    // rows are 4yd tiles at |z| = 2 + 4k: the courtyard band's outermost row
-    // sits just inside the curtain line, the approach band starts just outside
-    // it, and the garrison band starts past the keep mouth line. If a zone
-    // constant drifts off a wall line (or off the tile grid), this fails.
-    const mid = m.floors.filter((f) => bgZoneAt(f.z) === 'mid');
-    const approach = m.floors.filter((f) => bgZoneAt(f.z) === 'approach');
-    const keep = m.floors.filter((f) => bgZoneAt(f.z) === 'keep');
-    expect(Math.max(...mid.map((f) => Math.abs(f.z)))).toBe(BG_ZONE_MID_HALF_Z - 2);
-    expect(Math.min(...approach.map((f) => Math.abs(f.z)))).toBe(BG_ZONE_MID_HALF_Z + 2);
-    expect(Math.max(...approach.map((f) => Math.abs(f.z)))).toBe(BG_ZONE_KEEP_MIN_Z - 2);
-    expect(Math.min(...keep.map((f) => Math.abs(f.z)))).toBe(BG_ZONE_KEEP_MIN_Z + 2);
-  });
-
-  it('field dressing is visual-only, mirrored, and placed where it claims', () => {
-    expect(m.dressing.length).toBeGreaterThan(60); // the tree line alone is dozens
-    // Point symmetry (colors aside: the red/blue triple banners swap kinds).
-    const key = (x: number, z: number) => `${x.toFixed(3)}|${z.toFixed(3)}`;
-    const set = new Set(m.dressing.map((d) => key(d.x, d.z)));
-    for (const d of m.dressing) {
-      expect(set.has(key(-d.x, -d.z)), `dressing at (${d.x},${d.z}) has no mirror`).toBe(true);
-    }
-    // Trees live OUTSIDE the walls (skyline, never field furniture); rubble,
-    // trophies, and clutter live INSIDE the perimeter.
-    for (const d of m.dressing) {
-      const outside = Math.abs(d.x) > 50 || Math.abs(d.z) > 140;
-      if (d.kind.startsWith('tree_')) {
-        expect(outside, `tree at (${d.x},${d.z}) must sit outside the walls`).toBe(true);
-      } else {
-        expect(outside, `${d.kind} at (${d.x},${d.z}) must sit inside`).toBe(false);
-      }
-    }
-    // And none of it may share a spot with a collider footprint (visual-only
-    // dressing must never suggest cover that does not block): probe centers
-    // against the wall segments (trees are outside every wall by the check
-    // above; rubble/clutter spots are hand-placed clear).
-    for (const d of m.dressing) {
-      if (d.kind.startsWith('tree_')) continue;
-      for (const w of battlegroundWallSegments()) {
-        // Wall-hung cloth deliberately sits AT the face plane (inset 0.78 from
-        // a 1.0 half-thickness), so only a truly BURIED center fails here.
-        const inside =
-          Math.abs(d.x - w.x) < w.hw - 0.35 && Math.abs(d.z - w.z) < w.hd - 0.35 && d.y === 0;
-        expect(inside, `${d.kind} at (${d.x},${d.z}) is inside a wall footprint`).toBe(false);
-      }
-    }
-  });
-
-  it('torches are point-symmetric, so neither approach is better lit', () => {
-    const key = (x: number, z: number) => `${x.toFixed(2)}|${z.toFixed(2)}`;
-    const set = new Set(m.torches.map((t) => key(t.x, t.z)));
-    for (const t of m.torches) {
-      expect(set.has(key(-t.x, -t.z)), `torch at (${t.x},${t.z}) has no mirror`).toBe(true);
-    }
-    expect(m.torches.length).toBeGreaterThanOrEqual(12);
-  });
-
-  it('keep banner dressing mirrors exactly between the teams, colors aside', () => {
-    const red = m.wallBanners.filter((b) => b.kind.endsWith('_red'));
-    const blue = m.wallBanners.filter((b) => b.kind.endsWith('_blue'));
-    expect(red.length + blue.length).toBe(m.wallBanners.length); // team kinds only
-    expect(red.length).toBe(blue.length);
-    // every red banner has the point-mirrored blue twin of the matching family
-    const family = (k: string) => k.replace(/_(red|blue)$/, '');
-    const blueSet = new Set(
-      blue.map((b) => `${family(b.kind)}|${(-b.x).toFixed(2)}|${(-b.z).toFixed(2)}`),
-    );
-    for (const b of red) {
-      expect(
-        blueSet.has(`${family(b.kind)}|${b.x.toFixed(2)}|${b.z.toFixed(2)}`),
-        `red ${b.kind} at (${b.x},${b.z}) has no mirrored blue twin`,
-      ).toBe(true);
-    }
-    // red dresses the south keep, blue the north
-    for (const b of red) expect(b.z).toBeLessThan(0);
-    for (const b of blue) expect(b.z).toBeGreaterThan(0);
   });
 });

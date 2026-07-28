@@ -238,13 +238,14 @@ const NPC_DROP_RADIUS = 130;
 // the widest OPEN-WORLD radius any entity kind can be relevant at (the
 // battleground band widens past this: BG_MATCH_DROP_RADIUS below)
 const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
-// Ravenrift: the 100x280 field (diagonal ~297yd) stays fully tracked for its
-// own match, so the whole battle exists in every participant's sim mirror (the
-// CLIENT hides past ~120yd behind the band's distance fog, like the open
-// world's view distance). Applies to SAME-SLOT pairs only: slot spacing (460)
-// keeps cross-slot pairs >= 180yd apart, beyond every default radius.
-export const BG_MATCH_INTEREST_RADIUS = 300;
-const BG_MATCH_DROP_RADIUS = 320;
+// Ravenrift at Thornhollow: the walkable hollow is 172x364yd (diagonal ~403yd)
+// and stays fully tracked for its own match, so the whole battle exists in
+// every participant's sim mirror (the CLIENT hides past ~120yd behind the
+// band's distance fog, like the open world's view distance). Applies to
+// SAME-SLOT pairs only: slot spacing (BG_SLOT_SPACING, 920) keeps cross-slot
+// pairs over 550yd apart, beyond every radius here.
+export const BG_MATCH_INTEREST_RADIUS = 420;
+export const BG_MATCH_DROP_RADIUS = 440;
 // Distance-tiered update rates: full snapshot rate inside nameplate range
 // (55yd, beyond every ability range), half rate out to the 80yd draw range,
 // quarter rate beyond. The viewer's target and anything attacking the
