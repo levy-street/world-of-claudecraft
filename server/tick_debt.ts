@@ -8,7 +8,12 @@ export interface TickDebtPlan {
   capped: boolean;
 }
 
+export interface TickCallbackPlan extends TickDebtPlan {
+  cadenceElapsedSeconds: number;
+}
+
 export const DEFAULT_MAX_CATCH_UP_TICKS = 4;
+export const DEFAULT_MAX_CADENCE_ELAPSED_SECONDS = 0.5;
 
 export function planTickDebt(
   accumulatedSeconds: number,
@@ -49,5 +54,25 @@ export function planTickDebt(
     debtAfterSeconds: Math.max(0, remainder),
     droppedSeconds,
     capped: true,
+  };
+}
+
+export function planTickCallback(
+  accumulatedSeconds: number,
+  rawElapsedSeconds: number,
+  stepSeconds: number,
+  maxCatchUpTicks = DEFAULT_MAX_CATCH_UP_TICKS,
+  maxCadenceElapsedSeconds = DEFAULT_MAX_CADENCE_ELAPSED_SECONDS,
+): TickCallbackPlan {
+  if (!Number.isFinite(maxCadenceElapsedSeconds) || maxCadenceElapsedSeconds < 0) {
+    throw new RangeError('maxCadenceElapsedSeconds must be finite and non-negative');
+  }
+  const elapsed =
+    Number.isFinite(rawElapsedSeconds) && rawElapsedSeconds > 0 ? rawElapsedSeconds : 0;
+  return {
+    ...planTickDebt(accumulatedSeconds, elapsed, stepSeconds, maxCatchUpTicks),
+    // Periodic social and persistence work retains the legacy stall cap.
+    // Simulation debt and dropped-time accounting use the full wall time.
+    cadenceElapsedSeconds: Math.min(elapsed, maxCadenceElapsedSeconds),
   };
 }

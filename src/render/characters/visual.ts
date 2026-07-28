@@ -1371,6 +1371,52 @@ export class CharacterVisual {
     });
   }
 
+  /** Restore entity-local/transient state before a pooled rig is attached to a
+   * new view. Constructor identity (model, color, weapon layout) is pool-keyed;
+   * live skin/gear is applied by the renderer immediately after acquisition. */
+  resetForReuse(): void {
+    this.root.removeFromParent();
+    this.root.visible = true;
+    this.root.position.set(0, 0, 0);
+    this.root.rotation.set(0, 0, 0);
+    this.root.scale.set(1, 1, 1);
+    this.poseWrap.position.set(0, 0, 0);
+    this.poseWrap.rotation.set(0, 0, 0);
+
+    this.setFar(false);
+    this.setProxyShadow(false);
+    this.setShadow(true);
+    this.setGhost(false);
+    this.setSoulRend(false);
+    this.setShadowform(false);
+    this.setMoonkin(false);
+    this.setMetamorph(false);
+    this.setWeaponAura(false);
+
+    this.deadLock = false;
+    this.wasDead = false;
+    this.initialized = false;
+    this.attackIdx = 0;
+    this.hitCooldown = 0;
+    this.pendingDt = 0;
+    this.swimBlend = 0;
+    this.swimBobTime = 0;
+    this.climbOn = false;
+    this.climbBlend = 0;
+    this.climbPhase = 0;
+    this.climbTarget = null;
+    this.climbClipsActive = false;
+    this.spinAngle = 0;
+    this.spinOnceTimer = 0;
+    this.stow.timer = 0;
+    this.stow.target = this.stow.attached;
+    this.stowLift.t = -1;
+    this.stowLift.dur = 0;
+    this.weaponGraphDirty = false;
+    this.clickProxy.scale.y = pickProxyHeight(this.height, this.clickRadius, false);
+    this.clearPose();
+  }
+
   dispose(): void {
     this.disposed = true;
     this.disposeWeaponAura();

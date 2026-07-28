@@ -205,7 +205,12 @@ import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { createSerialWriter } from './serial_writer';
-import { encodeSnapshotBinary } from './snapshot_binary';
+import {
+  encodeSnapshotBinaryEntityFragment,
+  encodeSnapshotBinaryFromFragments,
+  type SnapshotBinaryEntityFragment,
+  type SnapshotObject,
+} from './snapshot_binary';
 import {
   jsonWithField,
   StableAuraWireCache,
@@ -220,7 +225,7 @@ import { PgSocialDb } from './social_db';
 // load-time requireAccount over the db module) into every test that
 // partial-mocks the db, the known overlay-mock breakage class.
 import { reconcileOnLogin } from './steam/mirror';
-import { planTickDebt } from './tick_debt';
+import { planTickCallback } from './tick_debt';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { holderInfoForPubkey } from './woc_balance';
@@ -1185,6 +1190,7 @@ interface EntityWireVariantCache {
   tick: number;
   idVer: number;
   dynJson: string;
+  dynValue: Record<string, unknown>;
   dynVer: number;
   auraVer: number;
   builtIdVer: number;
@@ -1194,12 +1200,22 @@ interface EntityWireVariantCache {
   liteJson: string;
   fullAuraJson: string;
   liteAuraJson: string;
+  fullValue: Record<string, unknown>;
+  liteValue: Record<string, unknown>;
+  fullAuraValue: Record<string, unknown>;
+  liteAuraValue: Record<string, unknown>;
+  fullBinary: SnapshotBinaryEntityFragment | null;
+  liteBinary: SnapshotBinaryEntityFragment | null;
+  fullAuraBinary: SnapshotBinaryEntityFragment | null;
+  liteAuraBinary: SnapshotBinaryEntityFragment | null;
 }
 
 interface EntityWireCache {
   tick: number;
   idJson: string;
+  idValue: Record<string, unknown>;
   baseDynJson: string;
+  baseDynValue: Record<string, unknown>;
   idVer: number;
   baseDynVer: number;
   auraCache: StableAuraWireCache;
@@ -1215,6 +1231,19 @@ interface EntityWireView {
   liteJson: string;
   fullAuraJson: string;
   liteAuraJson: string;
+  fullValue: Record<string, unknown>;
+  liteValue: Record<string, unknown>;
+  fullAuraValue: Record<string, unknown>;
+  liteAuraValue: Record<string, unknown>;
+  fullBinary: SnapshotBinaryEntityFragment | null;
+  liteBinary: SnapshotBinaryEntityFragment | null;
+  fullAuraBinary: SnapshotBinaryEntityFragment | null;
+  liteAuraBinary: SnapshotBinaryEntityFragment | null;
+}
+
+interface SerializedSnapshotValue {
+  json: string;
+  value: Record<string, unknown>;
 }
 
 // One session's resolved interest anchor for a broadcast pass: the entity whose
@@ -1241,6 +1270,7 @@ function emptyWireVariant(): EntityWireVariantCache {
     tick: -1,
     idVer: 0,
     dynJson: '',
+    dynValue: {},
     dynVer: 0,
     auraVer: 0,
     builtIdVer: -1,
@@ -1250,6 +1280,14 @@ function emptyWireVariant(): EntityWireVariantCache {
     liteJson: '',
     fullAuraJson: '',
     liteAuraJson: '',
+    fullValue: {},
+    liteValue: {},
+    fullAuraValue: {},
+    liteAuraValue: {},
+    fullBinary: null,
+    liteBinary: null,
+    fullAuraBinary: null,
+    liteAuraBinary: null,
   };
 }
 
@@ -1259,6 +1297,21 @@ function fullEntityJson(id: number, idJson: string, dynJson: string): string {
 
 function liteEntityJson(id: number, dynJson: string): string {
   return `{"id":${id},${dynJson.slice(1, -1)}}`;
+}
+
+function fullEntityValue(
+  id: number,
+  identity: Readonly<Record<string, unknown>>,
+  dynamic: Readonly<Record<string, unknown>>,
+): Record<string, unknown> {
+  return { id, ...identity, ...dynamic };
+}
+
+function liteEntityValue(
+  id: number,
+  dynamic: Readonly<Record<string, unknown>>,
+): Record<string, unknown> {
+  return { id, ...dynamic };
 }
 
 function logSocialErr(err: unknown): void {
@@ -1979,10 +2032,9 @@ export class GameServer {
       runGuarded(
         () => {
           const now = process.hrtime.bigint();
-          let dt = Number(now - last) / 1e9;
+          const rawElapsedSeconds = Number(now - last) / 1e9;
           last = now;
-          if (dt > 0.5) dt = 0.5;
-          const debtPlan = planTickDebt(acc, dt, DT);
+          const debtPlan = planTickCallback(acc, rawElapsedSeconds, DT);
           acc = debtPlan.debtAfterSeconds;
           // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
           // works without the sim reading the wall clock itself (determinism invariant).
@@ -2038,7 +2090,7 @@ export class GameServer {
           lap('broadcast');
           this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
           this.tickProfiler.add('bcastSelf', Number(this.bcastSelfNs) / 1e6);
-          this.socialPosTimer += dt;
+          this.socialPosTimer += debtPlan.cadenceElapsedSeconds;
           if (this.socialPosTimer >= 1) {
             this.socialPosTimer = 0;
             this.broadcastSocialPositions();
@@ -2052,7 +2104,7 @@ export class GameServer {
             this.tickMsAvg === 0
               ? tickMs
               : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
-          this.flushPeriodicSaves(dt);
+          this.flushPeriodicSaves(debtPlan.cadenceElapsedSeconds);
           // LAST statement of the guarded body, deliberately: this timestamp is the
           // liveness signal /livez reads, so only a pass that ran to completion may
           // refresh it (a body that throws every tick must go stale, not look alive).
@@ -5457,6 +5509,7 @@ export class GameServer {
     // meter reports a positive rate: a window with zero committed ticks cannot
     // coexist with a firing broadcast (acc accrues every callback), and a fully
     // stalled loop sends nothing. Old clients and warm-up read alike as absent.
+    let tickHzValue: number | undefined;
     let tickHzJson = '';
     if (this.tickHz != null) {
       const now = this.sim.time;
@@ -5464,7 +5517,8 @@ export class GameServer {
         this.lastTickHzHeadTime == null ||
         now - this.lastTickHzHeadTime >= TICK_HZ_HEAD_INTERVAL_S
       ) {
-        tickHzJson = `,"tickHz":${round2(this.tickHz)}`;
+        tickHzValue = round2(this.tickHz);
+        tickHzJson = `,"tickHz":${tickHzValue}`;
         this.lastTickHzHeadTime = now;
       }
     }
@@ -5543,8 +5597,16 @@ export class GameServer {
     forEachGuarded(
       anchors,
       ({ session, anchor: anchorEntity, anchorMeta, anchorSession, stableTimerWire }) => {
+        const wantsBinary = session.snapshotTransport === 'binary-v1';
         const ents: string[] = [];
+        const binaryEnts: SnapshotBinaryEntityFragment[] = [];
         const keep: number[] = [];
+        const pushEntity = (json: string, binary: SnapshotBinaryEntityFragment | null): void => {
+          ents.push(json);
+          if (!wantsBinary) return;
+          if (!binary) throw new Error('binary entity cache was not initialized');
+          binaryEnts.push(binary);
+        };
         const present = new Set<number>();
         const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         for (const e of candidates.forSession(session.pid)) {
@@ -5572,11 +5634,14 @@ export class GameServer {
               : interestLimitSq(e, known !== undefined);
           if (d2 > limitSq) continue;
           present.add(e.id);
-          const cache = this.wireCacheFor(e, stableTimerWire);
+          const cache = this.wireCacheFor(e, stableTimerWire, wantsBinary);
           if (known === undefined) {
             // first sight carries the at-rest state exactly, so no settle
             // record is owed until it moves again
-            ents.push(stableTimerWire ? cache.fullAuraJson : cache.fullJson);
+            pushEntity(
+              stableTimerWire ? cache.fullAuraJson : cache.fullJson,
+              stableTimerWire ? cache.fullAuraBinary : cache.fullBinary,
+            );
             session.sentEnts.set(e.id, {
               idVer: cache.idVer,
               dynVer: cache.dynVer,
@@ -5588,7 +5653,10 @@ export class GameServer {
           }
           const auraChanged = stableTimerWire && known.auraVer !== cache.auraVer;
           if (known.idVer !== cache.idVer) {
-            ents.push(auraChanged ? cache.fullAuraJson : cache.fullJson);
+            pushEntity(
+              auraChanged ? cache.fullAuraJson : cache.fullJson,
+              auraChanged ? cache.fullAuraBinary : cache.fullBinary,
+            );
             known.idVer = cache.idVer;
             known.dynVer = cache.dynVer;
             known.auraVer = cache.auraVer;
@@ -5610,7 +5678,10 @@ export class GameServer {
           known.dynVer = cache.dynVer;
           known.auraVer = cache.auraVer;
           known.sentAtTick = tick;
-          ents.push(auraChanged ? cache.liteAuraJson : cache.liteJson);
+          pushEntity(
+            auraChanged ? cache.liteAuraJson : cache.liteJson,
+            auraChanged ? cache.liteAuraBinary : cache.liteBinary,
+          );
         }
         // forget entities that left interest, so a re-entry sends identity again
         for (const id of session.sentEnts.keys()) {
@@ -5618,7 +5689,7 @@ export class GameServer {
         }
         const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         if (this.perfDetailActive) this.bcastGridNs += selfStart - gridStart;
-        const selfJson = this.selfWireJson(
+        const selfWire = this.selfWireJson(
           session,
           anchorEntity,
           anchorMeta,
@@ -5653,9 +5724,56 @@ export class GameServer {
         const temporalHourglassesJson =
           temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
+        let binaryRoot: SnapshotObject | null = null;
+        if (wantsBinary) {
+          const frostRingValues = activeFrostRings
+            .filter((ring) => {
+              const dx = ring.x - anchorEntity.pos.x;
+              const dz = ring.z - anchorEntity.pos.z;
+              const limit = INTEREST_QUERY_RADIUS + ring.radius;
+              return dx * dx + dz * dz <= limit * limit;
+            })
+            .map((ring) => ({
+              id: ring.id,
+              x: round2(ring.x),
+              z: round2(ring.z),
+              r: round2(ring.radius),
+              i: round2(ring.innerRadius),
+              dur: round2(ring.duration),
+              rem: round2(ring.remaining),
+            }));
+          const temporalHourglassValues = activeTemporalHourglasses
+            .filter((hourglass) => {
+              const dx = hourglass.x - anchorEntity.pos.x;
+              const dz = hourglass.z - anchorEntity.pos.z;
+              const limit = INTEREST_QUERY_RADIUS + hourglass.radius;
+              return dx * dx + dz * dz <= limit * limit;
+            })
+            .map((hourglass) => ({
+              id: hourglass.id,
+              x: round2(hourglass.x),
+              z: round2(hourglass.z),
+              r: round2(hourglass.radius),
+              dur: round2(hourglass.duration),
+              rem: round2(hourglass.remaining),
+            }));
+          binaryRoot = {
+            t: 'snap',
+            tick,
+            time: round2(this.sim.time),
+            self: selfWire.value,
+          };
+          if (tickHzValue !== undefined) binaryRoot.tickHz = tickHzValue;
+          if (stableTimerWire) binaryRoot.tw = STABLE_TIMER_WIRE_VERSION;
+          if (frostRingValues.length > 0) binaryRoot.rings = frostRingValues;
+          if (temporalHourglassValues.length > 0) binaryRoot.hourglasses = temporalHourglassValues;
+          if (keep.length > 0) binaryRoot.keep = keep;
+        }
         this.sendSnapshotRaw(
           session,
-          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
+          `${head}${timerWireJson},"self":${selfWire.json},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
+          binaryRoot,
+          binaryEnts,
         );
       },
       (err, resolved) =>
@@ -5689,7 +5807,9 @@ export class GameServer {
       cache = {
         tick: -1,
         idJson: '',
+        idValue: {},
         baseDynJson: '',
+        baseDynValue: {},
         idVer: 0,
         baseDynVer: 0,
         auraCache: new StableAuraWireCache(),
@@ -5704,13 +5824,17 @@ export class GameServer {
   // Identity and non-aura dynamics are serialized once per entity/tick. The
   // negotiated legacy and stable aura variants are then built lazily, at most
   // once each, and shared by every compatible recipient.
-  private wireCacheFor(e: Entity, stableTimerWire: boolean): EntityWireView {
+  private wireCacheFor(e: Entity, stableTimerWire: boolean, encodeBinary = false): EntityWireView {
     const cache = this.entityWireCacheFor(e);
     const t0 = this.perfDetailActive ? process.hrtime.bigint() : 0n;
     if (cache.tick !== this.sim.tickCount) {
       cache.tick = this.sim.tickCount;
-      const idJson = JSON.stringify(identityFields(e));
-      const baseDynJson = JSON.stringify(dynamicFields(e, false));
+      const idValue = identityFields(e);
+      const baseDynValue = dynamicFields(e, false);
+      const idJson = JSON.stringify(idValue);
+      const baseDynJson = JSON.stringify(baseDynValue);
+      cache.idValue = idValue;
+      cache.baseDynValue = baseDynValue;
       if (idJson !== cache.idJson) {
         cache.idJson = idJson;
         cache.idVer++;
@@ -5732,6 +5856,7 @@ export class GameServer {
       if (stableTimerWire) {
         const aura = cache.auraCache.encode(e.auras, this.sim.time, e.dead);
         variant.dynJson = cache.baseDynJson;
+        variant.dynValue = cache.baseDynValue;
         variant.dynVer = cache.baseDynVer;
         variant.auraVer = aura.revision;
 
@@ -5741,23 +5866,37 @@ export class GameServer {
         if (baseChanged) {
           variant.fullJson = fullEntityJson(e.id, cache.idJson, variant.dynJson);
           variant.liteJson = liteEntityJson(e.id, variant.dynJson);
+          variant.fullValue = fullEntityValue(e.id, cache.idValue, variant.dynValue);
+          variant.liteValue = liteEntityValue(e.id, variant.dynValue);
+          variant.fullBinary = null;
+          variant.liteBinary = null;
         }
         if (baseChanged || auraChanged) {
           const dynWithAuras = jsonWithField(variant.dynJson, 'auras', aura.json);
+          const dynWithAurasValue = { ...variant.dynValue, auras: aura.value };
           variant.fullAuraJson = fullEntityJson(e.id, cache.idJson, dynWithAuras);
           variant.liteAuraJson = liteEntityJson(e.id, dynWithAuras);
+          variant.fullAuraValue = fullEntityValue(e.id, cache.idValue, dynWithAurasValue);
+          variant.liteAuraValue = liteEntityValue(e.id, dynWithAurasValue);
+          variant.fullAuraBinary = null;
+          variant.liteAuraBinary = null;
           if (this.perfDetailActive) this.bcStableSerializes++;
         }
         variant.builtIdVer = cache.idVer;
         variant.builtDynVer = variant.dynVer;
         variant.builtAuraVer = variant.auraVer;
       } else {
-        const auraJson = e.auras.length > 0 ? JSON.stringify(e.auras.map(wireAura)) : null;
+        const auraValue = e.auras.length > 0 ? e.auras.map(wireAura) : null;
+        const auraJson = auraValue ? JSON.stringify(auraValue) : null;
         const dynJson = auraJson
           ? jsonWithField(cache.baseDynJson, 'auras', auraJson)
           : cache.baseDynJson;
+        const dynValue = auraValue
+          ? { ...cache.baseDynValue, auras: auraValue }
+          : cache.baseDynValue;
         if (dynJson !== variant.dynJson) {
           variant.dynJson = dynJson;
+          variant.dynValue = dynValue;
           variant.dynVer++;
         }
         if (variant.builtIdVer !== cache.idVer || variant.builtDynVer !== variant.dynVer) {
@@ -5765,10 +5904,29 @@ export class GameServer {
           variant.liteJson = liteEntityJson(e.id, variant.dynJson);
           variant.fullAuraJson = variant.fullJson;
           variant.liteAuraJson = variant.liteJson;
+          variant.fullValue = fullEntityValue(e.id, cache.idValue, variant.dynValue);
+          variant.liteValue = liteEntityValue(e.id, variant.dynValue);
+          variant.fullAuraValue = variant.fullValue;
+          variant.liteAuraValue = variant.liteValue;
+          variant.fullBinary = null;
+          variant.liteBinary = null;
+          variant.fullAuraBinary = null;
+          variant.liteAuraBinary = null;
           variant.builtIdVer = cache.idVer;
           variant.builtDynVer = variant.dynVer;
           if (this.perfDetailActive) this.bcLegacySerializes++;
         }
+      }
+    }
+    if (encodeBinary) {
+      variant.fullBinary ??= encodeSnapshotBinaryEntityFragment(variant.fullValue);
+      variant.liteBinary ??= encodeSnapshotBinaryEntityFragment(variant.liteValue);
+      if (stableTimerWire) {
+        variant.fullAuraBinary ??= encodeSnapshotBinaryEntityFragment(variant.fullAuraValue);
+        variant.liteAuraBinary ??= encodeSnapshotBinaryEntityFragment(variant.liteAuraValue);
+      } else {
+        variant.fullAuraBinary = variant.fullBinary;
+        variant.liteAuraBinary = variant.liteBinary;
       }
     }
     if (this.perfDetailActive) this.bcSerializeNs += process.hrtime.bigint() - t0;
@@ -5791,7 +5949,7 @@ export class GameServer {
     meta: PlayerMeta,
     anchorSession: ClientSession = session,
     vcupDue = false,
-  ): string {
+  ): SerializedSnapshotValue {
     const stableTimerWire = session.timerWireVersion === STABLE_TIMER_WIRE_VERSION;
     const self = wireEntity(p, !stableTimerWire);
     Object.assign(self, {
@@ -5832,10 +5990,11 @@ export class GameServer {
     // an absent field as "unchanged" (a fresh session always gets them all)
     const sent = session.lastSent;
     let extra = '';
-    const maybeSerialized = (key: string, s: string): void => {
+    const maybeSerialized = (key: string, s: string, value: unknown): void => {
       if (sent[key] !== s) {
         sent[key] = s;
         extra += `,"${key}":${s}`;
+        self[key] = value;
       }
     };
     // Like `maybe`, but for a value already serialized once (the realm-wide Vale
@@ -5843,14 +6002,16 @@ export class GameServer {
     // time per tick by their realm-readout memos): skip the per-session
     // re-stringify and only diff the pre-serialized string against what this
     // session last received.
-    const maybeRaw = (key: string, serialized: string): void => {
+    const maybeRaw = (key: string, serialized: string, value: unknown): void => {
       if (sent[key] !== serialized) {
         sent[key] = serialized;
         extra += `,"${key}":${serialized}`;
+        self[key] = value;
       }
     };
     const maybe = (key: string, value: unknown): void => {
-      maybeSerialized(key, JSON.stringify(value ?? null));
+      const wireValue = value ?? null;
+      maybeSerialized(key, JSON.stringify(wireValue), wireValue);
     };
     // Dynamic / latency-sensitive fields: diffed every tick. These change from
     // outside this session's own commands/events, party member HP from another
@@ -5871,11 +6032,10 @@ export class GameServer {
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
     if (stableTimerWire) {
-      maybeSerialized('auras', this.stableAuraWireFor(p).json);
-      maybeSerialized(
-        'cds',
-        session.timerWireCache.encodeCooldowns(anchorSession.pid, p, this.sim.time).json,
-      );
+      const auras = this.stableAuraWireFor(p);
+      maybeSerialized('auras', auras.json, auras.value);
+      const cooldowns = session.timerWireCache.encodeCooldowns(anchorSession.pid, p, this.sim.time);
+      maybeSerialized('cds', cooldowns.json, cooldowns.value);
     } else {
       maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
     }
@@ -5887,14 +6047,12 @@ export class GameServer {
     // src/sim/professions/gathering.ts isNodeHarvestableBy). Only entries with
     // remaining time survive the filter, an already-elapsed timer reads as ready.
     if (stableTimerWire) {
-      maybeSerialized(
-        'ncd',
-        session.timerWireCache.encodeNodeCooldowns(
-          anchorSession.pid,
-          meta.nodeHarvestReadyAt,
-          this.sim.time,
-        ).json,
+      const nodeCooldowns = session.timerWireCache.encodeNodeCooldowns(
+        anchorSession.pid,
+        meta.nodeHarvestReadyAt,
+        this.sim.time,
       );
+      maybeSerialized('ncd', nodeCooldowns.json, nodeCooldowns.value);
     } else {
       maybe(
         'ncd',
@@ -5910,22 +6068,18 @@ export class GameServer {
     // charges}. The empty-pool recharge timer rides `cds`; the client derives
     // the max from its own known-list rebake (1 + bonusCharges).
     if (stableTimerWire) {
-      maybeSerialized(
-        'achg',
-        session.timerWireCache.encodeCharges(anchorSession.pid, p.abilityCharges).json,
-      );
+      const charges = session.timerWireCache.encodeCharges(anchorSession.pid, p.abilityCharges);
+      maybeSerialized('achg', charges.json, charges.value);
       // The companion recharge timers ({abilityId: [deadline, length]}), so the
       // bar can show the thin recharge sweep while the pool still holds a use
       // (the empty-pool timer keeps riding `cds` unchanged). Additive key: an
       // older client simply ignores it.
-      maybeSerialized(
-        'achr',
-        session.timerWireCache.encodeChargeRecharges(
-          anchorSession.pid,
-          p.abilityCharges,
-          this.sim.time,
-        ).json,
+      const chargeRecharges = session.timerWireCache.encodeChargeRecharges(
+        anchorSession.pid,
+        p.abilityCharges,
+        this.sim.time,
       );
+      maybeSerialized('achr', chargeRecharges.json, chargeRecharges.value);
     } else {
       maybe(
         'achg',
@@ -6005,12 +6159,10 @@ export class GameServer {
           liveHidden,
         };
         maybe('vcup', viewerReadout);
-        maybeRaw(
-          'vcupb',
-          realmReadoutJson(this.realmReadout, this.sim.tickCount, () =>
-            this.sim.cupSharedInfoFor(),
-          ),
+        const sharedJson = realmReadoutJson(this.realmReadout, this.sim.tickCount, () =>
+          this.sim.cupSharedInfoFor(),
         );
+        maybeRaw('vcupb', sharedJson, shared);
       } else {
         maybe('vcup', null);
       }
@@ -6027,12 +6179,13 @@ export class GameServer {
     if (this.sim.tickCount - session.lastDfWireTick >= DF_WIRE_INTERVAL_TICKS) {
       session.lastDfWireTick = this.sim.tickCount;
       maybe('df', this.sim.dungeonFinderInfoFor(anchorSession.pid));
-      maybeRaw(
-        'dfb',
-        realmReadoutJson(this.dfBoardReadout, this.sim.tickCount, () =>
-          this.sim.dungeonFinderBoardView(),
-        ),
+      const sharedBoard = realmReadoutObject(this.dfBoardReadout, this.sim.tickCount, () =>
+        this.sim.dungeonFinderBoardView(),
       );
+      const sharedBoardJson = realmReadoutJson(this.dfBoardReadout, this.sim.tickCount, () =>
+        this.sim.dungeonFinderBoardView(),
+      );
+      maybeRaw('dfb', sharedBoardJson, sharedBoard);
     }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
@@ -6161,7 +6314,10 @@ export class GameServer {
       // strand the client on the sport kit).
       maybe('sport', meta.sportRole ? { role: meta.sportRole } : null);
     }
-    return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
+    return {
+      json: extra === '' ? json : `${json.slice(0, -1)}${extra}}`,
+      value: self,
+    };
   }
 
   // Global party-frame aggregates (aggro holders + incoming heals), scanned once
@@ -7173,13 +7329,19 @@ export class GameServer {
     this.sendFrame(session, payload);
   }
 
-  private sendSnapshotRaw(session: ClientSession, payload: string): void {
+  private sendSnapshotRaw(
+    session: ClientSession,
+    payload: string,
+    binaryRoot: SnapshotObject | null,
+    binaryEnts: readonly SnapshotBinaryEntityFragment[],
+  ): void {
     if (session.snapshotTransport !== 'binary-v1') {
       this.sendRaw(session, payload);
       return;
     }
     try {
-      this.sendFrame(session, encodeSnapshotBinary(JSON.parse(payload)));
+      if (!binaryRoot) throw new Error('binary snapshot root was not initialized');
+      this.sendFrame(session, encodeSnapshotBinaryFromFragments(binaryRoot, binaryEnts));
     } catch (error) {
       // Fail soft per session. The exact JSON payload that would have been sent
       // without negotiation remains the rollback frame.

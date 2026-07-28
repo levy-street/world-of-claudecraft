@@ -13,6 +13,18 @@ interface Batch {
   ownedMaterials: THREE.Material[];
 }
 
+function nextCapacity(current: number, required: number): number {
+  let capacity = Math.max(1, current);
+  while (capacity < required) capacity *= 2;
+  return capacity;
+}
+
+function configureMesh(mesh: THREE.InstancedMesh): void {
+  mesh.count = 0;
+  mesh.frustumCulled = false;
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+}
+
 export class CharacterCrowdBatch {
   readonly group = new THREE.Group();
   private readonly batches = new Map<string, Batch>();
@@ -24,11 +36,7 @@ export class CharacterCrowdBatch {
       throw new RangeError('crowd variant capacity must be a positive integer');
     }
     const mesh = new THREE.InstancedMesh(variant.geometry, variant.material, variant.capacity);
-    mesh.count = 0;
-    // The instance bounds move every frame. Rebuilding a union sphere over the
-    // whole crowd costs more than submitting the handful of batch draws.
-    mesh.frustumCulled = false;
-    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    configureMesh(mesh);
     const materials = Array.isArray(variant.material) ? variant.material : [variant.material];
     this.batches.set(key, {
       mesh,
@@ -36,6 +44,27 @@ export class CharacterCrowdBatch {
       ownedMaterials: variant.ownsMaterial ? materials : [],
     });
     this.group.add(mesh);
+  }
+
+  /** Ensure a variant can accept `required` instances this frame. Call only
+   * after beginFrame(), before addMatrix(). Growth is high-water-only, so the
+   * steady-state render loop performs no buffer allocations. */
+  reserve(key: string, required: number): boolean {
+    const batch = this.batches.get(key);
+    if (!batch) return false;
+    if (!Number.isInteger(required) || required < 0) {
+      throw new RangeError('crowd reserve must be a non-negative integer');
+    }
+    if (required <= batch.capacity) return true;
+    const capacity = nextCapacity(batch.capacity, required);
+    const mesh = new THREE.InstancedMesh(batch.mesh.geometry, batch.mesh.material, capacity);
+    configureMesh(mesh);
+    this.group.remove(batch.mesh);
+    batch.mesh.dispose();
+    batch.mesh = mesh;
+    batch.capacity = capacity;
+    this.group.add(mesh);
+    return true;
   }
 
   beginFrame(): void {
@@ -73,6 +102,7 @@ export class CharacterCrowdBatch {
 
   dispose(): void {
     for (const batch of this.batches.values()) {
+      batch.mesh.dispose();
       for (const material of batch.ownedMaterials) material.dispose();
     }
     this.group.remove(...this.group.children);

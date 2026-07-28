@@ -4,7 +4,12 @@ import {
   createNameplateAdmissionScratch,
   NAMEPLATE_CASTING,
   NAMEPLATE_HOSTILE,
+  NAMEPLATE_INTERACTABLE,
+  NAMEPLATE_LOOTABLE,
   NAMEPLATE_PARTY,
+  NAMEPLATE_PET,
+  NAMEPLATE_QUEST,
+  NAMEPLATE_RAID_MARKER,
   NAMEPLATE_TARGET,
 } from '../src/render/nameplate_budget_core';
 
@@ -38,5 +43,25 @@ describe('nameplate admission budget', () => {
       createNameplateAdmissionScratch(),
     );
     expect(admitted).toEqual([]);
+  });
+
+  it.each([
+    ['quest', NAMEPLATE_QUEST],
+    ['interactable', NAMEPLATE_INTERACTABLE],
+    ['raid marker', NAMEPLATE_RAID_MARKER],
+    ['pet', NAMEPLATE_PET],
+    ['lootable corpse', NAMEPLATE_LOOTABLE],
+  ])('keeps %s information outside the ordinary cap', (_label, flags) => {
+    const admitted: number[] = [];
+    admitNameplates(
+      [
+        { id: 1, flags: 0, distanceSq: 1, inViewport: true },
+        { id: 2, flags, distanceSq: 100, inViewport: true },
+      ],
+      0,
+      admitted,
+      createNameplateAdmissionScratch(),
+    );
+    expect(admitted).toEqual([2]);
   });
 });

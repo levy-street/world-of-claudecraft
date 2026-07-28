@@ -27,6 +27,7 @@ describe('loadConfig', () => {
     const cfg = loadConfig({ ...MIN_ENV });
     expect(cfg.databaseUrl).toBe('postgres://x');
     expect(cfg.dispatch).toBe('new');
+    expect(cfg.runtimeMode).toBe('inline');
     expect(cfg.port).toBe(8787);
     expect(cfg.allowDevCommands).toBe(false);
     expect(cfg.turnstileSecret).toBe('');
@@ -65,6 +66,18 @@ describe('loadConfig', () => {
       /legacy.*new|new.*legacy/,
     );
     expect(() => loadConfig({ ...MIN_ENV, API_DISPATCH: 'NEW' })).toThrow(/API_DISPATCH/);
+  });
+
+  it('fails closed while the instance worker runtime has no production adapter', () => {
+    expect(loadConfig({ ...MIN_ENV }).runtimeMode).toBe('inline');
+    expect(loadConfig({ ...MIN_ENV, MMO_RUNTIME_MODE: '' }).runtimeMode).toBe('inline');
+    expect(loadConfig({ ...MIN_ENV, MMO_RUNTIME_MODE: 'inline' }).runtimeMode).toBe('inline');
+    expect(() => loadConfig({ ...MIN_ENV, MMO_RUNTIME_MODE: 'instance-workers' })).toThrow(
+      /MMO_RUNTIME_MODE.*not configured/,
+    );
+    expect(() => loadConfig({ ...MIN_ENV, MMO_RUNTIME_MODE: 'workerz' })).toThrow(
+      /MMO_RUNTIME_MODE/,
+    );
   });
 
   it('is pure: it reads its env argument, never the global process.env', () => {

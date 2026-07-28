@@ -33,4 +33,23 @@ describe('CompileBatch', () => {
     await secondWait;
     expect(compile).toHaveBeenCalledTimes(2);
   });
+
+  it('contains runner rejection, settles waiters, and remains reusable', async () => {
+    const error = new Error('compile failed');
+    const onError = vi.fn();
+    const compile = vi.fn().mockRejectedValueOnce(error).mockResolvedValueOnce(undefined);
+    const batch = new CompileBatch<object>();
+    const firstWait = batch.request({ id: 1 });
+
+    await expect(batch.flush(compile, onError)).resolves.toBeUndefined();
+    await expect(firstWait).resolves.toBeUndefined();
+    expect(onError).toHaveBeenCalledOnce();
+    expect(onError).toHaveBeenCalledWith(error);
+    expect(batch.isPending).toBe(false);
+
+    const secondWait = batch.request({ id: 2 });
+    await expect(batch.flush(compile, onError)).resolves.toBeUndefined();
+    await expect(secondWait).resolves.toBeUndefined();
+    expect(compile).toHaveBeenCalledTimes(2);
+  });
 });

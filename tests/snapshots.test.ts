@@ -128,6 +128,32 @@ describe('binary snapshot live broadcast', () => {
     expect((snapshot.self as { id?: unknown }).id).toBe(joined.pid);
     expect(Array.isArray(snapshot.ents)).toBe(true);
   });
+
+  it('assembles negotiated frames without parsing the JSON fallback payload', () => {
+    const sent: (string | Uint8Array)[] = [];
+    const ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string | Uint8Array) => sent.push(payload),
+      terminate: vi.fn(),
+    };
+    const server = new GameServer();
+    const joined = server.join(ws as never, 1, 1, 'Binary', 'warrior', null, false, {
+      snapshotTransport: 'binary-v1',
+    });
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+    sent.length = 0;
+
+    const parse = vi.spyOn(JSON, 'parse');
+    broadcast(server);
+    expect(parse).not.toHaveBeenCalled();
+    parse.mockRestore();
+
+    const frame = sent.find((payload): payload is Uint8Array => payload instanceof Uint8Array);
+    expect(frame).toBeInstanceOf(Uint8Array);
+    expect(decodeSnapshotBinary(frame!).t).toBe('snap');
+  });
 });
 
 // A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.

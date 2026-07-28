@@ -8,6 +8,9 @@ describe('InlineRuntimeHost', () => {
       stop: vi.fn(),
       join: vi.fn(),
       leave: vi.fn(),
+      prepareTransfer: vi.fn(),
+      commitTransfer: vi.fn(),
+      abortTransfer: vi.fn(),
       handle: vi.fn(),
     };
     const host = new InlineRuntimeHost('alpha/overworld/world', adapter);
@@ -16,13 +19,23 @@ describe('InlineRuntimeHost', () => {
 
     await host.start();
     await host.join(request);
-    await host.handle('char-1', 3, message);
+    host.handle('char-1', 3, message);
+    await host.prepareTransfer({
+      characterId: 'char-1',
+      sourceEpoch: 3,
+      targetEpoch: 4,
+      transfer: request.input,
+    });
+    await host.commitTransfer('char-1', 4);
+    await host.abortTransfer('char-1', 4);
     await host.leave('char-1', 3);
     await host.stop();
 
     expect(adapter.start).toHaveBeenCalledOnce();
     expect(adapter.join).toHaveBeenCalledWith(request);
     expect(adapter.handle).toHaveBeenCalledWith('char-1', 3, message);
+    expect(adapter.commitTransfer).toHaveBeenCalledWith('char-1', 4);
+    expect(adapter.abortTransfer).toHaveBeenCalledWith('char-1', 4);
     expect(adapter.leave).toHaveBeenCalledWith('char-1', 3);
     expect(adapter.stop).toHaveBeenCalledOnce();
   });

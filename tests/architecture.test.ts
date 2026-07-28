@@ -283,6 +283,7 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_view.ts',
   'src/render/nameplate_budget_core.ts',
   'src/render/net_interp_core.ts',
+  'src/render/player_rig_residency_core.ts',
   'src/render/prewarm_policy.ts',
   'src/render/runtime/render_world_core.ts',
   'src/render/streaming_budget_core.ts',

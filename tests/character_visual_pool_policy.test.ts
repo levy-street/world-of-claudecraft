@@ -29,14 +29,10 @@ describe('character visual pool residency policy', () => {
 
     expect(takeStart).toBeGreaterThan(-1);
     expect(storeStart).toBeGreaterThan(takeStart);
-    expect(store).toContain(
-      'shouldRetainPooledCharacterVisual(this.pooledVisualCount, GFX.maxPooledCharacterVisuals)',
-    );
-    expect(take).toContain('this.pooledVisualCount = Math.max(0, this.pooledVisualCount - 1)');
-    expect(store).toContain('visual.dispose();');
-    expect(store).toContain('this.pooledVisualCount++;');
-    expect(store.indexOf('visual.dispose();')).toBeLessThan(
-      store.indexOf('this.pooledVisualCount++;'),
-    );
+    expect(renderer).toContain('new CharacterVisualPool<CharacterVisual>');
+    expect(take).toContain('this.visualPool.acquire(key)');
+    expect(store).toContain('this.visualPool.release(key, visual)');
+    expect(renderer).toContain('pooledVisuals: this.visualPool.size');
+    expect(renderer).not.toContain('private pooledVisualCount');
   });
 });

@@ -46,4 +46,26 @@ describe('far crowd batching', () => {
     expect((batch.group.children[0] as THREE.InstancedMesh).frustumCulled).toBe(false);
     batch.dispose();
   });
+
+  it('reserves enough instance storage before a frame instead of overflowing into rigs', () => {
+    const batch = new CharacterCrowdBatch();
+    batch.registerVariant('mage', {
+      geometry: new THREE.BoxGeometry(1, 1, 1),
+      material: new THREE.MeshBasicMaterial(),
+      capacity: 1,
+      ownsMaterial: true,
+    });
+
+    expect(batch.reserve('mage', 3)).toBe(true);
+    batch.beginFrame();
+    const matrix = new THREE.Matrix4().elements;
+    expect(batch.addMatrix('mage', matrix)).toBe(true);
+    expect(batch.addMatrix('mage', matrix)).toBe(true);
+    expect(batch.addMatrix('mage', matrix)).toBe(true);
+    batch.endFrame();
+
+    expect(batch.instanceCount).toBe(3);
+    expect(batch.addMatrix('missing', matrix)).toBe(false);
+    batch.dispose();
+  });
 });

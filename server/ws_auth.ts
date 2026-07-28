@@ -78,7 +78,7 @@ function rejectHandshake(ws: WebSocket, error: string): void {
 export interface WsAuthDeps {
   game: GameServer;
   runtime?: {
-    attach(session: ClientSession): void;
+    attach(session: ClientSession): Promise<void>;
     handleMessage(session: ClientSession, raw: string): void;
     socketClosed(session: ClientSession, ws: WebSocket): boolean;
   };
@@ -441,7 +441,16 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         return;
       }
       const session = result;
-      runtime?.attach(session);
+      if (runtime) {
+        try {
+          await runtime.attach(session);
+        } catch (error) {
+          await game.leave(session, 'runtime attach failed').catch((cleanupError) => {
+            console.error('runtime attach cleanup failed:', cleanupError);
+          });
+          throw error;
+        }
+      }
       console.log(`+ ${character.name} (${character.class}) joined, ${game.clients.size} online`);
       ws.on('message', (data) => {
         if (runtime) runtime.handleMessage(session, String(data));

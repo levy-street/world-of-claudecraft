@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_MAX_CATCH_UP_TICKS, planTickDebt } from '../server/tick_debt';
+import { DEFAULT_MAX_CATCH_UP_TICKS, planTickCallback, planTickDebt } from '../server/tick_debt';
 
 const STEP = 1 / 20;
 
@@ -64,5 +64,26 @@ describe('planTickDebt', () => {
     expect(() => planTickDebt(0, 0, 0)).toThrow(RangeError);
     expect(() => planTickDebt(0, 0, STEP, 0)).toThrow(RangeError);
     expect(() => planTickDebt(0, 0, STEP, 1.5)).toThrow(RangeError);
+  });
+});
+
+describe('planTickCallback', () => {
+  it('accounts exact raw wall time while capping only periodic cadence work', () => {
+    const plan = planTickCallback(0, 2, STEP);
+
+    expect(plan.ticks).toBe(4);
+    expect(plan.droppedSeconds).toBeCloseTo(1.8);
+    expect(plan.debtAfterSeconds).toBeCloseTo(0);
+    expect(plan.cadenceElapsedSeconds).toBe(0.5);
+  });
+
+  it('normalizes invalid elapsed once for debt and cadence accounting', () => {
+    expect(planTickCallback(0.01, Number.NaN, STEP)).toEqual({
+      ticks: 0,
+      debtAfterSeconds: 0.01,
+      droppedSeconds: 0,
+      capped: false,
+      cadenceElapsedSeconds: 0,
+    });
   });
 });

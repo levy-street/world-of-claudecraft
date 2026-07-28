@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
+  isNameplateNdcInViewport,
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from '../src/render/nameplate_projection';
@@ -34,5 +35,12 @@ describe('nameplate projection', () => {
     expect(nameplateScreenTransform(123.456, 78.123)).toBe(
       'translate3d(123.46px, 78.12px, 0) translate(-50%, -100%)',
     );
+  });
+
+  it('admits only anchors inside the actual projected viewport and clip depth', () => {
+    expect(isNameplateNdcInViewport(0, 0, 0)).toBe(true);
+    expect(isNameplateNdcInViewport(1.01, 0, 0)).toBe(false);
+    expect(isNameplateNdcInViewport(0, -1.01, 0)).toBe(false);
+    expect(isNameplateNdcInViewport(0, 0, 1.01)).toBe(false);
   });
 });

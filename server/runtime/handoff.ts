@@ -7,10 +7,15 @@ export interface RuntimeHandoff {
   characterId: string;
   source: RuntimeRoute;
   targetRuntimeKey: string;
+  targetEpoch: number;
   state: HandoffState;
 }
 
-export function beginHandoff(source: RuntimeRoute, targetRuntimeKey: string): RuntimeHandoff {
+export function beginHandoff(
+  router: RuntimeRouter,
+  source: RuntimeRoute,
+  targetRuntimeKey: string,
+): RuntimeHandoff {
   if (source.runtimeKey === targetRuntimeKey) {
     throw new Error('handoff target must differ from source runtime');
   }
@@ -18,6 +23,7 @@ export function beginHandoff(source: RuntimeRoute, targetRuntimeKey: string): Ru
     characterId: source.characterId,
     source,
     targetRuntimeKey,
+    targetEpoch: router.reserveEpoch(source.characterId),
     state: 'preparing',
   };
 }
@@ -33,6 +39,7 @@ export function commitHandoff(router: RuntimeRouter, handoff: RuntimeHandoff): R
     handoff.characterId,
     handoff.source.routeEpoch,
     handoff.targetRuntimeKey,
+    handoff.targetEpoch,
   );
   handoff.state = 'committed';
   return route;

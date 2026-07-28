@@ -45,10 +45,17 @@ import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labe
 import {
   admitNameplates,
   createNameplateAdmissionScratch,
+  NAMEPLATE_ACTIONABLE,
   NAMEPLATE_CASTING,
   NAMEPLATE_COMBAT,
+  NAMEPLATE_COMBO,
   NAMEPLATE_HOSTILE,
+  NAMEPLATE_INTERACTABLE,
+  NAMEPLATE_LOOTABLE,
   NAMEPLATE_PARTY,
+  NAMEPLATE_PET,
+  NAMEPLATE_QUEST,
+  NAMEPLATE_RAID_MARKER,
   NAMEPLATE_SELF_EMOTE,
   NAMEPLATE_TARGET,
   type NameplateAdmissionCandidate,
@@ -56,6 +63,7 @@ import {
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
 import {
+  isNameplateNdcInViewport,
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
@@ -120,6 +128,7 @@ export class NameplatePainter {
   private readonly admissionScratch = createNameplateAdmissionScratch();
   private readonly admittedIds: number[] = [];
   private readonly admitted = new Set<number>();
+  private readonly partyIds = new Set<number>();
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -134,13 +143,40 @@ export class NameplatePainter {
     this.maxOrdinaryNameplates = deps.maxOrdinaryNameplates ?? (() => Number.MAX_SAFE_INTEGER);
   }
 
+  private refreshPartyIds(): void {
+    this.partyIds.clear();
+    const members = this.world.partyInfo?.members;
+    if (!members) return;
+    for (const member of members) this.partyIds.add(member.pid);
+  }
+
+  private actionabilityFlags(e: Entity, id: number, player: Entity, plan: NameplatePlan): number {
+    let flags = 0;
+    if (id === player.targetId) flags |= NAMEPLATE_TARGET;
+    if (plan.hasOverheadEmote) flags |= NAMEPLATE_SELF_EMOTE;
+    if (e.hostile || (e.kind === 'player' && this.isHostilePlayer(e))) {
+      flags |= NAMEPLATE_HOSTILE;
+    }
+    if (e.inCombat) flags |= NAMEPLATE_COMBAT;
+    if (e.castingAbility !== null) flags |= NAMEPLATE_CASTING;
+    if (this.partyIds.has(id)) flags |= NAMEPLATE_PARTY;
+    if (e.questIds.length > 0) flags |= NAMEPLATE_QUEST;
+    // Every visible object is a door or a near-range delve interaction by
+    // nameplatePlanInto; NPCs are interaction landmarks even without a quest.
+    if (e.kind === 'npc' || e.kind === 'object') flags |= NAMEPLATE_INTERACTABLE;
+    if (this.world.markerFor(id) !== null) flags |= NAMEPLATE_RAID_MARKER;
+    if (e.ownerId !== null) flags |= NAMEPLATE_PET;
+    if (e.lootable) flags |= NAMEPLATE_LOOTABLE;
+    if (plan.comboPips > 0) flags |= NAMEPLATE_COMBO;
+    return flags;
+  }
+
   private refreshAdmission(
     showNameplates: boolean,
     showOwnNameplate: boolean,
     showPlayerNameplates: boolean,
   ): void {
     const p = this.world.player;
-    const party = this.world.partyInfo?.members ?? [];
     let count = 0;
     for (const [id, v] of this.views) {
       const e = this.world.entities.get(id);
@@ -156,15 +192,7 @@ export class NameplatePainter {
       );
       const dx = e.pos.x - p.pos.x;
       const dz = e.pos.z - p.pos.z;
-      let flags = 0;
-      if (id === p.targetId) flags |= NAMEPLATE_TARGET;
-      if (id === p.id && plan.hasOverheadEmote) flags |= NAMEPLATE_SELF_EMOTE;
-      if (e.hostile || (e.kind === 'player' && this.isHostilePlayer(e))) {
-        flags |= NAMEPLATE_HOSTILE;
-      }
-      if (e.inCombat) flags |= NAMEPLATE_COMBAT;
-      if (e.castingAbility !== null) flags |= NAMEPLATE_CASTING;
-      if (party.some((member) => member.pid === id)) flags |= NAMEPLATE_PARTY;
+      const flags = this.actionabilityFlags(e, id, p, plan);
       let candidate = this.admissionCandidatePool[count];
       if (!candidate) {
         candidate = { id, flags, distanceSq: 0, inViewport: false };
@@ -173,7 +201,15 @@ export class NameplatePainter {
       candidate.id = id;
       candidate.flags = flags;
       candidate.distanceSq = dx * dx + dz * dz;
-      candidate.inViewport = !plan.hidden && v.group.visible;
+      candidate.inViewport = false;
+      if (!plan.hidden) {
+        this.tmpV.copy(v.group.position);
+        this.tmpV.y += plan.anchorYOffset;
+        if (isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
+          this.tmpV.project(this.camera);
+          candidate.inViewport = isNameplateNdcInViewport(this.tmpV.x, this.tmpV.y, this.tmpV.z);
+        }
+      }
       this.admissionCandidates[count++] = candidate;
     }
     this.admissionCandidates.length = count;
@@ -198,6 +234,7 @@ export class NameplatePainter {
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
+    this.refreshPartyIds();
     if (fullPass || this.admitted.size === 0) {
       this.refreshAdmission(showNameplates, showOwnNameplate, showPlayerNameplates);
     }
@@ -218,7 +255,8 @@ export class NameplatePainter {
         this.hideNameplate(v);
         continue;
       }
-      if (!this.admitted.has(id)) {
+      const actionable = this.actionabilityFlags(e, id, p, plan) & NAMEPLATE_ACTIONABLE;
+      if (!this.admitted.has(id) && actionable === 0) {
         this.hideNameplate(v);
         continue;
       }
@@ -229,7 +267,7 @@ export class NameplatePainter {
         continue;
       }
       this.tmpV.project(this.camera);
-      if (this.tmpV.z < -1 || this.tmpV.z > 1) {
+      if (!isNameplateNdcInViewport(this.tmpV.x, this.tmpV.y, this.tmpV.z)) {
         this.hideNameplate(v);
         continue;
       }

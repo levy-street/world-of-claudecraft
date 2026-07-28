@@ -1,4 +1,5 @@
 export type CompileBatchRunner<Target> = (targets: readonly Target[]) => Promise<unknown>;
+export type CompileBatchErrorHandler = (error: unknown) => void;
 
 export class CompileBatch<Target> {
   private pending: Promise<void> | null = null;
@@ -12,7 +13,7 @@ export class CompileBatch<Target> {
     });
   }
 
-  flush(run: CompileBatchRunner<Target>): Promise<void> | null {
+  flush(run: CompileBatchRunner<Target>, onError?: CompileBatchErrorHandler): Promise<void> | null {
     if (this.targets.length === 0) return this.pending;
     if (this.pending) return this.pending;
 
@@ -21,6 +22,15 @@ export class CompileBatch<Target> {
     this.pending = Promise.resolve()
       .then(() => run(activeTargets))
       .then(() => undefined)
+      .catch((error: unknown) => {
+        // The renderer intentionally fire-and-forgets flushes. Keep the internal
+        // drain promise fulfilled so a driver compile failure cannot become an
+        // unhandled rejection or wedge the next batch. The waiter contract is
+        // fail-soft too: views reveal after their bounded gate and retry on use.
+        try {
+          onError?.(error);
+        } catch {}
+      })
       .finally(() => {
         for (const waiter of activeWaiters) waiter.resolve();
         this.pending = null;

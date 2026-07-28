@@ -2,7 +2,10 @@ import {
   DEFAULT_SNAPSHOT_BINARY_LIMITS,
   decodeSnapshotBinary as decodeCore,
   encodeSnapshotBinary as encodeCore,
+  encodeSnapshotBinaryEntityFragment as encodeCoreEntityFragment,
+  encodeSnapshotBinaryFromFragments as encodeCoreFromFragments,
   SNAPSHOT_BINARY_WIRE_VERSION,
+  type SnapshotBinaryEntityFragment,
   type SnapshotBinaryLimits,
   type SnapshotObject,
 } from './snapshot_binary_core';
@@ -45,6 +48,23 @@ export function encodeSnapshotBinary(
   return encodeCore(quantized, limits);
 }
 
+export function encodeSnapshotBinaryEntityFragment(
+  entity: unknown,
+  limits?: Partial<SnapshotBinaryLimits>,
+): SnapshotBinaryEntityFragment {
+  return encodeCoreEntityFragment(quantizeRecord(entity), limits);
+}
+
+export function encodeSnapshotBinaryFromFragments(
+  snapshot: SnapshotObject,
+  fragments: readonly SnapshotBinaryEntityFragment[],
+  limits?: Partial<SnapshotBinaryLimits>,
+): Uint8Array {
+  const quantized: SnapshotObject = { ...snapshot };
+  if (Object.hasOwn(snapshot, 'self')) quantized.self = quantizeRecord(snapshot.self);
+  return encodeCoreFromFragments(quantized, fragments, limits);
+}
+
 export function decodeSnapshotBinary(
   input: ArrayBuffer | ArrayBufferView,
   limits?: Partial<SnapshotBinaryLimits>,
@@ -60,6 +80,7 @@ export function decodeSnapshotBinary(
 export {
   DEFAULT_SNAPSHOT_BINARY_LIMITS,
   SNAPSHOT_BINARY_WIRE_VERSION,
+  type SnapshotBinaryEntityFragment,
   type SnapshotBinaryLimits,
   type SnapshotObject,
 };

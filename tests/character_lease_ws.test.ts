@@ -32,7 +32,14 @@ const fakeReq = () => ({}) as any;
 // the lease section and game.join. opts tunes the levers this file exercises:
 // whether a live session already exists, what game.join returns, and whether the
 // lease acquire succeeds.
-function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?: boolean } = {}) {
+function makeDeps(
+  opts: {
+    joinResult?: any;
+    hasSession?: boolean;
+    acquireResult?: boolean;
+    runtimeAttach?: (session: any) => Promise<void>;
+  } = {},
+) {
   const character = {
     id: 7,
     name: 'Vaultkeeper',
@@ -41,9 +48,16 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     is_gm: false,
     force_rename: false,
   };
-  const session = { pid: 1, characterId: 7, name: 'Vaultkeeper', ws: null, awaitingPong: false };
+  const session: any = {
+    pid: 1,
+    characterId: 7,
+    name: 'Vaultkeeper',
+    ws: null,
+    awaitingPong: false,
+  };
   const joinSpy = vi.fn((...args: unknown[]) => {
-    void args;
+    const meta = args[7] as { leaseNonce?: string } | undefined;
+    session.leaseNonce = meta?.leaseNonce;
     return opts.joinResult ?? session;
   });
   const hasSessionSpy = vi.fn((_characterId: number) => opts.hasSession ?? false);
@@ -51,6 +65,11 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     return opts.acquireResult ?? true;
   });
   const releaseSpy = vi.fn(async (_characterId: number, _nonce?: string) => {});
+  const leaveSpy = vi.fn(async (leftSession: any, _reason: string) => {
+    if (leftSession.leaseNonce) {
+      await releaseSpy(leftSession.characterId, leftSession.leaseNonce);
+    }
+  });
   // Bank bonus: the fresh-join arm recomputes the bank bonus before acquiring the lease.
   const bankBonusSpy = vi.fn(async (_accountId: number) => ({
     bonusSlots: 0,
@@ -62,6 +81,9 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     hasSessionForCharacter: hasSessionSpy,
     join: joinSpy,
     clients: { size: 1 },
+    leave: leaveSpy,
+    handleMessage: vi.fn(),
+    socketClosed: vi.fn(() => true),
   };
   const deps: any = {
     game,
@@ -84,7 +106,24 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     releaseCharacterLease: releaseSpy,
     bankBonusForAccount: bankBonusSpy,
   };
-  return { deps, game, joinSpy, hasSessionSpy, acquireSpy, releaseSpy, bankBonusSpy, session };
+  if (opts.runtimeAttach) {
+    deps.runtime = {
+      attach: vi.fn(opts.runtimeAttach),
+      handleMessage: vi.fn(),
+      socketClosed: vi.fn(() => true),
+    };
+  }
+  return {
+    deps,
+    game,
+    joinSpy,
+    leaveSpy,
+    hasSessionSpy,
+    acquireSpy,
+    releaseSpy,
+    bankBonusSpy,
+    session,
+  };
 }
 
 beforeEach(() => {
@@ -156,6 +195,23 @@ describe('ws auth character load lease', () => {
     expect(sent).not.toContainEqual({ t: 'error', error: ALREADY_IN_WORLD });
     // A successful join owns the lease; leave() releases it, not the handshake.
     expect(releaseSpy).not.toHaveBeenCalled();
+  });
+
+  it('hands a lease-owning session to canonical leave when runtime attach fails', async () => {
+    const attachError = new Error('runtime unavailable');
+    const { deps, session, leaveSpy, acquireSpy, releaseSpy } = makeDeps({
+      runtimeAttach: async () => {
+        throw attachError;
+      },
+    });
+    const { ws } = fakeWs();
+
+    await expect(
+      createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq()),
+    ).rejects.toBe(attachError);
+    expect(acquireSpy).toHaveBeenCalledOnce();
+    expect(leaveSpy).toHaveBeenCalledWith(session, 'runtime attach failed');
+    expect(releaseSpy).toHaveBeenCalledWith(7, acquireSpy.mock.calls[0][2]);
   });
 
   it('awaits a nonce-fenced release when join refuses and no session owns it', async () => {

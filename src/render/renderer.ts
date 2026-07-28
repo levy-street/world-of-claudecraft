@@ -95,13 +95,14 @@ import {
   tintedFarMaterials,
   trainingDummyAssetsReady,
 } from './characters/assets';
+import { createCharacterClickProxy, syncCharacterClickProxy } from './characters/click_proxy';
 import { CharacterCrowdBatch } from './characters/crowd_batch';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import {
   playerRangedAttackAlreadyStarted,
   playerRangedAttackStartsAtLaunch,
 } from './characters/skin_attack';
-import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
+import { CharacterVisualPool } from './characters/visual_pool';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { CompileBatch } from './compile_batch';
@@ -181,6 +182,7 @@ import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
+import { planPlayerRigResidency } from './player_rig_residency_core';
 import {
   applyPointLightBudget,
   type RankedPointLight,
@@ -672,7 +674,11 @@ export interface EntityView {
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
   visualKey: string | null;
+  visualColor: number;
   visualPoolKey: string | null;
+  crowdVariantKey: string | null;
+  /** Fresh promoted rig is compiling while the shell stays batched/clickable. */
+  rigCompilePending: boolean;
   sheepVisual: CharacterVisual | null; // polymorph form, built lazily
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
@@ -689,6 +695,8 @@ export interface EntityView {
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
+  /** unscaled stable-shell hit radius; independent of full rig residency */
+  clickRadius: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
   liveScale: number;
   /** what removeView pulls back out of clickTargets */
@@ -1201,6 +1209,8 @@ export class Renderer {
   private lastVisibleRigCount = 0;
   private readonly crowdBatch = new CharacterCrowdBatch();
   private readonly crowdVariantKeys = new Set<string>();
+  private readonly crowdBatchCounts = new Map<string, number>();
+  private readonly crowdPartyIds = new Set<number>();
   private readonly crowdMatrix = new THREE.Matrix4();
   private readonly crowdScale = new THREE.Vector3();
   private readonly crowdRigCandidates: RigBudgetCandidate[] = [];
@@ -1208,12 +1218,18 @@ export class Renderer {
   private readonly crowdRigDecisions: RigBudgetDecision[] = [];
   private readonly crowdRigScratch = createRigBudgetScratch();
   private readonly crowdRenderModes = new Map<number, CharacterRenderMode>();
+  private readonly playerRigResidentIds = new Set<number>();
+  private readonly playerRigReleaseIds: number[] = [];
+  private readonly playerRigAcquireIds: number[] = [];
   private crowdArticulatedCount = 0;
   private crowdLocalFarCount = 0;
   // KHR_parallel_shader_compile present: lets us link new programs off-thread and
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   private readonly compileBatch = new CompileBatch<THREE.Object3D>();
+  private readonly handleCompileBatchError = (error: unknown): void => {
+    logAssetMissOnce('runtime-compile-batch', 'Runtime shader compile batch failed:', error);
+  };
   private prewarmActive = false;
   private readonly renderWorld = new RenderWorldCore<Entity>();
   private readonly compileRuntimeViewBatch = async (
@@ -1359,8 +1375,7 @@ export class Renderer {
   private renderDiagnosticsLastTextures = 0;
   private appliedBudgetLevels: RenderBudgetState['levels'] | null = null;
   private lastQualityChange: Omit<RendererQualityChangeStats, 'ageMs'> | null = null;
-  private visualPool = new Map<string, CharacterVisual[]>();
-  private pooledVisualCount = 0;
+  private visualPool!: CharacterVisualPool<CharacterVisual>;
   private objectPool = new Map<string, PooledObjectView[]>();
 
   constructor(
@@ -1411,6 +1426,10 @@ export class Renderer {
       this.captureGlIdentity();
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
+    this.visualPool = new CharacterVisualPool<CharacterVisual>(GFX.maxPooledCharacterVisuals, {
+      reset: (visual) => visual.resetForReuse(),
+      dispose: (visual) => visual.dispose(),
+    });
     if (GFX.composer) {
       // three r165's render() resets info per pass (after the shadow pass, see
       // draw_stats_core.ts header), so with the composer's multiple passes every
@@ -2279,7 +2298,7 @@ export class Renderer {
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
       views: this.views.size,
-      pooledVisuals: this.pooledVisualCount,
+      pooledVisuals: this.visualPool.size,
       crowd: {
         articulated: this.crowdArticulatedCount,
         localFar: this.crowdLocalFarCount,
@@ -2645,14 +2664,49 @@ export class Renderer {
     if (e.dead || e.inCombat || e.castingAbility !== null || e.overheadEmoteId !== null)
       return true;
     if (e.auras.length > 0 || e.hostile || this.isHostilePlayer(e)) return true;
-    return this.sim.partyInfo?.members.some((member) => member.pid === e.id) ?? false;
+    return this.crowdPartyIds.has(e.id);
+  }
+
+  private refreshPlayerShellAppearance(e: Entity, view: EntityView): void {
+    const nextKey = visualKeyFor(e);
+    if (nextKey === view.visualKey && e.color === view.visualColor) return;
+    if (nextKey === 'player_mech' && !mechAssetsReady()) {
+      void preloadMechAssets()
+        .then(() => this.viewCreateRetry.markSucceeded(e.id, `base:${nextKey}`))
+        .catch((error) =>
+          logAssetMissOnce('preload:player_mech', 'Failed to preload live mech cosmetic:', error),
+        );
+      return;
+    }
+    try {
+      const prepared = prepareVisual(nextKey);
+      if (view.visual) this.releasePlayerRig(e.id);
+      view.visualKey = nextKey;
+      view.visualColor = e.color;
+      view.visualPoolKey = this.visualPoolKeyFor(e);
+      view.height = prepared.def.height;
+      view.clickRadius = prepared.clickRadius;
+      view.crowdVariantKey = null;
+      syncCharacterClickProxy(
+        view.clickTarget as THREE.Mesh,
+        view.height,
+        view.clickRadius,
+        e.dead,
+      );
+    } catch (error) {
+      logAssetMissOnce(`player-shell:${nextKey}`, 'Failed to refresh player shell:', error);
+    }
   }
 
   private planCrowdCharacterModes(player: Entity): void {
+    this.crowdPartyIds.clear();
+    const party = this.sim.partyInfo?.members;
+    if (party) for (const member of party) this.crowdPartyIds.add(member.pid);
     let candidateCount = 0;
     for (const [id, view] of this.views) {
       const e = this.sim.entities.get(id);
-      if (e?.kind !== 'player' || !view.visual) continue;
+      if (e?.kind !== 'player') continue;
+      this.refreshPlayerShellAppearance(e, view);
       const slot = this.renderWorld.slotFor(id);
       if (slot < 0) continue;
       let candidate = this.crowdRigCandidatePool[candidateCount];
@@ -2685,10 +2739,14 @@ export class Renderer {
     }
   }
 
-  private crowdVariantFor(e: Entity): string | null {
-    const visualKey = visualKeyFor(e);
+  private crowdVariantFor(e: Entity, view: EntityView): string | null {
+    if (view.crowdVariantKey !== null) return view.crowdVariantKey;
+    const visualKey = view.visualKey ?? visualKeyFor(e);
     const key = `${visualKey}:${e.color >>> 0}`;
-    if (this.crowdVariantKeys.has(key)) return key;
+    if (this.crowdVariantKeys.has(key)) {
+      view.crowdVariantKey = key;
+      return key;
+    }
     try {
       const prepared = prepareVisual(visualKey);
       if (!prepared.idleGeo) return null;
@@ -2696,14 +2754,33 @@ export class Renderer {
       this.crowdBatch.registerVariant(key, {
         geometry: prepared.idleGeo,
         material: materials,
-        capacity: 256,
+        capacity: 64,
         ownsMaterial: true,
       });
       this.crowdVariantKeys.add(key);
+      view.crowdVariantKey = key;
       this.compileBatch.request(this.crowdBatch.group);
       return key;
     } catch {
       return null;
+    }
+  }
+
+  private reserveCrowdBatchCapacity(): void {
+    this.crowdBatchCounts.clear();
+    for (const [id, view] of this.views) {
+      const e = this.sim.entities.get(id);
+      if (e?.kind !== 'player') continue;
+      const mode = this.crowdRenderModes.get(id);
+      if (mode !== 'batchedFar' && view.visual !== null && !view.rigCompilePending) {
+        continue;
+      }
+      const variant = this.crowdVariantFor(e, view);
+      if (!variant) continue;
+      this.crowdBatchCounts.set(variant, (this.crowdBatchCounts.get(variant) ?? 0) + 1);
+    }
+    for (const [variant, count] of this.crowdBatchCounts) {
+      this.crowdBatch.reserve(variant, count);
     }
   }
 
@@ -2714,7 +2791,7 @@ export class Renderer {
     alpha: number,
     now: number,
   ): boolean {
-    if (e.kind !== 'player' || !v.visual) return false;
+    if (e.kind !== 'player') return false;
     const dx = e.pos.x - player.pos.x;
     const dz = e.pos.z - player.pos.z;
     const d2 = dx * dx + dz * dz;
@@ -2725,32 +2802,153 @@ export class Renderer {
       v.group.visible = false;
       return true;
     }
-    const variant = this.crowdVariantFor(e);
-    if (!variant) return false;
     const ea = remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
     const x = e.prevPos.x + (e.pos.x - e.prevPos.x) * ea;
     const y = e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
     const z = e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
     const facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
-    this.crowdMatrix.makeRotationY(facing);
-    this.crowdScale.setScalar(e.scale);
-    this.crowdMatrix.scale(this.crowdScale);
-    this.crowdMatrix.setPosition(x, y, z);
-    if (!this.crowdBatch.addMatrix(variant, this.crowdMatrix.elements)) return false;
+    const variant = this.crowdVariantFor(e, v);
+    if (variant) {
+      this.crowdMatrix.makeRotationY(facing);
+      this.crowdScale.setScalar(e.scale);
+      this.crowdMatrix.scale(this.crowdScale);
+      this.crowdMatrix.setPosition(x, y, z);
+      // reserveCrowdBatchCapacity makes this total in normal operation. An
+      // unexpected miss sheds only the cosmetic instance for this frame; it
+      // must never fall through and construct/retain a full rig.
+      this.crowdBatch.addMatrix(variant, this.crowdMatrix.elements);
+    }
 
     v.group.visible = true;
     v.group.position.set(x, y, z);
     v.group.rotation.y = facing;
     v.group.scale.setScalar(e.scale);
-    v.visual.root.visible = false;
+    syncCharacterClickProxy(v.clickTarget as THREE.Mesh, v.height, v.clickRadius, e.dead);
+    if (v.visual) v.visual.root.visible = false;
     if (v.sheepVisual) v.sheepVisual.root.visible = false;
     if (v.bearVisual) v.bearVisual.root.visible = false;
     if (v.catVisual) v.catVisual.root.visible = false;
     if (v.travelVisual) v.travelVisual.root.visible = false;
-    v.visual.setShadow(false);
-    v.visual.setProxyShadow(false);
+    v.visual?.setShadow(false);
+    v.visual?.setProxyShadow(false);
     v.isFar = true;
     return true;
+  }
+
+  private reconcilePlayerRigResidency(): void {
+    planPlayerRigResidency(
+      this.crowdRigDecisions,
+      this.playerRigResidentIds,
+      this.playerRigReleaseIds,
+      this.playerRigAcquireIds,
+    );
+    // Demote first: the selected replacement can hit the finite LRU instead of
+    // constructing another rig, and resident ordinary rigs never exceed plan.
+    for (const id of this.playerRigReleaseIds) this.releasePlayerRig(id);
+    for (const id of this.playerRigAcquireIds) this.acquirePlayerRig(id);
+  }
+
+  private disposePlayerRigDependents(view: EntityView): void {
+    view.sheepVisual?.dispose();
+    view.bearVisual?.dispose();
+    view.catVisual?.dispose();
+    view.travelVisual?.dispose();
+    view.fireballTravelVisual?.dispose();
+    view.iceBlockVisual?.dispose();
+    view.temporalHourglassVisual?.dispose();
+    view.frostNovaRootVisual?.dispose();
+    view.mageBarrierVisual?.dispose();
+    view.sheepVisual = null;
+    view.bearVisual = null;
+    view.catVisual = null;
+    view.travelVisual = null;
+    view.fireballTravelVisual = null;
+    view.iceBlockVisual = null;
+    view.temporalHourglassVisual = null;
+    view.frostNovaRootVisual = null;
+    view.mageBarrierVisual = null;
+    view.recklessOn = false;
+  }
+
+  private releasePlayerRig(id: number): void {
+    const view = this.views.get(id);
+    if (!view?.visual) {
+      this.playerRigResidentIds.delete(id);
+      return;
+    }
+    const visual = view.visual;
+    const entity = this.sim.entities.get(id);
+    view.group.remove(visual.root);
+    view.visual = null;
+    view.rigCompilePending = false;
+    this.playerRigResidentIds.delete(id);
+    this.disposePlayerRigDependents(view);
+    this.reconcileViewLights(view);
+    const poolKey = view.visualPoolKey ?? (entity ? this.visualPoolKeyFor(entity) : null);
+    if (poolKey) this.storePooledVisual(poolKey, visual);
+    else visual.dispose();
+  }
+
+  private acquirePlayerRig(id: number): void {
+    const view = this.views.get(id);
+    const entity = this.sim.entities.get(id);
+    if (!view || entity?.kind !== 'player' || view.visual) return;
+    const poolKey = this.visualPoolKeyFor(entity);
+    if (!poolKey) return;
+    let visual = this.takePooledVisual(poolKey);
+    const pooled = visual !== null;
+    if (!visual) visual = this.createCharacterVisualWithRetry(entity, 'player-residency');
+    if (!visual) return;
+
+    // A pooled rig can come from another player with the same constructor
+    // identity. Apply every mutable appearance field before exposing it.
+    visual.setSkin(entity.skin);
+    visual.setWeapon(entity.mainhandItemId);
+    visual.setOffhand(entity.offhandItemId);
+    visual.setWeaponSkin(entity.weaponSkinId);
+    visual.setWeaponStowed(entity.weaponStowed);
+    visual.setShadow(view.shadowOn);
+    visual.setFar(false);
+    visual.root.visible = true;
+    view.group.add(visual.root);
+
+    view.visual = visual;
+    view.visualKey = visualKeyFor(entity);
+    view.visualColor = entity.color;
+    view.visualPoolKey = poolKey;
+    view.height = visual.height;
+    view.skin = entity.skin;
+    view.mainhandItemId = entity.mainhandItemId;
+    view.offhandItemId = entity.offhandItemId;
+    view.weaponSkinId = entity.weaponSkinId;
+    view.weaponStowed = entity.weaponStowed;
+    view.rigCompilePending = false;
+    this.playerRigResidentIds.add(id);
+    this.reconcileViewLights(view);
+
+    if (!pooled && id !== this.sim.player.id) {
+      this.gatePlayerRigOnCompile(view, visual);
+    }
+  }
+
+  private gatePlayerRigOnCompile(view: EntityView, visual: CharacterVisual): void {
+    if (!this.asyncCompileSupported) return;
+    view.rigCompilePending = true;
+    visual.root.visible = false;
+    const compileReady = this.compileBatch.request(visual.root);
+    let settled = false;
+    const clear = (): void => {
+      if (settled) return;
+      settled = true;
+      if (view.visual === visual) view.rigCompilePending = false;
+    };
+    const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);
+    try {
+      compileReady.then(clear, clear).finally(() => clearTimeout(guard));
+    } catch {
+      clearTimeout(guard);
+      clear();
+    }
   }
 
   private createdViewType(e: Entity): string {
@@ -2802,7 +3000,7 @@ export class Renderer {
     // Parallel compile resolves, rejects, or clears through the per-view 1500ms
     // fail-soft guard. Without parallel compile there are no promises and the
     // views begin ready for the per-entry synchronous link pass.
-    this.compileBatch.flush(this.compileRuntimeViewBatch);
+    this.compileBatch.flush(this.compileRuntimeViewBatch, this.handleCompileBatchError);
     await Promise.all(compileWaits);
     if (!mandatoryLandmarkViewsReady(ids, this.views)) {
       throw new Error('Mandatory interaction landmark views did not become ready');
@@ -2976,6 +3174,10 @@ export class Renderer {
   }
 
   private visualPoolKeyFor(e: Entity): string | null {
+    if (e.kind === 'player') {
+      // Mech uses the wearer's class-specific held-item layout, hence templateId.
+      return `player:${visualKeyFor(e)}:${e.templateId}:${e.color >>> 0}`;
+    }
     if (e.kind === 'mob') return `mob:${e.templateId}:${e.color}:${e.scale}`;
     // NPCs are skinned characters too: pool them like mobs so their Skeleton (and its
     // bone-matrix DataTexture) survives interest churn instead of being disposed and
@@ -2987,38 +3189,18 @@ export class Renderer {
   }
 
   private takePooledVisual(key: string): CharacterVisual | null {
-    const pool = this.visualPool.get(key);
-    const visual = pool?.pop() ?? null;
+    const visual = this.visualPool.acquire(key);
     if (!visual) return null;
-    this.pooledVisualCount = Math.max(0, this.pooledVisualCount - 1);
-    if (pool?.length === 0) this.visualPool.delete(key);
-    visual.root.removeFromParent();
-    visual.root.visible = true;
-    visual.root.position.set(0, 0, 0);
-    visual.root.rotation.set(0, 0, 0);
-    visual.root.scale.set(1, 1, 1);
-    visual.setFar(false);
-    visual.setGhost(false);
     return visual;
   }
 
   private storePooledVisual(key: string, visual: CharacterVisual): void {
     visual.root.removeFromParent();
-    if (!shouldRetainPooledCharacterVisual(this.pooledVisualCount, GFX.maxPooledCharacterVisuals)) {
-      visual.dispose();
-      return;
-    }
     visual.root.visible = false;
     visual.root.position.set(0, 0, 0);
     visual.root.rotation.set(0, 0, 0);
     visual.root.scale.set(1, 1, 1);
-    let pool = this.visualPool.get(key);
-    if (!pool) {
-      pool = [];
-      this.visualPool.set(key, pool);
-    }
-    pool.push(visual);
-    this.pooledVisualCount++;
+    this.visualPool.release(key, visual);
   }
 
   private objectPoolKeyFor(e: Entity): string | null {
@@ -4473,8 +4655,10 @@ export class Renderer {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
     let visual: CharacterVisual | null = null;
+    let characterVisualKey: string | null = null;
     let body: THREE.Group | null = null; // object views build meshes into this
     let height = 1.2;
+    let clickRadius = 0.4;
     let sparkle: THREE.Sprite | undefined;
     let objectMesh: THREE.Object3D | undefined;
     let visualPoolKey: string | null = null;
@@ -4577,6 +4761,7 @@ export class Renderer {
       objectMesh = body;
     } else {
       const visualKey = visualKeyFor(e);
+      characterVisualKey = visualKey;
       // The in-flight cooldown stops the deferring entity from burning a
       // budget slot every frame, and clearing it when the fetch RESOLVES
       // keeps pop-in at the next frame after readiness (only a rejected
@@ -4604,28 +4789,34 @@ export class Renderer {
         return;
       }
       visualPoolKey = this.visualPoolKeyFor(e);
-      visual = visualPoolKey ? this.takePooledVisual(visualPoolKey) : null;
-      if (!visual) {
-        // Pool MISS: build a fresh visual but KEEP its pool key so removeView returns
-        // it to the pool (which self-sizes to demand) instead of disposing it. Disposing
-        // a skinned visual frees its Skeleton's bone-matrix DataTexture; re-creating it
-        // when the entity streams back re-uploads that texture - the open-world
-        // "asset-upload" travel hitch. Before, only the few prewarm-seeded copies were
-        // ever recycled, so every mob past that count churned. Key is per-template, so
-        // the pool stays bounded by the peak simultaneous count.
-        visual = this.createCharacterVisualWithRetry(e, 'view');
-        // assets unavailable: skip, the entity stays a view candidate but sits
-        // out the retry cooldown so it cannot starve the per-frame budget
-        if (!visual) {
+      if (e.kind === 'player') {
+        // Remote players begin as a lightweight shell (group + stable pick
+        // proxy + nameplate). The residency pass below constructs only selected
+        // articulated/local-far rigs.
+        try {
+          const prepared = prepareVisual(visualKey);
+          height = prepared.def.height;
+          clickRadius = prepared.clickRadius;
+        } catch (error) {
+          logAssetMissOnce(`player-shell:${visualKey}`, 'Failed to create player shell:', error);
+          this.viewCreateRetry.markFailed(e.id, 'view', performance.now());
           return;
         }
       } else {
-        this.viewCreateRetry.markSucceeded(e.id, 'view');
+        visual = visualPoolKey ? this.takePooledVisual(visualPoolKey) : null;
+        if (!visual) {
+          // Pool MISS: build a fresh visual but KEEP its pool key so removeView
+          // returns it to the finite global LRU instead of churning skeletons.
+          visual = this.createCharacterVisualWithRetry(e, 'view');
+          if (!visual) return;
+        } else {
+          this.viewCreateRetry.markSucceeded(e.id, 'view');
+        }
+        // entity scale is applied to the whole group below, so it can update live
+        // and also scale lazily-built form visuals for free.
+        group.add(visual.root);
+        height = visual.height;
       }
-      // entity scale is applied to the whole group below, so it can update live
-      // (Fiesta size buffs) and also scale lazily-built form visuals for free.
-      group.add(visual.root);
-      height = visual.height;
     }
 
     const bankerChest = attachBankerChestToNpcView(
@@ -4636,7 +4827,13 @@ export class Renderer {
     );
 
     let clickTarget: THREE.Object3D;
-    if (visual) {
+    if (e.kind === 'player') {
+      // Shell-owned and never swapped during rig promotion/demotion.
+      const proxy = createCharacterClickProxy(height, clickRadius, e.dead);
+      proxy.userData.entityId = e.id;
+      group.add(proxy);
+      clickTarget = proxy;
+    } else if (visual) {
       // raycasting skinned meshes is expensive — pick against the invisible
       // capsule proxy instead (three's raycaster ignores `visible`)
       if (!isQuestVision) visual.clickProxy.userData.entityId = e.id;
@@ -4763,7 +4960,7 @@ export class Renderer {
     // Object views gate their own casters. Character shadows live in visual,
     // while separately composed accessories use this same distance gate.
     const objectCasters: THREE.Object3D[] = [];
-    if (!visual) collectCasters(group, objectCasters);
+    if (!visual && e.kind !== 'player') collectCasters(group, objectCasters);
     else if (bankerChest) collectCasters(bankerChest, objectCasters);
     // Register any point lights this view owns (e.g. the quest-object glow) into the
     // constant point-light budget so numPointLights never changes as it streams in.
@@ -4780,8 +4977,11 @@ export class Renderer {
     this.views.set(e.id, {
       group,
       visual,
-      visualKey: visual ? visualKeyFor(e) : null,
+      visualKey: characterVisualKey,
+      visualColor: e.color,
       visualPoolKey,
+      crowdVariantKey: null,
+      rigCompilePending: false,
       sheepVisual: null,
       bearVisual: null,
       catVisual: null,
@@ -4792,6 +4992,7 @@ export class Renderer {
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
       height,
+      clickRadius,
       clickTarget,
       nameplate: np,
       nameEl,
@@ -4843,11 +5044,10 @@ export class Renderer {
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
       offhandItemId: e.offhandItemId,
-      // built skinless; the per-frame diff below applies e.weaponSkinId (and its VFX)
-      weaponSkinId: null,
-      // Born false so the per-frame diff below sheathes an already-stowed entity
-      // (a peer entering interest) on its first sync.
-      weaponStowed: false,
+      // A player shell already caches the desired appearance; promotion applies
+      // it explicitly. Built non-player rigs retain the legacy first-frame diff.
+      weaponSkinId: e.kind === 'player' ? e.weaponSkinId : null,
+      weaponStowed: e.kind === 'player' ? e.weaponStowed : false,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -4876,7 +5076,7 @@ export class Renderer {
     // class is already prewarmed, and the self render path does not re-evaluate
     // the compilePending flag (only the non-self loop does), so gating it would
     // strand the player invisible. Other entities un-hide via that loop.
-    if (view && e.id !== this.sim.player.id) {
+    if (view && e.kind !== 'player' && e.id !== this.sim.player.id) {
       view.compileReady = this.gateViewOnCompile(view, group);
     }
   }
@@ -4929,6 +5129,7 @@ export class Renderer {
   }
 
   private updateBaseVisual(e: Entity, v: EntityView): void {
+    if (e.kind === 'player') return; // refreshed before residency planning
     if (!v.visual) return;
     const nextKey = visualKeyFor(e);
     if (nextKey === v.visualKey) return;
@@ -5352,6 +5553,7 @@ export class Renderer {
   private removeView(id: number): void {
     const v = this.views.get(id);
     if (!v) return;
+    this.playerRigResidentIds.delete(id);
     this.renderWorld.markViewAttached(id, false);
     this.scene.remove(v.group);
     this.lightOwnerGroups.delete(v.group);
@@ -5375,7 +5577,7 @@ export class Renderer {
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
       v.fireballTravelVisual?.dispose();
-    } else {
+    } else if (v.visualKey === null) {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, {
           group: v.objectMesh,
@@ -5557,7 +5759,7 @@ export class Renderer {
       createdViewTypes,
       performance.now() + createBudget.maxStartWorkMs,
     );
-    this.compileBatch.flush(this.compileRuntimeViewBatch);
+    this.compileBatch.flush(this.compileRuntimeViewBatch, this.handleCompileBatchError);
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
       const e = sim.entities.get(id);
@@ -5576,7 +5778,9 @@ export class Renderer {
       removedViews++;
     }
     this.planCrowdCharacterModes(p);
+    this.reconcilePlayerRigResidency();
     this.crowdBatch.beginFrame();
+    this.reserveCrowdBatchCapacity();
 
     // frame parity for distance-tiered mixer throttling
     this.frameIdx = (this.frameIdx + 1) & 0xffff;
@@ -5609,7 +5813,12 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
-      const plannedCharacterMode = this.crowdRenderModes.get(id);
+      const desiredCharacterMode = this.crowdRenderModes.get(id);
+      const plannedCharacterMode =
+        e.kind === 'player' &&
+        (desiredCharacterMode === 'batchedFar' || !v.visual || v.rigCompilePending)
+          ? 'batchedFar'
+          : desiredCharacterMode;
       if (plannedCharacterMode === 'batchedFar' && this.syncBatchedCrowdView(e, v, p, alpha, now)) {
         continue;
       }
@@ -5844,6 +6053,9 @@ export class Renderer {
         // bespoke ball motion (roll + contact shadow + dust); no rig to animate
         this.updateValeCupBall(e, v, dt);
         continue;
+      }
+      if (e.kind === 'player') {
+        syncCharacterClickProxy(v.clickTarget as THREE.Mesh, v.height, v.clickRadius, e.dead);
       }
       if (!v.visual) continue;
       v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasIceBlock, dt);
@@ -6403,7 +6615,7 @@ export class Renderer {
       if (!charOnScreen) v.group.visible = false;
     }
     this.crowdBatch.endFrame();
-    this.compileBatch.flush(this.compileRuntimeViewBatch);
+    this.compileBatch.flush(this.compileRuntimeViewBatch, this.handleCompileBatchError);
     this.lastVisibleRigCount = visibleRigCount;
 
     // Hidden views skip their whole matrix subtree: three recomposes even
@@ -7494,9 +7706,10 @@ export class Renderer {
     const candidates = this.sloppyCandidates;
     candidates.length = 0;
     for (const [id, v] of this.views) {
-      if (id === this.sim.playerId || !v.visual || !v.group.visible) continue;
+      if (id === this.sim.playerId || !v.group.visible) continue;
       const e = this.sim.entities.get(id);
-      if (!e || (e.kind === 'mob' && e.dead && !e.lootable)) continue;
+      if (!e || (!v.visual && e.kind !== 'player') || (e.kind === 'mob' && e.dead && !e.lootable))
+        continue;
       // A lying corpse (dead + lootable) has no upright body: collapse its sloppy
       // column to a ground-level point so a near-eye click above/behind the flat
       // body no longer snaps to it (issue 1486). Like the flattened pick proxy, this

@@ -3,6 +3,7 @@ import type { StableCooldownWire } from '../src/world_api';
 
 export interface SerializedTimerWire {
   json: string;
+  value: unknown;
   revision: number;
 }
 
@@ -160,8 +161,10 @@ export class StableAuraWireCache {
 
     this.records = auras.map((aura) => auraRecord(aura, simTime, paused));
     this.rebuilds++;
+    const value = this.records.map(auraWire);
     this.result = {
-      json: JSON.stringify(this.records.map(auraWire)),
+      json: JSON.stringify(value),
+      value,
       revision: this.rebuilds,
     };
     return this.result;
@@ -216,10 +219,6 @@ function cooldownDeadlineMatches(
     prior[1] === rate &&
     prior[2] === round2(simTime + acceleratedFor)
   );
-}
-
-function deadlineMapJson(deadlines: ReadonlyMap<string, CooldownDeadline>): string {
-  return JSON.stringify(Object.fromEntries(deadlines));
 }
 
 /** Per-recipient cache for v2 self timers. A spectator owner change resets it. */
@@ -286,8 +285,10 @@ export class StableSelfTimerWireCache {
     }
     this.cooldowns = next;
     this.cooldownRebuilds++;
+    const value = Object.fromEntries(next);
     this.cooldownResult = {
-      json: deadlineMapJson(next),
+      json: JSON.stringify(value),
+      value,
       revision: this.cooldownRebuilds,
     };
     return this.cooldownResult;
@@ -317,8 +318,10 @@ export class StableSelfTimerWireCache {
     }
     this.nodes = next;
     this.nodeCooldownRebuilds++;
+    const value = Object.fromEntries(next);
     this.nodeResult = {
-      json: JSON.stringify(Object.fromEntries(next)),
+      json: JSON.stringify(value),
+      value,
       revision: this.nodeCooldownRebuilds,
     };
     return this.nodeResult;
@@ -343,8 +346,10 @@ export class StableSelfTimerWireCache {
     }
     this.charges = next;
     this.chargeRebuilds++;
+    const value = Object.fromEntries(next);
     this.chargeResult = {
-      json: JSON.stringify(Object.fromEntries(next)),
+      json: JSON.stringify(value),
+      value,
       revision: this.chargeRebuilds,
     };
     return this.chargeResult;
@@ -400,8 +405,10 @@ export class StableSelfTimerWireCache {
     }
     this.chargeRecharges = next;
     this.chargeRechargeRebuilds++;
+    const value = Object.fromEntries(next);
     this.chargeRechargeResult = {
-      json: JSON.stringify(Object.fromEntries(next)),
+      json: JSON.stringify(value),
+      value,
       revision: this.chargeRechargeRebuilds,
     };
     return this.chargeRechargeResult;

@@ -65,6 +65,9 @@
 //       PUBLIC_ORIGIN that is not a bare origin, and a non-empty REALMS with no
 //       usable Name=origin entry.
 
+import type { RuntimeMode } from '../runtime/contract';
+import { parseRuntimeMode } from '../runtime/runtime_mode';
+
 // The two accepted API dispatch modes, single-sourced so the boot wiring
 // (server/main.ts) and the dispatcher (server/http/dispatch.ts) share ONE type
 // rather than re-typing the literal union at each call site.
@@ -77,6 +80,9 @@ export interface Config {
   // one-flag rollback. An unset flag defaults to DEFAULT_DISPATCH; a set-but-invalid
   // flag THROWS (see parseDispatch).
   readonly dispatch: DispatchMode;
+  // Production is deliberately one inline realm runtime. The reserved worker
+  // value fails closed until a deterministic transfer adapter is configured.
+  readonly runtimeMode: RuntimeMode;
   // Required. Also the tier-2 rate limiter DSN: the pg-backed global limiter
   // (server/ratelimit_db.ts) shares this one pool, so an empty value is fatal.
   readonly databaseUrl: string;
@@ -312,6 +318,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
 
   return Object.freeze({
     dispatch: parseDispatch(env.API_DISPATCH),
+    runtimeMode: parseRuntimeMode(env.MMO_RUNTIME_MODE),
     databaseUrl,
     port: numberOr(env.PORT, DEFAULT_PORT),
     allowDevCommands: env.ALLOW_DEV_COMMANDS === ALLOW_DEV_COMMANDS_ON,

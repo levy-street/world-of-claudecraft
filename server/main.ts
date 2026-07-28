@@ -286,7 +286,6 @@ import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
 import { AuthoritativeRuntimeCoordinator } from './runtime/coordinator';
-import { parseRuntimeMode } from './runtime/runtime_mode';
 import { resolveSfxOverlayFile } from './sfx_overlay';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
@@ -2841,8 +2840,9 @@ export async function startServer(): Promise<http.Server> {
   await ensureSchema();
   await seedOAuthClients();
   const game = liveGame();
-  const runtimeMode = parseRuntimeMode(process.env.MMO_RUNTIME_MODE);
+  const runtimeMode = config.runtimeMode;
   const runtime = new AuthoritativeRuntimeCoordinator(game, REALM, runtimeMode);
+  await runtime.start();
   game.setRuntimeDetachedHook((session) => runtime.detached(session));
   // Inject the game-session methods the ported admin routes (server/admin.ts) call
   // for their live reads + side effects (adminStats/liveSessions/disconnectAccount/

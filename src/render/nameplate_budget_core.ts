@@ -4,13 +4,25 @@ export const NAMEPLATE_HOSTILE = 1 << 2;
 export const NAMEPLATE_COMBAT = 1 << 3;
 export const NAMEPLATE_CASTING = 1 << 4;
 export const NAMEPLATE_PARTY = 1 << 5;
+export const NAMEPLATE_QUEST = 1 << 6;
+export const NAMEPLATE_INTERACTABLE = 1 << 7;
+export const NAMEPLATE_RAID_MARKER = 1 << 8;
+export const NAMEPLATE_PET = 1 << 9;
+export const NAMEPLATE_LOOTABLE = 1 << 10;
+export const NAMEPLATE_COMBO = 1 << 11;
 export const NAMEPLATE_ACTIONABLE =
   NAMEPLATE_TARGET |
   NAMEPLATE_SELF_EMOTE |
   NAMEPLATE_HOSTILE |
   NAMEPLATE_COMBAT |
   NAMEPLATE_CASTING |
-  NAMEPLATE_PARTY;
+  NAMEPLATE_PARTY |
+  NAMEPLATE_QUEST |
+  NAMEPLATE_INTERACTABLE |
+  NAMEPLATE_RAID_MARKER |
+  NAMEPLATE_PET |
+  NAMEPLATE_LOOTABLE |
+  NAMEPLATE_COMBO;
 
 export interface NameplateAdmissionCandidate {
   id: number;
@@ -53,7 +65,8 @@ export function admitNameplates(
   scratch.ordinary.sort(compareOrdinary);
   const count = Math.min(maxOrdinary, scratch.ordinary.length);
   for (let index = 0; index < count; index++) {
-    admittedIds.push(scratch.ordinary[index]!.id);
+    const candidate = scratch.ordinary[index];
+    if (candidate) admittedIds.push(candidate.id);
   }
   return admittedIds.length;
 }
