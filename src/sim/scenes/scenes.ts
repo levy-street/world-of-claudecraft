@@ -372,11 +372,11 @@ function resolveAndApply(
 
 function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean): void {
   const def = SCENES[playback.sceneId];
+  // Settle every already-emitted walk at its authored endpoint on both natural
+  // completion and skip. A later un-emitted walk may still win in authoring
+  // order through the skip-only applyOnly arm below.
+  fastForwardScriptedPlayerWalks(ctx, playback.claimId);
   if (def && skipped) {
-    // An already-emitted playerWalk is no longer in the remaining-op loop, so
-    // settle its live state first. A later un-emitted playerWalk may then win
-    // in authoring order through the applyOnly arm below.
-    fastForwardScriptedPlayerWalks(ctx, playback.claimId);
     // Fast-forward the remaining authoritative ops so world state matches a
     // watched scene; presentation ops are dropped (the client tears down on
     // the end op).
@@ -384,8 +384,8 @@ function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean)
       if (!playback.emitted[i]) resolveAndApply(ctx, playback, def.ops[i], true);
     }
   }
-  // End is unconditional teardown. Natural completion leaves a too-short walk
-  // where normal movement reached; skip has already placed it at its endpoint.
+  // End is unconditional teardown, including stale walk state whose player
+  // entity disappeared before the endpoint could be placed.
   clearScriptedPlayerWalks(ctx, playback.claimId);
   emitToAudience(ctx, playback, { kind: 'end' });
   ctx.scenePlaybacks.delete(playback.claimId);

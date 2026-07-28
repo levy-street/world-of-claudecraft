@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   applySceneOp,
@@ -19,6 +20,7 @@ import {
   type HarborDef,
   harborRampHeight,
 } from '../src/sim/harbor_layout';
+import type { SceneDef, SceneOpDef } from '../src/sim/scenes/scenes';
 import type { Sim } from '../src/sim/sim';
 import type {
   SceneAttachFrame,
@@ -333,12 +335,264 @@ interface Violation {
   readonly measured: string;
 }
 
+interface SyntheticControl {
+  readonly def: SceneDef;
+  readonly expectedCheck: MechanicalCheck | null;
+  readonly actorIds?: readonly string[];
+}
+
+function syntheticCameraScene(
+  id: string,
+  duration: number,
+  cameraOps: readonly SceneOpDef[],
+  hideRelease = true,
+): SceneDef {
+  const releaseAt = duration - 0.1;
+  return {
+    id,
+    duration,
+    ops: [
+      { at: 0, kind: 'inputLock', on: true },
+      { at: 0, kind: 'letterbox', on: true },
+      ...cameraOps,
+      ...(hideRelease
+        ? ([{ at: duration - 0.2, kind: 'fade', to: 'black', dur: 0 }] satisfies SceneOpDef[])
+        : []),
+      { at: releaseAt, kind: 'camera', shot: { kind: 'release' } },
+      { at: releaseAt, kind: 'inputLock', on: false },
+      { at: releaseAt, kind: 'letterbox', on: false },
+    ],
+  };
+}
+
+const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
+  {
+    def: syntheticCameraScene('scn_test_lint_dolly_pass', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: -1, z: -10, height: 6 },
+            { x: 1, z: -10, height: 6 },
+          ],
+          lookAt: {
+            kind: 'subject',
+            actorId: 'tam',
+            offset: { x: 0, y: 2, z: 0 },
+            fallback: { x: 0, z: 0, height: 2 },
+          },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: null,
+    actorIds: ['tam'],
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_attach_pass', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_mainland',
+          fallbackFrame: { point: { x: 240.5, z: -44, height: 12 }, yaw: Math.PI / 2 },
+          offset: { x: 6.6, y: 12, z: 8 },
+          lookAt: { x: 6.6, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: null,
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_framing_direction_bad', 8, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'focus',
+          x: 0,
+          z: -20,
+          dist: 9,
+          pitch: 0.32,
+          yaw: Math.PI,
+          dur: 8,
+        },
+      },
+    ]),
+    expectedCheck: 'framing.direction',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_framing_size_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 0, z: 0, height: 100 }],
+          lookAt: { kind: 'point', point: { x: 0, z: 100, height: 100 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'framing.size',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_pan_rate_bad', 2, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 0, z: 0, height: 100 }],
+          lookAt: {
+            kind: 'spline',
+            points: [
+              { x: -8.66, z: 5, height: 100 },
+              { x: 8.66, z: 5, height: 100 },
+            ],
+          },
+          dur: 1.8,
+        },
+      },
+    ]),
+    expectedCheck: 'motion.panRate',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_dolly_speed_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: -18, z: 0, height: 100 },
+            { x: 18, z: 0, height: 100 },
+          ],
+          lookAt: {
+            kind: 'spline',
+            points: [
+              { x: -18, z: 10, height: 100 },
+              { x: 18, z: 10, height: 100 },
+            ],
+          },
+          dur: 1.4,
+        },
+      },
+    ]),
+    expectedCheck: 'motion.dollySpeed',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_pose_teleport_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 0, z: 0, height: 100 },
+            { x: 0, z: 0, height: 100 },
+            { x: 0, z: 0, height: 100 },
+            { x: 0, z: 0, height: 100 },
+            { x: 10, z: 0, height: 100 },
+            { x: 10, z: 0, height: 100 },
+            { x: 10, z: 0, height: 100 },
+            { x: 10, z: 0, height: 100 },
+          ],
+          lookAt: {
+            kind: 'spline',
+            points: [
+              { x: 0, z: 10, height: 100 },
+              { x: 0, z: 10, height: 100 },
+              { x: 0, z: 10, height: 100 },
+              { x: 0, z: 10, height: 100 },
+              { x: 10, z: 10, height: 100 },
+              { x: 10, z: 10, height: 100 },
+              { x: 10, z: 10, height: 100 },
+              { x: 10, z: 10, height: 100 },
+            ],
+          },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'motion.poseContinuity',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_cut_jump_bad', 3.2, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 0, z: 0, height: 100 }],
+          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+          dur: 1.6,
+        },
+      },
+      {
+        at: 1.6,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 10, z: 0, height: 100 }],
+          lookAt: { kind: 'point', point: { x: 10, z: 10, height: 100 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'motion.cutJump',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_attach_volume_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_mainland',
+          fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
+          offset: { x: 6.6, y: 7.72, z: 0 },
+          lookAt: { x: 16.6, y: 7.72, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'clearance.volume',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_release_delta_bad',
+      1.7,
+      [
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'attach',
+            target: 'harbor_ship_mainland',
+            fallbackFrame: { point: { x: 240.5, z: -44, height: 12 }, yaw: Math.PI / 2 },
+            offset: { x: 6.6, y: 12, z: 8 },
+            lookAt: { x: 6.6, y: 8, z: 0 },
+          },
+        },
+      ],
+      false,
+    ),
+    expectedCheck: 'cut.releaseDelta',
+  },
+];
+
 const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
   LAST_BELL_PROP_PATH_SEGMENTS;
+const RENDERER_SOURCE = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 let SimConstructor: typeof import('../src/sim/sim').Sim;
 let playRegisteredScene: typeof import('../src/sim/scenes/scenes').playSceneForPlayer;
 let readRegisteredSceneIds: typeof import('../src/sim/scenes/scenes').registeredSceneIds;
+let registerSceneForLinter: typeof import('../src/sim/scenes/scenes').registerScene;
 let sampleTerrainHeight: typeof import('../src/sim/world').terrainHeight;
+let spawnSquadForLinter: typeof import('../src/sim/squad/squad').spawnSquad;
 let runtimeWaterLevel = 0;
 const SAMPLE_INTERVAL_SEC = 1 / SHOT_SAMPLE_RATE_HZ;
 const DEG_PER_RAD = 180 / Math.PI;
@@ -354,10 +608,13 @@ function sceneEvents(events: readonly SimEvent[]): Extract<SimEvent, { type: 'sc
 async function loadLinterRuntime(): Promise<void> {
   const simModule = await import('../src/sim/sim');
   const scenesModule = await import('../src/sim/scenes/scenes');
+  const squadModule = await import('../src/sim/squad/squad');
   const worldModule = await import('../src/sim/world');
   SimConstructor = simModule.Sim;
   playRegisteredScene = scenesModule.playSceneForPlayer;
   readRegisteredSceneIds = scenesModule.registeredSceneIds;
+  registerSceneForLinter = scenesModule.registerScene;
+  spawnSquadForLinter = squadModule.spawnSquad;
   sampleTerrainHeight = worldModule.terrainHeight;
   runtimeWaterLevel = worldModule.WATER_LEVEL;
 }
@@ -390,13 +647,25 @@ function sceneFrame(sim: Sim, trackedIds: ReadonlySet<number>): SceneFrame {
   };
 }
 
-function captureScene(id: string): CapturedScene {
+function captureScene(id: string, actorIds: readonly string[] = []): CapturedScene {
   const sim = new SimConstructor({
     seed: LINTER_WORLD_SEED,
     playerClass: 'warrior',
     playerName: 'Shot Linter',
   });
   const playbackKey = -sim.playerId;
+  if (actorIds.length > 0) {
+    expect(
+      spawnSquadForLinter(sim.ctx, {
+        claimId: playbackKey,
+        dungeonId: '',
+        anchor: { x: 0, z: 3 },
+        actorIds,
+        humanCount: 1,
+      }),
+      `failed to spawn synthetic scene subjects for ${id}`,
+    ).not.toBeNull();
+  }
   expect(
     playRegisteredScene(sim.ctx, sim.playerId, id),
     `failed to start registered scene ${id}`,
@@ -417,7 +686,12 @@ function captureScene(id: string): CapturedScene {
     const elapsed = sim.time - startTime;
     for (const event of sceneEvents(events)) {
       if (event.sceneId !== id || event.pid !== sim.playerId) continue;
-      const at = event.op.kind === 'start' ? 0 : roundTime(elapsed);
+      const at =
+        event.op.kind === 'start'
+          ? 0
+          : event.op.kind === 'end' && duration !== null
+            ? duration
+            : roundTime(elapsed);
       const timedOp = { index: ops.length, at, op: event.op };
       ops.push(timedOp);
       const entityId = trackedEntityId(event.op);
@@ -1226,6 +1500,9 @@ describe('cinematic shot mechanical gate', () => {
 
   it('samples every registered scene at 10 Hz against the mechanical rubric', async () => {
     await loadLinterRuntime();
+    // A renderer lens change must update the linter's framing calculations.
+    expect(RENDERER_SOURCE).toContain('CAMERA_BASE_FOV = 60');
+
     const ids = readRegisteredSceneIds();
     expect(ids.length, 'the Last Bell scene registry must not be empty').toBeGreaterThan(0);
     const exemptionKeys = new Set(
@@ -1259,5 +1536,49 @@ describe('cinematic shot mechanical gate', () => {
       );
     }
     expect(messages, messages.join('\n')).toEqual([]);
-  });
+
+    for (const control of SYNTHETIC_CONTROLS) registerSceneForLinter(control.def);
+    for (const control of SYNTHETIC_CONTROLS) {
+      const violations: Violation[] = [];
+      const scene = captureScene(control.def.id, control.actorIds);
+      if (control.actorIds) {
+        const subjectShot = scene.ops.find(
+          (
+            timed,
+          ): timed is TimedSceneOp & {
+            op: Extract<SceneWireOp, { kind: 'camera' }> & {
+              shot: Extract<SceneCameraShot, { kind: 'dolly' }>;
+            };
+          } =>
+            timed.op.kind === 'camera' &&
+            timed.op.shot.kind === 'dolly' &&
+            timed.op.shot.lookAt.kind === 'subject',
+        );
+        expect(subjectShot, `${control.def.id} emitted no subject-look-at dolly`).toBeDefined();
+        const entityId =
+          subjectShot?.op.shot.lookAt.kind === 'subject'
+            ? subjectShot.op.shot.lookAt.entityId
+            : null;
+        expect(entityId, `${control.def.id} did not resolve its dolly subject`).not.toBeNull();
+        expect(
+          [...scene.frames.values()].some((frame) =>
+            entityId === null ? false : frame.entities.has(entityId),
+          ),
+          `${control.def.id} did not capture its tracked dolly subject`,
+        ).toBe(true);
+      }
+      lintScene(scene, (violation) => violations.push(violation));
+      if (control.expectedCheck === null) {
+        expect(violations, violations.map(violationMessage).join('\n')).toEqual([]);
+        continue;
+      }
+      expect(
+        violations.some(
+          (violation) =>
+            violation.sceneId === control.def.id && violation.check === control.expectedCheck,
+        ),
+        violations.map(violationMessage).join('\n'),
+      ).toBe(true);
+    }
+  }, 60_000);
 });

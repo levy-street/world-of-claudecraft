@@ -129,7 +129,22 @@ describe('playerWalk scene op', () => {
     runUntilSceneEnds(sim);
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
     expect(sim.ctx.scriptedPlayerWalks.has(sim.playerId)).toBe(false);
-    expect(sim.player.pos.x).toBeLessThan(20);
+    expect(sim.player.pos).toEqual(sim.groundPos(20, START.z));
+  });
+
+  it('settles an under-authored natural end and a skip at the identical endpoint', () => {
+    const watched = makeSim();
+    expect(playSceneForPlayer(watched.ctx, watched.playerId, SHORT_SCENE)).toBe(true);
+    runUntilSceneEnds(watched);
+
+    const skipped = makeSim();
+    expect(playSceneForPlayer(skipped.ctx, skipped.playerId, SHORT_SCENE)).toBe(true);
+    expect(requestSceneSkip(skipped.ctx, skipped.playerId)).toBe(true);
+
+    const endpoint = watched.groundPos(20, START.z);
+    expect(watched.player.pos).toEqual(endpoint);
+    expect(skipped.player.pos).toEqual(endpoint);
+    expect(watched.player.pos).toEqual(skipped.player.pos);
   });
 
   it('terminates immediately when the player already occupies the endpoint', () => {

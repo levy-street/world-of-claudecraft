@@ -459,9 +459,11 @@ function resetShip(handle: HarborShipHandle): void {
 
 function syncDeckStandIn(handle: HarborShipHandle, player: Entity | null): void {
   const cueLive = handle.cueStartSec !== null && handle.segment !== null;
-  const action = deckStandInAction(cueLive, handle.deckStandIn !== null);
-  if (action === 'build' && player) {
+  const action = deckStandInAction(cueLive, handle.deckStandIn !== null, player?.kind === 'player');
+  if (action === 'build' && player?.kind === 'player') {
     const visual = createCharacterVisual(player);
+    // A null build retries next frame with no cooldown. World entry preloads
+    // these assets, and the cue window is short, so this retry policy is accepted.
     if (!visual) return;
     const transform = deckStandInParentTransform(
       HARBOR_SHIP_DECK_STAND_IN_ATTACH,

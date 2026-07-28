@@ -6208,7 +6208,8 @@ export class Renderer {
     }
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
-    // Scene-cued harbor ship motion and transient deck visual lifecycle.
+    // Scene-cued harbor ship motion and transient deck visual lifecycle. This
+    // performs one cheap stand-in decision per ship handle even with no live cue.
     updateHarborShips(this.sim.player, dt);
     for (const [id, remaining] of this.waterJetVisualChannels) {
       const next = remaining - dt;

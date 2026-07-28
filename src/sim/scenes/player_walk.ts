@@ -7,6 +7,10 @@
 // modifiers, footing, slope gates, collision, and vertical movement. This
 // module only caps the last step at the remaining distance and settles tiny
 // floating-point residue exactly onto the authored endpoint.
+//
+// Authors must keep the route to an endpoint from carrying the player over a
+// drop greater than the 12 yard FALL_SAFE_DISTANCE. Fall damage can reach
+// rng-backed damage resolution, while a scripted walk must draw no rng.
 
 import type { SimContext } from '../sim_context';
 import { type Entity, emptyMoveInput, type MoveInput, RUN_SPEED } from '../types';
@@ -102,7 +106,7 @@ export function finishScriptedPlayerWalkStep(ctx: SimContext, player: Entity): v
   ctx.scriptedPlayerWalks.delete(player.id);
 }
 
-/** Skip parity for an already-running walk. */
+/** Scene-end parity for an already-running walk. */
 export function fastForwardScriptedPlayerWalks(ctx: SimContext, playbackKey: number): void {
   for (const [playerId, walk] of ctx.scriptedPlayerWalks) {
     if (walk.playbackKey !== playbackKey) continue;

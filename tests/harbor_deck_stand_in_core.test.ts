@@ -12,13 +12,18 @@ const RENDERER_SOURCE = readFileSync(new URL('../src/render/renderer.ts', import
 
 describe('harbor deck stand-in core', () => {
   it('builds only while a ship prop cue is live and keeps one existing visual', () => {
-    expect(deckStandInAction(false, false)).toBe('idle');
-    expect(deckStandInAction(true, false)).toBe('build');
-    expect(deckStandInAction(true, true)).toBe('keep');
+    expect(deckStandInAction(false, false, true)).toBe('idle');
+    expect(deckStandInAction(true, false, true)).toBe('build');
+    expect(deckStandInAction(true, true, true)).toBe('keep');
   });
 
   it('disposes an existing visual as soon as the prop cue is no longer live', () => {
-    expect(deckStandInAction(false, true)).toBe('dispose');
+    expect(deckStandInAction(false, true, true)).toBe('dispose');
+  });
+
+  it('builds nothing for the online blank entity while preserving an existing stand-in', () => {
+    expect(deckStandInAction(true, false, false)).toBe('idle');
+    expect(deckStandInAction(true, true, false)).toBe('keep');
   });
 
   it('preserves the authored world offset and player scale under the scaled ship parent', () => {

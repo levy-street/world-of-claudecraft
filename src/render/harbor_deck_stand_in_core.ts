@@ -11,9 +11,16 @@ export interface DeckStandInParentTransform extends DeckStandInAttachPoint {
   scale: number;
 }
 
-/** Resolve the transient visual lifecycle from the live prop cue alone. */
-export function deckStandInAction(cueLive: boolean, standInPresent: boolean): DeckStandInAction {
-  if (cueLive) return standInPresent ? 'keep' : 'build';
+/** Resolve the transient visual lifecycle from the cue and local-player identity. */
+export function deckStandInAction(
+  cueLive: boolean,
+  standInPresent: boolean,
+  realLocalPlayer: boolean,
+): DeckStandInAction {
+  if (cueLive) {
+    if (standInPresent) return 'keep';
+    return realLocalPlayer ? 'build' : 'idle';
+  }
   return standInPresent ? 'dispose' : 'idle';
 }
 
