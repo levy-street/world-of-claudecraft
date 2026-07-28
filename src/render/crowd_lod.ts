@@ -98,7 +98,7 @@ export function animatesEveryFrame(
     (inCombat &&
       (ownerId === localPlayerId ||
         combatTargetId === localPlayerId ||
-        combatTargetId === targetId ||
+        (targetId !== null && combatTargetId === targetId) ||
         combatTargetOwnerId === localPlayerId))
   );
 }

@@ -47,6 +47,10 @@ import {
   planArticulatedRigs,
   type RigBudgetCandidate,
   type RigBudgetDecision,
+  requiresLocalCharacterVisual,
+  resolveRigBudgetRenderMode,
+  shouldHidePendingLocalCharacterVisual,
+  writeRigBudgetCandidate,
 } from './articulated_rig_budget_core';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import type { RenderBackendSelection } from './backend/types';
@@ -107,12 +111,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { CompileBatch } from './compile_batch';
 import { trackWebGLContext } from './context_release';
-import {
-  animatesEveryFrame,
-  animCadenceFrames,
-  characterLodBands,
-  showsStaticFarMesh,
-} from './crowd_lod';
+import { animCadenceFrames, characterLodBands, showsStaticFarMesh } from './crowd_lod';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
@@ -1210,12 +1209,14 @@ export class Renderer {
   private readonly crowdBatch = new CharacterCrowdBatch();
   private readonly crowdVariantKeys = new Set<string>();
   private readonly crowdBatchCounts = new Map<string, number>();
-  private readonly crowdPartyIds = new Set<number>();
   private readonly crowdMatrix = new THREE.Matrix4();
   private readonly crowdScale = new THREE.Vector3();
   private readonly crowdRigCandidates: RigBudgetCandidate[] = [];
   private readonly crowdRigCandidatePool: RigBudgetCandidate[] = [];
   private readonly crowdRigDecisions: RigBudgetDecision[] = [];
+  private readonly crowdPlayerRigDecisions: RigBudgetDecision[] = [];
+  private readonly crowdActionableIds = new Set<number>();
+  private readonly crowdLocalVisualIds = new Set<number>();
   private readonly crowdRigScratch = createRigBudgetScratch();
   private readonly crowdRenderModes = new Map<number, CharacterRenderMode>();
   private readonly playerRigResidentIds = new Set<number>();
@@ -2659,14 +2660,6 @@ export class Renderer {
     }
   }
 
-  private crowdCharacterActionable(e: Entity, player: Entity): boolean {
-    if (e.id === player.id || e.id === player.targetId) return true;
-    if (e.dead || e.inCombat || e.castingAbility !== null || e.overheadEmoteId !== null)
-      return true;
-    if (e.auras.length > 0 || e.hostile || this.isHostilePlayer(e)) return true;
-    return this.crowdPartyIds.has(e.id);
-  }
-
   private refreshPlayerShellAppearance(e: Entity, view: EntityView): void {
     const nextKey = visualKeyFor(e);
     if (nextKey === view.visualKey && e.color === view.visualColor) return;
@@ -2699,24 +2692,40 @@ export class Renderer {
   }
 
   private planCrowdCharacterModes(player: Entity): void {
-    this.crowdPartyIds.clear();
-    const party = this.sim.partyInfo?.members;
-    if (party) for (const member of party) this.crowdPartyIds.add(member.pid);
+    this.crowdActionableIds.clear();
+    this.crowdLocalVisualIds.clear();
+
     let candidateCount = 0;
     for (const [id, view] of this.views) {
       const e = this.sim.entities.get(id);
-      if (e?.kind !== 'player') continue;
-      this.refreshPlayerShellAppearance(e, view);
+      if (!e) continue;
       const slot = this.renderWorld.slotFor(id);
       if (slot < 0) continue;
       let candidate = this.crowdRigCandidatePool[candidateCount];
       if (!candidate) {
-        candidate = { id, distanceSq: 0, actionable: false };
+        candidate = { id: 0, distanceSq: 0, priority: 0, actionable: false };
         this.crowdRigCandidatePool.push(candidate);
       }
-      candidate.id = id;
-      candidate.distanceSq = this.renderWorld.distanceSq[slot];
-      candidate.actionable = this.crowdCharacterActionable(e, player);
+      const combatTargetId = e.aggroTargetId ?? e.targetId;
+      const combatTarget =
+        e.inCombat && combatTargetId !== null ? this.sim.entities.get(combatTargetId) : undefined;
+      if (
+        !writeRigBudgetCandidate(
+          candidate,
+          e,
+          this.renderWorld.distanceSq[slot],
+          ENTITY_LOD_RANGE_SQ,
+          player.id,
+          player.targetId,
+          combatTarget?.ownerId ?? null,
+          view.visual !== null,
+          e.templateId !== 'spirit_healer' || player.ghost,
+        )
+      ) {
+        continue;
+      }
+      if (candidate.actionable) this.crowdActionableIds.add(id);
+      if (e.kind === 'player') this.refreshPlayerShellAppearance(e, view);
       this.crowdRigCandidates[candidateCount++] = candidate;
     }
     this.crowdRigCandidates.length = candidateCount;
@@ -2730,10 +2739,35 @@ export class Renderer {
       this.crowdRigScratch,
     );
     this.crowdRenderModes.clear();
+    this.crowdPlayerRigDecisions.length = 0;
     this.crowdArticulatedCount = 0;
     this.crowdLocalFarCount = 0;
     for (const decision of this.crowdRigDecisions) {
+      const e = this.sim.entities.get(decision.id);
+      if (!e) continue;
+      const view = this.views.get(decision.id);
+      if (
+        e.kind === 'player' &&
+        (decision.mode === 'batchedFar' ||
+          view?.visual === null ||
+          view?.rigCompilePending === true) &&
+        requiresLocalCharacterVisual(e)
+      ) {
+        this.crowdLocalVisualIds.add(decision.id);
+      }
+      // Convert planner overflow into the mode this entity can actually draw:
+      // only players have an instanced batch, while status-heavy players must
+      // retain a local static far mesh so forms/corpses never become idle shells.
+      const effectiveMode = resolveRigBudgetRenderMode(
+        e.kind,
+        decision.mode,
+        true,
+        this.crowdLocalVisualIds.has(decision.id),
+      );
+      if (!effectiveMode) continue;
+      decision.mode = effectiveMode;
       this.crowdRenderModes.set(decision.id, decision.mode);
+      if (e.kind === 'player') this.crowdPlayerRigDecisions.push(decision);
       if (decision.mode === 'rig') this.crowdArticulatedCount++;
       else if (decision.mode === 'localFar') this.crowdLocalFarCount++;
     }
@@ -2837,7 +2871,7 @@ export class Renderer {
 
   private reconcilePlayerRigResidency(): void {
     planPlayerRigResidency(
-      this.crowdRigDecisions,
+      this.crowdPlayerRigDecisions,
       this.playerRigResidentIds,
       this.playerRigReleaseIds,
       this.playerRigAcquireIds,
@@ -5813,13 +5847,23 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
-      const desiredCharacterMode = this.crowdRenderModes.get(id);
-      const plannedCharacterMode =
-        e.kind === 'player' &&
-        (desiredCharacterMode === 'batchedFar' || !v.visual || v.rigCompilePending)
-          ? 'batchedFar'
-          : desiredCharacterMode;
+      const plannedCharacterMode = resolveRigBudgetRenderMode(
+        e.kind,
+        this.crowdRenderModes.get(id),
+        v.visual !== null && !v.rigCompilePending,
+        this.crowdLocalVisualIds.has(id),
+      );
       if (plannedCharacterMode === 'batchedFar' && this.syncBatchedCrowdView(e, v, p, alpha, now)) {
+        continue;
+      }
+      if (
+        shouldHidePendingLocalCharacterVisual(
+          e.kind,
+          v.rigCompilePending,
+          this.crowdLocalVisualIds.has(id),
+        )
+      ) {
+        v.group.visible = false;
         continue;
       }
       if (v.visual) v.visual.root.visible = true;
@@ -5879,19 +5923,7 @@ export class Renderer {
       // the current target, pet combat, a cast windup telegraph) rather than
       // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
       // throttle and the crowd-pulled frozen-mesh swap below.
-      const combatTargetId = e.aggroTargetId ?? e.targetId;
-      const combatTarget =
-        e.inCombat && combatTargetId !== null ? sim.entities.get(combatTargetId) : undefined;
-      const actionablePose = animatesEveryFrame(
-        id,
-        p.id,
-        p.targetId,
-        e.castingAbility,
-        e.inCombat,
-        e.ownerId,
-        combatTargetId,
-        combatTarget?.ownerId ?? null,
-      );
+      const actionablePose = this.crowdActionableIds.has(id);
       if (isSelf) {
         v.group.visible = true;
         v.isFar = false;
@@ -6200,6 +6232,10 @@ export class Renderer {
       v.visual.root.visible = active === v.visual && !fireballForm;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && !fireballForm);
+      v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
+      v.bearVisual?.setFar(v.isFar && active === v.bearVisual);
+      v.catVisual?.setFar(v.isFar && active === v.catVisual);
+      v.travelVisual?.setFar(v.isFar && active === v.travelVisual);
 
       // animation state machine inputs, derived from render-space motion with
       // hysteresis so a one-frame speed dip can't reset the walk clip.

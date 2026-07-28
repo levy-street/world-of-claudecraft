@@ -363,7 +363,10 @@ describe('constrained entry view creation ramp', () => {
   });
 
   it('uses the bounded texture path for constrained prewarm', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n?/g, '\n');
     expect(renderer).toContain(
       `await this.prewarmInitialSceneTexturesBatched(
                 policy.textureBatchSize,
