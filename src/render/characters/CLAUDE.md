@@ -43,6 +43,16 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
+- `mesh_graft.ts`: borrows skinned meshes from one GLB onto another GLB's rig by
+  bone name, driven by `VisualDef.graftUrl` (`assets.ts` `assembleModel`
+  calls it). Only use is the level-20 armored bodies whose helm is a MASK or an
+  open HAT: their GLB is `Armor_*` plates only, so the class body's head meshes
+  are grafted in or the hat sits over a hole. Exact, not approximate, because
+  both files carry the same 25-joint mixamorig rig with identical rest
+  transforms; read its header before pointing it at anything else, and never
+  use it to rebind across genuinely different skeletons.
+  `tests/mesh_graft.test.ts` pins the skinning equivalence and which classes
+  graft (mask/hat) versus which do not (enclosing helm).
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/ghost
   plumbing, one-shot triggers, death/revive edge logic.
 - `preview.ts`: `CharacterPreview`, the character-creation turntable (own scene/
@@ -125,3 +135,26 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   despawn (online interest churn strands GPU bone textures otherwise).
 - Never `Math.random` in *sim*, but here it's fine, this is presentation
   (bob phase, hit-clip pick). Never reach past `IWorld` into a concrete world.
+- **A new character GLB also gets its shells checked.** A piece with an open
+  boundary is not a subtle seam under front-face culling, it is a hole: the
+  level-20 armor sets ship cut into Torso / Legs / Arms / Shoulders / Helm, and
+  the cut left the torso with no bottom and the legs no top, so the waist showed
+  the sky straight through the character. Run
+  `node scripts/glb_cap_holes.mjs --check <file.glb>` (`--fix` closes each clean
+  rim cycle with a fan built from vertices the rim already owns, so nothing moves,
+  no vertex is added and no skin weight is invented);
+  `tests/armor_mesh_caps.test.ts` pins the level-20 sets. Branching rims are
+  reported and left alone rather than capped crooked.
+- **A new character GLB gets its normals checked before it ships.** An FBX source
+  is Z-up, and a converter that rotates POSITION into glTF's Y-up but runs that
+  rotation a second time over NORMAL produces a file that passes every other
+  check: right shape, right UVs, texture binds, silhouette correct. The only
+  symptom is shading, and it does not read as an asset bug. With the normals
+  turned side-on, `dot(normal, viewDir)` sits near zero everywhere, so the
+  fresnel in `addRimGlow` (`src/render/gfx.ts`) pins at full strength and adds
+  its whole bluish-white over the entire body instead of just the silhouette;
+  the diffuse term is wrong at the same time. The armor reads washed out and
+  pale, worst on dark atlases where the additive rim swamps the albedo. Run
+  `node scripts/glb_normal_axis.mjs --check <file.glb>` (`--fix` rotates the
+  normals back in place, leaving the byte layout untouched);
+  `tests/character_normal_axis.test.ts` pins the whole `chars/players/` tree.

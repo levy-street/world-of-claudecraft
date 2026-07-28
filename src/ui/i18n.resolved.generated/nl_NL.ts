@@ -4630,6 +4630,8 @@ export const nl_NL: EnTranslations = {
     "unequip": "Afleggen",
     "armored": "Armored",
     "armoredAria": "Level 20 armored plate cosmetic",
+    "armoredToggleOn": "Wear armor set",
+    "armoredToggleOff": "Remove armor set",
     "previewOnly": "Alleen voorvertoning — volledige ontgrendeling komt binnenkort",
     "mech": {
       "amber_crimson": "Amber Karmozijn",

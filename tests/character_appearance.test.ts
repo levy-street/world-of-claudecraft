@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_CLASSES } from '../src/sim/types';
 import { SKIN_COUNTS } from '../src/sim/content/skins';
-import { activeCharacterAppearancePreview, characterAppearanceOptions } from '../src/ui/character_appearance';
+import { ALL_CLASSES } from '../src/sim/types';
+import {
+  activeCharacterAppearancePreview,
+  armorSetIconUrl,
+  characterAppearanceOptions,
+  offersArmorSet,
+} from '../src/ui/character_appearance';
 
 describe('character appearance picker', () => {
   it('numbers unlocked mech cosmetics after the class appearances', () => {
@@ -13,15 +18,34 @@ describe('character appearance picker', () => {
       { kind: 'class', label: 3 },
       { kind: 'class', label: 4 },
       { kind: 'mech', label: 5 },
-      { kind: 'armored', label: 6 },
     ]);
     expect(options[4]).toMatchObject({
       kind: 'mech',
       skin: 0,
       chromaId: 'amber_crimson',
     });
-    // The level-20 armored look is always available, appended after the mech.
-    expect(options[5]).toMatchObject({ kind: 'armored', skin: 0 });
+    // The level-20 armor set is NOT one of these: it is a toggle worn OVER the
+    // selected chroma, so giving it a swatch number would both consume a chroma
+    // label and imply it is mutually exclusive with one.
+    expect(options.some((option) => (option as { kind: string }).kind === 'armored')).toBe(false);
+  });
+
+  it('offers the armor set only at the unlock level, per class', () => {
+    for (const cls of ALL_CLASSES) {
+      expect(offersArmorSet(cls, 1), cls).toBe(false);
+      expect(offersArmorSet(cls, 19), cls).toBe(false);
+      expect(offersArmorSet(cls, 20), cls).toBe(true);
+      expect(offersArmorSet(cls, 60), cls).toBe(true);
+    }
+  });
+
+  it('points each class at its own committed armor-set icon', () => {
+    for (const cls of ALL_CLASSES) {
+      expect(armorSetIconUrl(cls), cls).toBe(`/ui/armor-sets/${cls}.webp`);
+    }
+    // Distinct art per class, never one shared placeholder.
+    const urls = new Set(ALL_CLASSES.map((cls) => armorSetIconUrl(cls)));
+    expect(urls.size).toBe(ALL_CLASSES.length);
   });
 
   it('appends unlocked mech cosmetics after every class appearance set', () => {

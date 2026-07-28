@@ -98,7 +98,7 @@ export function rankAllowsSkin(granted: SkinRank, skin: number): boolean {
 }
 
 export function mechChromaForSkin(skin: number): MechChroma | null {
-  return Number.isInteger(skin) ? MECH_CHROMAS[skin] ?? null : null;
+  return Number.isInteger(skin) ? (MECH_CHROMAS[skin] ?? null) : null;
 }
 
 export function mechChromaSkinIndex(chromaId: string): number {
@@ -119,11 +119,44 @@ export function rankAllowsMechChroma(granted: SkinRank, skin: number): boolean {
 // host-agnostic sim can validate a chosen skin index without importing render/.
 // tests/skin_event.test.ts asserts this stays in lockstep with SKINS.
 export const SKIN_COUNTS: Record<PlayerClass, number> = {
-  warrior: 4, paladin: 2, hunter: 4, rogue: 4, priest: 4,
-  mage: 4, warlock: 4, shaman: 4, druid: 4,
+  warrior: 4,
+  paladin: 2,
+  hunter: 4,
+  rogue: 4,
+  priest: 4,
+  mage: 4,
+  warlock: 4,
+  shaman: 4,
+  druid: 4,
 };
 
 /** Whether `skin` is a valid appearance index for `cls` (0 = default). */
 export function classHasSkin(cls: PlayerClass, skin: number): boolean {
   return Number.isInteger(skin) && skin >= 0 && skin < SKIN_COUNTS[cls];
+}
+
+/** Level at which a class's level-20 armor set unlocks as a cosmetic toggle.
+ *  Lives here, not in the renderer or the HUD, because BOTH the client picker and
+ *  the authoritative server gate on it and the server cannot import `src/render/`. */
+export const ARMOR_SET_UNLOCK_LEVEL = 20;
+
+/** Whether a character at `level` may wear its class's level-20 armor set. The
+ *  client hides the toggle below this, but the Sim is what actually enforces it, so
+ *  a crafted `change_skin` cannot equip the set early. */
+export function canWearArmorSet(level: number): boolean {
+  return Number.isFinite(level) && level >= ARMOR_SET_UNLOCK_LEVEL;
+}
+
+/**
+ * The character's REAL level for a cosmetic unlock, ignoring a Fiesta bout's
+ * temporary standardization.
+ *
+ * A Fiesta sets `Entity.level` to 20 for everyone and stashes the true level in
+ * `PlayerMeta.fiestaRestore`, so reading `Entity.level` alone would let a level-3
+ * player queue a bout and walk out permanently wearing the level-20 set (the
+ * catalog is not part of the pre-bout snapshot `serializeCharacter` persists).
+ * `src/sim/deeds.ts` refuses level deeds mid-bout for exactly this reason.
+ */
+export function effectiveCosmeticLevel(entityLevel: number, fiestaRestoreLevel?: number): number {
+  return fiestaRestoreLevel ?? entityLevel;
 }

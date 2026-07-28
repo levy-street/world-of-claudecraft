@@ -4630,6 +4630,8 @@ export const en_XA: EnTranslations = {
     "unequip": "[Úñéɋúíþ]",
     "armored": "[Áŕɱóŕéð]",
     "armoredAria": "[Ļéʋéļ 20 áŕɱóŕéð þļáţé çóšɱéţíç]",
+    "armoredToggleOn": "[Ŵéáŕ áŕɱóŕ šéţ]",
+    "armoredToggleOff": "[Ŕéɱóʋé áŕɱóŕ šéţ]",
     "previewOnly": "[Þŕéʋíéŵ óñļý — ƒúļļ úñļóçķ çóɱíñĝ šóóñ]",
     "mech": {
       "amber_crimson": "[Áɱƀéŕ Çŕíɱšóñ]",

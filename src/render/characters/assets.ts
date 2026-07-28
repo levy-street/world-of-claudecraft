@@ -37,6 +37,7 @@ import {
   visualAssetUrlForGraphics,
   weaponSkinModelUrl,
 } from './manifest';
+import { graftSkinnedNodes } from './mesh_graft';
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
@@ -681,7 +682,19 @@ export function assembleModel(
   weaponItemId?: string | null,
   offhandItemId?: string | null,
 ): THREE.Object3D {
-  const root = cloneSkinned(optimizedScene(def.url, cosmeticMeshNames(def)));
+  const cosmeticNames = cosmeticMeshNames(def);
+  const root = cloneSkinned(optimizedScene(def.url, cosmeticNames));
+  // A cosmetic body whose own GLB has no head (the level-20 armored bodies are
+  // Armor_* plates only) borrows the class body's head meshes onto the SAME rig,
+  // so a mask or an open hat is not worn over a hole. Runs before the tagging
+  // sweep below so the grafted meshes are tagged like any other body mesh.
+  if (def.graftUrl) {
+    const source = cloneSkinned(optimizedScene(def.graftUrl, cosmeticNames));
+    const { skipped } = graftSkinnedNodes(root, source, cosmeticNames);
+    for (const miss of skipped) {
+      console.warn(`head graft skipped ${miss.name} from ${def.graftUrl}: ${miss.reason}`);
+    }
+  }
   // tag the character's own meshes (body + accessories share one texture atlas)
   // so a skin override hits them but not the separate weapons attached below.
   // `skinnable` narrows WHICH of those meshes a chroma atlas actually remaps:
@@ -1133,8 +1146,18 @@ export function prepareVisual(key: string): PreparedVisual {
     });
   }
   const rawHeight = Math.max(1e-3, bounds.max.y - bounds.min.y);
-  const normScale = def.height / rawHeight;
-  const yOffset = (def.hover ?? 0) - bounds.min.y * normScale;
+  // `def.height` is a normalization TARGET for this model's own measured bounds, not
+  // a scale factor, so two defs sharing a height do NOT render at the same size: a
+  // helm crest or a robe hem moves rawHeight and shrinks or grows the whole rig.
+  // A cosmetic body that must match its base body therefore inherits the base's
+  // normScale/yOffset outright (normalizeFrom) instead of deriving its own. That is
+  // exact rather than tuned, because the two GLBs carry the same rig with identical
+  // rest transforms, so every bone lands at the base body's world position and a
+  // tall crest simply extends past the height target, as it should.
+  const inherited =
+    def.normalizeFrom && def.normalizeFrom !== key ? prepareVisual(def.normalizeFrom) : null;
+  const normScale = inherited ? inherited.normScale : def.height / rawHeight;
+  const yOffset = inherited ? inherited.yOffset : (def.hover ?? 0) - bounds.min.y * normScale;
   const clickRadius = Math.min(
     2.2,
     Math.max(

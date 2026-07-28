@@ -105,6 +105,18 @@ export interface VisualDef {
     hairMeshes?: string[];
     faceMeshes?: string[];
   };
+  /** Inherit another visual key's normalization (scale + ground offset) instead of
+   *  deriving it from this model's own measured bounds. Set for a cosmetic body that
+   *  must render at exactly the size of the base body it replaces: `height` alone
+   *  cannot guarantee that, because it is a target for the MEASURED bounds and a
+   *  helm crest moves them. Requires the same rig; see prepareVisual. */
+  normalizeFrom?: string;
+  /** GLB to borrow this def's `cosmetics` head meshes from, when its own model has
+   *  none. Set for the level-20 armored bodies whose helm is a mask or an open hat
+   *  (the armor GLB is Armor_* plates only, so the head must come from the class
+   *  body). The source MUST carry the same rig: see mesh_graft.ts for why that
+   *  makes the graft exact. */
+  graftUrl?: string;
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -1412,21 +1424,61 @@ export const VISUALS: Record<string, VisualDef> = {
 // carries no clips of its own (it binds the base body's clips by name via
 // animUrls) and holds the same weapons (handslot bones grafted in). The base
 // bodies and the Mech are left untouched.
+/** Classes whose level-20 headpiece is a MASK or an open HAT rather than a helm
+ *  that encloses the skull: the rogue's hood, the hunter's beast skull, the druid's
+ *  antler mask, and the mage/priest/warlock hats. Their armor GLB has no head in
+ *  it, so without the graft the hat floats over a hole. The fully enclosing helms
+ *  (warrior, paladin, shaman) show no skin and deliberately skip the graft rather
+ *  than pay for head draws nobody can see. */
+const ARMORED_OPEN_HELMS: ReadonlySet<PlayerClass> = new Set([
+  'hunter',
+  'rogue',
+  'priest',
+  'mage',
+  'warlock',
+  'druid',
+]);
+
+/** Mesh names the armor GLBs use, one per authored slot (a class missing a slot
+ *  just has no mesh by that name). Named explicitly so a body chroma can only ever
+ *  reach the plates and never the grafted head, which rides its own atlas. */
+/** See VisualDef.graftInset. Tuned against the shipped sets in the creator. */
+const ARMOR_GRAFT_INSET = 0.08;
+
+const ARMOR_SLOT_MESHES = [
+  'Armor_Arms',
+  'Armor_Helm',
+  'Armor_Legs',
+  'Armor_Shoulders',
+  'Armor_Torso',
+];
+
 /** Derive a class's armored variant from its base body VisualDef: same rig,
  *  clips, weapons and halo; swap in the armor GLB, source clips from the base
- *  body, retarget the recolour set to the plates, and drop the head cosmetics
- *  and body show-list (the helm fully encloses the head). */
-function armoredVariant(base: VisualDef, armorUrl: string): VisualDef {
+ *  body, and drop the body show-list. An enclosing helm also drops the head
+ *  cosmetics; a mask or open hat keeps them and grafts the class body's head
+ *  meshes in underneath (see mesh_graft.ts). */
+function armoredVariant(
+  base: VisualDef,
+  baseKey: string,
+  armorUrl: string,
+  openHelm: boolean,
+): VisualDef {
   return {
     ...base,
     url: armorUrl,
+    // Render at exactly the base body's size. Inheriting `height` is not enough:
+    // height is a target for each model's OWN measured bounds, so a helm crest would
+    // otherwise shrink the whole character (see prepareVisual).
+    normalizeFrom: baseKey,
     animUrls: [...(base.animUrls ?? []), base.url],
-    // No skinMeshNames: the armor ships ONE baked atlas and has no chroma set of
-    // its own, so marking its plates as chroma targets only risks the recolour
-    // sweep replacing their embedded texture. Re-add this with a real SKINS
-    // entry if armour chromas are authored later.
-    skinMeshNames: undefined,
-    cosmetics: undefined,
+    // The armor ships ONE baked atlas and has no chroma set of its own, so the
+    // plates are named only to keep a recolour sweep off the grafted head; with no
+    // head to protect there is nothing to scope and the field stays unset. Re-add a
+    // real SKINS entry if armour chromas are authored later.
+    skinMeshNames: openHelm ? ARMOR_SLOT_MESHES : undefined,
+    cosmetics: openHelm ? base.cosmetics : undefined,
+    graftUrl: openHelm && base.cosmetics ? base.url : undefined,
     show: undefined,
   };
 }
@@ -1443,7 +1495,14 @@ for (const cls of [
   'druid',
 ] as const) {
   const base = VISUALS[`player_${cls}`];
-  if (base) VISUALS[`player_${cls}_armored`] = armoredVariant(base, `${PLAYERS}/${cls}_lvl20.glb`);
+  if (base) {
+    VISUALS[`player_${cls}_armored`] = armoredVariant(
+      base,
+      `player_${cls}`,
+      `${PLAYERS}/${cls}_lvl20.glb`,
+      ARMORED_OPEN_HELMS.has(cls),
+    );
+  }
 }
 
 /** Whether a class ships a level-20 armored cosmetic body, so a picker can offer
@@ -1637,6 +1696,7 @@ export function manifestUrls(): string[] {
     if (def.lazyPreload) continue; // fetched on demand, not at boot
     urls.add(def.url);
     for (const url of def.animUrls ?? []) urls.add(url);
+    if (def.graftUrl) urls.add(def.graftUrl);
     for (const a of def.attach ?? []) urls.add(a.url);
   }
   // Equipped-weapon models a player may swap to at runtime (any nearby player's

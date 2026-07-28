@@ -507,6 +507,57 @@ describe('Combat Mech held weapon over the wire', () => {
     expect(override?.offhandSlot).toBe(1);
   });
 
+  it('mirrors a level-20 armored body to other players, chroma and all', () => {
+    // Requirement: other players online must SEE the armor set. The encode was
+    // mech-only ("cat === 'mech' ? 'mech' : 'class'") on both sides, which silently
+    // showed everyone the base body.
+    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    const pid = sim.playerId;
+    sim.setPlayerLevel(20);
+    // A chroma is carried THROUGH the armored catalog, so it must survive the wire.
+    expect(sim.setPlayerSkin(pid, 2, 'armored')).toBe(true);
+    const e = sim.entities.get(pid)!;
+
+    const w = wireEntity(e);
+    expect(w.cat).toBe('armored');
+    expect(w.sk).toBe(2);
+
+    const client = bareClient(pid + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.skinCatalog).toBe('armored');
+    expect(mirrored.skin).toBe(2);
+    // The decisive assertion: what the renderer actually builds for that player.
+    expect(visualKeyFor(mirrored)).toBe('player_druid_armored');
+  });
+
+  it('keeps the encode sparse for an unarmored player, so bytes do not grow', () => {
+    const sim = new Sim({ seed: 12, playerClass: 'warrior', autoEquip: true });
+    const e = sim.entities.get(sim.playerId)!;
+
+    // 'class' must stay absent from the record, not be spelled out: every NPC and
+    // every unarmored player rides this field on every snapshot.
+    expect(wireEntity(e).cat).toBeUndefined();
+  });
+
+  it('reverts an optimistic armored nudge when the server refuses it', () => {
+    // The client nudges its own entity before the server answers. Decoding `cat`
+    // ABSOLUTELY (not `w.cat ?? current`) is what rolls that back when the server
+    // rejects the catalog, e.g. below the unlock level.
+    const sim = new Sim({ seed: 13, playerClass: 'mage', autoEquip: true });
+    const pid = sim.playerId;
+    const e = sim.entities.get(pid)!;
+
+    const client = bareClient(pid + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    const mirrored = client.entities.get(e.id)!;
+    mirrored.skinCatalog = 'armored'; // the optimistic local nudge
+
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+
+    expect(client.entities.get(e.id)!.skinCatalog).toBe('class');
+  });
+
   it('mirrors a winning Warrior mech with its real shield offhand', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
     const pid = sim.playerId;

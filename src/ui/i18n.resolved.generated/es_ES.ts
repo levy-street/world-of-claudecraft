@@ -4630,6 +4630,8 @@ export const es_ES: EnTranslations = {
     "unequip": "Quitar",
     "armored": "Armored",
     "armoredAria": "Level 20 armored plate cosmetic",
+    "armoredToggleOn": "Wear armor set",
+    "armoredToggleOff": "Remove armor set",
     "previewOnly": "Solo vista previa — desbloqueo completo muy pronto",
     "mech": {
       "amber_crimson": "Ámbar carmesí",

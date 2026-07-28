@@ -291,7 +291,12 @@ export function characterListEntry(
     forceRename: c.force_rename,
     lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
     playtimeSeconds: Number(c.playtime_seconds ?? 0),
-    skinCatalog: state?.skinCatalog === 'mech' ? 'mech' : 'class',
+    skinCatalog:
+      state?.skinCatalog === 'mech'
+        ? 'mech'
+        : state?.skinCatalog === 'armored'
+          ? 'armored'
+          : 'class',
     mainhandItemId: state?.equipment?.mainhand ?? null,
     offhandItemId: state?.equipment?.offhand ?? null,
     weaponSkinId,

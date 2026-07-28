@@ -21,7 +21,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "es_ES": [
     "auth.bald",
@@ -35,7 +37,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "fr_FR": [
     "auth.bald",
@@ -49,7 +53,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "fr_CA": [
     "auth.bald",
@@ -63,7 +69,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "en_CA": [],
   "it_IT": [
@@ -78,7 +86,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "de_DE": [
     "auth.bald",
@@ -92,7 +102,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "zh_CN": [
     "auth.bald",
@@ -100,9 +112,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone",
-    "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "auth.skinTone"
   ],
   "zh_TW": [
     "auth.bald",
@@ -110,9 +120,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone",
-    "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "auth.skinTone"
   ],
   "ko_KR": [
     "auth.bald",
@@ -120,9 +128,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone",
-    "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "auth.skinTone"
   ],
   "ja_JP": [
     "auth.bald",
@@ -130,9 +136,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone",
-    "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "auth.skinTone"
   ],
   "pt_BR": [
     "auth.bald",
@@ -146,7 +150,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "ru_RU": [
     "auth.bald",
@@ -154,9 +160,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone",
-    "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "auth.skinTone"
   ],
   "cs_CZ": [
     "auth.bald",
@@ -170,7 +174,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "nl_NL": [
     "auth.bald",
@@ -184,7 +190,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "pl_PL": [
     "auth.bald",
@@ -198,7 +206,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "id_ID": [
     "auth.bald",
@@ -212,7 +222,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "tr_TR": [
     "auth.bald",
@@ -226,7 +238,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "sv_SE": [
     "auth.bald",
@@ -240,7 +254,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "vi_VN": [
     "auth.bald",
@@ -254,7 +270,9 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ],
   "da_DK": [
     "auth.bald",
@@ -268,6 +286,8 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairStyle",
     "auth.skinTone",
     "skinEvent.armored",
-    "skinEvent.armoredAria"
+    "skinEvent.armoredAria",
+    "skinEvent.armoredToggleOff",
+    "skinEvent.armoredToggleOn"
   ]
 };

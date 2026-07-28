@@ -241,6 +241,8 @@ export const en = {
     unequip: 'Unequip',
     armored: 'Armored',
     armoredAria: 'Level 20 armored plate cosmetic',
+    armoredToggleOn: 'Wear armor set',
+    armoredToggleOff: 'Remove armor set',
     previewOnly: 'Preview only — full unlock coming soon',
     // Combat Mech chroma names (skin-select preview).
     mech: {

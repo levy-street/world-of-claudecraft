@@ -7499,6 +7499,8 @@ export type TranslationKeyFlat =
   | 'sim.lockpick.toolSlips'
   | 'skinEvent.armored'
   | 'skinEvent.armoredAria'
+  | 'skinEvent.armoredToggleOff'
+  | 'skinEvent.armoredToggleOn'
   | 'skinEvent.close'
   | 'skinEvent.lockIn'
   | 'skinEvent.locked'

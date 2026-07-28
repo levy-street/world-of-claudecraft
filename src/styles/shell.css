@@ -3598,6 +3598,33 @@
     color: #fff;
     box-shadow: 0 0 9px var(--class-color, #33c1f1);
   }
+  /* Level-20 armor-set TOGGLE on the character sheet's chroma row: the class's
+     armor art rather than a number or a colour dot, and a pressed state distinct
+     from a chroma selection (it is worn OVER the selected chroma, not instead of
+     it). Sized up from the 34px numbered swatch so the art reads. */
+  .skin-swatch-armor-toggle {
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.35);
+  }
+  .skin-swatch-armor-toggle .skin-swatch-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    display: block;
+    /* Dimmed until worn, so "off" reads at a glance without a second control. */
+    filter: saturate(0.55) brightness(0.72);
+    transition: filter 0.12s;
+  }
+  .skin-swatch-armor-toggle[aria-pressed="true"] .skin-swatch-img,
+  .skin-swatch-armor-toggle:hover .skin-swatch-img,
+  .skin-swatch-armor-toggle:focus-visible .skin-swatch-img {
+    filter: none;
+  }
+
   /* Chroma swatch: a plain armour-colour dot (no portrait). */
   .skin-swatch-color {
     width: 52px;
@@ -3722,6 +3749,27 @@
     }
     .skin-swatch-color[aria-pressed="true"],
     .head-skin[aria-pressed="true"] {
+      border: 3px solid Highlight;
+      font-weight: 700;
+    }
+    /* The armor toggle is an image with no text, so in forced colors (where the
+       art may be dropped entirely) it would render as an empty box. Fall back to
+       its own label, same treatment as the chroma swatches above. */
+    .skin-swatch-armor-toggle {
+      width: auto;
+      min-width: 52px;
+      padding: 0 8px;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .skin-swatch-armor-toggle .skin-swatch-img {
+      display: none;
+    }
+    .skin-swatch-armor-toggle::after {
+      content: attr(aria-label);
+      font-size: 11px;
+    }
+    .skin-swatch-armor-toggle[aria-pressed="true"] {
       border: 3px solid Highlight;
       font-weight: 700;
     }

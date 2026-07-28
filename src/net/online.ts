@@ -2424,7 +2424,10 @@ export class ClientWorld implements IWorld {
             ([slot, inst]) => [slot, cloneItemInstancePayload(inst)],
           ),
         );
-        e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
+        // Absolute, not `w.cat ?? e.skinCatalog`: decoding it absolutely is what
+        // reverts the optimistic local nudge in changeSkin when the server refuses
+        // the catalog (e.g. below the armor-set unlock level).
+        e.skinCatalog = w.cat === 'mech' ? 'mech' : w.cat === 'armored' ? 'armored' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
         e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)

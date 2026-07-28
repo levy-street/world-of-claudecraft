@@ -107,8 +107,10 @@ import type { GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
+  canWearArmorSet,
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
+  effectiveCosmeticLevel,
   MECH_CHROMAS,
   mechChromaItemId,
   mechChromaSkinIndex,
@@ -2214,10 +2216,17 @@ export class Sim {
       cls,
       name,
       skin: savedState?.skin ?? 0,
+      // The armored catalog is re-gated on LOAD, not just on the setter: this runs
+      // before player.level is assigned below, so it reads the blob's own level
+      // (clamped identically). A stored 'armored' on a sub-20 character (a dev
+      // de-level, a hand-edited row) loads as 'class' rather than being trusted.
       skinCatalog:
-        savedState?.skinCatalog === 'mech' || savedState?.skinCatalog === 'armored'
-          ? savedState.skinCatalog
-          : 'class',
+        savedState?.skinCatalog === 'mech'
+          ? 'mech'
+          : savedState?.skinCatalog === 'armored' &&
+              canWearArmorSet(Math.max(1, Math.min(MAX_LEVEL, savedState.level ?? 1)))
+            ? 'armored'
+            : 'class',
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
@@ -3213,12 +3222,29 @@ export class Sim {
 
   /** Set a player's appearance skin (meta + entity). Bounded; the renderer
    *  falls back to the default for an unknown index. Used by creation, the
-   *  in-game changer, and the server's changeSkin command. */
+   *  in-game changer, and the server's changeSkin command.
+   *
+   *  This is where the level-20 armor set is ENFORCED, not in the HUD: both hosts
+   *  run this Sim, so a crafted `change_skin` from a level-3 client is refused here
+   *  rather than trusted. Returns false when the request is rejected. */
   setPlayerSkin(pid: number, skin: number, catalog: SkinCatalog = 'class'): boolean {
     const meta = this.players.get(pid);
     const e = this.entities.get(pid);
     if (!meta || !e) return false;
-    const maxSkin = catalog === 'mech' ? MECH_CHROMAS.length - 1 : catalog === 'armored' ? 0 : 7;
+    // effectiveCosmeticLevel, not e.level: a Fiesta bout standardizes everyone to
+    // level 20, and the armored catalog is not part of the pre-bout snapshot that
+    // serializeCharacter persists, so a low-level fighter would keep the set.
+    if (
+      catalog === 'armored' &&
+      !canWearArmorSet(effectiveCosmeticLevel(e.level, meta.fiestaRestore?.level))
+    ) {
+      return false;
+    }
+    // The armored body has no chroma set of its own, so its skin index is inert for
+    // rendering. Carrying the player's CLASS chroma through unchanged is what makes
+    // the toggle lossless: switching armor off restores the chroma they picked
+    // instead of dumping them back on the default.
+    const maxSkin = catalog === 'mech' ? MECH_CHROMAS.length - 1 : 7;
     const idx = Math.max(0, Math.min(maxSkin, Math.floor(skin)));
     meta.skin = idx;
     meta.skinCatalog = catalog;

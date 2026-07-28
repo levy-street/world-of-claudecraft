@@ -25,6 +25,7 @@ import {
 } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
 import { onPortraitsReady } from '../render/characters/portrait';
+import { catalogForVisualKey } from '../render/characters/preview_appearance';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import {
@@ -9124,6 +9125,10 @@ export class Hud {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
+          // The sheet's level, progression bar and the level-20 armor-set toggle are
+          // all level-derived, so a level-up with the sheet open leaves them stale
+          // until it is reopened (same staleness class the prestige arm fixes).
+          this.renderCharIfOpen();
           if (isTalentRowUnlockLevel(ev.level)) {
             this.showBanner(t('game.talents.rowUnlockToast'));
             // No local gain override: the manifest's resolved gain (keyTrimDb)
@@ -12493,7 +12498,7 @@ export class Hud {
     const appearance: PreviewAppearance = {
       cls: opts.cls,
       skin: opts.skin,
-      skinCatalog: opts.previewKey === 'player_mech' ? 'mech' : 'class',
+      skinCatalog: opts.previewKey ? catalogForVisualKey(opts.previewKey) : 'class',
       mainhandItemId: opts.mainhand,
       offhandItemId: opts.offhand,
       weaponSkinId: opts.weaponSkinId,

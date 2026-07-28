@@ -4628,8 +4628,10 @@ export const zh_CN: EnTranslations = {
     "close": "关闭",
     "unlocked": "外观已解锁！",
     "unequip": "卸下",
-    "armored": "Armored",
-    "armoredAria": "Level 20 armored plate cosmetic",
+    "armored": "披甲",
+    "armoredAria": "20级披甲外观",
+    "armoredToggleOn": "穿上盔甲套装",
+    "armoredToggleOff": "脱下盔甲套装",
     "previewOnly": "仅供预览——完整解锁即将推出",
     "mech": {
       "amber_crimson": "琥珀绯红",

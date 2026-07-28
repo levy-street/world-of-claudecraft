@@ -1,16 +1,25 @@
-import { MECH_CHROMAS, SKIN_COUNTS } from '../sim/content/skins';
+import { hasArmoredBody } from '../render/characters/manifest';
+import { canWearArmorSet, MECH_CHROMAS, SKIN_COUNTS } from '../sim/content/skins';
 import type { PlayerClass, SkinCatalog } from '../sim/types';
 
 export type CharacterAppearanceOption =
   | { kind: 'class'; label: number; skin: number }
-  | { kind: 'mech'; label: number; skin: number; chromaId: string }
-  | { kind: 'armored'; label: number; skin: number };
+  | { kind: 'mech'; label: number; skin: number; chromaId: string };
 
 export interface ActiveCharacterAppearancePreview {
   skin: number;
   visualKey: string;
 }
 
+/**
+ * The numbered appearance swatches a character sheet offers: the class chromas
+ * plus any unlocked Combat Mech chromas.
+ *
+ * The level-20 armor set is deliberately NOT one of these. It is a toggle
+ * (`offersArmorSet`), worn over whichever chroma is selected, so giving it a
+ * swatch number would consume a chroma label and make "selected chroma" and
+ * "wearing armor" mutually exclusive when they are independent.
+ */
 export function characterAppearanceOptions(
   cls: PlayerClass,
   unlockedMechChromaIds: readonly string[],
@@ -30,17 +39,23 @@ export function characterAppearanceOptions(
       skin,
       chromaId: chroma.id,
     }));
+  return [...classOptions, ...mechOptions];
+}
 
-  // The level-20 armored look: a single always-available cosmetic body (no
-  // unlock gate and no chroma set of its own yet, so skin 0). Kept last so the
-  // class/mech option labels stay stable.
-  const armoredOption = {
-    kind: 'armored' as const,
-    label: classCount + mechOptions.length + 1,
-    skin: 0,
-  };
+/**
+ * Whether the character sheet shows the level-20 armor-set toggle: the class must
+ * ship an armored body AND the character must have reached the unlock level.
+ *
+ * Presentation only. `Sim.setPlayerSkin` is what refuses an early equip, because a
+ * client cannot be trusted to gate itself.
+ */
+export function offersArmorSet(cls: PlayerClass, level: number): boolean {
+  return canWearArmorSet(level) && hasArmoredBody(cls);
+}
 
-  return [...classOptions, ...mechOptions, armoredOption];
+/** The committed icon for a class's level-20 armor set (`public/ui/armor-sets/`). */
+export function armorSetIconUrl(cls: PlayerClass): string {
+  return `/ui/armor-sets/${cls}.webp`;
 }
 
 export function activeCharacterAppearancePreview(

@@ -71,6 +71,16 @@ export function classVisualKey(cls: PlayerClass, catalog: 'class' | 'mech' | 'ar
   return catalog === 'armored' ? `player_${cls}_armored` : `player_${cls}`;
 }
 
+/** The cosmetic catalog a body model key came from: the inverse of
+ *  `classVisualKey`. Callers that only have a key (the HUD mounts the character
+ *  preview by key) need this to rebuild a PreviewAppearance without flattening
+ *  every non-mech key to 'class', which silently rendered the base body in place
+ *  of the level-20 armored one. */
+export function catalogForVisualKey(key: string): 'class' | 'mech' | 'armored' {
+  if (key === 'player_mech') return 'mech';
+  return key.endsWith('_armored') ? 'armored' : 'class';
+}
+
 /** The model key + held-weapon layout the appearance resolves to. */
 export interface PreviewVisual {
   visualKey: string;

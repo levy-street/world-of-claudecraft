@@ -4630,6 +4630,8 @@ export const tr_TR: EnTranslations = {
     "unequip": "Çıkar",
     "armored": "Armored",
     "armoredAria": "Level 20 armored plate cosmetic",
+    "armoredToggleOn": "Wear armor set",
+    "armoredToggleOff": "Remove armor set",
     "previewOnly": "Yalnızca önizleme — tam kilit açma yakında geliyor",
     "mech": {
       "amber_crimson": "Kehribar Kızıl",

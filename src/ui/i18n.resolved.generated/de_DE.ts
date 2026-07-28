@@ -4630,6 +4630,8 @@ export const de_DE: EnTranslations = {
     "unequip": "Ablegen",
     "armored": "Armored",
     "armoredAria": "Level 20 armored plate cosmetic",
+    "armoredToggleOn": "Wear armor set",
+    "armoredToggleOff": "Remove armor set",
     "previewOnly": "Nur Vorschau — vollständige Freischaltung folgt in Kürze",
     "mech": {
       "amber_crimson": "Bernstein-Karmesin",

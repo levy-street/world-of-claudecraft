@@ -4630,6 +4630,8 @@ export const da_DK: EnTranslations = {
     "unequip": "Tag af",
     "armored": "Armored",
     "armoredAria": "Level 20 armored plate cosmetic",
+    "armoredToggleOn": "Wear armor set",
+    "armoredToggleOff": "Remove armor set",
     "previewOnly": "Kun forhåndsvisning — fuld oplåsning kommer snart",
     "mech": {
       "amber_crimson": "Ravgul Karmoisin",

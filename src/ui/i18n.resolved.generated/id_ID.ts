@@ -4630,6 +4630,8 @@ export const id_ID: EnTranslations = {
     "unequip": "Lepas",
     "armored": "Armored",
     "armoredAria": "Level 20 armored plate cosmetic",
+    "armoredToggleOn": "Wear armor set",
+    "armoredToggleOff": "Remove armor set",
     "previewOnly": "Hanya pratinjau — pembukaan penuh segera hadir",
     "mech": {
       "amber_crimson": "Ambar Merah Tua",
