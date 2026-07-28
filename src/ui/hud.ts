@@ -14592,6 +14592,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
   if (primary) {
     switch (primary.type) {
       case 'directDamage':
+      case 'unleashWeapon':
       case 'heal':
       case 'aoeDamage':
       case 'aoeHeal':

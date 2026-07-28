@@ -16,6 +16,7 @@
 //      placeholder instead.
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt, type KnownAbility } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation, TALENTS } from '../src/sim/content/talents';
 import { ABILITIES, CLASSES } from '../src/sim/data';
 import { MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 import {
@@ -174,6 +175,48 @@ describe('ability descriptions match their resolved effects', () => {
           if (/\$(?:h|e|p|g|s|a)/.test(desc)) {
             expect(
               abilityTemporalHourglassValues(known),
+              `${at}: Hourglass placeholders have no temporalHourglass effect`,
+            ).not.toBeNull();
+          }
+        }
+      }
+    }
+  });
+
+  it('resolves placeholders for every multi-button spec extra grant', () => {
+    for (const cls of classes) {
+      for (const spec of TALENTS[cls]?.specs ?? []) {
+        if (!spec.extraGrants?.length) continue;
+        const mods = computeTalentModifiers(
+          cls,
+          { ...emptyAllocation(), spec: spec.id } as never,
+          MAX_LEVEL,
+        );
+        const known = abilitiesKnownAt(cls, MAX_LEVEL, mods);
+        for (const id of spec.extraGrants) {
+          const ability = known.find((candidate) => candidate.def.id === id);
+          expect(ability, `${cls}.${spec.id} does not resolve extra grant ${id}`).toBeTruthy();
+          if (!ability) continue;
+          const desc = ability.def.description;
+          const at = `${cls}.${spec.id}.${id}`;
+          if (desc.includes('$d')) {
+            expect(
+              abilityPrimaryEffect(ability) ?? abilitySecondaryEffect(ability),
+              `${at}: $d has no effect to read`,
+            ).toBeTruthy();
+          }
+          if (desc.includes('$o')) {
+            expect(abilityOverTimeEffect(ability), `${at}: $o has no dot/hot`).toBeTruthy();
+          }
+          if (desc.includes('$b')) {
+            expect(abilityBuffValue(ability), `${at}: $b has no buff value`).not.toBeNull();
+          }
+          if (desc.includes('$t')) {
+            expect(abilityDurationValue(ability), `${at}: $t has no timed effect`).not.toBeNull();
+          }
+          if (/\$(?:h|e|p|g|s|a)/.test(desc)) {
+            expect(
+              abilityTemporalHourglassValues(ability),
               `${at}: Hourglass placeholders have no temporalHourglass effect`,
             ).not.toBeNull();
           }

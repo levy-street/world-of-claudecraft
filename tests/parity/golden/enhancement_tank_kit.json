@@ -1,0 +1,830 @@
+{
+  "scenario": "enhancement_tank_kit",
+  "seed": 1025,
+  "sampleEvery": 5,
+  "ticks": 10,
+  "coverage": [
+    "class:shaman Enhancement extra-grant tank kit",
+    "Stone Aegis direct-hit mitigation and charge consumption",
+    "Anchorbound Weapon doubled threat and flat discharge rider",
+    "Elemental Discharge range-then-crit shared RNG draws and enchant consumption"
+  ],
+  "draws": 7,
+  "drawDigest": "7d6e228e",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 410,
+      "state": "ffdab073",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 409,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 36,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.058,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.058,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 68,
+          "id": 409,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 68,
+          "maxResource": 108,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 108,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 9,
+          "stats": {
+            "agi": 16,
+            "armor": 86,
+            "int": 18,
+            "spi": 18,
+            "sta": 20,
+            "str": 18
+          },
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 411,
+      "state": "4929593c",
+      "events": "fdaeb1f8",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "stone-aegis-hit",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 80
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 409,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "rows": {},
+            "spec": "enhancement"
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "auras": [
+            {
+              "charges": 5,
+              "duration": 120,
+              "id": "earth_shield",
+              "kind": "earth_shield",
+              "name": "Stone Aegis",
+              "remaining": 120,
+              "school": "nature",
+              "sourceId": 409,
+              "value": 0.2
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "gcdRemaining": 1.5,
+          "hp": 653,
+          "id": 409,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1068,
+          "meleeHaste": 0.1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1038,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 28,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 56,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 410,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aggroTargetId": 409,
+          "aiState": "chase",
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 500000,
+          "id": 410,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 500000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "stats": {
+            "armor": 266
+          },
+          "templateId": "ridge_stalker",
+          "threat": [
+            [
+              409,
+              1
+            ]
+          ],
+          "weapon": {
+            "max": 72,
+            "min": 46,
+            "speed": 1.9
+          }
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "time": 0.25,
+      "nextId": 411,
+      "state": "ae2a8c85",
+      "events": "b01ff2ba",
+      "rng": {
+        "draws": 7,
+        "digest": "7d6e228e"
+      }
+    },
+    {
+      "tick": 10,
+      "time": 0.5,
+      "nextId": 411,
+      "state": "dec19650",
+      "events": "741638a5",
+      "rng": {
+        "draws": 7,
+        "digest": "7d6e228e"
+      }
+    },
+    {
+      "tick": 10,
+      "time": 0.5,
+      "nextId": 411,
+      "state": "dec19650",
+      "events": "741638a5",
+      "rng": {
+        "draws": 7,
+        "digest": "7d6e228e"
+      },
+      "label": "anchorbound-discharge",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 56,
+            "damageTaken": 129
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 56
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 409,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "enhancement"
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "auras": [
+            {
+              "charges": 4,
+              "duration": 120,
+              "id": "earth_shield",
+              "kind": "earth_shield",
+              "name": "Stone Aegis",
+              "remaining": 119.5,
+              "school": "nature",
+              "sourceId": 409,
+              "value": 0.2
+            }
+          ],
+          "combatTimer": 0.35,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "unleash_weapon",
+              5.5
+            ]
+          ],
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 0.5,
+          "gcdRemaining": 1,
+          "hp": 604,
+          "id": 409,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1068,
+          "meleeHaste": 0.1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1038,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 28,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 56,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 410,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aggroTargetId": 409,
+          "aiState": "attack",
+          "combatTimer": 0.35,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 499944,
+          "id": 410,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 500000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "stats": {
+            "armor": 266
+          },
+          "swingTimer": 1.45,
+          "tappedById": 409,
+          "templateId": "ridge_stalker",
+          "threat": [
+            [
+              409,
+              233
+            ]
+          ],
+          "weapon": {
+            "max": 72,
+            "min": 46,
+            "speed": 1.9
+          }
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "time": 0.5,
+      "nextId": 411,
+      "state": "dec19650",
+      "events": "741638a5",
+      "rng": {
+        "draws": 7,
+        "digest": "7d6e228e"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 56,
+            "damageTaken": 129
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 56
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 409,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "enhancement"
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "auras": [
+            {
+              "charges": 4,
+              "duration": 120,
+              "id": "earth_shield",
+              "kind": "earth_shield",
+              "name": "Stone Aegis",
+              "remaining": 119.5,
+              "school": "nature",
+              "sourceId": 409,
+              "value": 0.2
+            }
+          ],
+          "combatTimer": 0.35,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "unleash_weapon",
+              5.5
+            ]
+          ],
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 0.5,
+          "gcdRemaining": 1,
+          "hp": 604,
+          "id": 409,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1068,
+          "meleeHaste": 0.1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1038,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 28,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 56,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 410,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aggroTargetId": 409,
+          "aiState": "attack",
+          "combatTimer": 0.35,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 499944,
+          "id": 410,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 500000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "stats": {
+            "armor": 266
+          },
+          "swingTimer": 1.45,
+          "tappedById": 409,
+          "templateId": "ridge_stalker",
+          "threat": [
+            [
+              409,
+              233
+            ]
+          ],
+          "weapon": {
+            "max": 72,
+            "min": 46,
+            "speed": 1.9
+          }
+        }
+      ]
+    }
+  ]
+}

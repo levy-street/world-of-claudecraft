@@ -60,6 +60,7 @@ import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_b
 import { isUnbreakableControlAura } from './cc';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
 import { recordDamageTaken } from './damage_history';
+import { applyEarthShield } from './earth_shield';
 import {
   cauterizeFireDamageMult,
   fireMageCauterize,
@@ -192,6 +193,14 @@ export function dealDamage(
     let ward = 0;
     for (const a of target.auras) if (a.kind === 'shield_wall') ward = Math.max(ward, a.value);
     if (ward > 0) amount = Math.round(amount * (1 - ward));
+  }
+
+  // Earth Shield (Stone Aegis): a charge-limited damage-taken reduction on the
+  // shaman. Only a real incoming attack (a DIRECT hit from another entity) spends
+  // a charge; DoT ticks and reflects (direct=false) and self-damage leave it be,
+  // matching the "next N attacks" fantasy.
+  if (direct && source && source.id !== target.id && amount > 0) {
+    amount = applyEarthShield(ctx, target, amount);
   }
 
   // Expose: a cracked-guard debuff amplifies the physical damage the victim
@@ -1009,6 +1018,8 @@ function reflectSpellWard(
     ward.name ?? 'Spell Reflection',
     'hit',
     true,
+    undefined,
+    false,
   );
 }
 
