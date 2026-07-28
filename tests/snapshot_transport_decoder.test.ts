@@ -87,4 +87,26 @@ describe('SnapshotTransportDecoder', () => {
     expect(downgrade).toHaveBeenCalledOnce();
     expect(downgrade).toHaveBeenCalledWith('worker crashed');
   });
+
+  it('downgrades once without throwing when the bounded queue fills', () => {
+    const worker: SnapshotDecodeWorkerLike = {
+      postMessage: vi.fn(),
+      terminate: vi.fn(),
+      onmessage: null,
+      onerror: null,
+    };
+    const downgrade = vi.fn();
+    const decoder = new SnapshotTransportDecoder({ apply: vi.fn(), downgrade }, () => worker, 1);
+    decoder.beginSocket();
+
+    decoder.receiveBinary(buffer(encodeSnapshotBinary({ t: 'snap', ents: [], tick: 1 })));
+    expect(() => decoder.receiveString(JSON.stringify({ t: 'event' }))).not.toThrow();
+    expect(() =>
+      decoder.receiveBinary(buffer(encodeSnapshotBinary({ t: 'snap', ents: [], tick: 2 }))),
+    ).not.toThrow();
+
+    expect(downgrade).toHaveBeenCalledOnce();
+    expect(downgrade).toHaveBeenCalledWith('snapshot decode queue overflow');
+    expect(worker.postMessage).toHaveBeenCalledOnce();
+  });
 });

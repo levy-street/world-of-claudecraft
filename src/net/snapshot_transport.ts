@@ -1,6 +1,12 @@
 import { decodeSnapshotBinary, type SnapshotObject } from './snapshot_binary';
 import { SnapshotDecodeQueue, type SnapshotDecodeToken } from './snapshot_decode_queue_core';
 
+// The initial renderer prewarm may legitimately occupy most of its 12-second
+// budget while the socket continues receiving snapshots at 20 Hz. Keep the
+// strict-order worker queue bounded, but large enough to span that startup
+// window plus scheduling jitter instead of forcing every busy client to JSON.
+export const SNAPSHOT_DECODE_MAX_PENDING = 256;
+
 interface WorkerDecodeRequest extends SnapshotDecodeToken {
   bytes: ArrayBuffer;
 }
@@ -47,7 +53,7 @@ export class SnapshotTransportDecoder {
   constructor(
     private readonly hooks: SnapshotTransportHooks,
     workerFactory: (() => SnapshotDecodeWorkerLike) | null,
-    maxPending = 64,
+    maxPending = SNAPSHOT_DECODE_MAX_PENDING,
   ) {
     this.queue = new SnapshotDecodeQueue(maxPending);
     if (workerFactory) {
@@ -75,6 +81,7 @@ export class SnapshotTransportDecoder {
 
   receiveString(raw: string): void {
     const token = this.enqueue();
+    if (!token) return;
     let value: unknown;
     const started = performance.now();
     try {
@@ -96,6 +103,7 @@ export class SnapshotTransportDecoder {
 
   receiveBinary(bytes: ArrayBuffer): void {
     const token = this.enqueue();
+    if (!token) return;
     if (this.worker) {
       this.worker.postMessage({ ...token, bytes }, [bytes]);
       return;
@@ -121,12 +129,13 @@ export class SnapshotTransportDecoder {
     this.worker = null;
   }
 
-  private enqueue(): SnapshotDecodeToken {
+  private enqueue(): SnapshotDecodeToken | null {
+    if (this.downgradedGeneration === this.generation) return null;
     try {
       return this.queue.enqueue();
     } catch (error) {
       this.failGeneration(error instanceof Error ? error.message : 'snapshot queue overflow');
-      throw error;
+      return null;
     }
   }
 
