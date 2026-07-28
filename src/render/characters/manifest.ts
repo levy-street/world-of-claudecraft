@@ -669,10 +669,10 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     attach: [
       { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-      // shield faced inward + oversized on the v02 body: flip it face-out, halve it,
-      // and cancel the shared Shield grip's forward lift so it seats ON the hand slot
-      // (net local pos 0) instead of floating in front of the forearm. Measured
-      // against the live handslot.l bone (see head_cosmetics shield-grip test).
+      // shield faced inward + oversized on the v02 body: halve it, and cancel the
+      // shared Shield grip's forward lift so it seats ON the hand slot (net local
+      // pos 0) instead of floating in front of the forearm. Measured against the
+      // live handslot.l bone (see head_cosmetics shield-grip test).
       {
         url: `${WEAPONS}/shield_round.glb`,
         bone: 'handslot.l',
@@ -1412,8 +1412,6 @@ export const VISUALS: Record<string, VisualDef> = {
 // carries no clips of its own (it binds the base body's clips by name via
 // animUrls) and holds the same weapons (handslot bones grafted in). The base
 // bodies and the Mech are left untouched.
-const ARMOR_MESHES = ['Armor_Helm', 'Armor_Torso', 'Armor_Arms', 'Armor_Legs', 'Armor_Shoulders'];
-
 /** Derive a class's armored variant from its base body VisualDef: same rig,
  *  clips, weapons and halo; swap in the armor GLB, source clips from the base
  *  body, retarget the recolour set to the plates, and drop the head cosmetics
@@ -1423,7 +1421,11 @@ function armoredVariant(base: VisualDef, armorUrl: string): VisualDef {
     ...base,
     url: armorUrl,
     animUrls: [...(base.animUrls ?? []), base.url],
-    skinMeshNames: ARMOR_MESHES,
+    // No skinMeshNames: the armor ships ONE baked atlas and has no chroma set of
+    // its own, so marking its plates as chroma targets only risks the recolour
+    // sweep replacing their embedded texture. Re-add this with a real SKINS
+    // entry if armour chromas are authored later.
+    skinMeshNames: undefined,
     cosmetics: undefined,
     show: undefined,
   };
@@ -1442,6 +1444,12 @@ for (const cls of [
 ] as const) {
   const base = VISUALS[`player_${cls}`];
   if (base) VISUALS[`player_${cls}_armored`] = armoredVariant(base, `${PLAYERS}/${cls}_lvl20.glb`);
+}
+
+/** Whether a class ships a level-20 armored cosmetic body, so a picker can offer
+ *  it as one more chroma swatch. */
+export function hasArmoredBody(cls: PlayerClass): boolean {
+  return VISUALS[`player_${cls}_armored`] !== undefined;
 }
 
 // ---------------------------------------------------------------------------

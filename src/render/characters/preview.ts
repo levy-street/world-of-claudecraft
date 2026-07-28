@@ -6,6 +6,7 @@ import { mechAssetsReady, preloadMechAssets } from './assets';
 import type { WeaponLayoutOverride } from './manifest';
 import {
   appearanceSignature,
+  classVisualKey,
   DEFAULT_HEAD_APPEARANCE,
   type PreviewAppearance,
   previewAppearanceVisual,
@@ -130,7 +131,12 @@ export class CharacterPreview {
 
   /** Set the active character model by player class. Pass explicit hand ids for a
    *  character sheet; omit them to show the class starter equipment in creation. */
-  setClass(cls: PlayerClass, weaponItemId?: string | null, offhandItemId?: string | null): void {
+  setClass(
+    cls: PlayerClass,
+    weaponItemId?: string | null,
+    offhandItemId?: string | null,
+    catalog: 'class' | 'armored' = 'class',
+  ): void {
     if (this.destroyed) return;
     // A class-driven selection (create/offline picker, or a panel switch) supersedes
     // any pending async mech re-apply, so invalidate the tracked appearance.
@@ -141,7 +147,7 @@ export class CharacterPreview {
     const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
     const offhand =
       offhandItemId !== undefined ? offhandItemId : (CLASSES[cls].startOffhand ?? null);
-    this.setVisualKey(`player_${cls}`, weapon, null, offhand);
+    this.setVisualKey(classVisualKey(cls, catalog), weapon, null, offhand);
   }
 
   /** Show a character's real, in-world appearance: the class rig or the Combat Mech

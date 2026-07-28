@@ -168,7 +168,7 @@ import {
   type PreviewAppearance,
 } from './render/characters';
 import { charactersReady, preloadMechAssets } from './render/characters/assets';
-import { skinCount, skinSwatchColor } from './render/characters/manifest';
+import { hasArmoredBody, skinCount, skinSwatchColor } from './render/characters/manifest';
 import { installWebGLContextRelease } from './render/context_release';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
@@ -3700,6 +3700,7 @@ async function startOffline(
   hairColor?: number,
   faceColor?: number,
   face = 0,
+  skinCatalog: 'class' | 'armored' = 'class',
 ): Promise<void> {
   if (!(await prepareWorldEntry())) return;
   enterLoadingState(t('loading.world'));
@@ -3714,7 +3715,7 @@ async function startOffline(
     valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
     world,
   });
-  sim.setPlayerSkin(sim.playerId, skin);
+  sim.setPlayerSkin(sim.playerId, skin, skinCatalog);
   sim.setPlayerHead(sim.playerId, hairStyle, beard, hairColor, faceColor, face);
   // Dev convenience: ?mech drops an offline session straight into the Combat Mech
   // cosmetic body holding a spread of class-usable weapons, to eyeball the held
@@ -3787,6 +3788,10 @@ let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
+// Whether the level-20 armored cosmetic body is the picked "chroma" (it sits on
+// the end of the chroma row and swaps the body rather than the atlas).
+let offlineArmored = false;
+let onlineArmored = false;
 // chosen head look for the offline character (face index + hairStyle + beard +
 // optional hair/face colour tints; undefined = the model's baked colour)
 let offlineFace = DEFAULT_HEAD_APPEARANCE.face;
@@ -3813,14 +3818,18 @@ function renderSkinPicker(
   rowId: string,
   cls: PlayerClass,
   current: number,
-  onPick: (i: number) => void,
+  onPick: (i: number, armored?: boolean) => void,
 ): void {
   const row = $(rowId) as HTMLElement | null;
   if (!row) return;
   row.innerHTML = '';
   const count = skinCount(`player_${cls}`);
+  // The level-20 armored body is offered as one more swatch on the end of the
+  // chroma row: same picker, one index past the last chroma.
+  const armoredIndex = count;
+  const armored = hasArmoredBody(cls);
   const picker = row.closest('.skin-picker') as HTMLElement | null;
-  if (count <= 1) {
+  if (count <= 1 && !armored) {
     // only the default exists, nothing to pick
     if (picker) picker.style.display = 'none';
     return;
@@ -3844,15 +3853,40 @@ function renderSkinPicker(
     swatches.push(b);
     row.appendChild(b);
   }
+  if (armored) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'skin-swatch skin-swatch-armored';
+    b.dataset.skin = String(armoredIndex);
+    b.setAttribute('aria-label', t('skinEvent.armoredAria'));
+    b.setAttribute('aria-pressed', 'false');
+    b.textContent = String(armoredIndex + 1);
+    swatches.push(b);
+    row.appendChild(b);
+  }
+  // Swapping to/from the armored body rebuilds the preview rig, so only do it on
+  // an actual body transition; chroma-only moves stay on the cheap setSkin path.
+  let showingArmored = false;
+  const show = (i: number): void => {
+    const wantArmored = armored && i === armoredIndex;
+    if (wantArmored !== showingArmored) {
+      showingArmored = wantArmored;
+      characterPreview?.setClass(cls, undefined, undefined, wantArmored ? 'armored' : 'class');
+    }
+    if (!wantArmored) characterPreview?.setSkin(i);
+  };
   // Live-preview the chroma on the avatar while hovering, commit on click, and
   // revert to the committed selection when the pointer leaves the whole row.
   // The revert is row-level, not per swatch, so hovering the swatch next to the
   // selected one previews instead of being clobbered (issue 1464); see
   // wireSkinPicker.
   wireSkinPicker(row, swatches, current, {
-    onPreview: (i) => characterPreview?.setSkin(i),
-    onRevert: (i) => characterPreview?.setSkin(i),
-    onPick,
+    onPreview: show,
+    onRevert: show,
+    onPick: (i) => {
+      show(i);
+      onPick(i, armored && i === armoredIndex);
+    },
   });
 }
 
@@ -3867,9 +3901,11 @@ function selectedSkin(rowId: string, fallback: number): number {
 function refreshOfflineSkins(cls: PlayerClass): void {
   offlineSkin = 0;
   characterPreview?.setSkin(0);
-  renderSkinPicker('#offline-skin-row', cls, 0, (i) => {
-    offlineSkin = i;
-    characterPreview?.setSkin(i);
+  offlineArmored = false;
+  renderSkinPicker('#offline-skin-row', cls, 0, (i, armored) => {
+    offlineArmored = !!armored;
+    // the armored swatch is not a chroma index; keep the last real chroma
+    if (!armored) offlineSkin = i;
   });
   // Head look: reset to this class's starting look (its per-class default merged
   // over the global default); the player can still pick any option in the picker.
@@ -3895,9 +3931,10 @@ function refreshOfflineSkins(cls: PlayerClass): void {
 function refreshOnlineSkins(cls: PlayerClass): void {
   onlineSkin = 0;
   characterPreview?.setSkin(0);
-  renderSkinPicker('#online-skin-row', cls, 0, (i) => {
-    onlineSkin = i;
-    characterPreview?.setSkin(i);
+  onlineArmored = false;
+  renderSkinPicker('#online-skin-row', cls, 0, (i, armored) => {
+    onlineArmored = !!armored;
+    if (!armored) onlineSkin = i;
   });
   const onlineHead = defaultHeadFor(cls);
   onlineFace = onlineHead.face;
@@ -7849,7 +7886,8 @@ function wireStartScreens(): void {
     void startOffline(
       cls,
       name,
-      selectedSkin('#offline-skin-row', offlineSkin),
+      // the armored swatch is not a chroma index, so keep the last real chroma
+      offlineArmored ? offlineSkin : selectedSkin('#offline-skin-row', offlineSkin),
       undefined,
       undefined,
       offlineHairStyle,
@@ -7857,6 +7895,7 @@ function wireStartScreens(): void {
       offlineHairColor,
       offlineFaceColor,
       offlineFace,
+      offlineArmored ? 'armored' : 'class',
     );
   };
 
@@ -8687,7 +8726,9 @@ function wireStartScreens(): void {
       await api.createCharacter(
         name,
         clsEl.dataset.class as PlayerClass,
-        selectedSkin('#online-skin-row', onlineSkin),
+        // the armored swatch is not a chroma index; the armored look is applied
+        // in-world from the character sheet until create-time persistence lands
+        onlineArmored ? onlineSkin : selectedSkin('#online-skin-row', onlineSkin),
         {
           hairStyle: onlineHairStyle,
           beard: onlineBeard,

@@ -50,6 +50,12 @@ describe('CharacterVisual swimming presentation', () => {
     // and swimBobTime = -dt lands the bob on phase 0 after update()'s += dt.
     state.swimBlend = 1;
     state.swimBobTime = -0.1;
+    // v0.32 added a ledge-climb pose that also feeds poseWrap; seed it inactive
+    // so its contribution is 0 (Object.create skips these field initializers).
+    state.climbOn = false;
+    state.climbBlend = 0;
+    state.climbPhase = 0;
+    state.climbTarget = null;
     state.model = model;
     state.weaponAuraMeshes = [aura];
     state.pendingDt = 0;

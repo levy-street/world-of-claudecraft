@@ -62,6 +62,15 @@ export function defaultHeadFor(cls: PlayerClass): {
   return { ...DEFAULT_HEAD_APPEARANCE, ...(CLASS_DEFAULT_HEAD[cls] ?? {}) };
 }
 
+/** The body model key for a class in a given cosmetic catalog. The level-20
+ *  'armored' look is a separate per-class body (like the Mech), so it resolves
+ *  to its own key; every other catalog uses the plain class body. Shared by the
+ *  preview and the appearance resolver so they can never disagree. */
+export function classVisualKey(cls: PlayerClass, catalog: 'class' | 'mech' | 'armored'): string {
+  if (catalog === 'mech') return 'player_mech';
+  return catalog === 'armored' ? `player_${cls}_armored` : `player_${cls}`;
+}
+
 /** The model key + held-weapon layout the appearance resolves to. */
 export interface PreviewVisual {
   visualKey: string;
@@ -76,9 +85,8 @@ export interface PreviewVisual {
  *  `player_<class>` with no override. Kept DOM/Three-free so it is unit-tested. */
 export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
   const mech = a.skinCatalog === 'mech';
-  const armored = a.skinCatalog === 'armored';
   return {
-    visualKey: mech ? 'player_mech' : armored ? `player_${a.cls}_armored` : `player_${a.cls}`,
+    visualKey: classVisualKey(a.cls, a.skinCatalog),
     weaponItemId: a.mainhandItemId ?? null,
     offhandItemId: a.offhandItemId ?? null,
     weaponOverride: mech ? mechHeldWeaponOverride(a.cls) : null,

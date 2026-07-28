@@ -13,12 +13,15 @@ describe('character appearance picker', () => {
       { kind: 'class', label: 3 },
       { kind: 'class', label: 4 },
       { kind: 'mech', label: 5 },
+      { kind: 'armored', label: 6 },
     ]);
     expect(options[4]).toMatchObject({
       kind: 'mech',
       skin: 0,
       chromaId: 'amber_crimson',
     });
+    // The level-20 armored look is always available, appended after the mech.
+    expect(options[5]).toMatchObject({ kind: 'armored', skin: 0 });
   });
 
   it('appends unlocked mech cosmetics after every class appearance set', () => {
@@ -43,6 +46,10 @@ describe('character appearance picker', () => {
     expect(activeCharacterAppearancePreview('paladin', 1, 'class')).toEqual({
       skin: 1,
       visualKey: 'player_paladin',
+    });
+    expect(activeCharacterAppearancePreview('shaman', 0, 'armored')).toEqual({
+      skin: 0,
+      visualKey: 'player_shaman_armored',
     });
   });
 });
