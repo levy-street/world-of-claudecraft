@@ -872,7 +872,13 @@ export const ja_JP: EnTranslations = {
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
-      "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。"
+      "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "その他（{count}）",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "近接攻撃"
     },
     "petFeed": {
       "disabledFullHp": "ペットは満タンの体力です",

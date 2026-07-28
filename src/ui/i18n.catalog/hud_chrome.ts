@@ -609,6 +609,15 @@ export const hudChromeStrings = {
     // segment closes itself a few seconds after the fight ends.
     autoShowHint:
       'Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends.',
+    // Hover breakdown for one bar: a header line, then one row per ability (or,
+    // on the threat tab, per contributor). A pet is not its own bar, so its
+    // abilities carry the pet's name.
+    breakdownSummary: '{tab}: {value}',
+    breakdownRow: '{value} ({percent})',
+    breakdownOther: 'Other ({count})',
+    percent: '{value}%',
+    petAbility: '{pet}: {ability}',
+    melee: 'Melee',
   },
   // Pet action bar disabled-state tooltips: the feed/heal-pet button stays
   // visible (never hidden) while it cannot currently be used, so a hunter

@@ -4227,6 +4227,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': '挥手',
   'hudChrome.emoteWheel.edit': '编辑',
   'hudChrome.emoteWheel.label': '表情',
+  'hudChrome.meters.breakdownOther': '其他（{count}）',
+  'hudChrome.meters.melee': '近战',
   'hudChrome.meters.minutesSeconds': '{m}分{s}秒',
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',

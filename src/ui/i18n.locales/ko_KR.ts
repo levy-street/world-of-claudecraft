@@ -4384,6 +4384,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': '손인사',
   'hudChrome.emoteWheel.edit': '편집',
   'hudChrome.emoteWheel.label': '감정 표현',
+  'hudChrome.meters.breakdownOther': '기타 ({count})',
+  'hudChrome.meters.melee': '근접 공격',
   'hudChrome.meters.minutesSeconds': '{m}분 {s}초',
   'hudChrome.meters.perSecond': '{value}/초',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',

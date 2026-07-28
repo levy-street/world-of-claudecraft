@@ -872,7 +872,13 @@ export const de_DE: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} Min. {s} Sek.",
       "seconds": "{s} Sek.",
-      "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende."
+      "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Begleiter hat volle Gesundheit",

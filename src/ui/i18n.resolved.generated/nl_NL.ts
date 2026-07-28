@@ -872,7 +872,13 @@ export const nl_NL: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Rijen verschijnen automatisch zodra je groep schade aanricht of geneest, en dit segment sluit een paar seconden na het einde van het gevecht."
+      "autoShowHint": "Rijen verschijnen automatisch zodra je groep schade aanricht of geneest, en dit segment sluit een paar seconden na het einde van het gevecht.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Huisdier heeft volledige gezondheid",

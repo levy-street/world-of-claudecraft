@@ -872,7 +872,13 @@ export const pt_BR: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}min {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "As linhas aparecem automaticamente quando seu grupo causa dano ou cura, e este painel fecha alguns segundos após o fim do combate."
+      "autoShowHint": "As linhas aparecem automaticamente quando seu grupo causa dano ou cura, e este painel fecha alguns segundos após o fim do combate.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "O mascote está com vida cheia",

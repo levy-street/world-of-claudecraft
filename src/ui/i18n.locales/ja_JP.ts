@@ -4402,6 +4402,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': '手を振る',
   'hudChrome.emoteWheel.edit': '編集',
   'hudChrome.emoteWheel.label': 'エモート',
+  'hudChrome.meters.breakdownOther': 'その他（{count}）',
+  'hudChrome.meters.melee': '近接攻撃',
   'hudChrome.meters.minutesSeconds': '{m}分{s}秒',
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',

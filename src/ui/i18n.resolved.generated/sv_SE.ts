@@ -872,7 +872,13 @@ export const sv_SE: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} m {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas."
+      "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Husdjuret har fulla livspunkter",
