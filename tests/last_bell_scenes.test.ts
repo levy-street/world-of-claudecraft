@@ -179,11 +179,10 @@ describe('the voyage cinematic', () => {
     sim.player.pos = { ...pos };
     sim.player.prevPos = { ...pos };
     sim.rebucket(sim.player);
-    const ferry = [...sim.entities.values()].find(
-      (e) => e.templateId === 'lb_ferry' && Math.abs(e.pos.x - x) < 12,
-    );
-    expect(ferry).toBeTruthy();
-    sim.player.targetId = ferry?.id ?? null;
+    const keeperId = x < 400 ? 'ferryman_ewald' : 'ferrykeeper_odda';
+    const gatekeeper = [...sim.entities.values()].find((e) => e.templateId === keeperId);
+    expect(gatekeeper).toBeTruthy();
+    sim.player.targetId = gatekeeper?.id ?? null;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, choiceId, 'pay')).toBe(true);
   }

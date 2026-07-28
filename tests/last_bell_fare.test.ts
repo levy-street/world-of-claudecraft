@@ -1,13 +1,17 @@
-// The ferry fare (H2) through the real Sim: boarding opens a PERSONAL fare
-// prompt (audience of one, keyed -pid), paying charges the purse and crosses,
-// declining (by answer, by walking away, or by timeout) leaves the rider on
-// the dock unchanged, a broke first-timer rides free exactly once, party
-// members pay individually (no leader-answers on the dock), the return leg
-// charges the same fare, and talking to either gangplank keeper opens the
-// same dialog the boarding fixture does.
+// The ferry fare (H2) through the real Sim: talking to a gangplank keeper
+// opens a PERSONAL fare prompt (audience of one, keyed -pid; the client's
+// gossip button drives talk + 'pay' in one click), paying charges the purse
+// and crosses, declining (by answer, by walking away, or by timeout) leaves
+// the rider on the dock unchanged, a broke first-timer rides free exactly
+// once, party members pay individually (no leader-answers on the dock), and
+// the return leg charges the same fare.
 import { describe, expect, it } from 'vitest';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
-import { FERRY_FARE_COPPER, tryLastBellInteract } from '../src/sim/last_bell/campaign';
+import {
+  FERRY_FARE_COPPER,
+  ferryFareOfferFor,
+  tryLastBellNpcTalk,
+} from '../src/sim/last_bell/campaign';
 import { answerSceneChoice } from '../src/sim/scenes/choices';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -29,25 +33,23 @@ function teleport(sim: Sim, x: number, z: number): void {
   sim.rebucket(sim.player);
 }
 
-function ferryAt(sim: Sim, boardingX: number): Entity | undefined {
-  return [...sim.entities.values()].find(
-    (e) => e.templateId === 'lb_ferry' && e.pos.x === boardingX,
-  );
+function keeper(sim: Sim, templateId: string): Entity | undefined {
+  return [...sim.entities.values()].find((e) => e.templateId === templateId);
 }
 
 function boardMainland(sim: Sim): void {
   teleport(sim, 238, -47.5);
-  const ferry = ferryAt(sim, MAINLAND_HARBOR.boarding.x);
-  expect(ferry).toBeTruthy();
-  sim.player.targetId = ferry?.id ?? null;
+  const ewald = keeper(sim, 'ferryman_ewald');
+  expect(ewald).toBeTruthy();
+  sim.player.targetId = ewald?.id ?? null;
   sim.interact();
 }
 
 function boardGullhaven(sim: Sim): void {
   teleport(sim, 727, 131);
-  const ferry = ferryAt(sim, GULLHAVEN_HARBOR.boarding.x);
-  expect(ferry).toBeTruthy();
-  sim.player.targetId = ferry?.id ?? null;
+  const odda = keeper(sim, 'ferrykeeper_odda');
+  expect(odda).toBeTruthy();
+  sim.player.targetId = odda?.id ?? null;
   sim.interact();
 }
 
@@ -143,13 +145,13 @@ describe('the ferry fare', () => {
     metaA.copper = 40;
     metaB.copper = 40;
     boardMainland(sim);
-    const ferry = ferryAt(sim, MAINLAND_HARBOR.boarding.x);
+    const ewald = keeper(sim, 'ferryman_ewald');
     const entB = sim.entities.get(b);
-    if (!ferry || !entB) return;
+    if (!ewald || !entB) return;
     entB.pos = { ...sim.player.pos };
     entB.prevPos = { ...sim.player.pos };
     sim.rebucket(entB);
-    tryLastBellInteract(sim.ctx, ferry, b);
+    expect(tryLastBellNpcTalk(sim.ctx, ewald, b)).toBe(true);
     // Two personal prompts, one per rider.
     expect(sim.ctx.activeChoices.get(-a)?.choiceId).toBe(OUT);
     expect(sim.ctx.activeChoices.get(-b)?.choiceId).toBe(OUT);
@@ -209,7 +211,17 @@ describe('the ferry fare', () => {
     expect(sim.player.pos.x).toBeGreaterThan(200);
   });
 
-  it('talking to either gangplank keeper opens the same fare dialog', () => {
+  it('talking to either gangplank keeper opens the fare; the offer map pins both', () => {
+    // The one source of truth the gossip button and the sim talk arm share.
+    expect(ferryFareOfferFor('ferryman_ewald')).toEqual({
+      choiceId: OUT,
+      promptKey: 'lb.fare.promptOut',
+    });
+    expect(ferryFareOfferFor('ferrykeeper_odda')).toEqual({
+      choiceId: BACK,
+      promptKey: 'lb.fare.promptBack',
+    });
+    expect(ferryFareOfferFor('sergeant_marsh')).toBeNull();
     const sim = makeSim();
     const ewald = [...sim.entities.values()].find((e) => e.templateId === 'ferryman_ewald');
     expect(ewald).toBeTruthy();

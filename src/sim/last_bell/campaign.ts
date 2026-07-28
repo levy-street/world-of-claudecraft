@@ -28,12 +28,28 @@ const VOYAGE_SCENE = 'scn_lb_q0_voyage';
 const DEPART_OUT_SCENE = 'scn_lb_ferry_depart_out';
 const DEPART_BACK_SCENE = 'scn_lb_ferry_depart_back';
 
-// The fare (H2): each rider pays their own passage at the dock dialog. Kept
-// low on purpose; the campaign is never money-gated at its front door (a
-// broke first-timer rides free, below).
+// The fare (H2): each rider pays their own passage through the keeper's
+// gossip button. Kept low on purpose; the campaign is never money-gated at
+// its front door (a broke first-timer rides free, below).
 export const FERRY_FARE_COPPER = 10;
-const FARE_CHOICE_OUT = 'ch_lb_ferry_fare_out';
-const FARE_CHOICE_BACK = 'ch_lb_ferry_fare_back';
+export const FARE_CHOICE_OUT = 'ch_lb_ferry_fare_out';
+export const FARE_CHOICE_BACK = 'ch_lb_ferry_fare_back';
+
+// The keepers' gossip fare option (owner spec: talk to the ferryman, press
+// the buy button, sail). One source of truth for BOTH the client button
+// (quest_dialog_controller renders promptKey with the price and answers the
+// choice) and the sim talk arm below.
+export function ferryFareOfferFor(
+  templateId: string | undefined,
+): { choiceId: string; promptKey: string } | null {
+  if (templateId === 'ferryman_ewald') {
+    return { choiceId: FARE_CHOICE_OUT, promptKey: 'lb.fare.promptOut' };
+  }
+  if (templateId === 'ferrykeeper_odda') {
+    return { choiceId: FARE_CHOICE_BACK, promptKey: 'lb.fare.promptBack' };
+  }
+  return null;
+}
 
 // The two ferry landings: the mainland harbor at the vale's east point and
 // the Gullhaven harbor. Boarding at one lands you at the other. The harbor
@@ -86,10 +102,11 @@ export function initLastBellCampaign(ctx: SimContext): void {
     const obj = createGroundObject(ctx.nextId++, '', def.name, ctx.groundPos(def.x, def.z));
     obj.templateId = def.templateId;
     obj.objectItemId = null;
-    // interaction.ts only considers ground objects with lootable=true, so the
-    // breach maw (pure scenery) is spawned non-lootable and can never be
-    // interacted with; tryLastBellInteract has no lb_breach_maw arm either.
-    obj.lootable = def.templateId !== 'lb_breach_maw';
+    // interaction.ts only considers ground objects with lootable=true. Only
+    // the scenario door is a device; the breach maw AND the ferry moorings
+    // are pure scenery (the fare runs through the keepers' gossip button,
+    // never a dockside fixture, per the owner's spec).
+    obj.lootable = def.templateId === 'lb_scenario_door';
     // The sim's object-respawn pass re-arms every non-lootable object once its
     // respawnTimer runs out, so park the breach's timer effectively forever
     // (finite on purpose: it stays JSON-safe wherever entities get serialized).
@@ -177,14 +194,9 @@ function offerFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
 }
 
 // Interaction arm (interaction.ts): true when the target was a Last Bell
-// fixture and the interact was consumed.
+// fixture and the interact was consumed. The ferry moorings are scenery
+// (non-lootable, never reach here); only the scenario door is a device.
 export function tryLastBellInteract(ctx: SimContext, target: Entity, pid: number): boolean {
-  if (target.templateId === 'lb_ferry') {
-    // The strait divides the world well east of the mainland harbor and well
-    // west of the island: x 400 splits the two gangplanks on any layout drift.
-    offerFare(ctx, target.pos.x < 400, pid);
-    return true;
-  }
   if (target.templateId === 'lb_scenario_door' && target.scenarioId !== undefined) {
     startScenario(ctx, target.scenarioId, pid);
     return true;
@@ -192,10 +204,14 @@ export function tryLastBellInteract(ctx: SimContext, target: Entity, pid: number
   return false;
 }
 
-// NPC-talk arm (interaction.ts): talking to a gangplank keeper opens the
-// same fare dialog the boarding fixture does.
+// NPC-talk arm (interaction.ts): an interact on a gangplank keeper opens the
+// personal fare choice. The client's gossip fare button drives this
+// (targetEntity + interact + answer 'pay'), so the flow is identical on
+// every host and the server keeps full authority over the charge.
 export function tryLastBellNpcTalk(ctx: SimContext, npc: Entity, pid: number): boolean {
-  if (npc.templateId !== 'ferryman_ewald' && npc.templateId !== 'ferrykeeper_odda') return false;
+  if (ferryFareOfferFor(npc.templateId) === null) return false;
+  // The strait divides the world well east of the mainland harbor and well
+  // west of the island: x 400 splits the two gangplanks on any layout drift.
   offerFare(ctx, npc.pos.x < 400, pid);
   return true;
 }

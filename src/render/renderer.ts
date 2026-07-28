@@ -4821,14 +4821,14 @@ export class Renderer {
       height = built.height;
       objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId === 'lb_ferry') {
-      // Last Bell boarding point: the harbor builder owns the ship and the
-      // boardwalk (src/render/harbor.ts), so the fixture keeps only its
-      // minimal mooring marker plus the sparkle and nameplate.
+      // Last Bell mooring marker: pure scenery since the fare moved into the
+      // gangplank keepers' gossip dialog (no sparkle; the keeper standing at
+      // the gangplank is the interaction affordance). The harbor builder
+      // owns the ship and the boardwalk (src/render/harbor.ts).
       const built = buildFerryMooring(e.id);
       body = built.group;
       height = built.height;
       objectMesh = body;
-      sparkle = this.attachInteractSparkle(group);
     } else if (e.kind === 'object' && e.templateId === 'lb_scenario_door') {
       // Last Bell scenario door: the stone doorframe marking the way in (the
       // building it belongs to lands later). Interactable, so it sparkles.

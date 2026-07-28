@@ -18,6 +18,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(true);
   });
@@ -38,6 +39,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(true);
   });
@@ -54,6 +56,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
   });
@@ -70,6 +73,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
   });
@@ -86,6 +90,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
     expect(
@@ -99,6 +104,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
     expect(
@@ -112,6 +118,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
     expect(
@@ -125,6 +132,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
     expect(
@@ -138,6 +146,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: true,
         hasCardMaster: false,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
     expect(
@@ -151,6 +160,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: true,
         hasTraining: false,
+        hasFerry: false,
       }),
     ).toBe(false);
     // Phase 9: a station master's Train option alone keeps the menu open.
@@ -165,6 +175,22 @@ describe('gossipMenuIsEmpty', () => {
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: true,
+        hasFerry: false,
+      }),
+    ).toBe(false);
+    // A Last Bell gangplank keeper's fare button alone keeps the menu open.
+    expect(
+      gossipMenuIsEmpty({
+        questCount: 0,
+        discussionCount: 0,
+        hasVendor: false,
+        hasMarket: false,
+        hasHeroicVendor: false,
+        hasDelveBoard: false,
+        hasVcup: false,
+        hasCardMaster: false,
+        hasTraining: false,
+        hasFerry: true,
       }),
     ).toBe(false);
   });

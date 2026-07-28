@@ -53,7 +53,9 @@ describe('Last Bell campaign fixtures', () => {
     );
     for (const ferry of ferries) {
       expect(ferry.name).toBe('The Farshore Ferry');
-      expect(ferry.lootable).toBe(true); // interactable
+      // Scenery: the fare lives on the gangplank keepers' gossip button, so
+      // the mooring marker itself is never interactable.
+      expect(ferry.lootable).toBe(false);
     }
 
     const doors = fixtures(sim, 'lb_scenario_door');
@@ -100,20 +102,29 @@ describe('Last Bell campaign fixtures', () => {
     expect(breach.dead).toBe(false);
   });
 
-  it('keeps the ferries interactable: boarding opens the fare and paying crosses', () => {
+  it('the keepers sell passage: talk, pay, cross (the moorings stay scenery)', () => {
     const sim = makeSim();
     const meta = sim.ctx.players.get(sim.playerId);
     expect(meta).toBeTruthy();
     if (!meta) return;
     meta.copper = 25;
+    // The mooring marker itself ignores interact, exactly like the breach.
     const mainlandFerry = fixtures(sim, 'lb_ferry').find(
       (f) => f.pos.x === MAINLAND_HARBOR.boarding.x,
     );
     expect(mainlandFerry).toBeTruthy();
     if (!mainlandFerry) return;
-
     teleport(sim, 238, -47.5);
     sim.player.targetId = mainlandFerry.id;
+    sim.interact();
+    expect(sim.ctx.activeChoices.size).toBe(0);
+    expect(sim.player.pos.x).toBeGreaterThan(200);
+
+    // Talking to Ewald opens the fare; paying crosses.
+    const ewald = [...sim.entities.values()].find((e) => e.templateId === 'ferryman_ewald');
+    expect(ewald).toBeTruthy();
+    if (!ewald) return;
+    sim.player.targetId = ewald.id;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_out', 'pay')).toBe(true);
     expect(meta.copper).toBe(15);
@@ -125,14 +136,12 @@ describe('Last Bell campaign fixtures', () => {
     ).toBeLessThan(3);
 
     // The arrival deck is at the harbor's land end; walking back out along
-    // the pier and aboard is part of the flow, so step onto the ship first.
+    // the pier to Odda is part of the flow, so step onto the ship first.
     teleport(sim, 727, 131);
-    const pierFerry = fixtures(sim, 'lb_ferry').find(
-      (f) => f.pos.x === GULLHAVEN_HARBOR.boarding.x,
-    );
-    expect(pierFerry).toBeTruthy();
-    if (!pierFerry) return;
-    sim.player.targetId = pierFerry.id;
+    const odda = [...sim.entities.values()].find((e) => e.templateId === 'ferrykeeper_odda');
+    expect(odda).toBeTruthy();
+    if (!odda) return;
+    sim.player.targetId = odda.id;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_back', 'pay')).toBe(true);
     expect(meta.copper).toBe(5);

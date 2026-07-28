@@ -374,3 +374,24 @@ sound: OWNER SIGN-OFF PENDING on the sample, and the departure camera
 yaws are authored blind (owner-walk polish expected). The arrival
 scene's harbor wide was re-framed to the v4 berth (the old frame missed
 the ship).
+
+### H2 v2: the fare moves into the keeper's gossip button (2026-07-28)
+
+Owner playtest verdict on H2 v1: talking to the ferryman showed his plain
+greeting dialog with nothing to click, because NPC talk is a CLIENT-side
+gossip dialog (quest_dialog_controller.open via click or the F key's
+nearby_interaction path) that never routes through sim interact(), where
+the fare arm lived. The owner's spec: talk to the dude, press the button,
+buy the fare, sail. v2: the keepers' gossip dialog gains a fare button
+(ferryFareOfferFor in last_bell/campaign.ts is the one source of truth
+for keeper -> choiceId + promptKey; the button labels itself with the
+existing lb.fare.prompt keys and the price), and clicking it drives
+targetEntity + interact + answerSceneChoice('pay'), so the tested
+sim-authoritative flow (charge, waiver, refusal, teleport, cinematic)
+runs unchanged on every host and the standalone choice window never
+paints (open and answer resolve in the same command batch). The ferry
+moorings became pure scenery (non-lootable, sparkle removed): the
+keeper at the gangplank is the interaction affordance, not a stick on
+the dock. Suites re-pinned to keeper talk; verify pass deferred to
+after the owner's session (tight-loop rule: no local runs while the
+owner tests).

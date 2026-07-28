@@ -49,16 +49,16 @@ describe('Q0 Ashore end to end', () => {
   it('plays the whole quest from the mainland dock to the recruitment', () => {
     const sim = makeSim();
 
-    // 1. Board the ferry on the mainland ship's deck: the fare dialog opens
-    // (H2), paying charges the purse and crosses, the quest auto-accepts,
-    // the crossing lands on Gullhaven's harbor deck, and the arrival scene
-    // starts for this player.
+    // 1. Talk to Ewald on the mainland ship's deck: the fare opens (H2, the
+    // gossip button drives the same talk + pay pair), paying charges the
+    // purse and crosses, the quest auto-accepts, the crossing lands on
+    // Gullhaven's harbor deck, and the arrival scene starts for this player.
     const meta = sim.ctx.players.get(sim.playerId);
     if (meta) meta.copper = 50;
     teleport(sim, 238, -47.5);
-    const ferry = findByName(sim, 'The Farshore Ferry');
-    expect(ferry).toBeTruthy();
-    sim.player.targetId = ferry?.id ?? null;
+    const ewald = findByName(sim, 'Ferryman Ewald');
+    expect(ewald).toBeTruthy();
+    sim.player.targetId = ewald?.id ?? null;
     sim.interact();
     // The dialog holds the dock until it resolves: no charge, no crossing yet.
     expect(sim.questLog.has(QUEST)).toBe(false);
@@ -167,8 +167,8 @@ describe('Q0 Ashore end to end', () => {
     const meta = sim.ctx.players.get(sim.playerId);
     if (meta) meta.copper = 30;
     teleport(sim, 238, -47.5);
-    const ferry = findByName(sim, 'The Farshore Ferry');
-    sim.player.targetId = ferry?.id ?? null;
+    const ewald = findByName(sim, 'Ferryman Ewald');
+    sim.player.targetId = ewald?.id ?? null;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_out', 'pay')).toBe(true);
     expect(sim.questLog.has(QUEST)).toBe(false);
@@ -181,11 +181,12 @@ describe('Q0 Ashore end to end', () => {
     expect(sceneEvents.length).toBeGreaterThan(0);
     expect(sceneEvents.every((e) => e.sceneId === 'scn_lb_ferry_depart_out')).toBe(true);
     expect(sceneEvents.some((e) => e.op.kind === 'line')).toBe(false);
-    // And boarding on the Gullhaven ship's deck (out past the pier head, a
-    // walk from the arrival deck at the harbor's land end) ferries back.
+    // And talking to Odda on the Gullhaven ship's deck (out past the pier
+    // head, a walk from the arrival deck at the harbor's land end) ferries
+    // back.
     teleport(sim, 727, 131);
-    const back = findByName(sim, 'The Farshore Ferry');
-    sim.player.targetId = back?.id ?? null;
+    const odda = findByName(sim, 'Ferrykeeper Odda');
+    sim.player.targetId = odda?.id ?? null;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_back', 'pay')).toBe(true);
     expect(sim.player.pos.x).toBeLessThan(200);
