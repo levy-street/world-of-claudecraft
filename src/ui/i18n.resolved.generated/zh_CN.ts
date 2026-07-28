@@ -3639,6 +3639,7 @@ export const zh_CN: EnTranslations = {
       "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
+      "orkadiaBody": "一座盘踞在德雷克兰黑色火山岩上的残暴兽人战营，开阔的战场由剧毒的绿色战火照亮。杀穿血牙兵卒与铁皮劫掠者，直取盘踞在头骨高台上的督军格罗莫克·碎颅者。",
       "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
@@ -10977,6 +10978,30 @@ export const zh_CN: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "深渊之主阿兹戈拉斯"
       },
+      "orkadia_grunt": {
+        "name": "血牙兵卒"
+      },
+      "orkadia_marauder": {
+        "name": "铁皮劫掠者"
+      },
+      "orkadia_axethrower": {
+        "name": "血牙掷斧手"
+      },
+      "orkadia_fel_shaman": {
+        "name": "灰骨邪能萨满"
+      },
+      "orkadia_beast_handler": {
+        "name": "铁皮战兽驯兽师"
+      },
+      "orkadia_siege_brute": {
+        "name": "奥卡迪亚攻城蛮兵"
+      },
+      "orkadia_banner_captain": {
+        "name": "黑旗队长"
+      },
+      "orkadia_warlord": {
+        "name": "督军格罗莫克·碎颅者"
+      },
       "wildheart_stalker": {
         "name": "藤爪潜猎者"
       },
@@ -14088,6 +14113,11 @@ export const zh_CN: EnTranslations = {
         "name": "尼思拉克西斯团队竞技场",
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
+      },
+      "orkadia": {
+        "name": "奥卡迪亚",
+        "enterText": "战火骤然泛起绿光。奥卡迪亚的战营已知你到来。",
+        "leaveText": "你杀出重围，回到德雷克兰灰烬弥漫的劲风之中。"
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",

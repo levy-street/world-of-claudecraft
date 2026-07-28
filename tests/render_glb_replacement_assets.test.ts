@@ -34,6 +34,7 @@ import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
+import { orkadiaPropsPreloadInternalsForTest } from '../src/render/orkadia_props';
 import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
@@ -682,6 +683,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('crafting station prop assets (Professions 2.0)', () => {
     for (const url of Object.values(stationsPreloadInternalsForTest.assetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('Orkadia war-camp prop assets', () => {
+    for (const url of Object.values(orkadiaPropsPreloadInternalsForTest.assetUrl)) {
       expectAssetExistsAndManifested(url);
     }
   });

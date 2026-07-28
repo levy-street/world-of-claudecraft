@@ -2352,10 +2352,10 @@ export class Sim {
     // their old instance is gone (or belongs to someone else) by now.
     let savedPos = savedState?.pos ?? null;
     // Delve must be checked BEFORE the dungeon branch: dungeonAt() returns null
-    // for any x >= ARENA_X_MIN (which includes the delve band), so the dungeon
-    // branch's `?? DUNGEON_LIST[0]` fallback would otherwise swallow a delve
-    // position and eject the player to a dungeon door instead of the board door
-    // (FR-1.6). The two bands are disjoint, so `else if` keeps dungeon handling intact.
+    // for any delve-band x (x >= DELVE_BAND_X_MIN), so the dungeon branch's
+    // `?? DUNGEON_LIST[0]` fallback would otherwise swallow a delve position and
+    // eject the player to a dungeon door instead of the board door (FR-1.6). The
+    // two bands are disjoint, so `else if` keeps dungeon handling intact.
     if (savedPos) {
       // saves from before the instance plane moved east (see data.ts)
       savedPos = migrateLegacyInstancePos(savedPos) ?? savedPos;

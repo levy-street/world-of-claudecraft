@@ -56,9 +56,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 221 deeds worth 2730 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(221);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2730);
+  it('ships exactly 223 deeds worth 2750 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(223);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2750);
   });
 
   it('ships the audited per-category counts', () => {
@@ -67,7 +67,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 50,
       combat: 10,
-      dungeon: 29,
+      dungeon: 31,
       delve: 13,
       chronicle: 24,
       collection: 28,
@@ -118,11 +118,20 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_perfect_specimen',
       'soc_first_salvage',
       'soc_salvage_50',
-      // The Wildheart Basin dungeon deeds append after the
+      // The Orkadia and Wildheart Basin dungeon deeds append after the
       // Professions 2.0 tail (the release base merge put that tail first).
+      'dgn_orkadia',
+      'dgn_orkadia_heroic',
       'dgn_wildheart_basin',
       'dgn_wildheart_basin_heroic',
     ]);
+    expect(DEEDS.dgn_orkadia.renown).toBe(10);
+    expect(DEEDS.dgn_orkadia_heroic.renown).toBe(10);
+    expect(DEEDS.dgn_orkadia.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'orkadia',
+      count: 1,
+    });
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin.trigger).toEqual({
@@ -327,9 +336,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // trigger or renown changed; prog_master_gatherer had only its English desc
   // reworded, which this digest deliberately does not cover.
   // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
-  // Wildheart Basin dungeon deed pair (2 new deeds); no shipped
+  // Orkadia and Wildheart Basin dungeon deed pairs (4 new deeds); no shipped
   // trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '7e6b910bfc0b7a9a4635d7df67ee6c22691edb583a8bb59355d8a5063568ee75';
+  const FROZEN_CATALOG_SHA256 = '225ebed7ddee51df2910226f9b4f5ffb0ac689151369d8c681502c917d7f90a5';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(

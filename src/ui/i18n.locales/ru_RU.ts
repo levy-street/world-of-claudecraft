@@ -4317,6 +4317,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.gravewyrm_sanctum.name': 'Святилище Могильного Вирма',
   'entities.dungeons.gravewyrm_sanctum.enterText': 'Воздух холодеет. Внизу дышит нечто огромное...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': 'Вы пошатываясь выходите на горный ветер.',
+  'entities.mobs.orkadia_grunt.name': 'Пехотинец Кровавого Клыка',
+  'entities.mobs.orkadia_marauder.name': 'Мародёр Железношкурый',
+  'entities.mobs.orkadia_axethrower.name': 'Метатель топоров Кровавого Клыка',
+  'entities.mobs.orkadia_fel_shaman.name': 'Шаман Пепельной Кости',
+  'entities.mobs.orkadia_beast_handler.name': 'Укротитель боевых зверей Железной Шкуры',
+  'entities.mobs.orkadia_siege_brute.name': 'Осадный громила Оркадии',
+  'entities.mobs.orkadia_banner_captain.name': 'Капитан Чёрного Знамени',
+  'entities.mobs.orkadia_warlord.name': 'Полководец Громмок Черепокол',
+  'entities.dungeons.orkadia.name': 'Оркадия',
+  'entities.dungeons.orkadia.enterText':
+    'Боевые костры вспыхивают зелёным. Военный лагерь Оркадии знает о вашем приходе.',
+  'entities.dungeons.orkadia.leaveText':
+    'Прорубаясь, вы выбираетесь обратно на пепельный ветер Дрейкленда.',
   'entities.dungeons.drowned_temple.name': 'Утонувший храм',
   'entities.dungeons.drowned_temple.enterText':
     'Ты проходишь сквозь лунные врата — воздух обращается в холодную воду и бледный свет, и пение смыкается над твоей головой.',
@@ -6133,6 +6146,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'Сброс инстансов',
   'guide.dungeonsPage.sanctumBody':
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
+  'guide.dungeonsPage.orkadiaBody':
+    'Жестокий орочий военный лагерь в чёрном вулканическом камне Дрейкленда: открытое поле, освещённое ядовито-зелёными боевыми кострами. Прорубитесь сквозь пехотинцев Кровавого Клыка и мародёров Железношкурых, чтобы добраться до полководца Громмока Черепокола на его помосте из черепов.',
   'guide.dungeonsPage.wildheartBody':
     'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду к Зулгару.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',

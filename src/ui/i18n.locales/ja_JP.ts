@@ -4289,6 +4289,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.gravewyrm_sanctum.enterText':
     '空気が冷たくなります。下で巨大な何かが息をしています...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': '山風の中へよろめき戻ります。',
+  'entities.mobs.orkadia_grunt.name': '血牙の兵卒',
+  'entities.mobs.orkadia_marauder.name': '鉄皮の略奪者',
+  'entities.mobs.orkadia_axethrower.name': '血牙の斧投げ',
+  'entities.mobs.orkadia_fel_shaman.name': '灰骨のフェルシャーマン',
+  'entities.mobs.orkadia_beast_handler.name': '鉄皮の戦獣使い',
+  'entities.mobs.orkadia_siege_brute.name': 'オルカディアの攻城兵',
+  'entities.mobs.orkadia_banner_captain.name': '黒旗の隊長',
+  'entities.mobs.orkadia_warlord.name': '軍団長グロモク・スカルクリーヴァー',
+  'entities.dungeons.orkadia.name': 'オルカディア',
+  'entities.dungeons.orkadia.enterText':
+    '戦火が緑に燃え上がる。オルカディアの戦営はお前の来訪を知った。',
+  'entities.dungeons.orkadia.leaveText':
+    '斬り開いて外へ出ると、ドレイクランドの灰混じりの風が吹きつけた。',
   'entities.dungeons.drowned_temple.name': '溺れし神殿',
   'entities.dungeons.drowned_temple.enterText':
     '月の門をくぐり抜けると——大気は冷たい水と蒼白の光に変わり、歌声が頭上で閉ざされていく。',
@@ -6066,6 +6079,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'インスタンスのリセット',
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
+  'guide.dungeonsPage.orkadiaBody':
+    'ドレイクランドの黒い火山岩に構えた残虐なオークの戦営。毒々しい緑の戦火が照らす開けた野原だ。血牙の兵卒と鉄皮の略奪者を斬り伏せ、髑髏の壇上に鎮座する軍団長グロモク・スカルクリーヴァーへと至れ。',
   'guide.dungeonsPage.wildheartBody':
     '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドでズルガーに挑め。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',

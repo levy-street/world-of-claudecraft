@@ -480,6 +480,10 @@ const YUMI_MAZE_SUN_INTENSITY = 1.2;
 const YUMI_MAZE_HEMI_INTENSITY = 0.42;
 const YUMI_MAZE_ENV_INTENSITY = 0.28;
 const YUMI_MAZE_RIM_BOOST = 1.7;
+const ORKADIA_SUN_INTENSITY = 1.35;
+const ORKADIA_HEMI_INTENSITY = 0.55;
+const ORKADIA_ENV_INTENSITY = 0.24;
+const ORKADIA_RIM_BOOST = 1.75;
 const WILDHEART_SUN_INTENSITY = 1.55;
 const WILDHEART_HEMI_INTENSITY = 0.68;
 const WILDHEART_ENV_INTENSITY = 0.32;
@@ -3514,8 +3518,11 @@ export class Renderer {
       this.updateKeyLight(pp);
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    // The dome rides the camera, so it also serves Wildheart's open-air field.
-    this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
+    // The dome rides the camera, so it also serves Orkadia's open-air field.
+    this.sky.visible =
+      this.fogState === 'outdoor' ||
+      this.fogState === 'orkadiaField' ||
+      this.fogState === 'wildheartField';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
@@ -5940,6 +5947,7 @@ export class Renderer {
     | 'underwater'
     | 'rift'
     | 'practice'
+    | 'orkadiaField'
     | 'wildheartField'
     | 'lastkeep' = 'outdoor';
 
@@ -6285,8 +6293,9 @@ export class Renderer {
       inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
-    // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
-    // sky dome and the daylight rig and only swaps in its own field haze.
+    // Orkadia is an OPEN-AIR war-camp, not a closed room: it keeps the sky dome
+    // and the daylight rig and only swaps in its own ashen field haze.
+    const inOrkadiaField = interior === 'orkadia';
     const inWildheartField = interior === 'wildheart';
     const inLastKeep = interior === 'lastkeep';
     const desired = inPractice
@@ -6299,15 +6308,17 @@ export class Renderer {
             ? 'temple'
             : inNythraxis
               ? 'nythraxis'
-              : inWildheartField
-                ? 'wildheartField'
-                : inLastKeep
-                  ? 'lastkeep'
-                  : inside
-                    ? 'dungeon'
-                    : camY < waterLevelAt(px, pz) - 0.05
-                      ? 'underwater'
-                      : 'outdoor';
+              : inOrkadiaField
+                ? 'orkadiaField'
+                : inWildheartField
+                  ? 'wildheartField'
+                  : inLastKeep
+                    ? 'lastkeep'
+                    : inside
+                      ? 'dungeon'
+                      : camY < waterLevelAt(px, pz) - 0.05
+                        ? 'underwater'
+                        : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -6355,6 +6366,13 @@ export class Renderer {
         fog.color.setHex(0x020106);
         fog.near = 20;
         fog.far = 80;
+      } else if (desired === 'orkadiaField') {
+        // A smoky volcanic basin under its own storm dome. The far edge stays
+        // readable while the mountain and rear fortress fall into green-grey
+        // atmospheric depth instead of exposing the overworld horizon.
+        fog.color.setHex(0x303831);
+        fog.near = 90;
+        fog.far = 350;
       } else if (desired === 'wildheartField') {
         // Sunlit humid depth keeps the full caldera readable while the rear
         // shrine and limestone shell settle into a warm green atmospheric veil.
@@ -6404,6 +6422,7 @@ export class Renderer {
       // The rim glow cranks up instead — silhouettes must split from the murk.
       if (!this.lowGfx) {
         const mazeNight = desired === 'yumiMaze';
+        const orkadiaStorm = desired === 'orkadiaField';
         const wildheartSun = desired === 'wildheartField';
         const keepHearth = desired === 'lastkeep';
         const underground =
@@ -6416,41 +6435,53 @@ export class Renderer {
         // of a cave at night stays night.
         this.sun.intensity = mazeNight
           ? YUMI_MAZE_SUN_INTENSITY
-          : wildheartSun
-            ? WILDHEART_SUN_INTENSITY
-            : keepHearth
-              ? LASTKEEP_SUN_INTENSITY
-              : underground
-                ? DUNGEON_SUN_INTENSITY
-                : SUN_INTENSITY * this.dnGrade.lightScale;
+          : orkadiaStorm
+            ? ORKADIA_SUN_INTENSITY
+            : wildheartSun
+              ? WILDHEART_SUN_INTENSITY
+              : keepHearth
+                ? LASTKEEP_SUN_INTENSITY
+                : underground
+                  ? DUNGEON_SUN_INTENSITY
+                  : SUN_INTENSITY * this.dnGrade.lightScale;
         this.hemi.intensity = mazeNight
           ? YUMI_MAZE_HEMI_INTENSITY
-          : wildheartSun
-            ? WILDHEART_HEMI_INTENSITY
-            : keepHearth
-              ? LASTKEEP_HEMI_INTENSITY
-              : underground
-                ? DUNGEON_HEMI_INTENSITY
-                : HEMI_INTENSITY * this.dnGrade.lightScale;
+          : orkadiaStorm
+            ? ORKADIA_HEMI_INTENSITY
+            : wildheartSun
+              ? WILDHEART_HEMI_INTENSITY
+              : keepHearth
+                ? LASTKEEP_HEMI_INTENSITY
+                : underground
+                  ? DUNGEON_HEMI_INTENSITY
+                  : HEMI_INTENSITY * this.dnGrade.lightScale;
         this.scene.environmentIntensity = mazeNight
           ? YUMI_MAZE_ENV_INTENSITY
-          : wildheartSun
-            ? WILDHEART_ENV_INTENSITY
-            : keepHearth
-              ? LASTKEEP_ENV_INTENSITY
-              : underground
-                ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.lightScale;
+          : orkadiaStorm
+            ? ORKADIA_ENV_INTENSITY
+            : wildheartSun
+              ? WILDHEART_ENV_INTENSITY
+              : keepHearth
+                ? LASTKEEP_ENV_INTENSITY
+                : underground
+                  ? DUNGEON_ENV_INTENSITY
+                  : this.envOutdoorIntensity * this.dnGrade.lightScale;
         sharedUniforms.uRimBoost.value = mazeNight
           ? YUMI_MAZE_RIM_BOOST
-          : wildheartSun
-            ? WILDHEART_RIM_BOOST
-            : keepHearth
-              ? LASTKEEP_RIM_BOOST
-              : underground
-                ? DUNGEON_RIM_BOOST
-                : 1;
-        if (wildheartSun) {
+          : orkadiaStorm
+            ? ORKADIA_RIM_BOOST
+            : wildheartSun
+              ? WILDHEART_RIM_BOOST
+              : keepHearth
+                ? LASTKEEP_RIM_BOOST
+                : underground
+                  ? DUNGEON_RIM_BOOST
+                  : 1;
+        if (orkadiaStorm) {
+          this.sun.color.setHex(0xa9b8a8);
+          this.hemi.color.setHex(0x899b9a);
+          this.hemi.groundColor.setHex(0x25281f);
+        } else if (wildheartSun) {
           this.sun.color.setHex(0xffd48c);
           this.hemi.color.setHex(0xd8ebca);
           this.hemi.groundColor.setHex(0x5b4a2d);
@@ -8015,8 +8046,11 @@ export class Renderer {
     worldStart = markWorldPhase('shadows', worldStart);
     // sky dome + sun disc ride along with the camera
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    // The dome rides the camera, so it also serves Wildheart's open-air field.
-    this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
+    // The dome rides the camera, so it also serves Orkadia's open-air field.
+    this.sky.visible =
+      this.fogState === 'outdoor' ||
+      this.fogState === 'orkadiaField' ||
+      this.fogState === 'wildheartField';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);

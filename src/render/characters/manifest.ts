@@ -230,7 +230,27 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
-// Tripo biped rig. These creatures come through the current biped
+// Tripo orc rig (Orkadia dungeon: black/blue/red orc GLBs). Ships Idle_Loop,
+// Walk_Loop, Sprint_Loop, Punch_Jab, Sword_Attack (Red also Sword_Idle). The
+// batch had no death or hit-react take, so `Death` (a hips-driven topple that
+// clamps flat) and `Hit` (a short spine/neck flinch) are synthesized onto the
+// shipped Mixamo skeleton by scripts/_add_orc_death_anim.mjs (the Stone Cantor
+// precedent, _add_cantor_hit_anim.mjs); re-run it if the GLBs are regenerated.
+// A real Tripo death retarget exists (scripts/reanim_orc_death.mjs artifacts
+// under tmp/asset_pipeline/reanim_orc_death_*_orc/), but it targets Tripo's
+// 41-joint biped rig (Hip/Waist/Pelvis/...) after a full re-rig, not the
+// shipped 22-joint mixamorig:* skeleton, scripts/graft_orc_death.mjs verifies
+// the mismatch and refuses to graft, so the synthesized clips remain.
+const ORC_TRIPO: ClipMap = {
+  idle: 'Idle_Loop',
+  walk: 'Walk_Loop',
+  run: 'Sprint_Loop',
+  attack: ['Sword_Attack', 'Punch_Jab'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
+// Orkadia specialist rig. These five creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
 const TRIPO_BIPED_FULL_RIG: ClipMap = {
   idle: 'Idle',
@@ -1069,6 +1089,66 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2, // skin washes pink fast
   },
+  // Orkadia orc war-camp (Tripo GLBs). Low tint strength so each orc keeps its
+  // own baked black/blue/red identity; the mob `color` only nudges it.
+  mob_orc_grunt: {
+    url: `${CREATURES}/black_orc.glb`,
+    height: 2.3,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_orc_marauder: {
+    url: `${CREATURES}/blue_orc.glb`,
+    height: 2.4,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_orc_warlord: {
+    url: `${CREATURES}/red_orc.glb`,
+    height: 2.6,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  // Five bespoke Orkadia specialists, kept effectively untinted so their
+  // authored armor, warpaint, fel runes, and rank silhouettes remain distinct.
+  mob_orkadia_axethrower: {
+    url: `${CREATURES}/orkadia_axethrower.glb`,
+    height: 2.4,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_fel_shaman: {
+    url: `${CREATURES}/orkadia_fel_shaman.glb`,
+    height: 2.4,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_beast_handler: {
+    url: `${CREATURES}/orkadia_beast_handler.glb`,
+    height: 2.5,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_siege_brute: {
+    url: `${CREATURES}/orkadia_siege_brute.glb`,
+    height: 2.9,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_orkadia_banner_captain: {
+    url: `${CREATURES}/orkadia_banner_captain.glb`,
+    height: 2.7,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.05,
+  },
   // Five Wildheart troll silhouettes use the same complete biped vocabulary,
   // but preserve their woven cloth, bone paint, feathers, and jungle palette.
   mob_wildheart_stalker: {
@@ -1578,6 +1658,15 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Orkadia orc war-camp: each orc template renders its own Tripo GLB.
+  orkadia_grunt: 'mob_orc_grunt',
+  orkadia_marauder: 'mob_orc_marauder',
+  orkadia_warlord: 'mob_orc_warlord',
+  orkadia_axethrower: 'mob_orkadia_axethrower',
+  orkadia_fel_shaman: 'mob_orkadia_fel_shaman',
+  orkadia_beast_handler: 'mob_orkadia_beast_handler',
+  orkadia_siege_brute: 'mob_orkadia_siege_brute',
+  orkadia_banner_captain: 'mob_orkadia_banner_captain',
   wildheart_stalker: 'mob_wildheart_stalker',
   wildheart_ravager: 'mob_wildheart_ravager',
   wildheart_hexcaller: 'mob_wildheart_hexcaller',

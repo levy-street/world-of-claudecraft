@@ -4123,6 +4123,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.gravewyrm_sanctum.name': '墓龍聖所',
   'entities.dungeons.gravewyrm_sanctum.enterText': '空氣變得冰冷。下方有龐然之物在呼吸...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': '你踉蹌回到山風之中。',
+  'entities.mobs.orkadia_grunt.name': '血牙兵卒',
+  'entities.mobs.orkadia_marauder.name': '鐵皮劫掠者',
+  'entities.mobs.orkadia_axethrower.name': '血牙擲斧手',
+  'entities.mobs.orkadia_fel_shaman.name': '灰骨邪能薩滿',
+  'entities.mobs.orkadia_beast_handler.name': '鐵皮戰獸馴獸師',
+  'entities.mobs.orkadia_siege_brute.name': '奧卡迪亞攻城蠻兵',
+  'entities.mobs.orkadia_banner_captain.name': '黑旗隊長',
+  'entities.mobs.orkadia_warlord.name': '督軍格羅莫克·碎顱者',
+  'entities.dungeons.orkadia.name': '奧卡迪亞',
+  'entities.dungeons.orkadia.enterText': '戰火驟然泛起綠光。奧卡迪亞的戰營已知你到來。',
+  'entities.dungeons.orkadia.leaveText': '你殺出重圍，回到德雷克蘭灰燼瀰漫的勁風之中。',
   'entities.dungeons.drowned_temple.name': '溺亡神殿',
   'entities.dungeons.drowned_temple.enterText':
     '你踏過月門——空氣化作冰冷的水與蒼白的光，歌聲在你頭頂之上闔攏。',
@@ -5826,6 +5837,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在隊伍仍持有已認領副本時切換難度，舊的認領會保留一段時間後自行清除。隊長也可以立即放棄它們：在自己的頭像選單中選擇「重置所有地城副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才能進行，且副本內不能有任何人（無論生死）留守，兩次重置之間還隔著一段短暫的冷卻。帶著錯誤的難度來到門口，遊戲會在開打之前直接提醒你。團隊副本永遠不會以這種方式重置；它遵循自己的鎖定規則。',
   'guide.dungeonsPage.resetTitle': '重置你的地城副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。',
+  'guide.dungeonsPage.orkadiaBody':
+    '一座盤踞在德雷克蘭黑色火山岩上的殘暴獸人戰營，開闊的戰場由劇毒的綠色戰火照亮。殺穿血牙兵卒與鐵皮劫掠者，直取盤踞在頭骨高台上的督軍格羅莫克·碎顱者。',
   'guide.dungeonsPage.wildheartBody':
     '一座被暖雨浸透的叢林火山口，兩條高起的獵徑環繞著碧色深潭。穿過獸巢與先祖遺跡，在儀式金字塔上迎戰祖爾加。',
   'guide.dungeonsPage.raidName': '最終團隊副本',

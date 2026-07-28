@@ -2217,6 +2217,24 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 50 },
   },
+  // Orkadia orc war-camp dungeon (Drakelands). Appended per the append-only
+  // DEED_ORDER contract; normal + heroic clear pair like every other dungeon.
+  dgn_orkadia: {
+    id: 'dgn_orkadia',
+    name: 'Warbreaker of Orkadia',
+    desc: 'Defeat Warlord Grommok Skullcleaver in Orkadia.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'orkadia', count: 1 },
+  },
+  dgn_orkadia_heroic: {
+    id: 'dgn_orkadia_heroic',
+    name: 'Heroic: Orkadia',
+    desc: 'Defeat Warlord Grommok Skullcleaver in Orkadia on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'orkadia', difficulty: 'heroic', count: 1 },
+  },
   // Wildheart Basin (Palmreach). New records stay at the append-only tail.
   dgn_wildheart_basin: {
     id: 'dgn_wildheart_basin',

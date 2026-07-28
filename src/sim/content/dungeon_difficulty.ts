@@ -207,6 +207,24 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     finalBossId: 'korzul_the_gravewyrm',
     marksPerParticipant: 1,
   },
+  // The Orkadia orc war-camp: a Drakelands five-man on the same retuned
+  // model as the Sanctum band (health doubled, 500-floor damage), Warlord
+  // Grommok as the final boss whose Warstomp/enrage kit the transform scales.
+  orkadia: {
+    id: 'orkadia',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 4.0,
+    // Solved at the war camp's weakest spawn-list mob (orkadia_fel_shaman,
+    // 439 post-mitigation at the Sanctum band's 15.5x): the camp's caster-
+    // heavy roster needs the ladder's own notch above hollow_crypt's melee.
+    damageMultiplier: 18,
+    // No Orkadia boss summons adds; kept at the half convention, inert.
+    addDamageMultiplier: 9,
+    armorMultiplier: 1.2,
+    finalBossId: 'orkadia_warlord',
+    marksPerParticipant: 1,
+  },
   // Palmreach's open-field five-man. The broad route and two rare elites use
   // the same level-22 Heroic pin as the other endgame leveling dungeons.
   wildheart_basin: {

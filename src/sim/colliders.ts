@@ -37,6 +37,7 @@ import {
 } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
+import { ORKADIA_FIELD_COLLIDER_SPECS, ORKADIA_FIELD_WALLS } from './orkadia_field';
 import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import { WILDHEART_FIELD_COLLIDER_SPECS, WILDHEART_FIELD_WALLS } from './wildheart_field';
@@ -476,6 +477,22 @@ const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
 // authoredColliders).
 const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT);
 
+// Orkadia is an OPEN FIELD, not a room kit: a perimeter enclosure (plain obbs
+// that pull the chase cam in like interior walls, so players cannot leave the
+// war-camp) plus one circle per placed prop, camGhost + cameraTopY following
+// the world-prop contract. Both halves derive from the SAME placement table
+// the renderer builds the field from (src/sim/orkadia_field.ts), so what you
+// see is what you collide with. The skull dais stays walkable (no collider),
+// matching the room-kit boss-dais contract.
+const ORKADIA_COLLIDERS: Collider[] = [
+  ...ORKADIA_FIELD_WALLS.map(
+    (w): Collider => ({ type: 'obb', x: w.x, z: w.z, hw: w.hw, hd: w.hd, rot: 0 }),
+  ),
+  ...ORKADIA_FIELD_COLLIDER_SPECS.map(
+    (s): Collider => ({ type: 'circle', x: s.x, z: s.z, r: s.r, cameraTopY: s.h, camGhost: true }),
+  ),
+];
+
 // Wildheart follows the same open-field contract, but its walkable bridges and
 // water ribbons are heightfield surfaces rather than blocking props.
 const WILDHEART_COLLIDERS: Collider[] = [
@@ -515,6 +532,7 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   sanctum: SANCTUM_COLLIDERS,
   temple: TEMPLE_COLLIDERS,
   nythraxis: NYTHRAXIS_COLLIDERS,
+  orkadia: ORKADIA_COLLIDERS,
   wildheart: WILDHEART_COLLIDERS,
   lastkeep: LASTKEEP_COLLIDERS,
 };

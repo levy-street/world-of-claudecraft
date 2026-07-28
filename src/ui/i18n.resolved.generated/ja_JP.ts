@@ -3639,6 +3639,7 @@ export const ja_JP: EnTranslations = {
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
+      "orkadiaBody": "ドレイクランドの黒い火山岩に構えた残虐なオークの戦営。毒々しい緑の戦火が照らす開けた野原だ。血牙の兵卒と鉄皮の略奪者を斬り伏せ、髑髏の壇上に鎮座する軍団長グロモク・スカルクリーヴァーへと至れ。",
       "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドでズルガーに挑め。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
@@ -10977,6 +10978,30 @@ export const ja_JP: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "奈落の王アズゴラス"
       },
+      "orkadia_grunt": {
+        "name": "血牙の兵卒"
+      },
+      "orkadia_marauder": {
+        "name": "鉄皮の略奪者"
+      },
+      "orkadia_axethrower": {
+        "name": "血牙の斧投げ"
+      },
+      "orkadia_fel_shaman": {
+        "name": "灰骨のフェルシャーマン"
+      },
+      "orkadia_beast_handler": {
+        "name": "鉄皮の戦獣使い"
+      },
+      "orkadia_siege_brute": {
+        "name": "オルカディアの攻城兵"
+      },
+      "orkadia_banner_captain": {
+        "name": "黒旗の隊長"
+      },
+      "orkadia_warlord": {
+        "name": "軍団長グロモク・スカルクリーヴァー"
+      },
       "wildheart_stalker": {
         "name": "蔦爪の追跡者"
       },
@@ -14088,6 +14113,11 @@ export const ja_JP: EnTranslations = {
         "name": "ナイスラクシスのレイドアリーナ",
         "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
+      },
+      "orkadia": {
+        "name": "オルカディア",
+        "enterText": "戦火が緑に燃え上がる。オルカディアの戦営はお前の来訪を知った。",
+        "leaveText": "斬り開いて外へ出ると、ドレイクランドの灰混じりの風が吹きつけた。"
       },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",

@@ -161,6 +161,24 @@ describe('character visual manifest', () => {
     ).toEqual([]);
   });
 
+  it('points the three Orkadia orcs at clips in their GLBs (including the synthesized Death/Hit)', async () => {
+    // The Tripo orc batch shipped no death or hit-react take; Death (a hips-driven
+    // topple that clamps flat) and Hit are synthesized onto the Mixamo skeleton by
+    // scripts/_add_orc_death_anim.mjs, so ORC_TRIPO can map death to a real 'Death'
+    // clip instead of aliasing the idle pose. Guard both the map and the assets.
+    for (const key of ['mob_orc_grunt', 'mob_orc_marauder', 'mob_orc_warlord'] as const) {
+      const visual = VISUALS[key];
+      expect(visual.clips.death, key).toBe('Death');
+      expect(visual.clips.hit, key).toEqual(['Hit']);
+      const animationNames = await glbAnimationNames(`public/${visual.url}`);
+      expect(animationNames.size, key).toBeGreaterThan(0);
+      expect(
+        [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+        key,
+      ).toEqual([]);
+    }
+  });
+
   it('points the training dummy manifest at clips present in the GLB, with cast/jump deliberately absent', async () => {
     const visual = VISUALS.mob_training_dummy;
     const animationNames = await glbAnimationNames(`public/${visual.url}`);
