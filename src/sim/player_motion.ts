@@ -141,7 +141,19 @@ export interface PlayerMotionDeps {
   ): void;
 }
 
-export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInput): void {
+export interface PlayerMotionOptions {
+  /** Scripted base speed in yards/second; normal movement uses RUN_SPEED. */
+  baseSpeed?: number;
+  /** Cap this tick's horizontal travel without bypassing the movement kernel. */
+  maxDistance?: number;
+}
+
+export function stepPlayerMotion(
+  deps: PlayerMotionDeps,
+  p: Entity,
+  inp: MoveInput,
+  options?: PlayerMotionOptions,
+): void {
   const stepStartX = p.pos.x;
   const stepStartZ = p.pos.z;
   // Convention: facing f points along (sin f, cos f); the camera sits behind
@@ -201,7 +213,10 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     const len = Math.hypot(mx, mz);
     mx /= len;
     mz /= len;
-    let speed = RUN_SPEED * deps.moveSpeedMult(p);
+    let speed = (options?.baseSpeed ?? RUN_SPEED) * deps.moveSpeedMult(p);
+    if (options?.maxDistance !== undefined) {
+      speed = Math.min(speed, options.maxDistance / DT);
+    }
     if (mz < 0) speed *= BACKPEDAL_MULT;
     if (swimming) speed *= SWIM_SPEED_MULT;
     // world = forward * mz + right * mx, with right = (-cos f, sin f)

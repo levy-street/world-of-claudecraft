@@ -82,7 +82,9 @@ export function sceneCameraActive(s: SceneDirectorState): boolean {
  * Apply one scene op to the director's state. Returns the music directive for
  * a music op (the impure wrapper routes it to the music engine), else null.
  * Presentation ops this director does not own (line/letterbox/fade/anim) are
- * the HUD overlay's and are ignored here.
+ * the HUD overlay's and are ignored here. playerWalk is also intentionally a
+ * no-op: the offline Sim or authoritative server moves the entity, and online
+ * clients observe that movement through normal entity snapshots.
  */
 export function applySceneOp(
   s: SceneDirectorState,

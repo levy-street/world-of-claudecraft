@@ -376,6 +376,11 @@ import type { ScenarioRun } from './scenarios/scenarios';
 import * as scenarioMod from './scenarios/scenarios';
 import type { ActiveChoice } from './scenes/choices';
 import * as choicesMod from './scenes/choices';
+import {
+  finishScriptedPlayerWalkStep,
+  prepareScriptedPlayerWalkStep,
+  type ScriptedPlayerWalk,
+} from './scenes/player_walk';
 import type { ScenePlayback } from './scenes/scenes';
 import * as scenesMod from './scenes/scenes';
 import { persistedResource } from './serialize_resource';
@@ -1667,6 +1672,9 @@ export class Sim {
   scenarioRuns = new Map<number, ScenarioRun>();
   // Last Bell scene playbacks, keyed by story-instance claim id (exitId).
   scenePlaybacks = new Map<number, ScenePlayback>();
+  // Last Bell scripted walks, keyed by player entity id. State stays here;
+  // src/sim/scenes/player_walk.ts owns mutations through the SimContext view.
+  scriptedPlayerWalks = new Map<number, ScriptedPlayerWalk>();
   // Last Bell active dialogue choices, keyed by claim id.
   activeChoices = new Map<number, ActiveChoice>();
   // delve instances (separate slot pool from dungeons)
@@ -2915,6 +2923,7 @@ export class Sim {
     // Both would self-clean on the next tick once the entity is gone; the
     // explicit delete keeps teardown hygienic with the rest of this cluster.
     this.ctx.scenePlaybacks.delete(-pid);
+    this.ctx.scriptedPlayerWalks.delete(pid);
     this.ctx.activeChoices.delete(-pid);
     this.preparePlayerLeave(pid);
     despawnMobsForDev(this.ctx, pid, 'spawned');
@@ -4002,6 +4011,9 @@ export class Sim {
       },
       get scenePlaybacks() {
         return sim.scenePlaybacks;
+      },
+      get scriptedPlayerWalks() {
+        return sim.scriptedPlayerWalks;
       },
       get activeChoices() {
         return sim.activeChoices;
@@ -5287,6 +5299,18 @@ export class Sim {
       mv.jump
     ) {
       meta.lastActiveTick = this.tickCount;
+    }
+    // Scene-authored locomotion supplies a forward intent to the SAME motion
+    // kernel as real input. It owns this player's step while active, so stale
+    // held input cannot perturb the authoritative walk.
+    const scriptedWalk = prepareScriptedPlayerWalkStep(this.ctx, p);
+    if (scriptedWalk) {
+      stepPlayerMotion(this.playerMotionDeps, p, scriptedWalk.input, {
+        baseSpeed: scriptedWalk.speed,
+        maxDistance: scriptedWalk.maxDistance,
+      });
+      finishScriptedPlayerWalkStep(this.ctx, p);
+      return;
     }
     // The race countdown is a real start lock, not just a client animation.
     // Hold every forced/manual locomotion mode until the authoritative GO tick.

@@ -408,6 +408,7 @@ function makeFakeHost() {
     squadRuns: new Map(),
     scenarioRuns: new Map(),
     scenePlaybacks: new Map(),
+    scriptedPlayerWalks: new Map(),
     activeChoices: new Map(),
     playScene: vi.fn(),
     enterRift: vi.fn(),
@@ -637,6 +638,7 @@ describe('Sim.ctx (real seam delegation)', () => {
     const sim = makeSim();
     expect(sim.ctx.rng).toBe(sim.rng);
     expect(sim.ctx.entities).toBe(sim.entities);
+    expect(sim.ctx.scriptedPlayerWalks).toBe(sim.scriptedPlayerWalks);
     expect(sim.ctx.time).toBe(sim.time);
     expect(sim.ctx.tickCount).toBe(sim.tickCount);
     sim.tick();

@@ -3602,6 +3602,10 @@ export type SceneWireOp =
   | { kind: 'inputLock'; on: boolean }
   | { kind: 'fade'; to: 'black' | 'clear'; dur: number }
   | { kind: 'music'; directive: string }
+  // Authoritative sim cue. Offline the local Sim walks the player; online the
+  // server walks it and entity snapshots mirror the changing position. Client
+  // scene routing intentionally treats this resolved endpoint as a no-op.
+  | { kind: 'playerWalk'; to: SceneRigPoint; speed: number }
   | { kind: 'anim'; entityId: number; anim: string }
   // A render-prop path segment: pure presentation, client-resolved by target
   // key plus the segment id in cue; the end op resets all active segments.

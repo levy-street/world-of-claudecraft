@@ -26,6 +26,7 @@ import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
 import type { ScenarioRun } from './scenarios/scenarios';
 import type { ActiveChoice } from './scenes/choices';
+import type { ScriptedPlayerWalk } from './scenes/player_walk';
 import type { ScenePlayback } from './scenes/scenes';
 import type {
   ArenaMatch,
@@ -195,6 +196,9 @@ export interface SimContextPrimitives {
   readonly scenarioRuns: Map<number, ScenarioRun>;
   // Last Bell scene playbacks keyed by claim id; owned by src/sim/scenes/.
   readonly scenePlaybacks: Map<number, ScenePlayback>;
+  // Active Last Bell player walks keyed by player entity id. State stays on
+  // Sim; src/sim/scenes/player_walk.ts owns every mutation.
+  readonly scriptedPlayerWalks: Map<number, ScriptedPlayerWalk>;
   // Last Bell active dialogue choices keyed by claim id (scenes/choices.ts).
   readonly activeChoices: Map<number, ActiveChoice>;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
@@ -1116,6 +1120,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get scenePlaybacks() {
       return host.scenePlaybacks;
+    },
+    get scriptedPlayerWalks() {
+      return host.scriptedPlayerWalks;
     },
     get activeChoices() {
       return host.activeChoices;

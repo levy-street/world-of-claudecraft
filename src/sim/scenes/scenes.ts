@@ -26,6 +26,13 @@
 import type { SimContext } from '../sim_context';
 import { setSquadDirective, squadActorEntity } from '../squad/squad';
 import type { Entity, SceneDollyLookAt, SceneRigPoint, SceneWireOp } from '../types';
+import {
+  clearScriptedPlayerWalks,
+  fastForwardScriptedPlayerWalks,
+  placePlayerAtWalkEndpoint,
+  resolvedPlayerWalkSpeed,
+  startScriptedPlayerWalk,
+} from './player_walk';
 
 // Authoring shapes: actor ids and instance-local coords; resolved to entity
 // ids and world coords at emit time.
@@ -87,6 +94,7 @@ export type SceneOpDef = { at: number } & (
   | { kind: 'inputLock'; on: boolean }
   | { kind: 'fade'; to: 'black' | 'clear'; dur: number }
   | { kind: 'music'; directive: string }
+  | { kind: 'playerWalk'; to: { x: number; z: number }; speed?: number }
   | { kind: 'actorMove'; actorId: string; x: number; z: number }
   | { kind: 'actorFace'; actorId: string; facing: number }
   | { kind: 'anim'; actorId: string; anim: string }
@@ -314,6 +322,21 @@ function resolveAndApply(
       return applyOnly ? null : { kind: 'fade', to: op.to, dur: op.dur };
     case 'music':
       return applyOnly ? null : { kind: 'music', directive: op.directive };
+    case 'playerWalk': {
+      const x = origin ? origin.x + op.to.x : op.to.x;
+      const z = origin ? origin.z + op.to.z : op.to.z;
+      const to = ctx.groundPos(x, z);
+      for (const player of participants(ctx, playback)) {
+        if (applyOnly) {
+          placePlayerAtWalkEndpoint(ctx, player, to);
+        } else {
+          startScriptedPlayerWalk(ctx, playback.claimId, player, to, op.speed);
+        }
+      }
+      return applyOnly
+        ? null
+        : { kind: 'playerWalk', to, speed: resolvedPlayerWalkSpeed(op.speed) };
+    }
     case 'actorMove': {
       // Authoritative: order the actor to the point (hold directive), so a
       // skipped scene leaves actors exactly where a watched one does.
@@ -345,6 +368,10 @@ function resolveAndApply(
 function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean): void {
   const def = SCENES[playback.sceneId];
   if (def && skipped) {
+    // An already-emitted playerWalk is no longer in the remaining-op loop, so
+    // settle its live state first. A later un-emitted playerWalk may then win
+    // in authoring order through the applyOnly arm below.
+    fastForwardScriptedPlayerWalks(ctx, playback.claimId);
     // Fast-forward the remaining authoritative ops so world state matches a
     // watched scene; presentation ops are dropped (the client tears down on
     // the end op).
@@ -352,6 +379,9 @@ function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean)
       if (!playback.emitted[i]) resolveAndApply(ctx, playback, def.ops[i], true);
     }
   }
+  // End is unconditional teardown. Natural completion leaves a too-short walk
+  // where normal movement reached; skip has already placed it at its endpoint.
+  clearScriptedPlayerWalks(ctx, playback.claimId);
   emitToAudience(ctx, playback, { kind: 'end' });
   ctx.scenePlaybacks.delete(playback.claimId);
 }
@@ -381,6 +411,7 @@ export function updateScenes(ctx: SimContext): void {
   for (const playback of [...ctx.scenePlaybacks.values()]) {
     const def = SCENES[playback.sceneId];
     if (!def) {
+      clearScriptedPlayerWalks(ctx, playback.claimId);
       ctx.scenePlaybacks.delete(playback.claimId);
       continue;
     }
@@ -392,6 +423,7 @@ export function updateScenes(ctx: SimContext): void {
         (i) => i.dungeonId === playback.dungeonId && i.exitId === playback.claimId,
       );
     if (!claimAlive) {
+      clearScriptedPlayerWalks(ctx, playback.claimId);
       ctx.scenePlaybacks.delete(playback.claimId);
       continue;
     }
