@@ -181,6 +181,7 @@ import {
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
+import { playSceneForPlayer, registeredSceneIds, sceneById } from './sim/scenes/scenes';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
@@ -3684,6 +3685,7 @@ async function startGame(
           controller,
           perf,
           gamepad,
+          scenes: { registeredSceneIds, sceneById, playSceneForPlayer },
           /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
           lockpickEngage: (objectId: number, ante: number) =>
             hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),

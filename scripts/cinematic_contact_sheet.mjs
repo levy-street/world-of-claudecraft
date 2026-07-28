@@ -16,7 +16,6 @@ const WORLD_BOOT_TIMEOUT_MS = 120_000;
 const SCENE_START_TIMEOUT_MS = 10_000;
 const POLL_MS = 250;
 const WORLD_SEED_FALLBACK = 20061;
-const END_FRAME_EPSILON_SEC = 0.1;
 
 function usage() {
   return [
@@ -65,25 +64,7 @@ function formatSeconds(seconds) {
 }
 
 function frameFileName(index, seconds) {
-  return `t${String(index).padStart(4, '0')}_${formatSeconds(seconds)}s.png`;
-}
-
-function addCapture(captures, time, reason) {
-  const milliseconds = Math.round(time * 1000);
-  const current = captures.get(milliseconds);
-  if (current) current.reasons.add(reason);
-  else captures.set(milliseconds, { time: milliseconds / 1000, reasons: new Set([reason]) });
-}
-
-function capturePlan(scene) {
-  const captures = new Map();
-  for (let time = 0; time < scene.duration; time += 2) {
-    addCapture(captures, time, '2 second cadence');
-  }
-  for (const time of scene.cameraCuts) addCapture(captures, time, 'camera cut');
-  addCapture(captures, scene.duration, 'scene end');
-  addCapture(captures, scene.duration + 1, 'HUD restored');
-  return [...captures.values()].sort((a, b) => a.time - b.time);
+  return `t${String(index).padStart(4, '0')}_${formatSeconds(seconds).replace('.', '_')}s.png`;
 }
 
 async function assertDevServer() {
@@ -159,6 +140,16 @@ async function bootOfflineWorld(page) {
     });
     if (ready) {
       await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const dismiss = document.querySelector('#gpu-notice .gpu-notice-dismiss');
+        if (
+          dismiss instanceof HTMLButtonElement &&
+          dismiss.getClientRects().length > 0 &&
+          getComputedStyle(dismiss).visibility !== 'hidden'
+        ) {
+          dismiss.click();
+        }
+      });
       await sleep(750);
       return;
     }
@@ -171,9 +162,9 @@ async function bootOfflineWorld(page) {
 
 async function readSceneRegistry(page) {
   return page.evaluate(async () => {
-    const scenes = await import('/src/sim/scenes/scenes.ts');
-    const harbors = await import('/src/sim/harbor_layout.ts');
     const game = window.__game;
+    const scenes = game.scenes ?? (await import('/src/sim/scenes/scenes.ts'));
+    const harbors = await import('/src/sim/harbor_layout.ts');
     const current = game.sim.player.pos;
     const pointKey = (point) => `${point.x.toFixed(3)}:${point.z.toFixed(3)}`;
 
@@ -213,15 +204,18 @@ async function readSceneRegistry(page) {
       }
 
       let stagePoint = firstCameraPoint ?? { x: current.x, z: current.z };
+      // Stage where the fare flow leaves the rider: the DESTINATION harbor's
+      // arrival point (ashore end), not its boarding deck; the scene's walk
+      // op is authored from there.
       if (harborShipTarget === 'harbor_ship_mainland') {
         stagePoint = {
-          x: harbors.GULLHAVEN_HARBOR.boarding.x,
-          z: harbors.GULLHAVEN_HARBOR.boarding.z,
+          x: harbors.GULLHAVEN_HARBOR.arrival.x,
+          z: harbors.GULLHAVEN_HARBOR.arrival.z,
         };
       } else if (harborShipTarget === 'harbor_ship_gullhaven') {
         stagePoint = {
-          x: harbors.MAINLAND_HARBOR.boarding.x,
-          z: harbors.MAINLAND_HARBOR.boarding.z,
+          x: harbors.MAINLAND_HARBOR.arrival.x,
+          z: harbors.MAINLAND_HARBOR.arrival.z,
         };
       }
       preparePoints.set(pointKey(stagePoint), stagePoint);
@@ -239,6 +233,16 @@ async function readSceneRegistry(page) {
 }
 
 async function stageScene(page, scene) {
+  // Warmup lap: dwell the live renderer at every capture location first, so
+  // chunk/prop generation happens NOW and not mid-scene. A cold zone under
+  // SwiftShader stalls frames for seconds, and the sim then repays the rAF
+  // backlog in one clock burst that can leap past the scene end.
+  for (const point of scene.preparePoints) {
+    await page.evaluate((p) => {
+      window.__game.sim.chat(`/dev tp ${p.x} ${p.z}`);
+    }, point);
+    await sleep(1200);
+  }
   await page.evaluate(async (metadata) => {
     const game = window.__game;
     game.sim.chat(`/dev tp ${metadata.stagePoint.x} ${metadata.stagePoint.z}`);
@@ -263,8 +267,12 @@ async function stageScene(page, scene) {
 
 async function startScene(page, scene) {
   const started = await page.evaluate(async (sceneId) => {
-    const scenes = await import('/src/sim/scenes/scenes.ts');
     const game = window.__game;
+    // The game-instance entry point avoids Vite's dual-module trap (a bare
+    // dynamic import gets a second, empty scene registry after HMR).
+    const scenes = game.scenes?.playSceneForPlayer
+      ? game.scenes
+      : await import('/src/sim/scenes/scenes.ts');
     document.body.classList.add('reduce-motion');
     return {
       ok: scenes.playSceneForPlayer(game.sim.ctx, game.sim.playerId, sceneId),
@@ -272,60 +280,7 @@ async function startScene(page, scene) {
     };
   }, scene.id);
   if (!started.ok) throw new Error(`Scene ${scene.id} refused to start.`);
-
-  await page.waitForFunction(
-    (sceneId) =>
-      document.body.classList.contains('cinematic-mode') &&
-      [...window.__game.sim.scenePlaybacks.values()].some(
-        (playback) => playback.sceneId === sceneId,
-      ),
-    { polling: 50, timeout: SCENE_START_TIMEOUT_MS },
-    scene.id,
-  );
-  if (scene.expectsLetterbox) {
-    await page.waitForFunction(
-      () =>
-        [...document.querySelectorAll('.scene-letterbox')].some((bar) =>
-          bar.classList.contains('on'),
-        ),
-      { polling: 50, timeout: SCENE_START_TIMEOUT_MS },
-    );
-  }
-  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
   return started.seed ?? WORLD_SEED_FALLBACK;
-}
-
-async function waitForSceneTime(page, scene, targetTime) {
-  // Sample the authored end just before teardown, then use the +1s frame to prove HUD restore.
-  const threshold =
-    targetTime === scene.duration
-      ? Math.max(0, scene.duration - END_FRAME_EPSILON_SEC)
-      : targetTime;
-  await page.waitForFunction(
-    ({ sceneId, thresholdSec }) => {
-      const sim = window.__game?.sim;
-      const playback = sim
-        ? [...sim.scenePlaybacks.values()].find((candidate) => candidate.sceneId === sceneId)
-        : null;
-      return playback ? sim.time - playback.startedAt >= thresholdSec : false;
-    },
-    { polling: 25, timeout: Math.max(10_000, (scene.duration + 5) * 1000) },
-    { sceneId: scene.id, thresholdSec: threshold },
-  );
-  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
-}
-
-async function waitForHudRestore(page, scene) {
-  await page.waitForFunction(
-    (sceneId) =>
-      !document.body.classList.contains('cinematic-mode') &&
-      ![...window.__game.sim.scenePlaybacks.values()].some(
-        (playback) => playback.sceneId === sceneId,
-      ),
-    { polling: 25, timeout: Math.max(10_000, (scene.duration + 5) * 1000) },
-    scene.id,
-  );
-  await sleep(1000);
 }
 
 async function takeFrame(page, filePath) {
@@ -389,26 +344,90 @@ ${cards}
 `;
 }
 
-async function captureScene(page, scene, outDir) {
+async function sceneClock(page, sceneId) {
+  return page.evaluate((id) => {
+    const sim = window.__game.sim;
+    const playback = [...sim.scenePlaybacks.values()].find((c) => c.sceneId === id);
+    return {
+      elapsed: playback ? sim.time - playback.startedAt : null,
+      cinematic: document.body.classList.contains('cinematic-mode'),
+    };
+  }, sceneId);
+}
+
+async function captureScene(browser, scene, outDir) {
   await mkdir(outDir, { recursive: true });
-  await stageScene(page, scene);
-  const plan = capturePlan(scene);
-  const seed = await startScene(page, scene);
-  const frames = [];
-
-  for (const [index, capture] of plan.entries()) {
-    if (capture.reasons.has('HUD restored')) await waitForHudRestore(page, scene);
-    else await waitForSceneTime(page, scene, capture.time);
-    const file = frameFileName(index, capture.time);
-    await takeFrame(page, path.join(outDir, file));
-    frames.push({ ...capture, file });
-    console.log(
-      `[${scene.id}] captured ${formatSeconds(capture.time)}s (${[...capture.reasons].join(', ')})`,
+  const page = await browser.newPage();
+  const pageErrors = [];
+  page.on('pageerror', (error) => {
+    pageErrors.push(error.message);
+    console.error(`[pageerror] ${String(error.message).slice(0, 400)}`);
+  });
+  try {
+    await bootOfflineWorld(page);
+    await stageScene(page, scene);
+    const seed = await startScene(page, scene);
+    await page.waitForFunction(
+      (sceneId) =>
+        [...window.__game.sim.scenePlaybacks.values()].some(
+          (playback) => playback.sceneId === sceneId,
+        ) && document.body.classList.contains('cinematic-mode'),
+      { polling: 50, timeout: SCENE_START_TIMEOUT_MS },
+      scene.id,
     );
-  }
 
-  await writeFile(path.join(outDir, 'index.html'), renderIndex(scene, seed, frames), 'utf8');
-  return { frameCount: frames.length, outDir, seed };
+    // Greedy sampling: under software rendering a screenshot costs one to two
+    // seconds of REAL scene time, so exact-time sampling is impossible (the
+    // game loop is rAF-driven; virtual time does not drive rAF). Every frame
+    // is instead labeled with the MEASURED scene clock read just before the
+    // shot, and each camera cut is attributed to the first frame at or after
+    // it. The natural cadence lands near the two-second review target.
+    const cuts = [...scene.cameraCuts].sort((left, right) => left - right);
+    const frames = [];
+    let previous = -1;
+    while (true) {
+      const state = await sceneClock(page, scene.id);
+      if (state.elapsed === null) break;
+      const reasons = [];
+      for (const cut of cuts) {
+        if (cut > previous && cut <= state.elapsed) reasons.push(`cut at ${formatSeconds(cut)}s`);
+      }
+      if (reasons.length === 0) reasons.push('cadence');
+      const file = frameFileName(frames.length, state.elapsed);
+      await takeFrame(page, path.join(outDir, file));
+      frames.push({ time: state.elapsed, reasons: new Set(reasons), file });
+      console.log(
+        `[${scene.id}] captured ${formatSeconds(state.elapsed)}s (${reasons.join(', ')})`,
+      );
+      previous = state.elapsed;
+      await sleep(150);
+    }
+
+    // The scene is over: prove the teardown, then the restored HUD.
+    const endFile = frameFileName(frames.length, scene.duration);
+    await takeFrame(page, path.join(outDir, endFile));
+    frames.push({ time: scene.duration, reasons: new Set(['after scene end']), file: endFile });
+    await page.waitForFunction(() => !document.body.classList.contains('cinematic-mode'), {
+      polling: 50,
+      timeout: 15_000,
+    });
+    await sleep(1000);
+    const hudFile = frameFileName(frames.length, scene.duration + 1);
+    await takeFrame(page, path.join(outDir, hudFile));
+    frames.push({
+      time: scene.duration + 1,
+      reasons: new Set(['HUD restored']),
+      file: hudFile,
+    });
+
+    if (pageErrors.length > 0) {
+      throw new Error(`Page errors observed: ${pageErrors.join(' | ')}`);
+    }
+    await writeFile(path.join(outDir, 'index.html'), renderIndex(scene, seed, frames), 'utf8');
+    return { frameCount: frames.length, outDir, seed };
+  } finally {
+    await page.close();
+  }
 }
 
 async function main() {
@@ -431,14 +450,19 @@ async function main() {
     ],
     defaultViewport: VIEWPORT,
   });
-  const page = await browser.newPage();
-  const pageErrors = [];
-  page.on('pageerror', (error) => pageErrors.push(error.message));
 
   try {
     console.log(`Opening ${GAME_URL}`);
-    await bootOfflineWorld(page);
-    const registry = await readSceneRegistry(page);
+    // One boot to read the registry; each capture then boots its own page so
+    // virtual-time state never leaks between scenes.
+    const registryPage = await browser.newPage();
+    let registry;
+    try {
+      await bootOfflineWorld(registryPage);
+      registry = await readSceneRegistry(registryPage);
+    } finally {
+      await registryPage.close();
+    }
     const selected = args.all ? registry : registry.filter((scene) => scene.id === args.scene);
     if (selected.length === 0) {
       throw new Error(
@@ -451,16 +475,13 @@ async function main() {
       const outDir = args.all
         ? path.join(args.out ?? DEFAULT_OUT_ROOT, scene.id)
         : (args.out ?? path.join(DEFAULT_OUT_ROOT, scene.id));
-      results.push(await captureScene(page, scene, outDir));
+      results.push(await captureScene(browser, scene, outDir));
     }
 
     for (const result of results) {
       console.log(
         `Wrote ${result.frameCount} frames and index.html to ${path.relative(REPO_ROOT, result.outDir) || '.'} (seed ${result.seed}).`,
       );
-    }
-    if (pageErrors.length > 0) {
-      console.warn(`Page errors observed: ${pageErrors.join(' | ')}`);
     }
   } finally {
     await browser.close();
