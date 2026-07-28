@@ -5,12 +5,13 @@
 // and target stay at the call site); the UI-purity guard (tests/architecture.test.ts) is the
 // registered enforcement, and this is the behavioral line of defense.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { type FctSpawnShape, fctSpawnShape } from '../src/ui/fct_event';
 
-describe('fctSpawnShape: damage avoidance (miss/dodge/resist)', () => {
-  it('miss/dodge/resist always float; isSelf tracks isPlayerTarget; never crit', () => {
-    for (const damageKind of ['miss', 'dodge', 'resist'] as const) {
+describe('fctSpawnShape: damage avoidance outcomes', () => {
+  it('miss/dodge/resist/parry always float; isSelf tracks isPlayerTarget; never crit', () => {
+    for (const damageKind of ['miss', 'dodge', 'resist', 'parry'] as const) {
       // player is the target -> isSelf true (the #bbb self colour token)
       expect(
         fctSpawnShape({
@@ -34,6 +35,54 @@ describe('fctSpawnShape: damage avoidance (miss/dodge/resist)', () => {
         }),
       ).toEqual<FctSpawnShape>({ kind: damageKind, isSelf: false, crit: false });
     }
+  });
+});
+
+describe('fctSpawnShape: partial block damage', () => {
+  it('keeps reduced numbers while preserving Classic ability and auto colors', () => {
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: true,
+        crit: true,
+        isPlayerSource: true,
+        isPlayerTarget: false,
+      }),
+    ).toEqual<FctSpawnShape>({ kind: 'block-done-ability', isSelf: false, crit: true });
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: false,
+        crit: false,
+        isPlayerSource: true,
+        isPlayerTarget: false,
+      }),
+    ).toEqual<FctSpawnShape>({ kind: 'block-done-auto', isSelf: false, crit: false });
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: false,
+        crit: false,
+        isPlayerSource: false,
+        isPlayerTarget: true,
+      }),
+    ).toEqual<FctSpawnShape>({ kind: 'block-taken', isSelf: true, crit: false });
+  });
+
+  it('floats nothing for a block between two non-player entities', () => {
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: false,
+        crit: false,
+        isPlayerSource: false,
+        isPlayerTarget: false,
+      }),
+    ).toBeNull();
   });
 });
 
@@ -153,5 +202,23 @@ describe('fctSpawnShape: determinism (same input -> same output)', () => {
       isPlayerTarget: false,
     } as const;
     expect(fctSpawnShape(src)).toEqual(fctSpawnShape(src));
+  });
+});
+
+describe('FCT production wiring', () => {
+  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+  const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+
+  it('passes v0.32 partial blocks through the block mapper instead of hardcoding hit', () => {
+    expect(hud).toMatch(/damageKind:\s*ev\.kind === 'block' \? 'block' : 'hit'/);
+    expect(hud).toMatch(/hitShape\.kind === 'block-done-ability'/);
+    expect(hud).toMatch(/hitShape\.kind === 'block-done-auto'/);
+    expect(hud).toMatch(/hitShape\.kind === 'block-taken'/);
+  });
+
+  it('applies the saved combat text style to the root presentation attribute', () => {
+    expect(main).toMatch(
+      /case 'combatTextStyle':[\s\S]{0,160}document\.documentElement\.dataset\.combatText\s*=\s*v >= 0\.5 \? 'enhanced' : 'classic'/,
+    );
   });
 });

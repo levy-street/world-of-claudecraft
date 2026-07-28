@@ -25,6 +25,10 @@ const HUD_MOBILE_CSS = readFileSync(
   fileURLToPath(new URL('../src/styles/hud.mobile.css', import.meta.url)),
   'utf8',
 );
+const TOKENS_CSS = readFileSync(
+  fileURLToPath(new URL('../src/styles/tokens.css', import.meta.url)),
+  'utf8',
+);
 
 // Pull the `translate: ... calc(-50% - Npx)` travel magnitude out of a named
 // @keyframes block's final (100% / to) step. Returns the px number.
@@ -130,5 +134,30 @@ describe('mobile FCT css (hud.mobile.css)', () => {
     expect(m, 'the low-fx mobile xp/rested-xp shed rule should exist').not.toBeNull();
     expect(m![1]).toMatch(/animation-name:\s*fct-rise-mobile/);
     expect(m![1]).not.toMatch(/fct-xp-pop-mobile/);
+  });
+});
+
+describe('Enhanced mobile FCT remains loud but phone-safe', () => {
+  it('uses the enhanced mobile base, crit, and avoidance sizes', () => {
+    expect(TOKENS_CSS).toContain('--font-size-fct-enhanced-mobile: 21px');
+    expect(TOKENS_CSS).toContain('--font-size-fct-enhanced-mobile-crit: 34px');
+    expect(HUD_MOBILE_CSS).toMatch(
+      /:root\[data-combat-text="enhanced"\]\s+body\.mobile-touch\s+\.fct\s*\{[^}]*font-size:\s*calc\(var\(--font-size-fct-enhanced-mobile\)\s*\*\s*var\(--fct-scale/,
+    );
+    expect(HUD_MOBILE_CSS).toMatch(
+      /:root\[data-combat-text="enhanced"\]\s+body\.mobile-touch\s+\.fct\.crit\s*\{[^}]*font-size:\s*calc\(var\(--font-size-fct-enhanced-mobile-crit\)\s*\*\s*var\(--fct-scale/,
+    );
+    expect(HUD_MOBILE_CSS).toMatch(
+      /\.fct-parry-self,[\s\S]*?font-size:\s*calc\(var\(--font-size-fct-enhanced-mobile\)\s*\*\s*var\(--fct-scale/,
+    );
+  });
+
+  it('uses dedicated phone-safe travel and makes low-tier crit static', () => {
+    expect(keyframeTravelPx(HUD_MOBILE_CSS, 'fct-enhanced-hit-mobile')).toBe(72);
+    expect(keyframeTravelPx(HUD_MOBILE_CSS, 'fct-enhanced-crit-mobile')).toBe(88);
+    expect(keyframeTravelPx(HUD_MOBILE_CSS, 'fct-enhanced-deflect-mobile')).toBe(66);
+    expect(HUD_MOBILE_CSS).toMatch(
+      /:root\[data-fx-level="low"\]\[data-combat-text="enhanced"\]\s+body\.mobile-touch\s+\.fct\.crit\s*\{[^}]*animation-name:\s*fct-static/,
+    );
   });
 });

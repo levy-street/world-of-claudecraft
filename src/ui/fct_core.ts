@@ -30,6 +30,10 @@ export type FctKind =
   | 'dodge'
   | 'resist'
   | 'damage-done-ability'
+  | 'parry'
+  | 'block-done-ability'
+  | 'block-done-auto'
+  | 'block-taken'
   | 'damage-done-auto'
   | 'damage-taken'
   | 'absorb'
@@ -49,6 +53,9 @@ export const DAMAGE_FCT_KINDS: ReadonlySet<FctKind> = new Set<FctKind>([
   'damage-done-ability',
   'damage-done-auto',
   'damage-taken',
+  'block-done-ability',
+  'block-done-auto',
+  'block-taken',
 ]);
 
 /** Whether `kind` is a combat-damage floater (a damage number, not a word/info floater). */
@@ -69,6 +76,11 @@ export type FctColorToken =
   | 'dodge-self'
   | 'dodge-other'
   | 'damage-done-ability'
+  | 'parry-self'
+  | 'parry-other'
+  | 'block-done-ability'
+  | 'block-done-auto'
+  | 'block-taken'
   | 'damage-done-auto'
   | 'damage-taken'
   | 'absorb'
@@ -103,9 +115,9 @@ export interface FctEvent {
   /** Crit -> the painter adds the 'crit' class (bigger font + the crit rise animation). */
   readonly crit: boolean;
   /**
-   * Whether the local player is the FCT target. Only the miss/dodge color depends on it
-   * (the live fct() uses #bbb when the player is the target, #fff otherwise); every other
-   * kind ignores it.
+   * Whether the local player is the FCT target. Miss, dodge, resist, and parry use it
+   * to choose their self-vs-other color token. Block variants encode their direction
+   * in the kind so Classic can preserve ability, auto, and taken colors.
    */
   readonly isSelf: boolean;
 }
@@ -167,6 +179,8 @@ function colorToken(kind: FctKind, isSelf: boolean): FctColorToken {
       // A resisted spell is an avoidance word like a miss; it reuses the miss colour token
       // (self grey / other white) so it needs no new CSS class.
       return isSelf ? 'miss-self' : 'miss-other';
+    case 'parry':
+      return isSelf ? 'parry-self' : 'parry-other';
     default:
       // Non-avoidance kinds are their own color token 1:1; isSelf never
       // changes their color in the live fct(), so it is ignored here.

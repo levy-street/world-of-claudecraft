@@ -8996,12 +8996,12 @@ export class Hud {
             }
             break;
           }
-          // A landed hit: the mapper resolves damage-done (player dealt to other) vs
-          // damage-taken (player took) vs null (a hit between two non-player entities, which
-          // floats nothing). The amount text + target entity stay at the call site.
+          // Landed damage: the mapper resolves damage-done (player dealt to other) vs
+          // damage-taken (player took), keeps partial blocks distinct, or returns null for
+          // damage between two non-player entities. Amount text + target stay at the call site.
           const hitShape = fctSpawnShape({
             type: 'damage',
-            damageKind: 'hit',
+            damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,
             crit: ev.crit,
             isPlayerSource,
@@ -9009,10 +9009,13 @@ export class Hud {
           });
           if (
             hitShape &&
-            (hitShape.kind === 'damage-done-ability' || hitShape.kind === 'damage-done-auto')
+            (hitShape.kind === 'damage-done-ability' ||
+              hitShape.kind === 'damage-done-auto' ||
+              hitShape.kind === 'block-done-ability' ||
+              hitShape.kind === 'block-done-auto')
           ) {
             this.fctPainter.spawn(
-              { ...hitShape, text: `${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+              { ...hitShape, text: `${formatNumber(ev.amount)}${ev.crit ? '!' : ''}`, target: tgt },
               now,
             );
             this.combatLog(
@@ -9027,8 +9030,14 @@ export class Hud {
             // see playEventSfx, which runs for every damage event above.
             // Fiesta: every blow you land kicks the camera (bigger on a crit).
             if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.3 : 0.12);
-          } else if (hitShape && hitShape.kind === 'damage-taken') {
-            this.fctPainter.spawn({ ...hitShape, text: `-${ev.amount}`, target: tgt }, now);
+          } else if (
+            hitShape &&
+            (hitShape.kind === 'damage-taken' || hitShape.kind === 'block-taken')
+          ) {
+            this.fctPainter.spawn(
+              { ...hitShape, text: `-${formatNumber(ev.amount)}`, target: tgt },
+              now,
+            );
             this.combatLog(
               t(ev.crit ? 'hud.combat.damageTakenCrit' : 'hud.combat.damageTaken', {
                 source: src ? entityDisplayName(src) : '?',
@@ -9057,7 +9066,10 @@ export class Hud {
               isPlayerTarget: ev.targetId === sim.playerId,
             });
             if (healed && shape)
-              this.fctPainter.spawn({ ...shape, text: `+${ev.amount}`, target: healed }, now);
+              this.fctPainter.spawn(
+                { ...shape, text: `+${formatNumber(ev.amount)}`, target: healed },
+                now,
+              );
           }
           break;
         }
@@ -9073,7 +9085,7 @@ export class Hud {
             this.fctPainter.spawn(
               {
                 ...xpShape,
-                text: t('hud.core.xpFloat', { amount: ev.amount }),
+                text: t('hud.core.xpFloat', { amount: formatNumber(ev.amount) }),
                 target: sim.player,
               },
               now,
@@ -9084,7 +9096,7 @@ export class Hud {
               this.fctPainter.spawn(
                 {
                   ...restedShape,
-                  text: t('hud.core.xpFloatRested', { amount: ev.rested }),
+                  text: t('hud.core.xpFloatRested', { amount: formatNumber(ev.rested) }),
                   target: sim.player,
                 },
                 now,
@@ -9953,7 +9965,11 @@ export class Hud {
             });
             if (shape)
               this.fctPainter.spawn(
-                { ...shape, text: `+${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+                {
+                  ...shape,
+                  text: `+${formatNumber(ev.amount)}${ev.crit ? '!' : ''}`,
+                  target: tgt,
+                },
                 now,
               );
             if (ev.sourceId === sim.playerId) {

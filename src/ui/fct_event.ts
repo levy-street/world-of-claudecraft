@@ -1,7 +1,7 @@
 // Pure discrimination for floating-combat-text spawns: the SimEvent -> FctEvent SHAPING
 // half of the FCT split. The hud.ts spawn sites assemble the { kind, isSelf, crit }
 // triple inline; this lifts that decision (which is the only non-trivial part: the damage
-// source/target priority, the ability vs auto split, the miss/dodge self-vs-other colour
+// source/target priority, the ability vs auto split, the avoidance self-vs-other colour
 // flag) into one deterministic, testable function. Host-agnostic and DOM/clock/i18n-free
 // (registered in UI_PURE_CORES): the localized text (the t() calls and the `${amount}` /
 // `-${amount}` / `+${amount}` fragments) and the resolved target entity STAY at the call
@@ -18,8 +18,8 @@ import type { FctKind } from './fct_core';
 export type FctSpawnSource =
   | {
       readonly type: 'damage';
-      /** The damage event's kind: an avoidance word (miss/dodge/parry/resist) or a landed hit. */
-      readonly damageKind: 'miss' | 'dodge' | 'parry' | 'resist' | 'hit';
+      /** The damage event's kind: an avoidance word, a partial block, or a landed hit. */
+      readonly damageKind: 'miss' | 'dodge' | 'resist' | 'parry' | 'block' | 'hit';
       /** Whether an ability fired (a landed hit splits damage-done into -ability vs -auto). */
       readonly ability: boolean;
       readonly crit: boolean;
@@ -43,37 +43,44 @@ export interface FctSpawnShape {
 
 /**
  * Resolve the FCT spawn shape for an event, or null when nothing floats. The only null case
- * is a landed hit where the local player is neither the source nor the target (a mob hitting
- * another mob): the live hud.ts site spawned no floater there, so the byte-faithful result is
- * null. Every other case always floats. Pure: same input always yields the same shape.
+ * is landed damage where the local player is neither the source nor the target (a mob hitting
+ * another mob): the live hud.ts site spawns no floater there, so the byte-faithful result is
+ * null. Avoidance words always float. Pure: same input always yields the same shape.
  */
 export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
   switch (src.type) {
     case 'damage': {
       // Avoidance words always float; self vs other only flips the colour token.
-      // Parry reuses the dodge colour token (its own word is spread on at the call site).
       if (
         src.damageKind === 'miss' ||
         src.damageKind === 'dodge' ||
-        src.damageKind === 'parry' ||
-        src.damageKind === 'resist'
+        src.damageKind === 'resist' ||
+        src.damageKind === 'parry'
       )
-        return {
-          kind: src.damageKind === 'parry' ? 'dodge' : src.damageKind,
-          isSelf: src.isPlayerTarget,
-          crit: false,
-        };
-      // A landed hit: the player dealing it (and not to itself) floats damage-done; the
-      // player taking it floats damage-taken; a hit between two non-player entities floats
-      // nothing (the live site's `if (isPlayerSource && !isPlayerTarget) ... else if
-      // (isPlayerTarget)` with no else).
+        return { kind: src.damageKind, isSelf: src.isPlayerTarget, crit: false };
+      // Landed damage: a partial block keeps its reduced amount but gets a distinct token;
+      // ordinary hits split damage-done by ability vs auto. A hit between two non-player
+      // entities floats nothing (the live site's `if (isPlayerSource && !isPlayerTarget) ...
+      // else if (isPlayerTarget)` with no else).
       if (src.isPlayerSource && !src.isPlayerTarget)
         return {
-          kind: src.ability ? 'damage-done-ability' : 'damage-done-auto',
+          kind:
+            src.damageKind === 'block'
+              ? src.ability
+                ? 'block-done-ability'
+                : 'block-done-auto'
+              : src.ability
+                ? 'damage-done-ability'
+                : 'damage-done-auto',
           isSelf: false,
           crit: src.crit,
         };
-      if (src.isPlayerTarget) return { kind: 'damage-taken', isSelf: true, crit: src.crit };
+      if (src.isPlayerTarget)
+        return {
+          kind: src.damageKind === 'block' ? 'block-taken' : 'damage-taken',
+          isSelf: true,
+          crit: src.crit,
+        };
       return null;
     }
     case 'absorb':

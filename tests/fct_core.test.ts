@@ -72,6 +72,13 @@ describe('describeFct: color token by kind + flags', () => {
     dodge: { self: 'dodge-self', other: 'dodge-other' },
     resist: { self: 'miss-self', other: 'miss-other' },
     'damage-done-ability': { self: 'damage-done-ability', other: 'damage-done-ability' },
+    parry: { self: 'parry-self', other: 'parry-other' },
+    'block-done-ability': {
+      self: 'block-done-ability',
+      other: 'block-done-ability',
+    },
+    'block-done-auto': { self: 'block-done-auto', other: 'block-done-auto' },
+    'block-taken': { self: 'block-taken', other: 'block-taken' },
     'damage-done-auto': { self: 'damage-done-auto', other: 'damage-done-auto' },
     'damage-taken': { self: 'damage-taken', other: 'damage-taken' },
     absorb: { self: 'absorb', other: 'absorb' },
@@ -93,12 +100,17 @@ describe('describeFct: color token by kind + flags', () => {
     }
   });
 
-  it('only miss/dodge/resist change color with isSelf; every other kind ignores it', () => {
+  it('only avoidance outcomes change color with isSelf; every other kind ignores it', () => {
     for (const kind of Object.keys(expected) as FctKind[]) {
       const selfToken = describeFct(makeEvent({ kind, isSelf: true }), 0.5).colorToken;
       const otherToken = describeFct(makeEvent({ kind, isSelf: false }), 0.5).colorToken;
       // resist reuses the miss token (self grey / other white), so it varies with isSelf too.
-      if (kind === 'miss' || kind === 'dodge' || kind === 'resist')
+      if (
+        kind === 'miss' ||
+        kind === 'dodge' ||
+        kind === 'resist' ||
+        kind === 'parry'
+      )
         expect(selfToken).not.toBe(otherToken);
       else expect(selfToken).toBe(otherToken);
     }
@@ -124,6 +136,11 @@ describe('describeFct: ttl is a pure function of kind (constant across kinds, ex
       'dodge',
       'damage-done-ability',
       'damage-done-auto',
+      'resist',
+      'parry',
+      'block-done-ability',
+      'block-done-auto',
+      'block-taken',
       'damage-taken',
       'absorb',
       'heal',
@@ -212,8 +229,11 @@ describe('describeFct: ClientWorld-vs-Sim parity', () => {
 });
 
 describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)', () => {
-  it('classifies exactly the three damage-number kinds as damage', () => {
+  it('classifies exactly the six damage-number kinds as damage', () => {
     expect([...DAMAGE_FCT_KINDS].sort()).toEqual([
+      'block-done-ability',
+      'block-done-auto',
+      'block-taken',
       'damage-done-ability',
       'damage-done-auto',
       'damage-taken',
@@ -228,6 +248,7 @@ describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)
       'miss',
       'dodge',
       'resist',
+      'parry',
       'absorb',
       'heal',
       'xp',
