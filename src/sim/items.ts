@@ -464,6 +464,15 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   if (!def) return;
+  // The active consume slot owns the identical-food refusal, even after the
+  // first activation consumed the player's last copy. Check it before inventory
+  // availability so reactivating that same item reports the action state rather
+  // than claiming the already-consumed copy is missing. A different food falls
+  // through and replaces p.eating after all ordinary use gates pass below.
+  if (def.kind === 'food' && p.eating?.itemId === itemId) {
+    ctx.error(meta.entityId, "You're already eating.");
+    return;
+  }
   if (ctx.countItem(itemId, meta.entityId) <= 0) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
@@ -512,7 +521,8 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     }
     ctx.removeItem(itemId, 1, meta.entityId);
     p.sitting = true;
-    // food and drink occupy separate slots, so you can do both at once
+    // Food and drink occupy separate slots, so both can run at once. Assigning
+    // here also makes a different item of the same kind replace the active one.
     const slot = def.kind === 'food' ? 'eating' : 'drinking';
     p[slot] = {
       itemId,

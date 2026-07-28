@@ -5,7 +5,13 @@ import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { type Entity, type ItemDef, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
+import {
+  CONSUME_DURATION,
+  type Entity,
+  type ItemDef,
+  POTION_COOLDOWN,
+  type SimEvent,
+} from '../src/sim/types';
 
 // Direct tests for the extracted inventory/vendor module (W2). They call the module
 // functions with the real SimContext the Sim built in its ctor (the same seam the thin
@@ -118,6 +124,48 @@ describe('items.useItem', () => {
     items.useItem(ctx, 'spring_water', pid);
     expect(p.drinking?.itemId).toBe('spring_water');
     expect(sim.countItem('spring_water', pid)).toBe(0);
+  });
+
+  it('rejects the same food while it is already being eaten without consuming or restarting it', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('conjured_bread3', 1, pid);
+
+    items.useItem(ctx, 'conjured_bread3', pid);
+    const activeEating = p.eating;
+    expect(activeEating).toBeTruthy();
+    if (!activeEating) throw new Error('expected eating state after using food');
+    activeEating.remaining -= 2;
+    sim.drainEvents();
+
+    items.useItem(ctx, 'conjured_bread3', pid);
+
+    expect(p.eating).toBe(activeEating);
+    expect(p.eating?.remaining).toBe(CONSUME_DURATION - 2);
+    expect(sim.countItem('conjured_bread3', pid)).toBe(0);
+    expect(errorTexts(sim.drainEvents())).toContain("You're already eating.");
+  });
+
+  it('replaces the active food when a different food is used', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('baked_bread', 1, pid);
+    sim.addItem('conjured_bread3', 1, pid);
+
+    items.useItem(ctx, 'baked_bread', pid);
+    const previousEating = p.eating;
+    sim.drainEvents();
+
+    items.useItem(ctx, 'conjured_bread3', pid);
+
+    expect(p.eating).not.toBe(previousEating);
+    expect(p.eating?.itemId).toBe('conjured_bread3');
+    expect(p.eating?.remaining).toBe(CONSUME_DURATION);
+    expect(sim.countItem('baked_bread', pid)).toBe(0);
+    expect(sim.countItem('conjured_bread3', pid)).toBe(0);
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
   });
 
   it('sitting down to eat/drink emits an immediate sound-only heal (source + sfxTick), before any regen tick', () => {
