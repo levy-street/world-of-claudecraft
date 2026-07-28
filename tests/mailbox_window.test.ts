@@ -144,10 +144,14 @@ describe('mailbox_window: parcel quantity stepper (#1444, PR #1695 review)', () 
     expect(painter).toMatch(/name\.tabIndex = 0/);
   });
 
-  it('rebuilding the parcel list restores focus to the equivalent control by item + role', () => {
-    expect(painter).toContain('focusKey');
+  it('keys every parcel control by item + role, so a rebuild can refocus the equivalent', () => {
+    // Titled for what it checks: that the KEYS are written, in the shape the ladder
+    // splits on. Where focus actually LANDS is behavioral and lives in
+    // tests/mailbox_window_focus.test.ts; this file only reads source text.
     expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:minus`/);
     expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:plus`/);
+    // The qty input was missing from this list, and it is the rung the ladder prefers.
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:qty`/);
     expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:remove`/);
   });
 });

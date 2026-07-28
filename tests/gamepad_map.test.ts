@@ -75,8 +75,12 @@ describe('stickToMoveFlags', () => {
 });
 
 describe('stickToLook', () => {
-  it('returns zero inside the deadzone', () => {
-    expect(stickToLook(0.1, 0.1, 0.2, 2, false, 0.016)).toEqual({ yaw: 0, pitch: 0 });
+  it('returns zero and inactive inside the deadzone', () => {
+    expect(stickToLook(0.1, 0.1, 0.2, 2, false, 0.016)).toEqual({
+      yaw: 0,
+      pitch: 0,
+      active: false,
+    });
   });
 
   it('turns right (negative yaw delta) when pushed right and scales with dt', () => {
@@ -90,6 +94,20 @@ describe('stickToLook', () => {
     const normal = stickToLook(0, -1, 0.2, 2, false, 0.016);
     const inverted = stickToLook(0, -1, 0.2, 2, true, 0.016);
     expect(Math.sign(normal.pitch)).toBe(-Math.sign(inverted.pitch));
+  });
+
+  it('reports active whenever the stick clears the deadzone, even if the scaled delta is zero', () => {
+    // A deflected stick with dt === 0 (a stalled/zero-length frame) would
+    // otherwise compute yaw = pitch = 0 and be indistinguishable from a
+    // centered stick; `active` is derived from the raw deflection instead, so
+    // a "look active" consumer (Input.setGamepadLookActive) never misses a
+    // frame where the player is genuinely holding the stick over.
+    const zeroDt = stickToLook(1, 0, 0.2, 2, false, 0);
+    expect(zeroDt.yaw).toBeCloseTo(0, 10);
+    expect(zeroDt.active).toBe(true);
+
+    expect(stickToLook(1, 0, 0.2, 2, false, 0.016).active).toBe(true);
+    expect(stickToLook(0, 0, 0.2, 2, false, 0.016).active).toBe(false);
   });
 
   it('pushing the stick up (y < 0) with invertY off looks up, matching mouse/touch (negative pitch delta)', () => {

@@ -5533,6 +5533,7 @@ export const fr_CA: EnTranslations = {
     },
     "augment": {
       "choose": "Choisissez une augmentation",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalité",
         "desc": "Vos frappes physiques cognent 15% plus fort."

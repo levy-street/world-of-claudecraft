@@ -23,7 +23,7 @@
 // touches the shared sim stream, so existing golden traces stay byte-identical.
 
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
-import { MOBS, YUMI_MAZE_SLOT_COUNT, yumiMazeOrigin } from '../data';
+import { DUNGEON_X_THRESHOLD, MOBS, YUMI_MAZE_SLOT_COUNT, yumiMazeOrigin } from '../data';
 import { createMob } from '../entity';
 import { Rng } from '../rng';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools } from '../sim';
@@ -105,7 +105,10 @@ export function pruneYumiQueue(ctx: SimContext, fmt: YumiFormat): void {
   const keep = (unit: ArenaQueueUnit) =>
     unit.pids.every((id) => {
       const e = ctx.entities.get(id);
-      return !!e && !e.dead && !ctx.arenaMatches.has(id);
+      // Drop the whole unit if any member walked into a dungeon/instance while
+      // queued: the bout would return them inside fully restored (issue #1600).
+      // Same x-band test the sibling 1v1/2v2/fiesta arena prune paths use.
+      return !!e && !e.dead && !ctx.arenaMatches.has(id) && e.pos.x <= DUNGEON_X_THRESHOLD;
     });
   if (fmt === 'yumi3') ctx.arenaQueueYumi3 = ctx.arenaQueueYumi3.filter(keep);
   else ctx.arenaQueueYumi5 = ctx.arenaQueueYumi5.filter(keep);

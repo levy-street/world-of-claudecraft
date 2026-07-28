@@ -3078,6 +3078,7 @@ export type TranslationKeyFlat =
   | 'fiesta.augment.aug_vampirism.name'
   | 'fiesta.augment.aug_warlords_might.desc'
   | 'fiesta.augment.aug_warlords_might.name'
+  | 'fiesta.augment.cardAria'
   | 'fiesta.augment.choose'
   | 'fiesta.banner.augmentGained'
   | 'fiesta.banner.powerup'

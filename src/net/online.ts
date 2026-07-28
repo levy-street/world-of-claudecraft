@@ -1090,8 +1090,11 @@ const ACTION_BAR_SAVE_DEBOUNCE_MS = 1500;
 // schedule reaches the cap, so across 40 attempts the total runs from roughly
 // 4.6 minutes (every draw at the floor) to 9.4 minutes (every draw at the
 // ceiling), with an expected total near 8 minutes, before giving up for good.
-const RECONNECT_BASE_DELAY_MS = 1_000;
-const RECONNECT_MAX_DELAY_MS = 15_000;
+// Exported for the reconnect-overlay show-grace pin (tests/reconnect_overlay
+// .test.ts): the grace must clear attempt 1's full jitter band, and a band
+// widened here without that pin would quietly reintroduce the veil blink.
+export const RECONNECT_BASE_DELAY_MS = 1_000;
+export const RECONNECT_MAX_DELAY_MS = 15_000;
 const RECONNECT_MAX_ATTEMPTS = 40;
 // A pre-layout-gate server accepts only `t:'auth'`, so it rejects our current
 // discriminator with this otherwise-generic literal. During a handshake only,

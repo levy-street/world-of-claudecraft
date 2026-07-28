@@ -52,6 +52,7 @@ import {
 } from '../src/sim/party_frame_info';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
+import { RAID_MAX } from '../src/sim/social/party';
 import type { VcMatch } from '../src/sim/social/vale_cup';
 import {
   parseTalentAllocation,
@@ -4624,6 +4625,17 @@ export class GameServer {
           typeof msg.rollId === 'number' &&
           Array.isArray(msg.pids) &&
           msg.pids.length > 0 &&
+          // A curate-phase roll's candidates are the tapping group's loot-eligible
+          // members, so a full raid roster is the most an honest client can check
+          // (#2524). Over cap the frame is rejected outright, the way the other
+          // capped cases here reject theirs, rather than truncated to a selection
+          // the master looter never made. Tested BEFORE the element scan so the
+          // per-element work is bounded too; the Sim re-validates every pid.
+          // Never tighten this below the honest ceiling: the reject path is
+          // silent, so a cap a real roster can exceed would not fail visibly, it
+          // would livelock the looter against the #2526 regrace (the row clears,
+          // returns after the grace, and re-sending is dropped again).
+          msg.pids.length <= RAID_MAX &&
           msg.pids.every((p: unknown) => typeof p === 'number')
         )
           sim.assignMasterLoot(msg.rollId, msg.pids, pid);

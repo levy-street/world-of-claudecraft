@@ -7,6 +7,7 @@
 import { MAX_FOCUS_TIER_BONUS, POINTS_PER_TIER_BONUS } from '../sim/professions/focus';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import type { TownFocusView } from './town_focus_view';
 import { svgIcon } from './ui_icons';
@@ -36,17 +37,13 @@ export function renderTownFocusWindow(
   // is the other half (#2500). A step click rebuilds the whole panel, which
   // would otherwise drop keyboard focus to <body> and leave a keyboard player
   // unable to press + a second time. Remember which control had it (by
-  // component + role) so the rebuilt equivalent can reclaim it below, the
-  // mailbox_window parcel-stepper idiom.
-  // `instanceof` rather than a cast: activeElement is typed Element, and the
-  // dataset read below is only sound on an HTMLElement (focus_manager.ts
-  // narrows the same way). The containment check is load-bearing, not
-  // defensive: mailbox_window keys its parcel steppers with the SAME
-  // data-focus-key attribute in the same shape, so an unguarded read would let
-  // a slow-band repaint here pull focus out of another open window.
-  const active = document.activeElement;
-  const focusKey =
-    active instanceof HTMLElement && el.contains(active) ? (active.dataset.focusKey ?? null) : null;
+  // component + role) so the rebuilt equivalent can reclaim it below.
+  // The shared helper (#2528) owns the narrowing and, importantly, the
+  // containment check, which is load-bearing rather than defensive here:
+  // mailbox_window keys its parcel steppers with the SAME data-focus-key
+  // attribute in the same shape, so an unguarded read would let a slow-band
+  // repaint here pull focus out of another open window.
+  const focusKey = captureFocusKey(el);
   // Dialog semantics for the trapped root (#2525). Hud installs the Tab trap and
   // the return-to-opener through windowFocus('#town-focus-window'); a trapped
   // window also has to ANNOUNCE itself, or a screen-reader user is cycling inside
@@ -160,28 +157,29 @@ export function renderTownFocusWindow(
   close?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';
   el.scrollTop = scrollTop;
-  // Scroll FIRST, then focus, and deliberately WITHOUT { preventScroll: true }.
-  // `focus()` scrolls its target into view, so this order lets a degraded
+  // Scroll FIRST, then focus. `focus()` scrolls its target into view (the
+  // helper calls it bare, and states why there), so this order lets a degraded
   // target (Save or Close, when the control the player was on came back
   // disabled) win over the restored offset. That is the wanted outcome: focus
   // must be visible (WCAG 2.4.11), and the common case cannot conflict, since
   // the control being refocused is the one the player was already looking at,
-  // so it is in view and `focus()` scrolls nothing. Reversing the two, or
-  // passing preventScroll, would trade a visible focus ring for an offset the
-  // player can no longer see the focus in.
+  // so it is in view and `focus()` scrolls nothing. Reversing the two would
+  // trade a visible focus ring for an offset the player can no longer see the
+  // focus in.
   if (focusKey !== null) restoreFocus(focusKey, steppers, save, close);
 }
 
 /**
- * Hand focus back to the rebuilt equivalent of the control that had it.
+ * Resolve the rebuilt equivalent of the control that had focus and hand it back.
  *
- * The control the player just activated can legitimately come back DISABLED
- * (stepping the last point off a component disables its `-`, spending the last
- * budget point disables every `+`, and leaving town disables all of them), and
- * a disabled button cannot take focus. So this degrades along the row the
- * player is working in before it leaves it: the same stepper, then the row's
- * other stepper, then Save, then Close. Landing on Close is still keyboard
- * operation; landing on <body> is not.
+ * This is the half the shared helper deliberately does NOT own: the ladder is
+ * this panel's own. The control the player just activated can legitimately come
+ * back DISABLED (stepping the last point off a component disables its `-`,
+ * spending the last budget point disables every `+`, and leaving town disables
+ * all of them), and a disabled button cannot take focus. So the order below
+ * degrades along the row the player is working in before it leaves it: the same
+ * stepper, then the row's other stepper, then Save, then Close. Landing on
+ * Close is still keyboard operation; landing on <body> is not.
  */
 function restoreFocus(
   focusKey: string,
@@ -200,9 +198,5 @@ function restoreFocus(
   // player onto Save; every other key walks the row outward.
   const candidates: ReadonlyArray<HTMLButtonElement | null> =
     focusKey === CLOSE_FOCUS_KEY ? [close, save] : [preferred, other, save, close];
-  for (const candidate of candidates) {
-    if (candidate === null || candidate.disabled) continue;
-    candidate.focus();
-    return;
-  }
+  restoreFirstEnabled(candidates);
 }

@@ -64,7 +64,23 @@ export class LockpickController {
     this.window.repaintIfChanged();
   }
 
-  end(outcome: 'success' | 'fail' | 'abandoned', tier?: LootTier): void {
+  /** Re-localize the open lock board after an in-game language switch (the Hud's
+   *  woc:languagechange fan-out). Self-gated inside the window. */
+  relocalize(): void {
+    this.window.relocalize();
+  }
+
+  end(
+    outcome: 'success' | 'fail' | 'abandoned',
+    tier: LootTier | undefined,
+    sessionId: string,
+  ): void {
+    // The summary is deliberately NOT session-scoped: one events message can
+    // carry [lockpickEnd(old), lockpickSession(new)], and ClientWorld mirrors
+    // the whole message at receipt while the HUD drains a frame later, so the
+    // mirror can already sit on the new id when this arm runs. The outcome
+    // still happened (hud.ts fires the success sfx regardless), so the banner
+    // and log line always land.
     const summary =
       outcome === 'success'
         ? tier
@@ -78,6 +94,20 @@ export class LockpickController {
       summary,
       outcome === 'success' ? '#7fdc4f' : outcome === 'fail' ? '#ff7a6a' : '#ccc',
     );
+    // Session-scope the CLOSE, the way ClientWorld.applyLockpickEvent already
+    // scopes the mirror clear. ONLINE the answer to a withdrawal is a wire
+    // frame away, and the dismissal's own drain can legitimately re-open a
+    // FRESH session's board in the meantime (the repeat arm closes before it
+    // re-sends for exactly that reason). Without the guard the late
+    // lockpickEnd for the WITHDRAWN session tore that fresh board down: a
+    // split-second dark 420px dead-centre flash for the player, and a live
+    // server-side session left running headless until its step clock burned
+    // the tries and forfeited the chest (#2517's forfeiture by another road).
+    // sessionId is REQUIRED on purpose: the wire event always carries it
+    // (SimEvent's lockpickEnd, src/sim/types.ts) and the one production
+    // caller (Hud.endLockpick) always forwards it.
+    const live = this.deps.getState();
+    if (live !== null && live.sessionId !== sessionId) return;
     this.close();
   }
 

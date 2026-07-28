@@ -40,7 +40,9 @@ import {
 
 // Deep-copy the CC diminishing-return map so a snapshot never shares mutable
 // state objects with the live entity (values are re-derived each restore).
-function cloneCcDr(
+// Exported: vale_cup.ts reuses this to restore its own pre-match pools
+// (mirroring this same free-full-restore fix, see snapshotArenaReturnPools).
+export function cloneCcDr(
   src: Map<CrowdControlDrCategory, CrowdControlDrState>,
 ): Map<CrowdControlDrCategory, CrowdControlDrState> {
   const out = new Map<CrowdControlDrCategory, CrowdControlDrState>();
@@ -49,8 +51,11 @@ function cloneCcDr(
 }
 
 // Deep-copy the recharge-model charge pools (Entity.abilityCharges) so a
-// snapshot never shares mutable state objects with the live entity.
-function cloneAbilityCharges(src: Entity['abilityCharges']): ArenaReturnPools['abilityCharges'] {
+// snapshot never shares mutable state objects with the live entity. Exported
+// for the same reason as cloneCcDr above.
+export function cloneAbilityCharges(
+  src: Entity['abilityCharges'],
+): ArenaReturnPools['abilityCharges'] {
   const out: ArenaReturnPools['abilityCharges'] = {};
   if (src) for (const [id, state] of Object.entries(src)) out[id] = { ...state };
   return out;

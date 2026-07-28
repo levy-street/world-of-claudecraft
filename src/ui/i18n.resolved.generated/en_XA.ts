@@ -5533,6 +5533,7 @@ export const en_XA: EnTranslations = {
     },
     "augment": {
       "choose": "[Çĥóóšé áñ Áúĝɱéñţ]",
+      "cardAria": "[{name} ({category}) - {description}]",
       "aug_brutality": {
         "name": "[Ɓŕúţáļíţý]",
         "desc": "[Ýóúŕ þĥýšíçáļ šţŕíķéš ĥíţ 15% ĥáŕðéŕ.]"

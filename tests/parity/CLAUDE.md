@@ -87,8 +87,13 @@ confirmed each):
   same change.
 - **Transient Sim-owned collections are not sampled directly.** `arenaMatches`,
   `delveRuns`, `marketListings`/`marketCollections`, `instances`, `groundAoEs`,
-  `pendingMobRespawns` are pinned only via their entity/event/`PlayerMeta`
-  projection. Extracting one of these should add a scenario that drives it (the
+  `pendingMobRespawns`, `pendingLootRolls` are pinned only via their
+  entity/event/`PlayerMeta` projection. `pendingLootRolls` is the sharpest case:
+  a roll's `choices` map is wiped by `convertMasterRollToNeedGreed` and deleted by
+  `resolveLootRoll`, so a mid-window write to it that draws no rng leaves the whole
+  trace byte-identical. `master_loot` reaches around that with a `rec.notes`
+  readout (its refused curate-phase votes assert `choices.size === 0`); anything
+  else that must pin an unresolved roll needs the same trick. Extracting one of these should add a scenario that drives it (the
   precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
   the collection directly.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim

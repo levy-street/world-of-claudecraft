@@ -316,6 +316,14 @@ export function rollLoot(
     mob.lootable = true;
     // start the owner-lock countdown: after LOOT_FFA_DELAY the tap opens to all.
     mob.lootFfaTimer = LOOT_FFA_DELAY;
+  } else if (isHarvestableCorpse(template.componentTags)) {
+    // The regular loot table rolled empty (chance-based entries, no guaranteed
+    // copper/item), but the corpse still owes a harvest. isHarvestableCorpse is
+    // the single source of truth pruneCorpseLoot already uses to re-derive
+    // lootable once existing loot empties out (#2513); this mirrors that here
+    // so a zero-loot kill isn't permanently un-lootable before pruneCorpseLoot
+    // ever runs. mob.loot stays null: no copper/items to show, just the harvest.
+    mob.lootable = true;
   }
 }
 
@@ -635,6 +643,24 @@ export function removePlayerFromLootRolls(ctx: SimContext, pid: number): void {
   }
 }
 
+// A kick or a voluntary leave does not disconnect the player (unlike
+// removePlayerFromLootRolls above), so an existing roll's candidacy is left
+// untouched, exactly as it already is when a candidate simply regroups into a
+// different party mid-roll: only curate-phase ASSIGN AUTHORITY is scoped to
+// current party membership. Revoke it immediately on departure so a kicked or
+// departed master looter can never resolve/assign a roll for a group they are
+// no longer in, converting the roll to a normal need/greed prompt for the same
+// candidates, exactly like the uncurated 5-minute timeout fallback in
+// resolveLootRoll above.
+export function revokeMasterLooterAuthority(ctx: SimContext, pid: number): void {
+  // Snapshot before iterating, matching removePlayerFromLootRolls: the
+  // conversion never deletes an entry today, but the sibling's convention keeps
+  // this safe if it ever does.
+  for (const roll of [...ctx.pendingLootRolls.values()]) {
+    if (roll.masterLooter === pid) convertMasterRollToNeedGreed(ctx, roll, [...roll.candidates]);
+  }
+}
+
 // The master looter's curate-then-roll choice. `targetPids` is the set of
 // eligible players the looter checked: exactly one grants the item directly (the
 // classic assign), two or more open a need/greed roll for just that subset. Only
@@ -651,12 +677,32 @@ export function assignMasterLoot(
   const roll = ctx.pendingLootRolls.get(rollId);
   if (!roll || roll.masterLooter === undefined) return;
   if (r.meta.entityId !== roll.masterLooter) return; // only the master looter decides
+  // Defense in depth against the party-collapse exploit: a kick/leave that
+  // shrinks the party to just the master looter disbands it (see
+  // removeFromParty), which leaves `roll.masterLooter` still set with no other
+  // member left to stop a self-assign. Re-check live party membership here,
+  // not just the stale masterLooter field, so the same collapse is closed
+  // regardless of which membership-mutating path caused it (kick, leave, or
+  // disconnect). Anchor the check on THE ROLL'S OWN group (`roll.partyMembers`,
+  // the creation-time snapshot the rest of this module already broadcasts to):
+  // merely holding some party of 2+ would let a collapsed master looter regroup
+  // with unrelated players inside the 5-minute curate window and assign anyway.
+  // Treat a lost group the same as an explicit revoke: convert to need/greed
+  // rather than silently deny, so the corpse stays distributable.
+  const party = ctx.partyOf(roll.masterLooter);
+  const stillGroupedWithTheRoll =
+    !!party && party.members.some((m) => m !== roll.masterLooter && roll.partyMembers.includes(m));
+  if (!stillGroupedWithTheRoll) {
+    convertMasterRollToNeedGreed(ctx, roll, [...roll.candidates]);
+    return;
+  }
   // Keep only still-eligible targets, each counted once; ignore anyone no longer
   // a candidate. The pid list is client-supplied (the masterAssign wire case
-  // checks that pids is a non-empty array of numbers and nothing about the
-  // values), and a pid named twice would send that player two lootRoll prompts,
-  // print their reveal line twice, and can put one player in tiedWinners twice,
-  // drawing a tie-break ctx.rng.int the honest single-candidate case never draws.
+  // checks that pids is a non-empty numeric array no longer than a full raid
+  // roster, and nothing about the values), and a pid named twice would send that
+  // player two lootRoll prompts, print their reveal line twice, and can put one
+  // player in tiedWinners twice, drawing a tie-break ctx.rng.int the honest
+  // single-candidate case never draws.
   // What is load-bearing is deduping BEFORE the length tests below, so [X, X]
   // takes the direct-grant arm exactly like [X] instead of converting to a
   // one-player need/greed roll (the dedupe and the filter commute, so their

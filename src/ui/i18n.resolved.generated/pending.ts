@@ -20,6 +20,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -36,6 +37,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -52,6 +54,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -68,6 +71,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -85,6 +89,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -101,6 +106,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -112,7 +118,8 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "fiesta.augment.cardAria"
   ],
   "zh_TW": [
     "auth.bald",
@@ -120,7 +127,8 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "fiesta.augment.cardAria"
   ],
   "ko_KR": [
     "auth.bald",
@@ -128,7 +136,8 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "fiesta.augment.cardAria"
   ],
   "ja_JP": [
     "auth.bald",
@@ -136,7 +145,8 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "fiesta.augment.cardAria"
   ],
   "pt_BR": [
     "auth.bald",
@@ -149,6 +159,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -160,7 +171,8 @@ export const pending: Record<string, readonly string[]> = {
     "auth.faceOption",
     "auth.hair",
     "auth.hairStyle",
-    "auth.skinTone"
+    "auth.skinTone",
+    "fiesta.augment.cardAria"
   ],
   "cs_CZ": [
     "auth.bald",
@@ -173,6 +185,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -189,6 +202,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -205,6 +219,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -221,6 +236,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -237,6 +253,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -253,6 +270,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -269,6 +287,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",
@@ -285,6 +304,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.hairColor",
     "auth.hairStyle",
     "auth.skinTone",
+    "fiesta.augment.cardAria",
     "skinEvent.armored",
     "skinEvent.armoredAria",
     "skinEvent.armoredToggleOff",

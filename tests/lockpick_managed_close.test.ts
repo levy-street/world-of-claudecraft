@@ -115,12 +115,13 @@ function harness(initial: LockpickView | null, host: 'online' | 'offline' = 'onl
       return out;
     },
     // The one arm of Hud.handleEvents this path reaches, transcribed from
-    // src/ui/hud.ts's `case 'lockpickEnd': this.endLockpick(...)` -> controller.end(outcome).
-    // Transcribed, NOT pinned: no guard ties this fake to that switch, so a rewrite there
-    // would leave these cases green against a mapping the client no longer has.
+    // src/ui/hud.ts's `case 'lockpickEnd': this.endLockpick(...)` ->
+    // controller.end(outcome, tier, sessionId). Transcribed, NOT pinned: no guard ties this
+    // fake to that switch, so a rewrite there would leave these cases green against a mapping
+    // the client no longer has.
     handleEvents: (events) => {
       for (const ev of events) {
-        if (ev.type === 'lockpickEnd') controller.end(ev.outcome);
+        if (ev.type === 'lockpickEnd') controller.end(ev.outcome, undefined, ev.sessionId);
         // hud.ts's `case 'lockpickSession': this.openLockpickBoard()`. Faithful because the
         // repeat arm's statement ORDER depends on it: a drained event can re-open this panel.
         if (ev.type === 'lockpickSession') controller.openBoard();

@@ -5533,6 +5533,7 @@ export const id_ID: EnTranslations = {
     },
     "augment": {
       "choose": "Pilih sebuah Augment",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Kebrutalan",
         "desc": "Serangan fisikmu menghantam 15% lebih keras."

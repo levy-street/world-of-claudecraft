@@ -1235,4 +1235,34 @@ describe('Town Focus focus-system wiring (source pins)', () => {
     // ...and BEFORE the wipe, which is what makes it survive innerHTML.
     expect(painter.indexOf('markDialogRoot(')).toBeLessThan(painter.indexOf('el.innerHTML ='));
   });
+
+  it('captures the focus key BEFORE the wipe and restores it AFTER the scroll', () => {
+    // Both halves are ordering claims the painter's own comments make and no behavioral
+    // test can see (#2528). The capture must precede the innerHTML wipe, or the control
+    // it reads is already gone; the scroll restore must precede the focus call, because
+    // the bare focus() is what lets a DEGRADED target scroll itself into view and win
+    // over the restored offset. Reversing either is silent: focus still lands somewhere.
+    //
+    // Anchored on literals verified to occur once each in the comment-stripped painter,
+    // and asserted present before they are compared, so a rename reds here instead of
+    // quietly comparing against indexOf's -1.
+    const capture = painterSrc.indexOf('captureFocusKey(el)');
+    const wipe = painterSrc.indexOf('el.innerHTML =');
+    const scroll = painterSrc.indexOf('el.scrollTop = scrollTop');
+    // The CALL, which precedes the declaration of the same name in this file.
+    const restore = painterSrc.indexOf('restoreFocus(');
+    for (const [name, at] of [
+      ['captureFocusKey(el)', capture],
+      ['el.innerHTML =', wipe],
+      ['el.scrollTop = scrollTop', scroll],
+      ['restoreFocus(', restore],
+    ] as const) {
+      expect(
+        at,
+        `${name} is no longer in the painter, so this pin cannot order it`,
+      ).toBeGreaterThan(-1);
+    }
+    expect(capture).toBeLessThan(wipe);
+    expect(scroll).toBeLessThan(restore);
+  });
 });

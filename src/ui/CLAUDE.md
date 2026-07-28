@@ -51,6 +51,14 @@ mobile portrait *and* landscape before calling UI work done.
     `Hud` drives through `windowFocus(rootSel)`. The trap intercepts Tab ONLY when focus is
     already inside (Tab is the game's target-nearest key; an unconditional trap would hijack
     it). Esc stays with the single `closeAll` dispatcher, not the manager.
+  - **Focus across a REBUILD is the other half, and a different module:** a painter that wipes
+    its own subtree carries the focused control's identity across with `captureFocusKey` /
+    `restoreFirstEnabled` (`src/ui/focus_restore.ts`), never a hand-rolled `activeElement`
+    read. The helper owns the narrowing, the containment check (the `data-focus-key` namespace
+    is shared across windows, so an unguarded read steals focus from another one) and the
+    disabled skip; the caller owns only its own degradation ladder. A guard in
+    `tests/focus_restore.test.ts` refuses any `src/ui` module that touches the attribute
+    without importing it.
   - **Visible focus that never animates away:** every outline-based `:focus-visible` ring is
     steady and drawn from a token / system color, never a raw hex, never transitioned off.
   - **Skip links** ("Skip to Main HUD" / "Skip to Chat") are the first focusable elements;
@@ -358,6 +366,33 @@ expected and fine at PR tier.
 `t(key)` **throws on an untracked key in dev/test**, renders English for a `pending` key on
 **non-release builds only**, and **hard-fails a pending key on a release build**
 (`isReleaseBuild()` = `I18N_RELEASE=1` or `import.meta.env.PROD`).
+
+**A runtime language switch does not reload the page: a surface with a REPAINT SIGNATURE
+must be in the fan-out.** `changeLanguage` (`main.ts`) re-localizes the static shell and
+dispatches `woc:languagechange`; `Hud.refreshLocalizedDynamicUi()` repaints the dynamic
+surfaces. Which of the two elision idioms a module uses decides whether it needs an arm there:
+- a **write-elision facet** (`PainterHostWriters`) compares the RESOLVED string it is about to
+  write, so a locale change moves the comparison and the write happens by itself. Nothing to do.
+- a **repaint signature** (`lastSig` and its family) compares a digest of the DATA (ids, counts,
+  positions, booleans). That is text-independent BY DESIGN, so `setLanguage` alone can never
+  move it and the surface keeps the old locale until its data happens to change. It needs an arm.
+
+Give such a module a `relocalize()` that is **self-gated on its own open check** (the fan-out
+calls it unconditionally), forces exactly one rebuild, and leaves the signature **re-latched to
+the current state, never cleared**: a cleared signature buys a second rebuild on the next poll,
+which lands after any draft restore and undoes it. If the rebuild destroys live typed input
+(a compose form, a typeahead, a booking form), carry it across with
+`form_draft.ts` (`captureFormDraft` / `restoreFormDraft`). Two mistakes to avoid, both of which
+this repo has shipped: a `render()` whose signature check is INSIDE it is a silent no-op from
+the fan-out (`card_duel_window.ts`), and an arm that calls a method the callee's own signature
+swallows is present and inert (`delve_tracker_controller.ts`, #2529). The FOCUS half of that
+rebuild is the `focus_restore.ts` seam above, not a second `activeElement` read: `form_draft`
+owns only the identity (one key that finds the field again to write its value back, which
+`data-focus-key` does not carry) and takes the narrowing, the containment check and the
+disabled skip from there. Both halves are pinned by
+`tests/language_fanout_registry.test.ts`, which enumerates the fan-out and sweeps `src/ui` for
+signature-gated modules, so a new one cannot land without the question being answered; the
+per-surface behavior lives in `tests/language_fanout_relocalize.test.ts`.
 
 **Contributor workflow (add a player-visible string): add ENGLISH ONLY.**
 1. Add the key to `en` (the matching `i18n.catalog/<domain>.ts` module) and render it through

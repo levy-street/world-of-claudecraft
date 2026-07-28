@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { type MarketQuery, marketItemMatches, sanitizeMarketQuery } from '../src/sim/market_query';
+import {
+  deriveBagSizeFilters,
+  type MarketQuery,
+  marketItemMatches,
+  sanitizeMarketQuery,
+} from '../src/sim/market_query';
+import type { ItemDef } from '../src/sim/types';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
@@ -213,6 +219,36 @@ describe('World Market filters', () => {
     // catalog-side bagSlots typo moves the derivation and its mirror in lockstep, and it
     // is deliberately the one place a new bag capacity has to be acknowledged by a human.
     expect([...MARKET_BAG_SIZE_FILTERS]).toEqual(['all', '6', '8', '10', '12', '14']);
+  });
+
+  it('keeps a zero or missing bagSlots value as its own selectable option, not just under all', () => {
+    // A bagSlots of 0, or an absent bagSlots field entirely (defaulted to 0), used to be
+    // dropped by a `slots > 0` filter: the bag still matched itemType 'bag' + subtype
+    // 'all', but no specific-capacity button could ever reach it. Both cases must now
+    // surface a '0' option alongside the regular capacities.
+    const zeroSlotBag = {
+      id: 'zero_slot_bag',
+      name: 'Zero Slot Bag',
+      kind: 'bag',
+      quality: 'common',
+      bagSlots: 0,
+    } as ItemDef;
+    const missingSlotBag = {
+      id: 'missing_slot_bag',
+      name: 'Missing Slot Bag',
+      kind: 'bag',
+      quality: 'common',
+    } as ItemDef;
+    const normalBag = {
+      id: 'normal_bag',
+      name: 'Normal Bag',
+      kind: 'bag',
+      quality: 'common',
+      bagSlots: 6,
+    } as ItemDef;
+
+    expect(deriveBagSizeFilters([zeroSlotBag, normalBag])).toEqual(['all', '0', '6']);
+    expect(deriveBagSizeFilters([missingSlotBag, normalBag])).toEqual(['all', '0', '6']);
   });
 
   it('narrows bags by exact capacity, and every catalog bag is reachable by one size', () => {

@@ -203,8 +203,22 @@ export function colliderTopAt(c: Collider, x: number, z: number): number {
  * passable while airborne: the mantle assist. A jump whose apex falls short of
  * a crate rim by up to this much still carries the body over, and the support
  * snap in the movement kernel then seats the feet on the top (the vault).
+ *
+ * It is pinned to the grounded stride band (`MAX_STEP_HEIGHT` in
+ * `physics/character.ts`; the equality is pinned by
+ * `tests/physics_character.test.ts`) rather than tuned on its own, for two
+ * reasons. An airborne body must never lose ground a grounded stride crosses
+ * for free, and this ONE number is read by BOTH halves of the tick: the
+ * horizontal gates (`passesOver` here, `blocksAt` in the solver) and the
+ * vertical support query (`floorHeightAt`'s `maxY` in `player_motion.ts`).
+ * They must move together, or the horizontal pass admits a top the landing
+ * snap then refuses to seat and the body tunnels into the prop. It also
+ * leaves the traversal ladder gapless: `LEDGE_GRAB_MIN` is the same 0.9, so
+ * every standable top is either vaulted or grabbed, never a mid-air wall.
+ * The literal lives here (not imported) because `physics/` imports this
+ * module, never the reverse.
  */
-export const MANTLE_REACH = 0.7;
+export const MANTLE_REACH = 0.9;
 /** Float slack when comparing feet height against a collider top. */
 const MOVE_TOP_EPS = 1e-3;
 // How much of the body radius must overlap a standable top before it supports

@@ -273,6 +273,22 @@ export class SpellbookWindow {
     this.refreshHotbarControlsIfChanged();
   }
 
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on isOpen so the fan-out can call it unconditionally.
+   *
+   * tickOpen only rebuilds when a resolved ability's id, rank, cost, cast time
+   * or cooldown moved, and the hotbar toggles elide their accessible names on
+   * the on-bar state, all of it text-independent, so an open spellbook would
+   * otherwise keep the old locale until the player learned something. Goes
+   * through the scroll- and focus-preserving path for the same reason it exists:
+   * the list rebuild is an innerHTML write on the scroll container.
+   */
+  relocalize(): void {
+    if (!this.isOpen) return;
+    this.rerenderPreservingView();
+  }
+
   // render() rebuilds the list via innerHTML, and the window root is the scroll
   // container, so a mid-session rebuild would jump the scroll to top and drop the
   // keyboard user's focus. Preserve both across the talent-driven rebuild: capture

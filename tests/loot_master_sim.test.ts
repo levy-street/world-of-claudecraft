@@ -122,6 +122,180 @@ describe('master loot', () => {
     });
   });
 
+  it('revokes assign authority when the party leader kicks the master looter mid-roll', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, b, 'uncommon', a); // b (not the leader) is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.events.length = 0;
+    sim.partyKick(b, a); // leader kicks the master looter while the roll is still open
+
+    // The kicked looter must lose assignment authority immediately: a
+    // self-assign must NOT grant the item.
+    sim.assignMasterLoot(rollId, [b], b);
+    expect(sim.countItem(PREMIUM, b)).toBe(0);
+
+    // The roll falls back to a normal need/greed roll (same as the uncurated
+    // 5-minute timeout path) instead of staying a curate-phase prompt only the
+    // ex-looter could resolve.
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+    expect(sim.activeLootRolls(c).map((p) => p.rollId)).toContain(rollId);
+
+    // The kicked ex-looter is still an ordinary candidate (leaving a party does
+    // not retroactively strip existing roll candidacy, matching the "re-groups
+    // mid-roll" contract elsewhere), but now has to roll fairly like anyone
+    // else: no more self-assign shortcut.
+    sim.submitLootRoll(rollId, 'need', a);
+    sim.submitLootRoll(rollId, 'pass', b);
+    sim.submitLootRoll(rollId, 'pass', c);
+    expect(sim.countItem(PREMIUM, a)).toBe(1);
+    expect(sim.countItem(PREMIUM, b)).toBe(0);
+  });
+
+  it('revokes assign authority when the master looter voluntarily leaves the party mid-roll', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    sim.setPartyLootMaster(true, b, 'uncommon', a); // b (not the leader) is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.events.length = 0;
+    sim.partyLeave(b); // the master looter leaves on their own, still connected
+
+    sim.assignMasterLoot(rollId, [b], b);
+    expect(sim.countItem(PREMIUM, b)).toBe(0);
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+
+    sim.submitLootRoll(rollId, 'need', a);
+    sim.submitLootRoll(rollId, 'pass', b);
+    expect(sim.countItem(PREMIUM, a)).toBe(1);
+  });
+
+  it('blocks a self-assign after the leader/master-looter kicks every other member and the party disbands', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // leader a is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.partyKick(b, a);
+    sim.partyKick(c, a); // party collapses to just `a` and disbands
+
+    // Even though `a` still nominally holds roll.masterLooter, the party is
+    // gone: a self-assign must not grant the item.
+    sim.assignMasterLoot(rollId, [a], a);
+    expect(sim.countItem(PREMIUM, a)).toBe(0);
+
+    // The roll falls back to a normal need/greed prompt for the original
+    // candidates instead of staying stuck or self-assignable.
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+  });
+
+  it('blocks a self-assign after the leader/master-looter is the last one left when everyone else leaves', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // leader a is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.partyLeave(b);
+    sim.partyLeave(c); // party collapses to just `a` and disbands
+
+    sim.assignMasterLoot(rollId, [a], a);
+    expect(sim.countItem(PREMIUM, a)).toBe(0);
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+  });
+
+  it('blocks a self-assign after the master looter disbands the party and regroups with strangers', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // leader a is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.partyKick(b, a);
+    sim.partyKick(c, a); // party collapses to just `a` and disbands
+
+    // Re-forming ANY party must not restore authority over a roll that belongs
+    // to the old group: the gate is anchored on roll.partyMembers, not on
+    // merely holding some party of two or more.
+    const d = sim.addPlayer('priest', 'Dorn');
+    const e = sim.addPlayer('hunter', 'Elin');
+    teleportTo(sim, 21, 20, d);
+    teleportTo(sim, 20, 21, e);
+    sim.partyInvite(d, a);
+    sim.partyAccept(d);
+    sim.partyInvite(e, a);
+    sim.partyAccept(e);
+
+    sim.assignMasterLoot(rollId, [a], a);
+    expect(sim.countItem(PREMIUM, a)).toBe(0);
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+  });
+
+  it('read-side gate compares the roll own group, not merely holding some party', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // leader a is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.partyKick(b, a);
+    sim.partyKick(c, a); // party collapses to just `a` and disbands
+
+    // Restore stale curate authority directly, standing in for any future
+    // membership-mutating path that forgets to revoke: the read-side gate in
+    // assignMasterLoot is the backstop that must still refuse.
+    const roll = (sim as unknown as { pendingLootRolls: Map<number, { masterLooter?: number }> })
+      .pendingLootRolls;
+    const pending = roll.get(rollId);
+    if (!pending) throw new Error('expected the roll to still be pending');
+    pending.masterLooter = a;
+
+    // `a` regroups with two unrelated players, so they DO hold a party of more
+    // than one: only comparing against the roll own partyMembers refuses this.
+    const d = sim.addPlayer('priest', 'Dorn');
+    const e = sim.addPlayer('hunter', 'Elin');
+    teleportTo(sim, 21, 20, d);
+    teleportTo(sim, 20, 21, e);
+    sim.partyInvite(d, a);
+    sim.partyAccept(d);
+    sim.partyInvite(e, a);
+    sim.partyAccept(e);
+
+    sim.assignMasterLoot(rollId, [a], a);
+    expect(sim.countItem(PREMIUM, a)).toBe(0);
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+  });
+
   it('rejects assignment from anyone other than the master looter', () => {
     const sim = makeSim();
     const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
@@ -465,11 +639,11 @@ describe('the master looter reconcile surface (#2526)', () => {
 });
 
 // #2505. The pid list reaching assignMasterLoot is client-supplied and the
-// masterAssign wire case validates that pids is a non-empty array of numbers
-// and nothing about the values, so a hand-crafted frame can name the same
-// eligible candidate twice. Every case below runs the repeat against the
-// equivalent duplicate-free request on the SAME seed: the repeat must be
-// indistinguishable in bags, chat, prompts, and rng stream position.
+// masterAssign wire case validates that pids is a non-empty numeric array no
+// longer than a full raid roster (#2524) and nothing about the values, so a
+// hand-crafted frame can still name the same candidate twice. Every case runs the
+// repeat against the equivalent duplicate-free request on the SAME seed: the
+// repeat must be indistinguishable in bags, chat, prompts, and rng stream position.
 describe('a repeated pid in a master-loot assignment (#2505)', () => {
   // Every rng draw `fn` spends, counted through the parity harness's own
   // observer seam. A no-new-draws guard, NOT the determinism arm: the extra
@@ -669,6 +843,46 @@ describe('a repeated pid in a master-loot assignment (#2505)', () => {
     const pids = openMasterRoll().candidates.map((cand) => cand.pid);
     expect(pids).toHaveLength(3); // the whole party, so the check has something to catch
     expect(new Set(pids).size).toBe(3);
+  });
+
+  it('opens the master roll with a roster scoped to the tapping party', () => {
+    // The other half of that invariant, and now load-bearing in a second place:
+    // server/game.ts bounds the masterAssign pid list at RAID_MAX (#2524) purely
+    // because the candidate roster is a subset of one party, which partyAccept and
+    // the finder seam both cap. A bystander standing on the corpse is the way that
+    // could quietly stop being true, so pin it with one present: a count-only
+    // assertion on an all-party fixture would pass either way.
+    const { sim, a } = openMasterRoll();
+    const bystander = sim.addPlayer('hunter', 'Nosy');
+    teleportTo(sim, 21, 21, bystander); // right on the corpse, in no party
+    expect(sim.partyOf(bystander)).toBeNull();
+
+    const rosterFor = (mobId: number) => {
+      const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+      mob.dead = true;
+      mob.lootable = true;
+      mob.tappedById = a;
+      mob.loot = { copper: 0, items: [{ itemId: PREMIUM, count: 1 }] };
+      sim.entities.set(mob.id, mob);
+      sim.events.length = 0;
+      sim.lootCorpse(mob.id, a);
+      const opened = sim.events.find((e) => e.type === 'masterLoot');
+      expect(opened).toBeTruthy();
+      return (opened as { candidates: { pid: number }[] }).candidates.map((c) => c.pid);
+    };
+
+    const outside = rosterFor(990501);
+    const members = sim.partyOf(a)?.members ?? [];
+    expect(outside.length).toBeGreaterThan(1); // a real roll, not an empty one
+    expect(outside.filter((pid) => !members.includes(pid))).toEqual([]);
+    expect(outside).not.toContain(bystander);
+
+    // The control that makes it a statement about MEMBERSHIP rather than distance:
+    // nothing about where they stand changes, they simply join, and the very same
+    // corpse position now puts them on the roster.
+    sim.partyInvite(bystander, a);
+    sim.partyAccept(bystander);
+    expect(rosterFor(990502)).toContain(bystander);
   });
 
   it('routes a departed [X, X] target down the same fallback [X] takes', () => {

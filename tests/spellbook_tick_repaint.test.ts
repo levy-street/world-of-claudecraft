@@ -31,11 +31,11 @@
 // quietly stopped looking at `cooldown` (or at the tail of the list) moves no other assertion
 // in this file.
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ResolvedAbility } from '../src/sim/sim';
 import { tEntity } from '../src/ui/entity_i18n';
 import type { HotbarAction } from '../src/ui/hud/action_bar/hotbar';
-import { t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { SpellbookWindow, type SpellbookWindowDeps } from '../src/ui/spellbook_window';
 
 // jsdom ships no 2D canvas, so the procedural ability-icon compositor cannot run
@@ -807,5 +807,63 @@ describe('spellbook per-frame tick: the rebuild gate still watches every summary
     watch.stop();
     expect(h.toggle('charge')).toBe(before);
     expect(watch.writes, `a no-op snapshot repainted: ${watch.writes.join(', ')}`).toEqual([]);
+  });
+});
+
+// #2529: everything the gate above compares is an id or a number, so a runtime
+// language change moves none of it and an open spellbook kept the previous
+// locale until the player happened to learn or re-rank something.
+describe('spellbook: a language switch repaints through relocalize(), not through the gate', () => {
+  const OTHER = 'es';
+
+  beforeAll(async () => {
+    await ensureLocaleLoaded(OTHER);
+  });
+
+  afterEach(() => {
+    setLanguage('en');
+  });
+
+  it('holds the old locale through tickOpen and repaints on relocalize()', () => {
+    setLanguage('en');
+    const english = t('abilityUi.spellbook.title');
+    setLanguage(OTHER);
+    const other = t('abilityUi.spellbook.title');
+    expect(other, 'the spellbook title reads the same in both locales').not.toBe(english);
+    setLanguage('en');
+
+    const h = harness();
+    open(h);
+    const title = (): string =>
+      h.root.querySelector('.panel-title span')?.textContent?.trim() ?? '';
+    expect(title().startsWith(english)).toBe(true);
+
+    setLanguage(OTHER);
+    h.win.tickOpen();
+    expect(
+      title().startsWith(english),
+      'tickOpen repainted: this arm no longer proves the gap',
+    ).toBe(true);
+
+    h.win.relocalize();
+    expect(title().startsWith(other)).toBe(true);
+
+    // The rebuild re-latches every compared field, so the per-frame band goes
+    // straight back to eliding rather than repainting on every subsequent frame.
+    const settled = h.toggle('charge');
+    const watch = watchDom();
+    h.win.tickOpen();
+    watch.stop();
+    expect(h.toggle('charge')).toBe(settled);
+    expect(watch.writes, `relocalize() left the gate cleared: ${watch.writes.join(', ')}`).toEqual(
+      [],
+    );
+  });
+
+  it('refuses while the window is closed, so the fan-out can call it unconditionally', () => {
+    const h = harness();
+    setLanguage(OTHER);
+    h.win.relocalize();
+    expect(h.root.innerHTML, 'relocalize painted a closed spellbook').toBe('');
   });
 });

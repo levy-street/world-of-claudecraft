@@ -5533,6 +5533,7 @@ export const tr_TR: EnTranslations = {
     },
     "augment": {
       "choose": "Bir Güçlendirme Seç",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Vahşilik",
         "desc": "Fiziksel vuruşların %15 daha sert isabet eder."
