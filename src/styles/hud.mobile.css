@@ -4951,4 +4951,14 @@
     min-height: 40px;
     box-sizing: border-box;
   }
+  /* ---------- cinematic mode mobile controls (Last Bell scene) ---------- */
+  /* The touch joysticks and combat buttons hide with the rest of the HUD while
+     a scene runs (C0). #mobile-controls is a sibling of #ui, so it takes the
+     body.cinematic-mode class the scene painter sets; the game-active hide above
+     drives its display, and this override wins because both are in this layer and
+     this rule is later. The reconnect overlay is a <body> child and is not
+     touched here, so connection loss still surfaces during a cutscene. */
+  body.mobile-touch.cinematic-mode #mobile-controls {
+    display: none !important;
+  }
 }

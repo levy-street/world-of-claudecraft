@@ -32,6 +32,10 @@ export interface SceneOverlayModel {
   lineKey: string | null;
   /** 0..1 opacity of the full-screen black layer. */
   fadeOpacity: number;
+  /** True for the whole scene (start op to end op). Drives cinematic mode:
+   *  the painter toggles the `cinematic-mode` HUD-root class from this flag, so
+   *  the end op (watched or skipped) restores the HUD in one step. */
+  cinematic: boolean;
 }
 
 export interface SceneOverlayState {
@@ -56,6 +60,7 @@ export function createSceneOverlayState(): SceneOverlayState {
       speakerKey: null,
       lineKey: null,
       fadeOpacity: 0,
+      cinematic: false,
     },
   };
 }
@@ -118,6 +123,7 @@ export function sceneOverlayView(s: SceneOverlayState, nowSec: number): SceneOve
   const m = s.model;
   m.letterbox = s.letterbox;
   m.skipHintVisible = s.sceneActive;
+  m.cinematic = s.sceneActive;
   if (s.subtitle !== null && nowSec >= s.subtitle.until) s.subtitle = null;
   m.speakerKey = s.subtitle?.speakerKey ?? null;
   m.lineKey = s.subtitle?.lineKey ?? null;

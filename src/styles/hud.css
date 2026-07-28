@@ -5320,7 +5320,7 @@
     z-index: 39;
     pointer-events: none;
     color: var(--color-text-light);
-    font: 500 17px/1.45 var(--ui-font);
+    font: 500 17px / 1.45 var(--ui-font);
     text-shadow:
       0 1px 3px #000,
       0 0 12px #000c;
@@ -5383,7 +5383,7 @@
   .scene-choice-prompt {
     text-align: center;
     color: var(--color-text-light);
-    font: 500 16px/1.4 var(--ui-font);
+    font: 500 16px / 1.4 var(--ui-font);
     margin-bottom: 10px;
   }
   .scene-choice-options {
@@ -5398,7 +5398,7 @@
     border: 1px solid var(--color-border-default);
     border-radius: 6px;
     color: var(--color-text-light);
-    font: 500 14px/1.3 var(--ui-font);
+    font: 500 14px / 1.3 var(--ui-font);
     cursor: pointer;
     text-align: center;
   }
@@ -5413,7 +5413,7 @@
   .scene-choice-waiting {
     text-align: center;
     color: var(--color-text-muted);
-    font: 500 14px/1.4 var(--ui-font);
+    font: 500 14px / 1.4 var(--ui-font);
   }
   .scene-choice-timer {
     text-align: center;
@@ -5422,6 +5422,62 @@
     font-variant-numeric: tabular-nums;
     margin-top: 8px;
     min-height: 1.2em;
+  }
+  /* Cinematic mode (Last Bell scene, C0): while a scene runs the painter sets
+     body.cinematic-mode, and the whole HUD hides so the cutscene reads as film.
+     Only the scene overlay's own layers (.scene-letterbox, .scene-subtitle,
+     .scene-skip, .scene-fade) and the .scene-choice window stay visible, and
+     since none of them is in the enumerated hide set below they are untouched.
+     The end op (watched or skipped) clears the class, restoring the HUD in one
+     step. The roots are enumerated explicitly (NOT a blanket #ui hide), so a
+     future HUD addition is opt-in to hiding, not silently swept: #nameplates and
+     the mobile #mobile-controls are siblings of #ui, which is why the class lands
+     on <body>. #mobile-controls hides in hud.mobile.css (its owning module).
+     Two entries are BROAD-MATCH classes, not ids: .window (every feature window)
+     and .fct (floating combat text); a future component adopting either class
+     opts into cinematic hiding.
+     DELIBERATELY NOT hidden, each a decision, not an oversight:
+     - #reconnect-overlay (a <body> child appended by reconnect_overlay.ts): a
+       player must never sit through a cutscene unaware the connection died;
+       fatal/connection status stays on screen.
+     - #dfinder-proposal-popup (class `panel`, not `window`): a time-limited
+       actionable prompt; missing it costs the queue slot, same rationale as the
+       reconnect overlay.
+     - #death-overlay and #ghost-prompt: death state must stay visible if a
+       player somehow dies with a scene up.
+     - #perf-overlay: opt-in diagnostic, visible on purpose (it is how scene
+       perf gets measured).
+     - #combat-live, #target-live, #chat-live: visually-hidden a11y live
+       regions; never display:none them, they announce to screen readers. */
+  body.cinematic-mode #nameplates,
+  body.cinematic-mode #target-frame,
+  body.cinematic-mode #party-frames,
+  body.cinematic-mode #buff-bar,
+  body.cinematic-mode #debuff-bar,
+  body.cinematic-mode #castbar,
+  body.cinematic-mode #swingbar,
+  body.cinematic-mode #minimap-wrap,
+  body.cinematic-mode #community-hud,
+  body.cinematic-mode #right-tracker-stack,
+  body.cinematic-mode #bottom-bar,
+  body.cinematic-mode #chatlog-wrap,
+  body.cinematic-mode #side-buttons,
+  body.cinematic-mode #ctx-menu,
+  body.cinematic-mode #prompt-stack,
+  body.cinematic-mode #tooltip,
+  body.cinematic-mode #quest-banner,
+  body.cinematic-mode #banner,
+  body.cinematic-mode #subzone-banner,
+  body.cinematic-mode #low-health-vignette,
+  body.cinematic-mode #click-move-marker,
+  body.cinematic-mode #arena-status,
+  body.cinematic-mode #vcup-indicator,
+  body.cinematic-mode #mount-race-strip,
+  body.cinematic-mode #race-start-btn,
+  body.cinematic-mode #race-countdown,
+  body.cinematic-mode .window,
+  body.cinematic-mode .fct {
+    display: none !important;
   }
 }
 

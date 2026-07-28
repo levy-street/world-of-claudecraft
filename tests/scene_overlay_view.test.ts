@@ -20,6 +20,27 @@ describe('scene overlay state', () => {
     expect(sceneOverlayView(s, 5).skipHintVisible).toBe(false);
   });
 
+  it('flags cinematic false before start, true through the scene, false after end (HUD hide)', () => {
+    const s = createSceneOverlayState();
+    expect(sceneOverlayView(s, 0).cinematic).toBe(false);
+    overlayApplyOp(s, { kind: 'start', duration: 10 }, 0);
+    expect(sceneOverlayView(s, 1).cinematic).toBe(true);
+    overlayApplyOp(s, { kind: 'end' }, 5);
+    expect(sceneOverlayView(s, 5).cinematic).toBe(false);
+  });
+
+  it('clears cinematic on a skip teardown (end arriving with presentation ops still live)', () => {
+    // A skipped scene drops its remaining ops and delivers only end; cinematic
+    // must fall to false so the HUD is restored in one step, watched or skipped.
+    const s = createSceneOverlayState();
+    overlayApplyOp(s, { kind: 'start', duration: 10 }, 0);
+    overlayApplyOp(s, { kind: 'letterbox', on: true }, 0);
+    overlayApplyOp(s, { kind: 'fade', to: 'black', dur: 5 }, 0);
+    expect(sceneOverlayView(s, 1).cinematic).toBe(true);
+    overlayApplyOp(s, { kind: 'end' }, 2);
+    expect(sceneOverlayView(s, 2).cinematic).toBe(false);
+  });
+
   it('toggles the letterbox from the op', () => {
     const s = createSceneOverlayState();
     overlayApplyOp(s, { kind: 'letterbox', on: true }, 0);

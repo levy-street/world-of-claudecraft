@@ -61,6 +61,12 @@ export class SceneOverlayWindow {
 
   paint(model: SceneOverlayModel): void {
     const w = this.deps.writers;
+    // Cinematic mode: the whole HUD hides while a scene runs. The class lands on
+    // <body> (not the #ui container) because two hidden roots, #nameplates and the
+    // mobile #mobile-controls, are SIBLINGS of #ui, not descendants. The end op
+    // clears model.cinematic, so this one write restores the HUD. Elided, so an
+    // unchanged frame costs no DOM mutation.
+    w.toggleClass(this.deps.document.body, 'cinematic-mode', model.cinematic);
     w.toggleClass(this.barTop, 'on', model.letterbox);
     w.toggleClass(this.barBottom, 'on', model.letterbox);
     // The fade layer hides entirely at 0 so an idle HUD composites nothing.
