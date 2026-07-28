@@ -324,3 +324,53 @@ farshore.test.ts crossing line at z -30 stays open sea). Deck plane
 measured from the new model: 4.68 of its 24-unit normalized height,
 scale 1.649. harbor/fixtures/q0 suites re-pinned; parity goldens hold
 (the carve stamps sit outside the golden probe set).
+
+### H2: the fare, a personal dock dialog (2026-07-28)
+
+Boarding the ferry, or talking to Ewald or the NEW routing for Odda, opens
+the dialogue-choice window with the fare: 10 copper (the owner priced it
+down from the PRD's 50), "Pay the fare." / "Not today.", each party rider
+answering their own prompt. The engine change is the choice system's
+personal shared-world arm (src/sim/scenes/choices.ts), mirroring the
+scene engine's: audience of one, keyed -pid so claim choices never
+collide, leader is the rider, and ALL effects run through an onResolve
+callback (no campaignFlags write: a dock transaction colors no story).
+Declining, walking 10 yd off the prompt anchor, or the 25 s response
+window all leave the rider ashore unchanged; answers prefer the
+answering player's own personal prompt so two riders sharing a choiceId
+never eat each other's clicks. A broke FIRST crossing rides free with
+Ewald's waiver line (log.ferryFareWaived, filled in every matcher
+locale); any other empty purse gets the shared "Not enough money."
+refusal. The sceneChoice event gained interpolation values ({price},
+formatNumber in the window) and the crossing logs were re-aligned to the
+registered log.ferryEnter/ferryLeave matcher strings (the emitted
+English had drifted; the fills already existed). Fare strings shipped
+with their five non-Latin fills (M16). tests/last_bell_fare.test.ts
+pins pays/declines/waiver/party/return-leg/drift/timeout/keeper-talk.
+
+### H3: the voyage cinematic and the harbor's voice (2026-07-28)
+
+Paying the fare now letterboxes into the departure: harbor ambience,
+one bell toll, and the grand ferry casting off along its bow while the
+camera holds the berth, fade to black, fade up at the far pier. The sim
+teleports at PAY time, so the whole cinematic is world-coordinate
+presentation and an Esc skip at ANY point leaves state identical to a
+watched voyage (the scene has zero authoritative ops). The FIRST
+crossing splices the departure core and the Q0 arrival into one scene
+(scn_lb_q0_voyage) so a single skip covers the whole trip; re-rides get
+the short line-free departure per side. New machinery: a 'prop'
+SceneWireOp (target key + cue id) routed by the scene director to
+src/render/harbor.ts, whose ships register as harbor_ship_<id> and ease
+out on a cast_off cue (pure math in harbor_cast_off.ts, a registered
+RENDER_PURE_CORES core; a ship un-freezes matrixAutoUpdate ONLY while
+its cue is live and refreezes on reset, per review, and the scene end
+op resets every cue). Audio: scene music directives map to samples in
+src/game/scene_sfx.ts (lb_bell_toll_one stops being a no-op); the bell
+toll, harbor ambience, and cast-off takes are DETERMINISTIC BAKED
+PLACEHOLDERS from scripts/gen_last_bell_harbor_sfx.mjs through the
+standard conform path, with ElevenLabs prompts already in the catalog
+for a paid or CC0 replacement. The bell is the campaign's signature
+sound: OWNER SIGN-OFF PENDING on the sample, and the departure camera
+yaws are authored blind (owner-walk polish expected). The arrival
+scene's harbor wide was re-framed to the v4 berth (the old frame missed
+the ship).
