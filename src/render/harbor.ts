@@ -17,6 +17,7 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { LAST_BELL_PROP_PATH_SEGMENTS } from '../sim/content/last_bell_cinematics';
 import { getActiveWorldContent } from '../sim/data';
 import {
   HARBOR_RAIL_HEIGHT,
@@ -28,7 +29,7 @@ import {
 } from '../sim/harbor_layout';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { GFX, surfaceMat } from './gfx';
-import { castOffPose } from './harbor_cast_off';
+import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './prop_path_core';
 import { type PropAsset, propAsset } from './props';
 import { radialGlowTexture } from './textures';
 
@@ -357,37 +358,42 @@ function buildBollard(
   parent.add(collar);
 }
 
-// The scene-cued ships (H3): each moored ship registers under the prop
-// target key the departure scenes cue ('harbor_ship_<harborId>'). A cast-off
-// cue eases the hull out of the berth along its bow axis; the scene end
-// resets every cue (nobody but the cued rider ever receives the ops, so the
-// motion is per-client presentation, never shared state).
+// The scene-cued ships (H3): each moored ship registers under the prop target
+// key the departure scenes cue ('harbor_ship_<harborId>'). A cue resolves an
+// authored segment in the ship's berth-local frame; the scene end resets every
+// cue (nobody but the cued rider ever receives the ops, so the motion is
+// per-client presentation, never shared state).
 interface HarborShipHandle {
   group: THREE.Group;
   baseX: number;
   baseY: number;
   baseZ: number;
   baseRot: number;
-  /** performance.now()/1000 when the cast-off cue started, or null. */
+  /** performance.now()/1000 when the active segment started, or null. */
   cueStartSec: number | null;
+  segment: PropPathSegment | null;
 }
 
 const SHIPS = new Map<string, HarborShipHandle>();
-const CUE_POSE = { forward: 0, yawDrift: 0, done: false };
+const PROP_PATH_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
+  LAST_BELL_PROP_PATH_SEGMENTS;
+const CUE_POSE: PropPathSample = { x: 0, y: 0, z: 0, yaw: 0, done: false };
 
-/** Route a scene prop cue to a ship. Unknown targets/cues are ignored (an
- *  authored scene must never crash the client). The ship's matrix auto-update
- *  is enabled ONLY while a cue is live, so the harbors stay inside the
- *  freezeStaticMatrices contract the rest of the time. */
+/** Route a scene prop cue to a ship. Unknown targets are ignored and unknown
+ *  cues park a known ship, so authored mistakes never crash the client. The
+ *  ship's matrix auto-update is enabled ONLY while a cue is live, so harbors
+ *  stay inside the freezeStaticMatrices contract the rest of the time. */
 export function cueHarborShip(target: string, cue: string): void {
   const handle = SHIPS.get(target);
   if (!handle) return;
-  if (cue === 'cast_off') {
-    handle.cueStartSec = performance.now() / 1000;
-    handle.group.matrixAutoUpdate = true;
-  } else {
+  const segment = PROP_PATH_SEGMENTS[cue];
+  if (!segment) {
     resetShip(handle);
+    return;
   }
+  handle.segment = segment;
+  handle.cueStartSec = performance.now() / 1000;
+  handle.group.matrixAutoUpdate = true;
 }
 
 /** Scene teardown: every ship back at its berth. */
@@ -397,6 +403,7 @@ export function resetHarborShipCues(): void {
 
 function resetShip(handle: HarborShipHandle): void {
   handle.cueStartSec = null;
+  handle.segment = null;
   handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
   handle.group.rotation.y = handle.baseRot;
   // Back under the freeze: recompose the rest pose once (updateMatrix flags
@@ -408,12 +415,17 @@ function resetShip(handle: HarborShipHandle): void {
 /** Per-frame cue drive (renderer.sync). Zero work while no cue is live. */
 export function updateHarborShips(): void {
   for (const handle of SHIPS.values()) {
-    if (handle.cueStartSec === null) continue;
-    const pose = castOffPose(performance.now() / 1000 - handle.cueStartSec, CUE_POSE);
+    if (handle.cueStartSec === null || handle.segment === null) continue;
+    const pose = propPathPoseAt(
+      handle.segment,
+      performance.now() / 1000 - handle.cueStartSec,
+      CUE_POSE,
+    );
     handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
-    handle.group.rotation.y = handle.baseRot + pose.yawDrift;
-    // Local +x is the bow, so the heading owns the direction of travel.
-    handle.group.translateX(pose.forward);
+    handle.group.rotation.y = handle.baseRot + pose.yaw;
+    handle.group.translateX(pose.x);
+    handle.group.translateY(pose.y);
+    handle.group.translateZ(pose.z);
   }
 }
 
@@ -438,6 +450,7 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
     baseZ: harbor.berth.z,
     baseRot: harbor.berth.rot,
     cueStartSec: null,
+    segment: null,
   });
 }
 

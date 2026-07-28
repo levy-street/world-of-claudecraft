@@ -235,10 +235,11 @@ const UI_PURE_CORES = [
 ].map((rel) => join(repoRoot, rel));
 
 // Pure logic cores that live in src/render (the painter half is Three-side):
-// cast_bar (the overhead cast/channel state) and nameplate_view (the per-entity
-// nameplate visibility / anchor / threat / combo model). Each emits state
-// from sim types with no Three import and no i18n, so a NameplatePainter /
-// cast_bar painter draws it and a Vitest drives it directly.
+// cast_bar (the overhead cast/channel state), prop_path_core (authored segment
+// interpolation), and nameplate_view (the per-entity nameplate visibility /
+// anchor / threat / combo model). Each emits state from sim types with no
+// Three import and no i18n, so a render consumer drives it and a Vitest can
+// sample it directly.
 // terrain_region_core (editor partial-rebuild chunk/texel selection math) and
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
@@ -247,7 +248,7 @@ const UI_PURE_CORES = [
 // moment of the cycle.
 const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
-  'src/render/harbor_cast_off.ts',
+  'src/render/prop_path_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/nameplate_view.ts',
@@ -274,7 +275,6 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/render/foliage_lod.ts',
-  'src/render/harbor_cast_off.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/ui/mob_idle_sfx.ts',

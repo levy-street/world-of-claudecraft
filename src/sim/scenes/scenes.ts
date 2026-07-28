@@ -336,8 +336,8 @@ function resolveAndApply(
       return applyOnly || !actor ? null : { kind: 'anim', entityId: actor.id, anim: op.anim };
     }
     case 'prop':
-      // Pure presentation: the client resolves the target key to a render
-      // prop (the harbor ship) and runs the motion cue.
+      // Pure presentation: the client resolves the target key and segment id
+      // to a render prop path.
       return applyOnly ? null : { kind: 'prop', target: op.target, cue: op.cue };
   }
 }

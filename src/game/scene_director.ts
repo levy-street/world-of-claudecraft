@@ -25,7 +25,7 @@ export interface SceneDirectorDeps {
   musicSilence: (on: boolean) => void;
   /** Sampled interpretation of a music directive (scene_sfx.ts). */
   playDirective?: (directive: string) => void;
-  /** Route a prop motion cue to the renderer (the harbor ship cast-off). */
+  /** Route a prop target and path segment id to the renderer. */
   propCue?: (target: string, cue: string) => void;
   /** Scene teardown: every prop cue back to rest. */
   propReset?: () => void;

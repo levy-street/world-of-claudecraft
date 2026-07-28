@@ -15,6 +15,7 @@ import { registerScenario } from '../scenarios/registry';
 import { registerChoice } from '../scenes/choices';
 import { registerScene } from '../scenes/scenes';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
+import { LAST_BELL_CAST_OFF_SEGMENT_ID } from './last_bell_cinematics';
 
 // ---------------------------------------------------------------------------
 // Mobs
@@ -241,7 +242,7 @@ const departureCore = (ship: { x: number; z: number }, target: string, yaw: numb
   },
   { at: 1.4, kind: 'music', directive: 'lb_bell_toll_one' },
   // Cast off: the hull eases out of the berth under the wide shot.
-  { at: 3.0, kind: 'prop', target, cue: 'cast_off' },
+  { at: 3.0, kind: 'prop', target, cue: LAST_BELL_CAST_OFF_SEGMENT_ID },
   { at: 3.0, kind: 'music', directive: 'lb_ship_castoff' },
   {
     at: 3.4,
