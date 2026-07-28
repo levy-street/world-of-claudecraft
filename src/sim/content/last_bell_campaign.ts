@@ -12,6 +12,7 @@
 
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../harbor_layout';
 import { registerScenario } from '../scenarios/registry';
+import { registerChoice } from '../scenes/choices';
 import { registerScene } from '../scenes/scenes';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
 
@@ -138,6 +139,39 @@ export const LAST_BELL_CAMPAIGN_QUESTS: Record<string, QuestDef> = {
     minLevel: 3,
   },
 };
+
+// ---------------------------------------------------------------------------
+// Choices
+// ---------------------------------------------------------------------------
+
+// The ferry fare (H2): a personal dock prompt, not a story claim, so each
+// rider pays their own passage (the leader-answers rule stays story-only)
+// and the flag below is never written (the personal arm resolves through a
+// callback). One def per direction: the prompt names where you are going.
+// The price value interpolates {price} from the campaign module's
+// FERRY_FARE_COPPER const.
+const FARE_OPTIONS = [
+  { id: 'pay', key: 'lb.fare.pay' },
+  { id: 'decline', key: 'lb.fare.decline' },
+] as const;
+
+registerChoice({
+  id: 'ch_lb_ferry_fare_out',
+  promptKey: 'lb.fare.promptOut',
+  flag: 'lb_ferry_fare',
+  options: FARE_OPTIONS,
+  windowSeconds: 25,
+  defaultOptionId: 'decline',
+});
+
+registerChoice({
+  id: 'ch_lb_ferry_fare_back',
+  promptKey: 'lb.fare.promptBack',
+  flag: 'lb_ferry_fare',
+  options: FARE_OPTIONS,
+  windowSeconds: 25,
+  defaultOptionId: 'decline',
+});
 
 // ---------------------------------------------------------------------------
 // Scenes

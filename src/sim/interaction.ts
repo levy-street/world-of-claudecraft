@@ -34,7 +34,7 @@ import {
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
-import { tryLastBellInteract } from './last_bell/campaign';
+import { tryLastBellInteract, tryLastBellNpcTalk } from './last_bell/campaign';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -528,6 +528,9 @@ export function interact(ctx: SimContext, pid?: number): void {
         ctx.emit({ type: 'bank', pid: p.id });
         return;
       }
+      // Last Bell gangplank keepers: talk opens the fare dialog, not the
+      // quest-NPC greeting.
+      if (target.kind === 'npc' && tryLastBellNpcTalk(ctx, target, p.id)) return;
       if (ctx.isQuestInteractionEntity(target)) {
         ctx.talkToNpc(target.id, p.id);
         return;
@@ -609,5 +612,8 @@ export function interact(ctx: SimContext, pid?: number): void {
     ctx.emit({ type: 'bank', pid: p.id });
     return;
   }
+  // Last Bell gangplank keepers: talk opens the fare dialog, not the
+  // quest-NPC greeting.
+  if (questEntity?.kind === 'npc' && tryLastBellNpcTalk(ctx, questEntity, p.id)) return;
   if (questEntity) ctx.talkToNpc(questEntity.id, p.id);
 }

@@ -9073,6 +9073,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'lb.q0.tam.stretchers': 'ああいうのが前に出たときは、見張り全員の午前と担架二台が犠牲になった。',
   'lb.q0.coalfast.look':
     '灰色の男は倒れた獣を見て、それからお前を、わずかに長く見た。そして崖の方へ歩き去った。',
+  'lb.fare.promptOut': '遠つ岸への渡し賃：銅貨{price}枚。',
+  'lb.fare.promptBack': '本土へ戻る渡し賃：銅貨{price}枚。',
+  'lb.fare.pay': '渡し賃を払う。',
+  'lb.fare.decline': '今日はやめておく。',
   'hudChrome.scene.skipHint': 'シーンをスキップ（Esc）',
   'hudChrome.scene.waitingFor': '{name}を待っています',
   'guide.abilityHook.revenge':

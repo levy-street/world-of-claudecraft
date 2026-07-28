@@ -2522,6 +2522,12 @@ export const sv_SE: EnTranslations = {
       "edda": "Quartermaster Edda",
       "saul": "Mender Saul"
     },
+    "fare": {
+      "promptOut": "Passage to the Farshore: {price} copper.",
+      "promptBack": "Passage back to the mainland: {price} copper.",
+      "pay": "Pay the fare.",
+      "decline": "Not today."
+    },
     "q0": {
       "scene": {
         "harbor": "A working harbor: nets drying, star-glass salvage crates stenciled for mainland buyers.",

@@ -9223,6 +9223,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'lb.q0.scene.toll': 'Колокол бьет один раз. Все на улице замирают и считают. Продолжения нет, и вся улица разом выдыхает.',
   'lb.q0.tam.stretchers': 'Прошлый такой стоил всей страже утра и двух носилок.',
   'lb.q0.coalfast.look': 'Седой посмотрел на мертвую тварь, потом на тебя, чуть дольше. И зашагал обратно к утесам.',
+  'lb.fare.promptOut': 'Переправа на Дальний берег: {price} меди.',
+  'lb.fare.promptBack': 'Переправа обратно на большую землю: {price} меди.',
+  'lb.fare.pay': 'Заплатить за переправу.',
+  'lb.fare.decline': 'Не сегодня.',
   'hudChrome.scene.skipHint': 'Пропустить сцену (Esc)',
   'hudChrome.scene.waitingFor': 'Ожидание: {name}',
   'guide.abilityHook.revenge':

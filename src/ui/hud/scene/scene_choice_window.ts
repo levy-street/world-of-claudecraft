@@ -74,8 +74,16 @@ export class SceneChoiceWindow {
   private renderPrompt(model: SceneChoiceModel, leaderName: string): void {
     const doc = this.deps.document;
     // Prompt and option text arrive as stable keys (S3): render t(key) directly.
+    // Numeric prompt values (the fare price) format through formatNumber.
+    let promptValues: Record<string, string> | undefined;
+    if (model.values !== null) {
+      promptValues = {};
+      for (const [k, v] of Object.entries(model.values)) {
+        promptValues[k] = typeof v === 'number' ? formatNumber(v, NUM0) : v;
+      }
+    }
     this.promptEl.textContent =
-      model.promptKey !== null ? t(model.promptKey as TranslationKey) : '';
+      model.promptKey !== null ? t(model.promptKey as TranslationKey, promptValues) : '';
     this.optionsEl.textContent = '';
     if (model.isLeader) {
       for (const option of model.options) {

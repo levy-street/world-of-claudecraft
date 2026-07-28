@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { FARSHORE_PROPS } from '../src/sim/content/farshore';
 import { ZONE1_PROPS } from '../src/sim/content/zone1';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
+import { answerSceneChoice } from '../src/sim/scenes/choices';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { FARSHORE_BREACH } from '../src/sim/world';
@@ -99,8 +100,12 @@ describe('Last Bell campaign fixtures', () => {
     expect(breach.dead).toBe(false);
   });
 
-  it('keeps the ferries interactable: boarding still crosses the strait', () => {
+  it('keeps the ferries interactable: boarding opens the fare and paying crosses', () => {
     const sim = makeSim();
+    const meta = sim.ctx.players.get(sim.playerId);
+    expect(meta).toBeTruthy();
+    if (!meta) return;
+    meta.copper = 25;
     const mainlandFerry = fixtures(sim, 'lb_ferry').find(
       (f) => f.pos.x === MAINLAND_HARBOR.boarding.x,
     );
@@ -110,6 +115,8 @@ describe('Last Bell campaign fixtures', () => {
     teleport(sim, 238, -47.5);
     sim.player.targetId = mainlandFerry.id;
     sim.interact();
+    expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_out', 'pay')).toBe(true);
+    expect(meta.copper).toBe(15);
     expect(
       Math.hypot(
         sim.player.pos.x - GULLHAVEN_HARBOR.arrival.x,
@@ -127,6 +134,8 @@ describe('Last Bell campaign fixtures', () => {
     if (!pierFerry) return;
     sim.player.targetId = pierFerry.id;
     sim.interact();
+    expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_back', 'pay')).toBe(true);
+    expect(meta.copper).toBe(5);
     expect(
       Math.hypot(
         sim.player.pos.x - MAINLAND_HARBOR.arrival.x,

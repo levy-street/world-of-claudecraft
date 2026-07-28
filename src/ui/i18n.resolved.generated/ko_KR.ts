@@ -2522,6 +2522,12 @@ export const ko_KR: EnTranslations = {
       "edda": "보급관 에다",
       "saul": "치유사 사울"
     },
+    "fare": {
+      "promptOut": "먼기슭까지의 뱃삯: 동화 {price}닢.",
+      "promptBack": "뭍으로 돌아가는 뱃삯: 동화 {price}닢.",
+      "pay": "뱃삯을 낸다.",
+      "decline": "오늘은 됐다."
+    },
     "q0": {
       "scene": {
         "harbor": "일하는 항구. 그물이 마르고, 별유리 인양 상자에는 본토 구매자의 인장이 찍혀 있다.",

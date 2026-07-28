@@ -37,7 +37,21 @@ export interface ActiveChoice {
   dungeonId: string;
   startedAt: number;
   leaderPid: number;
+  /** Personal shared-world prompt (the ferry fare): the audience is exactly
+   * this player, keyed -pid so claim choices never collide. Resolution
+   * effects run through onResolve; campaignFlags stay untouched (a dock
+   * transaction colors no story). */
+  audiencePid?: number;
+  /** Where the personal prompt opened; drifting off it resolves the default
+   * (walking away from the dock is declining). */
+  anchorX?: number;
+  anchorZ?: number;
+  onResolve?: (ctx: SimContext, optionId: string) => void;
 }
+
+/** A personal prompt resolves to its default once the player drifts this far
+ * from where it opened (yards). */
+const PERSONAL_CHOICE_DRIFT = 10;
 
 const CHOICES: Record<string, SceneChoiceDef> = {};
 
@@ -54,6 +68,10 @@ export function choiceActiveFor(ctx: SimContext, claimId: number): boolean {
 }
 
 function participants(ctx: SimContext, choice: ActiveChoice): Entity[] {
+  if (choice.audiencePid !== undefined) {
+    const p = ctx.entities.get(choice.audiencePid);
+    return p ? [p] : [];
+  }
   const inst = ctx.instances.find(
     (i) => i.dungeonId === choice.dungeonId && i.exitId === choice.claimId,
   );
@@ -103,6 +121,49 @@ export function startChoice(ctx: SimContext, claimId: number, choiceId: string):
   return true;
 }
 
+// A personal shared-world choice (the ferry fare): audience of one, no claim,
+// keyed -pid mirroring playSceneForPlayer. The prompt may carry interpolation
+// values (the price); all resolution effects go through onResolve so an
+// open-world prompt can charge and act without story-claim flag semantics.
+export function startChoiceForPlayer(
+  ctx: SimContext,
+  pid: number,
+  choiceId: string,
+  opts?: {
+    values?: Record<string, string | number>;
+    onResolve?: (ctx: SimContext, optionId: string) => void;
+  },
+): boolean {
+  const def = CHOICES[choiceId];
+  const p = ctx.entities.get(pid);
+  if (!def || !p) return false;
+  const key = -pid;
+  if (ctx.activeChoices.has(key)) return false;
+  ctx.activeChoices.set(key, {
+    choiceId,
+    claimId: key,
+    dungeonId: '',
+    startedAt: ctx.time,
+    leaderPid: pid,
+    audiencePid: pid,
+    anchorX: p.pos.x,
+    anchorZ: p.pos.z,
+    onResolve: opts?.onResolve,
+  });
+  ctx.emit({
+    type: 'sceneChoice',
+    choiceId: def.id,
+    promptKey: def.promptKey,
+    options: def.options.map((o) => ({ id: o.id, key: o.key })),
+    windowSeconds: def.windowSeconds,
+    defaultOptionId: def.defaultOptionId,
+    leaderPid: pid,
+    values: opts?.values,
+    pid,
+  });
+  return true;
+}
+
 function resolveChoice(ctx: SimContext, choice: ActiveChoice, optionId: string): void {
   const def = CHOICES[choice.choiceId];
   if (!def) {
@@ -113,6 +174,22 @@ function resolveChoice(ctx: SimContext, choice: ActiveChoice, optionId: string):
     id: def.defaultOptionId,
     key: '',
   };
+  if (choice.audiencePid !== undefined) {
+    // Personal arm: no campaignFlags write; the result event closes the
+    // window first so the callback's own events (charge, crossing) land
+    // after it in the player's stream.
+    ctx.emit({
+      type: 'sceneChoiceResult',
+      choiceId: def.id,
+      optionId: option.id,
+      replyKey: 'replyKey' in option ? option.replyKey : undefined,
+      replySpeaker: 'replySpeaker' in option ? option.replySpeaker : undefined,
+      pid: choice.audiencePid,
+    });
+    ctx.activeChoices.delete(choice.claimId);
+    choice.onResolve?.(ctx, option.id);
+    return;
+  }
   const audience = participants(ctx, choice);
   for (const p of audience) {
     // The record is personal and persistent: every participant carries the
@@ -140,11 +217,19 @@ export function answerSceneChoice(
 ): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
+  const def = CHOICES[choiceId];
+  if (!def?.options.some((o) => o.id === optionId)) return false;
+  // The answering player's own personal prompt wins first: two riders at the
+  // dock share a choiceId but never a playback, so the claim scan below must
+  // not see a neighbor's personal prompt and drop the answer.
+  const personal = ctx.activeChoices.get(-r.meta.entityId);
+  if (personal?.choiceId === choiceId) {
+    resolveChoice(ctx, personal, optionId);
+    return true;
+  }
   for (const choice of ctx.activeChoices.values()) {
-    if (choice.choiceId !== choiceId) continue;
+    if (choice.audiencePid !== undefined || choice.choiceId !== choiceId) continue;
     if (choice.leaderPid !== r.meta.entityId) return false;
-    const def = CHOICES[choiceId];
-    if (!def?.options.some((o) => o.id === optionId)) return false;
     resolveChoice(ctx, choice, optionId);
     return true;
   }
@@ -160,12 +245,27 @@ export function updateChoices(ctx: SimContext): void {
       ctx.activeChoices.delete(choice.claimId);
       continue;
     }
-    const claimAlive = ctx.instances.some(
-      (i) => i.dungeonId === choice.dungeonId && i.exitId === choice.claimId,
-    );
-    if (!claimAlive) {
-      ctx.activeChoices.delete(choice.claimId);
-      continue;
+    if (choice.audiencePid !== undefined) {
+      const p = ctx.entities.get(choice.audiencePid);
+      if (!p) {
+        ctx.activeChoices.delete(choice.claimId);
+        continue;
+      }
+      // Walking away from the prompt is declining.
+      const dx = p.pos.x - (choice.anchorX ?? p.pos.x);
+      const dz = p.pos.z - (choice.anchorZ ?? p.pos.z);
+      if (dx * dx + dz * dz > PERSONAL_CHOICE_DRIFT * PERSONAL_CHOICE_DRIFT) {
+        resolveChoice(ctx, choice, def.defaultOptionId);
+        continue;
+      }
+    } else {
+      const claimAlive = ctx.instances.some(
+        (i) => i.dungeonId === choice.dungeonId && i.exitId === choice.claimId,
+      );
+      if (!claimAlive) {
+        ctx.activeChoices.delete(choice.claimId);
+        continue;
+      }
     }
     if (def.windowSeconds > 0 && ctx.time - choice.startedAt >= def.windowSeconds) {
       resolveChoice(ctx, choice, def.defaultOptionId);

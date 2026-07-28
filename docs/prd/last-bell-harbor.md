@@ -87,7 +87,8 @@ What it is:
   open world. Party rule for the ferry: each rider pays their own fare
   (the leader-answers rule stays for story claims only).
 - Q0 hooks the FIRST PAID crossing (auto-accept + arrival scene unchanged).
-  Fare price is a named const (initial: 50 copper; not enough to gate a
+  Fare price is a named const (initial: 10 copper, owner decision 2026-07-28,
+  down from the spec's 50; not enough to gate a
   broke level-3 player out of the campaign forever: first crossing is free
   if the purse cannot cover it, with a line from Ewald).
 

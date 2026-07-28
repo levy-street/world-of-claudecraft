@@ -2522,6 +2522,12 @@ export const ja_JP: EnTranslations = {
       "edda": "兵站係エッダ",
       "saul": "癒し手ソール"
     },
+    "fare": {
+      "promptOut": "遠つ岸への渡し賃：銅貨{price}枚。",
+      "promptBack": "本土へ戻る渡し賃：銅貨{price}枚。",
+      "pay": "渡し賃を払う。",
+      "decline": "今日はやめておく。"
+    },
     "q0": {
       "scene": {
         "harbor": "働く港。網が干され、星硝子のサルベージ箱には本土の買い手の刻印がある。",

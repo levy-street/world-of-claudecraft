@@ -17,12 +17,16 @@ export interface SceneChoicePrompt {
   windowSeconds: number;
   defaultOptionId: string;
   leaderPid: number;
+  /** Interpolation values for the prompt key (the fare price). */
+  values?: Record<string, string | number>;
 }
 
 export interface SceneChoiceModel {
   visible: boolean;
   choiceId: string | null;
   promptKey: string | null;
+  /** Interpolation values for the prompt key, or null when it has none. */
+  values: Record<string, string | number> | null;
   options: readonly SceneChoiceOption[];
   /** True when the local player is the one whose answer counts. */
   isLeader: boolean;
@@ -47,6 +51,7 @@ export function createSceneChoiceState(): SceneChoiceState {
       visible: false,
       choiceId: null,
       promptKey: null,
+      values: null,
       options: NO_OPTIONS,
       isLeader: false,
       leaderPid: -1,
@@ -83,6 +88,7 @@ export function sceneChoiceView(
   m.visible = prompt !== null;
   m.choiceId = prompt?.choiceId ?? null;
   m.promptKey = prompt?.promptKey ?? null;
+  m.values = prompt?.values ?? null;
   m.options = prompt?.options ?? NO_OPTIONS;
   m.isLeader = prompt !== null && prompt.leaderPid === playerId;
   m.leaderPid = prompt?.leaderPid ?? -1;

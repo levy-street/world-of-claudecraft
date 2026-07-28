@@ -3605,6 +3605,9 @@ export type SimEvent = { pid?: number } & (
       windowSeconds: number;
       defaultOptionId: string;
       leaderPid: number;
+      /** Interpolation values for the prompt key (the fare price); the client
+       * formats numbers through formatNumber before t(). */
+      values?: Record<string, string | number>;
     }
   | {
       type: 'sceneChoiceResult';

@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { scenarioRunFor } from '../src/sim/scenarios/scenarios';
+import { answerSceneChoice } from '../src/sim/scenes/choices';
 import { Sim } from '../src/sim/sim';
 import { squadActorEntity } from '../src/sim/squad/squad';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -48,14 +49,22 @@ describe('Q0 Ashore end to end', () => {
   it('plays the whole quest from the mainland dock to the recruitment', () => {
     const sim = makeSim();
 
-    // 1. Board the ferry on the mainland ship's deck: quest
-    // auto-accepts, the crossing lands on Gullhaven's harbor deck, and the
-    // arrival scene starts for this player.
+    // 1. Board the ferry on the mainland ship's deck: the fare dialog opens
+    // (H2), paying charges the purse and crosses, the quest auto-accepts,
+    // the crossing lands on Gullhaven's harbor deck, and the arrival scene
+    // starts for this player.
+    const meta = sim.ctx.players.get(sim.playerId);
+    if (meta) meta.copper = 50;
     teleport(sim, 238, -47.5);
     const ferry = findByName(sim, 'The Farshore Ferry');
     expect(ferry).toBeTruthy();
     sim.player.targetId = ferry?.id ?? null;
     sim.interact();
+    // The dialog holds the dock until it resolves: no charge, no crossing yet.
+    expect(sim.questLog.has(QUEST)).toBe(false);
+    expect(sim.player.pos.x).toBeGreaterThan(200);
+    expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_out', 'pay')).toBe(true);
+    expect(meta?.copper).toBe(40);
     expect(sim.questLog.get(QUEST)?.state).toBe('active');
     expect(Math.hypot(sim.player.pos.x - 782, sim.player.pos.z - 116)).toBeLessThan(3);
     const arrival = collect(sim, 30);
@@ -152,13 +161,16 @@ describe('Q0 Ashore end to end', () => {
     expect(sim.xp).toBeGreaterThan(xpBefore);
   });
 
-  it('the ferry is plain travel once the quest is done or active', () => {
+  it('the ferry is plain paid travel once the quest is done or active', () => {
     const sim = makeSim();
     sim.ctx.players.get(sim.playerId)?.questsDone.add(QUEST);
+    const meta = sim.ctx.players.get(sim.playerId);
+    if (meta) meta.copper = 30;
     teleport(sim, 238, -47.5);
     const ferry = findByName(sim, 'The Farshore Ferry');
     sim.player.targetId = ferry?.id ?? null;
     sim.interact();
+    expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_out', 'pay')).toBe(true);
     expect(sim.questLog.has(QUEST)).toBe(false);
     const events = collect(sim, 10);
     expect(events.some((e) => e.type === 'scene')).toBe(false);
@@ -168,6 +180,7 @@ describe('Q0 Ashore end to end', () => {
     const back = findByName(sim, 'The Farshore Ferry');
     sim.player.targetId = back?.id ?? null;
     sim.interact();
+    expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_back', 'pay')).toBe(true);
     expect(sim.player.pos.x).toBeLessThan(200);
   });
 });

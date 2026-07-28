@@ -21,6 +21,14 @@ export const lastBellStrings = {
     edda: 'Quartermaster Edda',
     saul: 'Mender Saul',
   },
+  // The ferry fare dialog (H2). {price} interpolates the sim's
+  // FERRY_FARE_COPPER through formatNumber in the choice window.
+  fare: {
+    promptOut: 'Passage to the Farshore: {price} copper.',
+    promptBack: 'Passage back to the mainland: {price} copper.',
+    pay: 'Pay the fare.',
+    decline: 'Not today.',
+  },
   q0: {
     scene: {
       harbor:

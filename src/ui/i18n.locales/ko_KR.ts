@@ -9060,6 +9060,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'lb.q0.tam.stretchers': '지난번 저런 놈 하나에 경비대 전원의 오전과 들것 두 개가 들었지.',
   'lb.q0.coalfast.look':
     '잿빛 사내는 쓰러진 짐승을 보고, 그다음 당신을 조금 더 오래 바라보았다. 그리고 절벽 쪽으로 걸어갔다.',
+  'lb.fare.promptOut': '먼기슭까지의 뱃삯: 동화 {price}닢.',
+  'lb.fare.promptBack': '뭍으로 돌아가는 뱃삯: 동화 {price}닢.',
+  'lb.fare.pay': '뱃삯을 낸다.',
+  'lb.fare.decline': '오늘은 됐다.',
   'hudChrome.scene.skipHint': '장면 건너뛰기 (Esc)',
   'hudChrome.scene.waitingFor': '{name} 대기 중',
   'guide.abilityHook.revenge':

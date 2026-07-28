@@ -2522,6 +2522,12 @@ export const zh_CN: EnTranslations = {
       "edda": "军需官艾达",
       "saul": "医者扫罗"
     },
+    "fare": {
+      "promptOut": "渡海去远岸：{price} 铜币。",
+      "promptBack": "渡海回大陆：{price} 铜币。",
+      "pay": "付船钱。",
+      "decline": "今天不去。"
+    },
     "q0": {
       "scene": {
         "harbor": "一座劳作中的港口：渔网晾晒着，星璃打捞箱上印着大陆买家的戳记。",

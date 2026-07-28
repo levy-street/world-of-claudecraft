@@ -77,6 +77,7 @@ export class SceneHudController {
           windowSeconds: ev.windowSeconds,
           defaultOptionId: ev.defaultOptionId,
           leaderPid: ev.leaderPid,
+          values: ev.values,
         },
         nowSec,
       );

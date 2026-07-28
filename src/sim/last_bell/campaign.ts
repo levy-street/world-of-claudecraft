@@ -15,6 +15,7 @@ import { createGroundObject } from '../entity';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../harbor_layout';
 import { acceptQuest } from '../quests/quest_commands';
 import { startScenario } from '../scenarios/scenarios';
+import { startChoiceForPlayer } from '../scenes/choices';
 import { playSceneForPlayer } from '../scenes/scenes';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
@@ -22,6 +23,13 @@ import { FARSHORE_BREACH } from '../world';
 
 const Q0_ID = 'q_lb_q0_ashore';
 const ARRIVAL_SCENE = 'scn_lb_q0_ashore';
+
+// The fare (H2): each rider pays their own passage at the dock dialog. Kept
+// low on purpose; the campaign is never money-gated at its front door (a
+// broke first-timer rides free, below).
+export const FERRY_FARE_COPPER = 10;
+const FARE_CHOICE_OUT = 'ch_lb_ferry_fare_out';
+const FARE_CHOICE_BACK = 'ch_lb_ferry_fare_back';
 
 // The two ferry landings: the mainland harbor at the vale's east point and
 // the Gullhaven harbor. Boarding at one lands you at the other. The harbor
@@ -87,17 +95,21 @@ export function initLastBellCampaign(ctx: SimContext): void {
   }
 }
 
-function boardFerry(ctx: SimContext, obj: Entity, pid: number): void {
+function firstCrossingFor(ctx: SimContext, pid: number, fromMainland: boolean): boolean {
+  const meta = ctx.players.get(pid);
+  if (!meta) return false;
+  return fromMainland && !meta.questsDone.has(Q0_ID) && !meta.questLog.has(Q0_ID);
+}
+
+// The crossing itself: teleport, Q0 hook, arrival scene. Runs only after the
+// fare resolves (or the broke-first-timer waiver).
+function crossFerry(ctx: SimContext, fromMainland: boolean, pid: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
-  // The strait divides the world well east of the mainland harbor and well
-  // west of the island: x 400 splits the two gangplanks on any layout drift.
-  const fromMainland = obj.pos.x < 400;
   const dest = fromMainland ? GULLHAVEN_PIER : MAINLAND_DOCK;
   // First crossing: the campaign begins. acceptQuest is a no-op error path
   // when already active; gate on the log so re-rides stay silent.
-  const firstCrossing =
-    fromMainland && !r.meta.questsDone.has(Q0_ID) && !r.meta.questLog.has(Q0_ID);
+  const firstCrossing = firstCrossingFor(ctx, r.meta.entityId, fromMainland);
   if (firstCrossing) acceptQuest(ctx, Q0_ID, r.meta.entityId);
   const p = r.e;
   p.pos = ctx.groundPos(dest.x, dest.z);
@@ -105,22 +117,64 @@ function boardFerry(ctx: SimContext, obj: Entity, pid: number): void {
   ctx.rebucket(p);
   p.targetId = null;
   p.autoAttack = false;
+  // Exact strings registered in the client matcher (sim_i18n.ts,
+  // log.ferryEnter / log.ferryLeave): change both together or not at all.
   ctx.emit({
     type: 'log',
     text: fromMainland
-      ? 'The ferry noses through the strait and puts you ashore at Gullhaven.'
-      : 'The ferry carries you back across the strait to the mainland dock.',
+      ? 'The ferry bell rings once, and the Farshore rises out of the spray.'
+      : 'The bell answers from the vale, and the mainland takes you back.',
     color: '#b9f',
     pid: r.meta.entityId,
   });
   if (firstCrossing) playSceneForPlayer(ctx, r.meta.entityId, ARRIVAL_SCENE);
 }
 
+// The pay answer. A broke FIRST crossing rides free (with its own log line)
+// so the campaign's front door never money-gates; any other empty purse gets
+// the shared refusal and stays ashore.
+function payFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
+  const r = ctx.resolve(pid);
+  if (!r || r.e.dead) return;
+  if (r.meta.copper >= FERRY_FARE_COPPER) {
+    r.meta.copper -= FERRY_FARE_COPPER;
+  } else if (firstCrossingFor(ctx, r.meta.entityId, fromMainland)) {
+    // Exact string registered in the client matcher (sim_i18n.ts,
+    // log.ferryFareWaived).
+    ctx.emit({
+      type: 'log',
+      text: "Ewald waves the fare away. The first crossing is the town's.",
+      color: '#b9f',
+      pid: r.meta.entityId,
+    });
+  } else {
+    ctx.error(r.meta.entityId, 'Not enough money.');
+    return;
+  }
+  crossFerry(ctx, fromMainland, pid);
+}
+
+// The fare dialog, opened by the boarding fixture and by talking to either
+// gangplank keeper. Personal prompt: in a party each rider pays their own
+// fare (leader-answers stays a story-claim rule).
+function offerFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
+  const r = ctx.resolve(pid);
+  if (!r || r.e.dead) return;
+  startChoiceForPlayer(ctx, r.meta.entityId, fromMainland ? FARE_CHOICE_OUT : FARE_CHOICE_BACK, {
+    values: { price: FERRY_FARE_COPPER },
+    onResolve: (c, optionId) => {
+      if (optionId === 'pay') payFare(c, fromMainland, pid);
+    },
+  });
+}
+
 // Interaction arm (interaction.ts): true when the target was a Last Bell
 // fixture and the interact was consumed.
 export function tryLastBellInteract(ctx: SimContext, target: Entity, pid: number): boolean {
   if (target.templateId === 'lb_ferry') {
-    boardFerry(ctx, target, pid);
+    // The strait divides the world well east of the mainland harbor and well
+    // west of the island: x 400 splits the two gangplanks on any layout drift.
+    offerFare(ctx, target.pos.x < 400, pid);
     return true;
   }
   if (target.templateId === 'lb_scenario_door' && target.scenarioId !== undefined) {
@@ -128,4 +182,12 @@ export function tryLastBellInteract(ctx: SimContext, target: Entity, pid: number
     return true;
   }
   return false;
+}
+
+// NPC-talk arm (interaction.ts): talking to a gangplank keeper opens the
+// same fare dialog the boarding fixture does.
+export function tryLastBellNpcTalk(ctx: SimContext, npc: Entity, pid: number): boolean {
+  if (npc.templateId !== 'ferryman_ewald' && npc.templateId !== 'ferrykeeper_odda') return false;
+  offerFare(ctx, npc.pos.x < 400, pid);
+  return true;
 }
