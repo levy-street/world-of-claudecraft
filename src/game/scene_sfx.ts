@@ -5,9 +5,11 @@
 // scene_director_core.sceneMusicAction contract for silence/resume.
 
 import { sfx } from './sfx';
+import type { SfxId } from './sfx_manifest.generated';
 
-// Directive -> catalog key (public/audio/sfx/<key>.mp3, sfx_manifest).
-const DIRECTIVE_SFX: Record<string, string> = {
+// Directive -> catalog key (public/audio/sfx/<key>.mp3, sfx_manifest). The
+// SfxId pin keeps a renamed manifest key from silently no-opping at runtime.
+const DIRECTIVE_SFX: Record<string, SfxId> = {
   // The campaign's signature sound: one bell toll, the street counts.
   lb_bell_toll_one: 'lb_bell_toll',
   // The departure bed: water against pilings, rope and timber.

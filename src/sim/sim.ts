@@ -2911,6 +2911,11 @@ export class Sim {
     // A leaving player's riding-lesson session is likewise abandoned (never
     // silently left IN_PROGRESS); the one-time fee stays paid either way.
     if (meta.mountTraining?.state === 'IN_PROGRESS') this.ctx.abandonMountTraining(meta);
+    // Personal (-pid keyed) scene/choice presentation dies with the session.
+    // Both would self-clean on the next tick once the entity is gone; the
+    // explicit delete keeps teardown hygienic with the rest of this cluster.
+    this.ctx.scenePlaybacks.delete(-pid);
+    this.ctx.activeChoices.delete(-pid);
     this.preparePlayerLeave(pid);
     despawnMobsForDev(this.ctx, pid, 'spawned');
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now

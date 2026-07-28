@@ -376,12 +376,18 @@ const SHIPS = new Map<string, HarborShipHandle>();
 const CUE_POSE = { forward: 0, yawDrift: 0, done: false };
 
 /** Route a scene prop cue to a ship. Unknown targets/cues are ignored (an
- *  authored scene must never crash the client). */
+ *  authored scene must never crash the client). The ship's matrix auto-update
+ *  is enabled ONLY while a cue is live, so the harbors stay inside the
+ *  freezeStaticMatrices contract the rest of the time. */
 export function cueHarborShip(target: string, cue: string): void {
   const handle = SHIPS.get(target);
   if (!handle) return;
-  if (cue === 'cast_off') handle.cueStartSec = performance.now() / 1000;
-  else resetShip(handle);
+  if (cue === 'cast_off') {
+    handle.cueStartSec = performance.now() / 1000;
+    handle.group.matrixAutoUpdate = true;
+  } else {
+    resetShip(handle);
+  }
 }
 
 /** Scene teardown: every ship back at its berth. */
@@ -393,6 +399,10 @@ function resetShip(handle: HarborShipHandle): void {
   handle.cueStartSec = null;
   handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
   handle.group.rotation.y = handle.baseRot;
+  // Back under the freeze: recompose the rest pose once (updateMatrix flags
+  // the world-matrix cascade for this frame), then stop the per-frame churn.
+  handle.group.updateMatrix();
+  handle.group.matrixAutoUpdate = false;
 }
 
 /** Per-frame cue drive (renderer.sync). Zero work while no cue is live. */
@@ -405,14 +415,6 @@ export function updateHarborShips(): void {
     // Local +x is the bow, so the heading owns the direction of travel.
     handle.group.translateX(pose.forward);
   }
-}
-
-/** Re-enable matrix auto-update on the cued ships. MUST run after the
- *  renderer's freezeStaticMatrices pass over the harbor group (the freeze
- *  contract in static_matrix.ts: transform-animated descendants re-enable
- *  themselves right after the freeze). */
-export function markHarborShipsDynamic(): void {
-  for (const handle of SHIPS.values()) handle.group.matrixAutoUpdate = true;
 }
 
 // The moored ferry ship: the generated GLB (long axis x, base at the keel)

@@ -134,7 +134,7 @@ import {
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
-import { buildHarbors, markHarborShipsDynamic, updateHarborShips } from './harbor';
+import { buildHarbors, updateHarborShips } from './harbor';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -1697,13 +1697,13 @@ export class Renderer {
     freezeStaticMatrices(props.group);
     for (const flame of this.flames) flame.matrixAutoUpdate = true;
     // The authored harbors (boardwalk + moored ship, src/sim/harbor_layout.ts):
-    // static world geometry like the props above, except the ships, which the
-    // departure scenes cue (the freeze contract's animated-descendant arm).
+    // static world geometry like the props above. The ships un-freeze
+    // themselves only while a departure scene's cast-off cue is live
+    // (cueHarborShip / resetShip in ./harbor.ts).
     const harbors = buildHarbors(this.sim.cfg.seed);
     setRenderCategory(harbors.group, 'props');
     this.scene.add(harbors.group);
     freezeStaticMatrices(harbors.group);
-    markHarborShipsDynamic();
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
