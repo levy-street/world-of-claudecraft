@@ -6,9 +6,15 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { assembleEventsFrame, serializeEventFragments } from '../server/event_frame';
 import { ClientWorld } from '../src/net/online';
+import { LAST_BELL_PROP_PATH_SEGMENTS } from '../src/sim/content/last_bell_cinematics';
 import { registerScenario, scenarioRunFor, startScenario } from '../src/sim/scenarios/scenarios';
 import { answerSceneChoice } from '../src/sim/scenes/choices';
-import { registerScene, requestSceneSkip, sceneActiveFor } from '../src/sim/scenes/scenes';
+import {
+  registerScene,
+  requestSceneSkip,
+  sceneActiveFor,
+  sceneById,
+} from '../src/sim/scenes/scenes';
 import { Sim } from '../src/sim/sim';
 import { squadActorEntity } from '../src/sim/squad/squad';
 import type { SimEvent } from '../src/sim/types';
@@ -292,14 +298,193 @@ describe('the voyage cinematic', () => {
     expect(answerSceneChoice(sim.ctx, choiceId, 'pay')).toBe(true);
   }
 
+  it('pins the C5 segment records and camera grammar in both directions', () => {
+    expect({
+      outCastOff: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_out_cast_off,
+      outOpenWater: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_out_open_water,
+      outArrival: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_out_arrival,
+      backCastOff: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_back_cast_off,
+      backOpenWater: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_back_open_water,
+      backArrival: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_back_arrival,
+    }).toEqual({
+      outCastOff: {
+        start: { x: 0, y: 0, z: 0, yaw: 0 },
+        end: { x: 22, y: 0, z: 3, yaw: -0.12 },
+        duration: 4,
+        ease: 'easeOutQuad',
+      },
+      outOpenWater: {
+        start: { x: 124.665, y: 0, z: -5.913, yaw: -1.910796 },
+        end: { x: 242.374, y: 0, z: -3, yaw: -1.910796 },
+        duration: 4.3,
+        ease: 'linear',
+      },
+      outArrival: {
+        start: { x: -28, y: 0, z: 0, yaw: -0.05 },
+        end: { x: 0, y: 0, z: 0, yaw: 0 },
+        duration: 4.3,
+        ease: 'easeInOutSine',
+      },
+      backCastOff: {
+        start: { x: 0, y: 0, z: 0, yaw: 0 },
+        end: { x: 22, y: 0, z: 0, yaw: -0.08 },
+        duration: 4,
+        ease: 'easeOutQuad',
+      },
+      backOpenWater: {
+        start: { x: 117.609, y: 0, z: -6.658, yaw: -0.371593 },
+        end: { x: 230.693, y: 0, z: -5.65, yaw: -0.371593 },
+        duration: 4.3,
+        ease: 'linear',
+      },
+      backArrival: {
+        start: { x: -28, y: 0, z: 0, yaw: 0.05 },
+        end: { x: 0, y: 0, z: 0, yaw: 0 },
+        duration: 4.3,
+        ease: 'easeInOutSine',
+      },
+    });
+
+    const out = sceneById('scn_lb_ferry_depart_out');
+    const back = sceneById('scn_lb_ferry_depart_back');
+    const ashore = sceneById('scn_lb_q0_ashore');
+    const q0 = sceneById('scn_lb_q0_voyage');
+    expect(out).toBeDefined();
+    expect(back).toBeDefined();
+    expect(ashore).toBeDefined();
+    expect(q0).toBeDefined();
+    if (!out || !back || !ashore || !q0) return;
+
+    const shotKinds = (scene: typeof out): string[] =>
+      scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.shot.kind] : []));
+    expect(shotKinds(out)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
+    expect(shotKinds(back)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
+    expect(shotKinds(ashore)).toEqual(['dolly', 'dolly', 'dolly', 'release']);
+    expect(shotKinds(q0)).toEqual([
+      'attach',
+      'attach',
+      'attach',
+      'dolly',
+      'dolly',
+      'dolly',
+      'release',
+    ]);
+
+    const attachSpecs = (scene: typeof out) =>
+      scene.ops.flatMap((op) =>
+        op.kind === 'camera' && op.shot.kind === 'attach'
+          ? [
+              {
+                target: op.shot.target,
+                offset: op.shot.offset,
+                lookAt: op.shot.lookAt,
+              },
+            ]
+          : [],
+      );
+    expect(attachSpecs(out)).toEqual([
+      {
+        target: 'harbor_ship_mainland',
+        offset: { x: -12, y: 11, z: 8 },
+        lookAt: { x: 6.6, y: 8.6, z: 0 },
+      },
+      {
+        target: 'harbor_ship_mainland',
+        offset: { x: 6.6, y: 9.2, z: -11 },
+        lookAt: { x: 6.6, y: 8.6, z: 0 },
+      },
+      {
+        target: 'harbor_ship_gullhaven',
+        offset: { x: 20, y: 11, z: 10 },
+        lookAt: { x: 6.6, y: 8.6, z: 0 },
+      },
+    ]);
+    expect(attachSpecs(back)).toEqual([
+      {
+        target: 'harbor_ship_gullhaven',
+        offset: { x: -12, y: 11, z: -8 },
+        lookAt: { x: 6.6, y: 8.6, z: 0 },
+      },
+      {
+        target: 'harbor_ship_gullhaven',
+        offset: { x: 6.6, y: 9.2, z: 11 },
+        lookAt: { x: 6.6, y: 8.6, z: 0 },
+      },
+      {
+        target: 'harbor_ship_mainland',
+        offset: { x: 20, y: 11, z: 10 },
+        lookAt: { x: 6.6, y: 8.6, z: 0 },
+      },
+    ]);
+
+    const walks = (scene: typeof out) =>
+      scene.ops.flatMap((op) =>
+        op.kind === 'playerWalk' ? [{ at: op.at, to: op.to, speed: op.speed }] : [],
+      );
+    expect(walks(out)).toHaveLength(1);
+    expect(walks(out)[0]?.at).toBeCloseTo(13.2, 8);
+    expect(walks(out)[0]).toMatchObject({ to: { x: 784.5, z: 116 }, speed: 1.25 });
+    expect(walks(back)).toHaveLength(1);
+    expect(walks(back)[0]?.at).toBeCloseTo(13.2, 8);
+    expect(walks(back)[0]).toMatchObject({ to: { x: 169.5, z: -48 }, speed: 1.5 });
+    expect(out.ops.some((op) => op.kind === 'line')).toBe(false);
+    expect(back.ops.some((op) => op.kind === 'line')).toBe(false);
+
+    const q0Lines = q0.ops.flatMap((op) =>
+      op.kind === 'line' ? [{ at: op.at, key: op.key, dur: op.dur }] : [],
+    );
+    expect(q0Lines.map(({ key, dur }) => ({ key, dur }))).toEqual([
+      { key: 'lb.q0.scene.harbor', dur: 4.5 },
+      { key: 'lb.q0.scene.plinth', dur: 4.5 },
+      { key: 'lb.q0.scene.toll', dur: 5 },
+    ]);
+    expect(q0Lines.map((line) => line.at)).toEqual([
+      expect.closeTo(13.3, 8),
+      expect.closeTo(18, 8),
+      expect.closeTo(22.8, 8),
+    ]);
+    const ashoreLines = ashore.ops.flatMap((op) =>
+      op.kind === 'line' ? [{ at: op.at, key: op.key, dur: op.dur }] : [],
+    );
+    expect(ashoreLines.map(({ key, dur }) => ({ key, dur }))).toEqual([
+      { key: 'lb.q0.scene.harbor', dur: 4.5 },
+      { key: 'lb.q0.scene.plinth', dur: 4.5 },
+      { key: 'lb.q0.scene.toll', dur: 5 },
+    ]);
+    expect(ashoreLines.map((line) => line.at)).toEqual([
+      expect.closeTo(0.5, 8),
+      expect.closeTo(5.2, 8),
+      expect.closeTo(10, 8),
+    ]);
+    expect(
+      q0.ops.filter((op) => op.kind === 'music' && op.directive === 'lb_bell_toll_one'),
+    ).toHaveLength(2);
+  });
+
   it('the first paid crossing plays the spliced voyage: ship cue, bell, then the arrival', () => {
     const sim = makeRider();
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
-    const ops = sceneOps(collect(sim, 13 * 20));
+    const ops = sceneOps(collect(sim, 14 * 20));
     expect(ops.every((e) => e.sceneId === 'scn_lb_q0_voyage')).toBe(true);
-    const prop = ops.find((e) => e.op.kind === 'prop');
-    expect(prop?.op.kind === 'prop' ? prop.op.target : '').toBe('harbor_ship_mainland');
-    expect(prop?.op.kind === 'prop' ? prop.op.cue : '').toBe('cast_off');
+    const props = ops
+      .filter((e): e is typeof e & { op: { kind: 'prop'; target: string; cue: string } } => {
+        return e.op.kind === 'prop';
+      })
+      .map((e) => ({ target: e.op.target, cue: e.op.cue }));
+    expect(props).toEqual([
+      {
+        target: 'harbor_ship_mainland',
+        cue: 'lb_voyage_out_cast_off',
+      },
+      {
+        target: 'harbor_ship_mainland',
+        cue: 'lb_voyage_out_open_water',
+      },
+      {
+        target: 'harbor_ship_gullhaven',
+        cue: 'lb_voyage_out_arrival',
+      },
+    ]);
     const directives = ops
       .filter((e): e is typeof e & { op: { kind: 'music'; directive: string } } => {
         return e.op.kind === 'music';
@@ -308,13 +493,26 @@ describe('the voyage cinematic', () => {
     expect(directives).toContain('lb_harbor_ambience');
     expect(directives).toContain('lb_bell_toll_one');
     expect(directives).toContain('lb_ship_castoff');
+    const walk = ops.find((e) => e.op.kind === 'playerWalk');
+    expect(walk?.op).toEqual({
+      kind: 'playerWalk',
+      to: sim.groundPos(784.5, 116),
+      speed: 1.25,
+    });
+    expect(sim.player.pos.x).toBeGreaterThan(782);
+    expect(sim.player.pos.x).toBeLessThan(784.5);
     // The arrival half: its first line lands after the splice point.
     const line = ops.find((e) => e.op.kind === 'line');
     expect(line?.op.kind === 'line' ? line.op.key : '').toBe('lb.q0.scene.harbor');
     // The whole voyage ends as one scene.
-    const tail = sceneOps(collect(sim, 20 * 20));
+    const tail = sceneOps(collect(sim, 16 * 20));
+    const lineKeys = [...ops, ...tail]
+      .filter((e): e is typeof e & { op: { kind: 'line'; key: string } } => e.op.kind === 'line')
+      .map((e) => e.op.key);
+    expect(lineKeys).toEqual(['lb.q0.scene.harbor', 'lb.q0.scene.plinth', 'lb.q0.scene.toll']);
     expect(tail.some((e) => e.op.kind === 'end')).toBe(true);
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
+    expect(sim.player.pos).toEqual(sim.groundPos(784.5, 116));
   });
 
   it('a re-ride departure cues the ship on its own side and stays line-free', () => {
@@ -322,14 +520,44 @@ describe('the voyage cinematic', () => {
     sim.ctx.players.get(sim.playerId)?.questsDone.add(Q0);
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
     // Let the outbound departure finish before riding back.
-    collect(sim, 12 * 20);
+    collect(sim, 19 * 20);
+    expect(sim.player.pos).toEqual(sim.groundPos(784.5, 116));
     board(sim, 727, 131, 'ch_lb_ferry_fare_back');
-    const ops = sceneOps(collect(sim, 6 * 20));
+    const ops = sceneOps(collect(sim, 10 * 20));
     expect(ops.length).toBeGreaterThan(0);
     expect(ops.every((e) => e.sceneId === 'scn_lb_ferry_depart_back')).toBe(true);
-    const prop = ops.find((e) => e.op.kind === 'prop');
-    expect(prop?.op.kind === 'prop' ? prop.op.target : '').toBe('harbor_ship_gullhaven');
+    const props = ops
+      .filter((e): e is typeof e & { op: { kind: 'prop'; target: string; cue: string } } => {
+        return e.op.kind === 'prop';
+      })
+      .map((e) => ({ target: e.op.target, cue: e.op.cue }));
+    expect(props).toEqual([
+      {
+        target: 'harbor_ship_gullhaven',
+        cue: 'lb_voyage_back_cast_off',
+      },
+      {
+        target: 'harbor_ship_gullhaven',
+        cue: 'lb_voyage_back_open_water',
+      },
+      {
+        target: 'harbor_ship_mainland',
+        cue: 'lb_voyage_back_arrival',
+      },
+    ]);
     expect(ops.some((e) => e.op.kind === 'line')).toBe(false);
+    const arrivalOps = sceneOps(collect(sim, 4 * 20));
+    const walk = arrivalOps.find((e) => e.op.kind === 'playerWalk');
+    expect(walk?.op).toEqual({
+      kind: 'playerWalk',
+      to: sim.groundPos(169.5, -48),
+      speed: 1.5,
+    });
+    expect(sim.player.pos.x).toBeGreaterThan(169.5);
+    expect(sim.player.pos.x).toBeLessThan(173);
+    collect(sim, 5 * 20);
+    expect(sim.ctx.scenePlaybacks.size).toBe(0);
+    expect(sim.player.pos).toEqual(sim.groundPos(169.5, -48));
   });
 
   it('skipping the voyage tears down cleanly with the rider already ashore', () => {
@@ -343,7 +571,19 @@ describe('the voyage cinematic', () => {
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
     // The crossing happened at pay time: the skip leaves the rider ashore
     // with the quest accepted, identical to a watched voyage.
-    expect(sim.player.pos.x).toBeGreaterThan(600);
+    expect(sim.player.pos).toEqual(sim.groundPos(784.5, 116));
     expect(sim.questLog.get(Q0)?.state).toBe('active');
+  });
+
+  it('skipping a return re-ride applies the un-emitted mainland walk endpoint', () => {
+    const sim = makeRider();
+    sim.ctx.players.get(sim.playerId)?.questsDone.add(Q0);
+    board(sim, 727, 131, 'ch_lb_ferry_fare_back');
+    collect(sim, 4);
+    expect(requestSceneSkip(sim.ctx)).toBe(true);
+    const ops = sceneOps(collect(sim, 2));
+    expect(ops.some((e) => e.op.kind === 'end')).toBe(true);
+    expect(sim.ctx.scenePlaybacks.size).toBe(0);
+    expect(sim.player.pos).toEqual(sim.groundPos(169.5, -48));
   });
 });

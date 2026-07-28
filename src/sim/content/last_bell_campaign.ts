@@ -10,12 +10,12 @@
 // solo-always story space, and Coalfast and Tam walk into the doorway as
 // the stalker dies.
 
-import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../harbor_layout';
+import { GULLHAVEN_HARBOR, type HarborDef, MAINLAND_HARBOR } from '../harbor_layout';
 import { registerScenario } from '../scenarios/registry';
 import { registerChoice } from '../scenes/choices';
-import { registerScene } from '../scenes/scenes';
+import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/scenes';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
-import { LAST_BELL_CAST_OFF_SEGMENT_ID } from './last_bell_cinematics';
+import { LAST_BELL_VOYAGE_SEGMENT_IDS } from './last_bell_cinematics';
 
 // ---------------------------------------------------------------------------
 // Mobs
@@ -178,114 +178,278 @@ registerChoice({
 // Scenes
 // ---------------------------------------------------------------------------
 
-// The Q0 arrival (20s): the opening shot, a street that stops to count a
-// bell. Personal shared-world playback; camera points are WORLD coordinates
-// (Gullhaven harbor). Kept as a shared ops list so the H3 voyage scene can
-// splice it in after the departure half.
 type SceneOps = Parameters<typeof registerScene>[0]['ops'];
+type SceneOp = SceneOps[number];
 
-const ARRIVAL_OPS: SceneOps = [
-  { at: 0, kind: 'letterbox', on: true },
-  { at: 0, kind: 'inputLock', on: true },
-  { at: 0, kind: 'fade', to: 'clear', dur: 1.2 },
-  // Wide of the working harbor from over the bay: the waterfront apron with
-  // the pier running west to the berthed grand ferry (H3 re-frame for the
-  // v4 harbor; the old frame missed the ship at its outer berth).
-  {
-    at: 0.2,
-    kind: 'camera',
-    shot: { kind: 'focus', x: 762, z: 124, dist: 30, pitch: 0.42, yaw: 2.1, dur: 5 },
+const CAST_OFF_AT = 0.2;
+const OPEN_WATER_AT = 4.2;
+const SEA_ARRIVAL_AT = 8.5;
+const PIER_AT = 12.8;
+const PIER_SHOT_SECONDS = 5;
+const Q0_STORY_SECONDS = 11;
+const RELEASE_SECONDS = 0.8;
+
+interface VoyageDirection {
+  readonly departureHarbor: HarborDef;
+  readonly arrivalHarbor: HarborDef;
+  readonly departureTarget: string;
+  readonly arrivalTarget: string;
+  readonly segmentIds: {
+    readonly castOff: string;
+    readonly openWater: string;
+    readonly arrival: string;
+  };
+  readonly sternOffset: { x: number; y: number; z: number };
+  readonly sideOffset: { x: number; y: number; z: number };
+  readonly bowOffset: { x: number; y: number; z: number };
+  readonly walkTo: { x: number; z: number };
+  readonly walkSpeed: number;
+  readonly pierShot: SceneDollyShotDef;
+}
+
+const OUTBOUND: VoyageDirection = {
+  departureHarbor: MAINLAND_HARBOR,
+  arrivalHarbor: GULLHAVEN_HARBOR,
+  departureTarget: 'harbor_ship_mainland',
+  arrivalTarget: 'harbor_ship_gullhaven',
+  segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.out,
+  sternOffset: { x: -12, y: 11, z: 8 },
+  sideOffset: { x: 6.6, y: 9.2, z: -11 },
+  bowOffset: { x: 20, y: 11, z: 10 },
+  walkTo: { x: 784.5, z: 116 },
+  walkSpeed: 1.25,
+  pierShot: {
+    kind: 'dolly',
+    points: [
+      { x: 778, z: 105, height: 15.36 },
+      { x: 780.594, z: 105.3, height: 11.318 },
+    ],
+    lookAt: {
+      kind: 'spline',
+      points: [
+        { x: GULLHAVEN_HARBOR.arrival.x, z: GULLHAVEN_HARBOR.arrival.z, height: 2 },
+        { x: 784.5, z: 116, height: 2 },
+      ],
+    },
+    dur: PIER_SHOT_SECONDS,
   },
-  { at: 1.0, kind: 'line', speaker: '', key: 'lb.q0.scene.harbor', dur: 4.5 },
-  // The statue above the harbor steps, close: the plinth and its names.
-  {
-    at: 6.0,
-    kind: 'camera',
-    shot: { kind: 'focus', x: 818, z: 120, dist: 6, pitch: 0.18, yaw: -0.6, dur: 4 },
+};
+
+const RETURN: VoyageDirection = {
+  departureHarbor: GULLHAVEN_HARBOR,
+  arrivalHarbor: MAINLAND_HARBOR,
+  departureTarget: 'harbor_ship_gullhaven',
+  arrivalTarget: 'harbor_ship_mainland',
+  segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.back,
+  sternOffset: { x: -12, y: 11, z: -8 },
+  sideOffset: { x: 6.6, y: 9.2, z: 11 },
+  bowOffset: { x: 20, y: 11, z: 10 },
+  walkTo: { x: 169.5, z: -48 },
+  walkSpeed: 1.5,
+  pierShot: {
+    kind: 'dolly',
+    points: [
+      { x: 175, z: -59, height: 6.6 },
+      { x: 173.406, z: -58.7, height: 6.422 },
+    ],
+    lookAt: {
+      kind: 'spline',
+      points: [
+        { x: MAINLAND_HARBOR.arrival.x, z: MAINLAND_HARBOR.arrival.z, height: 2 },
+        { x: 169.5, z: -48, height: 2 },
+      ],
+    },
+    dur: PIER_SHOT_SECONDS,
   },
-  { at: 6.5, kind: 'line', speaker: '', key: 'lb.q0.scene.plinth', dur: 4.5 },
-  // The bell tolls once; the street stops, counts, exhales.
-  { at: 11.5, kind: 'music', directive: 'lb_bell_toll_one' },
-  {
-    at: 11.8,
-    kind: 'camera',
-    shot: { kind: 'focus', x: 822, z: 118, dist: 14, pitch: 0.3, yaw: 0.8, dur: 5 },
+};
+
+function attachShot(
+  target: string,
+  harbor: HarborDef,
+  offset: { x: number; y: number; z: number },
+): SceneAttachShotDef {
+  return {
+    kind: 'attach',
+    target,
+    fallbackFrame: {
+      point: { x: harbor.berth.x, z: harbor.berth.z, height: -7.72 },
+      yaw: harbor.berth.rot,
+    },
+    offset,
+    lookAt: { x: 6.6, y: 8.6, z: 0 },
+  };
+}
+
+function arrivalPierOps(
+  direction: VoyageDirection,
+  at: number,
+  includeHarborLine: boolean,
+): SceneOp[] {
+  const ops: SceneOp[] = [
+    { at, kind: 'fade', to: 'black', dur: 0 },
+    { at, kind: 'camera', shot: direction.pierShot },
+    { at: at + 0.1, kind: 'fade', to: 'clear', dur: 0.6 },
+    {
+      at: at + 0.4,
+      kind: 'playerWalk',
+      to: direction.walkTo,
+      speed: direction.walkSpeed,
+    },
+  ];
+  if (includeHarborLine) {
+    ops.push({
+      at: at + 0.5,
+      kind: 'line',
+      speaker: '',
+      key: 'lb.q0.scene.harbor',
+      dur: 4.5,
+    });
+  }
+  return ops;
+}
+
+function departureCore(direction: VoyageDirection, includeHarborLine = false): SceneOp[] {
+  return [
+    { at: 0, kind: 'letterbox', on: true },
+    { at: 0, kind: 'inputLock', on: true },
+    { at: 0, kind: 'music', directive: 'lb_harbor_ambience' },
+    {
+      at: CAST_OFF_AT,
+      kind: 'prop',
+      target: direction.departureTarget,
+      cue: direction.segmentIds.castOff,
+    },
+    {
+      at: CAST_OFF_AT,
+      kind: 'camera',
+      shot: attachShot(direction.departureTarget, direction.departureHarbor, direction.sternOffset),
+    },
+    { at: 1.2, kind: 'music', directive: 'lb_bell_toll_one' },
+    { at: 1.8, kind: 'music', directive: 'lb_ship_castoff' },
+    { at: 3.8, kind: 'fade', to: 'black', dur: 0.4 },
+    {
+      at: OPEN_WATER_AT,
+      kind: 'prop',
+      target: direction.departureTarget,
+      cue: direction.segmentIds.openWater,
+    },
+    {
+      at: OPEN_WATER_AT,
+      kind: 'camera',
+      shot: attachShot(direction.departureTarget, direction.departureHarbor, direction.sideOffset),
+    },
+    { at: OPEN_WATER_AT + 0.15, kind: 'fade', to: 'clear', dur: 0.35 },
+    { at: 8.1, kind: 'fade', to: 'black', dur: 0.4 },
+    {
+      at: SEA_ARRIVAL_AT,
+      kind: 'prop',
+      target: direction.arrivalTarget,
+      cue: direction.segmentIds.arrival,
+    },
+    {
+      at: SEA_ARRIVAL_AT,
+      kind: 'camera',
+      shot: attachShot(direction.arrivalTarget, direction.arrivalHarbor, direction.bowOffset),
+    },
+    { at: SEA_ARRIVAL_AT + 0.15, kind: 'fade', to: 'clear', dur: 0.35 },
+    { at: 12.2, kind: 'fade', to: 'black', dur: 0.6 },
+    ...arrivalPierOps(direction, PIER_AT, includeHarborLine),
+  ];
+}
+
+const Q0_STATUE_SHOT: SceneDollyShotDef = {
+  kind: 'dolly',
+  points: [
+    { x: 806, z: 112, height: 8 },
+    { x: 808, z: 113, height: 7.4 },
+  ],
+  lookAt: { kind: 'point', point: { x: 818, z: 120, height: 2 } },
+  dur: 4.8,
+};
+
+const Q0_TOLL_SHOT: SceneDollyShotDef = {
+  kind: 'dolly',
+  points: [
+    { x: 808, z: 113, height: 7.4 },
+    { x: 795, z: 114.5, height: 7.5 },
+    { x: 780, z: 116, height: 5.9 },
+    { x: 780.594, z: 105.3, height: 11.318 },
+  ],
+  lookAt: {
+    kind: 'spline',
+    points: [
+      { x: 818, z: 120, height: 2 },
+      { x: 800, z: 116, height: 2 },
+      { x: 790, z: 116, height: 2 },
+      { x: 784.5, z: 116, height: 2 },
+    ],
   },
-  { at: 12.2, kind: 'line', speaker: '', key: 'lb.q0.scene.toll', dur: 5 },
-  { at: 17.5, kind: 'camera', shot: { kind: 'release' } },
-  { at: 18.4, kind: 'letterbox', on: false },
-  { at: 18.4, kind: 'inputLock', on: false },
-];
+  dur: 6.2,
+};
 
-registerScene({ id: 'scn_lb_q0_ashore', duration: 20, ops: ARRIVAL_OPS });
+function q0ArrivalBeats(at: number): SceneOp[] {
+  return [
+    { at: at - 0.4, kind: 'fade', to: 'black', dur: 0.4 },
+    { at, kind: 'camera', shot: Q0_STATUE_SHOT },
+    { at: at + 0.15, kind: 'fade', to: 'clear', dur: 0.35 },
+    {
+      at: at + 0.2,
+      kind: 'line',
+      speaker: '',
+      key: 'lb.q0.scene.plinth',
+      dur: 4.5,
+    },
+    { at: at + 4.4, kind: 'fade', to: 'black', dur: 0.4 },
+    { at: at + 4.7, kind: 'music', directive: 'lb_bell_toll_one' },
+    { at: at + 4.8, kind: 'camera', shot: Q0_TOLL_SHOT },
+    { at: at + 4.95, kind: 'fade', to: 'clear', dur: 0.35 },
+    { at: at + 5, kind: 'line', speaker: '', key: 'lb.q0.scene.toll', dur: 5 },
+  ];
+}
 
-// ---------------------------------------------------------------------------
-// The voyage (H3): the departure cinematic at the dock. The sim already
-// teleported the rider when the fare resolved, so every op here is pure
-// presentation over world coordinates (the camera films the dock they just
-// left; the ship is a client-side render prop, cued by target key). The
-// core runs 0..8.2s and ends under black; propReset and the end op restore
-// everything on skip at any point.
-// ---------------------------------------------------------------------------
+function releaseTail(at: number): SceneOp[] {
+  return [
+    { at, kind: 'camera', shot: { kind: 'release' } },
+    { at: at + RELEASE_SECONDS, kind: 'letterbox', on: false },
+    { at: at + RELEASE_SECONDS, kind: 'inputLock', on: false },
+  ];
+}
 
-// The departure core, framed per harbor: bell, gulls and water, the ship
-// pulling away from the pier.
-const departureCore = (ship: { x: number; z: number }, target: string, yaw: number): SceneOps => [
-  { at: 0, kind: 'letterbox', on: true },
-  { at: 0, kind: 'inputLock', on: true },
-  { at: 0, kind: 'music', directive: 'lb_harbor_ambience' },
-  // The berth from over the water, pier behind the hull.
-  {
-    at: 0.2,
-    kind: 'camera',
-    shot: { kind: 'focus', x: ship.x, z: ship.z, dist: 20, pitch: 0.34, yaw, dur: 3.5 },
-  },
-  { at: 1.4, kind: 'music', directive: 'lb_bell_toll_one' },
-  // Cast off: the hull eases out of the berth under the wide shot.
-  { at: 3.0, kind: 'prop', target, cue: LAST_BELL_CAST_OFF_SEGMENT_ID },
-  { at: 3.0, kind: 'music', directive: 'lb_ship_castoff' },
-  {
-    at: 3.4,
-    kind: 'camera',
-    shot: { kind: 'focus', x: ship.x, z: ship.z, dist: 32, pitch: 0.42, yaw, dur: 5 },
-  },
-  { at: 7.0, kind: 'fade', to: 'black', dur: 1.2 },
-  // The camera hands back under black so the fade-up opens on the arrival
-  // dock without a cross-strait swing.
-  { at: 8.2, kind: 'camera', shot: { kind: 'release' } },
-];
+const Q0_STORY_AT = PIER_AT + PIER_SHOT_SECONDS;
+const Q0_RELEASE_AT = Q0_STORY_AT + Q0_STORY_SECONDS;
+const RERIDE_RELEASE_AT = PIER_AT + PIER_SHOT_SECONDS;
 
-// The re-ride tail: fade up on the arrival dock and hand control back.
-const departureTail: SceneOps = [
-  { at: 9.6, kind: 'fade', to: 'clear', dur: 1.2 },
-  { at: 10.7, kind: 'letterbox', on: false },
-  { at: 10.7, kind: 'inputLock', on: false },
-];
-
-const MAINLAND_SHIP = { x: MAINLAND_HARBOR.berth.x, z: MAINLAND_HARBOR.berth.z };
-const GULLHAVEN_SHIP = { x: GULLHAVEN_HARBOR.berth.x, z: GULLHAVEN_HARBOR.berth.z };
+registerScene({
+  id: 'scn_lb_q0_ashore',
+  duration: PIER_SHOT_SECONDS + Q0_STORY_SECONDS + RELEASE_SECONDS + 0.2,
+  ops: [
+    { at: 0, kind: 'letterbox', on: true },
+    { at: 0, kind: 'inputLock', on: true },
+    ...arrivalPierOps(OUTBOUND, 0, true),
+    ...q0ArrivalBeats(PIER_SHOT_SECONDS),
+    ...releaseTail(PIER_SHOT_SECONDS + Q0_STORY_SECONDS),
+  ],
+});
 
 registerScene({
   id: 'scn_lb_ferry_depart_out',
-  duration: 11.4,
-  ops: [...departureCore(MAINLAND_SHIP, 'harbor_ship_mainland', -1.2), ...departureTail],
+  duration: RERIDE_RELEASE_AT + RELEASE_SECONDS + 0.2,
+  ops: [...departureCore(OUTBOUND), ...releaseTail(RERIDE_RELEASE_AT)],
 });
 
 registerScene({
   id: 'scn_lb_ferry_depart_back',
-  duration: 11.4,
-  ops: [...departureCore(GULLHAVEN_SHIP, 'harbor_ship_gullhaven', 1.8), ...departureTail],
+  duration: RERIDE_RELEASE_AT + RELEASE_SECONDS + 0.2,
+  ops: [...departureCore(RETURN), ...releaseTail(RERIDE_RELEASE_AT)],
 });
 
-// The first crossing: departure and arrival spliced into ONE scene (one Esc
-// skips the whole voyage). The arrival half opens with its own fade-up, so
-// the splice point is the held black after the departure core.
 registerScene({
   id: 'scn_lb_q0_voyage',
-  duration: 30.5,
+  duration: Q0_RELEASE_AT + RELEASE_SECONDS + 0.2,
   ops: [
-    ...departureCore(MAINLAND_SHIP, 'harbor_ship_mainland', -1.2),
-    ...ARRIVAL_OPS.map((op) => ({ ...op, at: op.at + 10.5 })),
+    ...departureCore(OUTBOUND, true),
+    ...q0ArrivalBeats(Q0_STORY_AT),
+    ...releaseTail(Q0_RELEASE_AT),
   ],
 });
 

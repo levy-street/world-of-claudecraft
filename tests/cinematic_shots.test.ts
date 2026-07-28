@@ -104,170 +104,7 @@ interface LegacyExemption {
   readonly reason: string;
 }
 
-const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
-  // C5 must clear this by replacing the undersized first return-leg focus transition.
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'framing.size',
-    reason: 'The legacy first focus transition begins with the ship below the 5% size floor.',
-  },
-  // C5 must clear this by keeping the return-leg ship inside the frame from shot start.
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'framing.direction',
-    reason: 'The legacy first focus transition begins outside the horizontal frame extent.',
-  },
-  // C5 must clear this by authoring bounded return-leg camera translation.
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'motion.dollySpeed',
-    reason: 'The legacy focus and release moves exceed the 30 yd/s translation cap.',
-  },
-  // C5 must clear this by removing large return-leg pose steps.
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'motion.poseContinuity',
-    reason: 'The legacy focus and release moves exceed the 3.5 yd sample-step limit.',
-  },
-  // C5 must clear this by authoring a slower return-leg release turn.
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'motion.panRate',
-    reason: 'The legacy release turn exceeds the 60 deg/s pan cap.',
-  },
-  // C5 must clear this by replacing the undersized first outbound focus transition.
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'framing.size',
-    reason: 'The legacy first focus transition begins with the ship below the 5% size floor.',
-  },
-  // C5 must clear this by keeping the outbound ship inside the frame from shot start.
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'framing.direction',
-    reason: 'The legacy first focus transition begins behind the camera.',
-  },
-  // C5 must clear this by authoring bounded outbound camera translation.
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'motion.dollySpeed',
-    reason: 'The legacy focus and release moves exceed the 30 yd/s translation cap.',
-  },
-  // C5 must clear this by removing large outbound pose steps.
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'motion.poseContinuity',
-    reason: 'The legacy focus and release moves exceed the 3.5 yd sample-step limit.',
-  },
-  // C5 must clear this by authoring a slower outbound release turn.
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'motion.panRate',
-    reason: 'The legacy release turn exceeds the 60 deg/s pan cap.',
-  },
-  // C5 must clear this by raising or rerouting the first arrival sight line.
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'visibility.terrain',
-    reason: 'Terrain blocks the legacy first focus transition sight line.',
-  },
-  // C5 must clear this by keeping every arrival subject within the size band.
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'framing.size',
-    reason: 'Legacy arrival transitions cross both undersized and oversized framing.',
-  },
-  // C5 must clear this by keeping arrival subjects inside the angular frame extents.
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'framing.direction',
-    reason: 'Legacy arrival transitions place subjects outside the horizontal frame extent.',
-  },
-  // C5 must clear this by authoring bounded arrival camera translation.
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'motion.dollySpeed',
-    reason: 'Legacy arrival focus and release moves exceed the 30 yd/s translation cap.',
-  },
-  // C5 must clear this by removing large arrival pose steps.
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'motion.poseContinuity',
-    reason: 'Legacy arrival focus and release moves exceed the 3.5 yd sample-step limit.',
-  },
-  // C5 must clear this by authoring a slower arrival release turn.
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'motion.panRate',
-    reason: 'The legacy arrival release exceeds the 60 deg/s pan cap.',
-  },
-  // C5 must clear this by moving arrival cameras outside the live ship deck volume.
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'clearance.volume',
-    reason: 'Legacy arrival focus shots enter the Gullhaven ship deck clearance margin.',
-  },
-  // C5 must clear this by handing back near gameplay or under full black.
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'cut.releaseDelta',
-    reason: 'The legacy visible release is farther than 20 yd from the gameplay camera.',
-  },
-  // C5 must clear this by keeping the voyage first focus transition at a sane size.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'framing.size',
-    reason: 'Legacy voyage transitions cross both undersized and oversized framing.',
-  },
-  // C5 must clear this by keeping every voyage subject inside the angular frame extents.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'framing.direction',
-    reason: 'Legacy voyage transitions place subjects behind or outside the camera.',
-  },
-  // C5 must clear this by authoring bounded voyage camera translation.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'motion.dollySpeed',
-    reason: 'Legacy voyage focus and release moves exceed the 30 yd/s translation cap.',
-  },
-  // C5 must clear this by removing large voyage pose steps.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'motion.poseContinuity',
-    reason: 'Legacy voyage focus and release moves exceed the 3.5 yd sample-step limit.',
-  },
-  // C5 must clear this by authoring slower voyage release turns.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'motion.panRate',
-    reason: 'Legacy voyage releases exceed the 60 deg/s pan cap.',
-  },
-  // C5 must clear this by raising or rerouting the arrival-half sight line.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'visibility.terrain',
-    reason: 'Terrain blocks the legacy arrival-half first focus transition sight line.',
-  },
-  // C5 must clear this by moving voyage cameras outside the live ship deck volume.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'clearance.volume',
-    reason: 'Legacy arrival-half focus shots enter the Gullhaven ship deck clearance margin.',
-  },
-  // C5 must clear this by handing back near gameplay or under full black.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'cut.releaseDelta',
-    reason: 'The legacy final visible release is farther than 20 yd from gameplay.',
-  },
-  // C5 must clear this by preserving ship screen direction across visible voyage cuts.
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'continuity.shipScreenDirection',
-    reason: 'Legacy arrival cuts reverse the ship screen-velocity sign without a fade.',
-  },
-];
+const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [];
 
 interface TimedSceneOp {
   readonly index: number;
@@ -647,12 +484,29 @@ function sceneFrame(sim: Sim, trackedIds: ReadonlySet<number>): SceneFrame {
   };
 }
 
+function settledPlayerStartForScene(id: string): { x: number; z: number } | null {
+  const harborId =
+    id === 'scn_lb_ferry_depart_back'
+      ? 'mainland'
+      : id === 'scn_lb_ferry_depart_out' || id === 'scn_lb_q0_ashore' || id === 'scn_lb_q0_voyage'
+        ? 'gullhaven'
+        : null;
+  if (harborId === null) return null;
+  return HARBORS.find((harbor) => harbor.id === harborId)?.arrival ?? null;
+}
+
 function captureScene(id: string, actorIds: readonly string[] = []): CapturedScene {
   const sim = new SimConstructor({
     seed: LINTER_WORLD_SEED,
     playerClass: 'warrior',
     playerName: 'Shot Linter',
   });
+  const settledStart = settledPlayerStartForScene(id);
+  if (settledStart) {
+    sim.player.pos = sim.groundPos(settledStart.x, settledStart.z);
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.rebucket(sim.player);
+  }
   const playbackKey = -sim.playerId;
   if (actorIds.length > 0) {
     expect(
@@ -1500,6 +1354,7 @@ describe('cinematic shot mechanical gate', () => {
 
   it('samples every registered scene at 10 Hz against the mechanical rubric', async () => {
     await loadLinterRuntime();
+    expect(LEGACY_EXEMPTIONS, 'C5 scenes must pass without legacy exemptions').toEqual([]);
     // A renderer lens change must update the linter's framing calculations.
     expect(RENDERER_SOURCE).toContain('CAMERA_BASE_FOV = 60');
 
