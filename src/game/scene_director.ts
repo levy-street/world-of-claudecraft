@@ -5,7 +5,7 @@
 // into its gates, and produces the per-frame camera override pose that is
 // applied over the input camera exactly like the first-spawn introCameraTick.
 
-import type { SimEvent } from '../sim/types';
+import type { SceneAttachFrame, SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   applySceneOp,
@@ -29,6 +29,8 @@ export interface SceneDirectorDeps {
   propCue?: (target: string, cue: string) => void;
   /** Scene teardown: every prop cue back to rest. */
   propReset?: () => void;
+  /** Live world frame of a scene attachment target, when its renderer owns one. */
+  attachmentFrame?: (target: string) => SceneAttachFrame | null;
 }
 
 export class SceneDirector {
@@ -78,13 +80,19 @@ export class SceneDirector {
   }
 
   /** The per-frame camera override, or null when the follow camera owns the
-   *  frame. Focus targets with an entityId track the entity's live mirrored
-   *  position through IWorld each frame. */
+   *  frame. Entity focus tracks IWorld, and attach shots use the injected
+   *  live attachment frame when one is available. */
   cameraPose(live: SceneLivePose): ScenePose | null {
-    return scenePose(this.state, this.deps.nowSec(), live, (id) => {
-      const e = this.deps.world().entities.get(id);
-      return e ? e.pos : null;
-    });
+    return scenePose(
+      this.state,
+      this.deps.nowSec(),
+      live,
+      (id) => {
+        const e = this.deps.world().entities.get(id);
+        return e ? e.pos : null;
+      },
+      this.deps.attachmentFrame,
+    );
   }
 
   /** Route a skip gesture (Esc / the HUD skip button) to the authority. */

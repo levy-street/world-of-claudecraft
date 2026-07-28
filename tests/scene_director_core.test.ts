@@ -14,7 +14,8 @@ import {
   sceneMusicAction,
   scenePose,
 } from '../src/game/scene_director_core';
-import type { SceneWireOp } from '../src/sim/types';
+import { sceneRigCameraPosition } from '../src/game/scene_rig_core';
+import type { SceneAttachFrame, SceneWireOp } from '../src/sim/types';
 
 const LIVE: SceneLivePose = {
   yaw: 1,
@@ -192,6 +193,99 @@ describe('focus shot easing', () => {
     const mid = scenePose(s, 5, LIVE, noEntities); // halfway: g = 0.5
     expect(mid?.yaw).toBeCloseTo(2.5, 6);
     expect(mid?.dist).toBeCloseTo(6, 6);
+  });
+});
+
+describe('rig shot delegation', () => {
+  it('evaluates a dolly shot through the director path', () => {
+    const s = createSceneDirectorState();
+    applySceneOp(s, { kind: 'start', duration: 10 }, 0);
+    applySceneOp(
+      s,
+      {
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 2, y: 6, z: 4 },
+            { x: 10, y: 8, z: 12 },
+          ],
+          lookAt: { kind: 'point', point: { x: 6, y: 3, z: 8 } },
+          dur: 2,
+        },
+      },
+      0,
+    );
+    const start = scenePose(s, 0, LIVE, noEntities);
+    expect(start).not.toBeNull();
+    if (!start) return;
+    const startCamera = sceneRigCameraPosition(start);
+    expect(startCamera.x).toBeCloseTo(2, 10);
+    expect(startCamera.y).toBeCloseTo(6, 10);
+    expect(startCamera.z).toBeCloseTo(4, 10);
+    const end = scenePose(s, 2, LIVE, noEntities);
+    expect(end).not.toBeNull();
+    if (!end) return;
+    const endCamera = sceneRigCameraPosition(end);
+    expect(endCamera.x).toBeCloseTo(10, 10);
+    expect(endCamera.y).toBeCloseTo(8, 10);
+    expect(endCamera.z).toBeCloseTo(12, 10);
+  });
+
+  it('evaluates an attach shot through the director path', () => {
+    const s = createSceneDirectorState();
+    applySceneOp(s, { kind: 'start', duration: 10 }, 0);
+    applySceneOp(
+      s,
+      {
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'ship',
+          fallbackFrame: { position: { x: 1, y: 2, z: 3 }, yaw: 0 },
+          offset: { x: 2, y: 3, z: 0 },
+          lookAt: { x: 0, y: 1, z: 4 },
+        },
+      },
+      0,
+    );
+    const frame: SceneAttachFrame = {
+      position: { x: 10, y: 5, z: 20 },
+      yaw: Math.PI / 2,
+    };
+    const pose = scenePose(s, 0, LIVE, noEntities, (target) => (target === 'ship' ? frame : null));
+    expect(pose).not.toBeNull();
+    if (!pose) return;
+    const camera = sceneRigCameraPosition(pose);
+    expect(camera.x).toBeCloseTo(10, 10);
+    expect(camera.y).toBeCloseTo(8, 10);
+    expect(camera.z).toBeCloseTo(18, 10);
+  });
+
+  it('reuses the existing release ease after a rig shot', () => {
+    const s = createSceneDirectorState();
+    applySceneOp(s, { kind: 'start', duration: 10 }, 0);
+    applySceneOp(
+      s,
+      {
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 2, y: 6, z: 4 }],
+          lookAt: { kind: 'point', point: { x: 6, y: 3, z: 8 } },
+          dur: 1,
+        },
+      },
+      0,
+    );
+    const shotPose = scenePose(s, 0, LIVE, noEntities);
+    expect(shotPose).not.toBeNull();
+    const shotDist = shotPose?.dist ?? 0;
+    applySceneOp(s, { kind: 'camera', shot: { kind: 'release' } }, 1);
+    const mid = scenePose(s, 1 + SCENE_RELEASE_SEC / 2, LIVE, noEntities);
+    expect(mid).not.toBeNull();
+    expect(mid?.dist).toBeCloseTo((shotDist + LIVE.dist) / 2, 6);
+    expect(scenePose(s, 1 + SCENE_RELEASE_SEC + 0.001, LIVE, noEntities)).toBeNull();
   });
 });
 

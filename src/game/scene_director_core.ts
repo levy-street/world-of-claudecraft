@@ -1,28 +1,26 @@
 // Pure playback core for the Last Bell scene director (scene_director.ts is
 // the thin wrapper main.ts drives). Consumes the sim's resolved SceneWireOps
 // and produces, per frame, the camera override pose the frame loop applies
-// over the input camera, in the spawn_cinematic easing style: a focus shot
-// eases from the current camera pose to frame its target over shot.dur and
-// holds until the next shot; a release (or the end op) eases back to the
-// pre-scene gameplay pose over SCENE_RELEASE_SEC. Time is fed in as seconds
-// (no wall clock here), so tests/scene_director_core.test.ts drives any moment
-// of a scene directly.
+// over the input camera. Focus shots retain their current-camera ease, while
+// dolly and attach shots delegate to scene_rig_core. A release (or the end op)
+// uses the shared camera ease back to the pre-scene gameplay pose over
+// SCENE_RELEASE_SEC. Time is fed in as seconds (no wall clock here), so
+// tests/scene_director_core.test.ts drives any moment of a scene directly.
 //
 // Ops can arrive out of order relative to authoring intent (a skip drops
 // presentation ops wholesale), so the end op is the unconditional teardown: it
 // ALWAYS releases the input lock and the music silence and starts the camera
 // release, whatever state the scene was in.
 
-import type { SceneWireOp } from '../sim/types';
+import type { SceneAttachFrame, SceneCameraShot, SceneWireOp } from '../sim/types';
+import {
+  evaluateSceneRigPose,
+  type SceneAttachmentResolver,
+  type SceneRigPose,
+  sceneCameraEase,
+} from './scene_rig_core';
 
-export interface ScenePose {
-  yaw: number;
-  pitch: number;
-  dist: number;
-  focusX: number;
-  focusY: number;
-  focusZ: number;
-}
+export type ScenePose = SceneRigPose;
 
 /** The live gameplay camera + player position the frame loop reads each frame. */
 export interface SceneLivePose {
@@ -34,17 +32,7 @@ export interface SceneLivePose {
   playerZ: number;
 }
 
-/** A resolved focus shot (the wire shape minus the discriminants). */
-interface SceneFocusShot {
-  entityId: number | null;
-  x: number;
-  y: number;
-  z: number;
-  dist: number;
-  pitch: number;
-  yaw: number;
-  dur: number;
-}
+type SceneActiveShot = Exclude<SceneCameraShot, { kind: 'release' }>;
 
 /** Ease-back duration when the camera is handed back to the player. */
 export const SCENE_RELEASE_SEC = 0.8;
@@ -52,8 +40,8 @@ export const SCENE_RELEASE_SEC = 0.8;
 export interface SceneDirectorState {
   sceneActive: boolean;
   inputLocked: boolean;
-  /** The active focus shot (held after its ease completes), or null. */
-  shot: SceneFocusShot | null;
+  /** The active camera shot (held after its evaluation completes), or null. */
+  shot: SceneActiveShot | null;
   shotStartAt: number;
   releasing: boolean;
   releaseStartAt: number;
@@ -168,6 +156,7 @@ export function scenePose(
   nowSec: number,
   live: SceneLivePose,
   resolveEntity: (id: number) => { x: number; y: number; z: number } | null,
+  resolveAttachment?: (target: string) => SceneAttachFrame | null,
 ): ScenePose | null {
   if (!sceneCameraActive(s)) return null;
   const out = s.pose;
@@ -178,7 +167,7 @@ export function scenePose(
       return null;
     }
     const t = clamp01((nowSec - s.releaseStartAt) / SCENE_RELEASE_SEC);
-    const g = easeInOutSine(t);
+    const g = sceneCameraEase(t);
     const target = s.prePose ?? live;
     out.yaw = lerpAngle(from.yaw, target.yaw, g);
     out.pitch = lerp(from.pitch, target.pitch, g);
@@ -210,9 +199,20 @@ export function scenePose(
     };
     if (s.prePose === null) s.prePose = { yaw: live.yaw, pitch: live.pitch, dist: live.dist };
   }
+  if (shot.kind !== 'focus') {
+    evaluateSceneRigPose(
+      shot,
+      nowSec - s.shotStartAt,
+      resolveEntity,
+      resolveAttachment ?? noAttachments,
+      out,
+    );
+    saveLast(s, out);
+    return out;
+  }
   const focus = (shot.entityId !== null ? resolveEntity(shot.entityId) : null) ?? shot;
   const t = shot.dur > 0 ? clamp01((nowSec - s.shotStartAt) / shot.dur) : 1;
-  const g = easeInOutSine(t);
+  const g = sceneCameraEase(t);
   out.yaw = lerpAngle(s.from.yaw, shot.yaw, g);
   out.pitch = lerp(s.from.pitch, shot.pitch, g);
   out.dist = lerp(s.from.dist, shot.dist, g);
@@ -274,6 +274,4 @@ function lerpAngle(a: number, b: number, t: number): number {
   return a + wrapAngle(b - a) * t;
 }
 
-function easeInOutSine(x: number): number {
-  return 0.5 - Math.cos(Math.PI * x) / 2;
-}
+const noAttachments: SceneAttachmentResolver = () => null;

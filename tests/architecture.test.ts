@@ -231,6 +231,7 @@ const UI_PURE_CORES = [
   // frame loop, not the HUD) but holds the same pure-core contract, like the
   // two src/game entries above.
   'src/game/scene_director_core.ts',
+  'src/game/scene_rig_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Pure logic cores that live in src/render (the painter half is Three-side):

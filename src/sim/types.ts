@@ -3539,26 +3539,65 @@ export interface PendingResurrection {
 // ids and instance-local coords to world coords before emitting; the client
 // scene director consumes these verbatim). Dialogue `key` and `speaker` are
 // stable i18n keys, never English prose (S3).
+export interface SceneRigPoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface SceneAttachFrame {
+  position: SceneRigPoint;
+  /** Rotation about world +y in the renderer's local-frame convention. */
+  yaw: number;
+}
+
+export type SceneDollyLookAt =
+  | { kind: 'point'; point: SceneRigPoint }
+  | { kind: 'spline'; points: readonly SceneRigPoint[] }
+  | {
+      kind: 'subject';
+      entityId: number | null;
+      offset: SceneRigPoint;
+      fallback: SceneRigPoint;
+    };
+
+export type SceneRigCameraShot =
+  | {
+      kind: 'dolly';
+      points: readonly SceneRigPoint[];
+      lookAt: SceneDollyLookAt;
+      dur: number;
+    }
+  | {
+      kind: 'attach';
+      target: string;
+      fallbackFrame: SceneAttachFrame;
+      /** Camera position in the target's local frame. */
+      offset: SceneRigPoint;
+      /** Exact look-at point in the target's local frame. */
+      lookAt: SceneRigPoint;
+    };
+
+export type SceneCameraShot =
+  | {
+      kind: 'focus';
+      entityId: number | null;
+      x: number;
+      y: number;
+      z: number;
+      dist: number;
+      pitch: number;
+      yaw: number;
+      dur: number;
+    }
+  | SceneRigCameraShot
+  | { kind: 'release' };
+
 export type SceneWireOp =
   | { kind: 'start'; duration: number }
   | { kind: 'end' }
   | { kind: 'line'; speaker: string; speakerEntityId: number | null; key: string; dur: number }
-  | {
-      kind: 'camera';
-      shot:
-        | {
-            kind: 'focus';
-            entityId: number | null;
-            x: number;
-            y: number;
-            z: number;
-            dist: number;
-            pitch: number;
-            yaw: number;
-            dur: number;
-          }
-        | { kind: 'release' };
-    }
+  | { kind: 'camera'; shot: SceneCameraShot }
   | { kind: 'letterbox'; on: boolean }
   | { kind: 'inputLock'; on: boolean }
   | { kind: 'fade'; to: 'black' | 'clear'; dur: number }

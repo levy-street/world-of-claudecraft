@@ -25,10 +25,45 @@
 
 import type { SimContext } from '../sim_context';
 import { setSquadDirective, squadActorEntity } from '../squad/squad';
-import type { Entity, SceneWireOp } from '../types';
+import type { Entity, SceneDollyLookAt, SceneRigPoint, SceneWireOp } from '../types';
 
 // Authoring shapes: actor ids and instance-local coords; resolved to entity
 // ids and world coords at emit time.
+export interface SceneRigPointDef {
+  x: number;
+  z: number;
+  /** Yards above terrain at the resolved x/z coordinate. */
+  height: number;
+}
+
+export type SceneDollyLookAtDef =
+  | { kind: 'point'; point: SceneRigPointDef }
+  | { kind: 'spline'; points: readonly SceneRigPointDef[] }
+  | {
+      kind: 'subject';
+      actorId: string;
+      offset: SceneRigPoint;
+      fallback: SceneRigPointDef;
+    };
+
+export interface SceneDollyShotDef {
+  kind: 'dolly';
+  points: readonly SceneRigPointDef[];
+  lookAt: SceneDollyLookAtDef;
+  dur: number;
+}
+
+export interface SceneAttachShotDef {
+  kind: 'attach';
+  target: string;
+  /** Rest frame used until the client resolves the live target frame. */
+  fallbackFrame: { point: SceneRigPointDef; yaw: number };
+  /** Camera position in the target's local frame. */
+  offset: SceneRigPoint;
+  /** Exact look-at point in the target's local frame. */
+  lookAt: SceneRigPoint;
+}
+
 export type SceneOpDef = { at: number } & (
   | { kind: 'line'; speaker: string; speakerActorId?: string; key: string; dur?: number }
   | {
@@ -44,6 +79,8 @@ export type SceneOpDef = { at: number } & (
             yaw?: number;
             dur: number;
           }
+        | SceneDollyShotDef
+        | SceneAttachShotDef
         | { kind: 'release' };
     }
   | { kind: 'letterbox'; on: boolean }
@@ -116,6 +153,16 @@ function claimOrigin(ctx: SimContext, playback: ScenePlayback): { x: number; z: 
     (i) => i.dungeonId === playback.dungeonId && i.exitId === playback.claimId,
   );
   return inst ? ctx.instanceOriginOf(inst) : null;
+}
+
+function resolveRigPoint(
+  ctx: SimContext,
+  origin: { x: number; z: number } | null,
+  point: SceneRigPointDef,
+): SceneRigPoint {
+  const x = origin ? origin.x + point.x : point.x;
+  const z = origin ? origin.z + point.z : point.z;
+  return { x, y: ctx.groundPos(x, z).y + point.height, z };
 }
 
 // A personal shared-world scene (the ferry arrival): audience of one, no
@@ -192,6 +239,54 @@ function resolveAndApply(
     case 'camera': {
       if (applyOnly) return null;
       if (op.shot.kind === 'release') return { kind: 'camera', shot: { kind: 'release' } };
+      if (op.shot.kind === 'dolly') {
+        const points = op.shot.points.map((point) => resolveRigPoint(ctx, origin, point));
+        const authoredLookAt = op.shot.lookAt;
+        let lookAt: SceneDollyLookAt;
+        switch (authoredLookAt.kind) {
+          case 'point':
+            lookAt = {
+              kind: 'point' as const,
+              point: resolveRigPoint(ctx, origin, authoredLookAt.point),
+            };
+            break;
+          case 'spline':
+            lookAt = {
+              kind: 'spline' as const,
+              points: authoredLookAt.points.map((point) => resolveRigPoint(ctx, origin, point)),
+            };
+            break;
+          case 'subject': {
+            const target = actorEntity(authoredLookAt.actorId);
+            lookAt = {
+              kind: 'subject' as const,
+              entityId: target?.id ?? null,
+              offset: authoredLookAt.offset,
+              fallback: resolveRigPoint(ctx, origin, authoredLookAt.fallback),
+            };
+            break;
+          }
+        }
+        return {
+          kind: 'camera',
+          shot: { kind: 'dolly', points, lookAt, dur: op.shot.dur },
+        };
+      }
+      if (op.shot.kind === 'attach') {
+        return {
+          kind: 'camera',
+          shot: {
+            kind: 'attach',
+            target: op.shot.target,
+            fallbackFrame: {
+              position: resolveRigPoint(ctx, origin, op.shot.fallbackFrame.point),
+              yaw: op.shot.fallbackFrame.yaw,
+            },
+            offset: op.shot.offset,
+            lookAt: op.shot.lookAt,
+          },
+        };
+      }
       const target = actorEntity(op.shot.actorId);
       const wx = target ? target.pos.x : origin ? origin.x + (op.shot.x ?? 0) : (op.shot.x ?? 0);
       const wz = target ? target.pos.z : origin ? origin.z + (op.shot.z ?? 0) : (op.shot.z ?? 0);

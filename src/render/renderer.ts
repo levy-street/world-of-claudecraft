@@ -7772,6 +7772,7 @@ export class Renderer {
     const px = sceneFocus ? sceneFocus.x : selfPos.x;
     const py = sceneFocus ? sceneFocus.y : selfPos.y;
     const pz = sceneFocus ? sceneFocus.z : selfPos.z;
+    // Keep 2.0 aligned with SCENE_FOCUS_HEIGHT in src/game/scene_rig_core.ts.
     const eyeY = py + 2.0;
     let cx = px - Math.sin(this.camYaw) * Math.cos(this.camPitch) * this.camDist;
     let cy = eyeY + Math.sin(this.camPitch) * this.camDist;

@@ -4,6 +4,8 @@
 // or skipped, the all-living-participants skip rule, and the scenario
 // sequencer's scene stage gating on playback state.
 import { beforeAll, describe, expect, it } from 'vitest';
+import { assembleEventsFrame, serializeEventFragments } from '../server/event_frame';
+import { ClientWorld } from '../src/net/online';
 import { registerScenario, scenarioRunFor, startScenario } from '../src/sim/scenarios/scenarios';
 import { answerSceneChoice } from '../src/sim/scenes/choices';
 import { registerScene, requestSceneSkip, sceneActiveFor } from '../src/sim/scenes/scenes';
@@ -21,6 +23,35 @@ beforeAll(() => {
       { at: 0, kind: 'letterbox', on: true },
       { at: 0, kind: 'inputLock', on: true },
       { at: 0.2, kind: 'camera', shot: { kind: 'focus', actorId: 'tam', dist: 6, dur: 2 } },
+      {
+        at: 0.25,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 1, z: -2, height: 5 },
+            { x: 6, z: -4, height: 7 },
+          ],
+          lookAt: {
+            kind: 'subject',
+            actorId: 'tam',
+            offset: { x: 0, y: 2, z: 0 },
+            fallback: { x: 2, z: -3, height: 2 },
+          },
+          dur: 3,
+        },
+      },
+      {
+        at: 0.3,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'test_ship',
+          fallbackFrame: { point: { x: 3, z: -5, height: 1 }, yaw: 0.4 },
+          offset: { x: -4, y: 3, z: 1 },
+          lookAt: { x: 2, y: 1, z: 0 },
+        },
+      },
       {
         at: 0.5,
         kind: 'line',
@@ -97,6 +128,36 @@ describe('scene playback', () => {
     } else {
       expect.unreachable('camera focus op missing');
     }
+    const dolly = ops.find((e) => e.op.kind === 'camera' && e.op.shot.kind === 'dolly');
+    const instance = sim.ctx.instances.find((i) => i.exitId === claimIdOf(sim));
+    expect(instance).toBeDefined();
+    if (!instance) return;
+    const origin = sim.ctx.instanceOriginOf(instance);
+    if (dolly?.op.kind === 'camera' && dolly.op.shot.kind === 'dolly') {
+      const first = dolly.op.shot.points[0];
+      expect(first.x).toBeCloseTo(origin.x + 1, 6);
+      expect(first.z).toBeCloseTo(origin.z - 2, 6);
+      expect(first.y).toBeCloseTo(sim.groundPos(first.x, first.z).y + 5, 6);
+      expect(dolly.op.shot.dur).toBe(3);
+      expect(dolly.op.shot.lookAt.kind).toBe('subject');
+      if (dolly.op.shot.lookAt.kind === 'subject') {
+        expect(dolly.op.shot.lookAt.entityId).toBe(tam?.id);
+        expect(dolly.op.shot.lookAt.offset).toEqual({ x: 0, y: 2, z: 0 });
+      }
+    } else {
+      expect.unreachable('camera dolly op missing');
+    }
+    const attach = ops.find((e) => e.op.kind === 'camera' && e.op.shot.kind === 'attach');
+    if (attach?.op.kind === 'camera' && attach.op.shot.kind === 'attach') {
+      expect(attach.op.shot.target).toBe('test_ship');
+      expect(attach.op.shot.fallbackFrame.position.x).toBeCloseTo(origin.x + 3, 6);
+      expect(attach.op.shot.fallbackFrame.position.z).toBeCloseTo(origin.z - 5, 6);
+      expect(attach.op.shot.fallbackFrame.yaw).toBe(0.4);
+      expect(attach.op.shot.offset).toEqual({ x: -4, y: 3, z: 1 });
+      expect(attach.op.shot.lookAt).toEqual({ x: 2, y: 1, z: 0 });
+    } else {
+      expect.unreachable('camera attach op missing');
+    }
   });
 
   it('the scene stage holds while the scene plays and advances when it ends', () => {
@@ -147,6 +208,50 @@ describe('scene playback', () => {
     expect(sceneActiveFor(sim.ctx, claimIdOf(sim))).toBe(true); // b has not skipped
     expect(requestSceneSkip(sim.ctx, b)).toBe(true);
     expect(sceneActiveFor(sim.ctx, claimIdOf(sim))).toBe(false);
+  });
+});
+
+describe('scene camera wire transport', () => {
+  it('preserves whole dolly and attach ops from the server frame into ClientWorld', () => {
+    const events: SimEvent[] = [
+      {
+        type: 'scene',
+        sceneId: 'scn_wire_test',
+        pid: 17,
+        op: {
+          kind: 'camera',
+          shot: {
+            kind: 'dolly',
+            points: [
+              { x: 1, y: 2, z: 3 },
+              { x: 4, y: 5, z: 6 },
+            ],
+            lookAt: { kind: 'point', point: { x: 7, y: 8, z: 9 } },
+            dur: 2,
+          },
+        },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_wire_test',
+        pid: 17,
+        op: {
+          kind: 'camera',
+          shot: {
+            kind: 'attach',
+            target: 'ship',
+            fallbackFrame: { position: { x: 10, y: 11, z: 12 }, yaw: 0.7 },
+            offset: { x: 1, y: 2, z: 3 },
+            lookAt: { x: 4, y: 5, z: 6 },
+          },
+        },
+      },
+    ];
+    const frame = assembleEventsFrame(serializeEventFragments(events));
+    const client = Object.create(ClientWorld.prototype) as ClientWorld;
+    (client as unknown as { eventQueue: SimEvent[] }).eventQueue = [];
+    (client as unknown as { onMessage(raw: string): void }).onMessage(frame);
+    expect(client.drainEvents()).toEqual(events);
   });
 });
 
