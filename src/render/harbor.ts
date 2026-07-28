@@ -27,9 +27,15 @@ import {
   type HarborRamp,
   harborSurfaceHeight,
 } from '../sim/harbor_layout';
-import type { SceneAttachFrame } from '../sim/types';
+import type { Entity, SceneAttachFrame } from '../sim/types';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
+import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
 import { GFX, surfaceMat } from './gfx';
+import {
+  type DeckStandInAttachPoint,
+  deckStandInAction,
+  deckStandInParentTransform,
+} from './harbor_deck_stand_in_core';
 import { harborShipAttachFrameFrom } from './harbor_ship_attach_core';
 import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './prop_path_core';
 import { type PropAsset, propAsset } from './props';
@@ -371,10 +377,33 @@ interface HarborShipHandle {
   baseY: number;
   baseZ: number;
   baseRot: number;
+  shipScale: number;
   /** performance.now()/1000 when the active segment started, or null. */
   cueStartSec: number | null;
   segment: PropPathSegment | null;
+  deckStandIn: CharacterVisual | null;
 }
+
+// Ship-local yards for the 60-yard grand ferry. The authored shipDecks center
+// the main deck 6.6 yards along the +x bow axis at world y 0.72. The keel
+// parent rests at WATER_LEVEL - draft = -7, so y 7.72 puts the feet on deck.
+const HARBOR_SHIP_DECK_STAND_IN_ATTACH = {
+  x: 6.6,
+  y: 7.72,
+  z: 0,
+  yaw: Math.PI / 2,
+} satisfies DeckStandInAttachPoint;
+const DECK_STAND_IN_IDLE_STATE: AnimState = {
+  speed: 0,
+  moving: false,
+  running: false,
+  airborne: false,
+  backwards: false,
+  dead: false,
+  casting: false,
+  swimming: false,
+  sitting: false,
+};
 
 const SHIPS = new Map<string, HarborShipHandle>();
 const PROP_PATH_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
@@ -419,6 +448,7 @@ export function resetHarborShipCues(): void {
 function resetShip(handle: HarborShipHandle): void {
   handle.cueStartSec = null;
   handle.segment = null;
+  syncDeckStandIn(handle, null);
   handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
   handle.group.rotation.y = handle.baseRot;
   // Back under the freeze: recompose the rest pose once (updateMatrix flags
@@ -427,9 +457,37 @@ function resetShip(handle: HarborShipHandle): void {
   handle.group.matrixAutoUpdate = false;
 }
 
-/** Per-frame cue drive (renderer.sync). Zero work while no cue is live. */
-export function updateHarborShips(): void {
+function syncDeckStandIn(handle: HarborShipHandle, player: Entity | null): void {
+  const cueLive = handle.cueStartSec !== null && handle.segment !== null;
+  const action = deckStandInAction(cueLive, handle.deckStandIn !== null);
+  if (action === 'build' && player) {
+    const visual = createCharacterVisual(player);
+    if (!visual) return;
+    const transform = deckStandInParentTransform(
+      HARBOR_SHIP_DECK_STAND_IN_ATTACH,
+      handle.shipScale,
+      player.scale,
+    );
+    visual.root.position.set(transform.x, transform.y, transform.z);
+    visual.root.rotation.y = transform.yaw;
+    visual.root.scale.setScalar(transform.scale);
+    visual.setWeaponSkin(player.weaponSkinId);
+    visual.update(0, DECK_STAND_IN_IDLE_STATE, true);
+    handle.group.add(visual.root);
+    handle.deckStandIn = visual;
+  } else if (action === 'dispose' && handle.deckStandIn) {
+    handle.deckStandIn.dispose();
+    handle.deckStandIn = null;
+  }
+}
+
+/** Per-frame ship motion and deck visual lifecycle from the live cue state. */
+export function updateHarborShips(localPlayer: Entity, dt: number): void {
   for (const handle of SHIPS.values()) {
+    syncDeckStandIn(handle, localPlayer);
+    if (handle.deckStandIn) {
+      handle.deckStandIn.update(dt, DECK_STAND_IN_IDLE_STATE, false);
+    }
     if (handle.cueStartSec === null || handle.segment === null) continue;
     const pose = propPathPoseAt(
       handle.segment,
@@ -464,8 +522,10 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
     baseY: WATER_LEVEL - harbor.berth.draft,
     baseZ: harbor.berth.z,
     baseRot: harbor.berth.rot,
+    shipScale: scale,
     cueStartSec: null,
     segment: null,
+    deckStandIn: null,
   });
 }
 

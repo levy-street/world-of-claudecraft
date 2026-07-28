@@ -248,6 +248,7 @@ const UI_PURE_CORES = [
 // moment of the cycle.
 const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
+  'src/render/harbor_deck_stand_in_core.ts',
   'src/render/harbor_ship_attach_core.ts',
   'src/render/prop_path_core.ts',
   'src/render/stations_core.ts',
