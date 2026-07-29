@@ -3085,6 +3085,11 @@ export class GameServer {
     session.chatStrikes = meta.chatStrikes ?? session.chatStrikes;
     session.isAdmin = meta.isAdmin ?? false;
     session.adminPermissions = new Set(meta.adminPermissions ?? []);
+    // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
+    // join. Without this, a mid-session save that already landed durably would
+    // be clobbered by the stale join-time snapshot once lastSent resets below
+    // forces a resend.
+    session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     session.lastSent = {};
