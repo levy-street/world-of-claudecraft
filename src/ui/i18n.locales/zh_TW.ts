@@ -8599,6 +8599,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '騎乘 / 下騎',
+  'hudChrome.mounts.mount': '騎乘',
   'hudChrome.mounts.spec_speed': '+{pct}% 額外移動力',
   'hudChrome.mounts.name_valorsteed': '英勇戰馬',
   'hudChrome.mounts.name_grag_bear': '歌利亞格拉格巨熊',

@@ -926,6 +926,7 @@ export const pl_PL: EnTranslations = {
       "mount": "Mount / Dismount"
     },
     "mounts": {
+      "mount": "Mount",
       "useToRide": "Use to summon this mount.",
       "spec_speed": "+{pct}% extra mobility",
       "name_valorsteed": "Valorsteed",

@@ -926,6 +926,7 @@ export const de_DE: EnTranslations = {
       "mount": "Aufsitzen / Absitzen"
     },
     "mounts": {
+      "mount": "Aufsitzen",
       "useToRide": "Benutzen, um dieses Reittier zu beschwören.",
       "spec_speed": "+{pct}% zusätzliche Mobilität",
       "name_valorsteed": "Valorross",

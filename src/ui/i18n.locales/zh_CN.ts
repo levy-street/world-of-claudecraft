@@ -8599,6 +8599,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '骑乘 / 下骑',
+  'hudChrome.mounts.mount': '骑乘',
   'hudChrome.mounts.spec_speed': '+{pct}%额外移动力',
   'hudChrome.mounts.name_valorsteed': '英勇战马',
   'hudChrome.mounts.name_grag_bear': '歌利亚格拉格巨熊',

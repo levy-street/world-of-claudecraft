@@ -926,6 +926,7 @@ export const it_IT: EnTranslations = {
       "mount": "Monta / Smonta"
     },
     "mounts": {
+      "mount": "Monta",
       "useToRide": "Usa per evocare questa cavalcatura.",
       "spec_speed": "+{pct}% di mobilità extra",
       "name_valorsteed": "Destriero del Valore",

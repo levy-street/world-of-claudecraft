@@ -8134,6 +8134,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Tipp: Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle.',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Aufsitzen / Absitzen',
+  'hudChrome.mounts.mount': 'Aufsitzen',
   'hudChrome.mounts.spec_speed': '+{pct}% zusätzliche Mobilität',
   'hudChrome.mounts.name_valorsteed': 'Valorross',
   'hudChrome.mounts.name_grag_bear': 'Goliath-Gragbär',

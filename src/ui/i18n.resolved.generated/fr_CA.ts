@@ -926,6 +926,7 @@ export const fr_CA: EnTranslations = {
       "mount": "Monter / Descendre"
     },
     "mounts": {
+      "mount": "Monter",
       "useToRide": "Utilisez pour invoquer cette monture.",
       "spec_speed": "+{pct}% de mobilité supplémentaire",
       "name_valorsteed": "Destrier de Bravoure",

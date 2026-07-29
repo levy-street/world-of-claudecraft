@@ -926,6 +926,7 @@ export const zh_CN: EnTranslations = {
       "mount": "骑乘 / 下骑"
     },
     "mounts": {
+      "mount": "骑乘",
       "useToRide": "使用以召唤该坐骑。",
       "spec_speed": "+{pct}%额外移动力",
       "name_valorsteed": "英勇战马",

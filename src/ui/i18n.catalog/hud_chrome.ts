@@ -685,6 +685,8 @@ export const hudChromeStrings = {
   // (src/sim/content/mounts.ts carries the canonical English names for the sim
   // side); useToRide is shared by every reins tooltip surface.
   mounts: {
+    // Compact label inside the mobile mount/dismount button in index.html/play.html.
+    mount: 'Mount',
     useToRide: 'Use to summon this mount.',
     spec_speed: '+{pct}% extra mobility',
     name_valorsteed: 'Valorsteed',

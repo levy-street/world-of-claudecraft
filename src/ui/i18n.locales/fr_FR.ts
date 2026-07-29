@@ -8630,6 +8630,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': 'Une vérification de disponibilité est déjà en cours.',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Monter / Descendre',
+  'hudChrome.mounts.mount': 'Monter',
   'hudChrome.mounts.spec_speed': '+{pct}% de mobilité supplémentaire',
   'hudChrome.mounts.name_valorsteed': 'Destrier de Bravoure',
   'hudChrome.mounts.name_grag_bear': 'Ours-Grag Goliath',

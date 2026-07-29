@@ -8049,6 +8049,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': 'Ya hay una comprobación de disponibilidad en curso.',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Montar / Desmontar',
+  'hudChrome.mounts.mount': 'Montar',
   'hudChrome.mounts.spec_speed': '+{pct}% de movilidad adicional',
   'hudChrome.mounts.name_valorsteed': 'Corcel del Valor',
   'hudChrome.mounts.name_grag_bear': 'Oso Grag Goliat',

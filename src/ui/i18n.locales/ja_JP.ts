@@ -9003,6 +9003,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '騎乗 / 降車',
+  'hudChrome.mounts.mount': '騎乗',
   'hudChrome.mounts.spec_speed': '+{pct}% 移動力上昇',
   'hudChrome.mounts.name_valorsteed': 'ヴァロースティード',
   'hudChrome.mounts.name_grag_bear': 'ゴリアテ・グラグベア',

@@ -8026,6 +8026,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': 'Já há uma verificação de prontidão em andamento.',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Montar / Desmontar',
+  'hudChrome.mounts.mount': 'Montar',
   'hudChrome.mounts.spec_speed': '+{pct}% de mobilidade extra',
   'hudChrome.mounts.name_valorsteed': 'Corcel do Valor',
   'hudChrome.mounts.name_grag_bear': 'Urso Grag Golias',

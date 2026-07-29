@@ -8988,6 +8988,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '탑승 / 하차',
+  'hudChrome.mounts.mount': '탑승',
   'hudChrome.mounts.spec_speed': '+{pct}% 추가 기동력',
   'hudChrome.mounts.name_valorsteed': '발러스티드',
   'hudChrome.mounts.name_grag_bear': '골리앗 그라그곰',

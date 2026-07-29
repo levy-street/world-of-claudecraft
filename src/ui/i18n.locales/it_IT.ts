@@ -8183,6 +8183,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': 'È già in corso un controllo di prontezza.',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Monta / Smonta',
+  'hudChrome.mounts.mount': 'Monta',
   'hudChrome.mounts.spec_speed': '+{pct}% di mobilità extra',
   'hudChrome.mounts.name_valorsteed': 'Destriero del Valore',
   'hudChrome.mounts.name_grag_bear': 'Orso Grag Golia',

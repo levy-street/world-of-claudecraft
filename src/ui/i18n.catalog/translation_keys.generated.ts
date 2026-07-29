@@ -7276,6 +7276,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.mounts.desc_stormfeather_griffin'
   | 'hudChrome.mounts.desc_thunderstrut_gobbler'
   | 'hudChrome.mounts.desc_valorsteed'
+  | 'hudChrome.mounts.mount'
   | 'hudChrome.mounts.name_aether_hover_cycle'
   | 'hudChrome.mounts.name_grag_bear'
   | 'hudChrome.mounts.name_shadowjump_toad'

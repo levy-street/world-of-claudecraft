@@ -926,6 +926,7 @@ export const ko_KR: EnTranslations = {
       "mount": "탑승 / 하차"
     },
     "mounts": {
+      "mount": "탑승",
       "useToRide": "사용하여 이 탈것을 소환합니다.",
       "spec_speed": "+{pct}% 추가 기동력",
       "name_valorsteed": "발러스티드",

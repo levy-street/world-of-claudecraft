@@ -926,6 +926,7 @@ export const ru_RU: EnTranslations = {
       "mount": "Сесть / Спешиться"
     },
     "mounts": {
+      "mount": "Сесть",
       "useToRide": "Используйте, чтобы призвать это ездовое животное.",
       "spec_speed": "+{pct}% к скорости передвижения",
       "name_valorsteed": "Доблестный скакун",

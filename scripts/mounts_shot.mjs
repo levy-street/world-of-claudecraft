@@ -19,7 +19,7 @@ const browser = await puppeteer.launch({
   defaultViewport: { width: 1600, height: 900 },
 });
 const page = await browser.newPage();
-page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
+page.on('pageerror', (e) => console.log('PAGEERROR:', e.stack ?? e.message));
 
 // `load` rather than networkidle0: a cold vite dev server streams module
 // transforms well past the idle window on first hit.
@@ -38,7 +38,7 @@ await sleep(300);
 await page.type('#char-name', 'Rider');
 await jsClick('#offline-select .mini-class[data-class="warrior"]');
 await jsClick('#btn-start-offline');
-await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 40000 });
+await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 120000 });
 await sleep(2000);
 
 // Dismiss the new-adventurer tutorial overlay, which otherwise intercepts input.
@@ -77,13 +77,13 @@ await sleep(300);
 // Ride the base horse through the real reins-item path, then let the GLB lazy-load.
 await page.evaluate(() => window.__game.sim.useItem('reins_valorsteed'));
 await page.waitForFunction(() => window.__game.sim.player.mountKey === 'valorsteed', {
-  timeout: 10000,
+  timeout: 60000,
   polling: 250,
 });
 // Wait for the lazy GLB fetch + the renderer's mount visual, not a fixed nap.
 await page.waitForFunction(
   () => !!window.__game.renderer?.views?.get(window.__game.sim.playerId)?.mountVisual,
-  { timeout: 20000, polling: 300 },
+  { timeout: 60000, polling: 300 },
 );
 await sleep(800);
 // A short run so the shot shows the gallop clip mid-stride.
@@ -112,7 +112,7 @@ const swapTo = async (itemId, key, path) => {
     (k) =>
       window.__game.renderer?.views?.get(window.__game.sim.playerId)?.mountVisualKey ===
       `mount_${k}`,
-    { timeout: 20000, polling: 300 },
+    { timeout: 60000, polling: 300 },
     key,
   );
   await sleep(800);

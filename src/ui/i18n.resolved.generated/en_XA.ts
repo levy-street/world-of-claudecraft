@@ -926,6 +926,7 @@ export const en_XA: EnTranslations = {
       "mount": "[Ɱóúñţ / Ðíšɱóúñţ]"
     },
     "mounts": {
+      "mount": "[Ɱóúñţ]",
       "useToRide": "[Úšé ţó šúɱɱóñ ţĥíš ɱóúñţ.]",
       "spec_speed": "[+{pct}% éẋţŕá ɱóƀíļíţý]",
       "name_valorsteed": "[Ʋáļóŕšţééð]",

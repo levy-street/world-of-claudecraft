@@ -9152,6 +9152,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
   // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  'hudChrome.mounts.mount': 'Сесть',
   'hudChrome.mounts.spec_speed': '+{pct}% к скорости передвижения',
   'hudChrome.mounts.name_valorsteed': 'Доблестный скакун',
   'hudChrome.mounts.name_grag_bear': 'Голиаф Граг-медведь',

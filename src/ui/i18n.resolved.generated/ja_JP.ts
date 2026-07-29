@@ -926,6 +926,7 @@ export const ja_JP: EnTranslations = {
       "mount": "騎乗 / 降車"
     },
     "mounts": {
+      "mount": "騎乗",
       "useToRide": "使用してこの騎乗生物を呼び出します。",
       "spec_speed": "+{pct}% 移動力上昇",
       "name_valorsteed": "ヴァロースティード",
