@@ -811,10 +811,10 @@ export const table: DeedLocaleTable = {
   },
   dgn_wildheart_basin: {
     name: 'Das Becken beißt zurück',
-    desc: 'Besiege Zulgar, die Stimme des Beckens, im Wildheart-Becken.',
+    desc: 'Besiege Zulgar, Stimme des Beckens, im Wildherzbecken.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Heroisch: Das Wildheart Basin',
-    desc: 'Besiege Zulgar, die Stimme des Beckens, im Wildheart-Becken auf dem Schwierigkeitsgrad „Heroisch“.',
+    name: 'Heroisch: Das Wildherzbecken',
+    desc: 'Besiege Zulgar, Stimme des Beckens, im Wildherzbecken auf heroischem Schwierigkeitsgrad.',
   },
 };

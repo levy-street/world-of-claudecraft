@@ -781,11 +781,11 @@ export const table: DeedLocaleTable = {
     desc: 'Rozeber 50 kusů výstroje zpět na základní materiály.',
   },
   dgn_wildheart_basin: {
-    name: 'Povodí kousne zpět',
-    desc: 'Porazte Zulgara, Voice of the Basin in the Wildheart Basin.',
+    name: 'Kotlina udeří zpět',
+    desc: 'Poraz Zulgara, hlas Kotliny, v Kotlině Divokého srdce.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Preklad: Heroic: The Wildheart Basin',
-    desc: 'Porazte Zulgara, Voice of the Basin v Wildheart Basin na obtížnost Heroic.',
+    name: 'Hrdinská: Kotlina Divokého srdce',
+    desc: 'Poraz Zulgara, hlas Kotliny, v Kotlině Divokého srdce na hrdinské obtížnosti.',
   },
 };

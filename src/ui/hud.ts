@@ -503,6 +503,7 @@ import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import { localizeSimText } from './sim_i18n';
+import { openSimpleMenu } from './simple_context_menu';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
@@ -1591,6 +1592,20 @@ export class Hud {
     this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim, {
       attachTooltip: (element, html) => this.attachTooltip(element, html),
+      uiScale: getUiScale,
+      isMobileLayout: () => this.isMobileLayout(),
+      storage: localStorage,
+      // The meters' tab menu paints into the ONE shared #ctx-menu box through
+      // the same seat/clamp/bind helpers every other HUD popup uses.
+      openMenu: (items, x, y, onSelect) =>
+        openSimpleMenu(items, x, y, onSelect, {
+          root: () => $('#ctx-menu'),
+          place: (el, px, py, reserveRight, reserveBottom, minLeft, minTop) =>
+            this.placePopupAt(el, px, py, reserveRight, reserveBottom, minLeft, minTop),
+          keepOnScreen: (el) => this.keepPopupOnScreen(el),
+          bindActions: (onActivate) => this.bindContextMenuActions(onActivate),
+          isMobileLayout: () => this.isMobileLayout(),
+        }),
     });
     this.actionBarController = new ActionBarController({
       storage: localStorage,

@@ -815,11 +815,11 @@ export const table: DeedLocaleTable = {
     desc: 'Tháo dỡ 50 món trang bị thành nguyên liệu thô.',
   },
   dgn_wildheart_basin: {
-    name: 'Lưu vực cắn lại',
-    desc: 'Đánh bại Zulgar, Voice of the Basin ở Wildheart Basin.',
+    name: 'Lòng Chảo Phản Đòn',
+    desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Anh hùng: Lưu vực Wildheart',
-    desc: 'Đánh bại Zulgar, Voice of the Basin ở Wildheart Basin ở độ khó Heroic.',
+    name: 'Anh Hùng: Lòng Chảo Trái Tim Hoang Dã',
+    desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã ở độ khó Anh Hùng.',
   },
 };

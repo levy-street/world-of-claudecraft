@@ -845,11 +845,11 @@ export const table: DeedLocaleTable = {
     desc: "Smantella 50 pezzi d'equipaggiamento ricavandone materie prime.",
   },
   dgn_wildheart_basin: {
-    name: 'Il bacino morde',
-    desc: 'Sconfiggi Zulgar, Voce del Bacino nel Bacino del Cuorselvaggio.',
+    name: 'Il Bacino Morde Ancora',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Eroico: Il Bacino del Cuore Selvaggio',
-    desc: 'Sconfiggi Zulgar, Voce del Bacino nel Bacino del Cuorselvaggio in modalità Eroica.',
+    name: 'Eroico: Il Bacino di Wildheart',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart in difficoltà Eroica.',
   },
 };

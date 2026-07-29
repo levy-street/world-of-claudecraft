@@ -818,11 +818,11 @@ export const table: DeedLocaleTable = {
     desc: 'Salvage 50 stuks uitrusting terug tot ruwe grondstoffen.',
   },
   dgn_wildheart_basin: {
-    name: 'Het bekken bijt terug',
-    desc: 'Versla Zulgar, Stem van het Basin in het Wildheart Basin.',
+    name: 'Het Bekken Bijt Terug',
+    desc: 'Versla Zulgar, Stem van het Bekken, in het Wildhartbekken.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Heldhaftig: het Wildheart Basin',
-    desc: 'Versla Zulgar, Voice of the Basin in het Wildheart Basin op Heroic-moeilijkheidsgraad.',
+    name: 'Heroïsch: Het Wildhartbekken',
+    desc: 'Versla Zulgar, Stem van het Bekken, in het Wildhartbekken op Heroïsche moeilijkheidsgraad.',
   },
 };

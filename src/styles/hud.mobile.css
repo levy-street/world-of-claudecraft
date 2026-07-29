@@ -2149,6 +2149,16 @@
     overflow-x: hidden;
     z-index: 25;
   }
+  /* Detached meter windows are a DESKTOP affordance: popping one out, dragging
+     it and resizing it are all pointer gestures the mobile HUD does not offer,
+     and a phone has no room for three floating panels over the action ring. The
+     tabbed meters window above already reaches all three meters here, so the
+     mobile decision for #heal-window / #threat-window is: never shown. The
+     tab right-click that would separate them is a desktop gesture too. */
+  body.mobile-touch #heal-window,
+  body.mobile-touch #threat-window {
+    display: none !important;
+  }
   /* Left-handed mirror: swap the move joystick (and the utility cluster and
      action ring that hug the two corners, see below) so the movement stick
      sits under the right thumb. Opt-in via the "Left-handed Touch" toggle in

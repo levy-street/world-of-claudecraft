@@ -745,11 +745,11 @@ export const table: DeedLocaleTable = {
     desc: 'Bjærg 50 stykker udstyr tilbage til råmaterialer.',
   },
   dgn_wildheart_basin: {
-    name: 'Bassinet bider tilbage',
-    desc: 'Besejr Zulgar, Voice of the Basin i Wildheart Basin.',
+    name: 'Bassinet Bider Igen',
+    desc: 'Besejr Zulgar, Bassinets Stemme, i Vildhjertebassinet.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Oversat: Heroic: The Wildheart Basin',
-    desc: 'Besejr Zulgar, Voice of the Basin i Wildheart Basin på heroisk sværhedsgrad.',
+    name: 'Heroisk: Vildhjertebassinet',
+    desc: 'Besejr Zulgar, Bassinets Stemme, i Vildhjertebassinet på heroisk sværhedsgrad.',
   },
 };

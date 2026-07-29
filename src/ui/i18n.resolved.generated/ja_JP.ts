@@ -901,12 +901,17 @@ export const ja_JP: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
-      "breakdownSummary": "{タブ}: {値} {tab} {value}",
-      "breakdownRow": "{値} ({パーセント}) {value} {percent}",
+      "breakdownSummary": "{tab}：{value}",
+      "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "その他（{count}）",
-      "percent": "{値}% {value}",
-      "petAbility": "{ペット}: {能力} {pet} {ability}",
-      "melee": "近接攻撃"
+      "percent": "{value}%",
+      "petAbility": "{pet}：{ability}",
+      "melee": "近接攻撃",
+      "move": "ドラッグしてこのメーターを移動",
+      "resize": "ドラッグしてこのメーターの大きさを変更",
+      "dock": "このメーターをメーターウィンドウに戻す",
+      "separate": "{meter}を分離",
+      "regroup": "{meter}を統合"
     },
     "petFeed": {
       "disabledFullHp": "ペットは満タンの体力です",
@@ -970,13 +975,13 @@ export const ja_JP: EnTranslations = {
     "mountRace": {
       "startButton": "レース開始",
       "cancelButton": "レースをキャンセル",
-      "go": "ゴー!",
+      "go": "スタート！",
       "start": "スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。",
       "toFinish": "アーチへ戻って駆け抜けろ！",
       "finished": "{seconds}秒でゴール！",
       "timeout": "レース失敗",
       "progress": "障害 {n} / {total}",
-      "timeLeft": "{秒}秒 {seconds}"
+      "timeLeft": "{seconds}秒"
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -5735,7 +5740,7 @@ export const ja_JP: EnTranslations = {
     },
     "augment": {
       "choose": "オーグメントを選択",
-      "cardAria": "{名前} ({カテゴリ}) - {説明} {name} {category} {description}",
+      "cardAria": "{name}（{category}）：{description}",
       "aug_brutality": {
         "name": "蛮勇",
         "desc": "物理攻撃の威力が15%上昇する。"
@@ -6106,8 +6111,8 @@ export const ja_JP: EnTranslations = {
       "secondsRemaining": "残り {seconds} 秒",
       "enteringZone": "{zone}に入りました。",
       "welcomeZone": "{zone}へようこそ！",
-      "riftLabel": "{名前} {name}",
-      "riftLabelRanked": "{名前} ({ランク}) {name} {rank}",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "レベル {level}！",
       "levelLog": "レベル {level}になりました！",
       "xpGain": "{amount}の経験値を獲得しました。",
@@ -6741,20 +6746,20 @@ export const ja_JP: EnTranslations = {
       "thunzharrStormcall": "嵐の呼び声",
       "rift_frost_execution": "氷河の墓",
       "rift_frost_strike": "絶対零度",
-      "rift_ember_execution": "マグマの井戸",
-      "rift_ember_strike": "炉心溶融",
-      "rift_venom_execution": "ヴェノム・プール",
-      "rift_venom_strike": "ブルーマザーのマーク",
-      "rift_necro_execution": "ソウルグレイブ",
-      "rift_necro_strike": "死刑判決",
-      "rift_brute_execution": "アースシャッター",
-      "rift_brute_strike": "最終判決",
-      "rift_arcane_execution": "ヴォイドリフト",
-      "rift_arcane_strike": "秘術の消滅",
+      "rift_ember_execution": "マグマの泉",
+      "rift_ember_strike": "コアメルトダウン",
+      "rift_venom_execution": "毒の沼",
+      "rift_venom_strike": "蜘蛛母の刻印",
+      "rift_necro_execution": "魂の墓",
+      "rift_necro_strike": "死の宣告",
+      "rift_brute_execution": "大地砕き",
+      "rift_brute_strike": "最後の審判",
+      "rift_arcane_execution": "虚空の裂け目",
+      "rift_arcane_strike": "秘術の殲滅",
       "rift_storm_execution": "避雷針",
-      "rift_storm_strike": "ストームコーラーの怒り",
-      "rift_tide_execution": "アビサル・マウ",
-      "rift_tide_strike": "破砕深度"
+      "rift_storm_strike": "嵐の使者の怒り",
+      "rift_tide_execution": "深淵の顎",
+      "rift_tide_strike": "粉砕の深淵"
     }
   },
   "questUi": {

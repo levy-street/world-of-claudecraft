@@ -848,12 +848,12 @@ export const table: DeedLocaleTable = {
     desc: "Récupérez 50 pièces d'équipement pour en extraire les matériaux bruts.",
   },
   dgn_wildheart_basin: {
-    name: 'Le bassin mord en retour',
-    desc: 'Battez Zulgar, la voix du bassin dans le bassin de Wildheart.',
+    name: 'Le bassin riposte',
+    desc: 'Vainquez Zulgar, Voix du Bassin, dans le Bassin du Cœur Sauvage.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Héroïque : Le bassin Wildheart',
-    desc: 'Battez Zulgar, la voix du bassin dans le bassin du Cœur Sauvage en difficulté héroïque.',
+    name: 'Héroïque : le Bassin du Cœur Sauvage',
+    desc: 'Vainquez Zulgar, Voix du Bassin, dans le Bassin du Cœur Sauvage en difficulté héroïque.',
   },
 };
 

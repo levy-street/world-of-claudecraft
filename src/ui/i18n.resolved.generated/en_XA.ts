@@ -906,7 +906,12 @@ export const en_XA: EnTranslations = {
       "breakdownOther": "[Óţĥéŕ ({count})]",
       "percent": "[{value}%]",
       "petAbility": "[{pet}: {ability}]",
-      "melee": "[Ɱéļéé]"
+      "melee": "[Ɱéļéé]",
+      "move": "[Ðŕáĝ ţó ɱóʋé ţĥíš ɱéţéŕ]",
+      "resize": "[Ðŕáĝ ţó ŕéšížé ţĥíš ɱéţéŕ]",
+      "dock": "[Ðóçķ ţĥíš ɱéţéŕ ƀáçķ íñţó ţĥé ɱéţéŕš ŵíñðóŵ]",
+      "separate": "[Šéþáŕáţé {meter}]",
+      "regroup": "[Ŕéĝŕóúþ {meter}]"
     },
     "petFeed": {
       "disabledFullHp": "[Þéţ íš áţ ƒúļļ ĥéáļţĥ]",

@@ -266,6 +266,15 @@ export const COPIED_ALLOW_IDS = [
   'admin::pt_BR::detail.streamerLabel',
   'admin::sv_SE::detail.streamerLabel',
   'admin::vi_VN::detail.streamerLabel',
+  // Unstuck-reports dashboard (v0.32.0). Three genuine cognates rather than
+  // re-coined words: French "Destination" and German "Hotspots" are the normal
+  // terms in those languages, and Indonesian "area" is a standard loanword.
+  // fr_CA carries no own row for colDestination, so it inherits fr_FR's value
+  // and needs its own shadow entry (the same pairing as who.statusCombat above).
+  'admin::fr_FR::unstuckReports.colDestination',
+  'admin::fr_CA::unstuckReports.colDestination',
+  'admin::de_DE::unstuckReports.hotspotsTitle',
+  'admin::id_ID::unstuckReports.areaId',
 ];
 
 export const V07_SLASH = [

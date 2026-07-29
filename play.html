@@ -315,21 +315,50 @@
           <div id="actionbar" class="panel"></div>
           <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
         </div>
-        <div id="meters-window" class="panel">
+        <div id="heal-window" class="panel mt-panel">
           <div class="panel-title">
-            <span class="mt-tabs">
-              <button class="mt-tab on" data-tab="dmg" data-i18n="hud.meters.damageShort">Dmg</button>
-              <button class="mt-tab" data-tab="heal" data-i18n="hud.meters.healingShort">Heal</button>
-              <button class="mt-tab" data-tab="threat" data-i18n="hud.meters.threat">Threat</button>
-            </span>
+            <span class="mt-title-label" data-i18n="hud.meters.healing">Healing</span>
             <span>
-              <button class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
-              <button class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
-              <button class="x-btn mt-close" data-i18n-title="hud.meters.close" data-i18n-aria="hud.meters.close" title="Close meters" aria-label="Close meters" data-icon="close"></button>
+              <button type="button" class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
+              <button type="button" class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
+              <button type="button" class="x-btn mt-close" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
             </span>
           </div>
           <div class="mt-view"></div>
           <div class="mt-sub"></div>
+          <div class="mt-hint"></div>
+          <div class="mt-rows"></div>
+        </div>
+        <div id="threat-window" class="panel mt-panel">
+          <div class="panel-title">
+            <span class="mt-title-label" data-i18n="hud.meters.threat">Threat</span>
+            <span>
+              <button type="button" class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
+              <button type="button" class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
+              <button type="button" class="x-btn mt-close" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
+            </span>
+          </div>
+          <div class="mt-view"></div>
+          <div class="mt-sub"></div>
+          <div class="mt-hint"></div>
+          <div class="mt-rows"></div>
+        </div>
+        <div id="meters-window" class="panel mt-panel">
+          <div class="panel-title">
+            <span class="mt-tabs">
+              <button type="button" class="mt-tab on" data-tab="dmg" data-i18n="hud.meters.damageShort">Dmg</button>
+              <button type="button" class="mt-tab" data-tab="heal" data-i18n="hud.meters.healingShort">Heal</button>
+              <button type="button" class="mt-tab" data-tab="threat" data-i18n="hud.meters.threat">Threat</button>
+            </span>
+            <span>
+              <button type="button" class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
+              <button type="button" class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
+              <button type="button" class="x-btn mt-close" data-i18n-title="hud.meters.close" data-i18n-aria="hud.meters.close" title="Close meters" aria-label="Close meters" data-icon="close"></button>
+            </span>
+          </div>
+          <div class="mt-view"></div>
+          <div class="mt-sub"></div>
+          <div class="mt-hint"></div>
           <div class="mt-rows"></div>
         </div>
       </div>
@@ -922,13 +951,13 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.31.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.32.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.31.0-win.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.32.0-win.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
           </div>
@@ -968,7 +997,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.31.0</div>
+      <div id="game-version">v0.32.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>

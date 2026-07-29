@@ -3600,6 +3600,22 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.gathering': 'Raccolta',
   'abilityUi.cast.thunzharrStormcall': 'Richiamo della tempesta',
   'abilityUi.cast.demonHeal': 'Cura demoniaca',
+  'abilityUi.cast.rift_arcane_execution': 'Squarcio del Vuoto',
+  'abilityUi.cast.rift_arcane_strike': 'Annientamento Arcano',
+  'abilityUi.cast.rift_brute_execution': 'Frantumaterra',
+  'abilityUi.cast.rift_brute_strike': 'Giudizio Finale',
+  'abilityUi.cast.rift_ember_execution': 'Pozzo di Magma',
+  'abilityUi.cast.rift_ember_strike': 'Fusione del Nucleo',
+  'abilityUi.cast.rift_frost_execution': 'Tomba Glaciale',
+  'abilityUi.cast.rift_frost_strike': 'Zero Assoluto',
+  'abilityUi.cast.rift_necro_execution': "Tomba dell'Anima",
+  'abilityUi.cast.rift_necro_strike': 'Sentenza di Morte',
+  'abilityUi.cast.rift_storm_execution': 'Parafulmine',
+  'abilityUi.cast.rift_storm_strike': 'Ira del Richiamatempeste',
+  'abilityUi.cast.rift_tide_execution': 'Fauci Abissali',
+  'abilityUi.cast.rift_tide_strike': 'Profondità Schiacciante',
+  'abilityUi.cast.rift_venom_execution': 'Pozza di Veleno',
+  'abilityUi.cast.rift_venom_strike': 'Marchio della Madre della Covata',
   'questUi.tracker.title': 'Missioni',
   'questUi.tracker.complete': 'Completata',
   'questUi.tracker.showOnMap': 'Mostra {name} sulla mappa',
@@ -5511,6 +5527,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.names.world': 'Mondo',
   'hud.core.chatChannels.names.yell': 'Gridare',
   'hud.core.chatChannels.sendingTo': 'Messaggio in {channel}',
+  'hud.core.riftLabel': '{name}',
+  'hud.core.riftLabelRanked': '{name} ({rank})',
   'hud.options.npcVoices': 'Voci dei PNG',
   'hud.options.voiceVolume': 'Volume voci',
   'entities.zones.eastbrook_vale.pois.8.label': 'Radura di Brightwood',
@@ -5563,6 +5581,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     '+25% danni fisici e +10% critico. Diventa la minaccia.',
   'fiesta.augment.aug_warlords_might.name': 'Possanza del condottiero',
   'fiesta.augment.choose': 'Scegli un potenziamento',
+  'fiesta.augment.cardAria': '{name} ({category}) - {description}',
   'fiesta.banner.augmentGained': 'Potenziamento ottenuto: {name}!',
   'fiesta.banner.powerup': '{name}!',
   'fiesta.banner.wave': 'ONDATA {wave}/{total} — SCEGLI UN POTENZIAMENTO!',
@@ -5771,10 +5790,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.targetTitle': 'Scegli un oggetto da incantare',
   'hudChrome.emoteWheel.edit': 'Modifica',
   'hudChrome.emoteWheel.label': 'Emote',
+  'hudChrome.meters.move': 'Trascina per spostare questo misuratore',
+  'hudChrome.meters.resize': 'Trascina per ridimensionare questo misuratore',
+  'hudChrome.meters.dock': 'Riporta questo misuratore nella finestra dei misuratori',
+  'hudChrome.meters.separate': 'Separa {meter}',
+  'hudChrome.meters.regroup': 'Raggruppa {meter}',
   'hudChrome.meters.minutesSeconds': '{m}m {s}s',
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}s',
+  'hudChrome.meters.breakdownOther': 'Altro ({count})',
+  'hudChrome.meters.breakdownRow': '{value} ({percent})',
+  'hudChrome.meters.breakdownSummary': '{tab}: {value}',
+  'hudChrome.meters.melee': 'Mischia',
+  'hudChrome.meters.percent': '{value}%',
+  'hudChrome.meters.petAbility': '{pet}: {ability}',
   'hudChrome.mobile.haptics': 'Vibrazione',
   'hudChrome.mobile.hapticsOff': 'Vibrazione disattivata',
   'hudChrome.mobile.hotbarPage': 'Abilità',
@@ -5875,6 +5905,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': "Arena d'incursione di Nythraxis",
   'entities.dungeons.nythraxis_boss_arena.enterText': 'Oltrepassi la porta reale sigillata.',
   'entities.dungeons.nythraxis_boss_arena.leaveText': "Torni nell'aria fredda di Thornpeak.",
+  'entities.dungeons.the_last_keep.name': "L'Ultima Rocca",
+  'entities.dungeons.the_last_keep.enterText':
+    'Metti piede nelle sale fredde e silenziose della Ultima Rocca.',
+  'entities.dungeons.the_last_keep.leaveText':
+    'Chiudi il portone della rocca e torni nel vento delle Drakelands.',
+  'entities.dungeons.wildheart_basin.name': 'Il Bacino di Wildheart',
+  'entities.dungeons.wildheart_basin.enterText':
+    'Una pioggia calda sibila sulla pietra antica. Il Bacino di Wildheart si apre davanti a te.',
+  'entities.dungeons.wildheart_basin.leaveText':
+    'Ripassi sotto le zanne di pietra verso il sole di Palmreach.',
   'nav.account': 'Account',
   'hudChrome.account.changePassword': 'Cambia password',
   'hudChrome.account.charactersCount': 'Personaggi: {count}',
@@ -6144,6 +6184,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.family.undead.desc':
     'I morti senza pace, rialzati da mani più oscure. Non si stancano e non fuggono.',
   'guide.family.undead.name': 'Non Morti',
+  'guide.family.demon.name': 'Demoni',
+  'guide.family.demon.desc':
+    'Invasori da oltre gli squarci, tutto fuoco e rancore. Dove uno si trova, una breccia non è mai lontana.',
+  'guide.family.kobold.name': 'Birbanti',
+  'guide.family.kobold.desc':
+    'Spazzini guizzanti e folletti di radure e siepi, più fastidiosi che pericolosi finché non si radunano in gran numero.',
+  'guide.family.murloc.name': 'Gracidopinne',
+  'guide.family.murloc.desc':
+    'Gracidanti genti-pesce di rive lacustri e pozze di marea, pronti a sciamare su chiunque si avvicini troppo.',
   'guide.faqPage.a1':
     "Sì. L'intero gioco è gratuito fino al livello massimo, e il codice sorgente è aperto su GitHub.",
   'guide.faqPage.a2':
@@ -6275,6 +6324,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Una terra continua, tre zone, dalle valli tranquille alle vette ghiacciate.',
   'guide.home.world.valeBlurb': 'Verdi colline e boschi antichi dove inizia ogni avventura.',
   'guide.home.world.valeName': 'Valle di Eastbrook',
+  'guide.home.world.amberBlurb':
+    'Dietro le scogliere occidentali un autunno che non finisce mai, e lanterne su uno stagno dorato.',
+  'guide.home.world.amberName': 'Amberfall',
+  'guide.home.world.duskBlurb':
+    'Un regno sigillato sotto le montagne, se i sussurri su una via di accesso sono veri.',
+  'guide.home.world.duskName': 'La Valletta Velata',
+  'guide.home.world.emberBlurb':
+    'Oltre la Pallida Strada Rialzata il verde lascia spazio alla cenere, e qualcosa di antico domina le lande desolate.',
+  'guide.home.world.emberName': 'Drakelands',
+  'guide.home.world.fenBlurb':
+    'Oltre la corona di autunno, una palude luminosa di salici e acque immobili, e un paese dietro un fossato.',
+  'guide.home.world.fenName': 'Willowfen',
+  'guide.home.world.frostBlurb':
+    "Un'altura innevata oltre ogni mappa, intravista solo tra le luci danzanti.",
+  'guide.home.world.frostName': 'La Distesa di Frostveil',
   'guide.howToPlay.basicsHeading': 'Le basi',
   'guide.howToPlay.controlsLink': 'Consulta il riferimento completo dei comandi',
   'guide.howToPlay.deathBody':
@@ -7058,6 +7122,116 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'I tuoi dati sono stati scaricati. Ti abbiamo inviato una conferma via email.',
   'hudChrome.account.exportFailed': 'Impossibile esportare i tuoi dati. Riprova tra un momento.',
   'entities.zones.eastbrook_vale.pois.9.label': 'Radura di Brightwood',
+  'entities.zones.amberfall.name': 'Amberfall',
+  'entities.zones.amberfall.pois.0.label': 'Lanternmere',
+  'entities.zones.amberfall.pois.1.label': 'Goldmelt',
+  'entities.zones.amberfall.pois.2.label': 'Il Frutteto Dorato',
+  'entities.zones.amberfall.pois.3.label': 'La Valletta del Raccolto',
+  'entities.zones.amberfall.pois.4.label': 'Il Grande Stagno',
+  'entities.zones.amberfall.pois.5.label': 'Poggio di Cindermaple',
+  'entities.zones.amberfall.pois.6.label': 'Il Monolito Pendente',
+  'entities.zones.amberfall.welcome':
+    "Ogni foglia qui arde d'oro e di rosso, eppure nessuna cade mai. Le lanterne di Lanternmere sono accese per te.",
+  'entities.zones.drakelands.name': 'Drakelands',
+  'entities.zones.drakelands.pois.0.label': 'Wyrmwatch',
+  'entities.zones.drakelands.pois.1.label': 'Gatewood',
+  'entities.zones.drakelands.pois.2.label': 'Dune di Cenere',
+  'entities.zones.drakelands.pois.3.label': 'Trollmoot',
+  'entities.zones.drakelands.pois.4.label': "L'Ultima Rocca",
+  'entities.zones.drakelands.pois.5.label': 'Campi di Vetro di Sangue',
+  'entities.zones.drakelands.pois.6.label': 'Caldera di Drakemaw',
+  'entities.zones.drakelands.welcome':
+    'Un vento caldo soffia dalle lande desolate davanti a te. I draghi volteggiano sopra il Drakemaw, e i fuochi dei troll ardono tra le dune.',
+  'entities.zones.eastbrook_vale.pois.11.label': 'La Strada Rialzata di Farshore',
+  'entities.zones.evergarden.name': 'Evergarden',
+  'entities.zones.evergarden.pois.0.label': 'Hedgewick',
+  'entities.zones.evergarden.pois.1.label': 'Il Cancello del Giardino',
+  'entities.zones.evergarden.pois.2.label': 'Il Viale del Parterre',
+  'entities.zones.evergarden.pois.3.label': 'Castello di Dawnhold',
+  'entities.zones.evergarden.pois.4.label': 'Lo Stagno dei Petali',
+  'entities.zones.evergarden.pois.5.label': 'Il Grande Labirinto',
+  'entities.zones.evergarden.pois.6.label': 'La Corte della Fontana',
+  'entities.zones.evergarden.pois.7.label': 'Il Vecchio Mulino',
+  'entities.zones.evergarden.pois.8.label': 'La Vedetta del Nord',
+  'entities.zones.evergarden.pois.9.label': 'Il Bacino dei Gigli',
+  'entities.zones.evergarden.welcome':
+    "Qualcuno sta ancora potando le siepi, eppure nessun giardiniere è stato visto da cent'anni. Fai attenzione al labirinto: anch'esso fa attenzione a te.",
+  'entities.zones.farshore_isle.name': 'Farshore',
+  'entities.zones.farshore_isle.pois.0.label': 'Gullhaven',
+  'entities.zones.farshore_isle.pois.1.label': "L'Approdo",
+  'entities.zones.farshore_isle.pois.2.label': 'Il Prato della Vedetta',
+  'entities.zones.farshore_isle.pois.3.label': 'Le Scogliere Squarciate',
+  'entities.zones.farshore_isle.pois.4.label': 'I Campi degli Squarci',
+  'entities.zones.farshore_isle.welcome':
+    'Attraversa la barra di sabbia e la campana di Gullhaven ti troverà prima ancora del paese. Le brecce si aprono senza preavviso, e il ridotto difende la sua costa da qualunque cosa vi si riversi. Aspettano da molto tempo qualcuno come te.',
+  'entities.zones.frostveil.name': 'La Distesa di Frostveil',
+  'entities.zones.frostveil.pois.0.label': 'Icemantle',
+  'entities.zones.frostveil.pois.1.label': 'La Linea delle Nevi',
+  'entities.zones.frostveil.pois.2.label': 'Laghetto del Ghiacciaio',
+  'entities.zones.frostveil.pois.3.label': "La Scalinata dell'Aurora",
+  'entities.zones.frostveil.pois.4.label': 'Shiverfen',
+  'entities.zones.frostveil.pois.5.label': 'Le Terrazze Ululanti',
+  'entities.zones.frostveil.welcome':
+    'La neve inghiotte ogni suono. Sotto le luci danzanti, persino il freddo sembra sveglio.',
+  'entities.zones.galecrest.name': 'Galecrest',
+  'entities.zones.galecrest.pois.0.label': 'Wickharbor',
+  'entities.zones.galecrest.pois.1.label': 'La Via del Vento',
+  'entities.zones.galecrest.pois.2.label': 'Le Colline Ululanti',
+  'entities.zones.galecrest.pois.3.label': 'Il Vecchio Faro',
+  'entities.zones.galecrest.pois.4.label': 'Lo Strapiombo',
+  'entities.zones.galecrest.pois.5.label': 'I Campi dei Relitti',
+  'entities.zones.galecrest.pois.6.label': 'Il Laghetto Specchio',
+  'entities.zones.galecrest.pois.7.label': 'Le Stalle di Galecrest',
+  'entities.zones.galecrest.welcome':
+    'Il vento non ha mai smesso di soffiare qui, e il Vecchio Faro non si è mai spento. Wickharbor chiede solo che tu chiuda la porta della locanda dietro di te.',
+  'entities.zones.nightbloom.name': 'Nightbloom',
+  'entities.zones.nightbloom.pois.0.label': 'Moonrest',
+  'entities.zones.nightbloom.pois.1.label': 'La Porta della Notte',
+  'entities.zones.nightbloom.pois.2.label': 'Il Pozzo della Luna',
+  'entities.zones.nightbloom.pois.3.label': 'Gloamfield',
+  'entities.zones.nightbloom.pois.4.label': 'La Veglia Perenne',
+  'entities.zones.nightbloom.pois.5.label': 'Il Tumulo Insonne',
+  'entities.zones.nightbloom.welcome':
+    "Oltre la Porta della Notte, l'aria stessa sogna. Segui la luce dei fiori fino a Moonrest, e fai attenzione al mondo addormentato che pende nel cielo.",
+  'entities.zones.palmreach.name': 'Palmreach',
+  'entities.zones.palmreach.pois.0.label': 'Drifthaven',
+  'entities.zones.palmreach.pois.1.label': 'La Foce Aggrovigliata',
+  'entities.zones.palmreach.pois.2.label': 'La Spiaggia delle Palme',
+  'entities.zones.palmreach.pois.3.label': 'Il Groviglio di Smeraldo',
+  'entities.zones.palmreach.pois.4.label': 'Vinefall',
+  'entities.zones.palmreach.pois.5.label': 'La Laguna di Zaffiro',
+  'entities.zones.palmreach.pois.6.label': "L'Idolo Sommerso",
+  'entities.zones.palmreach.welcome':
+    "Sabbia calda, uccelli chiassosi, e una giungla che divora l'orizzonte. Drifthaven tiene un fuoco acceso sulla spiaggia per te.",
+  'entities.zones.veiled_hollow.name': 'La Valletta Velata',
+  'entities.zones.veiled_hollow.pois.0.label': 'Eldergleam',
+  'entities.zones.veiled_hollow.pois.1.label': 'Grotta di Duskfall',
+  'entities.zones.veiled_hollow.pois.2.label': 'Belvedere di Duskfall',
+  'entities.zones.veiled_hollow.pois.3.label': 'Il Boschetto Antico',
+  'entities.zones.veiled_hollow.pois.4.label': 'Bacino delle Stelle Cadenti',
+  'entities.zones.veiled_hollow.pois.5.label': 'La Corte Sommersa',
+  'entities.zones.veiled_hollow.pois.6.label': 'Bassifondi Cristallini',
+  'entities.zones.veiled_hollow.pois.7.label': 'Il Profondo Splendente',
+  'entities.zones.veiled_hollow.welcome':
+    "L'aria vibra di antica magia. Cerca la Custode Saelwyn sotto il grande albero di Eldergleam.",
+  'entities.zones.willowfen.name': 'Willowfen',
+  'entities.zones.willowfen.pois.0.label': 'Bridgemere',
+  'entities.zones.willowfen.pois.1.label': 'La Scalinata di Amberfen',
+  'entities.zones.willowfen.pois.2.label': 'Lilymoors',
+  'entities.zones.willowfen.pois.3.label': 'Pozze di Bogshine',
+  'entities.zones.willowfen.pois.4.label': 'Willowweep',
+  'entities.zones.willowfen.pois.5.label': 'Le Piane Assonnate',
+  'entities.zones.willowfen.welcome':
+    "La palude ronza di libellule e api. Attraversa il ponte fino a Bridgemere e riposa i piedi per un po'.",
+  'entities.zones.wraithwood.name': 'Wraithwood',
+  'entities.zones.wraithwood.pois.0.label': 'Gallowmere',
+  'entities.zones.wraithwood.pois.1.label': 'La Porta dei Corvi',
+  'entities.zones.wraithwood.pois.2.label': 'Il Boschetto della Vedova',
+  'entities.zones.wraithwood.pois.3.label': 'La Radura degli Impiccati',
+  'entities.zones.wraithwood.pois.4.label': 'La Cappella di Mournstone',
+  'entities.zones.wraithwood.pois.5.label': 'La Radura del Cacciatore',
+  'entities.zones.wraithwood.welcome':
+    'La chioma si richiude sulla strada come un coperchio. Resta vicino alle lanterne di Gallowmere, e non rispondere se il bosco chiama il tuo nome.',
   'entities.items.reliquary_plate_chest.name': 'Usbergo della guardia del reliquiario',
   'entities.items.reliquary_leather_chest.name': 'Giaco del guardiano della polvere',
   'entities.items.reliquary_cloth_chest.name': 'Sudario del reliquiario',
@@ -7328,6 +7502,59 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Premi F per risalire',
   'sim.delve.objectiveClearRoom': 'Ripulisci la stanza.',
   'sim.delve.objectiveDefeatBoss': 'Sconfiggi il boss.',
+  'sim.rift.allUnstable': 'Tutti gli squarci sono instabili in questo momento. Riprova a breve.',
+  'sim.rift.alreadyCleared': 'Questo squarcio è già stato completato da {names}.',
+  'sim.rift.deadEntry': 'Non puoi entrare in uno squarcio mentre sei morto.',
+  'sim.rift.deadEntryCombat':
+    'Il tuo gruppo è ancora in combattimento. I morti potranno rientrare quando la battaglia sarà finita.',
+  'sim.rift.descendFloor': 'Scendi più in profondità in {name}.',
+  'sim.rift.detonateAbsoluteZero': 'Zero Assoluto erompe!',
+  'sim.rift.detonateAbyssalMaw': 'Fauci Abissali si chiudono!',
+  'sim.rift.detonateArcaneAnnihilation': 'Annientamento Arcano erompe!',
+  'sim.rift.detonateBloodRite': 'Rito di Sangue cala!',
+  'sim.rift.detonateBroodmothersMark': 'La Marca della Madre della Covata detona!',
+  'sim.rift.detonateCoreMeltdown': 'Fusione del Nucleo detona!',
+  'sim.rift.detonateCrushingDepth': 'Profondità Schiacciante schiaccia!',
+  'sim.rift.detonateDeathSentence': 'Sentenza di Morte cala!',
+  'sim.rift.detonateEarthshatter': 'Frantumaterra detona!',
+  'sim.rift.detonateFinalJudgment': 'Giudizio Finale colpisce!',
+  'sim.rift.detonateGlacialGrave': 'Tomba Glaciale detona!',
+  'sim.rift.detonateHellfireBrand': 'Marchio del Fuoco Infernale detona!',
+  'sim.rift.detonateLightningRod': 'Il Parafulmine colpisce!',
+  'sim.rift.detonateMagmaWell': 'Il Pozzo di Magma erompe!',
+  'sim.rift.detonatePactSeal': 'Il Sigillo del Patto detona!',
+  'sim.rift.detonatePitSentence': 'La Sentenza della Fossa detona!',
+  'sim.rift.detonateSoulGrave': "La Tomba dell'Anima detona!",
+  'sim.rift.detonateStormcallersWrath': "L'Ira del Richiamatempeste erompe!",
+  'sim.rift.detonateVenomPool': 'La Pozza di Veleno erompe!',
+  'sim.rift.detonateVoidRift': 'Lo Squarcio del Vuoto detona!',
+  'sim.rift.enterFloor': 'Attraversi lo squarcio ed entri in {name}.',
+  'sim.rift.exitOpens': 'Lo squarcio trema. Una via verso casa si apre alle spalle dei caduti.',
+  'sim.rift.forgeEnchanted': 'Incantesimo dello squarcio completato per {name}.',
+  'sim.rift.forgeSocketed': 'Gemma dello squarcio incastonata per {name}.',
+  'sim.rift.forgeUpgraded': 'Potenziamento dello squarcio completato per {name}.',
+  'sim.rift.gateOpen': 'Il cancello si apre con un cigolio.',
+  'sim.rift.iceGoalLit': 'Il sigillo di gelo si accende. La via si scuote.',
+  'sim.rift.levelGate':
+    'Solo gli avventurieri di livello {level} o superiore possono entrare in questo squarcio.',
+  'sim.rift.orbOpensGate':
+    'La Sfera di Sangue divampa. I cancelli del tempio si aprono con un cigolio.',
+  'sim.rift.orbSealed': 'La sfera è sigillata dal rituale sottostante.',
+  'sim.rift.orbWakes':
+    "La fiamma del pentagramma si spegne tremolando. Qualcosa si risveglia sull'altare.",
+  'sim.rift.portalCollapses': 'Lo squarcio di rango {tier} in {zone} collassa.',
+  'sim.rift.portalOpens': 'Uno squarcio di rango {tier} si apre in {zone}!',
+  'sim.rift.portalSealed': 'Lo squarcio di rango {tier} in {zone} è stato sigillato.',
+  'sim.rift.pylonLit': 'Un pilone runico si accende ({lit}/{total}).',
+  'sim.rift.raceLost': 'Lo squarcio è già stato completato da {names}. La tua corsa termina qui.',
+  'sim.rift.raceLostBanner': 'Squarcio già completato',
+  'sim.rift.raceWinBanner': 'Corsa allo squarcio vinta - {seconds}s',
+  'sim.rift.raceWorldWin': '{names} ha vinto la corsa allo squarcio di rango {tier} in {seconds}s!',
+  'sim.rift.seqProgress': 'Le rune rispondono in sequenza ({step}/{total}).',
+  'sim.rift.seqReset': 'Le rune si spengono. Ricomincia da capo.',
+  'sim.rift.socketsShut': 'Gli incastri si chiudono con un cigolio. La via si scuote.',
+  'sim.rift.stepBack': 'Fai un passo indietro attraverso lo squarcio.',
+  'sim.rift.wayDownOpens': 'La via verso il basso si squarcia.',
   'hudChrome.auraEffect.dot': 'Infligge {value} danni da {school} ogni {interval} s',
   'hudChrome.auraEffect.hot': 'Ripristina {value} salute ogni {interval} s',
   'hudChrome.auraEffect.absorb': 'Assorbe {value} danni',
@@ -7956,6 +8183,107 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': "Manichino d'allenamento",
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': "Elementale dell'Acqua",
+  'entities.mobs.ancient_guardian.name': 'Antico Guardiano',
+  'entities.mobs.apprentice_wren.name': 'Apprendista Wren',
+  'entities.mobs.ashbone_raider.name': 'Predone Ossocenere',
+  'entities.mobs.ashbone_warcaller.name': 'Banditore di Guerra Ossocenere',
+  'entities.mobs.aurelhorn.name': 'Aurelhorn, Primo della Mandria',
+  'entities.mobs.barrow_king.name': 'Il Re del Tumulo',
+  'entities.mobs.barrow_wight.name': 'Spettro del Tumulo',
+  'entities.mobs.bogtoad.name': 'Rospo di Palude',
+  'entities.mobs.breach_wretch.name': 'Miserabile della Breccia',
+  'entities.mobs.canopy_weaver.name': 'Tessitrice della Chioma',
+  'entities.mobs.castaway_navigator.name': 'Navigatrice Suli',
+  'entities.mobs.cindraleth_maw_matriarch.name': 'Cindraleth, la Matriarca delle Fauci',
+  'entities.mobs.corrupted_sporeling.name': 'Sporello Corrotto',
+  'entities.mobs.downs_bandit.name': 'Bandito delle Colline',
+  'entities.mobs.drowned_deckhand.name': 'Marinaio Annegato',
+  'entities.mobs.drowsy_croaker.name': 'Il Gracidatore Assonnato',
+  'entities.mobs.dune_troll.name': 'Troll delle Dune',
+  'entities.mobs.duskwisp.name': 'Fuoco Fatuo del Crepuscolo',
+  'entities.mobs.emberwing_drake.name': 'Drago Ala di Brace',
+  'entities.mobs.fen_sprite.name': 'Folletto di Palude',
+  'entities.mobs.fisher_bram.name': 'Pescatore Bram',
+  'entities.mobs.frostmane_yeti.name': 'Yeti dalla Criniera di Gelo',
+  'entities.mobs.gale_wisp.name': 'Fuoco Fatuo della Raffica',
+  'entities.mobs.gilded_stag.name': 'Cervo Dorato',
+  'entities.mobs.gleamstag.name': 'Il Cervo Splendente',
+  'entities.mobs.glimmerwisp.name': 'Fuoco Fatuo Scintillante',
+  'entities.mobs.gloam_fox.name': 'Volpe del Crepuscolo',
+  'entities.mobs.gloam_strider.name': 'Vagabondo del Crepuscolo',
+  'entities.mobs.gravedigger_mosley.name': 'Becchino Mosley',
+  'entities.mobs.gravenbark_shambler.name': 'Vagante dalla Corteccia Incisa',
+  'entities.mobs.harvest_sprite.name': 'Folletto del Raccolto',
+  'entities.mobs.hedge_gnome.name': 'Gnomo delle Siepi',
+  'entities.mobs.hedge_knight.name': 'Cavaliere di Dawnhold',
+  'entities.mobs.ice_wisp.name': 'Fuoco Fatuo di Ghiaccio',
+  'entities.mobs.idol_guardian.name': "Il Guardiano dell'Idolo",
+  'entities.mobs.lily_wisp.name': 'Fuoco Fatuo dei Gigli',
+  'entities.mobs.mere_lurker.name': 'Agguatatore dello Stagno',
+  'entities.mobs.moonfleece_grazer.name': 'Pascolatore dal Vello Lunare',
+  'entities.mobs.moor_ram.name': 'Montone della Brughiera',
+  'entities.mobs.mushroom_pixie.name': 'Fata Gleamfolk',
+  'entities.mobs.nightkin_stargazer.name': 'Astrologo Nightkin',
+  'entities.mobs.old_marrowshell.name': 'Vecchio Marrowshell',
+  'entities.mobs.orchard_treant.name': 'Treant del Frutteto',
+  'entities.mobs.pale_huntsman.name': 'Il Cacciatore Pallido',
+  'entities.mobs.rift_boneclad.name': "Guerriero Vestito d'Ossa",
+  'entities.mobs.rift_bonewalker.name': "Camminatore d'Ossa Risorto",
+  'entities.mobs.rift_boss_arcane.name': 'Arconte Nyxaris',
+  'entities.mobs.rift_boss_brute.name': 'Signore della Guerra Grask',
+  'entities.mobs.rift_boss_ember.name': 'Tiranno della Forgia di Brace',
+  'entities.mobs.rift_boss_frost.name': 'Guardiano della Brina',
+  'entities.mobs.rift_boss_necro.name': 'Signore delle Ossa Xarreth',
+  'entities.mobs.rift_boss_pitlord.name': 'Azgorath, Signore della Fossa',
+  'entities.mobs.rift_boss_ritualist.name': "Mago Vel'Kor il Vincolato dal Patto",
+  'entities.mobs.rift_boss_storm.name': 'Tempesta Vharok',
+  'entities.mobs.rift_boss_tide.name': 'Fauci Abissali',
+  'entities.mobs.rift_boss_venom.name': 'Madre della Covata Vysska',
+  'entities.mobs.rift_deep_lurker.name': 'Agguatatore Profondo',
+  'entities.mobs.rift_dread_stalker.name': 'Predatore del Terrore',
+  'entities.mobs.rift_ember_fiend.name': 'Demone di Brace',
+  'entities.mobs.rift_frost_revenant.name': 'Redivivo del Gelo',
+  'entities.mobs.rift_hellguard.name': 'Guardia Infernale',
+  'entities.mobs.rift_magma_brute.name': 'Bruto di Magma',
+  'entities.mobs.rift_marrow_troll.name': 'Troll del Midollo',
+  'entities.mobs.rift_pact_acolyte.name': 'Accolito del Patto',
+  'entities.mobs.rift_rime_elemental.name': 'Elementale di Brina',
+  'entities.mobs.rift_spawnling.name': 'Progenie dello Squarcio',
+  'entities.mobs.rift_stone_ogre.name': 'Ogre di Pietra',
+  'entities.mobs.rift_storm_caller.name': 'Evocatore di Tempeste',
+  'entities.mobs.rift_stormscale.name': 'Drago Scaglia di Tempesta',
+  'entities.mobs.rift_thornback.name': 'Predatore Dorso di Spine',
+  'entities.mobs.rift_tide_thrall.name': 'Schiavo della Marea',
+  'entities.mobs.rift_venom_weaver.name': 'Tessitore di Veleno',
+  'entities.mobs.rift_void_acolyte.name': 'Accolito della Cicatrice del Vuoto',
+  'entities.mobs.riftspawn.name': 'Progenie dello Squarcio',
+  'entities.mobs.rime_elemental.name': 'Elementale di Brina',
+  'entities.mobs.shoal_scuttler.name': 'Scorridore del Basso Fondale',
+  'entities.mobs.snowdrift_wolf.name': 'Lupo dei Cumuli di Neve',
+  'entities.mobs.sporeling_gatherer.name': 'Sporello Raccoglitore',
+  'entities.mobs.sundered_horror.name': "L'Orrore Squarciato",
+  'entities.mobs.terrace_howler.name': 'Ululatore delle Terrazze',
+  'entities.mobs.the_meredark.name': "L'Oscurità dello Stagno",
+  'entities.mobs.the_topiary_bull.name': 'Il Toro di Topiaria',
+  'entities.mobs.the_wreck_warden.name': 'Il Guardiano dei Relitti',
+  'entities.mobs.thicket_boar.name': 'Cinghiale del Roveto',
+  'entities.mobs.tide_scuttler.name': 'Scorridore della Marea',
+  'entities.mobs.topiary_stag.name': 'Cervo di Topiaria',
+  'entities.mobs.topiary_wolf.name': 'Lupo di Topiaria',
+  'entities.mobs.treant_elder.name': 'Treant Anziano',
+  'entities.mobs.veiled_doe.name': 'Cerva Velata',
+  'entities.mobs.veiled_stag.name': 'Cervo Velato',
+  'entities.mobs.void_stalker.name': 'Predatore del Vuoto',
+  'entities.mobs.waking_warden.name': 'Il Guardiano Risvegliato',
+  'entities.mobs.widowsilk_spinner.name': 'Filatrice di Seta della Vedova',
+  'entities.mobs.wildheart_beastmaster.name': 'Domabestie Signore delle Zanne',
+  'entities.mobs.wildheart_hexcaller.name': 'Ossosole, Chiamatore di Malefici',
+  'entities.mobs.wildheart_high_priest.name': 'Zulgar, Voce del Bacino',
+  'entities.mobs.wildheart_ravager.name': 'Devastatore Criniera di Sangue',
+  'entities.mobs.wildheart_stalker.name': 'Predatore Artiglio di Vite',
+  'entities.mobs.willow_sprite.name': 'Folletto del Salice',
+  'entities.mobs.wood_wraith.name': 'Spettro del Bosco',
+  'entities.mobs.wreck_thief.name': 'Ladro dei Relitti',
   'guide.arenaPage.yumiBody':
     'Proteggi Yumi è una modalità a obiettivi di squadra che si gioca in un labirinto: ogni fazione protegge il proprio famiglio felino mentre dà la caccia a quello avversario. Di tanto in tanto entrambi i gatti si teletrasportano in nuovi angoli del labirinto, così lo scontro oscilla tra difesa, caccia e corsa per ritrovarli. Mettiti in coda in tre contro tre o cinque contro cinque; cadere in battaglia ti tiene in panchina solo per un momento.',
   'guide.arenaPage.yumiHeading': 'Proteggi Yumi',
@@ -8165,6 +8493,675 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'Redini del Piumatempesta Toccacielo',
   'entities.items.reins_thunderstrut_gobbler.name': 'Redini di Passotuono, il Gran Tacchino',
   'entities.quests.q_prof_intro.title': 'Un mestiere per ogni mano',
+  'entities.quests.q_af_amber_from_the_herd.title': 'Ambra dalla Mandria',
+  'entities.quests.q_af_amber_from_the_herd.text':
+    "I cervi dorati si accucciano sotto i miei alberi più antichi, e la linfa gocciola oro sul loro manto per tutta la notte. I grumi pettinati via sono l'ambra più pura del bosco. Portamene sei, {playerName}. I cervi non ti ringrazieranno, ma non ne sentiranno nemmeno la mancanza.",
+  'entities.quests.q_af_amber_from_the_herd.objectives.0.label': 'Grumo di Linfa Dorata',
+  'entities.quests.q_af_amber_from_the_herd.completion':
+    "Sei grumi, puliti come miele versato. Questi guanti sono cuciti con l'ultimo lotto, {playerName}: induriti dalla linfa, e più caldi di quanto sembrino.",
+  'entities.quests.q_af_foxes_in_the_lamplight.title': 'Volpi al Chiaro di Lanterna',
+  'entities.quests.q_af_foxes_in_the_lamplight.text':
+    'Le volpi del crepuscolo hanno imparato quanto valgono le scorte delle lanterne, {playerName}. Ogni sera si infilano oltre le recinzioni e portano via il sego che spremiamo per le lampade dei traghetti. Zampe leggere, coscienza ancora più leggera. Abbattine dieci e le altre ricorderanno di temere la città.',
+  'entities.quests.q_af_foxes_in_the_lamplight.objectives.0.label': 'Volpe del Crepuscolo uccisa',
+  'entities.quests.q_af_foxes_in_the_lamplight.completion':
+    'Dieci, e le scorte sono rimaste intatte la notte scorsa per la prima volta in questa stagione. I lampionai ti mandano i loro ringraziamenti, {playerName}.',
+  'entities.quests.q_af_goldmelt_road.title': "La Strada d'Oro in Discesa",
+  'entities.quests.q_af_goldmelt_road.text':
+    "Sei venuto attraverso il Goldmelt, {playerName}, con la neve ancora sugli stivali. Custodisco questo santuario perché Lanternmere sappia chi arriva dal freddo, e ultimamente ho avuto poco da riferire. Prendi la strada d'oro verso la città, trova la Podestà Ottoline vicino al pozzo, e dille che il passo è tranquillo.",
+  'entities.quests.q_af_goldmelt_road.objectives.0.label': 'Riferisci alla Podestà Ottoline',
+  'entities.quests.q_af_goldmelt_road.completion':
+    'Tranquillo sul Goldmelt, e un viandante con la neve tra i capelli a dimostrarlo. Sorrel tiene la sua guardia troppo bene per mandare parole vuote. Sii il benvenuto a Lanternmere, {playerName}. Le lanterne ardono per te.',
+  'entities.quests.q_af_lanterns_on_the_water.title': "Lanterne sull'Acqua",
+  'entities.quests.q_af_lanterns_on_the_water.text':
+    "Ogni traghetto sullo stagno porta una lanterna di poppa, {playerName}, e tre delle mie barche sono tornate all'alba senza la loro. La nebbia le ha prese, o qualcosa nella nebbia lo ha fatto. Vengono a riva lungo la costa orientale quando il vento cambia. Percorri la strada costiera e riportami a casa le mie lanterne.",
+  'entities.quests.q_af_lanterns_on_the_water.objectives.0.label':
+    'Lanterna del Traghetto recuperata',
+  'entities.quests.q_af_lanterns_on_the_water.completion':
+    'Tutte e tre, e ancora accese. Le lanterne dei traghetti non si spengono in acqua, {playerName}. È proprio quello il loro scopo. Ciò che mi preoccupa è cosa le ha strappate via.',
+  'entities.quests.q_af_orchard_call.title': 'Un Carro per il Frutteto',
+  'entities.quests.q_af_orchard_call.text':
+    "La frutticoltrice Pomeline custodisce il Frutteto Dorato sulla strada ovest, e i suoi carri di linfa sono in ritardo di tre giorni. L'intera città dipende da quella linfa d'ambra, {playerName}: resina per le lampade, dolcificante, la birra del raccolto. Percorri la strada ovest e scopri cosa la trattiene.",
+  'entities.quests.q_af_orchard_call.objectives.0.label': 'Trova la Frutticoltrice Pomeline',
+  'entities.quests.q_af_orchard_call.completion':
+    'La Podestà conta i suoi carri, vero? Beh, può contarli mancanti ancora per un po’. Guarda i miei filari, {playerName}. Ho guai più grandi di una consegna in ritardo.',
+  'entities.quests.q_af_sprites_and_spigots.title': 'Folletti e Spilli',
+  'entities.quests.q_af_sprites_and_spigots.text':
+    'Folletti del raccolto, {playerName}. Strappano i miei spilli di linfa dai tronchi per la dolcezza al loro interno e scagliano i secchi nell’erba. Scaccia otto di questi piccoli ladri e riportami quattro dei miei secchi, e i carri torneranno a muoversi.',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Folletto del Raccolto scacciato',
+  'entities.quests.q_af_sprites_and_spigots.objectives.1.label':
+    'Secchio Raccogli-Linfa recuperato',
+  'entities.quests.q_af_sprites_and_spigots.completion':
+    'Quattro secchi di nuovo ai loro ganci e i filari finalmente tranquilli. Hai una mano più pesante coi folletti di quanta ne abbia io, {playerName}, e oggi ne sono felice.',
+  'entities.quests.q_af_the_meredark.title': "L'Oscurità dello Stagno",
+  'entities.quests.q_af_the_meredark.text':
+    "I vecchi traghettatori hanno un nome che pronunciano solo a riva: l'Oscurità dello Stagno, il primo agguatatore, antico quanto il lago e due volte più paziente. È emerso una volta prima d'ora, l'anno in cui il molo annegò, e sta emergendo di nuovo. Al crepuscolo si scalda al sole sulle rovine del molo al largo della costa meridionale, {playerName}. Porta un amico, portane due, e poni fine alla cosa finché può ancora essere fermata.",
+  'entities.quests.q_af_the_meredark.objectives.0.label': "L'Oscurità dello Stagno sconfitta",
+  'entities.quests.q_af_the_meredark.completion':
+    "La nebbia si è sollevata dallo stagno questa mattina, {playerName}, e l'intera città l'ha vista. I traghetti torneranno a fare la traversata notturna, e ogni lanterna sull'acqua arderà nel tuo nome. Prendi questo: è stato dragato dal molo annegato, e nessuno ha più diritto di te a indossarlo.",
+  'entities.quests.q_af_what_took_the_moorings.title': 'Cosa Ha Preso gli Ormeggi',
+  'entities.quests.q_af_what_took_the_moorings.text':
+    "Ora ti dirò ciò che non ho detto davanti alla città. Gli ormeggi non sono scivolati via, sono stati morsi fino a spezzarsi. Agguatatori dello stagno, sempre più audaci ogni notte, che tirano corde e timoni. Rimandane otto sott'acqua per sempre, {playerName}, prima che un traghettatore li segua.",
+  'entities.quests.q_af_what_took_the_moorings.objectives.0.label':
+    'Agguatatore dello Stagno ucciso',
+  'entities.quests.q_af_what_took_the_moorings.completion':
+    'Otto sagome in meno nei bassifondi, e la traversata è stata puntuale oggi per la prima volta in quindici giorni. Ma agguatatori audaci sono agguatatori spinti, {playerName}. Qualcosa sotto lo stagno li sta muovendo.',
+  'entities.quests.q_calming_the_deep.title': 'Placare il Profondo',
+  'entities.quests.q_calming_the_deep.text':
+    'Gli sporelli del Profondo Splendente erano creature gentili prima che lo squarcio toccasse i loro anelli. Ciò che la corruzione prende, non lo restituisce. Concedi riposo ai corrotti, {playerName}: dieci di loro, nel nord del Profondo.',
+  'entities.quests.q_calming_the_deep.objectives.0.label': 'Sporello Corrotto messo a riposo',
+  'entities.quests.q_calming_the_deep.completion':
+    'Hai fatto ciò che non sopportavo di fare io stesso. I raccoglitori cantano ancora negli anelli meridionali; grazie a te, continueranno a cantare.',
+  'entities.quests.q_dk_ash_on_the_wind.title': 'Cenere nel Vento',
+  'entities.quests.q_dk_ash_on_the_wind.text':
+    'Guarda a sud della palizzata, {playerName}. Quei fuochi tra le dune non sono fuochi da cucina dei troll, sono raduni ossocenere, e ogni notte ce ne sono di più. I morti risalgono dai campi d’ossa con la sabbia ancora tra i denti. Abbatti dieci predoni prima che aprano una strada fino al mio cancello.',
+  'entities.quests.q_dk_ash_on_the_wind.objectives.0.label': 'Predone Ossocenere ucciso',
+  'entities.quests.q_dk_ash_on_the_wind.completion':
+    'Dieci lame in meno tra le dune, e i fuochi del raduno hanno bruciato più deboli la notte scorsa. Le mie sentinelle hanno dormito, cosa che non facevano da una settimana. Ben tagliato, {playerName}.',
+  'entities.quests.q_dk_banners_over_the_dunes.title': 'Stendardi sopra le Dune',
+  'entities.quests.q_dk_banners_over_the_dunes.text':
+    'Gli ossocenere si radunano presso le vecchie tombe dei campi d’ossa, {playerName}, e le mie pattuglie non sanno leggere le dune come leggono un muro. Uccidi cinque dei loro banditori di guerra, quelli che urlano per far rialzare i morti, e pianta uno stendardo d’allarme su ogni terreno di raduno cosicché le mie sentinelle possano segnalarlo dal crinale.',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.0.label':
+    'Banditore di Guerra Ossocenere ucciso',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.1.label': "Stendardo d'allarme piantato",
+  'entities.quests.q_dk_banners_over_the_dunes.completion':
+    'Tre stendardi che sventolano nel vento caldo, proprio dove il mio cannocchiale può trovarli. Con cinque banditori di guerra messi a tacere, qualunque cosa risponda al loro richiamo arriverà più lentamente. Ci hai comprato tempo, {playerName}.',
+  'entities.quests.q_dk_marrow_and_ash.title': 'Midollo e Cenere',
+  'entities.quests.q_dk_marrow_and_ash.text':
+    'Ogni predone ossocenere porta un tizzone di guerra, {playerName}: un conteggio bruciacchiato dell’orda sotto cui marcia. Ho contato quattro orde da questo crinale, ma le supposizioni non sono informazioni. Portami sei tizzoni dai predoni e dai loro banditori di guerra, e darò a Brannoc la forma della guerra che sta arrivando.',
+  'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'Tizzone di Guerra Ossocenere',
+  'entities.quests.q_dk_marrow_and_ash.completion':
+    'Sei tizzoni, e un marchio impresso a fuoco su ognuno di essi. Questo non è un semplice raduno di razziatori, {playerName}. Ogni orda tra le dune risponde al cancello di guerra sotto di noi, i troll lo chiamano Orkadia, e nessuno dei cinque soldati con cui ho mai servito potrebbe abbattere ciò che tamburella dietro quella porta. Forse cinque come te.',
+  'entities.quests.q_dk_matriarch_of_the_maw.title': 'Matriarca delle Fauci',
+  'entities.quests.q_dk_matriarch_of_the_maw.text':
+    'Le scaglie dicevano il vero, {playerName}. Sono salito sul bordo all’alba e l’ho vista sul fondo del cratere: Cindraleth, la matriarca sotto cui ogni ala di brace in questo cielo si è schiusa, dorata come un carbone sul punto di prendere fuoco. Finché lei cova, i draghi diventano più audaci, e Wyrmwatch non può combattere sia i draghi che gli ossocenere. Finiscila nel suo cratere, poi porta la notizia al Capitano del Cancello Brannoc. Non andare da solo.',
+  'entities.quests.q_dk_matriarch_of_the_maw.objectives.0.label':
+    'Cindraleth, la Matriarca delle Fauci sconfitta',
+  'entities.quests.q_dk_matriarch_of_the_maw.completion':
+    'Il cielo sopra il Drakemaw è vuoto da due giorni, e ora entri dal mio cancello con il sangue di una matriarca sugli stivali. Wyrmwatch ha vegliato quarant’anni proprio per questo, {playerName}. Prendi questi spallacci, scaglia di fauci, forgiati dal nostro stesso fabbro. Indossali dove i draghi possano vederli.',
+  'entities.quests.q_dk_scales_of_the_maw.title': 'Scaglie delle Fauci',
+  'entities.quests.q_dk_scales_of_the_maw.text':
+    'Quando il vento cambia dal Drakemaw, i draghi ala di brace lo cavalcano sopra il mio accampamento abbastanza in basso da contargli i denti, {playerName}. Si spingono più lontano ogni giorno, e qualcosa in quel cratere li spinge. Portami tre delle loro scaglie. Le scaglie ricordano il calore, e posso capire dove un drago si è appollaiato dalle bruciature.',
+  'entities.quests.q_dk_scales_of_the_maw.objectives.0.label': 'Scaglia Ala di Brace',
+  'entities.quests.q_dk_scales_of_the_maw.completion':
+    'Guarda la parte inferiore di questa, {playerName}: bruciacchiata a spirale, e solo una cosa nidifica in cerchi. Questi draghi sono guardiani della covata. Qualcosa nel Drakemaw è una madre.',
+  'entities.quests.q_dk_scorched_stores.title': 'Scorte Bruciacchiate',
+  'entities.quests.q_dk_scorched_stores.text':
+    'L’ultimo carro è bruciato, {playerName}, ma le casse rinforzate di ferro non bruciano fino in fondo. Quattro di esse giacciono ancora bruciacchiate lungo la strada delle dune, con dentro una stagione di sale, chiodi e corde d’arco. Riportami a casa le mie scorte prima che i troll capiscano come aprirle.',
+  'entities.quests.q_dk_scorched_stores.objectives.0.label':
+    'Cassa di rifornimenti bruciacchiata recuperata',
+  'entities.quests.q_dk_scorched_stores.completion':
+    'Annerite dal fuoco e ogni fibbia ancora salda. Il fabbro riceve i suoi chiodi, la fabbricante di frecce le sue corde, e tu ricevi gli stivali che tenevo da parte per chiunque mi avesse riportato le casse, {playerName}.',
+  'entities.quests.q_dk_trolls_on_the_road.title': 'Troll sulla Strada',
+  'entities.quests.q_dk_trolls_on_the_road.text':
+    'I troll delle dune hanno imparato a riconoscere il suono di un carro di rifornimenti, {playerName}. Hanno colpito la strada delle Dune di Cenere tre volte questo mese, e l’ultimo conducente è arrivato a piedi portando solo le redini. Otto troll in meno su quella strada e i miei carri torneranno a muoversi.',
+  'entities.quests.q_dk_trolls_on_the_road.objectives.0.label': 'Troll delle Dune ucciso',
+  'entities.quests.q_dk_trolls_on_the_road.completion':
+    'Otto, e i miei conducenti hanno smesso di scrivere lettere d’addio prima di ogni viaggio. La guarnigione mangia grazie a te, {playerName}.',
+  'entities.quests.q_dk_watcher_at_the_wargate.title': 'La Vedetta al Cancello di Guerra',
+  'entities.quests.q_dk_watcher_at_the_wargate.text':
+    'Qualcosa sta attirando gli ossocenere a est, {playerName}, e ho mandato la mia migliore esploratrice a scoprire cosa. L’Esploratrice Yerrin si è accampata per un mese nelle dune lontane oltre Trollmoot, in vista di un cancello che nessuno ha costruito nella mia vita. I suoi rapporti si sono interrotti dieci giorni fa. Trova il suo accampamento e portami i suoi occhi.',
+  'entities.quests.q_dk_watcher_at_the_wargate.objectives.0.label': "Trova l'Esploratrice Yerrin",
+  'entities.quests.q_dk_watcher_at_the_wargate.completion':
+    'Ti ha mandato Brannoc? Allora il mio ultimo messaggero non ce l’ha fatta. Abbassa la voce e siediti, {playerName}. Vedi quel cancello laggiù? Conta gli stendardi di guerra davanti ad esso, e capirai perché ho smesso di scrivere le cose.',
+  'entities.quests.q_eg_bloom_clippings.title': 'Talee dal Verde Vivente',
+  'entities.quests.q_eg_bloom_clippings.text':
+    'Vuoi capire questo giardino? Allora leggilo come faccio io. I cervi che pascolano sui prati crescono il verde più autentico: ogni foglia su di loro è una pagina. Portami sei talee fresche dai cervi di topiaria, {playerName}. Non ti ringrazieranno per la potatura, ma ricresceranno. Qui tutto ricresce.',
+  'entities.quests.q_eg_bloom_clippings.objectives.0.label': 'Talea di Fiore Potato',
+  'entities.quests.q_eg_bloom_clippings.completion':
+    'Guarda qui: le foglie si stanno arricciando su se stesse, ogni talea è uguale. Il giardino ha paura, {playerName}. In cent’anni non l’ho mai visto spaventato.',
+  'entities.quests.q_eg_bull_of_the_court.title': 'Il Toro della Corte della Fontana',
+  'entities.quests.q_eg_bull_of_the_court.text':
+    'Ora la verità, {playerName}. Il toro nel cuore del labirinto era il mio capolavoro: l’ho plasmato per custodire la Corte della Fontana, e per cent’anni lo ha fatto. Ma la paura nel verde lo ha raggiunto, e ora non custodisce più nulla, caccia. Il labirinto gli offre in pasto chiunque vi si avventuri. Sono troppo vecchio per disfarlo, e deve essere disfatto, radice e ramo. Porta un amico, attraversa il labirinto fino alla corte, e abbatti il mio toro.',
+  'entities.quests.q_eg_bull_of_the_court.objectives.0.label': 'Il Toro di Topiaria disfatto',
+  'entities.quests.q_eg_bull_of_the_court.completion':
+    'L’ho sentito, qui, quando si è disfatto. Cent’anni di lavoro, e hai fatto bene a porvi fine. Prendi questo mantello: l’ho tagliato per chiunque si fosse dimostrato più forte del mio capolavoro. Stanotte la corte è solo una fontana, {playerName}, e il giardino è solo un giardino. Forse ora io e il Giardiniere Capo potremo entrambi dormire.',
+  'entities.quests.q_eg_four_statues.title': 'Le Quattro Sorelle Silenziose',
+  'entities.quests.q_eg_four_statues.text':
+    'Quando il giardino era giovane, i primi giardinieri eressero quattro sorelle di marmo a vegliare sui suoi quartieri: una sopra le Rose Selvatiche, una sul viale dello stagno a est del labirinto, una sul prato ovest dove gli gnomi tengono la loro tana, e una sul prato sud oltre le siepi. Il labirinto è cresciuto tra di loro, e la maggior parte della gente non le vede mai tutte e quattro. Percorri i quartieri, {playerName}, e posa il palmo su ogni sorella. Quando il giardino ti avrà osservato da tutti e quattro i lati, aprirà luoghi che tiene nascosti agli estranei.',
+  'entities.quests.q_eg_four_statues.objectives.0.label': 'Statua del giardino visitata',
+  'entities.quests.q_eg_four_statues.completion':
+    'Quattro ricalchi, quattro sorelle, e nemmeno una di loro ha pianto marmo. Il giardino ti ha misurato, {playerName}, e non ti ha trovato mancante. Ora posso mandarti dove vive davvero il problema.',
+  'entities.quests.q_eg_gate_report.title': 'Notizie Oltre il Cancello',
+  'entities.quests.q_eg_gate_report.text':
+    'I prati oltre questo cancello si potano da soli da cent’anni, {playerName}, e ultimamente hanno iniziato a potare anche i visitatori. Il Giardiniere Capo Amaranth tiene i registri a Hedgewick, su per la strada oltre i prati del cancello. Dille che un altro viandante è passato, e dille che le siepi vicino al cancello si sono mosse la notte scorsa.',
+  'entities.quests.q_eg_gate_report.objectives.0.label': 'Riferisci al Giardiniere Capo Amaranth',
+  'entities.quests.q_eg_gate_report.completion':
+    'Si sono mosse, eh. Pell lo riferisce ogni settimana, e ogni settimana ha ragione. Perdona i miei occhi, {playerName}, non dormo una notte intera da anni: qualcuno deve vegliare mentre il giardino veglia su di noi. Benvenuto a Hedgewick.',
+  'entities.quests.q_eg_gnomes_in_the_green.title': 'Il Rancore dei Giardinieri',
+  'entities.quests.q_eg_gnomes_in_the_green.text':
+    "Le cesoie erano solo l'inizio, {playerName}. La notte scorsa gli gnomi hanno rovesciato i nostri carretti degli attrezzi nel verde, uno vicino alla loro tana a ovest del labirinto, uno dall’altra parte del giardino sul viale dello stagno, e hanno sparso nell’erba cent’anni di buon ferro. Scaccia otto di questi piccoli demoni e riporta a casa i carretti rovesciati.",
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.0.label': 'Gnomo delle Siepi scacciato',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.1.label':
+    'Carretto degli attrezzi recuperato',
+  'entities.quests.q_eg_gnomes_in_the_green.completion':
+    'Tre carretti recuperati e i ganci di nuovo pieni. Che i piccoli demoni continuino a tenere il broncio nelle loro siepi: anche Hedgewick lavora questi prati.',
+  'entities.quests.q_eg_hungry_shapes.title': 'Potati fino alla Fame',
+  'entities.quests.q_eg_hungry_shapes.text':
+    'Chiunque plasmi questo giardino è diventato negligente, o crudele. Le sagome di lupo nelle Rose Selvatiche erano potate per mostra, eppure ultimamente danno la caccia: fauci verdi, senza ventre, e nessuna ragione per fermarsi mai. Abbatti dieci lupi di topiaria, {playerName}, e lascia che i prati tornino ad essere prati per un po’.',
+  'entities.quests.q_eg_hungry_shapes.objectives.0.label': 'Lupo di Topiaria ucciso',
+  'entities.quests.q_eg_hungry_shapes.completion':
+    'Dieci mucchi di ritagli dove sorgevano dieci lupi. Dovrebbe sembrare giardinaggio, {playerName}. Perché sembra guerra?',
+  'entities.quests.q_eg_stolen_shears.title': 'Le Cesoie Rubate',
+  'entities.quests.q_eg_stolen_shears.text':
+    'Ogni paio di cesoie a Hedgewick è sparito in quindici giorni, {playerName}: dai ganci, da capanni chiusi a chiave, un paio persino dal mio grembiule mentre sonnecchiavo. Sono gli gnomi delle siepi, i piccoli giardinieri che odiano vederci camminare sui loro prati. Recuperane sei paia prima che tutto il villaggio si ritrovi a usare coltelli da cucina.',
+  'entities.quests.q_eg_stolen_shears.objectives.0.label': 'Cesoie Rubate di Hedgewick',
+  'entities.quests.q_eg_stolen_shears.completion':
+    'Sei paia, e il mio tra loro, riconoscerei quella tacca sulla lama ovunque. Ecco, questi guanti sono stati lavorati per il lavoro di potatura. Mani calde reggono cesoie ferme.',
+  'entities.quests.q_eg_who_trims_the_hedges.title': 'Chi Pota le Siepi',
+  'entities.quests.q_eg_who_trims_the_hedges.text':
+    'Tengo i registri da trent’anni, {playerName}, e non dormo bene da dieci di questi, perché i conti non tornano. L’erba vuole essere tagliata e le siepi vogliono essere sagomate, e nessuno qui fa nessuna delle due cose, eppure ogni alba il giardino appare potato. Ultimamente la gente dei boschi giura di vedere un vecchio con una carriola sui prati lontani a sud, oltre il labirinto vicino al Bacino dei Gigli. Trovalo. Se è reale, potrò finalmente dormire. Se non lo è, suppongo che non dormirò mai più.',
+  'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label':
+    'Trova il giardiniere presso il Bacino dei Gigli',
+  'entities.quests.q_eg_who_trims_the_hedges.completion':
+    'Quindi la casa ha finalmente mandato qualcuno. Cammino su questi prati da cent’anni, {playerName}, e io e il giardino abbiamo un accordo: poto ciò che chiede di essere potato. Siediti. Le siepi possono concederti un’ora.',
+  'entities.quests.q_fs_bell_at_the_landing.title': "La Campana all'Approdo",
+  'entities.quests.q_fs_bell_at_the_landing.text':
+    'Sei venuto attraverso il Ferrywalk, {playerName}? Allora sei il primo in una settimana, e il Guardiano vorrà darti un’occhiata. Gullhaven si trova su per la strada costiera, oltre le rastrelliere di essiccazione di cui nessuno si occupa più. Di’ al Guardiano Coalfast che la strada rialzata regge ancora, e che Tam non ha ancora suonato tre rintocchi oggi. Ancora.',
+  'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': 'Riferisci al Guardiano Coalfast',
+  'entities.quests.q_fs_bell_at_the_landing.completion':
+    'La strada rialzata regge, e Tam ha ancora fiato a sufficienza per scherzare sui tre rintocchi. Bene. Siamo un’isola sotto assedio, {playerName}, e ogni paio di mani che attraversa quella barra di sabbia è un paio che le fratture devono superare prima di raggiungere la mia gente. Benvenuto a Gullhaven.',
+  'entities.quests.q_fs_bram_come_home.title': 'Bram Torna a Casa',
+  'entities.quests.q_fs_bram_come_home.text':
+    'Il mio Bram ha preso la barca la mattina in cui si è aperta la frattura delle reti, e il mare lo ha rigettato da qualche parte oltre la punta dell’Approdo. L’ho sentito tre notti fa, {playerName}, chiamare sull’acqua, ed ero troppo spaventata per andare. Sono ancora troppo spaventata. Ti prego. La sua barca giace naufragata sulla costa nord. Riportamelo a casa.',
+  'entities.quests.q_fs_bram_come_home.objectives.0.label':
+    'Pescatore Bram riportato sano e salvo a Gullhaven',
+  'entities.quests.q_fs_bram_come_home.completion':
+    'Bram! Me lo hai riportato intero, {playerName}. Abbiamo pianto entrambi e nessuno dei due se ne vergogna. Qualunque cosa le fratture prenderanno da quest’isola in futuro, non avranno la mia famiglia. Mai più.',
+  'entities.quests.q_fs_hold_the_riftfields.title': 'Difendi i Campi degli Squarci',
+  'entities.quests.q_fs_hold_the_riftfields.text':
+    'A est della città i filari di grano sono andati in rovina, e i miserabili giunti dalla frattura dei Campi degli Squarci ora li spogliano completamente. La mia gente non può curare un campo in cui non può stare in piedi, {playerName}. Abbattine dieci e ridai ai contadini la loro terra.',
+  'entities.quests.q_fs_hold_the_riftfields.objectives.0.label': 'Miserabile della Breccia ucciso',
+  'entities.quests.q_fs_hold_the_riftfields.completion':
+    'Dieci in meno, e i braccianti già litigano su chi uscirà per primo. Non durerà, le fratture non riposano mai a lungo, ma una città che mangia è una città che resiste.',
+  'entities.quests.q_fs_moss_and_mending.title': 'Muschio e Cure',
+  'entities.quests.q_fs_moss_and_mending.text':
+    'Il muschio salino che cresce lungo la linea di marea è la migliore fasciatura per ferite che conosca, e la progenie dello squarcio ha conquistato ogni tratto di costa dove cresce. Portano ciuffi impigliati nella loro pelle, per assurdo che sia. Elimina sei di loro dai tratti orientali, {playerName}, e raccogli per me quattro belle manciate di muschio da ciò che hanno calpestato.',
+  'entities.quests.q_fs_moss_and_mending.objectives.0.label': 'Progenie dello Squarcio uccisa',
+  'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Muschio Salino di Farshore',
+  'entities.quests.q_fs_moss_and_mending.completion':
+    'Muschio in una mano e una costa più tranquilla nell’altra. Hai rifornito tutto il mio ambulatorio, {playerName}. Fammi la cortesia di non diventare il mio prossimo paziente.',
+  'entities.quests.q_fs_song_before_the_break.title': 'Il Canto Prima della Frattura',
+  'entities.quests.q_fs_song_before_the_break.text':
+    'C’è un uomo che sente le fratture prima che si aprano. La Vedetta dello Squarcio Ollun: uno studioso, o un pazzo, e ultimamente non posso permettermi di distinguerli. Tiene la sua veglia al Prato della Vedetta, su per la strada a sudest della città. Trovalo, {playerName}, e chiedigli cosa l’isola sta per farci ancora.',
+  'entities.quests.q_fs_song_before_the_break.objectives.0.label':
+    'Trova la Vedetta dello Squarcio Ollun',
+  'entities.quests.q_fs_song_before_the_break.completion':
+    'Ti ha mandato il Guardiano? Bene. Significa che la città ha finalmente iniziato ad ascoltare. Ora resta fermo un momento, {playerName}. Ecco, sotto il vento, lo senti? Le scogliere stanno cantando, e non mi piace la melodia.',
+  'entities.quests.q_fs_stalkers_off_the_light.title': 'Predatori lontani dalla Luce',
+  'entities.quests.q_fs_stalkers_off_the_light.text':
+    'I predatori cacciano nel buio tra i fuochi di guardia, e ogni notte cerchiano il mio prato un po’ più vicino. Non sono privi di mente, {playerName}, sono pazienti, e la pazienza è l’unica cosa che non posso superare in resistenza. Uccidine otto e ricaccia il buio verso le scogliere da cui è venuto.',
+  'entities.quests.q_fs_stalkers_off_the_light.objectives.0.label': 'Predatore del Vuoto ucciso',
+  'entities.quests.q_fs_stalkers_off_the_light.completion':
+    'Otto notti di cerchi, finite in una sola. I fuochi ardono già più stabili, o forse sono solo le mie mani. In ogni caso il prato è di nuovo mio, e posso sentire l’isola pensare.',
+  'entities.quests.q_fs_steel_for_the_redoubt.title': 'Acciaio per il Ridotto',
+  'entities.quests.q_fs_steel_for_the_redoubt.text':
+    'Ogni lama che distribuisco è una che il mare ha restituito o una che ho strappato ai morti, {playerName}. I miserabili portano rottami attraverso le fratture, cardini, ganci, acciaio di spade spezzate, roba da gazza ladra, ma si forgia bene comunque. Portami sei pezzi del loro acciaio raccattato e la linea di barricate riavrà i suoi denti.',
+  'entities.quests.q_fs_steel_for_the_redoubt.objectives.0.label': 'Acciaio Segnato dalle Rotture',
+  'entities.quests.q_fs_steel_for_the_redoubt.completion':
+    'Corroso dal sale e segnato dalle fratture, ma manterrà comunque il filo. Ecco, ho foderato io stesso queste impugnature. Acciaio per acciaio, {playerName}: è l’unico commercio che il Farshore conosce di questi tempi.',
+  'entities.quests.q_fs_the_great_break.title': 'La Grande Frattura',
+  'entities.quests.q_fs_the_great_break.text':
+    'Ogni canto che quest’isola intona finisce sulla stessa nota bassa, e proviene dalle Scogliere Squarciate. Qualcosa è passato attraverso la grande frattura lì, {playerName}, qualcosa che le stesse scogliere si sono spaccate per lasciare entrare, e sta ancora crescendo. Se cammina verso nord, nessuna campana avrà importanza. Porta un amico, portane due, e poni fine alla cosa. Poi di’ a Coalfast che la melodia è cambiata.',
+  'entities.quests.q_fs_the_great_break.objectives.0.label': "L'Orrore Squarciato sconfitto",
+  'entities.quests.q_fs_the_great_break.completion':
+    'Ollun ha mandato notizie in anticipo: il canto si è fermato. Tutta la mia città ha sentito il silenzio, {playerName}, e metà di loro ha pianto al suono del nulla assoluto. Indossa questo mantello. Il Farshore non dimentica chi ha difeso la sua costa.',
+  'entities.quests.q_fs_the_three_bells.title': 'Le Tre Campane',
+  'entities.quests.q_fs_the_three_bells.text':
+    'Tre campane di vedetta presidiano la costa oltre la mia: una sulla punta dell’Approdo, una sulla spiaggia meridionale, una vicino alla costa dei Campi degli Squarci. Se una corda è marcita o un batacchio è stato portato via, la città scopre di una frattura quando è già nelle strade. Percorri la costa, {playerName}, e suona ogni campana una volta, così saprò che ha ancora una voce.',
+  'entities.quests.q_fs_the_three_bells.objectives.0.label': 'Campana di vedetta suonata',
+  'entities.quests.q_fs_the_three_bells.completion':
+    'Tre voci, tre risposte, portate limpide sull’acqua. Dormi a Gullhaven stanotte, {playerName}, e sappi che se una campana ti sveglierà, sarà per mano mia e al momento giusto.',
+  'entities.quests.q_fv_aurora_motes.title': "Granelli d'Aurora",
+  'entities.quests.q_fv_aurora_motes.text':
+    'I fuochi fatui che vagano su questi gradini sono sparsi dalle luci stesse, e ognuno porta un granello d’aurora nel suo cuore. Me ne servono sei per leggere ciò che il cielo sta scrivendo, {playerName}. I fuochi fatui non reagiscono. Se questo rende il lavoro più facile o più difficile è una questione tra te e la tua coscienza.',
+  'entities.quests.q_fv_aurora_motes.objectives.0.label': "Granello d'Aurora",
+  'entities.quests.q_fv_aurora_motes.completion':
+    'Sei granelli, ancora luminescenti. Guardali, {playerName}: pulsano all’unisono tra loro. Le luci non sono un fenomeno atmosferico. Sono un segnale.',
+  'entities.quests.q_fv_ember_caches.title': 'Braci sulla Strada del Laghetto',
+  'entities.quests.q_fv_ember_caches.text':
+    'Una slitta di scorte di braci si è ribaltata sulla strada del laghetto la notte scorsa: pentoloni di ferro che mantengono viva una brace coperta per un mese. Tre di essi giacciono ancora nella neve, {playerName}, e il rifugio non può fare a meno di ciò che contengono. Riporta il fuoco a casa.',
+  'entities.quests.q_fv_ember_caches.objectives.0.label': 'Scorta di Braci recuperata',
+  'entities.quests.q_fv_ember_caches.completion':
+    'Ancora calde, tutte quante. Hai regalato al rifugio un intero inverno di grazia, {playerName}.',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'Il Tiranno dalla Criniera di Gelo',
+  'entities.quests.q_fv_frostmane_tyrant.text':
+    "Gli ululatori non stavano cacciando quando sono scesi dalle terrazze. Stavano fuggendo. Uno yeti ha rivendicato le alture, la gente di montagna lo chiama la Criniera di Gelo, e nemmeno i branchi vogliono condividere un pendio con lui. Deve finire, {playerName}, prima che l'inverno lo spinga fino alle mie mura. Porta un amico. Portane due.",
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'La Criniera di Gelo sconfitta',
+  'entities.quests.q_fv_frostmane_tyrant.completion':
+    "Quando il vento è calato la notte scorsa, tutto il villaggio ha sentito il silenzio dove prima c'era la Criniera di Gelo. La Distesa ti deve un debito che impiegherà anni a ripagare, {playerName}. Indossa questo, e ogni porta a Icemantle ti sarà aperta.",
+  'entities.quests.q_fv_howl_above.title': "L'Ululato sulle Terrazze",
+  'entities.quests.q_fv_howl_above.text':
+    'Lo senti al crepuscolo, {playerName}: un ululato dalle Terrazze Ululanti che non è dei branchi dei cumuli di neve. Gole più grandi. Gli ululatori delle terrazze sono scesi dalle vette per la prima volta da quando mia nonna teneva questo posto, e sono loro ad aver spinto i lupi sulla mia strada. Abbattine otto e ricacciali indietro.',
+  'entities.quests.q_fv_howl_above.objectives.0.label': 'Ululatore delle Terrazze ucciso',
+  'entities.quests.q_fv_howl_above.completion':
+    'Otto, e il coro del crepuscolo ne risulta più rado. Ma gli ululatori non lasciano le vette per niente. Qualcosa lassù li ha spinti a farlo, e temo abbia un nome.',
+  'entities.quests.q_fv_lights_over_steps.title': 'Luci sopra la Scalinata',
+  'entities.quests.q_fv_lights_over_steps.text':
+    "L'aurora è arsa verde ogni notte questo mese, e gli anziani non vogliono camminare sotto di essa. Una donna potrebbe sapere perché: Veyla, l'Aurorista. Si accampa da sola sulla Scalinata dell'Aurora, a sudest oltre il laghetto. Trova il suo accampamento, {playerName}, e ascolta cosa le hanno detto le luci.",
+  'entities.quests.q_fv_lights_over_steps.objectives.0.label': "Trova l'Aurorista Veyla",
+  'entities.quests.q_fv_lights_over_steps.completion':
+    "Ti ha mandato Kaldra? Allora finalmente si preoccupa, e ha ragione a farlo. Siediti, {playerName}. Osserva il cielo con me per un po'.",
+  'entities.quests.q_fv_rime_unbound.title': 'Brina Sciolta',
+  'entities.quests.q_fv_rime_unbound.text':
+    "Quando l'aurora arde così luminosa, il freddo si alza e cammina: elementali di brina, gelo a cui è stata data una volontà. Si radunano dove le luci toccano i terrazzamenti, e vagano sempre più vicino al mio accampamento ogni notte. Distruggine otto, {playerName}, prima che uno di loro distrugga me.",
+  'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Elementale di Brina ucciso',
+  'entities.quests.q_fv_rime_unbound.completion':
+    "La notte sembra già più rarefatta. Qualunque cosa li risvegli non ha finito, ma hai comprato un po' di quiete per la Scalinata.",
+  'entities.quests.q_fv_seeing_wren_home.title': 'Riportare Wren a Casa',
+  'entities.quests.q_fv_seeing_wren_home.text':
+    "La mia apprendista Wren è uscita per percorrere la linea del Goldmelt due giorni fa e non è mai tornata. Ho trovato le sue tracce, si è rintanata sotto i segnavia a sudovest della Scalinata dell'Aurora, troppo spaventata dai lupi per muoversi. Non posso lasciare la palude, {playerName}. Accompagnala all'accampamento di Veyla sulla Scalinata. Sarà al sicuro sotto le luci.",
+  'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
+    "Apprendista Wren accompagnata sana e salva alla Scalinata dell'Aurora",
+  'entities.quests.q_fv_seeing_wren_home.completion':
+    'La ragazza è dentro, avvolta in metà delle mie coperte e a chiacchierare con le stelle nel cielo. Hai fatto una cosa gentile oggi, {playerName}. La Distesa non ne vede molte.',
+  'entities.quests.q_fv_silent_trapline.title': 'La Linea di Trappole Silenziosa',
+  'entities.quests.q_fv_silent_trapline.text':
+    "Il vecchio Brosk lavora la linea di trappole dello Shiverfen a ovest di qui, e ogni settimana da undici anni ha mandato un fascio di pellicce con la slitta della legna. Sono due settimane ormai, niente. È troppo testardo per congelare e troppo prudente per annegare, {playerName}, quindi qualcos'altro non va. Trova il suo accampamento nella palude e assicurati che respiri ancora.",
+  'entities.quests.q_fv_silent_trapline.objectives.0.label': 'Trova il Trappolatore Brosk',
+  'entities.quests.q_fv_silent_trapline.completion':
+    "Ti ha mandato Maeve? Ah. Undici anni e quella donna pensa ancora che la palude mi divorerà. Beh... quest'anno potrebbe avere ragione. Guarda cosa ha fatto alle mie trappole.",
+  'entities.quests.q_fv_snowline_report.title': 'Notizie dalla Linea delle Nevi',
+  'entities.quests.q_fv_snowline_report.text':
+    'Ogni anima che sale fuori dalle Drakelands passa dal mio fuoco, {playerName}, e ogni settimana ne salgono di meno. Il Guardiano Kaldra tiene Icemantle su per la strada nord. Dille che il passo è ancora aperto, e dille che uno straniero lo ha attraversato da solo.',
+  'entities.quests.q_fv_snowline_report.objectives.0.label': 'Riferisci al Guardiano Kaldra',
+  'entities.quests.q_fv_snowline_report.completion':
+    'Il passo regge, allora. Einna presidia quell’accampamento attraverso tempeste che seppelliscono i segnavia, e non mi ha mai mandato notizie inutili. Benvenuto a Icemantle, {playerName}.',
+  'entities.quests.q_fv_sprung_traps.title': 'Folletti nelle Trappole',
+  'entities.quests.q_fv_sprung_traps.text':
+    'Folletti di palude, {playerName}. I piccoli demoni fanno scattare le mie trappole per divertimento e spargono il ferro tra le canne. Scacciali, otto dovrebbero bastare a insegnare una lezione agli altri, e raccogli ciò che resta delle mie linee di trappole mentre sei là fuori.',
+  'entities.quests.q_fv_sprung_traps.objectives.0.label': 'Folletto di Palude scacciato',
+  'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Trappola recuperata',
+  'entities.quests.q_fv_sprung_traps.completion':
+    'Quattro buone trappole recuperate e le canne finalmente tranquille. Intrappoli con una mano più pesante della mia, {playerName}, ma non posso discutere con i risultati.',
+  'entities.quests.q_fv_winter_pelts.title': 'Pellicce per il Rifugio',
+  'entities.quests.q_fv_winter_pelts.text':
+    'La legna da ardere tiene in vita un corpo, {playerName}, ma la lana non fermerà questo freddo, solo la pelliccia di lupo lo farà. Sei spesse pellicce invernali dai branchi dei cumuli di neve e potrò foderare sacchi a pelo per tutti quelli che il rifugio ospita.',
+  'entities.quests.q_fv_winter_pelts.objectives.0.label': 'Pelliccia Invernale Spessa',
+  'entities.quests.q_fv_winter_pelts.completion':
+    "Una pelliccia così è l'unico argomento a cui l'inverno dà ascolto. Prendi questi stivali, sono foderati con l'ultimo lotto.",
+  'entities.quests.q_fv_wolves_at_the_door.title': 'Lupi alla Porta',
+  'entities.quests.q_fv_wolves_at_the_door.text':
+    'I branchi dei cumuli di neve un tempo restavano sui terrazzamenti alti. Ora attraversano la strada del laghetto in pieno giorno e i miei taglialegna non vogliono lasciare le mura. Dirada i branchi, {playerName}, dieci di loro, e la strada tornerà a essere una strada.',
+  'entities.quests.q_fv_wolves_at_the_door.objectives.0.label': 'Lupo dei Cumuli di Neve ucciso',
+  'entities.quests.q_fv_wolves_at_the_door.completion':
+    'Dieci ombre in meno tra qui e il laghetto. I taglialegna già litigano su chi uscirà per primo.',
+  'entities.quests.q_gc_dead_mens_cargo.title': 'Il Carico degli Uomini Morti',
+  'entities.quests.q_gc_dead_mens_cargo.text':
+    "La legge del recupero è semplice, {playerName}: ciò che il mare dà alla spiaggia è mio. I marinai annegati non sono d'accordo. Risorgono dai loro scafi e trascinano ogni cassa che impilo di nuovo sotto la linea di marea. Mettine sei a riposo per sempre, e mentre la spiaggia è tranquilla, tira a riva tre casse di relitti galleggianti prima che la marea presenti la sua controrichiesta.",
+  'entities.quests.q_gc_dead_mens_cargo.objectives.0.label': 'Marinaio Annegato messo a riposo',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.1.label':
+    'Cassa di Relitti Galleggianti recuperata',
+  'entities.quests.q_gc_dead_mens_cargo.completion':
+    "Sei equipaggi più tranquilli e tre casse al sicuro all'asciutto. Recuperi con una mano più pesante della mia, {playerName}, ma il registro non se ne cura. Metà di questo è tuo per legge, e per legge intendo che lo dico io.",
+  'entities.quests.q_gc_down_the_windway.title': 'Giù per la Via del Vento',
+  'entities.quests.q_gc_down_the_windway.text':
+    'Hai completato la salita, {playerName}, quindi il vento ha deciso di tenerti. Wickharbor si trova a est lungo la strada delle colline, riparata nel sottovento della sua insenatura. La Capitana di Porto Odile conta ogni anima che attraversa il passo, e vorrà contare anche te. Dille che la Via del Vento è ancora aperta.',
+  'entities.quests.q_gc_down_the_windway.objectives.0.label':
+    'Riferisci alla Capitana di Porto Odile',
+  'entities.quests.q_gc_down_the_windway.completion':
+    'A piedi sopra il passo, con questo tempo? Maren mi manda già pochi nomi, e ancora meno vengono di persona a rispondere per sé stessi. Benvenuto a Wickharbor, {playerName}. Chiudi la porta della locanda dietro di te.',
+  'entities.quests.q_gc_keeper_of_the_flame.title': 'Il Custode della Fiamma',
+  'entities.quests.q_gc_keeper_of_the_flame.text':
+    "Il vecchio Bram custodisce il Faro sull'alto promontorio a nordest della città, e non è sceso a prendere le sue scorte da due settimane. La lampada arde ancora, quindi è vivo, ma un uomo della sua età da solo su quel promontorio con questo vento, {playerName}. Sali la strada del faro e assicurati che sia ancora in piedi.",
+  'entities.quests.q_gc_keeper_of_the_flame.objectives.0.label': 'Trova il Custode Bram',
+  'entities.quests.q_gc_keeper_of_the_flame.completion':
+    "Odile ti ha mandato fin quassù per vedere se il vento mi aveva portato via? Ah. Dille che la lampada arde e anch'io. Ma dato che hai fatto la salita, {playerName}, resta un momento. Il Faro ha un lavoro che solo uno straniero sembra adatto a fare.",
+  'entities.quests.q_gc_lanterns_on_the_shear.title': 'Lanterne sullo Strapiombo',
+  'entities.quests.q_gc_lanterns_on_the_shear.text':
+    'Il Faro è la grande luce, {playerName}, ma sono le lanterne da tempesta a guidare un viandante notturno lungo la strada sulla scogliera sopra lo Strapiombo. La notte scorsa il vendaval le ha spente tutte, e quella strada al buio è una lunga caduta con una fine breve. Prendi il mio acciarino e riaccendi le quattro lungo la scogliera.',
+  'entities.quests.q_gc_lanterns_on_the_shear.objectives.0.label': 'Lanterna da tempesta riaccesa',
+  'entities.quests.q_gc_lanterns_on_the_shear.completion':
+    'Quattro punti di luce sulla strada della scogliera, proprio dove dovrebbero stare. Da quassù sembra che la costa abbia riaperto gli occhi. Hai la stoffa di un custode, {playerName}.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.title': 'Scorridori nelle Nasse',
+  'entities.quests.q_gc_scuttlers_in_the_pots.text':
+    'I scorridori dei bassi fondali hanno imparato ad arrampicarsi sulla strada della scogliera e a spaccare le nostre nasse per granchi contro le rocce, {playerName}. Metà del pescato perso questa settimana, e un pescatore di nasse con una mano che non userà per un mese. Sconfiggine dieci e gli altri ricorderanno perché restavano nei bassi fondali.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.objectives.0.label':
+    'Scorridore del Basso Fondale ucciso',
+  'entities.quests.q_gc_scuttlers_in_the_pots.completion':
+    'Dieci gusci in meno sulla mia strada, e le nasse sono tornate piene questa mattina. I nassaioli ti chiamano un buon presagio, {playerName}. A Wickharbor è il complimento più caloroso che si possa ricevere.',
+  'entities.quests.q_gc_the_far_shore.title': 'La Costa Lontana',
+  'entities.quests.q_gc_the_far_shore.text':
+    'Da questa sala della lampada posso vedere tutta la costa, {playerName}, e ciò che vedo a nord non mi piace. Luci verdi che camminano tra i Campi dei Relitti con la bassa marea, scafo dopo scafo. Una donna lavora quella costa da sola: Edda, la recuperante. Segui la strada della scogliera verso nord oltre lo Strapiombo finché non iniziano i relitti, e assicurati che respiri ancora.',
+  'entities.quests.q_gc_the_far_shore.objectives.0.label': 'Trova la Recuperante Edda',
+  'entities.quests.q_gc_the_far_shore.completion':
+    'Bram sorveglia la mia costa dalla sua torre ora, vero? Il vecchio ha ragione a preoccuparsi, {playerName}. I morti camminano sui propri relitti di notte, e ultimamente hanno smesso di curarsi se il sole sia sorto o meno.',
+  'entities.quests.q_gc_the_wreck_warden.title': 'Il Guardiano dei Relitti',
+  'entities.quests.q_gc_the_wreck_warden.text':
+    'Ora sai perché i marinai risorgono, {playerName}. Qualcosa indossa la corazza incrostata di cirripedi del primo relitto mai naufragato su questa costa, e sorveglia ogni scafo sulla spiaggia come un cimitero che è stato assunto per custodire. Custodisce un tesoro che ho bramato per dieci anni e un equipaggio che preferirei vedere a riposo. Poni fine al Guardiano dei Relitti. Porta un amico, i morti fanno buona guardia.',
+  'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'Il Guardiano dei Relitti abbattuto',
+  'entities.quests.q_gc_the_wreck_warden.completion':
+    "La spiaggia è ammutolita nell'istante in cui è caduto, {playerName}. Il primo silenzio che ho sentito su questa costa in dieci anni di lavoro. Gli equipaggi ora sono solo ossa, ossa a riposo. Prendi il mantello dalla cima del tesoro, sarebbe sempre stato più adatto a una schiena viva.",
+  'entities.quests.q_gc_wind_against_the_wick.title': 'Il Vento contro lo Stoppino',
+  'entities.quests.q_gc_wind_against_the_wick.text':
+    'I fuochi fatui della raffica sono il vento diventato malevolo, {playerName}. Si radunano sulle alte colline vicino al Laghetto Specchio, e ogni fiamma che trovano, la spengono: una lanterna, un focolare, un giorno questa lampada. Ho tenuto acceso il Faro per trentanove anni, e non lo perderò a causa di un tempo rancoroso. Disperdine otto.',
+  'entities.quests.q_gc_wind_against_the_wick.objectives.0.label':
+    'Fuoco Fatuo della Raffica disperso',
+  'entities.quests.q_gc_wind_against_the_wick.completion':
+    'La lampada non ha nemmeno tremolato la notte scorsa, la prima volta in un mese. Il vento ci odia ancora, {playerName}, ma è tornato a odiarci in modo equo.',
+  'entities.quests.q_gc_wool_off_the_downs.title': 'Lana dalle Colline',
+  'entities.quests.q_gc_wool_off_the_downs.text':
+    'I miei equipaggi remano contro un vendaval che taglia la tela cerata come carta, {playerName}. Solo una cosa ferma questo vento: la lana untuosa dei montoni della brughiera, filata spessa alla maniera di Wickharbor. Le mandrie pascolano sulle Colline Ululanti a ovest della città. Sei buoni velli e ogni equipaggio remerà al caldo questa stagione.',
+  'entities.quests.q_gc_wool_off_the_downs.objectives.0.label': 'Lana Untuosa di Montone',
+  'entities.quests.q_gc_wool_off_the_downs.completion':
+    "Un vello così è il motivo per cui i montoni se ne stanno là fuori grassi e compiaciuti in un clima che uccide gli uomini. Le filatrici ci si metteranno al lume di lampada. Prendi questi stivali, {playerName}, sono foderati con l'ultima tosatura.",
+  'entities.quests.q_gleaming_antlers.title': 'Corna Splendenti',
+  'entities.quests.q_gleaming_antlers.text':
+    "I cervi velati emanano luce dove pascolano, e le loro corna cadute la trattengono per anni. Cinque di esse, dalle mandrie nella radura aperta nel cuore della valle, e le mie lanterne arderanno per tutto l'inverno senza olio. I cervi non devono essere feriti, ma non se ne separano facilmente.",
+  'entities.quests.q_gleaming_antlers.objectives.0.label': 'Corno Splendente',
+  'entities.quests.q_gleaming_antlers.completion':
+    'Guarda come trattengono la luce! Nessuna fiamma, nessun fumo, solo il bagliore. La Valletta provvede.',
+  'entities.quests.q_grove_menace.title': 'Minaccia nella Radura',
+  'entities.quests.q_grove_menace.text':
+    'I fuochi fatui del crepuscolo hanno iniziato a vagare tra le mie bancarelle dopo il tramonto, {playerName}, e il loro gelo rovina tutto ciò che tocca. Diradali per me: dieci di loro, ovunque il velo si sia lacerato.',
+  'entities.quests.q_grove_menace.objectives.0.label': 'Fuoco Fatuo del Crepuscolo disperso',
+  'entities.quests.q_grove_menace.completion':
+    'Il mercato notturno può riaprire. Hai un cliente per la vita, o almeno uno sconto.',
+  'entities.quests.q_hollow_first_of_the_herd.title': 'Il Primo della Mandria',
+  'entities.quests.q_hollow_first_of_the_herd.text':
+    'Il secondo nome è più difficile da pronunciare. Aurelhorn guidava queste mandrie quando mia nonna teneva questa vedetta, e qualunque cosa si sia risvegliata nella Valletta lo ha risvegliato male. Calpesta ciò che un tempo proteggeva, e la mandria non sopravviverà alla sua follia. Vaga per i prati vicino alle vecchie strade di corte. Poni fine a lui con pietà, {playerName}, e porta un amico per condividerne il peso.',
+  'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'Pace concessa ad Aurelhorn',
+  'entities.quests.q_hollow_first_of_the_herd.completion':
+    "Così il Primo cade per mano dell'ultimo arrivato. La mandria è già più calma, lo senti? Hai fatto un favore alla Valletta oggi, anche se non sembra tale.",
+  'entities.quests.q_hollow_old_marrowshell.title': 'Il Vecchio Guscio dei Bassifondi',
+  'entities.quests.q_hollow_old_marrowshell.text':
+    'Il primo nome è Vecchio Marrowshell, un granchio grande come un carro che caccia nei bassifondi orientali da prima che Eldergleam avesse un cancello. Vaga, {playerName}, quindi dovrai percorrere la riva finché non incroci le sue tracce. Non andare da solo, e non fidarti della sua immobilità.',
+  'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Vecchio Marrowshell ucciso',
+  'entities.quests.q_hollow_old_marrowshell.completion':
+    'I bassifondi sono di nuovo solo acqua. Ho visto quel guscio spezzare cacciatori migliori di me, {playerName}. Non te.',
+  'entities.quests.q_hollow_the_huntsman.title': 'Il Guardiano delle Mandrie',
+  'entities.quests.q_hollow_the_huntsman.text':
+    'Sembri qualcuno capace di gestire più che semplici fuochi fatui, {playerName}. Il Cacciatore Deral tiene la sua vedetta tra i prati dei cervi a est di qui, ed è settimane che chiede di mani capaci. Qualunque cosa stia rintracciando là fuori, non la dirà ad alta voce nel villaggio.',
+  'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Trova il Cacciatore Deral',
+  'entities.quests.q_hollow_the_huntsman.completion':
+    'Ti ha mandato Fenna? Bene. Allora si fida di te, e io ho due nomi da depennare.',
+  'entities.quests.q_monument_tour.title': 'Ciò che le Pietre Ricordano',
+  'entities.quests.q_monument_tour.text':
+    'Tre monumenti sono ancora in piedi da prima della sigillatura: uno al Belvedere di Duskfall, uno nella Corte Sommersa, e uno perduto nel lontano nordest dove nessuno cammina. Leggili per me, {playerName}. Le mie ginocchia hanno ceduto due secoli di scale fa.',
+  'entities.quests.q_monument_tour.objectives.0.label': 'Monumento del Belvedere letto',
+  'entities.quests.q_monument_tour.objectives.1.label': 'Monumento della Corte letto',
+  'entities.quests.q_monument_tour.objectives.2.label': 'Il monumento dimenticato letto',
+  'entities.quests.q_monument_tour.completion':
+    'Un belvedere, una corte, e un angolo dimenticato... e tutti e tre i versi del canto di sigillatura, insieme per la prima volta da quando fu cantato. Hai reso una vecchia lettrice molto felice.',
+  'entities.quests.q_nb_charts_of_the_stones.title': 'Le Mappe nelle Pietre',
+  'entities.quests.q_nb_charts_of_the_stones.text':
+    'Le pietre della Veglia sono più antiche di Moonrest, più antiche dei nightkin che le curano, e le loro facce sono incise con mappe stellari che ho passato la vita a imparare a leggere. Il cielo si è spostato, {playerName}, e devo sapere di quanto. Leggi le mappe su tre delle pietre e portami i loro rilevamenti.',
+  'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Mappa stellare letta',
+  'entities.quests.q_nb_charts_of_the_stones.completion':
+    'Non resta alcun dubbio. Ogni rilevamento si è spostato verso il Tumulo Insonne, come se il cielo stesso si sporgesse su quel tumulo per osservare. Gli antichi re furono sepolti sotto stelle allineate per una ragione, {playerName}.',
+  'entities.quests.q_nb_eyes_on_the_vigil.title': 'Occhi sulla Veglia',
+  'entities.quests.q_nb_eyes_on_the_vigil.text':
+    'Qualcosa rende i vagabondi audaci e le mandrie inquiete, {playerName}, e non riesco a leggerlo nei fiori. Cassian può leggerlo nel cielo. Tiene il suo campo osservatorio vicino alla Veglia Perenne a est di qui, dove i nightkin vagano tra le pietre. Trovalo, e chiedigli cosa dicono le stelle.',
+  'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
+    "Trova l'Astronomo Cassian alla Veglia Perenne",
+  'entities.quests.q_nb_eyes_on_the_vigil.completion':
+    'Ti ha mandato Lira? Allora anche i giardini lo sentono. Siediti vicino al cannocchiale un momento, {playerName}. Le stelle sono inquiete da un mese, e ogni mappa che traccio pende a nord verso il tumulo.',
+  'entities.quests.q_nb_night_gardens.title': 'I Giardini Notturni',
+  'entities.quests.q_nb_night_gardens.text':
+    "Il fiore notturno si schiude solo sotto questo cielo, e Gloamfield custodisce le aiuole più antiche del regno. Mi servono quattro fiori freschi per le ghirlande del santuario, {playerName}. Taglia con delicatezza: un'aiuola ricorda una mano brusca per un'intera stagione.",
+  'entities.quests.q_nb_night_gardens.objectives.0.label': 'Fiore di Nightbloom raccolto',
+  'entities.quests.q_nb_night_gardens.completion':
+    'Ancora luminescenti, ogni petalo. Il santuario profumerà di notte per una settimana, e Moonrest dormirà più serena grazie a questo.',
+  'entities.quests.q_nb_restless_mounds.title': 'I Tumuli Irrequieti',
+  'entities.quests.q_nb_restless_mounds.text':
+    'Le mappe erano un avvertimento, e il campo dei tumuli lo dimostra: i tumuli si stanno aprendo dal basso. Gli spettri camminano tra i filari delle tombe indossando gli antichi onori, e le offerte che li mantenevano addormentati giacciono sparse nell’erba. Abbattine otto, {playerName}, e raccogline quattro delle offerte da riportarmi.',
+  'entities.quests.q_nb_restless_mounds.objectives.0.label': 'Spettro del Tumulo ucciso',
+  'entities.quests.q_nb_restless_mounds.objectives.1.label': 'Offerta funebre recuperata',
+  'entities.quests.q_nb_restless_mounds.completion':
+    'Oro funebre, ancora freddo dalla terra. Gli spettri non si risvegliano da soli, {playerName}: qualcosa sotto il grande tumulo li sta chiamando fuori, e temo che le mappe ci abbiano già rivelato il suo nome.',
+  'entities.quests.q_nb_road_of_lanterns.title': 'La Strada delle Lanterne',
+  'entities.quests.q_nb_road_of_lanterns.text':
+    'Quassù il sole non arriva mai, {playerName}, solo le lampade che tengo accese lungo la salita. Moonrest si trova a nord dove si raduna la luce dei fiori. Trova Lira Dewsong tra i suoi giardini e dille che le lampade della Porta della Notte ardono ancora.',
+  'entities.quests.q_nb_road_of_lanterns.objectives.0.label': 'Trova Lira Dewsong a Moonrest',
+  'entities.quests.q_nb_road_of_lanterns.completion':
+    'Le lampade ardono ancora, e la strada porta ancora stranieri fino a noi. Sorrel ha custodito quel cancello più a lungo di quanto chiunque a Moonrest ricordi. Benvenuto, {playerName}, nel regno che non albeggia mai.',
+  'entities.quests.q_nb_striders_in_the_dark.title': 'Vagabondi nel Buio',
+  'entities.quests.q_nb_striders_in_the_dark.text':
+    'I vagabondi del crepuscolo sono sempre stati cacciatori pazienti, {playerName}, ma ultimamente si insinuano dritti nelle aiuole di fiori e portano via gli agnelli di vello lunare proprio sotto le nostre lanterne. Abbattine dieci e ridai alle colline la loro quiete.',
+  'entities.quests.q_nb_striders_in_the_dark.objectives.0.label': 'Vagabondo del Crepuscolo ucciso',
+  'entities.quests.q_nb_striders_in_the_dark.completion':
+    'Dieci vagabondi in meno, e le mandrie già pascolano più tranquille. I giardini seguono i propri orari, ma stanotte li seguono in pace.',
+  'entities.quests.q_nb_the_barrow_king.title': 'Il Re del Tumulo si Risveglia',
+  'entities.quests.q_nb_the_barrow_king.text':
+    "Ogni rilevamento, ogni stella inquieta, ogni tumulo aperto indica una sola cosa: il Re del Tumulo si sta risvegliando sotto il grande tumulo, e questo regno non ha un'alba per trattenerlo. Deve essere messo a riposo prima che ricordi la sua corona, {playerName}. Non andare da solo: porta un amico, e tieni la luce dei fiori alle tue spalle.",
+  'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Il Re del Tumulo messo a riposo',
+  'entities.quests.q_nb_the_barrow_king.completion':
+    'Le stelle si sono placate per la prima volta in una stagione, {playerName}. I tumuli sono chiusi, i nightkin si sono acquietati presso le loro pietre, e il re dorme di nuovo sottoterra. Indossa questo mantello: Moonrest lo ha tagliato per chiunque la notte finalmente si fidasse.',
+  'entities.quests.q_nb_wool_by_moonlight.title': 'Lana al Chiaro di Luna',
+  'entities.quests.q_nb_wool_by_moonlight.text':
+    'Niente scalda come il vello lunare, {playerName}, e niente si fila così fine. I pascolatori portano la loro lana argentata sciolta in ciuffi mentre vagano per le colline. Portami sei buoni ciuffi dalle mandrie e ti tesserò qualcosa che valga la camminata.',
+  'entities.quests.q_nb_wool_by_moonlight.objectives.0.label': 'Ciuffo di Vello Lunare',
+  'entities.quests.q_nb_wool_by_moonlight.completion':
+    "Argentato come la luce delle stelle e due volte più morbido. Ecco, {playerName}: muffole dall'ultimo lotto, foderate come solo il vello lunare sa foderare.",
+  'entities.quests.q_pr_boars_in_the_gardens.title': 'Cinghiali nei Giardini',
+  'entities.quests.q_pr_boars_in_the_gardens.text':
+    'Qualunque cosa si agiti nel verde profondo, spinge i cinghiali del roveto sulla nostra spiaggia. Hanno sradicato le terrazze del giardino due volte questa settimana, e le prossime saranno le rastrelliere di essiccazione. Dieci cinghiali, {playerName}, e ricaccia il resto sotto gli alberi.',
+  'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Cinghiale del Roveto scacciato',
+  'entities.quests.q_pr_boars_in_the_gardens.completion':
+    'Le rastrelliere reggono e i giardini possono essere ripiantati. I cinghiali non hanno scelto di venire sulla sabbia, {playerName}. Ricordalo: qualcosa li ha spinti.',
+  'entities.quests.q_pr_canopy_silk.title': 'Seta dalla Chioma',
+  'entities.quests.q_pr_canopy_silk.text':
+    "Guarda in alto, {playerName}. Ogni chioma da qui all'idolo è intessuta come una rete da pesca, e le tessitrici diventano più audaci ogni stagione. Tendo la loro stessa seta lungo i sentieri, campanelli a filo di inciampo, così la giungla non può insinuarsi su di me. Sei buone matasse dalle tessitrici della chioma rinnoveranno le mie linee.",
+  'entities.quests.q_pr_canopy_silk.objectives.0.label': 'Matassa di Seta della Chioma',
+  'entities.quests.q_pr_canopy_silk.completion':
+    "Buona seta resistente. Le mie campanelle canteranno ancora per un po', e niente cammina su questi sentieri di notte senza che io lo sappia, {playerName}. Ultimamente, qualcosa cammina spesso.",
+  'entities.quests.q_pr_down_to_drifthaven.title': 'Giù verso Drifthaven',
+  'entities.quests.q_pr_down_to_drifthaven.text':
+    'Fuori dagli alberi neri e nella luce del sole, {playerName}. Segui la strada costiera verso nord e raggiungerai Drifthaven prima che la marea cambi. Chiedi del Capo dei Recuperi Ryna, ha lavoro per qualsiasi paio di mani dopo la tempesta, e dille che la strada della Foce Aggrovigliata è ancora aperta.',
+  'entities.quests.q_pr_down_to_drifthaven.objectives.0.label':
+    'Riferisci al Capo dei Recuperi Ryna',
+  'entities.quests.q_pr_down_to_drifthaven.completion':
+    'Ti ha mandato Pell? Allora hai percorso tutta la strada della Foce Aggrovigliata da solo, e per me è referenza sufficiente. Benvenuto a Drifthaven, {playerName}. Afferra una corda, siamo a corto di mani.',
+  'entities.quests.q_pr_idol_guardian.title': "Il Guardiano dell'Idolo",
+  'entities.quests.q_pr_idol_guardian.text':
+    "L'idolo è più antico dell'isola, {playerName}. Più antico dei tamburi, più antico del nome Palmreach. Il suo Guardiano è rimasto in quell'anello sommerso da prima che crescessero le palme, e ora si risveglia e cammina tra le colonne di notte. Qualunque cosa le offerte nutrano, il Guardiano ne è il custode della porta. Porta un amico, e distruggilo.",
+  'entities.quests.q_pr_idol_guardian.objectives.0.label': "Il Guardiano dell'Idolo distrutto",
+  'entities.quests.q_pr_idol_guardian.completion':
+    "Hai abbattuto una cosa che la giungla stessa non avrebbe osato toccare. Guarda lì, dietro l'idolo: il Guardiano non stava mai custodendo le colonne, {playerName}, custodiva i gradini sotto di esse. I tamburi si sono taciuti stanotte. Qualunque cosa dorma sotto il Bacino di Wildheart ora conosce il tuo nome.",
+  'entities.quests.q_pr_scuttler_cull.title': 'Ladri dal Guscio',
+  'entities.quests.q_pr_scuttler_cull.text':
+    'Ogni relitto su questa costa attira gli scorridori della marea, e il Pearlwake ha attirato mezza barriera corallina. Le mie squadre di recupero non lavoreranno una linea con quegli artigli nei bassifondi. Rompine dieci, {playerName}, e la linea dei relitti sarà di nuovo nostra.',
+  'entities.quests.q_pr_scuttler_cull.objectives.0.label': 'Scorridore della Marea spezzato',
+  'entities.quests.q_pr_scuttler_cull.completion':
+    'Dieci artigli in meno nella risacca. Le mie squadre stanno già guadando di nuovo verso il largo, e nessuno di loro ha detto grazie, quindi lo dirò io: grazie, {playerName}.',
+  'entities.quests.q_pr_the_lost_navigator.title': 'La Navigatrice Perduta',
+  'entities.quests.q_pr_the_lost_navigator.text':
+    "Abbiamo tirato fuori dal Pearlwake tutte le mani tranne una: la Navigatrice Suli, che ha nuotato verso la spiaggia lontana e non è mai più entrata a piedi. Una sommozzatrice l'ha avvistata rintanata nel relitto della prua oltre la Spiaggia delle Palme, viva, ma troppo sfinita per affrontare da sola il tragitto. Riportala a casa lungo la strada costiera, {playerName}. Ai granchi non piacerà, e alla giungla piace ancora meno.",
+  'entities.quests.q_pr_the_lost_navigator.objectives.0.label':
+    'Navigatrice Suli riportata sana e salva a Drifthaven',
+  'entities.quests.q_pr_the_lost_navigator.completion':
+    "Suli è vicino al fuoco, e giura ancora che ce l'avrebbe fatta a nuoto. Hai riportato l'unica lettrice di mappe di questa costa, {playerName}. Questi vengono dal suo baule marino, con la sua benedizione.",
+  'entities.quests.q_pr_the_man_who_went_in.title': "L'Uomo che Entrò",
+  'entities.quests.q_pr_the_man_who_went_in.text':
+    'I sommozzatori non metteranno piede oltre la linea degli alberi, {playerName}, e non glielo chiederò. Ormai avrai sentito i tamburi: tutti li sentono, entro la seconda notte. Un solo uomo su quest’isola ha mai camminato verso quel suono ed è tornato. Okku. Si accampa sotto i grandi banyan al Vinefall, in fondo alla strada del Groviglio. Trovalo, e chiedigli cosa nasconde il verde.',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Trova Okku al Vinefall',
+  'entities.quests.q_pr_the_man_who_went_in.completion':
+    'Ti ha mandato Isha? La Madre delle Perle non pronuncia il mio nome da anni. Siediti fuori dalla portata delle liane, {playerName}, e ti dirò ciò che so: i tamburi non sono il pericolo. Sono l’avvertimento.',
+  'entities.quests.q_pr_what_the_drums_guard.title': 'Ciò che i Tamburi Custodiscono',
+  'entities.quests.q_pr_what_the_drums_guard.text':
+    "Mi sono avvicinato all'Idolo Sommerso quanto un uomo vivo osa fare, e ho visto due cose: le tessitrici hanno drappeggiato la strada dell'idolo di ragnatele, e le vecchie ciotole delle offerte lungo di essa sono state riempite di nuovo. Di recente, {playerName}. Abbatti otto tessitrici dalla strada e portami tre di quelle offerte. Vorrei sapere quale mano nutre ancora un dio morto.",
+  'entities.quests.q_pr_what_the_drums_guard.objectives.0.label':
+    'Tessitrice della Chioma abbattuta',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.1.label':
+    'Ciotola delle Offerte Riempita raccolta',
+  'entities.quests.q_pr_what_the_drums_guard.completion':
+    'Muschio, guscio di perla, e sangue di cinghiale, pressati da dita. Qualcosa in quella rovina osserva ancora i suoi riti, {playerName}, e il Guardiano tiene fuori tutto il resto. È ora che ne parliamo apertamente.',
+  'entities.quests.q_pr_wreck_line_cargo.title': 'La Linea dei Relitti',
+  'entities.quests.q_pr_wreck_line_cargo.text':
+    'La tempesta di tre notti fa ha spinto il Pearlwake sulla barriera corallina, e il suo carico è sparso lungo tutta la linea dei relitti tra qui e la Spiaggia delle Palme. Tre casse di merci sono ancora nella risacca, {playerName}. Portale a riva prima che la marea, o i granchi, reclamino ciò che resta.',
+  'entities.quests.q_pr_wreck_line_cargo.objectives.0.label': 'Carico del Pearlwake recuperato',
+  'entities.quests.q_pr_wreck_line_cargo.completion':
+    'Macchiate di sale ma integre, tutte e tre. I sommozzatori mangiano questo mese grazie a te, {playerName}.',
+  'entities.quests.q_seal_restored.title': 'Il Sigillo Ristabilito',
+  'entities.quests.q_seal_restored.text':
+    'Porta il sigillo del Guardiano alla pietra sigillo nel cuore della corte e rimettilo dove fu strappato via. Allora la Valletta potrà iniziare a guarire, e tu, {playerName}, avrai fatto ciò che nessuno della tua specie ha mai fatto prima.',
+  'entities.quests.q_seal_restored.objectives.0.label': 'Il sigillo rimesso nella pietra sigillo',
+  'entities.quests.q_seal_restored.completion':
+    'L’ho sentito chiudersi da qui, delicato come il crepuscolo. La Valletta ricorda i suoi amici, {playerName}. Per quanto lontano tu viaggi, ci sarà sempre una luce per te sotto il grande albero.',
+  'entities.quests.q_shards_of_starfall.title': 'Frammenti di Stelle Cadenti',
+  'entities.quests.q_shards_of_starfall.text':
+    'Quando i fuochi fatui del crepuscolo passano sopra i campi di cristallo, schegge di antica luce stellare vi si attaccano come lappole. Sei frammenti, {playerName}, e potrò datare la sigillatura alla stagione esatta in cui fu cantata.',
+  'entities.quests.q_shards_of_starfall.objectives.0.label': 'Frammento di Stelle Cadenti',
+  'entities.quests.q_shards_of_starfall.completion':
+    'Guarda le striature! Autunno. La Valletta fu sigillata in autunno. Duecento anni di discussioni, risolti da sei piccole pietre.',
+  'entities.quests.q_spore_hearts.title': "Cuori dell'Anello",
+  'entities.quests.q_spore_hearts.text':
+    "Quando uno sporello cade nell'oscurità, il suo cuore continua a battere con ombra presa in prestito. Quattro di quei cuori, purificati al santuario, potrebbero insegnarci come si diffonde la corruzione. È un lavoro cupo, {playerName}, ma è un lavoro di guarigione.",
+  'entities.quests.q_spore_hearts.objectives.0.label': 'Cuore di Sporello',
+  'entities.quests.q_spore_hearts.completion':
+    "Ecco. Purificati, e quieti. Ognuno mostra lo stesso segno: l'ombra scorre DALLA Corte Sommersa. Dillo a Saelwyn.",
+  'entities.quests.q_spore_tide.title': 'Contro la Marea di Spore',
+  'entities.quests.q_spore_tide.text':
+    'L’unguento tiene il Boschetto, ma la corruzione preme più forte sul Profondo a ogni crepuscolo. Altri dodici dei corrotti devono essere messi a riposo prima che i raccoglitori possano rivendicare i loro anelli settentrionali, {playerName}.',
+  'entities.quests.q_spore_tide.objectives.0.label': 'Sporello Corrotto messo a riposo',
+  'entities.quests.q_spore_tide.completion':
+    'Gli anelli a nord stanno di nuovo cantando stanotte. Sommessamente, ma cantando.',
+  'entities.quests.q_sunken_court.title': 'La Corte Sommersa',
+  'entities.quests.q_sunken_court.text':
+    'Bryn ha letto i cuori correttamente: lo squarcio attraversa la vecchia corte a est, e i suoi guardiani si sono risvegliati male. Furono costruiti per proteggere il sigillo; ora schiacceranno chiunque vi si avvicini. Eliminane otto dalle rovine.',
+  'entities.quests.q_sunken_court.objectives.0.label': 'Antico Guardiano acquietato',
+  'entities.quests.q_sunken_court.completion':
+    'Otto guardiani, acquietati. Ricordo quando furono eretti, {playerName}. Non sembrare così sorpreso; la Valletta tiene i suoi custodi a lungo.',
+  'entities.quests.q_treant_accord.title': "L'Accordo dei Treant",
+  'entities.quests.q_treant_accord.text':
+    'Gli anziani del Boschetto perdono la loro corteccia esterna mentre la corruzione rode le loro radici. Quattro pezzi di essa, e potrò preparare un unguento per tutto il Boschetto. Non ti ringrazieranno mentre la stacchi, {playerName}, ma resisteranno un secolo più a lungo grazie a questo.',
+  'entities.quests.q_treant_accord.objectives.0.label': 'Corteccia Anziana',
+  'entities.quests.q_treant_accord.completion':
+    "Spessa e sana, tutte e quattro. L'unguento impiegherà una settimana a essere preparato e cent'anni per completare il suo lavoro. Gli alberi misurano la gentilezza in modo diverso.",
+  'entities.quests.q_veil_thinned.title': 'Il Velo Assottigliato',
+  'entities.quests.q_veil_thinned.text':
+    'Quindi la grotta si è aperta per te. Allora il sigillo è più debole di quanto temessi, {playerName}. Dove il velo si strappa, i fuochi fatui diventano scuri e freddi. Portami otto essenze dai fuochi fatui del crepuscolo e leggerò quanto è profonda la ferita.',
+  'entities.quests.q_veil_thinned.objectives.0.label': 'Essenza di Fuoco Fatuo del Crepuscolo',
+  'entities.quests.q_veil_thinned.completion':
+    'Fredde, tutte quante. La Valletta ha forse una stagione prima che lo strappo diventi uno squarcio. Abbiamo del lavoro da fare, tu e io.',
+  'entities.quests.q_waking_warden.title': 'Il Guardiano Risvegliato',
+  'entities.quests.q_waking_warden.text':
+    'La corte è silenziosa, ma il suo padrone no. Il Guardiano che custodisce il sigillo si è risvegliato corrotto, e finché resta in piedi, il sigillo non può essere riparato. Non cadrà facilmente; porta un amico se riesci a trovarne uno, {playerName}. Portane due se riesci a trovarne due.',
+  'entities.quests.q_waking_warden.objectives.0.label': 'Il Guardiano Risvegliato sconfitto',
+  'entities.quests.q_waking_warden.completion':
+    "La campana della sua voce è silenziosa. L'ho sentito da qui, come un peso sollevato dall'intera valle.",
+  'entities.quests.q_wardens_echoes.title': 'Echi del Guardiano',
+  'entities.quests.q_wardens_echoes.text':
+    "Anche con il loro padrone messo a tacere, i guardiani della corte ripetono il suo ultimo comando come un'eco che non svanisce. Finché il sigillo non sarà ripristinato, continueranno a risvegliarsi, {playerName}. Acquietane altri dieci così i muratori potranno raggiungere la pietra sigillo.",
+  'entities.quests.q_wardens_echoes.objectives.0.label': 'Antico Guardiano acquietato',
+  'entities.quests.q_wardens_echoes.completion':
+    "L'eco si affievolisce ogni volta di più. Presto la corte non conterrà altro che vento ed edera, come si conviene a una rovina.",
+  'entities.quests.q_wf_across_the_fenway.title': 'Attraverso il Fenway',
+  'entities.quests.q_wf_across_the_fenway.text':
+    "Una terra tranquilla, il Willowfen, ma tranquilla non è lo stesso che sicura, {playerName}. Segui la strada verso nord fino alla strada rialzata del Fenway e attraversa fino a Bridgemere. Di' al Costruttore di Ponti Alden che la Scalinata è aperta e il fuoco dell'accampamento è acceso.",
+  'entities.quests.q_wf_across_the_fenway.objectives.0.label':
+    'Riferisci al Costruttore di Ponti Alden',
+  'entities.quests.q_wf_across_the_fenway.completion':
+    "Pell tiene acceso quel fuoco attraverso ogni nebbia che la palude riesce a soffiarle addosso. Se dice che la Scalinata è aperta, lo è. Benvenuto a Bridgemere, {playerName}. Attento dove metti i piedi sulle mie assi e andremo d'accordo.",
+  'entities.quests.q_wf_croakers_hush.title': 'Il Silenzio del Gracidatore',
+  'entities.quests.q_wf_croakers_hush.text':
+    "Ora conosci il nome di chi russa, {playerName}: il Gracidatore Assonnato, il vecchio re rospo là fuori sulle Piane Assonnate. Ogni anno il suo gracidio si fa più pesante, e ogni anno più parte della palude dimentica di svegliarsi. Gli amuleti terranno aperti i tuoi occhi, ma la sua mole è un'altra faccenda: porta un amico, e non combatterlo in acqua. Concedi al vecchio re un sonno più quieto.",
+  'entities.quests.q_wf_croakers_hush.objectives.0.label': 'Il Gracidatore Assonnato sconfitto',
+  'entities.quests.q_wf_croakers_hush.completion':
+    "Ascolta, {playerName}. Niente. Il primo vero silenzio su questa palude in trent'anni, e metà della città non dormirà stanotte per quanto è strano. I salici dicono grazie, a modo loro. Indossa questo, tessuto dalla sua stessa aiuola di gigli, e la palude ti riconoscerà come amico ovunque l'acqua arrivi.",
+  'entities.quests.q_wf_eels_for_the_smokehouse.title': "Anguille per l'Affumicatoio",
+  'entities.quests.q_wf_eels_for_the_smokehouse.text':
+    "I rospi di palude non si limitano a mangiare le mie corde, {playerName}, mangiano anche il mio pescato: ingoiano le anguille intere, direttamente dalle trappole. Libera sei anguille paffute da quelle cose ingorde prima che la carne marcisca, e i fuochi dell'affumicatoio resteranno accesi.",
+  'entities.quests.q_wf_eels_for_the_smokehouse.objectives.0.label': 'Anguilla Paffuta di Palude',
+  'entities.quests.q_wf_eels_for_the_smokehouse.completion':
+    "Sei buone anguille, appena ammaccate. L'affumicatoio profumerà di denaro entro il mattino. Ecco, questi stivali erano miei quando ero più svelto: la pelle d'anguilla respinge l'umido come nient'altro.",
+  'entities.quests.q_wf_mind_the_moorings.title': 'Bada agli Ormeggi',
+  'entities.quests.q_wf_mind_the_moorings.text':
+    'Una buona corda è preziosa qui, {playerName}: ogni cima morsa dai rospi è una settimana di guadagni dalle anguille persa. I capi tagliati giacciono ancora lungo la riva del fossato dove le barche li hanno lasciati scivolare. Percorri le passerelle e riportami quattro cime, e potrò impiombarle come nuove.',
+  'entities.quests.q_wf_mind_the_moorings.objectives.0.label':
+    "Cima d'Ormeggio Tagliata recuperata",
+  'entities.quests.q_wf_mind_the_moorings.completion':
+    'Guarda un po’: morsi puliti, ognuno di essi, ma ne resta abbastanza corda da impiombare. Mi hai risparmiato un mese di monete e ai pescatori un mese di lamentele, {playerName}.',
+  'entities.quests.q_wf_rope_chewers.title': 'I Mangiacorde',
+  'entities.quests.q_wf_rope_chewers.text':
+    'Rospi di palude, {playerName}. Si arrampicano fuori dal fossato di notte e rodono le mie cime di ormeggio come fossero steli di canna. Tre battelli sono andati alla deriva la settimana scorsa, e uno di essi aveva a bordo il mio verricello buono. Diradali, dieci di quelle cose grasse, e le barche resteranno dove le leghiamo.',
+  'entities.quests.q_wf_rope_chewers.objectives.0.label': 'Rospo di Palude ucciso',
+  'entities.quests.q_wf_rope_chewers.completion':
+    'Dieci file di denti in meno nel mio fossato. I battelli sono rimasti ormeggiati tutta la notte per la prima volta in un mese, {playerName}. Hai la gratitudine di ogni pescatore in città.',
+  'entities.quests.q_wf_toll_and_tangle.title': 'Pedaggio e Groviglio',
+  'entities.quests.q_wf_toll_and_tangle.text':
+    "I folletti del salice pensano che sia un bel gioco liberare un traghetto, {playerName}, e la settimana scorsa il battello del pedaggio si è ribaltato sul percorso orientale con a bordo una stagione di pedaggi del ponte. I forzieri sono affondati nei bassifondi e i folletti danzano sulle passerelle come se fossero loro. Scaccine otto e recupera tre forzieri del pedaggio, e Bridgemere mangerà quest'inverno.",
+  'entities.quests.q_wf_toll_and_tangle.objectives.0.label': 'Folletto del Salice scacciato',
+  'entities.quests.q_wf_toll_and_tangle.objectives.1.label': 'Forziere del pedaggio recuperato',
+  'entities.quests.q_wf_toll_and_tangle.completion':
+    "Tre forzieri, e le monete ancora asciutte all'interno. I folletti terranno il broncio tra i salici per una settimana, {playerName}, e la città ti deve il suo pane invernale.",
+  'entities.quests.q_wf_wisplight_charms.title': 'Amuleti di Luce Fatua',
+  'entities.quests.q_wf_wisplight_charms.text':
+    "I fuochi fatui sopra le pozze sono la palude che sogna ad alta voce, {playerName}, e la loro luce è l'unica cosa che resiste alla ninnananna del Gracidatore. La intreccio in amuleti di salice: uno intorno al collo e il russare non può trascinare giù le tue palpebre. Portami sei globi di luce fatua. I fuochi fatui non li contenderanno, il che lo rende un atto di gentilezza o un furto, a seconda di come lo porti.",
+  'entities.quests.q_wf_wisplight_charms.objectives.0.label': 'Globo di Luce Fatua',
+  'entities.quests.q_wf_wisplight_charms.completion':
+    'Sei globi, ancora caldi di sogno. Dammi tempo fino al sorgere della luna e avrò amuleti tessuti per te e per chiunque sia abbastanza coraggioso da starti accanto.',
+  'entities.quests.q_wf_witch_of_willowweep.title': 'La Strega di Willowweep',
+  'entities.quests.q_wf_witch_of_willowweep.text':
+    "Ormai l'avrai sentito, {playerName}: il russare. Lento e pesante, oltre le Piane Assonnate, come se la palude stessa si girasse nel sonno. I rospi, i folletti, i fuochi fatui che ardono a mezzogiorno: tutto è iniziato quando è iniziato quel suono. Un'anima potrebbe sapere cosa sia. Madre Sedge tiene un accampamento a Willowweep, a ovest intorno al fossato e giù lungo la riva lontana. Trovala, e chiedile cosa dorme nel mezzo della mia palude.",
+  'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'Trova Madre Sedge',
+  'entities.quests.q_wf_witch_of_willowweep.completion':
+    "Alden ti ha mandato fin qui per chiedere del russare? Allora la gente del ponte sta finalmente ascoltando. Siediti al riparo dall'umidità, {playerName}. Quel suono ha un nome, e una gola, e aspettavo qualcuno abbastanza folle da aiutarmi a farlo tacere.",
+  'entities.quests.q_wisp_lights.title': 'Luci dei Bassifondi',
+  'entities.quests.q_wisp_lights.text':
+    "I fuochi fatui scintillanti portano granelli dell'antica luce stellare caduta qui quando la Valletta fu sigillata. Sei granelli, e le lampade del santuario arderanno per un anno. Prendine solo da quelli che svaniscono; la Valletta dà abbastanza senza bisogno di avidità.",
+  'entities.quests.q_wisp_lights.objectives.0.label': 'Granello di Fuoco Fatuo',
+  'entities.quests.q_wisp_lights.completion':
+    "Delicati come le prime stelle. Mettili qui vicino all'altare; il santuario farà il resto.",
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Le Campane di Gallowmere',
+  'entities.quests.q_ww_bells_of_gallowmere.text':
+    'Senti quel rintocco, {playerName}? È Gallowmere, su per la strada nord, che culla i suoi morti nel sonno a suon di campane. Il Sagrestano Marrow tiene il conto di ogni anima sotto la chioma, vivi e sepolti. Vai a farti contare, prima che il bosco ti conti da solo.',
+  'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Riferisci al Sagrestano Marrow',
+  'entities.quests.q_ww_bells_of_gallowmere.completion':
+    "Cobb ti ha mandato su per la strada tutto intero, vero? Bravo uomo. Ha tenuto accese quelle lanterne del cancello per trent'anni, e il bosco non gli è mai passato oltre nemmeno una volta. Benvenuto a Gallowmere, {playerName}. Fai attenzione alle campane.",
+  'entities.quests.q_ww_candles_at_the_bounds.title': 'Candele ai Confini',
+  'entities.quests.q_ww_candles_at_the_bounds.text':
+    'Quattro pietre di confine circondano Gallowmere, {playerName}, una su ogni strada in uscita, e una candela funebre arde su ogni pietra. Finché ardono, i sepolti restano sepolti. La pioggerella le ha spente, tutte e quattro, e sono troppo vecchio per percorrere i confini da solo. Prendi la mia candela e riaccendile, in fretta.',
+  'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Candela funebre riaccesa',
+  'entities.quests.q_ww_candles_at_the_bounds.completion':
+    "Tutte e quattro ardono? Allora respira, {playerName}. Non lo hai sentito, ma tutto il villaggio sì: le campane hanno suonato più leggere nell'istante in cui l'ultimo stoppino ha preso fuoco.",
+  'entities.quests.q_ww_horn_of_the_huntsman.title': 'Il Corno del Cacciatore',
+  'entities.quests.q_ww_horn_of_the_huntsman.text':
+    'Ormai avrai sentito il corno, {playerName}, sottile e lontano, il suono per cui tutto il bosco trattiene il respiro. Il Cacciatore Pallido cavalca la sua radura a nord di qui, e ogni tomba che attraversa diventa più superficiale. Un tempo era un uomo, e fu sepolto male, e ho smesso di fingere che la preghiera basterà. Porta un amico, portane due, e disarcionalo.',
+  'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label':
+    'Il Cacciatore Pallido disarcionato',
+  'entities.quests.q_ww_horn_of_the_huntsman.completion':
+    "Il corno si è fermato a metà nota. Ogni campana a Gallowmere ha suonato una volta, da sola, e poi il bosco è diventato più silenzioso di quanto lo abbia mai sentito in trent'anni. Hai compiuto il rito che io non potevo, {playerName}. Indossa questo, e cammina sotto la chioma senza paura.",
+  'entities.quests.q_ww_silk_in_the_eaves.title': 'Seta sotto le Grondaie',
+  'entities.quests.q_ww_silk_in_the_eaves.text':
+    'Guarda in alto mentre percorri la strada ovest, {playerName}, e le vedrai: forme avvolte nella chioma, che oscillano dove nessun vento arriva. Le filatrici di seta della vedova sono strisciate fuori dal Boschetto e hanno teso le loro dispense sopra le mie lanterne. Uccidine dieci, e la strada tornerà a essere una strada.',
+  'entities.quests.q_ww_silk_in_the_eaves.objectives.0.label':
+    'Filatrice di Seta della Vedova uccisa',
+  'entities.quests.q_ww_silk_in_the_eaves.completion':
+    'Dieci tessitrici in meno sotto le grondaie. I lampionai faranno il loro giro stanotte senza guardare in alto, e qui vale più di quanto tu sappia.',
+  'entities.quests.q_ww_the_last_vicar.title': "L'Ultimo Vicario",
+  'entities.quests.q_ww_the_last_vicar.text':
+    'A sud di qui la Cappella di Mournstone marcisce accanto al suo laghetto nero, e un solo uomo se ne prende ancora cura: il Vicario Creel, che non volle andarsene quando il tetto crollò. Conosce gli antichi riti meglio delle mie campane, {playerName}, e non manda notizie da un mese. Percorri la strada della cappella e assicurati che respiri ancora.',
+  'entities.quests.q_ww_the_last_vicar.objectives.0.label': 'Trova il Vicario Creel',
+  'entities.quests.q_ww_the_last_vicar.completion':
+    "Marrow si preoccupa per me? Questa è nuova. Digli che il Mournstone regge, più o meno, e anch'io. Resta un po', {playerName}. Il laghetto sussurra ultimamente, e preferirei non ascoltarlo da solo.",
+  'entities.quests.q_ww_walking_mosley_home.title': 'Riportare Mosley a Casa',
+  'entities.quests.q_ww_walking_mosley_home.text':
+    "Il mio becchino Mosley ha preso la strada della cappella tre giorni fa per aprire una fossa nel vecchio cimitero, e lo scavo gli è crollato addosso. Si è scavato una via d'uscita a forza di unghie, lo sciocco è vivo, ma è raggomitolato vicino alle tombe della cappella e non si muove per via delle filatrici sulla strada. Riportalo a casa, {playerName}. Non posso suonare le campane per un uomo vivo.",
+  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
+    'Becchino Mosley riportato sano e salvo a Gallowmere',
+  'entities.quests.q_ww_walking_mosley_home.completion':
+    "È entrato dal cancello con le sue stesse gambe, giurando che d'ora in poi non scaverà nulla di più profondo di un'aiuola di rape. Sarà di nuovo al cimitero entro domenica, lo sono sempre. Grazie, {playerName}. Gallowmere custodisce la sua gente, questa è tutta la nostra legge.",
+  'entities.quests.q_ww_what_the_bark_holds.title': 'Ciò che la Corteccia Custodisce',
+  'entities.quests.q_ww_what_the_bark_holds.text':
+    'Nella Radura degli Impiccati a est di Gallowmere le filatrici appendono ai rami i loro morti avvolti nella seta, e i vaganti dalla corteccia incisa fanno la guardia sotto come pazienti portatori di bara. Quella è la nostra gente lassù, {playerName}. Abbatti cinque vaganti, taglia giù tre dei morti avvolti, e riportali a casa nella terra.',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.0.label':
+    'Vagante dalla Corteccia Incisa abbattuto',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.1.label':
+    'Resti avvolti nella seta tagliati giù',
+  'entities.quests.q_ww_what_the_bark_holds.completion':
+    'Tre anime di nuovo sotto terra onesta prima del calar della notte. I vaganti ricresceranno, la corteccia lo fa sempre, ma stanotte la radura pende vuota, ed è abbastanza.',
+  'entities.quests.q_ww_widows_skeins.title': 'Le Matasse della Vedova',
+  'entities.quests.q_ww_widows_skeins.text':
+    'Le filatrici prendono i nostri morti per le loro dispense, {playerName}, quindi io prendo la loro seta per i nostri sudari. Brucia pulita e trattiene una benedizione meglio di quanto abbia mai fatto il lino. Portami sei matasse di seta della vedova, e la prossima anima che seppelliremo scenderà avvolta e protetta.',
+  'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Matassa di Seta della Vedova',
+  'entities.quests.q_ww_widows_skeins.completion':
+    "Sei matasse, morbide come un respiro trattenuto. I morti riposeranno meglio in questo. Prendi queste bende, le ho cucite dall'ultimo lotto, e il bosco non le ha mai morse.",
+  'entities.quests.q_ww_wraiths_of_the_tarn.title': 'Spettri del Laghetto',
+  'entities.quests.q_ww_wraiths_of_the_tarn.text':
+    'Gli spettri del bosco erano un tempo i guardiani della cappella, {playerName}, cresciuti da alberi piantati sopra i morti onorati. Da quando il laghetto si è annerito hanno dimenticato il loro compito, e ora vagano per il mio cimitero strappando la terra. Distruggine otto prima che finiscano ciò che hanno iniziato.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Spettro del Bosco ucciso',
+  'entities.quests.q_ww_wraiths_of_the_tarn.completion':
+    'Otto guardiani finalmente messi a riposo. Non lo chiamerò un atto di pietà alla luce del giorno, ma tra noi, {playerName}, lo era.',
   'hudChrome.auth.appleChoiceExpired':
     'Questo accesso con Apple è scaduto. Accedi di nuovo con Apple.',
   'hudChrome.auth.appleChoiceIntro':
@@ -8233,6 +9230,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyDropHint':
     'Le cavalcature più rare sono bottino dei boss di spedizione e incursione.',
   'hudChrome.mounts.clickManage': 'Clicca per scegliere la tua cavalcatura',
+  'hudChrome.mounts.useToRide': 'Usa per evocare questa cavalcatura.',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpente pallido come l'osso che scivola lungo la piattaforma profonda del Glimmermere, guardiano silenzioso delle acque che ha reclamato. Chi nuota nel lago in sua compagnia di rado torna a galla.",
   'guide.combat.metersBody':
@@ -8371,6 +9369,76 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     "In alto su Thornpeak, la tempesta sopra Stormcrag a volte prende forma. Thunzharr, la Vetta Risvegliata si erge lì con un ritmo costante, un elementale della potenza di un'incursione affrontato nel mondo aperto da chiunque risponda alla chiamata, e diventa più possente quanto più sfidanti gli si oppongono. Chiunque si unisca allo scontro guadagna il proprio tiro sul suo bottino, onorato secondo le regole di blocco d'incursione, e la sua caduta indugia abbastanza a lungo perché i caduti possano tornare di corsa a reclamare il dovuto. Raduna più spade di quante pensi ti servano.",
   'guide.worldPage.worldBossTitle': 'Quando la vetta si desta: il boss del mondo',
+  'guide.worldPage.amberBlurb':
+    'Un autunno eterno di foglie d’oro e rosse che non cadono mai, raccolto attorno alla città illuminata da lanterne di Lanternmere.',
+  'guide.worldPage.amberGreeter': 'Il lanternaio, Lanternmere',
+  'guide.worldPage.amberGreeting':
+    'Ogni foglia qui arde di oro e di rosso, eppure nessuna cade mai. Le lanterne sono accese per te; fai attenzione al Goldmelt durante la salita.',
+  'guide.worldPage.amberPlaceNotes':
+    'Lanternmere risplende nel cuore del raccolto. Il Goldmelt è il passaggio scivoloso d’ambra che vi conduce; il Frutteto Dorato e la Valletta del Raccolto custodiscono i frutti più dolci e i ladri più audaci; il Grande Stagno riflette le foglie ardenti; il Poggio di Cindermaple si erge più alto e più rosso di tutti; e il Monolito Pendente ricorda qualcosa di più antico dell’autunno.',
+  'guide.worldPage.duskBlurb':
+    'Una valle di crepuscolo perenne sotto il grande albero di Eldergleam, dove rovine di cristallo risplendono e l’aria vibra di antica magia.',
+  'guide.worldPage.duskGreeter': 'Custode Saelwyn, Eldergleam',
+  'guide.worldPage.duskGreeting':
+    'Pochi della tua specie si sono fermati sotto questi rami. Cammina con delicatezza, e sii il benvenuto.',
+  'guide.worldPage.duskPlaceNotes':
+    'Eldergleam si raduna sotto il grande albero. La Grotta di Duskfall e il suo belvedere sono la via d’accesso e il primo sguardo sulla valle; il Boschetto Antico e il Bacino delle Stelle Cadenti custodiscono il quieto sud; la Corte Sommersa custodisce rovine invase dalla vegetazione a est; e il Profondo Splendente e i Bassifondi Cristallini risplendono a nord.',
+  'guide.worldPage.emberBlurb':
+    'Lande desolate illuminate dalla tempesta, di cenere e vetro di sangue, dove i draghi volteggiano sopra la caldera e i fuochi dei troll ardono tra le dune, vegliate dalla città-cancello di Wyrmwatch.',
+  'guide.worldPage.emberGreeter': 'Il guardiano del cancello, Wyrmwatch',
+  'guide.worldPage.emberGreeting':
+    'Vento caldo dalle lande desolate, draghi sopra il Drakemaw, e fuochi di troll tra le dune. Bevi qualcosa prima di avventurarti là fuori.',
+  'guide.worldPage.emberPlaceNotes':
+    'Wyrmwatch presidia il cancello. Il Gatewood è l’ultimo verde prima delle lande desolate; le Dune di Cenere si spostano cariche di cenere e di peggio; il Trollmoot è dove i troll delle dune radunano i loro fuochi; i Campi di Vetro di Sangue scintillano di schegge taglienti; e la Caldera di Drakemaw è la corona fumante attorno a cui volteggiano i draghi.',
+  'guide.worldPage.fenBlurb':
+    'Una zona umida luminosa e ronzante di gigli e acque lente, attraversata su vecchie passerelle dalla città-ponte di Bridgemere.',
+  'guide.worldPage.fenGreeter': 'Il guardiano del ponte, Bridgemere',
+  'guide.worldPage.fenGreeting':
+    'La palude ronza di libellule e api. Attraversa il ponte, riposa i piedi per un po’, e resta sulle passerelle oltre le pozze.',
+  'guide.worldPage.fenPlaceNotes':
+    'Bridgemere siede a cavallo delle acque lente. La Scalinata di Amberfen scende dalle terre del raccolto; le Lilymoors e le Pozze di Bogshine scintillano di fuochi fatui e libellule; Willowweep lascia ricadere i suoi rami nello stagno; e le Piane Assonnate sono il luogo più quieto di questa terra.',
+  'guide.worldPage.frostBlurb':
+    'Un silenzio di neve e pini scuri sotto l’aurora, dove il freddo stesso sembra sveglio e Icemantle mantiene accesi i suoi fuochi.',
+  'guide.worldPage.frostGreeter': 'Il custode del focolare, Icemantle',
+  'guide.worldPage.frostGreeting':
+    'La neve inghiotte ogni suono oltre le mura. Se le luci iniziano a danzare, abbassa la voce e tieni il fuoco acceso.',
+  'guide.worldPage.frostPlaceNotes':
+    'Icemantle custodisce l’ultimo focolare caldo. La Linea delle Nevi segna dove i cumuli di neve prendono il sopravvento; il Laghetto del Ghiacciaio è acqua nera e immobile sotto il ghiaccio; la Scalinata dell’Aurora sale sotto le luci danzanti; lo Shiverfen è una palude ghiacciata che non dorme mai del tutto; e le Terrazze Ululanti meritano il loro nome ogni notte.',
+  'guide.worldPage.galeBlurb':
+    'Scogliere marine e colline ululanti dove il vento non si ferma mai, il Vecchio Faro non si spegne mai, e Wickharbor chiude bene le sue porte.',
+  'guide.worldPage.galeGreeter': 'Il guardiano del faro, Wickharbor',
+  'guide.worldPage.galeGreeting':
+    'Il vento non ha mai smesso di soffiare qui, e il Vecchio Faro non si è mai spento. Chiudi la porta della locanda dietro di te.',
+  'guide.worldPage.galePlaceNotes':
+    'Wickharbor si piega contro il vento. La Via del Vento è la strada sulla scogliera che vi conduce; le Colline Ululanti si estendono spoglie sotto la tempesta; il Vecchio Faro arde da quando chiunque possa ricordare; lo Strapiombo precipita a picco sull’acqua; i Campi dei Relitti tengono onesta la costa; e il Laghetto Specchio è l’unica cosa immobile in tutto il regno.',
+  'guide.worldPage.gardenBlurb':
+    'Un regno-giardino labirinto di siepi ancora potato da nessun giardiniere che qualcuno abbia mai visto, a cui si accede oltre Hedgewick e le sue corti di fontane.',
+  'guide.worldPage.gardenGreeter': 'Il guardiano del cancello, Hedgewick',
+  'guide.worldPage.gardenGreeting':
+    'Qualcuno sta ancora potando le siepi, eppure nessun giardiniere è stato visto da cent’anni. Fai attenzione al labirinto: anch’esso fa attenzione a te.',
+  'guide.worldPage.gardenPlaceNotes':
+    'Hedgewick attende al Cancello del Giardino. Il Viale del Parterre fiorisce in colori ben potati; il Castello di Dawnhold addestra i suoi cavalieri dietro mura nuove; lo Stagno dei Petali fluttua rosa tutto l’anno; il Vecchio Mulino gira sopra le proprie aiuole ad anello; il Grande Labirinto cambia le sue vie per ogni ospite, i suoi archi vegliati da volpi di foglie; la Vedetta del Nord custodisce la strada d’uscita; il Bacino dei Gigli riposa oltre ogni cosa; e la Corte della Fontana scorre ancora limpida nel cuore del giardino.',
+  'guide.worldPage.hauntBlurb':
+    'Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gallowmere sono l’unica luce onesta sulla strada.',
+  'guide.worldPage.hauntGreeter': 'Il lampionaio, Gallowmere',
+  'guide.worldPage.hauntGreeting':
+    'Resta vicino alle lanterne, viandante. E se il bosco chiama il tuo nome da fuori la strada, non rispondere.',
+  'guide.worldPage.hauntPlaceNotes':
+    'Gallowmere si raccoglie tra le sue lanterne. La Porta dei Corvi è la tetra porta d’ingresso del bosco; il Boschetto della Vedova è fitto di ragnatele; la Radura degli Impiccati e la Cappella di Mournstone custodiscono i lutti più antichi della foresta; e la Radura del Cacciatore appartiene a qualunque cosa cacci ancora lì.',
+  'guide.worldPage.jungleBlurb':
+    'Un intreccio tropicale di palme, sabbia bianca e uccelli chiassosi, con la città-spiaggia di Drifthaven che tiene un fuoco acceso sulla riva.',
+  'guide.worldPage.jungleGreeter': 'La capitana del porto, Drifthaven',
+  'guide.worldPage.jungleGreeting':
+    'Sabbia calda, uccelli chiassosi, e una giungla che divora l’orizzonte. Teniamo un fuoco acceso sulla spiaggia; cerca di tornarci.',
+  'guide.worldPage.junglePlaceNotes':
+    'Drifthaven tiene il suo fuoco sulla spiaggia. La Foce Aggrovigliata è dove il fiume incontra la muraglia verde; la Spiaggia delle Palme corre bianca e calda lungo la risacca; il Groviglio di Smeraldo e il Vinefall inghiottono l’interno; la Laguna di Zaffiro risplende limpida e profonda; e l’Idolo Sommerso veglia da sotto l’acqua.',
+  'guide.worldPage.nightBlurb':
+    'Un regno di mezzanotte stellata dove i fiori illuminano i sentieri e Moonrest veglia in silenzio sotto un cielo che sogna.',
+  'guide.worldPage.nightGreeter': 'La guardiana della veglia, Moonrest',
+  'guide.worldPage.nightGreeting':
+    'Oltre la Porta della Notte, l’aria stessa sogna. Segui la luce dei fiori, e fai attenzione al mondo addormentato che pende nel cielo.',
+  'guide.worldPage.nightPlaceNotes':
+    'Moonrest mantiene la veglia. La Porta della Notte è la via d’accesso alla terra di mezzanotte; il Pozzo della Luna custodisce una luce stellare accanto alla quale puoi restare; Gloamfield fiorisce nel buio; la Veglia Perenne osserva senza mai muoversi; e il Tumulo Insonne è l’unico luogo qui che non sogna mai.',
   'entities.abilities.chain_heal.description':
     'Cura abbondantemente un bersaglio alleato, poi si propaga a un massimo di altri 2 alleati vicini, curando il 50% in meno a ogni salto. (Abilità distintiva di Rigenerazione)',
   'entities.abilities.chain_heal.name': 'Guarigione a Catena',
@@ -8950,6 +10018,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'Reimpostare le istanze',
   'guide.dungeonsPage.resetBody':
     'Se cambi difficoltà mentre il gruppo conserva ancora delle spedizioni assegnate, le vecchie assegnazioni restano per un po’ prima di svanire. Il capogruppo può abbandonarle subito scegliendo Reimposta tutte le istanze dal menu del proprio ritratto oppure digitando /dungeon reset. La difficoltà deve essere stata davvero cambiata, nessuno, vivo o caduto, può trovarsi all’interno e tra due ripristini passa un breve tempo di recupero. Se arrivi all’ingresso con la difficoltà sbagliata, il gioco ti avvisa prima dell’inizio. L’incursione non viene mai reimpostata così e mantiene le proprie regole di vincolo.',
+  'guide.dungeonsPage.wildheartBody':
+    'Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per affrontare Zulgar.',
   'guide.gear.itemLevelBody':
     'Per confrontare rapidamente due pezzi, attiva Mostra livello oggetto nelle opzioni. L’equipaggiamento di provenienza nota, ottenuto da nemici, missioni e mestieri, mostra un livello oggetto: un unico valore che ne indica approssimativamente la potenza in base alla fonte e rende immediata la scelta del miglior potenziamento, anche tra slot diversi. I pezzi senza tale provenienza, come gli articoli base dei mercanti e l’equipaggiamento iniziale, non mostrano alcun livello; è normale.',
   'guide.gear.qualityBody':
@@ -9103,6 +10173,89 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': 'Gambali della Crescita Selvatica',
   'entities.items.wildsoul_maul.name': "Maglio dell'Anima Selvaggia",
   'entities.items.wyrmcult_spellgrips.name': 'Guanti da Incantesimo del Culto del Wyrm',
+  'entities.items.abyssal_loop.name': 'Anello Abissale',
+  'entities.items.abysswrought_band.name': 'Anello Forgiato nell’Abisso',
+  'entities.items.amberfall_sap_bucket.name': 'Secchio Raccogli-Linfa',
+  'entities.items.ashbone_war_brand.name': 'Tizzone di Guerra Ossocenere',
+  'entities.items.aurora_mote.name': 'Granello d’Aurora',
+  'entities.items.barrow_grave_offering.name': 'Offerta Funebre Sparsa',
+  'entities.items.barrowshade_mantle.name': 'Mantello dell’Ombra del Tumulo',
+  'entities.items.bonelord_mantle.name': 'Mantello del Signore delle Ossa',
+  'entities.items.breakscarred_steel.name': 'Acciaio Segnato dalle Rotture',
+  'entities.items.bridgemere_toll_chest.name': 'Forziere del Pedaggio Sommerso',
+  'entities.items.broodmother_carapace.name': 'Carapace della Madre della Covata',
+  'entities.items.canopy_silk_hank.name': 'Matassa di Seta della Chioma',
+  'entities.items.cinderwalk_treads.name': 'Stivali Cammina-Cenere',
+  'entities.items.eelskin_mudwaders.name': 'Stivali da Fango in Pelle d’Anguilla',
+  'entities.items.emberforge_gauntlets.name': 'Manopole della Forgia di Brace',
+  'entities.items.emberforged_bulwark.name': 'Baluardo Forgiato nella Brace',
+  'entities.items.emberwing_scale.name': 'Scaglia Ala di Brace',
+  'entities.items.evergarden_bloom_clipping.name': 'Talea di Fiore Potato',
+  'entities.items.evergarden_statue_rubbing.name': 'Ricalco della Statua',
+  'entities.items.farshore_salt_moss.name': 'Muschio Salino di Farshore',
+  'entities.items.fenway_mooring_line.name': 'Cima d’Ormeggio Tagliata',
+  'entities.items.fountain_court_mantle.name': 'Mantello della Corte della Fontana',
+  'entities.items.frostmane_mantle.name': 'Mantello della Criniera di Gelo',
+  'entities.items.galecrest_ram_wool.name': 'Lana Untuosa di Montone',
+  'entities.items.gallowmere_grave_candle.name': 'Candela Funebre',
+  'entities.items.gilded_sap_clot.name': 'Grumo di Linfa Dorata',
+  'entities.items.gloamfield_nightbloom.name': 'Fiore di Nightbloom',
+  'entities.items.graskbreaker_girdle.name': 'Cintura Spezza-Grask',
+  'entities.items.gravebound_silk_wraps.name': 'Bende di Seta Legate alla Tomba',
+  'entities.items.gullhaven_watchbell.name': 'Campana di Vedetta Costiera',
+  'entities.items.heart_of_the_rift.name': 'Cuore dello Squarcio',
+  'entities.items.hearth_ember_cache.name': 'Scorta di Braci',
+  'entities.items.hearthlined_treads.name': 'Stivali Foderati per il Focolare',
+  'entities.items.hedgewick_shears.name': 'Cesoie Rubate di Hedgewick',
+  'entities.items.hedgewick_tool_cart.name': 'Carretto degli Attrezzi Rovesciato',
+  'entities.items.hoarfrost_edge.name': 'Lama di Brina',
+  'entities.items.last_keep_signet.name': 'Sigillo dell’Ultima Rocca',
+  'entities.items.lilybed_mantle.name': 'Mantello dell’Aiuola di Gigli',
+  'entities.items.mantle_of_the_meredark.name': 'Mantello dell’Oscurità dello Stagno',
+  'entities.items.mantle_of_the_unbroken_shore.name': 'Mantello della Costa Inviolata',
+  'entities.items.mantle_of_the_unhorsed.name': 'Mantello del Disarcionato',
+  'entities.items.mawscale_pauldrons.name': 'Spallacci Scaglia di Fauci',
+  'entities.items.mere_ferry_lantern.name': 'Lanterna del Traghetto',
+  'entities.items.moonfleece_mitts.name': 'Muffole di Vello Lunare',
+  'entities.items.moonfleece_tuft.name': 'Ciuffo di Vello Lunare',
+  'entities.items.orchard_sapbinder_grips.name': 'Impugnature Lega-Linfa',
+  'entities.items.pactbound_vestments.name': 'Vesti Vincolate dal Patto',
+  'entities.items.pearlwake_cargo_crate.name': 'Cassa da Carico della Pearlwake',
+  'entities.items.pitlords_cleaver.name': 'Mannaia del Signore della Fossa',
+  'entities.items.plump_fen_eel.name': 'Anguilla Paffuta di Palude',
+  'entities.items.riding_training.name': 'Addestramento all’Equitazione',
+  'entities.items.rift_essence.name': 'Essenza dello Squarcio',
+  'entities.items.rift_gem_azure.name': 'Gemma Azzurra dello Squarcio',
+  'entities.items.rift_gem_crimson.name': 'Gemma Cremisi dello Squarcio',
+  'entities.items.rift_gem_verdant.name': 'Gemma Verdeggiante dello Squarcio',
+  'entities.items.riftbound_band_of_guile.name': 'Anello dello Squarcio dell’Astuzia',
+  'entities.items.riftbound_band_of_insight.name': 'Anello dello Squarcio della Perspicacia',
+  'entities.items.riftbound_band_of_might.name': 'Anello dello Squarcio della Potenza',
+  'entities.items.saltforged_grips.name': 'Impugnature Forgiate nel Sale',
+  'entities.items.saltwalker_sandals.name': 'Sandali Cammina-Sale',
+  'entities.items.scorched_supply_crate.name': 'Cassa di Rifornimenti Bruciacchiata',
+  'entities.items.shear_storm_lantern.name': 'Lanterna da Tempesta Spenta',
+  'entities.items.shearkeeper_gloves.name': 'Guanti del Guardiano dello Strapiombo',
+  'entities.items.silkbound_remains.name': 'Resti Avvolti nella Seta',
+  'entities.items.sprung_trap.name': 'Trappola di Palude Scattata',
+  'entities.items.stormscale_treads.name': 'Stivali Scaglia di Tempesta',
+  'entities.items.stormsunder_hood.name': 'Cappuccio Spezzatempesta',
+  'entities.items.sunken_idol_mantle.name': 'Mantello dell’Idolo Sommerso',
+  'entities.items.sunken_offering_bowl.name': 'Ciotola delle Offerte Riempita',
+  'entities.items.thick_winter_pelt.name': 'Pelliccia Invernale Spessa',
+  'entities.items.vigil_star_chart.name': 'Mappa Stellare della Veglia',
+  'entities.items.voidscar_handwraps.name': 'Bende della Cicatrice del Vuoto',
+  'entities.items.voidsong_dirk.name': 'Canto del Vuoto, Pugnale del Velo Squarciato',
+  'entities.items.voidweave_mantle.name': 'Mantello del Tessuto del Vuoto',
+  'entities.items.wickspun_treads.name': 'Stivali di Stoppino Intrecciato',
+  'entities.items.widowsilk_skein.name': 'Matassa di Seta della Vedova',
+  'entities.items.wildheart_fangknife.name': 'Pugnale Zanna di Zulgar',
+  'entities.items.wildheart_hexwood_staff.name': 'Bastone di Legno Maledetto del Bacino',
+  'entities.items.wildheart_tuskblade.name': 'Lama Zanna di Wildheart',
+  'entities.items.wisplight_globe.name': 'Globo di Luce Fatua',
+  'entities.items.wreck_wardens_mantle.name': 'Mantello del Guardiano dei Relitti',
+  'entities.items.wreckfield_flotsam_crate.name': 'Cassa di Relitti Galleggianti',
+  'entities.items.wyrmwatch_warning_banner.name': 'Stendardo d’Allarme di Wyrmwatch',
   'entities.letters.guild_trend_alchemy_cooking.body':
     "Artigiano,\n\nLa voce raggiunge la Gilda del tuo lavoro in Alchimia e Cucina: pozioni sobbollite e piatti conditi, i due mestieri si alimentano a vicenda. Mestieri vicini lavorati insieme segnano una mano pronta per la sintonizzazione. Coloro che legano questa coppia guadagnano col tempo il nome di Speziale. Cerca il Fabbro Haldren, l'armaiolo di Eastbrook: per ora parla a nome dei maestri. Dimostragli la tua abilità con il lavoro delle tue mani e vedrà le tue due specializzazioni in sintonia.\n\nIn regola,\nLa Gilda degli Artigiani",
   'entities.letters.guild_trend_alchemy_cooking.sender': 'La Gilda degli Artigiani',
@@ -9262,6 +10415,198 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Attenzione ai thread, {className}. Una mano ferma al telaio batte una mano forte.',
   'entities.npcs.weaver_ottilie.name': 'Tessitrice Ottilia',
   'entities.npcs.weaver_ottilie.title': 'Maestro del telaio',
+  'entities.npcs.archivist_tullo.name': 'Archivista Tullo',
+  'entities.npcs.archivist_tullo.title': 'Lettore di Pietre',
+  'entities.npcs.archivist_tullo.greeting':
+    "I monumenti là fuori non parlano a nessuno da un'epoca. Forse aspettavano orecchie nuove.",
+  'entities.npcs.astronomer_cassian.name': 'Astronomo Cassian',
+  'entities.npcs.astronomer_cassian.title': 'Vedetta alla Veglia',
+  'entities.npcs.astronomer_cassian.greeting':
+    'Silenzio ora. Il cielo qui non albeggia mai, quindi non smette mai di parlare.',
+  'entities.npcs.aurorist_veyla.name': 'Aurorista Veyla',
+  'entities.npcs.aurorist_veyla.title': 'Lettrice delle Luci',
+  'entities.npcs.aurorist_veyla.greeting':
+    'Silenzio. Le luci stanno parlando stanotte, e non si ripetono mai.',
+  'entities.npcs.bellkeeper_tam.name': 'Guardiano della Campana Tam',
+  'entities.npcs.bellkeeper_tam.title': 'Custode della Campana di Vedetta',
+  'entities.npcs.bellkeeper_tam.greeting':
+    "La campana è l'unico avviso che le fratture ci danno, {className}. Un rintocco per i campi, due per le scogliere, tre quando è così vicina che correre non servirebbe. Tienici un orecchio, e potrebbe tenerti intero.",
+  'entities.npcs.bridgewright_alden.name': 'Costruttore di Ponti Alden',
+  'entities.npcs.bridgewright_alden.title': 'Maestro della Fenway',
+  'entities.npcs.bridgewright_alden.greeting':
+    'Ogni asse di questa città è mia da custodire, e la palude le rosicchia tutte.',
+  'entities.npcs.ferrymaster_caddow.name': 'Maestro del Traghetto Caddow',
+  'entities.npcs.ferrymaster_caddow.title': 'Custode dei Traghetti delle Lanterne',
+  'entities.npcs.ferrymaster_caddow.greeting':
+    "La nebbia è di nuovo sullo stagno. Quando le lanterne si spengono sull'acqua, la gente saggia resta a riva.",
+  'entities.npcs.fisher_nell.name': 'Nell la Spaventata',
+  'entities.npcs.fisher_nell.title': 'Pescatrice di Gullhaven',
+  'entities.npcs.fisher_nell.greeting':
+    'Si è aperto proprio dove asciugano le reti. Proprio lì, dove sono stata ogni mattina della mia vita. Non scendo più alla riva. Non vado quasi più da nessuna parte.',
+  'entities.npcs.gardener_yew.name': 'Giardiniere Yew',
+  'entities.npcs.gardener_yew.title': "L'Ultimo Giardiniere",
+  'entities.npcs.gardener_yew.greeting':
+    'Passami quella carriola, vuoi? Questi prati non si curano da soli, qualunque cosa pensi il villaggio.',
+  'entities.npcs.gatecaptain_brannoc.name': 'Capitano del Cancello Brannoc',
+  'entities.npcs.gatecaptain_brannoc.title': 'Comandante di Wyrmwatch',
+  'entities.npcs.gatecaptain_brannoc.greeting':
+    "Wyrmwatch tiene il cancello. Lo tiene da quarant'anni. Lo terrà anche stanotte.",
+  'entities.npcs.gatewarden_pell.name': 'Guardiano del Cancello Pell',
+  'entities.npcs.gatewarden_pell.title': 'Custode del Cancello del Giardino',
+  'entities.npcs.gatewarden_pell.greeting':
+    'Fai attenzione a come cammini sui prati. Il giardino li tiene potati, e gli piacciono in ordine.',
+  'entities.npcs.harbormaster_odile.name': 'Capitana di Porto Odile',
+  'entities.npcs.harbormaster_odile.title': 'Capitano di Porto di Wickharbor',
+  'entities.npcs.harbormaster_odile.greeting':
+    'Ogni barca in questa insenatura deve la sua chiglia al Vecchio Faro. Parla in fretta, la marea non aspetta.',
+  'entities.npcs.head_gardener_amaranth.name': 'Giardiniere Capo Amaranth',
+  'entities.npcs.head_gardener_amaranth.title': "Giardiniere Capo dell'Evergarden",
+  'entities.npcs.head_gardener_amaranth.greeting':
+    'Non badare alle ombre sotto i miei occhi. Qualcuno deve restare sveglio mentre il giardino sogna.',
+  'entities.npcs.hearthkeeper_maeve.name': 'Guardiana del Focolare Maeve',
+  'entities.npcs.hearthkeeper_maeve.title': 'Custode del Rifugio del Focolare',
+  'entities.npcs.hearthkeeper_maeve.greeting':
+    'Entra, ripara dal freddo. Il fuoco del rifugio non si spegne mai, finché ho fiato in corpo.',
+  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.title': 'Uomo che Entrò',
+  'entities.npcs.hermit_okku.greeting':
+    'Silenzio ora. I tamburi contano tutto ciò che cammina sotto gli alberi, e ti hanno già contato.',
+  'entities.npcs.huntsman_deral.name': 'Cacciatore Deral',
+  'entities.npcs.huntsman_deral.title': 'Guardiano delle Mandrie',
+  'entities.npcs.huntsman_deral.greeting':
+    "Silenzio ora. La mandria conosce ogni suono che questa valle produce, e anch'io.",
+  'entities.npcs.keeper_bram.name': 'Custode Bram',
+  'entities.npcs.keeper_bram.title': 'Custode del Vecchio Faro',
+  'entities.npcs.keeper_bram.greeting':
+    'Trentanove anni questa lampada ha bruciato sotto la mia veglia. Non si spegnerà sotto la tua.',
+  'entities.npcs.keeper_saelwyn.name': 'Custode Saelwyn',
+  'entities.npcs.keeper_saelwyn.title': 'Custode della Valletta Velata',
+  'entities.npcs.keeper_saelwyn.greeting':
+    'Pochi della tua specie si sono fermati sotto questi rami, {className}. Cammina con delicatezza, e sii il benvenuto.',
+  'entities.npcs.lamplighter_sorrel.name': 'Lampionaio Sorrel',
+  'entities.npcs.lamplighter_sorrel.title': 'Custode della Porta della Notte',
+  'entities.npcs.lamplighter_sorrel.greeting':
+    'Bada alle lanterne, amico. Oltre questo cancello il sole si arrende e i fiori prendono il sopravvento.',
+  'entities.npcs.lampman_cobb.name': 'Uomo dei Lampioni Cobb',
+  'entities.npcs.lampman_cobb.title': 'Custode delle Lanterne della Porta dei Corvi',
+  'entities.npcs.lampman_cobb.greeting':
+    'Resta nella luce delle lanterne, amico. Il bosco conta chiunque oltrepassi il cancello.',
+  'entities.npcs.lira_dewsong.name': 'Lira Dewsong',
+  'entities.npcs.lira_dewsong.title': 'Giardiniera Notturna di Moonrest',
+  'entities.npcs.lira_dewsong.greeting':
+    "Benvenuto a Moonrest, dove i fiori fanno l'alba al posto nostro.",
+  'entities.npcs.loremother_bryn.name': 'Madre del Sapere Bryn',
+  'entities.npcs.loremother_bryn.title': 'Voce del Santuario',
+  'entities.npcs.loremother_bryn.greeting':
+    'Ogni luce in questa valle ricorda qualcosa, {playerName}. Aiutami ad ascoltare.',
+  'entities.npcs.mender_saul.name': 'Guaritore Saul',
+  'entities.npcs.mender_saul.title': 'Chirurgo da Campo',
+  'entities.npcs.mender_saul.greeting':
+    'Ho rimesso a posto più ossa in questo mese che in dieci anni di curare cadute da pesca. Le fratture non lasciano molto di ciò che prendono. Torna da me intero, se ci riesci.',
+  'entities.npcs.mother_sedge.name': 'Madre Sedge',
+  'entities.npcs.mother_sedge.title': 'Strega della Palude di Willowweep',
+  'entities.npcs.mother_sedge.greeting':
+    'I salici mi hanno detto che stavi arrivando prima ancora che i tuoi stivali lasciassero il ponte.',
+  'entities.npcs.netter_maris.name': 'Retaiola Maris',
+  'entities.npcs.netter_maris.title': 'Retaiola di Anguille di Bridgemere',
+  'entities.npcs.netter_maris.greeting':
+    "Senti quell'odore? Anguilla affumicata. Metà di questa città sta su palafitte che ho comprato con quella.",
+  'entities.npcs.orchardist_pomeline.name': 'Frutticoltrice Pomeline',
+  'entities.npcs.orchardist_pomeline.title': 'Custode dei Filari Dorati',
+  'entities.npcs.orchardist_pomeline.greeting':
+    'Fai attenzione a dove metti i piedi. Ogni radice in questi filari è più antica della città, e ricordano.',
+  'entities.npcs.pearlmother_isha.name': 'Madre delle Perle Isha',
+  'entities.npcs.pearlmother_isha.title': 'Anziana dei Tuffatori',
+  'entities.npcs.pearlmother_isha.greeting':
+    'Il mare dona, la sabbia custodisce, e la giungla prende. Resta sulla spiaggia, straniero.',
+  'entities.npcs.provisioner_fenna.name': 'Fornitrice Fenna',
+  'entities.npcs.provisioner_fenna.title': 'Fornitrice di Eldergleam',
+  'entities.npcs.provisioner_fenna.greeting':
+    "Pane ancora caldo, acqua ancora dolce. La Valletta provvede, e anch'io.",
+  'entities.npcs.quartermaster_edda.name': 'Furiere Edda',
+  'entities.npcs.quartermaster_edda.title': 'Armaiola del Ridotto',
+  'entities.npcs.quartermaster_edda.greeting':
+    'Acciaio e sale, {className}, è tutto ciò che mi resta da distribuire. Prendilo e fai in modo che le fratture rimpiangano di essersi aperte dove potevo raggiungerle.',
+  'entities.npcs.quartermaster_sela.name': 'Furiere Sela',
+  'entities.npcs.quartermaster_sela.title': 'Custode delle Scorte della Guarnigione',
+  'entities.npcs.quartermaster_sela.greeting':
+    'Ogni cassa in questo cortile ha attraversato quaranta miglia di cenere per arrivare qui. Trattale con cura.',
+  'entities.npcs.reeve_ottoline.name': 'Podestà Ottoline',
+  'entities.npcs.reeve_ottoline.title': 'Podestà di Lanternmere',
+  'entities.npcs.reeve_ottoline.greeting':
+    'Benvenuto a Lanternmere, dove il raccolto non finisce mai e nemmeno il lavoro.',
+  'entities.npcs.riftwatch_ollun.name': 'Vedetta dello Squarcio Ollun',
+  'entities.npcs.riftwatch_ollun.title': 'Studioso delle Brecce',
+  'entities.npcs.riftwatch_ollun.greeting':
+    "Ogni frattura canta prima di aprirsi, se hai l'orecchio per sentirla. Ne sento tre che si agitano sull'isola proprio ora, e una è vicina.",
+  'entities.npcs.salvage_boss_ryna.name': 'Capo dei Recuperi Ryna',
+  'entities.npcs.salvage_boss_ryna.title': 'Padrona della Linea dei Relitti',
+  'entities.npcs.salvage_boss_ryna.greeting':
+    'Un {className} con le braccia funzionanti, bene. La linea dei relitti paga bene, se i granchi ti lasciano abbastanza dita per contarlo.',
+  'entities.npcs.salvager_edda.name': 'Recuperante Edda',
+  'entities.npcs.salvager_edda.title': 'Recuperante dei Campi di Relitti',
+  'entities.npcs.salvager_edda.greeting':
+    'Legname di relitti, corde, e il carico di uomini morti. Il mare paga il mio salario, quando il Guardiano lo permette.',
+  'entities.npcs.scout_einna.name': 'Esploratrice Einna',
+  'entities.npcs.scout_einna.title': 'Esploratrice della Linea delle Nevi',
+  'entities.npcs.scout_einna.greeting':
+    'Hai attraversato il passo da viva. Bene. Icemantle dovrebbe saperlo.',
+  'entities.npcs.scout_yerrin.name': 'Esploratore Yerrin',
+  'entities.npcs.scout_yerrin.title': 'Vedetta delle Dune Lontane',
+  'entities.npcs.scout_yerrin.greeting':
+    'Resta basso. Il suono si propaga in modo strano sul vetro, e il cancello sottostante ha orecchie.',
+  'entities.npcs.sexton_marrow.name': 'Sagrestano Marrow',
+  'entities.npcs.sexton_marrow.title': 'Sagrestano di Gallowmere',
+  'entities.npcs.sexton_marrow.greeting':
+    'Qui li seppelliamo in profondità, e suoniamo le campane perché ricordino di restare giù.',
+  'entities.npcs.strandwatcher_pell.name': 'Guardiano della Riva Pell',
+  'entities.npcs.strandwatcher_pell.title': 'Vedetta della Foce Aggrovigliata',
+  'entities.npcs.strandwatcher_pell.greeting':
+    'Finalmente fuori dagli alberi neri. Respira, straniero, il sole regna su questo lato del passo.',
+  'entities.npcs.trapper_brosk.name': 'Trappolatore Brosk',
+  'entities.npcs.trapper_brosk.title': 'Trappolatore dello Shiverfen',
+  'entities.npcs.trapper_brosk.greeting':
+    "La palude ha preso tre delle mie trappole questa settimana. La palude non aveva mai preso una trappola in vent'anni.",
+  'entities.npcs.vicar_creel.name': 'Vicario Creel',
+  'entities.npcs.vicar_creel.title': 'Ultimo Vicario di Mournstone',
+  'entities.npcs.vicar_creel.greeting':
+    'La cappella è crollata anni fa. I morti sottostanti non se ne sono accorti, così sono rimasto.',
+  'entities.npcs.warden_coalfast.name': 'Guardiano Coalfast',
+  'entities.npcs.warden_coalfast.title': 'Comandante del Ridotto',
+  'entities.npcs.warden_coalfast.greeting':
+    'Alle fratture non importa che Gullhaven sia piccola, {className}. Difendiamo questa riva, o non resterà riva da difendere. Stai con noi e non lo dimenticherò.',
+  'entities.npcs.warden_kaldra.name': 'Guardiano Kaldra',
+  'entities.npcs.warden_kaldra.title': 'Guardiano di Icemantle',
+  'entities.npcs.warden_kaldra.greeting':
+    'Attento alle panchine, straniero. La neve tiene ciò che prende.',
+  'entities.npcs.wardsmith_orun.name': 'Fabbro dei Sigilli Orun',
+  'entities.npcs.wardsmith_orun.title': 'Custode delle Vecchie Forge',
+  'entities.npcs.wardsmith_orun.greeting':
+    'Queste forge si sono raffreddate secoli fa, {className}, ma il loro lavoro mantiene ancora il filo.',
+  'entities.npcs.watcher_maren.name': 'Vedetta Maren',
+  'entities.npcs.watcher_maren.title': 'La Vedetta della Via del Vento',
+  'entities.npcs.watcher_maren.greeting':
+    'Fai attenzione ai tuoi passi oltre il cancello. Il vento quassù porta via prima i cappelli e non fa mai domande.',
+  'entities.npcs.waykeeper_pell.name': 'Guardiano del Sentiero Pell',
+  'entities.npcs.waykeeper_pell.title': 'Custode della Scalinata di Amberfen',
+  'entities.npcs.waykeeper_pell.greeting':
+    'Giù per la Scalinata e nella terra morbida. Fai attenzione a dove pianti gli stivali.',
+  'entities.npcs.waywatcher_sorrel.name': 'Vedetta del Sentiero Sorrel',
+  'entities.npcs.waywatcher_sorrel.title': 'Vedetta del Goldmelt',
+  'entities.npcs.waywatcher_sorrel.greeting':
+    "Neve alle spalle, oro davanti. Pochi attraversano il Goldmelt due volte, quindi fai valere l'attraversata.",
+  'entities.npcs.weaver_amelle.name': 'Tessitrice Amelle',
+  'entities.npcs.weaver_amelle.title': 'Tessitrice del Vello Lunare',
+  'entities.npcs.weaver_amelle.greeting':
+    'Lo senti? Vello Lunare sul telaio. Più caldo di qualsiasi fuoco accanto a cui tu ti sia mai seduto.',
+  'entities.npcs.wickmother_sorrel.name': 'Madre della Locanda Sorrel',
+  'entities.npcs.wickmother_sorrel.title': 'Custode della Locanda di Hedgewick',
+  'entities.npcs.wickmother_sorrel.greeting':
+    "Entra, siediti, c'è del cordiale sul fuoco. Tieni solo una mano su tutto ciò che è di ferro: gli gnomi hanno le mani leggere ultimamente.",
+  'entities.npcs.widow_tansy.name': 'Vedova Tansy',
+  'entities.npcs.widow_tansy.title': 'Fabbricante di Candele di Gallowmere',
+  'entities.npcs.widow_tansy.greeting':
+    'Una candela per ogni tomba, e nemmeno una deve spegnersi. Nemmeno una, mi senti?',
   'gatherEvent.ancientHeartwood': '{finder} ha abbattuto un antico durame!',
   'gatherEvent.moonlitBloom': '{finder} ha scoperto una fioritura illuminata dalla luna!',
   'gatherEvent.pristineVein': '{finder} ha colpito una vena incontaminata!',
@@ -9407,6 +10752,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': 'Sciogli {name} per {fee}',
   'hudChrome.unbind.unbound': 'Sciolto {name} per {fee}. Si leghera di nuovo al prossimo scambio.',
   'hud.combat.auraGainOther': '{target} ottiene {name}.',
+  'hud.combat.floatingHealAbsorbed': 'Assorbito',
+  'hud.combat.healOtherAbsorbed': 'Il tuo {ability} viene divorato dalla piaga su {target}.',
+  'hud.combat.healSelfAbsorbed': 'Il tuo {ability} viene divorato dalla piaga su di te.',
   'hudChrome.corpseHarvest.components.cloth': 'Stoffa',
   'hudChrome.corpseHarvest.components.meat': 'Carne',
   'hudChrome.crafting.noBagSpace': "Non hai spazio per l'oggetto realizzato.",
@@ -9501,6 +10849,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': 'Da {min} a {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Incantato',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Incantato)',
+  'hudChrome.itemTooltip.riftSockets': 'Gemme dello squarcio {used}/{total}',
+  'hudChrome.itemTooltip.riftTier': 'Oggetto dello Squarcio di rango {tier}',
+  'hudChrome.itemTooltip.riftUpgrade': 'Potenziamento dello squarcio {level}/{max}',
   'hudChrome.marketIndicator.aria': 'Ricavi o oggetti del Mercato Mondiale in attesa',
   'hudChrome.marketIndicator.tip':
     'Ricavi di vendita o oggetti restituiti ti aspettano dal Mercante.',
@@ -9553,1403 +10904,59 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marchio del creatore',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus capolavoro',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vincolo di commissione',
-  'abilityUi.cast.rift_arcane_execution': 'Fenditura del Vuoto',
-  'abilityUi.cast.rift_arcane_strike': 'Annientamento Arcano',
-  'abilityUi.cast.rift_brute_execution': 'Frantumatore',
-  'abilityUi.cast.rift_brute_strike': 'Giudizio finale',
-  'abilityUi.cast.rift_ember_execution': 'Magma Bene',
-  'abilityUi.cast.rift_ember_strike': 'Fusione del nucleo',
-  'abilityUi.cast.rift_frost_execution': 'Tomba glaciale',
-  'abilityUi.cast.rift_frost_strike': 'Zero assoluto',
-  'abilityUi.cast.rift_necro_execution': "Tomba dell'Anima",
-  'abilityUi.cast.rift_necro_strike': 'Condanna a morte',
-  'abilityUi.cast.rift_storm_execution': 'Parafulmine',
-  'abilityUi.cast.rift_storm_strike': "Ira dell'Invocatore di Tempeste",
-  'abilityUi.cast.rift_tide_execution': 'Fauci Abissali',
-  'abilityUi.cast.rift_tide_strike': 'Profondità di frantumazione',
-  'abilityUi.cast.rift_venom_execution': 'Pozza di Veleno',
-  'abilityUi.cast.rift_venom_strike': 'Marchio della Madre della Stirpe',
-  'hud.combat.floatingHealAbsorbed': 'Assorbito',
-  'hud.combat.healOtherAbsorbed': 'La tua {abilità} è divorata dalla piaga su {target}. {ability}',
-  'hud.combat.healSelfAbsorbed': 'La tua {abilità} è divorata dalla piaga su di te. {ability}',
-  'hud.core.riftLabel': '{name}',
-  'hud.core.riftLabelRanked': '() {name} {rank}',
-  'entities.dungeons.the_last_keep.enterText':
-    "Entri nelle sale fredde e silenziose dell'Ultimo Forte.",
-  'entities.dungeons.the_last_keep.leaveText':
-    'Chiudi la porta del forte e fai un passo indietro nel vento delle Drakelands.',
-  'entities.dungeons.the_last_keep.name': "L'Ultima Fortezza",
-  'entities.dungeons.wildheart_basin.enterText':
-    'La pioggia calda sibila sulla vecchia pietra. Il Bacino del Cuore Selvaggio si apre davanti a te.',
-  'entities.dungeons.wildheart_basin.leaveText':
-    'Torni sotto le zanne di pietra nel sole di Palmreach.',
-  'entities.dungeons.wildheart_basin.name': 'Il Bacino del Cuorselvaggio',
-  'entities.items.abyssal_loop.name': 'Anello Abissale',
-  'entities.items.abysswrought_band.name': "Banda dell'Abisso",
-  'entities.items.amberfall_sap_bucket.name': 'Secchio Sap-Tap',
-  'entities.items.ashbone_war_brand.name': 'Marchio di Guerra di Ashbone',
-  'entities.items.aurora_mote.name': "Particella dell'Aurora",
-  'entities.items.barrow_grave_offering.name': 'Offerta tombale sparsa',
-  'entities.items.barrowshade_mantle.name': 'Mantello Barrowshade',
-  'entities.items.bonelord_mantle.name': 'Mantello del Signore delle Ossa',
-  'entities.items.breakscarred_steel.name': 'Acciaio Sfregiato',
-  'entities.items.bridgemere_toll_chest.name': 'Cassa del pedaggio affondata',
-  'entities.items.broodmother_carapace.name': 'Carapace della Madre della Stirpe',
-  'entities.items.canopy_silk_hank.name': 'Matassa di seta del baldacchino',
-  'entities.items.cinderwalk_treads.name': 'Calpestio di Cinderwalk',
-  'entities.items.eelskin_mudwaders.name': 'Paraspruzzi di Anguilla',
-  'entities.items.emberforge_gauntlets.name': 'Guanti di Forgiabrace',
-  'entities.items.emberforged_bulwark.name': 'Baluardo Forgiato dalle Braci',
-  'entities.items.emberwing_scale.name': 'Scaglia di Alabrace',
-  'entities.items.evergarden_bloom_clipping.name': 'Ritaglio di fiori potati',
-  'entities.items.evergarden_statue_rubbing.name': 'Sfregamento della statua',
-  'entities.items.farshore_salt_moss.name': 'Muschio salato della costa lontana',
-  'entities.items.fenway_mooring_line.name': 'Taglia la cima di ormeggio',
-  'entities.items.fountain_court_mantle.name': 'Mantello del Cortile della Fontana',
-  'entities.items.frostmane_mantle.name': 'Manto del Manto Gelido',
-  'entities.items.galecrest_ram_wool.name': 'Lana di montone sucida',
-  'entities.items.gallowmere_grave_candle.name': 'Candela tombale',
-  'entities.items.gilded_sap_clot.name': 'Coagulo di linfa dorato',
-  'entities.items.gloamfield_nightbloom.name': 'Fiore notturno',
-  'entities.items.graskbreaker_girdle.name': 'Cintura dello Spezzagrask',
-  'entities.items.gravebound_silk_wraps.name': 'Involucri di seta tombali',
-  'entities.items.gullhaven_watchbell.name': "Campanello dell'orologio costiero",
-  'entities.items.heart_of_the_rift.name': 'Cuore della Fenditura',
-  'entities.items.hearth_ember_cache.name': 'Cache di braci',
-  'entities.items.hearthlined_treads.name': 'Gradini Foderati',
-  'entities.items.hedgewick_shears.name': 'Cesoie Hedgewick rubate',
-  'entities.items.hedgewick_tool_cart.name': 'Carrello degli attrezzi rovesciato',
-  'entities.items.hoarfrost_edge.name': 'Bordo di brina',
-  'entities.items.last_keep_signet.name': "Sigillo dell'Ultima Fortezza",
-  'entities.items.lilybed_mantle.name': 'Mantello del Giglio',
-  'entities.items.mantle_of_the_meredark.name': 'Mantello del Meredark',
-  'entities.items.mantle_of_the_unbroken_shore.name': 'Mantello della Riva Ininterrotta',
-  'entities.items.mantle_of_the_unhorsed.name': 'Mantello del Disarcionato',
-  'entities.items.mawscale_pauldrons.name': 'Paraspalle di Scagliamaw',
-  'entities.items.mere_ferry_lantern.name': 'Lanterna del traghetto',
-  'entities.items.moonfleece_mitts.name': 'Guanti in pile lunare',
-  'entities.items.moonfleece_tuft.name': 'Ciuffo in Pile di Luna',
-  'entities.items.orchard_sapbinder_grips.name': 'Impugnature di Sapbinder',
-  'entities.items.pactbound_vestments.name': 'Paramenti del Patto',
-  'entities.items.pearlwake_cargo_crate.name': 'Cassa di carico Pearlwake',
-  'entities.items.pitlords_cleaver.name': 'Mannaia del Signore della Fossa',
-  'entities.items.plump_fen_eel.name': 'Anguilla paffuta',
-  'entities.items.riding_training.name': 'Allenamento di equitazione',
-  'entities.items.rift_essence.name': 'Essenza della spaccatura',
-  'entities.items.rift_gem_azure.name': 'Gemma della Fenditura Azzurra',
-  'entities.items.rift_gem_crimson.name': 'Gemma Cremisi della Fenditura',
-  'entities.items.rift_gem_verdant.name': 'Gemma della Fenditura Verdeggiante',
-  'entities.items.riftbound_band_of_guile.name': "Banda dell'Astuzia del Riftbound",
-  'entities.items.riftbound_band_of_insight.name': "Fascia dell'Intuito del Riftbound",
-  'entities.items.riftbound_band_of_might.name': 'Banda potente del Riftbound',
-  'entities.items.saltforged_grips.name': 'Impugnature di Forgiasale',
-  'entities.items.saltwalker_sandals.name': 'Sandali Calcasale',
-  'entities.items.scorched_supply_crate.name': 'Cassa di rifornimenti bruciata',
-  'entities.items.shear_storm_lantern.name': 'Lanterna della Tempesta spenta',
-  'entities.items.shearkeeper_gloves.name': 'Guanti da Tosatore',
-  'entities.items.silkbound_remains.name': 'Resti Sericati',
-  'entities.items.sprung_trap.name': 'Trappola paludosa sospesa',
-  'entities.items.stormscale_treads.name': 'Stivaletti Scagliatempesta',
-  'entities.items.stormsunder_hood.name': 'Cappuccio di Stormsunder',
-  'entities.items.sunken_idol_mantle.name': "Mantello dell'Idolo Sommerso",
-  'entities.items.sunken_offering_bowl.name': 'Ciotola per offerte riempita',
-  'entities.items.thick_winter_pelt.name': 'Spessa pelliccia invernale',
-  'entities.items.vigil_star_chart.name': 'Carta Stellare della Veglia',
-  'entities.items.voidscar_handwraps.name': 'Fasce della Cicatrice del Vuoto',
-  'entities.items.voidsong_dirk.name': 'Canto del Vuoto, Pugnale del Velo Spezzato',
-  'entities.items.voidweave_mantle.name': 'Mantello di Tela del Vuoto',
-  'entities.items.wickspun_treads.name': 'Battistrada Wickspun',
-  'entities.items.widowsilk_skein.name': 'Matassa di seta vedova',
-  'entities.items.wildheart_fangknife.name': 'Coltello Zanna di Zulgar',
-  'entities.items.wildheart_hexwood_staff.name': 'Bastone di legno maledetto del bacino',
-  'entities.items.wildheart_tuskblade.name': 'Zanna del Cuorselvaggio',
-  'entities.items.wisplight_globe.name': 'Globo di Luce Wisp',
-  'entities.items.wreck_wardens_mantle.name': 'Mantello del Guardiano del Relitto',
-  'entities.items.wreckfield_flotsam_crate.name': 'Cassa di relitti',
-  'entities.items.wyrmwatch_warning_banner.name':
-    'Stendardo di avvertimento della Guardia del Wyrm',
-  'entities.mobs.ancient_guardian.name': 'Antico Guardiano',
-  'entities.mobs.apprentice_wren.name': 'Apprendista Wren',
-  'entities.mobs.ashbone_raider.name': 'Predatore di Osso di Cenere',
-  'entities.mobs.ashbone_warcaller.name': 'Invocatore di Osso di Cenere',
-  'entities.mobs.aurelhorn.name': 'Aurelhorn, Primo del Branco',
-  'entities.mobs.barrow_king.name': 'Il Re dei Tumuli',
-  'entities.mobs.barrow_wight.name': 'Tradotto: Barrow Wight',
-  'entities.mobs.bogtoad.name': 'Rospo',
-  'entities.mobs.breach_wretch.name': 'Disgraziato della Breccia',
-  'entities.mobs.canopy_weaver.name': 'Tessitore di tettoie',
-  'entities.mobs.castaway_navigator.name': 'Navigatore Suli',
-  'entities.mobs.cindraleth_maw_matriarch.name': 'Cindraleth la Matriarca delle Fauci',
-  'entities.mobs.corrupted_sporeling.name': 'Sporeling corrotto',
-  'entities.mobs.downs_bandit.name': 'Bandito dei Downs',
-  'entities.mobs.drowned_deckhand.name': 'Mozzo annegato',
-  'entities.mobs.drowsy_croaker.name': "L'ombrina sonnolento",
-  'entities.mobs.dune_troll.name': 'Troll delle dune',
-  'entities.mobs.duskwisp.name': 'Crepuscolo fatuo',
-  'entities.mobs.emberwing_drake.name': 'Drago Alabrace',
-  'entities.mobs.fen_sprite.name': 'Folletto delle Paludi',
-  'entities.mobs.fisher_bram.name': 'Tradotto: Fisher Bram',
-  'entities.mobs.frostmane_yeti.name': 'Yeti Manto Gelido',
-  'entities.mobs.gale_wisp.name': 'Fuoco fatuo',
-  'entities.mobs.gilded_stag.name': 'Cervo dorato',
-  'entities.mobs.gleamstag.name': 'Il Gleamstag',
-  'entities.mobs.glimmerwisp.name': 'Fiammaluce',
-  'entities.mobs.gloam_fox.name': 'Volpe crepuscolare',
-  'entities.mobs.gloam_strider.name': 'Passo del Buio',
-  'entities.mobs.gravedigger_mosley.name': 'Becchino Mosley',
-  'entities.mobs.gravenbark_shambler.name': 'Barastone di Corteccia Graven',
-  'entities.mobs.harvest_sprite.name': 'Folletto del Raccolto',
-  'entities.mobs.hedge_gnome.name': 'Gnomo della Siepe',
-  'entities.mobs.hedge_knight.name': 'Cavaliere di Dawnhold',
-  'entities.mobs.ice_wisp.name': 'Fuoco fatuo di ghiaccio',
-  'entities.mobs.idol_guardian.name': "Il Guardiano dell'Idolo",
-  'entities.mobs.lily_wisp.name': 'Giglio fatuo',
-  'entities.mobs.mere_lurker.name': 'Semplice Lurker',
-  'entities.mobs.moonfleece_grazer.name': 'Grazer di vello lunare',
-  'entities.mobs.moor_ram.name': 'Moro Ariete',
-  'entities.mobs.mushroom_pixie.name': 'Folletto Gleamfolk',
-  'entities.mobs.nightkin_stargazer.name': 'Guardastelle Nightkin',
-  'entities.mobs.old_marrowshell.name': 'Vecchio Marrowshell',
-  'entities.mobs.orchard_treant.name': 'Frutteto Treant',
-  'entities.mobs.pale_huntsman.name': 'Il Cacciatore Pallido',
-  'entities.mobs.rift_boneclad.name': "Guerriero rivestito d'ossa",
-  'entities.mobs.rift_bonewalker.name': 'Camminatore di Ossa risorto',
-  'entities.mobs.rift_boss_arcane.name': 'Arconte Nyxaris',
-  'entities.mobs.rift_boss_brute.name': 'Signore della Guerra Grask',
-  'entities.mobs.rift_boss_ember.name': 'Tiranno di Forgiabrace',
-  'entities.mobs.rift_boss_frost.name': 'Guardiano della brina',
-  'entities.mobs.rift_boss_necro.name': 'Signore delle ossa Xarreth',
-  'entities.mobs.rift_boss_pitlord.name': "Azgorath, Signore dell'Abisso",
-  'entities.mobs.rift_boss_ritualist.name': "Magus Vel'Kor il Vincolato dal Patto",
-  'entities.mobs.rift_boss_storm.name': 'Tempesta Vharok',
-  'entities.mobs.rift_boss_tide.name': 'Fauci Abissali',
-  'entities.mobs.rift_boss_venom.name': 'Madre della stirpe Vysska',
-  'entities.mobs.rift_deep_lurker.name': 'Agguato delle profondità',
-  'entities.mobs.rift_dread_stalker.name': 'Inseguitore del Terrore',
-  'entities.mobs.rift_ember_fiend.name': 'Demone della Brace',
-  'entities.mobs.rift_frost_revenant.name': 'Revenant gelido',
-  'entities.mobs.rift_hellguard.name': "Guardia dell'Inferno",
-  'entities.mobs.rift_magma_brute.name': 'Magma Bruto',
-  'entities.mobs.rift_marrow_troll.name': 'Troll Midollo',
-  'entities.mobs.rift_pact_acolyte.name': 'Accolito del Patto',
-  'entities.mobs.rift_rime_elemental.name': 'Elementale della Brina',
-  'entities.mobs.rift_spawnling.name': 'Generazione della spaccatura',
-  'entities.mobs.rift_stone_ogre.name': 'Orco di pietra',
-  'entities.mobs.rift_storm_caller.name': 'Invocatore di Tempeste',
-  'entities.mobs.rift_stormscale.name': 'Draco Scagliatempesta',
-  'entities.mobs.rift_thornback.name': 'Inseguitore Spinato',
-  'entities.mobs.rift_tide_thrall.name': 'Schiavo delle maree',
-  'entities.mobs.rift_venom_weaver.name': 'Tessitore di veleno',
-  'entities.mobs.rift_void_acolyte.name': 'Accolito della Cicatrice del Vuoto',
-  'entities.mobs.riftspawn.name': 'Spawn',
-  'entities.mobs.rime_elemental.name': 'Elementale della Brina',
-  'entities.mobs.shoal_scuttler.name': 'Affondatore dei banchi',
-  'entities.mobs.snowdrift_wolf.name': 'Lupo cumulo di neve',
-  'entities.mobs.sporeling_gatherer.name': 'Raccoglitore di Sporeling',
-  'entities.mobs.sundered_horror.name': "L'orrore diviso",
-  'entities.mobs.terrace_howler.name': 'Urlatore da terrazza',
-  'entities.mobs.the_meredark.name': 'Il Meredoscuro',
-  'entities.mobs.the_topiary_bull.name': 'Bolla Topiaria',
-  'entities.mobs.the_wreck_warden.name': 'Il Guardiano del Relitto',
-  'entities.mobs.thicket_boar.name': 'Cinghiale nella boscaglia',
-  'entities.mobs.tide_scuttler.name': 'Scuttler delle maree',
-  'entities.mobs.topiary_stag.name': 'Cervo topiario',
-  'entities.mobs.topiary_wolf.name': 'Lupo topiario',
-  'entities.mobs.treant_elder.name': 'Treant Anziano',
-  'entities.mobs.veiled_doe.name': 'Cerva velata',
-  'entities.mobs.veiled_stag.name': 'Cervo velato',
-  'entities.mobs.void_stalker.name': 'Inseguitore del Vuoto',
-  'entities.mobs.waking_warden.name': 'Il Guardiano Risvegliato',
-  'entities.mobs.widowsilk_spinner.name': 'Filatore di Vedova Seta',
-  'entities.mobs.wildheart_beastmaster.name': 'Signore delle Zanne Maestro delle Bestie',
-  'entities.mobs.wildheart_hexcaller.name': 'Evocatore di malefici Osso del Sole',
-  'entities.mobs.wildheart_high_priest.name': 'Zulgar, Voce del Bacino',
-  'entities.mobs.wildheart_ravager.name': 'Devastatore di Criniera Insanguinata',
-  'entities.mobs.wildheart_stalker.name': 'Inseguitore di Vineclavi',
-  'entities.mobs.willow_sprite.name': 'Folletto del Salice',
-  'entities.mobs.wood_wraith.name': 'Spettro del Legno',
-  'entities.mobs.wreck_thief.name': 'Ladro delle rovine',
-  'entities.npcs.archivist_tullo.greeting':
-    "I monumenti là fuori non hanno parlato con nessuno da un'epoca. Forse stavano aspettando orecchie fresche.",
-  'entities.npcs.archivist_tullo.name': 'Archivista Tullo',
-  'entities.npcs.archivist_tullo.title': 'Lettore di Pietre',
-  'entities.npcs.astronomer_cassian.greeting':
-    'Zitto adesso. Qui il cielo non sorge mai, quindi non smette nemmeno di parlare.',
-  'entities.npcs.astronomer_cassian.name': 'Astronomo Cassiano',
-  'entities.npcs.astronomer_cassian.title': 'Osservatore alla Veglia',
-  'entities.npcs.aurorist_veyla.greeting': 'Zitto. Le luci parlano stasera e non si ripetono.',
-  'entities.npcs.aurorist_veyla.name': 'Aurorista Veyla',
-  'entities.npcs.aurorist_veyla.title': 'Lettore delle Luci',
-  'entities.npcs.bellkeeper_tam.greeting':
-    "Il campanello è l'unico avvertimento che ci danno le interruzioni, {className}. Un pedaggio per i campi, due per le scogliere, tre quando è così vicino che correre non aiuta. Tienilo d'occhio e potrebbe mantenerti integro.",
-  'entities.npcs.bellkeeper_tam.name': 'Il fattorino Tam',
-  'entities.npcs.bellkeeper_tam.title': 'Guardiano del campanello',
-  'entities.npcs.bridgewright_alden.greeting':
-    'Ogni asse di questa città è mio e la palude le rode tutte.',
-  'entities.npcs.bridgewright_alden.name': 'Pontefice Alden',
-  'entities.npcs.bridgewright_alden.title': 'Maestro del Fenway',
-  'entities.npcs.ferrymaster_caddow.greeting':
-    'La nebbia è di nuovo sulla Praia. Quando le lanterne si spengono sull’acqua, i saggi restano a riva.',
-  'entities.npcs.ferrymaster_caddow.name': 'Maestro del traghetto Caddow',
-  'entities.npcs.ferrymaster_caddow.title': 'Custode dei Traghetti Lanterna',
-  'entities.npcs.fisher_nell.greeting':
-    'Si aprì proprio dove asciugano le reti. Proprio lì, dove mi trovavo ogni mattina della mia vita. Non scendo più a riva. Non vado più molto da nessuna parte.',
-  'entities.npcs.fisher_nell.name': 'Nell spaventata',
-  'entities.npcs.fisher_nell.title': 'Tradotto: Gullhaven Fisher',
-  'entities.npcs.gardener_yew.greeting':
-    'Passami quella carriola, vuoi? Questi prati non si percorrono da soli, qualunque cosa ne pensi il borgo.',
-  'entities.npcs.gardener_yew.name': 'Giardiniere Yew',
-  'entities.npcs.gardener_yew.title': "L'ultimo giardiniere",
-  'entities.npcs.gatecaptain_brannoc.greeting':
-    "Wyrmwatch tiene il cancello. Lo ha tenuto per quarant'anni. Lo terrà stasera.",
-  'entities.npcs.gatecaptain_brannoc.name': 'Capitano Brannoc',
-  'entities.npcs.gatecaptain_brannoc.title': 'Comandante della Guardia del Wyrm',
-  'entities.npcs.gatewarden_pell.greeting':
-    'Attento a come vai sui prati. Il giardino li tiene curati e gli piace che siano in ordine.',
-  'entities.npcs.gatewarden_pell.name': 'Guardiano Pell',
-  'entities.npcs.gatewarden_pell.title': 'Custode della Porta del Giardino',
-  'entities.npcs.harbormaster_odile.greeting':
-    'Ogni barca in questa baia deve la sua chiglia al Vecchio Faro. Parla veloce, la marea non aspetterà.',
-  'entities.npcs.harbormaster_odile.name': 'Capitanera di porto Odile',
-  'entities.npcs.harbormaster_odile.title': 'Capitano di porto di Wickharbor',
-  'entities.npcs.head_gardener_amaranth.greeting':
-    'Non preoccuparti delle ombre sotto i miei occhi. Qualcuno deve restare sveglio mentre il giardino sogna.',
-  'entities.npcs.head_gardener_amaranth.name': 'Capo Giardiniere Amaranto',
-  'entities.npcs.head_gardener_amaranth.title': "Capo giardiniere dell'Evergarden",
-  'entities.npcs.hearthkeeper_maeve.greeting':
-    'Vieni fuori dal freddo. Il fuoco della loggia non si spegne mai, finché respiro.',
-  'entities.npcs.hearthkeeper_maeve.name': 'Custode del focolare Maeve',
-  'entities.npcs.hearthkeeper_maeve.title': 'Custode della Loggia del Focolare',
-  'entities.npcs.hermit_okku.greeting':
-    'Tranquillo adesso. I tamburi contano tutto ciò che cammina sotto gli alberi, e hanno già contato te.',
-  'entities.npcs.hermit_okku.name': 'Ok',
-  'entities.npcs.hermit_okku.title': "L'uomo che entrò",
-  'entities.npcs.huntsman_deral.greeting':
-    "Tranquillo adesso. La mandria conosce ogni suono emesso da questa valle, e anch'io.",
-  'entities.npcs.huntsman_deral.name': 'Cacciatore Deral',
-  'entities.npcs.huntsman_deral.title': 'Guardiano delle mandrie',
-  'entities.npcs.keeper_bram.greeting':
-    'Nove e trenta anni questa lampada arde sul mio orologio. Non si oscurerà sul tuo.',
-  'entities.npcs.keeper_bram.name': 'Custode Bram',
-  'entities.npcs.keeper_bram.title': 'Custode del Vecchio Faro',
-  'entities.npcs.keeper_saelwyn.greeting':
-    'Pochi della tua razza sono rimasti sotto questi rami, {className}. Cammina dolcemente e sii il benvenuto.',
-  'entities.npcs.keeper_saelwyn.name': 'Custode Saelwyn',
-  'entities.npcs.keeper_saelwyn.title': 'Custode del Vuoto',
-  'entities.npcs.lamplighter_sorrel.greeting':
-    'Attento alle lampade, amico. Oltrepassato questo cancello il sole si arrende e i fiori prendono il sopravvento.',
-  'entities.npcs.lamplighter_sorrel.name': 'Acetosa lampionaio',
-  'entities.npcs.lamplighter_sorrel.title': 'Custode della Porta della Notte',
-  'entities.npcs.lampman_cobb.greeting':
-    'Resta alla luce della lampada, amico. Il bosco conta tutti quelli che oltrepassano il cancello.',
-  'entities.npcs.lampman_cobb.name': 'Lampmann Cobb',
-  'entities.npcs.lampman_cobb.title': 'Custode delle Lanterne del Crowgate',
-  'entities.npcs.lira_dewsong.greeting':
-    'Benvenuti a Moonrest, dove i fiori fanno sorgere per noi.',
-  'entities.npcs.lira_dewsong.name': 'Tradotto: Lira Dewsong',
-  'entities.npcs.lira_dewsong.title': 'Giardiniere Notturno di Riposo Lunare',
-  'entities.npcs.loremother_bryn.greeting':
-    'Ogni luce in questa valle ricorda qualcosa, {playerName}. Aiutami ad ascoltare.',
-  'entities.npcs.loremother_bryn.name': 'Loremomadre Bryn',
-  'entities.npcs.loremother_bryn.title': 'Voce del Santuario',
-  'entities.npcs.mender_saul.greeting':
-    'Ho messo più ossa in questo mese che in dieci anni passati a riparare cadute di pesca. Le pause non lasciano molto di quello che prendono. Torna da me intero, se riesci a farcela.',
-  'entities.npcs.mender_saul.name': 'Riparatore Saulo',
-  'entities.npcs.mender_saul.title': 'Chirurgo sul campo',
-  'entities.npcs.mother_sedge.greeting':
-    'I salici mi hanno detto che saresti arrivato prima che i tuoi stivali lasciassero il ponte.',
-  'entities.npcs.mother_sedge.name': 'Madre Carice',
-  'entities.npcs.mother_sedge.title': 'Strega delle Paludi di Willowweep',
-  'entities.npcs.netter_maris.greeting':
-    'Lo senti? Anguilla affumicata. Metà di questa città poggia su palafitte che ho comprato con quella.',
-  'entities.npcs.netter_maris.name': 'Tradotto: Netter Maris',
-  'entities.npcs.netter_maris.title': 'Eel-Netter di Bridgemere',
-  'entities.npcs.orchardist_pomeline.greeting':
-    'Attento a dove metti i piedi. Ogni radice di questi filari è più antica della città, e loro ricordano.',
-  'entities.npcs.orchardist_pomeline.name': 'Frutticoltore Pomeline',
-  'entities.npcs.orchardist_pomeline.title': 'Custode delle File Dorate',
-  'entities.npcs.pearlmother_isha.greeting':
-    'Il mare dà, la sabbia trattiene e la giungla prende. Resta sulla spiaggia, straniero.',
-  'entities.npcs.pearlmother_isha.name': 'Madre Perla Isha',
-  'entities.npcs.pearlmother_isha.title': 'Anziano dei Tuffatori',
-  'entities.npcs.provisioner_fenna.greeting':
-    "Pane ancora caldo, acqua ancora dolce. Il Vuoto provvede, e anch'io.",
-  'entities.npcs.provisioner_fenna.name': 'Approvvigionatrice Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Approvvigionatore del Barlume Antico',
-  'entities.npcs.quartermaster_edda.greeting':
-    "Acciaio e sale, {className}, è tutto ciò che mi resta da distribuire. Prendilo e fai in modo che le pause rimpiangano l'apertura dove avrei potuto raggiungerle.",
-  'entities.npcs.quartermaster_edda.name': 'Quartiermastro Edda',
-  'entities.npcs.quartermaster_edda.title': 'Armaiolo della Ridotta',
-  'entities.npcs.quartermaster_sela.greeting':
-    'Ogni cassa in questo cortile ha attraversato quaranta miglia di cenere per arrivare qui. Trattateli gentilmente.',
-  'entities.npcs.quartermaster_sela.name': 'Quartiermastro Sela',
-  'entities.npcs.quartermaster_sela.title': 'Custode dei magazzini della guarnigione',
-  'entities.npcs.reeve_ottoline.greeting':
-    'Benvenuti a Lanternmere, dove il raccolto non finisce mai e nemmeno il lavoro.',
-  'entities.npcs.reeve_ottoline.name': 'Tradotto: Reeve Ottoline',
-  'entities.npcs.reeve_ottoline.title': 'Reeve di Lanternmere',
-  'entities.npcs.riftwatch_ollun.greeting':
-    "Ogni pausa canta prima di aprirsi, se ne hai l'orecchio. Ne sento tre che si muovono sull'isola in questo momento, e uno di loro è vicino.",
-  'entities.npcs.riftwatch_ollun.name': 'Tradotto: Riftwatch Ollun',
-  'entities.npcs.riftwatch_ollun.title': 'Studioso della Breccia',
-  'entities.npcs.salvage_boss_ryna.greeting':
-    'Un {className} con le braccia funzionanti, bene. La linea del relitto paga bene, se i granchi ti lasciano abbastanza dita per contarla.',
-  'entities.npcs.salvage_boss_ryna.name': 'Boss del salvataggio Ryna',
-  'entities.npcs.salvage_boss_ryna.title': 'Signora della Linea del Relitto',
-  'entities.npcs.salvager_edda.greeting':
-    'Relitti, corde e carico di morti. Il mare paga il mio salario, quando il Guardiano lo permette.',
-  'entities.npcs.salvager_edda.name': 'Salvatore Edda',
-  'entities.npcs.salvager_edda.title': 'Recuperatore di rottami',
-  'entities.npcs.scout_einna.greeting':
-    'Hai attraversato il passo vivo. Bene. Icemantle dovrebbe venirne a conoscenza.',
-  'entities.npcs.scout_einna.name': 'Esploratore Einna',
-  'entities.npcs.scout_einna.title': 'Esploratore della linea di neve',
-  'entities.npcs.scout_yerrin.greeting':
-    'Stai basso. Il suono si propaga in modo strano dal vetro, e il cancello sottostante ha le orecchie.',
-  'entities.npcs.scout_yerrin.name': 'Esploratore Yerrin',
-  'entities.npcs.scout_yerrin.title': 'Guardiano delle Dune Lontane',
-  'entities.npcs.sexton_marrow.greeting':
-    'Li seppelliamo qui in profondità e suoniamo le campane affinché si ricordino di restare giù.',
-  'entities.npcs.sexton_marrow.name': 'Sagrestano Midollo',
-  'entities.npcs.sexton_marrow.title': 'Sagrestano di Gallowmere',
-  'entities.npcs.strandwatcher_pell.greeting':
-    'Finalmente fuori dagli alberi neri. Respira, straniero, il sole tiene di qua dal passo.',
-  'entities.npcs.strandwatcher_pell.name': 'Osservatore di filo Pell',
-  'entities.npcs.strandwatcher_pell.title': 'Guardiano di Bocca Groviglio',
-  'entities.npcs.trapper_brosk.greeting':
-    "Fen ha preso tre delle mie battute questa settimana. Fen non ha mai preso posizione in vent'anni.",
-  'entities.npcs.trapper_brosk.name': 'Tradotto: Trapper Brosk',
-  'entities.npcs.trapper_brosk.title': 'Cacciatore di Shiverfen',
-  'entities.npcs.vicar_creel.greeting':
-    'La cappella crollò anni fa. I morti sotto non se ne accorsero, e così rimasi.',
-  'entities.npcs.vicar_creel.name': 'Vicario Creel',
-  'entities.npcs.vicar_creel.title': 'Ultimo Vicario della Pietra Mortale',
-  'entities.npcs.warden_coalfast.greeting':
-    'Alle pause non importa che Gullhaven sia piccola, {className}. Teniamo questa sponda, altrimenti non ci sarà più alcuna sponda da difendere. Stai con noi e non lo dimenticherò.',
-  'entities.npcs.warden_coalfast.name': 'Guardiano Carbonefast',
-  'entities.npcs.warden_coalfast.title': 'Comandante della Ridotta',
-  'entities.npcs.warden_kaldra.greeting':
-    'Attento alle panchine, straniero. La neve mantiene ciò che serve.',
-  'entities.npcs.warden_kaldra.name': 'Guardiano Kaldra',
-  'entities.npcs.warden_kaldra.title': 'Guardiano del Manto di Ghiaccio',
-  'entities.npcs.wardsmith_orun.greeting':
-    "Queste fucine si sono raffreddate secoli fa, {className}, ma il loro lavoro è ancora all'avanguardia.",
-  'entities.npcs.wardsmith_orun.name': 'Fabbro Orun',
-  'entities.npcs.wardsmith_orun.title': 'Custode delle Vecchie Forge',
-  'entities.npcs.watcher_maren.greeting':
-    'Fai attenzione a dove metti i piedi oltre il cancello. La fine qui richiede prima i cappelli e mai le domande.',
-  'entities.npcs.watcher_maren.name': 'Osservatrice Maren',
-  'entities.npcs.watcher_maren.title': "L'orologio Windway",
-  'entities.npcs.waykeeper_pell.greeting':
-    'Giù per le scale e nella dolce campagna. Fai attenzione a dove pianti gli stivali.',
-  'entities.npcs.waykeeper_pell.name': 'Guardiano Pell',
-  'entities.npcs.waykeeper_pell.title': 'Custode della Scalinata di Amberfen',
-  'entities.npcs.waywatcher_sorrel.greeting':
-    'Neve dietro di te, oro davanti. Pochi percorrono il Goldmelt due volte, quindi fai in modo che la traversata conti.',
-  'entities.npcs.waywatcher_sorrel.name': 'Sorrel Guardiana della Via',
-  'entities.npcs.waywatcher_sorrel.title': "Guardiano della Fusione dell'Oro",
-  'entities.npcs.weaver_amelle.greeting':
-    'Lo senti? Il vello della luna sul telaio. Più caldo di qualsiasi fuoco accanto al quale ti sei seduto.',
-  'entities.npcs.weaver_amelle.name': 'Tessitrice Amelle',
-  'entities.npcs.weaver_amelle.title': 'Tessitore di Vello Lunare',
-  'entities.npcs.wickmother_sorrel.greeting':
-    "Entrate, sedetevi, c'è il cordiale sul fuoco. Tieni solo le mani su qualsiasi cosa di ferro: gli gnomi ultimamente hanno le dita leggere.",
-  'entities.npcs.wickmother_sorrel.name': 'Malvagia Acetosa',
-  'entities.npcs.wickmother_sorrel.title': 'Custode della locanda Hedgewick',
-  'entities.npcs.widow_tansy.greeting':
-    'Una candela per ogni tomba, e nessuna si spegne. Nemmeno uno, mi senti?',
-  'entities.npcs.widow_tansy.name': 'Vedova Tanaceto',
-  'entities.npcs.widow_tansy.title': 'Candeliere di Gallowmere',
-  'entities.quests.q_af_amber_from_the_herd.completion':
-    "Sei grumi, puliti come miele versato. Questi guanti sono cuciti con l'ultimo lotto, {playerName}: irrigiditi e più caldi di quanto sembri.",
-  'entities.quests.q_af_amber_from_the_herd.objectives.0.label': 'Coagulo di linfa dorato',
-  'entities.quests.q_af_amber_from_the_herd.text':
-    "Sotto i miei alberi più vecchi dormono i cervi dorati, e tutta la notte la linfa gocciola oro nei loro manti. I suoi grumi pettinati sono l'ambra più pura del regno. Portamene sei, {playerName}. I cervi non vi ringrazieranno, ma non ne sentiranno la mancanza.",
-  'entities.quests.q_af_amber_from_the_herd.title': 'Ambra dalla Mandria',
-  'entities.quests.q_af_foxes_in_the_lamplight.completion':
-    'Dieci e i negozi sono rimasti intatti ieri sera per la prima volta in questa stagione. I lampionai ti ringraziano, {playerName}.',
-  'entities.quests.q_af_foxes_in_the_lamplight.objectives.0.label': 'Volpe fosca uccisa',
-  'entities.quests.q_af_foxes_in_the_lamplight.text':
-    'Le volpi tenebrose hanno imparato quanto valgono i negozi di lanterne, {playerName}. Ogni crepuscolo scavalcano le recinzioni e portano via il sego che pressiamo per le lampade del traghetto. Zampe morbide, coscienza più morbida. Selezionane dieci e gli altri si ricorderanno di temere la città.',
-  'entities.quests.q_af_foxes_in_the_lamplight.title': 'Volpi alla luce della lampada',
-  'entities.quests.q_af_goldmelt_road.completion':
-    'Tranquillità sul Goldmelt, e un viaggiatore con la neve tra i capelli a dimostrarlo. Sorrel vigila troppo bene per mandare parole inutili. Sii il benvenuto a Lanternmere, {playerName}. Le lanterne bruciano per te.',
-  'entities.quests.q_af_goldmelt_road.objectives.0.label': 'Fai rapporto a Reeve Ottoline',
-  'entities.quests.q_af_goldmelt_road.text':
-    "Sei arrivato dal Goldmelt, {playerName}, con la neve ancora sui tuoi stivali. Tengo questo santuario in modo che Lanternmere sappia chi entra dal freddo, e ultimamente ho avuto poco da riferire. Prendi la strada dell'oro fino alla città, trova Reeve Ottoline vicino al pozzo e dille che il passo è tranquillo.",
-  'entities.quests.q_af_goldmelt_road.title': "La Via dell'Oro",
-  'entities.quests.q_af_lanterns_on_the_water.completion':
-    "Tutti e tre e continuano a bruciare. Le lanterne dei traghetti non si spengono nell'acqua, {playerName}. Questo è il loro punto. Ciò che mi preoccupa è ciò che li ha liberati.",
-  'entities.quests.q_af_lanterns_on_the_water.objectives.0.label':
-    'Lanterna del traghetto recuperata',
-  'entities.quests.q_af_lanterns_on_the_water.text':
-    "Ogni traghetto sulla Mera ha una lanterna di poppa, {playerName}, e tre delle mie barche sono tornate all'alba senza la loro. Li ha presi la nebbia, o qualcosa nella nebbia. Si riversano lungo la sponda orientale quando il vento cambia. Percorri la strada costiera e porta a casa le mie lanterne.",
-  'entities.quests.q_af_lanterns_on_the_water.title': "Lanterne sull'acqua",
-  'entities.quests.q_af_orchard_call.completion':
-    "La Reeve conta i suoi carri, vero? Bene, può contare che mancano ancora per un po'. Guarda le mie righe, {playerName}. Ho problemi più grandi di una consegna in ritardo.",
-  'entities.quests.q_af_orchard_call.objectives.0.label': 'Trova il frutticoltore Pomeline',
-  'entities.quests.q_af_orchard_call.text':
-    "La frutticoltrice Pomeline mantiene il Frutteto Dorato sulla strada ovest, e i suoi carri di linfa sono in ritardo di tre giorni. L'intera città funziona con quella linfa ambrata, {playerName}: resina per lampade, dolcificante, birra del raccolto. Percorri la strada ad ovest e scopri cosa la trattiene.",
-  'entities.quests.q_af_orchard_call.title': 'Un carro per il frutteto',
-  'entities.quests.q_af_sprites_and_spigots.completion':
-    'Quattro secchi di nuovo sui ganci e le file si calmano. Con gli sprite hai le mani più pesanti delle mie, {playerName}, e oggi ne sono felice.',
-  'entities.quests.q_af_sprites_and_spigots.objectives.0.label':
-    'Il Folletto del Raccolto è stato scacciato',
-  'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Recuperata la benna Sap-Tap',
-  'entities.quests.q_af_sprites_and_spigots.text':
-    "Raccogli gli sprite, {playerName}. Strappano i miei rubinetti dai tronchi per la dolcezza che c'è dentro e lanciano i secchi nell'erba. Scaccia otto ladruncoli e riporta quattro dei miei secchi, e i carri riprendono a girare.",
-  'entities.quests.q_af_sprites_and_spigots.title': 'Folletti e rubinetti',
-  'entities.quests.q_af_the_meredark.completion':
-    "La nebbia si è sollevata dal Mere stamattina, {playerName}, e l'intera città l'ha vista. I traghetti faranno di nuovo la traversata notturna e ogni lanterna sull'acqua arderà nel tuo nome. Prendi questo: è stato dragato dal molo sommerso, e nessuno ha più diritto di indossarlo.",
-  'entities.quests.q_af_the_meredark.objectives.0.label': 'Il Meredark ucciso',
-  'entities.quests.q_af_the_meredark.text':
-    "I vecchi traghettatori hanno un nome che dicono solo a terra: il Meredark, il primo lurker, vecchio come il lago e due volte più paziente. Si è sollevata già una volta, l'anno in cui il molo sommerso è affondato, e si sta sollevando adesso. Al crepuscolo prende il sole sulle rovine del molo al largo della costa meridionale, {playerName}. Prendi un amico, prendine due e finiscilo finché è ancora possibile finirlo.",
-  'entities.quests.q_af_the_meredark.title': 'Il Meredoscuro',
-  'entities.quests.q_af_what_took_the_moorings.completion':
-    'Otto forme in meno nelle secche, e oggi la traversata è avvenuta in orario per la prima volta in due settimane. Ma i lurker audaci sono motivati, {playerName}. Qualcosa sotto il Mare li sta muovendo.',
-  'entities.quests.q_af_what_took_the_moorings.objectives.0.label': 'Semplice Lurker ucciso',
-  'entities.quests.q_af_what_took_the_moorings.text':
-    "Ora ti dirò quello che non ho detto davanti al paese. Gli ormeggi non sono stati allentati, sono stati morsicati. Semplici agguati, ogni notte più audaci, che trascinano le corde e i timoni. Rimettine otto sott'acqua per sempre, {playerName}, prima che un traghettatore se ne vada con loro.",
-  'entities.quests.q_af_what_took_the_moorings.title': 'Cosa ha preso gli ormeggi',
-  'entities.quests.q_calming_the_deep.completion':
-    'Hai fatto ciò che non potevo sopportare. I raccoglitori cantano ancora negli anelli del sud; grazie a te continueranno a cantare.',
-  'entities.quests.q_calming_the_deep.objectives.0.label': 'Sporeling corrotto sepolto',
-  'entities.quests.q_calming_the_deep.text':
-    'Gli sporeling del Profondo Scintillante erano un popolo gentile prima che la lacrima toccasse i loro anelli. Ciò che la corruzione prende, non lo restituisce. Concedi riposo ai corrotti, {playerName}: dieci di loro, a nord degli Abissi.',
-  'entities.quests.q_calming_the_deep.title': 'Calmare gli abissi',
-  'entities.quests.q_dk_ash_on_the_wind.completion':
-    'Dieci lame in meno tra le dune, e ieri notte i fuochi di adunata ardevano più bassi. Le mie sentinelle dormivano, cosa che non facevano da una settimana. Bel taglio, {playerName}.',
-  'entities.quests.q_dk_ash_on_the_wind.objectives.0.label': 'Predatore di Osso di Cenere ucciso',
-  'entities.quests.q_dk_ash_on_the_wind.text':
-    'Guarda a sud oltre la palizzata, {playerName}. Quei fuochi tra le dune non sono fuochi dei troll, sono adunate di ossa di cenere, e ogni notte ce ne sono altri. I morti escono dai campi di ossa con la sabbia ancora tra i denti. Abbatti dieci predoni prima che tagliano la strada fino al mio cancello.',
-  'entities.quests.q_dk_ash_on_the_wind.title': 'Cenere nel vento',
-  'entities.quests.q_dk_banners_over_the_dunes.completion':
-    'Tre stendardi che sventolano nel vento caldo, proprio dove il mio bicchiere può trovarli. Con cinque evocatori di guerra messi a tacere, qualunque risposta alla loro chiamata arriverà più lentamente. Ci hai fatto guadagnare tempo, {playerName}.',
-  'entities.quests.q_dk_banners_over_the_dunes.objectives.0.label':
-    'Invocatore di Osso di Cenere ucciso',
-  'entities.quests.q_dk_banners_over_the_dunes.objectives.1.label':
-    'Striscione di avvertimento piantato',
-  'entities.quests.q_dk_banners_over_the_dunes.text':
-    "L'adunata di Ashbone presso le vecchie tombe di Bonefield, {playerName}, e le mie pattuglie non riescono a leggere le dune come leggono un muro. Uccidi cinque dei loro evocatori di guerra, quelli che urlano i morti in posizione eretta, e pianta uno stendardo di avvertimento su ogni punto di raccolta in modo che le mie sentinelle possano segnalarlo dal crinale.",
-  'entities.quests.q_dk_banners_over_the_dunes.title': 'Stendardi sopra le Dune',
-  'entities.quests.q_dk_marrow_and_ash.completion':
-    'Sei marchi e un marchio impresso su ciascuno di essi. Questa non è una raccolta di raid, {playerName}. Ogni ospite tra le dune risponde al portale sotto di noi, i troll lo chiamano Orkadia, e nessun soldato con cui abbia mai prestato servizio potrebbe rompere i tamburi dietro quella porta. Forse cinque come te.',
-  'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'Marchio di Guerra di Ashbone',
-  'entities.quests.q_dk_marrow_and_ash.text':
-    "Ogni predone di Ashbone porta un marchio di guerra, {playerName}: un conteggio bruciacchiato dell'esercito sotto cui marcia. Ho contato quattro ospiti da questa cresta, ma le supposizioni non sono informazioni. Portami sei marchi dai predoni e dai loro evocatori di guerra, e darò a Brannoc la forma della guerra che sta arrivando.",
-  'entities.quests.q_dk_marrow_and_ash.title': 'Midollo e Cenere',
-  'entities.quests.q_dk_matriarch_of_the_maw.completion':
-    "Il cielo sopra Fauci del Draco è vuoto da due giorni, e ora varchi il mio cancello con il sangue di una matriarca sugli stivali. Wyrmwatch è stato di guardia proprio per questo per quarant'anni, {playerName}. Prendi questi spallacci, scaglie di mascelle, lavorati dal nostro fabbro. Indossali dove i draghi possono vedere.",
-  'entities.quests.q_dk_matriarch_of_the_maw.objectives.0.label':
-    'Cindraleth la Matriarca delle Fauci uccisa',
-  'entities.quests.q_dk_matriarch_of_the_maw.text':
-    "La bilancia diceva che era vero, {playerName}. Ho scalato il bordo all'alba e l'ho vista sul fondo del cratere: Cindraleth, la matriarca sotto la quale ogni braciere in questo cielo è stata covata, dorata come un carbone sul punto di catturare. Mentre lei rimugina, i draghi diventano più audaci e Wyrmwatch non può combattere sia i draghi che l'osso di cenere. Uccidila nel suo cratere, poi riferiscilo al Capitano Brannoc. Non andare da solo.",
-  'entities.quests.q_dk_matriarch_of_the_maw.title': 'Matriarca delle Fauci',
-  'entities.quests.q_dk_scales_of_the_maw.completion':
-    'Guarda la parte inferiore di questo, {playerName}: bruciato a spirale e solo una cosa si annida nei cerchi. Questi draghi sono guardiani della covata. Qualcosa nelle Fauci del Draco è una madre.',
-  'entities.quests.q_dk_scales_of_the_maw.objectives.0.label': 'Scaglia di Alabrace',
-  'entities.quests.q_dk_scales_of_the_maw.text':
-    'Quando il vento spegne le Fauci del Draco, i draghi Alabrace lo cavalcano sopra il mio accampamento abbastanza in basso da poter contare i loro denti, {playerName}. Ogni giorno si spingono più lontano e qualcosa in quel cratere li spinge. Portami tre delle loro scaglie. Le squame ricordano il calore e posso leggere dove un maschio si è appollaiato vicino al fuoco.',
-  'entities.quests.q_dk_scales_of_the_maw.title': 'Scaglie delle Fauci',
-  'entities.quests.q_dk_scorched_stores.completion':
-    "Nero bruciato e ogni serratura è ancora salda. Il fabbro prende i chiodi, l'arciere le corde, e tu prendi gli stivali che stavo conservando per chiunque abbia riportato indietro le mie casse, {playerName}.",
-  'entities.quests.q_dk_scorched_stores.objectives.0.label':
-    'Recuperata la cassa di rifornimenti bruciata',
-  'entities.quests.q_dk_scorched_stores.text':
-    "L'ultimo carro è bruciato, {playerName}, ma le casse con cinghie di ferro non bruciano. Quattro di loro giacciono ancora bruciati lungo la strada tra le dune, con dentro una stagione di sale, chiodi e corde d'arco. Porta i miei negozi a casa prima che i troll capiscano come aprirli.",
-  'entities.quests.q_dk_scorched_stores.title': 'Negozi bruciati',
-  'entities.quests.q_dk_trolls_on_the_road.completion':
-    'Otto, e i miei autisti hanno smesso di scrivere lettere di addio prima di ogni corsa. La guarnigione mangia per colpa tua, {playerName}.',
-  'entities.quests.q_dk_trolls_on_the_road.objectives.0.label': 'Troll delle Dune ucciso',
-  'entities.quests.q_dk_trolls_on_the_road.text':
-    "I troll delle dune hanno appreso il suono di un carro di rifornimenti, {playerName}. Hanno percorso la strada di Cinder Dunes tre volte questo mese, e l'ultimo conducente è entrato portando solo le redini. Otto troll fuori da quella strada e i miei carri ripartono.",
-  'entities.quests.q_dk_trolls_on_the_road.title': 'Troll sulla strada',
-  'entities.quests.q_dk_watcher_at_the_wargate.completion':
-    "Ti ha mandato Brannoc? Poi il mio ultimo corridore non ce l'ha mai fatta. Abbassa la voce e siediti, {playerName}. Vedi quel cancello qui sotto? Conta le bandiere di guerra che ci sono davanti e capirai perché ho smesso di scrivere.",
-  'entities.quests.q_dk_watcher_at_the_wargate.objectives.0.label': "Trova l'esploratore Yerrin",
-  'entities.quests.q_dk_watcher_at_the_wargate.text':
-    "Qualcosa sta trascinando il frassino verso est, {playerName}, e ho fatto del mio meglio per scoprire cosa. L'esploratore Yerrin è accampato da un mese tra le dune lontane oltre Trollmoot, in vista di un cancello che nessuno ha costruito in vita mia. I suoi rapporti si sono fermati dieci giorni fa. Trova il suo accampamento e procurami i suoi occhi.",
-  'entities.quests.q_dk_watcher_at_the_wargate.title': "L'Osservatore al Wargate",
-  'entities.quests.q_eg_bloom_clippings.completion':
-    'Guarda qui: le foglie si arricciano su se stesse, ogni ritaglio è uguale. Il giardino ha paura, {playerName}. In cento anni non ho mai avuto paura.',
-  'entities.quests.q_eg_bloom_clippings.objectives.0.label': 'Ritaglio di fiori potati',
-  'entities.quests.q_eg_bloom_clippings.text':
-    'Vuoi capire questo giardino? Allora leggilo come lo faccio io. I cervi che pascolano i prati crescono del verde più vero: ogni foglia su di loro è una pagina. Portami sei ritagli freschi di cervo topiario, {playerName}. Non ti ringrazieranno per la potatura, ma ricresceranno. Tutto qui ricresce.',
-  'entities.quests.q_eg_bloom_clippings.title': 'Ritagli dal Living Green',
-  'entities.quests.q_eg_bull_of_the_court.completion':
-    "L'ho sentito, qui, quando si è staccato. Cento anni di lavoro e hai fatto bene a finirlo. Prendi questo mantello: l'ho tagliato per chi si è dimostrato più forte del mio meglio. La corte è solo una fontana stasera, {playerName}, e il giardino è solo un giardino. Forse ora io e il capo giardiniere possiamo dormire entrambi.",
-  'entities.quests.q_eg_bull_of_the_court.objectives.0.label': 'Il topiario disfatto',
-  'entities.quests.q_eg_bull_of_the_court.text':
-    "Ora la verità, {playerName}. Il toro al centro del labirinto è stato il mio capolavoro: l'ho plasmato affinché custodisse la Corte della Fontana, e per cento anni lo ha fatto. Ma la paura nel verde lo ha raggiunto, e ormai non custodisce nulla, va a caccia. Il labirinto nutre chiunque vi entri. Sono troppo vecchio per disfarlo, e deve essere disfacimento, radice e ramo. Porta un amico, percorri il labirinto fino al campo e abbatti il ​​mio toro.",
-  'entities.quests.q_eg_bull_of_the_court.title': 'Il Toro del Cortile della Fontana',
-  'entities.quests.q_eg_four_statues.completion':
-    'Quattro sfregamenti, quattro sorelle, e nessuna di loro piangeva marmo. Il giardino ha preso le tue misure, {playerName}, e non ti ha trovato carente. Ora posso mandarti dove vivono veramente i problemi.',
-  'entities.quests.q_eg_four_statues.objectives.0.label': 'Statua del giardino visitata',
-  'entities.quests.q_eg_four_statues.text':
-    'Quando il giardino era giovane, i primi giardinieri allevarono quattro sorelle di marmo per sorvegliarne gli alloggi: una sopra le rose selvatiche, una sul sentiero dello stagno a est del labirinto, una sul prato ovest dove gli gnomi tengono il loro labirinto, e una sul prato sud oltre le siepi. Il labirinto si è sviluppato tra di loro e la maggior parte della gente non li vede mai tutti e quattro. Percorri i quartieri, {playerName}, e premi il palmo della mano su ciascuna sorella. Quando il giardino ti avrà osservato da tutti e quattro i lati, aprirà i luoghi che nasconde agli estranei.',
-  'entities.quests.q_eg_four_statues.title': 'Le quattro sorelle silenziose',
-  'entities.quests.q_eg_gate_report.completion':
-    'Si sono commossi, vero? Pell lo riferisce ogni settimana, e ogni settimana ha ragione. Perdona i miei occhi, {playerName}, non dormo una notte intera da anni: qualcuno deve pur guardare il giardino e guardarci. Benvenuti a Hedgewick.',
-  'entities.quests.q_eg_gate_report.objectives.0.label':
-    'Fai rapporto al capo giardiniere Amaranto',
-  'entities.quests.q_eg_gate_report.text':
-    'I prati oltre questo cancello si sono tagliati da soli per cento anni, {playerName}, e ultimamente hanno iniziato a tagliare i visitatori. Il capo giardiniere Amaranth tiene i libri contabili a Hedgewick, lungo la strada oltre i prati del cancello. Dille che è passato un altro viaggiatore e dille che le siepi vicino al cancello si sono spostate ieri notte.',
-  'entities.quests.q_eg_gate_report.title': 'Parola attraverso il cancello',
-  'entities.quests.q_eg_gnomes_in_the_green.completion':
-    'Tre carri indietro e i pioli di nuovo pieni. Lasciate che i diavoletti tengano il broncio nelle loro siepi: anche Hedgewick lavora questi prati.',
-  'entities.quests.q_eg_gnomes_in_the_green.objectives.0.label': 'Lo Gnomo della Siepe fugge',
-  'entities.quests.q_eg_gnomes_in_the_green.objectives.1.label':
-    'Carrello portautensili recuperato',
-  'entities.quests.q_eg_gnomes_in_the_green.text':
-    "Le cesoie sono state solo l'inizio, {playerName}. La scorsa notte gli gnomi hanno rovesciato i nostri carri degli attrezzi nel verde, uno fuori dal loro labirinto a ovest del labirinto, uno dall'altra parte del giardino sul vialetto del laghetto, e hanno sparso cent'anni di buon ferro nell'erba. Scaccia otto diavoletti e trasporta a casa i carri rovesciati.",
-  'entities.quests.q_eg_gnomes_in_the_green.title': 'Il rancore dei giardinieri',
-  'entities.quests.q_eg_hungry_shapes.completion':
-    'Dieci mucchi di ritagli dove stavano dieci lupi. Dovrebbe sembrare come fare giardinaggio, {playerName}. Perché sembra una guerra?',
-  'entities.quests.q_eg_hungry_shapes.objectives.0.label': 'Lupo Topiario ucciso',
-  'entities.quests.q_eg_hungry_shapes.text':
-    "Chiunque abbia modellato questo giardino è diventato negligente o crudele. Le forme di lupo nelle Rose Wilds sono state ritagliate per spettacolo, ma ultimamente cacciano: mascelle verdi, senza pancia e nessun motivo per fermarsi. Abbatti dieci lupi arte topiaria, {playerName}, e lascia che i prati siano di nuovo prati per un po'.",
-  'entities.quests.q_eg_hungry_shapes.title': 'Ridotto alla Fame',
-  'entities.quests.q_eg_stolen_shears.completion':
-    'Sei paia, e tra queste anche la mia, riconoscerei ovunque la scheggiatura nella lama. Qui questi guanti sono stati lavorati a maglia per i lavori di potatura. Le mani calde rendono le cesoie stabili.',
-  'entities.quests.q_eg_stolen_shears.objectives.0.label': 'Cesoie Hedgewick rubate',
-  'entities.quests.q_eg_stolen_shears.text':
-    "Ogni paio di cesoie di Hedgewick se n'è andato in due settimane, {playerName}: fuori dai picchetti, fuori dai capanni chiusi, un paio fuori dal mio grembiule mentre sonnecchiavo. Sono gli gnomi delle siepi, i piccoli custodi del giardino che ci odiano mentre camminiamo nei loro prati. Riprendine sei paia prima che l'intero villaggio sia ridotto ai coltelli da cucina.",
-  'entities.quests.q_eg_stolen_shears.title': 'Le cesoie rubate',
-  'entities.quests.q_eg_who_trims_the_hedges.completion':
-    "Quindi finalmente la casa ha mandato qualcuno. Ho camminato per cento anni su questi prati, {playerName}, e in questo giardino e ho un accordo: poto ciò che chiede di essere potato. Sedersi. Le siepi possono risparmiarti un'ora.",
-  'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label':
-    'Trova il giardiniere presso il Bacino dei Gigli',
-  'entities.quests.q_eg_who_trims_the_hedges.text':
-    "Ho tenuto i registri per trent'anni, {playerName}, e per dieci di essi non ho dormito bene, perché i conti non si chiudevano. L'erba vuole essere tagliata e le siepi vogliono essere modellate, e nessuno qui lo fa, eppure ogni alba il giardino è tagliato. Ultimamente i boscaioli giurano di aver visto un vecchio con un carretto sui prati dell'estremo sud, oltre il labirinto vicino al Bacino dei Gigli. Trovalo. Se è reale, finalmente posso dormire. Se non lo è, suppongo che non lo farò mai.",
-  'entities.quests.q_eg_who_trims_the_hedges.title': 'Chi taglia le siepi',
-  'entities.quests.q_fs_bell_at_the_landing.completion':
-    "La strada rialzata regge e Tam ha ancora abbastanza fiato per scherzare sul pedaggio tre. Bene. Siamo un'isola sotto assedio, {playerName}, e ogni coppia di mani che attraversa quel banco di sabbia è una coppia che le brecce devono superare prima che raggiungano la mia gente. Benvenuti a Gullhaven.",
-  'entities.quests.q_fs_bell_at_the_landing.objectives.0.label':
-    'Fai rapporto al Direttore Coalfast',
-  'entities.quests.q_fs_bell_at_the_landing.text':
-    "Sei venuto dal Ferrywalk, {playerName}? Allora sarai il primo tra una settimana e il Direttore vorrà esaminarti. Gullhaven si trova sulla strada costiera, oltre gli stendini a cui nessuno tende più. Di' al direttore Coalfast che la strada rialzata è ancora in piedi e che Tam non ha suonato il tre oggi. Ancora.",
-  'entities.quests.q_fs_bell_at_the_landing.title': 'La campana del pianerottolo',
-  'entities.quests.q_fs_bram_come_home.completion':
-    "Bram! Me lo hai riportato intero, {playerName}. Abbiamo pianto entrambi e nessuno dei due si vergogna. Qualunque siano le prossime pause che prenderanno da quest'isola, non prenderanno la mia famiglia. Non più.",
-  'entities.quests.q_fs_bram_come_home.objectives.0.label':
-    'Fisher Bram visto sano e salvo a casa a Gullhaven',
-  'entities.quests.q_fs_bram_come_home.text':
-    "Il mio Bram prese la barca la mattina in cui le reti si aprirono e il mare lo respinse da qualche parte oltre il punto di approdo. L'ho sentito tre notti fa, {playerName}, chiamare dall'acqua, ed avevo troppa paura per andare. Ho ancora troppa paura. Per favore. La sua barca giace naufragata sulla sponda nord. Accompagnalo a casa da me.",
-  'entities.quests.q_fs_bram_come_home.title': 'Bram Torna a casa',
-  'entities.quests.q_fs_hold_the_riftfields.completion':
-    'Dieci in meno e gli operai stanno già discutendo su chi uscirà per primo. Non durerà, le pause non riposano mai a lungo, ma una città che mangia è una città che tiene.',
-  'entities.quests.q_fs_hold_the_riftfields.objectives.0.label': 'Disgraziato della Breccia ucciso',
-  'entities.quests.q_fs_hold_the_riftfields.text':
-    'A est della città i filari di grano sono andati in frantumi, e i disgraziati che sono passati attraverso i Riftfields ora li spolpano. La mia gente non può prendersi cura di un campo in cui non può stare, {playerName}. Elimina dieci disgraziati e restituisci ai contadini la loro terra.',
-  'entities.quests.q_fs_hold_the_riftfields.title': 'Tieni i Riftfield',
-  'entities.quests.q_fs_moss_and_mending.completion':
-    "Il muschio in una mano e una costa più tranquilla nell'altra. Hai rifornito l'intero intervento chirurgico, {playerName}. Fammi la gentilezza di non diventare il mio prossimo paziente.",
-  'entities.quests.q_fs_moss_and_mending.objectives.0.label': 'Progenie del Varco ucciso',
-  'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Muschio salato della costa lontana',
-  'entities.quests.q_fs_moss_and_mending.text':
-    'Il muschio salato che cresce lungo la linea della marea è il miglior medicamento che conosco, e i Riftspawn hanno conquistato ogni tratto di costa su cui cresce. Ne portano ciuffi impigliati nella pelle, tra tutte le cose. Eliminane sei dai tratti orientali, {playerName}, e tirami fuori quattro belle manciate di muschio da ciò che hanno calpestato.',
-  'entities.quests.q_fs_moss_and_mending.title': 'Muschio e Riparazione',
-  'entities.quests.q_fs_song_before_the_break.completion':
-    'Ti ha mandato il Direttore? Bene. Ciò significa che la città ha finalmente iniziato ad ascoltare. Adesso fermati un attimo, {playerName}. Là, sotto il vento, lo senti? Le scogliere cantano e non mi piace la melodia.',
-  'entities.quests.q_fs_song_before_the_break.objectives.0.label':
-    'Trova la Guardia Spaccatura Ollun',
-  'entities.quests.q_fs_song_before_the_break.text':
-    "C'è un uomo che sente le rotture prima che si aprano. Riftwatch Ollun: uno studioso o un pazzo, e ultimamente non posso permettermi la differenza. Veglia al Watch Meadow, lungo la strada a sud-est della città. Trovalo, {playerName}, e chiedigli cosa sta per farci l'isola dopo.",
-  'entities.quests.q_fs_song_before_the_break.title': 'La canzone prima della pausa',
-  'entities.quests.q_fs_stalkers_off_the_light.completion':
-    "Otto notti di giri in cerchio, finite in una. I fuochi bruciano già in modo più costante, o forse sono solo le mie mani. In ogni caso il prato è di nuovo mio e posso sentire l'isola pensare.",
-  'entities.quests.q_fs_stalkers_off_the_light.objectives.0.label': 'Inseguitore del Vuoto ucciso',
-  'entities.quests.q_fs_stalkers_off_the_light.text':
-    "Gli stalker cacciano nell'oscurità tra i fuochi di guardia, e ogni notte circondano il mio prato un po' più da vicino. Non sono stupidi, {playerName}, sono pazienti e la pazienza è l'unica cosa a cui non riesco a resistere. Uccidine otto e respingi l'oscurità verso le scogliere da cui �� arrivata.",
-  'entities.quests.q_fs_stalkers_off_the_light.title': 'Stalker lontani dalla Luce',
-  'entities.quests.q_fs_steel_for_the_redoubt.completion':
-    "Snocciolato dal sale e sfregiato, ma manterrà comunque un bordo. Ecco, ho rivestito queste impugnature io stesso. Acciaio per acciaio, {playerName}: è l'unico commercio che la Farshore effettua oggigiorno.",
-  'entities.quests.q_fs_steel_for_the_redoubt.objectives.0.label': 'Acciaio Sfregiato',
-  'entities.quests.q_fs_steel_for_the_redoubt.text':
-    "Ogni lama che consegno è quella che il mare mi ha restituito o che ho strappato ai morti, {playerName}. I disgraziati trasportano rottami attraverso le rotture, cardini, ganci, spade d'acciaio rotte, roba da gazza, ma il risultato è vero. Portami sei pezzi del loro acciaio recuperato e la linea della barricata riprenderà i denti.",
-  'entities.quests.q_fs_steel_for_the_redoubt.title': 'Acciaio per la Ridotta',
-  'entities.quests.q_fs_the_great_break.completion':
-    'Ollun fece sapere in anticipo: il canto si fermò. Tutta la mia città ha sentito il silenzio, {playerName}, e metà di loro ha pianto nel suono del nulla. Indossa questo mantello. La Farshore non dimentica chi ne ha tenuto la riva.',
-  'entities.quests.q_fs_the_great_break.objectives.0.label': "L'Orrore Spezzato ucciso",
-  'entities.quests.q_fs_the_great_break.text':
-    "Ogni canzone cantata da quest'isola finisce con la stessa nota bassa, e viene dalle Scogliere Sundered. Qualcosa è arrivato durante la grande svolta, {playerName}, qualcosa che le scogliere stesse hanno spalancato per ammettere, e sta ancora crescendo. Se cammina verso nord, nessuna campana avrà importanza. Prendi un amico, prendine due e finiscila. Allora dì a Coalfast che la musica è cambiata.",
-  'entities.quests.q_fs_the_great_break.title': 'La grande occasione',
-  'entities.quests.q_fs_the_three_bells.completion':
-    "Tre voci, tre risposte, trasportate pulite sull'acqua. Dormi a Gullhaven stanotte, {playerName}, e sappi che se una campana ti sveglia, sarà per mano mia e al momento giusto.",
-  'entities.quests.q_fs_the_three_bells.objectives.0.label': 'Suonò il campanello',
-  'entities.quests.q_fs_the_three_bells.text':
-    'Tre campanelli sorvegliano la costa oltre la mia: una sul punto di Approdo, una sulla spiaggia sud, una sulla riva dei Riftfields. Se una corda è marcia o un batacchio è stato portato via, la città viene a sapere della rottura quando è già nelle strade. Cammina lungo la costa, {playerName}, e suona ogni campana una volta, così saprò che ha ancora una voce.',
-  'entities.quests.q_fs_the_three_bells.title': 'Le Tre Campane',
-  'entities.quests.q_fv_aurora_motes.completion':
-    "Sei granelli, ancora luminosi. Guardali, {playerName}: pulsano a ritmo l'uno con l'altro. Le luci non sono il tempo. Sono un segnale.",
-  'entities.quests.q_fv_aurora_motes.objectives.0.label': 'Granulometria aurora',
-  'entities.quests.q_fv_aurora_motes.text':
-    "I fuochi fatui che fluttuano lungo questi gradini vengono dispersi dalle luci stesse, e ognuno porta un granello dell'aurora nel suo cuore. Me ne servono sei per leggere quello che scrive il cielo, {playerName}. I fuochi fatui non reagiscono. Che ciò renda il lavoro più facile o più difficile è una cosa tra te e la tua coscienza.",
-  'entities.quests.q_fv_aurora_motes.title': "Granelli dell'Aurora",
-  'entities.quests.q_fv_ember_caches.completion':
-    'Ancora caldi, tutti quanti. Hai regalato alla loggia un intero inverno di misericordia, {playerName}.',
-  'entities.quests.q_fv_ember_caches.objectives.0.label': 'Ember Cache recuperata',
-  'entities.quests.q_fv_ember_caches.text':
-    'Una slitta piena di braci si è rovesciata sulla strada del laghetto ieri notte: pentole di ferro che tengono vivo un fuoco per un mese. Tre di loro giacciono ancora nella neve, {playerName}, e la loggia non può risparmiare ciò che tengono. Porta il fuoco a casa.',
-  'entities.quests.q_fv_ember_caches.title': 'Braci sulla Strada del Tarn',
-  'entities.quests.q_fv_frostmane_tyrant.completion':
-    "Quando il vento è calato la notte scorsa, l'intero villaggio ha sentito il silenzio dove un tempo c'era il Frostmane. Il Reach ha un debito con te che ci vorranno anni per ripagare, {playerName}. Indossalo e ogni porta di Icemantle sarà aperta per te.",
-  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Mantogelido ucciso',
-  'entities.quests.q_fv_frostmane_tyrant.text':
-    "Gli urlatori non stavano cacciando quando scesero dalle terrazze. Stavano fuggendo. Uno yeti ha conquistato l'altura, la gente della montagna la chiama Manto Gelido, e nemmeno i branchi condividono con lui un pendio. Deve finire, {playerName}, prima che l'inverno lo spinga fino alle mie mura. Porta un amico. Portane due.",
-  'entities.quests.q_fv_frostmane_tyrant.title': 'Il Tiranno Mantogelido',
-  'entities.quests.q_fv_howl_above.completion':
-    'Otto, e per questo il coro del crepuscolo è più sottile. Ma gli urlatori non lasciano le vette per niente. Qualcosa lassù li ha mossi, e temo che abbia un nome.',
-  'entities.quests.q_fv_howl_above.objectives.0.label': 'Urlatore della Terrazza ucciso',
-  'entities.quests.q_fv_howl_above.text':
-    'Lo senti al crepuscolo, {playerName}: un ululato proveniente dalle Terrazze Ululanti che non è dovuto ai cumuli di neve. Gole più grandi. Gli urlatori della terrazza sono scesi dalle vette per la prima volta da quando mia nonna ricopriva questo incarico, e sono loro che hanno spinto i lupi sulla mia strada. Selezionane otto e respingili indietro.',
-  'entities.quests.q_fv_howl_above.title': "L'Urlo sulle Terrazze",
-  'entities.quests.q_fv_lights_over_steps.completion':
-    "ti ha mandato Kaldra? Poi finalmente è preoccupata, ed ha ragione. Siediti, {playerName}. Guarda il cielo con me per un po'.",
-  'entities.quests.q_fv_lights_over_steps.objectives.0.label': "Trova l'Aurorista Veyla",
-  'entities.quests.q_fv_lights_over_steps.text':
-    "L'aurora ha brillato verde ogni notte questo mese, e i vecchi non ci passeranno sotto. Una donna potrebbe sapere perché: Veyla, l'Aurorista. Si accampa da sola sui Gradini dell'Aurora, a sud-est oltre il laghetto. Trova il suo accampamento, {playerName}, e ascolta cosa le hanno detto le luci.",
-  'entities.quests.q_fv_lights_over_steps.title': 'Luci sopra la scalinata',
-  'entities.quests.q_fv_rime_unbound.completion':
-    "La notte sembra già più sottile. Qualunque cosa li svegli non è finita, ma hai regalato un po' di tranquillità agli Steps.",
-  'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Elementale della Brina ucciso',
-  'entities.quests.q_fv_rime_unbound.text':
-    "Quando l'aurora arde così luminosa, il freddo si alza e cammina: elementali della brina, gelo dotato di volontà. Si radunano dove le luci toccano le panchine e ogni notte si avvicinano al mio accampamento. Distruggine otto, {playerName}, prima che uno di loro rompa me.",
-  'entities.quests.q_fv_rime_unbound.title': 'Brina libera',
-  'entities.quests.q_fv_seeing_wren_home.completion':
-    'La ragazza è dentro, avvolta in metà delle mie coperte e parla alle stelle del cielo. Hai fatto una cosa gentile oggi, {playerName}. Il Reach non ne vede molti.',
-  'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
-    "L'apprendista Wren accompagnato sano e salvo ai Gradini dell'Aurora",
-  'entities.quests.q_fv_seeing_wren_home.text':
-    "Il mio apprendista Wren è uscito per percorrere la linea Goldmelt due giorni fa e non è più tornato. Ho trovato le sue tracce, è rintanata sotto i segnali stradali a sud-ovest dei Gradini Aurora, troppo spaventata dai lupi per muoversi. Non posso lasciare la palude, {playerName}. Accompagnala all'accampamento di Veyla sulla Scalinata. Sarà al sicuro sotto le luci.",
-  'entities.quests.q_fv_seeing_wren_home.title': 'Vedendo Wren a casa',
-  'entities.quests.q_fv_silent_trapline.completion':
-    "ti ha mandato Maeve? Ah. Undici anni e la donna pensa ancora che la palude mi mangerà. Beh... quest'anno potrebbe avere ragione. Guarda cosa ha fatto alle mie battute.",
-  'entities.quests.q_fv_silent_trapline.objectives.0.label': 'Trova Trapper Brosk',
-  'entities.quests.q_fv_silent_trapline.text':
-    "Il vecchio Brosk manovra la trappola degli Shiverfen a ovest di qui, e ogni settimana da undici anni manda su un fascio di pellicce con la slitta di legno. Due settimane ormai, niente. È troppo testardo per congelarsi e troppo attento per affogare, {playerName}, quindi c'è qualcos'altro che non va. Trova il suo accampamento nella palude e guardalo respirare.",
-  'entities.quests.q_fv_silent_trapline.title': 'La trappola silenziosa',
-  'entities.quests.q_fv_snowline_report.completion':
-    'Il passo vale dunque. Einna siede lì, accampandosi in mezzo alle tempeste che seppelliscono le indicazioni stradali, e non mi ha mai mandato notizie inutili. Benvenuto su Icemantle, {playerName}.',
-  'entities.quests.q_fv_snowline_report.objectives.0.label': 'Fai rapporto al Custode Kaldra',
-  'entities.quests.q_fv_snowline_report.text':
-    'Ogni anima che esce dalle Terre dei Draghi supera il mio fuoco, {playerName}, e sempre meno scalano ogni settimana. Il Custode Kaldra sostiene Icemantle lungo la strada a nord. Dille che il passo è ancora aperto e dille che uno sconosciuto lo ha percorso da solo.',
-  'entities.quests.q_fv_snowline_report.title': 'Parola dalla Snowline',
-  'entities.quests.q_fv_sprung_traps.completion':
-    'Quattro buone trappole e le canne si sono calmate. Intrappoli con una mano più pesante della mia, {playerName}, ma non posso discutere con i risultati.',
-  'entities.quests.q_fv_sprung_traps.objectives.0.label': 'Il Folletto delle Paludi fugge',
-  'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Trappola recuperata',
-  'entities.quests.q_fv_sprung_traps.text':
-    'Folletti delle paludi, {playerName}. I diavoletti fanno scattare per gioco le mie trappole e spargono il ferro nelle canne. Scacciali, otto dovrebbero insegnare al resto, e raccogli ciò che resta delle mie trappole mentre sei là fuori.',
-  'entities.quests.q_fv_sprung_traps.title': 'Folletti nelle trappole',
-  'entities.quests.q_fv_winter_pelts.completion':
-    "Una pelliccia come questa è l'unico argomento che ascolta l'inverno. Prendi questi gradini, sono rivestiti con l'ultimo lotto.",
-  'entities.quests.q_fv_winter_pelts.objectives.0.label': 'Spessa pelliccia invernale',
-  'entities.quests.q_fv_winter_pelts.text':
-    'La legna da ardere mantiene in vita un corpo, {playerName}, ma la lana non diventerà così fredda, solo la pelliccia di lupo sì. Sei spesse pellicce invernali si staccano dai cumuli di neve e posso rivestire i letti per tutti i rifugi del lodge.',
-  'entities.quests.q_fv_winter_pelts.title': 'Pelli per la Loggia',
-  'entities.quests.q_fv_wolves_at_the_door.completion':
-    'Dieci ombre in meno tra qui e il laghetto. I taglialegna già discutono su chi esca per primo.',
-  'entities.quests.q_fv_wolves_at_the_door.objectives.0.label': 'Lupo Cumulo di Neve ucciso',
-  'entities.quests.q_fv_wolves_at_the_door.text':
-    'I cumuli di neve si tenevano sugli alti banchi. Adesso attraversano la strada del laghetto alla luce del giorno e i miei taglialegna non lasceranno le mura. Sfoltisci i pacchi, {playerName}, dieci, e la strada tornerà ad essere una strada.',
-  'entities.quests.q_fv_wolves_at_the_door.title': 'Lupi alla porta',
-  'entities.quests.q_gc_dead_mens_cargo.completion':
-    'Sei equipaggi più silenziosi e tre casse alte e asciutte. Tu recuperi con mano più pesante della mia, {playerName}, ma al registro non importa. La metà di questo è tuo per legge, e per legge intendo dire così.',
-  'entities.quests.q_gc_dead_mens_cargo.objectives.0.label': 'Il mozzo annegato riposa',
-  'entities.quests.q_gc_dead_mens_cargo.objectives.1.label': 'Cassa di relitti recuperata',
-  'entities.quests.q_gc_dead_mens_cargo.text':
-    "La legge sul salvataggio è semplice, {playerName}: ciò che il mare dà alla spiaggia è mio. I marinai annegati non sono d'accordo. Si alzano dagli scafi e trascinano tutte le casse che impilano sotto la linea di marea. Mettine giù sei per sempre e, mentre la spiaggia è tranquilla, trasporta tre casse di relitti prima che la marea presenti la sua domanda riconvenzionale.",
-  'entities.quests.q_gc_dead_mens_cargo.title': 'Carico di uomini morti',
-  'entities.quests.q_gc_down_the_windway.completion':
-    'Oltrepassare il passo a piedi, con questo tempo? Maren mi manda un numero sufficiente di nomi, e ancora meno entrano per rispondere da soli. Benvenuto a Wickharbor, {playerName}. Chiudi la porta della locanda dietro di te.',
-  'entities.quests.q_gc_down_the_windway.objectives.0.label':
-    'Fai rapporto alla capitana di porto Odile',
-  'entities.quests.q_gc_down_the_windway.text':
-    'Hai fatto la salita, {playerName}, quindi il vento ha deciso di trattenerti. Wickharbor si trova a est lungo la strada che scende, nascosto al riparo della sua baia. La capitana di porto Odile conta ogni anima che attraversa il passo e vorrà contare anche te. Dille che la Windway è ancora aperta.',
-  'entities.quests.q_gc_down_the_windway.title': 'Giù per la Windway',
-  'entities.quests.q_gc_keeper_of_the_flame.completion':
-    "Odile ti ha mandato fin qui per vedere se il vento mi aveva portato via? Ah. Dille che la lampada è accesa e lo faccio anch'io. Ma visto che hai fatto la salita, {playerName}, resta un momento. Il Faro ha un lavoro che solo un estraneo sembra adatto a svolgere.",
-  'entities.quests.q_gc_keeper_of_the_flame.objectives.0.label': 'Trova il custode Bram',
-  'entities.quests.q_gc_keeper_of_the_flame.text':
-    'Il vecchio Bram mantiene il Faro sulla sommità a nord-est della città, e non viene a fare provviste da due settimane. La lampada è ancora accesa, quindi lui vive, ma un uomo della sua età è solo su quella testa con questo vento, {playerName}. Sali sulla strada del faro e guardalo in piedi.',
-  'entities.quests.q_gc_keeper_of_the_flame.title': 'Il Custode della Fiamma',
-  'entities.quests.q_gc_lanterns_on_the_shear.completion':
-    'Quattro punti luce sulla strada della scogliera, proprio al loro posto. Da quassù sembra che la costa abbia riaperto gli occhi. Hai tutte le carte in regola per diventare un portiere, {playerName}.',
-  'entities.quests.q_gc_lanterns_on_the_shear.objectives.0.label':
-    'Riaccensione della lanterna anti-tempesta',
-  'entities.quests.q_gc_lanterns_on_the_shear.text':
-    "Il Faro è la grande luce, {playerName}, ma sono le lanterne della tempesta che accompagnano un viaggiatore notturno lungo la strada rocciosa sopra il Cesoia. La notte scorsa la tempesta li ha sommersi tutti, e quella strada nell'oscurità è una lunga caduta con una breve conclusione. Prendi il mio attaccante e riaccendi i quattro lungo la scogliera.",
-  'entities.quests.q_gc_lanterns_on_the_shear.title': 'Lanterne sulla Cesoia',
-  'entities.quests.q_gc_scuttlers_in_the_pots.completion':
-    'Dieci colpi in meno sulla mia strada e stamattina i vasi sono pieni. I potmen ti dicono che sei di buon auspicio, {playerName}. A Wickharbor questo è tanto caloroso quanto lo sono gli elogi.',
-  'entities.quests.q_gc_scuttlers_in_the_pots.objectives.0.label': 'Scuttler del Banco ucciso',
-  'entities.quests.q_gc_scuttlers_in_the_pots.text':
-    'Gli affondatori dei banchi hanno imparato a scalare la strada della scogliera e ad aprire le nostre nasse per granchi sulle pietre, {playerName}. Metà della preda è andata perduta questa settimana, e un cameriere con una mano che non userà per un mese. Rompine dieci e gli altri ricorderanno perché sono rimasti nei bassifondi.',
-  'entities.quests.q_gc_scuttlers_in_the_pots.title': 'Scuttlers nelle pentole',
-  'entities.quests.q_gc_the_far_shore.completion':
-    'Bram adesso osserva la mia riva dalla sua torre, vero? Il vecchio ha ragione a preoccuparsi, {playerName}. I morti camminano di notte sui loro rottami e ultimamente hanno smesso di preoccuparsi se il sole è alto.',
-  'entities.quests.q_gc_the_far_shore.objectives.0.label': 'Trova Salvager Edda',
-  'entities.quests.q_gc_the_far_shore.text':
-    'Da questa stanza delle lampade posso vedere tutta la costa, {playerName}, e quello che vedo a nord non mi piace. Luci verdi che percorrono i Wreckfields con la bassa marea, scafo dopo scafo. Una donna lavora da sola su quella riva: Edda, la salvatrice. Segui la strada sulla scogliera a nord oltre la Shear finché non iniziano i relitti e vedi se respira ancora.',
-  'entities.quests.q_gc_the_far_shore.title': 'La sponda lontana',
-  'entities.quests.q_gc_the_wreck_warden.completion':
-    'La spiaggia è diventata silenziosa nel momento in cui è caduta, {playerName}. Il primo silenzio che ho sentito su questa riva in dieci anni di lavoro. Gli equipaggi sono solo ossa adesso, ossa a riposo. Togli il mantello dalla cima del tesoro, sarebbe sempre stato meglio per vivere.',
-  'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'Il Guardiano del Relitto è caduto',
-  'entities.quests.q_gc_the_wreck_warden.text':
-    'Ora sai perché i marinai si alzano, {playerName}. Qualcosa indossa la placca ricoperta di cirripedi del primo relitto mai infranto su questa spiaggia, e protegge ogni scafo sulla spiaggia come un cimitero per il quale è stato incaricato di custodirlo. Contiene un tesoro che bramo da dieci anni e un equipaggio che preferirei vedere riposare. Metti fine al Guardiano del Relitto. Porta un amico, i morti vigilano bene.',
-  'entities.quests.q_gc_the_wreck_warden.title': 'Il Guardiano del Relitto',
-  'entities.quests.q_gc_wind_against_the_wick.completion':
-    'La lampada non ha funzionato nemmeno una goccia ieri sera, per la prima volta in un mese. Il vento ci odia ancora, {playerName}, ma è tornato a odiarci sinceramente.',
-  'entities.quests.q_gc_wind_against_the_wick.objectives.0.label':
-    'Il Fuoco Fatuo della Tempesta si disperse',
-  'entities.quests.q_gc_wind_against_the_wick.text':
-    'I soffi di burrasca sono il vento che si è allontanato, {playerName}. Si radunano sulle alture vicino al Mirror Tarn, e ogni fiamma che trovano, la spengono, una lanterna, un focolare, un giorno questa lampada. Per trentanove anni ho tenuto acceso il Faro, e non lo perderò a causa delle intemperie con rancore. Spargine otto.',
-  'entities.quests.q_gc_wind_against_the_wick.title': 'Vento Contro lo Stoppino',
-  'entities.quests.q_gc_wool_off_the_downs.completion':
-    "Il vello così è il motivo per cui i montoni stanno là fuori grassi e compiaciuti in un tempo che uccide gli uomini. I filatori ci saranno alla luce della lampada. Prendi questi gradini, {playerName}, sono rivestiti dall'ultima tosatura.",
-  'entities.quests.q_gc_wool_off_the_downs.objectives.0.label': 'Lana di montone sucida',
-  'entities.quests.q_gc_wool_off_the_downs.text':
-    'Gli equipaggi della mia barca remano in una tempesta che taglia la tela cerata come carta, {playerName}. Solo una cosa muove questo vento: la lana grassa dei montoni della brughiera, filata fitta alla maniera di Wickharbor. Le mandrie pascolano nelle Colline Ululanti a ovest della città. Sei buone pile e ogni equipaggio rema al caldo in questa stagione.',
-  'entities.quests.q_gc_wool_off_the_downs.title': 'Lana dei Downs',
-  'entities.quests.q_gleaming_antlers.completion':
-    'Guarda come tengono la luce! Nessuna fiamma, nessun fumo, solo il bagliore. Il Vuoto provvede.',
-  'entities.quests.q_gleaming_antlers.objectives.0.label': 'Corno scintillanti',
-  'entities.quests.q_gleaming_antlers.text':
-    "I cervi velati fanno luce dove pascolano, e le loro corna fuse la tengono per anni. Cinque di loro, dalle mandrie nella radura nel cuore della valle, e le mie lanterne bruciano durante l'inverno senza olio. Non è necessario fare del male ai cervi, ma non si separano facilmente da loro.",
-  'entities.quests.q_gleaming_antlers.title': 'Corna scintillanti',
-  'entities.quests.q_grove_menace.completion':
-    'Il mercato notturno può riaprire. Hai un cliente per tutta la vita, o almeno uno sconto.',
-  'entities.quests.q_grove_menace.objectives.0.label': 'Il Fuoco Crepuscolare si disperse',
-  'entities.quests.q_grove_menace.text':
-    'I Fiocchi del Crepuscolo hanno iniziato ad aggirarsi tra le mie bancarelle dopo il tramonto, {playerName}, e il loro freddo rovina tutto ciò che tocca. Diluiscili per me: dieci, ovunque il velo si sia squarciato.',
-  'entities.quests.q_grove_menace.title': 'Minaccia nella radura',
-  'entities.quests.q_hollow_first_of_the_herd.completion':
-    "Così il Primo cade all'ultimo. Il branco è già più calmo, lo senti? Hai fatto una gentilezza al Vuoto oggi, anche se non sembra tale.",
-  'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'Aurelhorn riceve la pace',
-  'entities.quests.q_hollow_first_of_the_herd.text':
-    'Il secondo nome è più difficile da pronunciare. Aurelhorn guidava queste mandrie quando mia nonna era di guardia, e qualunque cosa si svegliasse nella Valle lo svegliava nel modo sbagliato. Calpesta ciò che un tempo proteggeva e il gregge non sopravviverà alla sua follia. Vaga per i prati vicino alle vecchie strade di corte. Metti fine a lui con pietà, {playerName}, e porta un amico a condividerne il peso.',
-  'entities.quests.q_hollow_first_of_the_herd.title': 'Primo della Mandria',
-  'entities.quests.q_hollow_old_marrowshell.completion':
-    'Le secche sono di nuovo solo acqua. Ho visto quella granata spezzare cacciatori migliori di me, {playerName}. Non tu.',
-  'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Vecchio Marrowshell ucciso',
-  'entities.quests.q_hollow_old_marrowshell.text':
-    'Il primo nome è Vecchio Marrowshell, un granchio grande quanto un carro che caccia nelle acque basse orientali da prima che Eldergleam avesse un cancello. Vaga, {playerName}, quindi dovrai camminare lungo la costa finché non incrocerai il suo sentiero. Non andare da solo e non fidarti della sua quiete.',
-  'entities.quests.q_hollow_old_marrowshell.title': 'La Vecchia Conchiglia delle Secche',
-  'entities.quests.q_hollow_the_huntsman.completion':
-    'Ti ha mandato Fenna? Bene. Allora si fida di te e ho due nomi da cancellare.',
-  'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Trova il cacciatore Deral',
-  'entities.quests.q_hollow_the_huntsman.text':
-    'Sembri qualcuno in grado di gestire ben più che fuochi fatui, {playerName}. Il Cacciatore Deral mantiene la sua vedetta tra i prati di cervi a est di qui, e da settimane chiede mani capaci. Qualunque cosa stia cercando là fuori, non lo dirà ad alta voce nel villaggio.',
-  'entities.quests.q_hollow_the_huntsman.title': 'Il guardiano degli armenti',
-  'entities.quests.q_monument_tour.completion':
-    'Un punto panoramico, una corte e un angolo dimenticato... e tutti e tre i versi del canto di suggellamento, insieme per la prima volta da quando è stato cantato. Hai reso molto felice un vecchio lettore.',
-  'entities.quests.q_monument_tour.objectives.0.label': "Leggi il monumento all'Overlook",
-  'entities.quests.q_monument_tour.objectives.1.label': 'Si legge sul monumento di Corte',
-  'entities.quests.q_monument_tour.objectives.2.label': 'Leggi il monumento dimenticato',
-  'entities.quests.q_monument_tour.text':
-    "Tre monumenti sono ancora in piedi prima della sigillazione: uno al Belvedere del Crepuscolo, uno nella Corte Sommersa e uno perduto nell'estremo nord-est dove nessuno cammina. Leggili per me, {playerName}. Le mie ginocchia hanno ceduto due secoli fa di scale.",
-  'entities.quests.q_monument_tour.title': 'Ciò che ricordano le Pietre',
-  'entities.quests.q_nb_charts_of_the_stones.completion':
-    'Non resta alcun dubbio. Ogni orientamento si è insinuato verso il tumulo insonne, come se il cielo stesso si sporgesse su quel tumulo per guardare. I vecchi re furono sepolti sotto le stelle allineate per un motivo, {playerName}.',
-  'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Mappa stellare letta',
-  'entities.quests.q_nb_charts_of_the_stones.text':
-    'Le pietre della Veglia sono più antiche di Moonrest, più antiche dei Nightkin che le curano, e i loro volti sono incisi con mappe stellari che ho passato la vita a imparare a leggere. Il cielo è cambiato, {playerName}, e devo sapere fino a che punto. Leggi le carte su tre pietre e portami il loro orientamento.',
-  'entities.quests.q_nb_charts_of_the_stones.title': 'Le carte nelle pietre',
-  'entities.quests.q_nb_eyes_on_the_vigil.completion':
-    'Ti ha mandato Lira? Allora lo sentono anche i giardini. Siediti un momento accanto al bicchiere, {playerName}. Le stelle sono inquiete da un mese e ogni carta che disegno tende a nord, verso il tumulo.',
-  'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
-    "Trova l'astronomo Cassiano alla Veglia Permanente",
-  'entities.quests.q_nb_eyes_on_the_vigil.text':
-    'Qualcosa rende audaci i camminatori e inquieti le mandrie, {playerName}, e non riesco a leggerlo nei fiori. Cassiano può leggerlo nel cielo. Tiene il suo campo osservatorio presso la Veglia Permanente a est di qui, dove i Nightkin vanno alla deriva tra le pietre. Trovalo e chiedi cosa dicono le stelle.',
-  'entities.quests.q_nb_eyes_on_the_vigil.title': 'Occhi puntati sulla Veglia',
-  'entities.quests.q_nb_night_gardens.completion':
-    'Ancora splendente, ogni petalo. Il santuario profumerà di notte per una settimana e grazie a questo Moonrest potrà dormire più facilmente.',
-  'entities.quests.q_nb_night_gardens.objectives.0.label':
-    'I Fiori del Fiore Notturno si sono riuniti',
-  'entities.quests.q_nb_night_gardens.text':
-    'Il Nightbloom si apre solo sotto questo cielo, e Gloamfield ospita i letti più antichi del regno. Mi servono quattro fiori freschi per le ghirlande del santuario, {playerName}. Tagliateli delicatamente: un letto ricorda una mano ruvida per una stagione.',
-  'entities.quests.q_nb_night_gardens.title': 'I Giardini Notturni',
-  'entities.quests.q_nb_restless_mounds.completion':
-    'Oro grave, ancora freddo dal suolo. Gli spettri non si stanno sollevando da soli, {playerName}: qualcosa sotto il grande tumulo li sta chiamando allo scoperto, e temo che le classifiche ci abbiano già detto il suo nome.',
-  'entities.quests.q_nb_restless_mounds.objectives.0.label': 'Barrow Wight ucciso',
-  'entities.quests.q_nb_restless_mounds.objectives.1.label': "Recuperata l'offerta tombale",
-  'entities.quests.q_nb_restless_mounds.text':
-    "Le carte erano un avvertimento, e il campo dei tumuli lo dimostra: i tumuli si stanno aprendo da sotto. Gli spettri percorrono le file delle tombe indossando gli antichi onori e le offerte che li tenevano addormentati giacciono sparse nell'erba. Mettine giù otto, {playerName}, e raccoglimi quattro offerte.",
-  'entities.quests.q_nb_restless_mounds.title': 'I Tumuli Inquieti',
-  'entities.quests.q_nb_road_of_lanterns.completion':
-    'Le lampade sono ancora accese, e la strada porta ancora a noi stranieri. Sorrel ha mantenuto quel cancello più a lungo di quanto chiunque a Moonrest ricordi. Benvenuto, {playerName}, nel regno che non sorge mai.',
-  'entities.quests.q_nb_road_of_lanterns.objectives.0.label': 'Trova Lira Dewsong a Moonrest',
-  'entities.quests.q_nb_road_of_lanterns.text':
-    'Quassù il sole non segue mai, {playerName}, solo le lampade che tengo accese lungo la salita. Il Riposo della Luna si trova a nord, dove si raccoglie la luce dei fiori. Trova Lira Dewsong tra i suoi giardini e dille che le lampade del Cancello della Notte sono ancora accese.',
-  'entities.quests.q_nb_road_of_lanterns.title': 'La Via delle Lanterne',
-  'entities.quests.q_nb_striders_in_the_dark.completion':
-    'Dieci passi in meno, e gli armenti già pascolano più facilmente. I giardini hanno i loro orari, ma stasera li mantengono in pace.',
-  'entities.quests.q_nb_striders_in_the_dark.objectives.0.label': 'Passo del Buio ucciso',
-  'entities.quests.q_nb_striders_in_the_dark.text':
-    'I camminatori del crepuscolo sono sempre stati cacciatori pazienti, {playerName}, ma ultimamente scivolano direttamente nelle aiuole e catturano gli agnelli di vello di luna sotto le nostre lanterne. Selezionane dieci e restituisci ai bassi la loro quiete.',
-  'entities.quests.q_nb_striders_in_the_dark.title': "Strider nell'oscurità",
-  'entities.quests.q_nb_the_barrow_king.completion':
-    'Le stelle si sono stabilite per la prima volta in una stagione, {playerName}. I tumuli sono chiusi, i nightkin sono rimasti immobili davanti alle loro pietre, e il re dorme ancora una volta di sotto. Indossa questo mantello: Moonrest lo ha tagliato per chiunque la notte abbia finalmente avuto fiducia.',
-  'entities.quests.q_nb_the_barrow_king.objectives.0.label':
-    'Il Re dei Tumuli viene messo a riposo',
-  'entities.quests.q_nb_the_barrow_king.text':
-    "Ogni orientamento, ogni stella inquieta, ogni tumulo aperto indica una cosa: il Re dei tumuli si sta svegliando sotto il grande tumulo, e questo regno non ha un'alba che lo trattenga. Deve essere messo a riposo prima che si ricordi della sua corona, {playerName}. Non andare da solo: porta un amico e tieni la luce dei fiori alle tue spalle.",
-  'entities.quests.q_nb_the_barrow_king.title': 'Il Re dei Tumuli si Sveglia',
-  'entities.quests.q_nb_wool_by_moonlight.completion':
-    "Argento come la luce delle stelle e due volte più morbido. Tieni, {playerName}: guanti dell'ultimo lotto, foderati come solo le linee del vello lunare.",
-  'entities.quests.q_nb_wool_by_moonlight.objectives.0.label': 'Ciuffo in Pile di Luna',
-  'entities.quests.q_nb_wool_by_moonlight.text':
-    'Niente si riscalda come il moonfleece, {playerName}, e niente gira così bene. I pascolatori portano la loro lana argentata sciolta in ciuffi mentre vanno alla deriva sulle colline. Portami sei buoni ciuffi degli armenti e ti intreccerò qualcosa per cui valga la pena camminare.',
-  'entities.quests.q_nb_wool_by_moonlight.title': 'Lana al chiaro di luna',
-  'entities.quests.q_pr_boars_in_the_gardens.completion':
-    'Le rastrelliere stanno in piedi e i giardini possono essere ripiantati. I cinghiali non hanno scelto di venire sulla sabbia, {playerName}. Ricordatelo: qualcosa li ha mossi.',
-  'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Cinghiale in fuga',
-  'entities.quests.q_pr_boars_in_the_gardens.text':
-    'Ciò che si agita nel verde intenso, spinge i cinghiali della macchia sulla nostra spiaggia. Hanno sradicato le terrazze del giardino due volte questa settimana, e la prossima volta avranno gli stendini. Dieci cinghiali, {playerName}, e spingi gli altri sotto gli alberi.',
-  'entities.quests.q_pr_boars_in_the_gardens.title': 'Cinghiali nei giardini',
-  'entities.quests.q_pr_canopy_silk.completion':
-    "Seta buona e resistente. Le mie campane suoneranno ancora per un po' e niente percorre questi sentieri di notte senza che io lo sappia, {playerName}. Ultimamente qualcosa è andato spesso in giro.",
-  'entities.quests.q_pr_canopy_silk.objectives.0.label': 'Matassa di seta del baldacchino',
-  'entities.quests.q_pr_canopy_silk.text':
-    "Cerca, {playerName}. Ogni tettoia da qui all'idolo è tessuta come una rete da pesca, e i tessitori diventano più audaci ogni stagione. Filo la loro seta lungo i sentieri, campanelli tripli, così la giungla non può insinuarsi su di me. Sei buone matasse dei tessitori del baldacchino restringeranno le mie linee.",
-  'entities.quests.q_pr_canopy_silk.title': 'Seta dal baldacchino',
-  'entities.quests.q_pr_down_to_drifthaven.completion':
-    'Ti ha mandato Pell? Poi hai percorso tutta la strada di Tanglemouth da solo, e questo per me è un riferimento sufficiente. Benvenuto a Drifthaven, {playerName}. Prendi una corda, siamo a corto di personale.',
-  'entities.quests.q_pr_down_to_drifthaven.objectives.0.label':
-    'Fai rapporto al boss del salvataggio Ryna',
-  'entities.quests.q_pr_down_to_drifthaven.text':
-    'Fuori dagli alberi neri e verso il sole, {playerName}. Segui la strada costiera verso nord e raggiungerai Drifthaven prima che la marea cambi. Chiedi del capo del salvataggio Ryna, ha lavoro per qualsiasi paio di mani dopo la tempesta, e dille che la strada di Tanglemouth è ancora aperta.',
-  'entities.quests.q_pr_down_to_drifthaven.title': 'Giù a Drifthaven',
-  'entities.quests.q_pr_idol_guardian.completion':
-    "Hai abbattuto qualcosa che la giungla stessa non avrebbe potuto toccare. Guarda lì, dietro l'idolo: il Guardiano non è mai stato a guardia delle colonne, {playerName}, stava a guardia dei gradini sotto di loro. I tamburi si sono calmati stasera. Qualunque cosa dorma sotto il Bacino del Cuore Selvaggio ora conosce il tuo nome.",
-  'entities.quests.q_pr_idol_guardian.objectives.0.label': "Il Guardiano dell'Idolo rotto",
-  'entities.quests.q_pr_idol_guardian.text':
-    "L'idolo è più vecchio dell'isola, {playerName}. Più vecchio dei tamburi, più vecchio del nome Palmreach. Il suo Guardiano si trova in quell'anello sommerso da prima che crescessero le palme, e ora si sveglia e cammina tra le colonne di notte. Qualunque cosa alimentino le offerte, il Guardiano è la sua porta. Porta un amico e rompilo.",
-  'entities.quests.q_pr_idol_guardian.title': "Il Guardiano dell'Idolo",
-  'entities.quests.q_pr_scuttler_cull.completion':
-    'Dieci artigli in meno nella risacca. I miei equipaggi stanno già tornando indietro e nessuno di loro ha detto grazie, quindi lo farò: grazie, {playerName}.',
-  'entities.quests.q_pr_scuttler_cull.objectives.0.label': 'Il Tide Scuttler si è rotto',
-  'entities.quests.q_pr_scuttler_cull.text':
-    'Ogni relitto su questa costa attira gli affondatori di marea, e il Pearlwake ha attirato metà della barriera corallina. Le mie squadre di salvataggio non riusciranno a raggiungere una linea con quegli artigli nelle acque basse. Distruggine dieci, {playerName}, e la rotta sarà di nuovo nostra.',
-  'entities.quests.q_pr_scuttler_cull.title': 'Ladri armati',
-  'entities.quests.q_pr_the_lost_navigator.completion':
-    "Suli è accanto al fuoco, ancora giurando che avrebbe potuto nuotarci. Hai riportato indietro l'unico lettore di carte su questa costa, {playerName}. Questi provengono dal suo baule, con la sua benedizione.",
-  'entities.quests.q_pr_the_lost_navigator.objectives.0.label':
-    'Il navigatore Suli è stato visto sano e salvo a Drifthaven',
-  'entities.quests.q_pr_the_lost_navigator.text':
-    "Abbiamo staccato tutti gli uomini dalla Pearlwake tranne uno: il navigatore Suli, che ha nuotato fino alla spiaggia più lontana e non è mai entrato. Un sub l'ha vista rintanata tra i rottami di prua oltre il Palmstrand, viva e troppo esausta per affrontare la sfida da sola. Accompagnala a casa lungo la strada costiera, {playerName}. Ai granchi non piacerà e alla giungla piace meno.",
-  'entities.quests.q_pr_the_lost_navigator.title': 'Il Navigatore Perduto',
-  'entities.quests.q_pr_the_man_who_went_in.completion':
-    "Isha ti ha mandato? La Madre-Perla non pronuncia il mio nome da anni. Siediti fuori dalla portata delle liane, {playerName}, e ti dirò quello che so: i tamburi non sono il pericolo. Sono l'avvertimento.",
-  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Trova Okku a Vinefall',
-  'entities.quests.q_pr_the_man_who_went_in.text':
-    "I sub non oltrepasseranno il limite del bosco, {playerName}, e non glielo chiederò. Ormai hai sentito i tamburi: lo fanno tutti, entro la seconda notte. È mai capitato che un uomo su quest'isola si sia diretto verso quel suono e sia tornato indietro. Ok. Si accampa sotto i grandi baniani a Vinefall, in fondo alla strada del Groviglio. Trovalo e chiedigli cosa nasconde il verde.",
-  'entities.quests.q_pr_the_man_who_went_in.title': "L'uomo che entrò",
-  'entities.quests.q_pr_what_the_drums_guard.completion':
-    'Muschio, conchiglia e sangue di cinghiale, racchiusi tra le dita. Qualcosa in quelle rovine mantiene ancora i suoi riti, {playerName}, e il Guardiano tiene fuori tutto il resto. È giunto il momento di parlarne apertamente.',
-  'entities.quests.q_pr_what_the_drums_guard.objectives.0.label': 'Canopy Weaver tagliato',
-  'entities.quests.q_pr_what_the_drums_guard.objectives.1.label':
-    'Raccogliuta la ciotola delle offerte riempita',
-  'entities.quests.q_pr_what_the_drums_guard.text':
-    "Ho camminato vicino all'Idolo Sommerso quanto osa un uomo vivente, e ho visto due cose: i tessitori hanno coperto la strada dell'idolo con una tela, e le vecchie ciotole per le offerte lungo di essa sono state riempite di nuovo. Appena, {playerName}. Elimina otto tessitori dalla strada e portami tre di quelle offerte. Vorrei sapere quale mano nutre ancora un dio morto.",
-  'entities.quests.q_pr_what_the_drums_guard.title': 'Quello che la guardia dei tamburi',
-  'entities.quests.q_pr_wreck_line_cargo.completion':
-    'Macchiati di sale ma sani, tutti e tre. I subacquei mangiano questo mese grazie a te, {playerName}.',
-  'entities.quests.q_pr_wreck_line_cargo.objectives.0.label': 'Recupero del carico Pearlwake',
-  'entities.quests.q_pr_wreck_line_cargo.text':
-    'La tempesta di tre notti fa ha spinto la Pearlwake sulla barriera corallina e il suo carico è sparso per tutta la lunghezza della linea del relitto tra qui e il Palmstrand. Tre casse di beni commerciali sono ancora abbandonate tra le onde, {playerName}. Portateli dentro prima che la marea, o i granchi, reclamino ciò che resta.',
-  'entities.quests.q_pr_wreck_line_cargo.title': 'La linea del relitto',
-  'entities.quests.q_seal_restored.completion':
-    "L'ho sentito vicino da qui, dolce come il crepuscolo. Il Vuoto ricorda i suoi amici, {playerName}. Per quanto lontano viaggerai, ci sarà sempre una luce per te sotto il grande albero.",
-  'entities.quests.q_seal_restored.objectives.0.label': 'Il sigillo riposto nella pietra',
-  'entities.quests.q_seal_restored.text':
-    "Porta il sigillo del Custode sulla pietra del sigillo nel cuore della corte e rimettilo dove è stato staccato. Poi l'Hollow potrà iniziare a guarire e tu, {playerName}, avrai fatto ciò che nessuno della tua specie ha mai fatto prima.",
-  'entities.quests.q_seal_restored.title': 'Il Sigillo Restaurato',
-  'entities.quests.q_shards_of_starfall.completion':
-    "Guarda che striature! Autunno. L'Hollow venne sigillato in autunno. Duecento anni di discussioni, risolte da sei piccole pietre.",
-  'entities.quests.q_shards_of_starfall.objectives.0.label': 'Frammento di Stelle Cadute',
-  'entities.quests.q_shards_of_starfall.text':
-    'Quando i ciuffi crepuscolari passano sui campi di cristallo, schegge di vecchia luce stellare vi si attaccano come bave. Sei frammenti, {playerName}, e posso datare il suggellamento proprio alla stagione in cui è stato cantato.',
-  'entities.quests.q_shards_of_starfall.title': 'Frammenti di Stelle al Tramonto',
-  'entities.quests.q_spore_hearts.completion':
-    "Ecco. Pulito e silenzioso. Ognuno mostra lo stesso segno: l'ombra scorre DALLA Corte Sommersa. Dillo a Saelwyn.",
-  'entities.quests.q_spore_hearts.objectives.0.label': 'Cuore di spore',
-  'entities.quests.q_spore_hearts.text':
-    "Quando uno sporeling cade nell'oscurità, il suo cuore continua a battere con l'ombra presa in prestito. Quattro di quei cuori, purificati nel santuario, potrebbero insegnarci come si diffonde la corruzione. È un lavoro duro, {playerName}, ma è un lavoro di riparazione.",
-  'entities.quests.q_spore_hearts.title': "Cuori dell'Anello",
-  'entities.quests.q_spore_tide.completion':
-    'Gli anelli del nord cantano ancora stasera. In silenzio, ma cantando.',
-  'entities.quests.q_spore_tide.objectives.0.label': 'Sporeling corrotto sepolto',
-  'entities.quests.q_spore_tide.text':
-    "L'unguento protegge il Boschetto, ma la corruzione preme più forte sull'Abisso ad ogni crepuscolo. Altri dodici corrotti devono essere sepolti prima che i raccoglitori possano reclamare i loro anelli nord, {playerName}.",
-  'entities.quests.q_spore_tide.title': 'Contro la Marea delle Spore',
-  'entities.quests.q_sunken_court.completion':
-    'Otto guardiani, immobilizzati. Ricordo quando sono cresciuti, {playerName}. Non essere così sorpreso; il Vuoto mantiene i suoi custodi a lungo.',
-  'entities.quests.q_sunken_court.objectives.0.label': "L'Antico Guardiano si calmò",
-  'entities.quests.q_sunken_court.text':
-    'Bryn ha letto nel cuore la verità: la lacrima scorre attraverso la vecchia corte a est, e i suoi guardiani si sono svegliati in modo sbagliato. Sono stati costruiti per proteggere il sigillo; ora schiacceranno chiunque si avvicini ad esso. Eliminane otto dalle rovine.',
-  'entities.quests.q_sunken_court.title': 'La Corte Sommersa',
-  'entities.quests.q_treant_accord.completion':
-    "Grossi e sani, tutti e quattro. L'unguento impiegherà una settimana per prepararsi e un centinaio di anni per completare il suo lavoro. Gli alberi misurano la gentilezza in modo diverso.",
-  'entities.quests.q_treant_accord.objectives.0.label': 'Anziano Corteccia',
-  'entities.quests.q_treant_accord.text':
-    'Gli anziani del Boschetto perdono la corteccia esterna mentre la corruzione rode le loro radici. Quattro lunghezze e posso preparare un unguento per tutto il Grove. Non ti ringrazieranno finché non ti libererai, {playerName}, ma resisteranno un secolo in più.',
-  'entities.quests.q_treant_accord.title': "L'Accordo di Treant",
-  'entities.quests.q_veil_thinned.completion':
-    'Freddi, ognuno di loro. The Hollow ha forse una stagione prima che lo strappo diventi una spaccatura. Abbiamo del lavoro da fare, io e te.',
-  'entities.quests.q_veil_thinned.objectives.0.label': 'Essenza del Fuoco fatuo',
-  'entities.quests.q_veil_thinned.text':
-    'Quindi la grotta si è aperta per te. Allora il sigillo è più debole di quanto temessi, {playerName}. Dove il velo si squarcia, i ciuffi diventano scuri e freddi. Portami otto essenze dai fuochi fatui e leggerò quanto è profonda la ferita.',
-  'entities.quests.q_veil_thinned.title': 'Il velo assottigliato',
-  'entities.quests.q_waking_warden.completion':
-    "Il suono della sua voce tace. L'ho sentito da qui, come un peso sollevato da tutta la valle.",
-  'entities.quests.q_waking_warden.objectives.0.label': 'Il Guardiano del Risveglio sconfitto',
-  'entities.quests.q_waking_warden.text':
-    'La corte è silenziosa, ma il suo padrone no. Il Custode che detiene il sigillo si è svegliato contorto e, mentre è in piedi, il sigillo non può essere riparato. Non cadrà facilmente; porta un amico se riesci a trovarne uno, {playerName}. Portane due se riesci a trovarne due.',
-  'entities.quests.q_waking_warden.title': 'Il Guardiano Risvegliato',
-  'entities.quests.q_wardens_echoes.completion':
-    "L'eco diventa ogni volta più debole. Presto la corte non conterrà altro che vento ed edera, come dovrebbe essere una rovina.",
-  'entities.quests.q_wardens_echoes.objectives.0.label': "L'Antico Guardiano si calmò",
-  'entities.quests.q_wardens_echoes.text':
-    "Anche se il loro padrone è stato messo a tacere, i guardiani della corte ripetono il suo ultimo comando come un'eco che non si spegne. Finché il sigillo non verrà rimesso, continueranno a svegliarsi, {playerName}. Ancora dieci affinché i muratori possano raggiungere il sigillo.",
-  'entities.quests.q_wardens_echoes.title': 'Echi del Custode',
-  'entities.quests.q_wf_across_the_fenway.completion':
-    "Pell mantiene quel fuoco acceso attraverso ogni nebbia che la palude può alitare su di lei. Se dice che i Passi sono aperti, sono aperti. Benvenuto a Bridgemere, {playerName}. Fai attenzione a come metti i piedi sulle mie assi e andremo d'accordo.",
-  'entities.quests.q_wf_across_the_fenway.objectives.0.label': 'Fai rapporto a Bridgewright Alden',
-  'entities.quests.q_wf_across_the_fenway.text':
-    "Un paese gentile, il Willowfen, ma gentile non è la stessa cosa che sicuro, {playerName}. Seguire la strada verso nord fino alla strada rialzata Fenway e attraversare Bridgemere. Di' a Bridgewright Alden che i gradini sono aperti e che il fuoco del campo è acceso.",
-  'entities.quests.q_wf_across_the_fenway.title': "Dall'altra parte del Fenway",
-  'entities.quests.q_wf_croakers_hush.completion':
-    "Ascolta, {playerName}. Niente. Il primo vero silenzio su questa palude in trent'anni, e metà della città non dormirà stanotte per la stranezza di ciò. I salici dicono grazie, a modo loro. Indossa questo, tessuto dal suo stesso letto di gigli, e la palude ti riconoscerà per amico ovunque arrivi l'acqua.",
-  'entities.quests.q_wf_croakers_hush.objectives.0.label': 'Il Croaker Sonnolento ucciso',
-  'entities.quests.q_wf_croakers_hush.text':
-    "Ora conosci il nome di chi russa, {playerName}: il Drowsy Croaker, il vecchio re-rospo nelle Drowsy Flats. Ogni anno il suo gracidio diventa più forte, e ogni anno sempre più persone nella palude si dimenticano di svegliarsi. Gli incantesimi ti terranno gli occhi aperti, ma la sua mole è un'altra questione: porta con te un amico e non combatterlo in acqua. Metti il ​​vecchio re in un sonno più tranquillo.",
-  'entities.quests.q_wf_croakers_hush.title': "Il silenzio dell'ombrinatore",
-  'entities.quests.q_wf_eels_for_the_smokehouse.completion':
-    "Sei buone anguille, appena ammaccate. L'affumicatoio profumerà di denaro entro la mattina. Ecco, questi waders erano miei quando ero più veloce: la pelle di anguilla gira sul bagnato come nient'altro.",
-  'entities.quests.q_wf_eels_for_the_smokehouse.objectives.0.label': 'Anguilla paffuta',
-  'entities.quests.q_wf_eels_for_the_smokehouse.text':
-    "I rospi non stanno solo mangiando le mie corde, {playerName}, stanno mangiando anche la mia preda: ingoiano le anguille intere, direttamente dalle trappole. Tagliane sei paffuti e liberali dalle cose avide prima che la carne si rovini e i fuochi dell'affumicatoio rimangano accesi.",
-  'entities.quests.q_wf_eels_for_the_smokehouse.title': "Anguille per l'affumicatoio",
-  'entities.quests.q_wf_mind_the_moorings.completion':
-    "Guarda qua: morsi puliti, tutti, ma c'è abbastanza corda da unire. Mi hai risparmiato un mese di soldi e i netters un mese di lamentele, {playerName}.",
-  'entities.quests.q_wf_mind_the_moorings.objectives.0.label':
-    'Cavo di ormeggio tagliato recuperato',
-  'entities.quests.q_wf_mind_the_moorings.text':
-    "La buona corda è cara qui, {playerName}: ogni linea morsa dai rospi equivale a una settimana di soldi per l'anguilla. Le estremità tagliate giacciono ancora lungo la riva del fossato dove le barche le hanno fatte scivolare. Cammina sulle passerelle e riportami quattro righe, e potrò unirle come nuove.",
-  'entities.quests.q_wf_mind_the_moorings.title': 'Attenzione agli ormeggi',
-  'entities.quests.q_wf_rope_chewers.completion':
-    'Dieci serie di denti in meno nel mio fossato. Le barche sono rimaste ormeggiate tutta la notte per la prima volta in un mese, {playerName}. Hai i ringraziamenti di ogni netter in città.',
-  'entities.quests.q_wf_rope_chewers.objectives.0.label': 'Rospo ucciso',
-  'entities.quests.q_wf_rope_chewers.text':
-    "Rospo, {playerName}. Di notte tirano fuori dal fossato e rosicchiano le mie corde d'ormeggio come se fossero steli di giunco. Tre barche sono andate alla deriva la settimana scorsa e una di loro aveva a bordo il mio buon argano. Diluiscili, dieci cose grasse, e le barche restano dove le leghiamo.",
-  'entities.quests.q_wf_rope_chewers.title': 'I Masticatori di corde',
-  'entities.quests.q_wf_toll_and_tangle.completion':
-    "Tre scrigni e la moneta ancora asciutta all'interno. Gli spiriti rimarranno imbronciati per una settimana, {playerName}, e la città ti deve il suo pane invernale.",
-  'entities.quests.q_wf_toll_and_tangle.objectives.0.label': 'Willow Sprite scacciato',
-  'entities.quests.q_wf_toll_and_tangle.objectives.1.label': 'Cassa recuperata',
-  'entities.quests.q_wf_toll_and_tangle.text':
-    "Gli spiriti del salice pensano che sia un bel gioco liberare un traghetto, {playerName}, e la settimana scorsa lo skiff si è ribaltato sulla pista est con una stagione di pedaggio a bordo a bordo. Le casse sono affondate nelle acque basse e gli spiriti danzano sulle passerelle come se fossero loro. Ne guidi otto e carichi tre casse di pedaggio, e Bridgemere mangerà quest'inverno.",
-  'entities.quests.q_wf_toll_and_tangle.title': 'Pedaggio e groviglio',
-  'entities.quests.q_wf_wisplight_charms.completion':
-    'Sei globi, ancora caldi di sogno. Dammi tempo fino al sorgere della luna e farò intrecciare degli incantesimi per te e per chiunque sia abbastanza coraggioso da starti accanto.',
-  'entities.quests.q_wf_wisplight_charms.objectives.0.label': 'Globo di Luce Wisp',
-  'entities.quests.q_wf_wisplight_charms.text':
-    "I fuochi fatui sopra le pozze sono la palude che sogna ad alta voce, {playerName}, e la loro luce è l'unica cosa che resiste alla tregua dell'Ombrina. Lo intreccio in amuleti di salice: uno attorno al tuo collo e il russare non potrà abbassare le tue palpebre. Portami sei globi di luce fatuo. I fuochi fatui non ti combatteranno per loro, il che lo rende una gentilezza o un furto, a seconda di come lo porti.",
-  'entities.quests.q_wf_wisplight_charms.title': 'Incantesimi di Luce Fatuo',
-  'entities.quests.q_wf_witch_of_willowweep.completion':
-    "Alden ti ha mandato fin qui per chiederti se russavi? Poi finalmente il popolo del bridge ascolta. Siediti fuori dall'umidità, {playerName}. Quel suono ha un nome e una gola, e stavo aspettando qualcuno così stupido da aiutarmi a calmarlo.",
-  'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'Trova Madre Sedge',
-  'entities.quests.q_wf_witch_of_willowweep.text':
-    "Ormai l'hai sentito, {playerName}: il russare. Lento e pesante, oltre le Drowsy Flats, come la palude stessa che si rigira nel sonno. I rospi, i folletti, i fuochi fatui che bruciano a mezzogiorno: tutto ebbe inizio quando si udì quel suono. Un'anima potrebbe sapere di cosa si tratta. Madre Carice tiene un accampamento a Willowweep, a ovest attorno al fossato e lungo la sponda opposta. Trovala e chiedile cosa dorme in mezzo alla mia palude.",
-  'entities.quests.q_wf_witch_of_willowweep.title': 'La Strega di Willowweep',
-  'entities.quests.q_wisp_lights.completion':
-    "Soffice come le prime stelle. Mettili qui presso l'altare; il santuario farà il resto.",
-  'entities.quests.q_wisp_lights.objectives.0.label': 'Granello fatuo',
-  'entities.quests.q_wisp_lights.text':
-    "I fuochi fatui trasportano i granelli dell'antica luce stellare che caddero qui quando il Vuoto fu sigillato. Sei granelli e le lampade del santuario bruceranno per un anno. Prendi solo da quelli che svaniscono; il Vuoto dà abbastanza senza avidità.",
-  'entities.quests.q_wisp_lights.title': 'Luci delle secche',
-  'entities.quests.q_ww_bells_of_gallowmere.completion':
-    "Cobb ti ha mandato su per la strada, vero? Buon uomo. Sono trent'anni che tiene accese quelle lanterne del cancello, e il bosco non lo ha mai superato neanche una volta. Benvenuto a Gallowmere, {playerName}. Attenzione alle campane.",
-  'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Fai rapporto a Sexton Marrow',
-  'entities.quests.q_ww_bells_of_gallowmere.text':
-    "Hai sentito quel rintocco, {playerName}? Quella è Gallowmere, lungo la strada a nord, che suona per far addormentare i morti. Sexton Marrow tiene il conto di ogni anima sotto il baldacchino, viva e sepolta. Va' e fatti contare, prima che sia il legno a contare te.",
-  'entities.quests.q_ww_bells_of_gallowmere.title': 'Le campane di Gallowmere',
-  'entities.quests.q_ww_candles_at_the_bounds.completion':
-    "Tutti e quattro in fiamme? Poi respira, {playerName}. Tu non l'hai sentito, ma l'intero villaggio lo ha sentito: le campane hanno suonato più forte nel momento in cui ha preso l'ultimo stoppino.",
-  'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Riaccensione del cero tombale',
-  'entities.quests.q_ww_candles_at_the_bounds.text':
-    'Quattro pietre di confine circondano Gallowmere, {playerName}, una su ogni strada in uscita, e una candela tombale arde su ogni pietra. Mentre bruciano, i sepolti restano sepolti. La pioggerellina li ha sommersi, tutti e quattro, e io sono troppo vecchio per percorrere i confini da solo. Prendi la mia candela e riaccendila, velocemente.',
-  'entities.quests.q_ww_candles_at_the_bounds.title': 'Candele ai limiti',
-  'entities.quests.q_ww_horn_of_the_huntsman.completion':
-    "Il corno si fermò a metà nota. Ogni campana di Gallowmere suonò una volta, da sola, e poi il bosco divenne più silenzioso di quanto non avessi mai sentito in trent'anni. Hai eseguito il rito che io non avrei potuto compiere, {playerName}. Indossalo e cammina sotto la tettoia senza paura.",
-  'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label':
-    'Il Cacciatore Pallido disarcionato',
-  'entities.quests.q_ww_horn_of_the_huntsman.text':
-    'Ormai hai sentito il corno, {playerName}, sottile e lontano, il suono per cui tutto il bosco trattiene il fiato. Il Cacciatore Pallido cavalca la sua radura a nord di qui, e ogni tomba che passa diventa meno profonda. Una volta era un uomo, ed è stato sepolto nel modo sbagliato, e io ho smesso di fingere che la preghiera possa bastare. Prendi un amico, prendine due e disarcionalo.',
-  'entities.quests.q_ww_horn_of_the_huntsman.title': 'Il Corno del Cacciatore',
-  'entities.quests.q_ww_silk_in_the_eaves.completion':
-    'Dieci tessitori in meno nelle gronde. Stasera i lampionai faranno il giro senza alzare lo sguardo, e qui questo vale più di quanto tu creda.',
-  'entities.quests.q_ww_silk_in_the_eaves.objectives.0.label': 'Filatore della Vedova Seta ucciso',
-  'entities.quests.q_ww_silk_in_the_eaves.text':
-    'Alza lo sguardo quando percorri la strada ovest, {playerName}, e li vedrai: forme avvolte nel baldacchino, che ondeggiano dove non arriva il vento. Le vedove filatrici di seta sono strisciate fuori dal Boschetto e hanno appeso le loro dispense sopra le mie lanterne. Uccidine dieci e la strada sarà di nuovo una strada.',
-  'entities.quests.q_ww_silk_in_the_eaves.title': 'Seta nelle gronde',
-  'entities.quests.q_ww_the_last_vicar.completion':
-    "Midollo si preoccupa per me? Questa è una novità. Digli che la Pietra funebre è in piedi, in un certo senso, e anch'io lo faccio. Resta un po', {playerName}. Il laghetto ha sussurrato e preferirei non ascoltare da solo.",
-  'entities.quests.q_ww_the_last_vicar.objectives.0.label': 'Trova il vicario Creel',
-  'entities.quests.q_ww_the_last_vicar.text':
-    'A sud di qui la Cappella Mournstone si sgretola accanto al suo laghetto nero, e un uomo ancora se ne prende cura: Vicario Creel, che non voleva andarsene quando il tetto crollava. Conosce gli antichi riti meglio delle mie campane, {playerName}, e non manda notizie da un mese. Percorri la strada della cappella e guardalo respirare.',
-  'entities.quests.q_ww_the_last_vicar.title': "L'Ultimo Vicario",
-  'entities.quests.q_ww_walking_mosley_home.completion':
-    "Ha varcato il cancello con le sue gambe, giurando che d'ora in poi non avrebbe scavato nulla più in profondità di un letto di rape. Tornerà al cantiere entro domenica, come sempre. Grazie, {playerName}. Gallowmere mantiene la sua gente, questa è l'intera nostra legge.",
-  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
-    'Il becchino Mosley tornò sano e salvo a Gallowmere',
-  'entities.quests.q_ww_walking_mosley_home.text':
-    'Il mio becchino Mosley tre giorni fa ha preso la strada della cappella per aprire un terreno nel vecchio cortile, e lo scavo gli è caduto addosso. È riuscito ad uscire con gli artigli, lo sciocco è vivo, ma è rannicchiato vicino alle tombe della cappella e non si muoverà per i filatori sulla strada. Accompagnalo a casa, {playerName}. Non posso suonare le campane di un uomo vivo.',
-  'entities.quests.q_ww_walking_mosley_home.title': 'Camminando verso casa Mosley',
-  'entities.quests.q_ww_what_the_bark_holds.completion':
-    'Tre anime di nuovo sotto terra onesta prima del calare della notte. Gli shambler ricresceranno, la corteccia lo fa sempre, ma stasera la radura è vuota, e questo basta.',
-  'entities.quests.q_ww_what_the_bark_holds.objectives.0.label':
-    'Il Barbone di Corteccia Graven è stato abbattuto',
-  'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Silkbound rimane tagliato',
-  'entities.quests.q_ww_what_the_bark_holds.text':
-    'Nella Radura Sospesa a est di Gallowmere i filatori appendono ai rami i loro morti avvolti nella seta, e i camminatori di corteccia di tomba stanno di guardia sotto come pazienti portatori di bara. Quella è la nostra gente lassù, {playerName}. Spezza cinque shambler, abbatti tre dei morti avvolti e riportali a casa sulla terra.',
-  'entities.quests.q_ww_what_the_bark_holds.title': 'Ciò che contiene la corteccia',
-  'entities.quests.q_ww_widows_skeins.completion':
-    "Sei matasse, morbide come un respiro trattenuto. I morti mentiranno più facilmente in questo. Prendi queste fasce, le ho cucite dall'ultimo lotto e il legno non le ha mai morse.",
-  'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Matassa di seta vedova',
-  'entities.quests.q_ww_widows_skeins.text':
-    'I filatori prendono i nostri morti per le loro dispense, {playerName}, quindi prendo la loro seta per i nostri sudari. Brucia in modo pulito e contiene una benedizione migliore di quanto abbia mai fatto il lino. Portami sei matasse di seta vedova, e la prossima anima che seppelliremo verrà avvolta e protetta.',
-  'entities.quests.q_ww_widows_skeins.title': 'Le matasse della vedova',
-  'entities.quests.q_ww_wraiths_of_the_tarn.completion':
-    'Otto guardiani finalmente si sdraiarono. Non la chiamerò una grazia alla luce del giorno, ma detto tra noi, {playerName}, lo è stata.',
-  'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Spettro dei Boschi ucciso',
-  'entities.quests.q_ww_wraiths_of_the_tarn.text':
-    'Gli spettri del bosco una volta erano i guardiani della cappella, {playerName}, cresciuti da alberi piantati sopra i morti onorati. Da quando il laghetto è diventato nero hanno dimenticato il loro ufficio, e ora vagano per il mio cimitero scavando la terra. Rompine otto prima che finiscano ciò che hanno iniziato.',
-  'entities.quests.q_ww_wraiths_of_the_tarn.title': 'Spettri del Tarn',
-  'entities.zones.amberfall.name': "Caduta d'Ambra",
-  'entities.zones.amberfall.pois.0.label': 'Tradotto: Lanternmere',
-  'entities.zones.amberfall.pois.1.label': "La fusione dell'oro",
-  'entities.zones.amberfall.pois.2.label': 'Il Frutteto Dorato',
-  'entities.zones.amberfall.pois.3.label': 'Tradotto: Harvest Hollow',
-  'entities.zones.amberfall.pois.4.label': 'Il Grande Mare',
-  'entities.zones.amberfall.pois.5.label': "L'Ascesa dell'Acerocere",
-  'entities.zones.amberfall.pois.6.label': 'Il Monolite Pendente',
-  'entities.zones.amberfall.welcome':
-    "Qui ogni foglia arde d'oro e di rosso, eppure nessuna cade mai. Le lanterne di Lanternmere sono accese per te.",
-  'entities.zones.drakelands.name': 'Le Terre dei Draghi',
-  'entities.zones.drakelands.pois.0.label': 'Tradotto: Wyrmwatch',
-  'entities.zones.drakelands.pois.1.label': 'Il Gatewood',
-  'entities.zones.drakelands.pois.2.label': 'Dune di cenere',
-  'entities.zones.drakelands.pois.3.label': 'Tradotto: Trollmoot',
-  'entities.zones.drakelands.pois.4.label': "L'Ultima Fortezza",
-  'entities.zones.drakelands.pois.5.label': 'Campi di bicchieri di sangue',
-  'entities.zones.drakelands.pois.6.label': 'Caldera delle Fauci del Draco',
-  'entities.zones.drakelands.welcome':
-    'Il vento caldo trascina via la desolazione più avanti. I draghi volteggiano sulle Fauci del Draco e i fuochi dei troll ardono tra le dune.',
-  'entities.zones.eastbrook_vale.pois.11.label': 'La strada rialzata della Farshore',
-  'entities.zones.evergarden.name': "L'Evergarden",
-  'entities.zones.evergarden.pois.0.label': 'Tradotto: Hedgewick',
-  'entities.zones.evergarden.pois.1.label': 'La Porta del Giardino',
-  'entities.zones.evergarden.pois.2.label': 'La Passeggiata del Parterre',
-  'entities.zones.evergarden.pois.3.label': 'Castello di Dawnhold',
-  'entities.zones.evergarden.pois.4.label': 'Lo Stagno dei Petali',
-  'entities.zones.evergarden.pois.5.label': 'Il Grande Labirinto',
-  'entities.zones.evergarden.pois.6.label': 'La Corte della Fontana',
-  'entities.zones.evergarden.pois.7.label': 'Il Vecchio Mulino',
-  'entities.zones.evergarden.pois.8.label': 'La Guardia del Nord',
-  'entities.zones.evergarden.pois.9.label': 'La Conca dei Gigli',
-  'entities.zones.evergarden.welcome':
-    'Qualcuno taglia ancora le siepi, anche se da cento anni non si vede più il giardiniere. Attento al labirinto: ti fa attenzione.',
-  'entities.zones.farshore_isle.name': 'La Riva Lunga',
-  'entities.zones.farshore_isle.pois.0.label': 'Tradotto: Gullhaven',
-  'entities.zones.farshore_isle.pois.1.label': "L'Approdo",
-  'entities.zones.farshore_isle.pois.2.label': 'Il Prato della Guardia',
-  'entities.zones.farshore_isle.pois.3.label': 'Le scogliere separate',
-  'entities.zones.farshore_isle.pois.4.label': 'I Riftfield',
-  'entities.zones.farshore_isle.welcome':
-    'Attraversa il banco di sabbia e la campana di Gullhaven ti troverà prima della città. Le brecce si aprono senza preavviso e la ridotta mantiene la sua sponda contro qualunque cosa si riversi. Aspettano da molto tempo qualcuno come te.',
-  'entities.zones.frostveil.name': 'La Distesa di Velo Gelido',
-  'entities.zones.frostveil.pois.0.label': 'Manto di ghiaccio',
-  'entities.zones.frostveil.pois.1.label': 'La linea delle nevi',
-  'entities.zones.frostveil.pois.2.label': 'Ghiacciaio Tarn',
-  'entities.zones.frostveil.pois.3.label': "La Scalinata dell'Aurora",
-  'entities.zones.frostveil.pois.4.label': 'Lo Shiverfen',
-  'entities.zones.frostveil.pois.5.label': 'Le Terrazze Ululanti',
-  'entities.zones.frostveil.welcome':
-    'La neve ingoia ogni rumore. Sotto le luci danzanti, il freddo stesso si sente sveglio.',
-  'entities.zones.galecrest.name': 'Il Galecrest',
-  'entities.zones.galecrest.pois.0.label': 'Tradotto: Wickharbor',
-  'entities.zones.galecrest.pois.1.label': 'La Windway',
-  'entities.zones.galecrest.pois.2.label': 'Le Cascate Ululanti',
-  'entities.zones.galecrest.pois.3.label': 'Il Vecchio Faro',
-  'entities.zones.galecrest.pois.4.label': 'Il Taglio',
-  'entities.zones.galecrest.pois.5.label': 'I campi distrutti',
-  'entities.zones.galecrest.pois.6.label': 'Il Lago degli Specchi',
-  'entities.zones.galecrest.pois.7.label': 'Le Scuderie di Galecrest',
-  'entities.zones.galecrest.welcome':
-    'Qui il vento non si è mai fermato e il Vecchio Faro non si è mai spento. Wickharbor ti chiede solo di chiudere la porta della locanda dietro di te.',
-  'entities.zones.nightbloom.name': 'Il Fiore Notturno',
-  'entities.zones.nightbloom.pois.0.label': 'Riposo lunare',
-  'entities.zones.nightbloom.pois.1.label': 'La Porta della Notte',
-  'entities.zones.nightbloom.pois.2.label': 'Il Pozzo Lunare',
-  'entities.zones.nightbloom.pois.3.label': 'Campogloam',
-  'entities.zones.nightbloom.pois.4.label': 'La Veglia Permanente',
-  'entities.zones.nightbloom.pois.5.label': 'Il tumulo insonne',
-  'entities.zones.nightbloom.welcome':
-    "Oltre la Porta della Notte l'aria stessa sogna. Segui la luce dei fiori fino a Moonrest e bada al mondo addormentato sospeso nel cielo.",
-  'entities.zones.palmreach.name': 'Il Palmreach',
-  'entities.zones.palmreach.pois.0.label': 'Tradotto: Drifthaven',
-  'entities.zones.palmreach.pois.1.label': 'La Bocca Groviglio',
-  'entities.zones.palmreach.pois.2.label': 'Il Palmstrand',
-  'entities.zones.palmreach.pois.3.label': 'Il Groviglio di Smeraldo',
-  'entities.zones.palmreach.pois.4.label': 'La Vinefall',
-  'entities.zones.palmreach.pois.5.label': 'La Laguna di Zaffiro',
-  'entities.zones.palmreach.pois.6.label': "L'idolo sommerso",
-  'entities.zones.palmreach.welcome':
-    "Sabbia calda, uccelli rumorosi e una giungla che divora l'orizzonte. Drifthaven tiene acceso un fuoco sulla spiaggia per te.",
-  'entities.zones.veiled_hollow.name': 'La Valle Velata',
-  'entities.zones.veiled_hollow.pois.0.label': 'Bagliore antico',
-  'entities.zones.veiled_hollow.pois.1.label': 'Grotta del Crepuscolo',
-  'entities.zones.veiled_hollow.pois.2.label': 'Belvedere del Crepuscolo',
-  'entities.zones.veiled_hollow.pois.3.label': 'Anziano Grove',
-  'entities.zones.veiled_hollow.pois.4.label': 'Bacino delle Stelle al Calore',
-  'entities.zones.veiled_hollow.pois.5.label': 'La Corte Sommersa',
-  'entities.zones.veiled_hollow.pois.6.label': 'Secche cristalline',
-  'entities.zones.veiled_hollow.pois.7.label': "L'Abisso Scintillante",
-  'entities.zones.veiled_hollow.welcome':
-    "L'aria risuona di antica magia. Cerca la Custode Saelwyn sotto il grande albero di Eldergleam.",
-  'entities.zones.willowfen.name': 'Il Willowfen',
-  'entities.zones.willowfen.pois.0.label': 'Tradotto: Bridgemere',
-  'entities.zones.willowfen.pois.1.label': "La Scalinata dell'Amberfen",
-  'entities.zones.willowfen.pois.2.label': 'I Lilymoors',
-  'entities.zones.willowfen.pois.3.label': 'Piscine paludose',
-  'entities.zones.willowfen.pois.4.label': 'Pianta di salice',
-  'entities.zones.willowfen.pois.5.label': 'Gli appartamenti sonnolenti',
-  'entities.zones.willowfen.welcome':
-    "La palude brulica di libellule e di api. Attraversa il ponte verso Bridgemere e riposa un po' i piedi.",
-  'entities.zones.wraithwood.name': 'Il Bosco Spettro',
-  'entities.zones.wraithwood.pois.0.label': 'Tradotto: Gallowmere',
-  'entities.zones.wraithwood.pois.1.label': 'Il Crowgate',
-  'entities.zones.wraithwood.pois.2.label': 'Boschetto della vedova',
-  'entities.zones.wraithwood.pois.3.label': 'La Radura Sospesa',
-  'entities.zones.wraithwood.pois.4.label': 'La Cappella delle Pietre Lapide',
-  'entities.zones.wraithwood.pois.5.label': 'La radura del cacciatore',
-  'entities.zones.wraithwood.welcome':
-    'La tettoia si chiude sulla strada come un coperchio. Resta vicino alle lanterne di Gallowmere e non rispondere se il bosco chiama il tuo nome.',
-  'fiesta.augment.cardAria': '() - {name} {category} {description}',
-  'guide.dungeonsPage.wildheartBody':
-    'Una caldera nella giungla bagnata dalla pioggia dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa le tane delle bestie e le rovine degli antenati, quindi scala la piramide rituale per affrontare Zulgar.',
-  'guide.family.demon.desc':
-    'Invasori da oltre le spaccature, tutto fuoco e disprezzo. Dove ci si trova, una breccia non è mai lontana.',
-  'guide.family.demon.name': 'Demoni',
-  'guide.family.kobold.desc':
-    'Spazzini e folletti che sfrecciano nelle radure e nelle siepi, più un fastidio che una minaccia finché non si radunano in gran numero.',
-  'guide.family.kobold.name': 'Furfanti',
-  'guide.family.murloc.desc':
-    'Gracidano pesce-gente delle rive dei laghi e delle pozze di marea, pronto a sciamare su qualunque cosa si avvicini troppo.',
-  'guide.family.murloc.name': 'Tradotto: Croakfins',
-  'guide.home.world.amberBlurb':
-    'Dietro le scogliere occidentali un autunno che non finisce mai, e lanterne su una laguna dorata.',
-  'guide.home.world.amberName': "La Caduta d'Ambra",
-  'guide.home.world.duskBlurb':
-    "Un regno sigillato sotto le montagne, se i sussurri di un'entrata sono veri.",
-  'guide.home.world.duskName': 'La Fossa Velata',
-  'guide.home.world.emberBlurb':
-    'Attraverso la Pale Causeway il verde lascia il posto alla cenere, e qualcosa di vecchio governa le terre desolate.',
-  'guide.home.world.emberName': 'Le Terre dei Draghi',
-  'guide.home.world.fenBlurb':
-    'Oltre la corona autunnale, una luminosa palude di salici e acqua tranquilla, e una città dietro un fossato.',
-  'guide.home.world.fenName': 'Il Willowfen',
-  'guide.home.world.frostBlurb':
-    "Un'altezza innevata oltre ogni mappa, intravista solo nelle luci danzanti.",
-  'guide.home.world.frostName': 'La Distesa di Velogelido',
-  'guide.worldPage.amberBlurb':
-    'Un autunno eterno di foglie dorate e rosse che non cadono mai, raccolte attorno alla città di Lanternmere illuminata dalle lanterne.',
-  'guide.worldPage.amberGreeter': 'Il lanterniere, Lanternmere',
-  'guide.worldPage.amberGreeting':
-    "Qui ogni foglia arde d'oro e di rosso, eppure nessuna cade mai. Le lanterne sono accese per te; fai attenzione al Goldmelt mentre sali.",
-  'guide.worldPage.amberPlaceNotes':
-    'Lanternmere risplende nel cuore del raccolto. Il Goldmelt è il passaggio ambrato; il Frutteto Dorato e la Conca del Raccolto custodiscono i guadagni più dolci e i ladri più audaci; il Grande Lago rispecchia le foglie in fiamme; Cindermaple Rise è il più alto e il più rosso; e il Monolite Pendente ricorda qualcosa di più antico dell’autunno.',
-  'guide.worldPage.duskBlurb':
-    "Una valle dal crepuscolo permanente sotto il grande albero di Eldergleam, dove le rovine di cristallo brillano e l'aria vibra di antica magia.",
-  'guide.worldPage.duskGreeter': 'Custode Saelwyn, Bagliore Antico',
-  'guide.worldPage.duskGreeting':
-    'Pochi della tua specie sono rimasti sotto questi rami. Cammina dolcemente e sii il benvenuto.',
-  'guide.worldPage.duskPlaceNotes':
-    "Il Bagliore Antico si raccoglie sotto il grande albero. La Grotta Crepuscolo e il suo belvedere sono la via d'accesso e la prima vista della valle; Elder Grove e Starfall Basin mantengono il tranquillo sud; la Corte Sommersa custodisce rovine ricoperte di vegetazione a est; e le Profondità Scintillanti e le Secche Cristalline brillano attraverso il nord.",
-  'guide.worldPage.emberBlurb':
-    'Distese di cenere e vetro sanguigno illuminate dalla tempesta dove i draghi volteggiano sulla caldera e i fuochi dei troll ardono tra le dune, osservati dalla città-porta di Wyrmwatch.',
-  'guide.worldPage.emberGreeter': 'Il guardiano, Wyrmwatch',
-  'guide.worldPage.emberGreeting':
-    'Vento caldo dalle terre desolate, draghi sopra Fauci del Draco e fuochi di troll tra le dune. Bevi prima di uscire.',
-  'guide.worldPage.emberPlaceNotes':
-    "Wyrmwatch tiene il cancello. Il Gatewood è l'ultimo green prima dei rifiuti; le Dune di Cenere sono piene di cenere e peggio; il Trollmoot è il luogo in cui i troll delle dune raccolgono i loro fuochi; i Campi di Bloodglass brillano di schegge di rasoio; e la Caldera di Drakemaw è la corona fumante del cerchio dei draghi.",
-  'guide.worldPage.fenBlurb':
-    'Una zona umida luminosa e ronzante di ninfee e acqua lenta, attraversata su vecchie passerelle in legno dalla città-ponte di Bridgemere.',
-  'guide.worldPage.fenGreeter': 'Il guardiano del ponte, Bridgemere',
-  'guide.worldPage.fenGreeting':
-    "La palude brulica di libellule e di api. Attraversa il ponte, riposa un po' i piedi e rimani sulle assi oltre le piscine.",
-  'guide.worldPage.fenPlaceNotes':
-    "Bridgemere siede a cavalcioni dell'acqua lenta. I gradini dell'Amberfen scendono dal paese del raccolto; le Lilymoors e le Bogshine Pools brillano di fuochi fatui e libellule; La pianta di salice trascina i suoi rami nella pianura; e le Drowsy Flats sono dolci quanto questa terra.",
-  'guide.worldPage.frostBlurb':
-    "Un silenzio di neve e pini scuri sotto l'aurora, dove il freddo stesso si sente sveglio e Icemantle mantiene accesi i suoi fuochi.",
-  'guide.worldPage.frostGreeter': 'Il custode del focolare, Mantodighiaccio',
-  'guide.worldPage.frostGreeting':
-    'La neve inghiotte ogni rumore oltre il muro. Se le luci iniziano a ballare, abbassa la voce e accendi il fuoco.',
-  'guide.worldPage.frostPlaceNotes':
-    "Icemantle mantiene l'ultimo focolare caldo. Lo Snowline segna il punto in cui prendono il sopravvento le derive; Il ghiacciaio Tarn è nero, l'acqua ferma sotto il ghiaccio; la Scalinata dell'Aurora si inerpica sotto le luci danzanti; lo Shiverfen è un pantano ghiacciato che non dorme mai del tutto; e le Terrazze Ululanti guadagnano il loro nome ogni notte.",
-  'guide.worldPage.galeBlurb':
-    'Scogliere marine e discese ululanti dove il vento non si ferma mai, il Vecchio Faro non si spegne mai, e Wickharbor chiude ermeticamente le sue porte.',
-  'guide.worldPage.galeGreeter': 'Il guardiano del faro, Wickharbor',
-  'guide.worldPage.galeGreeting':
-    'Qui il vento non si è mai fermato e il Vecchio Faro non si è mai spento. Chiudi la porta della locanda dietro di te.',
-  'guide.worldPage.galePlaceNotes':
-    "Wickharbor si appoggia al vento. La Windway è la strada sulla scogliera; le Colline Ululanti rotolano senza alberi sotto il vento; il Vecchio Faro è bruciato da molto tempo, a quanto si può dire; il taglio cade a strapiombo sull'acqua; i Wreckfields mantengono onesta la costa; e il Mirror Tarn è l'unica cosa tranquilla in tutto il regno.",
-  'guide.worldPage.gardenBlurb':
-    'Un regno di giardini labirintici di siepi ancora curati da nessun giardiniere che nessuno abbia mai visto, entrava oltre Hedgewick e i suoi cortili con fontane.',
-  'guide.worldPage.gardenGreeter': 'Il guardiano, Hedgewick',
-  'guide.worldPage.gardenGreeting':
-    'Qualcuno taglia ancora le siepi, anche se da cento anni non si vede più il giardiniere. Attento al labirinto: ti fa attenzione.',
-  'guide.worldPage.gardenPlaceNotes':
-    "Hedgewick aspetta al Cancello del Giardino. La Passeggiata del Parterre sboccia in colori tagliati; Il castello di Dawnhold addestra i suoi cavalieri dietro nuove mura; lo Stagno dei Petali si colora di rosa tutto l'anno; il Vecchio Mulino ribalta i propri letti ad anello; il Grande Labirinto riorganizza i suoi modi per ogni ospite, i suoi archi sorvegliati da volpi frondose; la North Watch mantiene la strada d'uscita; il Bacino dei Gigli si trova al di là di tutto; e la Corte della Fontana corre ancora chiara nel cuore del giardino.",
-  'guide.worldPage.hauntBlurb':
-    "Una foresta infestata sotto giganteschi baldacchini, dove le lanterne di Gallowmere sono l'unica luce onesta sulla strada.",
-  'guide.worldPage.hauntGreeter': 'Il lampionaio, Gallowmere',
-  'guide.worldPage.hauntGreeting':
-    'Resta vicino alle lanterne, viaggiatore. E se il bosco chiama il tuo nome da fuori strada, non rispondere.',
-  'guide.worldPage.hauntPlaceNotes':
-    "Gallowmere si rannicchia all'interno delle sue lanterne. Il Crowgate è la cupa porta d'ingresso del bosco; Il Boschetto della Vedova è fitto di ragnatele; la Radura Sospesa e la Cappella della Pietra Mortuaria custodiscono i dolori più antichi della foresta; e la Radura del Cacciatore appartiene a tutto ciò che ancora caccia lì.",
-  'guide.worldPage.jungleBlurb':
-    'Un groviglio tropicale di palme, sabbia bianca e uccelli rumorosi, con la cittadina balneare di Drifthaven che tiene acceso un fuoco sulla spiaggia.',
-  'guide.worldPage.jungleGreeter': 'La capitana del porto, Drifthaven',
-  'guide.worldPage.jungleGreeting':
-    "Sabbia calda, uccelli rumorosi e una giungla che divora l'orizzonte. Teniamo acceso un fuoco sulla spiaggia; prova a tornarci sopra.",
-  'guide.worldPage.junglePlaceNotes':
-    "Drifthaven mantiene il fuoco sulla spiaggia. Il Tanglemouth è dove il fiume incontra il muro verde; il Palmstrand scorre bianco e caldo lungo le onde; il Groviglio di Smeraldo e la Caduta di Rampicanti inghiottono l'interno; la Laguna dello Zaffiro risplende chiara e profonda; e l'idolo sommerso osserva da sott'acqua.",
-  'guide.worldPage.nightBlurb':
-    'Un regno della mezzanotte stellata dove i fiori illuminano i sentieri e il Riposo della Luna veglia silenziosa sotto un cielo sognante.',
-  'guide.worldPage.nightGreeter': 'Il guardiano della veglia, Moonrest',
-  'guide.worldPage.nightGreeting':
-    "Oltre la Porta della Notte l'aria stessa sogna. Segui la luce dei fiori e bada al mondo addormentato sospeso nel cielo.",
-  'guide.worldPage.nightPlaceNotes':
-    "Moonrest veglia. La Porta della Notte è la via verso il paese della mezzanotte; il Moonwell contiene la luce delle stelle accanto alla quale puoi stare; Gloamfield fiorisce nell'oscurità; la Veglia Permanente veglia senza mai muoversi; e il tumulo degli insonni è l'unico posto qui che non sogna mai.",
   'hudChrome.continentMap.levels': 'Livelli da {min} a {max}',
   'hudChrome.continentMap.summary': 'Mappa del mondo. Scegli una zona per aprire la sua mappa.',
-  'hudChrome.continentMap.title': 'Mappa del mondo',
+  'hudChrome.continentMap.title': 'Mappa del Mondo',
   'hudChrome.continentMap.toWorld': 'Mappa del mondo',
-  'hudChrome.continentMap.toZone': 'Mappa delle zone',
-  'hudChrome.continentMap.toggleAria': 'Passa dalla mappa del mondo alla mappa delle zone',
-  'hudChrome.itemTooltip.riftSockets': 'Gemme della spaccatura / {used} {total}',
-  'hudChrome.itemTooltip.riftTier': 'Oggetto Varco di grado {tier}',
-  'hudChrome.itemTooltip.riftUpgrade': 'Miglioramento Varco /{max} {level}',
-  'hudChrome.meters.breakdownOther': 'Altro ({count})',
-  'hudChrome.meters.breakdownRow': '() {value} {percent}',
-  'hudChrome.meters.breakdownSummary': '{tab}: {value}',
-  'hudChrome.meters.melee': 'Mischia',
-  'hudChrome.meters.percent': '% {value}',
-  'hudChrome.meters.petAbility': '{animale domestico}: {abilità} {pet} {ability}',
-  'hudChrome.mountRace.cancelButton': 'Annulla gara',
-  'hudChrome.mountRace.finished': 'Finito in {seconds}s!',
-  'hudChrome.mountRace.go': 'VAI!',
-  'hudChrome.mountRace.progress': 'Porte {n} su {total}',
-  'hudChrome.mountRace.start': "Vai! Completa ogni salto, poi torna indietro attraverso l'arco.",
-  'hudChrome.mountRace.startButton': 'Inizia la gara',
-  'hudChrome.mountRace.timeLeft': 's {seconds}',
-  'hudChrome.mountRace.timeout': 'Gara fallita',
-  'hudChrome.mountRace.toFinish': "Torna indietro attraverso l'arco!",
-  'hudChrome.mountTraining.begin': 'Inizio lezione',
-  'hudChrome.mountTraining.mountPrompt':
-    'Premi il per montare sul Destriero del Valore da addestramento. {key}',
+  'hudChrome.continentMap.toZone': 'Mappa della zona',
+  'hudChrome.continentMap.toggleAria': 'Passa dalla mappa del mondo alla mappa della zona',
+  'hudChrome.mountTraining.begin': 'Inizia la Lezione',
+  'hudChrome.mountTraining.mountPrompt': 'Premi {key} per salire sul Valorsteed di addestramento.',
   'hudChrome.mountTraining.ownedMountPrompt':
-    'Le tue redini sono nelle tue borse. Usali per guidare.',
+    'Le tue redini sono nelle tue borse. Usale per cavalcare.',
   'hudChrome.mountTraining.returnToMarla':
-    'Ritorna da Marla alle stalle per acquistare le redini del Valorsteed per 10g.',
+    'Torna da Marla alle stalle per comprare le redini del tuo Valorsteed per 10g.',
   'hudChrome.mountTraining.ridePrompt':
-    "Segui l'indicatore luminoso fino alla linea di partenza, quindi premi Inizia gara.",
+    'Segui il marcatore luminoso fino alla linea di partenza, poi premi Inizia la Corsa.',
   'hudChrome.mountTraining.success': 'Hai domato il Valorsteed.',
-  'hudChrome.mounts.useToRide': 'Usalo per evocare questa cavalcatura.',
-  'hudChrome.unstuck.alreadyActive': 'Il conto alla rovescia per lo sblocco è già in corso.',
+  'hudChrome.mountRace.cancelButton': 'Annulla la Corsa',
+  'hudChrome.mountRace.finished': 'Terminata in {seconds}s!',
+  'hudChrome.mountRace.go': 'VIA!',
+  'hudChrome.mountRace.progress': 'Cancelli {n} di {total}',
+  'hudChrome.mountRace.start': "Via! Supera ogni salto, poi torna cavalcando attraverso l'arco.",
+  'hudChrome.mountRace.startButton': 'Inizia la Corsa',
+  'hudChrome.mountRace.timeLeft': '{seconds}s',
+  'hudChrome.mountRace.timeout': 'Corsa Fallita',
+  'hudChrome.mountRace.toFinish': "Torna cavalcando attraverso l'arco!",
+  'hudChrome.unstuck.alreadyActive': 'Sblocco è già in conto alla rovescia.',
   'hudChrome.unstuck.alreadySafe': 'Sei già in una posizione sicura e raggiungibile.',
-  'hudChrome.unstuck.busy': "Termina l'azione corrente prima di utilizzare Sblocca.",
+  'hudChrome.unstuck.busy': "Completa l'azione in corso prima di usare Sblocco.",
   'hudChrome.unstuck.cancelledBusy': "Sblocco annullato perché hai avviato un'altra azione.",
   'hudChrome.unstuck.cancelledCombat': 'Sblocco annullato perché sei entrato in combattimento.',
   'hudChrome.unstuck.cancelledDamaged': 'Sblocco annullato perché hai subito danni.',
   'hudChrome.unstuck.cancelledDisconnected': 'Sblocco annullato perché ti sei disconnesso.',
-  'hudChrome.unstuck.cancelledMoved': 'Sblocco annullato perché ti sei spostato.',
+  'hudChrome.unstuck.cancelledMoved': 'Sblocco annullato perché ti sei mosso.',
   'hudChrome.unstuck.cancelledState': 'Sblocco annullato perché il tuo stato è cambiato.',
-  'hudChrome.unstuck.combat': 'Non puoi usare Sbloccato durante il combattimento.',
-  'hudChrome.unstuck.completed': 'Spostato nel punto sicuro più vicino raggiungibile.',
+  'hudChrome.unstuck.combat': 'Non puoi usare Sblocco durante il combattimento.',
+  'hudChrome.unstuck.completed': 'Spostato nel punto sicuro raggiungibile più vicino.',
   'hudChrome.unstuck.completedAtGraveyard':
-    'Il tuo spirito è tornato al cimitero più vicino. Parla con il Custode Pallido per accettare il Pedaggio del Custode.',
-  'hudChrome.unstuck.controlled': 'Non puoi usare Sblocca mentre il movimento è compromesso.',
-  'hudChrome.unstuck.cooldown': 'Lo sblocco sarà pronto tra {seconds} secondi.',
-  'hudChrome.unstuck.countdown': 'Sbloccato: {seconds}',
-  'hudChrome.unstuck.dead': 'Non puoi usare Sbloccato mentre sei morto o in forma di spirito.',
+    'Il tuo spirito è tornato al cimitero più vicino. Parla con il Custode Pallido per accettare il Mal di resurrezione.',
+  'hudChrome.unstuck.controlled': 'Non puoi usare Sblocco mentre il movimento è impedito.',
+  'hudChrome.unstuck.cooldown': 'Sblocco sarà pronto tra {seconds} secondi.',
+  'hudChrome.unstuck.countdown': 'Sblocco: {seconds}',
+  'hudChrome.unstuck.dead': 'Non puoi usare Sblocco mentre sei morto o in forma di spirito.',
   'hudChrome.unstuck.help':
-    'Recupero: /unstuck avvia un conto alla rovescia stazionario per spostarti in un punto sicuro raggiungibile nelle vicinanze.',
+    'Recupero: /unstuck avvia un conto alla rovescia da fermo per spostarti in un punto sicuro raggiungibile nelle vicinanze.',
   'hudChrome.unstuck.helpAtGraveyard':
-    'Recupero: /unstuck avvia un conto alla rovescia stazionario, quindi invia il tuo spirito al cimitero più vicino. Il ritorno attraverso il Custode Pallido richiede il Pedaggio del Custode.',
-  'hudChrome.unstuck.menuButton': 'Sbloccato',
+    'Recupero: /unstuck avvia un conto alla rovescia da fermo, poi invia il tuo spirito al cimitero più vicino. Tornare tramite il Custode Pallido richiede il Mal di resurrezione.',
+  'hudChrome.unstuck.menuButton': 'Sblocco',
   'hudChrome.unstuck.noSafePosition':
-    'Non è stato trovato alcun posto sicuro raggiungibile nelle vicinanze. Non sei stato commosso.',
+    'Non è stato trovato alcun punto sicuro raggiungibile nelle vicinanze. Non sei stato spostato.',
   'hudChrome.unstuck.revivedAtGraveyard':
-    'Sei stato riportato al cimitero più vicino e rianimato. Il tributo del custode pesa su di te.',
-  'hudChrome.unstuck.standStill': 'Resta fermo su un terreno solido prima di usare Sblocca.',
-  'hudChrome.unstuck.standStillAnywhere': 'Resta fermo prima di usare Unstuck.',
+    'Sei stato riportato al cimitero più vicino e rianimato. Il Mal di resurrezione grava su di te.',
+  'hudChrome.unstuck.standStill': 'Resta fermo su terreno solido prima di usare Sblocco.',
+  'hudChrome.unstuck.standStillAnywhere': 'Resta fermo prima di usare Sblocco.',
   'hudChrome.unstuck.started':
-    "Sbloccato in {seconds} secondi. Muoversi, combattere, subire danni o iniziare un'altra azione lo annulla.",
-  'hudChrome.unstuck.unavailable': 'Sbloccato non è disponibile nel tuo stato attuale.',
-  'sim.rift.allUnstable': 'Tutte le spaccature sono instabili in questo momento. Riprova presto.',
-  'sim.rift.alreadyCleared': 'Questa spaccatura è già stata risolta da {names}.',
-  'sim.rift.deadEntry': 'Non puoi entrare in una spaccatura mentre sei morto.',
-  'sim.rift.deadEntryCombat':
-    'Il tuo gruppo è ancora in combattimento. I morti potrebbero rientrare una volta interrotti i combattimenti.',
-  'sim.rift.descendFloor': 'Scendi più in profondità in. {name}',
-  'sim.rift.detonateAbsoluteZero': 'Esplode lo Zero Assoluto!',
-  'sim.rift.detonateAbyssalMaw': 'Fauci Abissali chiude!',
-  'sim.rift.detonateArcaneAnnihilation': "Esplode l'Annientamento Arcano!",
-  'sim.rift.detonateBloodRite': 'Il Rito del Sangue cade!',
-  'sim.rift.detonateBroodmothersMark': 'Il Marchio della Madre della Stirpe esplode!',
-  'sim.rift.detonateCoreMeltdown': 'La fusione del nucleo esplode!',
-  'sim.rift.detonateCrushingDepth': 'Profondità di schiacciamento schiaccia!',
-  'sim.rift.detonateDeathSentence': 'Caduta la condanna a morte!',
-  'sim.rift.detonateEarthshatter': 'Earthshatter esplode!',
-  'sim.rift.detonateFinalJudgment': 'Il Giudizio Finale arriva!',
-  'sim.rift.detonateGlacialGrave': 'La tomba glaciale esplode!',
-  'sim.rift.detonateHellfireBrand': 'Il Marchio Hellfire esplode!',
-  'sim.rift.detonateLightningRod': 'Il parafulmine colpisce!',
-  'sim.rift.detonateMagmaWell': 'Il Pozzo di Magma erutta!',
-  'sim.rift.detonatePactSeal': 'Il Sigillo del Patto esplode!',
-  'sim.rift.detonatePitSentence': 'Pit Sentence esplode!',
-  'sim.rift.detonateSoulGrave': "La Tomba dell'Anima esplode!",
-  'sim.rift.detonateStormcallersWrath': "Scoppia l'Ira dell'Invocatore di Tempeste!",
-  'sim.rift.detonateVenomPool': 'La Piscina Velenosa erutta!',
-  'sim.rift.detonateVoidRift': 'Il Varco del Vuoto esplode!',
-  'sim.rift.enterFloor': 'Attraversi la spaccatura per entrare in {name}.',
-  'sim.rift.exitOpens': 'La spaccatura trema. Una strada verso casa si apre dietro i caduti.',
-  'sim.rift.forgeEnchanted': 'Incantamento del varco completato per {name}.',
-  'sim.rift.forgeSocketed': 'Gemma della spaccatura incastonata per. {name}',
-  'sim.rift.forgeUpgraded': 'Aggiornamento del Varco completato per. {name}',
-  'sim.rift.gateOpen': 'Il cancello si spalanca.',
-  'sim.rift.iceGoalLit': 'Il sigillo del gelo arde. La strada si muove.',
-  'sim.rift.levelGate':
-    'Solo gli avventurieri di livello {level} o superiore possono entrare in questa spaccatura.',
-  'sim.rift.orbOpensGate': 'La Sfera del Sangue avvampa. Le porte del tempio si aprono con forza.',
-  'sim.rift.orbSealed': 'La sfera viene sigillata dal rituale sottostante.',
-  'sim.rift.orbWakes': "La fiamma del pentagramma si spegne. Qualcosa si sveglia sull'altare.",
-  'sim.rift.portalCollapses': 'La frattura di rango {tier} in crolla. {zone}',
-  'sim.rift.portalOpens': 'Una spaccatura di si apre in! {tier} {zone}',
-  'sim.rift.portalSealed': 'La spaccatura di in è stata sigillata. {tier} {zone}',
-  'sim.rift.pylonLit': 'Un pilone runico prende vita ({lit}/{total}).',
-  'sim.rift.raceLost': 'La spaccatura è già stata cancellata da {names}. La tua corsa finisce.',
-  'sim.rift.raceLostBanner': 'Spaccatura già ripulita',
-  'sim.rift.raceWinBanner': 'Gara Rift vinta - secondi {seconds}',
-  'sim.rift.raceWorldWin': '{names} ha vinto la gara Rift di {tier} in {seconds} secondi!',
-  'sim.rift.seqProgress': 'Le rune rispondono a turno ({step}/{total}).',
-  'sim.rift.seqReset': 'Le rune si oscurano. Ricominciare.',
-  'sim.rift.socketsShut': 'Le prese si chiudono. La strada si muove.',
-  'sim.rift.stepBack': 'Fai un passo indietro attraverso la spaccatura.',
-  'sim.rift.wayDownOpens': 'La discesa si apre.',
+    "Sblocco tra {seconds} secondi. Muoverti, combattere, subire danni o avviare un'altra azione lo annulla.",
+  'hudChrome.unstuck.unavailable': 'Sblocco non è disponibile nel tuo stato attuale.',
 };

@@ -812,11 +812,11 @@ export const table: DeedLocaleTable = {
     desc: 'Salvasi 50 potong perlengkapan kembali menjadi material mentah.',
   },
   dgn_wildheart_basin: {
-    name: 'Cekungan Menggigit Kembali',
-    desc: 'Kalahkan Zulgar, Suara Cekungan di Cekungan Wildheart.',
+    name: 'Cekungan Membalas',
+    desc: 'Kalahkan Zulgar, Suara Cekungan, di Cekungan Hati Liar.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Heroik: Cekungan Wildheart',
-    desc: 'Kalahkan Zulgar, Voice of the Basin di Wildheart Basin pada tingkat kesulitan Heroic.',
+    name: 'Heroik: Cekungan Hati Liar',
+    desc: 'Kalahkan Zulgar, Suara Cekungan, di Cekungan Hati Liar pada tingkat kesulitan Heroik.',
   },
 };

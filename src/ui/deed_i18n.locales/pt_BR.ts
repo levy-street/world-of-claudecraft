@@ -815,11 +815,11 @@ export const table: DeedLocaleTable = {
     desc: 'Recupere 50 pecas de equipamento transformando-as em materiais brutos.',
   },
   dgn_wildheart_basin: {
-    name: 'A bacia morde de volta',
-    desc: 'Derrote Zulgar, Voz da Bacia na Bacia do Coração Selvagem.',
+    name: 'A Bacia Revida',
+    desc: 'Derrote Zulgar, Voz da Bacia, na Bacia de Wildheart.',
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Heroico: A Bacia do Coração Selvagem',
-    desc: 'Derrotar Zulgar, Voz da Bacia, na Bacia do Coração Selvagem, no modo Heroico.',
+    name: 'Heroico: A Bacia de Wildheart',
+    desc: 'Derrote Zulgar, Voz da Bacia, na Bacia de Wildheart na dificuldade Heroica.',
   },
 };

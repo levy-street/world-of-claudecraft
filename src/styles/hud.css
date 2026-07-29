@@ -2718,7 +2718,12 @@
   }
 
   /* ---------- combat meters ---------- */
-  #meters-window {
+  /* The damage window and the two detachable meters (Healing, Threat) share one
+     panel shape. Undisturbed they sit in the bottom-right HUD stack exactly as
+     the meters window always has; once the player drags or resizes one,
+     meters_frame.ts switches it to absolute left/top/width/height and stamps
+     .mt-framed, which is what turns it into a fixed-height scrolling column. */
+  .mt-panel {
     width: 240px;
     padding: 8px 10px;
     display: none;
@@ -2726,8 +2731,74 @@
     margin-bottom: 6px;
     text-align: left;
   }
-  #meters-window .panel-title {
+  .mt-panel .panel-title {
     margin-bottom: 4px;
+  }
+  /* A framed panel owns its height, so the bar list takes the leftover space and
+     scrolls rather than pushing the panel taller than the player sized it. */
+  /* The framed column's `display: flex` is written inline alongside the box (the
+     panel's open/closed state is an inline display too, so the class cannot win
+     that tie); this carries the rest of the framed layout. */
+  .mt-panel.mt-framed {
+    flex-direction: column;
+    z-index: 21;
+  }
+  .mt-panel.mt-framed .mt-rows {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  /* The title bar is the move handle. Buttons inside keep their own cursor and
+     their own pointerdown (meters_frame.ts ignores a press that lands on one). */
+  .mt-panel .mt-move-handle {
+    cursor: var(--cursor-point);
+    touch-action: none;
+  }
+  .mt-panel .mt-move-handle button {
+    touch-action: auto;
+  }
+  .mt-title-label {
+    font-family: var(--title-font);
+    color: var(--gold);
+  }
+  body.meter-frame-dragging,
+  body.meter-frame-dragging * {
+    user-select: none;
+  }
+  /* Corner resize grip, the same classic diagonal hatch the chat frame uses. */
+  .panel-resize-grip {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 3;
+    opacity: 0.45;
+    background: linear-gradient(
+      135deg,
+      transparent 0 45%,
+      #95886a 45% 55%,
+      transparent 55% 70%,
+      #95886a 70% 80%,
+      transparent 80%
+    );
+  }
+  .panel-resize-grip:hover {
+    opacity: 0.9;
+  }
+  .mt-panel {
+    position: relative;
+  }
+  /* Desktop-only chrome, mirroring the chat grip and the unit-frame move button:
+     on mobile the stylesheet owns panel placement. */
+  body.mobile-touch .panel-resize-grip {
+    display: none;
+  }
+  body.mobile-touch .mt-panel .mt-move-handle {
+    cursor: default;
+    touch-action: auto;
   }
   .mt-tab {
     background: #1a1410;

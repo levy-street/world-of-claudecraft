@@ -769,11 +769,11 @@ export const table: DeedLocaleTable = {
     desc: 'Elli teçhizat parçasını hurda işlemine sokarak ham maddelere dönüştür.',
   },
   dgn_wildheart_basin: {
-    name: 'Havza Geri Dönüyor',
-    desc: "Wildheart Havzasında Havzanın Sesi Zulgar'ı yen.",
+    name: 'Çukurun İntikamı',
+    desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni alt et.",
   },
   dgn_wildheart_basin_heroic: {
-    name: 'Heroic: Wildheart Havzası',
-    desc: "Heroic zorlukta Wildheart Basin'de, Havzanın Sesi Zulgar'ı yen.",
+    name: 'Kahramanca: Yaban Yürek Çukuru',
+    desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni Kahramanca zorlukta alt et.",
   },
 };

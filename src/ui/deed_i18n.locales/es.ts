@@ -819,11 +819,11 @@ export const table: DeedLocaleTable = {
   },
   dgn_wildheart_basin: {
     name: 'La cuenca contraataca',
-    desc: 'Derrota a Zulgar, Voz de la Cuenca en la Cuenca del Corazón Salvaje.',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje.',
   },
   dgn_wildheart_basin_heroic: {
     name: 'Heroico: La Cuenca del Corazón Salvaje',
-    desc: 'Derrota a Zulgar, Voz de la Cuenca en la Cuenca del Corazón Salvaje en dificultad heroica.',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje en dificultad heroica.',
   },
 };
 

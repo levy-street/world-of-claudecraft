@@ -901,12 +901,17 @@ export const zh_TW: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。",
-      "breakdownSummary": "{選項卡}：{值} {tab} {value}",
-      "breakdownRow": "{值} ({百分比}) {value} {percent}",
+      "breakdownSummary": "{tab}：{value}",
+      "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
-      "percent": "{值}% {value}",
-      "petAbility": "{寵物}：{能力} {pet} {ability}",
-      "melee": "近戰"
+      "percent": "{value}%",
+      "petAbility": "{pet}：{ability}",
+      "melee": "近戰",
+      "move": "拖曳以移動此統計面板",
+      "resize": "拖曳以調整此統計面板大小",
+      "dock": "將此統計停靠回統計視窗",
+      "separate": "分離{meter}",
+      "regroup": "合併{meter}"
     },
     "petFeed": {
       "disabledFullHp": "寵物生命值已滿",
@@ -976,7 +981,7 @@ export const zh_TW: EnTranslations = {
       "finished": "完成！用時 {seconds} 秒！",
       "timeout": "比賽失敗",
       "progress": "障礙 {n} / {total}",
-      "timeLeft": "{秒}秒 {seconds}"
+      "timeLeft": "{seconds}秒"
     },
     "vcup": {
       "title": "溪谷盃",
@@ -2809,7 +2814,7 @@ export const zh_TW: EnTranslations = {
       "title": "世界地圖",
       "summary": "世界地圖。選擇一個地區以開啟其地圖。",
       "toWorld": "世界地圖",
-      "toZone": "區域地圖",
+      "toZone": "地區地圖",
       "toggleAria": "在世界地圖與地區地圖之間切換",
       "levels": "等級 {min} 至 {max}"
     }
@@ -5735,7 +5740,7 @@ export const zh_TW: EnTranslations = {
     },
     "augment": {
       "choose": "選擇一項強化",
-      "cardAria": "{名稱}（{類別}）- {描述} {name} {category} {description}",
+      "cardAria": "{name}（{category}）：{description}",
       "aug_brutality": {
         "name": "殘暴",
         "desc": "你的物理打擊造成的傷害提高15%。"
@@ -6106,8 +6111,8 @@ export const zh_TW: EnTranslations = {
       "secondsRemaining": "剩餘 {seconds} 秒",
       "enteringZone": "進入 {zone}。",
       "welcomeZone": "歡迎來到 {zone}！",
-      "riftLabel": "{名稱} {name}",
-      "riftLabelRanked": "{姓名}（{排名}） {name} {rank}",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "{level} 級！",
       "levelLog": "你已達到 {level} 級！",
       "xpGain": "你獲得 {amount} 點經驗值。",
@@ -6739,22 +6744,22 @@ export const zh_TW: EnTranslations = {
       "gathering": "採集",
       "demonHeal": "惡魔治療",
       "thunzharrStormcall": "風暴召喚",
-      "rift_frost_execution": "冰河墳墓",
-      "rift_frost_strike": "絕對零",
-      "rift_ember_execution": "岩漿井",
+      "rift_frost_execution": "冰川之墓",
+      "rift_frost_strike": "絕對零度",
+      "rift_ember_execution": "岩漿泉",
       "rift_ember_strike": "核心熔毀",
       "rift_venom_execution": "毒液池",
-      "rift_venom_strike": "巢母印記",
-      "rift_necro_execution": "靈魂墳墓",
-      "rift_necro_strike": "死刑判決",
-      "rift_brute_execution": "碎地者",
-      "rift_brute_strike": "最終審判",
-      "rift_arcane_execution": "虛空裂縫",
-      "rift_arcane_strike": "奧術殲滅",
+      "rift_venom_strike": "蜘蛛母后之印",
+      "rift_necro_execution": "靈魂之墓",
+      "rift_necro_strike": "死亡判決",
+      "rift_brute_execution": "碎地之力",
+      "rift_brute_strike": "終極審判",
+      "rift_arcane_execution": "虛空裂隙",
+      "rift_arcane_strike": "奧術湮滅",
       "rift_storm_execution": "避雷針",
       "rift_storm_strike": "風暴召喚者之怒",
       "rift_tide_execution": "深淵之口",
-      "rift_tide_strike": "破碎深度"
+      "rift_tide_strike": "粉碎深淵"
     }
   },
   "questUi": {
