@@ -6232,8 +6232,13 @@ export class Hud {
           this.actionBarContextMenu.openForEvent(e, btn);
         });
         btn.addEventListener('keydown', (e) => {
-          if (this.attackSlotIsAttack()) return;
-          if (handleShiftClearKeydown(e, this.actionBarsLocked(), clearAttackSlotAction)) return;
+          const attackIsFixed = this.attackSlotIsAttack();
+          if (
+            !attackIsFixed &&
+            handleShiftClearKeydown(e, this.actionBarsLocked(), clearAttackSlotAction)
+          )
+            return;
+          if (attackIsFixed && e.shiftKey && (e.key === 'Delete' || e.key === 'Backspace')) return;
           this.actionBarContextMenu.openForKeyboardEvent(e, btn);
         });
         btn.addEventListener('dragstart', (e) => {

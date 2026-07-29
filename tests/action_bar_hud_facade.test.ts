@@ -41,6 +41,9 @@ describe('Hud action-bar facade', () => {
     expect(actionBarBuild).toContain(
       'handleShiftClearContextMenu(e, this.actionBarsLocked(), clearAttackSlotAction)',
     );
+    expect(actionBarBuild).toContain('const attackIsFixed = this.attackSlotIsAttack()');
+    expect(actionBarBuild).toContain('!attackIsFixed &&');
+    expect(actionBarBuild).toContain('this.actionBarContextMenu.openForKeyboardEvent(e, btn)');
     expect(actionBarBuild).toContain('this.attackSlotAction = null;');
     expect(actionBarBuild).toContain('this.saveAttackSlotAction();');
   });
