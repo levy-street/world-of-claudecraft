@@ -55,27 +55,3 @@ export function disposeDeckStandIn<TVisual>(
   dispose(handle.deckStandIn);
   handle.deckStandIn = null;
 }
-
-/**
- * Synchronize every moving ship's local-player stand-in and report whether
- * the authoritative rig must be hidden for this frame.
- */
-export function updateDeckStandIns<TVisual, THandle extends DeckStandInRuntimeHandle<TVisual>>(
-  handles: Iterable<THandle>,
-  realLocalPlayer: boolean,
-  create: (handle: THandle) => TVisual | null,
-  update: (visual: TVisual) => void,
-  dispose: (visual: TVisual) => void,
-): boolean {
-  let active = false;
-  for (const handle of handles) {
-    const cueLive = handle.cueStartSec !== null && handle.segment !== null;
-    const action = deckStandInAction(cueLive, handle.deckStandIn !== null, realLocalPlayer);
-    if (action === 'build') handle.deckStandIn = create(handle);
-    else if (action === 'dispose') disposeDeckStandIn(handle, dispose);
-    if (!handle.deckStandIn) continue;
-    active = true;
-    update(handle.deckStandIn);
-  }
-  return active;
-}

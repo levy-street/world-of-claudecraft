@@ -79,6 +79,37 @@ describe('HarborShipCueRegistry', () => {
     expect(latest.cueStartSec).toBe(13);
   });
 
+  it('parks every registered ship on reset and remains idempotent', () => {
+    const { registry, reset } = harness();
+    const ship = parked('mainland');
+    registry.register('mainland', ship);
+    registry.cue('mainland', 'castOff');
+    expect(ship.segment).toEqual({ id: 'castOff' });
+
+    registry.resetAll();
+    expect(reset).toHaveBeenCalledWith(ship);
+    expect(ship.segment).toBeNull();
+    expect(ship.cueStartSec).toBeNull();
+
+    registry.resetAll();
+    expect(ship.segment).toBeNull();
+    expect(ship.cueStartSec).toBeNull();
+  });
+
+  it('preserves a pre-build cue while render handles rebuild', () => {
+    const { registry, setNow } = harness();
+    const ship = parked('mainland');
+    setNow(10);
+    registry.cue('mainland', 'castOff');
+    registry.clearHandles();
+    setNow(12);
+
+    registry.register('mainland', ship);
+
+    expect(ship.segment).toEqual({ id: 'castOff' });
+    expect(ship.cueStartSec).toBe(10);
+  });
+
   it('keeps unknown cues parked before or after registration', () => {
     const { registry, reset } = harness();
     const pending = parked('pending');
