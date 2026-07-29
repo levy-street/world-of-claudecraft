@@ -285,6 +285,7 @@ const RENDER_PURE_CORES = [
   'src/render/net_interp_core.ts',
   'src/render/player_rig_residency_core.ts',
   'src/render/prewarm_policy.ts',
+  'src/render/renderer_phase_samples_core.ts',
   'src/render/runtime/render_world_core.ts',
   'src/render/streaming_budget_core.ts',
   'src/render/terrain_region_core.ts',

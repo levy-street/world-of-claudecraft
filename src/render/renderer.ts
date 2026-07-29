@@ -73,10 +73,9 @@ import {
   stepLandingDetector,
 } from './camera_feel_core';
 import {
-  characterRecklessnessActive,
-  characterSanguineAuraActive,
-  characterSoulRendActive,
-} from './character_effects';
+  CHARACTER_SHADOW_ONLY_LAYER,
+  CharacterMainPassCullState,
+} from './character_main_pass_cull';
 import {
   type AnimState,
   type CharacterVisual,
@@ -203,6 +202,7 @@ import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
+import { RendererPhaseSampleWindow } from './renderer_phase_samples_core';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import { RenderWorldCore } from './runtime';
 import { downscaleDims } from './screenshot';
@@ -803,24 +803,6 @@ function distSqXZ(a: Entity, b: Entity): number {
   return dx * dx + dz * dz;
 }
 
-function summarizeMs(values: number[]): {
-  count: number;
-  avg: number;
-  p95: number;
-  max: number;
-} {
-  if (values.length === 0) return { count: 0, avg: 0, p95: 0, max: 0 };
-  const sorted = [...values].sort((a, b) => a - b);
-  const total = values.reduce((a, b) => a + b, 0);
-  const p95Idx = Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * 0.95) - 1));
-  return {
-    count: values.length,
-    avg: roundMs(total / values.length),
-    p95: roundMs(sorted[p95Idx]),
-    max: roundMs(sorted[sorted.length - 1]),
-  };
-}
-
 function emptyFramePhaseMs(): RendererFramePhaseMs {
   return {
     setup: 0,
@@ -899,6 +881,8 @@ function emptyRenderDiagnosticsSnapshot(): RenderDiagnosticsSnapshot {
     categories: {},
   };
 }
+
+const EMPTY_RENDER_DIAGNOSTICS_SNAPSHOT = emptyRenderDiagnosticsSnapshot();
 
 function loopbackHostname(hostname: string): boolean {
   return (
@@ -1098,16 +1082,16 @@ export class Renderer {
   private tmpV2 = new THREE.Vector3();
   private tmpV3 = new THREE.Vector3();
   // Manual frustum cull for characters. Their skinned meshes keep
-  // frustumCulled=false (a skinned mesh's bind-pose bounds don't follow the
-  // animated pose, so Three's own cull pops visible rigs out), which means an
-  // off-screen rig otherwise issues its draws every frame. We instead cull at
-  // the group level from the rig's real world position + a generous radius.
-  // Gated to shadowless tiers so a culled off-screen caster can never drop a
-  // shadow that was actually visible in-frame.
+  // frustumCulled=false because bind-pose bounds do not follow animation.
+  // Shadow tiers move off-screen renderables to a shadow-camera-only layer;
+  // shadowless tiers can hide the full group and matrix subtree.
   private cullFrustum = new THREE.Frustum();
   private cullViewProj = new THREE.Matrix4();
   private cullSphere = new THREE.Sphere();
-  private cullCharacters = false;
+  private readonly characterMainPassCullStates = new WeakMap<
+    EntityView,
+    CharacterMainPassCullState
+  >();
   // Scratch AnimState reused across the per-entity sync loop: CharacterVisual
   // .update() and the pose-selection helpers only read it within the call (the
   // preview drives a shared constant too), so one buffer avoids allocating a
@@ -1197,7 +1181,6 @@ export class Renderer {
   };
   private eastbrookTownView!: EastbrookTownView;
   private lightRank: RankedPointLight[] = [];
-  private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
   private envBiome: BiomeId = 'vale';
@@ -1341,13 +1324,13 @@ export class Renderer {
   private glRenderer = '';
   private contextLostCount = 0;
   private contextRestoredCount = 0;
-  private phaseSamples: Record<RendererPhase, number[]> = {
-    setup: [],
-    entities: [],
-    world: [],
-    nameplates: [],
-    submit: [],
-    total: [],
+  private phaseSamples: Record<RendererPhase, RendererPhaseSampleWindow> = {
+    setup: new RendererPhaseSampleWindow(RENDERER_PHASE_SAMPLE_LIMIT),
+    entities: new RendererPhaseSampleWindow(RENDERER_PHASE_SAMPLE_LIMIT),
+    world: new RendererPhaseSampleWindow(RENDERER_PHASE_SAMPLE_LIMIT),
+    nameplates: new RendererPhaseSampleWindow(RENDERER_PHASE_SAMPLE_LIMIT),
+    submit: new RendererPhaseSampleWindow(RENDERER_PHASE_SAMPLE_LIMIT),
+    total: new RendererPhaseSampleWindow(RENDERER_PHASE_SAMPLE_LIMIT),
   };
   private lastFrameStats: RendererFrameStats = {
     phaseMs: emptyFramePhaseMs(),
@@ -1367,7 +1350,7 @@ export class Renderer {
   };
   private lastPrewarmStats: RendererPrewarmStats | null = null;
   private readonly renderDiagnosticsEnabled = localRenderDiagnosticsEnabled();
-  private renderDiagnosticsSnapshot = emptyRenderDiagnosticsSnapshot();
+  private renderDiagnosticsSnapshot = EMPTY_RENDER_DIAGNOSTICS_SNAPSHOT;
   private renderDiagnosticsNextSampleAt = 0;
   private renderDiagnosticsSamplePending = false;
   private renderDiagnosticsKnownMaterials = new Set<string>();
@@ -1581,11 +1564,10 @@ export class Renderer {
     sun.shadow.bias = -0.0006;
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.05;
     sun.shadow.radius = 4;
+    sun.shadow.camera.layers.enable(CHARACTER_SHADOW_ONLY_LAYER);
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
-    // characters can self-cull only where they cast no sun shadow (low/lean tier)
-    this.cullCharacters = !sun.castShadow;
     this.sunDir.copy(SUN_DIR);
 
     // visible sun disc + bloom halo
@@ -2319,21 +2301,17 @@ export class Renderer {
   }
 
   private recordRendererPhase(phase: RendererPhase, ms: number): void {
-    if (!Number.isFinite(ms) || ms < 0) return;
-    const samples = this.phaseSamples[phase];
-    samples.push(Math.min(250, ms));
-    if (samples.length > RENDERER_PHASE_SAMPLE_LIMIT)
-      samples.splice(0, samples.length - RENDERER_PHASE_SAMPLE_LIMIT);
+    this.phaseSamples[phase].push(ms);
   }
 
   private rendererPhaseStats(): RendererPhaseStats {
     return {
-      setup: summarizeMs(this.phaseSamples.setup),
-      entities: summarizeMs(this.phaseSamples.entities),
-      world: summarizeMs(this.phaseSamples.world),
-      nameplates: summarizeMs(this.phaseSamples.nameplates),
-      submit: summarizeMs(this.phaseSamples.submit),
-      total: summarizeMs(this.phaseSamples.total),
+      setup: this.phaseSamples.setup.summarize(),
+      entities: this.phaseSamples.entities.summarize(),
+      world: this.phaseSamples.world.summarize(),
+      nameplates: this.phaseSamples.nameplates.summarize(),
+      submit: this.phaseSamples.submit.summarize(),
+      total: this.phaseSamples.total.summarize(),
     };
   }
 
@@ -2371,7 +2349,7 @@ export class Renderer {
   }
 
   private collectRenderDiagnostics(): RenderDiagnosticsSnapshot {
-    if (!this.renderDiagnosticsEnabled) return emptyRenderDiagnosticsSnapshot();
+    if (!this.renderDiagnosticsEnabled) return EMPTY_RENDER_DIAGNOSTICS_SNAPSHOT;
     const info = this.webgl.info;
     const programs = info.programs?.length ?? 0;
     const textures = info.memory.textures;
@@ -2493,7 +2471,7 @@ export class Renderer {
   }
 
   private renderDiagnosticsForFrame(now: number, force = false): RenderDiagnosticsSnapshot {
-    if (!this.renderDiagnosticsEnabled) return emptyRenderDiagnosticsSnapshot();
+    if (!this.renderDiagnosticsEnabled) return EMPTY_RENDER_DIAGNOSTICS_SNAPSHOT;
     if (force) {
       this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
       this.renderDiagnosticsNextSampleAt = now + RENDER_DIAGNOSTICS_SAMPLE_MS;
@@ -2818,6 +2796,28 @@ export class Renderer {
     }
   }
 
+  private setCharacterMainPassCulled(
+    view: EntityView,
+    culled: boolean,
+    graphChanged = false,
+  ): void {
+    let state = this.characterMainPassCullStates.get(view);
+    if (!state) {
+      if (!culled) return;
+      state = new CharacterMainPassCullState();
+      this.characterMainPassCullStates.set(view, state);
+    }
+    state.set(view.group, culled, graphChanged);
+  }
+
+  private characterMainPassCulled(view: EntityView): boolean {
+    return this.characterMainPassCullStates.get(view)?.isCulled ?? false;
+  }
+
+  private restoreCharacterMainPass(view: EntityView): void {
+    this.characterMainPassCullStates.get(view)?.restore();
+  }
+
   private syncBatchedCrowdView(
     e: Entity,
     v: EntityView,
@@ -2826,6 +2826,7 @@ export class Renderer {
     now: number,
   ): boolean {
     if (e.kind !== 'player') return false;
+    this.restoreCharacterMainPass(v);
     const dx = e.pos.x - player.pos.x;
     const dz = e.pos.z - player.pos.z;
     const d2 = dx * dx + dz * dz;
@@ -2842,7 +2843,10 @@ export class Renderer {
     const z = e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
     const facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
     const variant = this.crowdVariantFor(e, v);
-    if (variant) {
+    this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
+    this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
+    const inMainFrustum = this.cullFrustum.intersectsSphere(this.cullSphere);
+    if (variant && inMainFrustum) {
       this.crowdMatrix.makeRotationY(facing);
       this.crowdScale.setScalar(e.scale);
       this.crowdMatrix.scale(this.crowdScale);
@@ -5587,6 +5591,7 @@ export class Renderer {
   private removeView(id: number): void {
     const v = this.views.get(id);
     if (!v) return;
+    this.restoreCharacterMainPass(v);
     this.playerRigResidentIds.delete(id);
     this.renderWorld.markViewAttached(id, false);
     this.scene.remove(v.group);
@@ -5772,7 +5777,7 @@ export class Renderer {
     const now = performance.now();
     this.viewCreateRetry.prune(now, sim.entities);
     const selfPos = this.updateSelfRenderPosition(alpha, dt, selfAlphaLead, selfMotion);
-    this.renderWorld.update(sim.entities, {
+    const renderWorldFrame = this.renderWorld.update(sim.entities, {
       originX: p.pos.x,
       originZ: p.pos.z,
       selfId: p.id,
@@ -5794,20 +5799,16 @@ export class Renderer {
       performance.now() + createBudget.maxStartWorkMs,
     );
     this.compileBatch.flush(this.compileRuntimeViewBatch, this.handleCompileBatchError);
-    this.doomedIds.length = 0;
-    for (const id of this.views.keys()) {
-      const e = sim.entities.get(id);
-      if (
-        !e ||
-        (!isPersistentPortalObject(e) &&
-          id !== p.id &&
-          id !== p.targetId &&
-          distSqXZ(e, p) > this.entityViewDestroyRangeSq)
-      ) {
-        this.doomedIds.push(id);
-      }
+    for (let i = 0; i < renderWorldFrame.removalCount; i++) {
+      const id = this.renderWorld.removalIds[i];
+      if (!this.views.has(id)) continue;
+      this.removeView(id);
+      removedViews++;
     }
-    for (const id of this.doomedIds) {
+    for (let i = 0; i < renderWorldFrame.evictionCount; i++) {
+      const id = this.renderWorld.evictionIds[i];
+      const e = sim.entities.get(id);
+      if (!e || isPersistentPortalObject(e) || !this.views.has(id)) continue;
       this.removeView(id);
       removedViews++;
     }
@@ -5822,13 +5823,11 @@ export class Renderer {
     // world-space view frustum for the per-character cull below. Built from last
     // frame's camera (it's repositioned after this loop); the one-frame lag is
     // absorbed by the generous per-rig cull radius.
-    if (this.cullCharacters) {
-      this.cullViewProj.multiplyMatrices(
-        this.camera.projectionMatrix,
-        this.camera.matrixWorldInverse,
-      );
-      this.cullFrustum.setFromProjectionMatrix(this.cullViewProj);
-    }
+    this.cullViewProj.multiplyMatrices(
+      this.camera.projectionMatrix,
+      this.camera.matrixWorldInverse,
+    );
+    this.cullFrustum.setFromProjectionMatrix(this.cullViewProj);
 
     // Crowd-adaptive LOD/shadow distances, derived from last frame's visible-rig
     // count (the one-frame lag is imperceptible); recount as we go this frame.
@@ -5882,6 +5881,9 @@ export class Renderer {
       let hasMoonkin = false;
       let hasMetamorph = false;
       let hasIceBlock = false;
+      let hasSoulRend = false;
+      let hasSanguineAura = false;
+      let hasRecklessness = false;
       let temporalHourglassMode: TemporalHourglassMode | null = null;
       let hasFrostNovaRoot = false;
       let mageBarrierState: MageBarrierState | null = null;
@@ -5896,6 +5898,9 @@ export class Renderer {
         if (a.kind === 'form_shadow') hasShadowform = true;
         if (a.kind === 'form_moonkin') hasMoonkin = true;
         if (a.kind === 'form_metamorph') hasMetamorph = true;
+        if (a.id === 'nythraxis_soul_rend') hasSoulRend = true;
+        if (a.id === 'sanguine_aura') hasSanguineAura = true;
+        if (a.kind === 'buff_reckless') hasRecklessness = true;
         if (a.id === 'ice_block' && a.kind === 'stasis') hasIceBlock = true;
         // Rime Snare victims wear the same ice shell (maintainer request);
         // the freeze aura is already wired, so this is render-only sugar.
@@ -6090,7 +6095,11 @@ export class Renderer {
         syncCharacterClickProxy(v.clickTarget as THREE.Mesh, v.height, v.clickRadius, e.dead);
       }
       if (!v.visual) continue;
+      let characterGraphChanged = false;
+      const previousIceBlockVisual = v.iceBlockVisual;
       v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasIceBlock, dt);
+      characterGraphChanged ||= previousIceBlockVisual !== v.iceBlockVisual;
+      const previousHourglassVisual = v.temporalHourglassVisual;
       v.temporalHourglassVisual = syncTemporalHourglassVisual(
         v.temporalHourglassVisual,
         v.group,
@@ -6098,6 +6107,8 @@ export class Renderer {
         dt,
         v.height,
       );
+      characterGraphChanged ||= previousHourglassVisual !== v.temporalHourglassVisual;
+      const previousFrostNovaVisual = v.frostNovaRootVisual;
       v.frostNovaRootVisual = syncFrostNovaRootVisual(
         v.frostNovaRootVisual,
         v.group,
@@ -6105,6 +6116,8 @@ export class Renderer {
         hasFrostNovaRoot,
         dt,
       );
+      characterGraphChanged ||= previousFrostNovaVisual !== v.frostNovaRootVisual;
+      const previousBarrierVisual = v.mageBarrierVisual;
       v.mageBarrierVisual = syncMageBarrierVisual(
         v.mageBarrierVisual,
         v.group,
@@ -6112,9 +6125,12 @@ export class Renderer {
         mageBarrierState,
         dt,
       );
+      characterGraphChanged ||= previousBarrierVisual !== v.mageBarrierVisual;
       const iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
 
+      const previousBaseVisual = v.visual;
       this.updateBaseVisual(e, v);
+      characterGraphChanged ||= previousBaseVisual !== v.visual;
       if (!v.visual) continue;
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 
@@ -6122,7 +6138,7 @@ export class Renderer {
       // Decide visibility now from the real world position; applied at the end so
       // the rest of the per-entity work (animation, footstep audio) is unaffected.
       let charOnScreen = true;
-      if (this.cullCharacters && id !== p.id) {
+      if (id !== p.id) {
         this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
         this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
@@ -6139,12 +6155,14 @@ export class Renderer {
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
         v.visual.setWeapon(e.mainhandItemId);
+        characterGraphChanged = true;
         this.reconcileViewLights(v);
       }
 
       if (e.offhandItemId !== v.offhandItemId) {
         v.offhandItemId = e.offhandItemId;
         v.visual.setOffhand(e.offhandItemId);
+        characterGraphChanged = true;
         this.reconcileViewLights(v);
       }
 
@@ -6153,9 +6171,10 @@ export class Renderer {
       if (e.weaponSkinId !== v.weaponSkinId) {
         v.weaponSkinId = e.weaponSkinId;
         v.visual.setWeaponSkin(e.weaponSkinId);
+        characterGraphChanged = true;
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(characterSanguineAuraActive(e));
+      characterGraphChanged ||= v.visual.setWeaponAura(hasSanguineAura);
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
@@ -6178,6 +6197,7 @@ export class Renderer {
         if (built) {
           v.sheepVisual = built;
           v.group.add(built.root); // group.scale already carries e.scale
+          characterGraphChanged = true;
         }
       }
       if (bear && !v.bearVisual) {
@@ -6185,6 +6205,7 @@ export class Renderer {
         if (built) {
           v.bearVisual = built;
           v.group.add(built.root);
+          characterGraphChanged = true;
         }
       }
       if (cat && !v.catVisual) {
@@ -6192,6 +6213,7 @@ export class Renderer {
         if (built) {
           v.catVisual = built;
           v.group.add(built.root);
+          characterGraphChanged = true;
         }
       }
       if (travel && !v.travelVisual) {
@@ -6199,6 +6221,7 @@ export class Renderer {
         if (built) {
           v.travelVisual = built;
           v.group.add(built.root);
+          characterGraphChanged = true;
         }
       }
       if (v.sheepVisual) v.sheepVisual.root.visible = polyed;
@@ -6222,7 +6245,7 @@ export class Renderer {
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
       active.setGhost(ghost);
-      active.setSoulRend(characterSoulRendActive(e));
+      active.setSoulRend(hasSoulRend);
       // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
       // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
       // Metamorphosis also grows the body via Entity.scale in the sim.
@@ -6270,6 +6293,7 @@ export class Renderer {
       v.lastZ = az;
       const loco = updateLocomotion(v.loco, vx, vz, facing, dt);
       const moving = loco.moving;
+      const previousFireballVisual = v.fireballTravelVisual;
       v.fireballTravelVisual = syncFireballTravelVisual(
         v.fireballTravelVisual,
         v.group,
@@ -6278,6 +6302,7 @@ export class Renderer {
         THREE.MathUtils.clamp(loco.speed / 9.8, 0, 1),
         isSelf || !v.isFar,
       );
+      characterGraphChanged ||= previousFireballVisual !== v.fireballTravelVisual;
       // A released spirit is `dead` but should stand and run, not lie prone, so it
       // animates as a living figure (only its translucent ghost material marks it).
       const visuallyDead = isVisuallyDead(e) && !e.ghost;
@@ -6597,7 +6622,10 @@ export class Renderer {
       v.visual.updateWeaponVfx(dt);
       // The sheathe swap is deferred to the gesture midpoint, so the rig (and any
       // skin VFX point light on it) is rebuilt inside update(), not at the diff.
-      if (v.visual.consumeWeaponGraphDirty()) this.reconcileViewLights(v);
+      if (v.visual.consumeWeaponGraphDirty()) {
+        characterGraphChanged = true;
+        this.reconcileViewLights(v);
+      }
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -6624,10 +6652,10 @@ export class Renderer {
           dt,
         );
       }
-      if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
+      if (hasSoulRend) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
-      if (characterRecklessnessActive(e)) {
+      if (hasRecklessness) {
         this.vfx.recklessFlame(e.id, dt);
         if (!v.recklessOn) {
           v.recklessOn = true;
@@ -6647,8 +6675,15 @@ export class Renderer {
       // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
       if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
 
-      // skip the draw for off-screen rigs (pose/audio above already ran)
-      if (!charOnScreen) v.group.visible = false;
+      // Skip off-screen color draws without dropping visible shadows. On
+      // shadowless tiers the full group can stay hidden, preserving the
+      // matrix-subtree gate below.
+      if (this.sun.castShadow) {
+        this.setCharacterMainPassCulled(v, !charOnScreen, characterGraphChanged);
+      } else {
+        this.restoreCharacterMainPass(v);
+        if (!charOnScreen) v.group.visible = false;
+      }
     }
     this.crowdBatch.endFrame();
     this.compileBatch.flush(this.compileRuntimeViewBatch, this.handleCompileBatchError);
@@ -6997,7 +7032,7 @@ export class Renderer {
     this.recordRendererPhase('total', totalMs);
     let visibleViews = 0;
     for (const v of this.views.values()) {
-      if (v.group.visible) visibleViews++;
+      if (v.group.visible && !this.characterMainPassCulled(v)) visibleViews++;
     }
     const afterSubmit = performance.now();
     const renderDiagnostics = this.renderDiagnosticsForFrame(

@@ -902,6 +902,7 @@ export class CharacterVisual {
   }
 
   setGhost(on: boolean): void {
+    if (on === this.ghosted) return;
     this.ghosted = on;
     this.applyVisualMaterials();
   }
@@ -1135,10 +1136,11 @@ export class CharacterVisual {
     this.rebuildWeaponAura();
   }
 
-  setWeaponAura(on: boolean): void {
-    if (on === this.weaponAuraOn) return;
+  setWeaponAura(on: boolean): boolean {
+    if (on === this.weaponAuraOn) return false;
     this.weaponAuraOn = on;
     this.rebuildWeaponAura();
+    return true;
   }
 
   private rebuildWeaponAura(): void {

@@ -81,7 +81,12 @@ export class CharacterCrowdBatch {
 
   endFrame(): void {
     for (const batch of this.batches.values()) {
-      if (batch.mesh.count > 0) batch.mesh.instanceMatrix.needsUpdate = true;
+      const attribute = batch.mesh.instanceMatrix;
+      attribute.clearUpdateRanges();
+      if (batch.mesh.count > 0) {
+        attribute.addUpdateRange(0, batch.mesh.count * 16);
+        attribute.needsUpdate = true;
+      }
       batch.mesh.visible = batch.mesh.count > 0;
     }
   }

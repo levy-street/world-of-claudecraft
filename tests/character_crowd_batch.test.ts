@@ -40,10 +40,15 @@ describe('far crowd batching', () => {
     });
     batch.beginFrame();
     expect(batch.addMatrix('mage', new THREE.Matrix4().elements)).toBe(true);
+    expect(batch.addMatrix('mage', new THREE.Matrix4().makeTranslation(1, 0, 0).elements)).toBe(
+      true,
+    );
     batch.endFrame();
     expect(batch.variantCount).toBe(1);
-    expect(batch.instanceCount).toBe(1);
-    expect((batch.group.children[0] as THREE.InstancedMesh).frustumCulled).toBe(false);
+    expect(batch.instanceCount).toBe(2);
+    const mesh = batch.group.children[0] as THREE.InstancedMesh;
+    expect(mesh.frustumCulled).toBe(false);
+    expect(mesh.instanceMatrix.updateRanges).toEqual([{ start: 0, count: 32 }]);
     batch.dispose();
   });
 

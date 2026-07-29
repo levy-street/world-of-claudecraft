@@ -210,6 +210,9 @@ export class Vfx {
   private spriteAttr: Float32Array;
   private rotAttr: Float32Array;
   private head = 0;
+  private particleHighWater = 0;
+  private staticDirtyStart = CAPACITY;
+  private staticDirtyEnd = 0;
   private projectiles: Projectile[] = [];
   private bubbleBeams: BubbleBeam[] = [];
   private tmpColor = new THREE.Color();
@@ -244,6 +247,10 @@ export class Vfx {
     geo.setAttribute('aAlpha', new THREE.BufferAttribute(this.alphaAttr, 1));
     geo.setAttribute('aSprite', new THREE.BufferAttribute(this.spriteAttr, 1));
     geo.setAttribute('aRot', new THREE.BufferAttribute(this.rotAttr, 1));
+    for (const attribute of Object.values(geo.attributes)) {
+      (attribute as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
+    }
+    geo.setDrawRange(0, 0);
     // huge static bounding sphere: particles fly everywhere, skip recompute
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(450, 0, 0), 2400);
 
@@ -341,11 +348,11 @@ export class Vfx {
     this.projectiles.length = 0;
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.life.fill(0);
-    this.size.fill(0);
-    this.alphaAttr.fill(0);
-    const geo = this.points.geometry;
-    (geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aAlpha as THREE.BufferAttribute).needsUpdate = true;
+    this.head = 0;
+    this.particleHighWater = 0;
+    this.staticDirtyStart = CAPACITY;
+    this.staticDirtyEnd = 0;
+    this.points.geometry.setDrawRange(0, 0);
   }
 
   private scaledCount(count: number): number {
@@ -384,6 +391,9 @@ export class Vfx {
   ): void {
     const i = this.head;
     this.head = (this.head + 1) % CAPACITY;
+    this.particleHighWater = Math.max(this.particleHighWater, i + 1);
+    this.staticDirtyStart = Math.min(this.staticDirtyStart, i);
+    this.staticDirtyEnd = Math.max(this.staticDirtyEnd, i + 1);
     this.pos[i * 3] = x;
     this.pos[i * 3 + 1] = y;
     this.pos[i * 3 + 2] = z;
@@ -1470,7 +1480,7 @@ export class Vfx {
     }
 
     // advance the pool
-    for (let i = 0; i < CAPACITY; i++) {
+    for (let i = 0; i < this.particleHighWater; i++) {
       if (this.life[i] <= 0) {
         if (this.size[i] !== 0) this.size[i] = 0;
         continue;
@@ -1484,12 +1494,39 @@ export class Vfx {
       this.alphaAttr[i] = f < 0.25 ? f * 4 : 1;
       if (this.life[i] <= 0) this.size[i] = 0;
     }
+    while (this.particleHighWater > 0 && this.life[this.particleHighWater - 1] <= 0) {
+      this.particleHighWater--;
+    }
+
     const geo = this.points.geometry;
-    (geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aAlpha as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aColor as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aSprite as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aRot as THREE.BufferAttribute).needsUpdate = true;
+    const position = geo.attributes.position as THREE.BufferAttribute;
+    const size = geo.attributes.aSize as THREE.BufferAttribute;
+    const alpha = geo.attributes.aAlpha as THREE.BufferAttribute;
+    const color = geo.attributes.aColor as THREE.BufferAttribute;
+    const sprite = geo.attributes.aSprite as THREE.BufferAttribute;
+    const rotation = geo.attributes.aRot as THREE.BufferAttribute;
+    for (const attribute of [position, size, alpha, color, sprite, rotation]) {
+      attribute.clearUpdateRanges();
+    }
+    geo.setDrawRange(0, this.particleHighWater);
+    if (this.particleHighWater > 0) {
+      position.addUpdateRange(0, this.particleHighWater * 3);
+      position.needsUpdate = true;
+      size.addUpdateRange(0, this.particleHighWater);
+      size.needsUpdate = true;
+      alpha.addUpdateRange(0, this.particleHighWater);
+      alpha.needsUpdate = true;
+    }
+    if (this.staticDirtyEnd > this.staticDirtyStart) {
+      const dirtyCount = this.staticDirtyEnd - this.staticDirtyStart;
+      color.addUpdateRange(this.staticDirtyStart * 3, dirtyCount * 3);
+      color.needsUpdate = true;
+      sprite.addUpdateRange(this.staticDirtyStart, dirtyCount);
+      sprite.needsUpdate = true;
+      rotation.addUpdateRange(this.staticDirtyStart, dirtyCount);
+      rotation.needsUpdate = true;
+      this.staticDirtyStart = CAPACITY;
+      this.staticDirtyEnd = 0;
+    }
   }
 }

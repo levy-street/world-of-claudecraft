@@ -37,6 +37,7 @@ import {
   visualAssetUrlForGraphics,
   weaponSkinModelUrl,
 } from './manifest';
+import { canonicalizeMaterialGroups } from './material_groups';
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
@@ -1191,5 +1192,6 @@ function bakeStaticPose(
     geo.clearGroups();
     geo.addGroup(0, geo.index ? geo.index.count : geo.getAttribute('position').count, 0);
   }
-  return { geo, mats };
+  const canonicalMaterials = geo ? canonicalizeMaterialGroups(geo, mats) : [];
+  return { geo, mats: canonicalMaterials };
 }

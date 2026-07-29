@@ -25,6 +25,7 @@
 // legendary kit (orbit motes, aurora, spin) or vice versa; the escalation ramp
 // is the whole point of the collections.
 import * as THREE from 'three';
+import { shareWeaponVfxFrameUniforms } from './weapon_vfx_uniforms';
 
 // ---------------------------------------------------------------------------
 // Palettes + tier presets (colors from the Armory Codex swatches)
@@ -2855,6 +2856,7 @@ export function createWeaponVfx(
   weaponRoot.add(group);
 
   const allMats = parts.flatMap((p) => p.mats ?? []);
+  const frameUniforms = shareWeaponVfxFrameUniforms(allMats);
 
   // Live FX tuning: per-channel multipliers over the spec values, applied to
   // the running rig (the inspector's fx sliders drive this). Each part's
@@ -2904,15 +2906,11 @@ export function createWeaponVfx(
     setPixelScale(devicePxHeight: number) {
       // Device px per world unit at distance 1 for a 35-degree vertical fov.
       const s = (devicePxHeight * 0.5) / Math.tan((35 * Math.PI) / 360);
-      for (const m of allMats) {
-        if (m.uniforms?.uScale) m.uniforms.uScale.value = s;
-      }
+      if (frameUniforms.scale) frameUniforms.scale.value = s;
     },
     update(dt: number) {
       time += dt;
-      for (const m of allMats) {
-        if (m.uniforms?.uTime) m.uniforms.uTime.value = time;
-      }
+      frameUniforms.time.value = time;
       for (const p of parts) p.update?.(time);
       const e = eSpec;
       const glowPulse = 1 - e.pulse / 2 + (e.pulse / 2) * Math.sin(time * e.pulseHz * Math.PI * 2);
