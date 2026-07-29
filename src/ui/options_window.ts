@@ -381,7 +381,7 @@ export class OptionsWindow {
    *  sub-view in place if it is open, so the button glyphs switch to the newly
    *  detected brand without the player reopening the panel. A no-op otherwise. */
   refreshControllerLabels(): void {
-    if (this.isOpen && this.view === 'controller') this.renderController();
+    if (this.isOpen && this.view === 'controller') this.render();
   }
 
   // -------------------------------------------------------------------------
@@ -908,7 +908,7 @@ export class OptionsWindow {
               // Success: rebuild the panel in the new language (re-creates this picker
               // at the now-active locale).
               if (this.isOpen && this.view === 'interface') {
-                this.renderInterface();
+                this.render();
                 // Return keyboard focus to the fresh picker trigger so it isn't lost to <body>.
                 this.deps.focusFirstInteractive(this.deps.root(), '.set-lang-select .ui-dd-btn');
               }
@@ -964,7 +964,7 @@ export class OptionsWindow {
       btn.addEventListener('click', () => {
         audio.click();
         theme.setPreset(id);
-        this.renderInterface(); // refresh active state + custom pickers
+        this.render(); // refresh active state + custom pickers
       });
       seg.appendChild(btn);
     }
@@ -986,7 +986,7 @@ export class OptionsWindow {
     reset.addEventListener('click', () => {
       audio.click();
       theme.resetCustom();
-      this.renderInterface();
+      this.render();
     });
     customRow.append(customName, reset);
     body.appendChild(customRow);
@@ -1047,7 +1047,7 @@ export class OptionsWindow {
     body.setAttribute('role', 'tabpanel');
     wireTabStrip(el, 'opt-tab', (id, focusFollow) => {
       this.interfaceTab = id as InterfaceTab;
-      this.renderInterface();
+      this.render();
       if (focusFollow) focusActiveTab(this.deps.root(), 'opt-tab', 'on');
     });
 
@@ -1063,7 +1063,7 @@ export class OptionsWindow {
         interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab),
         hooks,
         (focusKey) => {
-          this.renderInterface();
+          this.render();
           if (focusKey)
             this.deps
               .root()
@@ -1429,7 +1429,7 @@ export class OptionsWindow {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hudChrome.controller.title'));
     const controls = hooks ? buildControllerControls(this.settingsSource(hooks)) : [];
-    if (hooks) this.applyControls(body, controls, hooks, () => this.renderController());
+    if (hooks) this.applyControls(body, controls, hooks, () => this.render());
 
     const note = document.createElement('div');
     note.className = 'set-note';
@@ -1475,7 +1475,7 @@ export class OptionsWindow {
       reset.addEventListener('click', () => {
         audio.click();
         hooks.gamepad.reset();
-        this.renderController();
+        this.render();
       });
       body.appendChild(reset);
     }
