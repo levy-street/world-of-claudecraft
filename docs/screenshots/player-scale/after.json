@@ -1,0 +1,87 @@
+{
+  "playerVisualKey": "player_warrior",
+  "playerDeclared": 3.12,
+  "playerMeasured": 3.014,
+  "nearest": [
+    {
+      "id": 2,
+      "name": "Marshal Redbrook",
+      "visualKey": "npc_knight",
+      "declared": 2.6,
+      "measured": 2.606,
+      "dist": 7.9
+    },
+    {
+      "id": 10,
+      "name": "Card Master",
+      "visualKey": "npc_villager_robed",
+      "declared": 2.6,
+      "measured": 2.537,
+      "dist": 9
+    },
+    {
+      "id": 3,
+      "name": "Trader Wilkes",
+      "visualKey": "npc_villager",
+      "declared": 2.6,
+      "measured": 2.61,
+      "dist": 9.5
+    },
+    {
+      "id": 4,
+      "name": "Apothecary Lin",
+      "visualKey": "npc_villager_robed",
+      "declared": 2.6,
+      "measured": 2.537,
+      "dist": 11.7
+    },
+    {
+      "id": 1,
+      "name": "The Merchant",
+      "visualKey": "npc_villager",
+      "declared": 2.6,
+      "measured": 2.61,
+      "dist": 11.8
+    },
+    {
+      "id": 8,
+      "name": "Foreman Odell",
+      "visualKey": "npc_smith",
+      "declared": 2.6,
+      "measured": 2.652,
+      "dist": 12.5
+    },
+    {
+      "id": 11,
+      "name": "Saul the Chronicler",
+      "visualKey": "npc_chronicler",
+      "declared": 2.6,
+      "measured": 2.537,
+      "dist": 12.7
+    },
+    {
+      "id": 15,
+      "name": "Tinker Gizzel",
+      "visualKey": "npc_smith",
+      "declared": 2.6,
+      "measured": 2.652,
+      "dist": 12.8
+    },
+    {
+      "id": 9,
+      "name": "Bursar Fernando",
+      "visualKey": "npc_fernando",
+      "declared": 2.6,
+      "measured": 2.61,
+      "dist": 16.2
+    },
+    {
+      "id": 14,
+      "name": "Weaver Ottilie",
+      "visualKey": "npc_villager_robed",
+      "declared": 2.6,
+      "measured": 2.534,
+      "dist": 17.2
+    }
+  ]
+}
