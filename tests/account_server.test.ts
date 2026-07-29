@@ -262,7 +262,7 @@ describe('handleAccountChangePassword', () => {
   // phished the password and is already in-world would otherwise keep playing
   // on the victim's character after the victim locks them out. A successful
   // change must also force-disconnect any live session for the account.
-  it('force-disconnects any OTHER live WS session for the account, exempting the caller', async () => {
+  it('force-disconnects every live WS session for the account, unconditionally', async () => {
     const disconnectAccount = vi.fn();
     const res = makeRes();
     await handleAccountChangePassword(
@@ -273,11 +273,13 @@ describe('handleAccountChangePassword', () => {
       { disconnectAccount },
     );
     expect(parse(res).status).toBe(200);
-    // The caller's own token is passed through as the kick exception, so
-    // GameServer.disconnectAccount can spare the session that just made this
-    // request instead of yanking the player mid-session for rotating their own
-    // password (finding 1 on the original PR review).
-    expect(disconnectAccount).toHaveBeenCalledWith(1, expect.any(String), 'tokA');
+    // No exception token: a bearer token is a reusable wire credential, not a
+    // per-socket identity, so exempting a live session by token equality could
+    // just as easily spare an attacker's session sharing a stolen token as the
+    // legitimate caller's. disconnectAccount always kicks every live session for
+    // the account (a review finding on the original PR).
+    expect(disconnectAccount).toHaveBeenCalledWith(1, expect.any(String));
+    expect(disconnectAccount.mock.calls[0]).toHaveLength(2);
   });
   it('does not disconnect anyone when the change is rejected (wrong current password)', async () => {
     const disconnectAccount = vi.fn();

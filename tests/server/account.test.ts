@@ -628,23 +628,23 @@ describe('deactivate route: injected hooks + runtime wiring', () => {
 });
 
 // ---------------------------------------------------------------------------
-// The password route forwards the caller's own bearer token through to
-// disconnectAccount as exceptToken, so the RouteDef path can spare the session
-// that just made the request (the whole point of the caller-exemption fix).
-// This exercises account.ts's own wiring; the SEPARATE regression (twice now)
-// has been main.ts's injected configureAccountRuntime callback silently
-// dropping the exceptToken parameter before it reaches the real GameServer,
-// which the source-text pin below covers.
+// The password route revokes every OTHER token (keeping the caller's own token
+// valid) but disconnects EVERY live WS session for the account unconditionally.
+// An earlier revision tried to also exempt the live session matching the
+// caller's bearer token, but a bearer token is a reusable wire credential, not
+// a per-socket identity: an attacker holding a stolen/shared token could
+// authenticate their own live session with it and be spared by the exact same
+// comparison. This pins the safer, unconditional-kick shape.
 // ---------------------------------------------------------------------------
 
-describe('password route: exceptToken threads to the injected disconnectAccount hook', () => {
+describe('password route: disconnects every live session, keeps only the caller token valid', () => {
   const account = { accountId: 7, scope: 'full' as const };
   const acctRow = { id: 7, username: 'hero', password_hash: 'HASH' } as unknown as Awaited<
     ReturnType<typeof accountById>
   >;
   const callerToken = 'b'.repeat(64);
 
-  it('passes the callers own bearer token as exceptToken on a successful change', async () => {
+  it('revokes every other token but disconnects unconditionally (no exception argument)', async () => {
     vi.mocked(accountById).mockResolvedValue(acctRow);
     vi.mocked(verifyPassword).mockResolvedValue(true);
     vi.mocked(updatePasswordHash).mockResolvedValue(undefined);
@@ -660,12 +660,9 @@ describe('password route: exceptToken threads to the injected disconnectAccount 
 
     expect(r.status).toBe(200);
     expect(r.body).toEqual({ ok: true });
-    // revokeTokensExcept and disconnectAccount must be handed the SAME token: if
-    // either arm drops or mismatches it, the caller either gets kicked too (the
-    // regression this pins) or a different device stays logged in after a
-    // revoke, so both are asserted against the one literal.
     expect(revokeTokensExcept).toHaveBeenCalledWith(7, callerToken);
-    expect(disconnectAccount).toHaveBeenCalledWith(7, expect.any(String), callerToken);
+    expect(disconnectAccount).toHaveBeenCalledWith(7, expect.any(String));
+    expect(disconnectAccount.mock.calls[0]).toHaveLength(2);
   });
 });
 
@@ -693,30 +690,23 @@ describe('handler defensive callerToken re-guard', () => {
 
 // ---------------------------------------------------------------------------
 // server/main.ts wiring: the injected configureAccountRuntime callback must
-// forward exceptToken to the real GameServer.disconnectAccount. This has
-// regressed twice now (a fewer-params arrow is assignable, so tsc cannot
-// catch a dropped third argument, and importing main.ts to drive this live
-// would boot an HTTP listener + pg Pool), so pin the wiring at the source-text
-// level, the same idiom tests/server/board_read_single_flight.test.ts uses
-// for main.ts's other injected-runtime call sites.
+// forward exactly (id, reason) to the real GameServer.disconnectAccount, with
+// no third "except" argument: disconnectAccount no longer accepts one (see the
+// comment above), so a future arrow reintroducing one would silently do
+// nothing (an unused extra param) rather than fail to compile.
 // ---------------------------------------------------------------------------
 
-describe('server/main.ts wiring: configureAccountRuntime forwards exceptToken', () => {
+describe('server/main.ts wiring: configureAccountRuntime forwards no exception argument', () => {
   const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
   const codeOnly = src.replace(/(^|[^:])\/\/.*$/gm, '$1');
   const compactCode = codeOnly.replace(/\s+/g, '');
 
-  it('the account runtime disconnectAccount hook carries a 3rd param through to liveGame()', () => {
+  it('the account runtime disconnectAccount hook is a plain (id,reason) passthrough', () => {
     const at = compactCode.indexOf('configureAccountRuntime({');
     expect(at).toBeGreaterThan(-1);
     const block = compactCode.slice(at, compactCode.indexOf('});', at) + 3);
-    // Assignable-but-wrong shape this pin exists to catch: an arrow that takes
-    // only (id,reason) silently drops the caller-token exemption in production.
-    expect(block).not.toContain(
-      'disconnectAccount:(id,reason)=>liveGame().disconnectAccount(id,reason)',
-    );
     expect(block).toContain(
-      'disconnectAccount:(id,reason,exceptToken)=>liveGame().disconnectAccount(id,reason,exceptToken)',
+      'disconnectAccount:(id,reason)=>liveGame().disconnectAccount(id,reason)',
     );
   });
 });
