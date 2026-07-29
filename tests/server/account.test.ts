@@ -40,6 +40,7 @@ import {
   listCharacters,
   revokeTokensExcept,
   setAccountDeactivated,
+  updatePasswordHash,
 } from '../../server/db';
 import { emailAccountDeleted } from '../../server/email';
 import { compose } from '../../server/http/compose';
@@ -63,6 +64,7 @@ vi.mock('../../server/db', async (importActual) => {
     listCharacters: vi.fn(actual.listCharacters),
     setAccountDeactivated: vi.fn(actual.setAccountDeactivated),
     revokeTokensExcept: vi.fn(actual.revokeTokensExcept),
+    updatePasswordHash: vi.fn(actual.updatePasswordHash),
   };
 });
 vi.mock('../../server/auth', async (importActual) => {
@@ -626,6 +628,48 @@ describe('deactivate route: injected hooks + runtime wiring', () => {
 });
 
 // ---------------------------------------------------------------------------
+// The password route forwards the caller's own bearer token through to
+// disconnectAccount as exceptToken, so the RouteDef path can spare the session
+// that just made the request (the whole point of the caller-exemption fix).
+// This exercises account.ts's own wiring; the SEPARATE regression (twice now)
+// has been main.ts's injected configureAccountRuntime callback silently
+// dropping the exceptToken parameter before it reaches the real GameServer,
+// which the source-text pin below covers.
+// ---------------------------------------------------------------------------
+
+describe('password route: exceptToken threads to the injected disconnectAccount hook', () => {
+  const account = { accountId: 7, scope: 'full' as const };
+  const acctRow = { id: 7, username: 'hero', password_hash: 'HASH' } as unknown as Awaited<
+    ReturnType<typeof accountById>
+  >;
+  const callerToken = 'b'.repeat(64);
+
+  it('passes the callers own bearer token as exceptToken on a successful change', async () => {
+    vi.mocked(accountById).mockResolvedValue(acctRow);
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    vi.mocked(updatePasswordHash).mockResolvedValue(undefined);
+    vi.mocked(revokeTokensExcept).mockResolvedValue(undefined);
+    const disconnectAccount = vi.fn();
+    installRuntime({ disconnectAccount });
+
+    const r = await callHandler('POST', '/api/account/password', {
+      account,
+      headers: { authorization: `Bearer ${callerToken}` },
+      body: { current: 'old-pw', next: 'a-new-password' },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ ok: true });
+    // revokeTokensExcept and disconnectAccount must be handed the SAME token: if
+    // either arm drops or mismatches it, the caller either gets kicked too (the
+    // regression this pins) or a different device stays logged in after a
+    // revoke, so both are asserted against the one literal.
+    expect(revokeTokensExcept).toHaveBeenCalledWith(7, callerToken);
+    expect(disconnectAccount).toHaveBeenCalledWith(7, expect.any(String), callerToken);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // The password/logout handlers re-derive the caller token defensively. The guard
 // guarantees a non-null token, but the handler re-guards (tsc-satisfying + mirrors
 // the legacy arm's explicit 401 fallback), so a direct call with no bearer 401s.
@@ -644,5 +688,35 @@ describe('handler defensive callerToken re-guard', () => {
     const r = await callHandler('POST', '/api/account/logout', { account, body: {} });
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ error: 'not authenticated', code: 'auth.required' });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// server/main.ts wiring: the injected configureAccountRuntime callback must
+// forward exceptToken to the real GameServer.disconnectAccount. This has
+// regressed twice now (a fewer-params arrow is assignable, so tsc cannot
+// catch a dropped third argument, and importing main.ts to drive this live
+// would boot an HTTP listener + pg Pool), so pin the wiring at the source-text
+// level, the same idiom tests/server/board_read_single_flight.test.ts uses
+// for main.ts's other injected-runtime call sites.
+// ---------------------------------------------------------------------------
+
+describe('server/main.ts wiring: configureAccountRuntime forwards exceptToken', () => {
+  const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+  const codeOnly = src.replace(/(^|[^:])\/\/.*$/gm, '$1');
+  const compactCode = codeOnly.replace(/\s+/g, '');
+
+  it('the account runtime disconnectAccount hook carries a 3rd param through to liveGame()', () => {
+    const at = compactCode.indexOf('configureAccountRuntime({');
+    expect(at).toBeGreaterThan(-1);
+    const block = compactCode.slice(at, compactCode.indexOf('});', at) + 3);
+    // Assignable-but-wrong shape this pin exists to catch: an arrow that takes
+    // only (id,reason) silently drops the caller-token exemption in production.
+    expect(block).not.toContain(
+      'disconnectAccount:(id,reason)=>liveGame().disconnectAccount(id,reason)',
+    );
+    expect(block).toContain(
+      'disconnectAccount:(id,reason,exceptToken)=>liveGame().disconnectAccount(id,reason,exceptToken)',
+    );
   });
 });
