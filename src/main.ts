@@ -82,7 +82,7 @@ import {
 } from './game/mobile_controls';
 import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
-import { mouselookReleaseFacing } from './game/mouselook_release';
+import { updateMouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
@@ -1548,11 +1548,13 @@ async function startGame(
   // camera prompt lives outside Hud, so it reports its open state explicitly.
   // The Last Bell scene input lock joins here so ability/UI keys are
   // suppressed the same way the other blocking surfaces suppress them.
+  const sceneInputLockedNow = () =>
+    sceneDirector.inputLocked() || (online?.sceneInputLockPending() ?? false);
   const gameplayInputBlocked = () =>
     hud.isModalOpen() ||
     hud.promptModalOpen() ||
     cameraPromptOpen() ||
-    sceneDirector.inputLocked() ||
+    sceneInputLockedNow() ||
     chatInput.style.display === 'block';
 
   const input = new Input(
@@ -1656,7 +1658,7 @@ async function startGame(
           case 'escape':
             // While a scene plays, Escape is the skip gesture (the sim ends
             // the scene once every living participant asked), never the menu.
-            if (sceneDirector.sceneActive()) {
+            if (sceneDirector.sceneActive() || sceneInputLockedNow()) {
               world.sceneSkip();
               break;
             }
@@ -1775,6 +1777,10 @@ async function startGame(
   const sceneInputLock = new SceneInputLockCoordinator(sceneDirector, input, () =>
     mobileControls.syncAutorun(false),
   );
+  if (online) {
+    online.onSceneInputLockChanged = (locked) => sceneInputLock.applyPending(locked);
+    sceneInputLock.applyPending(online.sceneInputLockPending());
+  }
   const syncOverlayDiagnostics = (): void => {
     syncCharacterOpenDiagnostics();
     syncQuestDialogOpenDiagnostics();
@@ -1834,7 +1840,7 @@ async function startGame(
   function dispatchGamepadAction(id: string): void {
     if (id === 'escape') {
       // Same order as the keyboard path: a live scene turns Escape into skip.
-      if (sceneDirector.sceneActive()) {
+      if (sceneDirector.sceneActive() || sceneInputLockedNow()) {
         world.sceneSkip();
         return;
       }
@@ -3169,7 +3175,7 @@ async function startGame(
   // mode while a movement key is held) across frames so its falling edge can
   // commit the final camera yaw to the player facing (see mouselook_release.ts
   // and camera_driven_facing.ts).
-  let prevCameraDrivenFacing = false;
+  const cameraDrivenFacingEdge = { active: false };
   // The release yaw, latched until a sim tick actually commits it. Offline a tick
   // runs on only ~2/3 of frames (60Hz frames, 20Hz ticks), so committing only on
   // the release frame would drop the one-shot when release lands on a zero-tick
@@ -3472,14 +3478,16 @@ async function startGame(
     // enforces the same countdown lock, so online latency cannot move the
     // authoritative rider.
     const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
-    let sceneInputLocked = sceneInputLock.sync();
+    let sceneInputLocked = online
+      ? sceneInputLock.applyPending(online.sceneInputLockPending())
+      : sceneInputLock.sync();
     let drainedEvents: ReturnType<ClientWorld['drainEvents']> = [];
     let selfAuthoritativeDiscontinuity = false;
     if (online) {
       // Scene events must land before this frame derives or flushes movement:
       // a queued inputLock:on is authoritative for the whole outgoing frame.
       drainedEvents = online.drainEvents();
-      sceneInputLocked = sceneInputLock.handleEvents(drainedEvents);
+      sceneInputLocked = sceneInputLock.handleMirroredEvents(drainedEvents);
       selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
         drainedEvents,
         online.playerId,
@@ -3534,12 +3542,12 @@ async function startGame(
       input.isMouselookActive(),
       movementFrozen(),
     );
-    const edgeReleaseFacing = mouselookReleaseFacing(
-      prevCameraDrivenFacing,
+    const edgeReleaseFacing = updateMouselookReleaseFacing(
+      cameraDrivenFacingEdge,
       cameraDrivenFacing,
       input.camYaw,
+      sceneInputLocked,
     );
-    prevCameraDrivenFacing = cameraDrivenFacing;
     if (sceneInputLocked) {
       pendingReleaseFacing = null;
     } else if (renderFacing !== null || controllerFacing !== null) {

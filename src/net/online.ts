@@ -243,6 +243,7 @@ import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_c
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { sceneInputLockAfterEvent } from './scene_input_lock_mirror';
 import {
   type SnapshotTimerWireMode,
   STABLE_TIMER_WIRE_VERSION,
@@ -1713,6 +1714,8 @@ export class ClientWorld implements IWorld {
   onConnectionLost: ((attempt: number, maxAttempts: number, nextRetryAtMs: number) => void) | null =
     null;
   onReconnected: (() => void) | null = null;
+  onSceneInputLockChanged: ((locked: boolean) => void) | null = null;
+  private sceneInputLockedBeforeDrain = false;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
   // see src/net/reconnect_policy.ts for why these are tolerated (bounded)
@@ -1954,6 +1957,10 @@ export class ClientWorld implements IWorld {
     return out;
   }
 
+  sceneInputLockPending(): boolean {
+    return this.sceneInputLockedBeforeDrain;
+  }
+
   setMoveInput(input: unknown, facing?: unknown): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
     if (facing !== undefined) this.setMouselookFacing(facing);
@@ -2147,7 +2154,12 @@ export class ClientWorld implements IWorld {
       // The hello is ordered before any new tick event on this transport.
       // Object-or-null convergence prevents a dropped end/result event from
       // leaving the camera lock or choice focus trap stale forever.
-      this.eventQueue.push({ type: 'sceneSync', state: helloSceneState(msg.sceneState) });
+      const sceneSync = {
+        type: 'sceneSync',
+        state: helloSceneState(msg.sceneState),
+      } as SimEvent;
+      this.mirrorSceneInputLock(sceneSync);
+      this.eventQueue.push(sceneSync);
       this.eventQueue.push({
         type: 'sceneChoiceSync',
         state: helloChoiceState(msg.sceneChoiceState),
@@ -2244,20 +2256,22 @@ export class ClientWorld implements IWorld {
     }
     if (msg.t === 'events') {
       for (const ev of msg.list) {
-        this.applyLockpickEvent(ev as SimEvent);
-        this.applyMountRaceEvent(ev as SimEvent);
-        this.applyMountTrainEvent(ev as SimEvent);
-        this.applyCraftResultEvent(ev as SimEvent);
-        this.applyRiftStateEvent(ev as SimEvent);
-        this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
-        this.applyMasterworkEvent(ev as SimEvent);
-        this.applyDisenchantResultEvent(ev as SimEvent);
-        this.applyEnchantResultEvent(ev as SimEvent);
-        this.applySalvageResultEvent(ev as SimEvent);
-        this.applyChatFlairEvent(ev as SimEvent);
-        this.applyUnstuckEvent(ev as SimEvent);
-        this.applyPrestigeEvent(ev as SimEvent);
-        this.eventQueue.push(ev as SimEvent);
+        const event = ev as SimEvent;
+        this.mirrorSceneInputLock(event);
+        this.applyLockpickEvent(event);
+        this.applyMountRaceEvent(event);
+        this.applyMountTrainEvent(event);
+        this.applyCraftResultEvent(event);
+        this.applyRiftStateEvent(event);
+        this.applyRiftDeathZoneSpawnEvent(event);
+        this.applyMasterworkEvent(event);
+        this.applyDisenchantResultEvent(event);
+        this.applyEnchantResultEvent(event);
+        this.applySalvageResultEvent(event);
+        this.applyChatFlairEvent(event);
+        this.applyUnstuckEvent(event);
+        this.applyPrestigeEvent(event);
+        this.eventQueue.push(event);
       }
       return;
     }
@@ -2327,6 +2341,17 @@ export class ClientWorld implements IWorld {
         rawGapMs,
       });
     }
+  }
+
+  private mirrorSceneInputLock(event: SimEvent): void {
+    const locked = sceneInputLockAfterEvent(this.sceneInputLockedBeforeDrain, event, this.playerId);
+    if (locked === this.sceneInputLockedBeforeDrain) return;
+    this.sceneInputLockedBeforeDrain = locked;
+    if (locked) {
+      Object.assign(this.moveInput, emptyMoveInput());
+      this.mouselookFacing = null;
+    }
+    this.onSceneInputLockChanged?.(locked);
   }
 
   consumeSocialChanged(): boolean {

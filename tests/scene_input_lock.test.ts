@@ -7,6 +7,10 @@ const LOCK_ON = {
   type: 'scene',
   op: { kind: 'inputLock', on: true },
 } as SimEvent;
+const LOCK_OFF = {
+  type: 'scene',
+  op: { kind: 'inputLock', on: false },
+} as SimEvent;
 
 function harness() {
   let locked = false;
@@ -19,9 +23,11 @@ function harness() {
     inputLocked: () => locked,
   };
   let targetLocked = false;
+  const targetTransitions: boolean[] = [];
   const target = {
     setSceneInputLocked(on: boolean) {
       targetLocked = on;
+      targetTransitions.push(on);
     },
   };
   const onLockEdge = vi.fn();
@@ -29,6 +35,7 @@ function harness() {
   return {
     coordinator,
     targetLocked: () => targetLocked,
+    targetTransitions,
     onLockEdge,
   };
 }
@@ -58,6 +65,37 @@ describe('scene input lock frame coordination', () => {
     expect(flushedForward).toEqual([false]);
   });
 
+  it('preserves a rising edge inside a batch that finishes unlocked', () => {
+    const { coordinator, targetLocked, targetTransitions, onLockEdge } = harness();
+
+    coordinator.handleEvents([LOCK_ON, LOCK_OFF]);
+
+    expect(targetLocked()).toBe(false);
+    expect(targetTransitions).toEqual([true, false]);
+    expect(onLockEdge).toHaveBeenCalledTimes(1);
+  });
+
+  it('propagates an independent unlock without firing another lock edge', () => {
+    const { coordinator, targetLocked, onLockEdge } = harness();
+    coordinator.handleEvents([LOCK_ON]);
+
+    coordinator.handleEvents([LOCK_OFF]);
+
+    expect(targetLocked()).toBe(false);
+    expect(onLockEdge).toHaveBeenCalledTimes(1);
+  });
+
+  it('converges mirrored events without replaying their receipt-time lock edge', () => {
+    const { coordinator, targetLocked, onLockEdge } = harness();
+    coordinator.applyPending(true);
+    coordinator.applyPending(false);
+
+    coordinator.handleMirroredEvents([LOCK_ON, LOCK_OFF]);
+
+    expect(targetLocked()).toBe(false);
+    expect(onLockEdge).toHaveBeenCalledTimes(1);
+  });
+
   it('wires both event paths before their next authoritative input boundary', () => {
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
     const offline = main.slice(main.indexOf('while (acc >= DT)'), main.indexOf('const pp ='));
@@ -73,14 +111,16 @@ describe('scene input lock frame coordination', () => {
       offline.indexOf('acc -= DT'),
     );
     expect(online.indexOf('online.drainEvents()')).toBeLessThan(
-      online.indexOf('sceneInputLock.handleEvents(drainedEvents)'),
+      online.indexOf('sceneInputLock.handleMirroredEvents(drainedEvents)'),
     );
-    expect(online.indexOf('sceneInputLock.handleEvents(drainedEvents)')).toBeLessThan(
+    expect(online.indexOf('sceneInputLock.handleMirroredEvents(drainedEvents)')).toBeLessThan(
       online.indexOf('resolveMove('),
     );
     expect(online.indexOf('resolveMove(')).toBeLessThan(online.indexOf('net.flushInput()'));
     expect(main).toContain('const mouselook =\n      intro === null && !sceneInputLocked');
     expect(main).toContain('const netFacing = sceneInputLocked ? null');
     expect(main).toContain('sceneDirector.inputLocked() ? null');
+    expect(main).toContain('resetKeyboardTurnState(kbTurn)');
+    expect(main).toContain('online.onSceneInputLockChanged = (locked) =>');
   });
 });

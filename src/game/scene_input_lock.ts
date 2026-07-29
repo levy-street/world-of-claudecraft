@@ -24,7 +24,10 @@ export class SceneInputLockCoordinator {
   ) {}
 
   sync(): boolean {
-    const locked = this.source.inputLocked();
+    return this.applyPending(this.source.inputLocked());
+  }
+
+  applyPending(locked: boolean): boolean {
     if (locked && !this.wasLocked) this.onLockEdge();
     this.target.setSceneInputLocked(locked);
     this.wasLocked = locked;
@@ -32,7 +35,22 @@ export class SceneInputLockCoordinator {
   }
 
   handleEvents(events: SimEvent[]): boolean {
-    this.source.handleEvents(events);
+    let handled = false;
+    let locked = this.source.inputLocked();
+    for (const event of events) {
+      if (event.type !== 'scene' && event.type !== 'sceneSync') continue;
+      handled = true;
+      this.source.handleEvents([event]);
+      locked = this.sync();
+    }
+    return handled ? locked : this.sync();
+  }
+
+  handleMirroredEvents(events: SimEvent[]): boolean {
+    for (const event of events) {
+      if (event.type !== 'scene' && event.type !== 'sceneSync') continue;
+      this.source.handleEvents([event]);
+    }
     return this.sync();
   }
 }
