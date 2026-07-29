@@ -322,6 +322,7 @@ function payloadFromSnapshot(
       rendererPhaseMs: renderer.phaseMs,
       rendererFoliage: renderer.foliage,
       rendererBudget: renderer.renderBudget,
+      rendererGpuTiming: renderer.gpuTiming,
       rendererQualityBuckets: renderer.qualityBuckets,
       rendererDiagnostics: renderer.renderDiagnostics,
       rendererPrewarmSummary: rendererPrewarmSummary(renderer.prewarm),

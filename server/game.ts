@@ -211,6 +211,7 @@ import {
   type SnapshotBinaryEntityFragment,
   type SnapshotObject,
 } from './snapshot_binary';
+import { assembleSnapshotJson, type SnapshotJsonFrameParts } from './snapshot_frame';
 import {
   jsonWithField,
   StableAuraWireCache,
@@ -1383,6 +1384,28 @@ export class GameServer {
   readonly social: SocialService;
   private readonly moderation: ModerationService<ClientSession>;
   private wireCache = new Map<number, EntityWireCache>();
+  // Snapshot broadcasts are synchronous and non-reentrant. Reuse their transient
+  // collections across recipients so a crowded realm does not allocate four new
+  // containers per player at 20 Hz.
+  private readonly snapshotAnchorsScratch: SnapshotAnchor[] = [];
+  private readonly snapshotEntityJsonScratch: string[] = [];
+  private readonly snapshotEntityBinaryScratch: SnapshotBinaryEntityFragment[] = [];
+  private readonly snapshotKeepScratch: number[] = [];
+  private readonly snapshotPresentScratch = new Set<number>();
+  private readonly snapshotFrostRingScratch: SnapshotObject[] = [];
+  private readonly snapshotHourglassScratch: SnapshotObject[] = [];
+  private readonly snapshotJsonFrameParts: SnapshotJsonFrameParts = {
+    head: '',
+    timerWireJson: '',
+    selfJson: '',
+    entityJson: this.snapshotEntityJsonScratch,
+    rings: this.snapshotFrostRingScratch,
+    hourglasses: this.snapshotHourglassScratch,
+    keep: this.snapshotKeepScratch,
+  };
+  // Pins lazy fallback behavior in the live transport test and is useful while
+  // profiling mixed-version rolling deploys.
+  private snapshotJsonFramesBuilt = 0;
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
   // each grouped session. Memoize both for one broadcast so each party does one
@@ -5539,7 +5562,8 @@ export class GameServer {
     // leaving spectate limbo becomes visible to co-located viewers one tick
     // sooner, never later, and it never changes combat, loot, interest, or what
     // the spectated players see).
-    const anchors: SnapshotAnchor[] = [];
+    const anchors = this.snapshotAnchorsScratch;
+    anchors.length = 0;
     forEachGuarded(
       this.clients.values(),
       (session) => {
@@ -5598,16 +5622,18 @@ export class GameServer {
       anchors,
       ({ session, anchor: anchorEntity, anchorMeta, anchorSession, stableTimerWire }) => {
         const wantsBinary = session.snapshotTransport === 'binary-v1';
-        const ents: string[] = [];
-        const binaryEnts: SnapshotBinaryEntityFragment[] = [];
-        const keep: number[] = [];
-        const pushEntity = (json: string, binary: SnapshotBinaryEntityFragment | null): void => {
-          ents.push(json);
-          if (!wantsBinary) return;
-          if (!binary) throw new Error('binary entity cache was not initialized');
-          binaryEnts.push(binary);
-        };
-        const present = new Set<number>();
+        const ents = this.snapshotEntityJsonScratch;
+        const binaryEnts = this.snapshotEntityBinaryScratch;
+        const keep = this.snapshotKeepScratch;
+        const present = this.snapshotPresentScratch;
+        const frostRingValues = this.snapshotFrostRingScratch;
+        const temporalHourglassValues = this.snapshotHourglassScratch;
+        ents.length = 0;
+        binaryEnts.length = 0;
+        keep.length = 0;
+        present.clear();
+        frostRingValues.length = 0;
+        temporalHourglassValues.length = 0;
         const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         for (const e of candidates.forSession(session.pid)) {
           // Re-apply the exact viewer-relative cutoff the single grid query used
@@ -5638,7 +5664,8 @@ export class GameServer {
           if (known === undefined) {
             // first sight carries the at-rest state exactly, so no settle
             // record is owed until it moves again
-            pushEntity(
+            this.pushSnapshotEntity(
+              wantsBinary,
               stableTimerWire ? cache.fullAuraJson : cache.fullJson,
               stableTimerWire ? cache.fullAuraBinary : cache.fullBinary,
             );
@@ -5653,7 +5680,8 @@ export class GameServer {
           }
           const auraChanged = stableTimerWire && known.auraVer !== cache.auraVer;
           if (known.idVer !== cache.idVer) {
-            pushEntity(
+            this.pushSnapshotEntity(
+              wantsBinary,
               auraChanged ? cache.fullAuraJson : cache.fullJson,
               auraChanged ? cache.fullAuraBinary : cache.fullBinary,
             );
@@ -5678,7 +5706,8 @@ export class GameServer {
           known.dynVer = cache.dynVer;
           known.auraVer = cache.auraVer;
           known.sentAtTick = tick;
-          pushEntity(
+          this.pushSnapshotEntity(
+            wantsBinary,
             auraChanged ? cache.liteAuraJson : cache.liteJson,
             auraChanged ? cache.liteAuraBinary : cache.liteBinary,
           );
@@ -5697,66 +5726,38 @@ export class GameServer {
           vcupDue,
         );
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
-        const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-        const frostRings = activeFrostRings
-          .filter((ring) => {
-            const dx = ring.x - anchorEntity.pos.x;
-            const dz = ring.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + ring.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (ring) =>
-              `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
-          );
-        const frostRingsJson = frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
-        const temporalHourglasses = activeTemporalHourglasses
-          .filter((hourglass) => {
-            const dx = hourglass.x - anchorEntity.pos.x;
-            const dz = hourglass.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + hourglass.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (hourglass) =>
-              `{"id":${JSON.stringify(hourglass.id)},"x":${round2(hourglass.x)},"z":${round2(hourglass.z)},"r":${round2(hourglass.radius)},"dur":${round2(hourglass.duration)},"rem":${round2(hourglass.remaining)}}`,
-          );
-        const temporalHourglassesJson =
-          temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
+        for (const ring of activeFrostRings) {
+          const dx = ring.x - anchorEntity.pos.x;
+          const dz = ring.z - anchorEntity.pos.z;
+          const limit = INTEREST_QUERY_RADIUS + ring.radius;
+          if (dx * dx + dz * dz > limit * limit) continue;
+          frostRingValues.push({
+            id: ring.id,
+            x: round2(ring.x),
+            z: round2(ring.z),
+            r: round2(ring.radius),
+            i: round2(ring.innerRadius),
+            dur: round2(ring.duration),
+            rem: round2(ring.remaining),
+          });
+        }
+        for (const hourglass of activeTemporalHourglasses) {
+          const dx = hourglass.x - anchorEntity.pos.x;
+          const dz = hourglass.z - anchorEntity.pos.z;
+          const limit = INTEREST_QUERY_RADIUS + hourglass.radius;
+          if (dx * dx + dz * dz > limit * limit) continue;
+          temporalHourglassValues.push({
+            id: hourglass.id,
+            x: round2(hourglass.x),
+            z: round2(hourglass.z),
+            r: round2(hourglass.radius),
+            dur: round2(hourglass.duration),
+            rem: round2(hourglass.remaining),
+          });
+        }
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
         let binaryRoot: SnapshotObject | null = null;
         if (wantsBinary) {
-          const frostRingValues = activeFrostRings
-            .filter((ring) => {
-              const dx = ring.x - anchorEntity.pos.x;
-              const dz = ring.z - anchorEntity.pos.z;
-              const limit = INTEREST_QUERY_RADIUS + ring.radius;
-              return dx * dx + dz * dz <= limit * limit;
-            })
-            .map((ring) => ({
-              id: ring.id,
-              x: round2(ring.x),
-              z: round2(ring.z),
-              r: round2(ring.radius),
-              i: round2(ring.innerRadius),
-              dur: round2(ring.duration),
-              rem: round2(ring.remaining),
-            }));
-          const temporalHourglassValues = activeTemporalHourglasses
-            .filter((hourglass) => {
-              const dx = hourglass.x - anchorEntity.pos.x;
-              const dz = hourglass.z - anchorEntity.pos.z;
-              const limit = INTEREST_QUERY_RADIUS + hourglass.radius;
-              return dx * dx + dz * dz <= limit * limit;
-            })
-            .map((hourglass) => ({
-              id: hourglass.id,
-              x: round2(hourglass.x),
-              z: round2(hourglass.z),
-              r: round2(hourglass.radius),
-              dur: round2(hourglass.duration),
-              rem: round2(hourglass.remaining),
-            }));
           binaryRoot = {
             t: 'snap',
             tick,
@@ -5769,12 +5770,11 @@ export class GameServer {
           if (temporalHourglassValues.length > 0) binaryRoot.hourglasses = temporalHourglassValues;
           if (keep.length > 0) binaryRoot.keep = keep;
         }
-        this.sendSnapshotRaw(
-          session,
-          `${head}${timerWireJson},"self":${selfWire.json},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
-          binaryRoot,
-          binaryEnts,
-        );
+        const jsonFrame = this.snapshotJsonFrameParts;
+        jsonFrame.head = head;
+        jsonFrame.timerWireJson = timerWireJson;
+        jsonFrame.selfJson = selfWire.json;
+        this.sendSnapshotRaw(session, jsonFrame, binaryRoot, binaryEnts);
       },
       (err, resolved) =>
         console.error(
@@ -7329,26 +7329,37 @@ export class GameServer {
     this.sendFrame(session, payload);
   }
 
+  private pushSnapshotEntity(
+    wantsBinary: boolean,
+    json: string,
+    binary: SnapshotBinaryEntityFragment | null,
+  ): void {
+    this.snapshotEntityJsonScratch.push(json);
+    if (!wantsBinary) return;
+    if (!binary) throw new Error('binary entity cache was not initialized');
+    this.snapshotEntityBinaryScratch.push(binary);
+  }
+
   private sendSnapshotRaw(
     session: ClientSession,
-    payload: string,
+    jsonFrame: SnapshotJsonFrameParts,
     binaryRoot: SnapshotObject | null,
     binaryEnts: readonly SnapshotBinaryEntityFragment[],
   ): void {
-    if (session.snapshotTransport !== 'binary-v1') {
-      this.sendRaw(session, payload);
-      return;
+    if (session.snapshotTransport === 'binary-v1') {
+      try {
+        if (!binaryRoot) throw new Error('binary snapshot root was not initialized');
+        this.sendFrame(session, encodeSnapshotBinaryFromFragments(binaryRoot, binaryEnts));
+        return;
+      } catch (error) {
+        // Fail soft per session. The exact JSON payload that would have been sent
+        // without negotiation remains the rollback frame.
+        session.snapshotTransport = 'json';
+        console.error(`[snap] binary encode failed for pid ${session.pid}; using JSON:`, error);
+      }
     }
-    try {
-      if (!binaryRoot) throw new Error('binary snapshot root was not initialized');
-      this.sendFrame(session, encodeSnapshotBinaryFromFragments(binaryRoot, binaryEnts));
-    } catch (error) {
-      // Fail soft per session. The exact JSON payload that would have been sent
-      // without negotiation remains the rollback frame.
-      session.snapshotTransport = 'json';
-      console.error(`[snap] binary encode failed for pid ${session.pid}; using JSON:`, error);
-      this.sendRaw(session, payload);
-    }
+    this.snapshotJsonFramesBuilt++;
+    this.sendRaw(session, assembleSnapshotJson(jsonFrame));
   }
 
   private sendFrame(session: ClientSession, payload: string | Uint8Array): void {

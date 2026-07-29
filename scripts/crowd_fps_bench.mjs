@@ -14,7 +14,8 @@
 //
 // Env: CROWD_BATCHES=10,20,30,40 (cumulative crowd sizes), CROWD_W/H, CROWD_DPR,
 //      CROWD_SETTLE_MS, GAME_URL, SERVER_URL, BROWSER_PATH, CROWD_MIN_FPS (per-sample
-//      fps floor, unset = no floor), CROWD_JSON_OUT (evidence JSON path).
+//      fps floor, unset = no floor), CROWD_JSON_OUT (evidence JSON path),
+//      CROWD_GPU_TIMING=1 (opt-in asynchronous GPU query samples).
 //
 // This is a GATE, not just a probe (scripts/lib/bench_gate.mjs): every crowd batch
 // must join EXACTLY (actual sockets, bots.length, never attempts; partial joins fail,
@@ -180,7 +181,11 @@ async function enterWorld(page) {
   // CROWD_GFX forces a tier (low|medium|high|ultra) for a branch-independent,
   // tier-consistent before/after; default lets the client auto-detect.
   const gfxQs = process.env.CROWD_GFX ? `&gfx=${process.env.CROWD_GFX}` : '';
-  await page.goto(`${GAME_URL}/?perf${gfxQs}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const gpuQs = process.env.CROWD_GPU_TIMING === '1' ? '&gpuTiming=1' : '';
+  await page.goto(`${GAME_URL}/?perf${gfxQs}${gpuQs}`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 30000,
+  });
   // The homepage/landing mounts the mode-select compat triggers asynchronously
   // (slower under a real GPU than swiftshader), so wait for the hook to exist.
   await page.waitForFunction(
@@ -278,6 +283,11 @@ async function sample(page, label) {
       entitiesMs: rr.phaseMs?.entities?.avg ?? rr.phaseMs?.entities,
       submitMs: rr.phaseMs?.submit?.avg ?? rr.phaseMs?.submit,
       rendererMs: r.mainMs?.renderer?.avg,
+      gpuMs: rr.gpuTiming?.averageMs,
+      gpuP95: rr.gpuTiming?.p95Ms,
+      gpuMax: rr.gpuTiming?.maxMs,
+      gpuSamples: rr.gpuTiming?.sampleCount,
+      gpuTimingSupported: rr.gpuTiming?.supported,
       entityCount: g.world.entities.size,
       tier: rr.tier,
       scale: rr.effectiveRenderScale,
@@ -287,7 +297,7 @@ async function sample(page, label) {
 
 function row(s) {
   const f = (n, w = 6) => String(typeof n === 'number' ? Math.round(n * 10) / 10 : n).padStart(w);
-  return `${String(s.label).padEnd(14)} fps=${f(s.fps)} p95=${f(s.frameP95)} p99=${f(s.frameP99)} ents=${f(s.entityCount, 4)} views=${f(s.views, 4)} calls=${f(s.calls)} tris=${f(s.triangles, 9)} entMs=${f(s.entitiesMs, 5)} subMs=${f(s.submitMs, 5)}`;
+  return `${String(s.label).padEnd(14)} fps=${f(s.fps)} p95=${f(s.frameP95)} p99=${f(s.frameP99)} ents=${f(s.entityCount, 4)} views=${f(s.views, 4)} calls=${f(s.calls)} tris=${f(s.triangles, 9)} entMs=${f(s.entitiesMs, 5)} subMs=${f(s.submitMs, 5)} gpuMs=${f(s.gpuMs, 5)}`;
 }
 
 async function main() {

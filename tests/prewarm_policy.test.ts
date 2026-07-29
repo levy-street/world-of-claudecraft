@@ -122,6 +122,8 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     expect(renderer).toContain('const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;');
     expect(renderer).toContain('remainingPrewarmViewBudget(policy.maxViews, createdViews)');
+    expect(renderer).toContain('playerPrewarmOwnedVisuals = built.visuals');
+    expect(renderer).toContain('for (const visual of playerPrewarmOwnedVisuals) visual.dispose()');
   });
 
   it('moves programs.compile to just before world.initial-frame', () => {

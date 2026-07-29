@@ -1,27 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import {
-  RENDER_DIRTY_FACING,
-  RENDER_DIRTY_NEW,
-  RENDER_DIRTY_POSITION,
-  RENDER_ENTITY_ACTIONABLE,
-  type RenderEntityLike,
-  RenderWorldCore,
-} from '../src/render/runtime/render_world_core';
+import { type RenderEntityLike, RenderWorldCore } from '../src/render/runtime/render_world_core';
 
-function entity(
-  id: number,
-  x: number,
-  overrides: Partial<RenderEntityLike> = {},
-): RenderEntityLike {
+function entity(id: number, x: number): RenderEntityLike {
   return {
     id,
-    pos: { x, y: 0, z: 0 },
-    facing: 0,
-    hostile: false,
-    inCombat: false,
-    castingAbility: null,
-    ownerId: null,
-    ...overrides,
+    pos: { x, z: 0 },
   };
 }
 
@@ -41,48 +24,41 @@ function frame(
 }
 
 describe('RenderWorldCore', () => {
-  it('keeps slots stable and reports only changed hot fields', () => {
+  it('keeps slots stable and refreshes the consumed distance field', () => {
     const core = new RenderWorldCore(2);
     const first = entity(1, 2);
     frame(core, new Map([[1, first]]));
     const slot = core.slotFor(1);
     expect(slot).toBeGreaterThanOrEqual(0);
-    expect(core.dirty[slot]! & RENDER_DIRTY_NEW).not.toBe(0);
+    expect(core.distanceSq[slot]).toBe(4);
 
     frame(core, new Map([[1, first]]));
     expect(core.slotFor(1)).toBe(slot);
-    expect(core.dirty[slot]).toBe(0);
 
     first.pos.x = 3;
-    first.facing = 1;
     frame(core, new Map([[1, first]]));
     expect(core.slotFor(1)).toBe(slot);
-    expect(core.dirty[slot]! & RENDER_DIRTY_POSITION).not.toBe(0);
-    expect(core.dirty[slot]! & RENDER_DIRTY_FACING).not.toBe(0);
+    expect(core.distanceSq[slot]).toBe(9);
   });
 
-  it('uses actionable flags to admit important entities outside the create range', () => {
+  it('admits the target outside the create range', () => {
     const core = new RenderWorldCore();
     const farTarget = entity(2, 30);
     const result = frame(core, new Map([[2, farTarget]]), 2);
-    const slot = core.slotFor(2);
 
     expect(result.admissionCount).toBe(1);
     expect(core.admissionIds[0]).toBe(2);
-    expect(core.flags[slot]! & RENDER_ENTITY_ACTIONABLE).not.toBe(0);
   });
 
-  it('does not bypass spatial admission for a merely hostile far entity', () => {
+  it('does not bypass spatial admission for an ordinary far entity', () => {
     const core = new RenderWorldCore();
-    const farHostile = entity(2, 30, { hostile: true });
-    const result = frame(core, new Map([[2, farHostile]]));
-    const slot = core.slotFor(2);
+    const far = entity(2, 30);
+    const result = frame(core, new Map([[2, far]]));
 
-    expect(core.flags[slot]! & RENDER_ENTITY_ACTIONABLE).not.toBe(0);
     expect(result.admissionCount).toBe(0);
   });
 
-  it('separates view eviction from removal and preserves attached actionable views', () => {
+  it('separates view eviction from removal and preserves an attached target', () => {
     const core = new RenderWorldCore();
     const far = entity(2, 30);
     frame(core, new Map([[2, far]]));

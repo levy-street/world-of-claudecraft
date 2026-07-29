@@ -69,7 +69,7 @@ function ensureRig(): void {
     canvas,
     alpha: true,
     antialias: true,
-    preserveDrawingBuffer: true,
+    preserveDrawingBuffer: false,
   });
   renderer.setPixelRatio(1);
   renderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);

@@ -142,6 +142,7 @@ import {
   urlForcedTier,
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
+import { GpuFrameTimer, type GpuTimingSnapshot } from './gpu_timer';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
@@ -886,6 +887,12 @@ function localRenderDiagnosticsEnabled(): boolean {
   );
 }
 
+function sampledGpuTimingEnabled(): boolean {
+  if (typeof location === 'undefined') return false;
+  const params = new URLSearchParams(location.search);
+  return params.get('gpuTiming') === '1' || params.get('gpu_timing') === '1';
+}
+
 function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCategory): void {
   obj.userData.renderCategory = category;
 }
@@ -1248,6 +1255,7 @@ export class Renderer {
   private shakeElapsed = 0;
   private fiestaRing: THREE.Mesh | null = null;
   private fiestaPowerupMeshes = new Map<number, THREE.Mesh>();
+  private readonly fiestaPowerupSeenIds = new Set<number>();
   // Per-entity power-up glow: emits a coloured swirl around the carrier until it expires.
   private fiestaGlows = new Map<number, { color: number; until: number; nextSwirl: number }>();
   // Per-target heal-glow throttle (ms since a target last bloomed a heal glow). A
@@ -1287,6 +1295,7 @@ export class Renderer {
   private glRenderer = '';
   private contextLostCount = 0;
   private contextRestoredCount = 0;
+  private gpuTimer!: GpuFrameTimer;
   private phaseSamples: Record<RendererPhase, RendererPhaseSampleWindow> = {
     setup: new RendererPhaseSampleWindow(RENDERER_PHASE_SAMPLE_LIMIT),
     entities: new RendererPhaseSampleWindow(RENDERER_PHASE_SAMPLE_LIMIT),
@@ -1371,8 +1380,14 @@ export class Renderer {
     canvas.addEventListener('webglcontextrestored', () => {
       this.contextRestoredCount++;
       this.captureGlIdentity();
+      this.gpuTimer.reset();
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
+    this.gpuTimer = new GpuFrameTimer(
+      sampledGpuTimingEnabled() && this.webgl.capabilities.isWebGL2
+        ? (this.webgl.getContext() as WebGL2RenderingContext)
+        : null,
+    );
     this.visualPool = new CharacterVisualPool<CharacterVisual>(GFX.maxPooledCharacterVisuals, {
       reset: (visual) => visual.resetForReuse(),
       dispose: (visual) => visual.dispose(),
@@ -2180,6 +2195,7 @@ export class Renderer {
     glRenderer: string;
     contextLost: number;
     contextRestored: number;
+    gpuTiming: GpuTimingSnapshot;
     phaseMs: RendererPhaseStats;
     renderDiagnostics: RenderDiagnosticsSnapshot;
     lastFrame?: RendererFrameStats;
@@ -2242,6 +2258,7 @@ export class Renderer {
       glRenderer: this.glRenderer,
       contextLost: this.contextLostCount,
       contextRestored: this.contextRestoredCount,
+      gpuTiming: this.gpuTimer.snapshot(),
       phaseMs: this.rendererPhaseStats(),
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
       lastFrame: this.lastFrameStats,
@@ -2964,9 +2981,11 @@ export class Renderer {
 
   private buildPlayerPrewarmGroup(deadline: number): {
     group: THREE.Group;
+    visuals: CharacterVisual[];
     visualCount: number;
   } {
     const group = new THREE.Group();
+    const visuals: CharacterVisual[] = [];
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 21);
     setRenderCategory(group, 'prewarm');
@@ -2979,17 +2998,18 @@ export class Renderer {
     for (const cls of ALL_CLASSES) {
       const variants = skinCount(`player_${cls}`);
       for (let skin = 0; skin < variants; skin++) {
-        if (performance.now() >= deadline) return { group, visualCount: idx };
+        if (performance.now() >= deadline) return { group, visuals, visualCount: idx };
         const color = CLASSES[cls]?.color ?? 0xffffff;
         const entity = this.prewarmEntity('player', cls, color, 1, skin, -11_000 - idx);
         const visual = createCharacterVisual(entity);
         // assets unavailable: skip the seed
         if (!visual) continue;
+        visuals.push(visual);
         visual.root.visible = true;
         place(visual.root);
       }
     }
-    return { group, visualCount: idx };
+    return { group, visuals, visualCount: idx };
   }
 
   private buildObjectPrewarmGroup(): THREE.Group {
@@ -3213,6 +3233,7 @@ export class Renderer {
     let entityPrewarmGroup: THREE.Group | null = null;
     let npcPrewarmGroup: THREE.Group | null = null;
     let playerPrewarmGroup: THREE.Group | null = null;
+    let playerPrewarmOwnedVisuals: CharacterVisual[] = [];
     let objectPrewarmGroup: THREE.Group | null = null;
     let propMaterialPrewarmGroup: THREE.Group | null = null;
     let foliagePrewarmGroup: THREE.Group | null = null;
@@ -3392,6 +3413,7 @@ export class Renderer {
         run: () => {
           const built = this.buildPlayerPrewarmGroup(buildDeadline);
           playerPrewarmGroup = built.group;
+          playerPrewarmOwnedVisuals = built.visuals;
           playerPrewarmVisuals = built.visualCount;
           this.scene.add(playerPrewarmGroup);
         },
@@ -3649,7 +3671,10 @@ export class Renderer {
       if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
       if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
-      if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
+      if (playerPrewarmGroup) {
+        this.scene.remove(playerPrewarmGroup);
+        for (const visual of playerPrewarmOwnedVisuals) visual.dispose();
+      }
       if (objectPrewarmGroup) {
         // Re-show the object lights hidden during the prewarm so the pooled objects
         // (reused for the live ground objects) light normally. (Cast: the manifest
@@ -4217,7 +4242,8 @@ export class Renderer {
   private updateFiestaPowerups(dt: number): void {
     const match = this.sim.arenaInfo?.match;
     const list = match?.fiesta && match.state === 'active' ? match.fiesta.powerups : [];
-    const seen = new Set<number>();
+    const seen = this.fiestaPowerupSeenIds;
+    seen.clear();
     for (const p of list) {
       seen.add(p.id);
       let m = this.fiestaPowerupMeshes.get(p.id);
@@ -5296,6 +5322,7 @@ export class Renderer {
     selfMotion: SelfMotionFrame | null = null,
   ): void {
     const totalStart = performance.now();
+    const gpuTimerStarted = this.gpuTimer.beginFrame(this.frameIdx + 1);
     let phaseStart = totalStart;
     const framePhaseMs = emptyFramePhaseMs();
     const worldPhaseMs = emptyWorldPhaseMs();
@@ -6567,6 +6594,7 @@ export class Renderer {
     }
     if (this.post) this.post.render();
     else this.webgl.render(this.scene, this.camera);
+    this.gpuTimer.endFrame(gpuTimerStarted);
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;

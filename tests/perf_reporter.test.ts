@@ -306,6 +306,18 @@ function snapshot(): PerfSnapshot {
       glRenderer: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Pro)',
       contextLost: 0,
       contextRestored: 0,
+      gpuTiming: {
+        enabled: true,
+        supported: true,
+        sampleIntervalFrames: 300,
+        sampleCount: 12,
+        latestMs: 4.2,
+        averageMs: 4.1,
+        p95Ms: 4.8,
+        maxMs: 5.1,
+        disjointCount: 0,
+        droppedSamples: 0,
+      },
       phaseMs: {
         setup: { count: 1, avg: 1, p95: 1, max: 1 },
         entities: { count: 1, avg: 1, p95: 1, max: 1 },
@@ -404,6 +416,9 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererPrewarm?: { manifestEntries?: unknown[] } }).rendererPrewarm
         ?.manifestEntries,
     ).toHaveLength(2);
+    expect(
+      (body.rawSummary as { rendererGpuTiming?: { p95Ms?: number } }).rendererGpuTiming?.p95Ms,
+    ).toBe(4.8);
     expect(
       (body.rawSummary as { rendererFoliage?: { modelVisibleTrianglesByLod?: { core?: number } } })
         .rendererFoliage?.modelVisibleTrianglesByLod?.core,

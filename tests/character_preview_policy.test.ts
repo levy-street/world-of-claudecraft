@@ -6,10 +6,10 @@ import {
 } from '../src/render/characters/preview_policy';
 
 describe('character preview memory policy', () => {
-  it('preserves the historical desktop framebuffer quality', () => {
+  it('keeps desktop antialiasing and DPR while using a transient framebuffer', () => {
     expect(resolveCharacterPreviewPolicy(false)).toEqual({
       antialias: true,
-      preserveDrawingBuffer: true,
+      preserveDrawingBuffer: false,
       pixelRatioCap: 2,
     });
   });
@@ -44,6 +44,11 @@ describe('character preview memory policy', () => {
     expect(preview).toContain('antialias: policy.antialias');
     expect(preview).toContain('preserveDrawingBuffer: policy.preserveDrawingBuffer');
     expect(preview).toContain('Math.min(window.devicePixelRatio, policy.pixelRatioCap)');
+    const portrait = readFileSync(
+      new URL('../src/render/characters/portrait.ts', import.meta.url),
+      'utf8',
+    );
+    expect(portrait).toContain('preserveDrawingBuffer: false');
     const animateStart = preview.indexOf('private animate = (): void => {');
     const animateEnd = preview.indexOf('\n  private ', animateStart + 1);
     const animate = preview.slice(animateStart, animateEnd);

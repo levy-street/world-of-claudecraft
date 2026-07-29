@@ -241,6 +241,30 @@ describe('activePvpOpponentIds', () => {
     expect(idsB.has(901)).toBe(false);
   });
 
+  it('clears and reuses a caller-owned set', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const scratch = new Set([999]);
+    const ids = activePvpOpponentIds(
+      {
+        playerId: 1,
+        player,
+        duelInfo: { otherPid: 2, otherName: 'Duelist', state: 'active' },
+        arenaInfo: null,
+      },
+      scratch,
+    );
+
+    expect(ids).toBe(scratch);
+    expect(ids).toEqual(new Set([2]));
+
+    const empty = activePvpOpponentIds(
+      { playerId: 1, player, duelInfo: null, arenaInfo: null },
+      scratch,
+    );
+    expect(empty).toBe(scratch);
+    expect(empty.size).toBe(0);
+  });
+
   it('ignores inactive pvp states', () => {
     const player = stubEntity({ id: 1, kind: 'player' });
     const ids = activePvpOpponentIds({

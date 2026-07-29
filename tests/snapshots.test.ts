@@ -127,6 +127,7 @@ describe('binary snapshot live broadcast', () => {
     expect(snapshot.t).toBe('snap');
     expect((snapshot.self as { id?: unknown }).id).toBe(joined.pid);
     expect(Array.isArray(snapshot.ents)).toBe(true);
+    expect((server as any).snapshotJsonFramesBuilt).toBe(0);
   });
 
   it('assembles negotiated frames without parsing the JSON fallback payload', () => {
@@ -153,6 +154,177 @@ describe('binary snapshot live broadcast', () => {
     const frame = sent.find((payload): payload is Uint8Array => payload instanceof Uint8Array);
     expect(frame).toBeInstanceOf(Uint8Array);
     expect(decodeSnapshotBinary(frame!).t).toBe('snap');
+  });
+
+  it('builds the JSON rollback only after a binary send failure', () => {
+    const sent: (string | Uint8Array)[] = [];
+    const ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string | Uint8Array) => sent.push(payload),
+      terminate: vi.fn(),
+    };
+    const server = new GameServer();
+    const joined = server.join(ws as never, 1, 1, 'Fallback', 'warrior', null, false, {
+      snapshotTransport: 'binary-v1',
+    });
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+    sent.length = 0;
+
+    const sendFrame = (server as any).sendFrame.bind(server);
+    (server as any).sendFrame = (session: unknown, payload: string | Uint8Array) => {
+      if (payload instanceof Uint8Array) throw new Error('forced binary failure');
+      sendFrame(session, payload);
+    };
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    broadcast(server);
+    error.mockRestore();
+
+    expect(joined.snapshotTransport).toBe('json');
+    expect((server as any).snapshotJsonFramesBuilt).toBe(1);
+    const frame = sent.find((payload): payload is string => typeof payload === 'string');
+    expect(frame).toBeTypeOf('string');
+    expect(JSON.parse(frame!).t).toBe('snap');
+  });
+
+  it('matches the ordinary JSON frame byte for byte after binary fallback', () => {
+    const jsonSent: (string | Uint8Array)[] = [];
+    const fallbackSent: (string | Uint8Array)[] = [];
+    const jsonServer = new GameServer();
+    const fallbackServer = new GameServer();
+    const jsonWs = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string | Uint8Array) => jsonSent.push(payload),
+      terminate: vi.fn(),
+    };
+    const fallbackWs = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string | Uint8Array) => fallbackSent.push(payload),
+      terminate: vi.fn(),
+    };
+    const jsonSession = jsonServer.join(
+      jsonWs as never,
+      1,
+      1,
+      'Equivalent',
+      'warrior',
+      null,
+      false,
+    );
+    const fallbackSession = fallbackServer.join(
+      fallbackWs as never,
+      1,
+      1,
+      'Equivalent',
+      'warrior',
+      null,
+      false,
+      { snapshotTransport: 'binary-v1' },
+    );
+    if ('error' in jsonSession) throw new Error(jsonSession.error);
+    if ('error' in fallbackSession) throw new Error(fallbackSession.error);
+    jsonSession.blockListLoaded = true;
+    fallbackSession.blockListLoaded = true;
+    jsonSent.length = 0;
+    fallbackSent.length = 0;
+
+    const sendFrame = (fallbackServer as any).sendFrame.bind(fallbackServer);
+    (fallbackServer as any).sendFrame = (session: unknown, payload: string | Uint8Array) => {
+      if (payload instanceof Uint8Array) throw new Error('forced binary failure');
+      sendFrame(session, payload);
+    };
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      broadcast(jsonServer);
+      broadcast(fallbackServer);
+    } finally {
+      error.mockRestore();
+    }
+
+    const jsonFrame = jsonSent.find((payload): payload is string => typeof payload === 'string');
+    const fallbackFrame = fallbackSent.find(
+      (payload): payload is string => typeof payload === 'string',
+    );
+    expect(fallbackSession.snapshotTransport).toBe('json');
+    expect(fallbackFrame).toBe(jsonFrame);
+    expect((jsonServer as any).snapshotJsonFramesBuilt).toBe(1);
+    expect((fallbackServer as any).snapshotJsonFramesBuilt).toBe(1);
+  });
+
+  it('isolates shared snapshot scratch across mixed recipients and keeps fallback downgraded', () => {
+    const sentA: (string | Uint8Array)[] = [];
+    const sentB: (string | Uint8Array)[] = [];
+    const sentC: (string | Uint8Array)[] = [];
+    const socket = (sent: (string | Uint8Array)[]) => ({
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string | Uint8Array) => sent.push(payload),
+      terminate: vi.fn(),
+    });
+    const server = new GameServer();
+    const sessionA = server.join(socket(sentA) as never, 1, 1, 'Json A', 'warrior', null, false);
+    const sessionB = server.join(socket(sentB) as never, 2, 2, 'Binary B', 'mage', null, false, {
+      snapshotTransport: 'binary-v1',
+    });
+    const sessionC = server.join(socket(sentC) as never, 3, 3, 'Json C', 'priest', null, false);
+    if ('error' in sessionA) throw new Error(sessionA.error);
+    if ('error' in sessionB) throw new Error(sessionB.error);
+    if ('error' in sessionC) throw new Error(sessionC.error);
+    sessionA.blockListLoaded = true;
+    sessionB.blockListLoaded = true;
+    sessionC.blockListLoaded = true;
+    sentA.length = 0;
+    sentB.length = 0;
+    sentC.length = 0;
+
+    const sendFrame = (server as any).sendFrame.bind(server);
+    let binaryAttempts = 0;
+    (server as any).sendFrame = (session: unknown, payload: string | Uint8Array) => {
+      if (session === sessionB && payload instanceof Uint8Array) {
+        binaryAttempts++;
+        throw new Error('forced binary failure');
+      }
+      sendFrame(session, payload);
+    };
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      broadcast(server);
+    } finally {
+      error.mockRestore();
+    }
+
+    const read = (sent: (string | Uint8Array)[]) => {
+      const raw = sent.find((payload): payload is string => typeof payload === 'string');
+      expect(raw).toBeTypeOf('string');
+      return JSON.parse(raw!);
+    };
+    const first = [read(sentA), read(sentB), read(sentC)];
+    const sessions = [sessionA, sessionB, sessionC];
+    const entityIdSets = first.map(
+      (snapshot) => new Set(snapshot.ents.map((entity: { id: number }) => entity.id)),
+    );
+    first.forEach((snapshot, index) => {
+      expect(snapshot.self.id).toBe(sessions[index]!.pid);
+      for (const session of sessions) {
+        expect(entityIdSets[index]!.has(session.pid)).toBe(session !== sessions[index]);
+      }
+    });
+    expect(binaryAttempts).toBe(1);
+    expect(sessionB.snapshotTransport).toBe('json');
+    expect((server as any).snapshotJsonFramesBuilt).toBe(3);
+
+    sentA.length = 0;
+    sentB.length = 0;
+    sentC.length = 0;
+    broadcast(server);
+    [read(sentA), read(sentB), read(sentC)].forEach((snapshot, index) => {
+      expect(snapshot.self.id).toBe(sessions[index]!.pid);
+    });
+    expect(binaryAttempts).toBe(1);
+    expect((server as any).snapshotJsonFramesBuilt).toBe(6);
   });
 });
 

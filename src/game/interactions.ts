@@ -38,14 +38,17 @@ export interface PickInteractionHud {
   requestSpiritHealerResurrect(): void;
 }
 
+const EMPTY_ENTITY_IDS: ReadonlySet<number> = new Set<number>();
+
 export function isAttackHoverTarget(e: Entity | undefined): boolean {
-  return hoverCursorKind(e, -1, new Set()) === 'attack';
+  return hoverCursorKind(e, -1, EMPTY_ENTITY_IDS) === 'attack';
 }
 
 export function activePvpOpponentIds(
   world: Pick<PickInteractionWorld, 'player' | 'playerId' | 'duelInfo' | 'arenaInfo'>,
+  ids = new Set<number>(),
 ): Set<number> {
-  const ids = new Set<number>();
+  ids.clear();
   const selfId = world.playerId ?? world.player.id;
   if (world.duelInfo?.state === 'active' && world.duelInfo.otherPid !== selfId)
     ids.add(world.duelInfo.otherPid);
@@ -89,7 +92,7 @@ export class HoverPickGate {
 export function isAttackableEntity(
   e: Entity | undefined,
   playerId: number,
-  activePvpOpponentSet: ReadonlySet<number> = new Set(),
+  activePvpOpponentSet: ReadonlySet<number> = EMPTY_ENTITY_IDS,
 ): boolean {
   if (!e || e.dead || e.id === playerId) return false;
   // A mob is attackable when wild-hostile OR a match objective in the
@@ -105,7 +108,7 @@ export function hoverCursorKind(
   e: Entity | undefined,
   playerId: number,
   partyMemberIds: ReadonlySet<number>,
-  activePvpOpponentSet: ReadonlySet<number> = new Set(),
+  activePvpOpponentSet: ReadonlySet<number> = EMPTY_ENTITY_IDS,
 ): HoverCursorKind {
   if (!e) return 'default';
   if (isAttackableEntity(e, playerId, activePvpOpponentSet)) return 'attack';

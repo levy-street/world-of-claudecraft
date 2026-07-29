@@ -15,7 +15,7 @@ export function resolveCharacterPreviewPolicy(constrainedMemory: boolean): Chara
   }
   return {
     antialias: true,
-    preserveDrawingBuffer: true,
+    preserveDrawingBuffer: false,
     pixelRatioCap: 2,
   };
 }
