@@ -1,4 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  bindMirroredSceneInputLock,
+  drainMirroredSceneInput,
+  SceneInputLockCoordinator,
+} from '../src/game/scene_input_lock';
 import { ClientWorld } from '../src/net/online';
 import { sceneInputLockAfterEvent } from '../src/net/scene_input_lock_mirror';
 import { emptyMoveInput, type SimEvent } from '../src/sim/types';
@@ -69,6 +74,49 @@ describe('online scene input lock receipt', () => {
         mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 },
       },
     ]);
+  });
+
+  it('drives the frame coordinator through the production receipt and drain seam', () => {
+    const { client } = bareOnline();
+    let directorLocked = false;
+    let targetLocked = false;
+    const onLockEdge = vi.fn();
+    const coordinator = new SceneInputLockCoordinator(
+      {
+        handleEvents(events) {
+          for (const event of events) {
+            if (event.type === 'scene' && event.op.kind === 'inputLock') {
+              directorLocked = event.op.on;
+            }
+          }
+        },
+        inputLocked: () => directorLocked,
+      },
+      {
+        setSceneInputLocked(locked) {
+          targetLocked = locked;
+        },
+      },
+      onLockEdge,
+    );
+    bindMirroredSceneInputLock(client, coordinator);
+
+    feed(client, [
+      {
+        type: 'scene',
+        pid: 7,
+        op: { kind: 'inputLock', on: true },
+      } as SimEvent,
+    ]);
+
+    expect(targetLocked).toBe(true);
+    expect(onLockEdge).toHaveBeenCalledTimes(1);
+    const frame = drainMirroredSceneInput(client, coordinator);
+    expect(frame.events).toHaveLength(1);
+    expect(frame.locked).toBe(true);
+    expect(directorLocked).toBe(true);
+    expect(targetLocked).toBe(true);
+    expect(onLockEdge).toHaveBeenCalledTimes(1);
   });
 
   it('preserves an explicit input-lock on-to-off batch', () => {

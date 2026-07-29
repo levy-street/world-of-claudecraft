@@ -115,8 +115,11 @@ import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { SceneDirector } from './game/scene_director';
 import {
+  bindMirroredSceneInputLock,
+  drainMirroredSceneInput,
   newSceneFacingInputState,
   resetSceneFacingInputState,
+  runOfflineSceneInputTick,
   SceneInputLockCoordinator,
 } from './game/scene_input_lock';
 import { playSceneDirectiveSfx } from './game/scene_sfx';
@@ -2001,8 +2004,7 @@ async function startGame(
     resetSceneFacingInputState(sceneFacingInput);
   });
   if (online) {
-    online.onSceneInputLockChanged = (locked) => sceneInputLock.applyPending(locked);
-    sceneInputLock.applyPending(online.sceneInputLockPending());
+    bindMirroredSceneInputLock(online, sceneInputLock);
   }
   const syncOverlayDiagnostics = (): void => {
     syncCharacterOpenDiagnostics();
@@ -4098,16 +4100,15 @@ async function startGame(
     // enforces the same countdown lock, so online latency cannot move the
     // authoritative rider.
     const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
-    let sceneInputLocked = online
-      ? sceneInputLock.applyPending(online.sceneInputLockPending())
-      : sceneInputLock.sync();
+    let sceneInputLocked = online ? false : sceneInputLock.sync();
     let drainedEvents: ReturnType<ClientWorld['drainEvents']> = [];
     let selfAuthoritativeDiscontinuity = false;
     if (online) {
       // Scene events must land before this frame derives or flushes movement:
       // a queued inputLock:on is authoritative for the whole outgoing frame.
-      drainedEvents = online.drainEvents();
-      sceneInputLocked = sceneInputLock.handleMirroredEvents(drainedEvents);
+      const sceneFrame = drainMirroredSceneInput(online, sceneInputLock);
+      drainedEvents = sceneFrame.events;
+      sceneInputLocked = sceneFrame.locked;
       selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
         drainedEvents,
         online.playerId,
@@ -4200,20 +4201,27 @@ async function startGame(
       // clock itself, to stay deterministic).
       offlineSim.utcDay = currentUtcDay();
       while (acc >= DT) {
-        const { mi, facing } = resolveMove(
-          mouselook,
-          offlineSim.player.pos,
-          offlineSim.player.facing,
+        const sceneStep = runOfflineSceneInputTick(
+          sceneInputLock,
+          sceneInputLocked,
+          (lockedAtTickStart) => {
+            const { mi, facing } = resolveMove(
+              mouselook,
+              offlineSim.player.pos,
+              offlineSim.player.facing,
+            );
+            Object.assign(offlineSim.moveInput, mi);
+            const stepFacing = lockedAtTickStart ? null : (movementFacing ?? facing);
+            if (stepFacing !== null) offlineSim.player.facing = stepFacing;
+            offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
+            perf.markInputSent(performance.now());
+            return perf.time('sim', () =>
+              perf.trace('sim.tick', () => offlineSim.tick(), { mode: 'offline' }),
+            );
+          },
         );
-        Object.assign(offlineSim.moveInput, mi);
-        const stepFacing = sceneDirector.inputLocked() ? null : (movementFacing ?? facing);
-        if (stepFacing !== null) offlineSim.player.facing = stepFacing;
-        offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
-        perf.markInputSent(performance.now());
-        const events = perf.time('sim', () =>
-          perf.trace('sim.tick', () => offlineSim.tick(), { mode: 'offline' }),
-        );
-        sceneInputLocked = sceneInputLock.handleEvents(events);
+        const events = sceneStep.events;
+        sceneInputLocked = sceneStep.locked;
         perf.time('events', () =>
           perf.trace('hud.handleEvents', () => hud.handleEvents(events), {
             mode: 'offline',

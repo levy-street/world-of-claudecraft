@@ -1,11 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { SceneDirector } from '../src/game/scene_director';
 import {
   newSceneFacingInputState,
   resetSceneFacingInputState,
+  runOfflineSceneInputTick,
   SceneInputLockCoordinator,
 } from '../src/game/scene_input_lock';
 import type { SimEvent } from '../src/sim/types';
+import type { IWorld } from '../src/world_api';
 
 const LOCK_ON = {
   type: 'scene',
@@ -45,12 +48,16 @@ function harness(onLockEdge: () => void = vi.fn()) {
 
 describe('scene input lock frame coordination', () => {
   it('locks the second offline catch-up tick when the first tick emits the lock', () => {
-    const { coordinator, targetLocked, onLockEdge } = harness();
+    const { coordinator, onLockEdge } = harness();
     const appliedForward: boolean[] = [];
+    let locked = false;
 
     for (let tick = 0; tick < 2; tick++) {
-      appliedForward.push(!targetLocked());
-      coordinator.handleEvents(tick === 0 ? [LOCK_ON] : []);
+      const step = runOfflineSceneInputTick(coordinator, locked, (lockedAtTickStart) => {
+        appliedForward.push(!lockedAtTickStart);
+        return tick === 0 ? [LOCK_ON] : [];
+      });
+      locked = step.locked;
     }
 
     expect(appliedForward).toEqual([true, false]);
@@ -117,6 +124,38 @@ describe('scene input lock frame coordination', () => {
     expect(facing).toEqual(newSceneFacingInputState());
   });
 
+  it('keeps another player unlocked after the real director drains their scoped event', () => {
+    const world = { playerId: 7, entities: new Map() } as unknown as IWorld;
+    const director = new SceneDirector({
+      world: () => world,
+      nowSec: () => 0,
+      musicSilence: vi.fn(),
+      reducedMotion: () => false,
+    });
+    let targetLocked = false;
+    const coordinator = new SceneInputLockCoordinator(
+      director,
+      {
+        setSceneInputLocked(locked) {
+          targetLocked = locked;
+        },
+      },
+      vi.fn(),
+    );
+
+    coordinator.handleMirroredEvents([
+      {
+        type: 'scene',
+        sceneId: 'scn_foreign',
+        pid: 11,
+        op: { kind: 'inputLock', on: true },
+      },
+    ]);
+
+    expect(director.inputLocked()).toBe(false);
+    expect(targetLocked).toBe(false);
+  });
+
   it('wires both event paths before their next authoritative input boundary', () => {
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
     const offline = main.slice(main.indexOf('while (acc >= DT)'), main.indexOf('const pp ='));
@@ -125,23 +164,15 @@ describe('scene input lock frame coordination', () => {
       main.indexOf('const echoSamples ='),
     );
 
-    expect(offline.indexOf('offlineSim.tick()')).toBeLessThan(
-      offline.indexOf('sceneInputLock.handleEvents(events)'),
+    expect(offline.indexOf('runOfflineSceneInputTick(')).toBeLessThan(
+      offline.indexOf('offlineSim.tick()'),
     );
-    expect(offline.indexOf('sceneInputLock.handleEvents(events)')).toBeLessThan(
-      offline.indexOf('acc -= DT'),
-    );
-    expect(online.indexOf('online.drainEvents()')).toBeLessThan(
-      online.indexOf('sceneInputLock.handleMirroredEvents(drainedEvents)'),
-    );
-    expect(online.indexOf('sceneInputLock.handleMirroredEvents(drainedEvents)')).toBeLessThan(
-      online.indexOf('resolveMove('),
-    );
+    expect(offline.indexOf('offlineSim.tick()')).toBeLessThan(offline.indexOf('acc -= DT'));
+    expect(online.indexOf('drainMirroredSceneInput(')).toBeLessThan(online.indexOf('resolveMove('));
     expect(online.indexOf('resolveMove(')).toBeLessThan(online.indexOf('net.flushInput()'));
     expect(main).toContain('const mouselook =\n      intro === null && !sceneInputLocked');
     expect(main).toMatch(/const netFacing = sceneInputLocked\s+\? null/);
-    expect(main).toContain('sceneDirector.inputLocked() ? null');
     expect(main).toContain('resetSceneFacingInputState(sceneFacingInput)');
-    expect(main).toContain('online.onSceneInputLockChanged = (locked) =>');
+    expect(main).toContain('bindMirroredSceneInputLock(online, sceneInputLock)');
   });
 });

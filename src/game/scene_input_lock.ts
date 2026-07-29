@@ -43,6 +43,12 @@ export interface SceneInputLockTarget {
   setSceneInputLocked(on: boolean): void;
 }
 
+export interface MirroredSceneInputSource {
+  onSceneInputLockChanged: ((locked: boolean) => void) | null;
+  sceneInputLockPending(): boolean;
+  drainEvents(): SimEvent[];
+}
+
 export class SceneInputLockCoordinator {
   private wasLocked = false;
 
@@ -82,4 +88,36 @@ export class SceneInputLockCoordinator {
     }
     return this.sync();
   }
+}
+
+export function bindMirroredSceneInputLock(
+  source: MirroredSceneInputSource,
+  coordinator: SceneInputLockCoordinator,
+): boolean {
+  source.onSceneInputLockChanged = (locked) => coordinator.applyPending(locked);
+  return coordinator.applyPending(source.sceneInputLockPending());
+}
+
+export function drainMirroredSceneInput(
+  source: MirroredSceneInputSource,
+  coordinator: SceneInputLockCoordinator,
+): { events: SimEvent[]; locked: boolean } {
+  coordinator.applyPending(source.sceneInputLockPending());
+  const events = source.drainEvents();
+  return {
+    events,
+    locked: coordinator.handleMirroredEvents(events),
+  };
+}
+
+export function runOfflineSceneInputTick(
+  coordinator: SceneInputLockCoordinator,
+  locked: boolean,
+  tick: (lockedAtTickStart: boolean) => SimEvent[],
+): { events: SimEvent[]; locked: boolean } {
+  const events = tick(locked);
+  return {
+    events,
+    locked: coordinator.handleEvents(events),
+  };
 }

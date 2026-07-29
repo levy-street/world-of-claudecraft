@@ -44,6 +44,7 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { isInJailCage, JAIL_GATE, JAIL_VISITOR_POS, jailGateTeleport } from '../src/sim/jail';
+import { registerChoice, startChoiceForPlayer } from '../src/sim/scenes/choices';
 import { playSceneForPlayer, registerScene } from '../src/sim/scenes/scenes';
 
 // Moderation acts on player sessions and the fixed jail cage; ambient camps,
@@ -739,11 +740,22 @@ describe('moderator spectate integration', () => {
     });
   });
 
-  it('converges represented scene state on spectate enter and exit', () => {
+  it('converges represented scene and choice state on spectate enter and exit', () => {
     registerScene({
       id: 'scn_test_spectate_lock_convergence',
       duration: 10,
       ops: [{ at: 0, kind: 'inputLock', on: true }],
+    });
+    registerChoice({
+      id: 'ch_test_spectate_convergence',
+      promptKey: 'lb.test.spectate.prompt',
+      flag: 'test_spectate_choice',
+      options: [
+        { id: 'stay', key: 'lb.test.spectate.stay' },
+        { id: 'leave', key: 'lb.test.spectate.leave' },
+      ],
+      windowSeconds: 8,
+      defaultOptionId: 'leave',
     });
     const server = new GameServer();
     const moderatorWs = fakeWs();
@@ -756,6 +768,11 @@ describe('moderator spectate integration', () => {
     const suspect = joined(server.join(fakeWs(), 2, 102, 'Suspect', 'rogue', null));
     expect(
       playSceneForPlayer(server.sim.ctx, suspect.pid, 'scn_test_spectate_lock_convergence'),
+    ).toBe(true);
+    expect(
+      startChoiceForPlayer(server.sim.ctx, suspect.pid, 'ch_test_spectate_convergence', {
+        values: { price: 12 },
+      }),
     ).toBe(true);
     server.sim.tick();
     moderatorWs.send.mockClear();
@@ -770,7 +787,18 @@ describe('moderator spectate integration', () => {
         sceneId: 'scn_test_spectate_lock_convergence',
         inputLocked: true,
       },
-      sceneChoiceState: null,
+      sceneChoiceState: {
+        choiceId: 'ch_test_spectate_convergence',
+        promptKey: 'lb.test.spectate.prompt',
+        options: [
+          { id: 'stay', key: 'lb.test.spectate.stay' },
+          { id: 'leave', key: 'lb.test.spectate.leave' },
+        ],
+        defaultOptionId: 'leave',
+        leaderPid: suspect.pid,
+        values: { price: 12 },
+        windowSeconds: 8,
+      },
     });
 
     moderatorWs.send.mockClear();

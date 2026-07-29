@@ -337,7 +337,19 @@ describe('spectate client POV', () => {
           letterbox: true,
           musicSilenced: false,
         },
-        sceneChoiceState: null,
+        sceneChoiceState: {
+          choiceId: 'ch_test_spectated',
+          promptKey: 'lb.test.spectated.prompt',
+          options: [
+            { id: 'stay', key: 'lb.test.spectated.stay' },
+            { id: 'leave', key: 'lb.test.spectated.leave' },
+          ],
+          defaultOptionId: 'leave',
+          leaderPid: 2,
+          values: { price: 12 },
+          windowSeconds: 8,
+          remainingSeconds: 3,
+        },
       }),
     );
     expect(client.spectating).toBe('Suspect');
@@ -408,7 +420,22 @@ describe('spectate client POV', () => {
           musicSilenced: false,
         },
       },
-      { type: 'sceneChoiceSync', state: null },
+      {
+        type: 'sceneChoiceSync',
+        state: {
+          choiceId: 'ch_test_spectated',
+          promptKey: 'lb.test.spectated.prompt',
+          options: [
+            { id: 'stay', key: 'lb.test.spectated.stay' },
+            { id: 'leave', key: 'lb.test.spectated.leave' },
+          ],
+          defaultOptionId: 'leave',
+          leaderPid: 2,
+          values: { price: 12 },
+          windowSeconds: 8,
+          remainingSeconds: 3,
+        },
+      },
       { type: 'sceneSync', state: null },
       { type: 'sceneChoiceSync', state: null },
     ]);
