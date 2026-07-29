@@ -48,11 +48,18 @@ describe('scene overlay state', () => {
     expect(sceneOverlayView(s, 5).skipHintVisible).toBe(false);
   });
 
-  it('flags cinematic false before start, true through the scene, false after end (HUD hide)', () => {
+  it('keeps an unlocked active scene playable while the skip hint remains visible', () => {
     const s = createSceneOverlayState();
     expect(sceneOverlayView(s, 0).cinematic).toBe(false);
     overlayApplyOp(s, { kind: 'start', duration: 10 }, 0);
+    expect(sceneOverlayView(s, 1)).toMatchObject({
+      cinematic: false,
+      skipHintVisible: true,
+    });
+    overlayApplyOp(s, { kind: 'inputLock', on: true }, 1);
     expect(sceneOverlayView(s, 1).cinematic).toBe(true);
+    overlayApplyOp(s, { kind: 'inputLock', on: false }, 2);
+    expect(sceneOverlayView(s, 2).cinematic).toBe(false);
     overlayApplyOp(s, { kind: 'end' }, 5);
     expect(sceneOverlayView(s, 5).cinematic).toBe(false);
   });
@@ -62,6 +69,7 @@ describe('scene overlay state', () => {
     // must fall to false so the HUD is restored in one step, watched or skipped.
     const s = createSceneOverlayState();
     overlayApplyOp(s, { kind: 'start', duration: 10 }, 0);
+    overlayApplyOp(s, { kind: 'inputLock', on: true }, 0);
     overlayApplyOp(s, { kind: 'letterbox', on: true }, 0);
     overlayApplyOp(s, { kind: 'fade', to: 'black', dur: 5 }, 0);
     expect(sceneOverlayView(s, 1).cinematic).toBe(true);
@@ -139,9 +147,8 @@ describe('scene overlay state', () => {
     expect(m.skipHintVisible).toBe(false);
   });
 
-  it('ops the overlay does not own (camera/inputLock/music/anim) are ignored', () => {
+  it('presentation ops the overlay does not own (camera/music/anim) are ignored', () => {
     const s = createSceneOverlayState();
-    overlayApplyOp(s, { kind: 'inputLock', on: true }, 0);
     overlayApplyOp(s, { kind: 'music', directive: 'silence' }, 0);
     overlayApplyOp(s, { kind: 'camera', shot: { kind: 'release' } }, 0);
     overlayApplyOp(s, { kind: 'anim', entityId: 4, anim: 'wave' }, 0);
