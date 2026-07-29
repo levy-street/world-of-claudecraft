@@ -90,10 +90,18 @@ describe('admin login challenge in Chromium', () => {
     );
     expect(document.querySelector('#login-two-factor-prompt')).toHaveAttribute('role', 'status');
     expect(document.querySelector('#login-error')).toHaveAttribute('role', 'alert');
+    expect(document.querySelector('#login-code')).toHaveAttribute(
+      'aria-describedby',
+      'login-two-factor-prompt',
+    );
 
     button(t('auth.useRecoveryCode')).click();
     await vi.waitFor(() =>
       expect(document.querySelector('#login-recovery-code')).toBe(document.activeElement),
+    );
+    expect(document.querySelector('#login-recovery-code')).toHaveAttribute(
+      'aria-describedby',
+      'login-two-factor-prompt',
     );
 
     button(t('auth.useAuthenticatorCode')).click();
