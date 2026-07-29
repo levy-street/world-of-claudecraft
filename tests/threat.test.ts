@@ -586,7 +586,12 @@ describe('taunt and growl', () => {
     expect(wolf.forcedTargetTimer).toBeGreaterThan(0);
   });
 
-  it('Sacred Goad always lands (never resists), even against a higher-level mob', () => {
+  it('Sacred Goad always lands (never resists), even against a higher-level mob', {
+    // Forty synchronous world setups can exceed the suite-wide 20-second default
+    // when four simulation workers share the CPU. Preserve the complete seed
+    // ladder and every assertion while allowing the canonical gate to finish.
+    timeout: 60_000,
+  }, () => {
     // The paladin taunt is holy-school (a spell), so on impact it used to roll a full
     // resist. A resisted taunt silently breaks tanking, so taunts now skip the roll.
     // Force the shared spell-hit roll to reject every spell. A taunt must skip
