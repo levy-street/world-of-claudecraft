@@ -741,7 +741,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // with a bow displayed the shot plays a draw instead of the crossbow
     // shoulder-aim (visual.ts weaponSkinAttackClips).
     animUrls: [`${PLAYERS}/bow_anims.glb`],
-    attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
+    // LEFT hand: the ranged clip set extends the left arm toward the target and
+    // keeps the right back, so the weapon reads correctly in the front hand. The
+    // mirrored left seat for this model lives in KAYKIT_HAND_GRIPS['1H_Crossbow'].
+    attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.l' }],
     skinMeshNames: ['Torso', 'Arms', 'Pants'],
     cosmetics: V02_HEAD_COSMETICS,
   },

@@ -77,12 +77,13 @@ export function weaponSkinOrientPin(weaponSkinId: string | null): SkinOrientPinM
   return null;
 }
 
-/** The handslot a ranged skin occupies, by HANDLING. Bows sit in the LEFT
- *  hand: in the ranged animation set the left arm is the FRONT arm (it
- *  extends toward the target) and the right hand stays back at the shoulder
- *  as the string hand, so a bow glued to the right hand reads backwards.
- *  Crossbow handling (real crossbows, and guns that aim like them) keeps the
- *  class's authored right-hand attach (stock in the trigger hand). */
+/** The handslot a ranged skin occupies, by HANDLING. Bows sit in the LEFT hand: in
+ *  the ranged animation set the left arm is the FRONT arm (it extends toward the
+ *  target) and the right hand stays back at the shoulder as the string hand, so a
+ *  bow glued to the right hand reads backwards. Other ranged handling keeps the
+ *  class's AUTHORED attach, whichever hand that is; the hunter authors the left
+ *  hand (manifest player_hunter), so today both branches land there and the
+ *  replace is a no-op. It still matters for any class that authors the right. */
 export function weaponSkinAttachBone(handling: string, baseBone: string): string {
   return handling === 'bow' ? baseBone.replace(/\.r$/, '.l') : baseBone;
 }

@@ -194,6 +194,21 @@ const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
       quaternion: [0, 0.7071068, 0, 0.7071067],
       scale: 0.6109,
     },
+    // The hunter holds its crossbow in the LEFT hand (manifest player_hunter).
+    // Tuned against the render, not derived: the rotation carries over from the right
+    // hand unchanged (composing the 180-about-Y that the authored 1H_Axe and Knife
+    // left rows use flips this model end-over-end), and x is the seat height. BOTH
+    // hand bones point local +x straight DOWN in world space on this rig, measured,
+    // so they are NOT mirrored the way the axe/knife pair implies: a more negative x
+    // raises the weapon, a less negative one drops it. 0.115 lower than the mirrored
+    // -0.2286: the first 0.065 pulled the stock butt down out of the air above the
+    // fist, and this second 0.05 seats the wrapped grip properly mid-palm rather than
+    // at the top of the fingers.
+    l: {
+      position: [-0.1136, 0.0213, -0.0012],
+      quaternion: [0, 0.7071068, 0, 0.7071067],
+      scale: 0.6109,
+    },
   },
   '2H_Crossbow': {
     r: { position: [0.3381, 0.058, 0], quaternion: [0, 0.7071068, 0, 0.7071067], scale: 0.7204 },
