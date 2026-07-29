@@ -515,11 +515,18 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
   // A kill quest whose target mob camps inside the committed zone band, so the
   // quest-area branch exercises real content rather than a synthetic fixture.
   function requireKillQuestInZone() {
+    const zoneMinX = ZONE.xMin ?? STRIP_MIN_X;
+    const zoneMaxX = ZONE.xMax ?? STRIP_MAX_X;
     for (const q of Object.values(QUESTS)) {
       for (const obj of q.objectives) {
         if (obj.type !== 'kill') continue;
         const camp = CAMPS.find(
-          (c) => c.mobId === obj.targetMobId && c.center.z >= ZONE.zMin && c.center.z < ZONE.zMax,
+          (c) =>
+            c.mobId === obj.targetMobId &&
+            c.center.x >= zoneMinX &&
+            c.center.x < zoneMaxX &&
+            c.center.z >= ZONE.zMin &&
+            c.center.z < ZONE.zMax,
         );
         if (camp) return { quest: q, camp };
       }

@@ -10,8 +10,8 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 308,
-  "drawDigest": "5f7546de",
+  "draws": 302,
+  "drawDigest": "f2f40719",
   "frames": [
     {
       "tick": 0,
@@ -150,44 +150,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 845,
-      "state": "8035b23f",
-      "events": "2fff2b88",
+      "state": "5cde8bb8",
+      "events": "44990ab2",
       "rng": {
         "draws": 7,
-        "digest": "4f9a2cfb"
+        "digest": "d9dea8ae"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 845,
-      "state": "60a3871f",
+      "state": "ad179ad8",
       "events": "741638a5",
       "rng": {
         "draws": 7,
-        "digest": "4f9a2cfb"
+        "digest": "d9dea8ae"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 845,
-      "state": "00fc282d",
-      "events": "abb2a349",
+      "state": "66477d9e",
+      "events": "7a87be3c",
       "rng": {
-        "draws": 172,
-        "digest": "0ab212e7"
+        "draws": 166,
+        "digest": "0a7c62b3"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 845,
-      "state": "5304820b",
+      "state": "cf10cc3e",
       "events": "ebcbae74",
       "rng": {
-        "draws": 263,
-        "digest": "d3f0124f"
+        "draws": 255,
+        "digest": "ca1f00b6"
       },
       "label": "kill",
       "players": [
@@ -207,7 +207,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7073,
+            "damageDealt": 7072,
             "damageTaken": 4,
             "kills": 1
           },
@@ -215,7 +215,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 7073,
+              "damageDealt": 7072,
               "kills": 1
             },
             "dungeonClears": {},
@@ -296,13 +296,13 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49996,
+          "hp": 438,
           "id": 835,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 442,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -362,13 +362,7 @@
           },
           "level": 2,
           "loot": {
-            "copper": 11,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "wolf_fang"
-              }
-            ]
+            "copper": 10
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -411,11 +405,11 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 845,
-      "state": "f12aee98",
+      "state": "782637f9",
       "events": "1ca37634",
       "rng": {
-        "draws": 308,
-        "digest": "5f7546de"
+        "draws": 302,
+        "digest": "f2f40719"
       },
       "label": "final",
       "players": [
@@ -435,7 +429,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7073,
+            "damageDealt": 7072,
             "damageTaken": 4,
             "kills": 1
           },
@@ -443,7 +437,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 7073,
+              "damageDealt": 7072,
               "kills": 1
             },
             "dungeonClears": {},
@@ -529,13 +523,13 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 49996,
+          "hp": 438,
           "id": 835,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 442,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -595,13 +589,7 @@
           },
           "level": 2,
           "loot": {
-            "copper": 11,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "wolf_fang"
-              }
-            ]
+            "copper": 10
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [

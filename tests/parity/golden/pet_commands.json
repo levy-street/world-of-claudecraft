@@ -16,8 +16,8 @@
     "petTaunt -> applyTaunt manual arm + PET_GROWL_INTERVAL cooldown",
     "stowPetForDelve/restorePetFromDelveStash (serializePet/restorePet round-trip)"
   ],
-  "draws": 292,
-  "drawDigest": "cdf807dd",
+  "draws": 303,
+  "drawDigest": "94d0fbf4",
   "frames": [
     {
       "tick": 0,
@@ -2205,33 +2205,33 @@
       "tick": 60,
       "time": 3,
       "nextId": 852,
-      "state": "763690d3",
-      "events": "08311edc",
+      "state": "36672e22",
+      "events": "232fa087",
       "rng": {
-        "draws": 151,
-        "digest": "1e93d795"
+        "draws": 155,
+        "digest": "8bfee72f"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 852,
-      "state": "a2e98ba9",
+      "state": "a3314aba",
       "events": "4c6a0118",
       "rng": {
-        "draws": 292,
-        "digest": "cdf807dd"
+        "draws": 303,
+        "digest": "94d0fbf4"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 852,
-      "state": "a2e98ba9",
+      "state": "a3314aba",
       "events": "741638a5",
       "rng": {
-        "draws": 292,
-        "digest": "cdf807dd"
+        "draws": 303,
+        "digest": "94d0fbf4"
       },
       "label": "demon-heal-tick",
       "players": [
@@ -2440,7 +2440,7 @@
         {
           "aggroTargetId": 835,
           "aiState": "attack",
-          "combatTimer": 2,
+          "combatTimer": 1.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2451,7 +2451,7 @@
           "forcedTargetId": 845,
           "forcedTargetTimer": 1,
           "hostile": true,
-          "hp": 50000,
+          "hp": 49980,
           "id": 846,
           "inCombat": true,
           "kind": "mob",
@@ -2482,12 +2482,17 @@
             "armor": 70
           },
           "swingTimer": 0.05,
+          "tappedById": 835,
           "targetId": 845,
           "templateId": "forest_wolf",
           "threat": [
             [
               835,
               30
+            ],
+            [
+              849,
+              20
             ]
           ],
           "weapon": {
@@ -2599,11 +2604,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 854,
-      "state": "15723247",
+      "state": "ae0d29b6",
       "events": "90374606",
       "rng": {
-        "draws": 292,
-        "digest": "cdf807dd"
+        "draws": 303,
+        "digest": "94d0fbf4"
       },
       "label": "demon-resummoned",
       "players": [
@@ -2812,7 +2817,7 @@
         {
           "aggroTargetId": 835,
           "aiState": "attack",
-          "combatTimer": 2,
+          "combatTimer": 1.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2823,7 +2828,7 @@
           "forcedTargetId": 845,
           "forcedTargetTimer": 1,
           "hostile": true,
-          "hp": 50000,
+          "hp": 49980,
           "id": 846,
           "inCombat": true,
           "kind": "mob",
@@ -2854,12 +2859,17 @@
             "armor": 70
           },
           "swingTimer": 0.05,
+          "tappedById": 835,
           "targetId": 845,
           "templateId": "forest_wolf",
           "threat": [
             [
               835,
               30
+            ],
+            [
+              849,
+              20
             ]
           ],
           "weapon": {
@@ -2971,11 +2981,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 856,
-      "state": "ec863dc6",
+      "state": "b484cf3b",
       "events": "e037e139",
       "rng": {
-        "draws": 292,
-        "digest": "cdf807dd"
+        "draws": 303,
+        "digest": "94d0fbf4"
       },
       "label": "demon-despawned",
       "players": [
@@ -3184,7 +3194,7 @@
         {
           "aggroTargetId": 835,
           "aiState": "attack",
-          "combatTimer": 2,
+          "combatTimer": 1.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3195,7 +3205,7 @@
           "forcedTargetId": 845,
           "forcedTargetTimer": 1,
           "hostile": true,
-          "hp": 50000,
+          "hp": 49980,
           "id": 846,
           "inCombat": true,
           "kind": "mob",
@@ -3226,12 +3236,17 @@
             "armor": 70
           },
           "swingTimer": 0.05,
+          "tappedById": 835,
           "targetId": 845,
           "templateId": "forest_wolf",
           "threat": [
             [
               835,
               30
+            ],
+            [
+              849,
+              20
             ]
           ],
           "weapon": {
@@ -3352,11 +3367,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 856,
-      "state": "ec863dc6",
+      "state": "b484cf3b",
       "events": "741638a5",
       "rng": {
-        "draws": 292,
-        "digest": "cdf807dd"
+        "draws": 303,
+        "digest": "94d0fbf4"
       },
       "label": "final",
       "players": [
@@ -3565,7 +3580,7 @@
         {
           "aggroTargetId": 835,
           "aiState": "attack",
-          "combatTimer": 2,
+          "combatTimer": 1.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3576,7 +3591,7 @@
           "forcedTargetId": 845,
           "forcedTargetTimer": 1,
           "hostile": true,
-          "hp": 50000,
+          "hp": 49980,
           "id": 846,
           "inCombat": true,
           "kind": "mob",
@@ -3607,12 +3622,17 @@
             "armor": 70
           },
           "swingTimer": 0.05,
+          "tappedById": 835,
           "targetId": 845,
           "templateId": "forest_wolf",
           "threat": [
             [
               835,
               30
+            ],
+            [
+              849,
+              20
             ]
           ],
           "weapon": {

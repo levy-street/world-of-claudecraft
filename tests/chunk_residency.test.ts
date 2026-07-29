@@ -13,6 +13,7 @@ import {
   STRIP_MIN_X,
   WORLD_MAX_X,
   WORLD_MAX_Z,
+  WORLD_MIN_X,
   WORLD_MIN_Z,
   ZONES,
 } from '../src/sim/data';
@@ -21,9 +22,9 @@ import {
 const CHUNK_SIZE = 60;
 const GRID: ChunkGrid = {
   size: CHUNK_SIZE,
-  countX: Math.ceil((WORLD_MAX_X * 2) / CHUNK_SIZE),
+  countX: Math.ceil((WORLD_MAX_X - WORLD_MIN_X) / CHUNK_SIZE),
   countZ: Math.ceil((WORLD_MAX_Z - WORLD_MIN_Z) / CHUNK_SIZE),
-  originX: -WORLD_MAX_X,
+  originX: WORLD_MIN_X,
   originZ: WORLD_MIN_Z,
 };
 
@@ -149,17 +150,17 @@ describe('nearest unbuilt ground', () => {
   });
 
   it('never clamps against a cell no zone owns, or anything past the world rim', () => {
-    // 96 of the 792 cells are covered by no zone rectangle, so nothing will
-    // ever build them. Treating "no geometry" as "pending" would pin the view
-    // against a hole that never fills, which is worse than the zone clamp this
-    // replaces. The whole world is resident here, so only unowned cells remain.
+    // The Farshore's offshore campaign column deliberately adds a wide band of
+    // open sea between zone rectangles. Those cells have no direct zone owner;
+    // treating them as pending here would pin the view against water that no
+    // adjacent realm build owns directly.
     const unowned: [number, number][] = [];
     for (let cz = 0; cz < GRID.countZ; cz++) {
       for (let cx = 0; cx < GRID.countX; cx++) {
         if (cellOwner(cx, cz) === null) unowned.push([cx, cz]);
       }
     }
-    expect(unowned.length).toBe(96);
+    expect(unowned.length).toBe(645);
     const isPending = pendingOutside(new Set(ZONES.map((zone) => zone.id)));
     // Stand in the middle of an unowned cell: even at zero distance it must not
     // clamp, and the full biome request is granted.
@@ -194,7 +195,7 @@ describe('nearest unbuilt ground', () => {
       calls++;
       return isPending(cx, cz);
     };
-    nearestPendingGroundDistance(GRID, counted, 179, 0, MAX_OUTDOOR_FOG_FAR);
+    nearestPendingGroundDistance(GRID, counted, 0, 169, MAX_OUTDOOR_FOG_FAR);
     expect(calls).toBeLessThan(60);
 
     calls = 0;
@@ -212,28 +213,29 @@ describe('outdoor fog clamp on unbuilt ground', () => {
   const eastbrookOnly = pendingOutside(new Set(['eastbrook_vale']));
 
   it('clamps ahead of the nearest unbuilt ground at the Eastbrook spawn', () => {
-    // Farshore's nearest cell sits 178 yd from (2, -2), so the view is held at
-    // 178 - guard = 170 no matter what the biome preset asked for.
-    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 2, -2, 500)).toBe(170);
-    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 2, -2, 900)).toBe(170);
+    // The campaign's Farshore now sits offshore rather than against the Vale's
+    // east edge. The nearest owed cell starts at z=170, 172 yd from spawn, so
+    // the guard holds both biome requests at 164.
+    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 2, -2, 500)).toBe(164);
+    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 2, -2, 900)).toBe(164);
   });
 
   it('contracts as the camera closes on unbuilt ground', () => {
-    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 60, 0, 500)).toBe(
-      120 - UNBUILT_GROUND_FOG_GUARD,
+    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 0, 60, 500)).toBe(
+      110 - UNBUILT_GROUND_FOG_GUARD,
     );
-    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 100, 0, 500)).toBe(
-      80 - UNBUILT_GROUND_FOG_GUARD,
+    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 0, 100, 500)).toBe(
+      70 - UNBUILT_GROUND_FOG_GUARD,
     );
   });
 
   it('never exposes unbuilt ground at point-blank range', () => {
-    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 179, 0, 500)).toBe(MIN_OUTDOOR_FOG_FAR);
+    expect(fogFarForBuiltGround(GRID, eastbrookOnly, 0, 169, 500)).toBe(MIN_OUTDOOR_FOG_FAR);
   });
 
   it('grants the full request once the ground within it is built', () => {
-    const withFarshore = pendingOutside(new Set(['eastbrook_vale', 'farshore_isle']));
-    expect(fogFarForBuiltGround(GRID, withFarshore, 179, 0, 170)).toBe(170);
+    const withMirefen = pendingOutside(new Set(['eastbrook_vale', 'mirefen_marsh']));
+    expect(fogFarForBuiltGround(GRID, withMirefen, 0, 169, 170)).toBe(170);
   });
 
   it('caps every request at the rendering envelope even with the world built', () => {
@@ -246,15 +248,23 @@ describe('outdoor fog clamp on unbuilt ground', () => {
 });
 
 describe('partially built neighbours (the reported walls)', () => {
+  const thornpeakLogin = { x: -2, z: 580 };
+  const loginCx = Math.floor((thornpeakLogin.x - GRID.originX) / GRID.size);
+  const mirefenRows = Array.from({ length: GRID.countZ }, (_, cz) => cz).filter(
+    (cz) => cellOwner(loginCx, cz) === 'mirefen_marsh',
+  );
+
   it('lifts the Thornpeak login wall after two chunk rows, not a whole zone', () => {
     // Reported live: logging in at (-2, 580) put the player 40 yd from the
     // Mirefen rectangle, and the peaks preset's 850-yard vista sat at the
     // 45-yard floor for about a minute while a whole 36-chunk zone plus its
-    // HDRI finished. Mirefen occupies cell rows 6 to 11; the two rows against
-    // the border are the only ones that were ever in the way.
-    const login = { x: -2, z: 580 };
-    const mirefenRow = (cz: number): boolean => cellOwner(8, cz) === 'mirefen_marsh';
-    expect([6, 7, 8, 9, 10, 11].every(mirefenRow)).toBe(true);
+    // HDRI finished. The two rows against the border are the only ones that
+    // were ever in the way. Derive their indices from the live grid: the
+    // campaign's southern Farshore extent shifts originZ without changing
+    // this behavior.
+    const login = thornpeakLogin;
+    expect(mirefenRows).toHaveLength(6);
+    const northRows = mirefenRows.slice(-2);
 
     const builtZones = new Set(['thornpeak_heights']);
     const wholeZonePending = pendingOutside(builtZones);
@@ -262,18 +272,19 @@ describe('partially built neighbours (the reported walls)', () => {
       fogFarForBuiltGround(GRID, wholeZonePending, login.x, login.z, MAX_OUTDOOR_FOG_FAR),
     ).toBe(MIN_OUTDOOR_FOG_FAR);
 
-    // Now build ONLY Mirefen's two northern rows (cz 10 and 11, z 420 to 540).
+    // Now build ONLY Mirefen's two northern rows.
     const twoRowsBuilt: GroundPendingAt = (cx, cz) => {
       const owner = cellOwner(cx, cz);
       if (owner === null || builtZones.has(owner)) return false;
-      if (owner === 'mirefen_marsh' && cz >= 10) return false;
+      if (owner === 'mirefen_marsh' && cz >= northRows[0]) return false;
       return true;
     };
-    // The nearest ground still owed is Mirefen row 9, whose north edge is
-    // z = 420: 160 yd out instead of 40, so the wall is gone for the cost of
-    // 12 chunks rather than 36 chunks plus an HDRI.
+    // The nearest ground still owed ends at the south edge of the first built
+    // row, so the wall is gone for the cost of 12 chunks rather than a whole
+    // zone plus an HDRI.
     const opened = fogFarForBuiltGround(GRID, twoRowsBuilt, login.x, login.z, MAX_OUTDOOR_FOG_FAR);
-    expect(opened).toBe(160 - UNBUILT_GROUND_FOG_GUARD);
+    const pendingNorthEdge = GRID.originZ + northRows[0] * GRID.size;
+    expect(opened).toBe(login.z - pendingNorthEdge - UNBUILT_GROUND_FOG_GUARD);
     expect(opened).toBeGreaterThan(3 * MIN_OUTDOOR_FOG_FAR);
   });
 
@@ -306,7 +317,7 @@ describe('partially built neighbours (the reported walls)', () => {
     // The behaviour change in one assertion: the fog frontier tracks the build
     // frontier. Each further built row buys a strictly wider view, where the
     // zone clamp returned the floor for every one of these states.
-    const camera = { x: -2, z: 580 };
+    const camera = thornpeakLogin;
     const builtThrough =
       (lowestBuiltRow: number): GroundPendingAt =>
       (cx, cz) => {
@@ -315,28 +326,36 @@ describe('partially built neighbours (the reported walls)', () => {
         if (owner === 'mirefen_marsh') return cz < lowestBuiltRow;
         return true;
       };
-    const opened = [12, 11, 10, 9, 8, 7, 6].map((row) =>
+    const thresholds = [mirefenRows[mirefenRows.length - 1] + 1, ...mirefenRows.toReversed()];
+    const opened = thresholds.map((row) =>
       fogFarForBuiltGround(GRID, builtThrough(row), camera.x, camera.z, MAX_OUTDOOR_FOG_FAR),
     );
-    // Each row lands 60 yd further out, so the view earns 60 yd back per row
-    // until a different zone becomes the binding constraint: the Willowfen,
-    // 178 yd west, which caps the sequence at 170. Under the zone clamp every
-    // one of these states returned the 45-yard floor.
-    expect(opened).toEqual([
-      MIN_OUTDOOR_FOG_FAR, // no Mirefen ground: the border is 40 yd off
-      100 - UNBUILT_GROUND_FOG_GUARD, // row 11 built, row 10's edge at z=480
-      160 - UNBUILT_GROUND_FOG_GUARD, // rows 10 and 11, row 9's edge at z=420
-      178 - UNBUILT_GROUND_FOG_GUARD, // the Willowfen takes over from here
-      178 - UNBUILT_GROUND_FOG_GUARD,
-      178 - UNBUILT_GROUND_FOG_GUARD,
-      178 - UNBUILT_GROUND_FOG_GUARD,
-    ]);
+    // Compare against an independently scanned frontier, then pin the useful
+    // shape: it starts closed, never contracts as rows land, and opens well
+    // beyond the point-blank floor before another zone takes over.
+    const expected = thresholds.map((row) => {
+      const distance = bruteForceNearest(builtThrough(row), camera.x, camera.z);
+      return Math.min(
+        MAX_OUTDOOR_FOG_FAR,
+        Math.max(MIN_OUTDOOR_FOG_FAR, distance - UNBUILT_GROUND_FOG_GUARD),
+      );
+    });
+    expect(opened).toEqual(expected);
+    expect(opened[0]).toBe(MIN_OUTDOOR_FOG_FAR);
+    for (let i = 1; i < opened.length; i++) {
+      expect(opened[i]).toBeGreaterThanOrEqual(opened[i - 1]);
+    }
+    expect(opened.at(-1)).toBeGreaterThan(3 * MIN_OUTDOOR_FOG_FAR);
   });
 });
 
 describe('chunk build order (the which-chunk-next seam)', () => {
   const cells: [number, number][] = [];
-  for (let cz = 6; cz <= 11; cz++) for (let cx = 6; cx <= 11; cx++) cells.push([cx, cz]);
+  for (let cz = 0; cz < GRID.countZ; cz++) {
+    for (let cx = 0; cx < GRID.countX; cx++) {
+      if (cellOwner(cx, cz) === 'mirefen_marsh') cells.push([cx, cz]);
+    }
+  }
 
   it('builds outward from the entry point, nearest first', () => {
     const entry = { x: 0, z: 500 };

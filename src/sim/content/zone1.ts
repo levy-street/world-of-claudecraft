@@ -2,13 +2,13 @@
 // wolves and boars, the bandit camp, and Brother Aldric's Gravecaller chain
 // leading to the Hollow Crypt.
 
-import { MAINLAND_HARBOR } from '../harbor_layout';
 import { EASTBROOK_GRAND_ARMOURY } from '../building_layout';
 import {
   EASTBROOK_LAYOUT,
   EASTBROOK_NPC_PLACEMENTS_BY_ID,
   wallSegmentMirrored,
 } from '../eastbrook_layout';
+import { MAINLAND_HARBOR } from '../harbor_layout';
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,

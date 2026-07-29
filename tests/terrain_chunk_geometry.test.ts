@@ -80,9 +80,9 @@ describe('generated chunk geometry is stable', () => {
     await task;
 
     const meshes = terrain.group.children.filter((c) => (c as THREE.Mesh).isMesh) as THREE.Mesh[];
-    // 36 in-rect chunks plus the 12 merged super-chunk meshes over the 21 gap
-    // cells nearest-rect ownership hands the Vale (the rects do not tile).
-    expect(meshes.length).toBe(48);
+    // 36 in-rect chunks plus the offshore-world gap meshes nearest-rect
+    // ownership hands the Vale (the rects do not tile).
+    expect(meshes.length).toBe(58);
 
     // Order the chunks by their own geometry bounds, so the pin does not depend
     // on build ORDER (which the worker move is expressly going to change).
@@ -112,22 +112,31 @@ describe('generated chunk geometry is stable', () => {
       return digest.digest('hex').slice(0, 32);
     };
 
-    // The in-rect chunks split from the gap fill by their bounds: every Vale
-    // rect chunk starts at x >= -180 (the skirt overhangs by under a yard).
-    const inRect = keyed.filter(({ box }) => box.min.x >= -181);
-    const gapFill = keyed.filter(({ box }) => box.min.x < -181);
+    // Split the realm's own cells from its nearest-owned sea/rim cells by each
+    // chunk's centre. The campaign adds open sea east of the Vale, so an
+    // x-only split no longer distinguishes the two sets.
+    const inRect = keyed.filter(({ box }) => {
+      const x = (box.min.x + box.max.x) / 2;
+      const z = (box.min.z + box.max.z) / 2;
+      return x >= -180 && x < 180 && z >= -180 && z < 180;
+    });
+    const inRectKeys = new Set(inRect.map(({ key }) => key));
+    const gapFill = keyed.filter(({ key }) => !inRectKeys.has(key));
     expect(inRect.length).toBe(36);
-    expect(gapFill.length).toBe(12);
+    expect(gapFill.length).toBe(22);
 
     // Re-minted for the Eastbrook camp respacing (PR #2584, maintainer-ordered):
     // camp radii drive the terrain flatten aprons, so the deliberate, reviewed
     // spread of the starter camps regrades the Vale rect. The prior pin
     // (6f7fb63da247a5eb272dd9d7a42a5fcd) dated from before that change; the
     // gap-cell fill must still not perturb a single byte of in-rect geometry.
-    expect(digestOf(inRect)).toBe('987a8787d8d0101698ed259f73aa557b');
+    // Re-minted for the asymmetric campaign bounds: the same positions/colors
+    // now carry UVs normalized over WORLD_MIN_X..WORLD_MAX_X instead of the
+    // obsolete symmetric -WORLD_MAX_X..WORLD_MAX_X range.
+    expect(digestOf(inRect)).toBe('6e57b2b3457fd7612e6ace78247a2f22');
     // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
     // visual change.
-    expect(digestOf(gapFill)).toBe('1da89b363fda0dcac73d4d5a24c1760d');
+    expect(digestOf(gapFill)).toBe('7603031ddf0cba86d8172e0f4d8df80b');
 
     terrain.cancelStreaming();
   });

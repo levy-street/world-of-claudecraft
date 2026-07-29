@@ -2456,6 +2456,13 @@ export interface CampDef {
   center: { x: number; z: number };
   radius: number;
   count: number;
+  /**
+   * Number of spawns that consume the simulation's shared world-generation
+   * stream. Any remaining spawns use a deterministic camp-local stream. This
+   * lets an established camp grow without shifting the shared construction
+   * stream; omitted means every spawn uses the shared stream.
+   */
+  sharedRngCount?: number;
 }
 
 // Ground interactables (sparkle objects)

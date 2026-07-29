@@ -11,8 +11,8 @@
     "evade arm arrival -> resetEvadingMob (rng.range(2,8), full-heal, clearThreat, telegraph re-arm)",
     "cowardly flee: maybeFlee at FLEE_HP_THRESHOLD -> flee arm (fleeMoveSpeed run-away)"
   ],
-  "draws": 14,
-  "drawDigest": "9200acac",
+  "draws": 16,
+  "drawDigest": "e889d488",
   "frames": [
     {
       "tick": 0,
@@ -32,11 +32,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 845,
-      "state": "949d4e4e",
-      "events": "1425f5b3",
+      "state": "93561c7e",
+      "events": "52c9d2de",
       "rng": {
         "draws": 4,
-        "digest": "d97f1d6c"
+        "digest": "47ee7f72"
       },
       "label": "aoe-pulse",
       "players": [
@@ -55,7 +55,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 53
+            "damageTaken": 57
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -119,7 +119,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999947,
+          "hp": 999943,
           "id": 843,
           "inCombat": true,
           "kind": "player",
@@ -138,7 +138,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 9.716667,
+          "resource": 10.45,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -212,11 +212,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 846,
-      "state": "fc3fe33a",
-      "events": "6d2e65d3",
+      "state": "5d7f9317",
+      "events": "025efa68",
       "rng": {
-        "draws": 6,
-        "digest": "c864ad71"
+        "draws": 8,
+        "digest": "1c25486e"
       },
       "label": "war-stomp",
       "players": [
@@ -235,7 +235,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 75
+            "damageTaken": 165
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -308,7 +308,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999978,
+          "hp": 999892,
           "id": 843,
           "inCombat": true,
           "kind": "player",
@@ -327,7 +327,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 10.926667,
+          "resource": 16.39,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -445,11 +445,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 847,
-      "state": "f553ba59",
-      "events": "6122f7f3",
+      "state": "a7bded6f",
+      "events": "f5ebb5c2",
       "rng": {
-        "draws": 11,
-        "digest": "3210ce8a"
+        "draws": 13,
+        "digest": "df24ecbe"
       },
       "label": "terrify",
       "players": [
@@ -468,7 +468,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 188
+            "damageTaken": 357
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -541,7 +541,7 @@
               "remaining": 3,
               "school": "shadow",
               "sourceId": 846,
-              "value": -2.284655
+              "value": 1.584361
             }
           ],
           "blockChance": 0.05,
@@ -552,7 +552,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999887,
+          "hp": 999808,
           "id": 843,
           "inCombat": true,
           "kind": "player",
@@ -571,7 +571,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 21.285,
+          "resource": 33.99,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -734,11 +734,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 848,
-      "state": "543c40bb",
+      "state": "f2dd602b",
       "events": "741638a5",
       "rng": {
-        "draws": 13,
-        "digest": "d051f004"
+        "draws": 15,
+        "digest": "010d678b"
       },
       "label": "idle-wander",
       "players": [
@@ -757,7 +757,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 188
+            "damageTaken": 357
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -830,7 +830,7 @@
               "remaining": 3,
               "school": "shadow",
               "sourceId": 846,
-              "value": -2.284655
+              "value": 1.584361
             }
           ],
           "blockChance": 0.05,
@@ -841,7 +841,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999887,
+          "hp": 999808,
           "id": 843,
           "inCombat": true,
           "kind": "player",
@@ -860,7 +860,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 21.285,
+          "resource": 33.99,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1024,7 +1024,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.265191,
+          "facing": -2.456126,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -1039,9 +1039,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.866487,
-            "y": 6.753716,
-            "z": 300.042122
+            "x": 299.911375,
+            "y": 6.792022,
+            "z": 299.891623
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1054,9 +1054,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 295.354164,
-            "y": 6.060719,
-            "z": 301.465708
+            "x": 297.88148,
+            "y": 6.918564,
+            "z": 297.409308
           },
           "wanderTimer": 30,
           "weapon": {
@@ -1071,11 +1071,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 849,
-      "state": "ecfffc16",
+      "state": "ee9c40b9",
       "events": "741638a5",
       "rng": {
-        "draws": 14,
-        "digest": "9200acac"
+        "draws": 16,
+        "digest": "e889d488"
       },
       "label": "evade-reset",
       "players": [
@@ -1094,7 +1094,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 188
+            "damageTaken": 357
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1167,7 +1167,7 @@
               "remaining": 3,
               "school": "shadow",
               "sourceId": 846,
-              "value": -2.284655
+              "value": 1.584361
             }
           ],
           "blockChance": 0.05,
@@ -1178,7 +1178,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999887,
+          "hp": 999808,
           "id": 843,
           "inCombat": true,
           "kind": "player",
@@ -1197,7 +1197,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 21.285,
+          "resource": 33.99,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1361,7 +1361,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.265191,
+          "facing": -2.456126,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -1376,9 +1376,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.866487,
-            "y": 6.753716,
-            "z": 300.042122
+            "x": 299.911375,
+            "y": 6.792022,
+            "z": 299.891623
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1391,9 +1391,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 295.354164,
-            "y": 6.060719,
-            "z": 301.465708
+            "x": 297.88148,
+            "y": 6.918564,
+            "z": 297.409308
           },
           "wanderTimer": 30,
           "weapon": {
@@ -1437,7 +1437,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 6.489843,
+          "wanderTimer": 7.453312,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1450,11 +1450,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 850,
-      "state": "ac6ba7a4",
+      "state": "a742f41a",
       "events": "76b90998",
       "rng": {
-        "draws": 14,
-        "digest": "9200acac"
+        "draws": 16,
+        "digest": "e889d488"
       },
       "label": "flee-panic",
       "players": [
@@ -1473,7 +1473,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 188
+            "damageTaken": 357
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1546,7 +1546,7 @@
               "remaining": 3,
               "school": "shadow",
               "sourceId": 846,
-              "value": -2.284655
+              "value": 1.584361
             }
           ],
           "blockChance": 0.05,
@@ -1576,7 +1576,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 21.285,
+          "resource": 33.99,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1740,7 +1740,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.265191,
+          "facing": -2.456126,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -1755,9 +1755,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.866487,
-            "y": 6.753716,
-            "z": 300.042122
+            "x": 299.911375,
+            "y": 6.792022,
+            "z": 299.891623
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1770,9 +1770,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 295.354164,
-            "y": 6.060719,
-            "z": 301.465708
+            "x": 297.88148,
+            "y": 6.918564,
+            "z": 297.409308
           },
           "wanderTimer": 30,
           "weapon": {
@@ -1816,7 +1816,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 6.489843,
+          "wanderTimer": 7.453312,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1874,11 +1874,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 850,
-      "state": "7ae4d5db",
+      "state": "f9ac1225",
       "events": "741638a5",
       "rng": {
-        "draws": 14,
-        "digest": "9200acac"
+        "draws": 16,
+        "digest": "e889d488"
       },
       "label": "flee-run",
       "players": [
@@ -1897,7 +1897,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 188
+            "damageTaken": 357
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1970,7 +1970,7 @@
               "remaining": 3,
               "school": "shadow",
               "sourceId": 846,
-              "value": -2.284655
+              "value": 1.584361
             }
           ],
           "blockChance": 0.05,
@@ -2000,7 +2000,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 21.285,
+          "resource": 33.99,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2164,7 +2164,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.265191,
+          "facing": -2.456126,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -2179,9 +2179,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.866487,
-            "y": 6.753716,
-            "z": 300.042122
+            "x": 299.911375,
+            "y": 6.792022,
+            "z": 299.891623
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2194,9 +2194,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 295.354164,
-            "y": 6.060719,
-            "z": 301.465708
+            "x": 297.88148,
+            "y": 6.918564,
+            "z": 297.409308
           },
           "wanderTimer": 30,
           "weapon": {
@@ -2240,7 +2240,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 6.489843,
+          "wanderTimer": 7.453312,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2299,11 +2299,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 850,
-      "state": "7ae4d5db",
+      "state": "f9ac1225",
       "events": "741638a5",
       "rng": {
-        "draws": 14,
-        "digest": "9200acac"
+        "draws": 16,
+        "digest": "e889d488"
       },
       "label": "final",
       "players": [
@@ -2322,7 +2322,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 188
+            "damageTaken": 357
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2395,7 +2395,7 @@
               "remaining": 3,
               "school": "shadow",
               "sourceId": 846,
-              "value": -2.284655
+              "value": 1.584361
             }
           ],
           "blockChance": 0.05,
@@ -2425,7 +2425,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 21.285,
+          "resource": 33.99,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2589,7 +2589,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.265191,
+          "facing": -2.456126,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -2604,9 +2604,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.866487,
-            "y": 6.753716,
-            "z": 300.042122
+            "x": 299.911375,
+            "y": 6.792022,
+            "z": 299.891623
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2619,9 +2619,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 295.354164,
-            "y": 6.060719,
-            "z": 301.465708
+            "x": 297.88148,
+            "y": 6.918564,
+            "z": 297.409308
           },
           "wanderTimer": 30,
           "weapon": {
@@ -2665,7 +2665,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 6.489843,
+          "wanderTimer": 7.453312,
           "weapon": {
             "max": 12,
             "min": 8,

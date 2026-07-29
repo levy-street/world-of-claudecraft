@@ -151,9 +151,9 @@ describe('buildContinentMapModel: zone regions', () => {
     expect(eastbrook.rect.my).toBeCloseTo(tl.my, 4);
     expect(eastbrook.rect.w).toBeCloseTo(br.mx - tl.mx, 4);
     expect(eastbrook.rect.h).toBeCloseTo(br.my - tl.my, 4);
-    // The southern starter zone reaches z=WORLD_MIN_Z, so its rect touches the
-    // bottom edge of the plate.
-    expect(eastbrook.rect.my + eastbrook.rect.h).toBeCloseTo(m.image.my + m.image.h, 4);
+    // The offshore Farshore now reaches farther south than the starter zone,
+    // so Eastbrook correctly leaves a strip of southern ocean on the plate.
+    expect(eastbrook.rect.my + eastbrook.rect.h).toBeLessThan(m.image.my + m.image.h);
     // The label anchor is the rect centre (the painter draws the name there).
     expect(eastbrook.labelX).toBeCloseTo(eastbrook.rect.mx + eastbrook.rect.w / 2, 6);
     expect(eastbrook.labelY).toBeCloseTo(eastbrook.rect.my + eastbrook.rect.h / 2, 6);

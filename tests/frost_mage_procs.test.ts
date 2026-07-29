@@ -193,7 +193,10 @@ describe('frostbolt proc generation', () => {
   // wait) is a lot of synchronous sim work for vitest's 5s default: fine on an
   // idle machine, but tight under worker-pool CPU contention. Real execution is
   // sub-second in isolation; give this one real headroom instead of flaking.
-  const PROC_TEST_TIMEOUT_MS = 20_000;
+  // The expanded campaign world adds live entities to each full Sim tick. The
+  // bounded proc drive is unchanged, but needs headroom on the supported CI
+  // runtime when it runs beside the rest of the integration suite.
+  const PROC_TEST_TIMEOUT_MS = 40_000;
 
   it(
     'a committed-frost mage eventually rolls both procs, capped at 2 stacks',

@@ -29,6 +29,7 @@ import {
   STRIP_ZONES,
   WORLD_MAX_X,
   WORLD_MAX_Z,
+  WORLD_MIN_X,
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
@@ -480,7 +481,8 @@ function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): Ve
   // so from a zone's centre the rim reads as atmospheric haze rather than a
   // crisp silhouette, reinforcing the reduced BIOME_FOG draw distance.
   const edge = Math.max(
-    Math.abs(x) - (WORLD_MAX_X - 70),
+    WORLD_MIN_X + 70 - x,
+    x - (WORLD_MAX_X - 70),
     WORLD_MIN_Z + 70 - z,
     z - (WORLD_MAX_Z - 70),
   );
@@ -633,7 +635,7 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
     state.colors[vi * 3] = s.color[0];
     state.colors[vi * 3 + 1] = s.color[1];
     state.colors[vi * 3 + 2] = s.color[2];
-    state.uvs[vi * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
+    state.uvs[vi * 2] = (x - WORLD_MIN_X) / (WORLD_MAX_X - WORLD_MIN_X);
     state.uvs[vi * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
     if (state.splats) {
       state.splats[vi * 4] = s.splat[0];

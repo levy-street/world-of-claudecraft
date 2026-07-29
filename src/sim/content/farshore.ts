@@ -219,6 +219,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     facing: 0,
     color: 0x8a4b2b,
     questIds: [
+      'q_lb_q0_ashore',
       'q_fs_bell_at_the_landing',
       'q_fs_hold_the_riftfields',
       'q_fs_song_before_the_break',
@@ -528,15 +529,67 @@ export const FARSHORE_ITEMS: Record<string, ItemDef> = {
 };
 export const FARSHORE_CAMPS: CampDef[] = [
   // the break-spawned pour from the breach and hold the island's north and
-  // east; the redoubt keeps the town and the harbor
-  { mobId: 'riftspawn', center: { x: 1030, z: -160 }, radius: 12, count: 4 }, // the breach's east lip
-  { mobId: 'riftspawn', center: { x: 985, z: -178 }, radius: 12, count: 4 }, // the breach's west lip
-  { mobId: 'riftspawn', center: { x: 1008, z: -112 }, radius: 14, count: 5 }, // the Riftfields
-  { mobId: 'riftspawn', center: { x: 890, z: 218 }, radius: 14, count: 4 }, // the Wreckfields tide line
-  { mobId: 'breach_wretch', center: { x: 940, z: 60 }, radius: 14, count: 5 }, // the wracked grain rows
-  { mobId: 'breach_wretch', center: { x: 1055, z: 92 }, radius: 14, count: 5 }, // the east fields
-  { mobId: 'void_stalker', center: { x: 1092, z: -72 }, radius: 12, count: 3 }, // the cliff approach
-  { mobId: 'void_stalker', center: { x: 1108, z: 38 }, radius: 12, count: 3 }, // the cliffs' south foot
+  // east; the redoubt keeps the town and the harbor. sharedRngCount preserves
+  // the pre-campaign Farshore's 18 shared world-generation spawns (6
+  // riftspawn, 7 wretches, 4 stalkers, 1 horror). The 16 campaign additions
+  // scatter from deterministic camp-local streams, leaving the shared
+  // construction stream stable for later camps and immediate interactions.
+  {
+    mobId: 'riftspawn',
+    center: { x: 1030, z: -160 },
+    radius: 12,
+    count: 4,
+    sharedRngCount: 2,
+  }, // the breach's east lip
+  {
+    mobId: 'riftspawn',
+    center: { x: 985, z: -178 },
+    radius: 12,
+    count: 4,
+    sharedRngCount: 2,
+  }, // the breach's west lip
+  {
+    mobId: 'riftspawn',
+    center: { x: 1008, z: -112 },
+    radius: 14,
+    count: 5,
+    sharedRngCount: 1,
+  }, // the Riftfields
+  {
+    mobId: 'riftspawn',
+    center: { x: 890, z: 218 },
+    radius: 14,
+    count: 4,
+    sharedRngCount: 1,
+  }, // the Wreckfields tide line
+  {
+    mobId: 'breach_wretch',
+    center: { x: 940, z: 60 },
+    radius: 14,
+    count: 5,
+    sharedRngCount: 4,
+  }, // the wracked grain rows
+  {
+    mobId: 'breach_wretch',
+    center: { x: 1055, z: 92 },
+    radius: 14,
+    count: 5,
+    sharedRngCount: 3,
+  }, // the east fields
+  {
+    mobId: 'void_stalker',
+    center: { x: 1092, z: -72 },
+    radius: 12,
+    count: 3,
+    sharedRngCount: 2,
+  }, // the cliff approach
+  {
+    mobId: 'void_stalker',
+    center: { x: 1108, z: 38 },
+    radius: 12,
+    count: 3,
+    sharedRngCount: 2,
+  }, // the cliffs' south foot
   { mobId: 'sundered_horror', center: { x: 1197, z: -157 }, radius: 6, count: 1 }, // the cliffs' great break
 ];
 export const FARSHORE_OBJECTS: GroundObjectDef[] = [

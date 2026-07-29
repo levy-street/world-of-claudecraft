@@ -11022,6 +11022,24 @@ export const zh_TW: EnTranslations = {
       "fisher_bram": {
         "name": "漁夫布蘭姆"
       },
+      "lb_actor_coalfast": {
+        "name": "Warden Coalfast"
+      },
+      "lb_actor_ollun": {
+        "name": "Riftwatch Ollun"
+      },
+      "lb_actor_edda": {
+        "name": "Quartermaster Edda"
+      },
+      "lb_actor_saul": {
+        "name": "Mender Saul"
+      },
+      "lb_actor_tam": {
+        "name": "Bellkeeper Tam"
+      },
+      "tidemill_stalker": {
+        "name": "The Tidemill Stalker"
+      },
       "rift_hellguard": {
         "name": "地獄衛士"
       },
@@ -11576,6 +11594,21 @@ export const zh_TW: EnTranslations = {
         "name": "受驚的 奈兒",
         "title": "鷗港漁人",
         "greeting": "它就開在曬網的地方。就在那裡，就在我這輩子每天清晨站立的地方。我再也不下海岸了。如今哪兒我都幾乎不再去了。"
+      },
+      "ferryman_ewald": {
+        "name": "Ferryman Ewald",
+        "title": "The Farshore Crossing",
+        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+      },
+      "ferrykeeper_odda": {
+        "name": "Ferrykeeper Odda",
+        "title": "The Farshore Crossing",
+        "greeting": "Mainland-bound? The ship goes when you are aboard, not before. And if you hear the bell start counting while we cast off, do not ask me to turn her around: nobody rows toward a three-toll."
+      },
+      "sergeant_marsh": {
+        "name": "Sergeant Marsh",
+        "title": "Town Militia",
+        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
       },
       "forgemistress_darva": {
         "name": "達爾瓦鍛造師",
@@ -13559,6 +13592,22 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_lb_q0_ashore": {
+        "title": "Ashore",
+        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
+        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "objectives": {
+          "0": {
+            "label": "Report to Sergeant Marsh at the Watch Meadow"
+          },
+          "1": {
+            "label": "Riftspawn slain"
+          },
+          "2": {
+            "label": "Put down whatever is in the Tidemill"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "走下風道",
         "text": "你爬完了這段山路，{playerName}，看來風決定留下你了。燭港在丘陵路往東，蜷在海灣的背風處。港務長奧蒂爾清點每一個翻過隘口的人，她也會想清點你。告訴她，風道還開著。",
@@ -14161,6 +14210,51 @@ export const zh_TW: EnTranslations = {
         "name": "最後的堡壘",
         "enterText": "你踏入最後的堡壘那冰冷而寂靜的大廳。",
         "leaveText": "你帶上堡門，重新走進龍裔荒原的寒風中。"
+      },
+      "lb_tidemill": {
+        "name": "The Tidemill",
+        "enterText": "The mill door gives. Inside, the dark is listening.",
+        "leaveText": "You step out of the Tidemill into the evening air."
+      },
+      "lb_riftline": {
+        "name": "The Rift-Line at Dusk",
+        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
+        "leaveText": "You leave the rift-line to the dawn watch."
+      },
+      "lb_vault": {
+        "name": "The Drowned First Redoubt",
+        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
+        "leaveText": "You come up the cliff rope into daylight."
+      },
+      "lb_council": {
+        "name": "The Redoubt Council",
+        "enterText": "The council room holds six chairs. One is empty.",
+        "leaveText": "You step out of the redoubt."
+      },
+      "lb_landing": {
+        "name": "The Landing at Night",
+        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
+        "leaveText": "You leave the Landing beach behind."
+      },
+      "lb_riftfields": {
+        "name": "The Riftfields Approach",
+        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
+        "leaveText": "You walk back down out of the Riftfields."
+      },
+      "lb_breach": {
+        "name": "Inside the Breach",
+        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
+        "leaveText": "You cross the threshold into ordinary night air."
+      },
+      "lb_lastwatch": {
+        "name": "The Last Watch",
+        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
+        "leaveText": "You close the redoubt door behind you."
+      },
+      "lb_willowfen": {
+        "name": "Willowweep",
+        "enterText": "The willow does not move. The water does not either.",
+        "leaveText": "You leave the willow to its quiet."
       },
       "drowned_temple": {
         "name": "溺亡神殿",

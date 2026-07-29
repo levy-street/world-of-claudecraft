@@ -9,7 +9,7 @@
     "drawOne rng draw (round resolution, both sides)"
   ],
   "draws": 44,
-  "drawDigest": "4c6a10a0",
+  "drawDigest": "5d52aee1",
   "frames": [
     {
       "tick": 0,
@@ -30,10 +30,10 @@
       "time": 0.25,
       "nextId": 845,
       "state": "88843642",
-      "events": "e34c6a6f",
+      "events": "07310977",
       "rng": {
         "draws": 38,
-        "digest": "ef472e1d"
+        "digest": "90bc014b"
       }
     },
     {
@@ -44,7 +44,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "ef472e1d"
+        "digest": "90bc014b"
       }
     },
     {
@@ -55,7 +55,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "ef472e1d"
+        "digest": "90bc014b"
       }
     },
     {
@@ -66,7 +66,7 @@
       "events": "5b11cae4",
       "rng": {
         "draws": 38,
-        "digest": "ef472e1d"
+        "digest": "90bc014b"
       }
     },
     {
@@ -77,7 +77,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "ef472e1d"
+        "digest": "90bc014b"
       }
     },
     {
@@ -88,7 +88,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "ef472e1d"
+        "digest": "90bc014b"
       }
     },
     {
@@ -99,7 +99,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "ef472e1d"
+        "digest": "90bc014b"
       }
     },
     {
@@ -110,7 +110,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "ef472e1d"
+        "digest": "90bc014b"
       }
     },
     {
@@ -121,7 +121,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 44,
-        "digest": "4c6a10a0"
+        "digest": "5d52aee1"
       },
       "label": "final",
       "players": [

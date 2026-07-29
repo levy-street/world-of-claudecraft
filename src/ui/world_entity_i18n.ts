@@ -208,6 +208,13 @@ const MOB_IDS = [
   'void_stalker',
   'sundered_horror',
   'fisher_bram',
+  // Last Bell scenario-only cast and Q0 boss.
+  'lb_actor_coalfast',
+  'lb_actor_ollun',
+  'lb_actor_edda',
+  'lb_actor_saul',
+  'lb_actor_tam',
+  'tidemill_stalker',
   // The Infernal Citadel set-piece (src/sim/content/rift/infernal_citadel.ts).
   'rift_hellguard',
   'rift_pact_acolyte',
@@ -316,6 +323,10 @@ const NPC_IDS = [
   'mender_saul',
   'bellkeeper_tam',
   'fisher_nell',
+  // Last Bell campaign front-door and Watch Meadow cast.
+  'ferryman_ewald',
+  'ferrykeeper_odda',
+  'sergeant_marsh',
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
   'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)
@@ -522,6 +533,8 @@ const QUEST_IDS = [
   'q_fs_bram_come_home',
   'q_fs_stalkers_off_the_light',
   'q_fs_the_great_break',
+  // Last Bell campaign opener.
+  'q_lb_q0_ashore',
   // the Galecrest
   'q_gc_down_the_windway',
   'q_gc_wool_off_the_downs',
@@ -558,6 +571,16 @@ const DUNGEON_IDS = [
   'nythraxis_boss_arena',
   'wildheart_basin',
   'the_last_keep',
+  // Last Bell story-instance spaces.
+  'lb_tidemill',
+  'lb_riftline',
+  'lb_vault',
+  'lb_council',
+  'lb_landing',
+  'lb_riftfields',
+  'lb_breach',
+  'lb_lastwatch',
+  'lb_willowfen',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

@@ -8,7 +8,7 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "6f587c5e",
+  "drawDigest": "eb8d71f4",
   "frames": [
     {
       "tick": 0,
@@ -28,11 +28,11 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 846,
-      "state": "d5b0b21b",
-      "events": "755d1d0d",
+      "state": "b9d574f3",
+      "events": "7bf7ba48",
       "rng": {
         "draws": 2,
-        "digest": "6f587c5e"
+        "digest": "eb8d71f4"
       },
       "label": "final",
       "players": [
@@ -61,6 +61,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
+              "greyjaw_hide_boots",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -86,6 +87,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
@@ -124,7 +129,6 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "greyjaw_hide_boots",
               "spring_water"
             ]
           },
@@ -152,10 +156,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,

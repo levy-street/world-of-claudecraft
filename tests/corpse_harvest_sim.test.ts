@@ -3343,9 +3343,9 @@ describe('the concentration bonus on a mixed corpse is untouched (#2509)', () =>
     // the 2-tag shape, where a single box is the whole refusal and the spread
     // denominator is 2 rather than 3, so a narrowing scoped to them would slip
     // past every row above. Literals, measured the same way. `claimedBy` is the
-    // harvester's entity id, re-recorded 832 to 820 because thinning the zone-1
-    // camps removed mobs from world-gen and the players are numbered after
-    // them; every yield literal is unchanged.
+    // harvester's entity id, re-recorded to 843 because the Last Bell cast,
+    // expanded Farshore population, and fixtures are earlier world entities.
+    // Every yield literal remains unchanged.
     const boar = (components: string[] | undefined) => {
       const { sim, internals, a } = setup(153);
       const template = MOBS.mudfin_murloc;
@@ -3374,10 +3374,10 @@ describe('the concentration bonus on a mixed corpse is untouched (#2509)', () =>
     expect(MOBS.mudfin_murloc.componentTags).toEqual(['gills', 'hide']);
     // Spread over both tags at bonus 0: gills costs a tier roll and grants
     // nothing, which is exactly what keeps the denominator at 2.
-    expect(boar(undefined)).toEqual({ draws: 3, hide: 5, pristine: 0, claimedBy: 820 });
+    expect(boar(undefined)).toEqual({ draws: 3, hide: 5, pristine: 0, claimedBy: 843 });
     expect(boar(['gills', 'hide'])).toEqual(boar([]));
     // Concentrating on hide is bonus 1, and stays bonus 1.
-    expect(boar(['hide'])).toEqual({ draws: 2, hide: 3, pristine: 1, claimedBy: 820 });
+    expect(boar(['hide'])).toEqual({ draws: 2, hide: 3, pristine: 1, claimedBy: 843 });
   });
 });
 

@@ -9,8 +9,8 @@
     "Fingers of Frost proc draw from frostbolt",
     "Brain Freeze proc draw from frostbolt"
   ],
-  "draws": 360,
-  "drawDigest": "64b046c1",
+  "draws": 361,
+  "drawDigest": "eaec4366",
   "frames": [
     {
       "tick": 0,
@@ -143,7 +143,7 @@
       "events": "93f5099b",
       "rng": {
         "draws": 1,
-        "digest": "cf5e57a1"
+        "digest": "a5a623d7"
       }
     },
     {
@@ -154,40 +154,40 @@
       "events": "c8a00b20",
       "rng": {
         "draws": 2,
-        "digest": "6d172bb5"
+        "digest": "26adb9c5"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 845,
-      "state": "1a17acae",
-      "events": "f80e91fb",
+      "state": "84ac3252",
+      "events": "37fa6fbc",
       "rng": {
-        "draws": 150,
-        "digest": "478ace8d"
+        "draws": 153,
+        "digest": "4806f02f"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 845,
-      "state": "412fabfd",
-      "events": "6179ca6f",
+      "state": "fa25cd73",
+      "events": "7fd4dfc5",
       "rng": {
-        "draws": 319,
-        "digest": "f0292251"
+        "draws": 313,
+        "digest": "f7709e7a"
       }
     },
     {
       "tick": 84,
       "time": 4.2,
       "nextId": 845,
-      "state": "275741e9",
-      "events": "6b068c80",
+      "state": "6371b079",
+      "events": "3b8f497a",
       "rng": {
-        "draws": 360,
-        "digest": "64b046c1"
+        "draws": 361,
+        "digest": "eaec4366"
       },
       "label": "frost-procs",
       "players": [
@@ -207,13 +207,13 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 205
+            "damageDealt": 206
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 205
+              "dummyDamage": 206
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -393,7 +393,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499795,
+          "hp": 499794,
           "id": 844,
           "inCombat": true,
           "kind": "mob",
@@ -425,7 +425,7 @@
           "threat": [
             [
               835,
-              205
+              206
             ]
           ],
           "weapon": {
@@ -438,11 +438,11 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 845,
-      "state": "275741e9",
+      "state": "6371b079",
       "events": "741638a5",
       "rng": {
-        "draws": 360,
-        "digest": "64b046c1"
+        "draws": 361,
+        "digest": "eaec4366"
       },
       "label": "final",
       "players": [
@@ -462,13 +462,13 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 205
+            "damageDealt": 206
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 205
+              "dummyDamage": 206
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -648,7 +648,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499795,
+          "hp": 499794,
           "id": 844,
           "inCombat": true,
           "kind": "mob",
@@ -680,7 +680,7 @@
           "threat": [
             [
               835,
-              205
+              206
             ]
           ],
           "weapon": {

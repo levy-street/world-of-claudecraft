@@ -227,7 +227,9 @@ describe('isHarvestableCorpse', () => {
     // ship, all excluded before this change and all excluded after it, which is
     // the path fen_troll now joins instead of getting one of its own.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(199);
+    // The Last Bell contributes six scenario-only actor templates. They never
+    // leave harvestable corpses, so they correctly join this untagged cohort.
+    expect(untagged).toHaveLength(205);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

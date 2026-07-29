@@ -4346,10 +4346,10 @@ function cardDuel(): Scenario {
 // construction-time draw stream (quest camps + escort NPC spawns across the new
 // realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
 // counts (fewer camp mobs means fewer construction-time draws, which moves every
-// later draw). Re-hunted once more after the Last Bell campaign world additions
-// shifted the merged construction stream; seeds 5, 14, and 27 were verified to
-// fire the proc for this exact drive.
-function professionsCraft(seed = 5): Scenario {
+// later draw). Re-hunted once more after the Last Bell campaign's stable
+// shared-construction quotas were reconciled with the live ambient roster;
+// seeds 10, 36, and 39 were verified to fire for this exact drive.
+function professionsCraft(seed = 10): Scenario {
   return {
     name: 'professions_craft',
     coverage: [

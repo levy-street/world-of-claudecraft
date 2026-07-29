@@ -177,8 +177,8 @@ import {
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
-import { buildHarbors, updateHarborShips } from './harbor';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
+import { buildHarbors, updateHarborShips } from './harbor';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
@@ -8972,10 +8972,7 @@ export class Renderer {
     // distance curve, so gameplay impulses stay out of that camera path.
     const fovTarget = Math.min(
       100,
-      Math.max(
-        50,
-        this.camOcclusion.fov + (sceneCameraActive ? 0 : cameraFovOffset(this.camFeel)),
-      ),
+      Math.max(50, this.camOcclusion.fov + (sceneCameraActive ? 0 : cameraFovOffset(this.camFeel))),
     );
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
       this.camera.fov = fovTarget;

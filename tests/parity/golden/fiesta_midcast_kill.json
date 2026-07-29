@@ -10,8 +10,8 @@
     "fiesta lifesteal augment arm (~5499)",
     "multi-player fiesta meta"
   ],
-  "draws": 985,
-  "drawDigest": "86a9dba9",
+  "draws": 986,
+  "drawDigest": "232c3afe",
   "frames": [
     {
       "tick": 0,
@@ -45,8 +45,8 @@
       "state": "0c569f0f",
       "events": "a251f2f9",
       "rng": {
-        "draws": 66,
-        "digest": "55c435cf"
+        "draws": 68,
+        "digest": "e2d246d2"
       }
     },
     {
@@ -56,8 +56,8 @@
       "state": "2d1d8481",
       "events": "2b57d341",
       "rng": {
-        "draws": 286,
-        "digest": "faae7070"
+        "draws": 285,
+        "digest": "95dd1764"
       }
     },
     {
@@ -67,8 +67,8 @@
       "state": "e332a20e",
       "events": "623e5ee1",
       "rng": {
-        "draws": 546,
-        "digest": "730180f2"
+        "draws": 538,
+        "digest": "c9051cc3"
       }
     },
     {
@@ -78,8 +78,8 @@
       "state": "5ced22cf",
       "events": "93b56656",
       "rng": {
-        "draws": 556,
-        "digest": "954f45b3"
+        "draws": 550,
+        "digest": "6491d3c7"
       },
       "label": "midcast-pushback",
       "players": [
@@ -594,8 +594,8 @@
       "state": "88818823",
       "events": "47b2f082",
       "rng": {
-        "draws": 556,
-        "digest": "954f45b3"
+        "draws": 550,
+        "digest": "6491d3c7"
       },
       "label": "midcast-fishcancel",
       "players": [
@@ -1108,8 +1108,8 @@
       "state": "3a05f878",
       "events": "0c83776b",
       "rng": {
-        "draws": 556,
-        "digest": "954f45b3"
+        "draws": 550,
+        "digest": "6491d3c7"
       },
       "label": "takedown",
       "players": [
@@ -1626,8 +1626,8 @@
       "state": "9fef0572",
       "events": "741638a5",
       "rng": {
-        "draws": 805,
-        "digest": "99870e12"
+        "draws": 797,
+        "digest": "fcb0442b"
       }
     },
     {
@@ -1637,8 +1637,8 @@
       "state": "33c3982d",
       "events": "741638a5",
       "rng": {
-        "draws": 985,
-        "digest": "86a9dba9"
+        "draws": 986,
+        "digest": "232c3afe"
       },
       "label": "final",
       "players": [

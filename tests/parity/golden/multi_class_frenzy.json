@@ -10,7 +10,7 @@
     "multi-class sources: warrior/mage/rogue"
   ],
   "draws": 15,
-  "drawDigest": "7fb5c277",
+  "drawDigest": "3cfb68c1",
   "frames": [
     {
       "tick": 0,
@@ -34,7 +34,7 @@
       "events": "a6e4bb92",
       "rng": {
         "draws": 3,
-        "digest": "47d896a2"
+        "digest": "66304ffa"
       },
       "label": "frenzy-round-0",
       "players": [
@@ -474,7 +474,7 @@
       "events": "44228178",
       "rng": {
         "draws": 6,
-        "digest": "72ea3b7e"
+        "digest": "05b91507"
       },
       "label": "frenzy-round-1",
       "players": [
@@ -914,7 +914,7 @@
       "events": "44228178",
       "rng": {
         "draws": 9,
-        "digest": "d32543fd"
+        "digest": "34b479f4"
       },
       "label": "frenzy-round-2",
       "players": [
@@ -1354,7 +1354,7 @@
       "events": "44228178",
       "rng": {
         "draws": 12,
-        "digest": "7a3e7bc3"
+        "digest": "7000f036"
       },
       "label": "frenzy-round-3",
       "players": [
@@ -1790,33 +1790,33 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 847,
-      "state": "9eec21c9",
-      "events": "7c8ec761",
+      "state": "4500d79d",
+      "events": "cedef81b",
       "rng": {
         "draws": 15,
-        "digest": "7fb5c277"
+        "digest": "3cfb68c1"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
       "nextId": 847,
-      "state": "4b25b9df",
+      "state": "394dc747",
       "events": "741638a5",
       "rng": {
         "draws": 15,
-        "digest": "7fb5c277"
+        "digest": "3cfb68c1"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
       "nextId": 847,
-      "state": "4b25b9df",
+      "state": "394dc747",
       "events": "741638a5",
       "rng": {
         "draws": 15,
-        "digest": "7fb5c277"
+        "digest": "3cfb68c1"
       },
       "label": "final",
       "players": [
@@ -1836,7 +1836,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 120,
-            "damageTaken": 16
+            "damageTaken": 14
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2019,7 +2019,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 2.312838,
           "fiveSecondRule": 99.5,
-          "hp": 49984,
+          "hp": 49986,
           "id": 843,
           "inCombat": true,
           "kind": "player",

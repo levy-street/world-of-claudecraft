@@ -211,12 +211,11 @@ describe('chunk-level ground residency', () => {
     const cells = allCells(grid);
     const pendingCount = (): number => cells.filter(([cx, cz]) => isPending(cx, cz)).length;
 
-    // All 792 cells start pending. Ownership is TOTAL since the gap-cell fix
-    // (nearest-rect assignment in cellOwnerId): the 96 cells outside every
-    // zone rectangle are now built by their nearest zone, so pending-until-
-    // built is correct for every cell and the fog clamp can trust the bitmap.
-    expect(cells.length).toBe(792);
-    expect(pendingCount()).toBe(792);
+    // All 1,395 cells start pending. The Last Bell's offshore column expands
+    // the asymmetric world box; nearest-rect ownership still makes every open
+    // sea and rim cell buildable by exactly one zone.
+    expect(cells.length).toBe(1395);
+    expect(pendingCount()).toBe(1395);
 
     const zone = zoneAt(0, 0);
     const hubCx = Math.floor((zone.hub.x - grid.originX) / grid.size);
@@ -230,9 +229,10 @@ describe('chunk-level ground residency', () => {
 
     expect(isPending(hubCx, hubCz)).toBe(false);
     // Exactly this zone's OWNED cells settled, and nothing outside them: the
-    // 36 in-rect cells plus the 21 gap cells nearest-rect ownership assigns
-    // the Vale (see the gap-fill notes in terrain.ts).
-    expect(before - pendingCount()).toBe(57);
+    // 36 in-rect cells plus the 55 open-sea/rim cells nearest-rect ownership
+    // assigns the Vale in the asymmetric campaign world (see the gap-fill
+    // notes in terrain.ts).
+    expect(before - pendingCount()).toBe(91);
     terrain.cancelStreaming();
   });
 
@@ -336,7 +336,9 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
     vi.resetModules();
     mockEmptyAssetLoads();
     const { buildTerrain } = await import('../src/render/terrain');
-    const { ZONES, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } = await import('../src/sim/data');
+    const { ZONES, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z } = await import(
+      '../src/sim/data'
+    );
 
     const terrain = buildTerrain(WORLD_SEED);
     for (const zone of ZONES) {
@@ -351,13 +353,13 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
     const CHUNK = 60;
     const uncovered: [number, number][] = [];
     for (let z = WORLD_MIN_Z + CHUNK / 2; z < WORLD_MAX_Z; z += CHUNK) {
-      for (let x = -WORLD_MAX_X + CHUNK / 2; x < WORLD_MAX_X; x += CHUNK) {
+      for (let x = WORLD_MIN_X + CHUNK / 2; x < WORLD_MAX_X; x += CHUNK) {
         if (!coversPoint(terrain.group, x, z)) uncovered.push([x, z]);
       }
     }
     expect(uncovered).toEqual([]);
     terrain.cancelStreaming();
-  });
+  }, 60_000);
 
   it('builds every cell exactly once across all zones', async () => {
     vi.resetModules();
@@ -381,5 +383,5 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
     });
     expect(new Set(footprints).size).toBe(footprints.length);
     terrain.cancelStreaming();
-  });
+  }, 60_000);
 });

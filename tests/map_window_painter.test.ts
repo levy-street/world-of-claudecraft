@@ -387,12 +387,16 @@ function questWithGiver() {
 }
 
 function killQuestInZone() {
+  const zoneMinX = LABEL_ZONE.xMin ?? STRIP_MIN_X;
+  const zoneMaxX = LABEL_ZONE.xMax ?? STRIP_MAX_X;
   for (const quest of Object.values(QUESTS)) {
     for (const objective of quest.objectives) {
       if (objective.type !== 'kill') continue;
       const camp = CAMPS.find(
         (c) =>
           c.mobId === objective.targetMobId &&
+          c.center.x >= zoneMinX &&
+          c.center.x < zoneMaxX &&
           c.center.z >= LABEL_ZONE.zMin &&
           c.center.z < LABEL_ZONE.zMax,
       );
@@ -506,12 +510,16 @@ function noQuestWorld(): IWorld {
  *  area carries TWO badge numbers and the side-by-side layout is exercised. */
 function sharedCampWorld(): { world: IWorld; questIds: string[] } {
   const shared = new Map<string, string[]>();
+  const zoneMinX = LABEL_ZONE.xMin ?? STRIP_MIN_X;
+  const zoneMaxX = LABEL_ZONE.xMax ?? STRIP_MAX_X;
   for (const quest of Object.values(QUESTS)) {
     for (const objective of quest.objectives) {
       if (objective.type !== 'kill') continue;
       const camp = CAMPS.find(
         (c) =>
           c.mobId === objective.targetMobId &&
+          c.center.x >= zoneMinX &&
+          c.center.x < zoneMaxX &&
           c.center.z >= LABEL_ZONE.zMin &&
           c.center.z < LABEL_ZONE.zMax,
       );

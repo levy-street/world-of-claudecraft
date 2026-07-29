@@ -14,7 +14,7 @@
     "multi-class healers: priest/paladin/druid/shaman"
   ],
   "draws": 10,
-  "drawDigest": "3c49d817",
+  "drawDigest": "c5b6ea0d",
   "frames": [
     {
       "tick": 0,
@@ -38,7 +38,7 @@
       "events": "51b2c430",
       "rng": {
         "draws": 6,
-        "digest": "8b798846"
+        "digest": "f8418f96"
       },
       "label": "heals",
       "players": [
@@ -836,7 +836,7 @@
       "events": "f0eaa3bd",
       "rng": {
         "draws": 6,
-        "digest": "8b798846"
+        "digest": "f8418f96"
       },
       "label": "crit-vuln-damage",
       "players": [
@@ -1653,22 +1653,22 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 852,
-      "state": "8090e650",
+      "state": "27ab0e9c",
       "events": "ad1f9b85",
       "rng": {
         "draws": 10,
-        "digest": "3c49d817"
+        "digest": "c5b6ea0d"
       }
     },
     {
       "tick": 8,
       "time": 0.4,
       "nextId": 852,
-      "state": "63c4fb9f",
+      "state": "28f60455",
       "events": "ad1f9b85",
       "rng": {
         "draws": 10,
-        "digest": "3c49d817"
+        "digest": "c5b6ea0d"
       },
       "label": "final",
       "players": [
@@ -2383,7 +2383,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 2.702911,
+          "facing": 1.138017,
           "fallStartY": -1.41019,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -2399,9 +2399,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -89.524285,
+            "x": -88.98326,
             "y": -5.25,
-            "z": 88.98605
+            "z": 90.469723
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2432,9 +2432,9 @@
             ]
           ],
           "wanderTarget": {
-            "x": -88.015437,
+            "x": -86.078014,
             "y": -7.6,
-            "z": 85.770061
+            "z": 91.811916
           },
           "wanderTimer": 29.65,
           "weapon": {
@@ -2450,7 +2450,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.034545,
+          "facing": -1.965915,
           "fallStartY": -1.41019,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -2466,9 +2466,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 87.997063,
+            "x": 87.849525,
             "y": -3.24435,
-            "z": -88.809562
+            "z": -90.896859
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2499,9 +2499,9 @@
             ]
           ],
           "wanderTarget": {
-            "x": 84.509994,
+            "x": 87.319078,
             "y": -3.24435,
-            "z": -86.737038
+            "z": -91.118082
           },
           "wanderTimer": 29.65,
           "weapon": {

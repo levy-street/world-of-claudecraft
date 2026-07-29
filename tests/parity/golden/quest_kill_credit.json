@@ -10,7 +10,7 @@
     "turnInQuest (xp + copper reward)"
   ],
   "draws": 40,
-  "drawDigest": "73f698f7",
+  "drawDigest": "0f19c1c8",
   "frames": [
     {
       "tick": 0,
@@ -302,7 +302,7 @@
       "events": "7e9b73ee",
       "rng": {
         "draws": 40,
-        "digest": "73f698f7"
+        "digest": "0f19c1c8"
       },
       "label": "quest-ready",
       "players": [
@@ -482,7 +482,7 @@
       "events": "037ce4cf",
       "rng": {
         "draws": 40,
-        "digest": "73f698f7"
+        "digest": "0f19c1c8"
       },
       "label": "quest-turned-in",
       "players": [
@@ -654,7 +654,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 40,
-        "digest": "73f698f7"
+        "digest": "0f19c1c8"
       },
       "label": "final",
       "players": [

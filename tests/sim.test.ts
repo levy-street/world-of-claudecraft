@@ -132,6 +132,49 @@ describe('world generation', () => {
     expect(objects.length).toBeGreaterThanOrEqual(6);
   });
 
+  it('keeps later camp rolls stable when an established camp grows on a private stream', () => {
+    const firstCamp = {
+      mobId: 'riftspawn',
+      center: { x: 30, z: -30 },
+      radius: 8,
+      count: 2,
+    };
+    const laterCamp = {
+      mobId: 'forest_wolf',
+      center: { x: -30, z: -30 },
+      radius: 8,
+      count: 2,
+    };
+    const build = (expanded: boolean) =>
+      new Sim({
+        seed: 4242,
+        playerClass: 'warrior',
+        noPlayer: true,
+        world: {
+          ...EMPTY_TEST_WORLD,
+          camps: [
+            expanded ? { ...firstCamp, count: 4, sharedRngCount: firstCamp.count } : firstCamp,
+            laterCamp,
+          ],
+        },
+      });
+
+    const base = build(false);
+    const expanded = build(true);
+    const laterState = (sim: Sim) =>
+      [...sim.entities.values()]
+        .filter((entity) => entity.kind === 'mob' && entity.templateId === laterCamp.mobId)
+        .map((entity) => ({
+          level: entity.level,
+          pos: entity.pos,
+          facing: entity.facing,
+          wanderTimer: entity.wanderTimer,
+        }));
+
+    expect(laterState(expanded)).toEqual(laterState(base));
+    expect(expanded.rng.next()).toBe(base.rng.next());
+  });
+
   it('terrain is deterministic, town is flat, lake is below water level', () => {
     expect(terrainHeight(10, 10, 42)).toBe(terrainHeight(10, 10, 42));
     expect(Math.abs(terrainHeight(0, 0, 42) - terrainHeight(8, 8, 42))).toBeLessThan(1.5);

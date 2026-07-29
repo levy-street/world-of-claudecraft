@@ -10,8 +10,8 @@
     "mobSwing affix cascade: rampage stacking buff_ap (warlord_drogmar self-buff)",
     "friendly-pet mobSwing: mob.hostile=false short-circuits every proc (no debuff on its target)"
   ],
-  "draws": 367,
-  "drawDigest": "29790ac3",
+  "draws": 355,
+  "drawDigest": "fccd342d",
   "frames": [
     {
       "tick": 0,
@@ -150,44 +150,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 850,
-      "state": "98ce1f93",
-      "events": "0143eb3f",
+      "state": "d9d45f1f",
+      "events": "f0d26113",
       "rng": {
-        "draws": 56,
-        "digest": "7b458e00"
+        "draws": 58,
+        "digest": "508a273f"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 850,
-      "state": "72ef9f6a",
-      "events": "ec4e5a89",
+      "state": "9d3e90a1",
+      "events": "da4ba6c0",
       "rng": {
-        "draws": 92,
-        "digest": "4950606f"
+        "draws": 91,
+        "digest": "efa8bc3d"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 850,
-      "state": "97e5a936",
-      "events": "02704d86",
+      "state": "b830e6b3",
+      "events": "5d76dad2",
       "rng": {
-        "draws": 329,
-        "digest": "bd388749"
+        "draws": 317,
+        "digest": "3c2fb689"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 850,
-      "state": "991eb4f2",
+      "state": "8c73f703",
       "events": "741638a5",
       "rng": {
-        "draws": 329,
-        "digest": "bd388749"
+        "draws": 317,
+        "digest": "3c2fb689"
       },
       "label": "affixes",
       "players": [
@@ -207,7 +207,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1657
+            "damageTaken": 1217
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -286,21 +286,11 @@
               "sourceId": 835
             },
             {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 7.05,
-              "school": "shadow",
-              "sourceId": 846,
-              "value": 120
-            },
-            {
               "duration": 3,
               "id": "ensnare_webwood_spider",
               "kind": "root",
               "name": "Sticky Web",
-              "remaining": 2,
+              "remaining": 0.5,
               "school": "nature",
               "sourceId": 845
             },
@@ -333,6 +323,16 @@
               "remaining": 3.5,
               "school": "shadow",
               "sourceId": 846
+            },
+            {
+              "duration": 10,
+              "id": "heal_absorb_gravecaller_summoner",
+              "kind": "heal_absorb",
+              "name": "Grave Blight",
+              "remaining": 9.5,
+              "school": "shadow",
+              "sourceId": 846,
+              "value": 120
             }
           ],
           "blockChance": 0.05,
@@ -363,7 +363,7 @@
             "z": -21
           },
           "potionCooldownUntil": -1,
-          "resource": 100,
+          "resource": 74.372222,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -387,7 +387,7 @@
           }
         },
         {
-          "aggroTargetId": 848,
+          "aggroTargetId": 835,
           "aiState": "attack",
           "combatTimer": 0.5,
           "comboUntil": -1,
@@ -398,15 +398,10 @@
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199989,
+          "hp": 200000,
           "id": 844,
           "inCombat": true,
           "kind": "mob",
-          "leashAnchor": {
-            "x": 4,
-            "y": 1.359999,
-            "z": -21
-          },
           "level": 18,
           "lootFfaTimer": "Infinity",
           "maxHp": 200000,
@@ -429,15 +424,8 @@
             "armor": 306
           },
           "swingTimer": 1.05,
-          "tappedById": 835,
           "targetId": 835,
           "templateId": "mogger_lackey",
-          "threat": [
-            [
-              848,
-              11
-            ]
-          ],
           "weapon": {
             "max": 50,
             "min": 32,
@@ -546,8 +534,8 @@
               "remaining": 9.65,
               "school": "physical",
               "sourceId": 847,
-              "stacks": 5,
-              "value": 100
+              "stacks": 4,
+              "value": 80
             }
           ],
           "combatTimer": 0.3,
@@ -597,7 +585,7 @@
         {
           "aggroTargetId": 844,
           "aiState": "idle",
-          "combatTimer": 0.75,
+          "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -605,7 +593,7 @@
           "facing": 1.570796,
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
-          "hp": 110,
+          "hp": 112,
           "id": 848,
           "inCombat": true,
           "kind": "mob",
@@ -642,7 +630,7 @@
         {
           "aggroTargetId": 848,
           "aiState": "attack",
-          "combatTimer": 0.75,
+          "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -651,7 +639,7 @@
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199941,
+          "hp": 199923,
           "id": 849,
           "inCombat": true,
           "kind": "mob",
@@ -687,7 +675,7 @@
           "threat": [
             [
               848,
-              60
+              78
             ]
           ],
           "weapon": {
@@ -702,11 +690,11 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 850,
-      "state": "2398c5f9",
+      "state": "504431a6",
       "events": "741638a5",
       "rng": {
-        "draws": 367,
-        "digest": "29790ac3"
+        "draws": 355,
+        "digest": "fccd342d"
       },
       "label": "final",
       "players": [
@@ -726,7 +714,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1657
+            "damageTaken": 1217
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -805,21 +793,11 @@
               "sourceId": 835
             },
             {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 6.85,
-              "school": "shadow",
-              "sourceId": 846,
-              "value": 120
-            },
-            {
               "duration": 3,
               "id": "ensnare_webwood_spider",
               "kind": "root",
               "name": "Sticky Web",
-              "remaining": 1.8,
+              "remaining": 0.3,
               "school": "nature",
               "sourceId": 845
             },
@@ -852,6 +830,16 @@
               "remaining": 3.3,
               "school": "shadow",
               "sourceId": 846
+            },
+            {
+              "duration": 10,
+              "id": "heal_absorb_gravecaller_summoner",
+              "kind": "heal_absorb",
+              "name": "Grave Blight",
+              "remaining": 9.3,
+              "school": "shadow",
+              "sourceId": 846,
+              "value": 120
             }
           ],
           "blockChance": 0.05,
@@ -882,7 +870,7 @@
             "z": -21
           },
           "potionCooldownUntil": -1,
-          "resource": 100,
+          "resource": 74.372222,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -906,7 +894,7 @@
           }
         },
         {
-          "aggroTargetId": 848,
+          "aggroTargetId": 835,
           "aiState": "attack",
           "combatTimer": 0.7,
           "comboUntil": -1,
@@ -917,15 +905,10 @@
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199989,
+          "hp": 200000,
           "id": 844,
           "inCombat": true,
           "kind": "mob",
-          "leashAnchor": {
-            "x": 4,
-            "y": 1.359999,
-            "z": -21
-          },
           "level": 18,
           "lootFfaTimer": "Infinity",
           "maxHp": 200000,
@@ -948,15 +931,8 @@
             "armor": 306
           },
           "swingTimer": 0.85,
-          "tappedById": 835,
           "targetId": 835,
           "templateId": "mogger_lackey",
-          "threat": [
-            [
-              848,
-              11
-            ]
-          ],
           "weapon": {
             "max": 50,
             "min": 32,
@@ -1065,8 +1041,8 @@
               "remaining": 9.45,
               "school": "physical",
               "sourceId": 847,
-              "stacks": 5,
-              "value": 100
+              "stacks": 4,
+              "value": 80
             }
           ],
           "combatTimer": 0.5,
@@ -1116,7 +1092,7 @@
         {
           "aggroTargetId": 844,
           "aiState": "idle",
-          "combatTimer": 0.95,
+          "combatTimer": 0.7,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1124,7 +1100,7 @@
           "facing": 1.570796,
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
-          "hp": 110,
+          "hp": 112,
           "id": 848,
           "inCombat": true,
           "kind": "mob",
@@ -1161,7 +1137,7 @@
         {
           "aggroTargetId": 848,
           "aiState": "attack",
-          "combatTimer": 0.95,
+          "combatTimer": 0.7,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1170,7 +1146,7 @@
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199941,
+          "hp": 199923,
           "id": 849,
           "inCombat": true,
           "kind": "mob",
@@ -1206,7 +1182,7 @@
           "threat": [
             [
               848,
-              60
+              78
             ]
           ],
           "weapon": {

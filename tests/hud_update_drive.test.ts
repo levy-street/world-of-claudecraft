@@ -248,6 +248,17 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the delve lockpick panel; a per-frame safety net behind a display check and a sig diff',
   },
   {
+    call: 'this.sceneController.update',
+    band: 'frame',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'none',
+      why: 'the scene overlay uses PainterHost write elision, while the choice window cold-renders only when its choice or leader role changes; the countdown is intentionally live',
+    },
+    why: 'the cinematic overlay and Last Bell dialogue-choice window',
+  },
+  {
     call: 'this.tutorial.update',
     band: 'frame',
     gate: '',
@@ -1330,7 +1341,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 39, chrome: 69, none: 14 });
+    ).toEqual({ window: 40, chrome: 69, none: 14 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1345,7 +1356,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       module: 21,
       hud: 5,
       callsite: 9,
-      none: 4,
+      none: 5,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
     // grow quietly: every entry is a window this repo knows has no invalidation guard.
@@ -1357,6 +1368,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       'this.lootRolls.update',
       'this.lootWindow.updateProximity',
       'this.questDialog.updateProximity',
+      'this.sceneController.update',
       'this.updateMapWindow',
     ]);
   });

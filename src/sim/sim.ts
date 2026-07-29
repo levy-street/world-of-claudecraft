@@ -400,7 +400,7 @@ import { advancePendingProjectiles, type PendingProjectile } from './projectile_
 import * as honorMod from './pvp';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
-import { Rng } from './rng';
+import { hash2, Rng } from './rng';
 import type { ScenarioRun } from './scenarios/scenarios';
 import * as scenarioMod from './scenarios/scenarios';
 import type { ActiveChoice } from './scenes/choices';
@@ -1973,6 +1973,24 @@ export class Sim {
     // Mobs from camps
     for (const camp of worldContent.camps) {
       const template = MOBS[camp.mobId];
+      // Expansion rows may retain only their established shared-stream budget:
+      // added spawns still scatter deterministically, but from a private
+      // position-derived stream so content growth cannot re-roll later camps
+      // or immediate post-construction interactions. Creating the stream draws
+      // nothing from the shared rng.
+      const sharedRngCount = camp.sharedRngCount;
+      const privateSpawnRng =
+        sharedRngCount === undefined
+          ? null
+          : new Rng(
+              Math.floor(
+                hash2(
+                  Math.round(camp.center.x * 10),
+                  Math.round(camp.center.z * 10),
+                  this.cfg.seed,
+                ) * 0x1_0000_0000,
+              ),
+            );
       // Aquatic/flagged swimmers may wade in the shallows; everyone else
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
@@ -1995,13 +2013,17 @@ export class Sim {
           this.addEntity(mob);
           continue;
         }
+        const spawnRng =
+          privateSpawnRng !== null && sharedRngCount !== undefined && i >= sharedRngCount
+            ? privateSpawnRng
+            : this.rng;
         // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
         // spiral) instead of independent uniform sampling, which let mobs stack.
         // The two draws below feed campSpawnOffset as jitter and are consumed in the
         // SAME order/count as the old angle/radius rolls, so the global rng stream
         // position is unchanged: only spawn positions move (see camp_scatter.ts).
-        const jitterAngle = this.rng.range(0, Math.PI * 2);
-        const jitterFrac = this.rng.next();
+        const jitterAngle = spawnRng.range(0, Math.PI * 2);
+        const jitterFrac = spawnRng.next();
         const off = campSpawnOffset(i, camp.count, camp.radius, jitterAngle, jitterFrac);
         // Keep camp mobs out of every dungeon door's clear ring so approaching or
         // zoning out of a dungeon never lands the player in a pack's aggro radius.
@@ -2016,11 +2038,11 @@ export class Sim {
         const grounded = this.findSafePos(cleared.x, cleared.z, minHeight);
         const safe = projectOutsideDungeonDoors(grounded.x, grounded.z);
         const pos = this.groundPos(safe.x, safe.z);
-        const level = this.rng.int(template.minLevel, template.maxLevel);
+        const level = spawnRng.int(template.minLevel, template.maxLevel);
         const mob = createMob(this.nextId++, template, level, pos);
-        mob.facing = this.rng.range(-Math.PI, Math.PI);
+        mob.facing = spawnRng.range(-Math.PI, Math.PI);
         mob.prevFacing = mob.facing;
-        mob.wanderTimer = this.rng.range(2, 10);
+        mob.wanderTimer = spawnRng.range(2, 10);
         this.addEntity(mob);
       }
     }

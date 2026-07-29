@@ -298,8 +298,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literal (seed 4242, after every beat above, re-recorded after the
     // Eastbrook camp respacing merged into this branch, which thins the zone-1
     // camp counts and shifts every world-gen draw downstream, so neither
-    // parent's recording holds): the koi bites on session index 29.
-    expect(koiSession).toBe(29);
+    // parent's recording holds): the expanded campaign world's live tick
+    // stream lands the koi on session index 69.
+    expect(koiSession).toBe(69);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -325,20 +326,21 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 122 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 87 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 7,
+        hitAt: 175,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 159,
+        hitAt: 177,
       },
     ];
+    const hitIndices: number[] = [];
     for (const hunt of hunts) {
       const node = GATHER_NODES.find((n) => n.id === hunt.nodeId);
       if (!node) throw new Error(`missing node ${hunt.nodeId}`);
@@ -357,7 +359,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sim.ctx.completeGatherCast(player, meta);
         if (meta.deedStats.visited.has(`gather_event:${hunt.deedId.slice(4)}`)) hitAt = i;
       }
-      expect(hitAt, hunt.deedId).toBe(hunt.hitAt);
+      hitIndices.push(hitAt);
       const renownBefore = meta.renown;
       const evs = sim.tick(); // the visit mark sweeps at the tail
       expect(meta.deedsEarned.has(hunt.deedId)).toBe(true);
@@ -368,6 +370,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       const paid = deedEvents(evs).reduce((sum, ev) => sum + DEEDS[ev.deedId].renown, 0);
       expect(meta.renown).toBe(renownBefore + paid);
     }
+    expect(hitIndices).toEqual(hunts.map((hunt) => hunt.hitAt));
   });
 
   it('beat 15: the perfect specimen jackpot lands through the real corpse harvest', () => {
@@ -394,9 +397,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
     // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch): the rare-or-better
-    // rarity roll that mints the signed specimen lands on attempt index 7.
-    expect(hitAt).toBe(7);
+    // Eastbrook camp respacing and expanded campaign world merged into this
+    // branch): the rare-or-better rarity roll that mints the signed specimen
+    // lands on attempt index 5 after the three live rare-node hunts above.
+    expect(hitAt).toBe(5);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

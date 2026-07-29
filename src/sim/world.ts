@@ -31,8 +31,6 @@ import {
   ZONES,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
-import { harborSurfaceHeight } from './harbor_layout';
-import { LAST_BELL_AREAS } from './last_bell_field';
 import { dungeonFloorLift } from './dungeon_floor';
 import { lastKeepLiftAt } from './dungeon_layout';
 import {
@@ -42,6 +40,8 @@ import {
   emberNearestOnLink,
 } from './ember_lava_layout';
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
+import { harborSurfaceHeight } from './harbor_layout';
+import { LAST_BELL_AREAS } from './last_bell_field';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent, ZoneDef } from './types';

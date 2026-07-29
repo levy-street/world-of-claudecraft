@@ -54,10 +54,10 @@ import {
   LASTKEEP_LAYOUT,
   layoutColliders,
 } from './dungeon_layout';
-import { HARBOR_RAIL_HALF_THICK, HARBOR_RAIL_HEIGHT, harborDressingRadius } from './harbor_layout';
-import { LAST_BELL_AREAS } from './last_bell_field';
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
+import { HARBOR_RAIL_HALF_THICK, HARBOR_RAIL_HEIGHT, harborDressingRadius } from './harbor_layout';
+import { LAST_BELL_AREAS } from './last_bell_field';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,

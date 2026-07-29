@@ -134,6 +134,7 @@ import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
 import {
   LAST_BELL_CAMPAIGN_MOBS,
   LAST_BELL_CAMPAIGN_NPCS,
+  LAST_BELL_CAMPAIGN_QUEST_ORDER,
   LAST_BELL_CAMPAIGN_QUESTS,
 } from './content/last_bell_campaign';
 import { LAST_BELL_SQUAD_MOBS } from './content/last_bell_squad';
@@ -274,8 +275,8 @@ import {
   ZONE3_ZONE,
 } from './content/zone3';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
-import { HARBOR_TERRAIN_EDITS } from './harbor_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
+import { HARBOR_TERRAIN_EDITS } from './harbor_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -466,6 +467,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...LAST_BELL_CAMPAIGN_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
