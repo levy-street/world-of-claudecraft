@@ -46,16 +46,19 @@ import {
 } from './loot/loot_roll';
 import { applyFocusBonus, applyFocusTierBonus, type FocusAllocation } from './professions/focus';
 import {
-  effectiveFocusComponents,
-  HARVEST_COMPONENT_ITEMS,
+  forfeitsEveryMappedYield,
   type HarvestTier,
+  harvestItemForFamily,
   harvestTierQuantity,
   isHarvestableCorpse,
   isSignableMaterialRarity,
+  type MaterialRarity,
   resolveCorpseFocusHarvest,
   resolveCorpseHarvest,
   rollCorpseMaterialRarity,
+  yieldingFocusComponents,
 } from './professions/gathering';
+import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
 import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
@@ -218,9 +221,30 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * player's persistent town focus: the corpse tags holding allocation points
  * (none focused falls through to the spread). An EXPLICIT array keeps the
  * #1142 semantics: empty or covering every tagged component spreads across
- * every tag (the #1141 behavior); picking fewer concentrates the effort for
+ * every tag (the #1141 behavior); extracting fewer concentrates the effort for
  * a higher tier per component, per resolveCorpseFocusHarvest in
- * professions/gathering.ts.
+ * professions/gathering.ts. Extracting, not picking: an unmapped family is
+ * never extracted, so on a corpse carrying one mapped family there is no
+ * choice to make (#2514, see below). That array is sanitized before any of it is read
+ * (effectiveFocusComponents): repeats collapse (#2474) and tags this corpse
+ * does not carry drop out (#2504), so `['hide','hide']` and `['hide','junk']`
+ * are both exactly `['hide']` here and in the pre-claim capacity gate below,
+ * and a pick of nothing but junk is exactly the empty pick (it spreads).
+ * A pick that survives sanitization but names only families with no item
+ * behind them is REFUSED pre-claim instead (#2509, see the gate below), so no
+ * selection can spend a single-use corpse for nothing. A pick that names such
+ * a family BESIDE one that pays is allowed, and the unmapped entry is simply
+ * not extracted (#2514, yieldingFocusComponents): it costs no tier roll, no
+ * rng draw, and no concentration tier, so `['hide','claw']` is byte-identical
+ * to `['hide']`.
+ *
+ * The corpse-level half of that rule is isHarvestableCorpse (#2513): it answers
+ * on the MAPPED families the template carries, so a corpse that could never pay
+ * anything is refused up front (error.corpseNothingToHarvest) instead of
+ * advertising a harvest, taking the command, spending the claim and reporting
+ * nothing. Between the two gates, every command that reaches the roll below
+ * yields at least one item, so no path through this function can spend a
+ * single-use claim in silence.
  */
 export function harvestCorpse(
   ctx: SimContext,
@@ -238,7 +262,7 @@ export function harvestCorpse(
     return;
   }
   const mob = ctx.entities.get(mobId);
-  if (!mob || mob.kind !== 'mob' || !mob.dead) return;
+  if (mob?.kind !== 'mob' || !mob.dead) return;
   const componentTags = MOBS[mob.templateId]?.componentTags;
   if (!isHarvestableCorpse(componentTags)) {
     ctx.error(meta.entityId, 'That corpse has nothing to harvest.');
@@ -269,15 +293,90 @@ export function harvestCorpse(
   // derivation is rng-free, so a refused command below still draws nothing.
   const chosen =
     components ?? (componentTags ?? []).filter((tag) => (meta.townFocus[tag] ?? 0) > 0);
+  // #2509: refuse a pick that forfeits EVERYTHING this corpse had to give,
+  // before the claim is spent. Measured pre-fix on old_greyjaw (hide, fang,
+  // claw) with ['claw']: the claim was spent, one tier roll was drawn, nothing
+  // was granted, and the harvestResult ledger was skipped (it is gated on
+  // `granted.length > 0`), so the player burned a single-use corpse for no
+  // items and NO chat line at all. Nine shipped templates mix mapped and
+  // unmapped families, and on the three `gills, hide` murlocs a single
+  // checkbox is enough to hit it.
+  //
+  // Placed with the capacity gate below, for the same three reasons that one
+  // is here: pre-claim (a refusal must leave the corpse for the next
+  // harvester), rng-free (a refused command must not shift the world's draw
+  // order), and derived from the same sanitized pick the roll is. It fires
+  // exactly when the `wanted` loop below would come out empty (both sides ask
+  // harvestFamilyYieldsItem over effectiveFocusComponents, one as a `.some`
+  // and one as the `.filter` inside yieldingFocusComponents), and
+  // the bags-full gate needs `wanted` non-empty, so neither can mask the
+  // other's message. The predicate itself lives beside effectiveFocusComponents
+  // (professions/gathering.ts) because the picker's view-core mirrors it; one
+  // rule, one place, or the two drift the first time the spread rule moves.
+  //
+  // Deliberately NOT narrowed inside effectiveFocusComponents the way an
+  // uncarried tag is (#2504), and that ordering is still load-bearing after
+  // #2514 moved the bonus: the refusal is a statement about the pick the player
+  // MADE, so it has to be asked before the unmapped families are dropped. Fold
+  // the drop into effectiveFocusComponents instead and ['claw'] sanitizes to
+  // the empty pick, spreads, and burns the corpse in the silence this refusal
+  // exists to end. The drop happens one step later, in
+  // yieldingFocusComponents, which is what the capacity gate below and the tier
+  // rolls read.
+  //
+  // Scope, the other half of the #2504 comment: that one covers a tag the
+  // corpse does not CARRY, which sanitizes away and spreads. This covers a tag
+  // it carries that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills,
+  // horn) on a corpse that ALSO carries a mapped one. A corpse whose tags ALL
+  // map to nothing never reaches this gate at all any more (#2513): the
+  // isHarvestableCorpse check above answers on mapped families, so fen_troll
+  // (claw, tusk) is refused there with error.corpseNothingToHarvest, exactly
+  // like the 101 shipped templates that carry no component tags. That closed
+  // the last path to a claim spent in silence, and it is why this predicate's
+  // second half (`taggedComponents.some(yields)`) is now belt and braces here
+  // rather than the term that kept an all-unmapped corpse claimable.
+  //
+  // This also covers the DERIVED pick, not just an explicit one: an omitted
+  // `components` resolves through meta.townFocus, so a persisted `{ claw: 5 }`
+  // makes the plain interact press take this arm too. Refusing is the better
+  // outcome there as well: the corpse survives for a pick that can pay out,
+  // instead of being burned by a focus the player cannot see. #2511 has since
+  // closed the route that could WRITE such a focus (set_town_focus rejects a
+  // key outside HARVEST_COMPONENT_ITEMS, and the load arm drops one an older
+  // save carries), so this arm is now defense in depth on the derived pick
+  // rather than a reachable path; tests/corpse_harvest_sim.test.ts still
+  // drives it by poking meta directly, which is what a pre-#2511 save was.
+  if (forfeitsEveryMappedYield(componentTags ?? [], chosen)) {
+    ctx.error(meta.entityId, 'Nothing you selected can be harvested from that corpse.');
+    return;
+  }
   const wanted: InvSlot[] = [];
-  for (const component of effectiveFocusComponents(componentTags ?? [], chosen)) {
-    const wantedItemId = HARVEST_COMPONENT_ITEMS[component];
+  // The EXTRACTED set (#2514), which is exactly what resolveCorpseFocusHarvest
+  // will roll. Reserves nothing new: this loop already open-coded the same
+  // filter (`harvestItemForFamily` then `continue`) over the effective pick, so
+  // `wanted` is byte-identical before and after. What changes is that the rule
+  // is now NAMED, and the gate and the roll read the one function instead of
+  // agreeing by coincidence, which is the same argument harvestItemForFamily's
+  // own docstring makes about its readers.
+  for (const component of yieldingFocusComponents(componentTags ?? [], chosen)) {
+    const wantedItemId = harvestItemForFamily(component);
+    // A type narrowing, not a filter: yieldingFocusComponents already dropped
+    // every family this same accessor answers nothing for, so the arm is
+    // unreachable by construction. No fixture can reach it, so what is pinned
+    // is the property instead (tests/corpse_harvest_sim.test.ts, "every family
+    // a harvest extracts has an item behind it", swept over every shipped
+    // tagged template x every pick shape).
     if (!wantedItemId) continue;
     const maxQty = focusedHarvestQuantity('legendary', component, meta.townFocus);
     const existing = wanted.find((w) => w.itemId === wantedItemId);
     if (existing) existing.count += maxQty;
     else wanted.push({ itemId: wantedItemId, count: maxQty });
   }
+  // The third dead-by-construction guard on this path, named beside its two
+  // siblings above so the set is auditable rather than one-of-three documented:
+  // both gates upstream guarantee yieldingFocusComponents is non-empty, so
+  // `wanted` always holds at least one row and the short-circuit's false arm is
+  // unreachable. Dead since #2513, kept for the same reason the others are.
   if (wanted.length > 0 && !fitsAll(meta.inventory, bagCapacity(meta.bags), wanted)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
@@ -293,6 +392,14 @@ export function harvestCorpse(
   // higher-tier corpse families compose with.
   const bestAny = bestOwnedAnyGatherToolTier(meta.inventory, ITEMS);
   let toolDeniedEmitted = false;
+  // #2457: the yield ledger the single harvestResult event below carries. Every
+  // grant in this function passes { silent: true, callerLogs: true } from here
+  // on, so the hub's own per-grant "You receive:" line and generic ding stand
+  // down (the #2430 contract) and this ledger becomes the harvest's ONLY chat
+  // feedback. Recorded beside each grant as it LANDS rather than from the roll
+  // loop, so a full-bag downgrade reports the plain top-up it actually became
+  // and a refused specimen contributes no entry at all.
+  const granted: HarvestYield[] = [];
   // #1145: a rare-or-better monster material is stamped with the harvester's
   // name (a non-fungible instance slot); anything below that rarity stays a
   // plain fungible grant, same as before this issue. One rarity roll per
@@ -312,10 +419,29 @@ export function harvestCorpse(
   // the slot reserved for a LATER family's plain stack and push the uncapped
   // plain grant past capacity). The rarity rolls stay in this first loop, in
   // yield order, so the draw sequence is byte-identical to the single-pass
-  // shape (pinned by the parity goldens); only the grants are reordered.
-  const signedGrants: { itemId: string; specimen: boolean; plainQty: number }[] = [];
+  // shape (pinned by the draw-count cases in tests/corpse_harvest_sim.test.ts
+  // and tests/corpse_harvest_result_event.test.ts, NOT by the parity goldens:
+  // no parity scenario drives harvestCorpse); only the grants are reordered.
+  // `rarity` rides along purely so the deferred grants below can record their
+  // ledger entry with the roll that produced them (#2457): the line color is
+  // the ROLLED material rarity, and by the time a signed grant lands its own
+  // loop iteration is long past.
+  const signedGrants: {
+    itemId: string;
+    specimen: boolean;
+    plainQty: number;
+    rarity: MaterialRarity;
+  }[] = [];
   for (const y of yields) {
-    const itemId = HARVEST_COMPONENT_ITEMS[y.component];
+    const itemId = harvestItemForFamily(y.component);
+    // Unreachable by construction since #2514, for the same reason and under
+    // the same property pin as the capacity gate's twin above:
+    // resolveCorpseFocusHarvest only ever yields families
+    // yieldingFocusComponents kept, and that filter and this lookup are the
+    // SAME accessor. Kept as the type narrowing the `string | undefined`
+    // return needs, and because this `continue` is the exact line that used to
+    // swallow an unmapped family in silence, which is the harm the last three
+    // issues in this trail closed one path at a time.
     if (!itemId) continue;
     // #1143: the player's persistent town focus adds a bonus on top of the
     // #1142 roll for a focused component; an unfocused component's tier is
@@ -326,7 +452,9 @@ export function harvestCorpse(
     const qty = focusedHarvestQuantity(tier, y.component, meta.townFocus);
     const rarity = rollCorpseMaterialRarity(ctx.rng);
     // The rarity roll above MUST stay exactly where it is (one roll per yield,
-    // in yield order: the draw sequence is pinned by the parity goldens). The
+    // in yield order: the draw sequence is pinned by the corpse suites' own
+    // draw-count cases, one per arm, since no parity scenario harvests a
+    // corpse). The
     // premium-arm denial below happens strictly AFTER the roll and
     // draws no rng: a denied family downgrades to the plain fungible grant it
     // gets on a common roll today (a specimen family keeps its plain component
@@ -337,7 +465,8 @@ export function harvestCorpse(
       isSignableMaterialRarity(rarity) &&
       !canHarvestMonsterMaterial(bestAny, monsterMaterialTierFor(y.component))
     ) {
-      ctx.addItem(itemId, qty, meta.entityId);
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
       if (!toolDeniedEmitted) {
         toolDeniedEmitted = true;
         ctx.emit({
@@ -353,35 +482,102 @@ export function harvestCorpse(
       ? HARVEST_COMPONENT_SPECIMENS[y.component]
       : undefined;
     if (specimenId !== undefined) {
-      ctx.addItem(itemId, qty, meta.entityId);
-      signedGrants.push({ itemId: specimenId, specimen: true, plainQty: 0 });
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
+      signedGrants.push({ itemId: specimenId, specimen: true, plainQty: 0, rarity });
     } else if (isSignableMaterialRarity(rarity)) {
-      signedGrants.push({ itemId, specimen: false, plainQty: qty });
+      signedGrants.push({ itemId, specimen: false, plainQty: qty, rarity });
     } else {
-      ctx.addItem(itemId, qty, meta.entityId);
+      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
     }
   }
   // Signed-family components first: their plain FALLBACK still owns
   // pre-gate-reserved stack room, so they outrank the specimens, which are
   // pure extras. A signed instance merges into a byte-equal same-signer stack
   // (identical-payload stacking; never a plain stack, #1165), so
-  // this gate accepts same-signer stack room OR a genuinely free slot
+  // this gate accepts same-signer stack room plus genuinely free slots
   // (canGrantItemInstance, the countFit model harvestNode's signed grants
-  // share, #2139); with neither the signed-family grant falls back to the
+  // share, #2139), measured against the FULL grant: one unit for a specimen,
+  // the whole rolled quantity for a signed component (#2473). Without room for
+  // all of it the signed-family grant falls back to the
   // plain fungible top-up (the signature truncates, the yield does not) while
   // a specimen truncates outright, the same truncation contract harvestNode's
   // signed grants follow. Each downgrade tells the player via the text-free
   // personal gatherDowngrade event, at most ONCE per harvest command (the
   // toolDeniedEmitted idiom); the mark-lost arm runs first, so when both a
   // signature and a jackpot are lost the single event reports the mark.
+  // All-or-nothing is a deliberate divergence from harvestNode, whose signed
+  // batch lands a PARTIAL fit and lets the rest of the yield go: a corpse
+  // downgrade is an UNCAPPED plain grant of the whole rolled quantity into
+  // pre-gate-reserved room, so refusing the signature here costs the player no
+  // units and keeps the harvest at one ledger entry (one chat line) per item.
+  //
+  // #2473, the one behavior this quantity fix trades away, deliberately: with
+  // PARTIAL same-signer merge room the counted grant spills into a fresh slot
+  // where the one-unit grant it replaces merged for free, so on a corpse that
+  // also procs a specimen (forest_wolf tags hide AND fang) the last free slot
+  // can go to the component instead of the jackpot, which then truncates with
+  // its lost: 'find' notice. The component wins that slot for one reason only,
+  // stated plainly because it is easy to get wrong: this loop runs FIRST. It is
+  // NOT holding a claim on the slot. The pre-gate reserves room for a PLAIN add
+  // (every `wanted` entry carries no instance) and a signed instance can never
+  // spend plain-stack room (#1165), so the free slot taken here is unreserved
+  // room, the same unreserved room the specimen wanted.
+  // Refusing the signature whenever a jackpot is pending was measured across
+  // corpse templates, bag shapes, seeds and focus picks: it saves the specimen
+  // in every case that truncates and costs no yield, but it refuses tens of
+  // signatures for each specimen saved, because most bags have plain-stack room
+  // the fallback would have used anyway. Paying that much for a rare extra is
+  // the worse trade, so the simple rule stands. BOTH states are pinned in
+  // tests/corpse_harvest_sim.test.ts: the one where holding back would change
+  // nothing, and the one where it would have saved the jackpot. The real cure
+  // is a specimen reservation in the pre-gate, wider than this issue.
   let downgradeEmitted = false;
   for (const grant of signedGrants) {
     if (grant.specimen) continue;
     const payload = { signer: meta.name };
-    if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
-      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
+    if (
+      canGrantItemInstance(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        grant.itemId,
+        payload,
+        grant.plainQty,
+      )
+    ) {
+      // The whole rolled quantity, stamped (#2473): on a specimen-less family
+      // the component ITSELF is the signed grant, so the signature and the
+      // yield ride one call and a hardcoded count of 1 dropped the rest of the
+      // roll on the floor, leaving the premium arm smaller than the plain
+      // fallback right below it. The guard counts the WHOLE quantity for the
+      // same reason (#2139): a same-signer stack with room for one of three
+      // units must refuse rather than let the other two push a fresh slot past
+      // capacity. Mergeable signer payloads stack, so the whole roll costs at
+      // most ONE slot; that is one more than the single-unit grant it replaces
+      // spent whenever partial merge room let that one unit land for free,
+      // which is what the jackpot hold-back above accounts for.
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId, grant.plainQty, {
+        silent: true,
+        callerLogs: true,
+      });
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: grant.plainQty,
+        rarity: grant.rarity,
+        kind: 'signed',
+      });
     } else {
-      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId);
+      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId, { silent: true, callerLogs: true });
+      // Recorded 'plain', not 'signed': the ledger reports what LANDED, and
+      // this arm landed an unsigned top-up. The gatherDowngrade toast below
+      // still tells the player the mark was the thing that got away.
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: grant.plainQty,
+        rarity: grant.rarity,
+        kind: 'plain',
+      });
       if (!downgradeEmitted) {
         downgradeEmitted = true;
         ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'mark' });
@@ -392,17 +588,56 @@ export function harvestCorpse(
     if (!grant.specimen) continue;
     const payload = { signer: meta.name };
     if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
-      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
+      // Exactly one unit, deliberately: the specimen is a jackpot, not a
+      // quantity, so it never carries the component's rolled count the way the
+      // signed grant above does. The guard's count defaults to that same 1.
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId, 1, {
+        silent: true,
+        callerLogs: true,
+      });
+      recordHarvestYield(granted, {
+        itemId: grant.itemId,
+        qty: 1,
+        rarity: grant.rarity,
+        kind: 'specimen',
+      });
       // The perfect-specimen find mark (col_perfect_specimen), on
       // the LANDED jackpot only (a truncated find got away, like a fish with
       // no bag room). Every rarity draw happened in the roll loop above, so
       // this mark write cannot perturb the pinned draw sequence.
       ctx.markVisited(meta, 'gather_event:perfect_specimen');
     } else if (!downgradeEmitted) {
+      // A truncated specimen contributes NO ledger entry: nothing landed, so
+      // no line claims it did. The 'find' toast is the whole feedback.
       downgradeEmitted = true;
       ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'find' });
     }
   }
+  // #2457: one result event for the whole command, after every grant has
+  // landed, so the client prints one line per distinct granted item and plays
+  // exactly one cue instead of the per-grant burst the hub used to produce.
+  // The guard is the gatherResult "granted path only" rule, so the client is
+  // never asked to render a cue for a no-op. Its FALSE arm is unreachable BY
+  // CONSTRUCTION as of #2513, not merely absent from shipped content, and it is
+  // deliberately kept as dead defensive code. The proof, because "unreachable"
+  // is a claim worth being able to check: the corpse-level gate above
+  // guarantees at least one tag maps to an item; the #2509 gate then guarantees
+  // at least one member of the EFFECTIVE pick does, so yieldingFocusComponents
+  // (that same set, filtered by that same accessor) is non-empty; the `wanted`
+  // loop and the roll loop both iterate it, so at least one iteration
+  // clears `if (!itemId) continue`; `harvestTierQuantity` is `indexOf + 1 >= 1`
+  // and applyFocusBonus never lowers it, so that iteration's qty is >= 1; and
+  // every arm of the loop plus both signedGrants loops call recordHarvestYield,
+  // which pushes or merge-sums and never drops. So a spent claim always leaves
+  // `granted` non-empty. That direction is what is pinned, as a property over
+  // every subset of every tagged template (tests/corpse_harvest_sim.test.ts
+  // "every command that spends the claim reports at least one yield"), which is
+  // the live pin for the src/sim/types.ts harvestResult "yields is never empty"
+  // contract now that fen_troll no longer exercises the other arm. The guard
+  // stays so a future third way of landing nothing stays quiet instead of
+  // cueing an empty ledger. Draws no rng and reads no world state, so it cannot
+  // perturb the pinned draw sequence or the grant order.
+  if (granted.length > 0) ctx.emit({ type: 'harvestResult', pid: meta.entityId, yields: granted });
   // Lifecycle decoupling, the harvested half: with the claim spent
   // the corpse owes nobody a harvest window anymore, so exhausted loot
   // collapses it on the prune's fast arm while remaining loot keeps only a

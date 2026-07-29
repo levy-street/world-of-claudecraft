@@ -9,25 +9,175 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "es_ES": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "fr_FR": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "fr_CA": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "de_DE": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "zh_CN": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "zh_TW": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "ko_KR": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "ja_JP": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "pt_BR": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "ru_RU": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "cs_CZ": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "nl_NL": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "pl_PL": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "id_ID": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "tr_TR": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "sv_SE": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "vi_VN": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ],
+  "da_DK": [
+    "fiesta.augment.cardAria",
+    "hudChrome.meters.breakdownOther",
+    "hudChrome.meters.breakdownRow",
+    "hudChrome.meters.breakdownSummary",
+    "hudChrome.meters.melee",
+    "hudChrome.meters.percent",
+    "hudChrome.meters.petAbility"
+  ]
 };

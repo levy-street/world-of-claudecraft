@@ -18,8 +18,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Enchantement Arme - Concentration runique',
   'hudChrome.professions.ctaRaiseSpecialized':
     "Continuez à augmenter {craft} : encore {points} points jusqu'à Spécialisé, et les coûts en matériaux baissent.",
-  'guide.professions.harvestBody':
-    "La récolte ne s'arrête pas aux noeuds. De nombreuses bêtes abattues peuvent être dépecées une fois chacune, premier arrivé premier servi, pour des peaux, crocs, soie et viande, directement sur le cadavre en plus de son butin ordinaire ; une seule touche ouvre les deux. Le choix vous appartient à chaque fois : dépouiller tout ce que le cadavre offre, ou vous concentrer sur moins de composants et obtenir une qualité sensiblement meilleure de ce que vous prenez.\n\nUn jet de récolte rare ou mieux sur un cadavre d'une famille portant des spécimens accorde également un spécimen parfait signé (une Peau immaculée, une Soie immaculée, une Glande à venin vierge, ou une Pièce de choix) en plus du rendement ordinaire, et consigne Un spécimen parfait dans votre Livre des hauts faits. N'importe quel personnage peut récolter, sans formation requise, et tout outil de récolte que vous possédez compte pour le bonus de prime, quel que soit le métier auquel il appartient.",
+  'guide.professions.harvestBodyChoice':
+    "La récolte ne s'arrête pas aux noeuds. De nombreuses bêtes abattues peuvent être dépecées une fois chacune, premier arrivé premier servi, pour des peaux, crocs, soie et viande, directement sur le cadavre en plus de son butin ordinaire ; une seule touche ouvre les deux. Lorsqu'une bête porte plus d'un composant exploitable, le choix vous appartient : prendre tout ce qu'elle peut donner, ou vous concentrer sur moins de composants et obtenir une qualité sensiblement meilleure de ce que vous prenez.\n\nUn jet de récolte rare ou mieux sur un cadavre d'une famille portant des spécimens accorde également un spécimen parfait signé (une Peau immaculée, une Soie immaculée, une Glande à venin vierge, ou une Pièce de choix) en plus du rendement ordinaire, et consigne Un spécimen parfait dans votre Livre des hauts faits. N'importe quel personnage peut récolter, sans formation requise, et tout outil de récolte que vous possédez compte pour le bonus de prime, quel que soit le métier auquel il appartient.",
   'guide.professions.craftMasteryTitle': 'Combien de temps dure la maîtrise',
   'guide.professions.craftMasteryBody':
     "Quelques attentes honnêtes : la montée jusqu'au plafond de 125 d'un métier demande au moins 125 fabrications réussies, chaque fabrication à gain complet vous faisant progresser d'exactement un point, et en pratique un peu plus au fur et à mesure que les recettes s'estompent entre les échelons du formateur. La fabrication elle-même est rapide ; c'est l'approvisionnement qui constitue le vrai voyage, alors prévoyez quelques soirées dédiées à la récolte et à l'artisanat par métier.\n\nLes métiers de récolte atteignent leur plafond de 100 au fil d'une progression normale si vous récoltez en voyageant, bien que le dernier tronçon réclame les noeuds de haut palier du grand nord. La Pêche est la longue route par conception : selon son propre barème de gain, 200 points de maîtrise représentent plus de trois mille prises. Grand Pêcheur est un titre qui se gagne au fil d'une saison de soirées tranquilles, pas d'un week-end.",
@@ -1259,7 +1259,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Carte',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20 % de réduction',
+  'hudChrome.claudium.railWocDiscount': '{percent} % de réduction',
   'hudChrome.claudium.railWocUnavailable': 'Les prix en WOC sont indisponibles pour le moment.',
   'hudChrome.claudium.showAmounts': 'Afficher tous les montants de Claudium',
   'hudChrome.claudium.skuRow': '{claudium} Claudium pour {usd}',
@@ -4222,6 +4222,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterTypeAll': 'Tous les types',
   'itemUi.market.filterTypeWeapon': 'Armes',
   'itemUi.market.filterTypeArmor': 'Armure',
+  'itemUi.market.filterTypeBag': 'Sacs',
   'itemUi.market.filterTypeConsumable': 'Consommables',
   'itemUi.market.filterTypeMaterial': 'Matériaux',
   'itemUi.market.filterTypeCosmetic': 'Cosmétiques',
@@ -4230,6 +4231,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterArmorAll': "Toute l'armure",
   'itemUi.market.filterWeaponType': "Type d'arme",
   'itemUi.market.filterWeaponAll': 'Toutes les armes',
+  'itemUi.market.filterBagSize': 'Taille de sac',
+  'itemUi.market.filterBagAll': 'Tous les sacs',
   'itemUi.market.filterRarity': 'Rareté',
   'itemUi.market.filterRarityAll': 'Toutes les raretés',
   'itemUi.market.weaponSword': 'Épées',
@@ -6104,7 +6107,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Ce cadavre a déjà été dépecé.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
   'hudChrome.corpseHarvest.componentAria': 'Prélever {component}',
+  'hudChrome.corpseHarvest.componentNoYield': "rien pour l'instant",
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Prélever {component} : {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Moins un dépeçage prélève de composants, plus le palier de chacun est élevé.',
   'hudChrome.corpseHarvest.components.claw': 'Griffe',
   'hudChrome.corpseHarvest.components.fang': 'Croc',
   'hudChrome.corpseHarvest.components.gills': 'Branchies',
@@ -6113,8 +6122,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Soie',
   'hudChrome.corpseHarvest.components.tusk': 'Défense',
   'hudChrome.corpseHarvest.components.venomSac': 'Sac à venin',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Moins vous choisissez de composants, plus la qualité de chacun est élevée.',
   'hudChrome.corpseHarvest.harvestButton': 'Dépecer',
   'hudChrome.corpseHarvest.harvestTooltip':
     "Récupère les composants cochés. Chaque cadavre ne peut être dépecé qu'une fois, premier arrivé. Ne prend pas le butin.",
@@ -9306,6 +9313,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Accepter le Glas du Veilleur ?',
   'hudChrome.gathering.gatherLine': 'Vous rassemblez : {name}.',
   'hudChrome.gathering.gatherLineQty': 'Vous rassemblez : {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Vous dépècez : {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Vous dépècez : {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Vous récupérez aussi {name}.',
   'hudChrome.mobile.professions': 'Métiers',
   'hudChrome.options.showThirdActionBar': "Afficher la troisième barre d'action",
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer vérifié',
@@ -9479,13 +9489,15 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Enchantements Supérieurs',
   'hudChrome.enchanting.tier.runed': 'Enchantements Runiques',
   'hudChrome.enchanting.wornTag': 'Équipé ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Équipé ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Matériaux attendus :',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} à {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Enchanté',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Enchanté)',
-  'hudChrome.marketIndicator.aria': 'Collecte du Marché mondial en attente',
-  'hudChrome.marketIndicator.tip': "De l'or ou des objets vous attendent chez le Marchand.",
+  'hudChrome.marketIndicator.aria': 'Produit ou objets du Marché mondial en attente',
+  'hudChrome.marketIndicator.tip':
+    'Le produit de vos ventes ou des objets retournés vous attendent chez le Marchand.',
   'hudChrome.materialHint.arcaneDust':
     "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
   'hudChrome.materialHint.arcaneEssence':
@@ -9523,4 +9535,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Remplace {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Cet objet a déjà cet enchantement.',
   'hudChrome.enchanting.sameEnchantTag': 'Déjà appliqué',
+  'hudChrome.crafting.craftedToastQty': 'Fabriqué : {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Vous désenchantez {item} en {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Vous désenchantez {item} en {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Vous récupérez aussi {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Vous récupérez aussi {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Vous récupérez {item} en {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Vous récupérez {item} en {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Non enchanté',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conservé : {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marque du fabricant',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': "Bonus d'ouvrage de maître",
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Lien de commande',
 };

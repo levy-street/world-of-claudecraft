@@ -1354,8 +1354,16 @@ export const guideStrings = {
     // Corpse component harvesting: open to every character, no profession gate.
     // (Rendered on the gathering detail pages.)
     harvestTitle: 'Harvesting the hunt itself',
-    harvestBody:
-      'Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, silk, and meat, straight from the corpse alongside its ordinary loot; one press opens both. The choice is yours each time, too: strip everything the corpse offers, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.',
+    // #2514 reword, as a NEW key: the retired harvestBody promised "The choice
+    // is yours each time" and set "strip everything the corpse offers" against
+    // "concentrate on fewer components". After #2514 a component with nothing
+    // behind it yet is simply not taken, so on a beast carrying only one
+    // workable component there is no choice to make, and on the rest the two
+    // options are counted over what a harvest TAKES rather than what is ticked.
+    // An in-place edit would have left every locale's reviewed fill answering
+    // the old promise (the hudChrome.corpseHarvest.harvestTooltip precedent).
+    harvestBodyChoice:
+      'Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, silk, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.',
     focusTitle: 'Town Focus',
     focusBody:
       'Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and spread a budget of 10 focus points across the component types you care about. Every 5 points on a component raises its harvest grade one step (two steps at most), and each point adds 10 percent to its yield; unfocused components are never made worse. Your allocation follows your character everywhere and can be reworked, free, on any later visit to town.',

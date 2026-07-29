@@ -666,7 +666,7 @@ export const ko_KR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% 할인",
+      "railWocDiscount": "{percent}% 할인",
       "railWocUnavailable": "현재 WOC 가격을 이용할 수 없습니다.",
       "railNativeUnavailable": "SOL/WOC 사용 불가",
       "amountLabel": "수량",
@@ -872,7 +872,13 @@ export const ko_KR: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}분 {s}초",
       "seconds": "{s}초",
-      "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다."
+      "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "기타 ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "근접 공격"
     },
     "petFeed": {
       "disabledFullHp": "펫의 체력이 가득 찼습니다",
@@ -1463,9 +1469,12 @@ export const ko_KR: EnTranslations = {
       "title": "채집",
       "harvestButton": "채집",
       "harvestTooltip": "선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.",
-      "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
+      "yieldTierHint": "채집에서 실제로 얻는 부위가 적을수록 각 부위의 등급이 더 높아집니다.",
+      "nothingSelectedYields": "선택한 부위는 이 시체에서 채집할 수 없습니다.",
       "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
       "componentAria": "{component} 채집",
+      "componentNoYield": "아직 없음",
+      "componentAriaNoYield": "{component} 채집: {note}",
       "components": {
         "hide": "가죽",
         "fang": "송곳니",
@@ -2023,8 +2032,8 @@ export const ko_KR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "세계 시장 수령 대기",
-      "tip": "골드나 아이템이 상인에게서 수령을 기다리고 있습니다."
+      "aria": "세계 시장 판매 대금이나 아이템 수령 대기",
+      "tip": "판매 대금이나 반송된 아이템이 상인에게서 수령을 기다리고 있습니다."
     },
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다."
@@ -2168,6 +2177,9 @@ export const ko_KR: EnTranslations = {
       "notReady": "이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.",
       "gatherLine": "{name}을(를) 채집했습니다.",
       "gatherLineQty": "{name}을(를) {qty}개 채집했습니다.",
+      "harvestLine": "{name}을(를) 채취했습니다.",
+      "harvestLineQty": "{name}을(를) {qty}개 채취했습니다.",
+      "harvestSpecimenLine": "추가로 {name}을(를) 얻었습니다.",
       "catchLine": "{name}을(를) 낚아 올렸습니다",
       "biteLine": "무언가 미끼를 물었습니다!",
       "gotAwayLine": "놓쳐 버렸습니다.",
@@ -2349,6 +2361,7 @@ export const ko_KR: EnTranslations = {
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
+      "craftedToastQty": "제작 완료:{name} x{qty}",
       "insufficientMaterials": "재료가 부족합니다.",
       "unknownRecipe": "해당 제작법이 존재하지 않습니다.",
       "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.",
@@ -2441,7 +2454,13 @@ export const ko_KR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "{item}의 마력을 추출했습니다.",
+      "disenchantedYield": "{item}의 마력을 추출하여 {material}(으)로 만들었습니다.",
+      "disenchantedYieldQty": "{item}의 마력을 추출하여 {material} {qty}개로 만들었습니다.",
+      "disenchantedAlso": "추가로 {material}을(를) 얻었습니다.",
+      "disenchantedAlsoQty": "추가로 {material}을(를) {qty}개 얻었습니다.",
       "salvagedLine": "{item}을(를) 분해했습니다.",
+      "salvagedYield": "{item}을(를) 분해하여 {material}(으)로 만들었습니다.",
+      "salvagedYieldQty": "{item}을(를) 분해하여 {material} {qty}개로 만들었습니다.",
       "enchantAppliedLine": "{item}에 {enchant}을(를) 부여했습니다.",
       "notHeld": "해당 아이템을 가지고 있지 않습니다.",
       "notDisenchantable": "해당 아이템은 마력을 추출할 수 없습니다.",
@@ -2466,6 +2485,7 @@ export const ko_KR: EnTranslations = {
       "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
       "noTargets": "마법부여할 수 있는 아이템이 없습니다.",
       "wornTag": "착용 중 ({slot})",
+      "wornTagIndexed": "착용 중 ({slot} {index})",
       "tier": {
         "base": "기본 마법부여",
         "runed": "룬 마법부여",
@@ -2478,9 +2498,14 @@ export const ko_KR: EnTranslations = {
       "sameEnchant": "해당 아이템에는 이미 같은 마법부여가 되어 있습니다.",
       "replaceTag": "{enchant} 대체",
       "sameEnchantTag": "이미 적용됨",
+      "plainTag": "마법부여 없음",
       "replaceConfirmTitle": "{item}의 마법부여를 대체하시겠습니까?",
       "replaceConfirmBody": "{item}의 {old}을(를) {new}(으)로 대체합니다.",
       "replaceConfirmNoRefund": "기존 마법부여는 파괴되며 재료는 환불되지 않습니다. 되돌릴 수 없습니다.",
+      "replaceConfirmKeeps": "유지: {kept}",
+      "replaceConfirmKeepsSigner": "제작자 각인",
+      "replaceConfirmKeepsMasterwork": "걸작 보너스",
+      "replaceConfirmKeepsBond": "주문 제작품 귀속",
       "replaceConfirmCost": "비용: {cost}",
       "replaceConfirmCostItem": "{name} {count}개",
       "replaceConfirmAccept": "대체"
@@ -3726,7 +3751,7 @@ export const ko_KR: EnTranslations = {
     "professions": {
       "intro": "전투와 퀘스트를 넘어, 이 세계는 땅을 일구고 대장간에서 일하는 여러분에게도 보상을 준다. 원재료를 채집하고, 열 가지 제작 전문직에 걸쳐 이를 장비와 물품으로 바꾸며, 그 전문직들이 상징하는 열 가지 원형 중 하나로서 정체성을 다지는 것이다.",
       "harvestTitle": "사냥감 그 자체를 채집하기",
-      "harvestBody": "채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 일부는 시체에서 곧바로 부위를 채집할 수 있어, 가죽과 송곳니, 비단실, 그리고 더 낯선 것들이 평범한 전리품과 나란히 나온다. 처치 하나에 채집자는 한 명뿐이다: 먼저 채집한 사람이 전부 가져간다. 그리고 선택은 매번 당신 몫이다: 시체가 내주는 것을 전부 벗겨 내거나, 한 가지 부위에 집중해 더 좋은 등급으로 얻거나. 채집에는 전문직도 훈련도 필요 없어 어떤 캐릭터든 할 수 있으며, 유난히 좋은 부위에는 채집한 사람의 이름까지 새겨진다.",
+      "harvestBodyChoice": "채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 상당수는 시체에서 곧바로 한 번씩 채집할 수 있어, 가죽과 송곳니, 비단실, 고기가 평범한 전리품과 나란히 나온다. 시체 하나에 채집자는 선착순 한 명뿐이며, 한 번 누르면 전리품과 채집이 함께 열린다. 짐승이 쓸 만한 부위를 둘 이상 지녔다면 선택은 당신 몫이다. 그 시체가 내줄 수 있는 것을 전부 가져가거나, 더 적은 부위에 집중해 실제로 얻는 것을 눈에 띄게 더 좋은 등급으로 가져가거나.\n\n표본이 나오는 계열에서 희귀 이상 판정이 뜨면 평범한 산출물 위에 서명된 완벽한 표본(Pristine Hide, Pristine Silk, Pristine Venom Gland, Prime Cut)이 하나 더 주어지고, 업적의 서에 A Perfect Specimen이 기록된다. 채집에는 훈련이 필요 없어 어떤 캐릭터든 할 수 있으며, 가지고 있는 채집 도구는 어느 전문직의 것이든 최상급 재료 판정에 반영된다.",
       "focusTitle": "마을 집중",
       "focusBody": "모든 거점 마을은 찾아오는 채집자를 위해 마을 집중 게시판을 갖추고 있다. 마을에 선 채 미니맵 옆에서 이를 열고, 관심 있는 부위 종류에 약간의 집중 포인트를 겨누라. 집중한 부위는 이후의 모든 시체에서 한 등급 더 좋게, 조금 더 넉넉하게 나온다. 배분은 캐릭터가 어디를 떠돌든 따라다니며, 이후 마을에 들를 때마다 무료로 다시 짤 수 있다.",
       "craftHowTitle": "제작 창",
@@ -5500,6 +5525,7 @@ export const ko_KR: EnTranslations = {
     },
     "augment": {
       "choose": "증강 선택",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "잔혹함",
         "desc": "당신의 물리 공격이 15% 더 강하게 적중합니다."
@@ -6714,6 +6740,7 @@ export const ko_KR: EnTranslations = {
       "filterTypeAll": "모든 유형",
       "filterTypeWeapon": "무기",
       "filterTypeArmor": "방어구",
+      "filterTypeBag": "가방",
       "filterTypeConsumable": "소모품",
       "filterTypeMaterial": "재료",
       "filterTypeCosmetic": "외형",
@@ -6727,6 +6754,8 @@ export const ko_KR: EnTranslations = {
       "armorMail": "사슬 방어구",
       "filterWeaponType": "무기 유형",
       "filterWeaponAll": "모든 무기",
+      "filterBagSize": "가방 크기",
+      "filterBagAll": "모든 가방",
       "filterPrimaryStat": "주 능력치",
       "filterPrimaryStatAll": "모든 주 능력치",
       "filterRarity": "희귀도",

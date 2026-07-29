@@ -15,6 +15,7 @@ import {
   rollLoot,
   submitLootRoll,
 } from '../src/sim/loot/loot_roll';
+import { isHarvestableCorpse } from '../src/sim/professions/gathering';
 import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -125,6 +126,44 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
       // vacuously against a 0-item corpse.
       expect(ids.length).toBeGreaterThan(0);
       expect(new Set(ids).size).toBe(ids.length);
+    }
+  });
+});
+
+describe('loot_roll: rollLoot sets lootable for a harvestable corpse with empty loot', () => {
+  // Regression test: a mob template whose loot table is entirely chance-based
+  // (no guaranteed copper/item) but carries componentTags mapping to a real
+  // harvest item must still end up lootable=true after rollLoot, so
+  // corpseInteractionAvailability offers the harvest interaction. Before the
+  // fix, rollLoot only set mob.lootable inside `if (copper > 0 || items.length
+  // > 0)`, leaving it false (the baseEntity default) whenever every chance
+  // roll failed, even though isHarvestableCorpse(componentTags) is true.
+  const TEMPLATE_ID = 'test_harvest_only_empty_loot';
+
+  it('sets mob.lootable = true even when every chance-based loot entry fails to roll', () => {
+    (MOBS as Record<string, (typeof MOBS)['forest_wolf']>)[TEMPLATE_ID] = {
+      ...MOBS.forest_wolf,
+      id: TEMPLATE_ID,
+      // No guaranteed { copper, chance: 1 } entry: every entry is chance-based.
+      loot: [{ itemId: 'wolf_fang', chance: 0.45 }],
+      componentTags: ['hide'],
+    };
+    try {
+      const sim = makeSim(1);
+      const pid = sim.addPlayer('warrior', 'Looter');
+      const meta = playerMeta(sim, pid);
+      const template = MOBS[TEMPLATE_ID];
+      expect(isHarvestableCorpse(template.componentTags)).toBe(true);
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      // Force every chance-based roll to fail, so the regular loot table
+      // produces zero copper and zero items.
+      const chanceSpy = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+      rollLoot(sim.ctx, mob, meta);
+      chanceSpy.mockRestore();
+      expect(mob.loot).toBeNull();
+      expect(mob.lootable).toBe(true);
+    } finally {
+      delete (MOBS as Record<string, unknown>)[TEMPLATE_ID];
     }
   });
 });
@@ -580,6 +619,43 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     expect(mob.loot).toBeNull();
     expect(mob.lootable).toBe(false);
     expect(mob.corpseTimer).toBe(4);
+  });
+
+  it('pruneCorpseLoot collapses an emptied corpse whose every family is unmapped (#2513)', () => {
+    // The fourth arm, and the reason the harvest half is isHarvestableCorpse
+    // here and not a tag COUNT. fen_troll carries claw and tusk, neither
+    // mapped, so the command boundary refuses a harvest and the claim can never
+    // be spent. Counting tags held the 30s grace window open forever waiting on
+    // it, which is worse than the pre-#2513 world where a player could at least
+    // burn the claim to collapse the corpse.
+    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
+    expect(isHarvestableCorpse(MOBS.fen_troll.componentTags)).toBe(false);
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.fen_troll, 12, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    // The claim is UNSPENT, which is the state the grace arm used to key on:
+    // the arm is chosen by the corpse's families, not by the claim.
+    expect(mob.harvestClaimedBy).toBeNull();
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(false);
+    expect(mob.corpseTimer).toBe(4);
+    // The discriminator, identical rig and identical unspent claim: a corpse
+    // with a MAPPED family still takes the grace arm, so this is the predicate
+    // narrowing and not the grace arm being deleted.
+    const wolf = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    wolf.dead = true;
+    wolf.lootable = true;
+    wolf.corpseTimer = 60;
+    wolf.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(wolf.id, wolf);
+    pruneCorpseLoot(sim.ctx, wolf);
+    expect(wolf.lootable).toBe(true);
+    expect(wolf.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
   });
 
   it('partyLootCandidatesForMob prefers the death-time recipient snapshot', () => {

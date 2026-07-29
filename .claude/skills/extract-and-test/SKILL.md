@@ -67,7 +67,11 @@ Do not invent a new architecture. Pick the seam that matches the work:
   `src/ui/hud/<domain>/` directory and exports through that domain's `index.ts`
   (domain modules never import the `Hud` class; they receive narrow dependency
   bags; see `src/ui/hud/CLAUDE.md`); a standalone component stays a flat
-  `src/ui/` sibling. Reuse a painter FAMILY before writing a bespoke one (a
+  `src/ui/` sibling. A `src/ui` module that can be NEITHER (it must touch the DOM,
+  and it is not a painter) is a painter-side helper and a LAST RESORT: register it
+  in `UI_PAINTER_HELPERS` for the hard contract, or in `UI_DOM_MODULES` if it owns
+  browser state, since the classification sweep in the same test file fails on an
+  unregistered module that reaches a host. Reuse a painter FAMILY before writing a bespoke one (a
   unit-style frame is a `UnitFramePainter`; an extra action bar is a new
   `ActionBarPainter(descriptor)`). Full recipe: `src/ui/CLAUDE.md` and
   `src/ui/hud/CLAUDE.md`.
@@ -137,7 +141,9 @@ After an extraction or fix, these stay green (run the subset your change touches
 - `npx vitest run tests/<affected>.test.ts` (or `npm test` for broad changes)
 - `npx vitest run tests/architecture.test.ts` if you touched `src/sim/`, or added / renamed a
   `src/ui` or `src/render` `*_view` / `*_core` pure core (the completeness sweep also checks
-  `UI_PURE_CORES` / `RENDER_PURE_CORES` registration)
+  `UI_PURE_CORES` / `RENDER_PURE_CORES` registration), or added ANY `src/ui` module (the
+  classification sweep requires a browser-touching one to register in `UI_PAINTER_HELPERS` or
+  `UI_DOM_MODULES`, and anything unregistered to touch no browser global)
 - `npx vitest run tests/localization_fixes.test.ts` if any player-visible text or a
   `src/sim`/`server` emit changed (the S3 i18n guard)
 - `npm run ci:changed` (Biome on the files you changed; this is what the `.githooks/pre-push`

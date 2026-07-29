@@ -99,6 +99,11 @@ export interface MapsDb {
   ): Promise<MapRecord | null>;
   /** accountId null = unscoped (admin) update. */
   setStatus(id: number, accountId: number | null, status: MapStatus): Promise<boolean>;
+  /**
+   * Moderation: force any map back to private and record a
+   * content_moderation_actions audit row, atomically (see content_moderation_db.ts).
+   */
+  adminUnpublish(id: number, audit: { adminAccountId: number; reason: string }): Promise<boolean>;
   deleteMap(id: number, accountId: number): Promise<boolean>;
 }
 
@@ -264,9 +269,12 @@ export class MapsService {
     return this.db.setStatus(mapId, accountId, published ? 'public' : 'private');
   }
 
-  /** Moderation: force any map back to private regardless of owner. */
-  adminUnpublish(mapId: number): Promise<boolean> {
-    return this.db.setStatus(mapId, null, 'private');
+  /** Moderation: force any map back to private regardless of owner, audited. */
+  adminUnpublish(
+    mapId: number,
+    audit: { adminAccountId: number; reason: string },
+  ): Promise<boolean> {
+    return this.db.adminUnpublish(mapId, audit);
   }
 
   deleteMap(accountId: number, mapId: number): Promise<boolean> {

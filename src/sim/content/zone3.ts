@@ -3721,6 +3721,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
     [28, 847],
   ],
   mudHuts: [],
+  marshReeds: [],
   ruinRings: [
     { x: -40, z: 830, ringR: 7, columns: 6 }, // Revenant Fields battlefield
     { x: 141, z: 712, ringR: 7, columns: 6 }, // Malric grave ruins

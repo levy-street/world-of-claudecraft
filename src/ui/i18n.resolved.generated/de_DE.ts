@@ -666,7 +666,7 @@ export const de_DE: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% Rabatt",
+      "railWocDiscount": "{percent}% Rabatt",
       "railWocUnavailable": "WOC-Preise sind derzeit nicht verfügbar.",
       "railNativeUnavailable": "SOL/WOC deaktiviert.",
       "amountLabel": "Menge",
@@ -872,7 +872,13 @@ export const de_DE: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} Min. {s} Sek.",
       "seconds": "{s} Sek.",
-      "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende."
+      "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Begleiter hat volle Gesundheit",
@@ -1463,9 +1469,12 @@ export const de_DE: EnTranslations = {
       "title": "Verwerten",
       "harvestButton": "Verwerten",
       "harvestTooltip": "Verwirft die markierten Komponenten. Jeder Kadaver kann einmal verwertet werden, wer zuerst kommt. Nimmt nicht die Beute.",
-      "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
+      "yieldTierHint": "Je weniger Teile eine Verwertung tatsächlich entnimmt, desto höher ist die Sammelstufe jedes einzelnen Teils.",
+      "nothingSelectedYields": "An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
+      "componentNoYield": "noch nichts",
+      "componentAriaNoYield": "{component} verwerten: {note}",
       "components": {
         "hide": "Haut",
         "fang": "Fangzahn",
@@ -2023,8 +2032,8 @@ export const de_DE: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Abholung auf dem Weltmarkt wartet",
-      "tip": "Gold oder Gegenstände warten beim Händler auf dich."
+      "aria": "Weltmarkt-Erlöse oder Gegenstände warten",
+      "tip": "Verkaufserlöse oder zurückgegebene Gegenstände warten beim Händler auf dich."
     },
     "noticeboard": {
       "empty": "Hier scheint nichts ausgehängt zu sein."
@@ -2168,6 +2177,9 @@ export const de_DE: EnTranslations = {
       "notReady": "Dieser Ressourcenknoten ist fur dich noch nicht nachgewachsen.",
       "gatherLine": "Sie sammeln: {name}.",
       "gatherLineQty": "Sie sammeln: {name} x{qty}.",
+      "harvestLine": "Ihr häutet: {name}.",
+      "harvestLineQty": "Ihr häutet: {name} x{qty}.",
+      "harvestSpecimenLine": "Ihr erhaltet außerdem {name}.",
       "catchLine": "Du holst ein: {name}",
       "biteLine": "Etwas nimmt den Köder!",
       "gotAwayLine": "Es ist entkommen.",
@@ -2349,6 +2361,7 @@ export const de_DE: EnTranslations = {
       "empty": "Noch keine Rezepte bekannt.",
       "resultAria": "Basteln {name}",
       "craftedToast": "Hergestellt: {name}",
+      "craftedToastQty": "Hergestellt: {name} x{qty}",
       "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
       "unknownRecipe": "Dieses Rezept existiert nicht.",
       "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.",
@@ -2441,7 +2454,13 @@ export const de_DE: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Du entzauberst {item}.",
+      "disenchantedYield": "Du entzauberst {item} zu {material}.",
+      "disenchantedYieldQty": "Du entzauberst {item} zu {material} x{qty}.",
+      "disenchantedAlso": "Du gewinnst außerdem {material}.",
+      "disenchantedAlsoQty": "Du gewinnst außerdem {material} x{qty}.",
       "salvagedLine": "Du zerlegst {item}.",
+      "salvagedYield": "Du zerlegst {item} zu {material}.",
+      "salvagedYieldQty": "Du zerlegst {item} zu {material} x{qty}.",
       "enchantAppliedLine": "Du verzauberst {item} mit {enchant}.",
       "notHeld": "Du hast diesen Gegenstand nicht.",
       "notDisenchantable": "Du kannst das nicht entzaubern.",
@@ -2466,6 +2485,7 @@ export const de_DE: EnTranslations = {
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
       "noTargets": "Kein geeigneter Gegenstand zum Verzaubern.",
       "wornTag": "Angelegt ({slot})",
+      "wornTagIndexed": "Angelegt ({slot} {index})",
       "tier": {
         "base": "Basisverzauberungen",
         "runed": "Runen-Verzauberungen",
@@ -2478,9 +2498,14 @@ export const de_DE: EnTranslations = {
       "sameEnchant": "Dieser Gegenstand hat diese Verzauberung bereits.",
       "replaceTag": "Ersetzt {enchant}",
       "sameEnchantTag": "Bereits angewendet",
+      "plainTag": "Nicht verzaubert",
       "replaceConfirmTitle": "Verzauberung auf {item} ersetzen?",
       "replaceConfirmBody": "Dies ersetzt {old} auf {item} durch {new}.",
       "replaceConfirmNoRefund": "Die alte Verzauberung wird zerstört. Ihre Materialien werden nicht erstattet. Dies kann nicht rückgängig gemacht werden.",
+      "replaceConfirmKeeps": "Bleibt erhalten: {kept}",
+      "replaceConfirmKeepsSigner": "Zeichen des Herstellers",
+      "replaceConfirmKeepsMasterwork": "Meisterwerkbonus",
+      "replaceConfirmKeepsBond": "Auftragsbindung",
       "replaceConfirmCost": "Kosten: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ersetzen"
@@ -3726,7 +3751,7 @@ export const de_DE: EnTranslations = {
     "professions": {
       "intro": "Jenseits von Kampf und Quests belohnt dich die Welt für die Arbeit an Land und Esse: Rohstoffe sammeln, sie über zehn Handwerksgewerbe hinweg zu Ausrüstung und Waren verarbeiten und in eine Identität als einer der zehn Archetypen hineinwachsen, für die diese Gewerbe stehen.",
       "harvestTitle": "Die Jagd selbst ernten",
-      "harvestBody": "Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Die Wahl liegt auch jedes Mal bei dir: Streife alles ab, was die Leiche bietet, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.",
+      "harvestBodyChoice": "Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Trägt ein Tier mehr als eine verwertbare Komponente, so liegt die Wahl bei dir: Nimm alles mit, was es hergeben kann, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.",
       "focusTitle": "Stadtfokus",
       "focusBody": "Jede größere Stadt hält ein Stadtfokus-Panel für vorbeikommende Sammler bereit: Stell dich in die Stadt, öffne es neben der Minikarte und richte ein kleines Budget an Fokuspunkten auf die Komponententypen, die dir wichtig sind. Je mehr Fokus du einer Komponente gibst, desto feiner und reicher fällt sie von jeder späteren Leiche ab; deine Verteilung folgt deinem Charakter, wohin er auch zieht, und du kannst sie bei jedem späteren Besuch in der Stadt kostenlos umarbeiten.",
       "craftHowTitle": "Das Handwerksfenster",
@@ -5500,6 +5525,7 @@ export const de_DE: EnTranslations = {
     },
     "augment": {
       "choose": "Wählt eine Augmentierung",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalität",
         "desc": "Eure physischen Schläge treffen 15% härter."
@@ -6714,6 +6740,7 @@ export const de_DE: EnTranslations = {
       "filterTypeAll": "Alle Typen",
       "filterTypeWeapon": "Waffen",
       "filterTypeArmor": "Rüstung",
+      "filterTypeBag": "Taschen",
       "filterTypeConsumable": "Verbrauchbares",
       "filterTypeMaterial": "Materialien",
       "filterTypeCosmetic": "Kosmetik",
@@ -6727,6 +6754,8 @@ export const de_DE: EnTranslations = {
       "armorMail": "Kette",
       "filterWeaponType": "Waffentyp",
       "filterWeaponAll": "Alle Waffen",
+      "filterBagSize": "Taschengröße",
+      "filterBagAll": "Alle Taschen",
       "filterPrimaryStat": "Primärattribut",
       "filterPrimaryStatAll": "Beliebiges Primärattribut",
       "filterRarity": "Seltenheit",

@@ -666,7 +666,7 @@ export const it_IT: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% di sconto",
+      "railWocDiscount": "{percent}% di sconto",
       "railWocUnavailable": "I prezzi WOC non sono disponibili al momento.",
       "railNativeUnavailable": "SOL/WOC non disponibile.",
       "amountLabel": "Quantità",
@@ -872,7 +872,13 @@ export const it_IT: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Le righe appaiono automaticamente non appena il tuo gruppo infligge danni o cura, e questo pannello si chiude qualche secondo dopo la fine del combattimento."
+      "autoShowHint": "Le righe appaiono automaticamente non appena il tuo gruppo infligge danni o cura, e questo pannello si chiude qualche secondo dopo la fine del combattimento.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Il famiglio e a salute piena",
@@ -1463,9 +1469,12 @@ export const it_IT: EnTranslations = {
       "title": "Raccolta",
       "harvestButton": "Raccogli",
       "harvestTooltip": "Raccoglie i componenti selezionati. Ogni carcassa puo essere raccolta una volta, chi prima arriva. Non prende il bottino.",
-      "concentrateHint": "Meno componenti scegli, più alta sarà la qualità di ciascuno.",
+      "yieldTierHint": "Meno componenti prende una raccolta, più alto sarà il livello di raccolta di ciascuno.",
+      "nothingSelectedYields": "Questo cadavere non ha nulla da raccogliere tra i componenti selezionati.",
       "alreadyHarvested": "Questo cadavere è già stato raccolto.",
       "componentAria": "Raccogli {component}",
+      "componentNoYield": "ancora nulla",
+      "componentAriaNoYield": "Raccogli {component}: {note}",
       "components": {
         "hide": "Pelle",
         "fang": "Zanna",
@@ -2023,8 +2032,8 @@ export const it_IT: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Ritiro in attesa dal Mercato Mondiale",
-      "tip": "Oro o oggetti ti aspettano al Mercante."
+      "aria": "Ricavi o oggetti del Mercato Mondiale in attesa",
+      "tip": "Ricavi di vendita o oggetti restituiti ti aspettano dal Mercante."
     },
     "noticeboard": {
       "empty": "Non sembra esserci nulla di affisso."
@@ -2168,6 +2177,9 @@ export const it_IT: EnTranslations = {
       "notReady": "Questo nodo di risorse non e ancora rispawnato per te.",
       "gatherLine": "Raccogli: {name}.",
       "gatherLineQty": "Raccogli: {name} x {qty}.",
+      "harvestLine": "Scuoi: {name}.",
+      "harvestLineQty": "Scuoi: {name} x {qty}.",
+      "harvestSpecimenLine": "Recuperi anche {name}.",
       "catchLine": "Riporti in superficie: {name}",
       "biteLine": "Qualcosa abbocca alla lenza!",
       "gotAwayLine": "E' fuggito.",
@@ -2349,6 +2361,7 @@ export const it_IT: EnTranslations = {
       "empty": "Nessuna ricetta ancora conosciuta.",
       "resultAria": "Crea {name}",
       "craftedToast": "Realizzato: {name}",
+      "craftedToastQty": "Realizzato: {name} x{qty}",
       "insufficientMaterials": "Non hai i materiali per quello.",
       "unknownRecipe": "Quella ricetta non esiste.",
       "comboRequirementUnmet": "Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta.",
@@ -2441,7 +2454,13 @@ export const it_IT: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Disincanti {item}.",
+      "disenchantedYield": "Disincanti {item} in {material}.",
+      "disenchantedYieldQty": "Disincanti {item} in {material} x{qty}.",
+      "disenchantedAlso": "Recuperi anche {material}.",
+      "disenchantedAlsoQty": "Recuperi anche {material} x{qty}.",
       "salvagedLine": "Smantelli {item}.",
+      "salvagedYield": "Smantelli {item} in {material}.",
+      "salvagedYieldQty": "Smantelli {item} in {material} x{qty}.",
       "enchantAppliedLine": "Incanti {item} con {enchant}.",
       "notHeld": "Non possiedi quell'oggetto.",
       "notDisenchantable": "Non puoi disincantare quello.",
@@ -2466,6 +2485,7 @@ export const it_IT: EnTranslations = {
       "noEnchants": "Nessun incantesimo utilizza questo reagente.",
       "noTargets": "Nessun oggetto idoneo da incantare.",
       "wornTag": "Indossato ({slot})",
+      "wornTagIndexed": "Indossato ({slot} {index})",
       "tier": {
         "base": "Incanti Base",
         "runed": "Incanti Runici",
@@ -2478,9 +2498,14 @@ export const it_IT: EnTranslations = {
       "sameEnchant": "Quell'oggetto ha già quell'incantesimo.",
       "replaceTag": "Sostituisce {enchant}",
       "sameEnchantTag": "Già applicato",
+      "plainTag": "Non incantato",
       "replaceConfirmTitle": "Sostituisci l'incantesimo su {item}?",
       "replaceConfirmBody": "Questo sostituisce {old} su {item} con {new}.",
       "replaceConfirmNoRefund": "Il vecchio incantesimo viene distrutto. I suoi materiali non vengono rimborsati. L'azione non può essere annullata.",
+      "replaceConfirmKeeps": "Conserva: {kept}",
+      "replaceConfirmKeepsSigner": "Marchio del creatore",
+      "replaceConfirmKeepsMasterwork": "Bonus capolavoro",
+      "replaceConfirmKeepsBond": "Vincolo di commissione",
       "replaceConfirmCost": "Costo: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Sostituisci"
@@ -3726,7 +3751,7 @@ export const it_IT: EnTranslations = {
     "professions": {
       "intro": "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento e beni attraverso dieci mestieri artigiani e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
       "harvestTitle": "Raccogliere dalla caccia stessa",
-      "harvestBody": "La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, seta e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. La scelta e tua ogni volta: prendi tutto quello che la carcassa offre, oppure concentrati su meno componenti e ottieni una qualita misurabilmente superiore di cio che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio puo raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.",
+      "harvestBodyChoice": "La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, seta e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. Quando una bestia porta piu di un componente lavorabile, la scelta e tua: prendi tutto quello che puo dare, oppure concentrati su meno componenti e ottieni una qualita misurabilmente superiore di cio che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio puo raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.",
       "focusTitle": "Focus Cittadino",
       "focusBody": "Ogni città principale tiene un pannello Focus Cittadino per i raccoglitori di passaggio: fermati in città, aprilo da accanto alla minimappa e indirizza un piccolo budget di punti focus verso i tipi di componente che ti interessano. Più focus dai a un componente, più fine e ricco esce da ogni cadavere successivo; la tua ripartizione segue il personaggio ovunque vada, e puoi rielaborarla, gratis, a ogni successiva visita in città.",
       "craftHowTitle": "La finestra di creazione",
@@ -5500,6 +5525,7 @@ export const it_IT: EnTranslations = {
     },
     "augment": {
       "choose": "Scegli un potenziamento",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalità",
         "desc": "I tuoi colpi fisici infliggono il 15% di danni in più."
@@ -6714,6 +6740,7 @@ export const it_IT: EnTranslations = {
       "filterTypeAll": "Tutti i tipi",
       "filterTypeWeapon": "Armi",
       "filterTypeArmor": "Armatura",
+      "filterTypeBag": "Borse",
       "filterTypeConsumable": "Consumabili",
       "filterTypeMaterial": "Materiali",
       "filterTypeCosmetic": "Cosmetici",
@@ -6727,6 +6754,8 @@ export const it_IT: EnTranslations = {
       "armorMail": "Maglia",
       "filterWeaponType": "Tipo arma",
       "filterWeaponAll": "Tutte le armi",
+      "filterBagSize": "Dimensione borsa",
+      "filterBagAll": "Tutte le borse",
       "filterPrimaryStat": "Statistica principale",
       "filterPrimaryStatAll": "Qualsiasi statistica principale",
       "filterRarity": "Rarità",

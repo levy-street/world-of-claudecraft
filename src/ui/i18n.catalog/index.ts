@@ -1141,6 +1141,7 @@ export const en = {
     },
     augment: {
       choose: 'Choose an Augment',
+      cardAria: '{name} ({category}) - {description}',
       aug_brutality: { name: 'Brutality', desc: 'Your physical strikes hit 15% harder.' },
       aug_spellfire: { name: 'Grimfire', desc: 'Your spells deal 15% more damage.' },
       aug_toughness: { name: 'Toughness', desc: 'Gain 12% maximum health.' },

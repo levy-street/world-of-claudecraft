@@ -524,6 +524,9 @@ const mergeStringsEn = {
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
       clickBuyback: 'Click to buy back',
+      // Rendered by the item tooltip (hud.ts), the bag sockets (bags_window.ts) AND the
+      // World Market's bag-capacity dropdown (market_window.ts), which reuses it so a new
+      // bag size needs no new key. Rewording this restyles that market control too.
       bagSlots: '{slots} Slot Bag',
     },
     vendor: {

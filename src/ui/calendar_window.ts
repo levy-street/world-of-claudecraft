@@ -19,6 +19,7 @@ import {
 } from './calendar_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { formatDateTime, formatNumber, type TranslationKey, t } from './i18n';
 import { svgIcon } from './ui_icons';
 
@@ -121,14 +122,45 @@ export class CalendarWindow {
     this.lastSig = '';
   }
 
+  // The repaint signature: the visible month, the selected day, and the guild-event
+  // mirror. Every member is an id, a number or a date string, so a language switch
+  // alone can never move it, which is why relocalize() exists below.
+  private sig(): string {
+    const guild = this.deps.world().socialInfo?.guild ?? null;
+    return JSON.stringify([this.year, this.month, this.selectedIso, guild?.events ?? []]);
+  }
+
   // Slow-band refresh: repaint when the guild-event mirror changes.
   refreshIfChanged(): void {
     if (!this.opened) return;
-    const guild = this.deps.world().socialInfo?.guild ?? null;
-    const sig = JSON.stringify([this.year, this.month, this.selectedIso, guild?.events ?? []]);
+    const sig = this.sig();
     if (sig === this.lastSig) return;
     this.lastSig = sig;
     this.render();
+  }
+
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on the open flag so the fan-out can call it
+   * unconditionally.
+   *
+   * A bare render() would repaint in the new locale and wipe the guild-event
+   * booking form, which renderDayPane emits with empty inputs, so the draft is
+   * carried across the rebuild.
+   *
+   * The signature is RE-LATCHED rather than cleared. Clearing it is what the
+   * window's own interactive paths do, and each of those pays one extra rebuild
+   * on the next slow tick; here that second rebuild would land after the restore
+   * and wipe the draft again. The render below already painted the current data,
+   * so latching the current signature is what makes refreshIfChanged correct.
+   */
+  relocalize(): void {
+    if (!this.opened) return;
+    const root = this.deps.root();
+    const draft = captureFormDraft(root);
+    this.render();
+    restoreFormDraft(root, draft);
+    this.lastSig = this.sig();
   }
 
   private guildEvents(): GuildEventInfo[] {

@@ -49,17 +49,19 @@ when appropriate.
 ## Scope
 
 This Code of Conduct applies within all community spaces, including the
-repository, issues, pull requests, the Discord server, and any other official
-channel. It also applies when an individual is officially representing the
-community in public spaces.
+repository, issues, pull requests, the game itself (chat, character and guild
+names, and group play), the Discord server, and any other official channel. It
+also applies when an individual is officially representing the community in
+public spaces.
 
 ## Reporting and enforcement
 
 If you experience or witness unacceptable behavior, please report it privately to
-the maintainers. The simplest way is to send a direct message to a member of the
-**Levy St**, **Admin**, or **Devs** group on the
-[community Discord](https://discord.com/invite/worldofclaudecraft) and ask for a private channel to
-share the details.
+the maintainers by email at tony@levystreet.com. If you prefer, you can instead
+send a direct message to a member of the **Levy St**, **Admin**, or **Devs** group
+on the [community Discord](https://discord.com/invite/worldofclaudecraft) and ask
+for a private channel to share the details. In game, "Report Player" on a
+character's right-click menu reaches the same moderators.
 
 All reports will be reviewed and investigated promptly and fairly. Maintainers are
 obligated to respect the privacy and security of anyone who reports an incident.

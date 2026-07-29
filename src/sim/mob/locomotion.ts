@@ -34,7 +34,7 @@ import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
-import { clearThreat, stealthDetectionRadius } from '../threat';
+import { clearThreat, hasEscapeStealth, stealthDetectionRadius } from '../threat';
 import {
   type Aura,
   angleTo,
@@ -322,6 +322,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
         );
         radius *= ctx.delveDetectMult(e);
+        if (hasEscapeStealth(e)) return;
         // stealthed rogues are harder to detect, relative to observer level
         if (e.auras.some((a) => a.kind === 'stealth'))
           radius = stealthDetectionRadius(mob, e, radius);

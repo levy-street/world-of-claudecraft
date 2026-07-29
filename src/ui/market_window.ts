@@ -25,11 +25,9 @@ import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
-  MARKET_ARMOR_TYPE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
-  MARKET_WEAPON_TYPE_FILTERS,
   type MarketArmorClassFilter,
   type MarketItemTypeFilter,
   type MarketPrimaryStatFilter,
@@ -45,8 +43,10 @@ import {
   type MarketCollectBody,
   type MarketSellBody,
   type MarketSellMeta,
+  type MarketSubtypeKind,
   type MarketTab,
   marketCollectBadgeCount,
+  marketFilterMenus,
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
@@ -198,6 +198,14 @@ export class MarketWindow {
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
+    // The listings changed (a filter/search narrowed the result set, a listing sold, a
+    // page arrived), so renderContent() below is about to tear down and rebuild the
+    // `.mkt-row` nodes. A row detached this way fires no mouseleave, so a tooltip left
+    // open on a row that no longer matches the query would otherwise linger forever,
+    // still describing an item the list no longer shows (issue 2456). render()'s full rebuild
+    // already hides it for the tab/filter-click path; this is the same guard for the
+    // signature-driven refresh path (typing in search, an async listings update).
+    this.deps.hideTooltip();
     const collectTab = this.deps.root().querySelector('[data-tab="collect"]');
     if (collectTab) {
       const n = marketCollectBadgeCount(info);
@@ -229,15 +237,15 @@ export class MarketWindow {
     };
     const tab = (id: MarketTab) =>
       `<button type="button" class="mkt-tab${this.tab === id ? ' sel' : ''}" data-tab="${id}" aria-pressed="${this.tab === id ? 'true' : 'false'}">${esc(tabLabel(id))}</button>`;
-    // The search box and the type/subtype/rarity dropdowns are both filter controls for
-    // the Browse tab, so they render side by side in one `.mkt-controls` row: the search
-    // box lives here (rather than being created inside #market-body by renderBrowse) so it
-    // can sit in the same flex row as the filter menus. It is only rebuilt when render()
+    // The search box and the type/subtype/rarity dropdowns are all filter controls for
+    // the Browse tab, so `.mkt-controls` owns their shared accessible group and responsive
+    // grid. The search box lives here (rather than being created inside #market-body by
+    // renderBrowse) so it can align with every filter menu. It is only rebuilt when render()
     // rebuilds the whole window (tab switch, filter pick), never on every keystroke:
     // renderBrowse's own reuse-and-sync logic (below) is what preserves focus while typing.
     const controlsHtml =
       this.tab === 'browse'
-        ? `<div class="mkt-controls">` +
+        ? `<div class="mkt-controls" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
           `<input type="search" class="mkt-search" placeholder="${esc(t('itemUi.market.searchPlaceholder'))}" aria-label="${esc(t('itemUi.market.searchAria'))}" value="${esc(this.searchQuery)}">` +
           this.renderMarketFilters() +
           `</div>`
@@ -727,6 +735,7 @@ export class MarketWindow {
   private marketItemTypeLabel(filter: MarketItemTypeFilter): string {
     if (filter === 'weapon') return t('itemUi.market.filterTypeWeapon');
     if (filter === 'armor') return t('itemUi.market.filterTypeArmor');
+    if (filter === 'bag') return t('itemUi.market.filterTypeBag');
     if (filter === 'consumable') return t('itemUi.market.filterTypeConsumable');
     if (filter === 'material') return t('itemUi.market.filterTypeMaterial');
     if (filter === 'cosmetic') return t('itemUi.market.filterTypeCosmetic');
@@ -744,18 +753,14 @@ export class MarketWindow {
     return t('itemUi.market.filterRarityAll');
   }
 
-  private marketSubtypeOptions(): readonly MarketSubtypeFilter[] {
-    if (this.itemTypeFilter === 'armor') return MARKET_ARMOR_TYPE_FILTERS;
-    if (this.itemTypeFilter === 'weapon') return MARKET_WEAPON_TYPE_FILTERS;
-    return ['all'];
-  }
-
-  private marketSubtypeLabel(): string {
-    return t(
-      this.itemTypeFilter === 'armor'
-        ? 'itemUi.market.filterArmorSlot'
-        : 'itemUi.market.filterWeaponType',
-    );
+  // Both label functions switch on the core's subtypeKind, never on the item type:
+  // the options and their wording are decided together in marketFilterMenus, so a type
+  // that gains a subtype axis cannot get its list from one place and its words from
+  // another (which is how a bag size would have read "Other weapons").
+  private marketSubtypeLabel(kind: MarketSubtypeKind): string {
+    if (kind === 'bagCapacity') return t('itemUi.market.filterBagSize');
+    if (kind === 'armorSlot') return t('itemUi.market.filterArmorSlot');
+    return t('itemUi.market.filterWeaponType');
   }
 
   private marketArmorClassLabel(filter: MarketArmorClassFilter): string {
@@ -772,14 +777,27 @@ export class MarketWindow {
     return t('itemUi.market.filterPrimaryStatAll');
   }
 
-  private marketSubtypeOptionLabel(filter: MarketSubtypeFilter): string {
+  private marketSubtypeOptionLabel(kind: MarketSubtypeKind, filter: MarketSubtypeFilter): string {
+    // Bags first: their option values are capacities, so they must not fall through to
+    // the weapon-family chain below, whose tail labels anything unmatched "Other weapons".
+    if (kind === 'bagCapacity') {
+      const slots = Number(filter);
+      // A non-numeric value here means a subtype left over from another item type, which
+      // the wire's union allowlist permits even though the chrome resets on every type
+      // change. Label it "All bags" rather than rendering a literal "NaN Slot Bag".
+      return filter === 'all' || !Number.isFinite(slots)
+        ? t('itemUi.market.filterBagAll')
+        : t('itemUi.tooltip.bagSlots', {
+            // useGrouping: false so the label and the option VALUE stay the same digits
+            // at any capacity the catalog might ship ("1000", never "1,000").
+            slots: formatNumber(slots, { maximumFractionDigits: 0, useGrouping: false }),
+          });
+    }
     if (filter === 'all')
       return t(
-        this.itemTypeFilter === 'armor'
-          ? 'itemUi.market.filterArmorAll'
-          : 'itemUi.market.filterWeaponAll',
+        kind === 'armorSlot' ? 'itemUi.market.filterArmorAll' : 'itemUi.market.filterWeaponAll',
       );
-    if (this.itemTypeFilter === 'armor') return this.deps.slotName(filter as ItemSlot);
+    if (kind === 'armorSlot') return this.deps.slotName(filter as ItemSlot);
     if (filter === 'sword') return t('itemUi.market.weaponSword');
     if (filter === 'dagger') return t('itemUi.market.weaponDagger');
     if (filter === 'staff') return t('itemUi.market.weaponStaff');
@@ -799,7 +817,10 @@ export class MarketWindow {
     const optionHtml = options
       .map((option) => {
         const selected = option === value;
-        return `<button type="button" class="mkt-select-option${selected ? ' sel' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${option}">${esc(optionLabel(option))}</button>`;
+        // esc() on the value too: every option used to be a source-authored literal, but
+        // the bag capacities are derived from content (ITEMS[*].bagSlots), so the reason
+        // this interpolation was safe by construction no longer holds on its own.
+        return `<button type="button" class="mkt-select-option${selected ? ' sel' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${esc(option)}">${esc(optionLabel(option))}</button>`;
       })
       .join('');
     return (
@@ -812,9 +833,13 @@ export class MarketWindow {
 
   private renderMarketFilters(): string {
     if (this.tab !== 'browse') return '';
-    const hasSubtype = this.itemTypeFilter === 'armor' || this.itemTypeFilter === 'weapon';
+    // WHICH secondary menus this item type shows is a pure function of the type, so it
+    // is decided in the view core and merely painted here.
+    const menus = marketFilterMenus(this.itemTypeFilter);
+    // Bound to a const so the null check below narrows inside the option-label closure.
+    const subtypeKind = menus.subtypeKind;
     return (
-      `<div class="mkt-filters" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
+      `<div class="mkt-filters">` +
       this.renderMarketFilterMenu(
         'itemType',
         t('itemUi.market.filterType'),
@@ -822,16 +847,16 @@ export class MarketWindow {
         MARKET_ITEM_TYPE_FILTERS,
         (filter) => this.marketItemTypeLabel(filter as MarketItemTypeFilter),
       ) +
-      (hasSubtype
+      (menus.subtype && subtypeKind
         ? this.renderMarketFilterMenu(
             'subtype',
-            this.marketSubtypeLabel(),
+            this.marketSubtypeLabel(subtypeKind),
             this.subtypeFilter,
-            this.marketSubtypeOptions(),
-            (filter) => this.marketSubtypeOptionLabel(filter as MarketSubtypeFilter),
+            menus.subtype,
+            (filter) => this.marketSubtypeOptionLabel(subtypeKind, filter as MarketSubtypeFilter),
           )
         : '') +
-      (this.itemTypeFilter === 'armor'
+      (menus.armorClass
         ? this.renderMarketFilterMenu(
             'armorClass',
             t('itemUi.market.filterArmorType'),
@@ -840,7 +865,7 @@ export class MarketWindow {
             (filter) => this.marketArmorClassLabel(filter as MarketArmorClassFilter),
           )
         : '') +
-      (hasSubtype
+      (menus.primaryStat
         ? this.renderMarketFilterMenu(
             'primaryStat',
             t('itemUi.market.filterPrimaryStat'),

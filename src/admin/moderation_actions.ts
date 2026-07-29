@@ -139,6 +139,25 @@ export function liftChatMute(accountId: number, note: string): Built {
   };
 }
 
+// Reset an account's chat strikes to zero. Audited server-side (an account moderation
+// action row records who and why), so it requires a reason like every other audited
+// action rather than firing on a bare click.
+export function resetChatStrikes(accountId: number, note: string): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  return {
+    pending: {
+      title: t('dialog.confirmResetChatStrikes'),
+      rows: [
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionResetChatStrikes') },
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/reset-strikes`,
+      body: { reason: note },
+    },
+  };
+}
+
 // A free-form moderator note. Non-punitive and additive only: it posts to the note
 // endpoint, which appends to the audit log without changing account state. The note
 // text rides in `reason` for parity with the other actions; the inline form submits

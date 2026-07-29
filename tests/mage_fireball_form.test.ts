@@ -200,6 +200,8 @@ describe('Mage Fireball Form', () => {
     const distanceOver = (transformed: boolean): number => {
       const sim = mageWithSpec('arcane');
       const player = sim.player;
+      // Measure the speed ratio on empty ground: the town square is furnished.
+      placePlayerInOpenField(sim);
       if (transformed) activate(sim);
       const meta = sim.meta(player.id);
       if (!meta) throw new Error('mage metadata missing');

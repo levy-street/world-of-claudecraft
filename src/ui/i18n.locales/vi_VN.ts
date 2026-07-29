@@ -7,8 +7,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Pháp Khắc Vũ Khí - Tiêu Điểm Phù Văn',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Tiếp tục nâng cao {craft}: {points} điểm nữa đến Chuyên Ngành, và chi phí nguyên vật liệu sẽ giảm.',
-  'guide.professions.harvestBody':
-    'Thu thập không dừng lại ở các nút tài nguyên. Nhiều dã thú đã bị giết có thể được thu hoạch mỗi con một lần, ai đến trước được trước, lấy da, nanh, lụa và thịt, thẳng từ xác bên cạnh vật phẩm rơi thông thường; một lần nhấn mở cả hai. Lựa chọn cũng là của bạn mỗi lần: lấy tất cả những gì xác cung cấp, hoặc tập trung vào ít nguyên liệu hơn và nhận được phẩm cấp cao hơn đáng kể cho những gì bạn lấy.\n\nMột lần thu hoạch hiếm hoặc tốt hơn trên một họ sinh vật mang mẫu vật cũng trao thêm một mẫu vật hoàn hảo có chữ ký (Da Nguyên Vẹn, Tơ Nguyên Vẹn, Tuyến Nọc Độc Nguyên Vẹn, hoặc Miếng Thịt Hảo Hạng) bên trên sản lượng thường, và ghi Mẫu Vật Hoàn Hảo vào Sách Kỳ Công của bạn. Mọi nhân vật đều có thể thu hoạch, không cần huấn luyện, và bất kỳ công cụ thu thập nào bạn có đều tính cho phần thưởng bậc cao, dù nó thuộc nghề nào.',
+  'guide.professions.harvestBodyChoice':
+    'Thu thập không dừng lại ở các nút tài nguyên. Nhiều dã thú đã bị giết có thể được thu hoạch mỗi con một lần, ai đến trước được trước, lấy da, nanh, lụa và thịt, thẳng từ xác bên cạnh vật phẩm rơi thông thường; một lần nhấn mở cả hai. Khi một dã thú mang nhiều hơn một bộ phận dùng được, lựa chọn là của bạn: lấy tất cả những gì nó có thể cho, hoặc tập trung vào ít bộ phận hơn và nhận được phẩm cấp cao hơn đáng kể cho những gì bạn lấy.\n\nMột lần thu hoạch hiếm hoặc tốt hơn trên một họ sinh vật mang mẫu vật cũng trao thêm một mẫu vật hoàn hảo có chữ ký (Da Nguyên Vẹn, Tơ Nguyên Vẹn, Tuyến Nọc Độc Nguyên Vẹn, hoặc Miếng Thịt Hảo Hạng) bên trên sản lượng thường, và ghi Mẫu Vật Hoàn Hảo vào Sách Kỳ Công của bạn. Mọi nhân vật đều có thể thu hoạch, không cần huấn luyện, và bất kỳ công cụ thu thập nào bạn có đều tính cho phần thưởng bậc cao, dù nó thuộc nghề nào.',
   'guide.professions.craftMasteryTitle': 'Thời gian cần để đạt tinh thông',
   'guide.professions.craftMasteryBody':
     'Kỳ vọng thực tế: hành trình leo lên giới hạn 125 của một nghề thủ công cần ít nhất 125 lần chế tạo thành công, vì mỗi lần chế tạo được điểm đầy đủ chỉ tiến đúng một điểm, và trên thực tế hơi nhiều hơn khi công thức dần mờ giữa các bậc huấn luyện viên. Bản thân việc chế tạo rất nhanh; nguồn cung nguyên liệu mới là hành trình thực sự, vì vậy hãy dành vài buổi tối tập trung thu thập và chế tạo cho mỗi nghề.\n\nCác nghề thu thập đạt giới hạn 100 trong suốt hành trình lên cấp thông thường nếu bạn thu hoạch khi di chuyển, dù đoạn cuối cần các nút tài nguyên bậc cao ở vùng cực bắc. Câu cá là con đường dài theo thiết kế: theo lịch trình tích điểm riêng của nó, 200 thành thạo tương đương hơn ba nghìn lần câu được. Đại Ngư Sư là danh hiệu kiếm được qua một mùa những buổi tối yên tĩnh, không phải một cuối tuần.',
@@ -2074,7 +2074,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.title': 'Lịch Sự Kiện',
   'hudChrome.calendar.titlePlaceholder': 'Tiêu đề sự kiện',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Xác này đã bị thu hoạch rồi.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.',
   'hudChrome.corpseHarvest.componentAria': 'Thu hoạch {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'chưa có gì',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Thu hoạch {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Một lần thu hoạch lấy được càng ít bộ phận, bậc thu hoạch của mỗi bộ phận càng cao.',
   'hudChrome.corpseHarvest.components.claw': 'Móng Vuốt',
   'hudChrome.corpseHarvest.components.fang': 'Nanh',
   'hudChrome.corpseHarvest.components.gills': 'Mang',
@@ -2083,8 +2089,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Tơ',
   'hudChrome.corpseHarvest.components.tusk': 'Ngà',
   'hudChrome.corpseHarvest.components.venomSac': 'Túi Độc',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Chọn càng ít bộ phận, mỗi bộ phận thu được sẽ có bậc chất lượng càng cao.',
   'hudChrome.corpseHarvest.harvestButton': 'Thu Hoạch',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Thu thập các bộ phận đã chọn. Mỗi xác chỉ có thể thu hoạch một lần, ai đến trước được trước. Không lấy chiến lợi phẩm.',
@@ -6615,12 +6619,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterType': 'Loại',
   'itemUi.market.filterTypeAll': 'Tất cả loại',
   'itemUi.market.filterTypeArmor': 'Giáp',
+  'itemUi.market.filterTypeBag': 'Túi',
   'itemUi.market.filterTypeConsumable': 'Đồ Tiêu Hao',
   'itemUi.market.filterTypeCosmetic': 'Đồ Trang Trí',
   'itemUi.market.filterTypeMaterial': 'Nguyên Liệu',
   'itemUi.market.filterTypeOther': 'Khác',
   'itemUi.market.filterTypeWeapon': 'Vũ Khí',
   'itemUi.market.filterWeaponAll': 'Tất cả vũ khí',
+  'itemUi.market.filterBagSize': 'Sức chứa túi',
+  'itemUi.market.filterBagAll': 'Tất cả túi',
   'itemUi.market.filterWeaponType': 'Loại vũ khí',
   'itemUi.market.filters': 'Bộ lọc chợ',
   'itemUi.market.listButton': 'Rao bán trên Chợ Thế Giới',
@@ -8220,7 +8227,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Thẻ',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Giảm 20%',
+  'hudChrome.claudium.railWocDiscount': 'Giảm {percent}%',
   'hudChrome.claudium.railWocUnavailable': 'Giá WOC hiện không có sẵn.',
   'hudChrome.claudium.showAmounts': 'Hiển thị tất cả số lượng Claudium',
   'hudChrome.claudium.skuRow': '{usd} đổi lấy {claudium} Claudium',
@@ -9104,6 +9111,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Chấp nhận Cái Giá của Người Canh Giữ?',
   'hudChrome.gathering.gatherLine': 'Bạn tập hợp: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Bạn tập hợp: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Bạn thu hoạch: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Bạn thu hoạch: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Bạn cũng thu được {name}.',
   'hudChrome.mobile.professions': 'Nghề nghiệp',
   'hudChrome.options.showThirdActionBar': 'Hiển thị thanh hành động thứ ba',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Người phát trực tiếp đã được xác minh',
@@ -9269,13 +9279,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Pháp Khắc Cao Cấp',
   'hudChrome.enchanting.tier.runed': 'Pháp Khắc Phù Văn',
   'hudChrome.enchanting.wornTag': 'Đang Trang Bị ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Đang Trang Bị ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Nguyên liệu dự kiến:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} đến {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Đã Pháp Khắc',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Đã Pháp Khắc)',
-  'hudChrome.marketIndicator.aria': 'Có hàng chờ thu tại Chợ Thế Giới',
-  'hudChrome.marketIndicator.tip': 'Vàng hoặc vật phẩm đang chờ bạn tại Thương Nhân.',
+  'hudChrome.marketIndicator.aria': 'Tiền bán hoặc vật phẩm Chợ Thế Giới đang chờ',
+  'hudChrome.marketIndicator.tip':
+    'Tiền bán hàng hoặc vật phẩm bị trả lại đang chờ bạn tại Thương Nhân.',
   'hudChrome.materialHint.arcaneDust':
     'Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9313,4 +9325,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Thay Thế {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Vật phẩm đó đã có phép khắc đó rồi.',
   'hudChrome.enchanting.sameEnchantTag': 'Đã Áp Dụng',
+  'hudChrome.crafting.craftedToastQty': 'Đã chế tác: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Bạn hủy pháp khắc {item} thành {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Bạn hủy pháp khắc {item} thành {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Bạn cũng thu hồi {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Bạn cũng thu hồi {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Bạn tháo dỡ {item} thành {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Bạn tháo dỡ {item} thành {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Chưa pháp khắc',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Giữ lại: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Dấu người chế tạo',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Thưởng tuyệt phẩm',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ràng buộc ủy thác',
 };

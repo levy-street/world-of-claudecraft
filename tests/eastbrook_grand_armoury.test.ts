@@ -22,6 +22,7 @@ import {
   isEastbrookGrandArmoury,
 } from '../src/sim/building_layout';
 import {
+  bankerChestSpots,
   colliderInternalsForTest,
   isBlocked,
   pathCrossesFence,
@@ -369,9 +370,21 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
       if (!npc) throw new Error(`missing pinned Eastbrook NPC ${id}`);
       expect(isBlocked(SEED, npc.pos.x, npc.pos.z, 0.6), `${id} overlaps collision`).toBe(false);
     }
-    expect(isBlocked(SEED, 13.65, 9.15, 0.7), 'banker chest approach overlaps collision').toBe(
-      false,
+    // The strongbox is a SOLID standable prop now (banker_chest_layout): the
+    // chest spot itself blocks, and the approach that must stay clear is the
+    // banker's own interaction point beside it, at route body radius.
+    const chest = bankerChestSpots(SEED).find(
+      (s) =>
+        Math.hypot(s.anchorX - NPCS.bursar_fernando.pos.x, s.anchorZ - NPCS.bursar_fernando.pos.z) <
+        0.75,
     );
+    expect(chest, 'fernando chest spot resolved').toBeDefined();
+    if (!chest) return;
+    expect(isBlocked(SEED, chest.x, chest.z, 0.5), 'chest spot is solid').toBe(true);
+    expect(
+      isBlocked(SEED, chest.anchorX, chest.anchorZ, 0.8),
+      'banker approach overlaps collision',
+    ).toBe(false);
   });
 
   it('keeps the square, card table, toolworks, and armoury approach mutually reachable', () => {
@@ -394,12 +407,15 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     const props = stationPropPlacements(STATIONS).filter(
       (placement) => placement.stationId === 'station_eastbrook_toolworks',
     );
+    // The anchor prop stands BESIDE the station point now (solid furniture
+    // may not wall off the interaction point routes end on), so the cluster
+    // hangs off the authored anchor by its authored offsets.
     expect(props).toEqual([
       {
         stationId: 'station_eastbrook_toolworks',
         kind: 'workbench',
-        x: station.pos.x,
-        z: station.pos.z,
+        x: station.pos.x + 1.5,
+        z: station.pos.z + 0.6,
         rot: -0.4,
       },
       {

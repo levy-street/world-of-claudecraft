@@ -50,7 +50,9 @@ vi.mock('../server/moderation_db', () => ({
   liftAccountChatMute: vi.fn(),
   moderateAccount: vi.fn(),
   muteAccountChat: vi.fn(),
+  reactivateAccountAudited: vi.fn(),
   recordPasswordReset: vi.fn(),
+  resetChatStrikesAudited: vi.fn(),
 }));
 vi.mock('../server/chat_filter_db', () => ({
   addFilterWord: vi.fn(),
@@ -59,7 +61,6 @@ vi.mock('../server/chat_filter_db', () => ({
   getFilterConfig: vi.fn(),
   listFilterWords: vi.fn(),
   removeFilterWord: vi.fn(),
-  resetChatStrikes: vi.fn(),
   updateFilterConfig: vi.fn(),
 }));
 vi.mock('../server/ip_block_db', () => ({
@@ -112,7 +113,6 @@ import {
   getFilterConfig,
   listFilterWords,
   removeFilterWord,
-  resetChatStrikes,
   updateFilterConfig,
 } from '../server/chat_filter_db';
 import {
@@ -134,7 +134,9 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  reactivateAccountAudited,
   recordPasswordReset,
+  resetChatStrikesAudited,
 } from '../server/moderation_db';
 import {
   adminRolesForAccount,
@@ -713,7 +715,40 @@ describe('admin api auth', () => {
     expect(associationsForIp).toHaveBeenCalledWith('203.0.113.7', 2, 50);
     expect(res.statusCode).toBe(200);
     expect(res.body.data.blocked).toBe(true);
+    expect(res.body.data.blockable).toBe(true);
     expect(res.body.data.accounts[0].online).toBe(true);
+  });
+
+  it('serves associations for the stored unknown marker without checking the block list', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(associationsForIp).mockResolvedValue({
+      ip: 'unknown',
+      accounts: [],
+      total: 0,
+      page: 1,
+      limit: 25,
+    });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/ip-associations?ip=unknown' }),
+      res,
+      fakeGame,
+    );
+
+    expect(associationsForIp).toHaveBeenCalledWith('unknown', 1, 25);
+    expect(fakeGame.isIpBlocked).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({
+      ip: 'unknown',
+      accounts: [],
+      total: 0,
+      page: 1,
+      limit: 25,
+      blocked: false,
+      blockable: false,
+    });
   });
 
   it('rejects an invalid IP association lookup', async () => {
@@ -940,6 +975,7 @@ describe('admin api auth', () => {
       expiresAt,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account is suspended.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('bans and disconnects an account', async () => {
@@ -968,6 +1004,7 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account has been banned.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('mutes account chat and sends a live warning without disconnecting', async () => {
@@ -1025,6 +1062,7 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('unsuspends without disconnecting the account', async () => {
@@ -1054,6 +1092,7 @@ describe('admin api auth', () => {
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
     expect(accountMailTarget).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('rejects suspending or banning admin accounts', async () => {
@@ -1262,7 +1301,8 @@ describe('admin api chat filter', () => {
   });
 
   it('resets strikes and syncs the live session', async () => {
-    vi.mocked(resetChatStrikes).mockResolvedValue(true);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(resetChatStrikesAudited).mockResolvedValue(true);
     const res = fakeRes();
 
     await handleAdminApi(
@@ -1270,14 +1310,96 @@ describe('admin api chat filter', () => {
         method: 'POST',
         token: VALID_TOKEN,
         url: '/admin/api/moderation/accounts/9/reset-strikes',
+        body: { reason: 'appeal accepted' },
       }),
       res,
       fakeGame,
     );
 
     expect(res.statusCode).toBe(200);
-    expect(resetChatStrikes).toHaveBeenCalledWith(9);
+    expect(resetChatStrikesAudited).toHaveBeenCalledWith({
+      accountId: 9,
+      adminAccountId: 7,
+      reason: 'appeal accepted',
+    });
     expect(fakeGame.resetChatStrikesLive).toHaveBeenCalledWith(9);
+  });
+
+  it('rejects a reset-strikes without a reason before touching the account', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(resetChatStrikesAudited).mockRejectedValue(
+      new Error('moderation reason is required'),
+    );
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/accounts/9/reset-strikes',
+        body: {},
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({
+      success: false,
+      data: null,
+      error: 'moderation reason is required',
+    });
+    expect(fakeGame.resetChatStrikesLive).not.toHaveBeenCalled();
+  });
+
+  it('reactivates an account and records the reason', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(reactivateAccountAudited).mockResolvedValue();
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/accounts/9/reactivate',
+        body: { reason: 'appeal accepted' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(reactivateAccountAudited).toHaveBeenCalledWith({
+      accountId: 9,
+      adminAccountId: 7,
+      reason: 'appeal accepted',
+    });
+  });
+
+  it('rejects a reactivate without a reason before touching the account', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(reactivateAccountAudited).mockRejectedValue(
+      new Error('moderation reason is required'),
+    );
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/accounts/9/reactivate',
+        body: {},
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({
+      success: false,
+      data: null,
+      error: 'moderation reason is required',
+    });
   });
 
   it('includes chat moderation state in the moderation account detail', async () => {
@@ -1398,6 +1520,26 @@ describe('blocked-ips admin route', () => {
       fakeGame,
     );
     expect(res.statusCode).toBe(400);
+    expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
+  });
+
+  it('refuses to block unknown before the write boundary', async () => {
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/blocked-ips',
+        body: { ip: 'unknown' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(400);
+    expect(addBlockedIp).not.toHaveBeenCalled();
+    expect(fakeGame.reloadBlockedIps).not.toHaveBeenCalled();
     expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
   });
 

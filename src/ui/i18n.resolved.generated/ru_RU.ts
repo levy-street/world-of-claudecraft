@@ -666,7 +666,7 @@ export const ru_RU: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Скидка 20%",
+      "railWocDiscount": "Скидка {percent}%",
       "railWocUnavailable": "Цена WOC сейчас недоступна.",
       "railNativeUnavailable": "SOL/WOC недоступны",
       "amountLabel": "Количество",
@@ -872,7 +872,13 @@ export const ru_RU: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} мин {s} сек.",
       "seconds": "{s} сек.",
-      "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя."
+      "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Прочее ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Ближний бой"
     },
     "petFeed": {
       "disabledFullHp": "Питомец полностью здоров",
@@ -1463,9 +1469,12 @@ export const ru_RU: EnTranslations = {
       "title": "Сбор",
       "harvestButton": "Собрать",
       "harvestTooltip": "Собирает отмеченные компоненты. Каждый труп можно обработать только один раз, кто успел первым. Добычу при этом не забирает.",
-      "concentrateHint": "Чем меньше выбрано компонентов, тем выше их качество.",
+      "yieldTierHint": "Чем меньше компонентов забирает сбор, тем выше уровень добычи каждого из них.",
+      "nothingSelectedYields": "С этого трупа нельзя собрать ничего из выбранного.",
       "alreadyHarvested": "Этот труп уже был собран.",
       "componentAria": "Собрать {component}",
+      "componentNoYield": "пока ничего",
+      "componentAriaNoYield": "Собрать {component}: {note}",
       "components": {
         "hide": "Шкура",
         "fang": "Клык",
@@ -2023,8 +2032,8 @@ export const ru_RU: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Ожидает получения на Мировом рынке",
-      "tip": "Золото или предметы ждут вас у Торговца."
+      "aria": "Выручка или предметы с Мирового рынка ожидают",
+      "tip": "Выручка от продаж или возвращенные предметы ждут вас у Торговца."
     },
     "noticeboard": {
       "empty": "Похоже, здесь ничего не опубликовано."
@@ -2168,6 +2177,9 @@ export const ru_RU: EnTranslations = {
       "notReady": "Этот ресурсный узел еще не восстановился для вас.",
       "gatherLine": "Вы добываете: {name}.",
       "gatherLineQty": "Вы добываете: {name} x{qty}.",
+      "harvestLine": "Вы собираете: {name}.",
+      "harvestLineQty": "Вы собираете: {name} x{qty}.",
+      "harvestSpecimenLine": "Вы также получаете {name}.",
       "catchLine": "Вы выуживаете: {name}",
       "biteLine": "Что-то клюнуло!",
       "gotAwayLine": "Добыча сорвалась.",
@@ -2349,6 +2361,7 @@ export const ru_RU: EnTranslations = {
       "empty": "Известных рецептов пока нет.",
       "resultAria": "Создать {name}",
       "craftedToast": "Создано: {name}",
+      "craftedToastQty": "Создано: {name} x{qty}",
       "insufficientMaterials": "У вас недостаточно материалов.",
       "unknownRecipe": "Такого рецепта не существует.",
       "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.",
@@ -2441,7 +2454,13 @@ export const ru_RU: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Вы распыляете {item}.",
+      "disenchantedYield": "Вы распыляете {item} в {material}.",
+      "disenchantedYieldQty": "Вы распыляете {item} в {material} x{qty}.",
+      "disenchantedAlso": "Вы также получаете {material}.",
+      "disenchantedAlsoQty": "Вы также получаете {material} x{qty}.",
       "salvagedLine": "Вы разбираете {item}.",
+      "salvagedYield": "Вы разбираете {item} на {material}.",
+      "salvagedYieldQty": "Вы разбираете {item} на {material} x{qty}.",
       "enchantAppliedLine": "Вы накладываете на {item} чары «{enchant}».",
       "notHeld": "У вас нет этого предмета.",
       "notDisenchantable": "Это нельзя распылить.",
@@ -2466,6 +2485,7 @@ export const ru_RU: EnTranslations = {
       "noEnchants": "Нет чар, использующих этот реагент.",
       "noTargets": "Нет подходящего предмета для зачарования.",
       "wornTag": "Надето ({slot})",
+      "wornTagIndexed": "Надето ({slot} {index})",
       "tier": {
         "base": "Базовые чары",
         "runed": "Рунные чары",
@@ -2478,9 +2498,14 @@ export const ru_RU: EnTranslations = {
       "sameEnchant": "На этом предмете уже есть эти чары.",
       "replaceTag": "Заменяет «{enchant}»",
       "sameEnchantTag": "Уже наложено",
+      "plainTag": "Без чар",
       "replaceConfirmTitle": "Заменить чары на {item}?",
       "replaceConfirmBody": "Чары «{old}» на {item} будут заменены на «{new}».",
       "replaceConfirmNoRefund": "Старые чары уничтожаются, их материалы не возвращаются. Это действие нельзя отменить.",
+      "replaceConfirmKeeps": "Без изменений: {kept}",
+      "replaceConfirmKeepsSigner": "Клеймо создателя",
+      "replaceConfirmKeepsMasterwork": "Бонус шедевра",
+      "replaceConfirmKeepsBond": "Привязка изделия на заказ",
       "replaceConfirmCost": "Стоимость: {cost}",
       "replaceConfirmCostItem": "{name}: {count}",
       "replaceConfirmAccept": "Заменить"
@@ -3726,7 +3751,7 @@ export const ru_RU: EnTranslations = {
     "professions": {
       "intro": "Помимо боя и заданий, мир вознаграждает тех, кто трудится на земле и у горна: собирайте сырьё, превращайте его в снаряжение и товары в десяти ремёслах и обретайте облик одного из десяти призваний, которые эти ремёсла олицетворяют.",
       "harvestTitle": "Добыча с самой охоты",
-      "harvestBody": "Сбор не кончается на узлах. С некоторых убитых зверей можно собирать компоненты, шкуры, клыки, шёлк и вещи постраннее, прямо с трупа, рядом с его обычной добычей. Один добытчик на убийство: кто собрал первым, тому и достаётся всё. И выбор всякий раз за вами: забрать всё, что предлагает труп, или сосредоточиться на одном компоненте и взять его более высокого качества. Собирать может любой персонаж, без ремесла и обучения, а особенно тонкий компонент даже носит имя того, кто его добыл.",
+      "harvestBodyChoice": "Сбор не кончается на узлах. Со многих убитых зверей можно собрать шкуры, клыки, шёлк и мясо, по одному разу с каждого и кто успел первым, прямо с трупа, рядом с его обычной добычей: одно нажатие открывает и то и другое. Если зверь несёт больше одного пригодного компонента, выбор за вами: забрать всё, что он способен дать, или сосредоточиться на меньшем числе компонентов и взять то, что берёте, заметно более высокого уровня.\n\nРедкий или лучший результат сбора у семейства, дающего образцы, сверх обычного выхода приносит ещё и именной безупречный образец (Безупречную шкуру, Безупречный паучий шелк, Безупречную ядовитую железу или Отборную вырезку) и записывает «Безупречный трофей» в вашу Книгу деяний. Собирать может любой персонаж, без всякого обучения, а любой имеющийся у вас инструмент сбора идёт в зачёт улучшенного броска, к какому бы ремеслу он ни принадлежал.",
       "focusTitle": "Фокус города",
       "focusBody": "В каждом узловом городе для заезжих добытчиков есть панель «Фокус города»: стоя в городе, откройте её рядом с миникартой и направьте небольшой запас очков фокуса на те виды компонентов, что вам важны. Компоненты под фокусом сходят с каждого следующего трупа на ступень качественнее и чуть богаче, ваше распределение следует за персонажем, куда бы он ни забрёл, а переделать его можно бесплатно при любом следующем визите в город.",
       "craftHowTitle": "Окно ремесла",
@@ -5500,6 +5525,7 @@ export const ru_RU: EnTranslations = {
     },
     "augment": {
       "choose": "Выберите усиление",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Жестокость",
         "desc": "Твои физические удары бьют на 15% сильнее."
@@ -6714,6 +6740,7 @@ export const ru_RU: EnTranslations = {
       "filterTypeAll": "Все типы",
       "filterTypeWeapon": "Оружие",
       "filterTypeArmor": "Броня",
+      "filterTypeBag": "Сумки",
       "filterTypeConsumable": "Расходники",
       "filterTypeMaterial": "Материалы",
       "filterTypeCosmetic": "Косметика",
@@ -6727,6 +6754,8 @@ export const ru_RU: EnTranslations = {
       "armorMail": "Кольчуга",
       "filterWeaponType": "Тип оружия",
       "filterWeaponAll": "Все оружие",
+      "filterBagSize": "Размер сумки",
+      "filterBagAll": "Все сумки",
       "filterPrimaryStat": "Основная характеристика",
       "filterPrimaryStatAll": "Любая основная характеристика",
       "filterRarity": "Редкость",

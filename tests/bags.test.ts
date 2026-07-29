@@ -8,6 +8,7 @@ import {
   BAG_SOCKETS,
   bagCapacity,
   canAddItem,
+  canGrantItemInstance,
   consumeOneScratch,
   countFit,
   fitsAll,
@@ -114,6 +115,25 @@ describe('stack sizes and stacking math', () => {
     expect(inv[0].count).toBe(20);
     // At the cap the full stack offers zero room and a fresh add needs a slot.
     expect(countFit(inv, 1, 'baked_bread', 1, { signer: 'Ana' })).toBe(0);
+  });
+
+  it('canGrantItemInstance is all-or-nothing across the whole requested count (#2473)', () => {
+    // The signed-grant guard the corpse harvest reads. Its default is one copy,
+    // but a multi-unit signed yield must ask about ALL its units: a slot-full
+    // bag whose same-signer stack has room for one of three has to refuse, or
+    // the other two push a fresh slot past capacity (#2139, the class this
+    // guard exists to close).
+    const signer = { signer: 'Ana' };
+    const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 19, instance: { signer: 'Ana' } }];
+    // Capacity 1: zero free slots, exactly one unit of merge room.
+    expect(canGrantItemInstance(inv, 1, 'baked_bread', signer)).toBe(true);
+    expect(canGrantItemInstance(inv, 1, 'baked_bread', signer, 1)).toBe(true);
+    expect(canGrantItemInstance(inv, 1, 'baked_bread', signer, 2)).toBe(false);
+    expect(canGrantItemInstance(inv, 1, 'baked_bread', signer, 3)).toBe(false);
+    // One free slot absorbs a whole fresh stack, so the same counts now pass.
+    expect(canGrantItemInstance(inv, 2, 'baked_bread', signer, 3)).toBe(true);
+    // A differently-signed grant sees neither the merge room nor a shortcut.
+    expect(canGrantItemInstance(inv, 1, 'baked_bread', { signer: 'Bru' }, 1)).toBe(false);
   });
 
   it('a charge-bearing payload gets one unit per fresh slot and never tops up its twin', () => {

@@ -246,14 +246,28 @@ export function enchantGainTier(enchant: EnchantDef): number {
   return tier;
 }
 
-/** The shared post-success bookkeeping every enchanting action performs, in one
- *  place because all three arms (disenchant, apply-to-bagged, apply-to-worn) do
- *  exactly this and only the input tier differs: the quality-tiered
- *  'enchanting' skill gain (soft-clamped to the archetype ceiling and run
- *  through the four-state mastery curve; a zero gray gain never blocks the
- *  action), the shared action-throttle stamp, and the deed re-check the skill
- *  gain's craftSkill triggers need (the crafting.ts craftItem contract: the
- *  gaining site marks the player dirty itself). */
+interface ConsumedDisenchantUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
+}
+
+function isCraftedDisenchantVictim(consumed: ConsumedDisenchantUnit | undefined): boolean {
+  return (
+    consumed?.craftedRecipeId !== undefined ||
+    consumed?.instance?.craftedRecipeId !== undefined ||
+    !!consumed?.instance?.signer ||
+    !!consumed?.instance?.rolled?.masterwork
+  );
+}
+
+/** The shared post-success bookkeeping every skill-granting enchanting action
+ *  performs, in one place because all skill-granting arms do exactly this and
+ *  only the input tier differs: the quality-tiered 'enchanting' skill gain
+ *  (soft-clamped to the archetype ceiling and run through the four-state
+ *  mastery curve; a zero gray gain never blocks the action), the shared
+ *  action-throttle stamp, and the deed re-check the skill gain's craftSkill
+ *  triggers need (the crafting.ts craftItem contract: the gaining site marks
+ *  the player dirty itself). */
 function grantEnchantingSkill(ctx: SimContext, meta: PlayerMeta, inputTier: number): void {
   gainCraftSkill(
     meta.craftSkills,
@@ -288,6 +302,52 @@ export interface DisenchantResult {
   reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
 }
 
+function consumeSelectedInventorySlot(
+  inventory: InvSlot[],
+  itemId: string,
+  slotIndex: number | undefined,
+): ConsumedDisenchantUnit | undefined | null {
+  if (slotIndex === undefined) return undefined;
+  if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return null;
+  const slot = inventory[slotIndex];
+  if (slot.itemId !== itemId || slot.count < 1) return null;
+  const instance =
+    slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
+  const craftedRecipeId = slot.craftedRecipeId;
+  slot.count -= 1;
+  if (slot.count <= 0) inventory.splice(slotIndex, 1);
+  return { instance, craftedRecipeId };
+}
+
+function consumePreferredDisenchantVictim(
+  inventory: InvSlot[],
+  itemId: string,
+): ConsumedDisenchantUnit | undefined {
+  const consumeAt = (index: number): ConsumedDisenchantUnit => {
+    const slot = inventory[index];
+    const instance =
+      slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
+    const craftedRecipeId = slot.craftedRecipeId;
+    slot.count -= 1;
+    if (slot.count <= 0) inventory.splice(index, 1);
+    return { instance, craftedRecipeId };
+  };
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    const slot = inventory[i];
+    if (slot.itemId === itemId && !slot.instance) return consumeAt(i);
+  }
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    const slot = inventory[i];
+    if (slot.itemId === itemId && slot.instance && !isEnchantedInstance(slot.instance)) {
+      return consumeAt(i);
+    }
+  }
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    if (inventory[i].itemId === itemId) return consumeAt(i);
+  }
+  return undefined;
+}
+
 /** Resolve one disenchant attempt: denies (no side effect) if the item id is
  *  unknown, ineligible, or the player holds no copy of it at all. Consumes
  *  exactly one held copy on success, preferring the least special first: a
@@ -299,7 +359,12 @@ export interface DisenchantResult {
  *  an enchant, but disenchant destroys the item anyway, so gating on it here
  *  only denied a held item with a wrong "not held" message). Grants the
  *  rolled arcane material yield. */
-export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string): DisenchantResult {
+export function resolveDisenchant(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  slotIndex?: number,
+): DisenchantResult {
   const def = ITEMS[itemId];
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isDisenchantable(def)) return { ok: false, itemId, reason: 'not_disenchantable' };
@@ -318,15 +383,17 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   const isRarePlus = quality === 'rare' || quality === 'epic' || quality === 'legendary';
   const secondaryItemId = typedSecondaryFor(def);
   // #2350 capacity gate: the materials must fit AFTER the disenchanted copy
-  // leaves, so consume it on a scratch copy (consumeOneScratch with the
-  // isEnchantedInstance exclusion mirrors the countEnchantableItem-split
-  // victim order below) and pre-fit the WORST-CASE grants: the +1 rng bonus
+  // leaves, so consume it on a scratch copy using the same victim picker as
+  // the live path below and pre-fit the WORST-CASE grants: the +1 rng bonus
   // arm on the sub-rare yield, and two secondaries on an epic/legendary
   // piece. The denial draws nothing and has no side effect, like every other
   // arm above; a granted roll can never exceed what was checked.
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    consumeOneScratch(scratch, itemId, isEnchantedInstance);
+    if (consumeSelectedInventorySlot(scratch, itemId, slotIndex) === null) {
+      return { ok: false, itemId, reason: 'not_held' };
+    }
+    if (slotIndex === undefined) consumePreferredDisenchantVictim(scratch, itemId);
     const adds: InvSlot[] = isRarePlus
       ? [{ itemId: materialItemId, count: 1 }]
       : [{ itemId: materialItemId, count: maxDisenchantYield(def) }];
@@ -346,8 +413,16 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   // the #2340 fix: with only enchanted copies left, take the highest-index
   // one (removeItem order; the UI confirm predicate in
   // src/ui/bag_item_context_menu.ts mirrors this victim choice).
-  if (ctx.countEnchantableItem(itemId, pid) >= 1) ctx.removeEnchantableItem(itemId, 1, pid);
-  else ctx.removeItem(itemId, 1, pid);
+  const selected = meta
+    ? consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex)
+    : undefined;
+  if (selected === null) return { ok: false, itemId, reason: 'not_held' };
+  let consumed: ConsumedDisenchantUnit | undefined = selected === undefined ? undefined : selected;
+  if (slotIndex !== undefined && meta) ctx.onInventoryChangedForQuests(meta);
+  if (slotIndex === undefined) {
+    consumed = meta ? consumePreferredDisenchantVictim(meta.inventory, itemId) : undefined;
+    if (meta) ctx.onInventoryChangedForQuests(meta);
+  }
   // Yield model: sub-rare (common/uncommon) stays byte-identical to
   // today, a single rng draw (disenchantYield's +0/+1 bonus) over a rolled
   // count of the universal ladder material, and NO secondary. Rare+ shifts to a
@@ -369,17 +444,35 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   } else {
     count = disenchantYield(def, ctx.rng);
   }
-  // silent on both grants below: the disenchantResult event fires its own
-  // dedicated cue (audio.disenchant in src/game/audio.ts); the generic loot
-  // ding would otherwise stack on top of it for every disenchant.
-  ctx.addItem(materialItemId, count, pid, { silent: true });
+  // silent + callerLogs on both grants below: the disenchantResult event owns
+  // BOTH halves of the player feedback. It fires its own dedicated cue
+  // (audio.disenchant in src/game/audio.ts), so the generic loot ding would
+  // stack on top of it, and it logs the yield-naming, item-linked disenchant
+  // line off materialItemId/count (plus secondaryItemId/secondaryCount), so
+  // the hub's "You receive:" lines would repeat what that line already says
+  // (#2430: an epic yield used to print FOUR lines for one action).
+  ctx.addItem(materialItemId, count, pid, { silent: true, callerLogs: true });
   if (secondaryItemId && secondaryCount) {
+    // Still one grant call per unit (the shipped payload-aliasing contract):
+    // the per-unit loot events are elided by callerLogs, and the client
+    // renders ONE secondary line off disenchantResult.secondaryCount, so
+    // batching the grant would buy nothing player-visible and would move the
+    // per-grant discovery/quest hook cadence.
     for (let i = 0; i < secondaryCount; i++) {
-      ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid, 1, { silent: true });
+      ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid, 1, {
+        silent: true,
+        callerLogs: true,
+      });
     }
   }
-  // Quality-tiered gain: the disenchanted item's def quality is the input tier.
-  if (meta) grantEnchantingSkill(ctx, meta, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
+  if (meta) {
+    // Quality-tiered gain: the disenchanted item's def quality is the input
+    // tier. Crafted-provenance copies still yield materials and spend the
+    // shared throttle, but they do not teach enchanting, preventing a craft
+    // then disenchant loop from double-dipping profession progression.
+    if (isCraftedDisenchantVictim(consumed)) recordAction(meta);
+    else grantEnchantingSkill(ctx, meta, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
+  }
   const result: DisenchantResult = { ok: true, itemId, materialItemId, count };
   if (secondaryItemId && secondaryCount) {
     result.secondaryItemId = secondaryItemId;
@@ -392,10 +485,15 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
  *  exactly: resolves the caller's own player entity via ctx.resolve, then
  *  delegates to resolveDisenchant. Runs on the deterministic tick the
  *  command arrives on, never off-tick. */
-export function disenchantItem(ctx: SimContext, itemId: string, pid?: number): DisenchantResult {
+export function disenchantItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  slotIndex?: number,
+): DisenchantResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, reason: 'unknown_item' };
-  return resolveDisenchant(ctx, r.meta.entityId, itemId);
+  return resolveDisenchant(ctx, r.meta.entityId, itemId, slotIndex);
 }
 
 export interface ApplyEnchantResult {
@@ -708,11 +806,14 @@ function resolveReplaceEnchantBagged(
   if (!consumed) return { ok: false, itemId, enchantId, reason: 'not_held' };
   ctx.onInventoryChangedForQuests(meta);
   for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
-  // silent, exactly like the plain apply mint below: the enchantResult event
-  // fires its own dedicated cue (audio.enchant in src/game/audio.ts), so the
-  // generic loot ding would otherwise stack on top of it for every replace.
+  // silent + callerLogs, exactly like the plain apply mint below: the
+  // enchantResult event fires its own dedicated cue (audio.enchant in
+  // src/game/audio.ts) and logs the one enchant line. This mint re-grants the
+  // player's OWN copy, so the hub's "You receive:" line told them they had
+  // received an item that never left their bags (#2430).
   ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed, enchant), pid, 1, {
     silent: true,
+    callerLogs: true,
   });
   // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
   // like the plain arms (also stamps the shared throttle).
@@ -837,10 +938,11 @@ export function resolveApplyEnchant(
   // additive bonus and marker (enchantedPayloadFor above, shared with the
   // capacity gate).
   const merged = enchantedPayloadFor(consumed, enchant);
-  // silent: the enchantResult event fires its own dedicated cue
-  // (audio.enchant in src/game/audio.ts); the generic loot ding would
-  // otherwise stack on top of it for every applied enchant.
-  ctx.addItemInstance(itemId, merged, pid, 1, { silent: true });
+  // silent + callerLogs: the enchantResult event fires its own dedicated cue
+  // (audio.enchant in src/game/audio.ts) and logs the one enchant line. This
+  // mint re-grants the player's OWN copy, so the hub's "You receive:" line
+  // told them they had received an item that never left their bags (#2430).
+  ctx.addItemInstance(itemId, merged, pid, 1, { silent: true, callerLogs: true });
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return { ok: true, itemId, enchantId };

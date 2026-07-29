@@ -556,6 +556,45 @@
     }
   }
 
+  /* ---------- resized-window fill ---------- */
+  /* A window the user has dragged to a size (.window-sized, stamped by
+     src/ui/window_resize.ts once a corner drag engages) owns an explicit
+     width/height. Its scrolling body has to follow that box, and a body authored
+     with a viewport-relative cap does not: .lb-body's 56vh keeps its old height
+     inside the taller window, so the board stays truncated behind its own
+     scrollbar while a dead band opens under it (issue: leaderboard resize).
+
+     So the ONE child marked .window-fill absorbs whatever height the drag left
+     over and scrolls inside it, while the chrome around it (the sticky header, a
+     tab strip) keeps its intrinsic size. Windows with no .window-fill child are
+     left entirely alone (the shell's own overflow-y still handles their
+     overflow), and an unsized window is unaffected, so this costs nothing until a
+     drag actually engages.
+
+     The host window must be a flex COLUMN, which per the window-frame family
+     (#mailbox-window, #social-window) means it opens with an inline display:flex:
+     `.window` is opened by an inline style.display and no stylesheet display can
+     override that. A window adopting .window-fill opts into that pattern too.
+
+     It lives here in @layer components rather than beside the other window-shell
+     rules in layout.css because it has to OUTRANK the per-window body caps, and
+     those are authored in this layer: layout sits below components, so a
+     max-height reset there would silently lose. */
+  .window.window-sized > .window-fill {
+    flex: 1 1 auto;
+    /* A floor, NOT the usual min-height:0. The item still shrinks far below its
+       content height (that is what makes it scroll inside the window instead of
+       pushing the window into its own scroll), but at WINDOW_MIN_HEIGHT the chrome
+       above it (a title that wraps at 220px wide, plus a tab strip) can already
+       exceed the content box; min-height:0 would then collapse the body to nothing
+       and hide it outright. Roughly two rows, so the window's own overflow-y takes
+       the remainder and the content stays reachable. */
+    min-height: 48px;
+    /* The window height is the budget now; a leftover vh cap would re-open the
+       dead band this rule exists to close. */
+    max-height: none;
+  }
+
   /* ---------- windows ---------- */
   #quest-dialog {
     width: 440px;
@@ -728,6 +767,25 @@
     opacity: 0.75;
     margin-bottom: 6px;
   }
+  /* #2514: the current selection earns a tier the widest pick on this corpse
+     would not, so the rule the hint states is live right now. Lifting it out of
+     the muted default is the whole cue: it adds information the player can act
+     on (keep the boxes as they are) and takes none away, and it is what makes
+     the view model's `concentrated` a rendered decision rather than a field
+     nothing reads.
+     Opacity ONLY, and that is load-bearing rather than timid. This hint sits
+     ABOVE the checkbox list and the Harvest button, and it re-renders on every
+     toggle, so any metric-changing emphasis (a heavier weight, a border, a
+     padding) can flip a long locale from two wrapped lines to three and shove
+     the controls down at the exact moment the player is reaching for them. That
+     is the hazard corpse_harvest_window.ts already argues for the reason line,
+     and it is worse here because this block precedes the controls. Opacity
+     changes no box. The cue is supplementary in any case: the rule it
+     emphasizes is the sentence itself, which is always present and always
+     legible. */
+  .corpse-harvest.is-concentrated .corpse-harvest-hint {
+    opacity: 1;
+  }
   .corpse-harvest-list {
     display: flex;
     flex-direction: column;
@@ -737,12 +795,58 @@
   .corpse-harvest-row {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
     font-size: 12px;
     cursor: pointer;
   }
+  /* The name and the mark wrap instead of widening the fixed-width popup: the
+     longest localized pair ("Venom Sac" beside id_ID "belum ada hasil") would
+     otherwise push the row past the 230px window and turn .window's
+     overflow-y:auto into a horizontal scrollbar. */
+  .corpse-harvest-row > span {
+    min-width: 0;
+  }
+  /* #2514: a component family with no harvest item behind it yet. The row is
+     still offered and still CHECKABLE (the sim ignores it either way), so the
+     mark is the muted name plus the .corpse-harvest-note text beside it, never
+     colour alone.
+     Scoped to the row's text, deliberately: dimming the whole label would dim
+     the checkbox too, and a greyed checkbox is this HUD's disabled idiom
+     (.btn:disabled above), so a live control would read as a dead one in the
+     one place this change exists to make honest.
+     A themed token rather than an opacity, and the reason is measurement, not
+     taste: a stacked opacity composited the mark to 2.97:1 on the parchment
+     preset, and tests/theme.test.ts structurally cannot see a loss that happens
+     in a stylesheet rather than in a token. --color-text-muted is the house
+     treatment for muted 10-11px chrome (78 sibling rules across this file,
+     hud.css and shell.css) and theme.ts repairs it to the 3:1 large-text tier
+     against the panel base, which is a floor the composite did not have; it is
+     an improvement on every preset and it moves with the theme. It is NOT a
+     4.5:1 guarantee, and on parchment it measures 4.92:1 at the panel top and
+     3.60:1 in the gradient's edge band. That gap is systemic to the token
+     rather than introduced here, and it is not what carries the row's meaning:
+     the mark is the .corpse-harvest-note TEXT, whose sentence is also in the
+     checkbox's accessible name, so nothing is conveyed by contrast alone. */
+  .corpse-harvest-row-no-yield > span {
+    color: var(--color-text-muted);
+  }
+  .corpse-harvest-note {
+    font-size: 10px;
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
   .corpse-harvest-btn {
     width: 100%;
+  }
+  /* #2509: why Harvest is refused, stated in place. A disabled button takes no
+     pointer events and leaves the tab order, so its tooltip is unreachable.
+     Sits BELOW the button (see corpse_harvest_window.ts) so showing it never
+     moves the control the player is reaching for. */
+  .corpse-harvest-warning {
+    font-size: 11px;
+    color: var(--color-text-error);
+    margin-top: 6px;
   }
 
   /* ---------- town-focus ---------- */
@@ -1531,6 +1635,15 @@
   #leaderboard-window,
   #daily-rewards-window {
     width: 480px;
+  }
+  /* The leaderboard is a flex COLUMN window (the #mailbox-window / #social-window
+     family): the painter opens it with an inline display:flex, and .lb-body carries
+     .window-fill, so once the user drags the window to a size the board takes the
+     leftover height instead of staying pinned to its 56vh cap. flex-direction is
+     unconditional because the inline display:flex is; with the shell default (row)
+     the header, tabs and board would lay out side by side. */
+  #leaderboard-window {
+    flex-direction: column;
   }
   #daily-rewards-window {
     top: 24px;
@@ -2335,11 +2448,12 @@
     text-align: right;
     color: #ffe27a;
   }
-  /* Players / Guilds tab bar above the board. */
+  /* Players / Guilds tab bar above the board. No margin-top: the window is a flex
+     column, so this margin would ADD to .panel-title's 8px margin-bottom instead of
+     collapsing with it the way it did under block flow, doubling the gap. */
   .lb-tabs {
     display: flex;
     gap: 6px;
-    margin-top: 8px;
   }
   .lb-tab {
     flex: 1;
@@ -7307,6 +7421,8 @@
     font-size: 12px;
     color: #f0ead8;
     overflow-wrap: anywhere;
+    user-select: text;
+    -webkit-user-select: text;
   }
   .soc-billboard-msg.empty {
     color: #887c5c;
@@ -9469,23 +9585,22 @@
     color: #9fdc7f;
     font-size: 10.5px;
   }
-  /* The search box and the type/subtype/rarity dropdowns are one control row: at 860px
-     wide, a full-width search box (or a filter row spanning the whole window) reads
-     oversized, so both are capped to a sensible max-width and sit side by side,
-     wrapping onto their own line only once the window narrows too much to fit them
-     (mobile, or a three-menu row once the subtype filter appears). */
+  /* Search and every visible filter participate in one grid. The previous nested flex
+     rows wrapped independently, so the search aligned against the bottom of the entire
+     filter block and jumped beside its last row as the window narrowed. A shared grid
+     keeps every control on the same columns and moves complete fields between rows. */
   .mkt-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 10px 8px;
+    align-items: end;
     margin: 2px 0 8px;
     position: relative;
     z-index: 3;
   }
   .mkt-search {
-    flex: 1 1 200px;
-    max-width: 260px;
+    width: 100%;
+    max-width: none;
     min-width: 0;
     box-sizing: border-box;
     margin: 0;
@@ -9507,18 +9622,13 @@
     border-color: var(--color-border-focus);
   }
   .mkt-filters {
-    display: flex;
-    flex-wrap: wrap;
-    flex: 2 1 auto;
-    gap: 8px;
-    margin: 0;
+    display: contents;
   }
   .mkt-filter {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    flex: 1 1 140px;
-    max-width: 220px;
+    max-width: none;
     min-width: 0;
   }
   .mkt-filter span {

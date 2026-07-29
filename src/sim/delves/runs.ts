@@ -49,6 +49,7 @@ import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { delveExitDropZ } from '../prop_layout';
 import { aurasSurvivingDeath } from '../resurrection';
 import { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
@@ -427,7 +428,7 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   if (run?.companion) ctx.despawnDelveCompanion(run);
   restorePetFromDelveStash(ctx, r.meta.entityId);
   const p = r.e;
-  p.pos = ctx.groundPos(delve.doorPos.x, delve.doorPos.z - 4);
+  p.pos = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.targetId = null;
@@ -635,7 +636,7 @@ export function ejectToDelveDoor(
   if (!r) return;
   const p = r.e;
   p.dead = false;
-  const door = ctx.groundPos(delve.doorPos.x, delve.doorPos.z - 4);
+  const door = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

@@ -1,5 +1,6 @@
 import { DUNGEON_FLOOR_Y, DUNGEON_X_THRESHOLD, getActiveWorldContent, WORLD_MAX_X } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import { dungeonFloorLift } from './dungeon_floor';
 import { fbm2, hash2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
@@ -454,9 +455,10 @@ function dockSurfaceHeight(x: number, z: number, seed: number): number {
   return surface;
 }
 
-// Ground height including instanced dungeon floors (flat, far off-world).
+// Ground height including instanced dungeon floors (flat, far off-world,
+// plus the raised boss dais where the room stacks one).
 export function groundHeight(x: number, z: number, seed: number): number {
-  if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
+  if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y + dungeonFloorLift(x, z);
   // Raised walkable props live in groundHeight, NOT terrainHeight, so the
   // renderer's terrain baseline stays unchanged. Vale Cup adds tier lifts while
   // docks contribute absolute plank surfaces seated against that baseline.

@@ -200,7 +200,11 @@ Use the seams this repo already has, do not invent new ones:
   Node-tested, registered in the `UI_PURE_CORES` allowlist in `tests/architecture.test.ts`;
   HUD-domain components land in the matching `src/ui/hud/<domain>/` directory behind its
   `index.ts` barrel, see `src/ui/hud/CLAUDE.md`) plus a thin write-elided,
-  instance-parameterized painter on the `PainterHost` seam. Reuse a FAMILY before bespoke.
+  instance-parameterized painter on the `PainterHost` seam. Write-elision is the rule for a
+  per-frame painter; a cold `<name>_window.ts` is held instead to the two contracts that do
+  not depend on cadence (no forced-reflow layout read, no repeating driver of its own), and
+  `tests/hud_perf_budget.test.ts` sorts every painter into the bucket that decides which.
+  Reuse a FAMILY before bespoke.
   Full recipe + contracts: `src/ui/CLAUDE.md` and `src/styles/CLAUDE.md`.
 - New visual system: a new `src/render/<thing>.ts` the renderer calls, not a method bank on
   `renderer.ts` (pure logic goes in a `RENDER_PURE_CORES` core; see `src/render/CLAUDE.md`).

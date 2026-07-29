@@ -45,6 +45,7 @@ import type {
   AbilityDef,
   Aura,
   CrowdControlDrCategory,
+  DamageEventKind,
   DeedStatKey,
   DelveRun,
   DungeonDifficulty,
@@ -289,7 +290,7 @@ export interface SimContextCallbacks {
     crit: boolean,
     school: string,
     ability: string | null,
-    kind: 'hit' | 'miss' | 'dodge',
+    kind: DamageEventKind,
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
     direct?: boolean,
@@ -358,7 +359,7 @@ export interface SimContextCallbacks {
     crit: boolean,
     school: string,
     ability: string | null,
-    kind: 'hit' | 'miss' | 'dodge',
+    kind: DamageEventKind,
     attackAnimationStarted?: boolean,
   ): void;
   cleanupYumiMatch(match: ArenaMatch): void;
@@ -632,9 +633,15 @@ export interface SimContextCallbacks {
   // I2b lockpick controller (abandonLockpick/tickLockpickTimeout), and the I2c companion
   // AI (spawnDelveCompanion/despawnDelveCompanion/maybeCompanionBark).
   partyMembersForKey(key: string): number[];
-  // opts.silent: see Sim.addItem's matching param, same contract (suppress
-  // only the client's default loot audio cue, the text line still prints).
-  addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void;
+  // opts.silent / opts.callerLogs: see Sim.addItem's matching params, same
+  // contract (suppress the client's default loot audio cue, and its default
+  // "You receive:" text line when the caller owns the line for this grant).
+  addItem(
+    itemId: string,
+    count: number,
+    pid?: number,
+    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+  ): void;
   // Equip passthroughs for the /dev kit presets (src/sim/dev_kit.ts), which equip
   // bags before gear so pooled bag capacity exists before the pieces land. Plain
   // delegations to the Sim inventory hub; every validation (class, level, slot,
@@ -651,7 +658,7 @@ export interface SimContextCallbacks {
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
-    opts?: { silent?: boolean },
+    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.

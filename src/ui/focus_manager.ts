@@ -4,7 +4,9 @@
 // focusFirstInteractive) into a single trap + focus-first + return-to-opener system,
 // so there is one system, not two. It touches document.activeElement and listens on
 // document, so it is intentionally NOT in tests/architecture.test.ts UI_PURE_CORES;
-// the DOM-FREE boundary math it leans on lives in ./focus_order and IS registered.
+// it is registered in that file's UI_DOM_MODULES instead, as a module that owns
+// browser state. The DOM-FREE boundary math it leans on lives in ./focus_order and
+// IS a registered pure core.
 //
 // WHAT THIS OWNS:
 //   - the ONE canonical FOCUSABLE_SELECTOR (lifted from the old Hud helper, never

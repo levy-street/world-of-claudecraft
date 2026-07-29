@@ -18,8 +18,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Encantar arma - Sello Rúnico',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Sigue subiendo {craft}: {points} puntos más para Especializado, y los costos de materiales bajan.',
-  'guide.professions.harvestBody':
-    'La recolección no se limita a los nodos. Muchas bestias abatidas pueden cosecharse una sola vez, el primero en llegar, para obtener pieles, colmillos, seda y carne directamente del cadáver junto a su botín ordinario; con una pulsación se abre todo a la vez. La elección también es tuya cada vez: extrae todo lo que ofrece el cadáver, o concéntrate en menos componentes y obtén una calidad notablemente superior de lo que sí tomas.\n\nUna tirada de cosecha rara o mejor en una familia portadora de ejemplares también otorga un ejemplar perfecto firmado (una Piel Prístina, Seda Prístina, Glándula de Veneno Prístina o Corte Primo) además del rendimiento ordinario, y registra Espécimen Perfecto en tu Libro de Gestas. Cualquier personaje puede cosechar, sin necesidad de entrenamiento, y cualquier herramienta de recolección que poseas cuenta para el tramo de calidad superior, sea del oficio que sea.',
+  'guide.professions.harvestBodyChoice':
+    'La recolección no se limita a los nodos. Muchas bestias abatidas pueden cosecharse una sola vez, el primero en llegar, para obtener pieles, colmillos, seda y carne directamente del cadáver junto a su botín ordinario; con una pulsación se abre todo a la vez. Cuando una bestia porta más de un componente aprovechable, la elección es tuya: toma todo lo que pueda dar, o concéntrate en menos componentes y obtén una calidad notablemente superior de lo que sí tomas.\n\nUna tirada de cosecha rara o mejor en una familia portadora de ejemplares también otorga un ejemplar perfecto firmado (una Piel Prístina, Seda Prístina, Glándula de Veneno Prístina o Corte Primo) además del rendimiento ordinario, y registra Espécimen Perfecto en tu Libro de Gestas. Cualquier personaje puede cosechar, sin necesidad de entrenamiento, y cualquier herramienta de recolección que poseas cuenta para el tramo de calidad superior, sea del oficio que sea.',
   'guide.professions.craftMasteryTitle': 'Cuánto tarda la maestría',
   'guide.professions.craftMasteryBody':
     'Expectativas honestas: el camino hasta el tope de 125 de un oficio requiere al menos 125 elaboraciones exitosas, ya que cada elaboración con ganancia completa avanza exactamente un punto, y en la práctica algo más a medida que las recetas pierden color entre un peldaño y otro del entrenador. La elaboración en sí es rápida; abastecerla es el viaje real, así que reserva varias tardes dedicadas a recolectar y elaborar por cada oficio.\n\nLos oficios de recolección alcanzan su tope de 100 a lo largo de un recorrido normal de subida de nivel si cosechas mientras viajas, aunque el tramo final pide los nodos de nivel superior del lejano norte. La Pesca es el camino largo por diseño: según su propio ritmo de ganancia, 200 de pericia equivale a más de tres mil capturas. El Pescador Maestro es un título que se gana durante una temporada de tardes tranquilas, no en un fin de semana.',
@@ -3654,6 +3654,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterTypeAll': 'Todos los tipos',
   'itemUi.market.filterTypeWeapon': 'Armas',
   'itemUi.market.filterTypeArmor': 'Armadura',
+  'itemUi.market.filterTypeBag': 'Bolsas',
   'itemUi.market.filterTypeConsumable': 'Consumibles',
   'itemUi.market.filterTypeMaterial': 'Materiales',
   'itemUi.market.filterTypeCosmetic': 'Cosméticos',
@@ -3662,6 +3663,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterArmorAll': 'Toda la armadura',
   'itemUi.market.filterWeaponType': 'Tipo de arma',
   'itemUi.market.filterWeaponAll': 'Todas las armas',
+  'itemUi.market.filterBagSize': 'Tamaño de bolsa',
+  'itemUi.market.filterBagAll': 'Todas las bolsas',
   'itemUi.market.filterRarity': 'Rareza',
   'itemUi.market.filterRarityAll': 'Todas las rarezas',
   'itemUi.market.weaponSword': 'Espadas',
@@ -7498,7 +7501,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.body':
     'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Este cadáver ya ha sido recolectado.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Nada de lo que has seleccionado se puede recolectar de este cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Recolectar {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'aún nada',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Recolectar {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Cuantos menos componentes extraiga una recolección, mayor será el nivel de recolección de cada uno.',
   'hudChrome.corpseHarvest.components.claw': 'Garra',
   'hudChrome.corpseHarvest.components.fang': 'Colmillo',
   'hudChrome.corpseHarvest.components.gills': 'Agallas',
@@ -7507,8 +7516,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Seda',
   'hudChrome.corpseHarvest.components.tusk': 'Colmillo',
   'hudChrome.corpseHarvest.components.venomSac': 'Saco de veneno',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Cuantos menos componentes elijas, mayor será la calidad de cada uno.',
   'hudChrome.corpseHarvest.harvestButton': 'Recolectar',
   'hudChrome.corpseHarvest.title': 'Recolectar',
   'hudChrome.gathering.herbalism': 'Herboristería',
@@ -8245,7 +8252,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Tarjeta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20 % de descuento',
+  'hudChrome.claudium.railWocDiscount': '{percent} % de descuento',
   'hudChrome.claudium.railWocUnavailable':
     'Los precios en WOC no están disponibles en este momento.',
   'hudChrome.claudium.showAmounts': 'Mostrar todas las cantidades de Claudium',
@@ -9093,6 +9100,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': '¿Aceptar el Tañido del Guardián?',
   'hudChrome.gathering.gatherLine': 'Reúnes: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Reúnes: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Despiezas: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Despiezas: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'También recuperas {name}.',
   'hudChrome.mobile.professions': 'Profesiones',
   'hudChrome.options.showThirdActionBar': 'Mostrar tercera barra de acción',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer verificado',
@@ -9405,13 +9415,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Encantamientos Mayores',
   'hudChrome.enchanting.tier.runed': 'Encantamientos Rúnicos',
   'hudChrome.enchanting.wornTag': 'Equipado ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Equipado ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Materiales esperados:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} a {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Encantado',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Encantado)',
-  'hudChrome.marketIndicator.aria': 'Recogida pendiente en el Mercado Mundial',
-  'hudChrome.marketIndicator.tip': 'Oro u objetos te esperan en el Mercader.',
+  'hudChrome.marketIndicator.aria': 'Ganancias u objetos del Mercado Mundial en espera',
+  'hudChrome.marketIndicator.tip':
+    'Las ganancias de venta u objetos devueltos te esperan en el Mercader.',
   'hudChrome.materialHint.arcaneDust':
     'Reactivo de encantamiento. Se obtiene desencantando equipo común y poco común.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9449,4 +9461,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Reemplaza {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Ese objeto ya tiene ese encantamiento.',
   'hudChrome.enchanting.sameEnchantTag': 'Ya aplicado',
+  'hudChrome.crafting.craftedToastQty': 'Elaborado: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Desencantas {item} en {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Desencantas {item} en {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'También recuperas {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'También recuperas {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Desguazas {item} en {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Desguazas {item} en {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Sin encantar',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conserva: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marca del artesano',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonificación de obra maestra',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo de encargo',
 };

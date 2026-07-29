@@ -104,12 +104,18 @@ export function countFit(
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): number {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   let room = 0;
   for (const s of inventory) {
-    if (s.itemId === itemId && canStackInstancePayloads(s.instance, instance) && s.count < stack) {
+    if (
+      s.itemId === itemId &&
+      canStackInstancePayloads(s.instance, instance) &&
+      s.craftedRecipeId === craftedRecipeId &&
+      s.count < stack
+    ) {
       room += stack - s.count;
     }
   }
@@ -121,20 +127,45 @@ export function countFit(
   return Math.min(count, room);
 }
 
-/** True when ONE copy of an instanced grant fits: room in a byte-equal
- *  mergeable stack (identical-payload stacking) OR a free slot.
- *  The signed-grant guards (corpse focus-harvest, node harvest) consume this
- *  so a slot-full bag holding a same-payload stack with room keeps the
+/** True when ALL `count` copies of an instanced grant fit (one by default):
+ *  room in a byte-equal mergeable stack (identical-payload stacking) plus free
+ *  slots. The corpse focus-harvest signed guards consume this (harvestNode's
+ *  signed batch reads countFit directly for the same model) so a slot-full bag
+ *  holding a same-payload stack with room keeps the
  *  signature instead of downgrading to the plain fungible fallback (#2139:
  *  every capacity pre-check must model the merge identically, or a guard
- *  that disagrees with addStacked re-opens the overflow class). */
+ *  that disagrees with addStacked re-opens the overflow class). Counting the
+ *  WHOLE grant is what keeps that promise for a multi-unit signed yield
+ *  (#2473): a stack with room for one of three units must refuse, or the
+ *  remaining two push a fresh slot past capacity. The plain twin is
+ *  canAddItem, same all-or-nothing shape. A `count` of 0 answers true (nothing
+ *  is always grantable) and addItemInstance early-returns on it, so a caller
+ *  that can legitimately reach 0 owns that check itself; no shipped grant can
+ *  (a harvest quantity floors at 1). */
 export function canGrantItemInstance(
   inventory: readonly InvSlot[],
   capacity: number,
   itemId: string,
   instance: ItemInstancePayload,
+  count = 1,
 ): boolean {
-  return countFit(inventory, capacity, itemId, 1, instance) >= 1;
+  return countFit(inventory, capacity, itemId, count, instance) >= count;
+}
+
+/** How many of a `count`-unit instanced grant actually fit: the same
+ *  countFit room model canGrantItemInstance boolean-gates, surfaced as a
+ *  number. A signed-grant call site that owns a rolled quantity larger than
+ *  one (the corpse-harvest signed grant, mirroring the node-harvest signed
+ *  grant's own countFit call) uses this to size its addItemInstance call
+ *  instead of truncating an available multi-unit fit down to one. */
+export function fitForItemInstance(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  itemId: string,
+  count: number,
+  instance: ItemInstancePayload,
+): number {
+  return countFit(inventory, capacity, itemId, count, instance);
 }
 
 /** True when all `count` copies fit. */
@@ -156,8 +187,9 @@ export function fitsAll(
 ): boolean {
   const scratch = inventory.map((s) => ({ ...s }));
   for (const a of adds) {
-    if (countFit(scratch, capacity, a.itemId, a.count, a.instance) < a.count) return false;
-    addStacked(scratch, a.itemId, a.count, a.instance);
+    if (countFit(scratch, capacity, a.itemId, a.count, a.instance, a.craftedRecipeId) < a.count)
+      return false;
+    addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId);
   }
   return true;
 }
@@ -176,13 +208,19 @@ export function addStacked(
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): void {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   let remaining = count;
   for (const s of inventory) {
     if (remaining <= 0) return;
-    if (s.itemId !== itemId || !canStackInstancePayloads(s.instance, instance) || s.count >= stack)
+    if (
+      s.itemId !== itemId ||
+      !canStackInstancePayloads(s.instance, instance) ||
+      s.craftedRecipeId !== craftedRecipeId ||
+      s.count >= stack
+    )
       continue;
     const take = Math.min(stack - s.count, remaining);
     s.count += take;
@@ -193,11 +231,11 @@ export function addStacked(
     // A charge-bearing payload stays one-per-slot; every fresh instanced slot
     // carries its own deep clone so two slots never alias one mutable payload.
     const take = instance && !mergeable ? 1 : Math.min(stack, remaining);
-    inventory.push(
-      instance
-        ? { itemId, count: take, instance: cloneItemInstancePayload(instance) }
-        : { itemId, count: take },
-    );
+    const slot: InvSlot = instance
+      ? { itemId, count: take, instance: cloneItemInstancePayload(instance) }
+      : { itemId, count: take };
+    if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
+    inventory.push(slot);
     remaining -= take;
   }
 }

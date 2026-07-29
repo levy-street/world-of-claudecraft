@@ -9,6 +9,7 @@ import {
   WORLD_MAX_Z,
   WORLD_MIN_Z,
 } from '../sim/data';
+import { ROCK_SINK_UNITS, rockHeightOf } from '../sim/decoration_dims';
 import type { BiomeId } from '../sim/types';
 import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import type { Decoration } from '../sim/world';
@@ -239,6 +240,25 @@ export interface FoliagePerfStats {
 }
 
 // deterministic 0..1 hash on integer grid cells / world coords
+// Model-space height of a rock geometry, cached per geometry: the renderer
+// solves each variant's vertical scale from it so every rock lands at exactly
+// the height the sim publishes (src/sim/decoration_dims.ts), whichever GLB
+// variant it draws.
+const rockNativeHeights = new WeakMap<THREE.BufferGeometry, number>();
+function rockNativeHeight(geo: THREE.BufferGeometry | undefined): number {
+  if (!geo) return 1; // fail soft: a missing variant must never break world entry
+  const cached = rockNativeHeights.get(geo);
+  if (cached !== undefined) return cached;
+  geo.computeBoundingBox();
+  // bb.max.y, NOT the box height: the instance is seated at the terrain minus
+  // the sink, so top-above-ground is (max.y - sink) * scale. The merged
+  // cluster archetype has a member below zero, so using the full height there
+  // would render clusters short of the collider top the sim publishes.
+  const h = geo.boundingBox ? geo.boundingBox.max.y : 1;
+  rockNativeHeights.set(geo, h);
+  return h;
+}
+
 function hashAt(a: number, b: number, k: number): number {
   const s = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453123;
   return s - Math.floor(s);
@@ -1051,10 +1071,16 @@ function buildTrees(
         r.biome === 'peaks' && terrainHeight(r.x, r.z, seed) > ROCK_SNOWLINE_Y;
       // 1 of the 3 single variants per bucket + the cluster archetype
       const singleSubset = variantSubset(1, 3, bucket.band, bucket.col, 71);
+      // Index against the set's ACTUAL length: the colorway is
+      // [singles..., cluster], and the low-tier model list ships fewer single
+      // variants than the high tier, so a hardcoded index (set[3]) resolved to
+      // undefined there and handed an undefined geometry to the instancer.
       const groupGeo = (r: Decoration): THREE.BufferGeometry => {
         const set = isSnowy(r) ? snowRocks : mossRocks;
-        if (isCluster(r)) return set[3];
-        return set[singleSubset[Math.floor(hashAt(r.x, r.z, 72) * singleSubset.length)]];
+        const singles = Math.max(1, set.length - 1); // last entry is the cluster
+        if (isCluster(r)) return set[set.length - 1];
+        const pick = singleSubset[Math.floor(hashAt(r.x, r.z, 72) * singleSubset.length)];
+        return set[Math.min(pick, singles - 1)];
       };
       const groups = new Map<THREE.BufferGeometry, Decoration[]>();
       for (const r of rocks) {
@@ -1074,14 +1100,19 @@ function buildTrees(
           // boulders, low slabs and tall stones depending on the draw
           const sxz1 = r.scale * 0.62 * (0.85 + h2 * 0.5);
           const sxz2 = r.scale * 0.62 * (0.85 + h1 * 0.45);
-          const maxH = Math.max(sxz1, sxz2);
-          const sy = Math.max(r.scale * 0.45 * (0.75 + h3 * 0.5), 0.55 * maxH);
-          const tiltAmp = maxH > 0.8 ? 0.12 : 0.26;
+          // Vertical scale is DERIVED from the sim's rock height so the stone
+          // you see is exactly the stone you collide with and stand on: solve
+          // for the sy that puts the model's top (its own height, less the
+          // 0.3 sink below) at rockHeight() above the terrain. The geometry is
+          // seated base-near-zero, so top-above-ground = (nativeH - 0.3) * sy.
+          const nativeTop = rockNativeHeight(geo);
+          const sy = rockHeightOf(r, seed) / Math.max(0.1, nativeTop - ROCK_SINK_UNITS);
+          const tiltAmp = Math.max(sxz1, sxz2) > 0.8 ? 0.12 : 0.26;
           q.setFromEuler(
             e.set((h1 - 0.5) * tiltAmp, r.variant * 1.7 + h3 * 2.0, (h2 - 0.5) * tiltAmp),
           );
           // sink so undersides bury on slopes (geometry base is near y=0)
-          m.compose(v.set(r.x, y - 0.3 * sy, r.z), q, sv.set(sxz1, sy, sxz2));
+          m.compose(v.set(r.x, y - ROCK_SINK_UNITS * sy, r.z), q, sv.set(sxz1, sy, sxz2));
           rockMesh.setMatrixAt(i, m);
           // low-altitude peaks rocks drop the icy blue-gray for a warm field
           // stone — pale rocks on green foothill grass read as eggs

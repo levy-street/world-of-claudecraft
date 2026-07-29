@@ -264,6 +264,64 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain("t('itemUi.market.filterValueAria', { label, value: current })");
   });
 
+  // Issue #2189. WHICH menus each item type shows is decided in the pure core and pinned
+  // behaviorally in tests/market_view.test.ts (marketFilterMenus); the rendered DOM is
+  // driven in tests/browser/keyboard_nav.browser.test.ts. What is left for a source pin
+  // is exactly the thing neither can see: that the painter DELEGATES instead of
+  // re-deriving the gate inline, which would pass both of those suites while drifting
+  // from the tested core. Comments are stripped so prose cannot satisfy a pin.
+  it('delegates the per-item-type menu shape to the view core instead of re-deriving it', () => {
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+    expect(code).toContain('marketFilterMenus(this.itemTypeFilter)');
+    expect(code).toContain('const subtypeKind = menus.subtypeKind;');
+    expect(code).toMatch(
+      /\(menus\.subtype\s*&&\s*subtypeKind\s*\?\s*this\.renderMarketFilterMenu\(\s*'subtype'/,
+    );
+    expect(code).toMatch(
+      /\(menus\.armorClass\s*\?\s*this\.renderMarketFilterMenu\(\s*'armorClass'/,
+    );
+    expect(code).toMatch(
+      /\(menus\.primaryStat\s*\?\s*this\.renderMarketFilterMenu\(\s*'primaryStat'/,
+    );
+    // No inline gate may survive alongside the delegation, or the core stops being the
+    // single source of truth for the menu shape.
+    // No inline re-derivation may survive in ANY form (ternary, ||, a hoisted const),
+    // or the core stops being the single source of truth for the menu shape. The painter
+    // switches on the core's subtypeKind, so it needs no item-type test of its own: the
+    // one legitimate 'bag' comparison left is marketItemTypeLabel's, on its `filter`
+    // argument rather than on this.itemTypeFilter.
+    expect(code, 'the menu shape must not be re-derived on the painter').not.toContain(
+      "this.itemTypeFilter === 'bag'",
+    );
+    expect(code, 'subtype wording must switch on the core discriminator').toMatch(
+      /kind === 'bagCapacity'/,
+    );
+    // The option VALUE is escaped too. Every option used to be a source-authored literal
+    // from an `as const` tuple; the bag capacities are the first derived from content, so
+    // what made this interpolation safe by construction no longer holds on its own.
+    expect(code).toContain('data-market-filter-option="${esc(option)}"');
+    // The bag labels are i18n dispatch, which a pure core may not do, so they stay here.
+    expect(code).toContain("t('itemUi.market.filterTypeBag')");
+    expect(code).toContain("t('itemUi.market.filterBagSize')");
+    expect(code).toContain("t('itemUi.market.filterBagAll')");
+    // Capacity option labels reuse the bag tooltip template, already translated in every
+    // locale, instead of minting a new per-size string.
+    expect(code).toContain("t('itemUi.tooltip.bagSlots'");
+  });
+
+  // MKT_MENU_PREFERRED_HEIGHT drives the runtime open-up/clamp decision and must agree
+  // with the stylesheet's static cap, or the two disagree about where a menu ends. The
+  // bag capacity menu is the first new consumer of that pair since it was introduced.
+  it('keeps the dropdown menu height in the painter and the stylesheet in agreement', () => {
+    const preferred = painter.match(/const MKT_MENU_PREFERRED_HEIGHT = (\d+);/)?.[1];
+    expect(preferred, 'MKT_MENU_PREFERRED_HEIGHT must exist').toBe('236');
+    // Scoped to the .mkt-select-menu rule rather than searched across the whole sheet,
+    // so the agreement is proved against the rule that actually caps this menu.
+    const rule = componentsCss.match(/\.mkt-select-menu\s*\{[^}]*\}/)?.[0];
+    expect(rule, '.mkt-select-menu rule must exist').toBeTruthy();
+    expect(rule).toContain(`max-height: ${preferred}px`);
+  });
+
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {
     expect(painter).toContain('.marketBuy(l.id)');
     expect(painter).toContain('.marketCancel(l.id)');
@@ -271,5 +329,40 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain('.marketCollect()');
     expect(painter).toContain('this.deps.moneyHtml(');
     expect(painter).toContain('formatLocalizedMoney(');
+  });
+});
+
+describe('market_window: stale tooltip on re-filter (#2456)', () => {
+  // Typing in the search box, or picking a type/subtype/rarity filter that then narrows
+  // the async listings update, drives the signature-checked refresh path
+  // (refreshIfChanged -> renderContent), not the full render() rebuild. renderContent()
+  // tears down and rebuilds every `.mkt-row` node (`list.innerHTML = ''`); a row removed
+  // this way fires no mouseleave, so a tooltip left open on a row whose item no longer
+  // matches the query would otherwise linger, still describing an item the list no
+  // longer shows. render() already hides the tooltip on every full rebuild; this pins
+  // the same guard on the signature-driven refresh path.
+  it('hides the tooltip once the listings signature changes, before renderContent rebuilds the rows', () => {
+    const method = painter.slice(
+      painter.indexOf('refreshIfChanged(): void {'),
+      painter.indexOf('render(): void {'),
+    );
+    expect(method, 'refreshIfChanged must exist').toContain('if (sig === this.lastSig) return;');
+    const afterSigChange = method.slice(method.indexOf('this.lastSig = sig;'));
+    const hideIdx = afterSigChange.indexOf('this.deps.hideTooltip();');
+    const renderIdx = afterSigChange.indexOf('this.renderContent();');
+    expect(hideIdx, 'hideTooltip() must run once the signature actually changed').toBeGreaterThan(
+      -1,
+    );
+    expect(
+      hideIdx,
+      'hideTooltip() must run before renderContent() tears down the row nodes',
+    ).toBeLessThan(renderIdx);
+  });
+
+  it('still guards the full render() rebuild path (tab switch, filter-menu click) the same way', () => {
+    const render = painter.slice(painter.indexOf('render(): void {'));
+    expect(render.indexOf('this.deps.hideTooltip();')).toBeLessThan(
+      render.indexOf('this.renderContent();'),
+    );
   });
 });

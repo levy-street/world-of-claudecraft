@@ -293,8 +293,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       }
     }
     // Hunted literal (seed 4242, after every beat above): the koi bites on
-    // session index 16.
-    expect(koiSession).toBe(16);
+    // session index 5 (re-hunted for the solid-landmark world).
+    expect(koiSession).toBe(5);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -316,18 +316,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 271 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 236 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 156,
+        hitAt: 10,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 5,
+        hitAt: 13,
       },
     ];
     for (const hunt of hunts) {
@@ -385,8 +385,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
     // Hunted literal (seed 4242, after every beat above): the rare-or-better
-    // rarity roll that mints the signed specimen lands on attempt index 20.
-    expect(hitAt).toBe(20);
+    // rarity roll that mints the signed specimen lands on attempt index 5.
+    expect(hitAt).toBe(5);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

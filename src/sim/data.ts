@@ -286,6 +286,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     mines: sets.flatMap((s) => s.mines),
     docks: sets.flatMap((s) => s.docks),
     tents: sets.flatMap((s) => s.tents),
+    marshReeds: sets.flatMap((s) => s.marshReeds),
     crates: sets.flatMap((s) => s.crates),
     campfires: sets.flatMap((s) => s.campfires),
     mudHuts: sets.flatMap((s) => s.mudHuts),
@@ -433,8 +434,14 @@ export const DUNGEONS: Record<string, DungeonDef> = { ...DUNGEON_DEFS, ...TEMPLE
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 
+// Indexed lookup: dungeonAt runs inside groundHeight's dungeon branch (per
+// entity per tick in a populated instance), so the per-call find() scan and
+// its closure are not welcome there.
+const DUNGEON_BY_INDEX: (DungeonDef | undefined)[] = [];
+for (const d of DUNGEON_LIST) DUNGEON_BY_INDEX[d.index] = d;
+
 export function dungeonByIndex(index: number): DungeonDef | null {
-  return DUNGEON_LIST.find((d) => d.index === index) ?? null;
+  return DUNGEON_BY_INDEX[index] ?? null;
 }
 
 // Which dungeon a far-off instance position belongs to, by x-band.

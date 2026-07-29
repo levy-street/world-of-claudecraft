@@ -666,7 +666,7 @@ export const sv_SE: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% rabatt",
+      "railWocDiscount": "{percent}% rabatt",
       "railWocUnavailable": "WOC-priser är inte tillgängliga just nu.",
       "railNativeUnavailable": "SOL/WOC är avstängt.",
       "amountLabel": "Belopp",
@@ -872,7 +872,13 @@ export const sv_SE: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} m {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas."
+      "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Husdjuret har fulla livspunkter",
@@ -1463,9 +1469,12 @@ export const sv_SE: EnTranslations = {
       "title": "Skörda",
       "harvestButton": "Skörda",
       "harvestTooltip": "Samlar de markerade komponenterna. Varje kadaver kan skördas en gång, den som är först. Tar inte bytet.",
-      "concentrateHint": "Ju färre delar du väljer, desto högre kvalitetsnivå får var och en.",
+      "yieldTierHint": "Ju färre komponenter en skörd faktiskt tar, desto högre skördnivå får var och en.",
+      "nothingSelectedYields": "Inget du valt kan skördas från det här kadavret.",
       "alreadyHarvested": "Det här kadavret har redan skördats.",
       "componentAria": "Skörda {component}",
+      "componentNoYield": "inget ännu",
+      "componentAriaNoYield": "Skörda {component}: {note}",
       "components": {
         "hide": "Hud",
         "fang": "Huggtand",
@@ -2023,8 +2032,8 @@ export const sv_SE: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Hämtning väntar vid Världsmarknaden",
-      "tip": "Guld eller föremål väntar på dig hos Köpmannen."
+      "aria": "Världsmarknadsintäkter eller föremål väntar",
+      "tip": "Försäljningsintäkter eller returnerade föremål väntar på dig hos Köpmannen."
     },
     "noticeboard": {
       "empty": "Inget verkar vara uppsatt."
@@ -2168,6 +2177,9 @@ export const sv_SE: EnTranslations = {
       "notReady": "Den här resursnoden har inte återspawnats för dig ännu.",
       "gatherLine": "Du samlar: {name}.",
       "gatherLineQty": "Du samlar in: {name} x{qty}.",
+      "harvestLine": "Du skördar: {name}.",
+      "harvestLineQty": "Du skördar: {name} x{qty}.",
+      "harvestSpecimenLine": "Du får också {name}.",
       "catchLine": "Du drar in: {name}",
       "biteLine": "Något nappar på betet!",
       "gotAwayLine": "Det kom undan.",
@@ -2349,6 +2361,7 @@ export const sv_SE: EnTranslations = {
       "empty": "Inga recept kända än.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",
+      "craftedToastQty": "Tillverkad: {name} x{qty}",
       "insufficientMaterials": "Du har inte materialet för det.",
       "unknownRecipe": "Det receptet finns inte.",
       "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver.",
@@ -2441,7 +2454,13 @@ export const sv_SE: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Du avförtrollar {item}.",
+      "disenchantedYield": "Du avförtrollar {item} till {material}.",
+      "disenchantedYieldQty": "Du avförtrollar {item} till {material} x{qty}.",
+      "disenchantedAlso": "Du återvinner också {material}.",
+      "disenchantedAlsoQty": "Du återvinner också {material} x{qty}.",
       "salvagedLine": "Du bärgar {item}.",
+      "salvagedYield": "Du bärgar {item} till {material}.",
+      "salvagedYieldQty": "Du bärgar {item} till {material} x{qty}.",
       "enchantAppliedLine": "Du förtrollar {item} med {enchant}.",
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
@@ -2466,6 +2485,7 @@ export const sv_SE: EnTranslations = {
       "noEnchants": "Inget förtrollning använder det reagnset.",
       "noTargets": "Inget behörigt föremål att förtrylla.",
       "wornTag": "Buren ({slot})",
+      "wornTagIndexed": "Buren ({slot} {index})",
       "tier": {
         "base": "Basförtrollningar",
         "runed": "Runristade förtrollningar",
@@ -2478,9 +2498,14 @@ export const sv_SE: EnTranslations = {
       "sameEnchant": "Det föremålet har redan den förtrollningen.",
       "replaceTag": "Ersätter {enchant}",
       "sameEnchantTag": "Redan applicerad",
+      "plainTag": "Inte förtrollad",
       "replaceConfirmTitle": "Ersätt förtrollningen på {item}?",
       "replaceConfirmBody": "Detta ersätter {old} på {item} med {new}.",
       "replaceConfirmNoRefund": "Den gamla förtrollningen förstörs. Dess material återbetalas inte. Det kan inte ångras.",
+      "replaceConfirmKeeps": "Behålls: {kept}",
+      "replaceConfirmKeepsSigner": "Tillverkarens märke",
+      "replaceConfirmKeepsMasterwork": "Mästerverksbonus",
+      "replaceConfirmKeepsBond": "Uppdragsbindning",
       "replaceConfirmCost": "Kostnad: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ersätt"
@@ -3726,7 +3751,7 @@ export const sv_SE: EnTranslations = {
     "professions": {
       "intro": "Bortom strider och uppdrag belönar världen dig för att bruka jorden och smedjan: samla råmaterial, förvandla dem till utrustning och varor genom tio hantverksyrken, och slå dig till ro i en identitet som en av de tio arketyper yrkena representerar.",
       "harvestTitle": "Att skörda själva jakten",
-      "harvestBody": "Insamling stannar inte vid noder. Många slagna bestar kan skördas en gång var, först till kvarn, för hudar, huggtänder, silke och kött, direkt från kroppen vid sidan av det vanliga bytet; ett tryck öppnar båda. Valet är ditt varje gång: ta allt kroppen erbjuder, eller koncentrera dig på färre komponenter och ta en mätbart finare kvalitet av det du tar.\n\nEtt sällsynt eller bättre skördeslag på en exemplarbärande familj ger också ett signerat perfekt exemplar (ett Orört skinn, Orörd siden, Orörd giftkörtel eller Primärsnitt) utöver det vanliga utbytet, och registrerar Ett perfekt exemplar i din Bedrifternas bok. Vilken karaktär som helst kan skörda, ingen träning krävs, och vilket insamlingsverktyg du äger räknas mot premiumarmen, oavsett vilket yrke det tillhör.",
+      "harvestBodyChoice": "Insamling stannar inte vid noder. Många slagna bestar kan skördas en gång var, först till kvarn, för hudar, huggtänder, silke och kött, direkt från kroppen vid sidan av det vanliga bytet; ett tryck öppnar båda. När en best bär mer än en användbar komponent är valet ditt: ta allt den kan ge, eller koncentrera dig på färre komponenter och ta en mätbart finare kvalitet av det du tar.\n\nEtt sällsynt eller bättre skördeslag på en exemplarbärande familj ger också ett signerat perfekt exemplar (ett Orört skinn, Orörd siden, Orörd giftkörtel eller Primärsnitt) utöver det vanliga utbytet, och registrerar Ett perfekt exemplar i din Bedrifternas bok. Vilken karaktär som helst kan skörda, ingen träning krävs, och vilket insamlingsverktyg du äger räknas mot premiumarmen, oavsett vilket yrke det tillhör.",
       "focusTitle": "Stadsfokus",
       "focusBody": "Varje huvudort har en Stadsfokus-panel för besökande skördare: stå i staden, öppna den bredvid minikartan, och rikta en liten budget av fokuspoäng mot de komponenttyper du bryr dig om. Ju mer fokus du ger en komponent, desto finare och rikare kommer den av varje senare kropp; din fördelning följer din karaktär vart den än vandrar, och du kan göra om den, gratis, vid vilket senare besök i staden som helst.",
       "craftHowTitle": "Hantverksfönstret",
@@ -5500,6 +5525,7 @@ export const sv_SE: EnTranslations = {
     },
     "augment": {
       "choose": "Välj en förstärkning",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalitet",
         "desc": "Dina fysiska slag träffar 15% hårdare."
@@ -6714,6 +6740,7 @@ export const sv_SE: EnTranslations = {
       "filterTypeAll": "Alla typer",
       "filterTypeWeapon": "Vapen",
       "filterTypeArmor": "Rustning",
+      "filterTypeBag": "Väskor",
       "filterTypeConsumable": "Förbrukningsvaror",
       "filterTypeMaterial": "Material",
       "filterTypeCosmetic": "Kosmetika",
@@ -6727,6 +6754,8 @@ export const sv_SE: EnTranslations = {
       "armorMail": "Ringbrynja",
       "filterWeaponType": "Vapentyp",
       "filterWeaponAll": "Alla vapen",
+      "filterBagSize": "Väskstorlek",
+      "filterBagAll": "Alla väskor",
       "filterPrimaryStat": "Primärt attribut",
       "filterPrimaryStatAll": "Alla primära attribut",
       "filterRarity": "Sällsynthet",

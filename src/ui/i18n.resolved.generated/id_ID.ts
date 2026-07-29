@@ -666,7 +666,7 @@ export const id_ID: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Diskon 20%.",
+      "railWocDiscount": "Diskon {percent}%.",
       "railWocUnavailable": "Harga WOC tidak tersedia saat ini.",
       "railNativeUnavailable": "SOL/WOC tidak tersedia.",
       "amountLabel": "Jumlah",
@@ -872,7 +872,13 @@ export const id_ID: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}d",
       "seconds": "{s}d",
-      "autoShowHint": "Baris muncul secara otomatis setelah partaimu memberikan kerusakan atau penyembuhan, dan segmen ini tertutup beberapa detik setelah pertarungan berakhir."
+      "autoShowHint": "Baris muncul secara otomatis setelah partaimu memberikan kerusakan atau penyembuhan, dan segmen ini tertutup beberapa detik setelah pertarungan berakhir.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Peliharaan sudah dalam kondisi darah penuh",
@@ -1463,9 +1469,12 @@ export const id_ID: EnTranslations = {
       "title": "Panen",
       "harvestButton": "Panen",
       "harvestTooltip": "Mengumpulkan komponen yang dicentang. Setiap bangkai hanya bisa dipanen sekali, siapa cepat dia dapat. Tidak mengambil jarahan.",
-      "concentrateHint": "Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.",
+      "yieldTierHint": "Semakin sedikit bagian yang benar-benar diambil dalam satu panen, semakin tinggi tingkat panen tiap bagian.",
+      "nothingSelectedYields": "Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.",
       "alreadyHarvested": "Bangkai ini sudah dipanen.",
       "componentAria": "Panen {component}",
+      "componentNoYield": "belum ada hasil",
+      "componentAriaNoYield": "Panen {component}: {note}",
       "components": {
         "hide": "Kulit",
         "fang": "Taring",
@@ -2023,8 +2032,8 @@ export const id_ID: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Pengambilan Pasar Dunia menanti",
-      "tip": "Emas atau barang menantimu di Sang Pedagang."
+      "aria": "Hasil atau barang Pasar Dunia menanti",
+      "tip": "Hasil penjualan atau barang yang dikembalikan menantimu di Sang Pedagang."
     },
     "noticeboard": {
       "empty": "Sepertinya tidak ada yang ditempel."
@@ -2168,6 +2177,9 @@ export const id_ID: EnTranslations = {
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
+      "harvestLine": "Anda memanen: {name}.",
+      "harvestLineQty": "Anda memanen: {name} x{qty}.",
+      "harvestSpecimenLine": "Anda juga mendapatkan {name}.",
       "catchLine": "Kamu menarik: {name}",
       "biteLine": "Sesuatu menggigit umpannya!",
       "gotAwayLine": "Ikannya kabur.",
@@ -2349,6 +2361,7 @@ export const id_ID: EnTranslations = {
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",
+      "craftedToastQty": "Dibuat: {name} x{qty}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
       "unknownRecipe": "Resep itu tidak ada.",
       "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
@@ -2441,7 +2454,13 @@ export const id_ID: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
+      "disenchantedYield": "Kamu menghancurkan pemantraan {item} menjadi {material}.",
+      "disenchantedYieldQty": "Kamu menghancurkan pemantraan {item} menjadi {material} x{qty}.",
+      "disenchantedAlso": "Kamu juga memulihkan {material}.",
+      "disenchantedAlsoQty": "Kamu juga memulihkan {material} x{qty}.",
       "salvagedLine": "Kamu menyalvasi {item}.",
+      "salvagedYield": "Kamu menyalvasi {item} menjadi {material}.",
+      "salvagedYieldQty": "Kamu menyalvasi {item} menjadi {material} x{qty}.",
       "enchantAppliedLine": "Kamu memantrai {item} dengan {enchant}.",
       "notHeld": "Kamu tidak memiliki barang itu.",
       "notDisenchantable": "Kamu tidak bisa menghancurkan pemantraan itu.",
@@ -2466,6 +2485,7 @@ export const id_ID: EnTranslations = {
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
       "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai.",
       "wornTag": "Dipakai ({slot})",
+      "wornTagIndexed": "Dipakai ({slot} {index})",
       "tier": {
         "base": "Mantra Dasar",
         "runed": "Mantra Bersura",
@@ -2478,9 +2498,14 @@ export const id_ID: EnTranslations = {
       "sameEnchant": "Barang itu sudah memiliki mantra itu.",
       "replaceTag": "Menggantikan {enchant}",
       "sameEnchantTag": "Sudah diterapkan",
+      "plainTag": "Belum dimantrai",
       "replaceConfirmTitle": "Ganti mantra pada {item}?",
       "replaceConfirmBody": "Ini mengganti {old} pada {item} dengan {new}.",
       "replaceConfirmNoRefund": "Mantra lama dihancurkan. Bahannya tidak dikembalikan. Tindakan ini tidak dapat dibatalkan.",
+      "replaceConfirmKeeps": "Dipertahankan: {kept}",
+      "replaceConfirmKeepsSigner": "Tanda pembuat",
+      "replaceConfirmKeepsMasterwork": "Bonus mahakarya",
+      "replaceConfirmKeepsBond": "Ikatan komisi",
       "replaceConfirmCost": "Biaya: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ganti"
@@ -3726,7 +3751,7 @@ export const id_ID: EnTranslations = {
     "professions": {
       "intro": "Di luar pertempuran dan misi, dunia mengganjarmu karena menggarap tanah dan tempaan: mengumpulkan bahan mentah, mengolahnya menjadi perlengkapan dan barang lewat sepuluh kerajinan, dan menetap dalam identitas sebagai salah satu dari sepuluh arketipe yang diwakili kerajinan-kerajinan itu.",
       "harvestTitle": "Memanen dari hasil buruan",
-      "harvestBody": "Pengumpulan tidak berhenti di simpul. Banyak binatang yang dibunuh bisa dipanen sekali masing-masing, siapa cepat dia dapat, untuk kulit, taring, sutra, dan daging, langsung dari bangkai bersama jarahan biasanya; satu kali tekan membuka keduanya. Pilihannya juga ada di tanganmu setiap kali: ambil semua yang ditawarkan bangkai itu, atau fokus pada lebih sedikit komponen dan dapatkan kualitas yang jauh lebih baik dari apa yang kamu ambil.\n\nHasil panen langka atau lebih baik pada keluarga berisi spesimen juga memberikan spesimen sempurna bertanda tangan (Kulit Murni, Sutra Murni, Kelenjar Bisa Murni, atau Potongan Istimewa) di atas hasil biasa, dan mencatat Spesimen Sempurna di Kitab Jasamu. Karakter mana pun bisa memanen, tanpa pelatihan, dan alat pengumpul mana pun yang kamu miliki dihitung untuk bagian premium, dari perdagangan mana pun alat itu berasal.",
+      "harvestBodyChoice": "Pengumpulan tidak berhenti di simpul. Banyak binatang yang dibunuh bisa dipanen sekali masing-masing, siapa cepat dia dapat, untuk kulit, taring, sutra, dan daging, langsung dari bangkai bersama jarahan biasanya; satu kali tekan membuka keduanya. Bila seekor binatang membawa lebih dari satu komponen yang bisa diolah, pilihannya ada di tanganmu: ambil semua yang bisa diberikannya, atau fokus pada lebih sedikit komponen dan dapatkan kualitas yang jauh lebih baik dari apa yang kamu ambil.\n\nHasil panen langka atau lebih baik pada keluarga berisi spesimen juga memberikan spesimen sempurna bertanda tangan (Kulit Murni, Sutra Murni, Kelenjar Bisa Murni, atau Potongan Istimewa) di atas hasil biasa, dan mencatat Spesimen Sempurna di Kitab Jasamu. Karakter mana pun bisa memanen, tanpa pelatihan, dan alat pengumpul mana pun yang kamu miliki dihitung untuk bagian premium, dari perdagangan mana pun alat itu berasal.",
       "focusTitle": "Fokus Kota",
       "focusBody": "Setiap kota pusat menyimpan panel Fokus Kota bagi para pemanen yang berkunjung: berdirilah di kota, buka dari samping minimap, dan arahkan sedikit anggaran poin fokus pada jenis komponen yang kamu pedulikan. Makin banyak fokus yang kamu berikan pada sebuah komponen, makin halus dan kaya ia keluar dari tiap mayat berikutnya; alokasimu mengikuti karaktermu ke mana pun mereka menjelajah, dan kamu bisa mengubahnya, gratis, pada kunjungan berikutnya ke kota.",
       "craftHowTitle": "Jendela kriya",
@@ -5500,6 +5525,7 @@ export const id_ID: EnTranslations = {
     },
     "augment": {
       "choose": "Pilih sebuah Augment",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Kebrutalan",
         "desc": "Serangan fisikmu menghantam 15% lebih keras."
@@ -6714,6 +6740,7 @@ export const id_ID: EnTranslations = {
       "filterTypeAll": "Semua jenis",
       "filterTypeWeapon": "Senjata",
       "filterTypeArmor": "Zirah",
+      "filterTypeBag": "Tas",
       "filterTypeConsumable": "Konsumabel",
       "filterTypeMaterial": "Bahan",
       "filterTypeCosmetic": "Kosmetik",
@@ -6727,6 +6754,8 @@ export const id_ID: EnTranslations = {
       "armorMail": "Rantai",
       "filterWeaponType": "Jenis senjata",
       "filterWeaponAll": "Semua senjata",
+      "filterBagSize": "Ukuran tas",
+      "filterBagAll": "Semua tas",
       "filterPrimaryStat": "Stat utama",
       "filterPrimaryStatAll": "Stat utama apa pun",
       "filterRarity": "Kelangkaan",

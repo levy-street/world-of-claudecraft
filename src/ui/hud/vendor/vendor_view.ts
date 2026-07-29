@@ -9,7 +9,7 @@
 //
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
-import type { InvSlot, ItemDef } from '../../../sim/types';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { vendorStackSize } from '../../../sim/vendor_stack';
 
 export interface VendorGoodsRow {
@@ -41,6 +41,14 @@ export interface VendorBuybackRow {
   count: number;
   /** Copper the player pays to buy the item back (the vendor sell value). */
   price: number;
+  /** Position of this row in the source vendorBuyback array: pass back to
+   *  onBuyBack so the server redeems this exact row (see buyBackItem, #2398). */
+  index: number;
+  /** Present when this row carries a masterwork/signed payload the buyback
+   *  will restore, so it can be told apart from a plain row of the same item. */
+  instance?: ItemInstancePayload;
+  /** Present when this row carries crafted provenance used by disenchant. */
+  craftedRecipeId?: string;
 }
 
 export interface VendorView {
@@ -83,11 +91,19 @@ export function buildVendorView(
     });
   }
   const buyback: VendorBuybackRow[] = [];
-  for (const slot of buybackSlots) {
+  buybackSlots.forEach((slot, index) => {
     const item = items[slot.itemId];
-    if (!item || slot.count <= 0) continue;
-    buyback.push({ itemId: slot.itemId, item, count: slot.count, price: item.sellValue });
-  }
+    if (!item || slot.count <= 0) return;
+    buyback.push({
+      itemId: slot.itemId,
+      item,
+      count: slot.count,
+      price: item.sellValue,
+      index,
+      ...(slot.instance && { instance: slot.instance }),
+      ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
+    });
+  });
   return {
     goods,
     buyback,

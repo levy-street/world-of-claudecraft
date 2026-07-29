@@ -9,7 +9,7 @@
   import Badge from '../components/Badge.svelte';
   import WordList from '../components/WordList.svelte';
   import ModerationActionPrompt from '../components/ModerationActionPrompt.svelte';
-  import { liftChatMute } from '../moderation_actions';
+  import { liftChatMute, resetChatStrikes } from '../moderation_actions';
 
   // Chat filter tab: escalation config, the soft/hard word tiers, and the list of
   // chat-moderated accounts. Ported from renderChatFilter + wireChatFilterEvents.
@@ -18,6 +18,7 @@
   let warnings = $state(0);
   let ladder = $state('');
   let selectedLift = $state<ChatModeratedAccount | null>(null);
+  let selectedReset = $state<ChatModeratedAccount | null>(null);
 
   let ladderHuman = $derived((data?.config.muteLadderSeconds ?? []).map((s) => fmtDuration(s)).join(' → '));
 
@@ -50,10 +51,6 @@
     apiPost('/admin/api/chat-filter/config', { warningsBeforeMute, muteLadderSeconds }).then(() => refresh()).catch((err: unknown) => fail(err, 'alert.saveConfigFailed'));
   }
 
-  function resetStrikes(accountId: number): void {
-    apiPost(`/admin/api/moderation/accounts/${accountId}/reset-strikes`, {}).then(() => refresh()).catch((err: unknown) => fail(err, 'alert.actionFailed'));
-  }
-
   async function confirmLift(values: { reason: string; expiry: string }): Promise<void> {
     const account = selectedLift;
     if (!account) return;
@@ -65,6 +62,23 @@
     try {
       await apiPost(built.pending.endpoint, built.pending.body);
       selectedLift = null;
+      await refresh();
+    } catch (err) {
+      fail(err, 'alert.actionFailed');
+    }
+  }
+
+  async function confirmReset(values: { reason: string; expiry: string }): Promise<void> {
+    const account = selectedReset;
+    if (!account) return;
+    const built = resetChatStrikes(account.id, values.reason);
+    if ('errorKey' in built) {
+      window.alert(t(built.errorKey));
+      return;
+    }
+    try {
+      await apiPost(built.pending.endpoint, built.pending.body);
+      selectedReset = null;
       await refresh();
     } catch (err) {
       fail(err, 'alert.actionFailed');
@@ -140,7 +154,7 @@
               <td>
                 {#if canModerate}
                   {#if muted(a.chatMutedUntil)}<button onclick={() => (selectedLift = a)}>{t('chatMod.liftMute')}</button>{/if}
-                  {#if a.chatStrikes > 0}<button onclick={() => resetStrikes(a.id)}>{t('chatMod.resetStrikes')}</button>{/if}
+                  {#if a.chatStrikes > 0}<button onclick={() => (selectedReset = a)}>{t('chatMod.resetStrikes')}</button>{/if}
                 {/if}
               </td>
             </tr>
@@ -156,6 +170,23 @@
                       ]}
                       onConfirm={confirmLift}
                       onCancel={() => (selectedLift = null)}
+                    />
+                  {/key}
+                </td>
+              </tr>
+            {/if}
+            {#if selectedReset?.id === a.id}
+              <tr>
+                <td colspan="4">
+                  {#key a.id}
+                    <ModerationActionPrompt
+                      title={t('dialog.confirmResetChatStrikes')}
+                      rows={[
+                        { label: t('dialog.account'), value: a.username },
+                        { label: t('dialog.action'), value: t('dialog.actionResetChatStrikes') },
+                      ]}
+                      onConfirm={confirmReset}
+                      onCancel={() => (selectedReset = null)}
                     />
                   {/key}
                 </td>

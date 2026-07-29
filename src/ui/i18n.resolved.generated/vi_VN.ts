@@ -666,7 +666,7 @@ export const vi_VN: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Giảm 20%",
+      "railWocDiscount": "Giảm {percent}%",
       "railWocUnavailable": "Giá WOC hiện không có sẵn.",
       "railNativeUnavailable": "SOL/WOC hiện không khả dụng.",
       "amountLabel": "Số lượng",
@@ -872,7 +872,13 @@ export const vi_VN: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}p {s}g",
       "seconds": "{s}g",
-      "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc."
+      "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Thú cưng đang đầy máu",
@@ -1463,9 +1469,12 @@ export const vi_VN: EnTranslations = {
       "title": "Thu Hoạch",
       "harvestButton": "Thu Hoạch",
       "harvestTooltip": "Thu thập các bộ phận đã chọn. Mỗi xác chỉ có thể thu hoạch một lần, ai đến trước được trước. Không lấy chiến lợi phẩm.",
-      "concentrateHint": "Chọn càng ít bộ phận, mỗi bộ phận thu được sẽ có bậc chất lượng càng cao.",
+      "yieldTierHint": "Một lần thu hoạch lấy được càng ít bộ phận, bậc thu hoạch của mỗi bộ phận càng cao.",
+      "nothingSelectedYields": "Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.",
       "alreadyHarvested": "Xác này đã bị thu hoạch rồi.",
       "componentAria": "Thu hoạch {component}",
+      "componentNoYield": "chưa có gì",
+      "componentAriaNoYield": "Thu hoạch {component}: {note}",
       "components": {
         "hide": "Da",
         "fang": "Nanh",
@@ -2023,8 +2032,8 @@ export const vi_VN: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Có hàng chờ thu tại Chợ Thế Giới",
-      "tip": "Vàng hoặc vật phẩm đang chờ bạn tại Thương Nhân."
+      "aria": "Tiền bán hoặc vật phẩm Chợ Thế Giới đang chờ",
+      "tip": "Tiền bán hàng hoặc vật phẩm bị trả lại đang chờ bạn tại Thương Nhân."
     },
     "noticeboard": {
       "empty": "Có vẻ như chưa có gì được dán lên."
@@ -2168,6 +2177,9 @@ export const vi_VN: EnTranslations = {
       "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
       "gatherLine": "Bạn tập hợp: {name}.",
       "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
+      "harvestLine": "Bạn thu hoạch: {name}.",
+      "harvestLineQty": "Bạn thu hoạch: {name} x{qty}.",
+      "harvestSpecimenLine": "Bạn cũng thu được {name}.",
       "catchLine": "Bạn giật cần: {name}",
       "biteLine": "Có thứ gì đó cắn mồi!",
       "gotAwayLine": "Nó thoát mất rồi.",
@@ -2349,6 +2361,7 @@ export const vi_VN: EnTranslations = {
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
+      "craftedToastQty": "Đã chế tác: {name} x{qty}",
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
       "unknownRecipe": "Công thức đó không tồn tại.",
       "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
@@ -2441,7 +2454,13 @@ export const vi_VN: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Bạn hủy pháp khắc {item}.",
+      "disenchantedYield": "Bạn hủy pháp khắc {item} thành {material}.",
+      "disenchantedYieldQty": "Bạn hủy pháp khắc {item} thành {material} x{qty}.",
+      "disenchantedAlso": "Bạn cũng thu hồi {material}.",
+      "disenchantedAlsoQty": "Bạn cũng thu hồi {material} x{qty}.",
       "salvagedLine": "Bạn tháo dỡ {item}.",
+      "salvagedYield": "Bạn tháo dỡ {item} thành {material}.",
+      "salvagedYieldQty": "Bạn tháo dỡ {item} thành {material} x{qty}.",
       "enchantAppliedLine": "Bạn pháp khắc {item} với {enchant}.",
       "notHeld": "Bạn không có vật phẩm đó.",
       "notDisenchantable": "Bạn không thể hủy pháp khắc vật phẩm đó.",
@@ -2466,6 +2485,7 @@ export const vi_VN: EnTranslations = {
       "noEnchants": "Không có phép khắc nào dùng nguyên liệu này.",
       "noTargets": "Không có vật phẩm nào hợp lệ để pháp khắc.",
       "wornTag": "Đang Trang Bị ({slot})",
+      "wornTagIndexed": "Đang Trang Bị ({slot} {index})",
       "tier": {
         "base": "Pháp Khắc Cơ Bản",
         "runed": "Pháp Khắc Phù Văn",
@@ -2478,9 +2498,14 @@ export const vi_VN: EnTranslations = {
       "sameEnchant": "Vật phẩm đó đã có phép khắc đó rồi.",
       "replaceTag": "Thay Thế {enchant}",
       "sameEnchantTag": "Đã Áp Dụng",
+      "plainTag": "Chưa pháp khắc",
       "replaceConfirmTitle": "Thay Thế Pháp Khắc Trên {item}?",
       "replaceConfirmBody": "Thao tác này thay thế {old} trên {item} bằng {new}.",
       "replaceConfirmNoRefund": "Pháp khắc cũ sẽ bị phá hủy. Nguyên liệu của nó sẽ không được hoàn lại. Không thể hoàn tác.",
+      "replaceConfirmKeeps": "Giữ lại: {kept}",
+      "replaceConfirmKeepsSigner": "Dấu người chế tạo",
+      "replaceConfirmKeepsMasterwork": "Thưởng tuyệt phẩm",
+      "replaceConfirmKeepsBond": "Ràng buộc ủy thác",
       "replaceConfirmCost": "Chi phí: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Thay Thế"
@@ -3726,7 +3751,7 @@ export const vi_VN: EnTranslations = {
     "professions": {
       "intro": "Ngoài chiến đấu và nhiệm vụ, thế giới còn tưởng thưởng cho bạn khi cày cuốc và rèn đúc: thu thập nguyên liệu thô, biến chúng thành trang bị và hàng hóa qua mười nghề chế tác, và an cư trong một danh phận là một trong mười hình mẫu mà các nghề ấy đại diện.",
       "harvestTitle": "Thu hoạch chính cuộc đi săn",
-      "harvestBody": "Thu thập không dừng lại ở các nút tài nguyên. Nhiều dã thú đã bị giết có thể được thu hoạch mỗi con một lần, ai đến trước được trước, lấy da, nanh, lụa và thịt, thẳng từ xác bên cạnh vật phẩm rơi thông thường; một lần nhấn mở cả hai. Lựa chọn cũng là của bạn mỗi lần: lấy tất cả những gì xác cung cấp, hoặc tập trung vào ít nguyên liệu hơn và nhận được phẩm cấp cao hơn đáng kể cho những gì bạn lấy.\n\nMột lần thu hoạch hiếm hoặc tốt hơn trên một họ sinh vật mang mẫu vật cũng trao thêm một mẫu vật hoàn hảo có chữ ký (Da Nguyên Vẹn, Tơ Nguyên Vẹn, Tuyến Nọc Độc Nguyên Vẹn, hoặc Miếng Thịt Hảo Hạng) bên trên sản lượng thường, và ghi Mẫu Vật Hoàn Hảo vào Sách Kỳ Công của bạn. Mọi nhân vật đều có thể thu hoạch, không cần huấn luyện, và bất kỳ công cụ thu thập nào bạn có đều tính cho phần thưởng bậc cao, dù nó thuộc nghề nào.",
+      "harvestBodyChoice": "Thu thập không dừng lại ở các nút tài nguyên. Nhiều dã thú đã bị giết có thể được thu hoạch mỗi con một lần, ai đến trước được trước, lấy da, nanh, lụa và thịt, thẳng từ xác bên cạnh vật phẩm rơi thông thường; một lần nhấn mở cả hai. Khi một dã thú mang nhiều hơn một bộ phận dùng được, lựa chọn là của bạn: lấy tất cả những gì nó có thể cho, hoặc tập trung vào ít bộ phận hơn và nhận được phẩm cấp cao hơn đáng kể cho những gì bạn lấy.\n\nMột lần thu hoạch hiếm hoặc tốt hơn trên một họ sinh vật mang mẫu vật cũng trao thêm một mẫu vật hoàn hảo có chữ ký (Da Nguyên Vẹn, Tơ Nguyên Vẹn, Tuyến Nọc Độc Nguyên Vẹn, hoặc Miếng Thịt Hảo Hạng) bên trên sản lượng thường, và ghi Mẫu Vật Hoàn Hảo vào Sách Kỳ Công của bạn. Mọi nhân vật đều có thể thu hoạch, không cần huấn luyện, và bất kỳ công cụ thu thập nào bạn có đều tính cho phần thưởng bậc cao, dù nó thuộc nghề nào.",
       "focusTitle": "Trọng Tâm Thị Trấn",
       "focusBody": "Mỗi thị trấn trung tâm đều có một bảng Trọng Tâm Thị Trấn dành cho những người thu hoạch ghé qua: đứng trong thị trấn, mở nó từ cạnh bản đồ nhỏ, và nhắm một khoản nhỏ điểm trọng tâm vào những loại thành phần bạn quan tâm. Bạn dồn càng nhiều trọng tâm vào một thành phần, nó ra càng tinh và càng dồi dào từ mỗi cái xác về sau; phân bổ của bạn đi theo nhân vật dù họ rong ruổi đến đâu, và bạn có thể sắp xếp lại nó, miễn phí, trong bất kỳ lần ghé thị trấn nào sau này.",
       "craftHowTitle": "Cửa sổ chế tác",
@@ -5500,6 +5525,7 @@ export const vi_VN: EnTranslations = {
     },
     "augment": {
       "choose": "Chọn một Cường Hóa",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Tàn Bạo",
         "desc": "Đòn đánh vật lý của ngươi mạnh hơn 15%."
@@ -6714,6 +6740,7 @@ export const vi_VN: EnTranslations = {
       "filterTypeAll": "Tất cả loại",
       "filterTypeWeapon": "Vũ Khí",
       "filterTypeArmor": "Giáp",
+      "filterTypeBag": "Túi",
       "filterTypeConsumable": "Đồ Tiêu Hao",
       "filterTypeMaterial": "Nguyên Liệu",
       "filterTypeCosmetic": "Đồ Trang Trí",
@@ -6727,6 +6754,8 @@ export const vi_VN: EnTranslations = {
       "armorMail": "Giáp Lưới",
       "filterWeaponType": "Loại vũ khí",
       "filterWeaponAll": "Tất cả vũ khí",
+      "filterBagSize": "Sức chứa túi",
+      "filterBagAll": "Tất cả túi",
       "filterPrimaryStat": "Chỉ số chính",
       "filterPrimaryStatAll": "Bất kỳ chỉ số chính nào",
       "filterRarity": "Độ hiếm",

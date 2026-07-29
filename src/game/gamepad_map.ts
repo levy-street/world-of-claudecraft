@@ -16,6 +16,12 @@ export interface MoveFlags {
 export interface LookDelta {
   yaw: number;
   pitch: number;
+  // True while the stick is deflected past the deadzone this frame, independent
+  // of whether the scaled yaw/pitch happen to compute to zero (a zero `dt` or
+  // `speed` would otherwise mask a real deflection). Lets a consumer drive a
+  // "look active" signal (see Input.setGamepadLookActive) off the raw stick
+  // state rather than the scaled delta.
+  active: boolean;
 }
 
 // --- W3C "Standard Gamepad" indices --------------------------------------
@@ -262,9 +268,9 @@ export function stickToLook(
   dt: number,
 ): LookDelta {
   const v = applyRadialDeadzone(x, y, dz);
-  if (v.x === 0 && v.y === 0) return { yaw: 0, pitch: 0 };
-  const pitchSign = invertY ? 1 : -1;
-  return { yaw: -v.x * speed * dt, pitch: pitchSign * v.y * speed * dt };
+  if (v.x === 0 && v.y === 0) return { yaw: 0, pitch: 0, active: false };
+  const pitchSign = invertY ? -1 : 1;
+  return { yaw: -v.x * speed * dt, pitch: pitchSign * v.y * speed * dt, active: true };
 }
 
 /** Indices of buttons that went from up→down between the previous and current

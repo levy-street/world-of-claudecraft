@@ -666,7 +666,7 @@ export const fr_FR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20 % de réduction",
+      "railWocDiscount": "{percent} % de réduction",
       "railWocUnavailable": "Les prix en WOC sont indisponibles pour le moment.",
       "railNativeUnavailable": "SOL/WOC désactivé.",
       "amountLabel": "Montant",
@@ -872,7 +872,13 @@ export const fr_FR: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} min {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou des soins, et ce panneau se ferme quelques secondes après la fin du combat."
+      "autoShowHint": "Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou des soins, et ce panneau se ferme quelques secondes après la fin du combat.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Le familier est à pleine santé",
@@ -1463,9 +1469,12 @@ export const fr_FR: EnTranslations = {
       "title": "Dépeçage",
       "harvestButton": "Dépecer",
       "harvestTooltip": "Récupère les composants cochés. Chaque cadavre ne peut être dépecé qu'une fois, premier arrivé. Ne prend pas le butin.",
-      "concentrateHint": "Moins vous choisissez de composants, plus la qualité de chacun est élevée.",
+      "yieldTierHint": "Moins un dépeçage prélève de composants, plus le palier de chacun est élevé.",
+      "nothingSelectedYields": "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
       "alreadyHarvested": "Ce cadavre a déjà été dépecé.",
       "componentAria": "Prélever {component}",
+      "componentNoYield": "rien pour l'instant",
+      "componentAriaNoYield": "Prélever {component} : {note}",
       "components": {
         "hide": "Peau",
         "fang": "Croc",
@@ -2023,8 +2032,8 @@ export const fr_FR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Collecte du Marché mondial en attente",
-      "tip": "De l'or ou des objets vous attendent chez le Marchand."
+      "aria": "Produit ou objets du Marché mondial en attente",
+      "tip": "Le produit de vos ventes ou des objets retournés vous attendent chez le Marchand."
     },
     "noticeboard": {
       "empty": "Rien ne semble affiché."
@@ -2168,6 +2177,9 @@ export const fr_FR: EnTranslations = {
       "notReady": "Ce nœud de ressource n'a pas encore réapparu pour vous.",
       "gatherLine": "Vous rassemblez : {name}.",
       "gatherLineQty": "Vous rassemblez : {name} x{qty}.",
+      "harvestLine": "Vous dépècez : {name}.",
+      "harvestLineQty": "Vous dépècez : {name} x{qty}.",
+      "harvestSpecimenLine": "Vous récupérez aussi {name}.",
       "catchLine": "Vous remontez : {name}",
       "biteLine": "Quelque chose mord à l'hameçon !",
       "gotAwayLine": "Il s'est échappé.",
@@ -2349,6 +2361,7 @@ export const fr_FR: EnTranslations = {
       "empty": "Aucune recette connue pour l'instant.",
       "resultAria": "Artisanat {name}",
       "craftedToast": "Fabriqué$1 {name}",
+      "craftedToastQty": "Fabriqué : {name} x{qty}",
       "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
       "unknownRecipe": "Cette recette n'existe pas.",
       "comboRequirementUnmet": "Vous ne possédez pas les deux métiers requis au palier nécessaire pour cette recette.",
@@ -2441,7 +2454,13 @@ export const fr_FR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Vous désenchantez {item}.",
+      "disenchantedYield": "Vous désenchantez {item} en {material}.",
+      "disenchantedYieldQty": "Vous désenchantez {item} en {material} x{qty}.",
+      "disenchantedAlso": "Vous récupérez aussi {material}.",
+      "disenchantedAlsoQty": "Vous récupérez aussi {material} x{qty}.",
       "salvagedLine": "Vous récupérez {item}.",
+      "salvagedYield": "Vous récupérez {item} en {material}.",
+      "salvagedYieldQty": "Vous récupérez {item} en {material} x{qty}.",
       "enchantAppliedLine": "Vous enchantez {item} avec {enchant}.",
       "notHeld": "Vous n'avez pas cet objet.",
       "notDisenchantable": "Vous ne pouvez pas désenchanter cela.",
@@ -2466,6 +2485,7 @@ export const fr_FR: EnTranslations = {
       "noEnchants": "Aucun enchantement n'utilise ce réactif.",
       "noTargets": "Aucun objet éligible à enchanter.",
       "wornTag": "Équipé ({slot})",
+      "wornTagIndexed": "Équipé ({slot} {index})",
       "tier": {
         "base": "Enchantements de base",
         "runed": "Enchantements Runiques",
@@ -2478,9 +2498,14 @@ export const fr_FR: EnTranslations = {
       "sameEnchant": "Cet objet a déjà cet enchantement.",
       "replaceTag": "Remplace {enchant}",
       "sameEnchantTag": "Déjà appliqué",
+      "plainTag": "Non enchanté",
       "replaceConfirmTitle": "Remplacer l'enchantement sur {item} ?",
       "replaceConfirmBody": "Cela remplace {old} sur {item} par {new}.",
       "replaceConfirmNoRefund": "L'ancien enchantement est détruit sans remboursement. Cette action est irréversible.",
+      "replaceConfirmKeeps": "Conservé : {kept}",
+      "replaceConfirmKeepsSigner": "Marque du fabricant",
+      "replaceConfirmKeepsMasterwork": "Bonus d'ouvrage de maître",
+      "replaceConfirmKeepsBond": "Lien de commande",
       "replaceConfirmCost": "Coût : {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Remplacer"
@@ -3726,7 +3751,7 @@ export const fr_FR: EnTranslations = {
     "professions": {
       "intro": "Au-delà des combats et des quêtes, le monde vous récompense de travailler la terre et la forge : récolter des matières premières, les transformer en équipement et en biens à travers dix métiers d'artisanat, et vous installer dans une identité, celle de l'un des dix archétypes que ces métiers incarnent.",
       "harvestTitle": "Dépecer la chasse elle-même",
-      "harvestBody": "La récolte ne s'arrête pas aux noeuds. De nombreuses bêtes abattues peuvent être dépecées une fois chacune, premier arrivé premier servi, pour des peaux, crocs, soie et viande, directement sur le cadavre en plus de son butin ordinaire ; une seule touche ouvre les deux. Le choix vous appartient à chaque fois : dépouiller tout ce que le cadavre offre, ou vous concentrer sur moins de composants et obtenir une qualité sensiblement meilleure de ce que vous prenez.\n\nUn jet de récolte rare ou mieux sur un cadavre d'une famille portant des spécimens accorde également un spécimen parfait signé (une Peau immaculée, une Soie immaculée, une Glande à venin vierge, ou une Pièce de choix) en plus du rendement ordinaire, et consigne Un spécimen parfait dans votre Livre des hauts faits. N'importe quel personnage peut récolter, sans formation requise, et tout outil de récolte que vous possédez compte pour le bonus de prime, quel que soit le métier auquel il appartient.",
+      "harvestBodyChoice": "La récolte ne s'arrête pas aux noeuds. De nombreuses bêtes abattues peuvent être dépecées une fois chacune, premier arrivé premier servi, pour des peaux, crocs, soie et viande, directement sur le cadavre en plus de son butin ordinaire ; une seule touche ouvre les deux. Lorsqu'une bête porte plus d'un composant exploitable, le choix vous appartient : prendre tout ce qu'elle peut donner, ou vous concentrer sur moins de composants et obtenir une qualité sensiblement meilleure de ce que vous prenez.\n\nUn jet de récolte rare ou mieux sur un cadavre d'une famille portant des spécimens accorde également un spécimen parfait signé (une Peau immaculée, une Soie immaculée, une Glande à venin vierge, ou une Pièce de choix) en plus du rendement ordinaire, et consigne Un spécimen parfait dans votre Livre des hauts faits. N'importe quel personnage peut récolter, sans formation requise, et tout outil de récolte que vous possédez compte pour le bonus de prime, quel que soit le métier auquel il appartient.",
       "focusTitle": "Focalisation de la ville",
       "focusBody": "Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte et attribuez un petit capital de points aux types de composants qui vous intéressent. Plus un composant reçoit de focalisation, plus les dépouilles suivantes en fournissent une version fine et abondante. Cette répartition suit votre personnage et peut être modifiée gratuitement lors de chaque visite en ville.",
       "craftHowTitle": "La fenêtre d’artisanat",
@@ -5500,6 +5525,7 @@ export const fr_FR: EnTranslations = {
     },
     "augment": {
       "choose": "Choisissez une augmentation",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalité",
         "desc": "Vos frappes physiques cognent 15% plus fort."
@@ -6714,6 +6740,7 @@ export const fr_FR: EnTranslations = {
       "filterTypeAll": "Tous les types",
       "filterTypeWeapon": "Armes",
       "filterTypeArmor": "Armure",
+      "filterTypeBag": "Sacs",
       "filterTypeConsumable": "Consommables",
       "filterTypeMaterial": "Matériaux",
       "filterTypeCosmetic": "Cosmétiques",
@@ -6727,6 +6754,8 @@ export const fr_FR: EnTranslations = {
       "armorMail": "Mailles",
       "filterWeaponType": "Type d'arme",
       "filterWeaponAll": "Toutes les armes",
+      "filterBagSize": "Taille de sac",
+      "filterBagAll": "Tous les sacs",
       "filterPrimaryStat": "Caractéristique principale",
       "filterPrimaryStatAll": "Toute caractéristique principale",
       "filterRarity": "Rareté",

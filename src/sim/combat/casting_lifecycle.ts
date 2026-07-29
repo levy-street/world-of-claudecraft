@@ -553,6 +553,27 @@ function resolveDeadAllyTarget(
   return party && party.members.includes(t.id) ? t : null;
 }
 
+function vanishedLowBlowFallbackTarget(
+  ctx: SimContext,
+  p: Entity,
+  ability: AbilityDef,
+): Entity | null {
+  if (ability.id !== 'kidney_shot') return null;
+  if (p.targetId !== null) return null;
+  if (!p.auras.some((a) => a.kind === 'stealth')) return null;
+
+  let nearest: Entity | null = null;
+  let nearestDist = Infinity;
+  for (const entity of ctx.entities.values()) {
+    if (entity.id === p.id || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    const d = dist2d(p.pos, entity.pos);
+    if (d > MELEE_RANGE || d >= nearestDist) continue;
+    nearest = entity;
+    nearestDist = d;
+  }
+  return nearest;
+}
+
 export function castAbility(
   ctx: SimContext,
   abilityId: string,
@@ -784,7 +805,10 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    target =
+      p.targetId !== null
+        ? (ctx.entities.get(p.targetId) ?? null)
+        : vanishedLowBlowFallbackTarget(ctx, p, ability);
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
@@ -1163,6 +1187,7 @@ const MAGE_DEFENSIVE_COOLDOWNS = [
   'blink',
   'ice_barrier',
   'blazing_barrier',
+  'temporal_barrier',
   'greater_invisibility',
 ] as const;
 const OVERFLOW_CAP_SECONDS = 10;

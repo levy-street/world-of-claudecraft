@@ -666,7 +666,7 @@ export const pt_BR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% de desconto",
+      "railWocDiscount": "{percent}% de desconto",
       "railWocUnavailable": "O preço do WOC não está disponível no momento.",
       "railNativeUnavailable": "SOL/WOC indisponível.",
       "amountLabel": "Quantia",
@@ -872,7 +872,13 @@ export const pt_BR: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}min {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "As linhas aparecem automaticamente quando seu grupo causa dano ou cura, e este painel fecha alguns segundos após o fim do combate."
+      "autoShowHint": "As linhas aparecem automaticamente quando seu grupo causa dano ou cura, e este painel fecha alguns segundos após o fim do combate.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "O mascote está com vida cheia",
@@ -1463,9 +1469,12 @@ export const pt_BR: EnTranslations = {
       "title": "Coleta",
       "harvestButton": "Coletar",
       "harvestTooltip": "Coleta os componentes selecionados. Cada cadáver pode ser coletado uma vez, quem chegar primeiro. Não pega o saque.",
-      "concentrateHint": "Quanto menos componentes você escolher, maior a qualidade de cada um.",
+      "yieldTierHint": "Quanto menos componentes uma coleta retirar, maior o nível de coleta de cada um.",
+      "nothingSelectedYields": "Nada do que você selecionou pode ser coletado deste cadáver.",
       "alreadyHarvested": "Este cadáver já foi coletado.",
       "componentAria": "Coletar {component}",
+      "componentNoYield": "nada ainda",
+      "componentAriaNoYield": "Coletar {component}: {note}",
       "components": {
         "hide": "Pele",
         "fang": "Presa",
@@ -2023,8 +2032,8 @@ export const pt_BR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Coleta do Mercado Mundial pendente",
-      "tip": "Há ouro ou itens esperando por você com o Mercador."
+      "aria": "Receita ou itens do Mercado Mundial aguardam",
+      "tip": "Receita de vendas ou itens devolvidos estão esperando por você com o Mercador."
     },
     "noticeboard": {
       "empty": "Parece que não há nada afixado."
@@ -2168,6 +2177,9 @@ export const pt_BR: EnTranslations = {
       "notReady": "Este nó de recursos ainda não se regenerou para você.",
       "gatherLine": "Você coleta: {name}.",
       "gatherLineQty": "Você coleta: {name} x{qty}.",
+      "harvestLine": "Você esfolou: {name}.",
+      "harvestLineQty": "Você esfolou: {name} x{qty}.",
+      "harvestSpecimenLine": "Você também recupera {name}.",
       "catchLine": "Você recolhe: {name}",
       "biteLine": "Algo morde a isca!",
       "gotAwayLine": "Ele escapou.",
@@ -2349,6 +2361,7 @@ export const pt_BR: EnTranslations = {
       "empty": "Nenhuma receita conhecida ainda.",
       "resultAria": "Artesanato {name}",
       "craftedToast": "Feito: {name}",
+      "craftedToastQty": "Feito: {name} x{qty}",
       "insufficientMaterials": "Você não tem os materiais para isso.",
       "unknownRecipe": "Essa receita não existe.",
       "comboRequirementUnmet": "Você não possui os dois ofícios exigidos no nível necessário para essa receita.",
@@ -2441,7 +2454,13 @@ export const pt_BR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Você desencanta {item}.",
+      "disenchantedYield": "Você desencanta {item} em {material}.",
+      "disenchantedYieldQty": "Você desencanta {item} em {material} x{qty}.",
+      "disenchantedAlso": "Você também recupera {material}.",
+      "disenchantedAlsoQty": "Você também recupera {material} x{qty}.",
       "salvagedLine": "Você recupera {item}.",
+      "salvagedYield": "Você recupera {item} em {material}.",
+      "salvagedYieldQty": "Você recupera {item} em {material} x{qty}.",
       "enchantAppliedLine": "Você encanta {item} com {enchant}.",
       "notHeld": "Você não tem esse item.",
       "notDisenchantable": "Você não pode desencantar isso.",
@@ -2466,6 +2485,7 @@ export const pt_BR: EnTranslations = {
       "noEnchants": "Nenhum encantamento usa esse reagente.",
       "noTargets": "Nenhum item elegível para encantar.",
       "wornTag": "Equipado ({slot})",
+      "wornTagIndexed": "Equipado ({slot} {index})",
       "tier": {
         "base": "Encantamentos Base",
         "runed": "Encantamentos Rúnicos",
@@ -2478,9 +2498,14 @@ export const pt_BR: EnTranslations = {
       "sameEnchant": "Esse item já tem esse encantamento.",
       "replaceTag": "Substitui {enchant}",
       "sameEnchantTag": "Já aplicado",
+      "plainTag": "Sem encantamento",
       "replaceConfirmTitle": "Substituir o encantamento de {item}?",
       "replaceConfirmBody": "Isso substitui {old} em {item} por {new}.",
       "replaceConfirmNoRefund": "O encantamento antigo é destruído. Os materiais dele não são reembolsados. Não pode ser desfeito.",
+      "replaceConfirmKeeps": "Mantém: {kept}",
+      "replaceConfirmKeepsSigner": "Marca do criador",
+      "replaceConfirmKeepsMasterwork": "Bônus de obra-prima",
+      "replaceConfirmKeepsBond": "Vínculo da encomenda",
       "replaceConfirmCost": "Custo: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Substituir"
@@ -3726,7 +3751,7 @@ export const pt_BR: EnTranslations = {
     "professions": {
       "intro": "Além do combate e das missões, o mundo recompensa quem trabalha a terra e a forja: coletando matérias-primas, transformando-as em equipamento e bens ao longo de dez ofícios de criação e assumindo uma identidade como um dos dez arquétipos que esses ofícios representam.",
       "harvestTitle": "Colhendo a própria caçada",
-      "harvestBody": "A coleta não para nos nós. Muitas criaturas abatidas podem ser colhidas uma vez cada, por ordem de chegada, por couros, presas, seda e carne, direto do cadáver junto com o saque comum; um único toque abre os dois. A escolha é sua a cada vez: recolha tudo que o cadáver oferece, ou concentre-se em menos componentes e leve uma qualidade visivelmente superior do que você escolher.\n\nUm resultado de coleta raro ou melhor em uma família de espécimes também concede um espécime perfeito assinado (um Couro Imaculado, Seda Imaculada, Glândula de Veneno Imaculada ou Corte Nobre) além do rendimento comum, e registra Um Espécime Perfeito no seu Livro dos Feitos. Qualquer personagem pode colher, sem necessidade de treinamento, e qualquer ferramenta de coleta que você possua conta para o bônus de qualidade superior, independentemente do ofício ao qual ela pertence.",
+      "harvestBodyChoice": "A coleta não para nos nós. Muitas criaturas abatidas podem ser colhidas uma vez cada, por ordem de chegada, por couros, presas, seda e carne, direto do cadáver junto com o saque comum; um único toque abre os dois. Quando uma criatura carrega mais de um componente aproveitável, a escolha é sua: recolha tudo que ela puder dar, ou concentre-se em menos componentes e leve uma qualidade visivelmente superior do que você escolher.\n\nUm resultado de coleta raro ou melhor em uma família de espécimes também concede um espécime perfeito assinado (um Couro Imaculado, Seda Imaculada, Glândula de Veneno Imaculada ou Corte Nobre) além do rendimento comum, e registra Um Espécime Perfeito no seu Livro dos Feitos. Qualquer personagem pode colher, sem necessidade de treinamento, e qualquer ferramenta de coleta que você possua conta para o bônus de qualidade superior, independentemente do ofício ao qual ela pertence.",
       "focusTitle": "Foco da Cidade",
       "focusBody": "Toda cidade principal mantém um painel de Foco da Cidade para os coletores de passagem: fique na cidade, abra-o ao lado do minimapa e direcione um pequeno orçamento de pontos de foco aos tipos de componente que lhe interessam. Quanto mais foco você dá a um componente, mais fino e rico ele sai de cada corpo dali em diante; sua distribuição acompanha seu personagem por onde ele andar, e você pode reajustá-la, de graça, em qualquer visita posterior à cidade.",
       "craftHowTitle": "A janela de criação",
@@ -5500,6 +5525,7 @@ export const pt_BR: EnTranslations = {
     },
     "augment": {
       "choose": "Escolha um Aprimoramento",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalidade",
         "desc": "Seus golpes físicos batem 15% mais forte."
@@ -6714,6 +6740,7 @@ export const pt_BR: EnTranslations = {
       "filterTypeAll": "Todos os tipos",
       "filterTypeWeapon": "Armas",
       "filterTypeArmor": "Armadura",
+      "filterTypeBag": "Bolsas",
       "filterTypeConsumable": "Consumíveis",
       "filterTypeMaterial": "Materiais",
       "filterTypeCosmetic": "Cosméticos",
@@ -6727,6 +6754,8 @@ export const pt_BR: EnTranslations = {
       "armorMail": "Malha",
       "filterWeaponType": "Tipo de arma",
       "filterWeaponAll": "Todas as armas",
+      "filterBagSize": "Tamanho de bolsa",
+      "filterBagAll": "Todas as bolsas",
       "filterPrimaryStat": "Atributo primário",
       "filterPrimaryStatAll": "Qualquer atributo primário",
       "filterRarity": "Raridade",

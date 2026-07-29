@@ -7,8 +7,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Fortryl våben - Runet fokus',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Bliv ved med at hæve {craft}: {points} point mere til Specialiseret, og materialeomkostningerne falder.',
-  'guide.professions.harvestBody':
-    'Indsamling stopper ikke ved ressourcekilder. Mange dræbte bæster kan høstes én gang hver, den der kommer først betjenes først, for skind, huggtænder, silke og kød direkte fra liget ved siden af dets almindelige bytte; ét tryk åbner begge. Valget er dit hver gang: strip alt, liget byder på, eller koncentrer dig om færre komponenter og tag en mærkbart finere kvalitet af det, du faktisk tager.\n\nEt sjælden eller bedre høsteresultat på en prøve-bærende familie giver også et signeret perfekt eksemplar (et Uberørt Skind, Uberørt Silke, Uberørt Giftkirtel eller Førsteklasses Udskæring) oven i det ordinære udbytte og optegner Et Perfekt Eksemplar i din Bedrifternes Bog. Enhver karakter kan høste, ingen træning kræves, og ethvert indsamlingsredskab, du ejer, tæller mod premium-armen, uanset hvilket håndværk det tilhører.',
+  'guide.professions.harvestBodyChoice':
+    'Indsamling stopper ikke ved ressourcekilder. Mange dræbte bæster kan høstes én gang hver, den der kommer først betjenes først, for skind, huggtænder, silke og kød direkte fra liget ved siden af dets almindelige bytte; ét tryk åbner begge. Bærer et bæst mere end én brugbar komponent, er valget dit: tag alt, hvad det kan give, eller koncentrer dig om færre komponenter og tag en mærkbart finere kvalitet af det, du faktisk tager.\n\nEt sjælden eller bedre høsteresultat på en prøve-bærende familie giver også et signeret perfekt eksemplar (et Uberørt Skind, Uberørt Silke, Uberørt Giftkirtel eller Førsteklasses Udskæring) oven i det ordinære udbytte og optegner Et Perfekt Eksemplar i din Bedrifternes Bog. Enhver karakter kan høste, ingen træning kræves, og ethvert indsamlingsredskab, du ejer, tæller mod premium-armen, uanset hvilket håndværk det tilhører.',
   'guide.professions.craftMasteryTitle': 'Hvor lang tid mesterskab tager',
   'guide.professions.craftMasteryBody':
     'Ærlige forventninger: klatringen til et håndværks grænse på 125 er mindst 125 vellykkede fremstillinger, da enhver fuld-gevinst-fremstilling rykker dig præcis ét point, og i praksis noget mere, efterhånden som opskrifter falmer mellem trænertrin. Selve fremstillingen er hurtig; at forsyne den er den egentlige rejse, så afsæt et par dedikerede aftener med indsamling og fremstilling pr. håndværk.\n\nIndsamlingshåndværkene når deres grænse på 100 i løbet af en normal oplevelsesrejse, hvis du høster, mens du rejser, omend den sidste strækning kræver de høje niveaukilder langt mod nord. Fiskeri er af design den lange vej: efter sin egen gevinst-tidsplan er 200 færdighed mere end tre tusind fangster. Mesterangler er en titel, der optjenes over en sæson af stille aftener, ikke en weekend.',
@@ -6090,7 +6090,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.title': 'Controller',
   'hudChrome.controller.vibration': 'Vibration',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Dette kadaver er allerede blevet høstet.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Intet af det du har valgt kan høstes fra dette kadaver.',
   'hudChrome.corpseHarvest.componentAria': 'Høst {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'intet endnu',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Høst {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Jo færre komponenter en høst tager, desto højere høstniveau får hver enkelt.',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Hugtand',
   'hudChrome.corpseHarvest.components.gills': 'Gæller',
@@ -6099,8 +6105,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Silke',
   'hudChrome.corpseHarvest.components.tusk': 'Stødtand',
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsæk',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Jo færre dele du vælger, desto højere kvalitetsgrad får hver enkelt.',
   'hudChrome.corpseHarvest.harvestButton': 'Høst',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Indsamler de markerede komponenter. Hvert kadaver kan kun hostes en gang, og det gælder for den første der kommer. Tager ikke byttet.',
@@ -6514,12 +6518,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterType': 'Type',
   'itemUi.market.filterTypeAll': 'Alle typer',
   'itemUi.market.filterTypeArmor': 'Rustning',
+  'itemUi.market.filterTypeBag': 'Tasker',
   'itemUi.market.filterTypeConsumable': 'Forbrugsvarer',
   'itemUi.market.filterTypeCosmetic': 'Kosmetik',
   'itemUi.market.filterTypeMaterial': 'Materialer',
   'itemUi.market.filterTypeOther': 'Andet',
   'itemUi.market.filterTypeWeapon': 'Våben',
   'itemUi.market.filterWeaponAll': 'Alle våben',
+  'itemUi.market.filterBagSize': 'Taskestørrelse',
+  'itemUi.market.filterBagAll': 'Alle tasker',
   'itemUi.market.filterWeaponType': 'Våbentype',
   'itemUi.market.filters': 'Markedsfiltre',
   'itemUi.market.listButton': 'Sæt til salg på Verdensmarkedet',
@@ -8287,7 +8294,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kort',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% rabat',
+  'hudChrome.claudium.railWocDiscount': '{percent}% rabat',
   'hudChrome.claudium.railWocUnavailable': 'WOC-priser er ikke tilgængelige lige nu.',
   'hudChrome.claudium.showAmounts': 'Vis alle Claudium-beløb',
   'hudChrome.claudium.skuRow': '{usd} til {claudium} Claudium',
@@ -9042,6 +9049,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.fishing': 'Fiskeri',
   'hudChrome.gathering.gatherLine': 'Du samler: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Du samler: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Du høster: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Du høster: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Du får også {name}.',
   'hudChrome.gathering.gotAwayLine': 'Det slap væk.',
   'hudChrome.gathering.nodeName.herb': 'Urteplette',
   'hudChrome.gathering.nodeName.ore': 'Malmåre',
@@ -9225,13 +9235,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Større Fortryllelser',
   'hudChrome.enchanting.tier.runed': 'Runede Fortryllelser',
   'hudChrome.enchanting.wornTag': 'Båret ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Båret ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Forventede materialer:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} til {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Fortryllet',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Fortryllet)',
-  'hudChrome.marketIndicator.aria': 'Afhentning fra Verdensmarkedet venter',
-  'hudChrome.marketIndicator.tip': 'Guld eller genstande venter på dig hos Købmanden.',
+  'hudChrome.marketIndicator.aria': 'Verdensmarkedsprovenu eller genstande venter',
+  'hudChrome.marketIndicator.tip':
+    'Salgsprovenu eller returnerede genstande venter på dig hos Købmanden.',
   'hudChrome.materialHint.arcaneDust':
     'Fortryllelsesreagens. Fås ved affortryllelse af almindeligt og ualmindeligt udstyr.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9269,4 +9281,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Erstatter {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Den genstand har allerede den fortryllelse.',
   'hudChrome.enchanting.sameEnchantTag': 'Allerede anvendt',
+  'hudChrome.crafting.craftedToastQty': 'Udformet: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Du affortryller {item} til {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Du affortryller {item} til {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Du genvinder også {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du genvinder også {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Du bjærger {item} til {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Du bjærger {item} til {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Ikke fortryllet',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Beholdes: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Skaberens mærke',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mesterværksbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Kommissionsbinding',
 };

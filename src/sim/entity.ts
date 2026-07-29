@@ -337,6 +337,7 @@ export function recalcPlayerStats(
   let catForm = false;
   let moonkinForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
+  let flatAuraArmor = 0;
   // Percent raid buffs (Mark of the Wild / Arcane Intellect / Power Word: Fortitude /
   // Devotion Aura / Battle Shout / Blessing of Might). Accumulated as fractions here,
   // then folded multiplicatively at the relevant derivation step below.
@@ -352,7 +353,7 @@ export function recalcPlayerStats(
     // effectiveAttackPower; players bake it here, so without this arm the debuff
     // was a no-op versus enemy players (PvP).
     else if (a.kind === 'debuff_ap') bonusAp -= a.value;
-    else if (a.kind === 'buff_armor') s.armor += a.value;
+    else if (a.kind === 'buff_armor') flatAuraArmor += a.value;
     else if (a.kind === 'buff_int') s.int += a.value;
     else if (a.kind === 'buff_agi') s.agi += a.value;
     else if (a.kind === 'buff_spi') s.spi += a.value;
@@ -458,6 +459,9 @@ export function recalcPlayerStats(
   // Strength) before the armor multiplier so armorPct amplifies it too.
   if (mods?.stats.armorFromStrPct) s.armor += Math.round(s.str * mods.stats.armorFromStrPct);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
+  // Flat armor auras are authored as visible character-sheet deltas (Hallowed Wall
+  // is +150 armor), not extra base armor for forms or passive armor masteries to amplify.
+  if (flatAuraArmor) s.armor += flatAuraArmor;
   if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
   // drive out-of-combat regen (updateRegen reads stats.spi) below zero.

@@ -497,14 +497,25 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+  const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+  if (blocked) {
     dmg = Math.max(1, dmg - target.blockValue);
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
-  ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
-    flat: opts.threatFlat ?? 0,
-    mult: opts.threatMult ?? 1,
-  });
+  ctx.dealDamage(
+    attacker,
+    target,
+    dealtAmount,
+    crit,
+    'physical',
+    abilityName,
+    blocked ? 'block' : 'hit',
+    false,
+    {
+      flat: opts.threatFlat ?? 0,
+      mult: opts.threatMult ?? 1,
+    },
+  );
   opts.onDealt?.(dealtAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on

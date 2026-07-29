@@ -1063,7 +1063,7 @@ describe('persistence', () => {
     meta.deedStats.itemsDiscovered.delete('wolf_fang');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     sim.entities.get(pid)!.pos = { x: wilkes.pos.x + 2, y: wilkes.pos.y, z: wilkes.pos.z };
-    sim.buyBackItem('wolf_fang', pid);
+    sim.buyBackItem('wolf_fang', undefined, undefined, pid);
     expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(meta.deedStats.itemsDiscovered.has('wolf_fang')).toBe(true);
   });
@@ -1220,7 +1220,10 @@ describe('meter triggers (negative then positive per resolver)', () => {
           meta.townFocus = {};
         },
         at: () => {
-          meta.townFocus = { forge: 1 };
+          // A real component family: since #2511 no reachable path can put a
+          // key like 'forge' in an allocation, so a fixture using one would
+          // pin a shape the game cannot produce.
+          meta.townFocus = { hide: 1 };
         },
       },
       {
@@ -1634,6 +1637,40 @@ describe('site wiring (real modules, not direct bumps)', () => {
     for (const m of metas) expect(m.deedStats.counters.fullPartyDungeonClears).toBe(1);
     sim.tick();
     for (const m of metas) expect(m.deedsEarned.has('soc_full_house')).toBe(true);
+  });
+
+  it('a shared party kill through handleDeath credits kills to every eligible member, not just the tapper', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const puller = sim.addPlayer('warrior', 'Puller');
+    const healer = sim.addPlayer('priest', 'Healer');
+    sim.tick();
+    sim.partyInvite(healer, puller);
+    sim.partyAccept(healer);
+
+    const pE = sim.entities.get(puller)!;
+    const hE = sim.entities.get(healer)!;
+    const template = MOBS.forest_wolf;
+    const mob = createMob(9999, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    sim.entities.set(mob.id, mob);
+    for (const e of [pE, hE, mob]) {
+      e.pos = { x: 0, y: 0, z: 0 };
+      e.prevPos = { x: 0, y: 0, z: 0 };
+    }
+
+    const pullerMeta = sim.players.get(puller)!;
+    const healerMeta = sim.players.get(healer)!;
+    expect(pullerMeta.deedStats.counters.kills).toBe(0);
+    expect(healerMeta.deedStats.counters.kills).toBe(0);
+
+    // Only the puller taps and lands the killing blow; the healer stands in
+    // range the whole fight (earning the same shared XP/quest/loot credit as
+    // the tapper) but never attacks. A healer who never taps must still
+    // advance the same lifetime kills counter for a shared kill.
+    dealDamage(sim.ctx, pE, mob, mob.hp + 500, false, 'physical', null, 'hit');
+
+    expect(mob.dead).toBe(true);
+    expect(pullerMeta.deedStats.counters.kills).toBe(1);
+    expect(healerMeta.deedStats.counters.kills).toBe(1);
   });
 });
 

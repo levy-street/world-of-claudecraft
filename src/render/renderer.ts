@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
-import { cameraOcclusion } from '../sim/colliders';
+import { cameraOcclusion, supportHeightAt } from '../sim/colliders';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -142,6 +142,7 @@ import {
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
+import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
@@ -198,6 +199,7 @@ import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
+import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -309,6 +311,22 @@ const ENTITY_LOD_RANGE_SQ = 58 * 58;
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
 // `onGround`, so the flag alone never fires the jump clip for the mirrored world.
 const AIRBORNE_EPS = 0.4;
+/**
+ * Terrain-lean gradient resample interval (seconds) and sample arm (yards).
+ * TIME based, not frame based: a frame-count cadence silently starves on a
+ * slow client (at 4 fps an "every 4th frame" gradient updates once a second,
+ * so the lean never arrives), while a time budget costs the same four terrain
+ * samples at 60 fps and self-corrects when frames are scarce. Per body, the
+ * phase is staggered by entity id so a crowd never resamples in lockstep.
+ */
+/**
+ * Landing speed (yd/s) below which a touchdown is a step, not an impact. A
+ * jump from flat ground lands near 6 yd/s, so this sits under that: catching
+ * a boulder part way up the arc, or settling off a kerb, stays a footfall.
+ */
+const SOFT_LANDING_SPEED = 4.5;
+const TILT_SAMPLE_INTERVAL = 0.06;
+const TILT_SAMPLE_SPAN = 0.55;
 // Beyond this (squared) an entity's footsteps/movement are inaudible, so we skip
 // the surface sample + dispatch entirely. Kept under the engine's own cutoff (46u).
 const SFX_MOVE_RANGE_SQ = 42 * 42;
@@ -731,6 +749,20 @@ export interface EntityView {
   wasSwimming: boolean;
   // consecutive frames the foot-height heuristic read airborne (debounce)
   airborneHeurFrames: number;
+  /** Display-only vertical smoothing (step-up/step-down presentation). */
+  stepSmooth: StepSmoothState;
+  /** Previous drawn height, for the display-derived fall speed. */
+  prevRenderY: number;
+  hasPrevY: boolean;
+  /** Peak downward display speed this flight, reset on landing. */
+  fallSpeed: number;
+  /** Damped terrain lean plus its cadence-sampled gradient. */
+  groundTilt: GroundTiltState;
+  tiltGradX: number;
+  tiltGradZ: number;
+  tiltOnProp: boolean;
+  /** Countdown to the next gradient resample (seconds). */
+  tiltSampleT: number;
 }
 
 function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
@@ -1028,6 +1060,7 @@ export class Renderer {
   private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
+  private tmpPuff = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
   // Persistent scratch for the sloppy-pick column build. pick() is also the
   // per-frame hover-cursor path (updateHoverCursor in main.ts), so a fresh array
@@ -1924,6 +1957,28 @@ export class Renderer {
   }
 
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
+  // Ground impact dust at a body's feet, coloured by the surface underfoot.
+  // Water is skipped: splashes are the water system's job, and dust on a lake
+  // reads as a bug. Power below the floor emits nothing at all.
+  private emitGroundPuff(x: number, y: number, z: number, power: number): void {
+    const p = Math.min(1, power);
+    if (p <= 0.02) return;
+    const surface = this.surfaceAt(x, z, y);
+    if (surface === 'water') return;
+    const color =
+      surface === 'stone'
+        ? 0x9b9a95
+        : surface === 'wood'
+          ? 0xa8895f
+          : surface === 'snow'
+            ? 0xe6eef5
+            : surface === 'dirt'
+              ? 0xa38257
+              : 0x8d9a63;
+    this.tmpPuff.set(x, y, z);
+    this.vfx.groundPuff(this.tmpPuff, p, color);
+  }
+
   private surfaceAt(x: number, z: number, y: number): Surface {
     return footstepSurfaceAt(this.sim.cfg.seed, x, y, z, this.weatherOn);
   }
@@ -4537,6 +4592,16 @@ export class Renderer {
       wasAirborne: false,
       wasSwimming: false,
       airborneHeurFrames: 0,
+      stepSmooth: createStepSmooth(),
+      groundTilt: createGroundTilt(),
+      prevRenderY: 0,
+      hasPrevY: false,
+      fallSpeed: 0,
+      // Stagger the first resample so a crowd spreads its terrain samples.
+      tiltSampleT: (e.id % 7) * (TILT_SAMPLE_INTERVAL / 7),
+      tiltGradX: 0,
+      tiltGradZ: 0,
+      tiltOnProp: false,
     });
     const view = this.views.get(e.id);
     // Never gate the player's OWN view: it must be on screen immediately, its
@@ -5308,10 +5373,22 @@ export class Renderer {
       const d2 = cdx * cdx + cdz * cdz;
       const isSelf = id === p.id;
       // Pose carries information the player acts on (own feedback, the read on
-      // the current target, a cast windup telegraph) rather than mere cosmetic
-      // smoothness: such an entity is exempt from BOTH the cadence throttle and
-      // the crowd-pulled frozen-mesh swap below.
-      const actionablePose = animatesEveryFrame(id, p.id, p.targetId, e.castingAbility);
+      // the current target, pet combat, a cast windup telegraph) rather than
+      // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
+      // throttle and the crowd-pulled frozen-mesh swap below.
+      const combatTargetId = e.aggroTargetId ?? e.targetId;
+      const combatTarget =
+        e.inCombat && combatTargetId !== null ? sim.entities.get(combatTargetId) : undefined;
+      const actionablePose = animatesEveryFrame(
+        id,
+        p.id,
+        p.targetId,
+        e.castingAbility,
+        e.inCombat,
+        e.ownerId,
+        combatTargetId,
+        combatTarget?.ownerId ?? null,
+      );
       if (isSelf) {
         v.group.visible = true;
         v.isFar = false;
@@ -5670,13 +5747,17 @@ export class Renderer {
       // hitches transiently lift the sampled pose off the terrain, and a
       // single-frame false positive flips the base state to `jump` and back,
       // replaying the jump clip's crouch (the world-entry anim glitch).
-      if (
-        e.kind === 'player' &&
-        e.onGround &&
-        !swimming &&
-        ay - groundHeight(ax, az, this.sim.cfg.seed) > AIRBORNE_EPS
-      ) {
-        v.airborneHeurFrames++;
+      // The standing surface is the terrain OR a standable prop top under the
+      // feet (parkour: crates/rocks are walkable), else a player perched on a
+      // crate would read as permanently airborne and loop the jump pose.
+      if (e.kind === 'player' && e.onGround && !swimming) {
+        const heurSeed = this.sim.cfg.seed;
+        const standY = Math.max(
+          groundHeight(ax, az, heurSeed),
+          supportHeightAt(heurSeed, ax, az, 0.5, ay + 0.01),
+        );
+        if (ay - standY > AIRBORNE_EPS) v.airborneHeurFrames++;
+        else v.airborneHeurFrames = 0;
       } else {
         v.airborneHeurFrames = 0;
       }
@@ -5686,6 +5767,62 @@ export class Renderer {
         (animFromDisplay && this.selfMotionPredictor
           ? !this.selfMotionPredictor.onGround
           : !e.onGround || v.airborneHeurFrames >= 2);
+      // Grounded presentation polish, both display-only (see the cores).
+      // Vertical smoothing absorbs the step-up the solver performs inside a
+      // single tick, so the body strides onto a kerb instead of teleporting up
+      // it while the soft camera boom trails behind. Applied for every body,
+      // and fed back into the self pose so the camera follows what is drawn.
+      const settled = !airborne && !swimming && !visuallyDead;
+      // Display-derived fall speed: the wire carries no vy for remote bodies,
+      // so the drawn trajectory is the only honest source of landing weight.
+      const dyRaw = v.hasPrevY ? y - v.prevRenderY : 0;
+      v.prevRenderY = y;
+      v.hasPrevY = true;
+      if (airborne && dt > 1e-4) v.fallSpeed = Math.max(v.fallSpeed, -dyRaw / dt);
+      const smoothY = stepSmoothHeight(v.stepSmooth, y, settled, dt);
+      if (smoothY !== y) {
+        v.group.position.y = smoothY;
+        if (isSelf) selfPos.y = smoothY;
+      }
+      // Terrain lean: near bodies tip toward the surface they stand on. The
+      // gradient is resampled on a cadence (four terrain samples) and damped
+      // in between, so a crowd costs a handful of samples per frame, and a
+      // body standing on a flat prop top stays upright.
+      if (v.visual && !v.isFar) {
+        v.tiltSampleT -= dt;
+        if (v.tiltSampleT <= 0) {
+          v.tiltSampleT = TILT_SAMPLE_INTERVAL;
+          const ts = this.sim.cfg.seed;
+          const hx0 = groundHeight(ax - TILT_SAMPLE_SPAN, az, ts);
+          const hx1 = groundHeight(ax + TILT_SAMPLE_SPAN, az, ts);
+          const hz0 = groundHeight(ax, az - TILT_SAMPLE_SPAN, ts);
+          const hz1 = groundHeight(ax, az + TILT_SAMPLE_SPAN, ts);
+          v.tiltGradX = (hx1 - hx0) / (2 * TILT_SAMPLE_SPAN);
+          v.tiltGradZ = (hz1 - hz0) / (2 * TILT_SAMPLE_SPAN);
+          // Standing well above the local terrain means a prop top, which is
+          // flat whatever the ground below it does.
+          v.tiltOnProp = ay - (hx0 + hx1 + hz0 + hz1) / 4 > 0.2;
+        }
+        stepGroundTilt(
+          v.groundTilt,
+          v.tiltGradX,
+          v.tiltGradZ,
+          facing,
+          settled && !v.tiltOnProp,
+          dt,
+        );
+        v.visual.setGroundTilt(v.groundTilt.pitch, v.groundTilt.roll);
+      }
+      // Ledge climb: the sim owns the move (Entity.climb offline, the mirrored
+      // progress online); the visual poses it by hand, tracking the move's
+      // real phase so hands plant when the body reaches the lip whatever the
+      // climb's height-scaled duration is.
+      if (v.visual) {
+        v.visual.setClimbing(
+          !!e.climb || e.climbing === true,
+          e.climb ? e.climb.elapsed / e.climb.duration : e.climbProgress,
+        );
+      }
       const st = this.animScratch;
       st.speed = loco.speed;
       st.moving = moving;
@@ -5708,8 +5845,25 @@ export class Renderer {
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead) sink.movement('jump', ax, ay, az, isSelf);
-        else if (!airborne && v.wasAirborne && !visuallyDead)
-          sink.movement('land', ax, ay, az, isSelf);
+        else if (!airborne && v.wasAirborne && !visuallyDead) {
+          // A flight that ends by catching a ledge is not a fall, and the
+          // heavy landing thud on one reads as a bug: you hopped onto a rock
+          // mid-arc and the game played a crash. Anything softer than a plain
+          // jump's own landing speed gets a footfall instead.
+          if (v.fallSpeed >= SOFT_LANDING_SPEED) {
+            sink.movement('land', ax, ay, az, isSelf);
+          } else {
+            sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), false, isSelf);
+          }
+          // Impact dust, scaled by how hard the body actually came down and
+          // tinted by what it came down on. This is the visual half of the
+          // landing the camera already thumps for.
+          this.emitGroundPuff(ax, ay, az, (v.fallSpeed - 5) / 14);
+        }
+        // Striding up onto a ledge scuffs the surface: a wisp, not a landing.
+        if (settled && dyRaw > 0.28 && !visuallyDead) {
+          this.emitGroundPuff(ax, ay, az, 0.08);
+        }
         if (swimming && !v.wasSwimming && !visuallyDead)
           sink.movement('splash', ax, ay, az, isSelf);
         // footfalls / swim strokes via a distance accumulator (no timers)
@@ -5741,6 +5895,9 @@ export class Renderer {
           v.stepAccum = FOOT_STRIDE_WALK * 0.6;
         }
       }
+      // Reset the flight's peak fall speed once grounded, so the next landing
+      // is measured from its own drop and not the last one.
+      if (!airborne) v.fallSpeed = 0;
 
       // Feed rendered body motion into the persistent height field. This begins
       // while wading, before the swim-pose latch, and uses old minus new surface
@@ -5980,7 +6137,10 @@ export class Renderer {
           this.selRingZ = cz;
           this.selRingScale = target.scale;
           const seed = this.sim.cfg.seed;
-          const gy = groundHeight(cx, cz, seed);
+          // A target standing on a prop top (crate/rock) gets the ring on that
+          // surface, not buried at terrain height under it.
+          const supportY = supportHeightAt(seed, cx, cz, 0.5, tv.group.position.y + 0.01);
+          const gy = Math.max(groundHeight(cx, cz, seed), supportY);
           this.selectionRing.position.set(cx, gy, cz);
           this.selectionRing.scale.setScalar(target.scale);
           const drape = drapeRingLocalY(
@@ -5990,7 +6150,7 @@ export class Renderer {
             gy,
             target.scale,
             0.08,
-            (sx, sz) => groundHeight(sx, sz, seed),
+            (sx, sz) => Math.max(groundHeight(sx, sz, seed), supportY),
             this.selectionRingDrapeY,
           );
           const ringPos = this.selectionRingMesh.geometry.getAttribute(
