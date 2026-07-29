@@ -100,6 +100,7 @@ describe('admin auth flow', () => {
     await fireEvent.submit(loginForm());
 
     const codeInput = await screen.findByLabelText(t('auth.authenticatorCode'));
+    expect(codeInput).toHaveFocus();
     expect(screen.queryByText(t('auth.signOut'))).not.toBeInTheDocument();
     expect(h.apiLogin).toHaveBeenLastCalledWith('alice', 'pw', '', '');
 
@@ -118,6 +119,35 @@ describe('admin auth flow', () => {
     expect(h.apiLogin).toHaveBeenLastCalledWith('alice', 'pw', '123456', '');
   });
 
+  it('serializes login submissions while authentication is pending', async () => {
+    let resolveLogin!: (value: { twoFactorRequired: true }) => void;
+    h.apiLogin.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveLogin = resolve;
+        }),
+    );
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), {
+      target: { value: 'pw' },
+    });
+
+    const form = loginForm();
+    await Promise.all([fireEvent.submit(form), fireEvent.submit(form)]);
+
+    expect(h.apiLogin).toHaveBeenCalledTimes(1);
+    expect(form).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('button', { name: t('auth.signIn') })).toBeDisabled();
+
+    resolveLogin({ twoFactorRequired: true });
+
+    expect(await screen.findByLabelText(t('auth.authenticatorCode'))).toHaveFocus();
+    expect(form).toHaveAttribute('aria-busy', 'false');
+  });
+
   it('supports a recovery-code retry without leaving the challenge step', async () => {
     h.apiLogin.mockResolvedValueOnce({ twoFactorRequired: true });
     render(App);
@@ -130,6 +160,7 @@ describe('admin auth flow', () => {
 
     await fireEvent.click(screen.getByText(t('auth.useRecoveryCode')));
     const recoveryInput = screen.getByLabelText(t('auth.recoveryCode'));
+    expect(recoveryInput).toHaveFocus();
     h.apiLogin.mockRejectedValueOnce(new ApiError(401, 'invalid authentication code'));
     await fireEvent.input(recoveryInput, { target: { value: 'bad-code' } });
     await fireEvent.submit(loginForm());
@@ -153,6 +184,28 @@ describe('admin auth flow', () => {
 
     expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
     expect(h.apiLogin).toHaveBeenLastCalledWith('alice', 'pw', '', 'abcd-1234');
+  });
+
+  it('returns focus across factor-mode changes and Back', async () => {
+    h.apiLogin.mockResolvedValueOnce({ twoFactorRequired: true });
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), {
+      target: { value: 'pw' },
+    });
+    await fireEvent.submit(loginForm());
+
+    expect(await screen.findByLabelText(t('auth.authenticatorCode'))).toHaveFocus();
+    await fireEvent.click(screen.getByRole('button', { name: t('auth.useRecoveryCode') }));
+    expect(screen.getByLabelText(t('auth.recoveryCode'))).toHaveFocus();
+    await fireEvent.click(screen.getByRole('button', { name: t('auth.useAuthenticatorCode') }));
+    expect(screen.getByLabelText(t('auth.authenticatorCode'))).toHaveFocus();
+
+    await fireEvent.click(screen.getByRole('button', { name: t('auth.back') }));
+
+    expect(screen.getByLabelText(t('auth.username'))).toHaveFocus();
   });
 
   it('shows a localized error and stays on login when credentials fail', async () => {

@@ -38,13 +38,18 @@
     position: fixed;
     inset: 0;
     display: flex;
-    align-items: center;
+    align-items: safe center;
     justify-content: center;
+    overflow-y: auto;
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
     background: var(--bg-app);
     z-index: 10;
   }
   .login .panel {
-    width: 320px;
+    flex: 0 0 auto;
+    width: min(320px, 100%);
+    margin-block: auto;
   }
   .login label {
     display: block;
@@ -76,6 +81,11 @@
     font-size: 12px;
     margin-top: 10px;
     min-height: 15px;
+  }
+  @media (max-height: 480px) {
+    .login {
+      align-items: flex-start;
+    }
   }
 
   /* ---------- layout ---------- */
