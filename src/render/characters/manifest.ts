@@ -9,6 +9,7 @@ import { ITEMS, MOBS } from '../../sim/data';
 import type { Entity, PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import { PLAYER_HEIGHT_SCALE } from './player_scale';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -421,6 +422,24 @@ const LOW_URL_ALIAS: Record<string, string> = {
 
 const HUMANOID_H = 2.6;
 
+/** Player bodies render 20% taller than a stock humanoid NPC, so the nine class
+ *  rigs (and the Combat Mech cosmetic that shares them) read as heroic next to
+ *  the townsfolk and the trash mobs, which stay on HUMANOID_H.
+ *
+ *  This is the ONLY knob: `height` is a normalization target for each model's own
+ *  measured bounds (see prepareVisual), so scaling it scales the whole rig, the
+ *  bone-space weapon grips, and every body-fraction offset derived from
+ *  CharacterVisual.height (nameplate anchor, cull sphere, click proxy, contact
+ *  shadow, halo, ice block, LOD billboard). The level-20 armored bodies inherit
+ *  it for free through `normalizeFrom`. Purely cosmetic: the sim's entity radius
+ *  and collision are untouched, so this cannot move a gameplay outcome.
+ *
+ *  The factor lives in player_scale.ts because preview_framing.ts has to scale the
+ *  framed-preview cameras by the SAME number: those are absolute world-unit
+ *  positions composed around a known body height, so growing the body without
+ *  pulling the camera back crops the head out of the character screen. */
+const PLAYER_H = HUMANOID_H * PLAYER_HEIGHT_SCALE;
+
 const SKINS_DIR = 'textures/skins';
 
 // ---------------------------------------------------------------------------
@@ -641,7 +660,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // its own embedded textures - no show-list. Revert by pointing back at
     // knight.glb (+ its Knight_Helmet/Knight_Cape show list and knight skins).
     url: `${PLAYERS}/warrior_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: {
@@ -705,7 +724,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // its own embedded textures - no show-list/tint. Revert by pointing back
     // at paladin.glb (+ its paladin/alt_a skin).
     url: `${PLAYERS}/paladin_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       // Paladins can wield the vendor greatswords; no dual wield. This is the
@@ -731,7 +750,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // ships its own embedded ranger texture. Revert by pointing back at
     // ranger.glb (+ its ranger skins).
     url: `${PLAYERS}/hunter_male_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     // 2H_Ranged_Shoot is the bow auto-shot. No attackByAbility: aimed_shot's 3s
     // cast draws via the base cast state (Spellcasting = the bow draw); every
     // instant shot/trap/sting plays no cast anim (the shots fire via the weapon
@@ -753,7 +772,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // baked-on hairstyle), ships its own embedded textures - no show-list.
     // Revert by pointing back at rogue.glb (+ its Rogue_Cape + rogue skins).
     url: `${PLAYERS}/rogue_male_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     // Every rogue ability is INSTANT: the dagger strikes swing via the auto-attack
     // path (the default dual chop) and play no cast anim. The one dedicated gesture
     // the v02 rig has is the Kick interrupt.
@@ -775,7 +794,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // its own embedded white-and-gold textures. Revert by pointing back at
     // mage.glb (+ its priest/base skin at index 0). Keeps the Light halo.
     url: `${PLAYERS}/priest_male_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     // No attackByAbility: cast-time spells (smite/heal/flash_heal/mind_blast/
     // lesser_heal/prayer_of_healing) animate via the base cast state; every
     // instant (buffs, shields, shadow spells, AoE bursts) plays no anim.
@@ -792,7 +811,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // its own embedded teal-and-leather texture - no show-list/tint. Revert by
     // pointing back at barbarian.glb (+ its BearHat, tint, and shaman skins).
     url: `${PLAYERS}/shaman_male_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       // Shamans can wield the vendor greatswords; no dual wield. This is the
@@ -815,7 +834,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // its own embedded textures - no show-list/skins. Revert by pointing back
     // at mage.glb (+ its Mage_Cape show list, night skin, and eye emissive).
     url: `${PLAYERS}/mage_male_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     // the pack authors a real staff auto-attack for the melee swing. No
     // attackByAbility: cast-time spells (fireball/frostbolt/scorch/pyroblast/
     // polymorph/conjures) animate via the base cast state; every instant
@@ -831,7 +850,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // its own embedded dark textures - no tint/show. Revert by pointing back at
     // mage.glb (+ its 0x8d5fd3 tint and the shared mage skins).
     url: `${PLAYERS}/warlock_male_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     // wand zap auto-attack (Spellcast_Shoot). No attackByAbility: every warlock
     // spell that has a cast time or channel already animates via the base cast
     // state (clips.cast = Spellcasting); the instants play no animation.
@@ -850,7 +869,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // at druid.glb (+ its druid alt skins). Form abilities (bear/cat/travel/
     // moonkin and their strikes) play on the form rigs, not this body.
     url: `${PLAYERS}/druid_male_v02.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     // the pack authors one melee attack; it serves the auto and (cloned in the
     // bake) the greatsword/staff slam slot. No attackByAbility: cast-time spells
     // (wrath/starfire/heals/roots) animate via the base cast state; every
@@ -867,7 +886,7 @@ export const VISUALS: Record<string, VisualDef> = {
   //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
   player_mech: {
     url: `${PLAYERS}/Mech/characters/CombatMech.glb`,
-    height: HUMANOID_H,
+    height: PLAYER_H,
     // The mech is rigged to the same KayKit Rig_Medium skeleton as every other
     // player class; its GLB shipped with no clips, so the full KayKit set is
     // baked in from knight.glb (scripts/bake_mech_anims.mjs) — these names now
@@ -968,7 +987,11 @@ export const VISUALS: Record<string, VisualDef> = {
   // so no entity tint.
   mob_yumi_cat: {
     url: `${CREATURES}/yumi_cat.glb`,
-    height: HUMANOID_H * 1.2, // the objective reads over player heads
+    // Deliberately still keyed off HUMANOID_H, not PLAYER_H: this is a mob, and
+    // player bodies growing to PLAYER_H is not a reason to grow the world's cast.
+    // It used to clear a player head by 20%; now it stands level with one, which
+    // still reads fine for a static objective. Bump it only if it stops standing out.
+    height: HUMANOID_H * 1.2,
     clips: {
       idle: 'None',
       walk: 'None',

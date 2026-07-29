@@ -4,6 +4,7 @@ import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
 import { mechAssetsReady, preloadMechAssets } from './assets';
 import type { WeaponLayoutOverride } from './manifest';
+import { PLAYER_HEIGHT_SCALE } from './player_scale';
 import {
   appearanceSignature,
   classVisualKey,
@@ -444,8 +445,12 @@ export class CharacterPreview {
     // above the 2.6 head-top to clear the raised weapon/arms of the hero & victory
     // poses (~3.3u) while the feet stay inside (BUG: card character was out of
     // bounds). The card's drawCharacter() fit math then frames the whole capture.
-    this.camera.position.set(-0.1, 1.62, 4.6);
-    this.camera.lookAt(new THREE.Vector3(-0.1, 1.55, 0));
+    //
+    // Those numbers are absolute world units composed around that 2.6 head-top, so
+    // they scale with the body: PLAYER_HEIGHT_SCALE keeps the same headroom and the
+    // same feet margin now that a player rig stands 3.12 tall.
+    this.camera.position.set(-0.1, 1.62 * PLAYER_HEIGHT_SCALE, 4.6 * PLAYER_HEIGHT_SCALE);
+    this.camera.lookAt(new THREE.Vector3(-0.1, 1.55 * PLAYER_HEIGHT_SCALE, 0));
     this.camera.updateProjectionMatrix();
     this.characterGroup.rotation.y = angle;
     this.renderer.render(this.scene, this.camera);
@@ -457,7 +462,8 @@ export class CharacterPreview {
     this.renderer.setSize(prevSize.x, prevSize.y, false);
     this.camera.aspect = prevAspect;
     this.camera.position.copy(prevPos);
-    this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));
+    // Same aim height as PREVIEW_FRAMING.sheet.lookY, scaled the same way.
+    this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, PREVIEW_FRAMING.sheet.lookY, 0));
     this.camera.updateProjectionMatrix();
     this.characterGroup.rotation.y = prevRotY;
     this.renderer.render(this.scene, this.camera);
