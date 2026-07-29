@@ -121,7 +121,9 @@ a row here or a Key files entry (`sim.ts`, `sim_context.ts`, `entity_roster.ts`)
 these before inlining pure logic in a system module: `spell_scaling.ts` (spell/attack
 power coefficients), `stun_dr.ts` (CC diminishing-return categories), `item_level.ts`/
 `item_budget.ts`/`item_level_req.ts` (drop power math), `equipment_rules.ts` (equip
-legality), `cooldown_persist.ts` (cooldown save/load), `tab_target.ts`/`assist.ts`/
+legality), `cooldown_persist.ts` (cooldown save/load), `arena_season.ts` (the six-month Arena
+season calendar: every entry point takes the instant, so the server's settlement and
+the client's countdown share one set of boundaries), `tab_target.ts`/`assist.ts`/
 `dead_target.ts` (target cycling, /assist, dead-target selectability), `flee_speed.ts`,
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`

@@ -64,6 +64,16 @@ import {
 } from './apple_auth';
 import { pruneApplePendingLogins } from './apple_auth_db';
 import {
+  arenaSeasonPairCandidates,
+  arenaSeasonSoloCandidates,
+  arenaSeasonTitleDeedsForCharacter,
+  commitArenaSeasonSettlement,
+  pruneArenaSeasonEntrantsBatch,
+  pruneArenaSeasonPartnersBatch,
+  settledArenaSeasons,
+} from './arena_season_db';
+import { createArenaSeasonSettler, oldestUnsettledArenaSeason } from './arena_season_settlement';
+import {
   hashPassword,
   newToken,
   normalizeCharName,
@@ -2978,6 +2988,7 @@ export async function startServer(): Promise<http.Server> {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
+    arenaSeasonTitlesForCharacter: (characterId) => arenaSeasonTitleDeedsForCharacter(characterId),
   });
   wsAuth.attachUpgrade(server, wss);
 
@@ -3016,6 +3027,13 @@ export async function startServer(): Promise<http.Server> {
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
     console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
+
+  // The retention floor the two season ledgers prune against, resolved per batch
+  // from the persisted settlement markers. A read per batch is the right trade
+  // here: the sweep is nightly and LIMIT-bounded, and the alternative (resolving
+  // it once per run) would go stale across a long drain.
+  const arenaSeasonRetentionFloor = async (): Promise<number> =>
+    oldestUnsettledArenaSeason(Date.now(), await settledArenaSeasons(REALM));
 
   // Off-peak batched retention. The sweep self-clocks once per UTC day behind a
   // database advisory lock, so with several processes exactly one sweeps; each
@@ -3077,6 +3095,24 @@ export async function startServer(): Promise<http.Server> {
         pruneBatch: (n) =>
           pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
       },
+      // Arena season participation. Retained by season NUMBER rather than by age,
+      // so a settled season's rows leave together. The floor is the oldest
+      // UNSETTLED season, never the live one: a just-closed season is strictly
+      // older than the live season, so a live-season floor would let the sweep
+      // delete the very rows the pending settlement is about to rank over, and
+      // that season would then settle with zero champions and stamp its
+      // exactly-once marker (see oldestUnsettledArenaSeason). The award ledger and
+      // the settlement markers are deliberately never pruned.
+      {
+        name: 'arena_season_entrants',
+        pruneBatch: async (n) =>
+          pruneArenaSeasonEntrantsBatch(await arenaSeasonRetentionFloor(), n),
+      },
+      {
+        name: 'arena_season_partners',
+        pruneBatch: async (n) =>
+          pruneArenaSeasonPartnersBatch(await arenaSeasonRetentionFloor(), n),
+      },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group
     // when retention is off so quiet configs write nothing to world_state.
@@ -3092,6 +3128,28 @@ export async function startServer(): Promise<http.Server> {
   });
   retentionSweep.start();
 
+  // Arena season settlement. Self-clocked and idempotent: the poll asks the
+  // shared calendar which seasons have closed, and the commit's marker row is
+  // what makes a season settle exactly once across every realm process. Started
+  // beside the sweep so a realm that was down at the boundary settles on its next
+  // boot instead of waiting for the following season.
+  const arenaSeasonSettler = createArenaSeasonSettler({
+    realm: REALM,
+    now: () => Date.now(),
+    settledSeasons: (realm) => settledArenaSeasons(realm),
+    soloCandidates: (realm, season) => arenaSeasonSoloCandidates(realm, season),
+    pairCandidates: (realm, season) => arenaSeasonPairCandidates(realm, season),
+    commit: (realm, season, awards) => commitArenaSeasonSettlement(realm, season, awards),
+    // Champions who are online at the boundary get their title now, not on their
+    // next login. The ledger read at join is still the authority for everyone else.
+    onAwarded: (awards) => {
+      for (const award of awards) game.grantArenaSeasonTitles(award.characterId, [award.deedId]);
+    },
+    onInfo: (line) => console.log(line),
+    onError: (err) => console.error('arena season settlement failed:', err),
+  });
+  arenaSeasonSettler.start();
+
   const shutdown = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
     // sheds new traffic before we stop the loop and persist (in-flight requests and
@@ -3105,6 +3163,9 @@ export async function startServer(): Promise<http.Server> {
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
     await retentionSweep.stop();
+    // The settler holds no pool client between polls, so stopping is just
+    // cancelling the timer; do it before pool.end() all the same.
+    arenaSeasonSettler.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();

@@ -1186,6 +1186,51 @@ export const en_XA: EnTranslations = {
       "highContrast": "[Ĥíĝĥ Çóñţŕášţ]",
       "highContrastAria": "[Ţóĝĝļé ĥíĝĥ-çóñţŕášţ ƀáçķĝŕóúñð: ðíšáƀļéš ţĥé ɱóʋíñĝ ţŕáíļéŕ šó šţáŕţ-šçŕééñ ţéẋţ šţáýš ļéĝíƀļé]"
     },
+    "arenaSeason": {
+      "heading": "[Áŕéñá Šéášóñ {season}]",
+      "preseasonHeading": "[Áŕéñá Þŕéšéášóñ]",
+      "titleReward": "[Šéášóñ ţíţļé: {title}]",
+      "endsInDays": {
+        "one": "[Éñðš íñ {count} ðáý]",
+        "few": "[Éñðš íñ {count} ðáýš]",
+        "many": "[Éñðš íñ {count} ðáýš]",
+        "other": "[Éñðš íñ {count} ðáýš]"
+      },
+      "endsInHours": {
+        "one": "[Éñðš íñ {count} ĥóúŕ]",
+        "few": "[Éñðš íñ {count} ĥóúŕš]",
+        "many": "[Éñðš íñ {count} ĥóúŕš]",
+        "other": "[Éñðš íñ {count} ĥóúŕš]"
+      },
+      "endsInMinutes": {
+        "one": "[Éñðš íñ {count} ɱíñúţé]",
+        "few": "[Éñðš íñ {count} ɱíñúţéš]",
+        "many": "[Éñðš íñ {count} ɱíñúţéš]",
+        "other": "[Éñðš íñ {count} ɱíñúţéš]"
+      },
+      "opensInDays": {
+        "one": "[Óþéñš íñ {count} ðáý]",
+        "few": "[Óþéñš íñ {count} ðáýš]",
+        "many": "[Óþéñš íñ {count} ðáýš]",
+        "other": "[Óþéñš íñ {count} ðáýš]"
+      },
+      "opensInHours": {
+        "one": "[Óþéñš íñ {count} ĥóúŕ]",
+        "few": "[Óþéñš íñ {count} ĥóúŕš]",
+        "many": "[Óþéñš íñ {count} ĥóúŕš]",
+        "other": "[Óþéñš íñ {count} ĥóúŕš]"
+      },
+      "opensInMinutes": {
+        "one": "[Óþéñš íñ {count} ɱíñúţé]",
+        "few": "[Óþéñš íñ {count} ɱíñúţéš]",
+        "many": "[Óþéñš íñ {count} ɱíñúţéš]",
+        "other": "[Óþéñš íñ {count} ɱíñúţéš]"
+      },
+      "progressLabel": "[Šéášóñ þŕóĝŕéšš]",
+      "champions": "[Çĥáɱþíóñš]",
+      "seasonLabel": "[Šéášóñ {season}]",
+      "note": "[Ţĥé ĥíĝĥéšţ-ŕáţéð 1ʋ1 ðúéļíšţ áñð ţĥé ĥíĝĥéšţ-ŕáţéð 2ʋ2 þáíŕ éáŕñ ţĥé šéášóñ ţíţļé ŵĥéñ ţĥé šéášóñ çļóšéš.]"
+    },
     "warfare": {
       "honorAmount": "[{amount} Ĥóñóŕ]",
       "dualPrice": "[{money} + {honor}]",

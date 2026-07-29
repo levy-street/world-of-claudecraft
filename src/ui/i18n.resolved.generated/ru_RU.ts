@@ -1186,6 +1186,51 @@ export const ru_RU: EnTranslations = {
       "highContrast": "Высокая контрастность",
       "highContrastAria": "Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым"
     },
+    "arenaSeason": {
+      "heading": "Арена: сезон {season}",
+      "preseasonHeading": "Арена: предсезонье",
+      "titleReward": "Титул сезона: {title}",
+      "endsInDays": {
+        "one": "Остался {count} день",
+        "few": "Осталось {count} дня",
+        "many": "Осталось {count} дней",
+        "other": "Осталось {count} дня"
+      },
+      "endsInHours": {
+        "one": "Остался {count} час",
+        "few": "Осталось {count} часа",
+        "many": "Осталось {count} часов",
+        "other": "Осталось {count} часа"
+      },
+      "endsInMinutes": {
+        "one": "Осталась {count} минута",
+        "few": "Осталось {count} минуты",
+        "many": "Осталось {count} минут",
+        "other": "Осталось {count} минуты"
+      },
+      "opensInDays": {
+        "one": "Откроется через {count} день",
+        "few": "Откроется через {count} дня",
+        "many": "Откроется через {count} дней",
+        "other": "Откроется через {count} дня"
+      },
+      "opensInHours": {
+        "one": "Откроется через {count} час",
+        "few": "Откроется через {count} часа",
+        "many": "Откроется через {count} часов",
+        "other": "Откроется через {count} часа"
+      },
+      "opensInMinutes": {
+        "one": "Откроется через {count} минуту",
+        "few": "Откроется через {count} минуты",
+        "many": "Откроется через {count} минут",
+        "other": "Откроется через {count} минуты"
+      },
+      "progressLabel": "Ход сезона",
+      "champions": "Чемпионы",
+      "seasonLabel": "Сезон {season}",
+      "note": "По завершении сезона титул получают дуэлянт с наивысшим рейтингом 1v1 и пара с наивысшим рейтингом 2v2."
+    },
     "warfare": {
       "honorAmount": "{amount} очк. чести",
       "dualPrice": "{money} + {honor}",

@@ -2217,6 +2217,115 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 50 },
   },
+  // Arena season titles (the Warmaster line, src/sim/content/arena_seasons.ts).
+  // FEATS by rule 5: a season closes and its title can never be earned again, so
+  // each one is a preserved record rather than a chase, which also makes them
+  // zero-Renown and keeps the account score independent of who happened to be
+  // playing in a given half-year. `manual` because no per-character predicate can
+  // decide them: the champion is a REALM-WIDE ranking the server settles at the
+  // season boundary (server/arena_season_settlement.ts) and hands back to the sim
+  // through the join award lane (grantArenaSeasonTitlesForDeeds in deeds.ts).
+  // One title per season, awarded to both champions (1v1 and the 2v2 pair).
+  feat_arena_season_1_warmaster: {
+    id: 'feat_arena_season_1_warmaster',
+    name: 'Warmaster',
+    desc: 'Close Arena Season 1 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_2_glorious: {
+    id: 'feat_arena_season_2_glorious',
+    name: 'Glorious Warmaster',
+    desc: 'Close Arena Season 2 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Glorious Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_3_malevolent: {
+    id: 'feat_arena_season_3_malevolent',
+    name: 'Malevolent Warmaster',
+    desc: 'Close Arena Season 3 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Malevolent Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_4_ashen: {
+    id: 'feat_arena_season_4_ashen',
+    name: 'Ashen Warmaster',
+    desc: 'Close Arena Season 4 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Ashen Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_5_drowned: {
+    id: 'feat_arena_season_5_drowned',
+    name: 'Drowned Warmaster',
+    desc: 'Close Arena Season 5 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Drowned Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_6_merciless: {
+    id: 'feat_arena_season_6_merciless',
+    name: 'Merciless Warmaster',
+    desc: 'Close Arena Season 6 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Merciless Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_7_ruinous: {
+    id: 'feat_arena_season_7_ruinous',
+    name: 'Ruinous Warmaster',
+    desc: 'Close Arena Season 7 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Ruinous Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_8_sovereign: {
+    id: 'feat_arena_season_8_sovereign',
+    name: 'Sovereign Warmaster',
+    desc: 'Close Arena Season 8 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Sovereign Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_9_undying: {
+    id: 'feat_arena_season_9_undying',
+    name: 'Undying Warmaster',
+    desc: 'Close Arena Season 9 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Undying Warmaster' },
+    feat: true,
+  },
+  feat_arena_season_10_immortal: {
+    id: 'feat_arena_season_10_immortal',
+    name: 'Immortal Warmaster',
+    desc: 'Close Arena Season 10 atop the 1v1 ladder, or in the pair atop the 2v2 ladder.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Immortal Warmaster' },
+    feat: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

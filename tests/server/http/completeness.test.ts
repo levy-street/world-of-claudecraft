@@ -108,6 +108,7 @@ const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
 // stays-delegate-served requirement does not apply; the loop below asserts the
 // router-owned-only shape instead (the same assertion pair as the orphan).
 const REGISTRY_ONLY_PATHS = new Set<string>([
+  '/api/arena/seasons',
   '/api/deeds/rarity',
   '/api/deeds/broadcasts',
   '/api/steam/link',
@@ -306,6 +307,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/deeds/rarity' },
     { method: 'GET', path: '/api/deeds/broadcasts' },
     { method: 'POST', path: '/api/deeds/broadcasts' },
+    // The Arena season readout (server/arena_season.ts): registry-only for the
+    // same reason, and anonymous like the rarity read.
+    { method: 'GET', path: '/api/arena/seasons' },
     // The Steam link trio (server/steam/routes.ts): registry-only like the
     // deeds pair, env-gated dark until STEAM_ENABLED=1.
     { method: 'POST', path: '/api/steam/link' },

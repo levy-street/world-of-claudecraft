@@ -24,6 +24,7 @@
 import { routes as accountRoutes } from '../account';
 import { routes as adminRoutes } from '../admin';
 import { routes as appleAuthRoutes } from '../apple_auth';
+import { routes as arenaSeasonRoutes } from '../arena_season';
 import { routes as authRoutes } from '../auth_routes';
 import { routes as characterRoutes } from '../characters';
 import { routes as claudiumRoutes } from '../claudium';
@@ -131,6 +132,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...oauthRoutes,
   ...internalRoutes,
   ...deedsRoutes,
+  ...arenaSeasonRoutes,
   ...steamRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];

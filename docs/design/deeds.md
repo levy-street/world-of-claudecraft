@@ -186,7 +186,12 @@ the root `CLAUDE.md` content rule points here.
 - **Account-level deeds** (`prog_three_paths`, `prog_ninefold`, and the
   seven server-assisted `feat_*` world/realm firsts): the v1 evaluator is
   strictly per-character and `server/deeds_records.ts` is observer-only; an
-  account-level grant lane must exist first.
+  account-level grant lane must exist first. The Arena season titles
+  (`docs/design/arena-seasons.md`) are NOT a counter-example and do not unblock
+  these: they are per-CHARACTER awards the server decides and hands to the sim
+  at join (`grantArenaSeasonTitlesForDeeds`, gated on the season roster), so the
+  sim is still the only thing that writes a deed and there is still no
+  account-scoped grant.
 - **`prog_ringwright`**: jewelcrafting and inscription have zero recipes
   today (their depth arrives with the post-level-20 zone expansion, per
   `docs/design/professions.md`), so the ten-craft ring cannot complete and

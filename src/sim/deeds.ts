@@ -25,6 +25,7 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged
 // in Node, the browser, and the headless RL env.
 
+import { ARENA_SEASON_DEED_IDS } from './content/arena_seasons';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
@@ -543,6 +544,37 @@ export function grantDeed(
     ...(opts?.retro ? { retro: true } : {}),
   });
   return true;
+}
+
+/**
+ * Grant a character the Arena season titles the HOST says it won. The one entry
+ * point for the season award lane, called from `addPlayer` with the deed ids the
+ * server read out of `arena_season_titles` for this character.
+ *
+ * Why the sim cannot decide this itself: a season champion is a realm-wide
+ * ranking over every character, online or not, at a real-world instant. The sim
+ * sees only the players currently in ITS world and has no wall clock, so the
+ * server settles the season (server/arena_season_settlement.ts) and the sim
+ * stays the one thing that writes a deed, exactly like the bank-bonus lane
+ * recomputes off-sim facts and hands the sim a number to stamp.
+ *
+ * Host-trusted but NOT host-controlled: only ids in the season roster are
+ * accepted, so a bug (or a compromised host row) can never mint an arbitrary
+ * deed, and `grantDeed` makes a replay idempotent. Returns how many were newly
+ * granted, which is 0 on every login after the first.
+ */
+export function grantArenaSeasonTitlesForDeeds(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  awarded: readonly string[] | undefined,
+): number {
+  if (!awarded) return 0;
+  let granted = 0;
+  for (const deedId of awarded) {
+    if (!ARENA_SEASON_DEED_IDS.has(deedId)) continue;
+    if (grantDeed(ctx, meta, deedId, { retro: true })) granted++;
+  }
+  return granted;
 }
 
 /** Select (or clear, with null) the displayed title: the ONE validator both

@@ -8,6 +8,7 @@ import {
   hasStreamerLink,
   wireStreamerLinks,
 } from '../src/sim/account_flair';
+import { arenaSeasonIndexAt } from '../src/sim/arena_season';
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
@@ -91,6 +92,11 @@ import {
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { recordOnlineSample } from './admin_db';
+import {
+  arenaSeasonBoutWrites,
+  recordArenaSeasonEntry,
+  recordArenaSeasonPartnership,
+} from './arena_season_records';
 import { offensiveName } from './auth';
 import { recordBankOp } from './bank_ledger';
 import type {
@@ -2719,6 +2725,11 @@ export class GameServer {
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
         bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+        // Arena season title deed ids awarded to this character (ws_auth.ts,
+        // fresh-join arm), replayed into the sim at addPlayer. Absent on a resume
+        // and for callers that pass no meta; the sim's grant is idempotent, so
+        // re-passing the same set every login is the intended behavior.
+        arenaSeasonTitles?: readonly string[];
         // The character's stored action-bar layout (characters.hotbar_layout),
         // passed through from the join handler's DB read. Untrusted at rest, so
         // it is re-validated here before it reaches the client.
@@ -2760,6 +2771,7 @@ export class GameServer {
       state: state ?? undefined,
       characterId,
       bankBonus: meta.bankBonus,
+      arenaSeasonTitles: meta.arenaSeasonTitles,
     });
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
@@ -6206,6 +6218,60 @@ export class GameServer {
     return completion;
   }
 
+  /**
+   * Deliver an Arena season title to a champion who is online RIGHT NOW, so a
+   * settlement landing at the season boundary does not make them relog for it.
+   * A no-op for an offline character (and for a linkdead session's character,
+   * which is still in-world and so still resolves): the award is already in the
+   * ledger, and the join lane replays it on their next login either way.
+   */
+  grantArenaSeasonTitles(characterId: number, deedIds: readonly string[]): void {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session) return;
+    this.sim.grantArenaSeasonTitles(session.pid, deedIds);
+  }
+
+  /**
+   * Season bookkeeping for one finished ranked bout (see
+   * server/arena_season_settlement.ts). Only the two RANKED brackets count:
+   * Fiesta and Protect Yumi never move the Elo ladder, so they can never crown a
+   * champion. Bots and departed sessions have no character row and are skipped.
+   *
+   * The pair row is written by exactly ONE of the two teammates: both report the
+   * bout with the other as their ally, so the member with the lower character id
+   * is elected the single writer rather than letting the duo be counted twice.
+   */
+  private recordArenaSeasonBout(ev: Extract<SimEvent, { type: 'arenaEnd' }>): void {
+    if (ev.pid === undefined) return;
+    const self = this.clients.get(ev.pid);
+    if (!self) return;
+    const season = arenaSeasonIndexAt(Date.now());
+    const allyPid = ev.allies[0]?.pid;
+    const ally = allyPid === undefined ? undefined : this.clients.get(allyPid);
+    const writes = arenaSeasonBoutWrites({
+      season,
+      format: ev.format,
+      selfCharacterId: self.characterId,
+      allyCharacterId: ally?.characterId,
+    });
+    if (writes.entrant) {
+      recordArenaSeasonEntry({
+        realm: REALM,
+        season,
+        bracket: writes.entrant,
+        characterId: self.characterId,
+      });
+    }
+    if (writes.pair) {
+      recordArenaSeasonPartnership({
+        realm: REALM,
+        season,
+        characterIdA: writes.pair[0],
+        characterIdB: writes.pair[1],
+      });
+    }
+  }
+
   // Scan a tick's events for "significant activity" (max-level ding, rare drop,
   // duel result, arena win) and enqueue a card for the Discord bot to post. The
   // drain endpoint resolves which players are linked and tags them; the queue
@@ -6234,6 +6300,11 @@ export class GameServer {
           if (ev.retro !== true) this.maybeBroadcastDeedUnlock(s, ev.deedId);
         }
       }
+      // Arena seasons: mirror ranked participation (and 2v2 partnerships) for the
+      // season this bout closed in. Deliberately ahead of the `continue`-carrying
+      // activity chain below, and deliberately NOT gated on the result: a draw is
+      // still a contested bout, and a loss still makes you an entrant.
+      if (ev.type === 'arenaEnd') this.recordArenaSeasonBout(ev);
       if (ev.type === 'levelup' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);
         if (session) session.metricsMaxLevel = Math.max(session.metricsMaxLevel, ev.level);

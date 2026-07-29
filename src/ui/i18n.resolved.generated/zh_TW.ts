@@ -1186,6 +1186,51 @@ export const zh_TW: EnTranslations = {
       "highContrast": "高對比度",
       "highContrastAria": "切換高對比度背景：關閉動態預告片，使開始畫面文字保持清晰"
     },
+    "arenaSeason": {
+      "heading": "競技場 第 {season} 賽季",
+      "preseasonHeading": "競技場 季前賽",
+      "titleReward": "賽季頭銜：{title}",
+      "endsInDays": {
+        "one": "{count} 天後結束",
+        "few": "{count} 天後結束",
+        "many": "{count} 天後結束",
+        "other": "{count} 天後結束"
+      },
+      "endsInHours": {
+        "one": "{count} 小時後結束",
+        "few": "{count} 小時後結束",
+        "many": "{count} 小時後結束",
+        "other": "{count} 小時後結束"
+      },
+      "endsInMinutes": {
+        "one": "{count} 分鐘後結束",
+        "few": "{count} 分鐘後結束",
+        "many": "{count} 分鐘後結束",
+        "other": "{count} 分鐘後結束"
+      },
+      "opensInDays": {
+        "one": "{count} 天後開啟",
+        "few": "{count} 天後開啟",
+        "many": "{count} 天後開啟",
+        "other": "{count} 天後開啟"
+      },
+      "opensInHours": {
+        "one": "{count} 小時後開啟",
+        "few": "{count} 小時後開啟",
+        "many": "{count} 小時後開啟",
+        "other": "{count} 小時後開啟"
+      },
+      "opensInMinutes": {
+        "one": "{count} 分鐘後開啟",
+        "few": "{count} 分鐘後開啟",
+        "many": "{count} 分鐘後開啟",
+        "other": "{count} 分鐘後開啟"
+      },
+      "progressLabel": "賽季進度",
+      "champions": "冠軍",
+      "seasonLabel": "第 {season} 賽季",
+      "note": "賽季結束時，1v1 積分最高的鬥士與 2v2 積分最高的組合將獲得賽季頭銜。"
+    },
     "warfare": {
       "honorAmount": "{amount} 點榮譽",
       "dualPrice": "{money} + {honor}",

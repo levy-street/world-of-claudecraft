@@ -1186,6 +1186,51 @@ export const zh_CN: EnTranslations = {
       "highContrast": "高对比度",
       "highContrastAria": "切换高对比度背景：关闭动态预告片，使开始界面文字保持清晰"
     },
+    "arenaSeason": {
+      "heading": "竞技场 第 {season} 赛季",
+      "preseasonHeading": "竞技场 季前赛",
+      "titleReward": "赛季头衔：{title}",
+      "endsInDays": {
+        "one": "{count} 天后结束",
+        "few": "{count} 天后结束",
+        "many": "{count} 天后结束",
+        "other": "{count} 天后结束"
+      },
+      "endsInHours": {
+        "one": "{count} 小时后结束",
+        "few": "{count} 小时后结束",
+        "many": "{count} 小时后结束",
+        "other": "{count} 小时后结束"
+      },
+      "endsInMinutes": {
+        "one": "{count} 分钟后结束",
+        "few": "{count} 分钟后结束",
+        "many": "{count} 分钟后结束",
+        "other": "{count} 分钟后结束"
+      },
+      "opensInDays": {
+        "one": "{count} 天后开启",
+        "few": "{count} 天后开启",
+        "many": "{count} 天后开启",
+        "other": "{count} 天后开启"
+      },
+      "opensInHours": {
+        "one": "{count} 小时后开启",
+        "few": "{count} 小时后开启",
+        "many": "{count} 小时后开启",
+        "other": "{count} 小时后开启"
+      },
+      "opensInMinutes": {
+        "one": "{count} 分钟后开启",
+        "few": "{count} 分钟后开启",
+        "many": "{count} 分钟后开启",
+        "other": "{count} 分钟后开启"
+      },
+      "progressLabel": "赛季进度",
+      "champions": "冠军",
+      "seasonLabel": "第 {season} 赛季",
+      "note": "赛季结束时，1v1 积分最高的斗士与 2v2 积分最高的组合将获得赛季头衔。"
+    },
     "warfare": {
       "honorAmount": "{amount} 点荣誉",
       "dualPrice": "{money} + {honor}",

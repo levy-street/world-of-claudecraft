@@ -102,6 +102,7 @@ function setup() {
     // meta. The default returns an empty grant so every existing case reaches game.join
     // unchanged; the stamp/resume branches are pinned in the bank-bonus block below.
     bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
+    arenaSeasonTitlesForCharacter: vi.fn(async () => [] as string[]),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
@@ -953,6 +954,57 @@ describe('createWsAuth: bank bonus stamp', () => {
     // so addPlayer stamps it into the character state.
     const joinMeta = (game.join as any).mock.calls[0][7] as { bankBonus?: unknown };
     expect(joinMeta.bankBonus).toEqual(grant);
+  });
+
+  it('stamps the awarded Arena season titles onto the join meta', async () => {
+    const { ws, game, deps, req } = setup();
+    const awarded = ['feat_arena_season_1_warmaster'];
+    deps.arenaSeasonTitlesForCharacter = vi.fn(async () => awarded);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    // Keyed by CHARACTER id (7 for the default row), not the account: a season
+    // title belongs to the character that won it.
+    expect(deps.arenaSeasonTitlesForCharacter).toHaveBeenCalledTimes(1);
+    expect(deps.arenaSeasonTitlesForCharacter).toHaveBeenCalledWith(7);
+    const joinMeta = (game.join as any).mock.calls[0][7] as { arenaSeasonTitles?: unknown };
+    expect(joinMeta.arenaSeasonTitles).toEqual(awarded);
+  });
+
+  it('admits the handshake when the season-title reader is unwired or rejects', async () => {
+    // Both arms of the fail-soft contract, and both are real: a deps bag that
+    // predates the reader would otherwise throw a TypeError INSIDE the handshake
+    // (the tests/character_lease_ws.test.ts regression), and a database hiccup
+    // must not cost a player their login over a cosmetic title.
+    const unwired = setup();
+    unwired.deps.arenaSeasonTitlesForCharacter = undefined;
+    await createWsAuth(unwired.deps).authenticateWebSocket(
+      asWs(unwired.ws),
+      authRaw(),
+      unwired.req,
+    );
+    expect(unwired.game.join).toHaveBeenCalledTimes(1);
+    expect(
+      ((unwired.game.join as any).mock.calls[0][7] as { arenaSeasonTitles?: unknown })
+        .arenaSeasonTitles,
+    ).toEqual([]);
+
+    const failing = setup();
+    failing.deps.arenaSeasonTitlesForCharacter = vi.fn(async () => {
+      throw new Error('database unavailable');
+    });
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await createWsAuth(failing.deps).authenticateWebSocket(
+      asWs(failing.ws),
+      authRaw(),
+      failing.req,
+    );
+    errors.mockRestore();
+    expect(failing.game.join).toHaveBeenCalledTimes(1);
+    expect(
+      ((failing.game.join as any).mock.calls[0][7] as { arenaSeasonTitles?: unknown })
+        .arenaSeasonTitles,
+    ).toEqual([]);
   });
 
   it('never recomputes the bank bonus on the resume arm (no mid-session recompute)', async () => {

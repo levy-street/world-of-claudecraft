@@ -2143,6 +2143,12 @@ export class Sim {
       // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
       // stays the sanitized save value, [] breakdown).
       bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+      // Arena season titles the HOST has awarded this character (deed ids from
+      // server/arena_season_db.ts `arena_season_titles`). Granted at join through
+      // the roster-gated helper in deeds.ts, idempotently: the server re-reads and
+      // re-passes the same set on every login, and a replay grants nothing. Never
+      // passed offline (a sandbox realm settles no seasons).
+      arenaSeasonTitles?: readonly string[];
     },
   ): number {
     const savedState = opts?.state
@@ -2616,6 +2622,11 @@ export class Sim {
     // order cannot fork the draw order). Counters start at zero, so counter
     // deeds never retro-grant; the emitted events carry retro: true and
     // drain with the next tick to this player only.
+    // Host-awarded Arena season titles, before the retro pass so the season feat
+    // is already in the earned set for anything downstream that reads it. The
+    // server decides the champions (it alone sees the whole realm and the real
+    // clock); the sim stays the only thing that writes a deed.
+    deedsMod.grantArenaSeasonTitlesForDeeds(this.ctx, meta, opts?.arenaSeasonTitles);
     deedsMod.seedItemDiscovery(this.ctx, meta);
     deedsMod.retroFallbackGrants(this.ctx, meta, player);
     deedsMod.evaluateDeedsFor(this.ctx, meta, player, true);
@@ -3589,6 +3600,16 @@ export class Sim {
   setActiveTitle(deedId: string | null, pid?: number): void {
     const r = this.resolve(pid);
     if (r) deedsMod.setActiveTitle(r.meta, r.e, deedId);
+  }
+  /** Grant host-awarded Arena season titles to a player who is ALREADY in the
+   *  world (the server's settlement path; a player who joins later gets the
+   *  same awards through `addPlayer`'s `arenaSeasonTitles`). A thin delegate
+   *  because the only caller is foreign (server/game.ts), and gated by the same
+   *  season roster: the host names the deeds, it does not choose them. Returns
+   *  how many were newly granted. */
+  grantArenaSeasonTitles(pid: number, deedIds: readonly string[]): number {
+    const meta = this.players.get(pid);
+    return meta ? deedsMod.grantArenaSeasonTitlesForDeeds(this.ctx, meta, deedIds) : 0;
   }
   // Offline the sandbox has no population, so there is no rarity to report:
   // always null (the facet's documented no-data value; the window hides the

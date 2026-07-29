@@ -3969,6 +3969,86 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 10,
     "feat": false,
     "crest": "/ui/deeds/soc_salvage_50.webp"
+  },
+  {
+    "id": "feat_arena_season_1_warmaster",
+    "name": "Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Warmaster"
+  },
+  {
+    "id": "feat_arena_season_2_glorious",
+    "name": "Glorious Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Glorious Warmaster"
+  },
+  {
+    "id": "feat_arena_season_3_malevolent",
+    "name": "Malevolent Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Malevolent Warmaster"
+  },
+  {
+    "id": "feat_arena_season_4_ashen",
+    "name": "Ashen Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Ashen Warmaster"
+  },
+  {
+    "id": "feat_arena_season_5_drowned",
+    "name": "Drowned Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Drowned Warmaster"
+  },
+  {
+    "id": "feat_arena_season_6_merciless",
+    "name": "Merciless Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Merciless Warmaster"
+  },
+  {
+    "id": "feat_arena_season_7_ruinous",
+    "name": "Ruinous Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Ruinous Warmaster"
+  },
+  {
+    "id": "feat_arena_season_8_sovereign",
+    "name": "Sovereign Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Sovereign Warmaster"
+  },
+  {
+    "id": "feat_arena_season_9_undying",
+    "name": "Undying Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Undying Warmaster"
+  },
+  {
+    "id": "feat_arena_season_10_immortal",
+    "name": "Immortal Warmaster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Immortal Warmaster"
   }
 ];
 

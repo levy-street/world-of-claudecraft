@@ -563,10 +563,11 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 219 deeds - 3 feats - 9 hidden = 207 visible to a fresh character.
+    // 229 deeds - 13 feats - 9 hidden = 207 visible to a fresh character. The
+    // ten Arena season titles are feats, so they grow the shelf, not this count.
     expect(view.summary.visibleTotal).toBe(207);
-    // The bucket sum adds the Feats shelf's own 3 rows back on top.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(210);
+    // The bucket sum adds the Feats shelf's own 13 rows back on top.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(220);
   });
 
   it('maps every live catalog category onto a display bucket', () => {

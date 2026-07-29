@@ -1086,6 +1086,19 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   // per the new-route rule (server/http/CLAUDE.md): they have NO legacy ladder
   // arm, the registry dispatcher serves them under API_DISPATCH=new, and the
   // legacy rollback answers 404 for them by design.
+  // Arena seasons: the public season readout (live season number, authored
+  // roster size, settled champions). Registry-only like the deeds reads above,
+  // anonymous, and on the same public-read budget.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/arena/seasons',
+    handler: 'server/arena_season.ts seasonsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   {
     dispatcher: DISPATCH.mainApi,
     method: 'GET',

@@ -11,6 +11,7 @@ import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
+import { ARENA_SEASON_SCHEMA } from './arena_season_db';
 import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
@@ -1100,6 +1101,11 @@ export async function ensureSchema(): Promise<void> {
     // unconditionally (idempotent), like the other schema modules.
     await client.query(MAPS_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
+    // Arena seasons: ranked participation per season, the 2v2 duo ledger, the
+    // award ledger, and the exactly-once settlement markers. FK-references
+    // characters(id) and accounts(id), so it runs after SCHEMA. Applied
+    // unconditionally (idempotent), like the other schema modules.
+    await client.query(ARENA_SEASON_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);

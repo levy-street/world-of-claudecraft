@@ -54,8 +54,8 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 219 deeds worth 2710 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(219);
+  it('ships exactly 229 deeds worth 2710 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(229);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2710);
   });
 
@@ -72,7 +72,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       pvp: 28,
       social: 18,
       exploration: 9,
-      feat: 3,
+      feat: 13,
       hidden: 9,
     });
   });
@@ -116,6 +116,18 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_perfect_specimen',
       'soc_first_salvage',
       'soc_salvage_50',
+      // Arena seasons: one zero-Renown feat per planned season, each carrying
+      // that season's Warmaster title (src/sim/content/arena_seasons.ts).
+      'feat_arena_season_1_warmaster',
+      'feat_arena_season_2_glorious',
+      'feat_arena_season_3_malevolent',
+      'feat_arena_season_4_ashen',
+      'feat_arena_season_5_drowned',
+      'feat_arena_season_6_merciless',
+      'feat_arena_season_7_ruinous',
+      'feat_arena_season_8_sovereign',
+      'feat_arena_season_9_undying',
+      'feat_arena_season_10_immortal',
     ]);
     expect(DEEDS.prog_crown_below.renown).toBe(25);
     expect(DEEDS.prog_mere_at_rest.renown).toBe(25);
@@ -270,14 +282,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_ringwright).toBeUndefined();
   });
 
-  it('ships exactly 30 titles and 3 borders', () => {
+  it('ships exactly 40 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(30);
+    expect(titles.length).toBe(40);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(30);
+    expect(new Set(titleTexts).size).toBe(40);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -313,7 +325,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // milestones, the rare-find quartet, and the salvage pair). No shipped
   // trigger or renown changed; prog_master_gatherer had only its English desc
   // reworded, which this digest deliberately does not cover.
-  const FROZEN_CATALOG_SHA256 = '059694159a630369a4f9536f741dff8128f04ced50b8eb11a3a9edfde65e996a';
+  // Re-baselined once more for Arena seasons: ten appended zero-Renown feats,
+  // one per planned season, all `manual` (the server settles the champions).
+  // Again no shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '527a6f85e1b453fff1a5e54f5de2e56e844dd58d0515d0887692f9617618e9c3';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -443,12 +458,12 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and soc_salvage_50
-    // closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and the last authored
+    // Arena season feat closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('soc_salvage_50');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_arena_season_10_immortal');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

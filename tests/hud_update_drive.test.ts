@@ -832,8 +832,12 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'medium',
     gate: "$('#arena-window').style.display === 'block'",
     surface: 'window',
-    guard: { kind: 'module', module: 'arena_window.ts', proof: VIEW_SIG_RETURN },
-    why: 'the arena queue window',
+    // The guard now compares a COMPOSED signature (the bracket panel's view.sig
+    // plus the season banner's own), so it moved off VIEW_SIG_RETURN onto the
+    // shared bare-sig literal. Composed rather than either half alone: a season
+    // that ticks over while the window sits open must still rebuild it.
+    guard: { kind: 'module', module: 'arena_window.ts', proof: SIG_RETURN },
+    why: 'the arena queue window and its season banner',
   },
   {
     call: 'this.dungeonFinderWindow.render',
@@ -1343,7 +1347,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       'the resolved guard list moved. A row changed which module it points at, which line it looks for, or dropped to a guard kind that names no source at all.',
     ).toEqual(
       [
-        'arena_window.ts: if (view.sig === this.lastSig) return;',
+        'arena_window.ts: if (sig === this.lastSig) return;',
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',

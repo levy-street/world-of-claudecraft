@@ -1312,9 +1312,9 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    // name + desc per deed, plus one title entry per title deed (30 as of
-    // Professions 2.0; tests/deeds_content.test.ts pins the count).
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 30);
+    // name + desc per deed, plus one title entry per title deed (40 as of the
+    // Arena season titles; tests/deeds_content.test.ts pins the count).
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 40);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);

@@ -1186,6 +1186,51 @@ export const tr_TR: EnTranslations = {
       "highContrast": "Yüksek Kontrast",
       "highContrastAria": "Yüksek kontrastlı arka planı aç/kapat: hareketli tanıtımı devre dışı bırakır, böylece başlangıç ekranı metni okunaklı kalır"
     },
+    "arenaSeason": {
+      "heading": "Arena Season {season}",
+      "preseasonHeading": "Arena Preseason",
+      "titleReward": "Season title: {title}",
+      "endsInDays": {
+        "one": "Ends in {count} day",
+        "few": "Ends in {count} days",
+        "many": "Ends in {count} days",
+        "other": "Ends in {count} days"
+      },
+      "endsInHours": {
+        "one": "Ends in {count} hour",
+        "few": "Ends in {count} hours",
+        "many": "Ends in {count} hours",
+        "other": "Ends in {count} hours"
+      },
+      "endsInMinutes": {
+        "one": "Ends in {count} minute",
+        "few": "Ends in {count} minutes",
+        "many": "Ends in {count} minutes",
+        "other": "Ends in {count} minutes"
+      },
+      "opensInDays": {
+        "one": "Opens in {count} day",
+        "few": "Opens in {count} days",
+        "many": "Opens in {count} days",
+        "other": "Opens in {count} days"
+      },
+      "opensInHours": {
+        "one": "Opens in {count} hour",
+        "few": "Opens in {count} hours",
+        "many": "Opens in {count} hours",
+        "other": "Opens in {count} hours"
+      },
+      "opensInMinutes": {
+        "one": "Opens in {count} minute",
+        "few": "Opens in {count} minutes",
+        "many": "Opens in {count} minutes",
+        "other": "Opens in {count} minutes"
+      },
+      "progressLabel": "Season progress",
+      "champions": "Champions",
+      "seasonLabel": "Season {season}",
+      "note": "The highest-rated 1v1 duelist and the highest-rated 2v2 pair earn the season title when the season closes."
+    },
     "warfare": {
       "honorAmount": "{amount} Onur",
       "dualPrice": "{money} + {honor}",

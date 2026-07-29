@@ -55,7 +55,10 @@ there first if you need one.
 - **Events + world systems:** `augments.ts` (2v2 Fiesta) and `skins.ts` (cosmetic
   skin events), `vale_cup.ts`, `yumi.ts`, `item_sets.ts` (set bonuses),
   `graveyards.ts` (death loop), `letters.ts` + `mailboxes.ts` (mail), `tunnels.ts`
-  (voxel volumes), `warlock_pets.ts`, `ground_pickup_lines.ts` (pickup flavor).
+  (voxel volumes), `warlock_pets.ts`, `ground_pickup_lines.ts` (pickup flavor),
+  `arena_seasons.ts` (the six-month Arena season roster: one record per planned
+  season naming its `feat_arena_season_*` deed and Warmaster title; APPEND-ONLY,
+  because a settled season is persisted by number, see `docs/design/arena-seasons.md`).
 - **`deeds.ts`: the Book of Deeds catalog:** `DEEDS` (`DeedDef` records; append new
   deeds at the END of the table, since `DEED_ORDER` derives from table order;
   never reorder or retro-edit an existing trigger) + `DEEDS_ERA`. Cosmetic-only

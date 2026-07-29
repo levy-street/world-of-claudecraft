@@ -1046,6 +1046,60 @@ export const hudChromeStrings = {
     highContrastAria:
       'Toggle high-contrast background: disables the moving trailer so start-screen text stays legible',
   },
+  // The Arena season banner at the top of the Ashen Coliseum window: which
+  // season is live, how long is left in it, the title on offer, and the settled
+  // champions below it. The title itself is never a key here: it is a Book of
+  // Deeds reward that re-localizes from its deed id through deed_i18n.ts.
+  arenaSeason: {
+    heading: 'Arena Season {season}',
+    preseasonHeading: 'Arena Preseason',
+    titleReward: 'Season title: {title}',
+    // CLDR plural forms through tPlural (the hudChrome.plurals.* precedent): the
+    // countdown quantizes to whole days until the last 24 hours, so a flat form
+    // would put "Ends in 1 days" on screen for a full day every season, then
+    // "1 hours", then "1 minutes". Flat keys would also force every locale into
+    // a single form, which the Slavic few/many categories cannot use.
+    endsInDays: {
+      one: 'Ends in {count} day',
+      few: 'Ends in {count} days',
+      many: 'Ends in {count} days',
+      other: 'Ends in {count} days',
+    },
+    endsInHours: {
+      one: 'Ends in {count} hour',
+      few: 'Ends in {count} hours',
+      many: 'Ends in {count} hours',
+      other: 'Ends in {count} hours',
+    },
+    endsInMinutes: {
+      one: 'Ends in {count} minute',
+      few: 'Ends in {count} minutes',
+      many: 'Ends in {count} minutes',
+      other: 'Ends in {count} minutes',
+    },
+    opensInDays: {
+      one: 'Opens in {count} day',
+      few: 'Opens in {count} days',
+      many: 'Opens in {count} days',
+      other: 'Opens in {count} days',
+    },
+    opensInHours: {
+      one: 'Opens in {count} hour',
+      few: 'Opens in {count} hours',
+      many: 'Opens in {count} hours',
+      other: 'Opens in {count} hours',
+    },
+    opensInMinutes: {
+      one: 'Opens in {count} minute',
+      few: 'Opens in {count} minutes',
+      many: 'Opens in {count} minutes',
+      other: 'Opens in {count} minutes',
+    },
+    progressLabel: 'Season progress',
+    champions: 'Champions',
+    seasonLabel: 'Season {season}',
+    note: 'The highest-rated 1v1 duelist and the highest-rated 2v2 pair earn the season title when the season closes.',
+  },
   warfare: {
     honorAmount: '{amount} Honor',
     dualPrice: '{money} + {honor}',
