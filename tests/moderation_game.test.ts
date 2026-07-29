@@ -813,27 +813,76 @@ describe('moderator spectate integration', () => {
     });
   });
 
-  it('switches targets without moving the saved return point', async () => {
+  it('switches targets without moving the saved return point', () => {
+    registerScene({
+      id: 'scn_test_spectate_switch_first',
+      duration: 10,
+      ops: [{ at: 0, kind: 'inputLock', on: true }],
+    });
+    registerScene({
+      id: 'scn_test_spectate_switch_second',
+      duration: 10,
+      ops: [{ at: 0, kind: 'letterbox', on: true }],
+    });
+    for (const suffix of ['first', 'second']) {
+      registerChoice({
+        id: `ch_test_spectate_switch_${suffix}`,
+        promptKey: `lb.test.spectate.switch.${suffix}`,
+        flag: `test_spectate_switch_${suffix}`,
+        options: [{ id: 'continue', key: 'lb.test.spectate.continue' }],
+        windowSeconds: 8,
+        defaultOptionId: 'continue',
+      });
+    }
     const server = new GameServer();
+    const moderatorWs = fakeWs();
     const moderator = joined(
-      server.join(fakeWs(), 1, 101, 'Watcher', 'mage', null, false, {
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
         isAdmin: true,
         adminPermissions: MOD_PERMS,
       }),
     );
-    joined(server.join(fakeWs(), 2, 102, 'First', 'rogue', null));
+    const first = joined(server.join(fakeWs(), 2, 102, 'First', 'rogue', null));
     const second = joined(server.join(fakeWs(), 3, 103, 'Second', 'warrior', null));
     const original = { ...entity(server, moderator.pid).pos };
+    expect(playSceneForPlayer(server.sim.ctx, first.pid, 'scn_test_spectate_switch_first')).toBe(
+      true,
+    );
+    expect(playSceneForPlayer(server.sim.ctx, second.pid, 'scn_test_spectate_switch_second')).toBe(
+      true,
+    );
+    expect(
+      startChoiceForPlayer(server.sim.ctx, first.pid, 'ch_test_spectate_switch_first'),
+    ).toBe(true);
+    expect(
+      startChoiceForPlayer(server.sim.ctx, second.pid, 'ch_test_spectate_switch_second'),
+    ).toBe(true);
+    server.sim.tick();
+    moderatorWs.send.mockClear();
 
     command(server, moderator, '/spectate First');
     await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
     if (!moderator.spectating) throw new Error('spectate did not start');
     const saved = { ...moderator.spectating.savedPos };
+    expect(frames(moderatorWs).find((frame) => frame.t === 'spectate')).toMatchObject({
+      name: 'First',
+      pid: first.pid,
+      sceneState: { sceneId: 'scn_test_spectate_switch_first', inputLocked: true },
+      sceneChoiceState: { choiceId: 'ch_test_spectate_switch_first' },
+    });
+    moderatorWs.send.mockClear();
+
     command(server, moderator, '/spectate Second');
     await vi.waitFor(() => expect(moderator.spectating?.characterId).toBe(second.characterId));
 
     expect(moderator.spectating?.characterId).toBe(second.characterId);
     expect(moderator.spectating?.savedPos).toEqual(saved);
+    expect(frames(moderatorWs).find((frame) => frame.t === 'spectate')).toMatchObject({
+      name: 'Second',
+      pid: second.pid,
+      sceneState: { sceneId: 'scn_test_spectate_switch_second', inputLocked: false },
+      sceneChoiceState: { choiceId: 'ch_test_spectate_switch_second' },
+    });
     command(server, moderator, '/unspectate');
     await vi.waitFor(() => expect(moderator.spectating).toBeNull());
     expect(server.sim.entities.get(moderator.pid)?.pos).toEqual(original);

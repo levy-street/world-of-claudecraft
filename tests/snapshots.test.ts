@@ -357,6 +357,34 @@ describe('spectate client POV', () => {
     expect(client.sceneInputLockPending()).toBe(true);
     expect(client.moveInput).toEqual(emptyMoveInput());
     expect(lockChanges).toHaveBeenCalledExactlyOnceWith(true);
+    expect(client.drainEvents()).toEqual([
+      {
+        type: 'sceneSync',
+        state: {
+          sceneId: 'scn_test_spectated',
+          remainingSeconds: 4,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: false,
+        },
+      },
+      {
+        type: 'sceneChoiceSync',
+        state: {
+          choiceId: 'ch_test_spectated',
+          promptKey: 'lb.test.spectated.prompt',
+          options: [
+            { id: 'stay', key: 'lb.test.spectated.stay' },
+            { id: 'leave', key: 'lb.test.spectated.leave' },
+          ],
+          defaultOptionId: 'leave',
+          leaderPid: 2,
+          values: { price: 12 },
+          windowSeconds: 8,
+          remainingSeconds: 3,
+        },
+      },
+    ]);
 
     const snapshot = (facing: number, dead: boolean) => ({
       t: 'snap',
@@ -396,6 +424,59 @@ describe('spectate client POV', () => {
     internals.onMessage(
       JSON.stringify({
         t: 'spectate',
+        name: 'Second',
+        pid: 3,
+        sceneState: {
+          sceneId: 'scn_test_spectated_second',
+          remainingSeconds: 6,
+          inputLocked: false,
+          letterbox: true,
+          musicSilenced: true,
+        },
+        sceneChoiceState: {
+          choiceId: 'ch_test_spectated_second',
+          promptKey: 'lb.test.spectated.second.prompt',
+          options: [{ id: 'continue', key: 'lb.test.spectated.continue' }],
+          defaultOptionId: 'continue',
+          leaderPid: 3,
+          windowSeconds: 8,
+          remainingSeconds: 5,
+        },
+      }),
+    );
+    expect(client.spectating).toBe('Second');
+    expect(client.playerId).toBe(3);
+    expect(client.sceneInputLockPending()).toBe(false);
+    expect(lockChanges.mock.calls).toEqual([[true], [false]]);
+    expect(client.drainEvents()).toEqual([
+      {
+        type: 'sceneSync',
+        state: {
+          sceneId: 'scn_test_spectated_second',
+          remainingSeconds: 6,
+          inputLocked: false,
+          letterbox: true,
+          musicSilenced: true,
+        },
+      },
+      {
+        type: 'sceneChoiceSync',
+        state: {
+          choiceId: 'ch_test_spectated_second',
+          promptKey: 'lb.test.spectated.second.prompt',
+          options: [{ id: 'continue', key: 'lb.test.spectated.continue' }],
+          defaultOptionId: 'continue',
+          leaderPid: 3,
+          values: undefined,
+          windowSeconds: 8,
+          remainingSeconds: 5,
+        },
+      },
+    ]);
+
+    internals.onMessage(
+      JSON.stringify({
+        t: 'spectate',
         name: null,
         pid: 1,
         sceneState: null,
@@ -410,32 +491,6 @@ describe('spectate client POV', () => {
     expect(client.sceneInputLockPending()).toBe(false);
     expect(lockChanges.mock.calls).toEqual([[true], [false]]);
     expect(client.drainEvents()).toEqual([
-      {
-        type: 'sceneSync',
-        state: {
-          sceneId: 'scn_test_spectated',
-          remainingSeconds: 4,
-          inputLocked: true,
-          letterbox: true,
-          musicSilenced: false,
-        },
-      },
-      {
-        type: 'sceneChoiceSync',
-        state: {
-          choiceId: 'ch_test_spectated',
-          promptKey: 'lb.test.spectated.prompt',
-          options: [
-            { id: 'stay', key: 'lb.test.spectated.stay' },
-            { id: 'leave', key: 'lb.test.spectated.leave' },
-          ],
-          defaultOptionId: 'leave',
-          leaderPid: 2,
-          values: { price: 12 },
-          windowSeconds: 8,
-          remainingSeconds: 3,
-        },
-      },
       { type: 'sceneSync', state: null },
       { type: 'sceneChoiceSync', state: null },
     ]);
