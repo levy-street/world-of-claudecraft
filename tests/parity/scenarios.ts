@@ -31,6 +31,7 @@ import {
 } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
+import { MOUNT_SUMMON_SECONDS } from '../../src/sim/mounts';
 import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
 import { scenarioRunFor, startScenario } from '../../src/sim/scenarios/scenarios';
 import { Sim } from '../../src/sim/sim';
@@ -4611,6 +4612,51 @@ function lastBellTidemill(): Scenario {
   };
 }
 
+// Mount-reins integration seam: the collectible item is the summon command,
+// the per-tick transition applies its exact catalog mount, using the same reins
+// again dismounts instantly, and ownership remains because reins are reusable.
+function mountReins(): Scenario {
+  return {
+    name: 'mount_reins',
+    coverage: [
+      'riding-trained player owns literal reins_grag_bear',
+      'useItem(reins) starts the authoritative summon channel',
+      'tick completion applies Entity.mountKey=grag_bear',
+      'using active-mount reins dismounts instantly without consuming ownership',
+    ],
+    build: () =>
+      new Sim({
+        seed: 20_062,
+        playerClass: 'warrior',
+        playerName: 'Rider',
+        autoEquip: true,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(MAX_LEVEL);
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid);
+      if (!meta) throw new Error('mount reins parity player missing');
+      meta.ridingTrained = true;
+      sim.addItem('reins_grag_bear', 1, pid);
+      rec.snapshot('reins-owned');
+
+      sim.useItem('reins_grag_bear', pid);
+      rec.notes.summonStarted =
+        sim.player.mountCastKey === 'grag_bear' && sim.player.mountCastRemaining > 0;
+      rec.snapshot('summon-started');
+
+      rec.tick(Math.ceil(MOUNT_SUMMON_SECONDS / DT) + 2);
+      rec.notes.mountedKey = sim.player.mountKey;
+      rec.snapshot('summon-complete');
+
+      sim.useItem('reins_grag_bear', pid);
+      rec.notes.dismountedKey = sim.player.mountKey;
+      rec.snapshot('reins-dismount');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4669,4 +4715,5 @@ export const SCENARIOS: Scenario[] = [
   professionsCraft(),
   professionsGather(),
   lastBellTidemill(),
+  mountReins(),
 ];

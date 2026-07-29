@@ -427,4 +427,18 @@ describe('coverage: each scenario fires its subsystem', () => {
       ),
     ).toBe(false);
   });
+
+  it('mount_reins: item use summons the exact owned mount, then dismounts without consuming it', () => {
+    const rec = run('mount_reins');
+    const sim = rec.sim as any;
+    const pid = sim.playerId as number;
+
+    expect(rec.notes.summonStarted).toBe(true);
+    expect(rec.notes.mountedKey).toBe('grag_bear');
+    expect(rec.notes.dismountedKey).toBe('');
+    expect(sim.player.mountKey).toBe('');
+    expect(sim.player.mountCastRemaining).toBe(0);
+    expect(sim.countItem('reins_grag_bear', pid)).toBe(1);
+    expect(sim.ownedMountsFor(pid)).toEqual(['grag_bear']);
+  });
 });
