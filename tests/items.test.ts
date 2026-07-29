@@ -130,7 +130,7 @@ describe('items.useItem', () => {
     const sim = makeWorld();
     const { pid, p } = vendorPlayer(sim);
     const ctx = ctxOf(sim);
-    sim.addItem('conjured_bread3', 1, pid);
+    sim.addItem('conjured_bread3', 2, pid);
 
     items.useItem(ctx, 'conjured_bread3', pid);
     const activeEating = p.eating;
@@ -143,7 +143,7 @@ describe('items.useItem', () => {
 
     expect(p.eating).toBe(activeEating);
     expect(p.eating?.remaining).toBe(CONSUME_DURATION - 2);
-    expect(sim.countItem('conjured_bread3', pid)).toBe(0);
+    expect(sim.countItem('conjured_bread3', pid)).toBe(1);
     expect(errorTexts(sim.drainEvents())).toContain("You're already eating.");
   });
 

@@ -82,6 +82,21 @@ describe('sim /gear readout is fully localized in every locale', () => {
   });
 });
 
+describe('sim consumption errors localize in every translated locale', () => {
+  const alreadyEating = "You're already eating.";
+
+  it('does not leave the duplicate-food refusal in English', () => {
+    for (const lang of translatedLocales) {
+      setLanguage(lang);
+      expect(
+        localizeSimText(alreadyEating),
+        `${lang}: already-eating error stayed English`,
+      ).not.toBe(alreadyEating);
+    }
+    setLanguage('en');
+  });
+});
+
 describe('sim relic + pickup error toasts localize in every locale', () => {
   // The exact `?? 'English'` fallbacks emitted by sim.ts (activateNythraxisRelic /
   // pickUpObject). {name} stands in for a quest-item name spliced in by the sim.
