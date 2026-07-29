@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { PlayerClass } from '../src/sim/types';
-import { classIconUrl } from '../src/ui/portrait_chip';
+import { classIconUrl } from '../src/ui/class_icon_url';
 
 // Painted class portraits (CraftPix RPG icon art) shown on the pre-game choose /
 // create screens instead of the 3D model snapshot. public/ui/class-icons/<cls>.webp

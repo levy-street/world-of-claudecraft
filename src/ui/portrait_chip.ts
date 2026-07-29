@@ -13,22 +13,12 @@ import {
   portraitsReady,
 } from '../render/characters/portrait';
 import type { PlayerClass } from '../sim/types';
+import { classIconUrl } from './class_icon_url';
 import { esc } from './esc';
 import { t } from './i18n';
 import { iconDataUrl } from './icons';
 
 export type PortraitVariant = 'sm' | 'md' | 'lg';
-
-// Painted class portraits (CraftPix RPG icon art) for the PRE-GAME character
-// screens (choose / create), shown INSTEAD of the 3D model snapshot there. The
-// in-game HUD chips keep the live 3D render. public/ui/class-icons/<class>.webp;
-// provenance in CREDITS.md, existence pinned by tests/class_icons.test.ts.
-const CLASS_ICON_DIR = '/ui/class-icons';
-
-/** URL of the painted class portrait for `cls`. Every playable class ships one. */
-export function classIconUrl(cls: PlayerClass): string {
-  return `${CLASS_ICON_DIR}/${cls}.webp`;
-}
 
 /** Decorate pre-game class chips with their painted class icon once. */
 export function decorateClassChips(root: ParentNode = document): void {
