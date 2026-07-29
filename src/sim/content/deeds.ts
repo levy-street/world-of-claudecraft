@@ -2238,6 +2238,25 @@ export const DEEDS: Record<string, DeedDef> = {
       difficulty: 'heroic',
       count: 1,
     },
+  // Two camp rares shipped alongside their zones but were left off the first
+  // reckoning of named terrors (chr_marsh_rares / chr_peaks_rares). Design
+  // rule 9 forbids widening those shipped trigger lists, so the missed
+  // rares get their own NEW deeds instead of a retro-edit.
+  chr_marsh_rares_ii: {
+    id: 'chr_marsh_rares_ii',
+    name: 'The Glutton, Reckoned',
+    desc: 'Slay Grubjaw the Glutton, a fourth named terror of Mirefen Marsh left off the first reckoning.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'slain:grubjaw' },
+  },
+  chr_peaks_rares_ii: {
+    id: 'chr_peaks_rares_ii',
+    name: 'More Names Cut into the Crag',
+    desc: 'Slay Old Cragmaw and Shardlord Kazzix, two more named terrors of Thornpeak Heights left off the first reckoning.',
+    category: 'chronicle',
+    renown: 10,
+    trigger: { kind: 'visits', markIds: ['slain:old_cragmaw', 'slain:shardlord_kazzix'] },
   },
 };
 

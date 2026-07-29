@@ -195,8 +195,12 @@ const SANCTUM_SPEED_DEED = 'dgn_sanctum_speed';
 
 // The named overworld terrors whose kill credit feeds a 'slain:<templateId>'
 // visited mark (the chr_*_rares deeds). Pinned so the visited set stays
-// bounded by construction.
-const RARE_SLAIN_TEMPLATES = new Set([
+// bounded by construction; every live rare CAMPS mob belongs here UNLESS it
+// already has an alternate credit path (the content-integrity test in
+// tests/deeds_content.test.ts cross-checks the exact set against CAMPS/MOBS,
+// with sethrael_palecoil as the one documented exception: its kill is
+// required by q_palecoil, which already feeds prog_mere_at_rest).
+export const RARE_SLAIN_TEMPLATES = new Set([
   'old_greyjaw',
   'mogger',
   'grix_the_tunnelking',
@@ -205,10 +209,13 @@ const RARE_SLAIN_TEMPLATES = new Set([
   'mirejaw_the_ravenous',
   'sloomtooth_the_drowned',
   'sister_nhalia',
+  'grubjaw',
   'ironvein_foreman',
   'brutok_skullsmasher',
   'voskar_emberwing',
   'marrowlord_varkas',
+  'old_cragmaw',
+  'shardlord_kazzix',
 ]);
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds

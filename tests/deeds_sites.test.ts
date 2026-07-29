@@ -1453,3 +1453,36 @@ describe('enchanting skill-gain sites', () => {
     expect(meta.deedsEarned.has('prog_craft_specialist')).toBe(true);
   });
 });
+
+// Every rare CAMPS mob's kill must feed a 'slain:<templateId>' mark
+// (RARE_SLAIN_TEMPLATES) so it can progress a chr_*_rares deed. Grubjaw, Old
+// Cragmaw, and Shardlord Kazzix shipped with their zones but were left off
+// RARE_SLAIN_TEMPLATES, so killing them wrote no mark and could never
+// progress a deed; this drives the real kill-credit site end to end.
+describe('rare camp kills feed the Book of Deeds (RARE_SLAIN_TEMPLATES)', () => {
+  it('Grubjaw the Glutton (Mirefen Marsh) marks slain:grubjaw and grants chr_marsh_rares_ii', () => {
+    const sim = makeSim();
+    const meta = addMeta(sim, 'A');
+    const grubjaw = spawnMob(sim, 'grubjaw', { x: 0, y: 0, z: 0 });
+    onMobKillCreditForDeeds(sim.ctx, grubjaw, null, meta, [meta]);
+    updateDeeds(sim.ctx);
+    expect(meta.deedStats.visited.has('slain:grubjaw')).toBe(true);
+    expect(meta.deedsEarned.has('chr_marsh_rares_ii')).toBe(true);
+  });
+
+  it('Old Cragmaw and Shardlord Kazzix (Thornpeak Heights) both mark slain and grant chr_peaks_rares_ii', () => {
+    const sim = makeSim();
+    const meta = addMeta(sim, 'A');
+    const cragmaw = spawnMob(sim, 'old_cragmaw', { x: 0, y: 0, z: 0 });
+    onMobKillCreditForDeeds(sim.ctx, cragmaw, null, meta, [meta]);
+    updateDeeds(sim.ctx);
+    expect(meta.deedStats.visited.has('slain:old_cragmaw')).toBe(true);
+    // Only one of the two named terrors slain so far: not yet granted.
+    expect(meta.deedsEarned.has('chr_peaks_rares_ii')).toBe(false);
+    const kazzix = spawnMob(sim, 'shardlord_kazzix', { x: 10, y: 0, z: 10 });
+    onMobKillCreditForDeeds(sim.ctx, kazzix, null, meta, [meta]);
+    updateDeeds(sim.ctx);
+    expect(meta.deedStats.visited.has('slain:shardlord_kazzix')).toBe(true);
+    expect(meta.deedsEarned.has('chr_peaks_rares_ii')).toBe(true);
+  });
+});
