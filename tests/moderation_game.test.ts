@@ -851,12 +851,12 @@ describe('moderator spectate integration', () => {
     expect(playSceneForPlayer(server.sim.ctx, second.pid, 'scn_test_spectate_switch_second')).toBe(
       true,
     );
-    expect(
-      startChoiceForPlayer(server.sim.ctx, first.pid, 'ch_test_spectate_switch_first'),
-    ).toBe(true);
-    expect(
-      startChoiceForPlayer(server.sim.ctx, second.pid, 'ch_test_spectate_switch_second'),
-    ).toBe(true);
+    expect(startChoiceForPlayer(server.sim.ctx, first.pid, 'ch_test_spectate_switch_first')).toBe(
+      true,
+    );
+    expect(startChoiceForPlayer(server.sim.ctx, second.pid, 'ch_test_spectate_switch_second')).toBe(
+      true,
+    );
     server.sim.tick();
     moderatorWs.send.mockClear();
 
