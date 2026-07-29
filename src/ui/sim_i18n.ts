@@ -76,6 +76,16 @@ const baseEnTable = {
   'log.mountTrainSuccess': "Marla takes the Valorsteed's reins. Well ridden.",
   'log.mountTrainLeftYard':
     'You leave the paddock and the lesson ends. Come back to Marla to try again.',
+  // Dev slash-command diagnostics (src/sim/dev_commands.ts). These are
+  // player-visible in the local/dev client, so the release-tier sim matcher owns
+  // exact and parameterized localization here instead of leaving blocked source.
+  'dev.noSeedKind': '[dev] Found no seed of that kind. Try again.',
+  'dev.godOnInvulnerable': '[dev] God mode ON (invulnerable).',
+  'dev.portalOpened':
+    '[dev] Opened a {tier}-rank portal to {zone} ({floors} floors, L{level}). Walk through it.',
+  'dev.seedNotInfernal': '[dev] Seed {seed} is not infernal; using {fallback}.',
+  'dev.smiteOff': '[dev] Smite mode OFF.',
+  'dev.smiteOn': '[dev] Smite mode ON (one-shot everything).',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',
@@ -7467,10 +7477,202 @@ const RIDING_RELEASE_FILL: Partial<
   },
 };
 
+const DEV_COMMAND_RELEASE_FILL: Partial<
+  Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>>
+> = {
+  es: {
+    'dev.noSeedKind': '[dev] No se encontró ninguna semilla de ese tipo. Inténtalo de nuevo.',
+    'dev.godOnInvulnerable': '[dev] Modo dios ACTIVADO (invulnerable).',
+    'dev.portalOpened':
+      '[dev] Se abrió un portal de rango {tier} a {zone} ({floors} pisos, N{level}). Crúzalo.',
+    'dev.seedNotInfernal': '[dev] La semilla {seed} no es infernal; usando {fallback}.',
+    'dev.smiteOff': '[dev] Modo smite DESACTIVADO.',
+    'dev.smiteOn': '[dev] Modo smite ACTIVADO (mata todo de un golpe).',
+  },
+  es_ES: {
+    'dev.noSeedKind': '[dev] No se encontró ninguna semilla de ese tipo. Inténtalo de nuevo.',
+    'dev.godOnInvulnerable': '[dev] Modo dios ACTIVADO (invulnerable).',
+    'dev.portalOpened':
+      '[dev] Se abrió un portal de rango {tier} a {zone} ({floors} pisos, N{level}). Crúzalo.',
+    'dev.seedNotInfernal': '[dev] La semilla {seed} no es infernal; usando {fallback}.',
+    'dev.smiteOff': '[dev] Modo smite DESACTIVADO.',
+    'dev.smiteOn': '[dev] Modo smite ACTIVADO (mata todo de un golpe).',
+  },
+  fr_FR: {
+    'dev.noSeedKind': "[dev] Aucune graine de ce type n'a été trouvée. Réessayez.",
+    'dev.godOnInvulnerable': '[dev] Mode dieu ACTIVÉ (invulnérable).',
+    'dev.portalOpened':
+      '[dev] Portail de rang {tier} ouvert vers {zone} ({floors} étages, N{level}). Traversez-le.',
+    'dev.seedNotInfernal': "[dev] La graine {seed} n'est pas infernale; utilisation de {fallback}.",
+    'dev.smiteOff': '[dev] Mode smite DÉSACTIVÉ.',
+    'dev.smiteOn': '[dev] Mode smite ACTIVÉ (abat tout en un coup).',
+  },
+  fr_CA: {
+    'dev.noSeedKind': "[dev] Aucune graine de ce type n'a été trouvée. Réessayez.",
+    'dev.godOnInvulnerable': '[dev] Mode dieu ACTIVÉ (invulnérable).',
+    'dev.portalOpened':
+      '[dev] Portail de rang {tier} ouvert vers {zone} ({floors} étages, N{level}). Traversez-le.',
+    'dev.seedNotInfernal': "[dev] La graine {seed} n'est pas infernale; utilisation de {fallback}.",
+    'dev.smiteOff': '[dev] Mode smite DÉSACTIVÉ.',
+    'dev.smiteOn': '[dev] Mode smite ACTIVÉ (abat tout en un coup).',
+  },
+  it_IT: {
+    'dev.noSeedKind': '[dev] Nessun seme di quel tipo trovato. Riprova.',
+    'dev.godOnInvulnerable': '[dev] Modalità dio ATTIVA (invulnerabile).',
+    'dev.portalOpened':
+      '[dev] Aperto un portale di rango {tier} verso {zone} ({floors} piani, L{level}). Attraversalo.',
+    'dev.seedNotInfernal': '[dev] Il seme {seed} non è infernale; uso {fallback}.',
+    'dev.smiteOff': '[dev] Modalità smite DISATTIVATA.',
+    'dev.smiteOn': '[dev] Modalità smite ATTIVA (abbatte tutto con un colpo).',
+  },
+  de_DE: {
+    'dev.noSeedKind': '[dev] Kein Seed dieser Art gefunden. Versuche es erneut.',
+    'dev.godOnInvulnerable': '[dev] Gottmodus EIN (unverwundbar).',
+    'dev.portalOpened':
+      '[dev] Ein Portal des Rangs {tier} nach {zone} wurde geöffnet ({floors} Ebenen, L{level}). Geh hindurch.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} ist nicht infernal; verwende {fallback}.',
+    'dev.smiteOff': '[dev] Smite-Modus AUS.',
+    'dev.smiteOn': '[dev] Smite-Modus EIN (alles mit einem Treffer besiegen).',
+  },
+  zh_CN: {
+    'dev.noSeedKind': '[dev] 没有找到这种类型的种子。请重试。',
+    'dev.godOnInvulnerable': '[dev] 上帝模式开启（无敌）。',
+    'dev.portalOpened':
+      '[dev] 已开启通往 {zone} 的 {tier} 级传送门（{floors} 层，L{level}）。穿过去。',
+    'dev.seedNotInfernal': '[dev] 种子 {seed} 不是炼狱类型；改用 {fallback}。',
+    'dev.smiteOff': '[dev] 惩戒模式关闭。',
+    'dev.smiteOn': '[dev] 惩戒模式开启（一击击倒一切）。',
+  },
+  zh_TW: {
+    'dev.noSeedKind': '[dev] 找不到這種類型的種子。請重試。',
+    'dev.godOnInvulnerable': '[dev] 上帝模式開啟（無敵）。',
+    'dev.portalOpened':
+      '[dev] 已開啟通往 {zone} 的 {tier} 級傳送門（{floors} 層，L{level}）。穿過去。',
+    'dev.seedNotInfernal': '[dev] 種子 {seed} 不是煉獄類型；改用 {fallback}。',
+    'dev.smiteOff': '[dev] 懲戒模式關閉。',
+    'dev.smiteOn': '[dev] 懲戒模式開啟（一擊擊倒一切）。',
+  },
+  ko_KR: {
+    'dev.noSeedKind': '[dev] 해당 종류의 시드를 찾지 못했습니다. 다시 시도하세요.',
+    'dev.godOnInvulnerable': '[dev] 신 모드 켜짐(무적).',
+    'dev.portalOpened':
+      '[dev] {zone}로 가는 {tier} 등급 포털을 열었습니다({floors}층, L{level}). 통과하세요.',
+    'dev.seedNotInfernal': '[dev] 시드 {seed}는 지옥형이 아닙니다. {fallback}을 사용합니다.',
+    'dev.smiteOff': '[dev] 강타 모드 꺼짐.',
+    'dev.smiteOn': '[dev] 강타 모드 켜짐(모든 것을 한 방에 처치).',
+  },
+  ja_JP: {
+    'dev.noSeedKind': '[dev] その種類のシードは見つかりませんでした。もう一度試してください。',
+    'dev.godOnInvulnerable': '[dev] 神モード オン（無敵）。',
+    'dev.portalOpened':
+      '[dev] {zone} への {tier} ランクのポータルを開きました（{floors}階、L{level}）。通り抜けてください。',
+    'dev.seedNotInfernal':
+      '[dev] シード {seed} はインファーナルではありません。{fallback} を使用します。',
+    'dev.smiteOff': '[dev] スマイトモード オフ。',
+    'dev.smiteOn': '[dev] スマイトモード オン（一撃で全てを倒す）。',
+  },
+  pt_BR: {
+    'dev.noSeedKind': '[dev] Nenhuma semente desse tipo foi encontrada. Tente novamente.',
+    'dev.godOnInvulnerable': '[dev] Modo deus ATIVADO (invulnerável).',
+    'dev.portalOpened':
+      '[dev] Portal de ranque {tier} aberto para {zone} ({floors} andares, N{level}). Atravesse-o.',
+    'dev.seedNotInfernal': '[dev] A semente {seed} não é infernal; usando {fallback}.',
+    'dev.smiteOff': '[dev] Modo smite DESATIVADO.',
+    'dev.smiteOn': '[dev] Modo smite ATIVADO (derruba tudo com um golpe).',
+  },
+  ru_RU: {
+    'dev.noSeedKind': '[dev] Семя такого типа не найдено. Попробуйте снова.',
+    'dev.godOnInvulnerable': '[dev] Режим бога ВКЛ (неуязвимость).',
+    'dev.portalOpened':
+      '[dev] Открыт портал ранга {tier} в {zone} ({floors} этажей, L{level}). Пройдите через него.',
+    'dev.seedNotInfernal': '[dev] Семя {seed} не инфернальное; используется {fallback}.',
+    'dev.smiteOff': '[dev] Режим smite ВЫКЛ.',
+    'dev.smiteOn': '[dev] Режим smite ВКЛ (все погибает от одного удара).',
+  },
+  cs_CZ: {
+    'dev.noSeedKind': '[dev] Nebyl nalezen žádný seed tohoto typu. Zkuste to znovu.',
+    'dev.godOnInvulnerable': '[dev] Božský režim ZAPNUT (nezranitelnost).',
+    'dev.portalOpened':
+      '[dev] Otevřen portál hodnosti {tier} do {zone} ({floors} pater, L{level}). Projděte jím.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} není infernální; používá se {fallback}.',
+    'dev.smiteOff': '[dev] Režim smite VYPNUT.',
+    'dev.smiteOn': '[dev] Režim smite ZAPNUT (vše padne jednou ranou).',
+  },
+  nl_NL: {
+    'dev.noSeedKind': '[dev] Geen seed van dat type gevonden. Probeer opnieuw.',
+    'dev.godOnInvulnerable': '[dev] Godmodus AAN (onkwetsbaar).',
+    'dev.portalOpened':
+      '[dev] Een portaal van rang {tier} naar {zone} geopend ({floors} verdiepingen, L{level}). Loop erdoorheen.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} is niet infernaal; {fallback} wordt gebruikt.',
+    'dev.smiteOff': '[dev] Smite-modus UIT.',
+    'dev.smiteOn': '[dev] Smite-modus AAN (alles in één klap uitschakelen).',
+  },
+  pl_PL: {
+    'dev.noSeedKind': '[dev] Nie znaleziono seeda tego typu. Spróbuj ponownie.',
+    'dev.godOnInvulnerable': '[dev] Tryb boga WŁĄCZONY (niezniszczalność).',
+    'dev.portalOpened':
+      '[dev] Otwarto portal rangi {tier} do {zone} ({floors} pięter, L{level}). Przejdź przez niego.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} nie jest infernalny; używam {fallback}.',
+    'dev.smiteOff': '[dev] Tryb smite WYŁĄCZONY.',
+    'dev.smiteOn': '[dev] Tryb smite WŁĄCZONY (wszystko ginie od jednego ciosu).',
+  },
+  id_ID: {
+    'dev.noSeedKind': '[dev] Tidak ada seed jenis itu yang ditemukan. Coba lagi.',
+    'dev.godOnInvulnerable': '[dev] Mode dewa AKTIF (kebal).',
+    'dev.portalOpened':
+      '[dev] Portal peringkat {tier} ke {zone} dibuka ({floors} lantai, L{level}). Masuklah.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} bukan infernal; memakai {fallback}.',
+    'dev.smiteOff': '[dev] Mode smite NONAKTIF.',
+    'dev.smiteOn': '[dev] Mode smite AKTIF (mengalahkan semuanya sekali pukul).',
+  },
+  tr_TR: {
+    'dev.noSeedKind': '[dev] Bu türde bir seed bulunamadı. Tekrar deneyin.',
+    'dev.godOnInvulnerable': '[dev] Tanrı modu AÇIK (yenilmez).',
+    'dev.portalOpened':
+      '[dev] {zone} için {tier} rütbeli bir portal açıldı ({floors} kat, L{level}). İçinden geç.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} infernal değil; {fallback} kullanılıyor.',
+    'dev.smiteOff': '[dev] Smite modu KAPALI.',
+    'dev.smiteOn': '[dev] Smite modu AÇIK (her şeyi tek vuruşta indirir).',
+  },
+  sv_SE: {
+    'dev.noSeedKind': '[dev] Inget seed av den typen hittades. Försök igen.',
+    'dev.godOnInvulnerable': '[dev] Gudläge PÅ (osårbar).',
+    'dev.portalOpened':
+      '[dev] En portal av rang {tier} till {zone} öppnades ({floors} våningar, L{level}). Gå igenom den.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} är inte infernaliskt; använder {fallback}.',
+    'dev.smiteOff': '[dev] Smite-läge AV.',
+    'dev.smiteOn': '[dev] Smite-läge PÅ (fäller allt med ett slag).',
+  },
+  vi_VN: {
+    'dev.noSeedKind': '[dev] Không tìm thấy seed thuộc loại đó. Hãy thử lại.',
+    'dev.godOnInvulnerable': '[dev] Chế độ thần BẬT (bất khả xâm phạm).',
+    'dev.portalOpened':
+      '[dev] Đã mở cổng hạng {tier} tới {zone} ({floors} tầng, L{level}). Hãy đi qua.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} không phải infernal; dùng {fallback}.',
+    'dev.smiteOff': '[dev] Chế độ smite TẮT.',
+    'dev.smiteOn': '[dev] Chế độ smite BẬT (hạ mọi thứ bằng một đòn).',
+  },
+  da_DK: {
+    'dev.noSeedKind': '[dev] Ingen seed af den type blev fundet. Prøv igen.',
+    'dev.godOnInvulnerable': '[dev] Gudetilstand TIL (usårlig).',
+    'dev.portalOpened':
+      '[dev] En portal af rang {tier} til {zone} blev åbnet ({floors} etager, L{level}). Gå igennem den.',
+    'dev.seedNotInfernal': '[dev] Seed {seed} er ikke infernalsk; bruger {fallback}.',
+    'dev.smiteOff': '[dev] Smite-tilstand FRA.',
+    'dev.smiteOn': '[dev] Smite-tilstand TIL (nedlægger alt med ét slag).',
+  },
+};
+
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
-    { ...baseEnTable, ...BASE_DICT[lang], ...RIDING_RELEASE_FILL[lang], ...PET_DICT[lang] },
+    {
+      ...baseEnTable,
+      ...BASE_DICT[lang],
+      ...RIDING_RELEASE_FILL[lang],
+      ...DEV_COMMAND_RELEASE_FILL[lang],
+      ...PET_DICT[lang],
+    },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
@@ -8802,6 +9004,14 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  {
+    re: /^\[dev\] Opened a (.+)-rank portal to (.+) \((\d+) floors, L(\d+)\)\. Walk through it\.$/,
+    build: (m) => tSim('dev.portalOpened', { tier: m[1], zone: m[2], floors: m[3], level: m[4] }),
+  },
+  {
+    re: /^\[dev\] Seed (.+) is not infernal; using (.+)\.$/,
+    build: (m) => tSim('dev.seedNotInfernal', { seed: m[1], fallback: m[2] }),
+  },
   // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
   {
     re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
