@@ -20,7 +20,22 @@ import { type Aura, dist2d, type Entity } from '../types';
 // Players within this many yards of the dead boss's spawn get the wing cleared.
 // Matches NYTHRAXIS_ROOM_RADIUS: large enough to cover the interior, small enough
 // not to bleed into an adjacent instance's origin.
-const UNDERMOUNT_ROOM_RADIUS = 260;
+export const UNDERMOUNT_ROOM_RADIUS = 260;
+
+// Wing 2, Odrenn the Temperer: the section-1 design constants from the
+// handoff (docs/prd/furnace-lair-raid-handoff.md), all (tuning), locked for
+// PBE. Consumed by encounters/odrenn.ts and its tests.
+export const ODRENN_MARK_BURN_RADIUS = 12; // mixed-mark burn range, steady never bursty
+export const ODRENN_MARK_BURN_DPS = 12; // each of a mixed pair, per second
+export const ODRENN_ARC_RADIUS = 8; // Cinder Arc chain jump range
+export const ODRENN_ARC_CADENCE_S = 20;
+export const ODRENN_ARC_BASE_DMG = 40; // first jump; grows per jump
+export const ODRENN_ARC_GROWTH = 1.4; // damage multiplier per jump
+export const ODRENN_LATTICE_MIN = 9; // taught spacing: 9 to 11 yd lattice
+export const ODRENN_LATTICE_MAX = 11;
+export const ODRENN_HYSTERESIS_YD = 2; // keep-your-mark band astride the centerline
+export const ODRENN_ENRAGE_STACK_CADENCE_S = 45; // permanent stacking haste self-buff
+export const ODRENN_ENRAGE_HASTE_PER_STACK = 0.06; // +6% attack speed per Tempering stack
 
 // Kiln Fury: the surviving keeper of a duo frenzies when its partner falls (the
 // kill-together tension). The engine's packFrenzy only buffs SAME-templateId

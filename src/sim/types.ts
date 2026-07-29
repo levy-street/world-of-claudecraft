@@ -1857,6 +1857,7 @@ export interface Entity {
   slowImmune?: boolean;
   healedThisPull: boolean; // desperation self-heal already used this pull
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
+  odrenn?: import('./encounters/odrenn').OdrennEncounterState; // sim-only state, Undermount wing 2
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)

@@ -464,6 +464,8 @@ export interface SimContextCallbacks {
   updateBossMechanics(mob: Entity): void;
   updateNythraxisEncounter(boss: Entity): void;
   resetNythraxisEncounter(boss: Entity): void;
+  updateOdrennEncounter(boss: Entity): void;
+  resetOdrennEncounter(boss: Entity): void;
   despawnSummonedAdds(boss: Entity): void;
   updateFearMovement(e: Entity): boolean;
   delveDetectMult(player: Entity): number;
@@ -953,6 +955,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     updateBossMechanics: host.updateBossMechanics,
     updateNythraxisEncounter: host.updateNythraxisEncounter,
     resetNythraxisEncounter: host.resetNythraxisEncounter,
+    updateOdrennEncounter: host.updateOdrennEncounter,
+    resetOdrennEncounter: host.resetOdrennEncounter,
     despawnSummonedAdds: host.despawnSummonedAdds,
     updateFearMovement: host.updateFearMovement,
     delveDetectMult: host.delveDetectMult,

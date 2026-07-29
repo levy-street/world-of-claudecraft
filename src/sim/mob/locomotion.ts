@@ -186,6 +186,14 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   if (!mob.hostile) mob.hostile = true;
 
   const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
+  // Undermount wing 2: Odrenn runs his per-tick script while in combat and
+  // resets on leaving it (marks stripped, timers cleared), the Nythraxis
+  // dispatch pattern. Template id literal to avoid an import cycle; pinned by
+  // tests/odrenn.test.ts.
+  if (mob.templateId === 'odrenn_the_temperer') {
+    if (mob.inCombat) ctx.updateOdrennEncounter(mob);
+    else if (mob.odrenn) ctx.resetOdrennEncounter(mob);
+  }
   if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
     const nythraxisScriptLocked =
       isNythraxis &&

@@ -591,8 +591,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
-    // Wing 2, single boss. 48k effective (2.3x elite factor). Mechanics not yet
-    // authored: raid-scale stat block placeholder ahead of the wing-2 script.
+    // Wing 2, single boss. 48k effective (2.3x elite factor). The SORT script
+    // (geography marks, mixed-mark burn, Cinder Arc, Tempering) lives in
+    // encounters/odrenn.ts; this template carries only the data-only texture.
     hpBase: 48000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 52,
@@ -601,6 +602,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 7,
     aggroRadius: 18,
+    cleave: { radius: 8, mult: 0.6, name: 'Temper Sweep' },
+    aoePulse: { min: 14, max: 20, radius: 30, every: 12, name: 'Forge Draft', school: 'fire' },
     loot: [],
     scale: 1.8,
     color: 0xbfa36a,

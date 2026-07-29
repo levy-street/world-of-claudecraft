@@ -118,6 +118,7 @@ import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
 import * as nythraxis from './encounters/nythraxis';
+import * as odrenn from './encounters/odrenn';
 import * as undermount from './encounters/undermount';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -2879,6 +2880,9 @@ export class Sim {
       // arrow (mob/locomotion.ts updateMob drives it via ctx). resetNythraxisEncounter
       // keeps its .bind delegate (foreign callers + a test reach sim.resetNythraxisEncounter).
       updateNythraxisEncounter: (boss) => nythraxis.updateNythraxisEncounter(sim.ctx, boss),
+      // Undermount wing 2 (same late-bound pattern; driven from mob/locomotion.ts).
+      updateOdrennEncounter: (boss) => odrenn.updateOdrennEncounter(sim.ctx, boss),
+      resetOdrennEncounter: (boss) => odrenn.resetOdrennEncounter(sim.ctx, boss),
       resetNythraxisEncounter: sim.resetNythraxisEncounter.bind(sim),
       updateFearMovement: sim.updateFearMovement.bind(sim),
       // M4 mob death lifecycle: the five execution bodies live in mob/lifecycle.ts;
